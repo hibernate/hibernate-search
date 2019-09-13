@@ -52,7 +52,7 @@ final class StubSearchQuery<H> extends AbstractSearchQuery<H, SearchResult<H>>
 	}
 
 	@Override
-	public SearchResult<H> fetch(Integer limit, Integer offset) {
+	public SearchResult<H> fetch(Integer offset, Integer limit) {
 		workBuilder.limit( limit ).offset( offset );
 		return backend.getBehavior().executeSearchWork(
 				indexNames, workBuilder.build(), projectionContext, loadingContext, rootProjection

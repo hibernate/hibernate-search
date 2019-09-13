@@ -412,7 +412,7 @@ public class RangeAggregationSpecificsIT<F> {
 								.range( ascendingValues.get( 2 ), ascendingValues.get( 5 ) )
 								.range( ascendingValues.get( 5 ), null )
 						)
-						.fetch( 4, 3 )
+						.fetch( 3, 4 )
 		)
 				.aggregation(
 						aggregationKey,

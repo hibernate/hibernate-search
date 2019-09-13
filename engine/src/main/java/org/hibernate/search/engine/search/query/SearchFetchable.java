@@ -34,14 +34,14 @@ public interface SearchFetchable<H> {
 	 * Execute the query and return the {@link SearchResult},
 	 * skipping {@code offset} hits and limiting to {@code limit} hits.
 	 *
-	 * @param limit The maximum number of hits to be included in the {@link SearchResult}. {@code null} means no limit.
 	 * @param offset The number of hits to skip before adding the hits to the {@link SearchResult}. {@code null} means no offset.
+	 * @param limit The maximum number of hits to be included in the {@link SearchResult}. {@code null} means no limit.
 	 * @return The {@link SearchResult}.
 	 * @throws SearchException If something goes wrong while executing the query.
 	 * @throws RuntimeException If something goes wrong while loading entities. The exact type depends on the mapper,
 	 * e.g. HibernateException/PersistenceException for the Hibernate ORM mapper.
 	 */
-	SearchResult<H> fetch(Integer limit, Integer offset);
+	SearchResult<H> fetch(Integer offset, Integer limit);
 
 	/**
 	 * Execute the query and return the hits as a {@link List},
@@ -59,14 +59,14 @@ public interface SearchFetchable<H> {
 	 * Execute the query and return the hits as a {@link List},
 	 * skipping {@code offset} hits and limiting to {@code limit} hits.
 	 *
-	 * @param limit The maximum number of hits to be returned by this method. {@code null} means no limit.
 	 * @param offset The number of hits to skip. {@code null} means no offset.
+	 * @param limit The maximum number of hits to be returned by this method. {@code null} means no limit.
 	 * @return The query hits.
 	 * @throws SearchException If something goes wrong while executing the query.
 	 * @throws RuntimeException If something goes wrong while loading entities. The exact type depends on the mapper,
 	 * e.g. HibernateException/PersistenceException for the Hibernate ORM mapper.
 	 */
-	List<H> fetchHits(Integer limit, Integer offset);
+	List<H> fetchHits(Integer offset, Integer limit);
 
 	/**
 	 * Execute the query and return the hits as a single, optional element.

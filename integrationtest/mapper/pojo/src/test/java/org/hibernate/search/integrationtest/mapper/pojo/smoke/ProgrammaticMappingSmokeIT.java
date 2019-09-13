@@ -435,7 +435,7 @@ public class ProgrammaticMappingSmokeIT {
 			);
 
 
-			SearchResult<EntityReference> result = query.fetch( 2, 3 );
+			SearchResult<EntityReference> result = query.fetch( 3, 2 );
 			assertThat( result.getHits() )
 					.containsExactly(
 							new EntityReferenceImpl( IndexedEntity.class, 0 ),
@@ -469,7 +469,7 @@ public class ProgrammaticMappingSmokeIT {
 					)
 			);
 
-			SearchResult<String> result = query.fetch( 2, 3 );
+			SearchResult<String> result = query.fetch( 3, 2 );
 			assertThat( result.getHits() )
 					.containsExactly(
 							"text1",

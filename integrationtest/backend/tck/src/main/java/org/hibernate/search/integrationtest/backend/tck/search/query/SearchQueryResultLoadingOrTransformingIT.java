@@ -446,7 +446,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 		assertEquals( 2L, query.fetchTotalHitCount() );
 
-		query.fetch( 1, 0 );
+		query.fetch( 0, 1 );
 
 		assertEquals( 2L, query.fetchTotalHitCount() );
 	}

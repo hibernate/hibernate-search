@@ -90,7 +90,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	}
 
 	@Override
-	public ElasticsearchSearchResult<H> fetch(Integer limit, Integer offset) {
+	public ElasticsearchSearchResult<H> fetch(Integer offset, Integer limit) {
 		// TODO restore scrolling support. See HSEARCH-3323
 		ElasticsearchWork<ElasticsearchLoadableSearchResult<H>> work = workFactory.search( payload, searchResultExtractor )
 				.indexes( searchContext.getIndexNames() )

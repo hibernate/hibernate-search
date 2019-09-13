@@ -19,7 +19,7 @@ public interface ExtendedSearchFetchable<H, R extends SearchResult<H>> extends S
 	R fetch(Integer limit);
 
 	@Override
-	R fetch(Integer limit, Integer offset);
+	R fetch(Integer offset, Integer limit);
 
 	@Override
 	R fetchAll();

@@ -45,8 +45,8 @@ public abstract class AbstractExtendedSearchQueryOptionsStep<
 	}
 
 	@Override
-	public R fetch(Integer limit, Integer offset) {
-		return toQuery().fetch( limit, offset );
+	public R fetch(Integer offset, Integer limit) {
+		return toQuery().fetch( offset, limit );
 	}
 
 }

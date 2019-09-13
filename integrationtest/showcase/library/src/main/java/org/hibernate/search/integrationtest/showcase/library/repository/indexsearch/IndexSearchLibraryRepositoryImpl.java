@@ -37,7 +37,7 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 				.sort( f -> f.field( "collectionSize" ).desc()
 						.then().field( "name_sort" )
 				)
-				.fetchHits( limit, offset );
+				.fetchHits( offset, limit );
 	}
 
 	@Override
@@ -81,7 +81,7 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 						.orderByTermAscending()
 						.minDocumentCount( 0 )
 				)
-				.fetch( limit, offset );
+				.fetch( offset, limit );
 		return new LibraryFacetedSearchResult(
 				result.getTotalHitCount(), result.getHits(),
 				result.getAggregation( aggByCollectionSizekey ),

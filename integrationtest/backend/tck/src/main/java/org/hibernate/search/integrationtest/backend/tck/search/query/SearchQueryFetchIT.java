@@ -102,8 +102,8 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetch_limitAndOffset() {
-		assertThat( matchAllQuery().fetch( null, 1 ) )
+	public void fetch_offset_limit() {
+		assertThat( matchAllQuery().fetch( 1, null ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 1; i < DOCUMENT_COUNT; i++ ) {
@@ -115,7 +115,7 @@ public class SearchQueryFetchIT {
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( INDEX_NAME, docId( 1 ) );
 
-		assertThat( matchAllQuery().fetch( 2, null ) )
+		assertThat( matchAllQuery().fetch( null, 2 ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( INDEX_NAME, docId( 0 ), docId( 1 ) );
 
@@ -128,7 +128,7 @@ public class SearchQueryFetchIT {
 				} );
 
 		// Fetch beyond the total hit count
-		assertThat( matchAllQuery().fetch( null, DOCUMENT_COUNT + 1 ) )
+		assertThat( matchAllQuery().fetch( DOCUMENT_COUNT + 1, null ) )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasNoHits();
 	}
@@ -167,8 +167,8 @@ public class SearchQueryFetchIT {
 	}
 
 	@Test
-	public void fetchHits_limitAndOffset() {
-		assertThat( matchAllQuery().fetchHits( null, 1 ) )
+	public void fetchHits_offset_limit() {
+		assertThat( matchAllQuery().fetchHits( 1, null ) )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 1; i < DOCUMENT_COUNT; i++ ) {
 						builder.doc( INDEX_NAME, docId( i ) );
@@ -178,7 +178,7 @@ public class SearchQueryFetchIT {
 		assertThat( matchAllQuery().fetchHits( 1, 1 ) )
 				.hasDocRefHitsExactOrder( INDEX_NAME, docId( 1 ) );
 
-		assertThat( matchAllQuery().fetchHits( 2, null ) )
+		assertThat( matchAllQuery().fetchHits( null, 2 ) )
 				.hasDocRefHitsExactOrder( INDEX_NAME, docId( 0 ), docId( 1 ) );
 
 		assertThat( matchAllQuery().fetchHits( null, null ) )
@@ -189,7 +189,7 @@ public class SearchQueryFetchIT {
 				} );
 
 		// Fetch beyond the total hit count
-		assertThat( matchAllQuery().fetchHits( null, DOCUMENT_COUNT + 1 ) )
+		assertThat( matchAllQuery().fetchHits( DOCUMENT_COUNT + 1, null ) )
 				.isEmpty();
 	}
 
@@ -220,7 +220,7 @@ public class SearchQueryFetchIT {
 	@Test
 	public void fetch_limitAndOffset_reuseQuery() {
 		SearchQuery<DocumentReference> query = matchAllQuery().toQuery();
-		assertThat( query.fetch( null, 1 ) ).fromQuery( query )
+		assertThat( query.fetch( 1, null ) ).fromQuery( query )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( builder -> {
 					for ( int i = 1; i < DOCUMENT_COUNT; i++ ) {
@@ -232,7 +232,7 @@ public class SearchQueryFetchIT {
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( INDEX_NAME, docId( 1 ) );
 
-		assertThat( query.fetch( 2, null ) ).fromQuery( query )
+		assertThat( query.fetch( null, 2 ) ).fromQuery( query )
 				.hasTotalHitCount( DOCUMENT_COUNT )
 				.hasDocRefHitsExactOrder( INDEX_NAME, docId( 0 ), docId( 1 ) );
 
