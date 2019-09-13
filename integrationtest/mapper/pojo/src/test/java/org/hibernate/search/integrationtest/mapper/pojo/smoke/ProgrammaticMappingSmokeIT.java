@@ -521,7 +521,7 @@ public class ProgrammaticMappingSmokeIT {
 					)
 			);
 
-			SearchResult<List<?>> result = query.fetch();
+			SearchResult<List<?>> result = query.fetchAll();
 			assertThat( result.getHits() )
 					.containsExactly(
 							Arrays.asList(

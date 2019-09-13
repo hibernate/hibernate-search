@@ -255,7 +255,7 @@ public class PhraseSearchPredicateIT {
 				.predicate( f -> f.phrase().field( whitespaceAnalyzedField ).matching( "ONCE UPON" )
 						// we don't have any analyzer with that name
 						.analyzer( "this_name_does_actually_not_exist" ) )
-				.toQuery().fetch()
+				.toQuery().fetchAll()
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )

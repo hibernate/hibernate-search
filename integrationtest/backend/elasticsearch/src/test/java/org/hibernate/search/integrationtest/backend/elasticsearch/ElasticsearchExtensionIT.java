@@ -125,7 +125,7 @@ public class ElasticsearchExtensionIT {
 
 		// Put the query and result into variables to check they have the right type
 		ElasticsearchSearchQuery<DocumentReference> query = context4.toQuery();
-		ElasticsearchSearchResult<DocumentReference> result = query.fetch();
+		ElasticsearchSearchResult<DocumentReference> result = query.fetchAll();
 
 		assertThat( result ).fromQuery( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID )
@@ -156,7 +156,7 @@ public class ElasticsearchExtensionIT {
 
 		// Put the query and result into variables to check they have the right type
 		ElasticsearchSearchQuery<DocumentReference> query = genericQuery.extension( ElasticsearchExtension.get() );
-		ElasticsearchSearchResult<DocumentReference> result = query.fetch();
+		ElasticsearchSearchResult<DocumentReference> result = query.fetchAll();
 		assertThat( result ).fromQuery( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID )
 				.hasTotalHitCount( 6 );
@@ -449,7 +449,7 @@ public class ElasticsearchExtensionIT {
 				.predicate( f -> f.id().matching( FIFTH_ID ) )
 				.toQuery();
 
-		List<String> result = query.fetch().getHits();
+		List<String> result = query.fetchAll().getHits();
 		Assertions.assertThat( result ).hasSize( 1 );
 		JSONAssert.assertEquals(
 				"{"
@@ -483,7 +483,7 @@ public class ElasticsearchExtensionIT {
 				.predicate( f -> f.id().matching( FIFTH_ID ) )
 				.toQuery();
 
-		List<String> result = query.fetch().getHits().stream()
+		List<String> result = query.fetchAll().getHits().stream()
 				.map( list -> (String) list.get( 0 ) )
 				.collect( Collectors.toList() );
 		Assertions.assertThat( result ).hasSize( 1 );
@@ -510,7 +510,7 @@ public class ElasticsearchExtensionIT {
 				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
-		List<String> result = query.fetch().getHits();
+		List<String> result = query.fetchAll().getHits();
 		Assertions.assertThat( result ).hasSize( 1 );
 		Assertions.assertThat( result.get( 0 ) )
 				.asString()

@@ -116,7 +116,7 @@ public class LuceneFieldAttributesIT {
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 
-		List<Document> result = query.fetch().getHits();
+		List<Document> result = query.fetchAll().getHits();
 
 		Assertions.assertThat( result ).hasSize( 1 );
 		return result.get( 0 );

@@ -241,7 +241,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				.sort( f -> f.score().desc() )
 				.toQuery();
 
-		SearchResult<Float> result = query.fetch();
+		SearchResult<Float> result = query.fetchAll();
 		assertThat( result ).hasTotalHitCount( 2 );
 
 		Float score1 = result.getHits().get( 0 );
@@ -266,7 +266,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				.sort( f -> f.indexOrder() )
 				.toQuery();
 
-		SearchResult<Float> result = query.fetch();
+		SearchResult<Float> result = query.fetchAll();
 		assertThat( result ).hasTotalHitCount( 2 );
 
 		Float score1 = result.getHits().get( 0 );

@@ -77,7 +77,7 @@ public class GeoPointBindingMultipleIT {
 							.must( f.spatial().within().onField( "placeOfDeath" )
 									.circle( 40.6500000, -73.9800000, 50, DistanceUnit.KILOMETERS ) )
 					)
-					.fetchHits();
+					.fetchAllHits();
 			assertThat( result ).hasSize( 1 );
 		} );
 	}

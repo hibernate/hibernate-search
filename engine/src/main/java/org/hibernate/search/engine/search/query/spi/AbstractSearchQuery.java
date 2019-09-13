@@ -31,7 +31,7 @@ public abstract class AbstractSearchQuery<H, R extends SearchResult<H>> implemen
 	}
 
 	@Override
-	public R fetch() {
+	public R fetchAll() {
 		return fetch( null, null );
 	}
 
@@ -44,7 +44,7 @@ public abstract class AbstractSearchQuery<H, R extends SearchResult<H>> implemen
 	public abstract R fetch(Integer limit, Integer offset);
 
 	@Override
-	public List<H> fetchHits() {
+	public List<H> fetchAllHits() {
 		return fetchHits( null, null );
 	}
 

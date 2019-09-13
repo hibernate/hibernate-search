@@ -135,7 +135,7 @@ public class LuceneExtensionIT {
 
 		// Put the query and result into variables to check they have the right type
 		LuceneSearchQuery<DocumentReference> query = context4.toQuery();
-		LuceneSearchResult<DocumentReference> result = query.fetch();
+		LuceneSearchResult<DocumentReference> result = query.fetchAll();
 
 		assertThat( result ).fromQuery( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID )
@@ -166,7 +166,7 @@ public class LuceneExtensionIT {
 
 		// Put the query and result into variables to check they have the right type
 		LuceneSearchQuery<DocumentReference> query = genericQuery.extension( LuceneExtension.get() );
-		LuceneSearchResult<DocumentReference> result = query.fetch();
+		LuceneSearchResult<DocumentReference> result = query.fetchAll();
 		assertThat( result ).fromQuery( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID )
 				.hasTotalHitCount( 5 );
@@ -537,7 +537,7 @@ public class LuceneExtensionIT {
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 
-		List<Document> result = query.fetch().getHits();
+		List<Document> result = query.fetchAll().getHits();
 		Assertions.assertThat( result )
 				.hasSize( 5 )
 				.satisfies( containsDocument(
@@ -598,7 +598,7 @@ public class LuceneExtensionIT {
 				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
-		List<Document> result = query.fetch().getHits().stream()
+		List<Document> result = query.fetchAll().getHits().stream()
 				.map( list -> (Document) list.get( 0 ) )
 				.collect( Collectors.toList() );
 		Assertions.assertThat( result )
@@ -621,7 +621,7 @@ public class LuceneExtensionIT {
 				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
-		List<Explanation> result = query.fetch().getHits();
+		List<Explanation> result = query.fetchAll().getHits();
 		Assertions.assertThat( result ).hasSize( 1 );
 		Assertions.assertThat( result.get( 0 ) )
 				.isInstanceOf( Explanation.class )

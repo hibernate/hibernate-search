@@ -79,7 +79,7 @@ public class NestedDocumentDistanceProjectionIT {
 				.asProjection( f -> f.distance( "flattened.geoPoint", METRO_GARIBALDI ) )
 				.predicate( f -> f.matchAll() )
 				.sort( f -> f.field( "ordinal" ).desc() )
-				.fetchHits();
+				.fetchAllHits();
 
 		assertEquals( hits.size(), 3 );
 		checkResult( hits.get( 0 ), 164d, Offset.offset( 10d ) );
@@ -94,7 +94,7 @@ public class NestedDocumentDistanceProjectionIT {
 				.asProjection( f -> f.distance( "nested.geoPoint", METRO_GARIBALDI ) )
 				.predicate( f -> f.matchAll() )
 				.sort( f -> f.field( "ordinal" ).desc() )
-				.fetchHits();
+				.fetchAllHits();
 
 		assertEquals( hits.size(), 3 );
 		checkResult( hits.get( 0 ), 164d, Offset.offset( 10d ) );

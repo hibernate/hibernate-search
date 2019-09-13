@@ -70,7 +70,7 @@ public class GeoPointBindingPropertyIT {
 			List<Author> result = searchSession.search( Author.class )
 					.predicate( f -> f.spatial().within().onField( "placeOfBirth" )
 							.circle( 53.970000, 32.150000, 50, DistanceUnit.KILOMETERS ) )
-					.fetchHits();
+					.fetchAllHits();
 			assertThat( result ).hasSize( 1 );
 		} );
 	}

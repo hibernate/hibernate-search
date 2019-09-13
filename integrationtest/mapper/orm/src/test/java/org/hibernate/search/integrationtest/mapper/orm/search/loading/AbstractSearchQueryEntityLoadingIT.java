@@ -72,7 +72,7 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 					)
 			);
 
-			List<T> loadedEntities = query.fetchHits();
+			List<T> loadedEntities = query.fetchAllHits();
 
 			softAssertions.assertThat( loadedEntities )
 					.as(

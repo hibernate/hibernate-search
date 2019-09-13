@@ -16,12 +16,18 @@ package org.hibernate.search.engine.search.query;
 public interface ExtendedSearchFetchable<H, R extends SearchResult<H>> extends SearchFetchable<H> {
 
 	@Override
-	R fetch();
-
-	@Override
 	R fetch(Integer limit);
 
 	@Override
 	R fetch(Integer limit, Integer offset);
+
+	@Override
+	R fetchAll();
+
+	@Deprecated
+	@Override
+	default R fetch() {
+		return fetchAll();
+	}
 
 }

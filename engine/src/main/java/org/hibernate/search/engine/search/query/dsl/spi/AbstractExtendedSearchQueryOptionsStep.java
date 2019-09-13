@@ -35,8 +35,8 @@ public abstract class AbstractExtendedSearchQueryOptionsStep<
 	public abstract ExtendedSearchQuery<H, R> toQuery();
 
 	@Override
-	public R fetch() {
-		return toQuery().fetch();
+	public R fetchAll() {
+		return toQuery().fetchAll();
 	}
 
 	@Override
