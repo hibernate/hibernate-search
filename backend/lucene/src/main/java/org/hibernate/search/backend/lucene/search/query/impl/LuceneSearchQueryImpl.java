@@ -87,7 +87,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	}
 
 	@Override
-	public LuceneSearchResult<H> fetch(Integer limit, Integer offset) {
+	public LuceneSearchResult<H> fetch(Integer offset, Integer limit) {
 		LuceneReadWork<LuceneLoadableSearchResult<H>> work = workFactory.search( searcher, offset, limit );
 		return doSubmit( work )
 				/*

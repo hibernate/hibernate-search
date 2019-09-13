@@ -179,13 +179,13 @@ When displaying results on a web page,
 the user will be able to go to an arbitrary page and see the corresponding results,
 for example "results 151 to 170 of 14,265".
 
-Pagination is achieved in Hibernate Search by passing a limit and offset to the `fetch` or `fetchHits` method:
+Pagination is achieved in Hibernate Search by passing an offset and a limit to the `fetch` or `fetchHits` method:
 
-* The limit defines the maximum number of hits to return, i.e. the page size.
 * The offset defines the number of documents that should be skipped because they were displayed in previous pages.
 It is a *number of documents*, not a number of pages,
 so you will usually want to compute it from the page number and page size this way:
 `offset = zero-based-page-number * page-size`.
+* The limit defines the maximum number of hits to return, i.e. the page size.
 
 .Pagination retrieving a `SearchResult`
 ====
@@ -193,7 +193,7 @@ so you will usually want to compute it from the page number and page size this w
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-pagination-searchResult]
 ----
-<1> Set the limit to `20` and the offset to `40`.
+<1> Set the offset to `40` and the limit to `20`.
 ====
 
 .Pagination retrieving hits directly
@@ -202,7 +202,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-pagination-hits]
 ----
-<1> Set the limit to `20` and the offset to `40`.
+<1> Set the offset to `40` and the limit to `20`.
 ====
 
 [[search-dsl-query-fetching-results-scrolling]]

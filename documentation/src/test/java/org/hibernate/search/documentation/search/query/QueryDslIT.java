@@ -198,7 +198,7 @@ public class QueryDslIT {
 			// tag::fetching-pagination-searchResult[]
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.predicate( f -> f.matchAll() )
-					.fetch( 20, 40 ); // <1>
+					.fetch( 40, 20 ); // <1>
 			// end::fetching-pagination-searchResult[]
 			long totalHitCount = result.getTotalHitCount();
 			List<Book> hits = result.getHits();
@@ -212,7 +212,7 @@ public class QueryDslIT {
 			// tag::fetching-pagination-hits[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.matchAll() )
-					.fetchHits( 20, 40 ); // <1>
+					.fetchHits( 40, 20 ); // <1>
 			// end::fetching-pagination-hits[]
 
 			assertThat( hits ).isEmpty();

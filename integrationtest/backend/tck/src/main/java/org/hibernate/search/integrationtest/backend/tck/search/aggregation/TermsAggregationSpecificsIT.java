@@ -207,7 +207,7 @@ public class TermsAggregationSpecificsIT<F> {
 		SearchResultAssert.assertThat(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, typeDescriptor.getJavaType() ) )
-						.fetch( 4, 3 )
+						.fetch( 3, 4 )
 		)
 				.aggregation(
 						aggregationKey,

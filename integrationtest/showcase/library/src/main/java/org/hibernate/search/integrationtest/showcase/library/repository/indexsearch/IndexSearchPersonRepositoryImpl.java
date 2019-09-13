@@ -46,14 +46,14 @@ public class IndexSearchPersonRepositoryImpl implements IndexSearchPersonReposit
 				.sort( f -> f.field( "lastName_sort" )
 						.then().field( "firstName_sort" )
 				)
-				.fetchHits( limit, offset );
+				.fetchHits( offset, limit );
 	}
 
 	private List<Person> listTopBorrowers(String borrowalsCountField, int limit, int offset) {
 		return Search.session( entityManager ).search( Person.class )
 				.predicate( f -> f.matchAll() )
 				.sort( f -> f.field( borrowalsCountField ).desc() )
-				.fetchHits( limit, offset );
+				.fetchHits( offset, limit );
 	}
 
 }

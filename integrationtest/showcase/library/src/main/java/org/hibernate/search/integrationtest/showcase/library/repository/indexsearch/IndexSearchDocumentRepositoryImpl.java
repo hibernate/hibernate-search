@@ -74,7 +74,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 					);
 				} ) )
 				.sort( b -> b.field( "title_sort" ) )
-				.fetchHits( limit, offset );
+				.fetchHits( offset, limit );
 	}
 
 	@Override
@@ -135,7 +135,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 					}
 					b.add( f.score() );
 				} ) )
-				.fetchHits( limit, offset );
+				.fetchHits( offset, limit );
 	}
 
 	@Override

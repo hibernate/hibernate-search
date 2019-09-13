@@ -135,8 +135,8 @@ public abstract class AbstractSearchQueryOptionsStep<
 	}
 
 	@Override
-	public SearchResult<H> fetch(Integer limit, Integer offset) {
-		return toQuery().fetch( limit, offset );
+	public SearchResult<H> fetch(Integer offset, Integer limit) {
+		return toQuery().fetch( offset, limit );
 	}
 
 	@Override
@@ -150,8 +150,8 @@ public abstract class AbstractSearchQueryOptionsStep<
 	}
 
 	@Override
-	public List<H> fetchHits(Integer limit, Integer offset) {
-		return toQuery().fetchHits( limit, offset );
+	public List<H> fetchHits(Integer offset, Integer limit) {
+		return toQuery().fetchHits( offset, limit );
 	}
 
 	@Override

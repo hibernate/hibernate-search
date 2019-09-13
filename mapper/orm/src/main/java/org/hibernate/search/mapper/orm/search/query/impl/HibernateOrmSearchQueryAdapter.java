@@ -155,7 +155,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	protected List<R> doList() {
 		// TODO HSEARCH-3352 handle timeouts
 		// TODO HSEARCH-3093 apply the result transformer?
-		return delegate.fetchHits( maxResults, firstResult );
+		return delegate.fetchHits( firstResult, maxResults );
 	}
 
 	//-------------------------------------------------------------
