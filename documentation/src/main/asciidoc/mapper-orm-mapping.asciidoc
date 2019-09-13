@@ -1399,9 +1399,9 @@ https://github.com/hibernate/hibernate-search[Hibernate Search source code]:
 
 * `org.hibernate.search.integrationtest.showcase.library.bridge.ISBNBridge` implements `ValueBridge`.
 * `org.hibernate.search.integrationtest.showcase.library.bridge.MultiKeywordStringBridge` implements `PropertyBridge`.
-The corresponding annotation is `org.hibernate.search.integrationtest.showcase.library.bridge.annotation.MultiKeywordStringBridge`.
+The corresponding annotation is `org.hibernate.search.integrationtest.showcase.library.bridge.annotation.MultiKeywordStringBinding`.
 * `org.hibernate.search.integrationtest.showcase.library.bridge.AccountBorrowalSummaryBridge` implements `TypeBridge`.
-The corresponding annotation is `org.hibernate.search.integrationtest.showcase.library.bridge.annotation.AccountBorrowalSummaryBridge`.
+The corresponding annotation is `org.hibernate.search.integrationtest.showcase.library.bridge.annotation.AccountBorrowalSummaryBinding`.
 
 [[mapper-orm-bridge-valuebridge]]
 === Value bridges
