@@ -4,12 +4,12 @@
 This section will guide you through the initial steps required
 to integrate Hibernate Search into your application.
 
-[WARNING]
+[NOTE]
 ====
-Hibernate Search {hibernateSearchVersion} is a *technology preview* and is *not ready for production*.
+Hibernate Search {hibernateSearchVersion} is currently a *technology preview*.
 
-Use it to have a sneak peak at the APIs, make suggestions or warn us of what you consider blocking early so we can fix it,
-but *do not* use it to address business needs!
+If you encounter problems, be sure to https://hibernate.atlassian.net/browse/HSEARCH[report them]:
+new preview versions are released regularly.
 
 Read http://hibernate.org/search/releases/6.0/#preview-status[the dedicated page on our website]
 for more detailed and up-to-date information.
