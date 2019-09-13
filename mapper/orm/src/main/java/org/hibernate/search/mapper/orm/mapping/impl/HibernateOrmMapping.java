@@ -15,6 +15,7 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
@@ -172,6 +173,11 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	@Override
 	public HibernateOrmScopeSessionContext getSessionContext(EntityManager entityManager) {
 		return HibernateOrmSearchSession.get( this, HibernateOrmUtils.toSessionImplementor( entityManager ) );
+	}
+
+	@Override
+	public DetachedBackendSessionContext getDetachedBackendSessionContext(String tenantId) {
+		return DetachedBackendSessionContext.of( backendMappingContext, tenantId );
 	}
 
 	@Override

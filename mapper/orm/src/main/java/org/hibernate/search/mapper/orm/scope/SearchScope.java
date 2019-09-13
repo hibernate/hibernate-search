@@ -108,20 +108,48 @@ public interface SearchScope<E> {
 
 	/**
 	 * Create a {@link SearchWriter} for the indexes mapped to types in this scope, or to any of their sub-types.
+	 * <p>
+	 * This method only works for single-tenant applications.
+	 * If multi-tenancy is enabled, use {@link #writer(String)} instead.
 	 *
-	 * @param entityManager The Hibernate ORM {@link EntityManager} or {@link org.hibernate.Session}.
 	 * @return A {@link SearchWriter}.
 	 */
-	SearchWriter writer(EntityManager entityManager);
+	SearchWriter writer();
+
+	/**
+	 * Create a {@link SearchWriter} for the indexes mapped to types in this scope, or to any of their sub-types.
+	 * <p>
+	 * This method only works for multi-tenant applications.
+	 * If multi-tenancy is disabled, use {@link #writer()} instead.
+	 *
+	 * @param tenantId The identifier of the tenant whose index content should be targeted.
+	 * @return A {@link SearchWriter}.
+	 */
+	SearchWriter writer(String tenantId);
 
 	/**
 	 * Create a {@link MassIndexer} for the indexes mapped to types in this scope, or to any of their sub-types.
 	 * <p>
+	 * This method only works for single-tenant applications.
+	 * If multi-tenancy is enabled, use {@link #massIndexer(String)} instead.
+	 * <p>
 	 * {@link MassIndexer} instances cannot be reused.
 	 *
-	 * @param entityManager The Hibernate ORM {@link EntityManager} or {@link org.hibernate.Session}.
 	 * @return A {@link MassIndexer}.
 	 */
-	MassIndexer massIndexer(EntityManager entityManager);
+	MassIndexer massIndexer();
+
+	/**
+	 * Create a {@link MassIndexer} for the indexes mapped to types in this scope, or to any of their sub-types.
+	 * <p>
+	 * This method only works for multi-tenant applications.
+	 * If multi-tenancy is disabled, use {@link #massIndexer()} instead.
+	 * <p>
+	 * {@link MassIndexer} instances cannot be reused.
+	 *
+	 * @param tenantId The identifier of the tenant whose index content should be targeted.
+	 * @return A {@link MassIndexer}.
+	 */
+	MassIndexer massIndexer(String tenantId);
 
 }

@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.scope.impl;
 
 import javax.persistence.EntityManager;
 
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.orm.massindexing.impl.HibernateOrmMassIndexingMappingContext;
 import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmLoadingMappingContext;
 
@@ -15,5 +16,7 @@ public interface HibernateOrmScopeMappingContext
 		extends HibernateOrmMassIndexingMappingContext, HibernateOrmLoadingMappingContext {
 
 	HibernateOrmScopeSessionContext getSessionContext(EntityManager entityManager);
+
+	DetachedBackendSessionContext getDetachedBackendSessionContext(String tenantId);
 
 }
