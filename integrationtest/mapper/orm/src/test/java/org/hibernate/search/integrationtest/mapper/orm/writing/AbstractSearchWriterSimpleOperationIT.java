@@ -160,6 +160,23 @@ public abstract class AbstractSearchWriterSimpleOperationIT {
 		assertThat( futureFromWriter ).isSuccessful();
 	}
 
+	@Test
+	public void fromMappingWithoutSession() {
+		SessionFactory sessionFactory = setup();
+
+		SearchWriter writer = Search.mapping( sessionFactory ).scope( IndexedEntity1.class ).writer();
+
+		CompletableFuture<Object> futureFromBackend = new CompletableFuture<>();
+		expectWork( backend1Mock, IndexedEntity1.INDEX_NAME, futureFromBackend );
+
+		CompletableFuture<?> futureFromWriter = executeAsync( writer );
+		backend1Mock.verifyExpectationsMet();
+		assertThat( futureFromWriter ).isPending();
+
+		futureFromBackend.complete( new Object() );
+		assertThat( futureFromWriter ).isSuccessful();
+	}
+
 	protected abstract void expectWork(BackendMock backendMock, String indexName, CompletableFuture<?> future);
 
 	protected abstract void executeSync(SearchWriter writer);
