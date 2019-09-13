@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -107,6 +108,48 @@ public class MassIndexingBaseIT {
 			}
 
 		} );
+
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void fromMappingWithoutSession() throws Exception {
+		SearchMapping searchMapping = Search.mapping( sessionFactory );
+		MassIndexer indexer = searchMapping.scope( Object.class ).massIndexer();
+
+		// add operations on indexes can follow any random order,
+		// since they are executed by different threads
+		backendMock.expectWorksAnyOrder(
+				Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+		)
+				.add( "1", b -> b
+						.field( "title", TITLE_1 )
+						.field( "author", AUTHOR_1 )
+				)
+				.add( "2", b -> b
+						.field( "title", TITLE_2 )
+						.field( "author", AUTHOR_2 )
+				)
+				.add( "3", b -> b
+						.field( "title", TITLE_3 )
+						.field( "author", AUTHOR_3 )
+				)
+				.preparedThenExecuted();
+
+		// purgeAtStart, optimizeAfterPurge and purgeAtStart flags are active by default,
+		// so we expect 1 purge, 2 optimize and 1 flush calls in this order:
+		backendMock.expectIndexScopeWorks( Book.INDEX )
+				.purge()
+				.optimize()
+				.optimize()
+				.flush();
+
+		try {
+			indexer.startAndWait();
+		}
+		catch (InterruptedException e) {
+			fail( "Unexpected InterruptedException: " + e.getMessage() );
+		}
 
 		backendMock.verifyExpectationsMet();
 	}
