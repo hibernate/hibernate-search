@@ -34,6 +34,13 @@ public final class DetachedBackendSessionContext {
 		);
 	}
 
+	public static DetachedBackendSessionContext of(BackendMappingContext mappingContext, String tenantIdentifier) {
+		return new DetachedBackendSessionContext(
+				mappingContext,
+				tenantIdentifier
+		);
+	}
+
 	private final BackendMappingContext mappingContext;
 
 	private final String tenantIdentifier;

@@ -124,12 +124,12 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public SearchWriter writer(Collection<? extends Class<?>> types) {
-		return createScope( types ).writer( this );
+		return createScope( types ).writer( DetachedBackendSessionContext.of( sessionContext ) );
 	}
 
 	@Override
 	public MassIndexer massIndexer(Collection<? extends Class<?>> types) {
-		return createScope( types ).massIndexer( this );
+		return createScope( types ).massIndexer( DetachedBackendSessionContext.of( sessionContext ) );
 	}
 
 	@Override
@@ -164,11 +164,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	@Override
 	public BackendSessionContext getBackendSessionContext() {
 		return sessionContext;
-	}
-
-	@Override
-	public DetachedBackendSessionContext getDetachedBackendSessionContext() {
-		return DetachedBackendSessionContext.of( sessionContext );
 	}
 
 	@Override

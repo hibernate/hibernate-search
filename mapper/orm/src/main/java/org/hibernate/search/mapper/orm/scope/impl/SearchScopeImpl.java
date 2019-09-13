@@ -72,23 +72,30 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 	}
 
 	@Override
-	public SearchWriter writer(EntityManager entityManager) {
-		HibernateOrmScopeSessionContext sessionContext = mappingContext.getSessionContext( entityManager );
-		return writer( sessionContext );
-	}
-
-	public SearchWriter writer(HibernateOrmScopeSessionContext sessionContext) {
-		return new SearchWriterImpl( delegate.executor( sessionContext.getDetachedBackendSessionContext() ) );
+	public SearchWriter writer() {
+		return writer( (String) null );
 	}
 
 	@Override
-	public MassIndexer massIndexer(EntityManager entityManager) {
-		HibernateOrmScopeSessionContext sessionContext = mappingContext.getSessionContext( entityManager );
-		return massIndexer( sessionContext );
+	public SearchWriter writer(String tenantId) {
+		return writer( mappingContext.getDetachedBackendSessionContext( tenantId ) );
 	}
 
-	public MassIndexer massIndexer(HibernateOrmScopeSessionContext sessionContext) {
-		DetachedBackendSessionContext detachedSessionContext = sessionContext.getDetachedBackendSessionContext();
+	public SearchWriter writer(DetachedBackendSessionContext detachedSessionContext) {
+		return new SearchWriterImpl( delegate.executor( detachedSessionContext ) );
+	}
+
+	@Override
+	public MassIndexer massIndexer() {
+		return massIndexer( (String) null );
+	}
+
+	@Override
+	public MassIndexer massIndexer(String tenantId) {
+		return massIndexer( mappingContext.getDetachedBackendSessionContext( tenantId ) );
+	}
+
+	public MassIndexer massIndexer(DetachedBackendSessionContext detachedSessionContext) {
 		return new MassIndexerImpl(
 				mappingContext,
 				delegate.getIncludedIndexedTypes(),

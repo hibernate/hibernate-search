@@ -7,14 +7,11 @@
 package org.hibernate.search.mapper.orm.scope.impl;
 
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmLoadingSessionContext;
 
 public interface HibernateOrmScopeSessionContext
 		extends HibernateOrmLoadingSessionContext {
 
 	BackendSessionContext getBackendSessionContext();
-
-	DetachedBackendSessionContext getDetachedBackendSessionContext();
 
 }
