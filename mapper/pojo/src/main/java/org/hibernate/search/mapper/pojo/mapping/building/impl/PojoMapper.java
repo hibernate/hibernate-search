@@ -232,7 +232,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			PojoRawTypeModel<T> entityType) {
 		/*
 		 * TODO offer more flexibility to mapper implementations, allowing them to define their own dirtiness state?
-		 * Note this will require to allow them to define their own work plan APIs.
+		 * Note this will require to allow them to define their own indexing plan APIs.
 		 */
 		PojoPathFilterFactory<Set<String>> pathFilterFactory = typeAdditionalMetadataProvider.get( entityType )
 				.getEntityTypeMetadata().orElseThrow( () -> log.missingEntityTypeMetadata( entityType ) )

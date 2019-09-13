@@ -30,7 +30,7 @@ import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendS
 import org.hibernate.search.mapper.pojo.work.impl.CachingCastingEntitySupplier;
 import org.hibernate.search.mapper.pojo.work.impl.PojoDocumentContributor;
 import org.hibernate.search.mapper.pojo.work.impl.PojoDocumentReferenceProvider;
-import org.hibernate.search.mapper.pojo.work.impl.PojoIndexedTypeWorkPlan;
+import org.hibernate.search.mapper.pojo.work.impl.PojoIndexedTypeIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.impl.PojoTypeDocumentWorkExecutor;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkIndexedTypeContext;
 import org.hibernate.search.util.common.impl.Closer;
@@ -156,9 +156,9 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 	}
 
 	@Override
-	public PojoIndexedTypeWorkPlan<I, E, D> createWorkPlan(AbstractPojoBackendSessionContext sessionContext,
+	public PojoIndexedTypeIndexingPlan<I, E, D> createIndexingPlan(AbstractPojoBackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		return new PojoIndexedTypeWorkPlan<>(
+		return new PojoIndexedTypeIndexingPlan<>(
 				this, sessionContext,
 				indexManager.createWorkPlan( sessionContext, commitStrategy, refreshStrategy )
 		);

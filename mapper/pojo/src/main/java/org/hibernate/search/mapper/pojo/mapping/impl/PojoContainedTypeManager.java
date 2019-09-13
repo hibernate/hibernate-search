@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeContainedTypeContext;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.mapper.pojo.work.impl.CachingCastingEntitySupplier;
-import org.hibernate.search.mapper.pojo.work.impl.PojoContainedTypeWorkPlan;
+import org.hibernate.search.mapper.pojo.work.impl.PojoContainedTypeIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkContainedTypeContext;
 import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
@@ -76,8 +76,8 @@ public class PojoContainedTypeManager<E>
 	}
 
 	@Override
-	public PojoContainedTypeWorkPlan<E> createWorkPlan(AbstractPojoBackendSessionContext sessionContext) {
-		return new PojoContainedTypeWorkPlan<>(
+	public PojoContainedTypeIndexingPlan<E> createIndexingPlan(AbstractPojoBackendSessionContext sessionContext) {
+		return new PojoContainedTypeIndexingPlan<>(
 				this, sessionContext
 		);
 	}

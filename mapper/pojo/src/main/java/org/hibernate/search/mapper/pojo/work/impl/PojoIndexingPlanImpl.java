@@ -18,13 +18,13 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class PojoWorkPlanImpl implements PojoWorkPlan {
+public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -36,12 +36,12 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 	private final DocumentRefreshStrategy refreshStrategy;
 
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<Class<?>, PojoIndexedTypeWorkPlan<?, ?, ?>> indexedTypeDelegates = new LinkedHashMap<>();
-	private final Map<Class<?>, PojoContainedTypeWorkPlan<?>> containedTypeDelegates = new HashMap<>();
+	private final Map<Class<?>, PojoIndexedTypeIndexingPlan<?, ?, ?>> indexedTypeDelegates = new LinkedHashMap<>();
+	private final Map<Class<?>, PojoContainedTypeIndexingPlan<?>> containedTypeDelegates = new HashMap<>();
 
 	private boolean isPreparing = false;
 
-	public PojoWorkPlanImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
+	public PojoIndexingPlanImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
 			PojoWorkContainedTypeContextProvider containedTypeContextProvider,
 			AbstractPojoBackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy,
@@ -62,7 +62,7 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 	@Override
 	public void add(Object providedId, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
-		AbstractPojoTypeWorkPlan delegate = getDelegate( clazz );
+		AbstractPojoTypeIndexingPlan delegate = getDelegate( clazz );
 		delegate.add( providedId, entity );
 	}
 
@@ -74,7 +74,7 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 	@Override
 	public void update(Object providedId, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
-		AbstractPojoTypeWorkPlan delegate = getDelegate( clazz );
+		AbstractPojoTypeIndexingPlan delegate = getDelegate( clazz );
 		delegate.update( providedId, entity );
 	}
 
@@ -86,7 +86,7 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 	@Override
 	public void update(Object providedId, Object entity, String... dirtyPaths) {
 		Class<?> clazz = getIntrospector().getClass( entity );
-		AbstractPojoTypeWorkPlan delegate = getDelegate( clazz );
+		AbstractPojoTypeIndexingPlan delegate = getDelegate( clazz );
 		delegate.update( providedId, entity, dirtyPaths );
 	}
 
@@ -98,31 +98,31 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 	@Override
 	public void delete(Object providedId, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
-		AbstractPojoTypeWorkPlan delegate = getDelegate( clazz );
+		AbstractPojoTypeIndexingPlan delegate = getDelegate( clazz );
 		delegate.delete( providedId, entity );
 	}
 
 	@Override
 	public void purge(Class<?> clazz, Object providedId) {
-		AbstractPojoTypeWorkPlan delegate = getDelegate( clazz );
+		AbstractPojoTypeIndexingPlan delegate = getDelegate( clazz );
 		delegate.purge( providedId );
 	}
 
 	@Override
 	public void prepare() {
 		if ( isPreparing ) {
-			throw log.recursiveWorkPlanPrepare();
+			throw log.recursiveIndexingPlanPrepare();
 		}
 
 		isPreparing = true;
 		try {
-			for ( PojoContainedTypeWorkPlan<?> delegate : containedTypeDelegates.values() ) {
+			for ( PojoContainedTypeIndexingPlan<?> delegate : containedTypeDelegates.values() ) {
 				delegate.resolveDirty( this::updateBecauseOfContained );
 			}
-			for ( PojoIndexedTypeWorkPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
+			for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
 				delegate.resolveDirty( this::updateBecauseOfContained );
 			}
-			for ( PojoIndexedTypeWorkPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
+			for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
 				delegate.prepare();
 			}
 		}
@@ -136,7 +136,7 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 		try {
 			prepare();
 			List<CompletableFuture<?>> futures = new ArrayList<>();
-			for ( PojoIndexedTypeWorkPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
+			for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
 				futures.add( delegate.execute() );
 			}
 			return CompletableFuture.allOf( futures.toArray( new CompletableFuture<?>[0] ) );
@@ -149,7 +149,7 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 	@Override
 	public void discard() {
 		try {
-			for ( PojoIndexedTypeWorkPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
+			for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
 				delegate.discard();
 			}
 		}
@@ -160,7 +160,7 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 
 	@Override
 	public void clearNotPrepared() {
-		for ( PojoIndexedTypeWorkPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
+		for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
 			delegate.clearNotPrepared();
 		}
 	}
@@ -169,8 +169,8 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 		return introspector;
 	}
 
-	private AbstractPojoTypeWorkPlan getDelegate(Class<?> clazz) {
-		AbstractPojoTypeWorkPlan delegate = indexedTypeDelegates.get( clazz );
+	private AbstractPojoTypeIndexingPlan getDelegate(Class<?> clazz) {
+		AbstractPojoTypeIndexingPlan delegate = indexedTypeDelegates.get( clazz );
 		if ( delegate == null ) {
 			delegate = containedTypeDelegates.get( clazz );
 			if ( delegate == null ) {
@@ -180,12 +180,12 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 		return delegate;
 	}
 
-	private AbstractPojoTypeWorkPlan createDelegate(Class<?> clazz) {
+	private AbstractPojoTypeIndexingPlan createDelegate(Class<?> clazz) {
 		Optional<? extends PojoWorkIndexedTypeContext<?, ?, ?>> indexedTypeContextOptional =
 				indexedTypeContextProvider.getByExactClass( clazz );
 		if ( indexedTypeContextOptional.isPresent() ) {
-			PojoIndexedTypeWorkPlan<?, ?, ?> delegate = indexedTypeContextOptional.get()
-					.createWorkPlan( sessionContext, commitStrategy, refreshStrategy );
+			PojoIndexedTypeIndexingPlan<?, ?, ?> delegate = indexedTypeContextOptional.get()
+					.createIndexingPlan( sessionContext, commitStrategy, refreshStrategy );
 			indexedTypeDelegates.put( clazz, delegate );
 			return delegate;
 		}
@@ -193,8 +193,8 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 			Optional<? extends PojoWorkContainedTypeContext<?>> containedTypeContextOptional =
 					containedTypeContextProvider.getByExactClass( clazz );
 			if ( containedTypeContextOptional.isPresent() ) {
-				PojoContainedTypeWorkPlan<?> delegate = containedTypeContextOptional.get()
-						.createWorkPlan( sessionContext );
+				PojoContainedTypeIndexingPlan<?> delegate = containedTypeContextOptional.get()
+						.createIndexingPlan( sessionContext );
 				containedTypeDelegates.put( clazz, delegate );
 				return delegate;
 			}
@@ -202,8 +202,8 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 		throw log.notIndexedTypeNorAsDelegate( clazz );
 	}
 
-	private PojoIndexedTypeWorkPlan<?, ?, ?> getOrCreateIndexedDelegateForContainedUpdate(Class<?> clazz) {
-		PojoIndexedTypeWorkPlan<?, ?, ?> delegate = indexedTypeDelegates.get( clazz );
+	private PojoIndexedTypeIndexingPlan<?, ?, ?> getOrCreateIndexedDelegateForContainedUpdate(Class<?> clazz) {
+		PojoIndexedTypeIndexingPlan<?, ?, ?> delegate = indexedTypeDelegates.get( clazz );
 		if ( delegate != null ) {
 			return delegate;
 		}
@@ -212,7 +212,7 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 				indexedTypeContextProvider.getByExactClass( clazz );
 		if ( indexedTypeManagerOptional.isPresent() ) {
 			delegate = indexedTypeManagerOptional.get()
-					.createWorkPlan( sessionContext, commitStrategy, refreshStrategy );
+					.createIndexingPlan( sessionContext, commitStrategy, refreshStrategy );
 			indexedTypeDelegates.put( clazz, delegate );
 			return delegate;
 		}
@@ -227,7 +227,7 @@ public class PojoWorkPlanImpl implements PojoWorkPlan {
 	private void updateBecauseOfContained(Object containingEntity) {
 		// TODO ignore the event when containingEntity has provided IDs
 		Class<?> clazz = getIntrospector().getClass( containingEntity );
-		PojoIndexedTypeWorkPlan<?, ?, ?> delegate = getOrCreateIndexedDelegateForContainedUpdate( clazz );
+		PojoIndexedTypeIndexingPlan<?, ?, ?> delegate = getOrCreateIndexedDelegateForContainedUpdate( clazz );
 		delegate.updateBecauseOfContained( containingEntity );
 	}
 

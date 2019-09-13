@@ -534,7 +534,7 @@ public class AutomaticIndexingBasicIT {
 			session.persist( entity1 );
 			session.persist( entity2 );
 
-			// flush triggers the prepare of the current PojoWorkPlan
+			// flush triggers the prepare of the current indexing plan
 			Consumer<StubDocumentNode.Builder> documentFieldConsumer = b -> b.field( "indexedField", "number1" ).field( "noReindexOnUpdateField", null );
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
@@ -576,7 +576,7 @@ public class AutomaticIndexingBasicIT {
 			session.persist( entity5 );
 			session.persist( entity6 );
 
-			// flush triggers the prepare of the current PojoWorkPlan
+			// flush triggers the prepare of the current indexing plan
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "5", expectedValue( "number5" ) )
 					.add( "6", expectedValue( "number6" ) )

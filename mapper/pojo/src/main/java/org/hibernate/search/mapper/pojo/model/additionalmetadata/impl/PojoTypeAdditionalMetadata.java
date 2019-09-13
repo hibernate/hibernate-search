@@ -27,7 +27,7 @@ public class PojoTypeAdditionalMetadata {
 	 * All other types are assumed to only be able to be embedded in other objects,
 	 * with their lifecycle completely tied to their embedding object.
 	 * As a result, entity types are the only types whose lifecycle events are expected to be sent
-	 * to POJO work plans.
+	 * to POJO indexing plans.
 	 *
 	 * @return {@code true} if this type is an entity type, {@code false} otherwise.
 	 */

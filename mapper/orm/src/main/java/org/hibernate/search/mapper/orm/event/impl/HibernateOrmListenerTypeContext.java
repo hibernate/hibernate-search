@@ -8,6 +8,6 @@ package org.hibernate.search.mapper.orm.event.impl;
 
 public interface HibernateOrmListenerTypeContext {
 
-	Object toWorkPlanProvidedId(Object entityId);
+	Object toIndexingPlanProvidedId(Object entityId);
 
 }

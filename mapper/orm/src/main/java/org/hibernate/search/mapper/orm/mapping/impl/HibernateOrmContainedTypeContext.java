@@ -17,9 +17,9 @@ class HibernateOrmContainedTypeContext<E> extends AbstractHibernateOrmTypeContex
 	}
 
 	@Override
-	public Object toWorkPlanProvidedId(Object entityId) {
+	public Object toIndexingPlanProvidedId(Object entityId) {
 		// The concept of document ID is not relevant for contained types,
-		// so we always provide the entity ID to work plans
+		// so we always provide the entity ID to indexing plans
 		return entityId;
 	}
 

@@ -179,7 +179,7 @@ public class SearchIndexingPlanBaseIT {
 			session.persist( entity1 );
 			session.persist( entity2 );
 
-			// flush triggers the prepare of the current PojoWorkPlan
+			// flush triggers the prepare of the current indexing plan
 			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.add( "1", b -> b.field( "text", "number1" ) )
 					.add( "2", b -> b.field( "text", "number2" ) )

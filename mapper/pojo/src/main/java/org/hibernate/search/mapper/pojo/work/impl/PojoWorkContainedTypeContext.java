@@ -25,6 +25,6 @@ public interface PojoWorkContainedTypeContext<E> {
 	void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoRuntimeIntrospector runtimeIntrospector,
 			Supplier<E> entitySupplier, Set<String> dirtyPaths);
 
-	PojoContainedTypeWorkPlan<E> createWorkPlan(AbstractPojoBackendSessionContext sessionContext);
+	PojoContainedTypeIndexingPlan<E> createIndexingPlan(AbstractPojoBackendSessionContext sessionContext);
 
 }

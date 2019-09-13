@@ -24,15 +24,15 @@ import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendS
  * @param <E> The entity type mapped to the index.
  * @param <D> The document type for the index.
  */
-public class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends AbstractPojoTypeWorkPlan {
+public class PojoIndexedTypeIndexingPlan<I, E, D extends DocumentElement> extends AbstractPojoTypeIndexingPlan {
 
 	private final PojoWorkIndexedTypeContext<I, E, D> typeContext;
 	private final IndexWorkPlan<D> delegate;
 
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<I, IndexedEntityWorkPlan> workPlansPerId = new LinkedHashMap<>();
+	private final Map<I, IndexedEntityIndexingPlan> indexingPlansPerId = new LinkedHashMap<>();
 
-	public PojoIndexedTypeWorkPlan(PojoWorkIndexedTypeContext<I, E, D> typeContext,
+	public PojoIndexedTypeIndexingPlan(PojoWorkIndexedTypeContext<I, E, D> typeContext,
 			AbstractPojoBackendSessionContext sessionContext,
 			IndexWorkPlan<D> delegate) {
 		super( sessionContext );
@@ -44,58 +44,58 @@ public class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends Ab
 	void add(Object providedId, Object entity) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
-		getWork( identifier ).add( entitySupplier );
+		getPlan( identifier ).add( entitySupplier );
 	}
 
 	@Override
 	void update(Object providedId, Object entity) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
-		getWork( identifier ).update( entitySupplier );
+		getPlan( identifier ).update( entitySupplier );
 	}
 
 	@Override
 	void update(Object providedId, Object entity, String... dirtyPaths) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
-		getWork( identifier ).update( entitySupplier, dirtyPaths );
+		getPlan( identifier ).update( entitySupplier, dirtyPaths );
 	}
 
 	@Override
 	void delete(Object providedId, Object entity) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
-		getWork( identifier ).delete( entitySupplier );
+		getPlan( identifier ).delete( entitySupplier );
 	}
 
 	@Override
 	void purge(Object providedId) {
 		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId );
-		getWork( identifier ).purge();
+		getPlan( identifier ).purge();
 	}
 
 	void updateBecauseOfContained(Object entity) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.getIdentifierMapping().getIdentifier( null, entitySupplier );
-		if ( !workPlansPerId.containsKey( identifier ) ) {
-			getWork( identifier ).updateBecauseOfContained( entitySupplier );
+		if ( !indexingPlansPerId.containsKey( identifier ) ) {
+			getPlan( identifier ).updateBecauseOfContained( entitySupplier );
 		}
 		// If the entry is already there, no need for an additional update
 	}
 
 	void resolveDirty(PojoReindexingCollector containingEntityCollector) {
-		for ( IndexedEntityWorkPlan workPerDocument : workPlansPerId.values() ) {
-			workPerDocument.resolveDirty( containingEntityCollector );
+		for ( IndexedEntityIndexingPlan plan : indexingPlansPerId.values() ) {
+			plan.resolveDirty( containingEntityCollector );
 		}
 	}
 
 	void prepare() {
-		sendWorksToDelegate();
+		sendCommandsToDelegate();
 		getDelegate().prepare();
 	}
 
 	CompletableFuture<?> execute() {
-		sendWorksToDelegate();
+		sendCommandsToDelegate();
 		/*
 		 * No need to call prepare() here:
 		 * delegates are supposed to handle execute() even without a prior call to prepare().
@@ -108,32 +108,32 @@ public class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends Ab
 	}
 
 	void clearNotPrepared() {
-		this.workPlansPerId.clear();
+		this.indexingPlansPerId.clear();
 	}
 
-	private IndexedEntityWorkPlan getWork(I identifier) {
-		IndexedEntityWorkPlan work = workPlansPerId.get( identifier );
-		if ( work == null ) {
-			work = new IndexedEntityWorkPlan( identifier );
-			workPlansPerId.put( identifier, work );
+	private IndexedEntityIndexingPlan getPlan(I identifier) {
+		IndexedEntityIndexingPlan plan = indexingPlansPerId.get( identifier );
+		if ( plan == null ) {
+			plan = new IndexedEntityIndexingPlan( identifier );
+			indexingPlansPerId.put( identifier, plan );
 		}
-		return work;
+		return plan;
 	}
 
 	private IndexWorkPlan<D> getDelegate() {
 		return delegate;
 	}
 
-	private void sendWorksToDelegate() {
+	private void sendCommandsToDelegate() {
 		try {
-			workPlansPerId.values().forEach( IndexedEntityWorkPlan::sendWorkToDelegate );
+			indexingPlansPerId.values().forEach( IndexedEntityIndexingPlan::sendCommandsToDelegate );
 		}
 		finally {
-			workPlansPerId.clear();
+			indexingPlansPerId.clear();
 		}
 	}
 
-	private class IndexedEntityWorkPlan {
+	private class IndexedEntityIndexingPlan {
 		private final I identifier;
 		private Supplier<E> entitySupplier;
 
@@ -145,7 +145,7 @@ public class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends Ab
 		private boolean updatedBecauseOfContained;
 		private Set<String> dirtyPaths;
 
-		private IndexedEntityWorkPlan(I identifier) {
+		private IndexedEntityIndexingPlan(I identifier) {
 			this.identifier = identifier;
 		}
 
@@ -223,7 +223,7 @@ public class PojoIndexedTypeWorkPlan<I, E, D extends DocumentElement> extends Ab
 			}
 		}
 
-		void sendWorkToDelegate() {
+		void sendCommandsToDelegate() {
 			DocumentReferenceProvider referenceProvider =
 					typeContext.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier );
 			if ( add ) {

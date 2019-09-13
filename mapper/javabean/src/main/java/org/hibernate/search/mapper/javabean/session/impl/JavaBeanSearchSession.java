@@ -73,7 +73,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 	@Override
 	public SearchWorkPlan getMainWorkPlan() {
 		if ( workPlan == null ) {
-			workPlan = new SearchWorkPlanImpl( getDelegate().createWorkPlan( commitStrategy, refreshStrategy ) );
+			workPlan = new SearchWorkPlanImpl( getDelegate().createIndexingPlan( commitStrategy, refreshStrategy ) );
 		}
 		return workPlan;
 	}

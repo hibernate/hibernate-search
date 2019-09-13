@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.orm.work.impl;
 
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
-import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 
 public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
@@ -19,22 +19,22 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void addOrUpdate(Object entity) {
-		context.getCurrentWorkPlan( true ).update( entity );
+		context.getCurrentIndexingPlan( true ).update( entity );
 	}
 
 	@Override
 	public void delete(Object entity) {
-		context.getCurrentWorkPlan( true ).delete( entity );
+		context.getCurrentIndexingPlan( true ).delete( entity );
 	}
 
 	@Override
 	public void purge(Class<?> entityClass, Object providedId) {
-		context.getCurrentWorkPlan( true ).purge( entityClass, providedId );
+		context.getCurrentIndexingPlan( true ).purge( entityClass, providedId );
 	}
 
 	@Override
 	public void process() {
-		PojoWorkPlan plan = context.getCurrentWorkPlan( false );
+		PojoIndexingPlan plan = context.getCurrentIndexingPlan( false );
 		if ( plan == null ) {
 			return;
 		}
@@ -43,7 +43,7 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void execute() {
-		PojoWorkPlan plan = context.getCurrentWorkPlan( false );
+		PojoIndexingPlan plan = context.getCurrentIndexingPlan( false );
 		if ( plan == null ) {
 			return;
 		}

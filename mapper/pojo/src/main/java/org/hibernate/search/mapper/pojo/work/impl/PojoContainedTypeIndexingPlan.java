@@ -21,16 +21,16 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 /**
  * @param <E> The contained entity type.
  */
-public class PojoContainedTypeWorkPlan<E> extends AbstractPojoTypeWorkPlan {
+public class PojoContainedTypeIndexingPlan<E> extends AbstractPojoTypeIndexingPlan {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoWorkContainedTypeContext<E> typeContext;
 
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<Object, ContainedEntityWorkPlan> workPlansPerId = new LinkedHashMap<>();
+	private final Map<Object, ContainedEntityIndexingPlan> indexingPlansPerId = new LinkedHashMap<>();
 
-	public PojoContainedTypeWorkPlan(PojoWorkContainedTypeContext<E> typeContext,
+	public PojoContainedTypeIndexingPlan(PojoWorkContainedTypeContext<E> typeContext,
 			AbstractPojoBackendSessionContext sessionContext) {
 		super( sessionContext );
 		this.typeContext = typeContext;
@@ -39,25 +39,25 @@ public class PojoContainedTypeWorkPlan<E> extends AbstractPojoTypeWorkPlan {
 	@Override
 	void add(Object providedId, Object entity) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
-		getWork( providedId ).add( entitySupplier );
+		getPlan( providedId ).add( entitySupplier );
 	}
 
 	@Override
 	void update(Object providedId, Object entity) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
-		getWork( providedId ).update( entitySupplier );
+		getPlan( providedId ).update( entitySupplier );
 	}
 
 	@Override
 	void update(Object providedId, Object entity, String... dirtyPaths) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
-		getWork( providedId ).update( entitySupplier, dirtyPaths );
+		getPlan( providedId ).update( entitySupplier, dirtyPaths );
 	}
 
 	@Override
 	void delete(Object providedId, Object entity) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
-		getWork( providedId ).delete( entitySupplier );
+		getPlan( providedId ).delete( entitySupplier );
 	}
 
 	@Override
@@ -66,21 +66,21 @@ public class PojoContainedTypeWorkPlan<E> extends AbstractPojoTypeWorkPlan {
 	}
 
 	void resolveDirty(PojoReindexingCollector containingEntityCollector) {
-		for ( ContainedEntityWorkPlan workPerDocument : workPlansPerId.values() ) {
-			workPerDocument.resolveDirty( containingEntityCollector );
+		for ( ContainedEntityIndexingPlan plan : indexingPlansPerId.values() ) {
+			plan.resolveDirty( containingEntityCollector );
 		}
 	}
 
-	private ContainedEntityWorkPlan getWork(Object identifier) {
-		ContainedEntityWorkPlan work = workPlansPerId.get( identifier );
-		if ( work == null ) {
-			work = new ContainedEntityWorkPlan();
-			workPlansPerId.put( identifier, work );
+	private ContainedEntityIndexingPlan getPlan(Object identifier) {
+		ContainedEntityIndexingPlan plan = indexingPlansPerId.get( identifier );
+		if ( plan == null ) {
+			plan = new ContainedEntityIndexingPlan();
+			indexingPlansPerId.put( identifier, plan );
 		}
-		return work;
+		return plan;
 	}
 
-	private class ContainedEntityWorkPlan {
+	private class ContainedEntityIndexingPlan {
 		private Supplier<E> entitySupplier;
 
 		private Boolean createdInThisPlan;

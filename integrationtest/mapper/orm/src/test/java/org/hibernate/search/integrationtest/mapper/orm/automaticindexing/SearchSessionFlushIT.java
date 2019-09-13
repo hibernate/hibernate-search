@@ -18,7 +18,7 @@ import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -29,7 +29,7 @@ import org.junit.Test;
 
 /**
  * Tests the behaviour of different kinds of {@link Session#flush()}.
- * Each of ones has to trigger a {@link PojoWorkPlan#prepare()} exactly when the flush is expected.
+ * Each of ones has to trigger a {@link PojoIndexingPlan#prepare()} exactly when the flush is expected.
  */
 @TestForIssue( jiraKey = "HSEARCH-3360" )
 public class SearchSessionFlushIT {

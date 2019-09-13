@@ -58,7 +58,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 	}
 
 	@Override
-	public Object toWorkPlanProvidedId(Object entityId) {
+	public Object toIndexingPlanProvidedId(Object entityId) {
 		if ( documentIdIsEntityId ) {
 			return entityId;
 		}

@@ -45,7 +45,7 @@ import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
-import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.TransientReference;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -86,8 +86,8 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	private static final String SEARCH_SESSION_KEY =
 			HibernateOrmMapping.class.getName() + "#SEARCH_SESSION_KEY";
 
-	private static final String WORK_PLAN_PER_TRANSACTION_MAP_KEY =
-			HibernateOrmSearchSession.class.getName() + "#WORK_PLAN_PER_TRANSACTION_KEY";
+	private static final String INDEXING_PLAN_PER_TRANSACTION_MAP_KEY =
+			HibernateOrmSearchSession.class.getName() + "#INDEXING_PLAN_PER_TRANSACTION_KEY";
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -210,18 +210,18 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public PojoWorkPlan getCurrentWorkPlan(boolean createIfDoesNotExist) {
+	public PojoIndexingPlan getCurrentIndexingPlan(boolean createIfDoesNotExist) {
 		SessionImplementor sessionImplementor = sessionContext.getSession();
 		checkOrmSessionIsOpen( sessionImplementor );
 		Transaction transactionIdentifier = null;
 
-		TransientReference<Map<Transaction, PojoWorkPlan>> reference = (TransientReference<Map<Transaction, PojoWorkPlan>>) sessionImplementor.getProperties()
-				.get( WORK_PLAN_PER_TRANSACTION_MAP_KEY );
-		Map<Transaction, PojoWorkPlan> workPlanPerTransaction = reference == null ? null : reference.get();
-		if ( workPlanPerTransaction == null ) {
-			workPlanPerTransaction = new HashMap<>();
-			reference = new TransientReference<>( workPlanPerTransaction );
-			sessionImplementor.setProperty( WORK_PLAN_PER_TRANSACTION_MAP_KEY, reference );
+		TransientReference<Map<Transaction, PojoIndexingPlan>> reference = (TransientReference<Map<Transaction, PojoIndexingPlan>>) sessionImplementor.getProperties()
+				.get( INDEXING_PLAN_PER_TRANSACTION_MAP_KEY );
+		Map<Transaction, PojoIndexingPlan> planPerTransaction = reference == null ? null : reference.get();
+		if ( planPerTransaction == null ) {
+			planPerTransaction = new HashMap<>();
+			reference = new TransientReference<>( planPerTransaction );
+			sessionImplementor.setProperty( INDEXING_PLAN_PER_TRANSACTION_MAP_KEY, reference );
 		}
 
 		if ( sessionImplementor.isTransactionInProgress() ) {
@@ -229,29 +229,29 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		}
 		// For out of transaction case we will use null as transaction identifier
 
-		PojoWorkPlan workPlan = workPlanPerTransaction.get( transactionIdentifier );
-		if ( workPlan != null ) {
-			return workPlan;
+		PojoIndexingPlan plan = planPerTransaction.get( transactionIdentifier );
+		if ( plan != null ) {
+			return plan;
 		}
 
 		if ( !createIfDoesNotExist ) {
 			return null;
 		}
 
-		AutomaticIndexingSynchronizationStrategy workPlanSynchronizationStrategy = synchronizationStrategy;
-		workPlan = createWorkPlan(
-				workPlanSynchronizationStrategy.getDocumentCommitStrategy(),
-				workPlanSynchronizationStrategy.getDocumentRefreshStrategy()
+		AutomaticIndexingSynchronizationStrategy planSynchronizationStrategy = synchronizationStrategy;
+		plan = createIndexingPlan(
+				planSynchronizationStrategy.getDocumentCommitStrategy(),
+				planSynchronizationStrategy.getDocumentRefreshStrategy()
 		);
-		workPlanPerTransaction.put( transactionIdentifier, workPlan );
+		planPerTransaction.put( transactionIdentifier, plan );
 
 		if ( sessionImplementor.isTransactionInProgress() ) {
 			Synchronization txSync = createTransactionWorkQueueSynchronization(
-					workPlan, workPlanPerTransaction, transactionIdentifier, workPlanSynchronizationStrategy
+					plan, planPerTransaction, transactionIdentifier, planSynchronizationStrategy
 			);
 			registerSynchronization( sessionImplementor, txSync );
 		}
-		return workPlan;
+		return plan;
 	}
 
 	@Override
@@ -259,22 +259,22 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		return synchronizationStrategy;
 	}
 
-	private PojoWorkPlan createWorkPlan(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		return getDelegate().createWorkPlan( commitStrategy, refreshStrategy );
+	private PojoIndexingPlan createIndexingPlan(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		return getDelegate().createIndexingPlan( commitStrategy, refreshStrategy );
 	}
 
-	private Synchronization createTransactionWorkQueueSynchronization(PojoWorkPlan workPlan,
-			Map<Transaction, PojoWorkPlan> workPlanPerTransaction, Transaction transactionIdentifier,
+	private Synchronization createTransactionWorkQueueSynchronization(PojoIndexingPlan indexingPlan,
+			Map<Transaction, PojoIndexingPlan> indexingPlanPerTransaction, Transaction transactionIdentifier,
 			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		if ( enlistInTransaction ) {
 			return new InTransactionWorkQueueSynchronization(
-					workPlan, workPlanPerTransaction, transactionIdentifier,
+					indexingPlan, indexingPlanPerTransaction, transactionIdentifier,
 					synchronizationStrategy
 			);
 		}
 		else {
 			return new PostTransactionWorkQueueSynchronization(
-					workPlan, workPlanPerTransaction, transactionIdentifier,
+					indexingPlan, indexingPlanPerTransaction, transactionIdentifier,
 					synchronizationStrategy
 			);
 		}

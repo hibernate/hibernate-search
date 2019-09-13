@@ -14,7 +14,7 @@ import javax.transaction.Synchronization;
 
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
-import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -26,16 +26,16 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoWorkPlan workPlan;
-	private final Map<?, ?> workPlanPerTransaction;
+	private final PojoIndexingPlan indexingPlan;
+	private final Map<?, ?> indexingPlanPerTransaction;
 	private final Object transactionIdentifier;
 	private final AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 
-	public PostTransactionWorkQueueSynchronization(PojoWorkPlan workPlan,
-			Map<?, ?> workPlanPerTransaction, Object transactionIdentifier,
+	public PostTransactionWorkQueueSynchronization(PojoIndexingPlan indexingPlan,
+			Map<?, ?> indexingPlanPerTransaction, Object transactionIdentifier,
 			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
-		this.workPlan = workPlan;
-		this.workPlanPerTransaction = workPlanPerTransaction;
+		this.indexingPlan = indexingPlan;
+		this.indexingPlanPerTransaction = indexingPlanPerTransaction;
 		this.transactionIdentifier = transactionIdentifier;
 		this.synchronizationStrategy = synchronizationStrategy;
 	}
@@ -43,7 +43,7 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 	@Override
 	public void beforeCompletion() {
 		log.tracef( "Processing Transaction's beforeCompletion() phase: %s", this );
-		workPlan.prepare();
+		indexingPlan.prepare();
 	}
 
 	@Override
@@ -51,7 +51,7 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 		try {
 			if ( Status.STATUS_COMMITTED == i ) {
 				log.tracef( "Processing Transaction's afterCompletion() phase for %s. Performing work.", this );
-				CompletableFuture<?> future = workPlan.execute();
+				CompletableFuture<?> future = indexingPlan.execute();
 				synchronizationStrategy.handleFuture( future );
 			}
 			else {
@@ -60,12 +60,12 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 						this,
 						i
 				);
-				workPlan.discard();
+				indexingPlan.discard();
 			}
 		}
 		finally {
 			//clean the Synchronization per Transaction
-			workPlanPerTransaction.remove( transactionIdentifier );
+			indexingPlanPerTransaction.remove( transactionIdentifier );
 		}
 	}
 }

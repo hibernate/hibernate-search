@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.orm.event.impl;
 
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
-import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 
 public interface HibernateOrmListenerContextProvider {
 
@@ -16,6 +16,6 @@ public interface HibernateOrmListenerContextProvider {
 
 	AutomaticIndexingSynchronizationStrategy getSynchronizationStrategy();
 
-	PojoWorkPlan getCurrentWorkPlan(SessionImplementor session, boolean createIfDoesNotExist);
+	PojoIndexingPlan getCurrentIndexingPlan(SessionImplementor session, boolean createIfDoesNotExist);
 
 }

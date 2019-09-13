@@ -41,7 +41,7 @@ import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplement
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
-import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -181,8 +181,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public PojoWorkPlan getCurrentWorkPlan(SessionImplementor session, boolean createIfDoesNotExist) {
-		return HibernateOrmSearchSession.get( this, session ).getCurrentWorkPlan( createIfDoesNotExist );
+	public PojoIndexingPlan getCurrentIndexingPlan(SessionImplementor session, boolean createIfDoesNotExist) {
+		return HibernateOrmSearchSession.get( this, session ).getCurrentIndexingPlan( createIfDoesNotExist );
 	}
 
 	@Override

@@ -36,7 +36,7 @@ import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
-import org.hibernate.search.mapper.pojo.work.spi.PojoWorkPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -75,10 +75,10 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		final Object entity = event.getEntity();
 		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, entity );
 		if ( typeContext != null ) {
-			Object providedId = typeContext.toWorkPlanProvidedId( event.getId() );
+			Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
 			// TODO Check whether deletes work with hibernate.use_identifier_rollback enabled (see HSEARCH-650)
 			// I think they should, but better safe than sorry
-			getCurrentWorkPlan( contextProvider, event.getSession() )
+			getCurrentIndexingPlan( contextProvider, event.getSession() )
 					.delete( providedId, entity );
 		}
 	}
@@ -89,8 +89,8 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		final Object entity = event.getEntity();
 		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, entity );
 		if ( typeContext != null ) {
-			Object providedId = typeContext.toWorkPlanProvidedId( event.getId() );
-			getCurrentWorkPlan( contextProvider, event.getSession() )
+			Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
+			getCurrentIndexingPlan( contextProvider, event.getSession() )
 					.add( providedId, entity );
 		}
 	}
@@ -101,13 +101,13 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		final Object entity = event.getEntity();
 		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, entity );
 		if ( typeContext != null ) {
-			PojoWorkPlan workPlan = getCurrentWorkPlan( contextProvider, event.getSession() );
-			Object providedId = typeContext.toWorkPlanProvidedId( event.getId() );
+			PojoIndexingPlan plan = getCurrentIndexingPlan( contextProvider, event.getSession() );
+			Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
 			if ( dirtyCheckingEnabled ) {
-				workPlan.update( providedId, entity, getDirtyPropertyNames( event ) );
+				plan.update( providedId, entity, getDirtyPropertyNames( event ) );
 			}
 			else {
-				workPlan.update( providedId, entity );
+				plan.update( providedId, entity );
 			}
 		}
 	}
@@ -135,15 +135,15 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	public void onFlush(FlushEvent event) {
 		HibernateOrmListenerContextProvider contextProvider = state.getContextProvider();
 		EventSource session = event.getSession();
-		PojoWorkPlan currentWorkPlan = getCurrentWorkPlan( contextProvider, session );
-		currentWorkPlan.prepare();
+		PojoIndexingPlan plan = getCurrentIndexingPlan( contextProvider, session );
+		plan.prepare();
 
 		// flush within a transaction should trigger only the prepare phase,
 		// since the execute phase is supposed to be triggered by the transaction commit
 		if ( !session.isTransactionInProgress() ) {
 			// out of transaction it will trigger both of them
 			AutomaticIndexingSynchronizationStrategy synchronizationStrategy = contextProvider.getSynchronizationStrategy();
-			synchronizationStrategy.handleFuture( currentWorkPlan.execute() );
+			synchronizationStrategy.handleFuture( plan.execute() );
 		}
 	}
 
@@ -159,17 +159,17 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 //			 */
 //			return;
 //		}
-		getCurrentWorkPlan( state.getContextProvider(), event.getSession() ).prepare();
+		getCurrentIndexingPlan( state.getContextProvider(), event.getSession() ).prepare();
 	}
 
 	@Override
 	public void onClear(ClearEvent event) {
 		EventSource session = event.getSession();
-		PojoWorkPlan workPlan = getCurrentWorkPlanIfExisting( state.getContextProvider(), session );
+		PojoIndexingPlan plan = getCurrentIndexingPlanIfExisting( state.getContextProvider(), session );
 
 		// skip the clearNotPrepared operation in case there has been no one to clear
-		if ( workPlan != null ) {
-			workPlan.clearNotPrepared();
+		if ( plan != null ) {
+			plan.clearNotPrepared();
 		}
 	}
 
@@ -181,14 +181,14 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		return contextProvider;
 	}
 
-	private PojoWorkPlan getCurrentWorkPlan(HibernateOrmListenerContextProvider contextProvider,
+	private PojoIndexingPlan getCurrentIndexingPlan(HibernateOrmListenerContextProvider contextProvider,
 			SessionImplementor sessionImplementor) {
-		return contextProvider.getCurrentWorkPlan( sessionImplementor, true );
+		return contextProvider.getCurrentIndexingPlan( sessionImplementor, true );
 	}
 
-	private PojoWorkPlan getCurrentWorkPlanIfExisting(HibernateOrmListenerContextProvider contextProvider,
+	private PojoIndexingPlan getCurrentIndexingPlanIfExisting(HibernateOrmListenerContextProvider contextProvider,
 			SessionImplementor sessionImplementor) {
-		return contextProvider.getCurrentWorkPlan( sessionImplementor, false );
+		return contextProvider.getCurrentIndexingPlan( sessionImplementor, false );
 	}
 
 	private HibernateOrmListenerTypeContext getTypeContext(HibernateOrmListenerContextProvider contextProvider,
@@ -208,8 +208,8 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 
 		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, entity );
 		if ( typeContext != null ) {
-			PojoWorkPlan workPlan = getCurrentWorkPlan( contextProvider, event.getSession() );
-			Object providedId = typeContext.toWorkPlanProvidedId( event.getAffectedOwnerIdOrNull() );
+			PojoIndexingPlan plan = getCurrentIndexingPlan( contextProvider, event.getSession() );
+			Object providedId = typeContext.toIndexingPlanProvidedId( event.getAffectedOwnerIdOrNull() );
 
 			if ( dirtyCheckingEnabled ) {
 				PersistentCollection persistentCollection = event.getCollection();
@@ -220,22 +220,22 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 				if ( collectionRole != null ) {
 					/*
 					 * Collection role will only be non-null for PostCollectionUpdateEvents.
-					 * For those events, we can pass the role to the workPlan
+					 * For those events, we can pass the role to the indexing plan
 					 * which can then decide whether to reindex based on whether the collection
 					 * has any impact on indexing.
 					 */
-					workPlan.update( providedId, entity, collectionRole );
+					plan.update( providedId, entity, collectionRole );
 				}
 				else {
 					/*
 					 * We don't know which collection is being changed,
 					 * so we have to default to reindexing, just in case.
 					 */
-					workPlan.update( providedId, entity );
+					plan.update( providedId, entity );
 				}
 			}
 			else {
-				workPlan.update( providedId, entity );
+				plan.update( providedId, entity );
 			}
 		}
 	}

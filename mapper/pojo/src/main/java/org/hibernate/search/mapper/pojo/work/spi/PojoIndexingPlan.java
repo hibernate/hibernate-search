@@ -9,17 +9,23 @@ package org.hibernate.search.mapper.pojo.work.spi;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * A set of works to be executed on POJO-mapped indexes.
+ * An interface for indexing entities in the context of a session in a POJO mapper.
  * <p>
- * Works are accumulated when methods such as {@link #add(Object)} or {@link #update(Object, Object)} are called,
- * and executed only when {@link #execute()} is called.
+ * This class is stateful: it queues operations internally to apply them at a later time.
  * <p>
- * Relative ordering of works within a work plan will be preserved.
+ * When {@link #prepare()} is called,
+ * the entities will be processed and index documents will be built
+ * and stored in an internal buffer.
+ * <p>
+ * When {@link #execute()} is called,
+ * the operations will be actually sent to the index.
+ * <p>
+ * Note that {@link #execute()} will implicitly trigger processing of documents that weren't processed yet,
+ * if any, so calling {@link #prepare()} is not necessary if you call {@link #execute()} just next.
  * <p>
  * Implementations may not be thread-safe.
- *
  */
-public interface PojoWorkPlan {
+public interface PojoIndexingPlan {
 
 	/**
 	 * Add an entity to the index, assuming that the entity is absent from the index.
@@ -127,7 +133,7 @@ public interface PojoWorkPlan {
 	void purge(Class<?> clazz, Object providedId);
 
 	/**
-	 * Prepare the work plan execution, i.e. execute as much as possible without writing to the index.
+	 * Prepare the execution of the indexing plan, i.e. execute as much as possible without writing to the index.
 	 * <p>
 	 * In particular, ensure that all data is extracted from the POJOs
 	 * and converted to the backend-specific format.
