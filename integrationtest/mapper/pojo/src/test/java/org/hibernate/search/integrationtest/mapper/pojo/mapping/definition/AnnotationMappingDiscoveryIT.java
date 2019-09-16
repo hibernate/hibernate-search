@@ -183,10 +183,8 @@ public class AnnotationMappingDiscoveryIT {
 
 	/**
 	 * A type that is not registered explicitly, but mentioned in an indexed-embedded property.
-	 * It should be automatically discovered when applying the indexed-embedded,
-	 * BUT the fact that it is indexed should be ignored (only explicitly registered types are indexed).
+	 * It should be automatically discovered when applying the indexed-embedded.
 	 */
-	@Indexed(index = "SHOULD_NOT_BE_INDEXED")
 	public static class NonExplicitlyRegisteredType extends AlwaysPresentPropertyType {
 		private NonExplicitlyRegisteredNonMappedType content;
 
@@ -224,7 +222,6 @@ public class AnnotationMappingDiscoveryIT {
 	 * It should be automatically discovered when contributing the programmatic mapping;
 	 * if it isn't, the field "nonAnnotationMappedEmbedded.text" will be missing.
 	 */
-	@Indexed(index = "SHOULD_NOT_BE_INDEXED")
 	public static class NonExplicitlyRegisteredNonAnnotationMappedType extends AlwaysPresentPropertyType {
 		private String text;
 

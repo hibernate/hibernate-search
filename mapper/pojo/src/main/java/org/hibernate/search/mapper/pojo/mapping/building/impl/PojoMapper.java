@@ -154,7 +154,9 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			if ( rawTypeModel.isAbstract() ) {
 				throw log.cannotMapAbstractTypeToIndex( rawTypeModel );
 			}
-			// FIXME HSEARCH-3705 report a failure early if the indexed type is not an entity type?
+			if ( !metadata.getEntityTypeMetadata().isPresent() ) {
+				throw log.missingEntityTypeMetadata( rawTypeModel );
+			}
 			PojoIndexedTypeAdditionalMetadata indexedTypeMetadata = indexedTypeMetadataOptional.get();
 			backendNameCollector.accept( indexedTypeMetadata.getBackendName() );
 			indexedEntityTypes.add( rawTypeModel );
