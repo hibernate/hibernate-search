@@ -58,7 +58,7 @@ public class IndexedIT {
 			}
 		}
 
-		defaultBackendMock.expectSchema( IndexedEntity.class.getName(), b -> b
+		defaultBackendMock.expectSchema( IndexedEntity.class.getSimpleName(), b -> b
 				.field( "text", String.class )
 		);
 		setupHelper.start()

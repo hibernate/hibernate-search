@@ -28,7 +28,7 @@ public @interface Indexed {
 
 	/**
 	 * @return The name of the index.
-	 * Defaults to the simple name of the entity class.
+	 * Defaults to the entity name.
 	 */
 	String index() default "";
 

@@ -34,7 +34,7 @@ public class ImplementedInterfaceIT {
 
 	@Before
 	public void setup() {
-		backendMock.expectSchema( IndexedPojo.class.getName(), b -> b
+		backendMock.expectSchema( IndexedPojo.class.getSimpleName(), b -> b
 				.field( "text", String.class )
 		);
 
@@ -48,7 +48,7 @@ public class ImplementedInterfaceIT {
 			IndexedPojo indexedPojo = new IndexedPojo( 1, "Using some other text here" );
 			session.indexingPlan().add( indexedPojo );
 
-			backendMock.expectWorks( IndexedPojo.class.getName() ).add( "1", b -> b
+			backendMock.expectWorks( IndexedPojo.class.getSimpleName() ).add( "1", b -> b
 					.field( "text", "Using some other text here" )
 			).processedThenExecuted();
 		}
