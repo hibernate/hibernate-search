@@ -38,46 +38,46 @@ public class DefaultSearchProjectionFactory<R, E> implements SearchProjectionFac
 	}
 
 	@Override
-	public DocumentReferenceProjectionOptionsStep documentReference() {
+	public DocumentReferenceProjectionOptionsStep<?> documentReference() {
 		return new DocumentReferenceProjectionOptionsStepImpl( factory );
 	}
 
 	@Override
-	public <T> FieldProjectionOptionsStep<T> field(String absoluteFieldPath, Class<T> clazz, ValueConvert convert) {
+	public <T> FieldProjectionOptionsStep<?, T> field(String absoluteFieldPath, Class<T> clazz, ValueConvert convert) {
 		Contracts.assertNotNull( clazz, "clazz" );
 
 		return new FieldProjectionOptionsStepImpl<>( factory, absoluteFieldPath, clazz, convert );
 	}
 
 	@Override
-	public FieldProjectionOptionsStep<Object> field(String absoluteFieldPath, ValueConvert convert) {
+	public FieldProjectionOptionsStep<?, Object> field(String absoluteFieldPath, ValueConvert convert) {
 		return field( absoluteFieldPath, Object.class, convert );
 	}
 
 	@Override
-	public EntityReferenceProjectionOptionsStep<R> entityReference() {
+	public EntityReferenceProjectionOptionsStep<?, R> entityReference() {
 		return new EntityReferenceProjectionOptionsStepImpl<>( factory );
 	}
 
 	@Override
-	public EntityProjectionOptionsStep<E> entity() {
+	public EntityProjectionOptionsStep<?, E> entity() {
 		return new EntityProjectionOptionsStepImpl<>( factory );
 	}
 
 	@Override
-	public ScoreProjectionOptionsStep score() {
+	public ScoreProjectionOptionsStep<?> score() {
 		return new ScoreProjectionOptionsStepImpl( factory );
 	}
 
 	@Override
-	public DistanceToFieldProjectionOptionsStep distance(String absoluteFieldPath, GeoPoint center) {
+	public DistanceToFieldProjectionOptionsStep<?> distance(String absoluteFieldPath, GeoPoint center) {
 		Contracts.assertNotNull( center, "center" );
 
 		return new DistanceToFieldProjectionOptionsStepImpl( factory, absoluteFieldPath, center );
 	}
 
 	@Override
-	public <T> CompositeProjectionOptionsStep<T> composite(Function<List<?>, T> transformer,
+	public <T> CompositeProjectionOptionsStep<?, T> composite(Function<List<?>, T> transformer,
 			SearchProjection<?>... projections) {
 		Contracts.assertNotNull( transformer, "transformer" );
 		Contracts.assertNotNullNorEmpty( projections, "projections" );
@@ -86,7 +86,7 @@ public class DefaultSearchProjectionFactory<R, E> implements SearchProjectionFac
 	}
 
 	@Override
-	public <P, T> CompositeProjectionOptionsStep<T> composite(Function<P, T> transformer, SearchProjection<P> projection) {
+	public <P, T> CompositeProjectionOptionsStep<?, T> composite(Function<P, T> transformer, SearchProjection<P> projection) {
 		Contracts.assertNotNull( transformer, "transformer" );
 		Contracts.assertNotNull( projection, "projection" );
 
@@ -94,7 +94,7 @@ public class DefaultSearchProjectionFactory<R, E> implements SearchProjectionFac
 	}
 
 	@Override
-	public <P1, P2, T> CompositeProjectionOptionsStep<T> composite(BiFunction<P1, P2, T> transformer,
+	public <P1, P2, T> CompositeProjectionOptionsStep<?, T> composite(BiFunction<P1, P2, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
 		Contracts.assertNotNull( transformer, "transformer" );
 		Contracts.assertNotNull( projection1, "projection1" );
@@ -104,7 +104,7 @@ public class DefaultSearchProjectionFactory<R, E> implements SearchProjectionFac
 	}
 
 	@Override
-	public <P1, P2, P3, T> CompositeProjectionOptionsStep<T> composite(TriFunction<P1, P2, P3, T> transformer,
+	public <P1, P2, P3, T> CompositeProjectionOptionsStep<?, T> composite(TriFunction<P1, P2, P3, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
 		Contracts.assertNotNull( transformer, "transformer" );
 		Contracts.assertNotNull( projection1, "projection1" );

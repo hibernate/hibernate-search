@@ -32,7 +32,7 @@ public interface SearchProjectionFactory<R, E> {
 	 *
 	 * @return A DSL step where the "document reference" projection can be defined in more details.
 	 */
-	DocumentReferenceProjectionOptionsStep documentReference();
+	DocumentReferenceProjectionOptionsStep<?> documentReference();
 
 	/**
 	 * Project to a reference to the entity that was originally indexed.
@@ -42,7 +42,7 @@ public interface SearchProjectionFactory<R, E> {
 	 *
 	 * @return A DSL step where the "entity reference" projection can be defined in more details.
 	 */
-	EntityReferenceProjectionOptionsStep<R> entityReference();
+	EntityReferenceProjectionOptionsStep<?, R> entityReference();
 
 	/**
 	 * Project to the entity was originally indexed.
@@ -53,7 +53,7 @@ public interface SearchProjectionFactory<R, E> {
 	 *
 	 * @return A DSL step where the "entity" projection can be defined in more details.
 	 */
-	EntityProjectionOptionsStep<E> entity();
+	EntityProjectionOptionsStep<?, E> entity();
 
 	/**
 	 * Project to the value of a field in the indexed document.
@@ -66,7 +66,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param <T> The resulting type of the projection.
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
-	default <T> FieldProjectionOptionsStep<T> field(String absoluteFieldPath, Class<T> type) {
+	default <T> FieldProjectionOptionsStep<?, T> field(String absoluteFieldPath, Class<T> type) {
 		return field( absoluteFieldPath, type, ValueConvert.YES );
 	}
 
@@ -80,7 +80,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * See {@link ValueConvert}.
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
-	<T> FieldProjectionOptionsStep<T> field(String absoluteFieldPath, Class<T> type, ValueConvert convert);
+	<T> FieldProjectionOptionsStep<?, T> field(String absoluteFieldPath, Class<T> type, ValueConvert convert);
 
 	/**
 	 * Project to the value of a field in the indexed document, without specifying a type.
@@ -91,7 +91,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param absoluteFieldPath The absolute path of the field.
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
-	default FieldProjectionOptionsStep<Object> field(String absoluteFieldPath) {
+	default FieldProjectionOptionsStep<?, Object> field(String absoluteFieldPath) {
 		return field( absoluteFieldPath, ValueConvert.YES );
 	}
 
@@ -103,14 +103,14 @@ public interface SearchProjectionFactory<R, E> {
 	 * See {@link ValueConvert}.
 	 * @return A DSL step where the "field" projection can be defined in more details.
 	 */
-	FieldProjectionOptionsStep<Object> field(String absoluteFieldPath, ValueConvert convert);
+	FieldProjectionOptionsStep<?, Object> field(String absoluteFieldPath, ValueConvert convert);
 
 	/**
 	 * Project on the score of the hit.
 	 *
 	 * @return A DSL step where the "score" projection can be defined in more details.
 	 */
-	ScoreProjectionOptionsStep score();
+	ScoreProjectionOptionsStep<?> score();
 
 	/**
 	 * Project on the distance from the center to a {@link GeoPoint} field.
@@ -119,7 +119,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param center The center to compute the distance from.
 	 * @return A DSL step where the "distance" projection can be defined in more details.
 	 */
-	DistanceToFieldProjectionOptionsStep distance(String absoluteFieldPath, GeoPoint center);
+	DistanceToFieldProjectionOptionsStep<?> distance(String absoluteFieldPath, GeoPoint center);
 
 	/**
 	 * Create a projection that will compose a {@link List} based on the given projections.
@@ -127,7 +127,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param projections The projections used to populate the list, in order.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	default CompositeProjectionOptionsStep<List<?>> composite(SearchProjection<?>... projections) {
+	default CompositeProjectionOptionsStep<?, List<?>> composite(SearchProjection<?>... projections) {
 		return composite( Function.identity(), projections );
 	}
 
@@ -137,7 +137,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param dslFinalSteps The final steps in the projection DSL allowing the retrieval of {@link SearchProjection}s.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	default CompositeProjectionOptionsStep<List<?>> composite(ProjectionFinalStep<?>... dslFinalSteps) {
+	default CompositeProjectionOptionsStep<?, List<?>> composite(ProjectionFinalStep<?>... dslFinalSteps) {
 		return composite( Function.identity(), dslFinalSteps );
 	}
 
@@ -149,7 +149,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param <T> The type of the custom object composing the projected elements.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	<T> CompositeProjectionOptionsStep<T> composite(Function<List<?>, T> transformer, SearchProjection<?>... projections);
+	<T> CompositeProjectionOptionsStep<?, T> composite(Function<List<?>, T> transformer, SearchProjection<?>... projections);
 
 	/**
 	 * Create a projection that will compose a custom object based on the given almost-built projections.
@@ -159,7 +159,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param <T> The type of the custom object composing the projected elements.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	default <T> CompositeProjectionOptionsStep<T> composite(Function<List<?>, T> transformer,
+	default <T> CompositeProjectionOptionsStep<?, T> composite(Function<List<?>, T> transformer,
 			ProjectionFinalStep<?>... dslFinalSteps) {
 		SearchProjection<?>[] projections = new SearchProjection<?>[dslFinalSteps.length];
 		for ( int i = 0; i < dslFinalSteps.length; i++ ) {
@@ -177,7 +177,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param <T> The type of the custom object composing the projected element.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	<P, T> CompositeProjectionOptionsStep<T> composite(Function<P, T> transformer, SearchProjection<P> projection);
+	<P, T> CompositeProjectionOptionsStep<?, T> composite(Function<P, T> transformer, SearchProjection<P> projection);
 
 	/**
 	 * Create a projection that will compose a custom object based on one almost-built projection.
@@ -189,7 +189,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param <T> The type of the custom object composing the projected element.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	default <P, T> CompositeProjectionOptionsStep<T> composite(Function<P, T> transformer, ProjectionFinalStep<P> dslFinalStep) {
+	default <P, T> CompositeProjectionOptionsStep<?, T> composite(Function<P, T> transformer, ProjectionFinalStep<P> dslFinalStep) {
 		return composite( transformer, dslFinalStep.toProjection() );
 	}
 
@@ -204,7 +204,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param <T> The type of the custom object composing the projected elements.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	<P1, P2, T> CompositeProjectionOptionsStep<T> composite(BiFunction<P1, P2, T> transformer,
+	<P1, P2, T> CompositeProjectionOptionsStep<?, T> composite(BiFunction<P1, P2, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2);
 
 	/**
@@ -220,7 +220,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param <T> The type of the custom object composing the projected elements.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	default <P1, P2, T> CompositeProjectionOptionsStep<T> composite(BiFunction<P1, P2, T> transformer,
+	default <P1, P2, T> CompositeProjectionOptionsStep<?, T> composite(BiFunction<P1, P2, T> transformer,
 			ProjectionFinalStep<P1> dslFinalStep1, ProjectionFinalStep<P2> dslFinalStep2) {
 		return composite(
 				transformer,
@@ -241,7 +241,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param <T> The type of the custom object composing the projected elements.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	<P1, P2, P3, T> CompositeProjectionOptionsStep<T> composite(TriFunction<P1, P2, P3, T> transformer,
+	<P1, P2, P3, T> CompositeProjectionOptionsStep<?, T> composite(TriFunction<P1, P2, P3, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3);
 
 	/**
@@ -260,7 +260,7 @@ public interface SearchProjectionFactory<R, E> {
 	 * @param <T> The type of the custom object composing the projected elements.
 	 * @return A DSL step where the "composite" projection can be defined in more details.
 	 */
-	default <P1, P2, P3, T> CompositeProjectionOptionsStep<T> composite(TriFunction<P1, P2, P3, T> transformer,
+	default <P1, P2, P3, T> CompositeProjectionOptionsStep<?, T> composite(TriFunction<P1, P2, P3, T> transformer,
 			ProjectionFinalStep<P1> dslFinalStep1, ProjectionFinalStep<P2> dslFinalStep2,
 			ProjectionFinalStep<P3> dslFinalStep3) {
 		return composite(

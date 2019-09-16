@@ -10,7 +10,10 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 
 /**
  * The initial and final step in a "document reference" projection definition, where optional parameters can be set.
+ *
+ * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface DocumentReferenceProjectionOptionsStep extends ProjectionFinalStep<DocumentReference> {
+public interface DocumentReferenceProjectionOptionsStep<S extends DocumentReferenceProjectionOptionsStep<? extends S>>
+		extends ProjectionFinalStep<DocumentReference> {
 
 }

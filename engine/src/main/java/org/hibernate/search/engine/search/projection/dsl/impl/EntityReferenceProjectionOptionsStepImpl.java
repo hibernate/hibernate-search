@@ -12,7 +12,8 @@ import org.hibernate.search.engine.search.projection.spi.EntityReferenceProjecti
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
 
-public class EntityReferenceProjectionOptionsStepImpl<R> implements EntityReferenceProjectionOptionsStep<R> {
+public class EntityReferenceProjectionOptionsStepImpl<R>
+		implements EntityReferenceProjectionOptionsStep<EntityReferenceProjectionOptionsStepImpl<R>, R> {
 
 	private final EntityReferenceProjectionBuilder<R> entityReferenceProjectionBuilder;
 

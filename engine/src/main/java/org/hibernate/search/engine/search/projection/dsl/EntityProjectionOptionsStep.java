@@ -8,7 +8,11 @@ package org.hibernate.search.engine.search.projection.dsl;
 
 /**
  * The initial and final step in an "entity" projection definition, where optional parameters can be set.
+ *
+ * @param <S> The "self" type (the actual exposed type of this step).
+ * @param <E> The type of projected entities.
  */
-public interface EntityProjectionOptionsStep<E> extends ProjectionFinalStep<E> {
+public interface EntityProjectionOptionsStep<S extends EntityProjectionOptionsStep<? extends S, E>, E>
+		extends ProjectionFinalStep<E> {
 
 }

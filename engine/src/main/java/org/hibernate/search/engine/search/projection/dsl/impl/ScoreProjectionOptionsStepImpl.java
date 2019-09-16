@@ -12,7 +12,8 @@ import org.hibernate.search.engine.search.projection.spi.ScoreProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
 
-public class ScoreProjectionOptionsStepImpl implements ScoreProjectionOptionsStep {
+public class ScoreProjectionOptionsStepImpl
+		implements ScoreProjectionOptionsStep<ScoreProjectionOptionsStepImpl> {
 
 	private final ScoreProjectionBuilder scoreProjectionBuilder;
 
