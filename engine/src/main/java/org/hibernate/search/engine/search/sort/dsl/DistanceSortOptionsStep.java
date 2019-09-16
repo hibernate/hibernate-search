@@ -8,8 +8,10 @@ package org.hibernate.search.engine.search.sort.dsl;
 
 /**
  * The initial and final step in a "distance" sort definition, where optional parameters can be set.
+ *
+ * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface DistanceSortOptionsStep
-		extends SortFinalStep, SortThenStep, SortOrderStep<DistanceSortOptionsStep> {
+public interface DistanceSortOptionsStep<S extends DistanceSortOptionsStep<? extends S>>
+		extends SortFinalStep, SortThenStep, SortOrderStep<S> {
 
 }

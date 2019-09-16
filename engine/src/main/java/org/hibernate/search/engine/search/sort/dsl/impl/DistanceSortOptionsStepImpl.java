@@ -15,7 +15,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 
 class DistanceSortOptionsStepImpl<B>
 		extends AbstractSortThenStep<B>
-		implements DistanceSortOptionsStep {
+		implements DistanceSortOptionsStep<DistanceSortOptionsStepImpl<B>> {
 
 	private final DistanceSortBuilder<B> builder;
 
@@ -26,7 +26,7 @@ class DistanceSortOptionsStepImpl<B>
 	}
 
 	@Override
-	public DistanceSortOptionsStep order(SortOrder order) {
+	public DistanceSortOptionsStepImpl<B> order(SortOrder order) {
 		builder.order( order );
 		return this;
 	}

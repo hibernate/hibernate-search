@@ -9,24 +9,26 @@ package org.hibernate.search.engine.search.sort.dsl;
 /**
  * The initial and final step in a "field" sort definition, where optional parameters can be set.
  *
+ * @param <S> The "self" type (the actual exposed type of this step).
+ *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public interface FieldSortOptionsStep
-		extends SortFinalStep, SortThenStep, SortOrderStep<FieldSortOptionsStep> {
+public interface FieldSortOptionsStep<S extends FieldSortOptionsStep<? extends S>>
+		extends SortFinalStep, SortThenStep, SortOrderStep<S> {
 
 	/**
 	 * Start describing the behavior of this sort when a document doesn't have any value for the targeted field.
 	 *
 	 * @return The next step.
 	 */
-	FieldSortMissingValueBehaviorStep<FieldSortOptionsStep> missing();
+	FieldSortMissingValueBehaviorStep<S> missing();
 
 	/**
 	 * @deprecated Use {@link #missing()} instead.
 	 * @return The next step.
 	 */
 	@Deprecated
-	default FieldSortMissingValueBehaviorStep<FieldSortOptionsStep> onMissingValue() {
+	default FieldSortMissingValueBehaviorStep<S> onMissingValue() {
 		return missing();
 	}
 

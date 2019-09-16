@@ -16,7 +16,8 @@ import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
 class FieldSortOptionsStepImpl<B>
 		extends AbstractSortThenStep<B>
-		implements FieldSortOptionsStep, FieldSortMissingValueBehaviorStep<FieldSortOptionsStep> {
+		implements FieldSortOptionsStep<FieldSortOptionsStepImpl<B>>,
+				FieldSortMissingValueBehaviorStep<FieldSortOptionsStepImpl<B>> {
 
 	private final FieldSortBuilder<B> builder;
 
@@ -27,30 +28,30 @@ class FieldSortOptionsStepImpl<B>
 	}
 
 	@Override
-	public FieldSortOptionsStep order(SortOrder order) {
+	public FieldSortOptionsStepImpl<B> order(SortOrder order) {
 		builder.order( order );
 		return this;
 	}
 
 	@Override
-	public FieldSortMissingValueBehaviorStep<FieldSortOptionsStep> missing() {
+	public FieldSortMissingValueBehaviorStep<FieldSortOptionsStepImpl<B>> missing() {
 		return this;
 	}
 
 	@Override
-	public FieldSortOptionsStep first() {
+	public FieldSortOptionsStepImpl<B> first() {
 		builder.missingFirst();
 		return this;
 	}
 
 	@Override
-	public FieldSortOptionsStep last() {
+	public FieldSortOptionsStepImpl<B> last() {
 		builder.missingLast();
 		return this;
 	}
 
 	@Override
-	public FieldSortOptionsStep use(Object value, ValueConvert convert) {
+	public FieldSortOptionsStepImpl<B> use(Object value, ValueConvert convert) {
 		builder.missingAs( value, convert );
 		return this;
 	}
