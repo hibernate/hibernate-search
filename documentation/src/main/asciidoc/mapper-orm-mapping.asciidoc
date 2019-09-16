@@ -60,7 +60,9 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/entityindexma
 
 By default:
 
-* The index name will be the fully qualified name of the entity.
+* The index name will be equal to the entity name,
+which in Hibernate ORM is set using the `@Entity` annotation
+and defaults to the simple class name.
 * The index will be created in the default backend.
 See <<getting-started-configuration,the getting stated guide>>
 or <<configuration-structure>> for more information about how to configure backends.

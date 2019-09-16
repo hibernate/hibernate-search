@@ -53,7 +53,7 @@ public class ProjectionDslIT {
 	private static final int ASIMOV_ID = 1;
 	private static final int MARTINEZ_ID = 2;
 
-	private static final String BOOK_INDEX_NAME = Book.class.getName();
+	private static final String BOOK_INDEX_NAME = Book.class.getSimpleName();
 	private static final int BOOK1_ID = 1;
 	private static final int BOOK2_ID = 2;
 	private static final int BOOK3_ID = 3;

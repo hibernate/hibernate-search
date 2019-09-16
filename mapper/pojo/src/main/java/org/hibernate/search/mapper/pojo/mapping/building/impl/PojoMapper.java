@@ -42,6 +42,7 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerConta
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoMappingDelegateImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoIndexedTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
@@ -181,11 +182,13 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		PojoTypeAdditionalMetadata metadata = typeAdditionalMetadataProvider.get( indexedEntityType );
 		// This metadata is guaranteed to exist; see prepareEntityOrIndexedType()
 		PojoIndexedTypeAdditionalMetadata indexedTypeMetadata = metadata.getIndexedTypeMetadata().get();
+		PojoEntityTypeAdditionalMetadata entityTypeMetadata = metadata.getEntityTypeMetadata().get();
 
 		IndexManagerBuildingState<?> indexManagerBuildingState =
 				indexManagerBuildingStateProvider.getIndexManagerBuildingState(
 						indexedTypeMetadata.getBackendName(),
-						indexedTypeMetadata.getIndexName().orElse( indexedEntityType.getName() ),
+						indexedTypeMetadata.getIndexName()
+								.orElse( entityTypeMetadata.getEntityName() ),
 						multiTenancyEnabled
 				);
 
