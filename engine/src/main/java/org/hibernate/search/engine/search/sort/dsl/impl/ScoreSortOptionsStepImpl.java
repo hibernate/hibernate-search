@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 
 class ScoreSortOptionsStepImpl<B>
 		extends AbstractSortThenStep<B>
-		implements ScoreSortOptionsStep {
+		implements ScoreSortOptionsStep<ScoreSortOptionsStepImpl<B>> {
 
 	private final ScoreSortBuilder<B> builder;
 
@@ -24,7 +24,7 @@ class ScoreSortOptionsStepImpl<B>
 	}
 
 	@Override
-	public ScoreSortOptionsStep order(SortOrder order) {
+	public ScoreSortOptionsStepImpl<B> order(SortOrder order) {
 		builder.order( order );
 		return this;
 	}

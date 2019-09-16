@@ -11,7 +11,8 @@ import org.hibernate.search.engine.search.sort.dsl.CompositeSortComponentsStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 
-class CompositeSortComponentsStepImpl<B> implements CompositeSortComponentsStep {
+class CompositeSortComponentsStepImpl<B>
+		implements CompositeSortComponentsStep<CompositeSortComponentsStepImpl<B>> {
 
 	private SearchSortDslContext<?, B> dslContext;
 
@@ -20,7 +21,7 @@ class CompositeSortComponentsStepImpl<B> implements CompositeSortComponentsStep 
 	}
 
 	@Override
-	public CompositeSortComponentsStep add(SearchSort searchSort) {
+	public CompositeSortComponentsStepImpl<B> add(SearchSort searchSort) {
 		dslContext = dslContext.append( dslContext.getBuilderFactory().toImplementation( searchSort ) );
 		return this;
 	}

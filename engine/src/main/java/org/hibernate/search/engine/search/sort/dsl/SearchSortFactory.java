@@ -25,14 +25,14 @@ public interface SearchSortFactory {
 	 *
 	 * @return A DSL step where the "score" sort can be defined in more details.
 	 */
-	ScoreSortOptionsStep score();
+	ScoreSortOptionsStep<?> score();
 
 	/**
 	 * @deprecated Use {@link #score()} instead.
 	 * @return A DSL step where the "score" sort can be defined in more details.
 	 */
 	@Deprecated
-	default ScoreSortOptionsStep byScore() {
+	default ScoreSortOptionsStep<?> byScore() {
 		return score();
 	}
 
@@ -61,7 +61,7 @@ public interface SearchSortFactory {
 	 * @return A DSL step where the "field" sort can be defined in more details.
 	 * @throws SearchException If the field doesn't exist or cannot be sorted on.
 	 */
-	FieldSortOptionsStep field(String absoluteFieldPath);
+	FieldSortOptionsStep<?> field(String absoluteFieldPath);
 
 	/**
 	 * @deprecated Use {@link #field(String)} instead.
@@ -70,7 +70,7 @@ public interface SearchSortFactory {
 	 * @throws SearchException If the field doesn't exist or cannot be sorted on.
 	 */
 	@Deprecated
-	default FieldSortOptionsStep byField(String absoluteFieldPath) {
+	default FieldSortOptionsStep<?> byField(String absoluteFieldPath) {
 		return byField( absoluteFieldPath );
 	}
 
@@ -84,7 +84,7 @@ public interface SearchSortFactory {
 	 * @return A DSL step where the "distance" sort can be defined in more details.
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
-	DistanceSortOptionsStep distance(String absoluteFieldPath, GeoPoint location);
+	DistanceSortOptionsStep<?> distance(String absoluteFieldPath, GeoPoint location);
 
 	/**
 	 * @deprecated Use {@link #distance(String, GeoPoint)} instead.
@@ -94,7 +94,7 @@ public interface SearchSortFactory {
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
 	@Deprecated
-	default DistanceSortOptionsStep byDistance(String absoluteFieldPath, GeoPoint location) {
+	default DistanceSortOptionsStep<?> byDistance(String absoluteFieldPath, GeoPoint location) {
 		return distance( absoluteFieldPath, location );
 	}
 
@@ -109,7 +109,7 @@ public interface SearchSortFactory {
 	 * @return A DSL step where the "distance" sort can be defined in more details.
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
-	default DistanceSortOptionsStep distance(String absoluteFieldPath, double latitude, double longitude) {
+	default DistanceSortOptionsStep<?> distance(String absoluteFieldPath, double latitude, double longitude) {
 		return distance( absoluteFieldPath, GeoPoint.of( latitude, longitude ) );
 	}
 
@@ -122,7 +122,7 @@ public interface SearchSortFactory {
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
 	@Deprecated
-	default DistanceSortOptionsStep byDistance(String absoluteFieldPath, double latitude, double longitude) {
+	default DistanceSortOptionsStep<?> byDistance(String absoluteFieldPath, double latitude, double longitude) {
 		return distance( absoluteFieldPath, latitude, longitude );
 	}
 
@@ -136,14 +136,14 @@ public interface SearchSortFactory {
 	 *
 	 * @return A DSL step where the "composite" sort can be defined in more details.
 	 */
-	CompositeSortComponentsStep composite();
+	CompositeSortComponentsStep<?> composite();
 
 	/**
 	 * @deprecated Use {@link #byComposite()} instead.
 	 * @return A DSL step where the "composite" sort can be defined in more details.
 	 */
 	@Deprecated
-	default CompositeSortComponentsStep byComposite() {
+	default CompositeSortComponentsStep<?> byComposite() {
 		return composite();
 	}
 
@@ -168,7 +168,7 @@ public interface SearchSortFactory {
 	 * Should generally be a lambda expression.
 	 * @return A DSL step where the "composite" sort can be defined in more details.
 	 */
-	SortThenStep composite(Consumer<? super CompositeSortComponentsStep> elementContributor);
+	SortThenStep composite(Consumer<? super CompositeSortComponentsStep<?>> elementContributor);
 
 	/**
 	 * @deprecated Use {@link #byComposite(Consumer)} instead.
@@ -177,7 +177,7 @@ public interface SearchSortFactory {
 	 * @return A DSL step where the "composite" sort can be defined in more details.
 	 */
 	@Deprecated
-	default SortThenStep byComposite(Consumer<? super CompositeSortComponentsStep> elementContributor) {
+	default SortThenStep byComposite(Consumer<? super CompositeSortComponentsStep<?>> elementContributor) {
 		return composite( elementContributor );
 	}
 

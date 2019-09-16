@@ -14,8 +14,11 @@ import org.hibernate.search.engine.search.sort.SearchSort;
  * This is only used in "explicit" composite sorts,
  * for example when calling {@link SearchSortFactory#composite()},
  * but not in "implicit" composite sorts such as when calling {@link SortThenStep#then()}.
+ *
+ * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface CompositeSortComponentsStep extends SortFinalStep, SortThenStep {
+public interface CompositeSortComponentsStep<S extends CompositeSortComponentsStep>
+		extends SortFinalStep, SortThenStep {
 
 	/**
 	 * Add an element to the composite sort based on a previously-built {@link SearchSort}.
@@ -23,7 +26,7 @@ public interface CompositeSortComponentsStep extends SortFinalStep, SortThenStep
 	 * @param searchSort The sort to add.
 	 * @return {@code this}, for method chaining.
 	 */
-	CompositeSortComponentsStep add(SearchSort searchSort);
+	S add(SearchSort searchSort);
 
 	/**
 	 * Add an element to the composite sort based on an almost-built {@link SearchSort}.
@@ -31,7 +34,7 @@ public interface CompositeSortComponentsStep extends SortFinalStep, SortThenStep
 	 * @param dslFinalStep A final step in the sort DSL allowing the retrieval of a {@link SearchSort}.
 	 * @return {@code this}, for method chaining.
 	 */
-	default CompositeSortComponentsStep add(SortFinalStep dslFinalStep) {
+	default S add(SortFinalStep dslFinalStep) {
 		return add( dslFinalStep.toSort() );
 	}
 

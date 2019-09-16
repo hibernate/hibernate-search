@@ -32,7 +32,7 @@ public class DelegatingSearchSortFactory implements SearchSortFactory {
 	}
 
 	@Override
-	public ScoreSortOptionsStep score() {
+	public ScoreSortOptionsStep<?> score() {
 		return delegate.score();
 	}
 
@@ -42,27 +42,27 @@ public class DelegatingSearchSortFactory implements SearchSortFactory {
 	}
 
 	@Override
-	public FieldSortOptionsStep field(String absoluteFieldPath) {
+	public FieldSortOptionsStep<?> field(String absoluteFieldPath) {
 		return delegate.field( absoluteFieldPath );
 	}
 
 	@Override
-	public DistanceSortOptionsStep distance(String absoluteFieldPath, GeoPoint location) {
+	public DistanceSortOptionsStep<?> distance(String absoluteFieldPath, GeoPoint location) {
 		return delegate.distance( absoluteFieldPath, location );
 	}
 
 	@Override
-	public DistanceSortOptionsStep distance(String absoluteFieldPath, double latitude, double longitude) {
+	public DistanceSortOptionsStep<?> distance(String absoluteFieldPath, double latitude, double longitude) {
 		return delegate.distance( absoluteFieldPath, latitude, longitude );
 	}
 
 	@Override
-	public CompositeSortComponentsStep composite() {
+	public CompositeSortComponentsStep<?> composite() {
 		return delegate.composite();
 	}
 
 	@Override
-	public SortThenStep composite(Consumer<? super CompositeSortComponentsStep> elementContributor) {
+	public SortThenStep composite(Consumer<? super CompositeSortComponentsStep<?>> elementContributor) {
 		return delegate.composite( elementContributor );
 	}
 
