@@ -13,24 +13,26 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
+import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.MarkerBindingContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
-import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoPropertyAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
-import org.hibernate.search.engine.reporting.spi.FailureCollector;
+import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 
 class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollectorTypeNode {
+
 	private final BeanResolver beanResolver;
 	private final FailureCollector failureCollector;
 	private final PojoRawTypeModel<?> rawTypeModel;
 
 	private PojoEntityTypeAdditionalMetadataBuilder entityTypeMetadataBuilder;
+	private PojoIndexedTypeAdditionalMetadataBuilder indexedTypeMetadataBuilder;
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, PojoPropertyAdditionalMetadataBuilder> propertyBuilders = new LinkedHashMap<>();
 
@@ -58,6 +60,20 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 	}
 
 	@Override
+	public PojoIndexedTypeAdditionalMetadataBuilder markAsIndexed(Optional<String> backendName,
+			Optional<String> indexName) {
+		if ( indexedTypeMetadataBuilder == null ) {
+			indexedTypeMetadataBuilder = new PojoIndexedTypeAdditionalMetadataBuilder(
+					this, backendName, indexName
+			);
+		}
+		else {
+			indexedTypeMetadataBuilder.checkSameIndex( backendName, indexName );
+		}
+		return indexedTypeMetadataBuilder;
+	}
+
+	@Override
 	public PojoAdditionalMetadataCollectorPropertyNode property(String propertyName) {
 		return propertyBuilders.computeIfAbsent(
 				propertyName,
@@ -77,6 +93,7 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 		}
 		return new PojoTypeAdditionalMetadata(
 				entityTypeMetadataBuilder == null ? Optional.empty() : Optional.of( entityTypeMetadataBuilder.build() ),
+				indexedTypeMetadataBuilder == null ? Optional.empty() : Optional.of( indexedTypeMetadataBuilder.build() ),
 				properties
 		);
 	}
