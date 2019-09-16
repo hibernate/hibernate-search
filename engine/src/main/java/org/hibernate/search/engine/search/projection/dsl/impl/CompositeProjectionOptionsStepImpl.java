@@ -17,7 +17,8 @@ import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder
 import org.hibernate.search.util.common.function.TriFunction;
 
 
-public class CompositeProjectionOptionsStepImpl<T> implements CompositeProjectionOptionsStep<T> {
+public class CompositeProjectionOptionsStepImpl<T>
+		implements CompositeProjectionOptionsStep<CompositeProjectionOptionsStepImpl<T>, T> {
 
 	private final CompositeProjectionBuilder<T> compositeProjectionBuilder;
 

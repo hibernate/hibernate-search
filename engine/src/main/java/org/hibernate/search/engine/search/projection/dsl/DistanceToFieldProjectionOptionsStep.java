@@ -10,8 +10,11 @@ import org.hibernate.search.engine.spatial.DistanceUnit;
 
 /**
  * The initial and final step in a "distance to field" projection definition, where optional parameters can be set.
+ *
+ * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface DistanceToFieldProjectionOptionsStep extends ProjectionFinalStep<Double> {
+public interface DistanceToFieldProjectionOptionsStep<S extends DistanceToFieldProjectionOptionsStep>
+		extends ProjectionFinalStep<Double> {
 
 	/**
 	 * Defines the unit of the computed distance (default is meters).

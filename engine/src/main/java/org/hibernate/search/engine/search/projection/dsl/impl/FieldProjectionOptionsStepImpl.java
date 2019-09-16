@@ -13,7 +13,8 @@ import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
 
-public class FieldProjectionOptionsStepImpl<T> implements FieldProjectionOptionsStep<T> {
+public class FieldProjectionOptionsStepImpl<T>
+		implements FieldProjectionOptionsStep<FieldProjectionOptionsStepImpl<T>, T> {
 
 	private final FieldProjectionBuilder<T> fieldProjectionBuilder;
 

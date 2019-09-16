@@ -34,59 +34,59 @@ public class DelegatingSearchProjectionFactory<R, E> implements SearchProjection
 	}
 
 	@Override
-	public DocumentReferenceProjectionOptionsStep documentReference() {
+	public DocumentReferenceProjectionOptionsStep<?> documentReference() {
 		return delegate.documentReference();
 	}
 
 	@Override
-	public EntityReferenceProjectionOptionsStep<R> entityReference() {
+	public EntityReferenceProjectionOptionsStep<?, R> entityReference() {
 		return delegate.entityReference();
 	}
 
 	@Override
-	public EntityProjectionOptionsStep<E> entity() {
+	public EntityProjectionOptionsStep<?, E> entity() {
 		return delegate.entity();
 	}
 
 	@Override
-	public <T> FieldProjectionOptionsStep<T> field(String absoluteFieldPath, Class<T> type, ValueConvert convert) {
+	public <T> FieldProjectionOptionsStep<?, T> field(String absoluteFieldPath, Class<T> type, ValueConvert convert) {
 		return delegate.field( absoluteFieldPath, type, convert );
 	}
 
 	@Override
-	public FieldProjectionOptionsStep<Object> field(String absoluteFieldPath, ValueConvert convert) {
+	public FieldProjectionOptionsStep<?, Object> field(String absoluteFieldPath, ValueConvert convert) {
 		return delegate.field( absoluteFieldPath, convert );
 	}
 
 	@Override
-	public ScoreProjectionOptionsStep score() {
+	public ScoreProjectionOptionsStep<?> score() {
 		return delegate.score();
 	}
 
 	@Override
-	public DistanceToFieldProjectionOptionsStep distance(String absoluteFieldPath, GeoPoint center) {
+	public DistanceToFieldProjectionOptionsStep<?> distance(String absoluteFieldPath, GeoPoint center) {
 		return delegate.distance( absoluteFieldPath, center );
 	}
 
 	@Override
-	public <T> CompositeProjectionOptionsStep<T> composite(Function<List<?>, T> transformer,
+	public <T> CompositeProjectionOptionsStep<?, T> composite(Function<List<?>, T> transformer,
 			SearchProjection<?>... projections) {
 		return delegate.composite( transformer, projections );
 	}
 
 	@Override
-	public <P, T> CompositeProjectionOptionsStep<T> composite(Function<P, T> transformer, SearchProjection<P> projection) {
+	public <P, T> CompositeProjectionOptionsStep<?, T> composite(Function<P, T> transformer, SearchProjection<P> projection) {
 		return delegate.composite( transformer, projection );
 	}
 
 	@Override
-	public <P1, P2, T> CompositeProjectionOptionsStep<T> composite(BiFunction<P1, P2, T> transformer,
+	public <P1, P2, T> CompositeProjectionOptionsStep<?, T> composite(BiFunction<P1, P2, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2) {
 		return delegate.composite( transformer, projection1, projection2 );
 	}
 
 	@Override
-	public <P1, P2, P3, T> CompositeProjectionOptionsStep<T> composite(TriFunction<P1, P2, P3, T> transformer,
+	public <P1, P2, P3, T> CompositeProjectionOptionsStep<?, T> composite(TriFunction<P1, P2, P3, T> transformer,
 			SearchProjection<P1> projection1, SearchProjection<P2> projection2, SearchProjection<P3> projection3) {
 		return delegate.composite( transformer, projection1, projection2, projection3 );
 	}

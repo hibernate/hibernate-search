@@ -16,7 +16,8 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.impl.Contracts;
 
 
-public class DistanceToFieldProjectionOptionsStepImpl implements DistanceToFieldProjectionOptionsStep {
+public class DistanceToFieldProjectionOptionsStepImpl
+		implements DistanceToFieldProjectionOptionsStep<DistanceToFieldProjectionOptionsStepImpl> {
 
 	private final DistanceToFieldProjectionBuilder distanceFieldProjectionBuilder;
 

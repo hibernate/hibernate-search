@@ -13,7 +13,8 @@ import org.hibernate.search.engine.search.projection.spi.DocumentReferenceProjec
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 
 
-public class DocumentReferenceProjectionOptionsStepImpl implements DocumentReferenceProjectionOptionsStep {
+public class DocumentReferenceProjectionOptionsStepImpl
+		implements DocumentReferenceProjectionOptionsStep<DocumentReferenceProjectionOptionsStepImpl> {
 
 	private final DocumentReferenceProjectionBuilder documentReferenceProjectionBuilder;
 
