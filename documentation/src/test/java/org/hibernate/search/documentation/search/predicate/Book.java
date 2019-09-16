@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.documentation.searchdsl.projection;
+package org.hibernate.search.documentation.search.predicate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,8 +13,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
@@ -26,11 +26,21 @@ public class Book {
 	@Id
 	private Integer id;
 
-	@FullTextField(analyzer = "english", projectable = Projectable.YES)
+	@FullTextField(analyzer = "english")
+	@FullTextField(name = "title_autocomplete", analyzer = "autocomplete_indexing")
 	private String title;
 
-	@KeywordField(projectable = Projectable.YES)
+	@FullTextField(analyzer = "english")
+	private String description;
+
+	@GenericField
+	private Integer pageCount;
+
+	@KeywordField
 	private Genre genre;
+
+	@FullTextField(analyzer = "english")
+	private String comment;
 
 	@ManyToMany
 	@IndexedEmbedded(storage = ObjectFieldStorage.NESTED)
@@ -55,12 +65,36 @@ public class Book {
 		this.title = title;
 	}
 
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public Integer getPageCount() {
+		return pageCount;
+	}
+
+	public void setPageCount(Integer pageCount) {
+		this.pageCount = pageCount;
+	}
+
 	public Genre getGenre() {
 		return genre;
 	}
 
 	public void setGenre(Genre genre) {
 		this.genre = genre;
+	}
+
+	public String getComment() {
+		return comment;
+	}
+
+	public void setComment(String comment) {
+		this.comment = comment;
 	}
 
 	public List<Author> getAuthors() {
