@@ -54,8 +54,16 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 	}
 
 	@Override
-	public PojoEntityTypeAdditionalMetadataBuilder markAsEntity(PojoPathFilterFactory<Set<String>> pathFilterFactory) {
-		entityTypeMetadataBuilder = new PojoEntityTypeAdditionalMetadataBuilder( this, pathFilterFactory );
+	public PojoEntityTypeAdditionalMetadataBuilder markAsEntity(String entityName,
+			PojoPathFilterFactory<Set<String>> pathFilterFactory) {
+		if ( entityTypeMetadataBuilder == null ) {
+			entityTypeMetadataBuilder = new PojoEntityTypeAdditionalMetadataBuilder(
+					this, entityName, pathFilterFactory
+			);
+		}
+		else {
+			entityTypeMetadataBuilder.checkSameEntity( entityName );
+		}
 		return entityTypeMetadataBuilder;
 	}
 

@@ -433,4 +433,7 @@ public interface Log extends BasicLogger {
 			@FormatWith(OptionalEmptyAsDefaultFormatter.class) Optional<String> otherBackendName,
 			@FormatWith(OptionalEmptyAsDefaultFormatter.class) Optional<String> otherIndexName);
 
+	@Message(id = ID_OFFSET_2 + 64, value = "Multiple entity names assigned to the same type: '%1$s', '%2$s'.")
+	SearchException multipleEntityNames(String entityName, String otherEntityName);
+
 }

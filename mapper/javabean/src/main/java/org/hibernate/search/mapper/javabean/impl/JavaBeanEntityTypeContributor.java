@@ -15,9 +15,11 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 class JavaBeanEntityTypeContributor implements PojoTypeMetadataContributor {
 
 	private final PojoRawTypeModel<?> typeModel;
+	private final String entityName;
 
-	JavaBeanEntityTypeContributor(PojoRawTypeModel<?> typeModel) {
+	JavaBeanEntityTypeContributor(PojoRawTypeModel<?> typeModel, String entityName) {
 		this.typeModel = typeModel;
+		this.entityName = entityName;
 	}
 
 	@Override
@@ -27,7 +29,7 @@ class JavaBeanEntityTypeContributor implements PojoTypeMetadataContributor {
 				// Entity metadata is not inherited; only contribute it to the exact type.
 				return;
 			}
-			collector.markAsEntity( new JavaBeanSimpleStringSetPojoPathFilterFactory() );
+			collector.markAsEntity( entityName, new JavaBeanSimpleStringSetPojoPathFilterFactory() );
 		}
 		catch (RuntimeException e) {
 			collector.getFailureCollector().add( e );
