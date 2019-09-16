@@ -206,7 +206,7 @@ public class AnalysisIT {
 	}
 
 	@Entity(name = IndexedEntity.NAME)
-	@Indexed(index = IndexedEntity.NAME)
+	@Indexed
 	static class IndexedEntity {
 
 		static final String NAME = "indexed";

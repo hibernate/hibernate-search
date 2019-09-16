@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextFi
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 
 @Entity
-@Indexed(index = "Book")
+@Indexed
 @Cacheable
 public class Book {
 

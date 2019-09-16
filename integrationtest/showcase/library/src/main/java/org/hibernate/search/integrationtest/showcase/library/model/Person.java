@@ -20,10 +20,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 
 @Entity
-@Indexed(index = Person.INDEX)
+@Indexed
 public class Person extends AbstractEntity<Integer> {
-
-	static final String INDEX = "Person";
 
 	@Id
 	private Integer id;
