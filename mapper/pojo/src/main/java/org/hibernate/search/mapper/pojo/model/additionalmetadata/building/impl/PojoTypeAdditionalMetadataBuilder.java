@@ -47,6 +47,11 @@ class PojoTypeAdditionalMetadataBuilder implements PojoAdditionalMetadataCollect
 	}
 
 	@Override
+	public PojoRawTypeModel<?> getType() {
+		return rawTypeModel;
+	}
+
+	@Override
 	public PojoEntityTypeAdditionalMetadataBuilder markAsEntity(PojoPathFilterFactory<Set<String>> pathFilterFactory) {
 		entityTypeMetadataBuilder = new PojoEntityTypeAdditionalMetadataBuilder( this, pathFilterFactory );
 		return entityTypeMetadataBuilder;

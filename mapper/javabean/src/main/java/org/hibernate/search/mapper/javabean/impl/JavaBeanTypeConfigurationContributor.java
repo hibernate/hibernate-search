@@ -14,6 +14,7 @@ import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospe
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 class JavaBeanTypeConfigurationContributor implements PojoMappingConfigurationContributor {
 
@@ -30,9 +31,10 @@ class JavaBeanTypeConfigurationContributor implements PojoMappingConfigurationCo
 	public void configure(MappingBuildContext buildContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
 		for ( Class<?> type : entityTypes ) {
+			PojoRawTypeModel<?> typeModel = introspector.getTypeModel( type );
 			configurationCollector.collectContributor(
-					introspector.getTypeModel( type ),
-					new JavaBeanEntityTypeContributor()
+					typeModel,
+					new JavaBeanEntityTypeContributor( typeModel )
 			);
 		}
 	}
