@@ -49,4 +49,7 @@ public interface Log extends BasicLogger {
 					+ " There is probably an entity projection in the query definition: it should be removed."
 	)
 	SearchException cannotLoadEntity(DocumentReference reference);
+
+	@Message(id = ID_OFFSET_1 + 6, value = "Multiple entity types configured with the same name '%1$s': '%2$s', '%3$s'")
+	SearchException multipleEntityTypesWithSameName(String entityName, Class<?> previousType, Class<?> type);
 }

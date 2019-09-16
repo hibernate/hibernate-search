@@ -22,8 +22,8 @@ public class JavaBeanMappingInitiator extends AbstractPojoMappingInitiator<JavaB
 		addConfigurationContributor( typeConfigurationContributor );
 	}
 
-	public void addEntityType(Class<?> type) {
-		typeConfigurationContributor.addEntityType( type );
+	public void addEntityType(Class<?> type, String entityName) {
+		typeConfigurationContributor.addEntityType( type, entityName );
 	}
 
 	@Override

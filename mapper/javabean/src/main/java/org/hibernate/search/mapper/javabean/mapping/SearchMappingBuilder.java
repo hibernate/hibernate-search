@@ -66,12 +66,24 @@ public final class SearchMappingBuilder {
 	}
 
 	/**
+	 * Register a type as an entity type with the default name, its simple class name.
 	 * @param type The type to be considered as an entity type, i.e. a type that may be indexed
 	 * and whose instances be added/updated/deleted through the {@link SearchSession#indexingPlan() indexing plan}.
 	 * @return {@code this}, for call chaining.
 	 */
 	public SearchMappingBuilder addEntityType(Class<?> type) {
-		mappingInitiator.addEntityType( type );
+		return addEntityType( type, type.getSimpleName() );
+	}
+
+	/**
+	 * Register a type as an entity type with the given name.
+	 * @param type The type to be considered as an entity type, i.e. a type that may be indexed
+	 * and whose instances be added/updated/deleted through the {@link SearchSession#indexingPlan() indexing plan}.
+	 * @param entityName The name of the entity.
+	 * @return {@code this}, for call chaining.
+	 */
+	public SearchMappingBuilder addEntityType(Class<?> type, String entityName) {
+		mappingInitiator.addEntityType( type, entityName );
 		return this;
 	}
 

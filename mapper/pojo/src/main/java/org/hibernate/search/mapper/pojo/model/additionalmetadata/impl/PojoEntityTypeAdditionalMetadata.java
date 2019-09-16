@@ -12,13 +12,20 @@ import java.util.Set;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
 
 public class PojoEntityTypeAdditionalMetadata {
+	private final String entityName;
 	private final PojoPathFilterFactory<Set<String>> pathFilterFactory;
 	private final Optional<String> entityIdPropertyName;
 
-	public PojoEntityTypeAdditionalMetadata(PojoPathFilterFactory<Set<String>> pathFilterFactory,
+	public PojoEntityTypeAdditionalMetadata(String entityName,
+			PojoPathFilterFactory<Set<String>> pathFilterFactory,
 			Optional<String> entityIdPropertyName) {
+		this.entityName = entityName;
 		this.pathFilterFactory = pathFilterFactory;
 		this.entityIdPropertyName = entityIdPropertyName;
+	}
+
+	public String getEntityName() {
+		return entityName;
 	}
 
 	/**
