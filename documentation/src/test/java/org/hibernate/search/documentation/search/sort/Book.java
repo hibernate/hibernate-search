@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.documentation.searchdsl.predicate;
+package org.hibernate.search.documentation.search.sort;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +13,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -27,20 +28,15 @@ public class Book {
 	private Integer id;
 
 	@FullTextField(analyzer = "english")
-	@FullTextField(name = "title_autocomplete", analyzer = "autocomplete_indexing")
+	@KeywordField(name = "title_sort", normalizer = "english", sortable = Sortable.YES)
 	private String title;
 
-	@FullTextField(analyzer = "english")
-	private String description;
-
-	@GenericField
+	@GenericField(sortable = Sortable.YES)
 	private Integer pageCount;
 
 	@KeywordField
+	@KeywordField(name = "genre_sort", normalizer = "english", sortable = Sortable.YES)
 	private Genre genre;
-
-	@FullTextField(analyzer = "english")
-	private String comment;
 
 	@ManyToMany
 	@IndexedEmbedded(storage = ObjectFieldStorage.NESTED)
@@ -65,14 +61,6 @@ public class Book {
 		this.title = title;
 	}
 
-	public String getDescription() {
-		return description;
-	}
-
-	public void setDescription(String description) {
-		this.description = description;
-	}
-
 	public Integer getPageCount() {
 		return pageCount;
 	}
@@ -87,14 +75,6 @@ public class Book {
 
 	public void setGenre(Genre genre) {
 		this.genre = genre;
-	}
-
-	public String getComment() {
-		return comment;
-	}
-
-	public void setComment(String comment) {
-		this.comment = comment;
 	}
 
 	public List<Author> getAuthors() {
