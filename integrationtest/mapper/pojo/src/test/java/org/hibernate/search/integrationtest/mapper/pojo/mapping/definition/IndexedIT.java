@@ -16,6 +16,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.SubTest;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -43,7 +44,8 @@ public class IndexedIT {
 			);
 
 	@Test
-	public void implicitIndexName() {
+	@TestForIssue(jiraKey = "HSEARCH-3705")
+	public void implicitIndexName_defaultEntityName() {
 		@Indexed
 		class IndexedEntity {
 			Integer id;
@@ -63,6 +65,35 @@ public class IndexedIT {
 		);
 		setupHelper.start()
 				.setup( IndexedEntity.class );
+		defaultBackendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3705")
+	public void implicitIndexName_explicitEntityName() {
+		@Indexed
+		class IndexedEntity {
+			Integer id;
+			String text;
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@GenericField
+			public String getText() {
+				throw new UnsupportedOperationException( "Should not be called" );
+			}
+		}
+
+		defaultBackendMock.expectSchema( "myEntityName", b -> b
+				.field( "text", String.class )
+		);
+		setupHelper.start()
+				.withConfiguration( b -> {
+					b.annotationMapping().add( IndexedEntity.class );
+					b.addEntityType( IndexedEntity.class, "myEntityName" );
+				} )
+				.setup();
 		defaultBackendMock.verifyExpectationsMet();
 	}
 
