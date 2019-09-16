@@ -31,11 +31,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
  * A place where documents are available.
  */
 @Entity
-@Indexed(index = Library.INDEX)
+@Indexed
 @GeoPointBinding(fieldName = "location", sortable = Sortable.YES)
 public class Library extends AbstractEntity<Integer> {
-
-	static final String INDEX = "Library";
 
 	@Id
 	private Integer id;

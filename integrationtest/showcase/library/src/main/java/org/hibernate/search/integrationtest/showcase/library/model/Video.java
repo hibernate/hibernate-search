@@ -16,10 +16,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
  * @see Document
  */
 @Entity
-@Indexed(index = Video.INDEX)
+@Indexed
 public class Video extends Document<VideoCopy> {
-
-	static final String INDEX = "Video";
 
 	public Video() {
 	}

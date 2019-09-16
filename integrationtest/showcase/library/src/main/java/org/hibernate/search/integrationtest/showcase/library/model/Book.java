@@ -22,10 +22,8 @@ import org.hibernate.search.integrationtest.showcase.library.usertype.ISBNUserTy
  * @see Document
  */
 @Entity
-@Indexed(index = Book.INDEX)
+@Indexed
 public class Book extends Document<BookCopy> {
-
-	static final String INDEX = "Book";
 
 	@Basic
 	@Type(type = ISBNUserType.NAME)
