@@ -24,7 +24,6 @@ import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.common.data.Range;
@@ -97,9 +96,9 @@ public class AggregationDslIT {
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::entryPoint-objects[]
-			SearchMapping searchMapping = Search.mapping( entityManager.getEntityManagerFactory() );
+			SearchSession searchSession = Search.session( entityManager );
 
-			SearchScope<Book> scope = searchMapping.scope( Book.class );
+			SearchScope<Book> scope = searchSession.scope( Book.class );
 
 			AggregationKey<Map<Genre, Long>> countsByGenreKey = AggregationKey.of( "countsByGenre" );
 

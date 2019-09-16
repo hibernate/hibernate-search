@@ -119,17 +119,23 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	@Override
 	public <T> HibernateOrmSearchQueryHitTypeStep<T> search(Collection<? extends Class<? extends T>> types) {
-		return createScope( types ).search( this );
+		return scope( types ).search( this );
 	}
 
 	@Override
 	public SearchWriter writer(Collection<? extends Class<?>> types) {
-		return createScope( types ).writer( DetachedBackendSessionContext.of( sessionContext ) );
+		return scope( types ).writer( DetachedBackendSessionContext.of( sessionContext ) );
 	}
 
 	@Override
 	public MassIndexer massIndexer(Collection<? extends Class<?>> types) {
-		return createScope( types ).massIndexer( DetachedBackendSessionContext.of( sessionContext ) );
+		return scope( types ).massIndexer( DetachedBackendSessionContext.of( sessionContext ) );
+	}
+
+	@Override
+	public <T> SearchScopeImpl<T> scope(Collection<? extends Class<? extends T>> types) {
+		checkOrmSessionIsOpen();
+		return mappingContext.createScope( types );
 	}
 
 	@Override
@@ -235,11 +241,6 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	AutomaticIndexingSynchronizationStrategy getAutomaticIndexingSynchronizationStrategy() {
 		return synchronizationStrategy;
-	}
-
-	private <T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> types) {
-		checkOrmSessionIsOpen();
-		return mappingContext.createScope( types );
 	}
 
 	private PojoWorkPlan createWorkPlan(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {

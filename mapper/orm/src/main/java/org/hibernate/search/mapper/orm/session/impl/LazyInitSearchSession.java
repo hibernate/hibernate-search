@@ -14,6 +14,7 @@ import javax.persistence.EntityManager;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
+import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQueryHitTypeStep;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
@@ -51,6 +52,11 @@ public class LazyInitSearchSession implements SearchSession {
 	@Override
 	public MassIndexer massIndexer(Collection<? extends Class<?>> types) {
 		return getDelegate().massIndexer( types );
+	}
+
+	@Override
+	public <T> SearchScope<T> scope(Collection<? extends Class<? extends T>> types) {
+		return getDelegate().scope( types );
 	}
 
 	@Override

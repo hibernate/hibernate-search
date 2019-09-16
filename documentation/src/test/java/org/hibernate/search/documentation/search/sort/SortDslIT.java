@@ -23,7 +23,6 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
-import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
@@ -98,9 +97,9 @@ public class SortDslIT {
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::entryPoint-objects[]
-			SearchMapping searchMapping = Search.mapping( entityManager.getEntityManagerFactory() );
+			SearchSession searchSession = Search.session( entityManager );
 
-			SearchScope<Book> scope = searchMapping.scope( Book.class );
+			SearchScope<Book> scope = searchSession.scope( Book.class );
 
 			List<Book> result = scope.search( entityManager )
 					.predicate( scope.predicate().matchAll().toPredicate() )

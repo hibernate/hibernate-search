@@ -306,9 +306,9 @@ but it will be a bit more verbose:
 ----
 include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=searching-objects]
 ----
-<1> Get a Hibernate Search mapping, called `SearchMapping`, from the `EntityManagerFactory`.
+<1> Get a Hibernate Search session, called `SearchSession`, from the `EntityManager`.
 <2> Create a "search scope", representing the indexed types that will be queried.
-<3> Initiate a search query targeting the search scope and relying on the given entity manager for entity loading.
+<3> Initiate a search query targeting the search scope.
 <4> Define that only documents matching the given predicate should be returned.
 The predicate is created using the same search scope as the query.
 <5> Build the query and fetch the results, limiting to the top 20 hits.

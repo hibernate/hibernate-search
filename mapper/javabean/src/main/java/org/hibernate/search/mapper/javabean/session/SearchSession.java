@@ -59,6 +59,26 @@ public interface SearchSession extends AutoCloseable {
 	SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?> search(SearchScope scope);
 
 	/**
+	 * Create a {@link SearchScope} limited to the given type.
+	 *
+	 * @param type A type to include in the scope.
+	 * @return The created scope.
+	 * @see SearchScope
+	 */
+	default SearchScope scope(Class<?> type) {
+		return scope( Collections.singleton( type ) );
+	}
+
+	/**
+	 * Create a {@link SearchScope} limited to the given types.
+	 *
+	 * @param types A collection of types to include in the scope.
+	 * @return The created scope.
+	 * @see SearchScope
+	 */
+	SearchScope scope(Collection<? extends Class<?>> types);
+
+	/**
 	 * @return The main work plan for this session. It will be executed upon closing this session.
 	 */
 	SearchWorkPlan getMainWorkPlan();
