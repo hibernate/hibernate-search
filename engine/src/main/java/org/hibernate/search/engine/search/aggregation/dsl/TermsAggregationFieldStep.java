@@ -23,7 +23,7 @@ public interface TermsAggregationFieldStep {
 	 * @param <F> The type of field values.
 	 * @return The next step.
 	 */
-	default <F> TermsAggregationOptionsStep<F, Map<F, Long>> field(String absoluteFieldPath, Class<F> type) {
+	default <F> TermsAggregationOptionsStep<?, F, Map<F, Long>> field(String absoluteFieldPath, Class<F> type) {
 		return field( absoluteFieldPath, type, ValueConvert.YES );
 	}
 
@@ -37,7 +37,7 @@ public interface TermsAggregationFieldStep {
 	 * See {@link ValueConvert}.
 	 * @return The next step.
 	 */
-	<F> TermsAggregationOptionsStep<F, Map<F, Long>> field(String absoluteFieldPath, Class<F> type,
+	<F> TermsAggregationOptionsStep<?, F, Map<F, Long>> field(String absoluteFieldPath, Class<F> type,
 			ValueConvert convert);
 
 }

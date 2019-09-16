@@ -13,7 +13,8 @@ import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilde
 import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationOptionsStep;
 import org.hibernate.search.util.common.impl.Contracts;
 
-class TermsAggregationOptionsStepImpl<F> implements TermsAggregationOptionsStep<F, Map<F, Long>> {
+class TermsAggregationOptionsStepImpl<F>
+		implements TermsAggregationOptionsStep<TermsAggregationOptionsStepImpl<F>, F, Map<F, Long>> {
 	private final TermsAggregationBuilder<F> builder;
 
 	TermsAggregationOptionsStepImpl(TermsAggregationBuilder<F> builder) {
@@ -21,38 +22,38 @@ class TermsAggregationOptionsStepImpl<F> implements TermsAggregationOptionsStep<
 	}
 
 	@Override
-	public TermsAggregationOptionsStep<F, Map<F, Long>> orderByCountDescending() {
+	public TermsAggregationOptionsStepImpl<F> orderByCountDescending() {
 		builder.orderByCountDescending();
 		return this;
 	}
 
 	@Override
-	public TermsAggregationOptionsStep<F, Map<F, Long>> orderByCountAscending() {
+	public TermsAggregationOptionsStepImpl<F> orderByCountAscending() {
 		builder.orderByCountAscending();
 		return this;
 	}
 
 	@Override
-	public TermsAggregationOptionsStep<F, Map<F, Long>> orderByTermAscending() {
+	public TermsAggregationOptionsStepImpl<F> orderByTermAscending() {
 		builder.orderByTermAscending();
 		return this;
 	}
 
 	@Override
-	public TermsAggregationOptionsStep<F, Map<F, Long>> orderByTermDescending() {
+	public TermsAggregationOptionsStepImpl<F> orderByTermDescending() {
 		builder.orderByTermDescending();
 		return this;
 	}
 
 	@Override
-	public TermsAggregationOptionsStep<F, Map<F, Long>> minDocumentCount(int minDocumentCount) {
+	public TermsAggregationOptionsStepImpl<F> minDocumentCount(int minDocumentCount) {
 		Contracts.assertPositiveOrZero( minDocumentCount, "minDocumentCount" );
 		builder.minDocumentCount( minDocumentCount );
 		return this;
 	}
 
 	@Override
-	public TermsAggregationOptionsStep<F, Map<F, Long>> maxTermCount(int maxTermCount) {
+	public TermsAggregationOptionsStepImpl<F> maxTermCount(int maxTermCount) {
 		Contracts.assertStrictlyPositive( maxTermCount, "maxTermCount" );
 		builder.maxTermCount( maxTermCount );
 		return this;

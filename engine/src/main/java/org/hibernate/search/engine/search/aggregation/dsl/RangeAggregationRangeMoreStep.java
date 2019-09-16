@@ -15,10 +15,16 @@ import org.hibernate.search.util.common.data.Range;
  * (see the superinterface {@link RangeAggregationOptionsStep}),
  * or more ranges can be added.
  *
+ * @param <S> The "self" type (the actual exposed type of this step).
+ * @param <N> The type of the next step.
  * @param <F> The type of the targeted field.
  */
-public interface RangeAggregationRangeMoreStep<F>
-		extends RangeAggregationOptionsStep<F, Map<Range<F>, Long>>,
-				RangeAggregationRangeStep<F> {
+public interface RangeAggregationRangeMoreStep<
+				S extends RangeAggregationRangeMoreStep<? extends S, ?, F>,
+				N extends RangeAggregationOptionsStep<? extends N, F, Map<Range<F>, Long>>,
+				F
+		>
+		extends RangeAggregationOptionsStep<N, F, Map<Range<F>, Long>>,
+				RangeAggregationRangeStep<S, F> {
 
 }

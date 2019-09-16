@@ -21,7 +21,7 @@ class RangeAggregationFieldStepImpl implements RangeAggregationFieldStep {
 	}
 
 	@Override
-	public <F> RangeAggregationRangeStep<F> field(String absoluteFieldPath, Class<F> type, ValueConvert convert) {
+	public <F> RangeAggregationRangeStep<?, F> field(String absoluteFieldPath, Class<F> type, ValueConvert convert) {
 		Contracts.assertNotNull( absoluteFieldPath, "absoluteFieldPath" );
 		Contracts.assertNotNull( type, "type" );
 		RangeAggregationBuilder<F> builder =

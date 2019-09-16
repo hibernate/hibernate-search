@@ -13,9 +13,10 @@ import org.hibernate.search.util.common.data.Range;
 /**
  * The step in a "range" aggregation definition where the ranges can be set.
  *
+ * @param <N> The type of the next step.
  * @param <F> The type of the targeted field.
  */
-public interface RangeAggregationRangeStep<F> {
+public interface RangeAggregationRangeStep<N extends RangeAggregationRangeMoreStep<? extends N, ?, F>, F> {
 
 	/**
 	 * Add a bucket for the range {@code [lowerBound, upperBound)} (lower bound included, upper bound excluded),
@@ -25,7 +26,7 @@ public interface RangeAggregationRangeStep<F> {
 	 * @param upperBound The upper bound of the range.
 	 * @return The next step.
 	 */
-	default RangeAggregationRangeMoreStep<F> range(F lowerBound, F upperBound) {
+	default N range(F lowerBound, F upperBound) {
 		return range( Range.canonical( lowerBound, upperBound ) );
 	}
 
@@ -37,7 +38,7 @@ public interface RangeAggregationRangeStep<F> {
 	 *
 	 * @see Range
 	 */
-	RangeAggregationRangeMoreStep<F> range(Range<? extends F> range);
+	N range(Range<? extends F> range);
 
 	/**
 	 * Add one bucket for each of the given ranges.
@@ -47,6 +48,6 @@ public interface RangeAggregationRangeStep<F> {
 	 *
 	 * @see Range
 	 */
-	RangeAggregationRangeMoreStep<F> ranges(Collection<? extends Range<? extends F>> ranges);
+	N ranges(Collection<? extends Range<? extends F>> ranges);
 
 }

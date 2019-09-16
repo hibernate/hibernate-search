@@ -21,7 +21,7 @@ public interface RangeAggregationFieldStep {
 	 * @param <F> The type of field values.
 	 * @return The next step.
 	 */
-	default <F> RangeAggregationRangeStep<F> field(String absoluteFieldPath, Class<F> type) {
+	default <F> RangeAggregationRangeStep<?, F> field(String absoluteFieldPath, Class<F> type) {
 		return field( absoluteFieldPath, type, ValueConvert.YES );
 	}
 
@@ -35,6 +35,6 @@ public interface RangeAggregationFieldStep {
 	 * See {@link ValueConvert}.
 	 * @return The next step.
 	 */
-	<F> RangeAggregationRangeStep<F> field(String absoluteFieldPath, Class<F> type, ValueConvert convert);
+	<F> RangeAggregationRangeStep<?, F> field(String absoluteFieldPath, Class<F> type, ValueConvert convert);
 
 }
