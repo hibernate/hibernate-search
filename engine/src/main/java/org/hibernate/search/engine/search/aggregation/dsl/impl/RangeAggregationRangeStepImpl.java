@@ -16,7 +16,9 @@ import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationRangeS
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.impl.Contracts;
 
-class RangeAggregationRangeStepImpl<F> implements RangeAggregationRangeStep<F>, RangeAggregationRangeMoreStep<F> {
+class RangeAggregationRangeStepImpl<F>
+		implements RangeAggregationRangeStep<RangeAggregationRangeStepImpl<F>, F>,
+				RangeAggregationRangeMoreStep<RangeAggregationRangeStepImpl<F>, RangeAggregationRangeStepImpl<F>, F> {
 	private final RangeAggregationBuilder<F> builder;
 
 	RangeAggregationRangeStepImpl(RangeAggregationBuilder<F> builder) {
@@ -24,14 +26,14 @@ class RangeAggregationRangeStepImpl<F> implements RangeAggregationRangeStep<F>, 
 	}
 
 	@Override
-	public RangeAggregationRangeMoreStep<F> range(Range<? extends F> range) {
+	public RangeAggregationRangeStepImpl<F> range(Range<? extends F> range) {
 		Contracts.assertNotNull( range, "range" );
 		builder.range( range );
 		return this;
 	}
 
 	@Override
-	public RangeAggregationRangeMoreStep<F> ranges(Collection<? extends Range<? extends F>> ranges) {
+	public RangeAggregationRangeStepImpl<F> ranges(Collection<? extends Range<? extends F>> ranges) {
 		Contracts.assertNotNull( ranges, "ranges" );
 		for ( Range<? extends F> range : ranges ) {
 			range( range );

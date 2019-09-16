@@ -23,7 +23,7 @@ class TermsAggregationFieldStepImpl implements TermsAggregationFieldStep {
 	}
 
 	@Override
-	public <F> TermsAggregationOptionsStep<F, Map<F, Long>> field(String absoluteFieldPath, Class<F> type,
+	public <F> TermsAggregationOptionsStep<?, F, Map<F, Long>> field(String absoluteFieldPath, Class<F> type,
 			ValueConvert convert) {
 		Contracts.assertNotNull( absoluteFieldPath, "absoluteFieldPath" );
 		Contracts.assertNotNull( type, "type" );
