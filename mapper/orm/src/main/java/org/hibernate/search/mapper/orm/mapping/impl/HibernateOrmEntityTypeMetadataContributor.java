@@ -24,6 +24,10 @@ final class HibernateOrmEntityTypeMetadataContributor implements PojoTypeMetadat
 
 	@Override
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
+		if ( !persistentClass.getMappedClass().equals( collector.getType().getJavaClass() ) ) {
+			// Entity metadata is not inherited; only contribute it to the exact type.
+			return;
+		}
 		collector.markAsEntity( new HibernateOrmPathFilterFactory( persistentClass ) )
 				.entityIdPropertyName( idPropertyName );
 	}
