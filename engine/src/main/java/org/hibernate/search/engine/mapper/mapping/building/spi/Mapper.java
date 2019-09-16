@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
+import java.util.Optional;
+import java.util.function.Consumer;
+
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
-import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
 /**
  * @param <MPBS> The Java type of the partial build state of the produced mapping.
@@ -24,23 +26,30 @@ public interface Mapper<MPBS extends MappingPartialBuildState> {
 	void closeOnFailure();
 
 	/**
-	 * Add an indexed type to the mapping that will be {@link #prepareBuild() built}.
+	 * Prepare for the mapping of indexed types
+	 * and inform the engine of the names of all backends this mapper depends on.
 	 * <p>
-	 * Never called after {@link #prepareBuild()}.
+	 * Called exactly once just before {@link #mapIndexedTypes(IndexManagerBuildingStateProvider)}.
 	 *
-	 * @param typeModel A model of the type to be mapped
-	 * @param indexManagerBuildingState The building state for the index to be mapped
+	 * @param backendNameCollector A collector of backend names, {@code Optional.empty()} means "the default backend".
 	 */
-	void addIndexed(MappableTypeModel typeModel, IndexManagerBuildingState<?> indexManagerBuildingState);
+	void prepareIndexedTypes(Consumer<Optional<String>> backendNameCollector);
 
 	/**
-	 * Partially build the mapping based on the {@link #addIndexed(MappableTypeModel, IndexManagerBuildingState) indexed types}
+	 * Begin the creation of a mapping for all indexed types.
+	 * <p>
+	 * Called exactly once just after {@link #prepareIndexedTypes(Consumer)} and before {@link #prepareBuild()}.
+	 *
+	 * @param indexManagerBuildingStateProvider A provider of index manager building states,
+	 * supporting all the backends declared in {@link #prepareIndexedTypes(Consumer)}.
+	 */
+	void mapIndexedTypes(IndexManagerBuildingStateProvider indexManagerBuildingStateProvider);
+
+	/**
+	 * Partially build the mapping based on the {@link #mapIndexedTypes(IndexManagerBuildingStateProvider) indexex types}
 	 * added so far.
 	 * <p>
-	 * May only be called once on a given object.
-	 * <p>
-	 * The
-	 * </p>
+	 * Called exactly once just after {@link #mapIndexedTypes(IndexManagerBuildingStateProvider)}.
 	 *
 	 * @return The partially-built mapping.
 	 * @throws MappingAbortedException When aborting the mapping due to

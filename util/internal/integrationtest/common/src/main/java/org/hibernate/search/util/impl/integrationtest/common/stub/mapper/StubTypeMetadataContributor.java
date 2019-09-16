@@ -28,9 +28,6 @@ class StubTypeMetadataContributor {
 	}
 
 	final void contribute(MappingConfigurationCollector<StubTypeMetadataContributor> collector) {
-		if ( indexName != null ) {
-			collector.mapToIndex( typeIdentifier, backendName, indexName );
-		}
 		collector.collectContributor( typeIdentifier, this );
 	}
 
@@ -38,4 +35,11 @@ class StubTypeMetadataContributor {
 		delegate.accept( indexManagerBuildingState.getIndexedEntityBindingContext() );
 	}
 
+	public String getBackendName() {
+		return backendName;
+	}
+
+	public String getIndexName() {
+		return indexName;
+	}
 }

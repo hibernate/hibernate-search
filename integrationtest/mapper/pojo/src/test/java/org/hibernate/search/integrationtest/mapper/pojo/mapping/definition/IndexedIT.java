@@ -206,9 +206,8 @@ public class IndexedIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( AbstractIndexedEntity.class.getName() )
-						.annotationContextAnyParameters( Indexed.class )
 						.failure(
-								"Cannot map type '" + AbstractIndexedEntity.class.getName() + "' to index 'indexName',"
+								"Cannot map type '" + AbstractIndexedEntity.class.getName() + "' to an index,"
 										+ " because this type is abstract."
 						)
 						.build()
@@ -241,7 +240,7 @@ public class IndexedIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( AbstractIndexedEntity.class.getName() )
 						.failure(
-								"Cannot map type '" + AbstractIndexedEntity.class.getName() + "' to index 'indexName',"
+								"Cannot map type '" + AbstractIndexedEntity.class.getName() + "' to an index,"
 										+ " because this type is abstract."
 						)
 						.build()

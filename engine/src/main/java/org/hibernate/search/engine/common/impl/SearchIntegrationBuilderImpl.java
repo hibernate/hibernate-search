@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.common.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -23,8 +22,8 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
+import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.impl.ConfiguredBeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
@@ -36,11 +35,7 @@ import org.hibernate.search.engine.environment.classpath.spi.DefaultResourceReso
 import org.hibernate.search.engine.environment.classpath.spi.DefaultServiceResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
-import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.engine.reporting.impl.RootFailureCollector;
-import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingStateProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingAbortedException;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
@@ -51,14 +46,13 @@ import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.engine.reporting.impl.RootFailureCollector;
+import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final int FAILURE_LIMIT = 100;
 
@@ -172,7 +166,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 			indexManagerBuildingStateHolder = new IndexManagerBuildingStateHolder( beanResolver, propertySource, rootBuildContext );
 
-			// First step: collect configuration for all mappings
+			// Step #1: collect configuration for all mappings
 			for ( Map.Entry<MappingKey<?, ?>, MappingInitiator<?, ?>> entry : mappingInitiators.entrySet() ) {
 				// We know the key and initiator have compatible types, see how they are put into the map
 				@SuppressWarnings({"rawtypes", "unchecked"})
@@ -187,25 +181,38 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			failureCollector.checkNoFailure();
 			checkingRootFailures = false;
 
-			// Second step: create backends that will be necessary for mappers
-			Set<String> backendNames = new LinkedHashSet<>();
+			// Step #2: create mappers
 			for ( MappingBuildingState<?, ?> mappingBuildingState : mappingBuildingStates ) {
-				mappingBuildingState.contributeBackendNames( backendNames );
+				mappingBuildingState.createMapper();
 			}
+			checkingRootFailures = true;
+			failureCollector.checkNoFailure();
+			checkingRootFailures = false;
+
+			// Step #3: determine indexed types and the necessary backends
+			Set<Optional<String>> backendNames = new LinkedHashSet<>();
+			for ( MappingBuildingState<?, ?> mappingBuildingState : mappingBuildingStates ) {
+				mappingBuildingState.determineIndexedTypes( backendNames );
+			}
+			checkingRootFailures = true;
+			failureCollector.checkNoFailure();
+			checkingRootFailures = false;
+
+			// Step #4: create backends that will be necessary for mappers
 			indexManagerBuildingStateHolder.createBackends( backendNames );
 			checkingRootFailures = true;
 			failureCollector.checkNoFailure();
 			checkingRootFailures = false;
 
-			// Third step: create mappers and their backing index managers
+			// Step #5: map indexed types and create the corresponding index managers
 			for ( MappingBuildingState<?, ?> mappingBuildingState : mappingBuildingStates ) {
-				mappingBuildingState.createMapper( indexManagerBuildingStateHolder );
+				mappingBuildingState.mapIndexedTypes( indexManagerBuildingStateHolder );
 			}
 			checkingRootFailures = true;
 			failureCollector.checkNoFailure();
 			checkingRootFailures = false;
 
-			// Fourth step: create mappings
+			// Step #6: create mappings
 			for ( MappingBuildingState<?, ?> mappingBuildingState : mappingBuildingStates ) {
 				mappingBuildingState.partiallyBuildAndAddTo( partiallyBuiltMappings );
 			}
@@ -270,7 +277,6 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<MappableTypeModel, TypeMappingContribution<C>> contributionByType = new LinkedHashMap<>();
 		private final List<TypeMetadataDiscoverer<C>> metadataDiscoverers = new ArrayList<>();
-		private boolean multiTenancyEnabled;
 
 		private final Set<MappableTypeModel> typesSubmittedToDiscoverers = new HashSet<>();
 
@@ -287,52 +293,17 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			mappingInitiator.configure( buildContext, new MappingConfigurationCollectorImpl() );
 		}
 
-		void contributeBackendNames(Set<String> backendNames) {
-			for ( TypeMappingContribution<C> contribution : contributionByType.values() ) {
-				if ( contribution.getIndexName() != null ) { // If the type is mapped to an index
-					String backendName = contribution.getBackendName();
-					backendNames.add( backendName );
-				}
-			}
-		}
-
-		void createMapper(IndexManagerBuildingStateHolder indexManagerBuildingStateHolder) {
+		void createMapper() {
 			TypeMetadataContributorProviderImpl contributorProvider = new TypeMetadataContributorProviderImpl();
 			mapper = mappingInitiator.createMapper( buildContext, contributorProvider );
+		}
 
-			// We need to create a separate Set because calls to mapper.addIndexed() might add more contributions
-			Set<MappableTypeModel> potentiallyMappedToIndexTypes = new LinkedHashSet<>( contributionByType.keySet() );
-			for ( MappableTypeModel typeModel : potentiallyMappedToIndexTypes ) {
-				TypeMappingContribution<C> contribution = contributionByType.get( typeModel );
-				String indexName = contribution.getIndexName();
-				if ( indexName != null ) {
-					String backendName = contribution.getBackendName();
-					IndexManagerBuildingState<?> indexManagerBuildingState;
-					try {
-						indexManagerBuildingState = indexManagerBuildingStateHolder
-								.getBackend( backendName )
-								.getIndexManagerBuildingState( indexName, multiTenancyEnabled );
-					}
-					catch (RuntimeException e) {
-						buildContext.getFailureCollector()
-								.withContext( EventContexts.fromType( typeModel ) )
-								.withContext( EventContexts.fromIndexName( indexName ) )
-								.add( e );
-						continue;
-					}
-					try {
-						mapper.addIndexed(
-								typeModel,
-								indexManagerBuildingState
-						);
-					}
-					catch (RuntimeException e) {
-						buildContext.getFailureCollector()
-								.withContext( EventContexts.fromType( typeModel ) )
-								.add( e );
-					}
-				}
-			}
+		void determineIndexedTypes(Set<Optional<String>> backendNames) {
+			mapper.prepareIndexedTypes( backendNames::add );
+		}
+
+		void mapIndexedTypes(IndexManagerBuildingStateProvider indexManagerBuildingStateProvider) {
+			mapper.mapIndexedTypes( indexManagerBuildingStateProvider );
 		}
 
 		void partiallyBuildAndAddTo(Map<MappingKey<?, ?>, MappingPartialBuildState> mappings) {
@@ -348,7 +319,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 		private TypeMappingContribution<C> getOrCreateContribution(MappableTypeModel typeModel) {
 			TypeMappingContribution<C> contribution = contributionByType.get( typeModel );
 			if ( contribution == null ) {
-				contribution = new TypeMappingContribution<>( typeModel );
+				contribution = new TypeMappingContribution<>();
 				contributionByType.put( typeModel, contribution );
 			}
 			return contribution;
@@ -406,14 +377,6 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 		private class MappingConfigurationCollectorImpl implements MappingConfigurationCollector<C> {
 			@Override
-			public void mapToIndex(MappableTypeModel typeModel, String backendName, String indexName) {
-				if ( typeModel.isAbstract() ) {
-					throw log.cannotMapAbstractTypeToIndex( typeModel, indexName );
-				}
-				getOrCreateContribution( typeModel ).mapToIndex( backendName, indexName );
-			}
-
-			@Override
 			public void collectContributor(MappableTypeModel typeModel, C contributor) {
 				getOrCreateContribution( typeModel ).collectContributor( contributor );
 			}
@@ -421,11 +384,6 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			@Override
 			public void collectDiscoverer(TypeMetadataDiscoverer<C> metadataDiscoverer) {
 				metadataDiscoverers.add( metadataDiscoverer );
-			}
-
-			@Override
-			public void enableMultiTenancy() {
-				multiTenancyEnabled = true;
 			}
 		}
 
@@ -453,36 +411,16 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 	}
 
 	private static class TypeMappingContribution<C> {
-		private final MappableTypeModel typeModel;
-		private String indexName;
-		private String backendName;
 		private final List<C> contributors = new ArrayList<>();
 
-		TypeMappingContribution(MappableTypeModel typeModel) {
-			this.typeModel = typeModel;
+		TypeMappingContribution() {
 		}
 
-		public String getIndexName() {
-			return indexName;
-		}
-
-		public String getBackendName() {
-			return backendName;
-		}
-
-		public void mapToIndex(String backendName, String indexName) {
-			if ( this.indexName != null ) {
-				throw log.multipleIndexMapping( typeModel, this.indexName, indexName );
-			}
-			this.backendName = backendName;
-			this.indexName = indexName;
-		}
-
-		public void collectContributor(C contributor) {
+		void collectContributor(C contributor) {
 			this.contributors.add( contributor );
 		}
 
-		public Stream<C> getContributors() {
+		Stream<C> getContributors() {
 			return contributors.stream();
 		}
 	}

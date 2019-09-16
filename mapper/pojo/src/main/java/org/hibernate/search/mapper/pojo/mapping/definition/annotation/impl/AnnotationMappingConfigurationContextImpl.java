@@ -11,18 +11,16 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataDiscoverer;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
-import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
+import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.engine.reporting.spi.FailureCollector;
 
 public class AnnotationMappingConfigurationContextImpl implements AnnotationMappingConfigurationContext,
 		PojoMappingConfigurationContributor {
@@ -78,23 +76,6 @@ public class AnnotationMappingConfigurationContextImpl implements AnnotationMapp
 				.filter( alreadyContributedTypes::add )
 				// TODO optimize by completely ignoring standard Java types, e.g. Object or standard Java interfaces such as Serializable?
 				.forEach( typeModel -> {
-					Optional<Indexed> indexedAnnotation = typeModel.getAnnotationByType( Indexed.class );
-					if ( indexedAnnotation.isPresent() ) {
-						String backendName = indexedAnnotation.get().backend();
-						String defaultedIndexName = indexedAnnotation.get().index();
-						if ( defaultedIndexName.isEmpty() ) {
-							defaultedIndexName = typeModel.getJavaClass().getName();
-						}
-						try {
-							collector.mapToIndex( typeModel, backendName, defaultedIndexName );
-						}
-						catch (RuntimeException e) {
-							failureCollector.withContext( PojoEventContexts.fromType( typeModel ) )
-									.withContext( PojoEventContexts.fromAnnotation( indexedAnnotation.get() ) )
-									.add( e );
-						}
-					}
-
 					Optional<PojoTypeMetadataContributor> contributorOptional =
 							contributorFactory.createIfAnnotated( typeModel );
 					if ( contributorOptional.isPresent() ) {

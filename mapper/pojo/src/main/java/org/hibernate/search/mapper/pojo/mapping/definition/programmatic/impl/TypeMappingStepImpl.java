@@ -23,15 +23,11 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationCont
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 
 public class TypeMappingStepImpl
 		implements TypeMappingStep, PojoMappingConfigurationContributor, PojoTypeMetadataContributor {
 
 	private final PojoRawTypeModel<?> typeModel;
-
-	private String backendName;
-	private String indexName;
 
 	private final ErrorCollectingPojoTypeMetadataContributor children = new ErrorCollectingPojoTypeMetadataContributor();
 
@@ -42,16 +38,6 @@ public class TypeMappingStepImpl
 	@Override
 	public void configure(MappingBuildContext buildContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
-		if ( indexName != null ) {
-			try {
-				configurationCollector.mapToIndex( typeModel, backendName, indexName );
-			}
-			catch (RuntimeException e) {
-				buildContext.getFailureCollector()
-						.withContext( PojoEventContexts.fromType( typeModel ) )
-						.add( e );
-			}
-		}
 		configurationCollector.collectContributor( typeModel, this );
 	}
 
@@ -67,7 +53,7 @@ public class TypeMappingStepImpl
 
 	@Override
 	public TypeMappingStep indexed() {
-		return indexed( null, typeModel.getJavaClass().getName() );
+		return indexed( null, null );
 	}
 
 	@Override
@@ -77,8 +63,6 @@ public class TypeMappingStepImpl
 
 	@Override
 	public TypeMappingStep indexed(String backendName, String indexName) {
-		this.backendName = backendName;
-		this.indexName = indexName;
 		children.add( new IndexedMetadataContributor( typeModel, backendName, indexName ) );
 		return this;
 	}

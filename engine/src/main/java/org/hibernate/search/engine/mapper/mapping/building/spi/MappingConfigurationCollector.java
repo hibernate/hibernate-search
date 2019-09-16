@@ -13,12 +13,8 @@ import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
  */
 public interface MappingConfigurationCollector<C> {
 
-	void mapToIndex(MappableTypeModel typeModel, String backendName, String indexName);
-
 	void collectContributor(MappableTypeModel typeModel, C contributor);
 
 	void collectDiscoverer(TypeMetadataDiscoverer<C> metadataDiscoverer);
-
-	void enableMultiTenancy();
 
 }

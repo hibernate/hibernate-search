@@ -8,8 +8,12 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Consumer;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingStateProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingAbortedException;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
@@ -24,12 +28,16 @@ class StubMapper implements Mapper<StubMappingPartialBuildState> {
 	private final ContextualFailureCollector failureCollector;
 	private final TypeMetadataContributorProvider<StubTypeMetadataContributor> contributorProvider;
 
+	private final boolean multiTenancyEnabled;
+
 	private final Map<StubTypeModel, IndexManagerBuildingState<?>> indexManagerBuildingStates = new HashMap<>();
 
 	StubMapper(MappingBuildContext buildContext,
-			TypeMetadataContributorProvider<StubTypeMetadataContributor> contributorProvider) {
+			TypeMetadataContributorProvider<StubTypeMetadataContributor> contributorProvider,
+			boolean multiTenancyEnabled) {
 		this.failureCollector = buildContext.getFailureCollector();
 		this.contributorProvider = contributorProvider;
+		this.multiTenancyEnabled = multiTenancyEnabled;
 	}
 
 	@Override
@@ -38,9 +46,65 @@ class StubMapper implements Mapper<StubMappingPartialBuildState> {
 	}
 
 	@Override
-	public void addIndexed(MappableTypeModel typeModel, IndexManagerBuildingState<?> indexManagerBuildingState) {
-		indexManagerBuildingStates.put( (StubTypeModel) typeModel, indexManagerBuildingState );
-		contributorProvider.get( typeModel ).forEach( c -> c.contribute( indexManagerBuildingState ) );
+	public void prepareIndexedTypes(Consumer<Optional<String>> backendNameCollector) {
+		contributorProvider.getTypesContributedTo()
+				.forEach( type -> {
+					try {
+						prepareType( type, backendNameCollector );
+					}
+					catch (RuntimeException e) {
+						failureCollector.withContext( EventContexts.fromType( type ) )
+								.add( e );
+					}
+				} );
+	}
+
+	private void prepareType(MappableTypeModel type, Consumer<Optional<String>> backendNameCollector) {
+		Set<StubTypeMetadataContributor> metadataSet = contributorProvider.get( type );
+		metadataSet.forEach( metadata -> {
+			if ( metadata.getIndexName() != null ) {
+				backendNameCollector.accept( Optional.ofNullable( metadata.getBackendName() ) );
+			}
+		} );
+	}
+
+	@Override
+	public void mapIndexedTypes(IndexManagerBuildingStateProvider indexManagerBuildingStateProvider) {
+		contributorProvider.getTypesContributedTo()
+				.forEach( type -> {
+					try {
+						mapTypeIfIndexed( type, indexManagerBuildingStateProvider );
+					}
+					catch (RuntimeException e) {
+						failureCollector.withContext( EventContexts.fromType( type ) )
+								.add( e );
+					}
+				} );
+	}
+
+	private void mapTypeIfIndexed(MappableTypeModel type,
+			IndexManagerBuildingStateProvider indexManagerBuildingStateProvider) {
+		Set<StubTypeMetadataContributor> contributorSet = contributorProvider.get( type );
+		String indexName = null;
+		String backendName = null;
+		for ( StubTypeMetadataContributor contributor : contributorSet ) {
+			if ( contributor.getIndexName() != null ) {
+				indexName = contributor.getIndexName();
+			}
+			if ( contributor.getBackendName() != null ) {
+				backendName = contributor.getBackendName();
+			}
+		}
+		if ( indexName != null ) {
+			IndexManagerBuildingState<?> indexManagerBuildingState =
+					indexManagerBuildingStateProvider.getIndexManagerBuildingState(
+							Optional.ofNullable( backendName ),
+							indexName,
+							multiTenancyEnabled
+					);
+			indexManagerBuildingStates.put( (StubTypeModel) type, indexManagerBuildingState );
+			contributorProvider.get( type ).forEach( c -> c.contribute( indexManagerBuildingState ) );
+		}
 	}
 
 	@Override
