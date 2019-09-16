@@ -103,14 +103,6 @@ public interface Log extends BasicLogger {
 			value = "Invalid value: at least one bound in range predicates must be non-null.")
 	SearchException rangePredicateCannotMatchNullValue(@Param EventContext context);
 
-	@Message(id = ID_OFFSET_2 + 13,
-			value = "Cannot map type '%1$s' to index '%2$s', because this type is abstract."
-					+ " Index mappings are not inherited: they apply to exact instances of a given type."
-					+ " As a result, mapping an abstract type to an index does not make sense,"
-					+ " since the index would always be empty.")
-	SearchException cannotMapAbstractTypeToIndex(
-			@FormatWith(MappableTypeModelFormatter.class) MappableTypeModel typeModel, String indexName);
-
 	@Message(id = ID_OFFSET_2 + 14,
 			value = "Field name '%1$s' is invalid: field names cannot be null or empty.")
 	SearchException relativeFieldNameCannotBeNullOrEmpty(String relativeFieldName,
@@ -177,9 +169,6 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 30, value = "Unable to load class [%1$s]")
 	ClassLoadingException unableToLoadTheClass(String className, @Cause Throwable cause);
-
-	@Message(id = ID_OFFSET_2 + 31, value = "Trying to map the Type '%1$s' mapped to multiple indexes: '%2$s', '%3$s'.")
-	SearchException multipleIndexMapping(@FormatWith(MappableTypeModelFormatter.class) MappableTypeModel typeModel, String indexName, String otherIndexName);
 
 	@Message(id = ID_OFFSET_2 + 32, value = "No mapping registered for mapping key: '%1$s'.")
 	SearchException noMappingRegistered(@FormatWith(MappingKeyFormatter.class) MappingKey<?, ?> mappingKey);

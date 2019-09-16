@@ -85,9 +85,6 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 	@Override
 	public void configure(MappingBuildContext buildContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
-		if ( multiTenancyEnabled ) {
-			configurationCollector.enableMultiTenancy();
-		}
 		for ( PojoMappingConfigurationContributor delegate : delegates ) {
 			delegate.configure( buildContext, configurationCollector );
 		}
@@ -101,6 +98,7 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 				introspector,
 				containerExtractorRegistryBuilder.build(),
 				implicitProvidedId,
+				multiTenancyEnabled,
 				createMapperDelegate()
 		);
 	}

@@ -8,12 +8,11 @@ package org.hibernate.search.engine.mapper.model.spi;
 
 import java.util.stream.Stream;
 
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
-
 /**
  * A representation of an entity type that can be mapped to an index.
  *
- * @see org.hibernate.search.engine.mapper.mapping.building.spi.Mapper#addIndexed(MappableTypeModel, IndexManagerBuildingState)
+ * @see org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider#get(MappableTypeModel)
+ * @see org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataDiscoverer#discover(MappableTypeModel)
  */
 public interface MappableTypeModel {
 

@@ -72,12 +72,7 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		) )
 				.andReturn( (BackendImplementor) backendMock );
 		replayAll();
-		holder.createBackends( CollectionHelper.asSet( "myBackend" ) );
-		verifyAll();
-
-		resetAll();
-		replayAll();
-		IndexManagerBuildingStateHolder.BackendInitialBuildState<?> backend = holder.getBackend( "myBackend" );
+		holder.createBackends( CollectionHelper.asSet( Optional.of( "myBackend" ) ) );
 		verifyAll();
 
 		resetAll();
@@ -91,7 +86,7 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		EasyMock.expect( indexManagerBuilderMock.getSchemaRootNodeBuilder() )
 				.andStubReturn( indexSchemaRootNodeBuilderMock );
 		replayAll();
-		backend.getIndexManagerBuildingState( "myIndex", false );
+		holder.getIndexManagerBuildingState( Optional.of( "myBackend" ), "myIndex", false );
 		verifyAll();
 
 		// Check that configuration property sources behave as expected
@@ -128,7 +123,7 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 	}
 
 	@Test
-	public void error_missingBackend_nullName() {
+	public void error_missingBackend_emptyName() {
 		resetAll();
 		EasyMock.expect( configurationSourceMock.get( "backends.myBackend.type" ) )
 				.andReturn( (Optional) Optional.of( "someBackendType" ) );
@@ -143,28 +138,7 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		thrown.expectMessage( "The name of the default backend is not set" );
 		thrown.expectMessage( "Set it through the configuration property 'somePrefix.default_backend'" );
 		thrown.expectMessage( "or set the backend name explicitly for each indexed type in your mapping" );
-		holder.createBackends( CollectionHelper.asSet( (String) null ) );
-		verifyAll();
-	}
-
-	@Test
-	public void error_missingIndexBackend_emptyName() {
-		String keyPrefix = "somePrefix.";
-		resetAll();
-		EasyMock.expect( configurationSourceMock.get( "indexes.indexName.backend" ) )
-				.andReturn( (Optional) Optional.of( "" ) );
-		EasyMock.expect( configurationSourceMock.resolve( "indexes.indexName.backend" ) )
-				.andReturn( Optional.of( keyPrefix + "indexes.indexName.backend" ) );
-		EasyMock.expect( configurationSourceMock.get( "default_backend" ) )
-				.andReturn( (Optional) Optional.of( "" ) );
-		EasyMock.expect( configurationSourceMock.resolve( "default_backend" ) )
-				.andReturn( Optional.of( keyPrefix + "default_backend" ) );
-		replayAll();
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "The name of the default backend is not set" );
-		thrown.expectMessage( "Set it through the configuration property 'somePrefix.default_backend'" );
-		thrown.expectMessage( "or set the backend name explicitly for each indexed type in your mapping" );
-		holder.createBackends( CollectionHelper.asSet( "" ) );
+		holder.createBackends( CollectionHelper.asSet( Optional.empty() ) );
 		verifyAll();
 	}
 
@@ -188,7 +162,7 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 				.andReturn( backendFailureCollectorMock );
 		backendFailureCollectorMock.add( EasyMock.capture( throwableCapture ) );
 		replayAll();
-		holder.createBackends( CollectionHelper.asSet( "backendName" ) );
+		holder.createBackends( CollectionHelper.asSet( Optional.of( "backendName" ) ) );
 		verifyAll();
 
 		assertThat( throwableCapture.getValue() )
@@ -217,7 +191,7 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 				.andReturn( backendFailureCollectorMock );
 		backendFailureCollectorMock.add( EasyMock.capture( throwableCapture ) );
 		replayAll();
-		holder.createBackends( CollectionHelper.asSet( "backendName" ) );
+		holder.createBackends( CollectionHelper.asSet( Optional.of( "backendName" ) ) );
 		verifyAll();
 
 		assertThat( throwableCapture.getValue() )

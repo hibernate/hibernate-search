@@ -14,34 +14,34 @@ import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
+import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
+import org.hibernate.search.engine.backend.spi.BackendBuildContext;
+import org.hibernate.search.engine.backend.spi.BackendFactory;
+import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.impl.EngineConfigurationUtils;
-import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
-import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
-import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
-import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
-import org.hibernate.search.engine.backend.spi.BackendImplementor;
-import org.hibernate.search.engine.backend.spi.BackendFactory;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.engine.backend.spi.BackendBuildContext;
+import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.mapper.mapping.building.impl.IndexedEntityBindingContextImpl;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingStateProvider;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.impl.StringHelper;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
 
-class IndexManagerBuildingStateHolder {
+class IndexManagerBuildingStateHolder implements IndexManagerBuildingStateProvider {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -68,13 +68,12 @@ class IndexManagerBuildingStateHolder {
 		this.rootBuildContext = rootBuildContext;
 	}
 
-	void createBackends(Set<String> backendNames) {
-		if ( backendNames.contains( "" ) || backendNames.contains( null ) ) {
-			backendNames.remove( "" );
-			backendNames.remove( null );
-			backendNames.add( getDefaultBackendName() );
+	void createBackends(Set<Optional<String>> backendNames) {
+		if ( backendNames.remove( Optional.<String>empty() ) ) {
+			backendNames.add( Optional.of( getDefaultBackendName() ) );
 		}
-		for ( String backendName : backendNames ) {
+		for ( Optional<String> backendNameOptional : backendNames ) {
+			String backendName = backendNameOptional.get(); // Never empty, see above
 			BackendInitialBuildState<?> backendBuildState;
 			try {
 				backendBuildState = createBackend( backendName );
@@ -89,10 +88,14 @@ class IndexManagerBuildingStateHolder {
 		}
 	}
 
-	BackendInitialBuildState<?> getBackend(String backendName) {
-		if ( StringHelper.isEmpty( backendName ) ) {
-			backendName = getDefaultBackendName();
-		}
+	@Override
+	public IndexManagerBuildingState<?> getIndexManagerBuildingState(Optional<String> backendName, String indexName,
+			boolean multiTenancyEnabled) {
+		return getBackend( backendName.orElseGet( this::getDefaultBackendName ) )
+				.getIndexManagerBuildingState( indexName, multiTenancyEnabled );
+	}
+
+	private BackendInitialBuildState<?> getBackend(String backendName) {
 		BackendInitialBuildState<?> backendBuildState = backendBuildStateByName.get( backendName );
 		if ( backendBuildState == null ) {
 			throw new AssertionFailure(
