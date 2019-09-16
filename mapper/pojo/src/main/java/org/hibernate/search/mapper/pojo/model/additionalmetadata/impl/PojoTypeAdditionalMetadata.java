@@ -11,11 +11,14 @@ import java.util.Optional;
 
 public class PojoTypeAdditionalMetadata {
 	private final Optional<PojoEntityTypeAdditionalMetadata> entityTypeMetadata;
+	private final Optional<PojoIndexedTypeAdditionalMetadata> indexedTypeMetadata;
 	private final Map<String, PojoPropertyAdditionalMetadata> propertiesAdditionalMetadata;
 
 	public PojoTypeAdditionalMetadata(Optional<PojoEntityTypeAdditionalMetadata> entityTypeMetadata,
+			Optional<PojoIndexedTypeAdditionalMetadata> indexedTypeMetadata,
 			Map<String, PojoPropertyAdditionalMetadata> propertiesAdditionalMetadata) {
 		this.entityTypeMetadata = entityTypeMetadata;
+		this.indexedTypeMetadata = indexedTypeMetadata;
 		this.propertiesAdditionalMetadata = propertiesAdditionalMetadata;
 	}
 
@@ -37,6 +40,10 @@ public class PojoTypeAdditionalMetadata {
 
 	public Optional<PojoEntityTypeAdditionalMetadata> getEntityTypeMetadata() {
 		return entityTypeMetadata;
+	}
+
+	public Optional<PojoIndexedTypeAdditionalMetadata> getIndexedTypeMetadata() {
+		return indexedTypeMetadata;
 	}
 
 	public PojoPropertyAdditionalMetadata getPropertyAdditionalMetadata(String name) {

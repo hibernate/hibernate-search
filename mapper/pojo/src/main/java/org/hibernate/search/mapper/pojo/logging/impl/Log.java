@@ -10,10 +10,12 @@ import java.lang.annotation.Annotation;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
+import org.hibernate.search.mapper.pojo.logging.spi.OptionalEmptyAsDefaultFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
@@ -22,10 +24,10 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.ToStringTreeAppendableMultilineFormatter;
-import org.hibernate.search.util.common.SearchException;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
@@ -413,4 +415,22 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 61, value = "Type '%1$s' cannot be indexed-embedded, because no index mapping (@GenericField, @FullTextField, ...) is defined for that type.")
 	SearchException invalidIndexedEmbedded(@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> typeModel);
+
+	@Message(id = ID_OFFSET_2 + 62,
+			value = "Cannot map type '%1$s' to an index, because this type is abstract."
+					+ " Index mappings are not inherited: they apply to exact instances of a given type."
+					+ " As a result, mapping an abstract type to an index does not make sense,"
+					+ " since the index would always be empty.")
+	SearchException cannotMapAbstractTypeToIndex(
+			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel);
+
+	@Message(id = ID_OFFSET_2 + 63, value = "Trying to map type to multiple indexes:"
+			+ " '%2$s' in backend '%1$s',"
+			+ " '%4$s' in backend '%3$s.")
+	SearchException multipleIndexMapping(
+			@FormatWith(OptionalEmptyAsDefaultFormatter.class) Optional<String> backendName,
+			@FormatWith(OptionalEmptyAsDefaultFormatter.class) Optional<String> indexName,
+			@FormatWith(OptionalEmptyAsDefaultFormatter.class) Optional<String> otherBackendName,
+			@FormatWith(OptionalEmptyAsDefaultFormatter.class) Optional<String> otherIndexName);
+
 }

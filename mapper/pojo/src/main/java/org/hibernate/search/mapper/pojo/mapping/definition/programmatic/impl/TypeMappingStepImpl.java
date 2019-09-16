@@ -14,7 +14,6 @@ import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
-import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
@@ -24,6 +23,7 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationCont
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 
 public class TypeMappingStepImpl
 		implements TypeMappingStep, PojoMappingConfigurationContributor, PojoTypeMetadataContributor {
@@ -67,19 +67,19 @@ public class TypeMappingStepImpl
 
 	@Override
 	public TypeMappingStep indexed() {
-		return indexed( typeModel.getJavaClass().getName() );
+		return indexed( null, typeModel.getJavaClass().getName() );
 	}
 
 	@Override
 	public TypeMappingStep indexed(String indexName) {
-		this.indexName = indexName;
-		return this;
+		return indexed( null, indexName );
 	}
 
 	@Override
 	public TypeMappingStep indexed(String backendName, String indexName) {
 		this.backendName = backendName;
 		this.indexName = indexName;
+		children.add( new IndexedMetadataContributor( typeModel, backendName, indexName ) );
 		return this;
 	}
 

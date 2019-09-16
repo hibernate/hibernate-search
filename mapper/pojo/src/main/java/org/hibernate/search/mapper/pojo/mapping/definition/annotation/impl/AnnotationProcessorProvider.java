@@ -42,6 +42,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Associatio
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
@@ -72,6 +73,7 @@ class AnnotationProcessorProvider {
 		AnnotationProcessorHelper helper = new AnnotationProcessorHelper( rootFailureCollector );
 
 		this.typeAnnotationProcessors = CollectionHelper.toImmutableList( CollectionHelper.asList(
+				new IndexedProcessor( helper ),
 				new RoutingKeyBridgeProcessor( helper ),
 				new TypeBridgeProcessor( helper )
 		) );
@@ -197,6 +199,30 @@ class AnnotationProcessorProvider {
 					helper.createIdentifierBinder( annotation, propertyModel );
 
 			mappingContext.documentId().identifierBinder( binder );
+		}
+	}
+
+	private static class IndexedProcessor extends TypeAnnotationProcessor<Indexed> {
+		IndexedProcessor(AnnotationProcessorHelper helper) {
+			super( helper );
+		}
+
+		@Override
+		Stream<? extends Indexed> extractAnnotations(PojoRawTypeModel<?> typeModel) {
+			return typeModel.getAnnotationsByType( Indexed.class );
+		}
+
+		@Override
+		void doProcess(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel, Indexed annotation) {
+			String indexName = annotation.index();
+			if ( indexName.isEmpty() ) {
+				indexName = null;
+			}
+			String backendName = annotation.backend();
+			if ( backendName.isEmpty() ) {
+				backendName = null;
+			}
+			mappingContext.indexed( backendName, indexName );
 		}
 	}
 
