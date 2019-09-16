@@ -30,7 +30,6 @@ import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchr
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
-import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert;
@@ -109,9 +108,9 @@ public class ProjectionDslIT {
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			// tag::entryPoint-objects[]
-			SearchMapping searchMapping = Search.mapping( entityManager.getEntityManagerFactory() );
+			SearchSession searchSession = Search.session( entityManager );
 
-			SearchScope<Book> scope = searchMapping.scope( Book.class );
+			SearchScope<Book> scope = searchSession.scope( Book.class );
 
 			List<String> result = scope.search( entityManager )
 					.asProjection( scope.projection().field( "title", String.class )

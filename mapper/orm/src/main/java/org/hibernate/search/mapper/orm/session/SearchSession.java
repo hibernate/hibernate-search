@@ -13,6 +13,7 @@ import java.util.Collections;
 import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
+import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.writing.SearchWriter;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQueryHitTypeStep;
@@ -102,6 +103,28 @@ public interface SearchSession {
 	 * @return A {@link SearchWriter}.
 	 */
 	MassIndexer massIndexer(Collection<? extends Class<?>> types);
+
+	/**
+	 * Create a {@link SearchScope} limited to the given type.
+	 *
+	 * @param type A type to include in the scope.
+	 * @param <T> A type to include in the scope.
+	 * @return The created scope.
+	 * @see SearchScope
+	 */
+	default <T> SearchScope<T> scope(Class<T> type) {
+		return scope( Collections.singleton( type ) );
+	}
+
+	/**
+	 * Create a {@link SearchScope} limited to the given types.
+	 *
+	 * @param types A collection of types to include in the scope.
+	 * @param <T> A supertype of all types to include in the scope.
+	 * @return The created scope.
+	 * @see SearchScope
+	 */
+	<T> SearchScope<T> scope(Collection<? extends Class<? extends T>> types);
 
 	/**
 	 * Creates a {@link MassIndexer} to rebuild the indexes of some or all indexed entity types.
