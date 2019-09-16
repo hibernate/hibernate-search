@@ -341,31 +341,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 				mappings.put( mappingKey, partiallyBuiltMapping );
 			}
 			catch (MappingAbortedException e) {
-				ContextualFailureCollector failureCollector = buildContext.getFailureCollector();
-
-				if ( !failureCollector.hasFailure() ) {
-					throw new AssertionFailure(
-							"Caught " + MappingAbortedException.class.getSimpleName()
-									+ ", but the mapper did not collect any failure."
-									+ " There is a bug in the mapper, please report it.",
-							e
-					);
-				}
-
-				/*
-				 * This generally shouldn't do anything, because we don't expect a cause nor suppressed exceptions
-				 * in the MappingAbortedException, but ignoring exceptions can lead to
-				 * spending some really annoying hours debugging.
-				 * So let's be extra cautious not to lose these.
-				 */
-				Throwable cause = e.getCause();
-				if ( cause != null ) {
-					failureCollector.add( cause );
-				}
-				Throwable[] suppressed = e.getSuppressed();
-				for ( Throwable throwable : suppressed ) {
-					failureCollector.add( throwable );
-				}
+				handleMappingAborted( e );
 			}
 		}
 
@@ -397,6 +373,34 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 		public void closeOnFailure() {
 			if ( mapper != null ) {
 				mapper.closeOnFailure();
+			}
+		}
+
+		private void handleMappingAborted(MappingAbortedException e) {
+			ContextualFailureCollector failureCollector = buildContext.getFailureCollector();
+
+			if ( !failureCollector.hasFailure() ) {
+				throw new AssertionFailure(
+						"Caught " + MappingAbortedException.class.getSimpleName()
+								+ ", but the mapper did not collect any failure."
+								+ " There is a bug in the mapper, please report it.",
+						e
+				);
+			}
+
+			/*
+			 * This generally shouldn't do anything, because we don't expect a cause nor suppressed exceptions
+			 * in the MappingAbortedException, but ignoring exceptions can lead to
+			 * spending some really annoying hours debugging.
+			 * So let's be extra cautious not to lose these.
+			 */
+			Throwable cause = e.getCause();
+			if ( cause != null ) {
+				failureCollector.add( cause );
+			}
+			Throwable[] suppressed = e.getSuppressed();
+			for ( Throwable throwable : suppressed ) {
+				failureCollector.add( throwable );
 			}
 		}
 
