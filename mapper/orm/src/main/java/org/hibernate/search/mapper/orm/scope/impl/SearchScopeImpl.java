@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.scope.impl;
 
-import javax.persistence.EntityManager;
-
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
@@ -33,12 +31,6 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 			PojoScopeDelegate<EntityReference, E, HibernateOrmScopeIndexedTypeContext<? extends E>> delegate) {
 		this.mappingContext = mappingContext;
 		this.delegate = delegate;
-	}
-
-	@Override
-	public HibernateOrmSearchQueryHitTypeStep<E> search(EntityManager entityManager) {
-		HibernateOrmScopeSessionContext sessionContext = mappingContext.getSessionContext( entityManager );
-		return search( sessionContext );
 	}
 
 	public HibernateOrmSearchQueryHitTypeStep<E> search(HibernateOrmScopeSessionContext sessionContext) {

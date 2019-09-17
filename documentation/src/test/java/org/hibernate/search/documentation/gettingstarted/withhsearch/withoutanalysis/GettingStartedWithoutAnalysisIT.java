@@ -104,7 +104,7 @@ public class GettingStartedWithoutAnalysisIT {
 
 			SearchScope<Book> scope = searchSession.scope( Book.class ); // <2>
 
-			SearchResult<Book> result = scope.search( entityManager ) // <3>
+			SearchResult<Book> result = searchSession.search( scope ) // <3>
 					.predicate( scope.predicate().match() // <4>
 							.fields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
@@ -118,7 +118,7 @@ public class GettingStartedWithoutAnalysisIT {
 			List<Book> hits2 =
 					/* ... same DSL calls as above... */
 			// end::searching-objects[]
-					scope.search( entityManager )
+					searchSession.search( scope )
 					.predicate( scope.predicate().match()
 							.fields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )

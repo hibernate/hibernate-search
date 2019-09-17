@@ -45,6 +45,11 @@ public class LazyInitSearchSession implements SearchSession {
 	}
 
 	@Override
+	public <T> HibernateOrmSearchQueryHitTypeStep<T> search(SearchScope<T> scope) {
+		return getDelegate().search( scope );
+	}
+
+	@Override
 	public SearchWriter writer(Collection<? extends Class<?>> types) {
 		return getDelegate().writer( types );
 	}
