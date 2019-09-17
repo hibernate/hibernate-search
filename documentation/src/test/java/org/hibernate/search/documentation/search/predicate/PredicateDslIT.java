@@ -29,6 +29,7 @@ import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchr
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
@@ -415,7 +416,7 @@ public class PredicateDslIT {
 			// tag::range-between[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.range().field( "pageCount" )
-							.from( 210 ).to( 250 ) )
+							.between( 210, 250 ) )
 					.fetchHits( 20 );
 			// end::range-between[]
 			assertThat( hits )
@@ -424,37 +425,63 @@ public class PredicateDslIT {
 		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::range-above[]
+			// tag::range-atLeast[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.range().field( "pageCount" )
-							.above( 400 ) )
+							.atLeast( 400 ) )
 					.fetchHits( 20 );
-			// end::range-above[]
+			// end::range-atLeast[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK3_ID );
 		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::range-below[]
+			// tag::range-greaterThan[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.range().field( "pageCount" )
-							.below( 400 ) )
+							.greaterThan( 400 ) )
 					.fetchHits( 20 );
-			// end::range-below[]
+			// end::range-greaterThan[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK3_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::range-atMost[]
+			List<Book> hits = searchSession.search( Book.class )
+					.predicate( f -> f.range().field( "pageCount" )
+							.atMost( 400 ) )
+					.fetchHits( 20 );
+			// end::range-atMost[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK4_ID );
 		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::range-excludeLimit[]
+			// tag::range-lessThan[]
 			List<Book> hits = searchSession.search( Book.class )
 					.predicate( f -> f.range().field( "pageCount" )
-							.from( 200 ).excludeLimit()
-							.to( 250 ).excludeLimit() )
+							.lessThan( 400 ) )
 					.fetchHits( 20 );
-			// end::range-excludeLimit[]
+			// end::range-lessThan[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK4_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::range-between-advanced[]
+			List<Book> hits = searchSession.search( Book.class )
+					.predicate( f -> f.range().field( "pageCount" )
+							.between(
+									200, RangeBoundInclusion.EXCLUDED,
+									250, RangeBoundInclusion.EXCLUDED
+							) )
+					.fetchHits( 20 );
+			// end::range-between-advanced[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK2_ID, BOOK4_ID );

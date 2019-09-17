@@ -693,27 +693,43 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 ----
 ====
 
-.Matching values above a given value
+.Matching values equal to or greater than a given value
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-above]
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-atLeast]
 ----
 ====
 
-.Matching values below a given value
+.Matching values strictly greater than a given value
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-below]
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-greaterThan]
 ----
 ====
 
-.Matching a range of values, excluding the limit(s)
+.Matching values equal to or less than a given value
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-excludeLimit]
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-atMost]
+----
+====
+
+.Matching values strictly less than a given value
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-lessThan]
+----
+====
+
+.Matching a range of values with explicit bound inclusion/exclusion
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-between-advanced]
 ----
 ====
 
@@ -1806,7 +1822,7 @@ include::todo-placeholder.asciidoc[]
 === Type of arguments passed to the DSL
 
 Some predicates, such as the `match` predicate or the `range` predicate,
-require a parameter of type `Object` at some point (`matching(Object)`, `above(Object)`, ...).
+require a parameter of type `Object` at some point (`matching(Object)`, `atLeast(Object)`, ...).
 Similarly, it is possible to pass an argument of type `Object` in the sort DSL
 when defining the behavior for missing values (`missing().use(Object)`).
 
@@ -1871,7 +1887,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/converter/DslConv
 ====
 
 All methods that apply DSL converters offer a variant that accepts a `ValueConvert` parameter:
-`matching`, `from`, `to`, `above`, `below`, ...
+`matching`, `between`, `atLeast`, `atMost`, `greaterThan`, `lessThan`, `range`, ...
 
 [NOTE]
 ====
@@ -2002,8 +2018,10 @@ and combine them with a <<search-dsl-predicate-boolean,boolean junction>>.
 ==== Incompatible DSL converters
 
 Incompatible DSL converters are only a problem when you need to pass an argument to the DSL in certain methods:
-`matching(Object)`/`to(Object)`/`above(Object)`/`below(Object)`/etc. in the predicate DSL,
-or `missing().use(Object) in the sort DSL.
+`matching(Object)`/`between(Object)`/`atLeast(Object)`/`greaterThan(Object)`/etc. in the predicate DSL,
+`missing().use(Object) in the sort DSL,
+`range(Object, Object)` in the aggregation DSL,
+...
 
 If two fields encoded in a compatible way (for example both as `String`),
 but that have different DSL converters
