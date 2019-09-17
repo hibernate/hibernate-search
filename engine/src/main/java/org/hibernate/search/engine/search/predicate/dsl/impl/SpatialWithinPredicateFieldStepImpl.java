@@ -8,12 +8,13 @@ package org.hibernate.search.engine.search.predicate.dsl.impl;
 
 import java.util.Arrays;
 
-import org.hibernate.search.engine.search.predicate.dsl.SpatialWithinPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.SpatialWithinPredicateFieldMoreStep;
+import org.hibernate.search.engine.search.predicate.dsl.SpatialWithinPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
-class SpatialWithinPredicateFieldStepImpl<B> implements SpatialWithinPredicateFieldStep {
+class SpatialWithinPredicateFieldStepImpl<B>
+		implements SpatialWithinPredicateFieldStep<SpatialWithinPredicateFieldMoreStep<?, ?>> {
 
 	private final SpatialWithinPredicateFieldMoreStepImpl.CommonState<B> commonState;
 
@@ -22,7 +23,7 @@ class SpatialWithinPredicateFieldStepImpl<B> implements SpatialWithinPredicateFi
 	}
 
 	@Override
-	public SpatialWithinPredicateFieldMoreStep fields(String ... absoluteFieldPaths) {
+	public SpatialWithinPredicateFieldMoreStep<?, ?> fields(String ... absoluteFieldPaths) {
 		return new SpatialWithinPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 }

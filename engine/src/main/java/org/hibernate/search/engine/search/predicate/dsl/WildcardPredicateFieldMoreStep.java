@@ -11,9 +11,15 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * (see the superinterface {@link WildcardPredicateMatchingStep}),
  * or optional parameters for the last targeted field(s) can be set,
  * or more target fields can be added.
+ *
+ * @param <S> The "self" type (the actual exposed type of this step).
+ * @param <N> The type of the next step.
  */
-public interface WildcardPredicateFieldMoreStep
-		extends WildcardPredicateMatchingStep, MultiFieldPredicateFieldBoostStep<WildcardPredicateFieldMoreStep> {
+public interface WildcardPredicateFieldMoreStep<
+				S extends WildcardPredicateFieldMoreStep<? extends S, N>,
+				N extends WildcardPredicateOptionsStep<? extends N>
+		>
+		extends WildcardPredicateMatchingStep<N>, MultiFieldPredicateFieldBoostStep<S> {
 
 	/**
 	 * Target the given field in the wildcard predicate,
@@ -28,7 +34,7 @@ public interface WildcardPredicateFieldMoreStep
 	 *
 	 * @see WildcardPredicateFieldStep#field(String)
 	 */
-	default WildcardPredicateFieldMoreStep field(String absoluteFieldPath) {
+	default S field(String absoluteFieldPath) {
 		return fields( absoluteFieldPath );
 	}
 
@@ -38,7 +44,7 @@ public interface WildcardPredicateFieldMoreStep
 	 * @return The next step.
 	 */
 	@Deprecated
-	default WildcardPredicateFieldMoreStep orField(String absoluteFieldPath) {
+	default S orField(String absoluteFieldPath) {
 		return field( absoluteFieldPath );
 	}
 
@@ -55,7 +61,7 @@ public interface WildcardPredicateFieldMoreStep
 	 *
 	 * @see WildcardPredicateFieldStep#fields(String...)
 	 */
-	WildcardPredicateFieldMoreStep fields(String... absoluteFieldPaths);
+	S fields(String... absoluteFieldPaths);
 
 	/**
 	 * @deprecated Use {@link #fields(String...)} instead.
@@ -63,7 +69,7 @@ public interface WildcardPredicateFieldMoreStep
 	 * @return The next step.
 	 */
 	@Deprecated
-	default WildcardPredicateFieldMoreStep orFields(String... absoluteFieldPaths) {
+	default S orFields(String... absoluteFieldPaths) {
 		return fields( absoluteFieldPaths );
 	}
 

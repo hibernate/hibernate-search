@@ -38,57 +38,57 @@ public class DelegatingSearchPredicateFactory implements SearchPredicateFactory 
 	}
 
 	@Override
-	public MatchAllPredicateOptionsStep matchAll() {
+	public MatchAllPredicateOptionsStep<?> matchAll() {
 		return delegate.matchAll();
 	}
 
 	@Override
-	public MatchIdPredicateMatchingStep id() {
+	public MatchIdPredicateMatchingStep<?> id() {
 		return delegate.id();
 	}
 
 	@Override
-	public BooleanPredicateClausesStep bool() {
+	public BooleanPredicateClausesStep<?> bool() {
 		return delegate.bool();
 	}
 
 	@Override
-	public PredicateFinalStep bool(Consumer<? super BooleanPredicateClausesStep> clauseContributor) {
+	public PredicateFinalStep bool(Consumer<? super BooleanPredicateClausesStep<?>> clauseContributor) {
 		return delegate.bool( clauseContributor );
 	}
 
 	@Override
-	public MatchPredicateFieldStep match() {
+	public MatchPredicateFieldStep<?> match() {
 		return delegate.match();
 	}
 
 	@Override
-	public RangePredicateFieldStep range() {
+	public RangePredicateFieldStep<?> range() {
 		return delegate.range();
 	}
 
 	@Override
-	public PhrasePredicateFieldStep phrase() {
+	public PhrasePredicateFieldStep<?> phrase() {
 		return delegate.phrase();
 	}
 
 	@Override
-	public WildcardPredicateFieldStep wildcard() {
+	public WildcardPredicateFieldStep<?> wildcard() {
 		return delegate.wildcard();
 	}
 
 	@Override
-	public NestedPredicateFieldStep nested() {
+	public NestedPredicateFieldStep<?> nested() {
 		return delegate.nested();
 	}
 
 	@Override
-	public SimpleQueryStringPredicateFieldStep simpleQueryString() {
+	public SimpleQueryStringPredicateFieldStep<?> simpleQueryString() {
 		return delegate.simpleQueryString();
 	}
 
 	@Override
-	public ExistsPredicateFieldStep exists() {
+	public ExistsPredicateFieldStep<?> exists() {
 		return delegate.exists();
 	}
 

@@ -61,9 +61,11 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
  * </ul>
  * <p>
  * Matching "should" clauses are taken into account in score computation.
+ *
+ * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface BooleanPredicateClausesStep extends
-		PredicateScoreStep<BooleanPredicateClausesStep>, PredicateFinalStep {
+public interface BooleanPredicateClausesStep<S extends BooleanPredicateClausesStep<? extends S>>
+		extends PredicateScoreStep<S>, PredicateFinalStep {
 
 	/**
 	 * Add a <a href="#must">"must" clause</a> based on a previously-built {@link SearchPredicate}.
@@ -71,7 +73,7 @@ public interface BooleanPredicateClausesStep extends
 	 * @param searchPredicate The predicate that must match.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanPredicateClausesStep must(SearchPredicate searchPredicate);
+	S must(SearchPredicate searchPredicate);
 
 	/**
 	 * Add a <a href="#mustnot">"must not" clause</a> based on a previously-built {@link SearchPredicate}.
@@ -79,7 +81,7 @@ public interface BooleanPredicateClausesStep extends
 	 * @param searchPredicate The predicate that must not match.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanPredicateClausesStep mustNot(SearchPredicate searchPredicate);
+	S mustNot(SearchPredicate searchPredicate);
 
 	/**
 	 * Add a <a href="#should">"should" clause</a> based on a previously-built {@link SearchPredicate}.
@@ -87,7 +89,7 @@ public interface BooleanPredicateClausesStep extends
 	 * @param searchPredicate The predicate that should match.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanPredicateClausesStep should(SearchPredicate searchPredicate);
+	S should(SearchPredicate searchPredicate);
 
 	/**
 	 * Add a <a href="#filter">"filter" clause</a> based on a previously-built {@link SearchPredicate}.
@@ -95,7 +97,7 @@ public interface BooleanPredicateClausesStep extends
 	 * @param searchPredicate The predicate that must match.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanPredicateClausesStep filter(SearchPredicate searchPredicate);
+	S filter(SearchPredicate searchPredicate);
 
 	/*
 	 * Syntactic sugar allowing to skip the toPredicate() call by passing a PredicateFinalStep
@@ -108,7 +110,7 @@ public interface BooleanPredicateClausesStep extends
 	 * @param dslFinalStep A final step in the predicate DSL allowing the retrieval of a {@link SearchPredicate}.
 	 * @return {@code this}, for method chaining.
 	 */
-	default BooleanPredicateClausesStep must(PredicateFinalStep dslFinalStep) {
+	default S must(PredicateFinalStep dslFinalStep) {
 		return must( dslFinalStep.toPredicate() );
 	}
 
@@ -118,7 +120,7 @@ public interface BooleanPredicateClausesStep extends
 	 * @param dslFinalStep A final step in the predicate DSL allowing the retrieval of a {@link SearchPredicate}.
 	 * @return {@code this}, for method chaining.
 	 */
-	default BooleanPredicateClausesStep mustNot(PredicateFinalStep dslFinalStep) {
+	default S mustNot(PredicateFinalStep dslFinalStep) {
 		return mustNot( dslFinalStep.toPredicate() );
 	}
 
@@ -128,7 +130,7 @@ public interface BooleanPredicateClausesStep extends
 	 * @param dslFinalStep A final step in the predicate DSL allowing the retrieval of a {@link SearchPredicate}.
 	 * @return {@code this}, for method chaining.
 	 */
-	default BooleanPredicateClausesStep should(PredicateFinalStep dslFinalStep) {
+	default S should(PredicateFinalStep dslFinalStep) {
 		return should( dslFinalStep.toPredicate() );
 	}
 
@@ -138,7 +140,7 @@ public interface BooleanPredicateClausesStep extends
 	 * @param dslFinalStep A final step in the predicate DSL allowing the retrieval of a {@link SearchPredicate}.
 	 * @return {@code this}, for method chaining.
 	 */
-	default BooleanPredicateClausesStep filter(PredicateFinalStep dslFinalStep) {
+	default S filter(PredicateFinalStep dslFinalStep) {
 		return filter( dslFinalStep.toPredicate() );
 	}
 
@@ -158,8 +160,7 @@ public interface BooleanPredicateClausesStep extends
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanPredicateClausesStep must(
-			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
+	S must(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
 
 	/**
 	 * Add a <a href="#mustnot">"must not" clause</a> to be defined by the given function.
@@ -171,8 +172,7 @@ public interface BooleanPredicateClausesStep extends
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanPredicateClausesStep mustNot(
-			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
+	S mustNot(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
 
 	/**
 	 * Add a <a href="#should">"should" clause</a> to be defined by the given function.
@@ -184,8 +184,7 @@ public interface BooleanPredicateClausesStep extends
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanPredicateClausesStep should(
-			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
+	S should(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
 
 	/**
 	 * Add a <a href="#filter">"filter" clause</a> to be defined by the given function.
@@ -197,8 +196,7 @@ public interface BooleanPredicateClausesStep extends
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanPredicateClausesStep filter(
-			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
+	S filter(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
 
 	/*
 	 * Options
@@ -213,7 +211,7 @@ public interface BooleanPredicateClausesStep extends
 	 * for details and possible values, in particular negative values.
 	 * @return {@code this}, for method chaining.
 	 */
-	default BooleanPredicateClausesStep minimumShouldMatchNumber(int matchingClausesNumber) {
+	default S minimumShouldMatchNumber(int matchingClausesNumber) {
 		return minimumShouldMatch()
 				.ifMoreThan( 0 ).thenRequireNumber( matchingClausesNumber )
 				.end();
@@ -228,7 +226,7 @@ public interface BooleanPredicateClausesStep extends
 	 * for details and possible values, in particular negative values.
 	 * @return {@code this}, for method chaining.
 	 */
-	default BooleanPredicateClausesStep minimumShouldMatchPercent(int matchingClausesPercent) {
+	default S minimumShouldMatchPercent(int matchingClausesPercent) {
 		return minimumShouldMatch()
 				.ifMoreThan( 0 ).thenRequirePercent( matchingClausesPercent )
 				.end();
@@ -242,7 +240,7 @@ public interface BooleanPredicateClausesStep extends
 	 *
 	 * @return A {@link MinimumShouldMatchConditionStep} where constraints can be defined.
 	 */
-	MinimumShouldMatchConditionStep<? extends BooleanPredicateClausesStep> minimumShouldMatch();
+	MinimumShouldMatchConditionStep<S> minimumShouldMatch();
 
 	/**
 	 * Start defining the minimum number of "should" constraints that have to match
@@ -254,7 +252,6 @@ public interface BooleanPredicateClausesStep extends
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	BooleanPredicateClausesStep minimumShouldMatch(
-			Consumer<? super MinimumShouldMatchConditionStep<?>> constraintContributor);
+	S minimumShouldMatch(Consumer<? super MinimumShouldMatchConditionStep<?>> constraintContributor);
 
 }

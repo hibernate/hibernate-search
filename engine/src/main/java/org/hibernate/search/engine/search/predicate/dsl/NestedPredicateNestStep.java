@@ -12,8 +12,10 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 /**
  * The step in a "nested" predicate definition where the predicate to nest can be set.
+ *
+ * @param <N> The type of the next step.
  */
-public interface NestedPredicateNestStep {
+public interface NestedPredicateNestStep<N extends NestedPredicateOptionsStep<? extends N>> {
 
 	/**
 	 * Set the inner predicate to a previously-built {@link SearchPredicate}.
@@ -24,7 +26,7 @@ public interface NestedPredicateNestStep {
 	 * @param searchPredicate The predicate that must be matched by at least one element of the nested object field.
 	 * @return The next step.
 	 */
-	NestedPredicateOptionsStep nest(SearchPredicate searchPredicate);
+	N nest(SearchPredicate searchPredicate);
 
 	/*
 	 * Syntactic sugar allowing to skip the toPredicate() call by passing a PredicateFinalStep
@@ -40,7 +42,7 @@ public interface NestedPredicateNestStep {
 	 * @param dslFinalStep A final step in the predicate DSL allowing the retrieval of a {@link SearchPredicate}.
 	 * @return The next step.
 	 */
-	default NestedPredicateOptionsStep nest(PredicateFinalStep dslFinalStep) {
+	default N nest(PredicateFinalStep dslFinalStep) {
 		return nest( dslFinalStep.toPredicate() );
 	}
 
@@ -63,7 +65,6 @@ public interface NestedPredicateNestStep {
 	 * Should generally be a lambda expression.
 	 * @return The next step.
 	 */
-	NestedPredicateOptionsStep nest(
-			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor);
+	N nest(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor);
 
 }

@@ -10,9 +10,11 @@ import org.hibernate.search.engine.search.common.BooleanOperator;
 
 /**
  * The final step in an "simple query string" predicate definition, where optional parameters can be set.
+ *
+ * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface SimpleQueryStringPredicateOptionsStep
-		extends PredicateFinalStep, PredicateScoreStep<SimpleQueryStringPredicateOptionsStep> {
+public interface SimpleQueryStringPredicateOptionsStep<S extends SimpleQueryStringPredicateOptionsStep<? extends S>>
+		extends PredicateFinalStep, PredicateScoreStep<S> {
 
 	/**
 	 * Define the default operator.
@@ -25,14 +27,14 @@ public interface SimpleQueryStringPredicateOptionsStep
 	 * @param operator The default operator ({@code OR} or {@code AND}).
 	 * @return {@code this}, for method chaining.
 	 */
-	SimpleQueryStringPredicateOptionsStep defaultOperator(BooleanOperator operator);
+	S defaultOperator(BooleanOperator operator);
 
 	/**
 	 * @deprecated Use {@code defaultOperator(BooleanOperator.AND)} instead.
 	 * @return {@code this}, for method chaining.
 	 */
 	@Deprecated
-	default SimpleQueryStringPredicateOptionsStep withAndAsDefaultOperator() {
+	default S withAndAsDefaultOperator() {
 		return defaultOperator( BooleanOperator.AND );
 	}
 
@@ -44,13 +46,13 @@ public interface SimpleQueryStringPredicateOptionsStep
 	 * @param analyzerName The name of the analyzer to use in the query for this predicate.
 	 * @return {@code this}, for method chaining.
 	 */
-	SimpleQueryStringPredicateOptionsStep analyzer(String analyzerName);
+	S analyzer(String analyzerName);
 
 	/**
 	 * Any analyzer or normalizer defined on any field will be ignored to interpret the value to match.
 	 *
 	 * @return {@code this}, for method chaining.
 	 */
-	SimpleQueryStringPredicateOptionsStep skipAnalysis();
+	S skipAnalysis();
 
 }

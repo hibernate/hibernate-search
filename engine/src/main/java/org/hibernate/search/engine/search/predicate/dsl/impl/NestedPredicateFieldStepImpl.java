@@ -24,7 +24,9 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class NestedPredicateFieldStepImpl<B>
 		extends AbstractPredicateFinalStep<B>
-		implements NestedPredicateFieldStep, NestedPredicateNestStep, NestedPredicateOptionsStep {
+		implements NestedPredicateFieldStep<NestedPredicateNestStep<?>>,
+				NestedPredicateNestStep<NestedPredicateOptionsStep<?>>,
+				NestedPredicateOptionsStep<NestedPredicateOptionsStep<?>> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -38,13 +40,13 @@ class NestedPredicateFieldStepImpl<B>
 	}
 
 	@Override
-	public NestedPredicateNestStep objectField(String absoluteFieldPath) {
+	public NestedPredicateNestStep<?> objectField(String absoluteFieldPath) {
 		this.builder = builderFactory.nested( absoluteFieldPath );
 		return this;
 	}
 
 	@Override
-	public NestedPredicateOptionsStep nest(SearchPredicate searchPredicate) {
+	public NestedPredicateOptionsStep<?> nest(SearchPredicate searchPredicate) {
 		if ( this.childPredicateBuilder != null ) {
 			throw log.cannotAddMultiplePredicatesToNestedPredicate();
 		}
@@ -53,7 +55,7 @@ class NestedPredicateFieldStepImpl<B>
 	}
 
 	@Override
-	public NestedPredicateOptionsStep nest(
+	public NestedPredicateOptionsStep<?> nest(
 			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
 		return nest( predicateContributor.apply( factory ) );
 	}

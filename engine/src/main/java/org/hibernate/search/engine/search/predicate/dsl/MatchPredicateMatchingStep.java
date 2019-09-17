@@ -10,8 +10,10 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 
 /**
  * The step in a "match" predicate definition where the value to match can be set.
+ *
+ * @param <N> The type of the next step.
  */
-public interface MatchPredicateMatchingStep {
+public interface MatchPredicateMatchingStep<N extends MatchPredicateOptionsStep<? extends N>> {
 
 	/**
 	 * Require at least one of the targeted fields to match the given value.
@@ -27,7 +29,7 @@ public interface MatchPredicateMatchingStep {
 	 *
 	 * @see #matching(Object, ValueConvert)
 	 */
-	default MatchPredicateOptionsStep matching(Object value) {
+	default N matching(Object value) {
 		return matching( value, ValueConvert.YES );
 	}
 
@@ -44,6 +46,6 @@ public interface MatchPredicateMatchingStep {
 	 *
 	 * @see ValueConvert
 	 */
-	MatchPredicateOptionsStep matching(Object value, ValueConvert convert);
+	N matching(Object value, ValueConvert convert);
 
 }

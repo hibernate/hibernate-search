@@ -8,9 +8,11 @@ package org.hibernate.search.engine.search.predicate.dsl;
 
 /**
  * The final step in a "phrase" predicate definition, where optional parameters can be set.
+ *
+ * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface PhrasePredicateOptionsStep
-		extends PredicateFinalStep, PredicateScoreStep<PhrasePredicateOptionsStep> {
+public interface PhrasePredicateOptionsStep<S extends PhrasePredicateOptionsStep<? extends S>>
+		extends PredicateFinalStep, PredicateScoreStep<S> {
 
 	/**
 	 * Sets the slop, which defines how permissive the phrase predicate will be.
@@ -28,7 +30,7 @@ public interface PhrasePredicateOptionsStep
 	 * @param slop The slop value
 	 * @return {@code this}, for method chaining.
 	 */
-	PhrasePredicateOptionsStep slop(int slop);
+	S slop(int slop);
 
 	/**
 	 * @deprecated Use {@link #slop(int)} instead.
@@ -36,7 +38,7 @@ public interface PhrasePredicateOptionsStep
 	 * @return {@code this}, for method chaining.
 	 */
 	@Deprecated
-	default PhrasePredicateOptionsStep withSlop(int slop) {
+	default S withSlop(int slop) {
 		return slop( slop );
 	}
 
@@ -48,13 +50,13 @@ public interface PhrasePredicateOptionsStep
 	 * @param analyzerName The name of the analyzer to use in the query for this predicate.
 	 * @return {@code this}, for method chaining.
 	 */
-	PhrasePredicateOptionsStep analyzer(String analyzerName);
+	S analyzer(String analyzerName);
 
 	/**
 	 * Any analyzer or normalizer defined on any field will be ignored to interpret the value to match.
 	 *
 	 * @return {@code this}, for method chaining.
 	 */
-	PhrasePredicateOptionsStep skipAnalysis();
+	S skipAnalysis();
 
 }

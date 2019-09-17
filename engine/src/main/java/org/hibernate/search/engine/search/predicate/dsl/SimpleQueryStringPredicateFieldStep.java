@@ -8,8 +8,10 @@ package org.hibernate.search.engine.search.predicate.dsl;
 
 /**
  * The initial step in a "simple query string" predicate definition, where the target field can be set.
+ *
+ * @param <N> The type of the next step.
  */
-public interface SimpleQueryStringPredicateFieldStep {
+public interface SimpleQueryStringPredicateFieldStep<N extends SimpleQueryStringPredicateFieldMoreStep<? extends N, ?>> {
 
 	/**
 	 * Target the given field in the simple query string predicate.
@@ -25,7 +27,7 @@ public interface SimpleQueryStringPredicateFieldStep {
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return The next step.
 	 */
-	default SimpleQueryStringPredicateFieldMoreStep field(String absoluteFieldPath) {
+	default N field(String absoluteFieldPath) {
 		return fields( absoluteFieldPath );
 	}
 
@@ -35,7 +37,7 @@ public interface SimpleQueryStringPredicateFieldStep {
 	 * @return The next step.
 	 */
 	@Deprecated
-	default SimpleQueryStringPredicateFieldMoreStep onField(String absoluteFieldPath) {
+	default N onField(String absoluteFieldPath) {
 		return field( absoluteFieldPath );
 	}
 
@@ -55,7 +57,7 @@ public interface SimpleQueryStringPredicateFieldStep {
 	 *
 	 * @see #field(String)
 	 */
-	SimpleQueryStringPredicateFieldMoreStep fields(String... absoluteFieldPaths);
+	N fields(String... absoluteFieldPaths);
 
 	/**
 	 * @deprecated Use {@link #fields(String...)} instead.
@@ -63,7 +65,7 @@ public interface SimpleQueryStringPredicateFieldStep {
 	 * @return The next step.
 	 */
 	@Deprecated
-	default SimpleQueryStringPredicateFieldMoreStep onFields(String... absoluteFieldPaths) {
+	default N onFields(String... absoluteFieldPaths) {
 		return fields( absoluteFieldPaths );
 	}
 

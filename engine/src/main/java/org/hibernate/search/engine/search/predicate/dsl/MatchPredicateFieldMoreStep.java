@@ -11,9 +11,15 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * (see the superinterface {@link MatchPredicateMatchingStep}),
  * or optional parameters for the last targeted field(s) can be set,
  * or more target fields can be added.
+ *
+ * @param <S> The "self" type (the actual exposed type of this step).
+ * @param <N> The type of the next step.
  */
-public interface MatchPredicateFieldMoreStep
-		extends MatchPredicateMatchingStep, MultiFieldPredicateFieldBoostStep<MatchPredicateFieldMoreStep> {
+public interface MatchPredicateFieldMoreStep<
+				S extends MatchPredicateFieldMoreStep<? extends S, N>,
+				N extends MatchPredicateOptionsStep<? extends N>
+		>
+		extends MatchPredicateMatchingStep<N>, MultiFieldPredicateFieldBoostStep<S> {
 
 	/**
 	 * Target the given field in the match predicate,
@@ -26,7 +32,7 @@ public interface MatchPredicateFieldMoreStep
 	 *
 	 * @see MatchPredicateFieldStep#field(String)
 	 */
-	default MatchPredicateFieldMoreStep field(String absoluteFieldPath) {
+	default S field(String absoluteFieldPath) {
 		return fields( absoluteFieldPath );
 	}
 
@@ -36,7 +42,7 @@ public interface MatchPredicateFieldMoreStep
 	 * @return The next step.
 	 */
 	@Deprecated
-	default MatchPredicateFieldMoreStep orField(String absoluteFieldPath) {
+	default S orField(String absoluteFieldPath) {
 		return field( absoluteFieldPath );
 	}
 
@@ -51,7 +57,7 @@ public interface MatchPredicateFieldMoreStep
 	 *
 	 * @see MatchPredicateFieldStep#fields(String...)
 	 */
-	MatchPredicateFieldMoreStep fields(String ... absoluteFieldPaths);
+	S fields(String ... absoluteFieldPaths);
 
 	/**
 	 * @deprecated Use {@link #fields(String...)} instead.
@@ -59,7 +65,7 @@ public interface MatchPredicateFieldMoreStep
 	 * @return The next step.
 	 */
 	@Deprecated
-	default MatchPredicateFieldMoreStep orFields(String ... absoluteFieldPaths) {
+	default S orFields(String ... absoluteFieldPaths) {
 		return fields( absoluteFieldPaths );
 	}
 

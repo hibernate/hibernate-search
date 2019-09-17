@@ -7,13 +7,12 @@
 package org.hibernate.search.engine.search.predicate.dsl;
 
 /**
- * The final step in an "nested" predicate definition, where optional parameters can be set.
+ * The final step in a "match id" predicate definition,
+ * where optional parameters can be set.
  *
  * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface NestedPredicateOptionsStep<S extends NestedPredicateOptionsStep<? extends S>>
+public interface MatchIdPredicateOptionsStep<S extends MatchIdPredicateOptionsStep<? extends S>>
 		extends PredicateFinalStep {
-
-	// TODO HSEARCH-3090 add tuning methods, like the "score_mode" in Elasticsearch (avg, min, ...)
 
 }

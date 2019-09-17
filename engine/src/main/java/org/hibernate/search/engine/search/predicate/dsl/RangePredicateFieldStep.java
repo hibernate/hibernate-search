@@ -9,8 +9,10 @@ package org.hibernate.search.engine.search.predicate.dsl;
 
 /**
  * The initial step in a "range" predicate definition, where the target field can be set.
+ *
+ * @param <N> The type of the next step.
  */
-public interface RangePredicateFieldStep {
+public interface RangePredicateFieldStep<N extends RangePredicateFieldMoreStep<?, ?>> {
 
 	/**
 	 * Target the given field in the range predicate.
@@ -24,7 +26,7 @@ public interface RangePredicateFieldStep {
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return The next step.
 	 */
-	default RangePredicateFieldMoreStep field(String absoluteFieldPath) {
+	default N field(String absoluteFieldPath) {
 		return fields( absoluteFieldPath );
 	}
 
@@ -34,7 +36,7 @@ public interface RangePredicateFieldStep {
 	 * @return The next step.
 	 */
 	@Deprecated
-	default RangePredicateFieldMoreStep onField(String absoluteFieldPath) {
+	default N onField(String absoluteFieldPath) {
 		return field( absoluteFieldPath );
 	}
 
@@ -52,7 +54,7 @@ public interface RangePredicateFieldStep {
 	 *
 	 * @see #field(String)
 	 */
-	RangePredicateFieldMoreStep fields(String ... absoluteFieldPaths);
+	N fields(String ... absoluteFieldPaths);
 
 	/**
 	 * @deprecated Use {@link #fields(String...)} instead.
@@ -60,7 +62,7 @@ public interface RangePredicateFieldStep {
 	 * @return The next step.
 	 */
 	@Deprecated
-	default RangePredicateFieldMoreStep onFields(String ... absoluteFieldPaths) {
+	default N onFields(String ... absoluteFieldPaths) {
 		return fields( absoluteFieldPaths );
 	}
 }

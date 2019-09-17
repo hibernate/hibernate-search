@@ -25,7 +25,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where the "match all" predicate can be defined.
 	 * @see MatchAllPredicateOptionsStep
 	 */
-	MatchAllPredicateOptionsStep matchAll();
+	MatchAllPredicateOptionsStep<?> matchAll();
 
 	/**
 	 * Match documents where the identifier is among the given values.
@@ -33,7 +33,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL allowing the definition of an "id" predicate.
 	 * @see MatchIdPredicateMatchingStep
 	 */
-	MatchIdPredicateMatchingStep id();
+	MatchIdPredicateMatchingStep<?> id();
 
 	/**
 	 * Match documents if they match a combination of boolean clauses.
@@ -41,7 +41,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where the "boolean" predicate can be defined.
 	 * @see BooleanPredicateClausesStep
 	 */
-	BooleanPredicateClausesStep bool();
+	BooleanPredicateClausesStep<?> bool();
 
 	/**
 	 * Match documents if they match a combination of boolean clauses,
@@ -54,7 +54,7 @@ public interface SearchPredicateFactory {
 	 * @return The final step of the boolean predicate definition.
 	 * @see BooleanPredicateClausesStep
 	 */
-	PredicateFinalStep bool(Consumer<? super BooleanPredicateClausesStep> clauseContributor);
+	PredicateFinalStep bool(Consumer<? super BooleanPredicateClausesStep<?>> clauseContributor);
 
 	/**
 	 * Match documents where targeted fields have a value that "matches" a given single value.
@@ -66,7 +66,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where the "match" predicate can be defined.
 	 * @see MatchPredicateFieldStep
 	 */
-	MatchPredicateFieldStep match();
+	MatchPredicateFieldStep<?> match();
 
 	/**
 	 * Match documents where targeted fields have a value within lower and upper bounds.
@@ -74,7 +74,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where the "range" predicate can be defined.
 	 * @see RangePredicateFieldStep
 	 */
-	RangePredicateFieldStep range();
+	RangePredicateFieldStep<?> range();
 
 	/**
 	 * Match documents where targeted fields have a value that contains a given phrase.
@@ -82,7 +82,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where the "phrase" predicate can be defined.
 	 * @see PhrasePredicateFieldStep
 	 */
-	PhrasePredicateFieldStep phrase();
+	PhrasePredicateFieldStep<?> phrase();
 
 	/**
 	 * Match documents where targeted fields contain a term that matches a given pattern,
@@ -95,7 +95,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where the "wildcard" predicate can be defined.
 	 * @see WildcardPredicateFieldStep
 	 */
-	WildcardPredicateFieldStep wildcard();
+	WildcardPredicateFieldStep<?> wildcard();
 
 	/**
 	 * Match documents where a
@@ -105,7 +105,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where the "nested" predicate can be defined.
 	 * @see NestedPredicateFieldStep
 	 */
-	NestedPredicateFieldStep nested();
+	NestedPredicateFieldStep<?> nested();
 
 	/**
 	 * Match documents according to a given query string,
@@ -119,7 +119,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where the "simple query string" predicate can be defined.
 	 * @see SimpleQueryStringPredicateFieldStep
 	 */
-	SimpleQueryStringPredicateFieldStep simpleQueryString();
+	SimpleQueryStringPredicateFieldStep<?> simpleQueryString();
 
 	/**
 	 * Match documents where a given field exists.
@@ -129,7 +129,7 @@ public interface SearchPredicateFactory {
 	 * @return The initial step of a DSL where the "exists" predicate can be defined.
 	 * @see ExistsPredicateFieldStep
 	 */
-	ExistsPredicateFieldStep exists();
+	ExistsPredicateFieldStep<?> exists();
 
 	/**
 	 * Access the different types of spatial predicates.

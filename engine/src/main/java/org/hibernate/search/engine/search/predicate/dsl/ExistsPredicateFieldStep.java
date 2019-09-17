@@ -9,8 +9,10 @@ package org.hibernate.search.engine.search.predicate.dsl;
 
 /**
  * The initial step in an "exists" predicate definition, where the target field can be set.
+ *
+ * @param <N> The type of the next step.
  */
-public interface ExistsPredicateFieldStep {
+public interface ExistsPredicateFieldStep<N extends ExistsPredicateOptionsStep<? extends N>> {
 
 	/**
 	 * Target the given field in the "exists" predicate.
@@ -18,7 +20,7 @@ public interface ExistsPredicateFieldStep {
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return The next step.
 	 */
-	ExistsPredicateOptionsStep field(String absoluteFieldPath);
+	N field(String absoluteFieldPath);
 
 	/**
 	 * @deprecated Use {@link #field(String)} instead.
@@ -26,7 +28,7 @@ public interface ExistsPredicateFieldStep {
 	 * @return The next step.
 	 */
 	@Deprecated
-	default ExistsPredicateOptionsStep onField(String absoluteFieldPath) {
+	default N onField(String absoluteFieldPath) {
 		return field( absoluteFieldPath );
 	}
 

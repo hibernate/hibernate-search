@@ -21,13 +21,13 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFa
 
 class BooleanPredicateClausesStepImpl<B>
 		extends AbstractPredicateFinalStep<B>
-		implements BooleanPredicateClausesStep {
+		implements BooleanPredicateClausesStep<BooleanPredicateClausesStep<?>> {
 
 	private final SearchPredicateFactory factory;
 
 	private final BooleanPredicateBuilder<B> builder;
 
-	private final MinimumShouldMatchConditionStepImpl<BooleanPredicateClausesStep> minimumShouldMatchStep;
+	private final MinimumShouldMatchConditionStepImpl<BooleanPredicateClausesStep<?>> minimumShouldMatchStep;
 
 	BooleanPredicateClausesStepImpl(SearchPredicateBuilderFactory<?, B> builderFactory,
 			SearchPredicateFactory factory) {
@@ -38,76 +38,76 @@ class BooleanPredicateClausesStepImpl<B>
 	}
 
 	@Override
-	public BooleanPredicateClausesStep boost(float boost) {
+	public BooleanPredicateClausesStep<?> boost(float boost) {
 		builder.boost( boost );
 		return this;
 	}
 
 	@Override
-	public BooleanPredicateClausesStep constantScore() {
+	public BooleanPredicateClausesStep<?> constantScore() {
 		builder.constantScore();
 		return this;
 	}
 
 	@Override
-	public BooleanPredicateClausesStep must(SearchPredicate searchPredicate) {
+	public BooleanPredicateClausesStep<?> must(SearchPredicate searchPredicate) {
 		builder.must( builderFactory.toImplementation( searchPredicate ) );
 		return this;
 	}
 
 	@Override
-	public BooleanPredicateClausesStep mustNot(SearchPredicate searchPredicate) {
+	public BooleanPredicateClausesStep<?> mustNot(SearchPredicate searchPredicate) {
 		builder.mustNot( builderFactory.toImplementation( searchPredicate ) );
 		return this;
 	}
 
 	@Override
-	public BooleanPredicateClausesStep should(SearchPredicate searchPredicate) {
+	public BooleanPredicateClausesStep<?> should(SearchPredicate searchPredicate) {
 		builder.should( builderFactory.toImplementation( searchPredicate ) );
 		return this;
 	}
 
 	@Override
-	public BooleanPredicateClausesStep filter(SearchPredicate searchPredicate) {
+	public BooleanPredicateClausesStep<?> filter(SearchPredicate searchPredicate) {
 		builder.filter( builderFactory.toImplementation( searchPredicate ) );
 		return this;
 	}
 
 	@Override
-	public BooleanPredicateClausesStep must(
+	public BooleanPredicateClausesStep<?> must(
 			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
 		must( clauseContributor.apply( factory ) );
 		return this;
 	}
 
 	@Override
-	public BooleanPredicateClausesStep mustNot(
+	public BooleanPredicateClausesStep<?> mustNot(
 			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
 		mustNot( clauseContributor.apply( factory ) );
 		return this;
 	}
 
 	@Override
-	public BooleanPredicateClausesStep should(
+	public BooleanPredicateClausesStep<?> should(
 			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
 		should( clauseContributor.apply( factory ) );
 		return this;
 	}
 
 	@Override
-	public BooleanPredicateClausesStep filter(
+	public BooleanPredicateClausesStep<?> filter(
 			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
 		filter( clauseContributor.apply( factory ) );
 		return this;
 	}
 
 	@Override
-	public MinimumShouldMatchConditionStep<? extends BooleanPredicateClausesStep> minimumShouldMatch() {
+	public MinimumShouldMatchConditionStep<BooleanPredicateClausesStep<?>> minimumShouldMatch() {
 		return minimumShouldMatchStep;
 	}
 
 	@Override
-	public BooleanPredicateClausesStep minimumShouldMatch(
+	public BooleanPredicateClausesStep<?> minimumShouldMatch(
 			Consumer<? super MinimumShouldMatchConditionStep<?>> constraintContributor) {
 		constraintContributor.accept( minimumShouldMatchStep );
 		return this;

@@ -8,12 +8,13 @@ package org.hibernate.search.engine.search.predicate.dsl.impl;
 
 import java.util.Arrays;
 
-import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldMoreStep;
+import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
-class SimpleQueryStringPredicateFieldStepImpl<B> implements SimpleQueryStringPredicateFieldStep {
+class SimpleQueryStringPredicateFieldStepImpl<B>
+		implements SimpleQueryStringPredicateFieldStep<SimpleQueryStringPredicateFieldMoreStep<?, ?>> {
 
 	private final SimpleQueryStringPredicateFieldMoreStepImpl.CommonState<B> commonState;
 
@@ -22,7 +23,7 @@ class SimpleQueryStringPredicateFieldStepImpl<B> implements SimpleQueryStringPre
 	}
 
 	@Override
-	public SimpleQueryStringPredicateFieldMoreStep fields(String ... absoluteFieldPaths) {
+	public SimpleQueryStringPredicateFieldMoreStep<?, ?> fields(String ... absoluteFieldPaths) {
 		return new SimpleQueryStringPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 }

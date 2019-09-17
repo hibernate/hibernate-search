@@ -21,7 +21,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
 class WildcardPredicateFieldMoreStepImpl<B>
-		implements WildcardPredicateFieldMoreStep, AbstractBooleanMultiFieldPredicateCommonState.FieldSetState<B> {
+		implements WildcardPredicateFieldMoreStep<WildcardPredicateFieldMoreStepImpl<B>, WildcardPredicateOptionsStep<?>>,
+				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState<B> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -43,18 +44,18 @@ class WildcardPredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public WildcardPredicateFieldMoreStep fields(String... absoluteFieldPaths) {
+	public WildcardPredicateFieldMoreStepImpl<B> fields(String... absoluteFieldPaths) {
 		return new WildcardPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 
 	@Override
-	public WildcardPredicateFieldMoreStep boost(float boost) {
+	public WildcardPredicateFieldMoreStepImpl<B> boost(float boost) {
 		this.fieldSetBoost = boost;
 		return this;
 	}
 
 	@Override
-	public WildcardPredicateOptionsStep matching(String wildcard) {
+	public WildcardPredicateOptionsStep<?> matching(String wildcard) {
 		return commonState.matching( wildcard );
 	}
 
@@ -73,14 +74,15 @@ class WildcardPredicateFieldMoreStepImpl<B>
 		}
 	}
 
-	static class CommonState<B> extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<B>, B, WildcardPredicateFieldMoreStepImpl<B>>
-			implements WildcardPredicateOptionsStep {
+	static class CommonState<B>
+			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<B>, B, WildcardPredicateFieldMoreStepImpl<B>>
+			implements WildcardPredicateOptionsStep<CommonState<B>> {
 
 		CommonState(SearchPredicateBuilderFactory<?, B> builderFactory) {
 			super( builderFactory );
 		}
 
-		private WildcardPredicateOptionsStep matching(String wildcardPattern) {
+		private WildcardPredicateOptionsStep<?> matching(String wildcardPattern) {
 			if ( wildcardPattern == null ) {
 				throw log.wildcardPredicateCannotMatchNullPattern( getEventContext() );
 			}

@@ -23,7 +23,10 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
 class SimpleQueryStringPredicateFieldMoreStepImpl<B>
-		implements SimpleQueryStringPredicateFieldMoreStep {
+		implements SimpleQueryStringPredicateFieldMoreStep<
+				SimpleQueryStringPredicateFieldMoreStepImpl<B>,
+				SimpleQueryStringPredicateOptionsStep<?>
+		> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -42,23 +45,23 @@ class SimpleQueryStringPredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public SimpleQueryStringPredicateFieldMoreStep fields(String... absoluteFieldPaths) {
+	public SimpleQueryStringPredicateFieldMoreStepImpl<B> fields(String... absoluteFieldPaths) {
 		return new SimpleQueryStringPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 
 	@Override
-	public SimpleQueryStringPredicateFieldMoreStep boost(float boost) {
+	public SimpleQueryStringPredicateFieldMoreStepImpl<B> boost(float boost) {
 		fieldStates.forEach( c -> c.boost( boost ) );
 		return this;
 	}
 
 	@Override
-	public SimpleQueryStringPredicateOptionsStep matching(String simpleQueryString) {
+	public SimpleQueryStringPredicateOptionsStep<?> matching(String simpleQueryString) {
 		return commonState.matching( simpleQueryString );
 	}
 
 	static class CommonState<B> extends AbstractPredicateFinalStep<B>
-			implements SimpleQueryStringPredicateOptionsStep {
+			implements SimpleQueryStringPredicateOptionsStep<CommonState<B>> {
 
 		private final SimpleQueryStringPredicateBuilder<B> builder;
 
@@ -82,7 +85,7 @@ class SimpleQueryStringPredicateFieldMoreStepImpl<B>
 			return builder.field( absoluteFieldPath );
 		}
 
-		private SimpleQueryStringPredicateOptionsStep matching(String simpleQueryString) {
+		private SimpleQueryStringPredicateOptionsStep<?> matching(String simpleQueryString) {
 			if ( simpleQueryString == null ) {
 				throw log.simpleQueryStringCannotBeNull( collectAbsoluteFieldPaths() );
 			}
@@ -103,19 +106,19 @@ class SimpleQueryStringPredicateFieldMoreStepImpl<B>
 		}
 
 		@Override
-		public SimpleQueryStringPredicateOptionsStep defaultOperator(BooleanOperator operator) {
+		public CommonState<B> defaultOperator(BooleanOperator operator) {
 			builder.defaultOperator( operator );
 			return this;
 		}
 
 		@Override
-		public SimpleQueryStringPredicateOptionsStep analyzer(String analyzerName) {
+		public CommonState<B> analyzer(String analyzerName) {
 			builder.analyzer( analyzerName );
 			return this;
 		}
 
 		@Override
-		public SimpleQueryStringPredicateOptionsStep skipAnalysis() {
+		public CommonState<B> skipAnalysis() {
 			builder.skipAnalysis();
 			return this;
 		}

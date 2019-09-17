@@ -8,8 +8,10 @@ package org.hibernate.search.engine.search.predicate.dsl;
 
 /**
  * The initial step in a "phrase" predicate definition, where the target field can be set.
+ *
+ * @param <N> The type of the next step.
  */
-public interface PhrasePredicateFieldStep {
+public interface PhrasePredicateFieldStep<N extends PhrasePredicateFieldMoreStep<?, ?>> {
 
 	/**
 	 * Target the given field in the phrase predicate.
@@ -25,7 +27,7 @@ public interface PhrasePredicateFieldStep {
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return The next step.
 	 */
-	default PhrasePredicateFieldMoreStep field(String absoluteFieldPath) {
+	default N field(String absoluteFieldPath) {
 		return fields( absoluteFieldPath );
 	}
 
@@ -35,7 +37,7 @@ public interface PhrasePredicateFieldStep {
 	 * @return The next step.
 	 */
 	@Deprecated
-	default PhrasePredicateFieldMoreStep onField(String absoluteFieldPath) {
+	default N onField(String absoluteFieldPath) {
 		return field( absoluteFieldPath );
 	}
 
@@ -55,7 +57,7 @@ public interface PhrasePredicateFieldStep {
 	 *
 	 * @see #field(String)
 	 */
-	PhrasePredicateFieldMoreStep fields(String... absoluteFieldPaths);
+	N fields(String... absoluteFieldPaths);
 
 	/**
 	 * @deprecated Use {@link #fields(String...)} instead.
@@ -63,7 +65,7 @@ public interface PhrasePredicateFieldStep {
 	 * @return The next step.
 	 */
 	@Deprecated
-	default PhrasePredicateFieldMoreStep onFields(String... absoluteFieldPaths) {
+	default N onFields(String... absoluteFieldPaths) {
 		return fields( absoluteFieldPaths );
 	}
 

@@ -10,7 +10,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
 /**
  * The initial step in a "match" predicate definition, where the target field can be set.
  */
-public interface MatchPredicateFieldStep {
+public interface MatchPredicateFieldStep<N extends MatchPredicateFieldMoreStep<? extends N, ?>> {
 
 	/**
 	 * Target the given field in the match predicate.
@@ -24,7 +24,7 @@ public interface MatchPredicateFieldStep {
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return The next step.
 	 */
-	default MatchPredicateFieldMoreStep field(String absoluteFieldPath) {
+	default N field(String absoluteFieldPath) {
 		return fields( absoluteFieldPath );
 	}
 
@@ -34,7 +34,7 @@ public interface MatchPredicateFieldStep {
 	 * @return The next step.
 	 */
 	@Deprecated
-	default MatchPredicateFieldMoreStep onField(String absoluteFieldPath) {
+	default N onField(String absoluteFieldPath) {
 		return field( absoluteFieldPath );
 	}
 
@@ -52,7 +52,7 @@ public interface MatchPredicateFieldStep {
 	 *
 	 * @see #field(String)
 	 */
-	MatchPredicateFieldMoreStep fields(String ... absoluteFieldPaths);
+	N fields(String ... absoluteFieldPaths);
 
 	/**
 	 * @deprecated Use {@link #fields(String...)} instead.
@@ -60,7 +60,7 @@ public interface MatchPredicateFieldStep {
 	 * @return The next step.
 	 */
 	@Deprecated
-	default MatchPredicateFieldMoreStep onFields(String ... absoluteFieldPaths) {
+	default N onFields(String ... absoluteFieldPaths) {
 		return fields( absoluteFieldPaths );
 	}
 }

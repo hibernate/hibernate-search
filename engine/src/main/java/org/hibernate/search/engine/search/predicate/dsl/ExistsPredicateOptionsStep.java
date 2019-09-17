@@ -8,8 +8,10 @@ package org.hibernate.search.engine.search.predicate.dsl;
 
 /**
  * The final step in an "exists" predicate definition, where optional parameters can be set.
+ *
+ * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface ExistsPredicateOptionsStep
-		extends PredicateFinalStep, PredicateBoostStep<ExistsPredicateOptionsStep> {
+public interface ExistsPredicateOptionsStep<S extends ExistsPredicateOptionsStep<? extends S>>
+		extends PredicateFinalStep, PredicateBoostStep<ExistsPredicateOptionsStep<?>> {
 
 }

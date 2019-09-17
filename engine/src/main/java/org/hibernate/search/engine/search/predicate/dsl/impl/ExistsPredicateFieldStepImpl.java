@@ -15,7 +15,8 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFa
 
 final class ExistsPredicateFieldStepImpl<B>
 		extends AbstractPredicateFinalStep<B>
-		implements ExistsPredicateFieldStep, ExistsPredicateOptionsStep {
+		implements ExistsPredicateFieldStep<ExistsPredicateOptionsStep<?>>,
+				ExistsPredicateOptionsStep<ExistsPredicateOptionsStep<?>> {
 
 	private ExistsPredicateBuilder<B> builder;
 
@@ -24,13 +25,13 @@ final class ExistsPredicateFieldStepImpl<B>
 	}
 
 	@Override
-	public ExistsPredicateOptionsStep field(String absoluteFieldPath) {
+	public ExistsPredicateOptionsStep<?> field(String absoluteFieldPath) {
 		this.builder = builderFactory.exists( absoluteFieldPath );
 		return this;
 	}
 
 	@Override
-	public ExistsPredicateOptionsStep boost(float boost) {
+	public ExistsPredicateOptionsStep<?> boost(float boost) {
 		this.builder.boost( boost );
 		return this;
 	}
