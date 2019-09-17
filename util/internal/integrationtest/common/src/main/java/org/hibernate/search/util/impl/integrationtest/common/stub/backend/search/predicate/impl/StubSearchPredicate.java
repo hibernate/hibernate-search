@@ -8,7 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
-class StubSearchPredicate implements SearchPredicate {
+public class StubSearchPredicate implements SearchPredicate {
 	private final StubPredicateBuilder builder;
 
 	StubSearchPredicate(

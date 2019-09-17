@@ -10,6 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.backend
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.persistence.Entity;
@@ -17,10 +18,19 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.SoftAssertions;
+
 import org.hibernate.SessionFactory;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.aggregation.SearchAggregation;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.projection.SearchProjection;
+import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
+import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -28,8 +38,13 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.aggregation.impl.StubSearchAggregation;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl.StubSearchPredicate;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.StubSearchSort;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -292,6 +307,66 @@ public class SearchQueryBaseIT {
 					new Book_Author_Score( new Book_Author( session.load( Book.class, 1 ), AUTHOR_4_3_2_1 ), 4.0F ),
 					new Book_Author_Score( new Book_Author( session.load( Book.class, 2 ), AUTHOR_CIDER_HOUSE ), 5.0F ),
 					new Book_Author_Score( new Book_Author( session.load( Book.class, 3 ), AUTHOR_AVENUE_OF_MYSTERIES ), 6.0F )
+			);
+		} );
+	}
+
+	/**
+	 * A smoke test for components (predicate, sort, ...) created from the mapping without a session
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3671")
+	public void componentsFromMappingWithoutSession() {
+		SearchMapping mapping = Search.mapping( sessionFactory );
+		SearchScope<Book> scope = mapping.scope( Book.class );
+
+		/*
+		 * The backend is a stub, so these components are stub too:
+		 * we simply test that the mapper correctly delegates to the backend.
+		 */
+		SearchProjection<EntityReference> projection = scope.projection().entityReference().toProjection();
+		SearchPredicate predicate = scope.predicate().matchAll().toPredicate();
+		SearchSort sort = scope.sort().field( "title" ).toSort();
+		SearchAggregation<Map<String, Long>> aggregation = scope.aggregation().terms()
+				.field( "title", String.class ).toAggregation();
+		SoftAssertions.assertSoftly( a -> {
+			a.assertThat( projection ).isInstanceOf( StubSearchProjection.class );
+			a.assertThat( predicate ).isInstanceOf( StubSearchPredicate.class );
+			a.assertThat( sort ).isInstanceOf( StubSearchSort.class );
+			a.assertThat( aggregation ).isInstanceOf( StubSearchAggregation.class );
+		} );
+
+		/*
+		 * ... and below we test that passing these objects to the DSL will work correctly.
+		 * Objects are casted explicitly by the stub backend,
+		 * so if a wrong object was passed, the whole query would fail.
+		 */
+		AggregationKey<Map<String, Long>> aggregationKey = AggregationKey.of( "titleAgg" );
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+
+			SearchQuery<EntityReference> query = searchSession.search( scope )
+					.asProjection( projection )
+					.predicate( predicate )
+					.sort( sort )
+					.aggregation( aggregationKey, aggregation )
+					.toQuery();
+
+			backendMock.expectSearchProjection(
+					Arrays.asList( Book.INDEX ),
+					b -> { },
+					StubSearchWorkBehavior.of(
+							3L,
+							StubBackendUtils.reference( Book.INDEX, "1" ),
+							StubBackendUtils.reference( Book.INDEX, "2" ),
+							StubBackendUtils.reference( Book.INDEX, "3" )
+					)
+			);
+
+			Assertions.assertThat( query.fetchHits() ).containsExactlyInAnyOrder(
+					new EntityReferenceImpl( Book.class, 1 ),
+					new EntityReferenceImpl( Book.class, 2 ),
+					new EntityReferenceImpl( Book.class, 3 )
 			);
 		} );
 	}
