@@ -23,7 +23,12 @@ public final class DefaultJavaUtilDateValueBridge implements ValueBridge<Date, I
 
 	@Override
 	public Instant toIndexedValue(Date value, ValueBridgeToIndexedValueContext context) {
-		return value == null ? null : value.toInstant();
+		if ( value == null ) {
+			return null;
+		}
+
+		// java.sql.* types do not support toInstant(). See HSEARCH-3670
+		return Instant.ofEpochMilli( value.getTime() );
 	}
 
 	@Override
