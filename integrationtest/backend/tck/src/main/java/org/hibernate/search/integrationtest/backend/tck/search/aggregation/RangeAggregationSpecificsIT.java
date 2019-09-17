@@ -227,7 +227,7 @@ public class RangeAggregationSpecificsIT<F> {
 
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeBelowMiddleAbove")
-	public void rangesOfIncludingAllBounds() {
+	public void rangesBetweenIncludingAllBounds() {
 		assumeNonCanonicalRangesSupported();
 
 		String fieldPath = indexMapping.fieldModel.relativeFieldName;
@@ -238,11 +238,11 @@ public class RangeAggregationSpecificsIT<F> {
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, typeDescriptor.getJavaType() )
 								.ranges( Arrays.asList(
-										Range.of( null, RangeBoundInclusion.INCLUDED,
+										Range.between( null, RangeBoundInclusion.INCLUDED,
 												ascendingValues.get( 2 ), RangeBoundInclusion.INCLUDED ),
-										Range.of( ascendingValues.get( 3 ), RangeBoundInclusion.INCLUDED,
+										Range.between( ascendingValues.get( 3 ), RangeBoundInclusion.INCLUDED,
 												ascendingValues.get( 4 ), RangeBoundInclusion.INCLUDED ),
-										Range.of( ascendingValues.get( 5 ), RangeBoundInclusion.INCLUDED,
+										Range.between( ascendingValues.get( 5 ), RangeBoundInclusion.INCLUDED,
 												null, RangeBoundInclusion.INCLUDED )
 								) )
 						)
@@ -252,17 +252,17 @@ public class RangeAggregationSpecificsIT<F> {
 						aggregationKey,
 						containsExactly( c -> {
 							c.accept(
-									Range.of( null, RangeBoundInclusion.INCLUDED,
+									Range.between( null, RangeBoundInclusion.INCLUDED,
 											ascendingValues.get( 2 ), RangeBoundInclusion.INCLUDED ),
 									3L
 							);
 							c.accept(
-									Range.of( ascendingValues.get( 3 ), RangeBoundInclusion.INCLUDED,
+									Range.between( ascendingValues.get( 3 ), RangeBoundInclusion.INCLUDED,
 											ascendingValues.get( 4 ), RangeBoundInclusion.INCLUDED ),
 									2L
 							);
 							c.accept(
-									Range.of( ascendingValues.get( 5 ), RangeBoundInclusion.INCLUDED,
+									Range.between( ascendingValues.get( 5 ), RangeBoundInclusion.INCLUDED,
 											null, RangeBoundInclusion.INCLUDED ),
 									2L
 							);

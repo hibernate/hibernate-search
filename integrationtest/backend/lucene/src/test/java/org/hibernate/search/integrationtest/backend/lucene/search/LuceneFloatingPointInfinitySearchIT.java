@@ -96,9 +96,9 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 		SearchResultAssert.assertThat(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, Float.class )
-								.range( Range.of( null, RangeBoundInclusion.EXCLUDED,
+								.range( Range.between( null, RangeBoundInclusion.EXCLUDED,
 										0f, RangeBoundInclusion.EXCLUDED ) )
-								.range( Range.of( 0f, RangeBoundInclusion.INCLUDED,
+								.range( Range.between( 0f, RangeBoundInclusion.INCLUDED,
 										null, RangeBoundInclusion.EXCLUDED ) )
 						)
 						.toQuery()
@@ -107,12 +107,12 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 						aggregationKey,
 						a -> assertThat( a ).containsExactly(
 								entry(
-										Range.of( null, RangeBoundInclusion.EXCLUDED,
+										Range.between( null, RangeBoundInclusion.EXCLUDED,
 												0f, RangeBoundInclusion.EXCLUDED ),
 										0L
 								),
 								entry(
-										Range.of( 0f, RangeBoundInclusion.INCLUDED,
+										Range.between( 0f, RangeBoundInclusion.INCLUDED,
 												null, RangeBoundInclusion.EXCLUDED ),
 										1L
 								)
@@ -156,9 +156,9 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 		SearchResultAssert.assertThat(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, Double.class )
-								.range( Range.of( null, RangeBoundInclusion.EXCLUDED,
+								.range( Range.between( null, RangeBoundInclusion.EXCLUDED,
 										0d, RangeBoundInclusion.EXCLUDED ) )
-								.range( Range.of( 0d, RangeBoundInclusion.INCLUDED,
+								.range( Range.between( 0d, RangeBoundInclusion.INCLUDED,
 										null, RangeBoundInclusion.EXCLUDED ) )
 						)
 						.toQuery()
@@ -167,12 +167,12 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 						aggregationKey,
 						a -> assertThat( a ).containsExactly(
 								entry(
-										Range.of( null, RangeBoundInclusion.EXCLUDED,
+										Range.between( null, RangeBoundInclusion.EXCLUDED,
 												0d, RangeBoundInclusion.EXCLUDED ),
 										0L
 								),
 								entry(
-										Range.of( 0d, RangeBoundInclusion.INCLUDED,
+										Range.between( 0d, RangeBoundInclusion.INCLUDED,
 												null, RangeBoundInclusion.EXCLUDED ),
 										1L
 								)

@@ -295,7 +295,7 @@ public class AggregationDslIT {
 					.aggregation( countsByPriceKey, f -> f.range()
 							.field( "price", Double.class )
 							.range( Range.canonical( 0.0, 10.0 ) ) // <1>
-							.range( Range.of( 10.0, RangeBoundInclusion.INCLUDED,
+							.range( Range.between( 10.0, RangeBoundInclusion.INCLUDED,
 									20.0, RangeBoundInclusion.EXCLUDED ) ) // <2>
 							.range( Range.atLeast( 20.0 ) ) // <3>
 					)
