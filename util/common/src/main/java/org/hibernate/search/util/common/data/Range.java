@@ -72,6 +72,18 @@ public final class Range<T> {
 	}
 
 	/**
+	 * @param lowerBoundValue The lower bound of the range.
+	 * May be {@code null} to represent {@code -Infinity} (no lower bound),
+	 * @param upperBoundValue The upper bound of the range.
+	 * May be {@code null} to represent {@code +Infinity} (no upper bound).
+	 * @param <T> The type of range bounds.
+	 * @return The range {@code [lowerBoundValue, upperBoundValue]} (both bounds included).
+	 */
+	public static <T> Range<T> between(T lowerBoundValue, T upperBoundValue) {
+		return of( lowerBoundValue, RangeBoundInclusion.INCLUDED, upperBoundValue, RangeBoundInclusion.INCLUDED );
+	}
+
+	/**
 	 * @param lowerBoundValue The value of the lower bound of the range. Must not be {@code null}.
 	 * @param <T> The type of range bounds.
 	 * @return The range {@code [lowerBoundValue, +Infinity]} (both bounds included).
