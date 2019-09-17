@@ -59,12 +59,12 @@ public class LibraryService {
 	}
 
 	public List<Library> search(String terms, int offset, int limit) {
-		return libraryRepo.search( terms, limit, offset );
+		return libraryRepo.search( terms, offset, limit );
 	}
 
 	public LibraryFacetedSearchResult searchFaceted(String terms,
 			Integer minCollectionSize, List<LibraryServiceOption> libraryServices,
 			int limit, int offset) {
-		return libraryRepo.searchFaceted( terms, minCollectionSize, libraryServices, limit, offset );
+		return libraryRepo.searchFaceted( terms, minCollectionSize, libraryServices, offset, limit );
 	}
 }

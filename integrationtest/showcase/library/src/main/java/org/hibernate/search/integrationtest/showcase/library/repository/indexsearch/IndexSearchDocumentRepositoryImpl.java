@@ -59,7 +59,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 	}
 
 	@Override
-	public List<Book> searchByMedium(String terms, BookMedium medium, int limit, int offset) {
+	public List<Book> searchByMedium(String terms, BookMedium medium, int offset, int limit) {
 		return Search.session( entityManager ).search( Book.class )
 				.predicate( f -> f.bool( b -> {
 					if ( terms != null && !terms.isEmpty() ) {
@@ -81,7 +81,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 	public List<Document<?>> searchAroundMe(String terms, String tags,
 			GeoPoint myLocation, Double maxDistanceInKilometers,
 			List<LibraryServiceOption> libraryServices,
-			int limit, int offset) {
+			int offset, int limit) {
 		return Search.session( entityManager ).search( DOCUMENT_CLASS )
 				.predicate( f -> f.bool( b -> {
 					// Match query

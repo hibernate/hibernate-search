@@ -21,22 +21,22 @@ public class IndexSearchPersonRepositoryImpl implements IndexSearchPersonReposit
 	private EntityManager entityManager;
 
 	@Override
-	public List<Person> listTopBorrowers(int limit, int offset) {
+	public List<Person> listTopBorrowers(int offset, int limit) {
 		return listTopBorrowers( "account.borrowals.totalCount", limit, offset );
 	}
 
 	@Override
-	public List<Person> listTopShortTermBorrowers(int limit, int offset) {
+	public List<Person> listTopShortTermBorrowers(int offset, int limit) {
 		return listTopBorrowers( "account.borrowals.shortTermCount", limit, offset );
 	}
 
 	@Override
-	public List<Person> listTopLongTermBorrowers(int limit, int offset) {
+	public List<Person> listTopLongTermBorrowers(int offset, int limit) {
 		return listTopBorrowers( "account.borrowals.longTermCount", limit, offset );
 	}
 
 	@Override
-	public List<Person> searchPerson(String terms, int limit, int offset) {
+	public List<Person> searchPerson(String terms, int offset, int limit) {
 		if ( terms == null || terms.isEmpty() ) {
 			return Collections.emptyList();
 		}

@@ -59,19 +59,19 @@ public class BorrowalService {
 	}
 
 	public List<Person> listTopBorrowers(int offset, int limit) {
-		return personRepo.listTopBorrowers( limit, offset );
+		return personRepo.listTopBorrowers( offset, limit );
 	}
 
 	public List<Person> listTopShortTermBorrowers(int offset, int limit) {
-		return personRepo.listTopShortTermBorrowers( limit, offset );
+		return personRepo.listTopShortTermBorrowers( offset, limit );
 	}
 
 	public List<Person> listTopLongTermBorrowers(int offset, int limit) {
-		return personRepo.listTopLongTermBorrowers( limit, offset );
+		return personRepo.listTopLongTermBorrowers( offset, limit );
 	}
 
 	public List<Person> searchPerson(String terms, int offset, int limit) {
-		return personRepo.searchPerson( terms, limit, offset );
+		return personRepo.searchPerson( terms, offset, limit );
 	}
 
 	private DocumentCopy getCopy(Document<DocumentCopy<?>> document, Library library, int copyIndex) {
