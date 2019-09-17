@@ -9,7 +9,10 @@ package org.hibernate.search.engine.search.predicate.dsl;
 /**
  * The final step in a "range" predicate definition, where optional parameters can be set,
  * or the last defined range limit can be excluded.
+ *
+ * @deprecated Use {@link RangePredicateMatchingStep} instead.
  */
+@Deprecated
 public interface RangePredicateLastLimitExcludeStep
 		extends RangePredicateLimitExcludeStep<RangePredicateOptionsStep>, RangePredicateOptionsStep {
 

@@ -7,10 +7,14 @@
 package org.hibernate.search.engine.search.predicate.dsl;
 
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.util.common.data.Range;
 
 /**
  * The step in a "range" predicate definition where the limits of the range to match can be set.
+ *
+ * @deprecated Use {@link RangePredicateMatchingStep} instead.
  */
+@Deprecated
 public interface RangePredicateLimitsStep {
 
 	/**
@@ -27,7 +31,9 @@ public interface RangePredicateLimitsStep {
 	 * The lower bound is included in the range by default,
 	 * but can be excluded by calling {@link RangePredicateLimitExcludeStep#excludeLimit()} on the next step.
 	 * @return The next step.
+	 * @deprecated Use {@link RangePredicateMatchingStep#between(Object, Object)} instead.
 	 */
+	@Deprecated
 	default RangePredicateFromToStep from(Object value) {
 		return from( value, ValueConvert.YES );
 	}
@@ -48,7 +54,9 @@ public interface RangePredicateLimitsStep {
 	 * @param convert Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
 	 * See {@link ValueConvert} for more information.
 	 * @return The next step.
+	 * @deprecated Use {@link RangePredicateMatchingStep#range(Range, ValueConvert)} instead.
 	 */
+	@Deprecated
 	RangePredicateFromToStep from(Object value, ValueConvert convert);
 
 	/**
@@ -62,7 +70,10 @@ public interface RangePredicateLimitsStep {
 	 * The lower bound is included in the range by default,
 	 * but can be excluded by calling {@link RangePredicateLimitExcludeStep#excludeLimit()} on the next step.
 	 * @return The next step.
+	 * @deprecated Use {@link RangePredicateMatchingStep#atLeast(Object)}
+	 * or {@link RangePredicateMatchingStep#greaterThan(Object)} instead.
 	 */
+	@Deprecated
 	default RangePredicateLastLimitExcludeStep above(Object value) {
 		return above( value, ValueConvert.YES );
 	}
@@ -80,7 +91,10 @@ public interface RangePredicateLimitsStep {
 	 * @param convert Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
 	 * See {@link ValueConvert} for more information.
 	 * @return The next step.
+	 * @deprecated Use {@link RangePredicateMatchingStep#atLeast(Object, ValueConvert)}
+	 * or {@link RangePredicateMatchingStep#greaterThan(Object, ValueConvert)} instead.
 	 */
+	@Deprecated
 	RangePredicateLastLimitExcludeStep above(Object value, ValueConvert convert);
 
 	/**
@@ -94,7 +108,10 @@ public interface RangePredicateLimitsStep {
 	 * The upper bound is included in the range by default,
 	 * but can be excluded by calling {@link RangePredicateLimitExcludeStep#excludeLimit()} on the next step.
 	 * @return The next step.
+	 * @deprecated Use {@link RangePredicateMatchingStep#atMost(Object)}
+	 * or {@link RangePredicateMatchingStep#lessThan(Object)} instead.
 	 */
+	@Deprecated
 	default RangePredicateLastLimitExcludeStep below(Object value) {
 		return below( value, ValueConvert.YES );
 	}
@@ -112,7 +129,10 @@ public interface RangePredicateLimitsStep {
 	 * @param convert Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
 	 * See {@link ValueConvert} for more information.
 	 * @return The next step.
+	 * @deprecated Use {@link RangePredicateMatchingStep#atMost(Object, ValueConvert)}
+	 * or {@link RangePredicateMatchingStep#lessThan(Object, ValueConvert)} instead.
 	 */
+	@Deprecated
 	RangePredicateLastLimitExcludeStep below(Object value, ValueConvert convert);
 
 }

@@ -8,12 +8,12 @@ package org.hibernate.search.engine.search.predicate.dsl;
 
 /**
  * The step in a "range" predicate definition where the limits of the range to match can be set
- * (see the superinterface {@link RangePredicateLimitsStep}),
+ * (see the superinterface {@link RangePredicateMatchingStep}),
  * or optional parameters for the last targeted field(s) can be set,
  * or more target fields can be added.
  */
 public interface RangePredicateFieldMoreStep
-		extends RangePredicateLimitsStep, MultiFieldPredicateFieldBoostStep<RangePredicateFieldMoreStep> {
+		extends RangePredicateMatchingStep, MultiFieldPredicateFieldBoostStep<RangePredicateFieldMoreStep> {
 
 	/**
 	 * Target the given field in the range predicate,

@@ -7,10 +7,14 @@
 package org.hibernate.search.engine.search.predicate.dsl;
 
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.util.common.data.Range;
 
 /**
  * The step in a "range" predicate definition where the upper limit of the range can be set.
+ *
+ * @deprecated Use {@link RangePredicateMatchingStep} instead.
  */
+@Deprecated
 public interface RangePredicateToStep {
 
 	/**
@@ -30,6 +34,7 @@ public interface RangePredicateToStep {
 	 * The upper bound is included in the range by default,
 	 * but can be excluded by calling {@link RangePredicateLimitExcludeStep#excludeLimit()} on the next step.
 	 * @return The next step.
+	 * @deprecated Use {@link RangePredicateMatchingStep#between(Object, Object)} instead.
 	 */
 	default RangePredicateLastLimitExcludeStep to(Object value) {
 		return to( value, ValueConvert.YES );
@@ -51,6 +56,7 @@ public interface RangePredicateToStep {
 	 * @param convert Controls how the {@code value} should be converted before Hibernate Search attempts to interpret it as a field value.
 	 * See {@link ValueConvert} for more information.
 	 * @return The next step.
+	 * @deprecated Use {@link RangePredicateMatchingStep#range(Range, ValueConvert)} instead.
 	 */
 	RangePredicateLastLimitExcludeStep to(Object value, ValueConvert convert);
 

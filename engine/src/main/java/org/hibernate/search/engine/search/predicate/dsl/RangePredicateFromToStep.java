@@ -9,7 +9,10 @@ package org.hibernate.search.engine.search.predicate.dsl;
 /**
  * The step in a "range" predicate definition where the upper limit of the range can be set,
  * or the lower limit of the range can be excluded.
+ *
+ * @deprecated Use {@link RangePredicateMatchingStep} instead.
  */
+@Deprecated
 public interface RangePredicateFromToStep
 		extends RangePredicateToStep, RangePredicateLimitExcludeStep<RangePredicateToStep> {
 

@@ -10,7 +10,10 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * The step in a "range" predicate definition where the last defined range limit can be excluded.
  *
  * @param <N> The type of the next step (returned by {@link #excludeLimit()}.
+ *
+ * @deprecated Use {@link RangePredicateMatchingStep} instead.
  */
+@Deprecated
 public interface RangePredicateLimitExcludeStep<N> {
 
 	/**
@@ -23,7 +26,9 @@ public interface RangePredicateLimitExcludeStep<N> {
 	 * this will exclude the lower bound.
 	 *
 	 * @return The next step.
+	 * @deprecated Use the appropriate method in {@link RangePredicateMatchingStep} instead.
 	 */
+	@Deprecated
 	N excludeLimit();
 
 }
