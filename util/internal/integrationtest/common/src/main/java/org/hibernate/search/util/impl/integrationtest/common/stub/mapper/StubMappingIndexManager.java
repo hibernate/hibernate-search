@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
@@ -62,16 +62,16 @@ public class StubMappingIndexManager {
 		return indexManager.createIndexer( sessionContext, commitStrategy );
 	}
 
-	public IndexWorkExecutor createWorkExecutor() {
-		return createWorkExecutor( new StubBackendSessionContext() );
+	public IndexWorkspace createWorkspace() {
+		return createWorkspace( new StubBackendSessionContext() );
 	}
 
-	public IndexWorkExecutor createWorkExecutor(StubBackendSessionContext sessionContext) {
-		return createWorkExecutor( DetachedBackendSessionContext.of( sessionContext ) );
+	public IndexWorkspace createWorkspace(StubBackendSessionContext sessionContext) {
+		return createWorkspace( DetachedBackendSessionContext.of( sessionContext ) );
 	}
 
-	public IndexWorkExecutor createWorkExecutor(DetachedBackendSessionContext sessionContext) {
-		return indexManager.createWorkExecutor( sessionContext );
+	public IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext) {
+		return indexManager.createWorkspace( sessionContext );
 	}
 
 	/**

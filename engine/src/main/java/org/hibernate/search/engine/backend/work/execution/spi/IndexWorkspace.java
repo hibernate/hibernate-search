@@ -8,7 +8,10 @@ package org.hibernate.search.engine.backend.work.execution.spi;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface IndexWorkExecutor {
+/**
+ * The entry point for explicit index operations on a single index.
+ */
+public interface IndexWorkspace {
 
 	CompletableFuture<?> optimize();
 

@@ -26,12 +26,12 @@ import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancy
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorProvider;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.ElasticsearchIndexIndexer;
-import org.hibernate.search.backend.elasticsearch.work.execution.impl.ElasticsearchIndexWorkExecutor;
+import org.hibernate.search.backend.elasticsearch.work.execution.impl.ElasticsearchIndexWorkspace;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.ElasticsearchIndexIndexingPlan;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.WorkExecutionBackendContext;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
@@ -106,11 +106,11 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	}
 
 	@Override
-	public IndexWorkExecutor createWorkExecutor(ElasticsearchWorkOrchestrator orchestrator, URLEncodedString indexName,
+	public IndexWorkspace createWorkspace(ElasticsearchWorkOrchestrator orchestrator, URLEncodedString indexName,
 			DetachedBackendSessionContext sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
-		return new ElasticsearchIndexWorkExecutor(
+		return new ElasticsearchIndexWorkspace(
 				link.getWorkBuilderFactory(), multiTenancyStrategy, orchestrator, indexName,
 				sessionContext
 		);

@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.mapper.orm.massindexing.monitor.impl.SimpleIndexingProgressMonitor;
-import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -37,7 +37,7 @@ public class MassIndexerImpl implements MassIndexer {
 	private final DetachedBackendSessionContext sessionContext;
 
 	private final Set<Class<?>> rootEntities;
-	private final PojoScopeWorkExecutor scopeWorkExecutor;
+	private final PojoScopeWorkspace scopeWorkspace;
 
 	// default settings defined here:
 	private int typesToIndexInParallel = 1;
@@ -55,11 +55,11 @@ public class MassIndexerImpl implements MassIndexer {
 	public MassIndexerImpl(HibernateOrmMassIndexingMappingContext mappingContext,
 			Set<? extends HibernateOrmMassIndexingIndexedTypeContext<?>> targetedIndexedTypes,
 			DetachedBackendSessionContext sessionContext,
-			PojoScopeWorkExecutor scopeWorkExecutor) {
+			PojoScopeWorkspace scopeWorkspace) {
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
 		this.rootEntities = toRootEntities( targetedIndexedTypes );
-		this.scopeWorkExecutor = scopeWorkExecutor;
+		this.scopeWorkspace = scopeWorkspace;
 
 		// TODO HSEARCH-3057 use a JMX monitor if JMX is enabled (see Search 5)
 		this.monitor = new SimpleIndexingProgressMonitor();
@@ -172,7 +172,7 @@ public class MassIndexerImpl implements MassIndexer {
 	protected BatchCoordinator createCoordinator() {
 		return new BatchCoordinator(
 				mappingContext, sessionContext,
-				rootEntities, scopeWorkExecutor,
+				rootEntities, scopeWorkspace,
 				typesToIndexInParallel, documentBuilderThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,
 				optimizeAtEnd, purgeAtStart, optimizeAfterPurge,

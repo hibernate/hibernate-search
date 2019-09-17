@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
@@ -46,8 +46,8 @@ class MappedIndexManagerImpl<D extends DocumentElement> implements MappedIndexMa
 	}
 
 	@Override
-	public IndexWorkExecutor createWorkExecutor(DetachedBackendSessionContext sessionContext) {
-		return implementor.createWorkExecutor( sessionContext );
+	public IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext) {
+		return implementor.createWorkspace( sessionContext );
 	}
 
 	@Override

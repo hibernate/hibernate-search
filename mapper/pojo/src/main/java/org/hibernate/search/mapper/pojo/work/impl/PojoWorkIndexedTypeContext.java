@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
@@ -51,6 +51,6 @@ public interface PojoWorkIndexedTypeContext<I, E, D extends DocumentElement> {
 			AbstractPojoBackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy);
 
-	IndexWorkExecutor createWorkExecutor(DetachedBackendSessionContext sessionContext);
+	IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext);
 
 }

@@ -9,14 +9,14 @@ package org.hibernate.search.mapper.orm.work.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
-import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.impl.Futures;
 
 public class SearchWorkspaceImpl implements SearchWorkspace {
-	private final PojoScopeWorkExecutor scopeWorkExecutor;
+	private final PojoScopeWorkspace delegate;
 
-	public SearchWorkspaceImpl(PojoScopeWorkExecutor scopeWorkExecutor) {
-		this.scopeWorkExecutor = scopeWorkExecutor;
+	public SearchWorkspaceImpl(PojoScopeWorkspace delegate) {
+		this.delegate = delegate;
 	}
 
 	@Override
@@ -26,7 +26,7 @@ public class SearchWorkspaceImpl implements SearchWorkspace {
 
 	@Override
 	public CompletableFuture<?> optimizeAsync() {
-		return scopeWorkExecutor.optimize();
+		return delegate.optimize();
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public class SearchWorkspaceImpl implements SearchWorkspace {
 
 	@Override
 	public CompletableFuture<?> purgeAsync() {
-		return scopeWorkExecutor.purge();
+		return delegate.purge();
 	}
 
 	@Override
@@ -46,6 +46,6 @@ public class SearchWorkspaceImpl implements SearchWorkspace {
 
 	@Override
 	public CompletableFuture<?> flushAsync() {
-		return scopeWorkExecutor.flush();
+		return delegate.flush();
 	}
 }

@@ -28,8 +28,8 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeExtendedContextPr
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoBackendMappingContext;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
-import org.hibernate.search.mapper.pojo.work.impl.PojoScopeWorkExecutorImpl;
-import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
+import org.hibernate.search.mapper.pojo.work.impl.PojoScopeWorkspaceImpl;
+import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelegate<R, E2, C> {
@@ -126,8 +126,8 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 	}
 
 	@Override
-	public PojoScopeWorkExecutor executor(DetachedBackendSessionContext sessionContext) {
-		return new PojoScopeWorkExecutorImpl(
+	public PojoScopeWorkspace workspace(DetachedBackendSessionContext sessionContext) {
+		return new PojoScopeWorkspaceImpl(
 				targetedTypeContexts, sessionContext
 		);
 	}

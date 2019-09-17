@@ -17,7 +17,7 @@ import org.hibernate.CacheMode;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
-import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Executors;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -39,7 +39,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	private final HibernateOrmMassIndexingMappingContext mappingContext;
 	private final DetachedBackendSessionContext sessionContext;
 	private final Set<Class<?>> rootEntities; //entity types to reindex excluding all subtypes of each-other
-	private final PojoScopeWorkExecutor scopeWorkExecutor;
+	private final PojoScopeWorkspace scopeWorkspace;
 
 	private final int typesToIndexInParallel;
 	private final int documentBuilderThreads;
@@ -57,7 +57,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 
 	public BatchCoordinator(HibernateOrmMassIndexingMappingContext mappingContext,
 			DetachedBackendSessionContext sessionContext,
-			Set<Class<?>> rootEntities, PojoScopeWorkExecutor scopeWorkExecutor,
+			Set<Class<?>> rootEntities, PojoScopeWorkspace scopeWorkspace,
 			int typesToIndexInParallel, int documentBuilderThreads, CacheMode cacheMode,
 			int objectLoadingBatchSize, long objectsLimit, boolean optimizeAtEnd,
 			boolean purgeAtStart, boolean optimizeAfterPurge, MassIndexingMonitor monitor,
@@ -65,7 +65,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
 		this.rootEntities = rootEntities;
-		this.scopeWorkExecutor = scopeWorkExecutor;
+		this.scopeWorkspace = scopeWorkspace;
 
 		this.idFetchSize = idFetchSize;
 		this.transactionTimeout = transactionTimeout;
@@ -145,16 +145,16 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	 */
 	private void afterBatch() {
 		if ( this.optimizeAtEnd ) {
-			scopeWorkExecutor.optimize().join();
+			scopeWorkspace.optimize().join();
 		}
-		scopeWorkExecutor.flush().join();
+		scopeWorkspace.flush().join();
 	}
 
 	/**
 	 * batch indexing has been interrupted : flush to apply all index update realized before interruption
 	 */
 	private void afterBatchOnInterruption() {
-		scopeWorkExecutor.flush().join();
+		scopeWorkspace.flush().join();
 	}
 
 	/**
@@ -162,9 +162,9 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	 */
 	private void beforeBatch() {
 		if ( this.purgeAtStart ) {
-			scopeWorkExecutor.purge().join();
+			scopeWorkspace.purge().join();
 			if ( this.optimizeAfterPurge ) {
-				scopeWorkExecutor.optimize().join();
+				scopeWorkspace.optimize().join();
 			}
 		}
 	}

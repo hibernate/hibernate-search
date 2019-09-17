@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -83,8 +83,8 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 	}
 
 	@Override
-	public IndexWorkExecutor createWorkExecutor(DetachedBackendSessionContext sessionContext) {
-		return new StubIndexWorkExecutor( name, backend.getBehavior(), sessionContext );
+	public IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext) {
+		return new StubIndexWorkspace( name, backend.getBehavior(), sessionContext );
 	}
 
 	@Override

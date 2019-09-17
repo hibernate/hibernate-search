@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -61,7 +61,7 @@ public class IndexIndexerIT {
 		IndexIndexer<? extends DocumentElement> indexer =
 				indexManager.createIndexer( DocumentCommitStrategy.NONE );
 		CompletableFuture<?>[] tasks = new CompletableFuture<?>[NUMBER_OF_BOOKS];
-		IndexWorkExecutor workExecutor = indexManager.createWorkExecutor();
+		IndexWorkspace workspace = indexManager.createWorkspace();
 
 		for ( int i = 0; i < NUMBER_OF_BOOKS; i++ ) {
 			final String id = i + "";
@@ -70,7 +70,7 @@ public class IndexIndexerIT {
 			} );
 		}
 		CompletableFuture.allOf( tasks ).join();
-		workExecutor.flush().join();
+		workspace.flush().join();
 
 		SearchQuery<DocumentReference> query = indexManager.createScope().query()
 				.predicate( f -> f.matchAll() )

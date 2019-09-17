@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
@@ -48,7 +48,7 @@ public interface IndexManagerImplementor<D extends DocumentElement> extends Auto
 	IndexIndexer<D> createIndexer(BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy);
 
-	IndexWorkExecutor createWorkExecutor(DetachedBackendSessionContext sessionContext);
+	IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext);
 
 	IndexScopeBuilder createScopeBuilder(BackendMappingContext mappingContext);
 

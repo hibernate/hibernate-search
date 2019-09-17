@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrc
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
@@ -47,6 +47,6 @@ public interface WorkExecutionBackendContext {
 			BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy);
 
-	IndexWorkExecutor createWorkExecutor(WorkExecutionIndexManagerContext indexManagerContext,
+	IndexWorkspace createWorkspace(WorkExecutionIndexManagerContext indexManagerContext,
 			DetachedBackendSessionContext sessionContext);
 }

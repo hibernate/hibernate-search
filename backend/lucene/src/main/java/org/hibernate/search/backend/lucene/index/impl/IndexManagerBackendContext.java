@@ -30,13 +30,13 @@ import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchPr
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexIndexer;
-import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexWorkExecutor;
+import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexWorkspace;
 import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexIndexingPlan;
 import org.hibernate.search.backend.lucene.work.execution.impl.WorkExecutionBackendContext;
 import org.hibernate.search.backend.lucene.work.execution.impl.WorkExecutionIndexManagerContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
@@ -139,11 +139,11 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	}
 
 	@Override
-	public IndexWorkExecutor createWorkExecutor(WorkExecutionIndexManagerContext indexManagerContext,
+	public IndexWorkspace createWorkspace(WorkExecutionIndexManagerContext indexManagerContext,
 			DetachedBackendSessionContext sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
-		return new LuceneIndexWorkExecutor( workFactory, indexManagerContext, sessionContext );
+		return new LuceneIndexWorkspace( workFactory, indexManagerContext, sessionContext );
 	}
 
 	@Override

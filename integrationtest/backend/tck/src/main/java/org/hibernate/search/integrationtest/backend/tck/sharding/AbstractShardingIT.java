@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.NormalizedDocRefHit;
@@ -66,8 +66,8 @@ public abstract class AbstractShardingIT {
 		}
 		CompletableFuture.allOf( tasks.toArray( new CompletableFuture<?>[0] ) ).join();
 
-		IndexWorkExecutor indexWorkExecutor = indexManager.createWorkExecutor();
-		indexWorkExecutor.flush().join();
+		IndexWorkspace workspace = indexManager.createWorkspace();
+		workspace.flush().join();
 	}
 
 	protected class IndexMapping {

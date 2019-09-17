@@ -74,7 +74,7 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 	}
 
 	public SearchWorkspace workspace(DetachedBackendSessionContext detachedSessionContext) {
-		return new SearchWorkspaceImpl( delegate.executor( detachedSessionContext ) );
+		return new SearchWorkspaceImpl( delegate.workspace( detachedSessionContext ) );
 	}
 
 	@Override
@@ -92,7 +92,7 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 				mappingContext,
 				delegate.getIncludedIndexedTypes(),
 				detachedSessionContext,
-				delegate.executor( detachedSessionContext )
+				delegate.workspace( detachedSessionContext )
 		);
 	}
 }

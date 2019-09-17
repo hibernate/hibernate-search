@@ -14,16 +14,16 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 
-public class LuceneIndexWorkExecutor implements IndexWorkExecutor {
+public class LuceneIndexWorkspace implements IndexWorkspace {
 
 	private final LuceneWorkFactory factory;
 	private final WorkExecutionIndexManagerContext indexManagerContext;
 	private final DetachedBackendSessionContext sessionContext;
 
-	public LuceneIndexWorkExecutor(LuceneWorkFactory factory,
+	public LuceneIndexWorkspace(LuceneWorkFactory factory,
 			WorkExecutionIndexManagerContext indexManagerContext,
 			DetachedBackendSessionContext sessionContext) {
 		this.factory = factory;

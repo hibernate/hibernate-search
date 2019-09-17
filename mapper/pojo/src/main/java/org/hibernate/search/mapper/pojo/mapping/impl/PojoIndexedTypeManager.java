@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
@@ -151,8 +151,8 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 	}
 
 	@Override
-	public IndexWorkExecutor createWorkExecutor(DetachedBackendSessionContext sessionContext) {
-		return indexManager.createWorkExecutor( sessionContext );
+	public IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext) {
+		return indexManager.createWorkspace( sessionContext );
 	}
 
 	@Override

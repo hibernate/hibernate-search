@@ -12,12 +12,12 @@ import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancy
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchIndexWorkExecutor implements IndexWorkExecutor {
+public class ElasticsearchIndexWorkspace implements IndexWorkspace {
 
 	private final ElasticsearchWorkBuilderFactory builderFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
@@ -25,7 +25,7 @@ public class ElasticsearchIndexWorkExecutor implements IndexWorkExecutor {
 	private final URLEncodedString indexName;
 	private final DetachedBackendSessionContext sessionContext;
 
-	public ElasticsearchIndexWorkExecutor(ElasticsearchWorkBuilderFactory builderFactory,
+	public ElasticsearchIndexWorkspace(ElasticsearchWorkBuilderFactory builderFactory,
 			MultiTenancyStrategy multiTenancyStrategy, ElasticsearchWorkOrchestrator orchestrator,
 			URLEncodedString indexName,
 			DetachedBackendSessionContext sessionContext) {

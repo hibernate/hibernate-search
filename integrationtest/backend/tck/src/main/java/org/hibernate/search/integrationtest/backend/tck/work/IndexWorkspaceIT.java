@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
@@ -31,10 +31,10 @@ import org.assertj.core.api.Assertions;
 
 /**
  * Verify that the work executor operations:
- * {@link IndexWorkExecutor#optimize()}, {@link IndexWorkExecutor#purge()}, {@link IndexWorkExecutor#flush()}
+ * {@link IndexWorkspace#optimize()}, {@link IndexWorkspace#purge()}, {@link IndexWorkspace#flush()}
  * work properly, in every backends.
  */
-public class IndexWorkExecutorIT {
+public class IndexWorkspaceIT {
 
 	private static final String TENANT_1 = "tenant1";
 	private static final String TENANT_2 = "tenant2";
@@ -69,18 +69,18 @@ public class IndexWorkExecutorIT {
 				.setup();
 
 		// Do not provide a tenant
-		IndexWorkExecutor workExecutor = indexManager.createWorkExecutor();
+		IndexWorkspace workspace = indexManager.createWorkspace();
 		createBookIndexes( noTenantSessionContext );
 
-		workExecutor.flush().join();
+		workspace.flush().join();
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, noTenantSessionContext );
 
-		workExecutor.optimize().join();
+		workspace.optimize().join();
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, noTenantSessionContext );
 
 		// purge without providing a tenant
-		workExecutor.purge().join();
-		workExecutor.flush().join();
+		workspace.purge().join();
+		workspace.flush().join();
 
 		assertBookNumberIsEqualsTo( 0, noTenantSessionContext );
 	}
@@ -97,21 +97,21 @@ public class IndexWorkExecutorIT {
 				.setup();
 
 		// Do provide a tenant ID
-		IndexWorkExecutor workExecutor = indexManager.createWorkExecutor( tenant1SessionContext );
+		IndexWorkspace workspace = indexManager.createWorkspace( tenant1SessionContext );
 
 		createBookIndexes( tenant1SessionContext );
 		createBookIndexes( tenant2SessionContext );
-		workExecutor.flush().join();
+		workspace.flush().join();
 
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant1SessionContext );
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant2SessionContext );
 
-		workExecutor.optimize().join();
+		workspace.optimize().join();
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant1SessionContext );
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant2SessionContext );
 
-		workExecutor.purge().join();
-		workExecutor.flush().join();
+		workspace.purge().join();
+		workspace.flush().join();
 
 		// check that only TENANT_1 is affected by the purge
 		assertBookNumberIsEqualsTo( 0, tenant1SessionContext );

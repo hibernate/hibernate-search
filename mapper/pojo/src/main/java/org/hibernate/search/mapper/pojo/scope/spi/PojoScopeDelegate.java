@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory
 import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
-import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkExecutor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 
 /**
  * @param <R> The type of entity references, i.e. the type of hits returned by
@@ -44,6 +44,6 @@ public interface PojoScopeDelegate<R, E, C> {
 
 	SearchAggregationFactory aggregation();
 
-	PojoScopeWorkExecutor executor(DetachedBackendSessionContext sessionContext);
+	PojoScopeWorkspace workspace(DetachedBackendSessionContext sessionContext);
 
 }

@@ -9,18 +9,18 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScopeWork;
 
-class StubIndexWorkExecutor implements IndexWorkExecutor {
+class StubIndexWorkspace implements IndexWorkspace {
 
 	private final String indexName;
 	private final StubBackendBehavior behavior;
 	private final DetachedBackendSessionContext sessionContext;
 
-	StubIndexWorkExecutor(String indexName, StubBackendBehavior behavior,
+	StubIndexWorkspace(String indexName, StubBackendBehavior behavior,
 			DetachedBackendSessionContext sessionContext) {
 		this.indexName = indexName;
 		this.behavior = behavior;

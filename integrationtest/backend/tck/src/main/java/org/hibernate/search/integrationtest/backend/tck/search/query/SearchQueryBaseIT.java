@@ -135,7 +135,7 @@ public class SearchQueryBaseIT {
 		}
 
 		CompletableFuture.allOf( futures.toArray( new CompletableFuture<?>[0] ) ).join();
-		indexManager.createWorkExecutor().flush().join();
+		indexManager.createWorkspace().flush().join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();

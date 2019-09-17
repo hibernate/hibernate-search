@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.work.spi;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface PojoScopeWorkExecutor {
+public interface PojoScopeWorkspace {
 
 	CompletableFuture<?> optimize();
 
