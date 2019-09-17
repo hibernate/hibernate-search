@@ -58,7 +58,14 @@ public class JavaUtilDatePropertyTypeDescriptor extends PropertyTypeDescriptor<D
 						// A february 29th on a leap year
 						date( 2000, 2, 29, 12, 0, 0, 0 ),
 						// A february 29th on a leap year in the Julian calendar (java.util), but not the Gregorian calendar (java.time)
-						date( 1500, 2, 29, 12, 0, 0, 0 )
+						date( 1500, 2, 29, 12, 0, 0, 0 ),
+
+						// Adding some sql dates. See HSEARCH-3670
+						JavaSqlDatePropertyTypeDescriptor.date( 2017, 11, 6, 19, 19, 0, 540 ),
+						// A february 29th on a leap year
+						JavaSqlDatePropertyTypeDescriptor.date( 2000, 2, 29, 12, 0, 0, 0 ),
+						// A february 29th on a leap year in the Julian calendar (java.util), but not the Gregorian calendar (java.time)
+						JavaSqlDatePropertyTypeDescriptor.date( 1500, 2, 29, 12, 0, 0, 0 )
 				);
 			}
 
@@ -71,6 +78,13 @@ public class JavaUtilDatePropertyTypeDescriptor extends PropertyTypeDescriptor<D
 						Instant.parse( "2017-11-06T19:19:00.54Z" ),
 						Instant.ofEpochMilli( Long.MAX_VALUE ),
 
+						Instant.parse( "2000-02-29T12:00:00.0Z" ),
+						// The Julian calendar is 10 days late at this point
+						// See https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar#Difference_between_Julian_and_proleptic_Gregorian_calendar_dates
+						Instant.parse( "1500-03-10T12:00:00.0Z" ),
+
+						// Adding some sql dates. See HSEARCH-3670
+						Instant.parse( "2017-11-06T19:19:00.54Z" ),
 						Instant.parse( "2000-02-29T12:00:00.0Z" ),
 						// The Julian calendar is 10 days late at this point
 						// See https://en.wikipedia.org/wiki/Proleptic_Gregorian_calendar#Difference_between_Julian_and_proleptic_Gregorian_calendar_dates
