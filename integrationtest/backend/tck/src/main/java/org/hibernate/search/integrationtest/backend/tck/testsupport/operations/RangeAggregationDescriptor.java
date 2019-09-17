@@ -62,16 +62,16 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 		otherIndexDocumentFieldValues.add( ascendingValues.get( 1 ) );
 		otherIndexDocumentFieldValues.add( ascendingValues.get( 6 ) );
 
-		mainIndexExpected.put( Range.of( ascendingValues.get( 0 ), ascendingValues.get( 2 ) ), 3L );
-		mainIndexExpected.put( Range.of( ascendingValues.get( 2 ), ascendingValues.get( 5 ) ), 5L );
+		mainIndexExpected.put( Range.canonical( ascendingValues.get( 0 ), ascendingValues.get( 2 ) ), 3L );
+		mainIndexExpected.put( Range.canonical( ascendingValues.get( 2 ), ascendingValues.get( 5 ) ), 5L );
 		mainIndexExpected.put( Range.atLeast( ascendingValues.get( 5 ) ), 2L );
 
-		mainAndOtherIndexExpected.put( Range.of( ascendingValues.get( 0 ), ascendingValues.get( 2 ) ), 4L );
-		mainAndOtherIndexExpected.put( Range.of( ascendingValues.get( 2 ), ascendingValues.get( 5 ) ), 5L );
+		mainAndOtherIndexExpected.put( Range.canonical( ascendingValues.get( 0 ), ascendingValues.get( 2 ) ), 4L );
+		mainAndOtherIndexExpected.put( Range.canonical( ascendingValues.get( 2 ), ascendingValues.get( 5 ) ), 5L );
 		mainAndOtherIndexExpected.put( Range.atLeast( ascendingValues.get( 5 ) ), 3L );
 
-		noIndexedValueExpected.put( Range.of( ascendingValues.get( 0 ), ascendingValues.get( 2 ) ), 0L );
-		noIndexedValueExpected.put( Range.of( ascendingValues.get( 2 ), ascendingValues.get( 5 ) ), 0L );
+		noIndexedValueExpected.put( Range.canonical( ascendingValues.get( 0 ), ascendingValues.get( 2 ) ), 0L );
+		noIndexedValueExpected.put( Range.canonical( ascendingValues.get( 2 ), ascendingValues.get( 5 ) ), 0L );
 		noIndexedValueExpected.put( Range.atLeast( ascendingValues.get( 5 ) ), 0L );
 
 		// Dataset and expectations for the multi-valued index
@@ -88,8 +88,8 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 				Arrays.asList( ascendingValues.get( 3 ), ascendingValues.get( 4 ) )
 		);
 
-		multiValuedIndexExpected.put( Range.of( ascendingValues.get( 0 ), ascendingValues.get( 2 ) ), 2L );
-		multiValuedIndexExpected.put( Range.of( ascendingValues.get( 2 ), ascendingValues.get( 5 ) ), 2L );
+		multiValuedIndexExpected.put( Range.canonical( ascendingValues.get( 0 ), ascendingValues.get( 2 ) ), 2L );
+		multiValuedIndexExpected.put( Range.canonical( ascendingValues.get( 2 ), ascendingValues.get( 5 ) ), 2L );
 		multiValuedIndexExpected.put( Range.atLeast( ascendingValues.get( 5 ) ), 2L );
 
 		return ExpectationsAlternative.supported( new SupportedSingleFieldAggregationExpectations<F>(

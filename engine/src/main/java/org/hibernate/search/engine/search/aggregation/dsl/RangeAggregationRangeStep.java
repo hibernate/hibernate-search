@@ -26,7 +26,7 @@ public interface RangeAggregationRangeStep<F> {
 	 * @return The next step.
 	 */
 	default RangeAggregationRangeMoreStep<F> range(F lowerBound, F upperBound) {
-		return range( Range.of( lowerBound, upperBound ) );
+		return range( Range.canonical( lowerBound, upperBound ) );
 	}
 
 	/**

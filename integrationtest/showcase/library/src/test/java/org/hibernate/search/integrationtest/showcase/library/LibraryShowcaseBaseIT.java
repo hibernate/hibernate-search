@@ -394,10 +394,10 @@ public class LibraryShowcaseBaseIT {
 		);
 		assertThat( result.getTotalHitCountByCollectionSize() )
 				.containsExactly(
-						entry( Range.of( 0, 1_000 ), 2L ),
-						entry( Range.of( 1_000, 5_000 ), 0L ),
-						entry( Range.of( 5_000, 10_000 ), 1L ),
-						entry( Range.of( 10_000, null ), 1L )
+						entry( Range.canonical( 0, 1_000 ), 2L ),
+						entry( Range.canonical( 1_000, 5_000 ), 0L ),
+						entry( Range.canonical( 5_000, 10_000 ), 1L ),
+						entry( Range.canonical( 10_000, null ), 1L )
 				);
 		assertThat( result.getTotalHitCountByService() )
 				.containsExactly(
@@ -414,10 +414,10 @@ public class LibraryShowcaseBaseIT {
 		);
 		assertThat( result.getTotalHitCountByCollectionSize() )
 				.containsExactly(
-						entry( Range.of( 0, 1_000 ), 0L ),
-						entry( Range.of( 1_000, 5_000 ), 0L ),
-						entry( Range.of( 5_000, 10_000 ), 1L ),
-						entry( Range.of( 10_000, null ), 1L )
+						entry( Range.canonical( 0, 1_000 ), 0L ),
+						entry( Range.canonical( 1_000, 5_000 ), 0L ),
+						entry( Range.canonical( 5_000, 10_000 ), 1L ),
+						entry( Range.canonical( 10_000, null ), 1L )
 				);
 		assertThat( result.getTotalHitCountByService() )
 				.containsExactly(
@@ -435,10 +435,10 @@ public class LibraryShowcaseBaseIT {
 		);
 		assertThat( result.getTotalHitCountByCollectionSize() )
 				.containsExactly(
-						entry( Range.of( 0, 1_000 ), 1L ),
-						entry( Range.of( 1_000, 5_000 ), 0L ),
-						entry( Range.of( 5_000, 10_000 ), 1L ),
-						entry( Range.of( 10_000, null ), 1L )
+						entry( Range.canonical( 0, 1_000 ), 1L ),
+						entry( Range.canonical( 1_000, 5_000 ), 0L ),
+						entry( Range.canonical( 5_000, 10_000 ), 1L ),
+						entry( Range.canonical( 10_000, null ), 1L )
 				);
 		assertThat( result.getTotalHitCountByService() )
 				.containsExactly(

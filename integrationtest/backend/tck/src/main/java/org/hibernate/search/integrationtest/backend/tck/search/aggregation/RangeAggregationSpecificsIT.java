@@ -146,7 +146,7 @@ public class RangeAggregationSpecificsIT<F> {
 				.aggregation(
 						aggregationKey,
 						containsExactly( c -> {
-							c.accept( Range.of( null, ascendingValues.get( 2 ) ), 2L );
+							c.accept( Range.canonical( null, ascendingValues.get( 2 ) ), 2L );
 						} )
 				);
 	}
@@ -199,7 +199,7 @@ public class RangeAggregationSpecificsIT<F> {
 
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeWithExcludeLimitsAtEachLevel")
-	public void rangesOf() {
+	public void rangesCanonical() {
 		String fieldPath = indexMapping.fieldModel.relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
@@ -208,9 +208,9 @@ public class RangeAggregationSpecificsIT<F> {
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, typeDescriptor.getJavaType() )
 								.ranges( Arrays.asList(
-										Range.of( null, ascendingValues.get( 3 ) ),
-										Range.of( ascendingValues.get( 3 ), ascendingValues.get( 5 ) ),
-										Range.of( ascendingValues.get( 5 ), null )
+										Range.canonical( null, ascendingValues.get( 3 ) ),
+										Range.canonical( ascendingValues.get( 3 ), ascendingValues.get( 5 ) ),
+										Range.canonical( ascendingValues.get( 5 ), null )
 								) )
 						)
 						.toQuery()
@@ -218,9 +218,9 @@ public class RangeAggregationSpecificsIT<F> {
 				.aggregation(
 						aggregationKey,
 						containsExactly( c -> {
-							c.accept( Range.of( null, ascendingValues.get( 3 ) ), 3L );
-							c.accept( Range.of( ascendingValues.get( 3 ), ascendingValues.get( 5 ) ), 2L );
-							c.accept( Range.of( ascendingValues.get( 5 ), null ), 2L );
+							c.accept( Range.canonical( null, ascendingValues.get( 3 ) ), 3L );
+							c.accept( Range.canonical( ascendingValues.get( 3 ), ascendingValues.get( 5 ) ), 2L );
+							c.accept( Range.canonical( ascendingValues.get( 5 ), null ), 2L );
 						} )
 				);
 	}
@@ -282,9 +282,9 @@ public class RangeAggregationSpecificsIT<F> {
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, typeDescriptor.getJavaType() )
 								.ranges( Arrays.asList(
-										Range.of( null, ascendingValues.get( 3 ) ),
-										Range.of( ascendingValues.get( 1 ), ascendingValues.get( 5 ) ),
-										Range.of( ascendingValues.get( 2 ), null )
+										Range.canonical( null, ascendingValues.get( 3 ) ),
+										Range.canonical( ascendingValues.get( 1 ), ascendingValues.get( 5 ) ),
+										Range.canonical( ascendingValues.get( 2 ), null )
 								) )
 						)
 						.toQuery()
@@ -292,9 +292,9 @@ public class RangeAggregationSpecificsIT<F> {
 				.aggregation(
 						aggregationKey,
 						containsExactly( c -> {
-							c.accept( Range.of( null, ascendingValues.get( 3 ) ), 3L );
-							c.accept( Range.of( ascendingValues.get( 1 ), ascendingValues.get( 5 ) ), 4L );
-							c.accept( Range.of( ascendingValues.get( 2 ), null ), 5L );
+							c.accept( Range.canonical( null, ascendingValues.get( 3 ) ), 3L );
+							c.accept( Range.canonical( ascendingValues.get( 1 ), ascendingValues.get( 5 ) ), 4L );
+							c.accept( Range.canonical( ascendingValues.get( 2 ), null ), 5L );
 						} )
 				);
 	}
@@ -338,7 +338,7 @@ public class RangeAggregationSpecificsIT<F> {
 				indexManager.createScope().aggregation().range()
 						.field( fieldPath, typeDescriptor.getJavaType() )
 						.ranges( Arrays.asList(
-								Range.of( ascendingValues.get( 0 ), ascendingValues.get( 1 ) ),
+								Range.canonical( ascendingValues.get( 0 ), ascendingValues.get( 1 ) ),
 								null
 						) )
 		)
@@ -388,10 +388,10 @@ public class RangeAggregationSpecificsIT<F> {
 						aggregationKey,
 						// Only document 1 and 5 should be taken into account by the aggregation
 						containsExactly( c -> {
-								c.accept( Range.of( null, ascendingValues.get( 2 ) ), 1L );
+								c.accept( Range.canonical( null, ascendingValues.get( 2 ) ), 1L );
 								// Ranges with 0 matching documents should still be returned
-								c.accept( Range.of( ascendingValues.get( 2 ), ascendingValues.get( 5 ) ), 0L );
-								c.accept( Range.of( ascendingValues.get( 5 ), null ), 1L );
+								c.accept( Range.canonical( ascendingValues.get( 2 ), ascendingValues.get( 5 ) ), 0L );
+								c.accept( Range.canonical( ascendingValues.get( 5 ), null ), 1L );
 						} )
 				);
 	}
@@ -418,9 +418,9 @@ public class RangeAggregationSpecificsIT<F> {
 						aggregationKey,
 						// All documents should be taken into account by the aggregation, even those excluded by the limit/offset
 						containsExactly( c -> {
-							c.accept( Range.of( null, ascendingValues.get( 2 ) ), 2L );
-							c.accept( Range.of( ascendingValues.get( 2 ), ascendingValues.get( 5 ) ), 3L );
-							c.accept( Range.of( ascendingValues.get( 5 ), null ), 2L );
+							c.accept( Range.canonical( null, ascendingValues.get( 2 ) ), 2L );
+							c.accept( Range.canonical( ascendingValues.get( 2 ), ascendingValues.get( 5 ) ), 3L );
+							c.accept( Range.canonical( ascendingValues.get( 5 ), null ), 2L );
 						} )
 				);
 	}
@@ -450,13 +450,13 @@ public class RangeAggregationSpecificsIT<F> {
 				.aggregation(
 						aggregationKey,
 						containsExactly( c -> {
-							c.accept( Range.of( ascendingValues.get( 0 ), null ), 7L );
-							c.accept( Range.of( null, ascendingValues.get( 2 ) ), 2L );
-							c.accept( Range.of( ascendingValues.get( 2 ), ascendingValues.get( 5 ) ), 3L );
-							c.accept( Range.of( null, null ), 7L );
-							c.accept( Range.of( ascendingValues.get( 0 ), ascendingValues.get( 7 ) ), 7L );
-							c.accept( Range.of( ascendingValues.get( 5 ), null ), 2L );
-							c.accept( Range.of( null, ascendingValues.get( 6 ) ), 6L );
+							c.accept( Range.canonical( ascendingValues.get( 0 ), null ), 7L );
+							c.accept( Range.canonical( null, ascendingValues.get( 2 ) ), 2L );
+							c.accept( Range.canonical( ascendingValues.get( 2 ), ascendingValues.get( 5 ) ), 3L );
+							c.accept( Range.canonical( null, null ), 7L );
+							c.accept( Range.canonical( ascendingValues.get( 0 ), ascendingValues.get( 7 ) ), 7L );
+							c.accept( Range.canonical( ascendingValues.get( 5 ), null ), 2L );
+							c.accept( Range.canonical( null, ascendingValues.get( 6 ) ), 6L );
 						} )
 				);
 	}
@@ -482,9 +482,9 @@ public class RangeAggregationSpecificsIT<F> {
 				.aggregation(
 						aggregationKey,
 						containsExactly( c -> {
-							c.accept( Range.of( null, ascendingValues.get( 2 ) ), 2L );
-							c.accept( Range.of( ascendingValues.get( 2 ), ascendingValues.get( 5 ) ), 3L );
-							c.accept( Range.of( ascendingValues.get( 5 ), null ), 2L );
+							c.accept( Range.canonical( null, ascendingValues.get( 2 ) ), 2L );
+							c.accept( Range.canonical( ascendingValues.get( 2 ), ascendingValues.get( 5 ) ), 3L );
+							c.accept( Range.canonical( ascendingValues.get( 5 ), null ), 2L );
 						} )
 				);
 	}

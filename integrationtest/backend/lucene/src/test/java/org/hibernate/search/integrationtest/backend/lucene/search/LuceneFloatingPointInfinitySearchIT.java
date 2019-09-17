@@ -70,8 +70,8 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 		SearchResultAssert.assertThat(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, Float.class )
-								.range( Range.of( null, 0f ) )
-								.range( Range.of( 0f, null ) )
+								.range( Range.canonical( null, 0f ) )
+								.range( Range.canonical( 0f, null ) )
 								.range( Range.all() )
 						)
 						.toQuery()
@@ -79,8 +79,8 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 				.aggregation(
 						aggregationKey,
 						a -> assertThat( a ).containsExactly(
-								entry( Range.of( null, 0f ), 1L ),
-								entry( Range.of( 0f, null ), 2L ),
+								entry( Range.canonical( null, 0f ), 1L ),
+								entry( Range.canonical( 0f, null ), 2L ),
 								entry( Range.<Float>all(), 3L )
 						)
 				);
@@ -130,8 +130,8 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 		SearchResultAssert.assertThat(
 				matchAllQuery()
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, Double.class )
-								.range( Range.of( null, 0d ) )
-								.range( Range.of( 0d, null ) )
+								.range( Range.canonical( null, 0d ) )
+								.range( Range.canonical( 0d, null ) )
 								.range( Range.all() )
 						)
 						.toQuery()
@@ -139,8 +139,8 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 				.aggregation(
 						aggregationKey,
 						a -> assertThat( a ).containsExactly(
-								entry( Range.of( null, 0d ), 1L ),
-								entry( Range.of( 0d, null ), 2L ),
+								entry( Range.canonical( null, 0d ), 1L ),
+								entry( Range.canonical( 0d, null ), 2L ),
 								entry( Range.<Double>all(), 3L )
 						)
 				);

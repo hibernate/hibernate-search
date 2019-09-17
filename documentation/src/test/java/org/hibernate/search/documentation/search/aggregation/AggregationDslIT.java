@@ -281,9 +281,9 @@ public class AggregationDslIT {
 			// end::range[]
 			assertThat( countsByPrice )
 					.containsExactly(
-							entry( Range.of( 0.0, 10.0 ), 1L ),
-							entry( Range.of( 10.0, 20.0 ), 2L ),
-							entry( Range.of( 20.0, null ), 1L )
+							entry( Range.canonical( 0.0, 10.0 ), 1L ),
+							entry( Range.canonical( 10.0, 20.0 ), 2L ),
+							entry( Range.canonical( 20.0, null ), 1L )
 					);
 		} );
 
@@ -294,7 +294,7 @@ public class AggregationDslIT {
 					.predicate( f -> f.matchAll() )
 					.aggregation( countsByPriceKey, f -> f.range()
 							.field( "price", Double.class )
-							.range( Range.of( 0.0, 10.0 ) ) // <1>
+							.range( Range.canonical( 0.0, 10.0 ) ) // <1>
 							.range( Range.of( 10.0, RangeBoundInclusion.INCLUDED,
 									20.0, RangeBoundInclusion.EXCLUDED ) ) // <2>
 							.range( Range.atLeast( 20.0 ) ) // <3>
@@ -304,9 +304,9 @@ public class AggregationDslIT {
 			// end::range-objects[]
 			assertThat( countsByPrice )
 					.containsExactly(
-							entry( Range.of( 0.0, 10.0 ), 1L ),
-							entry( Range.of( 10.0, 20.0 ), 2L ),
-							entry( Range.of( 20.0, null ), 1L )
+							entry( Range.canonical( 0.0, 10.0 ), 1L ),
+							entry( Range.canonical( 10.0, 20.0 ), 2L ),
+							entry( Range.canonical( 20.0, null ), 1L )
 					);
 		} );
 
@@ -335,7 +335,7 @@ public class AggregationDslIT {
 			assertThat( countsByPrice )
 					.containsExactly(
 							entry(
-									Range.of(
+									Range.canonical(
 											null,
 											LocalDate.of( 1970, 1, 1 )
 													.atStartOfDay().toInstant( ZoneOffset.UTC )
@@ -343,7 +343,7 @@ public class AggregationDslIT {
 									2L
 							),
 							entry(
-									Range.of(
+									Range.canonical(
 											LocalDate.of( 1970, 1, 1 )
 													.atStartOfDay().toInstant( ZoneOffset.UTC ),
 											LocalDate.of( 2000, 1, 1 )
@@ -352,7 +352,7 @@ public class AggregationDslIT {
 									1L
 							),
 							entry(
-									Range.of(
+									Range.canonical(
 											LocalDate.of( 2000, 1, 1 )
 													.atStartOfDay().toInstant( ZoneOffset.UTC ),
 											null

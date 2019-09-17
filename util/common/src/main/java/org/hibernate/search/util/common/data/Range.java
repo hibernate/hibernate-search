@@ -28,20 +28,6 @@ import org.hibernate.search.util.common.impl.Contracts;
 public final class Range<T> {
 
 	/**
-	 * @param lowerBoundValue The lower bound of the range.
-	 * May be {@code null} to represent {@code -Infinity} (no lower bound),
-	 * @param upperBoundValue The upper bound of the range.
-	 * May be {@code null} to represent {@code +Infinity} (no upper bound).
-	 * @param <T> The type of range bounds.
-	 * @return The range {@code [lowerBoundValue, upperBoundValue)} (lower bound included, upper bound excluded),
-	 * or {@code [lowerBoundValue, +Infinity]} (both bounds included) if the upper bound is {@code +Infinity}.
-	 */
-	public static <T> Range<T> of(T lowerBoundValue, T upperBoundValue) {
-		return new Range<>( lowerBoundValue, RangeBoundInclusion.INCLUDED,
-				upperBoundValue, upperBoundValue == null ? RangeBoundInclusion.INCLUDED : RangeBoundInclusion.EXCLUDED );
-	}
-
-	/**
 	 * @param lowerBoundValue The value of the lower bound of the range.
 	 * May be {@code null} to represent {@code -Infinity} (no lower bound).
 	 * @param lowerBoundInclusion Whether the lower bound is included in the range or excluded.
@@ -54,6 +40,27 @@ public final class Range<T> {
 	public static <T> Range<T> of(T lowerBoundValue, RangeBoundInclusion lowerBoundInclusion,
 			T upperBoundValue, RangeBoundInclusion upperBoundInclusion) {
 		return new Range<>( lowerBoundValue, lowerBoundInclusion, upperBoundValue, upperBoundInclusion );
+	}
+
+	/**
+	 * Create a canonical range, i.e. a range in the form
+	 * {@code [lowerBoundValue, upperBoundValue)} (lower bound included, upper bound excluded),
+	 * or {@code [lowerBoundValue, +Infinity]} (both bounds included) if the upper bound is {@code +Infinity}.
+	 * <p>
+	 * This is mostly useful when creating multiple, contiguous ranges,
+	 * like for example in range aggregations.
+	 *
+	 * @param lowerBoundValue The lower bound of the range.
+	 * May be {@code null} to represent {@code -Infinity} (no lower bound),
+	 * @param upperBoundValue The upper bound of the range.
+	 * May be {@code null} to represent {@code +Infinity} (no upper bound).
+	 * @param <T> The type of range bounds.
+	 * @return The range {@code [lowerBoundValue, upperBoundValue)} (lower bound included, upper bound excluded),
+	 * or {@code [lowerBoundValue, +Infinity]} (both bounds included) if the upper bound is {@code +Infinity}.
+	 */
+	public static <T> Range<T> canonical(T lowerBoundValue, T upperBoundValue) {
+		return new Range<>( lowerBoundValue, RangeBoundInclusion.INCLUDED,
+				upperBoundValue, upperBoundValue == null ? RangeBoundInclusion.INCLUDED : RangeBoundInclusion.EXCLUDED );
 	}
 
 	/**
