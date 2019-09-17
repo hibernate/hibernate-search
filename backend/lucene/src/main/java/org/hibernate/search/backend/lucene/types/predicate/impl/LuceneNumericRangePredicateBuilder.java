@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import java.util.Optional;
+
 import org.apache.lucene.search.Query;
 
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
@@ -15,6 +17,7 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPre
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.util.common.data.RangeBoundInclusion;
 
 class LuceneNumericRangePredicateBuilder<F, E extends Number>
 		extends AbstractLuceneStandardRangePredicateBuilder<F, E, AbstractLuceneNumericFieldCodec<F, E>> {
@@ -32,26 +35,26 @@ class LuceneNumericRangePredicateBuilder<F, E extends Number>
 		LuceneNumericDomain<E> domain = codec.getDomain();
 		return domain.createRangeQuery(
 				absoluteFieldPath,
-				getLowerValue( domain, lowerLimit, excludeLowerLimit ),
-				getUpperValue( domain, upperLimit, excludeUpperLimit )
+				getLowerValue( domain, range.getLowerBoundValue(), range.getLowerBoundInclusion() ),
+				getUpperValue( domain, range.getUpperBoundValue(), range.getUpperBoundInclusion() )
 		);
 	}
 
-	private static <E extends Number> E getLowerValue(LuceneNumericDomain<E> domain, E lowerLimit, boolean excludeLowerLimit) {
-		if ( lowerLimit == null ) {
+	private static <E extends Number> E getLowerValue(LuceneNumericDomain<E> domain, Optional<E> boundValueOptional,
+			RangeBoundInclusion inclusion) {
+		if ( !boundValueOptional.isPresent() ) {
 			return domain.getMinValue();
 		}
-		else {
-			return excludeLowerLimit ? domain.getNextValue( lowerLimit ) : lowerLimit;
-		}
+		E boundValue = boundValueOptional.get();
+		return RangeBoundInclusion.EXCLUDED.equals( inclusion ) ? domain.getNextValue( boundValue ) : boundValue;
 	}
 
-	private static <E extends Number> E getUpperValue(LuceneNumericDomain<E> domain, E upperLimit, boolean excludeUpperLimit) {
-		if ( upperLimit == null ) {
+	private static <E extends Number> E getUpperValue(LuceneNumericDomain<E> domain, Optional<E> boundValueOptional,
+			RangeBoundInclusion inclusion) {
+		if ( !boundValueOptional.isPresent() ) {
 			return domain.getMaxValue();
 		}
-		else {
-			return excludeUpperLimit ? domain.getPreviousValue( upperLimit ) : upperLimit;
-		}
+		E boundValue = boundValueOptional.get();
+		return RangeBoundInclusion.EXCLUDED.equals( inclusion ) ? domain.getPreviousValue( boundValue ) : boundValue;
 	}
 }

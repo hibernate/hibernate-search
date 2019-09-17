@@ -15,6 +15,7 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneS
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.util.common.data.RangeBoundInclusion;
 
 class LuceneTextRangePredicateBuilder<F>
 		extends AbstractLuceneStandardRangePredicateBuilder<F, String, LuceneTextFieldCodec<F>> {
@@ -35,11 +36,13 @@ class LuceneTextRangePredicateBuilder<F>
 
 		return new TermRangeQuery(
 				absoluteFieldPath,
-				codec.normalize( absoluteFieldPath, lowerLimit ),
-				codec.normalize( absoluteFieldPath, upperLimit ),
-				// we force the true value if the limit is null because of some Lucene checks down the hill
-				lowerLimit == null || !excludeLowerLimit,
-				upperLimit == null || !excludeUpperLimit
+				codec.normalize( absoluteFieldPath, range.getLowerBoundValue().orElse( null ) ),
+				codec.normalize( absoluteFieldPath, range.getUpperBoundValue().orElse( null ) ),
+				// we force the true value if the bound is null because of some Lucene checks down the hill
+				RangeBoundInclusion.INCLUDED.equals( range.getLowerBoundInclusion() )
+						|| !range.getLowerBoundValue().isPresent(),
+				RangeBoundInclusion.INCLUDED.equals( range.getUpperBoundInclusion() )
+						|| !range.getUpperBoundValue().isPresent()
 		);
 	}
 }

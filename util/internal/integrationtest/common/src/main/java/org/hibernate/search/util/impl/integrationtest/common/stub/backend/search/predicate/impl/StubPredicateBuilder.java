@@ -25,6 +25,7 @@ import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.engine.spatial.GeoPolygon;
+import org.hibernate.search.util.common.data.Range;
 
 public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredicateBuilder>,
 		BooleanPredicateBuilder<StubPredicateBuilder>,
@@ -102,22 +103,7 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 	}
 
 	@Override
-	public void lowerLimit(Object value, ValueConvert convert) {
-		// No-op
-	}
-
-	@Override
-	public void excludeLowerLimit() {
-		// No-op
-	}
-
-	@Override
-	public void upperLimit(Object value, ValueConvert convert) {
-		// No-op
-	}
-
-	@Override
-	public void excludeUpperLimit() {
+	public void range(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
 		// No-op
 	}
 

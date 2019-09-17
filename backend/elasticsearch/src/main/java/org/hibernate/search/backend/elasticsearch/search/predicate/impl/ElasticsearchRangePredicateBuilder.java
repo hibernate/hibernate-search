@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
@@ -18,6 +19,8 @@ import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueC
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
+import org.hibernate.search.util.common.data.Range;
+import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonElement;
@@ -45,10 +48,7 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 
 	private final ElasticsearchFieldCodec<F> codec;
 
-	private JsonElement lowerLimit;
-	private boolean excludeLowerLimit = false;
-	private JsonElement upperLimit;
-	private boolean excludeUpperLimit = false;
+	private Range<JsonElement> range;
 
 	public ElasticsearchRangePredicateBuilder(ElasticsearchSearchContext searchContext,
 			String absoluteFieldPath,
@@ -63,54 +63,28 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 	}
 
 	@Override
-	public void lowerLimit(Object value, ValueConvert convert) {
-		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( convert );
-		try {
-			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
-			this.lowerLimit = codec.encode( converted );
-		}
-		catch (RuntimeException e) {
-			throw log.cannotConvertDslParameter(
-					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-			);
-		}
-	}
-
-	@Override
-	public void excludeLowerLimit() {
-		this.excludeLowerLimit = true;
-	}
-
-	@Override
-	public void upperLimit(Object value, ValueConvert convert) {
-		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( convert );
-		try {
-			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
-			this.upperLimit = codec.encode( converted );
-		}
-		catch (RuntimeException e) {
-			throw log.cannotConvertDslParameter(
-					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-			);
-		}
-	}
-
-	@Override
-	public void excludeUpperLimit() {
-		this.excludeUpperLimit = true;
+	public void range(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
+		this.range = Range.between(
+				convertToFieldValue( range.getLowerBoundValue(), convertLowerBound ),
+				range.getLowerBoundInclusion(),
+				convertToFieldValue( range.getUpperBoundValue(), convertUpperBound ),
+				range.getUpperBoundInclusion()
+		);
 	}
 
 	@Override
 	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
 			JsonObject outerObject, JsonObject innerObject) {
 		JsonAccessor<JsonElement> accessor;
-		if ( lowerLimit != null ) {
-			accessor = excludeLowerLimit ? GT_ACCESSOR : GTE_ACCESSOR;
-			accessor.set( innerObject, lowerLimit );
+		Optional<JsonElement> lowerBoundValue = range.getLowerBoundValue();
+		if ( lowerBoundValue.isPresent() ) {
+			accessor = RangeBoundInclusion.EXCLUDED.equals( range.getLowerBoundInclusion() ) ? GT_ACCESSOR : GTE_ACCESSOR;
+			accessor.set( innerObject, lowerBoundValue.get() );
 		}
-		if ( upperLimit != null ) {
-			accessor = excludeUpperLimit ? LT_ACCESSOR : LTE_ACCESSOR;
-			accessor.set( innerObject, upperLimit );
+		Optional<JsonElement> upperBoundValue = range.getUpperBoundValue();
+		if ( upperBoundValue.isPresent() ) {
+			accessor = RangeBoundInclusion.EXCLUDED.equals( range.getUpperBoundInclusion() ) ? LT_ACCESSOR : LTE_ACCESSOR;
+			accessor.set( innerObject, upperBoundValue.get() );
 		}
 
 		JsonObject middleObject = new JsonObject();
@@ -118,6 +92,25 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 		RANGE_ACCESSOR.set( outerObject, middleObject );
 
 		return outerObject;
+	}
+
+	private JsonElement convertToFieldValue(Optional<?> valueOptional, ValueConvert convert) {
+		if ( !valueOptional.isPresent() ) {
+			return null;
+		}
+		Object value = valueOptional.get();
+		ToDocumentFieldValueConverter<?, ? extends F> toFieldValueConverter = getDslToIndexConverter( convert );
+		try {
+			F converted = toFieldValueConverter.convertUnknown(
+					value, searchContext.getToDocumentFieldValueConvertContext()
+			);
+			return codec.encode( converted );
+		}
+		catch (RuntimeException e) {
+			throw log.cannotConvertDslParameter(
+					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+			);
+		}
 	}
 
 	private ToDocumentFieldValueConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {

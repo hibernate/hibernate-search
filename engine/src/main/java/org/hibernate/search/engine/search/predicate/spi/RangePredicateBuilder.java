@@ -7,15 +7,10 @@
 package org.hibernate.search.engine.search.predicate.spi;
 
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.util.common.data.Range;
 
 public interface RangePredicateBuilder<B> extends SearchPredicateBuilder<B> {
 
-	void lowerLimit(Object value, ValueConvert convert);
-
-	void excludeLowerLimit();
-
-	void upperLimit(Object value, ValueConvert convert);
-
-	void excludeUpperLimit();
+	void range(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound);
 
 }

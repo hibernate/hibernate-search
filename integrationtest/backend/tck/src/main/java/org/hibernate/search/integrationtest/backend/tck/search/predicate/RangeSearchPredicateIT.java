@@ -698,6 +698,7 @@ public class RangeSearchPredicateIT {
 			SubTest.expectException(
 					"range() predicate with null bounds on field " + fieldPath,
 					() -> scope.predicate().range().field( fieldPath ).from( null ).to( null )
+							.toPredicate()
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -709,6 +710,7 @@ public class RangeSearchPredicateIT {
 			SubTest.expectException(
 					"range() predicate with null bounds on field " + fieldPath,
 					() -> scope.predicate().range().field( fieldPath ).above( null )
+							.toPredicate()
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -721,6 +723,7 @@ public class RangeSearchPredicateIT {
 			SubTest.expectException(
 					"range() predicate with null bounds on field " + fieldPath,
 					() -> scope.predicate().range().field( fieldPath ).below( null )
+							.toPredicate()
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -787,6 +790,7 @@ public class RangeSearchPredicateIT {
 			SubTest.expectException(
 					"range().above() predicate with invalid parameter type on field " + absoluteFieldPath,
 					() -> scope.predicate().range().field( absoluteFieldPath ).above( invalidValueToMatch )
+							.toPredicate()
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -800,6 +804,7 @@ public class RangeSearchPredicateIT {
 			SubTest.expectException(
 					"range().below() predicate with invalid parameter type on field " + absoluteFieldPath,
 					() -> scope.predicate().range().field( absoluteFieldPath ).below( invalidValueToMatch )
+							.toPredicate()
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -812,7 +817,9 @@ public class RangeSearchPredicateIT {
 
 			SubTest.expectException(
 					"range().from() predicate with invalid parameter type on field " + absoluteFieldPath,
-					() -> scope.predicate().range().field( absoluteFieldPath ).from( invalidValueToMatch )
+					() -> scope.predicate().range().field( absoluteFieldPath )
+							.from( invalidValueToMatch ).to( null )
+							.toPredicate()
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -827,6 +834,7 @@ public class RangeSearchPredicateIT {
 					"range().from().to() predicate with invalid parameter type on field " + absoluteFieldPath,
 					() -> scope.predicate().range().field( absoluteFieldPath )
 							.from( null ).to( invalidValueToMatch )
+							.toPredicate()
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -868,7 +876,8 @@ public class RangeSearchPredicateIT {
 			SubTest.expectException(
 					() -> {
 						indexManager.createScope( rawFieldCompatibleIndexManager )
-								.predicate().range().field( absoluteFieldPath ).below( upperValueToMatch );
+								.predicate().range().field( absoluteFieldPath ).below( upperValueToMatch )
+								.toPredicate();
 					}
 			)
 					.assertThrown()

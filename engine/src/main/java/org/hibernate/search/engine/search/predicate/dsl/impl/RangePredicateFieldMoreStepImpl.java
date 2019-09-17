@@ -11,9 +11,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateLastLimitExcludeStep;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldMoreStep;
@@ -21,6 +21,8 @@ import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFromToStep
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
+import org.hibernate.search.util.common.data.Range;
+import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
@@ -59,17 +61,23 @@ class RangePredicateFieldMoreStepImpl<B>
 
 	@Override
 	public RangePredicateFromToStep from(Object value, ValueConvert convert) {
-		return commonState.from( value, convert );
+		commonState.lowerBoundValue = value;
+		commonState.lowerBoundConvert = convert;
+		return new RangePredicateFromToStepImpl<>( commonState );
 	}
 
 	@Override
 	public RangePredicateLastLimitExcludeStep above(Object value, ValueConvert convert) {
-		return commonState.above( value, convert );
+		commonState.lowerBoundValue = value;
+		commonState.lowerBoundConvert = convert;
+		return new RangePredicateSingleLimitExcludeStep<>( commonState, false );
 	}
 
 	@Override
 	public RangePredicateLastLimitExcludeStep below(Object value, ValueConvert convert) {
-		return commonState.below( value, convert );
+		commonState.upperBoundValue = value;
+		commonState.upperBoundConvert = convert;
+		return new RangePredicateSingleLimitExcludeStep<>( commonState, true );
 	}
 
 	@Override
@@ -87,73 +95,41 @@ class RangePredicateFieldMoreStepImpl<B>
 		}
 	}
 
-	static class CommonState<B> extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<B>, B, RangePredicateFieldMoreStepImpl<B>>
-			implements RangePredicateLastLimitExcludeStep {
+	static class CommonState<B> extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<B>, B, RangePredicateFieldMoreStepImpl<B>> {
 
-		private boolean hasNonNullBound = false;
-
-		// excludeLimit in from/above means excluding the lower limit
-		// excludeLimit in to/below means excluding the upper one
-		protected boolean excludeUpperLimit = false;
+		private Object lowerBoundValue = null;
+		private RangeBoundInclusion lowerBoundInclusion = RangeBoundInclusion.INCLUDED;
+		private ValueConvert lowerBoundConvert = ValueConvert.YES;
+		private Object upperBoundValue = null;
+		private RangeBoundInclusion upperBoundInclusion = RangeBoundInclusion.INCLUDED;
+		private ValueConvert upperBoundConvert = ValueConvert.YES;
 
 		CommonState(SearchPredicateBuilderFactory<?, B> builderFactory) {
 			super( builderFactory );
 		}
 
-		@Override
-		public RangePredicateOptionsStep excludeLimit() {
-			getQueryBuilders().forEach( ( excludeUpperLimit ) ? RangePredicateBuilder::excludeUpperLimit : RangePredicateBuilder::excludeLowerLimit );
-			return this;
+		void range(Range<?> range, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert) {
+			if ( !range.getLowerBoundValue().isPresent() && !range.getUpperBoundValue().isPresent() ) {
+				throw log.rangePredicateCannotMatchNullValue( getEventContext() );
+			}
+			for ( RangePredicateFieldMoreStepImpl<B> fieldSetState : getFieldSetStates() ) {
+				for ( RangePredicateBuilder<B> predicateBuilder : fieldSetState.predicateBuilders ) {
+					predicateBuilder.range( range, lowerBoundConvert, upperBoundConvert );
+				}
+			}
 		}
 
 		@Override
 		protected B toImplementation() {
-			// Just in case from() was called, but not to()
-			checkHasNonNullBound();
+			range(
+					Range.between(
+							lowerBoundValue, lowerBoundInclusion,
+							upperBoundValue, upperBoundInclusion
+					),
+					lowerBoundConvert,
+					upperBoundConvert
+			);
 			return super.toImplementation();
-		}
-
-		RangePredicateFromToStep from(Object value, ValueConvert convert) {
-			doAbove( value, convert );
-			return new RangePredicateFromToStepImpl<>( this );
-		}
-
-		RangePredicateLastLimitExcludeStep above(Object value, ValueConvert convert) {
-			doAbove( value, convert );
-			checkHasNonNullBound();
-			return this;
-		}
-
-		RangePredicateLastLimitExcludeStep below(Object value, ValueConvert convert) {
-			doBelow( value, convert );
-			checkHasNonNullBound();
-			return this;
-		}
-
-		private void doAbove(Object value, ValueConvert convert) {
-			excludeUpperLimit = false;
-			if ( value != null ) {
-				hasNonNullBound = true;
-				getQueryBuilders().forEach( q -> q.lowerLimit( value, convert ) );
-			}
-		}
-
-		private void doBelow(Object value, ValueConvert convert) {
-			excludeUpperLimit = true;
-			if ( value != null ) {
-				hasNonNullBound = true;
-				getQueryBuilders().forEach( q -> q.upperLimit( value, convert ) );
-			}
-		}
-
-		private void checkHasNonNullBound() {
-			if ( !hasNonNullBound ) {
-				throw log.rangePredicateCannotMatchNullValue( getEventContext() );
-			}
-		}
-
-		private Stream<RangePredicateBuilder<B>> getQueryBuilders() {
-			return getFieldSetStates().stream().flatMap( f -> f.predicateBuilders.stream() );
 		}
 
 		@Override
@@ -164,23 +140,57 @@ class RangePredicateFieldMoreStepImpl<B>
 
 	static class RangePredicateFromToStepImpl<B> implements RangePredicateFromToStep {
 
-		private final CommonState<B> delegate;
+		private final CommonState<B> commonState;
 
-		RangePredicateFromToStepImpl(CommonState<B> delegate) {
-			this.delegate = delegate;
+		RangePredicateFromToStepImpl(CommonState<B> commonState) {
+			this.commonState = commonState;
 		}
 
 		@Override
 		public RangePredicateLastLimitExcludeStep to(Object value, ValueConvert convert) {
-			delegate.doBelow( value, convert );
-			delegate.checkHasNonNullBound();
-			return delegate;
+			commonState.upperBoundValue = value;
+			commonState.upperBoundConvert = convert;
+			return new RangePredicateSingleLimitExcludeStep<>( commonState, true );
 		}
 
 		@Override
 		public RangePredicateFromToStep excludeLimit() {
-			delegate.getQueryBuilders().forEach( RangePredicateBuilder::excludeLowerLimit );
+			commonState.lowerBoundInclusion = RangeBoundInclusion.EXCLUDED;
 			return this;
+		}
+	}
+
+	static class RangePredicateSingleLimitExcludeStep<B> implements RangePredicateLastLimitExcludeStep {
+
+		private final CommonState<B> commonState;
+
+		private final boolean isUpperBound;
+
+		RangePredicateSingleLimitExcludeStep(CommonState<B> commonState, boolean isUpperBound) {
+			this.commonState = commonState;
+			this.isUpperBound = isUpperBound;
+		}
+
+		@Override
+		public RangePredicateOptionsStep boost(float boost) {
+			commonState.boost( boost );
+			return this;
+		}
+
+		@Override
+		public RangePredicateOptionsStep excludeLimit() {
+			if ( isUpperBound ) {
+				commonState.upperBoundInclusion = RangeBoundInclusion.EXCLUDED;
+			}
+			else {
+				commonState.lowerBoundInclusion = RangeBoundInclusion.EXCLUDED;
+			}
+			return this;
+		}
+
+		@Override
+		public SearchPredicate toPredicate() {
+			return commonState.toPredicate();
 		}
 	}
 }

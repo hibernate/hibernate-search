@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
@@ -16,6 +17,7 @@ import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueC
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
+import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -40,11 +42,7 @@ public abstract class AbstractLuceneStandardRangePredicateBuilder<F, E, C extend
 
 	protected final C codec;
 
-	protected E lowerLimit;
-	protected boolean excludeLowerLimit = false;
-
-	protected E upperLimit;
-	protected boolean excludeUpperLimit = false;
+	protected Range<E> range;
 
 	protected AbstractLuceneStandardRangePredicateBuilder(
 			LuceneSearchContext searchContext,
@@ -60,41 +58,32 @@ public abstract class AbstractLuceneStandardRangePredicateBuilder<F, E, C extend
 	}
 
 	@Override
-	public void lowerLimit(Object value, ValueConvert convert) {
-		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( convert );
+	public void range(Range<?> range, ValueConvert convertLowerBound, ValueConvert convertUpperBound) {
+		this.range = Range.between(
+				convertAndEncode( range.getLowerBoundValue(), convertLowerBound ),
+				range.getLowerBoundInclusion(),
+				convertAndEncode( range.getUpperBoundValue(), convertUpperBound ),
+				range.getUpperBoundInclusion()
+		);
+	}
+
+	private E convertAndEncode(Optional<?> valueOptional, ValueConvert convert) {
+		if ( !valueOptional.isPresent() ) {
+			return null;
+		}
+		Object value = valueOptional.get();
+		ToDocumentFieldValueConverter<?, ? extends F> toFieldValueConverter = getDslToIndexConverter( convert );
 		try {
-			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
-			lowerLimit = codec.encode( converted );
+			F converted = toFieldValueConverter.convertUnknown(
+					value, searchContext.getToDocumentFieldValueConvertContext()
+			);
+			return codec.encode( converted );
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(
 					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 			);
 		}
-	}
-
-	@Override
-	public void excludeLowerLimit() {
-		excludeLowerLimit = true;
-	}
-
-	@Override
-	public void upperLimit(Object value, ValueConvert convert) {
-		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( convert );
-		try {
-			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
-			upperLimit = codec.encode( converted );
-		}
-		catch (RuntimeException e) {
-			throw log.cannotConvertDslParameter(
-					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-			);
-		}
-	}
-
-	@Override
-	public void excludeUpperLimit() {
-		excludeUpperLimit = true;
 	}
 
 	private ToDocumentFieldValueConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {
