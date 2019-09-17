@@ -35,7 +35,6 @@ import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -84,7 +83,6 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 	}
 
 	@Test
-	@Ignore("TODO HSEARCH-3665")
 	public void test() {
 		// Init
 		OrmUtils.withinTransaction( sessionFactory, session -> {
