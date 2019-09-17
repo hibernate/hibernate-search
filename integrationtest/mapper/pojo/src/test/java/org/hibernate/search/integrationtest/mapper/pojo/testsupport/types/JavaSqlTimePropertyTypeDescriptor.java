@@ -112,7 +112,7 @@ public class JavaSqlTimePropertyTypeDescriptor extends PropertyTypeDescriptor<Ti
 		return new Time( epochMilli );
 	}
 
-	private static Time date(int year, int month, int day, int hour, int minute, int second, int millisecond) {
+	static Time date(int year, int month, int day, int hour, int minute, int second, int millisecond) {
 		Calendar calendar = new GregorianCalendar( TimeZone.getTimeZone( "UTC" ), Locale.ROOT );
 		calendar.clear();
 		calendar.set( year, month - 1, day, hour, minute, second );
