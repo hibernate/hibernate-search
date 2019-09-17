@@ -17,6 +17,7 @@ import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuild
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubQueryElementCollector;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.aggregation.impl.StubSearchAggregationBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.impl.StubScopeModel;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl.StubSearchPredicateBuilderFactory;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionBuilderFactory;
@@ -25,8 +26,9 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 class StubIndexScope implements IndexScope<StubQueryElementCollector> {
 	private final StubSearchPredicateBuilderFactory predicateFactory;
 	private final StubSearchSortBuilderFactory sortFactory;
-	private final StubSearchQueryBuilderFactory queryFactory;
 	private final StubSearchProjectionBuilderFactory projectionFactory;
+	private final StubSearchAggregationBuilderFactory aggregationFactory;
+	private final StubSearchQueryBuilderFactory queryFactory;
 
 	private StubIndexScope(Builder builder) {
 		Set<String> immutableIndexNames = Collections.unmodifiableSet( new LinkedHashSet<>( builder.indexNames ) );
@@ -36,6 +38,7 @@ class StubIndexScope implements IndexScope<StubQueryElementCollector> {
 		this.predicateFactory = new StubSearchPredicateBuilderFactory();
 		this.sortFactory = new StubSearchSortBuilderFactory();
 		this.projectionFactory = new StubSearchProjectionBuilderFactory( model );
+		this.aggregationFactory = new StubSearchAggregationBuilderFactory();
 		this.queryFactory = new StubSearchQueryBuilderFactory( builder.backend, model );
 	}
 
@@ -61,7 +64,7 @@ class StubIndexScope implements IndexScope<StubQueryElementCollector> {
 
 	@Override
 	public SearchAggregationBuilderFactory<? super StubQueryElementCollector> getSearchAggregationFactory() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return aggregationFactory;
 	}
 
 	static class Builder implements IndexScopeBuilder {
