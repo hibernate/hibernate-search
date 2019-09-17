@@ -108,7 +108,7 @@ public class SearchQueryBaseIT {
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
 
-			SearchQuery<String> query = scope.search( session )
+			SearchQuery<String> query = searchSession.search( scope )
 					.asProjection(
 							scope.projection().field( "title", String.class ).toProjection()
 					)
@@ -141,7 +141,7 @@ public class SearchQueryBaseIT {
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
 
-			SearchQuery<List<?>> query = scope.search( session )
+			SearchQuery<List<?>> query = searchSession.search( scope )
 					.asProjections(
 							scope.projection().field( "title", String.class ).toProjection(),
 							scope.projection().entityReference().toProjection(),

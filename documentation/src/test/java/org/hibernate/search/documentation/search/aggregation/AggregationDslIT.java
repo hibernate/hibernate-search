@@ -102,7 +102,7 @@ public class AggregationDslIT {
 
 			AggregationKey<Map<Genre, Long>> countsByGenreKey = AggregationKey.of( "countsByGenre" );
 
-			SearchResult<Book> result = scope.search( entityManager )
+			SearchResult<Book> result = searchSession.search( scope )
 					.predicate( scope.predicate().match().field( "title" )
 							.matching( "robot" )
 							.toPredicate() )

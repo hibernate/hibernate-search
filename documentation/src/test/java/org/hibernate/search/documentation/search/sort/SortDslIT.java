@@ -101,7 +101,7 @@ public class SortDslIT {
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
 
-			List<Book> result = scope.search( entityManager )
+			List<Book> result = searchSession.search( scope )
 					.predicate( scope.predicate().matchAll().toPredicate() )
 					.sort( scope.sort()
 							.field( "pageCount" ).desc()

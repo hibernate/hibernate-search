@@ -112,7 +112,7 @@ public class ProjectionDslIT {
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
 
-			List<String> result = scope.search( entityManager )
+			List<String> result = searchSession.search( scope )
 					.asProjection( scope.projection().field( "title", String.class )
 							.toProjection() )
 					.predicate( scope.predicate().matchAll().toPredicate() )

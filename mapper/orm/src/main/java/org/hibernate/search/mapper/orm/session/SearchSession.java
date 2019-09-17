@@ -47,6 +47,18 @@ public interface SearchSession {
 	<T> HibernateOrmSearchQueryHitTypeStep<T> search(Collection<? extends Class<? extends T>> types);
 
 	/**
+	 * Initiate the building of a search query.
+	 * <p>
+	 * The query will target the indexes in the given scope.
+	 *
+	 * @param scope A scope representing all indexed types that will be targeted by the search query.
+	 * @param <T> A supertype of all types in the given scope.
+	 * @return The initial step of a DSL where the search query can be defined.
+	 * @see HibernateOrmSearchQueryHitTypeStep
+	 */
+	<T> HibernateOrmSearchQueryHitTypeStep<T> search(SearchScope<T> scope);
+
+	/**
 	 * Create a {@link SearchWriter} for the indexes mapped to all indexed types.
 	 *
 	 * @return A {@link SearchWriter}.

@@ -104,7 +104,7 @@ public class PredicateDslIT {
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
 
-			List<Book> result = scope.search( entityManager )
+			List<Book> result = searchSession.search( scope )
 					.predicate( scope.predicate().match().field( "title" )
 							.matching( "robot" )
 							.toPredicate() )
