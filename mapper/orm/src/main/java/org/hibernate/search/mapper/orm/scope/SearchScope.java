@@ -34,7 +34,7 @@ public interface SearchScope<E> {
 	 * Initiate the building of a search predicate.
 	 * <p>
 	 * The predicate will only be valid for {@link org.hibernate.search.mapper.orm.session.SearchSession#search(SearchScope) search queries}
-	 * created using this scope or a wider scope.
+	 * created using this scope or another scope instance targeting the same indexes.
 	 * <p>
 	 * Note this method is only necessary if you do not want to use lambda expressions,
 	 * since you can {@link SearchQueryPredicateStep#predicate(Function) define predicates with lambdas}
@@ -50,7 +50,7 @@ public interface SearchScope<E> {
 	 * Initiate the building of a search sort.
 	 * <p>
 	 * The sort will only be valid for {@link org.hibernate.search.mapper.orm.session.SearchSession#search(SearchScope) search queries}
-	 * created using this scope or a wider scope.
+	 * created using this scope or another scope instance targeting the same indexes.
 	 * or a wider scope.
 	 * <p>
 	 * Note this method is only necessary if you do not want to use lambda expressions,
@@ -67,7 +67,7 @@ public interface SearchScope<E> {
 	 * Initiate the building of a search projection that will be valid for the indexes in this scope.
 	 * <p>
 	 * The projection will only be valid for {@link org.hibernate.search.mapper.orm.session.SearchSession#search(SearchScope) search queries}
-	 * created using this scope or a wider scope.
+	 * created using this scope or another scope instance targeting the same indexes.
 	 * <p>
 	 * Note this method is only necessary if you do not want to use lambda expressions,
 	 * since you can {@link HibernateOrmSearchQueryHitTypeStep#asProjection(Function)} define projections with lambdas}
@@ -83,7 +83,7 @@ public interface SearchScope<E> {
 	 * Initiate the building of a search aggregation that will be valid for the indexes in this scope.
 	 * <p>
 	 * The aggregation will only be usable in {@link org.hibernate.search.mapper.orm.session.SearchSession#search(SearchScope) search queries}
-	 * created using this scope or a wider scope.
+	 * created using this scope or another scope instance targeting the same indexes.
 	 * <p>
 	 * Note this method is only necessary if you do not want to use lambda expressions,
 	 * since you can {@link SearchQueryOptionsStep#aggregation(AggregationKey, SearchAggregation)} define aggregations with lambdas}
