@@ -55,7 +55,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> { } )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -78,7 +78,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 									.field( "indexedField", "initialValue" )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -102,7 +102,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 									.field( "indexedField", "updatedValue" )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -115,7 +115,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.update( "1", b -> { } )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -136,7 +136,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> { } )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -203,7 +203,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.add( "1", b -> { } )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -278,7 +278,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 					.add( "1", b -> b
 							.objectField( "child", b2 -> { } )
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -303,7 +303,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 									)
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -329,7 +329,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 									)
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -361,7 +361,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 					.update( "1", b -> b
 							.objectField( "child", b2 -> { } )
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -390,7 +390,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 					.add( "1", b -> b
 							.objectField( "child", b2 -> { } )
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -466,7 +466,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 					.add( "1", b -> b
 							.objectField( "child", b2 -> { } )
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -546,7 +546,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 					.add( "1", b -> b
 							.objectField( "child", b2 -> { } )
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -573,7 +573,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 									)
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -601,7 +601,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 									)
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -634,7 +634,7 @@ public class AutomaticIndexingSingleAssociationIT extends AbstractAutomaticIndex
 					.update( "1", b -> b
 							.objectField( "child", b2 -> { } )
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}

@@ -37,7 +37,7 @@ public abstract class StubBackendBehavior {
 		}
 
 		@Override
-		public void prepareDocumentWorks(String indexName, List<StubDocumentWork> works) {
+		public void processDocumentWorks(String indexName, List<StubDocumentWork> works) {
 			throw new IllegalStateException( "The stub backend behavior was not set when works were prepared for index '"
 					+ indexName + "': " + works );
 		}
@@ -55,7 +55,7 @@ public abstract class StubBackendBehavior {
 		}
 
 		@Override
-		public CompletableFuture<?> prepareAndExecuteDocumentWork(String indexName, StubDocumentWork work) {
+		public CompletableFuture<?> processAndExecuteDocumentWork(String indexName, StubDocumentWork work) {
 			throw new IllegalStateException( "The stub backend behavior was not set when work were prepared and executed for index '"
 					+ indexName + "': " + work );
 		}
@@ -102,13 +102,13 @@ public abstract class StubBackendBehavior {
 
 	public abstract void pushSchema(String indexName, StubIndexSchemaNode rootSchemaNode);
 
-	public abstract void prepareDocumentWorks(String indexName, List<StubDocumentWork> works);
+	public abstract void processDocumentWorks(String indexName, List<StubDocumentWork> works);
 
 	public abstract void discardDocumentWorks(String indexName, List<StubDocumentWork> works);
 
 	public abstract CompletableFuture<?> executeDocumentWorks(String indexName, List<StubDocumentWork> works);
 
-	public abstract CompletableFuture<?> prepareAndExecuteDocumentWork(String indexName, StubDocumentWork work);
+	public abstract CompletableFuture<?> processAndExecuteDocumentWork(String indexName, StubDocumentWork work);
 
 	public abstract <T> SearchResult<T> executeSearchWork(Set<String> indexNames, StubSearchWork work,
 			StubSearchProjectionContext projectionContext,

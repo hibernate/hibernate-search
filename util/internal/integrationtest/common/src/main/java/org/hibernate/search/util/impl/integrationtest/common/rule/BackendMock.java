@@ -264,11 +264,11 @@ public class BackendMock implements TestRule {
 			return this;
 		}
 
-		public BackendMock preparedThenExecuted(CompletableFuture<?> future) {
+		public BackendMock processedThenExecuted(CompletableFuture<?> future) {
 			log.debugf( "Expecting %d works to be prepared, then executed", works.size() );
 			// First expect all works to be prepared, then expect all works to be executed
 			works.stream()
-					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PREPARE, work ) )
+					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PROCESS, work ) )
 					.forEach( expectationConsumer );
 			works.stream()
 					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work, future ) )
@@ -276,8 +276,8 @@ public class BackendMock implements TestRule {
 			return BackendMock.this;
 		}
 
-		public BackendMock preparedThenExecuted() {
-			return preparedThenExecuted( CompletableFuture.completedFuture( null ) );
+		public BackendMock processedThenExecuted() {
+			return processedThenExecuted( CompletableFuture.completedFuture( null ) );
 		}
 
 		public BackendMock executed(CompletableFuture<?> future) {
@@ -292,10 +292,10 @@ public class BackendMock implements TestRule {
 			return executed( CompletableFuture.completedFuture( null ) );
 		}
 
-		public BackendMock prepared() {
+		public BackendMock processed() {
 			log.debugf( "Expecting %d works to be prepared", works.size() );
 			works.stream()
-					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PREPARE, work ) )
+					.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PROCESS, work ) )
 					.forEach( expectationConsumer );
 			return BackendMock.this;
 		}

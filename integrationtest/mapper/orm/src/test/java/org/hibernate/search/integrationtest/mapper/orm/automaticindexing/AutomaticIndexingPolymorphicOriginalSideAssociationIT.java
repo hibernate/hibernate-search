@@ -131,7 +131,7 @@ public class AutomaticIndexingPolymorphicOriginalSideAssociationIT {
 									)
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -155,7 +155,7 @@ public class AutomaticIndexingPolymorphicOriginalSideAssociationIT {
 									)
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}

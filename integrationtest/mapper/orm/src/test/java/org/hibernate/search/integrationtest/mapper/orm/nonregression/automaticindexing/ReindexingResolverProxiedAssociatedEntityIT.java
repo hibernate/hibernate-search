@@ -87,7 +87,7 @@ public class ReindexingResolverProxiedAssociatedEntityIT {
 									)
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -107,7 +107,7 @@ public class ReindexingResolverProxiedAssociatedEntityIT {
 									)
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -141,7 +141,7 @@ public class ReindexingResolverProxiedAssociatedEntityIT {
 									)
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -166,7 +166,7 @@ public class ReindexingResolverProxiedAssociatedEntityIT {
 									)
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}

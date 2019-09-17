@@ -66,7 +66,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									)
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -83,7 +83,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									)
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -94,7 +94,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.delete( "1" )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -130,7 +130,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									)
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -155,7 +155,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									)
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -181,7 +181,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									)
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -216,7 +216,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									)
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -266,7 +266,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									)
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -284,7 +284,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									)
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -335,7 +335,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									.field( "includedInSingleValuedPropertyBridge", null )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -357,7 +357,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									.field( "includedInSingleValuedPropertyBridge", "initialValue" )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -380,7 +380,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									.field( "includedInSingleValuedPropertyBridge", "updatedValue" )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -412,7 +412,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									.field( "includedInSingleValuedPropertyBridge", null )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -460,7 +460,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									.field( "includedInSingleValuedPropertyBridge", "initialValue" )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -475,7 +475,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									.field( "includedInSingleValuedPropertyBridge", "updatedValue" )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -515,7 +515,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									.field( "includedInMultiValuedPropertyBridge", null )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -543,7 +543,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									.field( "includedInMultiValuedPropertyBridge", "value1" )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -571,7 +571,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									.field( "includedInMultiValuedPropertyBridge", "value1 value2" )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -603,7 +603,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									.field( "includedInMultiValuedPropertyBridge", "updatedValue" )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -621,7 +621,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 									.field( "includedInMultiValuedPropertyBridge", null )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}

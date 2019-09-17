@@ -78,7 +78,7 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 	}
 
 	@Override
-	public void prepare() {
+	public void process() {
 		/*
 		 * Nothing to do: we can't execute anything more
 		 * without sending a request to the cluster.

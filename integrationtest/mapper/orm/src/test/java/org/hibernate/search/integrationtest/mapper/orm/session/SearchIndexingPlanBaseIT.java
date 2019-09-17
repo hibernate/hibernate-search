@@ -71,7 +71,7 @@ public class SearchIndexingPlanBaseIT {
 					.update( "2", b -> b.field( "text", "number2" ) )
 					.delete( "3" )
 					.delete( "42" )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backend1Mock.verifyExpectationsMet();
 	}
@@ -147,7 +147,7 @@ public class SearchIndexingPlanBaseIT {
 					.delete( "7" )
 					// purge then addOrUpdate => update
 					.update( "8", b -> b.field( "text", "number8" ) )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backend1Mock.verifyExpectationsMet();
 	}
@@ -183,7 +183,7 @@ public class SearchIndexingPlanBaseIT {
 			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.add( "1", b -> b.field( "text", "number1" ) )
 					.add( "2", b -> b.field( "text", "number2" ) )
-					.prepared();
+					.processed();
 
 			session.flush();
 
@@ -224,7 +224,7 @@ public class SearchIndexingPlanBaseIT {
 			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.add( "1", b -> b.field( "text", "number1" ) )
 					.add( "2", b -> b.field( "text", "number2" ) )
-					.prepared();
+					.processed();
 
 			session.flush();
 			backend1Mock.verifyExpectationsMet();
@@ -259,7 +259,7 @@ public class SearchIndexingPlanBaseIT {
 			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.add( "1", b -> b.field( "text", "number1" ) )
 					.add( "2", b -> b.field( "text", "number2" ) )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backend1Mock.verifyExpectationsMet();
 
@@ -280,7 +280,7 @@ public class SearchIndexingPlanBaseIT {
 					.delete( "2" )
 					// Automatic on persist
 					.add( "3", b -> b.field( "text", "number3" ) )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backend1Mock.verifyExpectationsMet();
 	}
@@ -306,10 +306,10 @@ public class SearchIndexingPlanBaseIT {
 			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.update( "1", b -> b.field( "text", "number1" ) )
 					.delete( "3" )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 			backend2Mock.expectWorks( IndexedEntity2.INDEX_NAME )
 					.update( "2", b -> b.field( "text", "number2" ) )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backend1Mock.verifyExpectationsMet();
 		backend2Mock.verifyExpectationsMet();

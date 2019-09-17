@@ -390,7 +390,7 @@ public class SearchQueryBaseIT {
 							.field( "title", TITLE_AVENUE_OF_MYSTERIES )
 							.field( "author", AUTHOR_AVENUE_OF_MYSTERIES )
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 
 		backendMock.verifyExpectationsMet();

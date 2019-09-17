@@ -46,12 +46,12 @@ public interface IndexWorkPlan<D> {
 	void delete(DocumentReferenceProvider documentReferenceProvider);
 
 	/**
-	 * Prepare the work plan execution, i.e. execute as much as possible without writing to the index.
+	 * Process works before their execution, i.e. do as much as possible without writing to the index.
 	 * <p>
 	 * Calling this method is optional: the {@link #execute()} method
-	 * will perform the preparation if necessary.
+	 * will perform the processing if necessary.
 	 */
-	void prepare();
+	void process();
 
 	/**
 	 * Start executing all the works in this plan, and clear the plan so that it can be re-used.

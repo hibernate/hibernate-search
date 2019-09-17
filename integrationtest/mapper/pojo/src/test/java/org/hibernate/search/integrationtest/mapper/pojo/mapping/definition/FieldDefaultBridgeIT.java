@@ -134,7 +134,7 @@ public class FieldDefaultBridgeIT<V, F> {
 				} );
 				++id;
 			}
-			expectationSetter.preparedThenExecuted();
+			expectationSetter.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}

@@ -87,7 +87,7 @@ public class AutomaticIndexingMappedSuperclassIT {
 									.field( "includedInSingle", "initialValue" )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -102,7 +102,7 @@ public class AutomaticIndexingMappedSuperclassIT {
 									.field( "includedInSingle", "updatedValue" )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}

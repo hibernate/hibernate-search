@@ -54,7 +54,7 @@ public class AutomaticIndexingOutOfTransactionIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX_NAME )
 					.add( "1", b -> b.field( "text", "number1" ) )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 
 			// Flush without a transaction acts as a commit.
 			// So all the involved works here are supposed to be both prepared and executed,
@@ -82,7 +82,7 @@ public class AutomaticIndexingOutOfTransactionIT {
 			// only entity 2 is supposed to be flushed here
 			backendMock.expectWorks( IndexedEntity.INDEX_NAME )
 					.update( "2", b -> b.field( "text", "number2" ) )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 
 			session.flush();
 		} );

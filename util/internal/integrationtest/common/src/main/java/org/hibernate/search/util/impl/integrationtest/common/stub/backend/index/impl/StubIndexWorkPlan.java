@@ -76,14 +76,14 @@ class StubIndexWorkPlan implements IndexWorkPlan<StubDocumentElement> {
 	}
 
 	@Override
-	public void prepare() {
-		indexManager.prepare( works.subList( preparedIndex, works.size() ) );
+	public void process() {
+		indexManager.process( works.subList( preparedIndex, works.size() ) );
 		preparedIndex = works.size();
 	}
 
 	@Override
 	public CompletableFuture<?> execute() {
-		prepare();
+		process();
 		CompletableFuture<?> future = indexManager.execute( works );
 		works.clear();
 		preparedIndex = 0;

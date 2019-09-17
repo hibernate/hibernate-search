@@ -111,8 +111,8 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 		throw new SearchException( "Cannot unwrap " + this + " to " + clazz );
 	}
 
-	void prepare(List<StubDocumentWork> works) {
-		backend.getBehavior().prepareDocumentWorks( name, works );
+	void process(List<StubDocumentWork> works) {
+		backend.getBehavior().processDocumentWorks( name, works );
 	}
 
 	CompletableFuture<?> execute(List<StubDocumentWork> works) {
@@ -120,7 +120,7 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 	}
 
 	CompletableFuture<?> prepareAndExecuteWork(StubDocumentWork work) {
-		return backend.getBehavior().prepareAndExecuteDocumentWork( name, work );
+		return backend.getBehavior().processAndExecuteDocumentWork( name, work );
 	}
 
 	public void discard(List<StubDocumentWork> works) {

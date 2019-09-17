@@ -74,7 +74,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 									entity1.getIndexedElementCollectionField().get( 0 )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -90,7 +90,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 									entity1.getIndexedElementCollectionField().get( 0 )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -101,7 +101,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX )
 					.delete( "42" )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -125,7 +125,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 									entity1.getIndexedElementCollectionField().get( 0 )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -143,7 +143,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 									entity1.getIndexedElementCollectionField().get( 1 )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -160,7 +160,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 									entity1.getIndexedElementCollectionField().get( 0 )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -191,7 +191,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 									entity1.getIndexedElementCollectionField().get( 0 )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -210,7 +210,7 @@ public class AutomaticIndexingNonEntityIdDocumentIdIT {
 									entity1.getIndexedElementCollectionField().get( 1 )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}

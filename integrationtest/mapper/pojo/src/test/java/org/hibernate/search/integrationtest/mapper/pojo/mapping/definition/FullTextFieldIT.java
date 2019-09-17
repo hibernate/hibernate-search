@@ -407,7 +407,7 @@ public class FullTextFieldIT {
 					.add( "1", b -> b
 							.field( "myProperty", indexedFieldValue )
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}

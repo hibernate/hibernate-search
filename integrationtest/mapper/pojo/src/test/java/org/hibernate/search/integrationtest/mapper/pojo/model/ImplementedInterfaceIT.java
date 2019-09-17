@@ -50,7 +50,7 @@ public class ImplementedInterfaceIT {
 
 			backendMock.expectWorks( IndexedPojo.class.getName() ).add( "1", b -> b
 					.field( "text", "Using some other text here" )
-			).preparedThenExecuted();
+			).processedThenExecuted();
 		}
 	}
 

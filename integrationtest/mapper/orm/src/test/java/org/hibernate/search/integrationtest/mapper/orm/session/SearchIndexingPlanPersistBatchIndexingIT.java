@@ -63,7 +63,7 @@ public class SearchIndexingPlanPersistBatchIndexingIT {
 			for ( int i = 0; i < ENTITY_COUNT; i++ ) {
 				if ( i > 0 && i % BATCH_SIZE == 0 ) {
 					// For test only: register expectations regarding processing
-					expectAddWorks( firstIdOfThisBatch, i ).prepared();
+					expectAddWorks( firstIdOfThisBatch, i ).processed();
 					firstIdOfThisBatch = i;
 
 					session.flush();
@@ -80,7 +80,7 @@ public class SearchIndexingPlanPersistBatchIndexingIT {
 
 			// For test only: check on-commit processing/execution of works
 			// If the last batch was smaller, there is still some preparing that will occur on commit
-			expectAddWorks( firstIdOfThisBatch, ENTITY_COUNT ).prepared();
+			expectAddWorks( firstIdOfThisBatch, ENTITY_COUNT ).processed();
 			// Finally, the works will be executed on commit
 			expectAddWorks( 0, ENTITY_COUNT ).executed();
 		} );
@@ -105,7 +105,7 @@ public class SearchIndexingPlanPersistBatchIndexingIT {
 
 			for ( int i = 0; i < ENTITY_COUNT; i++ ) {
 				if ( i > 0 && i % BATCH_SIZE == 0 ) {
-					expectAddWorks( firstIdOfThisBatch, i ).prepared();
+					expectAddWorks( firstIdOfThisBatch, i ).processed();
 					session.flush();
 					backendMock.verifyExpectationsMet();
 
@@ -127,7 +127,7 @@ public class SearchIndexingPlanPersistBatchIndexingIT {
 
 			// For test only: check on-commit processing/execution of works
 			// If the last batch was smaller, there is still some indexing that will occur on commit
-			expectAddWorks( firstIdOfThisBatch, ENTITY_COUNT ).preparedThenExecuted();
+			expectAddWorks( firstIdOfThisBatch, ENTITY_COUNT ).processedThenExecuted();
 		} );
 		// This is for test only and wouldn't be present in real code
 		backendMock.verifyExpectationsMet();

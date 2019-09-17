@@ -80,7 +80,7 @@ public class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuil
 	}
 
 	@Override
-	public void prepare() {
+	public void process() {
 		// Nothing to do: we only have to send the works to the orchestrator
 	}
 

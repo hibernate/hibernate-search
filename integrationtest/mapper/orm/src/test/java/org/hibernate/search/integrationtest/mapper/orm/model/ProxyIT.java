@@ -71,7 +71,7 @@ public class ProxyIT {
 					.add( "1", b -> b
 							.field( "text", entity1.text )
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 
 		OrmUtils.withinTransaction( sessionFactory, session -> {
@@ -91,7 +91,7 @@ public class ProxyIT {
 					.update( "1", b -> b
 							.field( "text", proxy.getText() )
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 	}
 

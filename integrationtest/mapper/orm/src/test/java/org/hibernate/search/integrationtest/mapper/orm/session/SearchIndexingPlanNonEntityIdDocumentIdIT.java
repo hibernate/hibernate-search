@@ -64,7 +64,7 @@ public class SearchIndexingPlanNonEntityIdDocumentIdIT {
 					.update( "42", b -> b.field( "text", "number2" ) )
 					.delete( "43" )
 					.delete( "47" )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}

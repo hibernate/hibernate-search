@@ -313,7 +313,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 									firstIndexedFieldValues, (Object[]) otherIndexedFieldValues
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -343,7 +343,7 @@ public abstract class AbstractFieldContainerExtractorIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> { } )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 

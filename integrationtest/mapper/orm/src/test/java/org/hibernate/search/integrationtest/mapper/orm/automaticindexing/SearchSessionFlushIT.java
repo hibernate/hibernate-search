@@ -58,7 +58,7 @@ public class SearchSessionFlushIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX_NAME )
 					.add( "1", b -> b.field( "text", "number1" ) )
-					.prepared();
+					.processed();
 
 			session.flush();
 			backendMock.verifyExpectationsMet();
@@ -79,7 +79,7 @@ public class SearchSessionFlushIT {
 
 			backendMock.expectWorks( IndexedEntity.INDEX_NAME )
 					.add( "1", b -> b.field( "text", "number1" ) )
-					.prepared();
+					.processed();
 
 			// An auto flush is performed on query invocation
 			List<?> resultList = session.createQuery( "select i from IndexedEntity i" )

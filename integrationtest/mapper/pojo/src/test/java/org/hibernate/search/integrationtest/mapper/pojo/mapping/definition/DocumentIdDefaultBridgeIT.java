@@ -110,7 +110,7 @@ public class DocumentIdDefaultBridgeIT<I> {
 						b -> { }
 				);
 			}
-			expectationSetter.preparedThenExecuted();
+			expectationSetter.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}

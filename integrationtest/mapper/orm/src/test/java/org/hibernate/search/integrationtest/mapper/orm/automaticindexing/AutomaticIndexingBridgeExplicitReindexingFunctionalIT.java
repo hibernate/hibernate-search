@@ -95,7 +95,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 					.add( "1", b -> b
 							.objectField( "typeBridge", b2 -> { } )
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -113,7 +113,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 									.field( "includedInTypeBridge", "value1" )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -136,7 +136,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 									.field( "includedInTypeBridge", "value1" )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -154,7 +154,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 										.field( "includedInTypeBridge", "value1", "value2" )
 								)
 						)
-						.preparedThenExecuted();
+						.processedThenExecuted();
 			} );
 			backendMock.verifyExpectationsMet();
 

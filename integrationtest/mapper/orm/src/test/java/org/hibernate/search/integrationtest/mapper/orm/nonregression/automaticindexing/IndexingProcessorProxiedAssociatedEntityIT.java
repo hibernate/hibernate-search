@@ -80,7 +80,7 @@ public class IndexingProcessorProxiedAssociatedEntityIT {
 									.field( "text", "initialValue" )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -99,7 +99,7 @@ public class IndexingProcessorProxiedAssociatedEntityIT {
 									.field( "text", "initialValue" )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}
@@ -123,7 +123,7 @@ public class IndexingProcessorProxiedAssociatedEntityIT {
 									.field( "text", "initialValue1" )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -147,7 +147,7 @@ public class IndexingProcessorProxiedAssociatedEntityIT {
 									.field( "text", "initialValue1" )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}

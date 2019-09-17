@@ -68,7 +68,7 @@ public class MassIndexingPrimitiveIdIT {
 					.add( "1", b -> { } )
 					.add( "2", b -> { } )
 					.add( "3", b -> { } )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 
 			// purgeAtStart, optimizeAfterPurge and purgeAtStart flags are active by default,
 			// so we expect 1 purge, 2 optimize and 1 flush calls in this order:

@@ -105,10 +105,10 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	}
 
 	@Override
-	public void prepareDocumentWorks(String indexName, List<StubDocumentWork> works) {
+	public void processDocumentWorks(String indexName, List<StubDocumentWork> works) {
 		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
 		works.stream()
-				.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PREPARE, work ) )
+				.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PROCESS, work ) )
 				.forEach( call -> callQueue.verify(
 						call,
 						DocumentWorkCall::verify,
@@ -143,10 +143,10 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	}
 
 	@Override
-	public CompletableFuture<?> prepareAndExecuteDocumentWork(String indexName, StubDocumentWork work) {
+	public CompletableFuture<?> processAndExecuteDocumentWork(String indexName, StubDocumentWork work) {
 		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
 		callQueue.verify(
-				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PREPARE, work ),
+				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PROCESS, work ),
 				DocumentWorkCall::verify,
 				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
 		);

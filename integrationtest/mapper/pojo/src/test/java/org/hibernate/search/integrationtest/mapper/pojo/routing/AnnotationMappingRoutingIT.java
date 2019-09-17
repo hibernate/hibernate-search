@@ -78,7 +78,7 @@ public class AnnotationMappingRoutingIT {
 									.build()
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 	}
 
@@ -104,7 +104,7 @@ public class AnnotationMappingRoutingIT {
 									.build()
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 	}
 

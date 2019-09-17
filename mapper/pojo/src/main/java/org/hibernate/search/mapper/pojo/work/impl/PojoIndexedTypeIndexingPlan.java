@@ -91,7 +91,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, D extends DocumentElement> extend
 
 	void process() {
 		sendCommandsToDelegate();
-		getDelegate().prepare();
+		getDelegate().process();
 	}
 
 	CompletableFuture<?> execute() {

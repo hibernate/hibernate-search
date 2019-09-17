@@ -113,7 +113,7 @@ public class TypeBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "someField", entity.stringProperty ) )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -123,7 +123,7 @@ public class TypeBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.update( "1", b -> b.field( "someField", entity.stringProperty ) )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -186,7 +186,7 @@ public class TypeBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "someField", entity.stringProperty ) )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -196,7 +196,7 @@ public class TypeBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.update( "1", b -> b.field( "someField", entity.stringProperty ) )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -311,7 +311,7 @@ public class TypeBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "someField", "constant" ) )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -322,7 +322,7 @@ public class TypeBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.update( "1", b -> b.field( "someField", "constant" ) )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -706,7 +706,7 @@ public class TypeBridgeBaseIT {
 									.field( "someField", entity.enumProperty.stringProperty )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -721,7 +721,7 @@ public class TypeBridgeBaseIT {
 									.field( "someField", entity.enumProperty.stringProperty )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}

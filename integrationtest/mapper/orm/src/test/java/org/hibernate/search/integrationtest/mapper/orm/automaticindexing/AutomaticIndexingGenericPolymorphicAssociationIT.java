@@ -98,7 +98,7 @@ public class AutomaticIndexingGenericPolymorphicAssociationIT {
 									)
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -116,7 +116,7 @@ public class AutomaticIndexingGenericPolymorphicAssociationIT {
 									)
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}

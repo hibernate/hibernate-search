@@ -90,7 +90,7 @@ public class MassIndexingBaseIT {
 							.field( "title", TITLE_3 )
 							.field( "author", AUTHOR_3 )
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 
 			// purgeAtStart, optimizeAfterPurge and purgeAtStart flags are active by default,
 			// so we expect 1 purge, 2 optimize and 1 flush calls in this order:
@@ -134,7 +134,7 @@ public class MassIndexingBaseIT {
 						.field( "title", TITLE_3 )
 						.field( "author", AUTHOR_3 )
 				)
-				.preparedThenExecuted();
+				.processedThenExecuted();
 
 		// purgeAtStart, optimizeAfterPurge and purgeAtStart flags are active by default,
 		// so we expect 1 purge, 2 optimize and 1 flush calls in this order:

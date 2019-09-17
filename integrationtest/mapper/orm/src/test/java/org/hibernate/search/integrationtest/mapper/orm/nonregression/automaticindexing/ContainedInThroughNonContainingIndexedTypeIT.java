@@ -83,13 +83,13 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 					.add( "1", b -> b
 							.field( "indexedInContaining", 0 )
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 
 			backendMock.expectWorks( Contained.INDEX )
 					.add( "2", b -> b
 							.field( "indexedInContained", 0 )
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 
@@ -107,7 +107,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 					.update( "1", b -> b
 							.field( "indexedInContaining", 42 )
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 
 			// No work is expected on the index for the Contained entity
 		} );

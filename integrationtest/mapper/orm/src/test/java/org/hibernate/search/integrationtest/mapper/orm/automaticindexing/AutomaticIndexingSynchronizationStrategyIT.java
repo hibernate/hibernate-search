@@ -233,7 +233,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 						.add( "1", b -> b
 								.field( "indexedField", entity1.getIndexedField() )
 						)
-						.preparedThenExecuted( workFuture );
+						.processedThenExecuted( workFuture );
 				justBeforeTransactionCommitFuture.complete( null );
 			} );
 			backendMock.verifyExpectationsMet();

@@ -83,7 +83,7 @@ public class ProgrammaticMappingRoutingIT {
 									.build()
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 	}
 
@@ -109,7 +109,7 @@ public class ProgrammaticMappingRoutingIT {
 									.build()
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 	}
 

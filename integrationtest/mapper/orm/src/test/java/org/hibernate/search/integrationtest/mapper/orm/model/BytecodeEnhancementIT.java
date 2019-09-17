@@ -164,7 +164,7 @@ public class BytecodeEnhancementIT {
 							.field( "primitiveDouble", 42.0d )
 							.field( "transientText", "initialValue" )
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 			} );
 
 			AtomicReference<IndexedEntity> entityFromTransaction = new AtomicReference<>();
@@ -212,7 +212,7 @@ public class BytecodeEnhancementIT {
 								.field( "primitiveDouble", 42.0d )
 								.field( "transientText", null )
 						)
-						.preparedThenExecuted();
+						.processedThenExecuted();
 		} );
 
 		assertPropertiesAreNotLoaded( entityFromTransaction.get(), "notIndexedText" );

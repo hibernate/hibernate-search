@@ -291,13 +291,13 @@ public class AnnotationMappingSmokeIT {
 									.field( "date", entity6.getLocalDate() )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 			backendMock.expectWorks( OtherIndexedEntity.INDEX )
 					.add( "4", b -> b
 							.field( "numeric", entity4.getNumeric() )
 							.field( "numericAsString", String.valueOf( entity4.getNumeric() ) )
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 			backendMock.expectWorks( YetAnotherIndexedEntity.INDEX )
 					.add( "5", b -> b
 							.field( "myLocalDateField", entity5.getLocalDate() )
@@ -358,7 +358,7 @@ public class AnnotationMappingSmokeIT {
 									)
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 	}
 

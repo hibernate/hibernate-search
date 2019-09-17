@@ -125,7 +125,7 @@ public class AnnotationMappingAccessTypeIT {
 									.field( "field", nonManaged.getField() )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 	}
 

@@ -80,7 +80,7 @@ public class GenericPropertyIT {
 									.field( "arrayContent", genericEntity.getArrayContent()[1] )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 	}
 

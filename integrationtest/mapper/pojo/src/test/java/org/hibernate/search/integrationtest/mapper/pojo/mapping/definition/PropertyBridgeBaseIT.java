@@ -119,7 +119,7 @@ public class PropertyBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "someField", entity.stringProperty ) )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -129,7 +129,7 @@ public class PropertyBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.update( "1", b -> b.field( "someField", entity.stringProperty ) )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -200,7 +200,7 @@ public class PropertyBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "someField", contained.stringProperty ) )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -210,7 +210,7 @@ public class PropertyBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.update( "1", b -> b.field( "someField", contained.stringProperty ) )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -378,7 +378,7 @@ public class PropertyBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "someField", "constant" ) )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -388,7 +388,7 @@ public class PropertyBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.update( "1", b -> b.field( "someField", "constant" ) )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}
@@ -804,7 +804,7 @@ public class PropertyBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.add( "1", b -> b.field( "someField", "value1" ) )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 
@@ -814,7 +814,7 @@ public class PropertyBridgeBaseIT {
 
 			backendMock.expectWorks( INDEX_NAME )
 					.update( "1", b -> b.field( "someField", "value1", "value2" ) )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}

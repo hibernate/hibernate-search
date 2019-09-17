@@ -304,7 +304,7 @@ public class FieldBaseIT {
 			backendMock.expectWorks( INDEX_NAME )
 					// Stub backend is not supposed to use 'indexNullAs' option
 					.add( "1", b -> b.field( "integer", null ) )
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		}
 		backendMock.verifyExpectationsMet();
 	}

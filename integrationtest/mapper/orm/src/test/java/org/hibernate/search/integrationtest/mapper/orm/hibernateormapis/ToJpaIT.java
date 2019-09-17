@@ -78,7 +78,7 @@ public class ToJpaIT {
 					.add( "2", b -> b
 							.field( "text", entity2.getText() )
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 		backendMock.verifyExpectationsMet();
 	}

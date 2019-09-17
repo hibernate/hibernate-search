@@ -127,7 +127,7 @@ public class ProgrammaticMappingAccessTypeIT {
 									.field( "field", nonManaged.getField() )
 							)
 					)
-					.preparedThenExecuted();
+					.processedThenExecuted();
 		} );
 	}
 
