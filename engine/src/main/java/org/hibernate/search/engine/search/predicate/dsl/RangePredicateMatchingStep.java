@@ -12,8 +12,11 @@ import org.hibernate.search.util.common.data.RangeBoundInclusion;
 
 /**
  * The step in a "range" predicate definition where the range to match can be set.
+ *
+ * @param <N> The type of the next step.
  */
-public interface RangePredicateMatchingStep extends RangePredicateLimitsStep {
+public interface RangePredicateMatchingStep<N extends RangePredicateOptionsStep<? extends N>>
+		extends RangePredicateLimitsStep {
 
 	/**
 	 * Require at least one of the targeted fields to be in the range
@@ -29,7 +32,7 @@ public interface RangePredicateMatchingStep extends RangePredicateLimitsStep {
 	 * See {@link ValueConvert#YES} for more information.
 	 * @return The next step.
 	 */
-	default RangePredicateOptionsStep between(Object lowerBound, Object upperBound) {
+	default N between(Object lowerBound, Object upperBound) {
 		return between( lowerBound, upperBound, ValueConvert.YES );
 	}
 
@@ -50,7 +53,7 @@ public interface RangePredicateMatchingStep extends RangePredicateLimitsStep {
 	 * See {@link ValueConvert} for more information.
 	 * @return The next step.
 	 */
-	default RangePredicateOptionsStep between(Object lowerBound, Object upperBound, ValueConvert convert) {
+	default N between(Object lowerBound, Object upperBound, ValueConvert convert) {
 		return range( Range.between( lowerBound, upperBound ), convert );
 	}
 
@@ -70,7 +73,7 @@ public interface RangePredicateMatchingStep extends RangePredicateLimitsStep {
 	 * @param upperBoundInclusion Whether the upper bound is included in the range or excluded.
 	 * @return The next step.
 	 */
-	default RangePredicateOptionsStep between(Object lowerBound, RangeBoundInclusion lowerBoundInclusion,
+	default N between(Object lowerBound, RangeBoundInclusion lowerBoundInclusion,
 			Object upperBound, RangeBoundInclusion upperBoundInclusion) {
 		return range( Range.between( lowerBound, lowerBoundInclusion, upperBound, upperBoundInclusion ) );
 	}
@@ -85,7 +88,7 @@ public interface RangePredicateMatchingStep extends RangePredicateLimitsStep {
 	 * See {@link ValueConvert#YES} for more information.
 	 * @return The next step.
 	 */
-	default RangePredicateOptionsStep atLeast(Object lowerBoundValue) {
+	default N atLeast(Object lowerBoundValue) {
 		return atLeast( lowerBoundValue, ValueConvert.YES );
 	}
 
@@ -102,7 +105,7 @@ public interface RangePredicateMatchingStep extends RangePredicateLimitsStep {
 	 * See {@link ValueConvert} for more information.
 	 * @return The next step.
 	 */
-	default RangePredicateOptionsStep atLeast(Object lowerBoundValue, ValueConvert convert) {
+	default N atLeast(Object lowerBoundValue, ValueConvert convert) {
 		return range( Range.atLeast( lowerBoundValue ), convert );
 	}
 
@@ -116,7 +119,7 @@ public interface RangePredicateMatchingStep extends RangePredicateLimitsStep {
 	 * See {@link ValueConvert#YES} for more information.
 	 * @return The next step.
 	 */
-	default RangePredicateOptionsStep greaterThan(Object lowerBoundValue) {
+	default N greaterThan(Object lowerBoundValue) {
 		return greaterThan( lowerBoundValue, ValueConvert.YES );
 	}
 
@@ -133,7 +136,7 @@ public interface RangePredicateMatchingStep extends RangePredicateLimitsStep {
 	 * See {@link ValueConvert} for more information.
 	 * @return The next step.
 	 */
-	default RangePredicateOptionsStep greaterThan(Object lowerBoundValue, ValueConvert convert) {
+	default N greaterThan(Object lowerBoundValue, ValueConvert convert) {
 		return range( Range.greaterThan( lowerBoundValue ), convert );
 	}
 
@@ -147,7 +150,7 @@ public interface RangePredicateMatchingStep extends RangePredicateLimitsStep {
 	 * See {@link ValueConvert#YES} for more information.
 	 * @return The next step.
 	 */
-	default RangePredicateOptionsStep atMost(Object upperBoundValue) {
+	default N atMost(Object upperBoundValue) {
 		return atMost( upperBoundValue, ValueConvert.YES );
 	}
 
@@ -164,7 +167,7 @@ public interface RangePredicateMatchingStep extends RangePredicateLimitsStep {
 	 * See {@link ValueConvert} for more information.
 	 * @return The next step.
 	 */
-	default RangePredicateOptionsStep atMost(Object upperBoundValue, ValueConvert convert) {
+	default N atMost(Object upperBoundValue, ValueConvert convert) {
 		return range( Range.atMost( upperBoundValue ), convert );
 	}
 
@@ -178,7 +181,7 @@ public interface RangePredicateMatchingStep extends RangePredicateLimitsStep {
 	 * See {@link ValueConvert#YES} for more information.
 	 * @return The next step.
 	 */
-	default RangePredicateOptionsStep lessThan(Object upperBoundValue) {
+	default N lessThan(Object upperBoundValue) {
 		return lessThan( upperBoundValue, ValueConvert.YES );
 	}
 
@@ -195,7 +198,7 @@ public interface RangePredicateMatchingStep extends RangePredicateLimitsStep {
 	 * See {@link ValueConvert} for more information.
 	 * @return The next step.
 	 */
-	default RangePredicateOptionsStep lessThan(Object upperBoundValue, ValueConvert convert) {
+	default N lessThan(Object upperBoundValue, ValueConvert convert) {
 		return range( Range.lessThan( upperBoundValue ), convert );
 	}
 
@@ -208,7 +211,7 @@ public interface RangePredicateMatchingStep extends RangePredicateLimitsStep {
 	 * See {@link ValueConvert#YES} for more information.
 	 * @return The next step.
 	 */
-	default RangePredicateOptionsStep range(Range<?> range) {
+	default N range(Range<?> range) {
 		return range( range, ValueConvert.YES );
 	}
 
@@ -224,6 +227,6 @@ public interface RangePredicateMatchingStep extends RangePredicateLimitsStep {
 	 * See {@link ValueConvert} for more information.
 	 * @return The next step.
 	 */
-	RangePredicateOptionsStep range(Range<?> range, ValueConvert convert);
+	N range(Range<?> range, ValueConvert convert);
 
 }

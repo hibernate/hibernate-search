@@ -28,7 +28,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
 class RangePredicateFieldMoreStepImpl<B>
-		implements RangePredicateFieldMoreStep, AbstractBooleanMultiFieldPredicateCommonState.FieldSetState<B> {
+		implements RangePredicateFieldMoreStep<RangePredicateFieldMoreStepImpl<B>, RangePredicateOptionsStep<?>>,
+				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState<B> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -50,12 +51,12 @@ class RangePredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public RangePredicateFieldMoreStep fields(String... absoluteFieldPaths) {
+	public RangePredicateFieldMoreStepImpl<B> fields(String... absoluteFieldPaths) {
 		return new RangePredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 
 	@Override
-	public RangePredicateFieldMoreStep boost(float boost) {
+	public RangePredicateFieldMoreStepImpl<B> boost(float boost) {
 		this.fieldSetBoost = boost;
 		return this;
 	}
@@ -103,7 +104,7 @@ class RangePredicateFieldMoreStepImpl<B>
 
 	static class CommonState<B>
 			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<B>, B, RangePredicateFieldMoreStepImpl<B>>
-			implements RangePredicateOptionsStep {
+			implements RangePredicateOptionsStep<CommonState<B>> {
 
 		private LegacySyntaxState legacySyntaxState;
 
@@ -111,7 +112,7 @@ class RangePredicateFieldMoreStepImpl<B>
 			super( builderFactory );
 		}
 
-		RangePredicateOptionsStep range(Range<?> range, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert) {
+		CommonState<B> range(Range<?> range, ValueConvert lowerBoundConvert, ValueConvert upperBoundConvert) {
 			Contracts.assertNotNull( range, "range" );
 			if ( !range.getLowerBoundValue().isPresent() && !range.getUpperBoundValue().isPresent() ) {
 				throw log.rangePredicateCannotMatchNullValue( getEventContext() );

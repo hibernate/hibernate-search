@@ -8,8 +8,10 @@ package org.hibernate.search.engine.search.predicate.dsl;
 
 /**
  * The final step in a "wildcard" predicate definition, where optional parameters can be set.
+ *
+ * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface WildcardPredicateOptionsStep
-		extends PredicateFinalStep, PredicateBoostStep<WildcardPredicateOptionsStep> {
+public interface WildcardPredicateOptionsStep<S extends WildcardPredicateOptionsStep<? extends S>>
+		extends PredicateFinalStep, PredicateBoostStep<S> {
 
 }

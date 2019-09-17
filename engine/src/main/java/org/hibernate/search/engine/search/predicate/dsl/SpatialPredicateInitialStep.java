@@ -18,6 +18,6 @@ public interface SpatialPredicateInitialStep {
 	 *
 	 * @return The initial step of a DSL allowing the definition of a "within" predicate.
 	 */
-	SpatialWithinPredicateFieldStep within();
+	SpatialWithinPredicateFieldStep<?> within();
 
 }

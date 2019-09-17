@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldStep;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
-class RangePredicateFieldStepImpl<B> implements RangePredicateFieldStep {
+class RangePredicateFieldStepImpl<B> implements RangePredicateFieldStep<RangePredicateFieldMoreStep<?, ?>> {
 
 	private final RangePredicateFieldMoreStepImpl.CommonState<B> commonState;
 
@@ -21,7 +21,7 @@ class RangePredicateFieldStepImpl<B> implements RangePredicateFieldStep {
 	}
 
 	@Override
-	public RangePredicateFieldMoreStep fields(String ... absoluteFieldPaths) {
+	public RangePredicateFieldMoreStep<?, ?> fields(String ... absoluteFieldPaths) {
 		return new RangePredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 }

@@ -13,7 +13,8 @@ import org.hibernate.search.engine.search.predicate.dsl.WildcardPredicateFieldMo
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 
-class WildcardPredicateFieldStepImpl<B> implements WildcardPredicateFieldStep {
+class WildcardPredicateFieldStepImpl<B>
+		implements WildcardPredicateFieldStep<WildcardPredicateFieldMoreStep<?, ?>> {
 
 	private final WildcardPredicateFieldMoreStepImpl.CommonState<B> commonState;
 
@@ -22,7 +23,7 @@ class WildcardPredicateFieldStepImpl<B> implements WildcardPredicateFieldStep {
 	}
 
 	@Override
-	public WildcardPredicateFieldMoreStep fields(String ... absoluteFieldPaths) {
+	public WildcardPredicateFieldMoreStep<?, ?> fields(String ... absoluteFieldPaths) {
 		return new WildcardPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 }

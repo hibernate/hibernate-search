@@ -11,9 +11,15 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * (see the superinterface {@link RangePredicateMatchingStep}),
  * or optional parameters for the last targeted field(s) can be set,
  * or more target fields can be added.
+ *
+ * @param <S> The "self" type (the actual exposed type of this step).
+ * @param <N> The type of the next step.
  */
-public interface RangePredicateFieldMoreStep
-		extends RangePredicateMatchingStep, MultiFieldPredicateFieldBoostStep<RangePredicateFieldMoreStep> {
+public interface RangePredicateFieldMoreStep<
+				S extends RangePredicateFieldMoreStep<? extends S, N>,
+				N extends RangePredicateOptionsStep<? extends N>
+		>
+		extends RangePredicateMatchingStep<N>, MultiFieldPredicateFieldBoostStep<S> {
 
 	/**
 	 * Target the given field in the range predicate,
@@ -26,7 +32,7 @@ public interface RangePredicateFieldMoreStep
 	 *
 	 * @see RangePredicateFieldStep#field(String)
 	 */
-	default RangePredicateFieldMoreStep field(String absoluteFieldPath) {
+	default S field(String absoluteFieldPath) {
 		return fields( absoluteFieldPath );
 	}
 
@@ -36,7 +42,7 @@ public interface RangePredicateFieldMoreStep
 	 * @return The next step.
 	 */
 	@Deprecated
-	default RangePredicateFieldMoreStep orField(String absoluteFieldPath) {
+	default S orField(String absoluteFieldPath) {
 		return field( absoluteFieldPath );
 	}
 
@@ -51,7 +57,7 @@ public interface RangePredicateFieldMoreStep
 	 *
 	 * @see RangePredicateFieldStep#fields(String...)
 	 */
-	RangePredicateFieldMoreStep fields(String ... absoluteFieldPaths);
+	S fields(String ... absoluteFieldPaths);
 
 	/**
 	 * @deprecated Use {@link #fields(String...)} instead.
@@ -59,7 +65,7 @@ public interface RangePredicateFieldMoreStep
 	 * @return The next step.
 	 */
 	@Deprecated
-	default RangePredicateFieldMoreStep orFields(String ... absoluteFieldPaths) {
+	default S orFields(String ... absoluteFieldPaths) {
 		return fields( absoluteFieldPaths );
 	}
 

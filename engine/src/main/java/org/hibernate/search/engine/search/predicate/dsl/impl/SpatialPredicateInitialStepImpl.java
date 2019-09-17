@@ -19,7 +19,7 @@ class SpatialPredicateInitialStepImpl<B> implements SpatialPredicateInitialStep 
 	}
 
 	@Override
-	public SpatialWithinPredicateFieldStep within() {
+	public SpatialWithinPredicateFieldStep<?> within() {
 		return new SpatialWithinPredicateFieldStepImpl<>( factory );
 	}
 }

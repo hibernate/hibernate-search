@@ -8,8 +8,10 @@ package org.hibernate.search.engine.search.predicate.dsl;
 
 /**
  * The step in a "wildcard" predicate definition where the pattern to match can be set.
+ *
+ * @param <N> The type of the next step.
  */
-public interface WildcardPredicateMatchingStep {
+public interface WildcardPredicateMatchingStep<N extends WildcardPredicateOptionsStep<? extends N>> {
 
 	/**
 	 * Require at least one of the targeted fields to match the given wildcard pattern.
@@ -19,6 +21,6 @@ public interface WildcardPredicateMatchingStep {
 	 * which matches any single character. {@code \} is the escape character.
 	 * @return The next step.
 	 */
-	WildcardPredicateOptionsStep matching(String wildcardPattern);
+	N matching(String wildcardPattern);
 
 }

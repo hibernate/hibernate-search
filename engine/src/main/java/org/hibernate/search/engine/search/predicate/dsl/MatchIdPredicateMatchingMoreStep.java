@@ -9,8 +9,14 @@ package org.hibernate.search.engine.search.predicate.dsl;
 /**
  * The final step in a "match id" predicate definition,
  * where more IDs to match can be set.
+ *
+ * @param <S> The "self" type (the actual exposed type of this step).
+ * @param <N> The type of the next step.
  */
-public interface MatchIdPredicateMatchingMoreStep
-		extends PredicateFinalStep, MatchIdPredicateMatchingStep {
+public interface MatchIdPredicateMatchingMoreStep<
+				S extends MatchIdPredicateMatchingMoreStep<? extends S, N>,
+				N extends MatchIdPredicateOptionsStep<? extends N>
+		>
+		extends MatchIdPredicateMatchingStep<S>, MatchIdPredicateOptionsStep<N> {
 
 }

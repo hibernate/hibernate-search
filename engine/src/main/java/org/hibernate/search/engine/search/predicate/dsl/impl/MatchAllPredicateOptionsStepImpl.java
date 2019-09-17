@@ -22,7 +22,7 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFa
 
 class MatchAllPredicateOptionsStepImpl<B>
 		extends AbstractPredicateFinalStep<B>
-		implements MatchAllPredicateOptionsStep {
+		implements MatchAllPredicateOptionsStep<MatchAllPredicateOptionsStep<?>> {
 
 	private final SearchPredicateFactory factory;
 
@@ -37,19 +37,19 @@ class MatchAllPredicateOptionsStepImpl<B>
 	}
 
 	@Override
-	public MatchAllPredicateOptionsStep boost(float boost) {
+	public MatchAllPredicateOptionsStep<?> boost(float boost) {
 		this.matchAllBuilder.boost( boost );
 		return this;
 	}
 
 	@Override
-	public MatchAllPredicateOptionsStep except(SearchPredicate searchPredicate) {
+	public MatchAllPredicateOptionsStep<?> except(SearchPredicate searchPredicate) {
 		getExceptState().addClause( searchPredicate );
 		return this;
 	}
 
 	@Override
-	public MatchAllPredicateOptionsStep except(
+	public MatchAllPredicateOptionsStep<?> except(
 			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
 		getExceptState().addClause( clauseContributor );
 		return this;

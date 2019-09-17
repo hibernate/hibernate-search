@@ -11,8 +11,10 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 
 /**
  * The initial step in a "nested" predicate definition, where the target field can be set.
+ *
+ * @param <N> The type of the next step.
  */
-public interface NestedPredicateFieldStep {
+public interface NestedPredicateFieldStep<N extends NestedPredicateNestStep<?>> {
 
 	/**
 	 * Set the object field to "nest" on.
@@ -22,7 +24,7 @@ public interface NestedPredicateFieldStep {
 	 * @param absoluteFieldPath The path to the object.
 	 * @return The next step.
 	 */
-	NestedPredicateNestStep objectField(String absoluteFieldPath);
+	N objectField(String absoluteFieldPath);
 
 	/**
 	 * @deprecated Use {@link #objectField(String)} instead.
@@ -30,7 +32,7 @@ public interface NestedPredicateFieldStep {
 	 * @return The next step.
 	 */
 	@Deprecated
-	default NestedPredicateNestStep onObjectField(String absoluteFieldPath) {
+	default N onObjectField(String absoluteFieldPath) {
 		return objectField( absoluteFieldPath );
 	}
 

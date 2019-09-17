@@ -8,8 +8,10 @@ package org.hibernate.search.engine.search.predicate.dsl;
 
 /**
  * The final step in a "within" predicate definition, where optional parameters can be set.
+ *
+ * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface SpatialWithinPredicateOptionsStep
-		extends PredicateFinalStep, PredicateBoostStep<SpatialWithinPredicateOptionsStep> {
+public interface SpatialWithinPredicateOptionsStep<S extends SpatialWithinPredicateOptionsStep<? extends S>>
+		extends PredicateFinalStep, PredicateBoostStep<S> {
 
 }

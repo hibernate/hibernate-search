@@ -22,7 +22,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
 class MatchPredicateFieldMoreStepImpl<B>
-		implements MatchPredicateFieldMoreStep, AbstractBooleanMultiFieldPredicateCommonState.FieldSetState<B> {
+		implements MatchPredicateFieldMoreStep<MatchPredicateFieldMoreStepImpl<B>, MatchPredicateOptionsStep<?>>,
+				AbstractBooleanMultiFieldPredicateCommonState.FieldSetState<B> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -44,18 +45,18 @@ class MatchPredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public MatchPredicateFieldMoreStep fields(String... absoluteFieldPaths) {
+	public MatchPredicateFieldMoreStepImpl<B> fields(String... absoluteFieldPaths) {
 		return new MatchPredicateFieldMoreStepImpl<>( commonState, Arrays.asList( absoluteFieldPaths ) );
 	}
 
 	@Override
-	public MatchPredicateFieldMoreStep boost(float boost) {
+	public MatchPredicateFieldMoreStepImpl<B> boost(float boost) {
 		this.fieldSetBoost = boost;
 		return this;
 	}
 
 	@Override
-	public MatchPredicateOptionsStep matching(Object value, ValueConvert convert) {
+	public MatchPredicateOptionsStep<?> matching(Object value, ValueConvert convert) {
 		return commonState.matching( value, convert );
 	}
 
@@ -75,13 +76,13 @@ class MatchPredicateFieldMoreStepImpl<B>
 	}
 
 	static class CommonState<B> extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<B>, B, MatchPredicateFieldMoreStepImpl<B>>
-			implements MatchPredicateOptionsStep {
+			implements MatchPredicateOptionsStep<CommonState<B>> {
 
 		CommonState(SearchPredicateBuilderFactory<?, B> builderFactory) {
 			super( builderFactory );
 		}
 
-		MatchPredicateOptionsStep matching(Object value, ValueConvert convert) {
+		MatchPredicateOptionsStep<?> matching(Object value, ValueConvert convert) {
 			if ( value == null ) {
 				throw log.matchPredicateCannotMatchNullValue( getEventContext() );
 			}
@@ -95,7 +96,7 @@ class MatchPredicateFieldMoreStepImpl<B>
 		}
 
 		@Override
-		public MatchPredicateOptionsStep fuzzy(int maxEditDistance, int exactPrefixLength) {
+		public CommonState<B> fuzzy(int maxEditDistance, int exactPrefixLength) {
 			if ( maxEditDistance < 0 || 2 < maxEditDistance ) {
 				throw log.invalidFuzzyMaximumEditDistance( maxEditDistance );
 			}
@@ -112,7 +113,7 @@ class MatchPredicateFieldMoreStepImpl<B>
 		}
 
 		@Override
-		public MatchPredicateOptionsStep analyzer(String analyzerName) {
+		public CommonState<B> analyzer(String analyzerName) {
 			for ( MatchPredicateFieldMoreStepImpl<B> fieldSetState : getFieldSetStates() ) {
 				for ( MatchPredicateBuilder<B> predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.analyzer( analyzerName );
@@ -122,7 +123,7 @@ class MatchPredicateFieldMoreStepImpl<B>
 		}
 
 		@Override
-		public MatchPredicateOptionsStep skipAnalysis() {
+		public CommonState<B> skipAnalysis() {
 			for ( MatchPredicateFieldMoreStepImpl<B> fieldSetState : getFieldSetStates() ) {
 				for ( MatchPredicateBuilder<B> predicateBuilder : fieldSetState.predicateBuilders ) {
 					predicateBuilder.skipAnalysis();

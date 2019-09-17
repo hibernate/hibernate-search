@@ -36,59 +36,59 @@ public class DefaultSearchPredicateFactory<B> implements SearchPredicateFactory 
 	}
 
 	@Override
-	public MatchAllPredicateOptionsStep matchAll() {
+	public MatchAllPredicateOptionsStep<?> matchAll() {
 		return new MatchAllPredicateOptionsStepImpl<>( builderFactory, this );
 	}
 
 	@Override
-	public MatchIdPredicateMatchingStep id() {
+	public MatchIdPredicateMatchingStep<?> id() {
 		return new MatchIdPredicateMatchingStepImpl<>( builderFactory );
 	}
 
 	@Override
-	public BooleanPredicateClausesStep bool() {
+	public BooleanPredicateClausesStep<?> bool() {
 		return new BooleanPredicateClausesStepImpl<>( builderFactory, this );
 	}
 
 	@Override
-	public PredicateFinalStep bool(Consumer<? super BooleanPredicateClausesStep> clauseContributor) {
-		BooleanPredicateClausesStep next = bool();
+	public PredicateFinalStep bool(Consumer<? super BooleanPredicateClausesStep<?>> clauseContributor) {
+		BooleanPredicateClausesStep<?> next = bool();
 		clauseContributor.accept( next );
 		return next;
 	}
 
 	@Override
-	public MatchPredicateFieldStep match() {
+	public MatchPredicateFieldStep<?> match() {
 		return new MatchPredicateFieldStepImpl<>( builderFactory );
 	}
 
 	@Override
-	public RangePredicateFieldStep range() {
+	public RangePredicateFieldStep<?> range() {
 		return new RangePredicateFieldStepImpl<>( builderFactory );
 	}
 
 	@Override
-	public PhrasePredicateFieldStep phrase() {
+	public PhrasePredicateFieldStep<?> phrase() {
 		return new PhrasePredicateFieldStepImpl<>( builderFactory );
 	}
 
 	@Override
-	public WildcardPredicateFieldStep wildcard() {
+	public WildcardPredicateFieldStep<?> wildcard() {
 		return new WildcardPredicateFieldStepImpl<>( builderFactory );
 	}
 
 	@Override
-	public NestedPredicateFieldStep nested() {
+	public NestedPredicateFieldStep<?> nested() {
 		return new NestedPredicateFieldStepImpl<>( builderFactory, this );
 	}
 
 	@Override
-	public SimpleQueryStringPredicateFieldStep simpleQueryString() {
+	public SimpleQueryStringPredicateFieldStep<?> simpleQueryString() {
 		return new SimpleQueryStringPredicateFieldStepImpl<>( builderFactory );
 	}
 
 	@Override
-	public ExistsPredicateFieldStep exists() {
+	public ExistsPredicateFieldStep<?> exists() {
 		return new ExistsPredicateFieldStepImpl<>( builderFactory );
 	}
 

@@ -10,8 +10,10 @@ import java.util.Collection;
 
 /**
  * The step in a "match id" predicate definition where the IDs to match can be set.
+ *
+ * @param <N> The type of the next step.
  */
-public interface MatchIdPredicateMatchingStep {
+public interface MatchIdPredicateMatchingStep<N extends MatchIdPredicateMatchingMoreStep<? extends N, ?>> {
 
 	/**
 	 * Target the identifier with the given id.
@@ -22,7 +24,7 @@ public interface MatchIdPredicateMatchingStep {
 	 * @param value the value of the id we want to match.
 	 * @return The next step.
 	 */
-	MatchIdPredicateMatchingMoreStep matching(Object value);
+	N matching(Object value);
 
 	/**
 	 * Target the identifiers matching any of the values in a collection.
@@ -30,8 +32,8 @@ public interface MatchIdPredicateMatchingStep {
 	 * @param values the collection of identifiers to match.
 	 * @return The next step.
 	 */
-	default MatchIdPredicateMatchingMoreStep matchingAny(Collection<?> values) {
-		MatchIdPredicateMatchingMoreStep next = null;
+	default N matchingAny(Collection<?> values) {
+		N next = null;
 		for ( Object value : values ) {
 			next = matching( value );
 		}

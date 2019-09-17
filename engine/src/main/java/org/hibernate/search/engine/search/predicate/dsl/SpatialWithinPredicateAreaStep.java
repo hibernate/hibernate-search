@@ -13,8 +13,10 @@ import org.hibernate.search.engine.spatial.GeoPolygon;
 
 /**
  * The step in a "within" predicate definition where the area to match can be set.
+ *
+ * @param <N> The type of the next step.
  */
-public interface SpatialWithinPredicateAreaStep {
+public interface SpatialWithinPredicateAreaStep<N extends SpatialWithinPredicateOptionsStep<? extends N>> {
 
 	/**
 	 * Require at least one of the targeted fields to point to a location within the given circle,
@@ -25,7 +27,7 @@ public interface SpatialWithinPredicateAreaStep {
 	 * @param unit The unit used for the radius.
 	 * @return The next step.
 	 */
-	SpatialWithinPredicateOptionsStep circle(GeoPoint center, double radius, DistanceUnit unit);
+	N circle(GeoPoint center, double radius, DistanceUnit unit);
 
 	/**
 	 * Require at least one of the targeted fields to point to a location within the given circle,
@@ -35,7 +37,7 @@ public interface SpatialWithinPredicateAreaStep {
 	 * @param radiusInMeters The radius of the bounding circle, in meters.
 	 * @return The next step.
 	 */
-	default SpatialWithinPredicateOptionsStep circle(GeoPoint center, double radiusInMeters) {
+	default N circle(GeoPoint center, double radiusInMeters) {
 		return circle( center, radiusInMeters, DistanceUnit.METERS );
 	}
 
@@ -49,7 +51,7 @@ public interface SpatialWithinPredicateAreaStep {
 	 * @param unit The unit used for the radius.
 	 * @return The next step.
 	 */
-	default SpatialWithinPredicateOptionsStep circle(double latitude, double longitude, double radius, DistanceUnit unit) {
+	default N circle(double latitude, double longitude, double radius, DistanceUnit unit) {
 		return circle( GeoPoint.of( latitude, longitude ), radius, unit );
 	}
 
@@ -62,7 +64,7 @@ public interface SpatialWithinPredicateAreaStep {
 	 * @param radiusInMeters The radius of the bounding circle, in meters.
 	 * @return The next step.
 	 */
-	default SpatialWithinPredicateOptionsStep circle(double latitude, double longitude, double radiusInMeters) {
+	default N circle(double latitude, double longitude, double radiusInMeters) {
 		return circle( GeoPoint.of( latitude, longitude ), radiusInMeters, DistanceUnit.METERS );
 	}
 
@@ -72,7 +74,7 @@ public interface SpatialWithinPredicateAreaStep {
 	 * @param polygon The bounding polygon.
 	 * @return The next step.
 	 */
-	SpatialWithinPredicateOptionsStep polygon(GeoPolygon polygon);
+	N polygon(GeoPolygon polygon);
 
 	/**
 	 * Require at least one of the targeted fields to point to a location within the given box (~rectangle).
@@ -80,7 +82,7 @@ public interface SpatialWithinPredicateAreaStep {
 	 * @param boundingBox The bounding box.
 	 * @return The next step.
 	 */
-	SpatialWithinPredicateOptionsStep boundingBox(GeoBoundingBox boundingBox);
+	N boundingBox(GeoBoundingBox boundingBox);
 
 	/**
 	 * Require at least one of the targeted fields to point to a location within the given box (~rectangle).
@@ -91,7 +93,7 @@ public interface SpatialWithinPredicateAreaStep {
 	 * @param bottomRightLongitude The longitude of the bottom-right corner of the box.
 	 * @return The next step.
 	 */
-	default SpatialWithinPredicateOptionsStep boundingBox(double topLeftLatitude, double topLeftLongitude,
+	default N boundingBox(double topLeftLatitude, double topLeftLongitude,
 			double bottomRightLatitude, double bottomRightLongitude) {
 		return boundingBox( GeoBoundingBox.of(
 				topLeftLatitude, topLeftLongitude, bottomRightLatitude, bottomRightLongitude

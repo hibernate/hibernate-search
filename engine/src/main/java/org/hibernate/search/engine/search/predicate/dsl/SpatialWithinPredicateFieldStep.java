@@ -9,8 +9,10 @@ package org.hibernate.search.engine.search.predicate.dsl;
 
 /**
  * The initial step in a "within" predicate definition, where the target field can be set.
+ *
+ * @param <N> The type of the next step.
  */
-public interface SpatialWithinPredicateFieldStep {
+public interface SpatialWithinPredicateFieldStep<N extends SpatialWithinPredicateFieldMoreStep<? extends N, ?>> {
 
 	/**
 	 * Target the given field in the "within" predicate.
@@ -21,7 +23,7 @@ public interface SpatialWithinPredicateFieldStep {
 	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
 	 * @return The next step.
 	 */
-	default SpatialWithinPredicateFieldMoreStep field(String absoluteFieldPath) {
+	default N field(String absoluteFieldPath) {
 		return fields( absoluteFieldPath );
 	}
 
@@ -31,7 +33,7 @@ public interface SpatialWithinPredicateFieldStep {
 	 * @return The next step.
 	 */
 	@Deprecated
-	default SpatialWithinPredicateFieldMoreStep onField(String absoluteFieldPath) {
+	default N onField(String absoluteFieldPath) {
 		return field( absoluteFieldPath );
 	}
 
@@ -49,7 +51,7 @@ public interface SpatialWithinPredicateFieldStep {
 	 *
 	 * @see #field(String)
 	 */
-	SpatialWithinPredicateFieldMoreStep fields(String ... absoluteFieldPaths);
+	N fields(String ... absoluteFieldPaths);
 
 	/**
 	 * @deprecated Use {@link #fields(String...)} instead.
@@ -57,7 +59,7 @@ public interface SpatialWithinPredicateFieldStep {
 	 * @return The next step.
 	 */
 	@Deprecated
-	default SpatialWithinPredicateFieldMoreStep onFields(String ... absoluteFieldPaths) {
+	default N onFields(String ... absoluteFieldPaths) {
 		return fields( absoluteFieldPaths );
 	}
 

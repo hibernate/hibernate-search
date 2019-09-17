@@ -11,10 +11,16 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * (see the superinterface {@link SpatialWithinPredicateAreaStep}),
  * or optional parameters for the last targeted field(s) can be set,
  * or more target fields can be added.
+ *
+ * @param <S> The "self" type (the actual exposed type of this step).
+ * @param <N> The type of the next step.
  */
-public interface SpatialWithinPredicateFieldMoreStep
-		extends SpatialWithinPredicateAreaStep,
-		MultiFieldPredicateFieldBoostStep<SpatialWithinPredicateFieldMoreStep> {
+public interface SpatialWithinPredicateFieldMoreStep<
+				S extends SpatialWithinPredicateFieldMoreStep<? extends S, N>,
+				N extends SpatialWithinPredicateOptionsStep<? extends N>
+		>
+		extends SpatialWithinPredicateAreaStep<N>,
+				MultiFieldPredicateFieldBoostStep<S> {
 
 	/**
 	 * Target the given field in the "within" predicate,
@@ -27,7 +33,7 @@ public interface SpatialWithinPredicateFieldMoreStep
 	 *
 	 * @see SpatialWithinPredicateFieldStep#field(String)
 	 */
-	default SpatialWithinPredicateFieldMoreStep field(String absoluteFieldPath) {
+	default S field(String absoluteFieldPath) {
 		return fields( absoluteFieldPath );
 	}
 
@@ -37,7 +43,7 @@ public interface SpatialWithinPredicateFieldMoreStep
 	 * @return The next step.
 	 */
 	@Deprecated
-	default SpatialWithinPredicateFieldMoreStep orField(String absoluteFieldPath) {
+	default S orField(String absoluteFieldPath) {
 		return field( absoluteFieldPath );
 	}
 
@@ -52,7 +58,7 @@ public interface SpatialWithinPredicateFieldMoreStep
 	 *
 	 * @see SpatialWithinPredicateFieldStep#fields(String...)
 	 */
-	SpatialWithinPredicateFieldMoreStep fields(String ... absoluteFieldPaths);
+	S fields(String ... absoluteFieldPaths);
 
 	/**
 	 * @deprecated Use {@link #fields(String...)} instead.
@@ -60,7 +66,7 @@ public interface SpatialWithinPredicateFieldMoreStep
 	 * @return The next step.
 	 */
 	@Deprecated
-	default SpatialWithinPredicateFieldMoreStep orFields(String ... absoluteFieldPaths) {
+	default S orFields(String ... absoluteFieldPaths) {
 		return fields( absoluteFieldPaths );
 	}
 

@@ -11,10 +11,15 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * (see the superinterface {@link SimpleQueryStringPredicateMatchingStep}),
  * or optional parameters for the last targeted field(s) can be set,
  * or more target fields can be added.
+ *
+ * @param <S> The "self" type (the actual exposed type of this step).
+ * @param <N> The type of the next step.
  */
-public interface SimpleQueryStringPredicateFieldMoreStep
-		extends SimpleQueryStringPredicateMatchingStep,
-		MultiFieldPredicateFieldBoostStep<SimpleQueryStringPredicateFieldMoreStep> {
+public interface SimpleQueryStringPredicateFieldMoreStep<
+				S extends SimpleQueryStringPredicateFieldMoreStep<? extends S, N>,
+				N extends SimpleQueryStringPredicateOptionsStep<? extends N>
+		>
+		extends SimpleQueryStringPredicateMatchingStep<N>, MultiFieldPredicateFieldBoostStep<S> {
 
 	/**
 	 * Target the given field in the simple query string predicate,
@@ -29,7 +34,7 @@ public interface SimpleQueryStringPredicateFieldMoreStep
 	 *
 	 * @see SimpleQueryStringPredicateFieldStep#field(String)
 	 */
-	default SimpleQueryStringPredicateFieldMoreStep field(String absoluteFieldPath) {
+	default S field(String absoluteFieldPath) {
 		return fields( absoluteFieldPath );
 	}
 
@@ -39,7 +44,7 @@ public interface SimpleQueryStringPredicateFieldMoreStep
 	 * @return The next step.
 	 */
 	@Deprecated
-	default SimpleQueryStringPredicateFieldMoreStep orField(String absoluteFieldPath) {
+	default S orField(String absoluteFieldPath) {
 		return field( absoluteFieldPath );
 	}
 
@@ -56,7 +61,7 @@ public interface SimpleQueryStringPredicateFieldMoreStep
 	 *
 	 * @see SimpleQueryStringPredicateFieldStep#fields(String...)
 	 */
-	SimpleQueryStringPredicateFieldMoreStep fields(String... absoluteFieldPaths);
+	S fields(String... absoluteFieldPaths);
 
 	/**
 	 * @deprecated Use {@link #fields(String...)} instead.
@@ -64,7 +69,7 @@ public interface SimpleQueryStringPredicateFieldMoreStep
 	 * @return The next step.
 	 */
 	@Deprecated
-	default SimpleQueryStringPredicateFieldMoreStep orFields(String... absoluteFieldPaths) {
+	default S orFields(String... absoluteFieldPaths) {
 		return fields( absoluteFieldPaths );
 	}
 

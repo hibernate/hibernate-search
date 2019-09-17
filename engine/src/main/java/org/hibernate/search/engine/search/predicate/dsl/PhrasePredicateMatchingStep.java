@@ -8,8 +8,10 @@ package org.hibernate.search.engine.search.predicate.dsl;
 
 /**
  * The step in a "phrase" predicate definition where the phrase to match can be set.
+ *
+ * @param <N> The type of the next step.
  */
-public interface PhrasePredicateMatchingStep {
+public interface PhrasePredicateMatchingStep<N extends PhrasePredicateOptionsStep<? extends N>> {
 
 	/**
 	 * Require at least one of the targeted fields to match the given phrase.
@@ -17,6 +19,6 @@ public interface PhrasePredicateMatchingStep {
 	 * @param phrase The phrase to match.
 	 * @return The next step.
 	 */
-	PhrasePredicateOptionsStep matching(String phrase);
+	N matching(String phrase);
 
 }

@@ -6,16 +6,17 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl.impl;
 
-import org.hibernate.search.engine.search.predicate.dsl.MatchIdPredicateMatchingStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchIdPredicateMatchingMoreStep;
+import org.hibernate.search.engine.search.predicate.dsl.MatchIdPredicateMatchingStep;
+import org.hibernate.search.engine.search.predicate.dsl.MatchIdPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
-
 class MatchIdPredicateMatchingStepImpl<B>
 		extends AbstractPredicateFinalStep<B>
-		implements MatchIdPredicateMatchingStep, MatchIdPredicateMatchingMoreStep {
+		implements MatchIdPredicateMatchingStep<MatchIdPredicateMatchingStepImpl<B>>,
+				MatchIdPredicateMatchingMoreStep<MatchIdPredicateMatchingStepImpl<B>, MatchIdPredicateOptionsStep<?>> {
 
 	private final MatchIdPredicateBuilder<B> matchIdBuilder;
 
@@ -25,7 +26,7 @@ class MatchIdPredicateMatchingStepImpl<B>
 	}
 
 	@Override
-	public MatchIdPredicateMatchingMoreStep matching(Object value) {
+	public MatchIdPredicateMatchingStepImpl<B> matching(Object value) {
 		matchIdBuilder.value( value );
 		return this;
 	}

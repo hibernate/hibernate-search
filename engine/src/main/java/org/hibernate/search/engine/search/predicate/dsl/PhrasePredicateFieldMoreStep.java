@@ -11,9 +11,15 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * (see the superinterface {@link PhrasePredicateMatchingStep}),
  * or optional parameters for the last targeted field(s) can be set,
  * or more target fields can be added.
+ *
+ * @param <S> The "self" type (the actual exposed type of this step).
+ * @param <N> The type of the next step.
  */
-public interface PhrasePredicateFieldMoreStep
-		extends PhrasePredicateMatchingStep, MultiFieldPredicateFieldBoostStep<PhrasePredicateFieldMoreStep> {
+public interface PhrasePredicateFieldMoreStep<
+				S extends PhrasePredicateFieldMoreStep<? extends S, N>,
+				N extends PhrasePredicateOptionsStep<? extends N>
+		>
+		extends PhrasePredicateMatchingStep<N>, MultiFieldPredicateFieldBoostStep<S> {
 
 	/**
 	 * Target the given field in the phrase predicate,
@@ -28,7 +34,7 @@ public interface PhrasePredicateFieldMoreStep
 	 *
 	 * @see PhrasePredicateFieldStep#field(String)
 	 */
-	default PhrasePredicateFieldMoreStep field(String absoluteFieldPath) {
+	default S field(String absoluteFieldPath) {
 		return fields( absoluteFieldPath );
 	}
 
@@ -38,7 +44,7 @@ public interface PhrasePredicateFieldMoreStep
 	 * @return The next step.
 	 */
 	@Deprecated
-	default PhrasePredicateFieldMoreStep orField(String absoluteFieldPath) {
+	default S orField(String absoluteFieldPath) {
 		return field( absoluteFieldPath );
 	}
 
@@ -55,7 +61,7 @@ public interface PhrasePredicateFieldMoreStep
 	 *
 	 * @see PhrasePredicateFieldStep#fields(String...)
 	 */
-	PhrasePredicateFieldMoreStep fields(String... absoluteFieldPaths);
+	S fields(String... absoluteFieldPaths);
 
 	/**
 	 * @deprecated Use {@link #fields(String...)} instead.
@@ -63,7 +69,7 @@ public interface PhrasePredicateFieldMoreStep
 	 * @return The next step.
 	 */
 	@Deprecated
-	default PhrasePredicateFieldMoreStep orFields(String... absoluteFieldPaths) {
+	default S orFields(String... absoluteFieldPaths) {
 		return fields( absoluteFieldPaths );
 	}
 
