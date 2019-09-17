@@ -39,7 +39,7 @@
                 take care to also update the name of the commented property just above.
              -->
             <property name="hibernate.search.backends.myBackend.directory.root"
-                      value="${project.build.directory}/test-indexes/gettingstarted/"/>
+                      value="${project.build.directory}/test-indexes/gettingstarted/withoutanalysis/"/>
         </properties>
     </persistence-unit>
 
@@ -114,7 +114,7 @@
                 take care to also update the name of the commented property just above.
              -->
             <property name="hibernate.search.backends.myBackend.directory.root"
-                      value="${project.build.directory}/test-indexes/gettingstarted/"/>
+                      value="${project.build.directory}/test-indexes/gettingstarted/withanalysis/"/>
         </properties>
     </persistence-unit>
 
