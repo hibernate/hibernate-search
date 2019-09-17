@@ -8,7 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 
-class StubSearchAggregation<A> implements SearchAggregation<A> {
+public class StubSearchAggregation<A> implements SearchAggregation<A> {
 	private final StubAggregationBuilder builder;
 
 	StubSearchAggregation(StubAggregationBuilder builder) {
