@@ -99,21 +99,21 @@ public class SmokeIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.range().field( "string" ).from( "text 2" ).to( "text 42" ) )
+				.predicate( f -> f.range().field( "string" ).between( "text 2", "text 42" ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2", "3" )
 				.hasTotalHitCount( 2 );
 
 		query = scope.query()
-				.predicate( f -> f.range().field( "string_analyzed" ).from( "2" ).to( "42" ) )
+				.predicate( f -> f.range().field( "string_analyzed" ).between( "2", "42" ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2", "3" )
 				.hasTotalHitCount( 2 );
 
 		query = scope.query()
-				.predicate( f -> f.range().field( "integer" ).from( 2 ).to( 42 ) )
+				.predicate( f -> f.range().field( "integer" ).between( 2, 42 ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2", "3" )
@@ -121,8 +121,8 @@ public class SmokeIT {
 
 		query = scope.query()
 				.predicate( f -> f.range().field( "localDate" )
-						.from( LocalDate.of( 2018, 1, 2 ) )
-						.to( LocalDate.of( 2018, 2, 23 ) )
+						.between( LocalDate.of( 2018, 1, 2 ),
+								LocalDate.of( 2018, 2, 23 ) )
 				)
 				.toQuery();
 		assertThat( query )
@@ -130,7 +130,7 @@ public class SmokeIT {
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
-				.predicate( f -> f.range().field( "flattenedObject.integer" ).from( 201 ).to( 242 ) )
+				.predicate( f -> f.range().field( "flattenedObject.integer" ).between( 201, 242 ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2" )
@@ -234,7 +234,7 @@ public class SmokeIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
 				.hasTotalHitCount( 1 );
 
-		predicate = scope.predicate().range().field( "integer" ).from( 1 ).to( 2 ).toPredicate();
+		predicate = scope.predicate().range().field( "integer" ).between( 1, 2 ).toPredicate();
 		query = scope.query()
 				.predicate( predicate )
 				.toQuery();

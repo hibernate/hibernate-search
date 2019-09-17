@@ -15,37 +15,37 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.util.impl.test.SubTest;
 
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class RangeSearchPredicateIT {
+public class RangeSearchPredicateLegacySyntaxIT {
 
 	private static final String INDEX_NAME = "IndexName";
 	private static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
@@ -120,7 +120,7 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void unsearchable() {
+	public void range_unsearchable() {
 		StubMappingScope scope = unsearchableFieldsIndexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
@@ -137,7 +137,7 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void atLeast() {
+	public void above() {
 		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
@@ -145,7 +145,7 @@ public class RangeSearchPredicateIT {
 			Object lowerValueToMatch = fieldModel.predicateLowerBound;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.range().field( absoluteFieldPath ).atLeast( lowerValueToMatch ) )
+					.predicate( f -> f.range().field( absoluteFieldPath ).above( lowerValueToMatch ) )
 					.toQuery();
 
 			assertThat( query )
@@ -154,7 +154,7 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void atLeast_withDslConverter_dslConverterEnabled() {
+	public void above_withDslConverter_dslConverterEnabled() {
 		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
@@ -162,7 +162,7 @@ public class RangeSearchPredicateIT {
 			Object lowerValueToMatch = new ValueWrapper<>( fieldModel.predicateLowerBound );
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.range().field( absoluteFieldPath ).atLeast( lowerValueToMatch ) )
+					.predicate( f -> f.range().field( absoluteFieldPath ).above( lowerValueToMatch ) )
 					.toQuery();
 
 			assertThat( query )
@@ -171,15 +171,14 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void atLeast_withDslConverter_dslConverterDisabled() {
+	public void above_withDslConverter_dslConverterDisabled() {
 		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.range().field( absoluteFieldPath )
-							.atLeast( fieldModel.predicateLowerBound, ValueConvert.NO ) )
+					.predicate( f -> f.range().field( absoluteFieldPath ).above( fieldModel.predicateLowerBound, ValueConvert.NO ) )
 					.toQuery();
 
 			assertThat( query )
@@ -188,20 +187,30 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void greaterThan() {
+	public void above_include_exclude() {
 		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object lowerValueToMatch = fieldModel.document2Value.indexedValue;
 
-			if ( BigDecimal.class.equals( fieldModel.javaType )
-					&& !TckConfiguration.get().getBackendFeatures().worksFineWithStrictAboveRangedQueriesOnDecimalScaledField() ) {
-				continue;
-			}
+			// Default is inclusion
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.range().field( absoluteFieldPath ).greaterThan( lowerValueToMatch ) )
+					.predicate( f -> f.range().field( absoluteFieldPath ).above( lowerValueToMatch ) )
+					.toQuery();
+
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+
+			// explicit exclusion
+			Assume.assumeTrue(
+					"Skip the subsequent test if the current backend does not support exact-above-ranged-queries among a decimal-scaled-field",
+					!BigDecimal.class.equals( fieldModel.javaType ) || TckConfiguration.get().getBackendFeatures().worksFineWithStrictAboveRangedQueriesOnDecimalScaledField()
+			);
+
+			query = scope.query()
+					.predicate( f -> f.range().field( absoluteFieldPath ).above( lowerValueToMatch ).excludeLimit() )
 					.toQuery();
 
 			assertThat( query )
@@ -210,7 +219,7 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void atMost() {
+	public void below() {
 		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
@@ -218,7 +227,7 @@ public class RangeSearchPredicateIT {
 			Object upperValueToMatch = fieldModel.predicateUpperBound;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.range().field( absoluteFieldPath ).atMost( upperValueToMatch ) )
+					.predicate( f -> f.range().field( absoluteFieldPath ).below( upperValueToMatch ) )
 					.toQuery();
 
 			assertThat( query )
@@ -227,7 +236,7 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void atMost_withDslConverter_dslConverterEnabled() {
+	public void below_withDslConverter_dslConverterEnabled() {
 		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
@@ -235,7 +244,7 @@ public class RangeSearchPredicateIT {
 			Object upperValueToMatch = new ValueWrapper<>( fieldModel.predicateUpperBound );
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.range().field( absoluteFieldPath ).atMost( upperValueToMatch ) )
+					.predicate( f -> f.range().field( absoluteFieldPath ).below( upperValueToMatch ) )
 					.toQuery();
 
 			assertThat( query )
@@ -244,15 +253,14 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void atMost_withDslConverter_dslConverterDisabled() {
+	public void below_withDslConverter_dslConverterDisabled() {
 		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.range().field( absoluteFieldPath )
-							.atMost( fieldModel.predicateUpperBound, ValueConvert.NO ) )
+					.predicate( f -> f.range().field( absoluteFieldPath ).below( fieldModel.predicateUpperBound, ValueConvert.NO ) )
 					.toQuery();
 
 			assertThat( query )
@@ -261,15 +269,26 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void lessThan() {
+	public void below_include_exclude() {
 		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object upperValueToMatch = fieldModel.document2Value.indexedValue;
 
+			// Default is inclusion
+
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.range().field( absoluteFieldPath ).lessThan( upperValueToMatch ) )
+					.predicate( f -> f.range().field( absoluteFieldPath ).below( upperValueToMatch ) )
+					.toQuery();
+
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+
+			// explicit exclusion
+
+			query = scope.query()
+					.predicate( f -> f.range().field( absoluteFieldPath ).below( upperValueToMatch ).excludeLimit() )
 					.toQuery();
 
 			assertThat( query )
@@ -278,7 +297,7 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void between() {
+	public void fromTo() {
 		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
@@ -287,7 +306,7 @@ public class RangeSearchPredicateIT {
 			Object upperValueToMatch = fieldModel.predicateUpperBound;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.range().field( absoluteFieldPath ).between( lowerValueToMatch, upperValueToMatch ) )
+					.predicate( f -> f.range().field( absoluteFieldPath ).from( lowerValueToMatch ).to( upperValueToMatch ) )
 					.toQuery();
 
 			assertThat( query )
@@ -296,7 +315,7 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void between_withDslConverter_dslConverterEnabled() {
+	public void fromTo_withDslConverter_dslConverterEnabled() {
 		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
@@ -305,7 +324,7 @@ public class RangeSearchPredicateIT {
 			Object upperValueToMatch = new ValueWrapper<>( fieldModel.predicateUpperBound );
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.range().field( absoluteFieldPath ).between( lowerValueToMatch, upperValueToMatch ) )
+					.predicate( f -> f.range().field( absoluteFieldPath ).from( lowerValueToMatch ).to( upperValueToMatch ) )
 					.toQuery();
 
 			assertThat( query )
@@ -314,7 +333,7 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void between_withDslConverter_dslConverterDisabled() {
+	public void fromTo_withDslConverter_dslConverterDisabled() {
 		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldWithDslConverterModels ) {
@@ -322,11 +341,8 @@ public class RangeSearchPredicateIT {
 
 			SearchQuery<DocumentReference> query = scope.query()
 					.predicate( f -> f.range().field( absoluteFieldPath )
-							.between(
-									fieldModel.predicateLowerBound, fieldModel.predicateUpperBound,
-									ValueConvert.NO
-							)
-					)
+							.from( fieldModel.predicateLowerBound, ValueConvert.NO )
+							.to( fieldModel.predicateUpperBound, ValueConvert.NO ) )
 					.toQuery();
 
 			assertThat( query )
@@ -335,7 +351,7 @@ public class RangeSearchPredicateIT {
 	}
 
 	@Test
-	public void between_boundInclusion() {
+	public void fromTo_include_exclude() {
 		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
@@ -344,97 +360,50 @@ public class RangeSearchPredicateIT {
 			Object value2ToMatch = fieldModel.document2Value.indexedValue;
 			Object value3ToMatch = fieldModel.document3Value.indexedValue;
 
-			// Default is including both bounds
+			// Default is inclusion
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.range().field( absoluteFieldPath ).between( value1ToMatch, value2ToMatch ) )
+					.predicate( f -> f.range().field( absoluteFieldPath ).from( value1ToMatch ).to( value2ToMatch ) )
 					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
-			// explicit exclusion for the lower bound
+			// explicit exclusion for the from clause
 
 			query = scope.query()
 					.predicate( f -> f.range().field( absoluteFieldPath )
-							.between(
-									value1ToMatch, RangeBoundInclusion.EXCLUDED,
-									value2ToMatch, RangeBoundInclusion.INCLUDED
-							)
+							.from( value1ToMatch ).excludeLimit()
+							.to( value2ToMatch )
 					)
 					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 
-			// explicit exclusion for the upper bound
+			// explicit exclusion for the to clause
 
 			query = scope.query()
 					.predicate( f -> f.range().field( absoluteFieldPath )
-							.between(
-									value1ToMatch, RangeBoundInclusion.INCLUDED,
-									value2ToMatch, RangeBoundInclusion.EXCLUDED
-							)
+							.from( value1ToMatch )
+							.to( value2ToMatch ).excludeLimit()
 					)
 					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
-			// explicit inclusion for both bounds
+			// explicit exclusion for both clauses
 
 			query = scope.query()
 					.predicate( f -> f.range().field( absoluteFieldPath )
-							.between(
-									value1ToMatch, RangeBoundInclusion.INCLUDED,
-									value2ToMatch, RangeBoundInclusion.INCLUDED
-							)
-					)
-					.toQuery();
-
-			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
-
-			// explicit exclusion for both bounds
-
-			query = scope.query()
-					.predicate( f -> f.range().field( absoluteFieldPath )
-							.between(
-									value1ToMatch, RangeBoundInclusion.EXCLUDED,
-									value3ToMatch, RangeBoundInclusion.EXCLUDED
-							)
+							.from( value1ToMatch ).excludeLimit()
+							.to( value3ToMatch ).excludeLimit()
 					)
 					.toQuery();
 
 			assertThat( query )
 					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
-		}
-	}
-
-	@Test
-	public void between_nullBounds() {
-		StubMappingScope scope = indexManager.createScope();
-
-		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
-			String absoluteFieldPath = fieldModel.relativeFieldName;
-			Object lowerValueToMatch = fieldModel.predicateLowerBound;
-			Object upperValueToMatch = fieldModel.predicateUpperBound;
-
-			SearchQuery<DocumentReference> query;
-
-			query = scope.query()
-					.predicate( f -> f.range().field( absoluteFieldPath )
-							.between( lowerValueToMatch, null ) )
-					.toQuery();
-			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
-
-			query = scope.query()
-					.predicate( f -> f.range().field( absoluteFieldPath )
-							.between( null, upperValueToMatch ) )
-					.toQuery();
-			assertThat( query )
-					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 		}
 	}
 
@@ -466,10 +435,10 @@ public class RangeSearchPredicateIT {
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.bool()
 						.should( f.range().field( indexMapping.string1Field.relativeFieldName )
-								.atLeast( indexMapping.string1Field.document3Value.indexedValue )
+								.above( indexMapping.string1Field.document3Value.indexedValue )
 						)
 						.should( f.range().field( indexMapping.string1Field.relativeFieldName ).boost( 42 )
-								.atMost( indexMapping.string1Field.document1Value.indexedValue )
+								.below( indexMapping.string1Field.document1Value.indexedValue )
 						)
 				)
 				.sort( f -> f.score() )
@@ -481,10 +450,10 @@ public class RangeSearchPredicateIT {
 		query = scope.query()
 				.predicate( f -> f.bool()
 						.should( f.range().field( indexMapping.string1Field.relativeFieldName ).boost( 42 )
-								.atLeast( indexMapping.string1Field.document3Value.indexedValue )
+								.above( indexMapping.string1Field.document3Value.indexedValue )
 						)
 						.should( f.range().field( indexMapping.string1Field.relativeFieldName )
-								.atMost( indexMapping.string1Field.document1Value.indexedValue )
+								.below( indexMapping.string1Field.document1Value.indexedValue )
 						)
 				)
 				.sort( f -> f.score() )
@@ -501,10 +470,10 @@ public class RangeSearchPredicateIT {
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.bool()
 						.should( f.range().field( indexMapping.string1Field.relativeFieldName )
-								.atLeast( indexMapping.string1Field.document3Value.indexedValue )
+								.above( indexMapping.string1Field.document3Value.indexedValue )
 						)
 						.should( f.range().field( indexMapping.string1Field.relativeFieldName )
-								.atMost( indexMapping.string1Field.document1Value.indexedValue )
+								.below( indexMapping.string1Field.document1Value.indexedValue )
 								.boost( 7 )
 						)
 				)
@@ -517,11 +486,11 @@ public class RangeSearchPredicateIT {
 		query = scope.query()
 				.predicate( f -> f.bool()
 						.should( f.range().field( indexMapping.string1Field.relativeFieldName )
-								.atLeast( indexMapping.string1Field.document3Value.indexedValue )
+								.above( indexMapping.string1Field.document3Value.indexedValue )
 								.boost( 39 )
 						)
 						.should( f.range().field( indexMapping.string1Field.relativeFieldName )
-								.atMost( indexMapping.string1Field.document1Value.indexedValue )
+								.below( indexMapping.string1Field.document1Value.indexedValue )
 						)
 				)
 				.sort( f -> f.score() )
@@ -539,12 +508,12 @@ public class RangeSearchPredicateIT {
 				.predicate( f -> f.bool()
 						// 2 * 3 => boost x6
 						.should( f.range().field( indexMapping.string1Field.relativeFieldName ).boost( 3 )
-								.atLeast( indexMapping.string1Field.document3Value.indexedValue )
+								.above( indexMapping.string1Field.document3Value.indexedValue )
 								.boost( 2 )
 						)
 						// 7 * 1 => boost x7
 						.should( f.range().field( indexMapping.string1Field.relativeFieldName )
-								.atMost( indexMapping.string1Field.document1Value.indexedValue )
+								.below( indexMapping.string1Field.document1Value.indexedValue )
 								.boost( 7 )
 						)
 				)
@@ -558,12 +527,12 @@ public class RangeSearchPredicateIT {
 				.predicate( f -> f.bool()
 						// 39 * 0.5 => boost x19.5
 						.should( f.range().field( indexMapping.string1Field.relativeFieldName ).boost( 0.5f )
-								.atLeast( indexMapping.string1Field.document3Value.indexedValue )
+								.above( indexMapping.string1Field.document3Value.indexedValue )
 								.boost( 39 )
 						)
 						// 3 * 3 => boost x9
 						.should( f.range().field( indexMapping.string1Field.relativeFieldName ).boost( 3 )
-								.atMost( indexMapping.string1Field.document1Value.indexedValue )
+								.below( indexMapping.string1Field.document1Value.indexedValue )
 								.boost( 3 )
 						)
 				)
@@ -582,12 +551,12 @@ public class RangeSearchPredicateIT {
 				.predicate( f -> f.bool()
 						.should( f.range().field( indexMapping.string1Field.relativeFieldName )
 								.field( indexMapping.string2Field.relativeFieldName )
-								.atLeast( indexMapping.string1Field.document3Value.indexedValue )
+								.above( indexMapping.string1Field.document3Value.indexedValue )
 								.boost( 2 )
 						)
 						.should( f.range().field( indexMapping.string1Field.relativeFieldName )
 								.field( indexMapping.string2Field.relativeFieldName )
-								.atMost( indexMapping.string1Field.document1Value.indexedValue )
+								.below( indexMapping.string1Field.document1Value.indexedValue )
 								.boost( 7 )
 						)
 				)
@@ -601,12 +570,12 @@ public class RangeSearchPredicateIT {
 				.predicate( f -> f.bool()
 						.should( f.range().field( indexMapping.string1Field.relativeFieldName )
 								.field( indexMapping.string2Field.relativeFieldName )
-								.atLeast( indexMapping.string1Field.document3Value.indexedValue )
+								.above( indexMapping.string1Field.document3Value.indexedValue )
 								.boost( 39 )
 						)
 						.should( f.range().field( indexMapping.string1Field.relativeFieldName )
 								.field( indexMapping.string2Field.relativeFieldName )
-								.atMost( indexMapping.string1Field.document1Value.indexedValue )
+								.below( indexMapping.string1Field.document1Value.indexedValue )
 								.boost( 3 )
 						)
 				)
@@ -626,7 +595,7 @@ public class RangeSearchPredicateIT {
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.range().field( indexMapping.string1Field.relativeFieldName )
 						.field( indexMapping.string2Field.relativeFieldName )
-						.atMost( indexMapping.string1Field.document1Value.indexedValue )
+						.below( indexMapping.string1Field.document1Value.indexedValue )
 				)
 				.toQuery();
 
@@ -636,7 +605,7 @@ public class RangeSearchPredicateIT {
 		query = scope.query()
 				.predicate( f -> f.range().field( indexMapping.string1Field.relativeFieldName )
 						.field( indexMapping.string2Field.relativeFieldName )
-						.atLeast( indexMapping.string2Field.document3Value.indexedValue )
+						.above( indexMapping.string2Field.document3Value.indexedValue )
 				)
 				.toQuery();
 
@@ -648,7 +617,7 @@ public class RangeSearchPredicateIT {
 		query = scope.query()
 				.predicate( f -> f.range().field( indexMapping.string1Field.relativeFieldName )
 						.fields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
-						.atMost( indexMapping.string1Field.document1Value.indexedValue )
+						.below( indexMapping.string1Field.document1Value.indexedValue )
 				)
 				.toQuery();
 
@@ -658,7 +627,7 @@ public class RangeSearchPredicateIT {
 		query = scope.query()
 				.predicate( f -> f.range().field( indexMapping.string1Field.relativeFieldName )
 						.fields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
-						.between( "d", "e" )
+						.from( "d" ).to( "e" )
 				)
 				.toQuery();
 
@@ -668,7 +637,7 @@ public class RangeSearchPredicateIT {
 		query = scope.query()
 				.predicate( f -> f.range().field( indexMapping.string1Field.relativeFieldName )
 						.fields( indexMapping.string2Field.relativeFieldName, indexMapping.string3Field.relativeFieldName )
-						.atLeast( indexMapping.string3Field.document3Value.indexedValue )
+						.above( indexMapping.string3Field.document3Value.indexedValue )
 				)
 				.toQuery();
 
@@ -679,7 +648,7 @@ public class RangeSearchPredicateIT {
 
 		query = scope.query()
 				.predicate( f -> f.range().fields( indexMapping.string1Field.relativeFieldName, indexMapping.string2Field.relativeFieldName )
-						.atMost( indexMapping.string1Field.document1Value.indexedValue )
+						.below( indexMapping.string1Field.document1Value.indexedValue )
 				)
 				.toQuery();
 
@@ -688,7 +657,7 @@ public class RangeSearchPredicateIT {
 
 		query = scope.query()
 				.predicate( f -> f.range().fields( indexMapping.string1Field.relativeFieldName, indexMapping.string2Field.relativeFieldName )
-						.atLeast( indexMapping.string2Field.document3Value.indexedValue )
+						.above( indexMapping.string2Field.document3Value.indexedValue )
 				)
 				.toQuery();
 
@@ -701,7 +670,7 @@ public class RangeSearchPredicateIT {
 		SearchQuery<DocumentReference> query = indexManager.createScope().query()
 				.predicate( f -> f.range().field( indexMapping.string1FieldWithDslConverter.relativeFieldName )
 						.field( indexMapping.string2FieldWithDslConverter.relativeFieldName )
-						.atMost( new ValueWrapper<>( indexMapping.string1FieldWithDslConverter.document1Value.indexedValue ) )
+						.below( new ValueWrapper<>( indexMapping.string1FieldWithDslConverter.document1Value.indexedValue ) )
 				)
 				.toQuery();
 
@@ -713,7 +682,7 @@ public class RangeSearchPredicateIT {
 		SearchQuery<DocumentReference> query = indexManager.createScope().query()
 				.predicate( f -> f.range().field( indexMapping.string1FieldWithDslConverter.relativeFieldName )
 						.field( indexMapping.string2FieldWithDslConverter.relativeFieldName )
-						.atMost( indexMapping.string1FieldWithDslConverter.document1Value.indexedValue, ValueConvert.NO )
+						.below( indexMapping.string1FieldWithDslConverter.document1Value.indexedValue, ValueConvert.NO )
 				)
 				.toQuery();
 
@@ -728,18 +697,8 @@ public class RangeSearchPredicateIT {
 			String fieldPath = fieldModel.relativeFieldName;
 			SubTest.expectException(
 					"range() predicate with null bounds on field " + fieldPath,
-					() -> scope.predicate().range().field( fieldPath )
-							.range( null )
-			)
-					.assertThrown()
-					.isInstanceOf( IllegalArgumentException.class )
-					.hasMessageContaining( "'range'" )
-					.hasMessageContaining( "must not be null" );
-
-			SubTest.expectException(
-					"range() predicate with null bounds on field " + fieldPath,
-					() -> scope.predicate().range().field( fieldPath )
-							.between( null, null )
+					() -> scope.predicate().range().field( fieldPath ).from( null ).to( null )
+							.toPredicate()
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -750,22 +709,28 @@ public class RangeSearchPredicateIT {
 
 			SubTest.expectException(
 					"range() predicate with null bounds on field " + fieldPath,
-					() -> scope.predicate().range().field( fieldPath ).atLeast( null )
+					() -> scope.predicate().range().field( fieldPath ).above( null )
+							.toPredicate()
 			)
 					.assertThrown()
-					.isInstanceOf( IllegalArgumentException.class )
-					.hasMessageContaining( "'lowerBoundValue'" )
-					.hasMessageContaining( "must not be null" );
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Invalid value" )
+					.hasMessageContaining( "at least one bound" )
+					.hasMessageContaining( "must be non-null" )
+					.hasMessageContaining( fieldPath );
 
 
 			SubTest.expectException(
 					"range() predicate with null bounds on field " + fieldPath,
-					() -> scope.predicate().range().field( fieldPath ).atMost( null )
+					() -> scope.predicate().range().field( fieldPath ).below( null )
+							.toPredicate()
 			)
 					.assertThrown()
-					.isInstanceOf( IllegalArgumentException.class )
-					.hasMessageContaining( "'upperBoundValue'" )
-					.hasMessageContaining( "must not be null" );
+					.isInstanceOf( SearchException.class )
+					.hasMessageContaining( "Invalid value" )
+					.hasMessageContaining( "at least one bound" )
+					.hasMessageContaining( "must be non-null" )
+					.hasMessageContaining( fieldPath );
 		}
 	}
 
@@ -823,8 +788,9 @@ public class RangeSearchPredicateIT {
 			Object invalidValueToMatch = new InvalidType();
 
 			SubTest.expectException(
-					"range().atLeast() predicate with invalid parameter type on field " + absoluteFieldPath,
-					() -> scope.predicate().range().field( absoluteFieldPath ).atLeast( invalidValueToMatch )
+					"range().above() predicate with invalid parameter type on field " + absoluteFieldPath,
+					() -> scope.predicate().range().field( absoluteFieldPath ).above( invalidValueToMatch )
+							.toPredicate()
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -836,8 +802,9 @@ public class RangeSearchPredicateIT {
 					) );
 
 			SubTest.expectException(
-					"range().atMost() predicate with invalid parameter type on field " + absoluteFieldPath,
-					() -> scope.predicate().range().field( absoluteFieldPath ).atMost( invalidValueToMatch )
+					"range().below() predicate with invalid parameter type on field " + absoluteFieldPath,
+					() -> scope.predicate().range().field( absoluteFieldPath ).below( invalidValueToMatch )
+							.toPredicate()
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -851,7 +818,8 @@ public class RangeSearchPredicateIT {
 			SubTest.expectException(
 					"range().from() predicate with invalid parameter type on field " + absoluteFieldPath,
 					() -> scope.predicate().range().field( absoluteFieldPath )
-							.between( invalidValueToMatch, null )
+							.from( invalidValueToMatch ).to( null )
+							.toPredicate()
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -865,7 +833,8 @@ public class RangeSearchPredicateIT {
 			SubTest.expectException(
 					"range().from().to() predicate with invalid parameter type on field " + absoluteFieldPath,
 					() -> scope.predicate().range().field( absoluteFieldPath )
-							.between( null, invalidValueToMatch )
+							.from( null ).to( invalidValueToMatch )
+							.toPredicate()
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -887,7 +856,7 @@ public class RangeSearchPredicateIT {
 			Object upperValueToMatch = fieldModel.predicateUpperBound;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.range().field( absoluteFieldPath ).atMost( upperValueToMatch ) )
+					.predicate( f -> f.range().field( absoluteFieldPath ).below( upperValueToMatch ) )
 					.toQuery();
 
 			assertThat( query ).hasDocRefHitsAnyOrder( b -> {
@@ -907,7 +876,8 @@ public class RangeSearchPredicateIT {
 			SubTest.expectException(
 					() -> {
 						indexManager.createScope( rawFieldCompatibleIndexManager )
-								.predicate().range().field( absoluteFieldPath ).atMost( upperValueToMatch );
+								.predicate().range().field( absoluteFieldPath ).below( upperValueToMatch )
+								.toPredicate();
 					}
 			)
 					.assertThrown()
@@ -929,7 +899,7 @@ public class RangeSearchPredicateIT {
 			Object upperValueToMatch = fieldModel.predicateUpperBound;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.range().field( absoluteFieldPath ).atMost( upperValueToMatch, ValueConvert.NO ) )
+					.predicate( f -> f.range().field( absoluteFieldPath ).below( upperValueToMatch, ValueConvert.NO ) )
 					.toQuery();
 
 			assertThat( query ).hasDocRefHitsAnyOrder( b -> {
@@ -988,7 +958,7 @@ public class RangeSearchPredicateIT {
 		SubTest.expectException(
 				() -> {
 					scope.query().asEntityReference()
-							.predicate( f -> f.range().field( absoluteFieldPath ).atLeast( new BigDecimal( "739.333" ) ) )
+							.predicate( f -> f.range().field( absoluteFieldPath ).above( new BigDecimal( "739.333" ) ) )
 							.toQuery();
 				}
 		)

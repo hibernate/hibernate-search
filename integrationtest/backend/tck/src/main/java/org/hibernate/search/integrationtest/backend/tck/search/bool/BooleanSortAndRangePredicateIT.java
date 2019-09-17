@@ -111,28 +111,29 @@ public class BooleanSortAndRangePredicateIT {
 	}
 
 	@Test
-	public void rangeQueryAbove() {
-		SearchQuery<DocumentReference> query = rangeQuery( f -> f.range().field( FIELD_PATH ).above( Boolean.TRUE ) );
+	public void rangePredicateAtLeast() {
+		SearchQuery<DocumentReference> query = rangeQuery( f -> f.range().field( FIELD_PATH ).atLeast( Boolean.TRUE ) );
 		assertHasHitsWithBooleanProperties( query, Boolean.TRUE, Boolean.TRUE );
 	}
 
 	@Test
-	public void rangeQueryBelow() {
-		SearchQuery<DocumentReference> query = rangeQuery( f -> f.range().field( FIELD_PATH ).below( Boolean.FALSE ) );
+	public void rangePredicateAtMost() {
+		SearchQuery<DocumentReference> query = rangeQuery( f -> f.range().field( FIELD_PATH ).atMost( Boolean.FALSE ) );
 		assertHasHitsWithBooleanProperties( query, Boolean.FALSE, Boolean.FALSE );
 	}
 
 	@Test
-	public void rangeQueryFromTo() {
-		SearchQuery<DocumentReference> query = rangeQuery( f -> f.range().field( FIELD_PATH ).from( Boolean.FALSE ).to( Boolean.FALSE ) );
+	public void rangePredicateBetween() {
+		SearchQuery<DocumentReference> query = rangeQuery( f -> f.range().field( FIELD_PATH )
+				.between( Boolean.FALSE, Boolean.FALSE ) );
 		assertHasHitsWithBooleanProperties( query, Boolean.FALSE, Boolean.FALSE );
 	}
 
 	@Test
-	public void rangeFromToSortByFieldQuery() {
+	public void rangeBetweenAndSortByField() {
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.range().field( FIELD_PATH ).from( Boolean.FALSE ).to( Boolean.TRUE ) )
+				.predicate( f -> f.range().field( FIELD_PATH ).between( Boolean.FALSE, Boolean.TRUE ) )
 				.sort( f -> f.field( FIELD_PATH ).missing().last() )
 				.toQuery();
 
