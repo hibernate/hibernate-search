@@ -27,7 +27,7 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 	private EntityManager entityManager;
 
 	@Override
-	public List<Library> search(String terms, int limit, int offset) {
+	public List<Library> search(String terms, int offset, int limit) {
 		if ( terms == null || terms.isEmpty() ) {
 			return Collections.emptyList();
 		}
@@ -42,7 +42,7 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 
 	@Override
 	public LibraryFacetedSearchResult searchFaceted(String terms, Integer minCollectionSize,
-			List<LibraryServiceOption> libraryServices, int limit, int offset) {
+			List<LibraryServiceOption> libraryServices, int offset, int limit) {
 		AggregationKey<Map<Range<Integer>, Long>> aggByCollectionSizekey = AggregationKey.of( "collectionSize" );
 		AggregationKey<Map<LibraryServiceOption, Long>> aggByLibraryServiceKey = AggregationKey.of( "libraryService" );
 		SearchResult<Library> result = Search.session( entityManager )

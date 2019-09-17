@@ -13,9 +13,9 @@ import org.hibernate.search.integrationtest.showcase.library.model.Library;
 import org.hibernate.search.integrationtest.showcase.library.model.LibraryServiceOption;
 
 public interface IndexSearchLibraryRepository {
-	List<Library> search(String terms, int limit, int offset);
+	List<Library> search(String terms, int offset, int limit);
 
 	LibraryFacetedSearchResult searchFaceted(String terms,
 			Integer minCollectionSize, List<LibraryServiceOption> libraryServices,
-			int limit, int offset);
+			int offset, int limit);
 }
