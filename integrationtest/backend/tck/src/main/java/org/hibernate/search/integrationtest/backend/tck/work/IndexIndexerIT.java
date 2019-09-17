@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -29,9 +29,9 @@ import org.junit.rules.ExpectedException;
 import org.assertj.core.api.Assertions;
 
 /**
- * Verify that the {@link IndexDocumentWorkExecutor}, provided by a backend, is working properly, storing correctly the indexes.
+ * Verify that the {@link IndexIndexer}, provided by a backend, is working properly, storing correctly the indexes.
  */
-public class IndexDocumentWorkExecutorIT {
+public class IndexIndexerIT {
 
 	private static final String INDEX_NAME = "lordOfTheRingsChapters";
 	private static final int NUMBER_OF_BOOKS = 200;
@@ -58,14 +58,14 @@ public class IndexDocumentWorkExecutorIT {
 
 	@Test
 	public void checkAllDocumentsAreSearchable() {
-		IndexDocumentWorkExecutor<? extends DocumentElement> documentWorkExecutor =
-				indexManager.createDocumentWorkExecutor( DocumentCommitStrategy.NONE );
+		IndexIndexer<? extends DocumentElement> indexer =
+				indexManager.createIndexer( DocumentCommitStrategy.NONE );
 		CompletableFuture<?>[] tasks = new CompletableFuture<?>[NUMBER_OF_BOOKS];
 		IndexWorkExecutor workExecutor = indexManager.createWorkExecutor();
 
 		for ( int i = 0; i < NUMBER_OF_BOOKS; i++ ) {
 			final String id = i + "";
-			tasks[i] = documentWorkExecutor.add( referenceProvider( id ), document -> {
+			tasks[i] = indexer.add( referenceProvider( id ), document -> {
 				document.addValue( indexMapping.title, "The Lord of the Rings cap. " + id );
 			} );
 		}

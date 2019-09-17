@@ -44,7 +44,7 @@ import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanContext;
 import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
-import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.TransientReference;
@@ -204,8 +204,8 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		return new EntityReferenceImpl( typeContext.getJavaClass(), id );
 	}
 
-	public PojoSessionWorkExecutor createSessionWorkExecutor(DocumentCommitStrategy commitStrategy) {
-		return getDelegate().createSessionWorkExecutor( commitStrategy );
+	public PojoIndexer createIndexer(DocumentCommitStrategy commitStrategy) {
+		return getDelegate().createIndexer( commitStrategy );
 	}
 
 	@Override

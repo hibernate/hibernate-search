@@ -26,7 +26,7 @@ import org.hibernate.query.Query;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
-import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -114,7 +114,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 
 	private void loadAllFromQueue(SessionImplementor session) throws Exception {
 		// The search session will be closed automatically with the ORM session
-		PojoSessionWorkExecutor workExecutor = mappingContext.createSessionWorkExecutor(
+		PojoIndexer indexer = mappingContext.createIndexer(
 				session, DocumentCommitStrategy.NONE
 		);
 		try {
@@ -123,7 +123,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 				idList = source.take();
 				if ( idList != null ) {
 					log.tracef( "received list of ids %s", idList );
-					loadList( idList, session, workExecutor );
+					loadList( idList, session, indexer );
 				}
 			}
 			while ( idList != null );
@@ -141,9 +141,9 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 	 *
 	 * @param listIds the list of entity identifiers (of type
 	 * @param session the session to be used
-	 * @param workExecutor the work executor to be used
+	 * @param indexer the indexer to be used
 	 */
-	private void loadList(List<I> listIds, SessionImplementor session, PojoSessionWorkExecutor workExecutor) throws Exception {
+	private void loadList(List<I> listIds, SessionImplementor session, PojoIndexer indexer) throws Exception {
 		try {
 			beginTransaction( session );
 
@@ -160,7 +160,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 					.setHibernateFlushMode( FlushMode.MANUAL )
 					.setFetchSize( listIds.size() );
 
-			indexAllQueue( workExecutor, query.getResultList() );
+			indexAllQueue( indexer, query.getResultList() );
 			session.clear();
 		}
 		finally {
@@ -196,7 +196,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		}
 	}
 
-	private void indexAllQueue(PojoSessionWorkExecutor workExecutor, List<E> entities) throws InterruptedException {
+	private void indexAllQueue(PojoIndexer indexer, List<E> entities) throws InterruptedException {
 		if ( entities == null || entities.isEmpty() ) {
 			return;
 		}
@@ -206,7 +206,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 
 		for ( int i = 0; i < entities.size(); i++ ) {
 			final E entity = entities.get( i );
-			futures[i] = index( workExecutor, entity );
+			futures[i] = index( indexer, entity );
 			futures[i].exceptionally( exception -> {
 				handleException( entity, exception );
 				return null;
@@ -218,14 +218,14 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		monitor.documentsAdded( entities.size() );
 	}
 
-	private CompletableFuture<?> index(PojoSessionWorkExecutor workExecutor, E entity) throws InterruptedException {
+	private CompletableFuture<?> index(PojoIndexer indexer, E entity) throws InterruptedException {
 		// abort if the thread has been interrupted while not in wait(), I/O or similar which themselves would have
 		// raised the InterruptedException
 		if ( Thread.currentThread().isInterrupted() ) {
 			throw new InterruptedException();
 		}
 
-		CompletableFuture<?> future = Futures.create( () -> workExecutor.add( entity )
+		CompletableFuture<?> future = Futures.create( () -> indexer.add( entity )
 				.exceptionally( exception -> {
 					handleException( entity, exception );
 					return null;

@@ -17,7 +17,7 @@ import java.util.stream.Stream;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -51,14 +51,14 @@ public abstract class AbstractShardingIT {
 	}
 
 	protected final void initData(Map<String, List<String>> docIdByRoutingKey) {
-		IndexDocumentWorkExecutor<? extends DocumentElement> documentWorkExecutor =
-				indexManager.createDocumentWorkExecutor( DocumentCommitStrategy.NONE );
+		IndexIndexer<? extends DocumentElement> indexer =
+				indexManager.createIndexer( DocumentCommitStrategy.NONE );
 		List<CompletableFuture<?>> tasks = new ArrayList<>();
 
 		for ( Map.Entry<String, List<String>> entry : docIdByRoutingKey.entrySet() ) {
 			String routingKey = entry.getKey();
 			for ( String documentId : entry.getValue() ) {
-				tasks.add( documentWorkExecutor.add(
+				tasks.add( indexer.add(
 						referenceProvider( documentId, routingKey ),
 						document -> document.addValue( indexMapping.indexedRoutingKey, routingKey )
 				) );

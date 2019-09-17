@@ -8,7 +8,12 @@ package org.hibernate.search.engine.backend.work.execution.spi;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface IndexDocumentWorkExecutor<D> {
+/**
+ * An indexer scoped to a single index.
+ *
+ * @param <D> The expected document type.
+ */
+public interface IndexIndexer<D> {
 
 	CompletableFuture<?> add(DocumentReferenceProvider documentReferenceProvider, DocumentContributor<D> documentContributor);
 

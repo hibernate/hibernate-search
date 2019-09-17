@@ -8,7 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -52,14 +52,14 @@ public class StubMappingIndexManager {
 		return indexManager.createIndexingPlan( sessionContext, commitStrategy, refreshStrategy );
 	}
 
-	public IndexDocumentWorkExecutor<? extends DocumentElement> createDocumentWorkExecutor(
+	public IndexIndexer<? extends DocumentElement> createIndexer(
 			DocumentCommitStrategy commitStrategy) {
-		return createDocumentWorkExecutor( new StubBackendSessionContext(), commitStrategy );
+		return createIndexer( new StubBackendSessionContext(), commitStrategy );
 	}
 
-	public IndexDocumentWorkExecutor<? extends DocumentElement> createDocumentWorkExecutor(
+	public IndexIndexer<? extends DocumentElement> createIndexer(
 			StubBackendSessionContext sessionContext, DocumentCommitStrategy commitStrategy) {
-		return indexManager.createDocumentWorkExecutor( sessionContext, commitStrategy );
+		return indexManager.createIndexer( sessionContext, commitStrategy );
 	}
 
 	public IndexWorkExecutor createWorkExecutor() {

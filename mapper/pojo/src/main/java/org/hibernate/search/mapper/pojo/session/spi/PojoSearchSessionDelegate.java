@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.session.spi;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
-import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 
 public interface PojoSearchSessionDelegate {
@@ -18,6 +18,6 @@ public interface PojoSearchSessionDelegate {
 
 	PojoIndexingPlan createIndexingPlan(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
-	PojoSessionWorkExecutor createSessionWorkExecutor(DocumentCommitStrategy commitStrategy);
+	PojoIndexer createIndexer(DocumentCommitStrategy commitStrategy);
 
 }

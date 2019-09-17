@@ -10,7 +10,7 @@ import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDoc
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
@@ -35,7 +35,7 @@ public interface WorkExecutionBackendContext {
 			DocumentRefreshStrategy refreshStrategy,
 			BackendSessionContext sessionContext);
 
-	IndexDocumentWorkExecutor<ElasticsearchDocumentObjectBuilder> createDocumentWorkExecutor(
+	IndexIndexer<ElasticsearchDocumentObjectBuilder> createIndexer(
 			ElasticsearchWorkOrchestrator orchestrator,
 			URLEncodedString indexName,
 			BackendSessionContext sessionContext);

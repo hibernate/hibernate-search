@@ -22,7 +22,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
@@ -96,9 +96,9 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(
+	public IndexIndexer<LuceneRootDocumentBuilder> createIndexer(
 			BackendSessionContext sessionContext, DocumentCommitStrategy commitStrategy) {
-		return backendContext.createDocumentWorkExecutor(
+		return backendContext.createIndexer(
 				shardHolder, indexEntryFactory,
 				sessionContext, commitStrategy
 		);

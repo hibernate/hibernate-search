@@ -29,7 +29,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
-import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexDocumentWorkExecutor;
+import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexIndexer;
 import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexWorkExecutor;
 import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexIndexingPlan;
 import org.hibernate.search.backend.lucene.work.execution.impl.WorkExecutionBackendContext;
@@ -37,7 +37,7 @@ import org.hibernate.search.backend.lucene.work.execution.impl.WorkExecutionInde
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
@@ -122,14 +122,14 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	}
 
 	@Override
-	public IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(
+	public IndexIndexer<LuceneRootDocumentBuilder> createIndexer(
 			WorkExecutionIndexManagerContext indexManagerContext,
 			LuceneIndexEntryFactory indexEntryFactory,
 			BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
-		return new LuceneIndexDocumentWorkExecutor(
+		return new LuceneIndexIndexer(
 				workFactory,
 				indexEntryFactory,
 				indexManagerContext,

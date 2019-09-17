@@ -9,7 +9,7 @@ package org.hibernate.search.engine.mapper.mapping.spi;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -30,7 +30,7 @@ public interface MappedIndexManager<D extends DocumentElement> {
 	IndexIndexingPlan<D> createIndexingPlan(BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
-	IndexDocumentWorkExecutor<D> createDocumentWorkExecutor(BackendSessionContext sessionContext,
+	IndexIndexer<D> createIndexer(BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy);
 
 	IndexWorkExecutor createWorkExecutor(DetachedBackendSessionContext sessionContext);

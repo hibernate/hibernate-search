@@ -8,7 +8,11 @@ package org.hibernate.search.mapper.pojo.work.spi;
 
 import java.util.concurrent.CompletableFuture;
 
-public interface PojoSessionWorkExecutor {
+/**
+ * An interface for indexing entities in the context of a session in a POJO mapper,
+ * immediately, asynchronously and without any sort of {@link PojoIndexingPlan planning}.
+ */
+public interface PojoIndexer {
 
 	/**
 	 * Add an entity to the index, assuming that the entity is absent from the index.

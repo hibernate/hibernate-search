@@ -40,7 +40,7 @@ import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSessionMap
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
-import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -145,9 +145,9 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public PojoSessionWorkExecutor createSessionWorkExecutor(SessionImplementor sessionImplementor,
+	public PojoIndexer createIndexer(SessionImplementor sessionImplementor,
 			DocumentCommitStrategy commitStrategy) {
-		return HibernateOrmSearchSession.get( this, sessionImplementor ).createSessionWorkExecutor( commitStrategy );
+		return HibernateOrmSearchSession.get( this, sessionImplementor ).createIndexer( commitStrategy );
 	}
 
 	@Override

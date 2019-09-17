@@ -17,10 +17,10 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
-public class LuceneIndexDocumentWorkExecutor implements IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> {
+public class LuceneIndexIndexer implements IndexIndexer<LuceneRootDocumentBuilder> {
 
 	private final LuceneWorkFactory factory;
 	private final LuceneIndexEntryFactory indexEntryFactory;
@@ -28,7 +28,7 @@ public class LuceneIndexDocumentWorkExecutor implements IndexDocumentWorkExecuto
 	private final String tenantId;
 	private final DocumentCommitStrategy commitStrategy;
 
-	public LuceneIndexDocumentWorkExecutor(LuceneWorkFactory factory,
+	public LuceneIndexIndexer(LuceneWorkFactory factory,
 			LuceneIndexEntryFactory indexEntryFactory,
 			WorkExecutionIndexManagerContext indexManagerContext,
 			BackendSessionContext sessionContext,

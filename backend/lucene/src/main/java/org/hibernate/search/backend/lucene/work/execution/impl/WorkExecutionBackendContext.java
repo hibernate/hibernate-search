@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDeleg
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
@@ -41,7 +41,7 @@ public interface WorkExecutionBackendContext {
 	LuceneWriteWorkOrchestratorImplementor createOrchestrator(String indexName, Optional<String> shardId,
 			IndexWriterDelegator indexWriterDelegator);
 
-	IndexDocumentWorkExecutor<LuceneRootDocumentBuilder> createDocumentWorkExecutor(
+	IndexIndexer<LuceneRootDocumentBuilder> createIndexer(
 			WorkExecutionIndexManagerContext indexManagerContext,
 			LuceneIndexEntryFactory indexEntryFactory,
 			BackendSessionContext sessionContext,

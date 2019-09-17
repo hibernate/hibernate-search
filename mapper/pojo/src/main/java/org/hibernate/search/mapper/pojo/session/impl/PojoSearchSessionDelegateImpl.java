@@ -12,9 +12,9 @@ import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeContainedTypeContext
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContextProvider;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionDelegate;
-import org.hibernate.search.mapper.pojo.work.impl.PojoSessionWorkExecutorImpl;
+import org.hibernate.search.mapper.pojo.work.impl.PojoIndexerImpl;
 import org.hibernate.search.mapper.pojo.work.impl.PojoIndexingPlanImpl;
-import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 
 public final class PojoSearchSessionDelegateImpl implements PojoSearchSessionDelegate {
@@ -45,8 +45,8 @@ public final class PojoSearchSessionDelegateImpl implements PojoSearchSessionDel
 	}
 
 	@Override
-	public PojoSessionWorkExecutor createSessionWorkExecutor(DocumentCommitStrategy commitStrategy) {
-		return new PojoSessionWorkExecutorImpl( indexedTypeContextProvider, backendSessionContext, commitStrategy );
+	public PojoIndexer createIndexer(DocumentCommitStrategy commitStrategy) {
+		return new PojoIndexerImpl( indexedTypeContextProvider, backendSessionContext, commitStrategy );
 	}
 
 }

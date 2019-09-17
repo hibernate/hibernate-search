@@ -22,7 +22,7 @@ import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
  * everywhere {@link BackendSessionContext} can.
  * In particular, it cannot be used when creating document-related
  * {@link org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor#createIndexingPlan(BackendSessionContext, DocumentCommitStrategy, DocumentRefreshStrategy) indexing plans}
- * or {@link org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor#createDocumentWorkExecutor(BackendSessionContext, DocumentCommitStrategy) work executors}
+ * or {@link org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor#createIndexer(BackendSessionContext, DocumentCommitStrategy) indexers}
  * because these may need access to the session.
  */
 public final class DetachedBackendSessionContext {

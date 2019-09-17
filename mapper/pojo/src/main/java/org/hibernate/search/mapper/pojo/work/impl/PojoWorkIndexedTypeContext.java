@@ -47,7 +47,7 @@ public interface PojoWorkIndexedTypeContext<I, E, D extends DocumentElement> {
 	PojoIndexedTypeIndexingPlan<I, E, D> createIndexingPlan(AbstractPojoBackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
-	PojoTypeDocumentWorkExecutor<I, E, D> createDocumentWorkExecutor(
+	PojoTypeIndexer<I, E, D> createIndexer(
 			AbstractPojoBackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy);
 

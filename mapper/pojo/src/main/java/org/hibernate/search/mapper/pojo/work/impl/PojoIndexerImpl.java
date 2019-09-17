@@ -16,10 +16,10 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
-import org.hibernate.search.mapper.pojo.work.spi.PojoSessionWorkExecutor;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class PojoSessionWorkExecutorImpl implements PojoSessionWorkExecutor {
+public class PojoIndexerImpl implements PojoIndexer {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -28,9 +28,9 @@ public class PojoSessionWorkExecutorImpl implements PojoSessionWorkExecutor {
 	private final PojoRuntimeIntrospector introspector;
 	private final DocumentCommitStrategy commitStrategy;
 
-	private final Map<Class<?>, PojoTypeDocumentWorkExecutor<?, ?, ?>> typeExecutors = new HashMap<>();
+	private final Map<Class<?>, PojoTypeIndexer<?, ?, ?>> typeExecutors = new HashMap<>();
 
-	public PojoSessionWorkExecutorImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
+	public PojoIndexerImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
 			AbstractPojoBackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy) {
 		this.indexedTypeContextProvider = indexedTypeContextProvider;
@@ -47,22 +47,22 @@ public class PojoSessionWorkExecutorImpl implements PojoSessionWorkExecutor {
 	@Override
 	public CompletableFuture<?> add(Object providedId, Object entity) {
 		Class<?> clazz = introspector.getClass( entity );
-		PojoTypeDocumentWorkExecutor<?, ?, ?> typeExecutor = this.typeExecutors.get( clazz );
+		PojoTypeIndexer<?, ?, ?> typeExecutor = this.typeExecutors.get( clazz );
 		if ( typeExecutor == null ) {
-			typeExecutor = createTypeDocumentExecutor( clazz );
+			typeExecutor = createTypeIndexer( clazz );
 			typeExecutors.put( clazz, typeExecutor );
 		}
 
 		return typeExecutor.add( providedId, entity );
 	}
 
-	private PojoTypeDocumentWorkExecutor<?, ?, ?> createTypeDocumentExecutor(Class<?> clazz) {
+	private PojoTypeIndexer<?, ?, ?> createTypeIndexer(Class<?> clazz) {
 		Optional<? extends PojoWorkIndexedTypeContext<?, ?, ?>> typeContext =
 				indexedTypeContextProvider.getByExactClass( clazz );
 		if ( !typeContext.isPresent() ) {
 			throw log.notDirectlyIndexedType( clazz );
 		}
 
-		return typeContext.get().createDocumentWorkExecutor( sessionContext, commitStrategy );
+		return typeContext.get().createIndexer( sessionContext, commitStrategy );
 	}
 }
