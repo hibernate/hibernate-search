@@ -26,7 +26,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -593,8 +593,8 @@ public class FieldSearchProjectionIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 			indexMapping.supportedFieldWithProjectionConverterModels.forEach( f -> f.document1Value.write( document ) );
 
@@ -608,7 +608,7 @@ public class FieldSearchProjectionIT {
 			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
 			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document1Value.write( nestedObject ) );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
 			indexMapping.supportedFieldWithProjectionConverterModels.forEach( f -> f.document2Value.write( document ) );
 
@@ -622,7 +622,7 @@ public class FieldSearchProjectionIT {
 			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
 			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject ) );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document3Value.write( document ) );
 			indexMapping.supportedFieldWithProjectionConverterModels.forEach( f -> f.document3Value.write( document ) );
 
@@ -636,21 +636,21 @@ public class FieldSearchProjectionIT {
 			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
 			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document3Value.write( nestedObject ) );
 		} );
-		workPlan.add( referenceProvider( EMPTY ), document -> { } );
-		workPlan.execute().join();
+		plan.add( referenceProvider( EMPTY ), document -> { } );
+		plan.execute().join();
 
-		workPlan = compatibleIndexManager.createWorkPlan();
-		workPlan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
+		plan = compatibleIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
 			compatibleIndexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 			compatibleIndexMapping.supportedFieldWithProjectionConverterModels.forEach( f -> f.document1Value.write( document ) );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
-		workPlan = rawFieldCompatibleIndexManager.createWorkPlan();
-		workPlan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
+		plan = rawFieldCompatibleIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
 			rawFieldCompatibleIndexMapping.supportedFieldWithProjectionConverterModels.forEach( f -> f.document1Value.write( document ) );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		SearchQuery<DocumentReference> query = indexManager.createScope().query()

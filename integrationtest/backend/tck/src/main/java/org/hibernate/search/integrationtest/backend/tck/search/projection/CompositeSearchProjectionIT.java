@@ -21,7 +21,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
@@ -326,24 +326,24 @@ public class CompositeSearchProjectionIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexMapping.author.document1Value.write( document );
 			indexMapping.title.document1Value.write( document );
 			indexMapping.releaseDate.document1Value.write( document );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexMapping.author.document2Value.write( document );
 			indexMapping.title.document2Value.write( document );
 			indexMapping.releaseDate.document2Value.write( document );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			indexMapping.author.document3Value.write( document );
 			indexMapping.title.document3Value.write( document );
 			indexMapping.releaseDate.document3Value.write( document );
 		} );
 
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();

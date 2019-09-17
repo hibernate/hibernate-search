@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
@@ -382,8 +382,8 @@ public class ExistsSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 			indexMapping.supportedFieldWithDocValuesModels.forEach( f -> f.document1Value.write( document ) );
 			indexMapping.string1Field.document1Value.write( document );
@@ -405,7 +405,7 @@ public class ExistsSearchPredicateIT {
 			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
 			indexMapping.nestedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
 			indexMapping.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( document ) );
 			indexMapping.string2Field.document2Value.write( document );
@@ -422,7 +422,7 @@ public class ExistsSearchPredicateIT {
 			indexMapping.nestedObject.supportedFieldModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
 			indexMapping.nestedObject.supportedFieldWithDocValuesModels.forEach( f -> f.document2Value.write( nestedObject2 ) );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			indexMapping.string1Field.document3Value.write( document );
 
 			// Add two empty objects
@@ -433,20 +433,20 @@ public class ExistsSearchPredicateIT {
 			document.addObject( indexMapping.nestedObject.self );
 			document.addObject( indexMapping.nestedObject.self );
 		} );
-		workPlan.add( referenceProvider( EMPTY ), document -> { } );
-		workPlan.execute().join();
+		plan.add( referenceProvider( EMPTY ), document -> { } );
+		plan.execute().join();
 
-		workPlan = compatibleIndexManager.createWorkPlan();
-		workPlan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
+		plan = compatibleIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
 			compatibleIndexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
-		workPlan = rawFieldCompatibleIndexManager.createWorkPlan();
-		workPlan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
+		plan = rawFieldCompatibleIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
 			rawFieldCompatibleIndexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		SearchQuery<DocumentReference> query = indexManager.createScope().query()

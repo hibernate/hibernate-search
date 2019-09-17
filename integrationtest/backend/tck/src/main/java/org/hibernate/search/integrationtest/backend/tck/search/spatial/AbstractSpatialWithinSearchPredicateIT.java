@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -81,8 +81,8 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 	}
 
 	protected void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
 			document.addValue( indexMapping.string, OURSON_QUI_BOIT_STRING );
 			document.addValue( indexMapping.geoPoint, OURSON_QUI_BOIT_GEO_POINT );
 			document.addValue( indexMapping.geoPoint_1, GeoPoint.of( OURSON_QUI_BOIT_GEO_POINT.getLatitude() - 1,
@@ -92,7 +92,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 			document.addValue( indexMapping.geoPoint_with_longName, OURSON_QUI_BOIT_GEO_POINT );
 			document.addValue( indexMapping.projectableUnsortableGeoPoint, OURSON_QUI_BOIT_GEO_POINT );
 		} );
-		workPlan.add( referenceProvider( IMOUTO_ID ), document -> {
+		plan.add( referenceProvider( IMOUTO_ID ), document -> {
 			document.addValue( indexMapping.string, IMOUTO_STRING );
 			document.addValue( indexMapping.geoPoint, IMOUTO_GEO_POINT );
 			document.addValue( indexMapping.geoPoint_1, GeoPoint.of( IMOUTO_GEO_POINT.getLatitude() - 1,
@@ -102,7 +102,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 			document.addValue( indexMapping.geoPoint_with_longName, IMOUTO_GEO_POINT );
 			document.addValue( indexMapping.projectableUnsortableGeoPoint, IMOUTO_GEO_POINT );
 		} );
-		workPlan.add( referenceProvider( CHEZ_MARGOTTE_ID ), document -> {
+		plan.add( referenceProvider( CHEZ_MARGOTTE_ID ), document -> {
 			document.addValue( indexMapping.string, CHEZ_MARGOTTE_STRING );
 			document.addValue( indexMapping.geoPoint, CHEZ_MARGOTTE_GEO_POINT );
 			document.addValue( indexMapping.geoPoint_1, GeoPoint.of( CHEZ_MARGOTTE_GEO_POINT.getLatitude() - 1,
@@ -112,9 +112,9 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 			document.addValue( indexMapping.geoPoint_with_longName, CHEZ_MARGOTTE_GEO_POINT );
 			document.addValue( indexMapping.projectableUnsortableGeoPoint, CHEZ_MARGOTTE_GEO_POINT );
 		} );
-		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
+		plan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();

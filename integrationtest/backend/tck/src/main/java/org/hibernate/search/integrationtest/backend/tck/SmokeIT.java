@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -255,8 +255,8 @@ public class SmokeIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( "1" ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( "1" ), document -> {
 			document.addValue( indexMapping.string, "text 1" );
 			document.addValue( indexMapping.string_analyzed, "text 1" );
 			document.addValue( indexMapping.integer, 1 );
@@ -278,7 +278,7 @@ public class SmokeIT {
 			nestedObject.addValue( indexMapping.nestedObject.integer, 102 );
 		} );
 
-		workPlan.add( referenceProvider( "2" ), document -> {
+		plan.add( referenceProvider( "2" ), document -> {
 			document.addValue( indexMapping.string, "text 2" );
 			document.addValue( indexMapping.string_analyzed, "text 2" );
 			document.addValue( indexMapping.integer, 2 );
@@ -300,21 +300,21 @@ public class SmokeIT {
 			nestedObject.addValue( indexMapping.nestedObject.integer, 202 );
 		} );
 
-		workPlan.add( referenceProvider( "3" ), document -> {
+		plan.add( referenceProvider( "3" ), document -> {
 			document.addValue( indexMapping.string, "text 3" );
 			document.addValue( indexMapping.string_analyzed, "text 3" );
 			document.addValue( indexMapping.integer, 3 );
 		} );
 
-		workPlan.add( referenceProvider( "neverMatching" ), document -> {
+		plan.add( referenceProvider( "neverMatching" ), document -> {
 			document.addValue( indexMapping.string, "never matching" );
 			document.addValue( indexMapping.string_analyzed, "never matching" );
 			document.addValue( indexMapping.integer, 9484 );
 		} );
 
-		workPlan.add( referenceProvider( "empty" ), document -> { } );
+		plan.add( referenceProvider( "empty" ), document -> { } );
 
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();

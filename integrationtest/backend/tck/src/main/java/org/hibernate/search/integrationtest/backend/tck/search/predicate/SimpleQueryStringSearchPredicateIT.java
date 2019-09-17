@@ -18,7 +18,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
@@ -828,8 +828,8 @@ public class SimpleQueryStringSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_1_AND_TERM_2 );
 			document.addValue( indexMapping.analyzedStringFieldWithDslConverter.reference, TEXT_TERM_1_AND_TERM_2 );
 			document.addValue( indexMapping.analyzedStringField2.reference, TEXT_TERM_1_AND_TERM_3 );
@@ -838,48 +838,48 @@ public class SimpleQueryStringSearchPredicateIT {
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toLowerCase( Locale.ROOT ) );
 			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toLowerCase( Locale.ROOT ) );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_1_AND_TERM_3 );
 			document.addValue( indexMapping.analyzedStringField4.reference, PREFIX_2 );
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toUpperCase( Locale.ROOT ) );
 			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toUpperCase( Locale.ROOT ) );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_2_IN_PHRASE );
 			document.addValue( indexMapping.analyzedStringField4.reference, PREFIX_3 );
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2 );
 			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2 );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_4 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_4 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_4_IN_PHRASE_SLOP_2 );
 			document.addValue( indexMapping.analyzedStringField2.reference, TEXT_TERM_2_IN_PHRASE );
 			document.addValue( indexMapping.analyzedStringField4.reference, PREFIX_4 );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_5 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_5 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_1_EDIT_DISTANCE_1 );
 			document.addValue( indexMapping.analyzedStringField3.reference, TEXT_TERM_2_IN_PHRASE );
 			document.addValue( indexMapping.analyzedStringField3.reference, TEXT_TERM_1_AND_TERM_3 );
 		} );
-		workPlan.add( referenceProvider( EMPTY ), document -> {
+		plan.add( referenceProvider( EMPTY ), document -> {
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
-		workPlan = compatibleIndexManager.createWorkPlan();
-		workPlan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
+		plan = compatibleIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
 			document.addValue( compatibleIndexMapping.analyzedStringField1.reference, TEXT_TERM_1_AND_TERM_2 );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
-		workPlan = rawFieldCompatibleIndexManager.createWorkPlan();
-		workPlan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
+		plan = rawFieldCompatibleIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
 			document.addValue( rawFieldCompatibleIndexMapping.analyzedStringField1.reference, TEXT_TERM_1_AND_TERM_2 );
 		} );
-		workPlan.execute().join();
-		workPlan = incompatibleAnalyzerIndexManager.createWorkPlan();
-		workPlan.add( referenceProvider( INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 ), document -> {
+		plan.execute().join();
+		plan = incompatibleAnalyzerIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 ), document -> {
 			document.addValue( incompatibleAnalyzerIndexMapping.analyzedStringField1.reference, TEXT_TERM_1_AND_TERM_2 );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();

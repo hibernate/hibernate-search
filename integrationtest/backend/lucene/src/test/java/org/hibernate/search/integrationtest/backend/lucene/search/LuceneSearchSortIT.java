@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
@@ -80,19 +80,19 @@ public class LuceneSearchSortIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( FIRST_ID ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( FIRST_ID ), document -> {
 			document.addValue( indexMapping.geoPoint, GeoPoint.of( 45.7705687,4.835233 ) );
 		} );
-		workPlan.add( referenceProvider( SECOND_ID ), document -> {
+		plan.add( referenceProvider( SECOND_ID ), document -> {
 			document.addValue( indexMapping.geoPoint, GeoPoint.of( 45.7541719, 4.8386221 ) );
 		} );
-		workPlan.add( referenceProvider( THIRD_ID ), document -> {
+		plan.add( referenceProvider( THIRD_ID ), document -> {
 			document.addValue( indexMapping.geoPoint, GeoPoint.of( 45.7530374, 4.8510299 ) );
 		} );
-		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
+		plan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();

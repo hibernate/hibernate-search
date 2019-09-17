@@ -11,7 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -64,9 +64,9 @@ public class ElasticsearchMatchSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( "1" ), document -> document.addValue( indexMapping.normalizedStringField, TEST_TERM ) );
-		workPlan.execute().join();
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( "1" ), document -> document.addValue( indexMapping.normalizedStringField, TEST_TERM ) );
+		plan.execute().join();
 	}
 
 	private static class IndexMapping {

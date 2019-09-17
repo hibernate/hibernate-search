@@ -25,7 +25,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
@@ -619,9 +619,9 @@ public class FieldSearchSortIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
 		// Important: do not index the documents in the expected order after sorts (1, 2, 3)
-		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
 			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document2Value.write( document ) );
 			indexMapping.unsupportedFieldModels.forEach( f -> f.document2Value.write( document ) );
@@ -638,7 +638,7 @@ public class FieldSearchSortIT {
 
 			indexMapping.scaledBigDecimal.document2Value.write( document );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
 			indexMapping.unsupportedFieldModels.forEach( f -> f.document1Value.write( document ) );
@@ -655,7 +655,7 @@ public class FieldSearchSortIT {
 
 			indexMapping.scaledBigDecimal.document1Value.write( document );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document3Value.write( document ) );
 			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document3Value.write( document ) );
 			indexMapping.unsupportedFieldModels.forEach( f -> f.document3Value.write( document ) );
@@ -672,43 +672,43 @@ public class FieldSearchSortIT {
 
 			indexMapping.scaledBigDecimal.document3Value.write( document );
 		} );
-		workPlan.add( referenceProvider( EMPTY ), document -> { } );
-		workPlan.execute().join();
+		plan.add( referenceProvider( EMPTY ), document -> { } );
+		plan.execute().join();
 
-		workPlan = compatibleIndexManager.createWorkPlan();
-		workPlan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
+		plan = compatibleIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
 			compatibleIndexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 			compatibleIndexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
-		workPlan = rawFieldCompatibleIndexManager.createWorkPlan();
-		workPlan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
+		plan = rawFieldCompatibleIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
 			rawFieldCompatibleIndexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
-		workPlan = incompatibleDecimalScaleIndexManager.createWorkPlan();
-		workPlan.add( referenceProvider( INCOMPATIBLE_DECIMAL_SCALE_INDEX_DOCUMENT_1 ), document -> {
+		plan = incompatibleDecimalScaleIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( INCOMPATIBLE_DECIMAL_SCALE_INDEX_DOCUMENT_1 ), document -> {
 			incompatibleDecimalScaleIndexMapping.scaledBigDecimal.document1Value.write( document );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
-		workPlan = multipleEmptyIndexManager.createWorkPlan();
-		workPlan.add( referenceProvider( EMPTY_1 ), document -> { } );
-		workPlan.add( referenceProvider( DOCUMENT_2 ), document ->
+		plan = multipleEmptyIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( EMPTY_1 ), document -> { } );
+		plan.add( referenceProvider( DOCUMENT_2 ), document ->
 			multipleEmptyIndexMapping.supportedFieldModels.forEach( f -> f.document2Value.write( document ) )
 		);
-		workPlan.add( referenceProvider( EMPTY_2 ), document -> { } );
-		workPlan.add( referenceProvider( DOCUMENT_3 ), document ->
+		plan.add( referenceProvider( EMPTY_2 ), document -> { } );
+		plan.add( referenceProvider( DOCUMENT_3 ), document ->
 			multipleEmptyIndexMapping.supportedFieldModels.forEach( f -> f.document3Value.write( document ) )
 		);
-		workPlan.add( referenceProvider( EMPTY_3 ), document -> { } );
-		workPlan.add( referenceProvider( DOCUMENT_1 ), document ->
+		plan.add( referenceProvider( EMPTY_3 ), document -> { } );
+		plan.add( referenceProvider( DOCUMENT_1 ), document ->
 			multipleEmptyIndexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) )
 		);
-		workPlan.add( referenceProvider( EMPTY_4 ), document -> { } );
-		workPlan.execute().join();
+		plan.add( referenceProvider( EMPTY_4 ), document -> { } );
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		SearchQuery<DocumentReference> query = indexManager.createScope().query()

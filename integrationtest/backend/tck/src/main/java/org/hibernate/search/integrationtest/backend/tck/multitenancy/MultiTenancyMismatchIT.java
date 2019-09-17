@@ -12,7 +12,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubBackendSessionContext;
@@ -94,9 +94,9 @@ public class MultiTenancyMismatchIT {
 		thrown.expectMessage( "Tenant identifier" );
 		thrown.expectMessage( "is provided, but multi-tenancy is disabled for this backend" );
 
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant1SessionContext );
-		workPlan.update( referenceProvider( "1" ), document -> { } );
-		workPlan.execute().join();
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( tenant1SessionContext );
+		plan.update( referenceProvider( "1" ), document -> { } );
+		plan.execute().join();
 	}
 
 	@Test
@@ -113,9 +113,9 @@ public class MultiTenancyMismatchIT {
 		thrown.expectMessage( "Tenant identifier" );
 		thrown.expectMessage( "is provided, but multi-tenancy is disabled for this backend" );
 
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant1SessionContext );
-		workPlan.update( referenceProvider( "1" ), document -> { } );
-		workPlan.execute().join();
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( tenant1SessionContext );
+		plan.update( referenceProvider( "1" ), document -> { } );
+		plan.execute().join();
 	}
 
 	@Test
@@ -132,9 +132,9 @@ public class MultiTenancyMismatchIT {
 		thrown.expectMessage( "Tenant identifier" );
 		thrown.expectMessage( "is provided, but multi-tenancy is disabled for this backend" );
 
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant1SessionContext );
-		workPlan.delete( referenceProvider( "1" ) );
-		workPlan.execute().join();
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( tenant1SessionContext );
+		plan.delete( referenceProvider( "1" ) );
+		plan.execute().join();
 	}
 
 	private static class IndexMapping {

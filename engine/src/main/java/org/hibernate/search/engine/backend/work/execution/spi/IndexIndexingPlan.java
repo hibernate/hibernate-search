@@ -9,18 +9,17 @@ package org.hibernate.search.engine.backend.work.execution.spi;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * A set of works to be executed on an index.
+ * A set of works to be executed on a single index.
  * <p>
  * Works are accumulated when methods such as {@link #add(DocumentReferenceProvider, DocumentContributor)}
  * or {@link #update(DocumentReferenceProvider, DocumentContributor)} are called,
  * and executed only when {@link #execute()} is called.
  * <p>
- * Relative ordering of works within a work plan will be preserved.
+ * Relative ordering of works within a plan will be preserved.
  * <p>
  * Implementations may not be thread-safe.
- *
  */
-public interface IndexWorkPlan<D> {
+public interface IndexIndexingPlan<D> {
 
 	/**
 	 * Add a document to the index, assuming that the document is absent from the index.

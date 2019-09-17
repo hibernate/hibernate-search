@@ -15,7 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
@@ -25,7 +25,7 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
-public class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuilder> {
+public class LuceneIndexIndexingPlan implements IndexIndexingPlan<LuceneRootDocumentBuilder> {
 
 	private final LuceneWorkFactory factory;
 	private final LuceneIndexEntryFactory indexEntryFactory;
@@ -36,7 +36,7 @@ public class LuceneIndexWorkPlan implements IndexWorkPlan<LuceneRootDocumentBuil
 
 	private final Map<LuceneWriteWorkOrchestrator, List<LuceneWriteWork<?>>> worksByOrchestrator = new HashMap<>();
 
-	public LuceneIndexWorkPlan(LuceneWorkFactory factory,
+	public LuceneIndexIndexingPlan(LuceneWorkFactory factory,
 			WorkExecutionIndexManagerContext indexManagerContext,
 			LuceneIndexEntryFactory indexEntryFactory,
 			BackendSessionContext sessionContext,

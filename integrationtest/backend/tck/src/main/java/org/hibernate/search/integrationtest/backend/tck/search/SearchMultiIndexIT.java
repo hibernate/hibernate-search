@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -297,22 +297,22 @@ public class SearchMultiIndexIT {
 	private void initData() {
 		// Backend 1 / Index 1
 
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager_1_1.createWorkPlan();
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager_1_1.createIndexingPlan();
 
-		workPlan.add( referenceProvider( DOCUMENT_1_1_1 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_1_1_1 ), document -> {
 			document.addValue( indexMapping_1_1.string, STRING_1 );
 			document.addValue( indexMapping_1_1.additionalField, ADDITIONAL_FIELD_1_1_1 );
 			document.addValue( indexMapping_1_1.differentTypesField, DIFFERENT_TYPES_FIELD_1_1_1 );
 			document.addValue( indexMapping_1_1.sortField, SORT_FIELD_1_1_1 );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_1_1_2 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_1_1_2 ), document -> {
 			document.addValue( indexMapping_1_1.string, STRING_2 );
 			document.addValue( indexMapping_1_1.additionalField, ADDITIONAL_FIELD_1_1_2 );
 			document.addValue( indexMapping_1_1.differentTypesField, DIFFERENT_TYPES_FIELD_1_1_2 );
 			document.addValue( indexMapping_1_1.sortField, SORT_FIELD_1_1_2 );
 		} );
 
-		workPlan.execute().join();
+		plan.execute().join();
 
 		StubMappingScope scope = indexManager_1_1.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
@@ -322,15 +322,15 @@ public class SearchMultiIndexIT {
 
 		// Backend 1 / Index 2
 
-		workPlan = indexManager_1_2.createWorkPlan();
+		plan = indexManager_1_2.createIndexingPlan();
 
-		workPlan.add( referenceProvider( DOCUMENT_1_2_1 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_1_2_1 ), document -> {
 			document.addValue( indexMapping_1_2.string, STRING_1 );
 			document.addValue( indexMapping_1_2.differentTypesField, DIFFERENT_TYPES_FIELD_1_2_1 );
 			document.addValue( indexMapping_1_2.sortField, SORT_FIELD_1_2_1 );
 		} );
 
-		workPlan.execute().join();
+		plan.execute().join();
 
 		scope = indexManager_1_2.createScope();
 		query = scope.query()
@@ -340,16 +340,16 @@ public class SearchMultiIndexIT {
 
 		// Backend 2 / Index 1
 
-		workPlan = indexManager_2_1.createWorkPlan();
+		plan = indexManager_2_1.createIndexingPlan();
 
-		workPlan.add( referenceProvider( DOCUMENT_2_1_1 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_2_1_1 ), document -> {
 			document.addValue( indexMapping_2_1.string, STRING_1 );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_2_1_2 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_2_1_2 ), document -> {
 			document.addValue( indexMapping_2_1.string, STRING_2 );
 		} );
 
-		workPlan.execute().join();
+		plan.execute().join();
 
 		scope = indexManager_2_1.createScope();
 		query = scope.query()

@@ -14,7 +14,7 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.predicate.dsl.MinimumShouldMatchConditionStep;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
@@ -1029,22 +1029,22 @@ public class BoolSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			document.addValue( indexMapping.field1, FIELD1_VALUE1 );
 			document.addValue( indexMapping.field2, FIELD2_VALUE1 );
 			document.addValue( indexMapping.field3, FIELD3_VALUE1 );
 			document.addValue( indexMapping.field4, FIELD4_VALUE1AND2 );
 			document.addValue( indexMapping.field5, FIELD5_VALUE1AND2 );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			document.addValue( indexMapping.field1, FIELD1_VALUE2 );
 			document.addValue( indexMapping.field2, FIELD2_VALUE2 );
 			document.addValue( indexMapping.field3, FIELD3_VALUE2 );
 			document.addValue( indexMapping.field4, FIELD4_VALUE1AND2 );
 			document.addValue( indexMapping.field5, FIELD5_VALUE1AND2 );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			document.addValue( indexMapping.field1, FIELD1_VALUE3 );
 			document.addValue( indexMapping.field2, FIELD2_VALUE3 );
 			document.addValue( indexMapping.field3, FIELD3_VALUE3 );
@@ -1052,7 +1052,7 @@ public class BoolSearchPredicateIT {
 			document.addValue( indexMapping.field5, FIELD5_VALUE3 );
 		} );
 
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();

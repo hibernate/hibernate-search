@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -103,8 +103,8 @@ public class NestedDocumentDistanceProjectionIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
 			document.addValue( indexMapping.ordinalField, 1 );
 
 			DocumentElement nestedDocument = document.addObject( indexMapping.nestedDocument );
@@ -113,7 +113,7 @@ public class NestedDocumentDistanceProjectionIT {
 			DocumentElement flattenedDocument = document.addObject( indexMapping.flattenedDocument );
 			flattenedDocument.addValue( indexMapping.flattenedGeoPoint, OURSON_QUI_BOIT_GEO_POINT );
 		} );
-		workPlan.add( referenceProvider( IMOUTO_ID ), document -> {
+		plan.add( referenceProvider( IMOUTO_ID ), document -> {
 			document.addValue( indexMapping.ordinalField, 2 );
 
 			DocumentElement nestedDocument = document.addObject( indexMapping.nestedDocument );
@@ -122,7 +122,7 @@ public class NestedDocumentDistanceProjectionIT {
 			DocumentElement flattenedDocument = document.addObject( indexMapping.flattenedDocument );
 			flattenedDocument.addValue( indexMapping.flattenedGeoPoint, IMOUTO_GEO_POINT );
 		} );
-		workPlan.add( referenceProvider( CHEZ_MARGOTTE_ID ), document -> {
+		plan.add( referenceProvider( CHEZ_MARGOTTE_ID ), document -> {
 			document.addValue( indexMapping.ordinalField, 3 );
 
 			DocumentElement nestedDocument = document.addObject( indexMapping.nestedDocument );
@@ -131,7 +131,7 @@ public class NestedDocumentDistanceProjectionIT {
 			DocumentElement flattenedDocument = document.addObject( indexMapping.flattenedDocument );
 			flattenedDocument.addValue( indexMapping.flattenedGeoPoint, CHEZ_MARGOTTE_GEO_POINT );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();

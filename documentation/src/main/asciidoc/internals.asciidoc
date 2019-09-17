@@ -146,14 +146,14 @@ so that the value is added to the field.
 
 The other part of indexing (or altering the index in any way) is to give an order to the index manager:
 "add this document", "delete this document", ...
-This is done through the `IndexWorkPlan` class.
-The mapper should create a work plan whenever it needs to execute a series of works.
+This is done through the `IndexIndexingPlan` class.
+The mapper should create an indexing plan whenever it needs to add, update or delete a document.
 
-`IndexWorkPlan` carries *some* context usually associated to a "session" in the JPA world,
+`IndexIndexingPlan` carries *some* context usually associated to a "session" in the JPA world,
 including the tenant identifier when using multi-tenancy, in particular.
-Thus the mapper should instantiate a new work plan whenever this context changes.
+Thus the mapper should instantiate a new indexing plan whenever this context changes.
 
-NOTE: For now index-scoped operations such as flush, optimize, etc. are unavailable from work plans.
+NOTE: For now index-scoped operations such as flush, optimize, etc. are unavailable from indexing plans.
 HSEARCH-3305 will introduce APIs and SPIs for these.
 
 === Searching

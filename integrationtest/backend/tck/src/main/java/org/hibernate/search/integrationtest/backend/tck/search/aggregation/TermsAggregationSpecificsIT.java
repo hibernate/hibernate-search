@@ -26,7 +26,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
@@ -606,21 +606,21 @@ public class TermsAggregationSpecificsIT<F> {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
 		int documentCount = 0;
 		for ( Map.Entry<F, List<String>> entry : documentIdPerTerm.entrySet() ) {
 			F value = entry.getKey();
 			for ( String documentId : entry.getValue() ) {
-				workPlan.add( referenceProvider( documentId ), document -> {
+				plan.add( referenceProvider( documentId ), document -> {
 					document.addValue( indexMapping.fieldModel.reference, value );
 					document.addValue( indexMapping.fieldWithConverterModel.reference, value );
 				} );
 				++documentCount;
 			}
 		}
-		workPlan.add( referenceProvider( "document_empty" ), document -> { } );
+		plan.add( referenceProvider( "document_empty" ), document -> { } );
 		++documentCount;
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		SearchResultAssert.assertThat(

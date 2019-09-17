@@ -10,7 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -428,15 +428,15 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 	protected void initData() {
 		super.initData();
 
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( ADDITIONAL_POINT_1_ID ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( ADDITIONAL_POINT_1_ID ), document -> {
 			document.addValue( indexMapping.geoPoint, ADDITIONAL_POINT_1_GEO_POINT );
 		} );
-		workPlan.add( referenceProvider( ADDITIONAL_POINT_2_ID ), document -> {
+		plan.add( referenceProvider( ADDITIONAL_POINT_2_ID ), document -> {
 			document.addValue( indexMapping.geoPoint, ADDITIONAL_POINT_2_GEO_POINT );
 		} );
 
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();

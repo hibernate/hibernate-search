@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
@@ -185,20 +185,20 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( "negative-infinity" ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( "negative-infinity" ), document -> {
 			document.addValue( indexMapping.floatFieldModel.reference, Float.NEGATIVE_INFINITY );
 			document.addValue( indexMapping.doubleFieldModel.reference, Double.NEGATIVE_INFINITY );
 		} );
-		workPlan.add( referenceProvider( "zero" ), document -> {
+		plan.add( referenceProvider( "zero" ), document -> {
 			document.addValue( indexMapping.floatFieldModel.reference, 0f );
 			document.addValue( indexMapping.doubleFieldModel.reference, 0d );
 		} );
-		workPlan.add( referenceProvider( "positive-infinity" ), document -> {
+		plan.add( referenceProvider( "positive-infinity" ), document -> {
 			document.addValue( indexMapping.floatFieldModel.reference, Float.POSITIVE_INFINITY );
 			document.addValue( indexMapping.doubleFieldModel.reference, Double.POSITIVE_INFINITY );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		SearchResultAssert.assertThat(

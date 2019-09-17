@@ -25,7 +25,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
@@ -503,16 +503,16 @@ public class RangeAggregationSpecificsIT<F> {
 	private void initData() {
 		List<F> documentFieldValues = ascendingValues.subList( 0, 7 );
 
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
 		for ( int i = 0; i < documentFieldValues.size(); i++ ) {
 			F value = documentFieldValues.get( i );
-			workPlan.add( referenceProvider( "document_" + i ), document -> {
+			plan.add( referenceProvider( "document_" + i ), document -> {
 				document.addValue( indexMapping.fieldModel.reference, value );
 				document.addValue( indexMapping.fieldWithConverterModel.reference, value );
 			} );
 		}
-		workPlan.add( referenceProvider( "document_empty" ), document -> { } );
-		workPlan.execute().join();
+		plan.add( referenceProvider( "document_empty" ), document -> { } );
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		SearchResultAssert.assertThat(

@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -90,16 +90,16 @@ public class LuceneFieldTypesIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
 
-		workPlan.add( referenceProvider( "ID:1" ), document -> {
+		plan.add( referenceProvider( "ID:1" ), document -> {
 			document.addValue( indexMapping.string, "keyword" );
 			document.addValue( indexMapping.text, TEXT_1 );
 			document.addValue( indexMapping.integer, 739 );
 			document.addValue( indexMapping.longNumber, 739L );
 			document.addValue( indexMapping.bool, true );
 		} );
-		workPlan.add( referenceProvider( "ID:2" ), document -> {
+		plan.add( referenceProvider( "ID:2" ), document -> {
 			document.addValue( indexMapping.string, "anotherKeyword" );
 			document.addValue( indexMapping.text, TEXT_2 );
 			document.addValue( indexMapping.integer, 123 );
@@ -107,7 +107,7 @@ public class LuceneFieldTypesIT {
 			document.addValue( indexMapping.bool, false );
 		} );
 
-		workPlan.execute().join();
+		plan.execute().join();
 	}
 
 	private static class IndexMapping {

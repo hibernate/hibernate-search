@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -224,8 +224,8 @@ public class NestedSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			ObjectMapping level1;
 			SecondLevelObjectMapping level2;
 			DocumentElement object;
@@ -262,7 +262,7 @@ public class NestedSearchPredicateIT {
 			object.addNullObject( level2.self );
 		} );
 
-		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			ObjectMapping level1 = indexMapping.nestedObject;
 			DocumentElement object = document.addObject( level1.self );
 			SecondLevelObjectMapping level2 = level1.nestedObject;
@@ -294,7 +294,7 @@ public class NestedSearchPredicateIT {
 			object = document.addObject( level1.self );
 		} );
 
-		workPlan.add( referenceProvider( "neverMatching" ), document -> {
+		plan.add( referenceProvider( "neverMatching" ), document -> {
 			ObjectMapping level1 = indexMapping.nestedObject;
 			SecondLevelObjectMapping level2 = level1.nestedObject;
 
@@ -335,9 +335,9 @@ public class NestedSearchPredicateIT {
 			secondLevelObject.addValue( level2.field2, NON_MATCHING_SECOND_LEVEL_CONDITION1_FIELD2 );
 		} );
 
-		workPlan.add( referenceProvider( "empty" ), document -> { } );
+		plan.add( referenceProvider( "empty" ), document -> { } );
 
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();

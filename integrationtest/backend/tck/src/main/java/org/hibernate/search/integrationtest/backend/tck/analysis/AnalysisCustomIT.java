@@ -21,7 +21,7 @@ import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptions
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -276,19 +276,19 @@ public class AnalysisCustomIT {
 	}
 
 	private void initData(Consumer<AnalysisITDocumentBuilder> valueContributor) {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
 		List<String> documentIds = new ArrayList<>();
 		valueContributor.accept(
 				(String documentId, String ... fieldValues) -> {
 					documentIds.add( documentId );
-					workPlan.add( referenceProvider( documentId ), document -> {
+					plan.add( referenceProvider( documentId ), document -> {
 						for ( String fieldValue : fieldValues ) {
 							indexMapping.field.write( document, fieldValue );
 						}
 					} );
 				}
 		);
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();

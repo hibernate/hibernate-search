@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -161,29 +161,29 @@ public class DistanceSearchSearchableSortableIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
 			document.addValue( indexMapping.searchableSortable, OURSON_QUI_BOIT_GEO_POINT );
 			document.addValue( indexMapping.searchableNotSortable, OURSON_QUI_BOIT_GEO_POINT );
 			document.addValue( indexMapping.searchableDefaultSortable, OURSON_QUI_BOIT_GEO_POINT );
 			document.addValue( indexMapping.notSearchableSortable, OURSON_QUI_BOIT_GEO_POINT );
 			document.addValue( indexMapping.defaultSearchableSortable, OURSON_QUI_BOIT_GEO_POINT );
 		} );
-		workPlan.add( referenceProvider( IMOUTO_ID ), document -> {
+		plan.add( referenceProvider( IMOUTO_ID ), document -> {
 			document.addValue( indexMapping.searchableSortable, IMOUTO_GEO_POINT );
 			document.addValue( indexMapping.searchableNotSortable, IMOUTO_GEO_POINT );
 			document.addValue( indexMapping.searchableDefaultSortable, IMOUTO_GEO_POINT );
 			document.addValue( indexMapping.notSearchableSortable, IMOUTO_GEO_POINT );
 			document.addValue( indexMapping.defaultSearchableSortable, IMOUTO_GEO_POINT );
 		} );
-		workPlan.add( referenceProvider( CHEZ_MARGOTTE_ID ), document -> {
+		plan.add( referenceProvider( CHEZ_MARGOTTE_ID ), document -> {
 			document.addValue( indexMapping.searchableSortable, CHEZ_MARGOTTE_GEO_POINT );
 			document.addValue( indexMapping.searchableNotSortable, CHEZ_MARGOTTE_GEO_POINT );
 			document.addValue( indexMapping.searchableDefaultSortable, CHEZ_MARGOTTE_GEO_POINT );
 			document.addValue( indexMapping.notSearchableSortable, CHEZ_MARGOTTE_GEO_POINT );
 			document.addValue( indexMapping.defaultSearchableSortable, CHEZ_MARGOTTE_GEO_POINT );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();

@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
@@ -20,7 +20,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.docume
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 
-class StubIndexWorkPlan implements IndexWorkPlan<StubDocumentElement> {
+class StubIndexIndexingPlan implements IndexIndexingPlan<StubDocumentElement> {
 	private final StubIndexManager indexManager;
 	private final BackendSessionContext sessionContext;
 	private final DocumentCommitStrategy commitStrategy;
@@ -30,7 +30,7 @@ class StubIndexWorkPlan implements IndexWorkPlan<StubDocumentElement> {
 
 	private int preparedIndex = 0;
 
-	StubIndexWorkPlan(StubIndexManager indexManager, BackendSessionContext sessionContext,
+	StubIndexIndexingPlan(StubIndexManager indexManager, BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		this.sessionContext = sessionContext;
 		this.indexManager = indexManager;

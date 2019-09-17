@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -72,48 +72,48 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void index_error_invalidFieldForDocumentElement_root() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Invalid field reference for this document element" );
 		thrown.expectMessage( "this document element has path 'null', but the referenced field has a parent with path 'flattenedObject'." );
 
-		workPlan.add( referenceProvider( "willNotWork" ), document -> {
+		plan.add( referenceProvider( "willNotWork" ), document -> {
 			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
 			flattenedObject.addValue( indexMapping.string, "willNotWork" );
 		} );
 
-		workPlan.execute().join();
+		plan.execute().join();
 	}
 
 	@Test
 	public void index_error_invalidFieldForDocumentElement_flattened() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Invalid field reference for this document element" );
 		thrown.expectMessage( "this document element has path 'flattenedObject', but the referenced field has a parent with path 'null'." );
 
-		workPlan.add( referenceProvider( "willNotWork" ), document -> {
+		plan.add( referenceProvider( "willNotWork" ), document -> {
 			document.addValue( indexMapping.flattenedObject.string, "willNotWork" );
 		} );
 
-		workPlan.execute().join();
+		plan.execute().join();
 	}
 
 	@Test
 	public void index_error_invalidFieldForDocumentElement_nested() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Invalid field reference for this document element" );
 		thrown.expectMessage( "this document element has path 'nestedObject', but the referenced field has a parent with path 'null'." );
 
-		workPlan.add( referenceProvider( "willNotWork" ), document -> {
+		plan.add( referenceProvider( "willNotWork" ), document -> {
 			document.addValue( indexMapping.nestedObject.string, "willNotWork" );
 		} );
 
-		workPlan.execute().join();
+		plan.execute().join();
 	}
 
 	@Test
@@ -220,8 +220,8 @@ public class ObjectFieldStorageIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( EXPECTED_NESTED_MATCH_ID ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( EXPECTED_NESTED_MATCH_ID ), document -> {
 			ObjectMapping objectMapping;
 			DocumentElement object;
 
@@ -251,7 +251,7 @@ public class ObjectFieldStorageIT {
 			object.addValue( objectMapping.localDate, NON_MATCHING_LOCAL_DATE );
 		} );
 
-		workPlan.add( referenceProvider( EXPECTED_NON_NESTED_MATCH_ID ), document -> {
+		plan.add( referenceProvider( EXPECTED_NON_NESTED_MATCH_ID ), document -> {
 			/*
 			 * Below, we use the same content for both the flattened object and the nested object.
 			 * This is to demonstrate the practical difference of object storage:
@@ -283,7 +283,7 @@ public class ObjectFieldStorageIT {
 			}
 		} );
 
-		workPlan.add( referenceProvider( "neverMatching" ), document -> {
+		plan.add( referenceProvider( "neverMatching" ), document -> {
 			/*
 			 * This should not match, be it on the nested or the flattened object.
 			 * For first-level nesting tests, it's because of the integer field.
@@ -310,9 +310,9 @@ public class ObjectFieldStorageIT {
 			}
 		} );
 
-		workPlan.add( referenceProvider( "empty" ), document -> { } );
+		plan.add( referenceProvider( "empty" ), document -> { } );
 
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();

@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
@@ -308,8 +308,8 @@ public class CompositeSearchSortIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexMapping.identicalForFirstTwo.write( document, "aaa" );
 			indexMapping.identicalForLastTwo.write( document, "aaa" );
 
@@ -318,7 +318,7 @@ public class CompositeSearchSortIT {
 			DocumentElement nested = document.addObject( indexMapping.nestedObject );
 			indexMapping.nestedField.write( nested, "bbb" );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexMapping.identicalForFirstTwo.write( document, "aaa" );
 			indexMapping.identicalForLastTwo.write( document, "bbb" );
 
@@ -327,7 +327,7 @@ public class CompositeSearchSortIT {
 			DocumentElement nested = document.addObject( indexMapping.nestedObject );
 			indexMapping.nestedField.write( nested, "aaa" );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			indexMapping.identicalForFirstTwo.write( document, "bbb" );
 			indexMapping.identicalForLastTwo.write( document, "bbb" );
 
@@ -336,7 +336,7 @@ public class CompositeSearchSortIT {
 			DocumentElement nested = document.addObject( indexMapping.nestedObject );
 			indexMapping.nestedField.write( nested, "aaa" );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		SearchQuery<DocumentReference> query = indexManager.createScope().query()

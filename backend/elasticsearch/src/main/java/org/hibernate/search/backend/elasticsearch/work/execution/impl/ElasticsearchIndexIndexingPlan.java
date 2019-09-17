@@ -17,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
@@ -26,7 +26,7 @@ import com.google.gson.JsonObject;
 
 
 
-public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDocumentObjectBuilder> {
+public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan<ElasticsearchDocumentObjectBuilder> {
 
 	private final ElasticsearchWorkBuilderFactory builderFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
@@ -37,7 +37,7 @@ public class ElasticsearchIndexWorkPlan implements IndexWorkPlan<ElasticsearchDo
 
 	private final List<ElasticsearchWork<?>> works = new ArrayList<>();
 
-	public ElasticsearchIndexWorkPlan(ElasticsearchWorkBuilderFactory builderFactory,
+	public ElasticsearchIndexIndexingPlan(ElasticsearchWorkBuilderFactory builderFactory,
 			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestrator orchestrator,
 			URLEncodedString indexName,

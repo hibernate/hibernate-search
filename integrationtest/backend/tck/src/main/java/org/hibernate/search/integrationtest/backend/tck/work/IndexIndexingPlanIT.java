@@ -12,7 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -22,7 +22,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class IndexWorkPlanIT {
+public class IndexIndexingPlanIT {
 
 	private static final String INDEX_NAME = "indexName";
 
@@ -45,13 +45,13 @@ public class IndexWorkPlanIT {
 
 	@Test
 	public void discard() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
 
-		workPlan.add( referenceProvider( "1" ), document -> document.addValue( indexMapping.title, "Title of Book 1" ) );
-		workPlan.discard();
+		plan.add( referenceProvider( "1" ), document -> document.addValue( indexMapping.title, "Title of Book 1" ) );
+		plan.discard();
 
-		workPlan.add( referenceProvider( "2" ), document -> document.addValue( indexMapping.title, "Title of Book 2" ) );
-		workPlan.execute().join();
+		plan.add( referenceProvider( "2" ), document -> document.addValue( indexMapping.title, "Title of Book 2" ) );
+		plan.execute().join();
 
 		SearchQuery<DocumentReference> query = indexManager.createScope().query()
 				.predicate( f -> f.matchAll() )

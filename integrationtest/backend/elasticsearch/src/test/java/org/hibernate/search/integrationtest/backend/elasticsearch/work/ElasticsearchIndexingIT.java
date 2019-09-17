@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.util.impl.integrationtest.elasticsearch.dialect.ElasticsearchTestDialect;
@@ -67,9 +67,9 @@ public class ElasticsearchIndexingIT {
 	@Test
 	public void addUpdateDelete_routing() {
 		String routingKey = "someRoutingKey";
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
 
-		workPlan.add( referenceProvider( "1", routingKey ), document -> {
+		plan.add( referenceProvider( "1", routingKey ), document -> {
 			document.addValue( indexMapping.string, "text1" );
 		} );
 		clientSpy.expectNext(
@@ -82,10 +82,10 @@ public class ElasticsearchIndexingIT {
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
-		workPlan.execute().join();
+		plan.execute().join();
 		clientSpy.verifyExpectationsMet();
 
-		workPlan.update( referenceProvider( "1", routingKey ), document -> {
+		plan.update( referenceProvider( "1", routingKey ), document -> {
 			document.addValue( indexMapping.string, "text2" );
 		} );
 		clientSpy.expectNext(
@@ -98,10 +98,10 @@ public class ElasticsearchIndexingIT {
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
-		workPlan.execute().join();
+		plan.execute().join();
 		clientSpy.verifyExpectationsMet();
 
-		workPlan.delete( referenceProvider( "1", routingKey ) );
+		plan.delete( referenceProvider( "1", routingKey ) );
 		clientSpy.expectNext(
 				ElasticsearchRequest.delete()
 						.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
@@ -111,7 +111,7 @@ public class ElasticsearchIndexingIT {
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
-		workPlan.execute().join();
+		plan.execute().join();
 		clientSpy.verifyExpectationsMet();
 	}
 

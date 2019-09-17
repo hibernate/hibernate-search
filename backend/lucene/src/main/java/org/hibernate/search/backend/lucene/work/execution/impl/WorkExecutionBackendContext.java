@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
@@ -32,7 +32,7 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
  * we would end up with methods with many parameters.
  */
 public interface WorkExecutionBackendContext {
-	IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(
+	IndexIndexingPlan<LuceneRootDocumentBuilder> createIndexingPlan(
 			WorkExecutionIndexManagerContext indexManagerContext,
 			LuceneIndexEntryFactory indexEntryFactory,
 			BackendSessionContext sessionContext,

@@ -46,7 +46,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.index.IndexManager;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
@@ -631,11 +631,11 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void nativeField_invalidFieldPath() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
 
 		SubTest.expectException(
 				"native field contributing field with invalid field path",
-				() -> workPlan.add( referenceProvider( FIRST_ID ), document -> {
+				() -> plan.add( referenceProvider( FIRST_ID ), document -> {
 					document.addValue( indexMapping.nativeField_invalidFieldPath, 45 );
 				} ) )
 				.assertThrown()
@@ -680,8 +680,8 @@ public class LuceneExtensionIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( FIRST_ID ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( FIRST_ID ), document -> {
 			document.addValue( indexMapping.string, "text 1" );
 
 			document.addValue( indexMapping.nativeField, 37 );
@@ -691,7 +691,7 @@ public class LuceneExtensionIT {
 			document.addValue( indexMapping.sort2, "z" );
 			document.addValue( indexMapping.sort3, "z" );
 		} );
-		workPlan.add( referenceProvider( SECOND_ID ), document -> {
+		plan.add( referenceProvider( SECOND_ID ), document -> {
 			document.addValue( indexMapping.integer, 2 );
 
 			document.addValue( indexMapping.nativeField, 78 );
@@ -701,7 +701,7 @@ public class LuceneExtensionIT {
 			document.addValue( indexMapping.sort2, "a" );
 			document.addValue( indexMapping.sort3, "z" );
 		} );
-		workPlan.add( referenceProvider( THIRD_ID ), document -> {
+		plan.add( referenceProvider( THIRD_ID ), document -> {
 			document.addValue( indexMapping.geoPoint, GeoPoint.of( 40.12, -71.34 ) );
 
 			document.addValue( indexMapping.nativeField, 13 );
@@ -711,7 +711,7 @@ public class LuceneExtensionIT {
 			document.addValue( indexMapping.sort2, "z" );
 			document.addValue( indexMapping.sort3, "a" );
 		} );
-		workPlan.add( referenceProvider( FOURTH_ID ), document -> {
+		plan.add( referenceProvider( FOURTH_ID ), document -> {
 			document.addValue( indexMapping.nativeField, 89 );
 			document.addValue( indexMapping.nativeField_unsupportedProjection, 89 );
 
@@ -719,7 +719,7 @@ public class LuceneExtensionIT {
 			document.addValue( indexMapping.sort2, "z" );
 			document.addValue( indexMapping.sort3, "z" );
 		} );
-		workPlan.add( referenceProvider( FIFTH_ID ), document -> {
+		plan.add( referenceProvider( FIFTH_ID ), document -> {
 			// This document should not match any query
 			document.addValue( indexMapping.string, "text 2" );
 			document.addValue( indexMapping.integer, 1 );
@@ -730,7 +730,7 @@ public class LuceneExtensionIT {
 			document.addValue( indexMapping.sort3, "zz" );
 		} );
 
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();

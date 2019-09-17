@@ -19,7 +19,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
@@ -1334,8 +1334,8 @@ public class MatchSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
 			indexMapping.unsupportedFieldModels.forEach( f -> f.document1Value.write( document ) );
@@ -1351,7 +1351,7 @@ public class MatchSearchPredicateIT {
 			indexMapping.whitespaceLowercaseAnalyzedField.document1Value.write( document );
 			indexMapping.scaledBigDecimal.document1Value.write( document );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document2Value.write( document ) );
 			indexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document2Value.write( document ) );
 			indexMapping.unsupportedFieldModels.forEach( f -> f.document2Value.write( document ) );
@@ -1367,8 +1367,8 @@ public class MatchSearchPredicateIT {
 			indexMapping.whitespaceLowercaseAnalyzedField.document2Value.write( document );
 			indexMapping.scaledBigDecimal.document2Value.write( document );
 		} );
-		workPlan.add( referenceProvider( EMPTY ), document -> { } );
-		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
+		plan.add( referenceProvider( EMPTY ), document -> { } );
+		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			indexMapping.string1Field.document3Value.write( document );
 			indexMapping.string2Field.document3Value.write( document );
 			indexMapping.string3Field.document3Value.write( document );
@@ -1381,32 +1381,32 @@ public class MatchSearchPredicateIT {
 			indexMapping.whitespaceLowercaseAnalyzedField.document3Value.write( document );
 			indexMapping.scaledBigDecimal.document3Value.write( document );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
-		workPlan = compatibleIndexManager.createWorkPlan();
-		workPlan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
+		plan = compatibleIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
 			compatibleIndexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 			compatibleIndexMapping.supportedFieldWithDslConverterModels.forEach( f -> f.document1Value.write( document ) );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
-		workPlan = rawFieldCompatibleIndexManager.createWorkPlan();
-		workPlan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
+		plan = rawFieldCompatibleIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
 			rawFieldCompatibleIndexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
-		workPlan = incompatibleAnalyzerIndexManager.createWorkPlan();
-		workPlan.add( referenceProvider( INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 ), document -> {
+		plan = incompatibleAnalyzerIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 ), document -> {
 			incompatibleAnalyzerIndexMapping.analyzedStringField.document1Value.write( document );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
-		workPlan = incompatibleDecimalScaleIndexManager.createWorkPlan();
-		workPlan.add( referenceProvider( INCOMPATIBLE_DECIMAL_SCALE_INDEX_DOCUMENT_1 ), document -> {
+		plan = incompatibleDecimalScaleIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( INCOMPATIBLE_DECIMAL_SCALE_INDEX_DOCUMENT_1 ), document -> {
 			incompatibleDecimalScaleIndexMapping.scaledBigDecimal.document1Value.write( document );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		SearchQuery<DocumentReference> query = indexManager.createScope().query()

@@ -17,7 +17,7 @@ import java.util.Optional;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -88,16 +88,16 @@ public class IndexingIT<F> {
 		List<IdAndValue<F>> expectedDocuments = new ArrayList<>();
 
 		// Index all values, each in its own document
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
 		for ( int i = 0; i < values.size(); i++ ) {
 			String documentId = "document_" + i;
 			F value = values.get( i );
-			workPlan.add( referenceProvider( documentId ), document -> {
+			plan.add( referenceProvider( documentId ), document -> {
 				document.addValue( indexMapping.fieldModel.reference, value );
 			} );
 			expectedDocuments.add( new IdAndValue<>( documentId, value ) );
 		}
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// If we get here, indexing went well.
 		// However, it may have failed silently... Let's check the documents are there, with the right value.

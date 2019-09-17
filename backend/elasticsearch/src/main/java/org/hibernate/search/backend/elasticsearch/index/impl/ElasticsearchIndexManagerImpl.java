@@ -29,7 +29,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
@@ -141,10 +141,10 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	}
 
 	@Override
-	public IndexWorkPlan<ElasticsearchDocumentObjectBuilder> createWorkPlan(BackendSessionContext sessionContext,
+	public IndexIndexingPlan<ElasticsearchDocumentObjectBuilder> createIndexingPlan(BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		// The commit strategy is ignored, because Elasticsearch always commits changes to its transaction log.
-		return backendContext.createWorkPlan(
+		return backendContext.createIndexingPlan(
 				serialOrchestrator,
 				elasticsearchIndexName,
 				refreshStrategy,

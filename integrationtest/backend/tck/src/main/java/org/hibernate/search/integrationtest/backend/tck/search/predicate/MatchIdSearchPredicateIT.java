@@ -12,7 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import java.util.Arrays;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -119,11 +119,11 @@ public class MatchIdSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> { } );
-		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> { } );
-		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> { } );
-		workPlan.execute().join();
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( DOCUMENT_1 ), document -> { } );
+		plan.add( referenceProvider( DOCUMENT_2 ), document -> { } );
+		plan.add( referenceProvider( DOCUMENT_3 ), document -> { } );
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();

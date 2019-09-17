@@ -17,7 +17,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.TermVector;
@@ -123,8 +123,8 @@ public class LuceneFieldAttributesIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( "ID:1" ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( "ID:1" ), document -> {
 			document.addValue( indexMapping.string, "keyword" );
 			document.addValue( indexMapping.text, TEXT );
 			document.addValue( indexMapping.norms, TEXT );
@@ -133,7 +133,7 @@ public class LuceneFieldAttributesIT {
 			document.addValue( indexMapping.moreOptions, "Search 6 groundwork - Add the missing common field type options compared to Search 5" );
 		} );
 
-		workPlan.execute().join();
+		plan.execute().join();
 	}
 
 	private static class IndexMapping {

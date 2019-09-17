@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -503,42 +503,42 @@ public class WildcardSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_MATCHING_PATTERN_1 );
 			document.addValue( indexMapping.analyzedStringFieldWithDslConverter.reference, TEXT_MATCHING_PATTERN_1 );
 			document.addValue( indexMapping.normalizedField.reference, TERM_MATCHING_PATTERN_1 );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_MATCHING_PATTERN_2 );
 			document.addValue( indexMapping.normalizedField.reference, TERM_MATCHING_PATTERN_2 );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_MATCHING_PATTERN_3 );
 			document.addValue( indexMapping.normalizedField.reference, TERM_MATCHING_PATTERN_2_AND_3 );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_4 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_4 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_MATCHING_PATTERN_2_AND_3 );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_5 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_5 ), document -> {
 			document.addValue( indexMapping.analyzedStringField2.reference, TEXT_MATCHING_PATTERN_1 );
 			document.addValue( indexMapping.analyzedStringField3.reference, TEXT_MATCHING_PATTERN_3 );
 		} );
-		workPlan.add( referenceProvider( EMPTY ), document -> {
+		plan.add( referenceProvider( EMPTY ), document -> {
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
-		workPlan = compatibleIndexManager.createWorkPlan();
-		workPlan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
+		plan = compatibleIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
 			document.addValue( compatibleIndexMapping.analyzedStringField1.reference, TEXT_MATCHING_PATTERN_1 );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
-		workPlan = rawFieldCompatibleIndexManager.createWorkPlan();
-		workPlan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
+		plan = rawFieldCompatibleIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
 			document.addValue( rawFieldCompatibleIndexMapping.analyzedStringField1.reference, TEXT_MATCHING_PATTERN_1 );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();

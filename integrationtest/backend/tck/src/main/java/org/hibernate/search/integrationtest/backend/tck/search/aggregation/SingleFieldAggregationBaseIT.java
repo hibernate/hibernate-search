@@ -29,7 +29,7 @@ import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValu
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -748,10 +748,10 @@ public class SingleFieldAggregationBaseIT<F> {
 		List<F> otherIndexDocumentFieldValues = expectations.getOtherIndexDocumentFieldValues();
 		List<List<F>> multiValuedIndexDocumentFieldValues = expectations.getMultiValuedIndexDocumentFieldValues();
 
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
 		for ( int i = 0; i < mainIndexDocumentFieldValues.size(); i++ ) {
 			F value = mainIndexDocumentFieldValues.get( i );
-			workPlan.add( referenceProvider( "document_" + i ), document -> {
+			plan.add( referenceProvider( "document_" + i ), document -> {
 				document.addValue( indexMapping.fieldModel.reference, value );
 				document.addValue( indexMapping.fieldWithConverterModel.reference, value );
 
@@ -764,46 +764,46 @@ public class SingleFieldAggregationBaseIT<F> {
 				nestedObject.addValue( indexMapping.nestedObject.fieldModel.reference, value );
 			} );
 		}
-		workPlan.add( referenceProvider( "document_empty" ), document -> { } );
-		workPlan.execute().join();
+		plan.add( referenceProvider( "document_empty" ), document -> { } );
+		plan.execute().join();
 
-		workPlan = compatibleIndexManager.createWorkPlan();
+		plan = compatibleIndexManager.createIndexingPlan();
 		for ( int i = 0; i < otherIndexDocumentFieldValues.size(); i++ ) {
 			F value = otherIndexDocumentFieldValues.get( i );
-			workPlan.add( referenceProvider( "compatibleindex_document_" + i ), document -> {
+			plan.add( referenceProvider( "compatibleindex_document_" + i ), document -> {
 				document.addValue( compatibleIndexMapping.fieldModel.reference, value );
 				document.addValue( compatibleIndexMapping.fieldWithConverterModel.reference, value );
 			} );
 		}
-		workPlan.execute().join();
+		plan.execute().join();
 
-		workPlan = rawFieldCompatibleIndexManager.createWorkPlan();
+		plan = rawFieldCompatibleIndexManager.createIndexingPlan();
 		for ( int i = 0; i < otherIndexDocumentFieldValues.size(); i++ ) {
 			F value = otherIndexDocumentFieldValues.get( i );
-			workPlan.add( referenceProvider( "rawcompatibleindex_document_" + i ), document -> {
+			plan.add( referenceProvider( "rawcompatibleindex_document_" + i ), document -> {
 				document.addValue( rawFieldCompatibleIndexMapping.fieldWithConverterModel.reference, value );
 			} );
 		}
-		workPlan.execute().join();
+		plan.execute().join();
 
-		workPlan = nullOnlyIndexManager.createWorkPlan();
-		workPlan.add( referenceProvider( "nullOnlyIndexManager_document_0" ), document -> {
+		plan = nullOnlyIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( "nullOnlyIndexManager_document_0" ), document -> {
 			document.addValue( nullOnlyIndexMapping.fieldModel.reference, null );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
 		if ( TckConfiguration.get().getBackendFeatures().aggregationsOnMultiValuedFields( typeDescriptor.getJavaType() ) ) {
-			workPlan = multiValuedIndexManager.createWorkPlan();
+			plan = multiValuedIndexManager.createIndexingPlan();
 			for ( int i = 0; i < multiValuedIndexDocumentFieldValues.size(); i++ ) {
 				List<F> values = multiValuedIndexDocumentFieldValues.get( i );
-				workPlan.add( referenceProvider( "document_" + i ), document -> {
+				plan.add( referenceProvider( "document_" + i ), document -> {
 					for ( F value : values ) {
 						document.addValue( multiValuedIndexMapping.fieldModel.reference, value );
 					}
 				} );
 			}
-			workPlan.add( referenceProvider( "document_empty" ), document -> { } );
-			workPlan.execute().join();
+			plan.add( referenceProvider( "document_empty" ), document -> { } );
+			plan.execute().join();
 		}
 
 		// Check that all documents are searchable

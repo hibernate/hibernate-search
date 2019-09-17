@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
@@ -27,14 +27,14 @@ import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendS
 public class PojoIndexedTypeIndexingPlan<I, E, D extends DocumentElement> extends AbstractPojoTypeIndexingPlan {
 
 	private final PojoWorkIndexedTypeContext<I, E, D> typeContext;
-	private final IndexWorkPlan<D> delegate;
+	private final IndexIndexingPlan<D> delegate;
 
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<I, IndexedEntityIndexingPlan> indexingPlansPerId = new LinkedHashMap<>();
 
 	public PojoIndexedTypeIndexingPlan(PojoWorkIndexedTypeContext<I, E, D> typeContext,
 			AbstractPojoBackendSessionContext sessionContext,
-			IndexWorkPlan<D> delegate) {
+			IndexIndexingPlan<D> delegate) {
 		super( sessionContext );
 		this.typeContext = typeContext;
 		this.delegate = delegate;
@@ -120,7 +120,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, D extends DocumentElement> extend
 		return plan;
 	}
 
-	private IndexWorkPlan<D> getDelegate() {
+	private IndexIndexingPlan<D> getDelegate() {
 		return delegate;
 	}
 

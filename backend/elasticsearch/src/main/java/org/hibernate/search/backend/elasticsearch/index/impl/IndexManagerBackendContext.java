@@ -27,12 +27,12 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorProvider;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.ElasticsearchIndexDocumentWorkExecutor;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.ElasticsearchIndexWorkExecutor;
-import org.hibernate.search.backend.elasticsearch.work.execution.impl.ElasticsearchIndexWorkPlan;
+import org.hibernate.search.backend.elasticsearch.work.execution.impl.ElasticsearchIndexIndexingPlan;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.WorkExecutionBackendContext;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
@@ -79,14 +79,14 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	}
 
 	@Override
-	public IndexWorkPlan<ElasticsearchDocumentObjectBuilder> createWorkPlan(
+	public IndexIndexingPlan<ElasticsearchDocumentObjectBuilder> createIndexingPlan(
 			ElasticsearchWorkOrchestrator orchestrator,
 			URLEncodedString indexName,
 			DocumentRefreshStrategy refreshStrategy,
 			BackendSessionContext sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
-		return new ElasticsearchIndexWorkPlan(
+		return new ElasticsearchIndexIndexingPlan(
 				link.getWorkBuilderFactory(), multiTenancyStrategy, orchestrator,
 				indexName,
 				refreshStrategy,

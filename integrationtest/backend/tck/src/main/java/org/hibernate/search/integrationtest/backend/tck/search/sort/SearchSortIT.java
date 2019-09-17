@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
@@ -513,9 +513,9 @@ public class SearchSortIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
 		// Important: do not index the documents in the expected order after sorts
-		workPlan.add( referenceProvider( SECOND_ID ), document -> {
+		plan.add( referenceProvider( SECOND_ID ), document -> {
 			document.addValue( indexMapping.string, "george" );
 			document.addValue( indexMapping.geoPoint, GeoPoint.of( 45.7705687,4.835233 ) );
 
@@ -537,7 +537,7 @@ public class SearchSortIT {
 			nestedX2Object.addValue( indexMapping.nestedX2Object.string, "george" );
 			nestedX2Object.addValue( indexMapping.nestedX2Object.integer, 2 );
 		} );
-		workPlan.add( referenceProvider( FIRST_ID ), document -> {
+		plan.add( referenceProvider( FIRST_ID ), document -> {
 			document.addValue( indexMapping.string, "aaron" );
 			document.addValue( indexMapping.geoPoint, GeoPoint.of( 45.7541719, 4.8386221 ) );
 
@@ -559,7 +559,7 @@ public class SearchSortIT {
 			nestedX2Object.addValue( indexMapping.nestedX2Object.string, "aaron" );
 			nestedX2Object.addValue( indexMapping.nestedX2Object.integer, 1 );
 		} );
-		workPlan.add( referenceProvider( THIRD_ID ), document -> {
+		plan.add( referenceProvider( THIRD_ID ), document -> {
 			document.addValue( indexMapping.string, "zach" );
 			document.addValue( indexMapping.geoPoint, GeoPoint.of( 45.7530374, 4.8510299 ) );
 
@@ -581,9 +581,9 @@ public class SearchSortIT {
 			nestedX2Object.addValue( indexMapping.nestedX2Object.string, "zach" );
 			nestedX2Object.addValue( indexMapping.nestedX2Object.integer, 3 );
 		} );
-		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
+		plan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();

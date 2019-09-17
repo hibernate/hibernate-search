@@ -11,7 +11,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
@@ -35,21 +35,21 @@ public class StubMappingIndexManager {
 		return clazz.cast( indexManager.toAPI() );
 	}
 
-	public IndexWorkPlan<? extends DocumentElement> createWorkPlan() {
-		return createWorkPlan( new StubBackendSessionContext() );
+	public IndexIndexingPlan<? extends DocumentElement> createIndexingPlan() {
+		return createIndexingPlan( new StubBackendSessionContext() );
 	}
 
-	public IndexWorkPlan<? extends DocumentElement> createWorkPlan(StubBackendSessionContext sessionContext) {
+	public IndexIndexingPlan<? extends DocumentElement> createIndexingPlan(StubBackendSessionContext sessionContext) {
 		/*
 		 * Use the same defaults as in the ORM mapper for the commit strategy,
 		 * but force refreshes because it's more convenient for tests.
 		 */
-		return indexManager.createWorkPlan( sessionContext, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE );
+		return indexManager.createIndexingPlan( sessionContext, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE );
 	}
 
-	public IndexWorkPlan<? extends DocumentElement> createWorkPlan(StubBackendSessionContext sessionContext,
+	public IndexIndexingPlan<? extends DocumentElement> createIndexingPlan(StubBackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		return indexManager.createWorkPlan( sessionContext, commitStrategy, refreshStrategy );
+		return indexManager.createIndexingPlan( sessionContext, commitStrategy, refreshStrategy );
 	}
 
 	public IndexDocumentWorkExecutor<? extends DocumentElement> createDocumentWorkExecutor(

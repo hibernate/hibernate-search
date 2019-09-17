@@ -160,7 +160,7 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return new PojoIndexedTypeIndexingPlan<>(
 				this, sessionContext,
-				indexManager.createWorkPlan( sessionContext, commitStrategy, refreshStrategy )
+				indexManager.createIndexingPlan( sessionContext, commitStrategy, refreshStrategy )
 		);
 	}
 

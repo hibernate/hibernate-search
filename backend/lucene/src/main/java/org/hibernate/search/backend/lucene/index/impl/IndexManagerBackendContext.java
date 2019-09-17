@@ -31,14 +31,14 @@ import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBu
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexDocumentWorkExecutor;
 import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexWorkExecutor;
-import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexWorkPlan;
+import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexIndexingPlan;
 import org.hibernate.search.backend.lucene.work.execution.impl.WorkExecutionBackendContext;
 import org.hibernate.search.backend.lucene.work.execution.impl.WorkExecutionIndexManagerContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkExecutor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexDocumentWorkExecutor;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
@@ -90,14 +90,14 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	}
 
 	@Override
-	public IndexWorkPlan<LuceneRootDocumentBuilder> createWorkPlan(
+	public IndexIndexingPlan<LuceneRootDocumentBuilder> createIndexingPlan(
 			WorkExecutionIndexManagerContext indexManagerContext,
 			LuceneIndexEntryFactory indexEntryFactory,
 			BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
-		return new LuceneIndexWorkPlan(
+		return new LuceneIndexIndexingPlan(
 				workFactory,
 				indexManagerContext,
 				indexEntryFactory,

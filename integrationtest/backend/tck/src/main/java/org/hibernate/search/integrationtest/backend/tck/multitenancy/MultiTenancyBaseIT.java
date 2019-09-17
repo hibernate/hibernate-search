@@ -18,7 +18,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
@@ -175,7 +175,7 @@ public class MultiTenancyBaseIT {
 
 	@Test
 	public void delete_only_deletes_elements_of_the_tenant() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant2SessionContext );
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( tenant2SessionContext );
 
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query( tenant2SessionContext )
@@ -198,9 +198,9 @@ public class MultiTenancyBaseIT {
 				b.list( STRING_VALUE_2, INTEGER_VALUE_4 );
 		} );
 
-		workPlan.delete( referenceProvider( DOCUMENT_ID_1 ) );
+		plan.delete( referenceProvider( DOCUMENT_ID_1 ) );
 
-		workPlan.execute().join();
+		plan.execute().join();
 
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_2 );
@@ -226,7 +226,7 @@ public class MultiTenancyBaseIT {
 
 	@Test
 	public void update_only_updates_elements_of_the_tenant() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant2SessionContext );
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( tenant2SessionContext );
 
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> checkQuery = scope.query( tenant2SessionContext )
@@ -235,7 +235,7 @@ public class MultiTenancyBaseIT {
 		assertThat( checkQuery )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
-		workPlan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
+		plan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
 			document.addValue( indexMapping.string, UPDATED_STRING );
 			document.addValue( indexMapping.integer, INTEGER_VALUE_4 );
 
@@ -244,7 +244,7 @@ public class MultiTenancyBaseIT {
 			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_4 );
 		} );
 
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// The tenant 2 has been updated properly.
 
@@ -347,9 +347,9 @@ public class MultiTenancyBaseIT {
 		thrown.expectMessage( "Backend" );
 		thrown.expectMessage( "has multi-tenancy enabled, but no tenant identifier is provided." );
 
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( new StubBackendSessionContext() );
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( new StubBackendSessionContext() );
 
-		workPlan.add( referenceProvider( DOCUMENT_ID_3 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_ID_3 ), document -> {
 			document.addValue( indexMapping.string, STRING_VALUE_3 );
 			document.addValue( indexMapping.integer, INTEGER_VALUE_5 );
 
@@ -358,7 +358,7 @@ public class MultiTenancyBaseIT {
 			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_5 );
 		} );
 
-		workPlan.execute().join();
+		plan.execute().join();
 	}
 
 	@Test
@@ -367,9 +367,9 @@ public class MultiTenancyBaseIT {
 		thrown.expectMessage( "Backend" );
 		thrown.expectMessage( "has multi-tenancy enabled, but no tenant identifier is provided." );
 
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( new StubBackendSessionContext() );
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( new StubBackendSessionContext() );
 
-		workPlan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
+		plan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
 			document.addValue( indexMapping.string, UPDATED_STRING );
 			document.addValue( indexMapping.integer, INTEGER_VALUE_4 );
 
@@ -378,7 +378,7 @@ public class MultiTenancyBaseIT {
 			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_4 );
 		} );
 
-		workPlan.execute().join();
+		plan.execute().join();
 	}
 
 	@Test
@@ -387,14 +387,14 @@ public class MultiTenancyBaseIT {
 		thrown.expectMessage( "Backend" );
 		thrown.expectMessage( "has multi-tenancy enabled, but no tenant identifier is provided." );
 
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( new StubBackendSessionContext() );
-		workPlan.delete( referenceProvider( DOCUMENT_ID_1 ) );
-		workPlan.execute().join();
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( new StubBackendSessionContext() );
+		plan.delete( referenceProvider( DOCUMENT_ID_1 ) );
+		plan.execute().join();
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan( tenant1SessionContext );
-		workPlan.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( tenant1SessionContext );
+		plan.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
 			document.addValue( indexMapping.string, STRING_VALUE_1 );
 			document.addValue( indexMapping.integer, INTEGER_VALUE_1 );
 
@@ -403,7 +403,7 @@ public class MultiTenancyBaseIT {
 			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_1 );
 		} );
 
-		workPlan.add( referenceProvider( DOCUMENT_ID_2 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_ID_2 ), document -> {
 			document.addValue( indexMapping.string, STRING_VALUE_2 );
 			document.addValue( indexMapping.integer, INTEGER_VALUE_2 );
 
@@ -412,10 +412,10 @@ public class MultiTenancyBaseIT {
 			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_2 );
 		} );
 
-		workPlan.execute().join();
+		plan.execute().join();
 
-		workPlan = indexManager.createWorkPlan( tenant2SessionContext );
-		workPlan.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
+		plan = indexManager.createIndexingPlan( tenant2SessionContext );
+		plan.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
 			document.addValue( indexMapping.string, STRING_VALUE_1 );
 			document.addValue( indexMapping.integer, INTEGER_VALUE_3 );
 
@@ -424,7 +424,7 @@ public class MultiTenancyBaseIT {
 			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_3 );
 		} );
 
-		workPlan.add( referenceProvider( DOCUMENT_ID_2 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_ID_2 ), document -> {
 			document.addValue( indexMapping.string, STRING_VALUE_2 );
 			document.addValue( indexMapping.integer, INTEGER_VALUE_4 );
 
@@ -433,7 +433,7 @@ public class MultiTenancyBaseIT {
 			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_4 );
 		} );
 
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();

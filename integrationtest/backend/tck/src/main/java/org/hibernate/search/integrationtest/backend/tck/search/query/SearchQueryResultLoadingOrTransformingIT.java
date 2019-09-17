@@ -24,7 +24,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper;
@@ -547,8 +547,8 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( MAIN_ID ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( MAIN_ID ), document -> {
 			document.addValue( indexMapping.string, STRING_VALUE );
 			document.addValue( indexMapping.string_analyzed, STRING_ANALYZED_VALUE );
 			document.addValue( indexMapping.integer, INTEGER_VALUE );
@@ -566,9 +566,9 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 			nestedObject.addValue( indexMapping.nestedObject.integer, NESTED_OBJECT_INTEGER_VALUE );
 		} );
 
-		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
+		plan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();

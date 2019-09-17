@@ -19,7 +19,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -730,55 +730,55 @@ public class PhraseSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( DOCUMENT_1 ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
 			document.addValue( indexMapping.analyzedStringFieldWithDslConverter.reference, PHRASE_1_TEXT_EXACT_MATCH );
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toLowerCase( Locale.ROOT ) );
 			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toLowerCase( Locale.ROOT ) );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_2 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_1_MATCH );
 			document.addValue( indexMapping.analyzedStringField2.reference, PHRASE_2_TEXT_EXACT_MATCH );
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toUpperCase( Locale.ROOT ) );
 			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toUpperCase( Locale.ROOT ) );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_3 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_2_MATCH );
 			document.addValue( indexMapping.analyzedStringField2.reference, PHRASE_3_TEXT_EXACT_MATCH );
 			document.addValue( indexMapping.analyzedStringField3.reference, PHRASE_1_TEXT_EXACT_MATCH );
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
 			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_4 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_4 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_3_MATCH );
 			document.addValue( indexMapping.analyzedStringField3.reference, PHRASE_2_TEXT_EXACT_MATCH );
 		} );
-		workPlan.add( referenceProvider( DOCUMENT_5 ), document -> {
+		plan.add( referenceProvider( DOCUMENT_5 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, PHRASE_2_TEXT_EXACT_MATCH );
 			document.addValue( indexMapping.analyzedStringField2.reference, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
-		workPlan.add( referenceProvider( EMPTY ), document -> {
+		plan.add( referenceProvider( EMPTY ), document -> {
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
-		workPlan = compatibleIndexManager.createWorkPlan();
-		workPlan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
+		plan = compatibleIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
 			document.addValue( compatibleIndexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
-		workPlan = rawFieldCompatibleIndexManager.createWorkPlan();
-		workPlan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
+		plan = rawFieldCompatibleIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
 			document.addValue( rawFieldCompatibleIndexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
-		workPlan = incompatibleAnalyzerIndexManager.createWorkPlan();
-		workPlan.add( referenceProvider( INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 ), document -> {
+		plan = incompatibleAnalyzerIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 ), document -> {
 			document.addValue( incompatibleAnalyzerIndexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();

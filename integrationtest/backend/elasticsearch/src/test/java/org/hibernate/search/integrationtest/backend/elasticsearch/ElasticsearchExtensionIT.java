@@ -27,7 +27,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.IndexManager;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -579,8 +579,8 @@ public class ElasticsearchExtensionIT {
 	}
 
 	private void initData() {
-		IndexWorkPlan<? extends DocumentElement> workPlan = indexManager.createWorkPlan();
-		workPlan.add( referenceProvider( SECOND_ID ), document -> {
+		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( SECOND_ID ), document -> {
 			document.addValue( indexMapping.integer, "2" );
 			document.addValue( indexMapping.unsupportedType, "42" );
 
@@ -590,7 +590,7 @@ public class ElasticsearchExtensionIT {
 			document.addValue( indexMapping.sort4, "z" );
 			document.addValue( indexMapping.sort5, "a" );
 		} );
-		workPlan.add( referenceProvider( FIRST_ID ), document -> {
+		plan.add( referenceProvider( FIRST_ID ), document -> {
 			document.addValue( indexMapping.string, "'text 1'" );
 
 			document.addValue( indexMapping.sort1, "a" );
@@ -599,7 +599,7 @@ public class ElasticsearchExtensionIT {
 			document.addValue( indexMapping.sort4, "z" );
 			document.addValue( indexMapping.sort5, "a" );
 		} );
-		workPlan.add( referenceProvider( THIRD_ID ), document -> {
+		plan.add( referenceProvider( THIRD_ID ), document -> {
 			document.addValue( indexMapping.geoPoint, "{'lat': 40.12, 'lon': -71.34}" );
 
 			document.addValue( indexMapping.sort1, "z" );
@@ -608,7 +608,7 @@ public class ElasticsearchExtensionIT {
 			document.addValue( indexMapping.sort4, "z" );
 			document.addValue( indexMapping.sort5, "a" );
 		} );
-		workPlan.add( referenceProvider( FOURTH_ID ), document -> {
+		plan.add( referenceProvider( FOURTH_ID ), document -> {
 			document.addValue( indexMapping.dateWithColons, "'2018:01:12'" );
 
 			document.addValue( indexMapping.sort1, "z" );
@@ -617,7 +617,7 @@ public class ElasticsearchExtensionIT {
 			document.addValue( indexMapping.sort4, "a" );
 			document.addValue( indexMapping.sort5, "a" );
 		} );
-		workPlan.add( referenceProvider( FIFTH_ID ), document -> {
+		plan.add( referenceProvider( FIFTH_ID ), document -> {
 			// This document should not match any query
 			document.addValue( indexMapping.string, "'text 2'" );
 			document.addValue( indexMapping.integer, "1" );
@@ -627,9 +627,9 @@ public class ElasticsearchExtensionIT {
 
 			document.addValue( indexMapping.sort5, "z" );
 		} );
-		workPlan.add( referenceProvider( EMPTY_ID ), document -> { } );
+		plan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
-		workPlan.execute().join();
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();
