@@ -18,6 +18,7 @@ import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Latitude;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Longitude;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 
@@ -43,8 +44,8 @@ public class AnnotationMappingGeoPointBindingIT {
 				.field( "workLocation", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ).sortable( Sortable.DEFAULT ) )
 		);
 		backendMock.expectSchema( GeoPointOnCoordinatesPropertyEntity.INDEX, b -> b
-				.field( "coord", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ).sortable( Sortable.DEFAULT ) )
-				.field( "location", GeoPoint.class, b2 -> b2.projectable( Projectable.NO ).sortable( Sortable.DEFAULT ) )
+				.field( "coord", GeoPoint.class )
+				.field( "location", GeoPoint.class, b2 -> b2.projectable( Projectable.NO ) )
 		);
 		backendMock.expectSchema( GeoPointOnCustomCoordinatesPropertyEntity.INDEX, b -> b
 				.field( "coord", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ).sortable( Sortable.DEFAULT ) )
@@ -206,8 +207,8 @@ public class AnnotationMappingGeoPointBindingIT {
 			this.id = id;
 		}
 
-		@GeoPointBinding
-		@GeoPointBinding(fieldName = "location", projectable = Projectable.NO)
+		@GenericField
+		@GenericField(name = "location", projectable = Projectable.NO)
 		public GeoPoint getCoord() {
 			return coord;
 		}
