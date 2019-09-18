@@ -1362,5 +1362,7 @@ Wiping the index and reindexing *is* required if the mapping changes include any
 include::todo-placeholder.asciidoc[]
 
 ////
-TODO Detailed description of the programmatic mapping API.
+TODO HSEARCH-3680 Detailed description of the programmatic mapping API.
+
+TODO In particular, explain how to use type/property bridges in the programmatic mapping
 ////

@@ -4,6 +4,8 @@
 [[search-mapping-bridge]]
 
 == Basics
+// Search 5 anchors backward compatibility
+[[section-custom-bridges]]
 
 In Hibernate Search, bridges are the components responsible for converting pieces of data
 from the entity model to the document model.
@@ -83,25 +85,235 @@ the following table may help:
 
 [[mapper-orm-bridge-valuebridge]]
 == Value bridges
+// Search 5 anchors backward compatibility
+[[_stringbridge]]
+
+=== Basics
 
 include::todo-placeholder.asciidoc[]
+// TODO intro
 
-[[mapper-orm-bridge-typeandpropertybridge]]
-== Type bridges and property bridges
+// Search 5 anchors backward compatibility
+[[example-custom-string-bridge]]
+//TODO basic example toIndexedValue + mapping with @GenericField
+
+// TODO constraints regarding the type parameters (unless using ValueBinder)
+
+=== Using bridges in other `@*Field` annotations
 
 include::todo-placeholder.asciidoc[]
+// TODO explain the type requirements (ValueBridge<?, String> for @FullTextField, ...)
+
+=== Supporting projections with `fromIndexedValue()`
+// Search 5 anchors backward compatibility
+[[section-two-way-bridge]]
+
+include::todo-placeholder.asciidoc[]
+// TODO fromIndexedValue (for projections)
+
+=== Supporting `indexNullAs` with `parse()`
+
+include::todo-placeholder.asciidoc[]
+// TODO parse (for indexNullAs)
+
+=== Compatibility across indexes with `isCompatibleWith()`
+
+include::todo-placeholder.asciidoc[]
+// TODO isCompatibleWith
+
+=== Configuring the bridge more finely with `ValueBinder`
+
+include::todo-placeholder.asciidoc[]
+// TODO ValueBinder: intro
+
+// TODO example with bridge + binder with setBridge + mapping with @GenericField
+
+// TODO example with bridge + binder with setBridge and custom type + mapping with @GenericField
+
+// TODO NOTE: values passed to @GenericField take precedence
+
+// TODO NOTE: only .asString() if using @FullTextField, etc.
+
+// TODO link to dedicated section for index field type DSL
+
+=== Accessing the ORM session or session factory from the bridge
+
+include::todo-placeholder.asciidoc[]
+// TODO HibernateOrmExtension.get()? Make sure to warn that not all operations are valid.
+
+=== Injecting beans into the value bridge or value binder
+
+include::todo-placeholder.asciidoc[]
+// TODO say it's supported, give some basic information and link to <<configuration-bean-injection>>
+
+=== Experimental features
+
+include::todo-placeholder.asciidoc[]
+[[_type_aware_bridge]]
+// TODO experimental support for reflection with getBridgedElement (advanced use, no example)
+
+[[mapper-orm-bridge-propertybridge]]
+== Property bridge
+// Search 5 anchors backward compatibility
+[[section-field-bridge]]
+
+=== Basics
+
+include::todo-placeholder.asciidoc[]
+// TODO intro
+
+// Search 5 anchors backward compatibility
+[[example-field-bridge]]
+// TODO basic example with annotation, binder, bridge, mapping
+
+=== Passing parameters
+// Search 5 anchors backward compatibility
+[[_parameterized_bridge]]
+
+include::todo-placeholder.asciidoc[]
+// Search 5 anchors backward compatibility
+[[example-passing-bridge-parameters]]
+//TODO parameterized example
+
+=== Accessing the ORM session from the bridge
+
+include::todo-placeholder.asciidoc[]
+// TODO HibernateOrmExtension.get()? Make sure to warn that not all operations are valid.
+
+=== Injecting beans into the binder
+
+include::todo-placeholder.asciidoc[]
+// TODO say it's supported, give some basic information and link to <<configuration-bean-injection>>
+
+=== Experimental features
+
+include::todo-placeholder.asciidoc[]
+// TODO experimental support for reflection with getBridgedElement (advanced use, no example)
+
+[[mapper-orm-bridge-typebridge]]
+== Type bridge
+// Search 5 anchors backward compatibility
+[[_classbridge]]
+
+=== Basics
+
+include::todo-placeholder.asciidoc[]
+// TODO intro
+
+// Search 5 anchors backward compatibility
+[[example-class-bridge]]
+// TODO basic example with annotation, binder, bridge, mapping
+
+=== Passing parameters
+
+include::todo-placeholder.asciidoc[]
+//TODO parameterized example
+
+=== Accessing the ORM session from the bridge
+
+include::todo-placeholder.asciidoc[]
+// TODO HibernateOrmExtension.get()? Make sure to warn that not all operations are valid.
+
+=== Injecting beans into the binder
+
+include::todo-placeholder.asciidoc[]
+// TODO say it's supported, give some basic information and link to <<configuration-bean-injection>>
+
+=== Experimental features
+
+include::todo-placeholder.asciidoc[]
+// TODO experimental support for reflection with getBridgedElement (advanced use, no example)
 
 [[mapper-orm-bridge-identifierbridge]]
 == Identifier bridges
 
+=== Basics
+
 include::todo-placeholder.asciidoc[]
+// TODO intro
+
+// TODO basic example with bridge + mapping with @DocumentId
+
+// TODO NOTE: constraints regarding the type parameters (unless using ValueBinder)
+
+=== Compatibility across indexes with `isCompatibleWith()`
+
+include::todo-placeholder.asciidoc[]
+// TODO isCompatibleWith
+
+=== Configuring the bridge more finely with `IdentifierBinder`
+
+include::todo-placeholder.asciidoc[]
+// TODO IdentifierBinder: intro
+
+// TODO example with bridge + binder with setBridge + mapping with @DocumentId
+
+=== Accessing the ORM session or session factory from the bridge
+
+include::todo-placeholder.asciidoc[]
+// TODO HibernateOrmExtension.get()? Make sure to warn that not all operations are valid.
+
+=== Injecting beans into the bridge or binder
+
+include::todo-placeholder.asciidoc[]
+// TODO say it's supported, give some basic information and link to <<configuration-bean-injection>>
+
+=== Experimental features
+
+include::todo-placeholder.asciidoc[]
+// TODO experimental support for reflection with getBridgedElement (advanced use, no example)
 
 [[mapper-orm-bridge-routingkeybridge]]
 == Routing key bridges
 
+=== Basics
+
 include::todo-placeholder.asciidoc[]
+//TODO HSEARCH-3709 basic example with annotation, binder, bridge, mapping
+
+=== Passing parameters
+
+include::todo-placeholder.asciidoc[]
+//TODO HSEARCH-3709 parameterized example
+
+=== Accessing the ORM session from the bridge
+
+include::todo-placeholder.asciidoc[]
+// TODO HSEARCH-3709 HibernateOrmExtension.get()? Make sure to warn that not all operations are valid.
+
+=== Injecting beans into the binder
+
+include::todo-placeholder.asciidoc[]
+// TODO HSEARCH-3709 say it's supported, give some basic information and link to <<configuration-bean-injection>>
+
+=== Experimental features
+
+include::todo-placeholder.asciidoc[]
+// TODO HSEARCH-3709 experimental support for reflection with getBridgedElement (advanced use, no example)
+
+[[mapper-orm-bridge-bridgedelement-dependencies]]
+== Declaring dependencies to bridged elements
+
+include::todo-placeholder.asciidoc[]
+// TODO HSEARCH-3710
+
+[[mapper-orm-bridge-index-field-dsl]]
+== Declaring index fields
+
+include::todo-placeholder.asciidoc[]
+// TODO
+
+[[mapper-orm-bridge-index-field-type-dsl]]
+== Declaring index field types
+
+include::todo-placeholder.asciidoc[]
+// TODO
 
 [[mapper-orm-bridge-resolver]]
-== Default bridge resolver
+== Assigning default bridges with the bridge resolver
+// Search 5 anchors backward compatibility
+[[_bridgeprovider_associate_a_bridge_to_a_given_return_type]]
 
 include::todo-placeholder.asciidoc[]
+
+// TODO HSEARCH-3678
