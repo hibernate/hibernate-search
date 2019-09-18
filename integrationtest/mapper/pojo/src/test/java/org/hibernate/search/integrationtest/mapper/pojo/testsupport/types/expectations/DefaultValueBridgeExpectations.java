@@ -20,6 +20,10 @@ public interface DefaultValueBridgeExpectations<V, F> {
 
 	List<V> getEntityPropertyValues();
 
+	default List<V> getProjectionValues() {
+		return getEntityPropertyValues();
+	}
+
 	List<F> getDocumentFieldValues();
 
 	Class<?> getTypeWithValueBridge1();
