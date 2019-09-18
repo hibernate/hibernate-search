@@ -159,7 +159,7 @@ public class FieldDefaultBridgeIT<V, F> {
 			);
 
 			Assertions.<Object>assertThat( query.fetchAll().getHits() )
-					.containsExactly( getPropertyValues().toArray() );
+					.containsExactly( getProjectionValues().toArray() );
 		}
 	}
 
@@ -248,13 +248,13 @@ public class FieldDefaultBridgeIT<V, F> {
 				indexToProjectionConverter.convert( null, fromDocumentConvertContext )
 		)
 				.isNull();
-		Iterator<V> propertyValuesIterator = getPropertyValues().iterator();
+		Iterator<V> projectionValuesIterator = getProjectionValues().iterator();
 		for ( F fieldValue : getDocumentFieldValues() ) {
-			V propertyValue = propertyValuesIterator.next();
+			V projectionValue = projectionValuesIterator.next();
 			assertThat(
 					indexToProjectionConverter.convert( fieldValue, fromDocumentConvertContext )
 			)
-					.isEqualTo( propertyValue );
+					.isEqualTo( projectionValue );
 		}
 	}
 
@@ -264,6 +264,14 @@ public class FieldDefaultBridgeIT<V, F> {
 			propertyValues.add( null );
 		}
 		return propertyValues;
+	}
+
+	private List<V> getProjectionValues() {
+		List<V> values = new ArrayList<>( expectations.getProjectionValues() );
+		if ( typeDescriptor.isNullable() ) {
+			values.add( null );
+		}
+		return values;
 	}
 
 	private List<F> getDocumentFieldValues() {
