@@ -153,33 +153,27 @@ public class GeoPointBridge implements TypeBridge, PropertyBridge {
 					.toReference();
 
 			Function<Object, GeoPoint> coordinatesExtractor;
-			if ( bridgedPojoModelElement.isAssignableTo( GeoPoint.class ) ) {
-				PojoElementAccessor<GeoPoint> sourceAccessor = bridgedPojoModelElement.createAccessor( GeoPoint.class );
-				coordinatesExtractor = sourceAccessor::read;
-			}
-			else {
-				PojoElementAccessor<Double> latitudeAccessor = bridgedPojoModelElement.properties()
-						.filter( model -> model.markers( LatitudeMarker.class )
-								.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
-						.collect( singleMarkedProperty( "latitude", defaultedFieldName, markerSet ) )
-						.createAccessor( Double.class );
-				PojoElementAccessor<Double> longitudeAccessor = bridgedPojoModelElement.properties()
-						.filter( model -> model.markers( LongitudeMarker.class )
-								.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
-						.collect( singleMarkedProperty( "longitude", defaultedFieldName, markerSet ) )
-						.createAccessor( Double.class );
+			PojoElementAccessor<Double> latitudeAccessor = bridgedPojoModelElement.properties()
+					.filter( model -> model.markers( LatitudeMarker.class )
+							.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
+					.collect( singleMarkedProperty( "latitude", defaultedFieldName, markerSet ) )
+					.createAccessor( Double.class );
+			PojoElementAccessor<Double> longitudeAccessor = bridgedPojoModelElement.properties()
+					.filter( model -> model.markers( LongitudeMarker.class )
+							.anyMatch( m -> Objects.equals( markerSet, m.getMarkerSet() ) ) )
+					.collect( singleMarkedProperty( "longitude", defaultedFieldName, markerSet ) )
+					.createAccessor( Double.class );
 
-				coordinatesExtractor = bridgedElement -> {
-					Double latitude = latitudeAccessor.read( bridgedElement );
-					Double longitude = longitudeAccessor.read( bridgedElement );
+			coordinatesExtractor = bridgedElement -> {
+				Double latitude = latitudeAccessor.read( bridgedElement );
+				Double longitude = longitudeAccessor.read( bridgedElement );
 
-					if ( latitude == null || longitude == null ) {
-						return null;
-					}
+				if ( latitude == null || longitude == null ) {
+					return null;
+				}
 
-					return GeoPoint.of( latitude, longitude );
-				};
-			}
+				return GeoPoint.of( latitude, longitude );
+			};
 
 			return new GeoPointBridge(
 					coordinatesExtractor,
