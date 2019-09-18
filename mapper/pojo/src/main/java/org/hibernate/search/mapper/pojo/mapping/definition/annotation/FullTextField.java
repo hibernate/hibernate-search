@@ -56,6 +56,15 @@ public @interface FullTextField {
 	String analyzer();
 
 	/**
+	 * @return A reference to a different analyzer, overriding the {@link #analyzer()},
+	 * to use for query parameters at search time.
+	 * If not defined, the same {@link #analyzer()} will be used.
+	 * <p>
+	 * As above, see the documentation of your backend to know how to define analyzers.
+	 */
+	String searchAnalyzer() default "";
+
+	/**
 	 * @return Whether index-time scoring information should be stored or not.
 	 * @see Norms
 	 */
