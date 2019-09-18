@@ -41,8 +41,8 @@ public class ProgrammaticMappingGeoPointBindingIT {
 				.field( "workLocation", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ).sortable( Sortable.DEFAULT ) )
 		);
 		backendMock.expectSchema( GeoPointOnCoordinatesPropertyEntity.INDEX, b -> b
-				.field( "coord", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ).sortable( Sortable.DEFAULT ) )
-				.field( "location", GeoPoint.class, b2 -> b2.projectable( Projectable.NO ).sortable( Sortable.DEFAULT ) )
+				.field( "coord", GeoPoint.class )
+				.field( "location", GeoPoint.class, b2 -> b2.projectable( Projectable.NO ) )
 		);
 		backendMock.expectSchema( GeoPointOnCustomCoordinatesPropertyEntity.INDEX, b -> b
 				.field( "coord", GeoPoint.class, b2 -> b2.projectable( Projectable.DEFAULT ).sortable( Sortable.DEFAULT ) )
@@ -86,11 +86,8 @@ public class ProgrammaticMappingGeoPointBindingIT {
 							.property( "id" )
 									.documentId()
 							.property( "coord" )
-									.binder( GeoPointBinder.create() )
-									.binder( GeoPointBinder.create()
-											.fieldName( "location" )
-											.projectable( Projectable.NO )
-									);
+									.genericField()
+									.genericField( "location" ).projectable( Projectable.NO );
 
 					mappingDefinition.type( GeoPointOnCustomCoordinatesPropertyEntity.class )
 							.indexed( GeoPointOnCustomCoordinatesPropertyEntity.INDEX )
