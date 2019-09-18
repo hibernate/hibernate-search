@@ -1,6 +1,24 @@
 Hibernate Search Changelog
 ==========================
 
+5.11.3.Final (18-09-2019)
+-------------------------
+
+** Bug
+    * HSEARCH-3647 Search result lost after Session.merge on a child entity when using Multi-Tenancy
+    * HSEARCH-3622 Backport to 5.x: SimpleIndexingProgressMonitor stops logging as soon as the number of indexed document stops being a multiple of the logging period
+
+** Improvement
+    * HSEARCH-3706 Upgrade to Hibernate ORM 5.4.5.Final
+    * HSEARCH-3648 Upgrade to Hibernate ORM 5.4.4
+
+** Task
+    * HSEARCH-3703 Remove the dependency to javax.xml.bind.api in JBoss modules
+    * HSEARCH-3702 Upgrade to JBoss logging 3.4.0.Final
+    * HSEARCH-3701 Upgrade to WildFly 17.0.1.Final
+    * HSEARCH-3697 Test Hibernate Search on JDK13 regularly on the CI
+    * HSEARCH-3652 Refresh Jenkinsfiles to match the new CI environment
+
 5.11.2.Final (17-06-2019)
 -------------------------
 
