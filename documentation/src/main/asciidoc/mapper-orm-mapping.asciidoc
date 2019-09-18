@@ -489,10 +489,10 @@ or <<backend-elasticsearch-field-types,Elasticsearch field types>> depending on 
 |java.time.MonthDay|- | `MonthDay.parse(String)`
 |java.util.UUID|`toString()` as a `java.lang.String` | `UUID.fromString(String)`
 |java.util.Calendar|A `java.time.ZonedDateTime` representing the same date/time and timezone; see <<mapper-orm-legacy-date-time-apis>> | `ZonedDateTime.parse(String)`
-|java.util.Date|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
-|java.sql.Timestamp|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
-|java.sql.Date|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
-|java.sql.Time|`toInstant()` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
+|java.util.Date|`Instant.ofEpochMilli(long)` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
+|java.sql.Timestamp|`Instant.ofEpochMilli(long)` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
+|java.sql.Date|`Instant.ofEpochMilli(long)` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
+|java.sql.Time|`Instant.ofEpochMilli(long)` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
 |org.hibernate.search.engine.spatial.GeoPoint and subtypes|-| Latitude as double and longitude as double, separated by a comma. Ex: `41.8919, 12.51133`.
 |===
 
