@@ -112,7 +112,7 @@ public class JavaSqlTimestampPropertyTypeDescriptor extends PropertyTypeDescript
 		return new Timestamp( epochMilli );
 	}
 
-	private static Timestamp date(int year, int month, int day, int hour, int minute, int second, int millisecond) {
+	static Timestamp date(int year, int month, int day, int hour, int minute, int second, int millisecond) {
 		Calendar calendar = new GregorianCalendar( TimeZone.getTimeZone( "UTC" ), Locale.ROOT );
 		calendar.clear();
 		calendar.set( year, month - 1, day, hour, minute, second );

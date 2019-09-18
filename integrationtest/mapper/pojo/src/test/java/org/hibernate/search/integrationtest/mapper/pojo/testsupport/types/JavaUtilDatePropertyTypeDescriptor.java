@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultIdentifierBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
@@ -68,8 +69,29 @@ public class JavaUtilDatePropertyTypeDescriptor extends PropertyTypeDescriptor<D
 						JavaSqlDatePropertyTypeDescriptor.date( 1500, 2, 29, 12, 0, 0, 0 ),
 
 						// Adding a sql time. See HSEARCH-3670
-						JavaSqlTimePropertyTypeDescriptor.date( 2017, 11, 6, 19, 19, 0, 540 )
+						JavaSqlTimePropertyTypeDescriptor.date( 2017, 11, 6, 19, 19, 0, 540 ),
+
+						// Adding a sql timestamp. See HSEARCH-3670
+						JavaSqlTimestampPropertyTypeDescriptor.date( 2017, 11, 6, 19, 19, 0, 540 )
 				);
+			}
+
+			@Override
+			public List<Date> getProjectionValues() {
+				return getEntityPropertyValues().stream()
+						.map( d -> {
+							if ( d.getClass().equals( Date.class ) ) {
+								return d;
+							}
+							else {
+								/*
+								 * The bridge always returns a java.util.Date,
+								 * even if the original value was a subtype from the java.sql package.
+								 */
+								return new Date( d.getTime() );
+							}
+						} )
+						.collect( Collectors.toList() );
 			}
 
 			@Override
@@ -94,6 +116,9 @@ public class JavaUtilDatePropertyTypeDescriptor extends PropertyTypeDescriptor<D
 						Instant.parse( "1500-03-10T12:00:00.0Z" ),
 
 						// Adding a sql time. See HSEARCH-3670
+						Instant.parse( "2017-11-06T19:19:00.54Z" ),
+
+						// Adding a sql timestamp. See HSEARCH-3670
 						Instant.parse( "2017-11-06T19:19:00.54Z" )
 				);
 			}
