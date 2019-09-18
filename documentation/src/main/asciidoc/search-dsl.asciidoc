@@ -1894,7 +1894,7 @@ All methods that apply DSL converters offer a variant that accepts a `ValueConve
 A DSL converter is always automatically generated for value bridges.
 However, more complex bridges will require explicit configuration.
 
-See <<mapper-orm-bridge-typeandpropertybridge>> for more information.
+See <<mapper-orm-bridge-typebridge>> or <<mapper-orm-bridge-propertybridge>> for more information.
 ====
 
 [[search-dsl-projected-value-type]]
@@ -1955,7 +1955,8 @@ include::{sourcedir}/org/hibernate/search/documentation/search/converter/Project
 ====
 Projection converters must be configured explicitly in custom bridges.
 
-See <<mapper-orm-bridge-valuebridge>> and <<mapper-orm-bridge-typeandpropertybridge>> for more information.
+See <<mapper-orm-bridge-valuebridge>>,
+<<mapper-orm-bridge-propertybridge>> or <<mapper-orm-bridge-typebridge>> for more information.
 ====
 
 [[search-dsl-multiple-fields]]
