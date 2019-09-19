@@ -30,6 +30,12 @@ class StubStringIndexFieldTypeOptionsStep
 	}
 
 	@Override
+	public StubStringIndexFieldTypeOptionsStep searchAnalyzer(String searchAnalyzerName) {
+		modifiers.add( b -> b.searchAnalyzerName( searchAnalyzerName ) );
+		return this;
+	}
+
+	@Override
 	public StubStringIndexFieldTypeOptionsStep normalizer(String normalizerName) {
 		modifiers.add( b -> b.normalizerName( normalizerName ) );
 		return this;

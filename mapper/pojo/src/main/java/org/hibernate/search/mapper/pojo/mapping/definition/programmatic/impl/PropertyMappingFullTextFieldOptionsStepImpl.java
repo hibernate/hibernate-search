@@ -43,6 +43,12 @@ class PropertyMappingFullTextFieldOptionsStepImpl
 	}
 
 	@Override
+	public PropertyMappingFullTextFieldOptionsStep searchAnalyzer(String searchAnalyzerName) {
+		fieldModelContributor.add( (c, b) -> c.searchAnalyzer( searchAnalyzerName ) );
+		return thisAsS();
+	}
+
+	@Override
 	public PropertyMappingFullTextFieldOptionsStep norms(Norms norms) {
 		fieldModelContributor.add( (c, b) -> c.norms( norms ) );
 		return thisAsS();

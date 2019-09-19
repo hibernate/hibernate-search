@@ -25,6 +25,13 @@ public interface PropertyMappingFullTextFieldOptionsStep
 	PropertyMappingFullTextFieldOptionsStep analyzer(String analyzerName);
 
 	/**
+	 * @param searchAnalyzerName A reference to the analyzer to use for query parameters at search time.
+	 * @return {@code this}, for method chaining.
+	 * @see FullTextField#searchAnalyzer()
+	 */
+	PropertyMappingFullTextFieldOptionsStep searchAnalyzer(String searchAnalyzerName);
+
+	/**
 	 * @param norms Whether index time scoring information should be stored or not.
 	 * @return {@code this}, for method chaining.
 	 * @see FullTextField#norms()

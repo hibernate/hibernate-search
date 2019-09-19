@@ -36,6 +36,8 @@ class LuceneStringIndexFieldTypeOptionsStep
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private String analyzerName;
+	// TODO HSEARCH-3042 use this value
+	private String searchAnalyzerName;
 	private Analyzer analyzer;
 	private String normalizerName;
 	private Analyzer normalizer;
@@ -56,6 +58,12 @@ class LuceneStringIndexFieldTypeOptionsStep
 		if ( analyzer == null ) {
 			throw log.unknownAnalyzer( analyzerName, getBuildContext().getEventContext() );
 		}
+		return this;
+	}
+
+	@Override
+	public LuceneStringIndexFieldTypeOptionsStep searchAnalyzer(String searchAnalyzerName) {
+		this.searchAnalyzerName = searchAnalyzerName;
 		return this;
 	}
 

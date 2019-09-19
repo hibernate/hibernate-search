@@ -41,6 +41,8 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private String analyzerName;
+	// TODO HSEARCH-3042 use this value
+	private String searchAnalyzerName;
 	private String normalizerName;
 	private Projectable projectable = Projectable.DEFAULT;
 	private Searchable searchable = Searchable.DEFAULT;
@@ -57,6 +59,12 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 	@Override
 	public ElasticsearchStringIndexFieldTypeOptionsStep analyzer(String analyzerName) {
 		this.analyzerName = analyzerName;
+		return this;
+	}
+
+	@Override
+	public ElasticsearchStringIndexFieldTypeOptionsStep searchAnalyzer(String searchAnalyzerName) {
+		this.searchAnalyzerName = searchAnalyzerName;
 		return this;
 	}
 
