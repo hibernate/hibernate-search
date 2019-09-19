@@ -1,0 +1,75 @@
+[[mapper-orm-bridge]]
+= Bridges
+// Search 5 anchors backward compatibility
+[[search-mapping-bridge]]
+
+include::todo-placeholder.asciidoc[]
+
+////
+TODO The getting started section has a link pointing here and expects the section to
+include a detailed description of how to define and use bridges.
+////
+
+Starting with Hibernate Search 6, there are five separate interfaces for bridges:
+
+* <<mapper-orm-bridge-valuebridge,`ValueBridge`>> can be used for simple use cases when mapping an object's property.
++
+The `ValueBridge` is applied at the property level using one of the pre-defined `@*Field` annotations:
+`@GenericField`, `@FullTextField`, ...
++
+`ValueBridge` is a suitable interface for your custom bridge if:
++
+** The property value should be mapped to a single index field.
+** The bridge should be applied to a property whose type is effectively immutable.
+For example `Integer`, or a custom `enum` type, or a custom bean type whose content never changes would be suitable candidates,
+but a custom bean type with setters would most definitely not.
+* <<mapper-orm-bridge-typeandpropertybridge,`PropertyBridge`>> can be used for more complex uses cases when mapping an object's property.
++
+The `PropertyBridge` is applied at the property level using a custom annotation.
++
+`PropertyBridge` can be used even if the property being mapped has a mutable type,
+or if its value should be mapped to multiple index fields.
+* <<mapper-orm-bridge-typeandpropertybridge,`TypeBridge`>> should be used when mapping multiple properties of an object, potentially combining them in the process.
++
+The `TypeBridge` is applied at the type level using a custom annotation.
++
+Similarly to `PropertyBridge`, `TypeBridge` can be used even if the properties being mapped have a mutable type,
+or if their values should be mapped to multiple index fields.
+* <<mapper-orm-bridge-identifierbridge,`IdentifierBridge`>> can be used together with `@DocumentId`
+to map an unusual entity identifier to a document identifier.
+* <<mapper-orm-bridge-routingkeybridge,`RoutingKeyBridge`>> can be used to define a "routing key",
+i.e. a key that will be used to determine the shard where corresponding documents must be stored in the index.
+
+You can find example of custom bridges in the
+https://github.com/hibernate/hibernate-search[Hibernate Search source code]:
+
+* `org.hibernate.search.integrationtest.showcase.library.bridge.ISBNBridge` implements `ValueBridge`.
+* `org.hibernate.search.integrationtest.showcase.library.bridge.MultiKeywordStringBridge` implements `PropertyBridge`.
+The corresponding annotation is `org.hibernate.search.integrationtest.showcase.library.bridge.annotation.MultiKeywordStringBinding`.
+* `org.hibernate.search.integrationtest.showcase.library.bridge.AccountBorrowalSummaryBridge` implements `TypeBridge`.
+The corresponding annotation is `org.hibernate.search.integrationtest.showcase.library.bridge.annotation.AccountBorrowalSummaryBinding`.
+
+[[mapper-orm-bridge-valuebridge]]
+== Value bridges
+
+include::todo-placeholder.asciidoc[]
+
+[[mapper-orm-bridge-typeandpropertybridge]]
+== Type bridges and property bridges
+
+include::todo-placeholder.asciidoc[]
+
+[[mapper-orm-bridge-identifierbridge]]
+== Identifier bridges
+
+include::todo-placeholder.asciidoc[]
+
+[[mapper-orm-bridge-routingkeybridge]]
+== Routing key bridges
+
+include::todo-placeholder.asciidoc[]
+
+[[mapper-orm-bridge-resolver]]
+== Default bridge resolver
+
+include::todo-placeholder.asciidoc[]
