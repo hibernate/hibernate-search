@@ -582,6 +582,103 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	}
 
 	@Test
+	public void attribute_searchAnalyzer_missing() {
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'myField': {"
+									+ "'type': 'text',"
+									+ "'index': true,"
+									+ "'analyzer': 'keyword'"
+							+ "}"
+					+ "}"
+				+ "}"
+		);
+
+		SubTest.expectException( () ->
+				validateSchemaConfig()
+						.withIndex( INDEX_NAME, ctx -> {
+									IndexSchemaElement root = ctx.getSchemaElement();
+									root.field( "myField", f -> f.asString()
+											.analyzer( "keyword" ).searchAnalyzer( "italian" ) ).toReference();
+								}
+						)
+						.setup() )
+				.assertThrown()
+				.isInstanceOf( Exception.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX_NAME )
+						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.indexFieldContext( "myField" )
+						.failure( "Invalid value for attribute 'search_analyzer'. Expected 'italian', actual is 'null'" )
+						.build() );
+	}
+
+	@Test
+	public void attribute_searchAnalyzer_valid() {
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'myField': {"
+									+ "'type': 'text',"
+									+ "'index': true,"
+									+ "'analyzer': 'keyword',"
+									+ "'search_analyzer': 'english'"
+							+ "}"
+					+ "}"
+				+ "}"
+		);
+
+		validateSchemaConfig()
+				.withIndex( INDEX_NAME, ctx -> {
+							IndexSchemaElement root = ctx.getSchemaElement();
+							root.field( "myField", f -> f.asString()
+									.analyzer( "keyword" ).searchAnalyzer( "english" ) ).toReference();
+						}
+				)
+				.setup();
+	}
+
+	@Test
+	public void attribute_searchAnalyzer_invalid() {
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
+				"{"
+					+ "'dynamic': 'strict',"
+					+ "'properties': {"
+							+ "'myField': {"
+									+ "'type': 'text',"
+									+ "'index': true,"
+									+ "'analyzer': 'keyword',"
+									+ "'search_analyzer': 'english'"
+							+ "}"
+					+ "}"
+				+ "}"
+		);
+
+		SubTest.expectException( () ->
+				validateSchemaConfig()
+						.withIndex( INDEX_NAME, ctx -> {
+									IndexSchemaElement root = ctx.getSchemaElement();
+									root.field( "myField", f -> f.asString().analyzer( "keyword" ).searchAnalyzer( "italian" ) ).toReference();
+								}
+						)
+						.setup() )
+				.assertThrown()
+				.isInstanceOf( Exception.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.indexContext( INDEX_NAME )
+						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.indexFieldContext( "myField" )
+						.failure( "Invalid value for attribute 'search_analyzer'. Expected 'italian', actual is 'english'" )
+						.build() );
+	}
+
+	@Test
 	public void property_norms_valid() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
