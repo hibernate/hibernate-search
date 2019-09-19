@@ -12,7 +12,7 @@ package org.hibernate.search.engine.search.projection.dsl;
  * @param <S> The "self" type (the actual exposed type of this step).
  * @param <T> The type of composed projections.
  */
-public interface CompositeProjectionOptionsStep<S extends CompositeProjectionOptionsStep<? extends S, T>, T>
+public interface CompositeProjectionOptionsStep<S extends CompositeProjectionOptionsStep<?, T>, T>
 		extends ProjectionFinalStep<T> {
 
 }

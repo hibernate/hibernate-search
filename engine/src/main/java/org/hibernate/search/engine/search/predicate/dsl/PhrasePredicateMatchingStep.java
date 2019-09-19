@@ -11,7 +11,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
  *
  * @param <N> The type of the next step.
  */
-public interface PhrasePredicateMatchingStep<N extends PhrasePredicateOptionsStep<? extends N>> {
+public interface PhrasePredicateMatchingStep<N extends PhrasePredicateOptionsStep<?>> {
 
 	/**
 	 * Require at least one of the targeted fields to match the given phrase.

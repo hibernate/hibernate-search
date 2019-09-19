@@ -11,7 +11,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
  *
  * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface NestedPredicateOptionsStep<S extends NestedPredicateOptionsStep<? extends S>>
+public interface NestedPredicateOptionsStep<S extends NestedPredicateOptionsStep<?>>
 		extends PredicateFinalStep {
 
 	// TODO HSEARCH-3090 add tuning methods, like the "score_mode" in Elasticsearch (avg, min, ...)

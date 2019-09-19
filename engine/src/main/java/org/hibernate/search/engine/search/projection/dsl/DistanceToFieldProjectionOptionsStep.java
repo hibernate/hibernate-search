@@ -13,7 +13,7 @@ import org.hibernate.search.engine.spatial.DistanceUnit;
  *
  * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface DistanceToFieldProjectionOptionsStep<S extends DistanceToFieldProjectionOptionsStep<? extends S>>
+public interface DistanceToFieldProjectionOptionsStep<S extends DistanceToFieldProjectionOptionsStep<?>>
 		extends ProjectionFinalStep<Double> {
 
 	/**

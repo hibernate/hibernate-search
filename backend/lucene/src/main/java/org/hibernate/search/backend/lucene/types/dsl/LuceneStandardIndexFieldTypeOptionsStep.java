@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptio
 
 
 
-public interface LuceneStandardIndexFieldTypeOptionsStep<S extends LuceneStandardIndexFieldTypeOptionsStep<? extends S, F>, F>
+public interface LuceneStandardIndexFieldTypeOptionsStep<S extends LuceneStandardIndexFieldTypeOptionsStep<?, F>, F>
 		extends StandardIndexFieldTypeOptionsStep<S, F> {
 
 }

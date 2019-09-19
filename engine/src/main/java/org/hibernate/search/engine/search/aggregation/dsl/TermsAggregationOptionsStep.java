@@ -14,7 +14,7 @@ package org.hibernate.search.engine.search.aggregation.dsl;
  * @param <F> The type of the targeted field.
  * @param <A> The type of result for this aggregation.
  */
-public interface TermsAggregationOptionsStep<S extends TermsAggregationOptionsStep<? extends S, F, A>, F, A>
+public interface TermsAggregationOptionsStep<S extends TermsAggregationOptionsStep<?, F, A>, F, A>
 		extends AggregationFinalStep<A> {
 
 	/**

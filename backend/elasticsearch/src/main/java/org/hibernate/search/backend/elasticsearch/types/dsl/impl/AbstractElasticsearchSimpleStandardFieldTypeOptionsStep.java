@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 
 
-abstract class AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<S extends AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<? extends S, F>, F>
+abstract class AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<S extends AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<?, F>, F>
 		extends AbstractElasticsearchStandardIndexFieldTypeOptionsStep<S, F> {
 
 	private final String dataType;

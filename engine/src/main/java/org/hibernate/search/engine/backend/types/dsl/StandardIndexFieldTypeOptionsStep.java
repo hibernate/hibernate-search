@@ -20,7 +20,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
  * @param <S> The "self" type (the actual exposed type of this step).
  * @param <F> The type of field values.
  */
-public interface StandardIndexFieldTypeOptionsStep<S extends StandardIndexFieldTypeOptionsStep<? extends S, F>, F>
+public interface StandardIndexFieldTypeOptionsStep<S extends StandardIndexFieldTypeOptionsStep<?, F>, F>
 		extends IndexFieldTypeConverterStep<S, F>, IndexFieldTypeFinalStep<F> {
 
 	/**

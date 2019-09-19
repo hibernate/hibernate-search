@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.types.TermVector;
  *
  * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface StringIndexFieldTypeOptionsStep<S extends StringIndexFieldTypeOptionsStep<? extends S>>
+public interface StringIndexFieldTypeOptionsStep<S extends StringIndexFieldTypeOptionsStep<?>>
 		extends StandardIndexFieldTypeOptionsStep<S, String> {
 
 	/**

@@ -12,7 +12,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
  *
  * @param <N> The type of the next step.
  */
-public interface ExistsPredicateFieldStep<N extends ExistsPredicateOptionsStep<? extends N>> {
+public interface ExistsPredicateFieldStep<N extends ExistsPredicateOptionsStep<?>> {
 
 	/**
 	 * Target the given field in the "exists" predicate.

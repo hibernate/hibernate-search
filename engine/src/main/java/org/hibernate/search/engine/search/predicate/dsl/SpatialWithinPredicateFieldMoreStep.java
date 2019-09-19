@@ -16,8 +16,8 @@ package org.hibernate.search.engine.search.predicate.dsl;
  * @param <N> The type of the next step.
  */
 public interface SpatialWithinPredicateFieldMoreStep<
-				S extends SpatialWithinPredicateFieldMoreStep<? extends S, N>,
-				N extends SpatialWithinPredicateOptionsStep<? extends N>
+				S extends SpatialWithinPredicateFieldMoreStep<?, N>,
+				N extends SpatialWithinPredicateOptionsStep<?>
 		>
 		extends SpatialWithinPredicateAreaStep<N>,
 				MultiFieldPredicateFieldBoostStep<S> {

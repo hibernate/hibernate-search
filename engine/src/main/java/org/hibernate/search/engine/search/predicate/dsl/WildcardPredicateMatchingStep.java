@@ -11,7 +11,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
  *
  * @param <N> The type of the next step.
  */
-public interface WildcardPredicateMatchingStep<N extends WildcardPredicateOptionsStep<? extends N>> {
+public interface WildcardPredicateMatchingStep<N extends WildcardPredicateOptionsStep<?>> {
 
 	/**
 	 * Require at least one of the targeted fields to match the given wildcard pattern.

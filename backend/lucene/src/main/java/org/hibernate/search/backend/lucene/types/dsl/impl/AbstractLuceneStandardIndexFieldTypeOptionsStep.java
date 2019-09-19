@@ -23,7 +23,7 @@ import org.hibernate.search.util.common.impl.Contracts;
  * @param <S> The "self" type (the actual exposed type of this step).
  * @param <F> The type of field values.
  */
-abstract class AbstractLuceneStandardIndexFieldTypeOptionsStep<S extends AbstractLuceneStandardIndexFieldTypeOptionsStep<? extends S, F>, F>
+abstract class AbstractLuceneStandardIndexFieldTypeOptionsStep<S extends AbstractLuceneStandardIndexFieldTypeOptionsStep<?, F>, F>
 		implements LuceneStandardIndexFieldTypeOptionsStep<S, F> {
 
 	private final LuceneIndexFieldTypeBuildContext buildContext;

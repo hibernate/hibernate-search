@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.PassThroughToDocu
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterStep;
 import org.hibernate.search.util.common.impl.Contracts;
 
-abstract class AbstractElasticsearchIndexFieldTypeConverterStep<S extends AbstractElasticsearchIndexFieldTypeConverterStep<? extends S, F>, F>
+abstract class AbstractElasticsearchIndexFieldTypeConverterStep<S extends AbstractElasticsearchIndexFieldTypeConverterStep<?, F>, F>
 		implements IndexFieldTypeConverterStep<S, F> {
 	private final ElasticsearchIndexFieldTypeBuildContext buildContext;
 	private final Class<F> fieldType;

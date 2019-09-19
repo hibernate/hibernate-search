@@ -16,7 +16,7 @@ import org.hibernate.search.engine.spatial.GeoPolygon;
  *
  * @param <N> The type of the next step.
  */
-public interface SpatialWithinPredicateAreaStep<N extends SpatialWithinPredicateOptionsStep<? extends N>> {
+public interface SpatialWithinPredicateAreaStep<N extends SpatialWithinPredicateOptionsStep<?>> {
 
 	/**
 	 * Require at least one of the targeted fields to point to a location within the given circle,

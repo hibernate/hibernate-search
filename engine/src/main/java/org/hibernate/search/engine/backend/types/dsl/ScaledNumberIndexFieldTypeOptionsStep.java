@@ -12,7 +12,7 @@ package org.hibernate.search.engine.backend.types.dsl;
  * @param <S> The "self" type (the actual exposed type of this step).
  * @param <F> The type of field values.
  */
-public interface ScaledNumberIndexFieldTypeOptionsStep<S extends ScaledNumberIndexFieldTypeOptionsStep<? extends S, F>, F>
+public interface ScaledNumberIndexFieldTypeOptionsStep<S extends ScaledNumberIndexFieldTypeOptionsStep<?, F>, F>
 		extends StandardIndexFieldTypeOptionsStep<S, F> {
 
 	/**

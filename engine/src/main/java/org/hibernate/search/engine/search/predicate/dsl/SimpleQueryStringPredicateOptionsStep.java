@@ -13,7 +13,7 @@ import org.hibernate.search.engine.search.common.BooleanOperator;
  *
  * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface SimpleQueryStringPredicateOptionsStep<S extends SimpleQueryStringPredicateOptionsStep<? extends S>>
+public interface SimpleQueryStringPredicateOptionsStep<S extends SimpleQueryStringPredicateOptionsStep<?>>
 		extends PredicateFinalStep, PredicateScoreStep<S> {
 
 	/**

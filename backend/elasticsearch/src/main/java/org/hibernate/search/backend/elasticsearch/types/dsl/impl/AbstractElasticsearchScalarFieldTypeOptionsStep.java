@@ -17,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchS
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 
-abstract class AbstractElasticsearchScalarFieldTypeOptionsStep<S extends AbstractElasticsearchScalarFieldTypeOptionsStep<? extends S, F>, F>
+abstract class AbstractElasticsearchScalarFieldTypeOptionsStep<S extends AbstractElasticsearchScalarFieldTypeOptionsStep<?, F>, F>
 		extends AbstractElasticsearchSimpleStandardFieldTypeOptionsStep<S, F> {
 
 	AbstractElasticsearchScalarFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext,
