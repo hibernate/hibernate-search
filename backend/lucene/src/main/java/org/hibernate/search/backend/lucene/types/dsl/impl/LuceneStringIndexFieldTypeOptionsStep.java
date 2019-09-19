@@ -36,9 +36,9 @@ class LuceneStringIndexFieldTypeOptionsStep
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private String analyzerName;
-	// TODO HSEARCH-3042 use this value
-	private String searchAnalyzerName;
 	private Analyzer analyzer;
+	private Analyzer searchAnalyzer;
+
 	private String normalizerName;
 	private Analyzer normalizer;
 
@@ -63,7 +63,10 @@ class LuceneStringIndexFieldTypeOptionsStep
 
 	@Override
 	public LuceneStringIndexFieldTypeOptionsStep searchAnalyzer(String searchAnalyzerName) {
-		this.searchAnalyzerName = searchAnalyzerName;
+		this.searchAnalyzer = getAnalysisDefinitionRegistry().getAnalyzerDefinition( searchAnalyzerName );
+		if ( searchAnalyzer == null ) {
+			throw log.unknownAnalyzer( searchAnalyzerName, getBuildContext().getEventContext() );
+		}
 		return this;
 	}
 
@@ -142,7 +145,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 				codec,
 				new LuceneTextFieldPredicateBuilderFactory<>(
 						resolvedSearchable, dslToIndexConverter, rawDslToIndexConverter, codec,
-						analyzerOrNormalizer, analyzer, normalizer
+						( searchAnalyzer != null ) ? searchAnalyzer : analyzerOrNormalizer
 				),
 				new LuceneTextFieldSortBuilderFactory<>(
 						resolvedSortable, dslToIndexConverter, rawDslToIndexConverter, codec
