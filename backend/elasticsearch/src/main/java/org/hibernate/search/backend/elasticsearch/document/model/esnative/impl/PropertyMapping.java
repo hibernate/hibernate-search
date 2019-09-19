@@ -62,6 +62,14 @@ public class PropertyMapping extends AbstractTypeMapping {
 	private String analyzer;
 
 	/*
+	 * Text datatype
+	 * https://www.elastic.co/guide/en/elasticsearch/reference/current/search-analyzer.html
+	 */
+
+	@SerializedName("search_analyzer")
+	private String searchAnalyzer;
+
+	/*
 	 * Keyword datatype
 	 * https://www.elastic.co/guide/en/elasticsearch/reference/current/keyword.html
 	 */
@@ -142,6 +150,14 @@ public class PropertyMapping extends AbstractTypeMapping {
 
 	public void setAnalyzer(String analyzer) {
 		this.analyzer = analyzer;
+	}
+
+	public String getSearchAnalyzer() {
+		return searchAnalyzer;
+	}
+
+	public void setSearchAnalyzer(String searchAnalyzer) {
+		this.searchAnalyzer = searchAnalyzer;
 	}
 
 	public String getNormalizer() {
