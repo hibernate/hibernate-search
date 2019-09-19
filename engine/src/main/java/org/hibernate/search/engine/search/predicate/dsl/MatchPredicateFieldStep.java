@@ -10,7 +10,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
 /**
  * The initial step in a "match" predicate definition, where the target field can be set.
  */
-public interface MatchPredicateFieldStep<N extends MatchPredicateFieldMoreStep<? extends N, ?>> {
+public interface MatchPredicateFieldStep<N extends MatchPredicateFieldMoreStep<?, ?>> {
 
 	/**
 	 * Target the given field in the match predicate.

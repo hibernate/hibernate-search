@@ -16,7 +16,7 @@ import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueC
  * @param <S> The "self" type (the actual exposed type of this step).
  * @param <F> The type of field values.
  */
-public interface IndexFieldTypeConverterStep<S extends IndexFieldTypeConverterStep<? extends S, F>, F> {
+public interface IndexFieldTypeConverterStep<S extends IndexFieldTypeConverterStep<?, F>, F> {
 
 	/**
 	 * Define how values passed to the predicate and sort DSL should be converted to the type of field values.

@@ -13,7 +13,7 @@ import java.util.Collection;
  *
  * @param <N> The type of the next step.
  */
-public interface MatchIdPredicateMatchingStep<N extends MatchIdPredicateMatchingMoreStep<? extends N, ?>> {
+public interface MatchIdPredicateMatchingStep<N extends MatchIdPredicateMatchingMoreStep<?, ?>> {
 
 	/**
 	 * Target the identifier with the given id.

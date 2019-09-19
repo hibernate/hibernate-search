@@ -11,7 +11,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
  *
  * @param <N> The type of the next step.
  */
-public interface SimpleQueryStringPredicateMatchingStep<N extends SimpleQueryStringPredicateOptionsStep<? extends N>> {
+public interface SimpleQueryStringPredicateMatchingStep<N extends SimpleQueryStringPredicateOptionsStep<?>> {
 
 	/**
 	 * Require at least one of the targeted fields to match the given query string.

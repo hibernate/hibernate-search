@@ -16,7 +16,7 @@ import org.hibernate.search.util.common.data.Range;
  * @param <N> The type of the next step.
  * @param <F> The type of the targeted field.
  */
-public interface RangeAggregationRangeStep<N extends RangeAggregationRangeMoreStep<? extends N, ?, F>, F> {
+public interface RangeAggregationRangeStep<N extends RangeAggregationRangeMoreStep<?, ?, F>, F> {
 
 	/**
 	 * Add a bucket for the range {@code [lowerBound, upperBound)} (lower bound included, upper bound excluded),

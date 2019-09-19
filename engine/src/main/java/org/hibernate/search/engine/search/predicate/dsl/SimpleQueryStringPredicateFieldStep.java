@@ -11,7 +11,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
  *
  * @param <N> The type of the next step.
  */
-public interface SimpleQueryStringPredicateFieldStep<N extends SimpleQueryStringPredicateFieldMoreStep<? extends N, ?>> {
+public interface SimpleQueryStringPredicateFieldStep<N extends SimpleQueryStringPredicateFieldMoreStep<?, ?>> {
 
 	/**
 	 * Target the given field in the simple query string predicate.

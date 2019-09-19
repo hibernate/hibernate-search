@@ -12,7 +12,7 @@ package org.hibernate.search.engine.search.projection.dsl;
  * @param <S> The "self" type (the actual exposed type of this step).
  * @param <R> The type of projected entity references.
  */
-public interface EntityReferenceProjectionOptionsStep<S extends EntityReferenceProjectionOptionsStep<? extends S, R>, R>
+public interface EntityReferenceProjectionOptionsStep<S extends EntityReferenceProjectionOptionsStep<?, R>, R>
 		extends ProjectionFinalStep<R> {
 
 }

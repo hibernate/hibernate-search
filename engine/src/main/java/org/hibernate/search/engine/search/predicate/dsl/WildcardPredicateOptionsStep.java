@@ -11,7 +11,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
  *
  * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface WildcardPredicateOptionsStep<S extends WildcardPredicateOptionsStep<? extends S>>
+public interface WildcardPredicateOptionsStep<S extends WildcardPredicateOptionsStep<?>>
 		extends PredicateFinalStep, PredicateBoostStep<S> {
 
 }

@@ -31,7 +31,7 @@ import org.hibernate.search.engine.search.query.SearchResult;
  * @param <AF> The type of factory used to create aggregations in {@link #aggregation(AggregationKey, Function)}.
  */
 public interface SearchQueryOptionsStep<
-				S extends SearchQueryOptionsStep<? extends S, H, SF, AF>,
+				S extends SearchQueryOptionsStep<?, H, SF, AF>,
 				H,
 				SF extends SearchSortFactory,
 				AF extends SearchAggregationFactory

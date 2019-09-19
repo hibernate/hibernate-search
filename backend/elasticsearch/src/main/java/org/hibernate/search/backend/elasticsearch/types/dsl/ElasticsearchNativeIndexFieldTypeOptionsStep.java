@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.types.dsl;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterStep;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
 
-public interface ElasticsearchNativeIndexFieldTypeOptionsStep<S extends ElasticsearchNativeIndexFieldTypeOptionsStep<? extends S>>
+public interface ElasticsearchNativeIndexFieldTypeOptionsStep<S extends ElasticsearchNativeIndexFieldTypeOptionsStep<?>>
 		extends IndexFieldTypeConverterStep<S, String>, IndexFieldTypeFinalStep<String> {
 
 }

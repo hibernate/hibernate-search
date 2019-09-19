@@ -15,7 +15,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
  *
  * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface MatchAllPredicateOptionsStep<S extends MatchAllPredicateOptionsStep<? extends S>>
+public interface MatchAllPredicateOptionsStep<S extends MatchAllPredicateOptionsStep<?>>
 		extends PredicateFinalStep, PredicateBoostStep<S> {
 
 	/**

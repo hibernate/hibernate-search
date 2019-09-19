@@ -24,7 +24,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.docume
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.converter.impl.StubFieldConverter;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.impl.StubIndexFieldType;
 
-abstract class AbstractStubStandardIndexFieldTypeOptionsStep<S extends AbstractStubStandardIndexFieldTypeOptionsStep<? extends S, F>, F>
+abstract class AbstractStubStandardIndexFieldTypeOptionsStep<S extends AbstractStubStandardIndexFieldTypeOptionsStep<?, F>, F>
 		implements StandardIndexFieldTypeOptionsStep<S, F> {
 
 	final List<Consumer<StubIndexSchemaNode.Builder>> modifiers;

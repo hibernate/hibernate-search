@@ -15,7 +15,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
  *
  * @param <N> The type of the next step.
  */
-public interface NestedPredicateNestStep<N extends NestedPredicateOptionsStep<? extends N>> {
+public interface NestedPredicateNestStep<N extends NestedPredicateOptionsStep<?>> {
 
 	/**
 	 * Set the inner predicate to a previously-built {@link SearchPredicate}.

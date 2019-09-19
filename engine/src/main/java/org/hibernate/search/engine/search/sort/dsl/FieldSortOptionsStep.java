@@ -13,7 +13,7 @@ package org.hibernate.search.engine.search.sort.dsl;
  *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public interface FieldSortOptionsStep<S extends FieldSortOptionsStep<? extends S>>
+public interface FieldSortOptionsStep<S extends FieldSortOptionsStep<?>>
 		extends SortFinalStep, SortThenStep, SortOrderStep<S> {
 
 	/**

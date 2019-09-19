@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
  *
  * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface DocumentReferenceProjectionOptionsStep<S extends DocumentReferenceProjectionOptionsStep<? extends S>>
+public interface DocumentReferenceProjectionOptionsStep<S extends DocumentReferenceProjectionOptionsStep<?>>
 		extends ProjectionFinalStep<DocumentReference> {
 
 }

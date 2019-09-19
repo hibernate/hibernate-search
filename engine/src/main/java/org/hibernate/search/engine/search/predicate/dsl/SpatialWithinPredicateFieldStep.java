@@ -12,7 +12,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
  *
  * @param <N> The type of the next step.
  */
-public interface SpatialWithinPredicateFieldStep<N extends SpatialWithinPredicateFieldMoreStep<? extends N, ?>> {
+public interface SpatialWithinPredicateFieldStep<N extends SpatialWithinPredicateFieldMoreStep<?, ?>> {
 
 	/**
 	 * Target the given field in the "within" predicate.

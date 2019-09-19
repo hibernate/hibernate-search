@@ -13,7 +13,7 @@ import org.hibernate.search.engine.search.common.ValueConvert;
  *
  * @param <N> The type of the next step.
  */
-public interface MatchPredicateMatchingStep<N extends MatchPredicateOptionsStep<? extends N>> {
+public interface MatchPredicateMatchingStep<N extends MatchPredicateOptionsStep<?>> {
 
 	/**
 	 * Require at least one of the targeted fields to match the given value.

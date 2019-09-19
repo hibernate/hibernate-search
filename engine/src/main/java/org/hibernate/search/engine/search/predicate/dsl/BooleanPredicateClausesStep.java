@@ -64,7 +64,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
  *
  * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface BooleanPredicateClausesStep<S extends BooleanPredicateClausesStep<? extends S>>
+public interface BooleanPredicateClausesStep<S extends BooleanPredicateClausesStep<?>>
 		extends PredicateScoreStep<S>, PredicateFinalStep {
 
 	/**

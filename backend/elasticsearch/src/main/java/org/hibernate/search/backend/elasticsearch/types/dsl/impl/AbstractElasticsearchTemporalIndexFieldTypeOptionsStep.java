@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.types.format.impl.ElasticsearchDefaultFieldFormatProvider;
 
 abstract class AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<
-				S extends AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<? extends S, F>, F extends TemporalAccessor
+				S extends AbstractElasticsearchTemporalIndexFieldTypeOptionsStep<?, F>, F extends TemporalAccessor
 		>
 		extends AbstractElasticsearchScalarFieldTypeOptionsStep<S, F> {
 

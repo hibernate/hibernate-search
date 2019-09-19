@@ -11,7 +11,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
  *
  * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface SpatialWithinPredicateOptionsStep<S extends SpatialWithinPredicateOptionsStep<? extends S>>
+public interface SpatialWithinPredicateOptionsStep<S extends SpatialWithinPredicateOptionsStep<?>>
 		extends PredicateFinalStep, PredicateBoostStep<S> {
 
 }
