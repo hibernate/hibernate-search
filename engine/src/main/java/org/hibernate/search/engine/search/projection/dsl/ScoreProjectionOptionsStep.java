@@ -11,6 +11,7 @@ package org.hibernate.search.engine.search.projection.dsl;
  *
  * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface ScoreProjectionOptionsStep<S extends ScoreProjectionOptionsStep> extends ProjectionFinalStep<Float> {
+public interface ScoreProjectionOptionsStep<S extends ScoreProjectionOptionsStep<? extends S>>
+		extends ProjectionFinalStep<Float> {
 
 }

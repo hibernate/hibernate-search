@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.sort.SearchSort;
  *
  * @param <S> The "self" type (the actual exposed type of this step).
  */
-public interface CompositeSortComponentsStep<S extends CompositeSortComponentsStep>
+public interface CompositeSortComponentsStep<S extends CompositeSortComponentsStep<? extends S>>
 		extends SortFinalStep, SortThenStep {
 
 	/**

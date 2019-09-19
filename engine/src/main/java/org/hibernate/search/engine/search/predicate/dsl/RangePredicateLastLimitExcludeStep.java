@@ -14,7 +14,7 @@ package org.hibernate.search.engine.search.predicate.dsl;
  */
 @Deprecated
 public interface RangePredicateLastLimitExcludeStep
-		extends RangePredicateLimitExcludeStep<RangePredicateOptionsStep>,
+		extends RangePredicateLimitExcludeStep<RangePredicateOptionsStep<?>>,
 				RangePredicateOptionsStep<RangePredicateOptionsStep<?>> {
 
 }
