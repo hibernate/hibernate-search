@@ -62,7 +62,7 @@ class RangePredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public RangePredicateOptionsStep range(Range<?> range, ValueConvert convert) {
+	public RangePredicateOptionsStep<?> range(Range<?> range, ValueConvert convert) {
 		return commonState.range( range, convert, convert );
 	}
 
@@ -180,13 +180,13 @@ class RangePredicateFieldMoreStepImpl<B>
 		}
 
 		@Override
-		public RangePredicateOptionsStep boost(float boost) {
+		public RangePredicateOptionsStep<?> boost(float boost) {
 			commonState.boost( boost );
 			return this;
 		}
 
 		@Override
-		public RangePredicateOptionsStep excludeLimit() {
+		public RangePredicateOptionsStep<?> excludeLimit() {
 			if ( isUpperBound ) {
 				commonState.getOrCreateLegacySyntaxState().upperBoundInclusion = RangeBoundInclusion.EXCLUDED;
 			}
