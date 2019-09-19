@@ -781,28 +781,46 @@ public class MatchSearchPredicateIT {
 
 		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
 		String whitespaceLowercaseAnalyzedField = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
+		String whitespaceLowercaseSearchAnalyzedField = indexMapping.whitespaceLowercaseSearchAnalyzedField.relativeFieldName;
 
+		// Terms are never lower-cased, neither at write nor at query time.
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.match().field( whitespaceAnalyzedField ).matching( "NEW WORLD" ) )
 				.toQuery();
-
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 
+		// Terms are always lower-cased, both at write and at query time.
 		query = scope.query()
 				.predicate( f -> f.match().field( whitespaceLowercaseAnalyzedField ).matching( "NEW WORLD" ) )
 				.toQuery();
-
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
+		// Terms are lower-cased only at query time. Because we are overriding the analyzer in the predicate.
 		query = scope.query()
 				.predicate( f -> f.match().field( whitespaceAnalyzedField ).matching( "NEW WORLD" )
 						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
 				.toQuery();
-
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+
+		// Same here. Terms are lower-cased only at query time. Because we've defined a search analyzer.
+		query = scope.query()
+				.predicate( f -> f.match().field( whitespaceLowercaseSearchAnalyzedField ).matching( "NEW WORLD" ) )
+				.toQuery();
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+
+		// As for the first query, terms are never lower-cased, neither at write nor at query time.
+		// Because even if we've defined a search analyzer, we are overriding it with an analyzer in the predicate,
+		// since the overriding takes precedence over the search analyzer.
+		query = scope.query()
+				.predicate( f -> f.match().field( whitespaceLowercaseSearchAnalyzedField ).matching( "NEW WORLD" )
+						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name ) )
+				.toQuery();
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 	}
 
 	@Test
@@ -811,28 +829,46 @@ public class MatchSearchPredicateIT {
 
 		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
 		String whitespaceLowercaseAnalyzedField = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
+		String whitespaceLowercaseSearchAnalyzedField = indexMapping.whitespaceLowercaseSearchAnalyzedField.relativeFieldName;
 
+		// Terms are never lower-cased, neither at write nor at query time.
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.match().field( whitespaceAnalyzedField ).matching( "WORD" ).fuzzy() )
 				.toQuery();
-
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
+		// Terms are always lower-cased, both at write and at query time.
 		query = scope.query()
 				.predicate( f -> f.match().field( whitespaceLowercaseAnalyzedField ).matching( "WORD" ).fuzzy() )
 				.toQuery();
-
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
+		// Terms are lower-cased only at query time. Because we are overriding the analyzer in the predicate.
 		query = scope.query()
 				.predicate( f -> f.match().field( whitespaceAnalyzedField ).matching( "WORD" ).fuzzy()
 						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
 				.toQuery();
-
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+
+		// Same here. Terms are lower-cased only at query time. Because we've defined a search analyzer.
+		query = scope.query()
+				.predicate( f -> f.match().field( whitespaceLowercaseSearchAnalyzedField ).matching( "WORD" ).fuzzy() )
+				.toQuery();
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+
+		// As for the first query, terms are never lower-cased, neither at write nor at query time.
+		// Because even if we've defined a search analyzer, we are overriding it with an analyzer in the predicate,
+		// since the overriding takes precedence over the search analyzer.
+		query = scope.query()
+				.predicate( f -> f.match().field( whitespaceLowercaseSearchAnalyzedField ).matching( "WORD" ).fuzzy()
+						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name ) )
+				.toQuery();
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 	}
 
 	@Test
@@ -1349,6 +1385,7 @@ public class MatchSearchPredicateIT {
 			indexMapping.normalizedStringField.document1Value.write( document );
 			indexMapping.whitespaceAnalyzedField.document1Value.write( document );
 			indexMapping.whitespaceLowercaseAnalyzedField.document1Value.write( document );
+			indexMapping.whitespaceLowercaseSearchAnalyzedField.document1Value.write( document );
 			indexMapping.scaledBigDecimal.document1Value.write( document );
 		} );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
@@ -1365,6 +1402,7 @@ public class MatchSearchPredicateIT {
 			indexMapping.normalizedStringField.document2Value.write( document );
 			indexMapping.whitespaceAnalyzedField.document2Value.write( document );
 			indexMapping.whitespaceLowercaseAnalyzedField.document2Value.write( document );
+			indexMapping.whitespaceLowercaseSearchAnalyzedField.document2Value.write( document );
 			indexMapping.scaledBigDecimal.document2Value.write( document );
 		} );
 		plan.add( referenceProvider( EMPTY ), document -> { } );
@@ -1379,6 +1417,7 @@ public class MatchSearchPredicateIT {
 			indexMapping.normalizedStringField.document3Value.write( document );
 			indexMapping.whitespaceAnalyzedField.document3Value.write( document );
 			indexMapping.whitespaceLowercaseAnalyzedField.document3Value.write( document );
+			indexMapping.whitespaceLowercaseSearchAnalyzedField.document3Value.write( document );
 			indexMapping.scaledBigDecimal.document3Value.write( document );
 		} );
 		plan.execute().join();
@@ -1469,6 +1508,7 @@ public class MatchSearchPredicateIT {
 
 		final MainFieldModel<String> whitespaceAnalyzedField;
 		final MainFieldModel<String> whitespaceLowercaseAnalyzedField;
+		final MainFieldModel<String> whitespaceLowercaseSearchAnalyzedField;
 
 		final MainFieldModel<BigDecimal> scaledBigDecimal;
 
@@ -1546,6 +1586,12 @@ public class MatchSearchPredicateIT {
 					"brave new world", "BRAVE NEW WORLD", "BRave NeW WoRlD"
 			)
 					.map( root, "whitespaceLowercaseAnalyzed" );
+			whitespaceLowercaseSearchAnalyzedField = MainFieldModel.mapper(
+					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name )
+							.searchAnalyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ),
+					"brave new world", "BRAVE NEW WORLD", "BRave NeW WoRlD"
+			)
+					.map( root, "whitespaceLowercaseSearchAnalyzed" );
 			scaledBigDecimal = MainFieldModel.mapper(
 					c -> c.asBigDecimal().decimalScale( 3 ),
 					new BigDecimal( "739.739" ), BigDecimal.ONE, BigDecimal.TEN
