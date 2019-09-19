@@ -295,28 +295,46 @@ public class SimpleQueryStringSearchPredicateIT {
 
 		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
 		String whitespaceLowercaseAnalyzedField = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
+		String whitespaceLowercaseSearchAnalyzedField = indexMapping.whitespaceLowercaseSearchAnalyzedField.relativeFieldName;
 
+		// Terms are never lower-cased, neither at write nor at query time.
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.simpleQueryString().field( whitespaceAnalyzedField ).matching( "HERE | PANDA" ) )
 				.toQuery();
-
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 
+		// Terms are always lower-cased, both at write and at query time.
 		query = scope.query()
 				.predicate( f -> f.simpleQueryString().field( whitespaceLowercaseAnalyzedField ).matching( "HERE | PANDA" ) )
 				.toQuery();
-
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
+		// Terms are lower-cased only at query time. Because we are overriding the analyzer in the predicate.
 		query = scope.query()
 				.predicate( f -> f.simpleQueryString().field( whitespaceAnalyzedField ).matching( "HERE | PANDA" )
 						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
 				.toQuery();
-
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+
+		// Same here. Terms are lower-cased only at query time. Because we've defined a search analyzer.
+		query = scope.query()
+				.predicate( f -> f.simpleQueryString().field( whitespaceLowercaseSearchAnalyzedField ).matching( "HERE | PANDA" ) )
+				.toQuery();
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+
+		// As for the first query, terms are never lower-cased, neither at write nor at query time.
+		// Because even if we've defined a search analyzer, we are overriding it with an analyzer in the predicate,
+		// since the overriding takes the precedence over the search analyzer.
+		query = scope.query()
+				.predicate( f -> f.simpleQueryString().field( whitespaceLowercaseSearchAnalyzedField ).matching( "HERE | PANDA" )
+						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name ) )
+				.toQuery();
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 	}
 
 	@Test
@@ -837,18 +855,21 @@ public class SimpleQueryStringSearchPredicateIT {
 			document.addValue( indexMapping.analyzedStringField4.reference, PREFIX_1 );
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toLowerCase( Locale.ROOT ) );
 			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toLowerCase( Locale.ROOT ) );
+			document.addValue( indexMapping.whitespaceLowercaseSearchAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toLowerCase( Locale.ROOT ) );
 		} );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_1_AND_TERM_3 );
 			document.addValue( indexMapping.analyzedStringField4.reference, PREFIX_2 );
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toUpperCase( Locale.ROOT ) );
 			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toUpperCase( Locale.ROOT ) );
+			document.addValue( indexMapping.whitespaceLowercaseSearchAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toUpperCase( Locale.ROOT ) );
 		} );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_2_IN_PHRASE );
 			document.addValue( indexMapping.analyzedStringField4.reference, PREFIX_3 );
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2 );
 			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2 );
+			document.addValue( indexMapping.whitespaceLowercaseSearchAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2 );
 		} );
 		plan.add( referenceProvider( DOCUMENT_4 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_4_IN_PHRASE_SLOP_2 );
@@ -927,6 +948,7 @@ public class SimpleQueryStringSearchPredicateIT {
 		final MainFieldModel analyzedStringFieldWithDslConverter;
 		final MainFieldModel whitespaceAnalyzedField;
 		final MainFieldModel whitespaceLowercaseAnalyzedField;
+		final MainFieldModel whitespaceLowercaseSearchAnalyzedField;
 
 		IndexMapping(IndexSchemaElement root) {
 			mapByTypeFields(
@@ -966,6 +988,11 @@ public class SimpleQueryStringSearchPredicateIT {
 					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
 			)
 					.map( root, "whitespaceLowercaseAnalyzed" );
+			whitespaceLowercaseSearchAnalyzedField = MainFieldModel.mapper(
+					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name )
+							.searchAnalyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
+			)
+					.map( root, "whitespaceLowercaseSearchAnalyzed" );
 		}
 	}
 
