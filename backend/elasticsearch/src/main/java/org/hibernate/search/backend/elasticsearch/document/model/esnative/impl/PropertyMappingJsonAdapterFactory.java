@@ -6,16 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.esnative.impl;
 
-import java.util.Map;
-
 import com.google.gson.JsonPrimitive;
-import com.google.gson.reflect.TypeToken;
 
 public class PropertyMappingJsonAdapterFactory extends AbstractTypeMappingJsonAdapterFactory {
-
-	private static final TypeToken<Map<String, PropertyMapping>> FIELD_MAP_TYPE_TOKEN =
-			new TypeToken<Map<String, PropertyMapping>>() {
-			};
 
 	@Override
 	protected <T> void addFields(Builder<T> builder) {
@@ -26,7 +19,6 @@ public class PropertyMappingJsonAdapterFactory extends AbstractTypeMappingJsonAd
 		builder.add( "docValues", Boolean.class );
 		builder.add( "store", Boolean.class );
 		builder.add( "nullValue", JsonPrimitive.class );
-		builder.add( "fields", FIELD_MAP_TYPE_TOKEN );
 		builder.add( "analyzer", String.class );
 		builder.add( "normalizer", String.class );
 		builder.add( "format", new ElasticsearchFormatJsonAdapter() );
