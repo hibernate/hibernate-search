@@ -559,11 +559,6 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 			validateEqualWithDefault( errorCollector, "term_vector", expectedMapping.getTermVector(), actualMapping.getTermVector(), "no" );
 
 			super.validate( errorCollector, expectedMapping, actualMapping );
-
-			// Validate fields with the same method as properties, since the content is about the same
-			validateAll( errorCollector, ValidationContextType.MAPPING_PROPERTY_FIELD, MESSAGES.propertyFieldMissing(),
-					getPropertyMappingValidator(),
-					expectedMapping.getFields(), actualMapping.getFields() );
 		}
 	}
 
