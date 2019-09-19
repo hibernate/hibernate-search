@@ -129,11 +129,32 @@ because that might indicate a configuration issue.
 To disable this warning, set the `hibernate.search.configuration_property_checking.strategy`
 property to `ignore`.
 
-[[configuration-bean-resolution]]
-== Bean resolution
+[[configuration-bean]]
+== Beans
 
 Hibernate Search allows to plug in references to custom beans in various places:
 configuration properties, mapping annotations, arguments to APIs, ...
+
+This section describes <<configuration-bean-frameworks,the supported frameworks>>,
+<<configuration-bean-resolution,how the beans are resolved>>
+and <<configuration-bean-injection,how the beans can be injected with other beans>>.
+
+[[configuration-bean-frameworks]]
+=== Supported frameworks
+
+When using the Hibernate Search integration into Hibernate ORM,
+all dependency injection frameworks supported by Hibernate ORM are supported.
+
+This includes, but may not be limited to:
+
+* all CDI-compliant frameworks, including link:{wildflyUrl}[WildFly] and link:{quarkusUrl}[Quarkus];
+* the link:{springUrl}[Spring] framework.
+
+When the framework is not supported, or when using Hibernate Search without Hibernate ORM,
+beans can only be retrieved using reflection by calling the public, no-arg constructor of the referenced type.
+
+[[configuration-bean-resolution]]
+=== Bean resolution
 
 Everywhere a custom bean reference is expected, three types of references are accepted:
 
@@ -161,3 +182,58 @@ which is accepted in configuration properties and APIs.
 This interface allows to plug in custom instantiation and cleanup code.
 See the javadoc of this interface for details.
 ====
+
+[[configuration-bean-injection]]
+=== Bean injection
+// Search 5 anchors backward compatibility
+[[section-bridge-dependency-injection]]
+
+All beans <<configuration-bean-resolution,resolved by Hibernate Search>>
+using a <<configuration-bean-frameworks,supported framework>>
+can take advantage of injection features of this framework.
+
+For example a bean can be injected with another bean
+by annotating one of its fields in the bridge with `@Inject`.
+
+Lifecycle annotations such as `@PostConstruct` should also work as expected.
+
+Even when not using any framework,
+it is still possible to take advantage of the `BeanResolver`.
+This component, passed to several methods during bootstrap,
+exposes several methods to <<configuration-bean-resolution,resolve>>
+a reference into a bean,
+exposing programmatically what would usually be achieved with an `@Inject` annotation.
+See the javadoc of `BeanResolver` for more information.
+
+[[configuration-bean-lifecycle]]
+=== Bean lifecycle
+
+As soon as beans are no longer needed,
+Hibernate Search will release them and let the dependency injection framework
+call the appropriate methods (`@PreDestroy`, ...).
+
+Some beans are only necessary during bootstrap,
+such as ``ElasticsearchAnalysisConfigurer``s,
+so they will be released just after bootstrap.
+
+Other beans are necessary at runtime, such as ``ValueBridge``s,
+so they will be released on shutdown.
+
+[WARNING]
+====
+Be careful to define the scope of your beans as appropriate.
+
+Immutable beans or beans used only once such as `ElasticsearchAnalysisConfigurer`
+may safely most scopes,
+but some beans are expected to be mutable and instantiated multiple times,
+such as for example `PropertyBinder`.
+
+For these beans, it is recommended to use the "dependent" scope (CDI terminology)
+or the "prototype" scope (Spring terminology).
+When in doubt, this is also generally the safest choice
+for beans injected into Hibernate Search.
+====
+
+Beans <<configuration-bean-resolution,resolved by Hibernate Search>>
+using a <<configuration-bean-frameworks,supported framework>>
+can take advantage of injection features of this framework.
