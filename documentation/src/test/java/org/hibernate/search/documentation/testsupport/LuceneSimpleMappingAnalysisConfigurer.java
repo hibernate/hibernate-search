@@ -12,6 +12,7 @@ import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurationC
 import org.apache.lucene.analysis.core.LowerCaseFilterFactory;
 import org.apache.lucene.analysis.miscellaneous.ASCIIFoldingFilterFactory;
 import org.apache.lucene.analysis.ngram.EdgeNGramFilterFactory;
+import org.apache.lucene.analysis.pattern.PatternReplaceCharFilterFactory;
 import org.apache.lucene.analysis.snowball.SnowballPorterFilterFactory;
 import org.apache.lucene.analysis.standard.StandardTokenizerFactory;
 
@@ -57,5 +58,10 @@ class LuceneSimpleMappingAnalysisConfigurer implements LuceneAnalysisConfigurer 
 		context.normalizer( "name" ).custom()
 				.tokenFilter( LowerCaseFilterFactory.class )
 				.tokenFilter( ASCIIFoldingFilterFactory.class );
+
+		context.normalizer( "isbn" ).custom()
+				.charFilter( PatternReplaceCharFilterFactory.class )
+						.param( "pattern", "-+" )
+						.param( "replacement", "" );
 	}
 }

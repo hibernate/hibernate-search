@@ -45,5 +45,12 @@ class ElasticsearchSimpleMappingAnalysisConfigurer implements ElasticsearchAnaly
 
 		context.normalizer( "name" ).custom()
 				.tokenFilters( "lowercase", "asciifolding" );
+
+		context.normalizer( "isbn" ).custom()
+				.charFilters( "removeHyphens" );
+
+		context.charFilter( "removeHyphens" ).type( "pattern_replace" )
+				.param( "pattern", "-+" )
+				.param( "replacement", "" );
 	}
 }
