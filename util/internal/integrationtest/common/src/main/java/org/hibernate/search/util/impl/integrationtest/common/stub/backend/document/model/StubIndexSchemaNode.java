@@ -138,6 +138,11 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 			return this;
 		}
 
+		public Builder searchAnalyzerName(String searchAnalyzerName) {
+			attribute( "searchAnalyzerName", searchAnalyzerName );
+			return this;
+		}
+
 		public Builder normalizerName(String normalizerName) {
 			attribute( "normalizerName", normalizerName );
 			return this;

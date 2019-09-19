@@ -347,6 +347,10 @@ class AnnotationProcessorProvider {
 			PropertyMappingFullTextFieldOptionsStep fieldContext = mappingContext.fullTextField( fieldName )
 					.analyzer( annotation.analyzer() );
 
+			if ( !annotation.searchAnalyzer().isEmpty() ) {
+				fieldContext.searchAnalyzer( annotation.searchAnalyzer() );
+			}
+
 			Norms norms = annotation.norms();
 			if ( !Norms.DEFAULT.equals( norms ) ) {
 				fieldContext.norms( norms );

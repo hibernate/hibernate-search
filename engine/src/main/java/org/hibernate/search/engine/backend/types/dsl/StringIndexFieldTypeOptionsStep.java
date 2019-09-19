@@ -29,6 +29,18 @@ public interface StringIndexFieldTypeOptionsStep<S extends StringIndexFieldTypeO
 	S analyzer(String analyzerName);
 
 	/**
+	 * Overrides {@link #analyzer} to use for query parameters at search time.
+	 * <p>
+	 * A search analyzer can only be set if an analyzer was set through {@link #analyzer(String)}.
+	 *
+	 * @param searchAnalyzerName The name of an analyzer to apply to values when querying the index only.
+	 * It overrides the {@link #analyzer(String)} when querying the index.
+	 * See the reference documentation for more information about analyzers and how to define them.
+	 * @return {@code this}, for method chaining.
+	 */
+	S searchAnalyzer(String searchAnalyzerName);
+
+	/**
 	 * Define the type as normalized.
 	 * <p>
 	 * Incompatible with {@link #analyzer(String)}.
