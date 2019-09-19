@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.documentation.mapper.orm.identifiermapping.customtype;
+package org.hibernate.search.documentation.testsupport.data;
 
 import javax.persistence.AttributeConverter;
 
@@ -17,6 +17,6 @@ public class ISBNAttributeConverter implements AttributeConverter<ISBN, String> 
 
 	@Override
 	public ISBN convertToEntityAttribute(String dbData) {
-		return dbData == null ? null : new ISBN( dbData );
+		return dbData == null ? null : ISBN.parse( dbData );
 	}
 }

@@ -13,6 +13,7 @@ import java.util.List;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
+import org.hibernate.search.documentation.testsupport.data.ISBN;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyName;
@@ -58,7 +59,7 @@ public class IdentifierMappingCustomTypeIT {
 	public void smoke() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			Book book = new Book();
-			book.setIsbn( new ISBN( "9780586008355" ) );
+			book.setIsbn( ISBN.parse( "978-0-58-600835-5" ) );
 
 			entityManager.persist( book );
 		} );
@@ -73,7 +74,7 @@ public class IdentifierMappingCustomTypeIT {
 
 			assertThat( result )
 					.extracting( DocumentReference::getId )
-					.containsExactly( "9780586008355" );
+					.containsExactly( "978-0-58-600835-5" );
 		} );
 	}
 
