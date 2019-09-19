@@ -585,6 +585,7 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 
 	private void validateAnalyzerOptions(ValidationErrorCollector errorCollector, PropertyMapping expectedMapping, PropertyMapping actualMapping) {
 		validateEqualWithDefault( errorCollector, "analyzer", expectedMapping.getAnalyzer(), actualMapping.getAnalyzer(), "default" );
+		validateEqualWithoutDefault( errorCollector, "search_analyzer", expectedMapping.getSearchAnalyzer(), actualMapping.getSearchAnalyzer() );
 		validateEqualWithoutDefault( errorCollector, "normalizer", expectedMapping.getNormalizer(), actualMapping.getNormalizer() );
 	}
 

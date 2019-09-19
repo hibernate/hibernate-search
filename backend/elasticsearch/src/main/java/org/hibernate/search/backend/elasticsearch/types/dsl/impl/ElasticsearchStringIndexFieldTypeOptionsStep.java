@@ -41,7 +41,6 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private String analyzerName;
-	// TODO HSEARCH-3042 use this value
 	private String searchAnalyzerName;
 	private String normalizerName;
 	private Projectable projectable = Projectable.DEFAULT;
@@ -130,6 +129,7 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 		if ( analyzerName != null ) {
 			mapping.setType( DataTypes.TEXT );
 			mapping.setAnalyzer( analyzerName );
+			mapping.setSearchAnalyzer( searchAnalyzerName );
 			mapping.setTermVector( resolveTermVector() );
 
 			if ( normalizerName != null ) {

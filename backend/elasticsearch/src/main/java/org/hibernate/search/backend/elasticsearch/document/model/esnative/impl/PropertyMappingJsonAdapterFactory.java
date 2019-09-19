@@ -20,6 +20,7 @@ public class PropertyMappingJsonAdapterFactory extends AbstractTypeMappingJsonAd
 		builder.add( "store", Boolean.class );
 		builder.add( "nullValue", JsonPrimitive.class );
 		builder.add( "analyzer", String.class );
+		builder.add( "searchAnalyzer", String.class );
 		builder.add( "normalizer", String.class );
 		builder.add( "format", new ElasticsearchFormatJsonAdapter() );
 		builder.add( "scalingFactor", Double.class );

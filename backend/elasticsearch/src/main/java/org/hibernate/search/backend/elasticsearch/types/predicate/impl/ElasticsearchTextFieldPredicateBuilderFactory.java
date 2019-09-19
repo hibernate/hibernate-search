@@ -31,7 +31,8 @@ public class ElasticsearchTextFieldPredicateBuilderFactory
 			ElasticsearchFieldCodec<String> codec, PropertyMapping mapping) {
 		super( searchable, converter, rawConverter, codec );
 		this.type = mapping.getType();
-		this.analyzer = mapping.getAnalyzer();
+		this.analyzer = ( mapping.getSearchAnalyzer() != null ) ?
+				mapping.getSearchAnalyzer() : mapping.getAnalyzer();
 		this.normalizer = mapping.getNormalizer();
 	}
 
