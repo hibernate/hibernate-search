@@ -222,28 +222,46 @@ public class PhraseSearchPredicateIT {
 
 		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
 		String whitespaceLowercaseAnalyzedField = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
+		String whitespaceLowercaseSearchAnalyzedField = indexMapping.whitespaceLowercaseSearchAnalyzedField.relativeFieldName;
 
+		// Terms are never lower-cased, neither at write nor at query time.
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.phrase().field( whitespaceAnalyzedField ).matching( "ONCE UPON" ) )
 				.toQuery();
-
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 
+		// Terms are always lower-cased, both at write and at query time.
 		query = scope.query()
 				.predicate( f -> f.phrase().field( whitespaceLowercaseAnalyzedField ).matching( "ONCE UPON" ) )
 				.toQuery();
-
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
+		// Terms are lower-cased only at query time. Because we are overriding the analyzer in the predicate.
 		query = scope.query()
 				.predicate( f -> f.phrase().field( whitespaceAnalyzedField ).matching( "ONCE UPON" )
 						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name ) )
 				.toQuery();
-
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+
+		// Same here. Terms are lower-cased only at query time. Because we've defined a search analyzer.
+		query = scope.query()
+				.predicate( f -> f.phrase().field( whitespaceLowercaseSearchAnalyzedField ).matching( "ONCE UPON" ) )
+				.toQuery();
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+
+		// As for the first query, terms are never lower-cased, neither at write nor at query time.
+		// Because even if we've defined a search analyzer, we are overriding it with an analyzer in the predicate,
+		// since the overriding takes precedence over the search analyzer.
+		query = scope.query()
+				.predicate( f -> f.phrase().field( whitespaceLowercaseSearchAnalyzedField ).matching( "ONCE UPON" )
+						.analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name ) )
+				.toQuery();
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
 	}
 
 	@Test
@@ -736,12 +754,14 @@ public class PhraseSearchPredicateIT {
 			document.addValue( indexMapping.analyzedStringFieldWithDslConverter.reference, PHRASE_1_TEXT_EXACT_MATCH );
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toLowerCase( Locale.ROOT ) );
 			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toLowerCase( Locale.ROOT ) );
+			document.addValue( indexMapping.whitespaceLowercaseSearchAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toLowerCase( Locale.ROOT ) );
 		} );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_1_MATCH );
 			document.addValue( indexMapping.analyzedStringField2.reference, PHRASE_2_TEXT_EXACT_MATCH );
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toUpperCase( Locale.ROOT ) );
 			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toUpperCase( Locale.ROOT ) );
+			document.addValue( indexMapping.whitespaceLowercaseSearchAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toUpperCase( Locale.ROOT ) );
 		} );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_2_MATCH );
@@ -749,6 +769,7 @@ public class PhraseSearchPredicateIT {
 			document.addValue( indexMapping.analyzedStringField3.reference, PHRASE_1_TEXT_EXACT_MATCH );
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
 			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
+			document.addValue( indexMapping.whitespaceLowercaseSearchAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
 		plan.add( referenceProvider( DOCUMENT_4 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_3_MATCH );
@@ -825,6 +846,7 @@ public class PhraseSearchPredicateIT {
 		final MainFieldModel analyzedStringFieldWithDslConverter;
 		final MainFieldModel whitespaceAnalyzedField;
 		final MainFieldModel whitespaceLowercaseAnalyzedField;
+		final MainFieldModel whitespaceLowercaseSearchAnalyzedField;
 
 		IndexMapping(IndexSchemaElement root) {
 			mapByTypeFields(
@@ -860,6 +882,11 @@ public class PhraseSearchPredicateIT {
 					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
 			)
 					.map( root, "whitespaceLowercaseAnalyzed" );
+			whitespaceLowercaseSearchAnalyzedField = MainFieldModel.mapper(
+					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name )
+							.searchAnalyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
+			)
+					.map( root, "whitespaceLowercaseSearchAnalyzed" );
 		}
 	}
 
