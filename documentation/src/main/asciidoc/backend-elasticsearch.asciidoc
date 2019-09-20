@@ -348,6 +348,9 @@ For these reasons, migrating your mapping on a live cluster should be carefully 
 [[backend-elasticsearch-field-types]]
 == Field types
 
+[[backend-elasticsearch-field-types-available]]
+=== Available field types
+
 [NOTE]
 ====
 Some types are not supported directly by the Elasticsearch backend,
@@ -414,7 +417,11 @@ The Elasticsearch `date` type does not support the whole range of years that can
 * Elasticsearch supports years ranging from `-292.275.054` to `292.278.993`.
 ====
 
-// TODO also document "extension" types
+[[backend-elasticsearch-field-types-extension]]
+=== Index field type DSL extension
+
+include::todo-placeholder.asciidoc[]
+// TODO HSEARCH-3711 also document "extension" types
 
 [[backend-elasticsearch-analysis]]
 == Analysis

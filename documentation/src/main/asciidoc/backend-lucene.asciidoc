@@ -318,6 +318,9 @@ You can find a full reference of available properties in the Hibernate Search ja
 [[backend-lucene-field-types]]
 == Field types
 
+[[backend-lucene-field-types-available]]
+=== Available field types
+
 [NOTE]
 ====
 Some types are not supported directly by the Elasticsearch backend,
@@ -362,7 +365,11 @@ Date/time types do not support the whole range of years that can be represented 
 * The Lucene backend supports dates ranging from year `-292.275.054` to year `292.278.993`.
 ====
 
-// TODO also document "extension" types
+[[backend-lucene-field-types-extension]]
+=== Index field type DSL extensions
+
+include::todo-placeholder.asciidoc[]
+// TODO HSEARCH-3711 also document "extension" types
 
 [[backend-lucene-analysis]]
 == Analysis
