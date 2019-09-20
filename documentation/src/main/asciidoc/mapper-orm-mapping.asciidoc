@@ -884,6 +884,7 @@ and its `authors` property is annotated with  `@IndexedEmbedded`:
 **** firstName = Ty
 **** lastName = Frank
 
+[[mapper-orm-indexedembedded-storage-flattened]]
 ==== `DEFAULT` or `FLATTENED` storage
 
 By default, indexed-embedded fields are "flattened",
@@ -907,6 +908,7 @@ The book given in example
 would show up as a match to a query such as `authors.firstname:Ty AND authors.lastname:Abraham`,
 even though "Ty Abraham" is not one of this book's authors.
 
+[[mapper-orm-indexedembedded-storage-nested]]
 ==== `NESTED` storage
 
 When indexed-embedded elements are "nested",
