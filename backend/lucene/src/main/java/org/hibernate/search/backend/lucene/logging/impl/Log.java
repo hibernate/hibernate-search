@@ -571,4 +571,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 103, value = "This field does not support aggregations.")
 	SearchException unsupportedDSLAggregations(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 104, value = "Cannot apply a search analyzer if an analyzer has not been defined on the same field." +
+			" Search analyzer: '%1$s'.")
+	SearchException searchAnalyzerWithoutAnalyzer(String searchAnalyzer, @Param EventContext context);
 }

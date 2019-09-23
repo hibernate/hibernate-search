@@ -37,6 +37,8 @@ class LuceneStringIndexFieldTypeOptionsStep
 
 	private String analyzerName;
 	private Analyzer analyzer;
+
+	private String searchAnalyzerName;
 	private Analyzer searchAnalyzer;
 
 	private String normalizerName;
@@ -63,6 +65,7 @@ class LuceneStringIndexFieldTypeOptionsStep
 
 	@Override
 	public LuceneStringIndexFieldTypeOptionsStep searchAnalyzer(String searchAnalyzerName) {
+		this.searchAnalyzerName = searchAnalyzerName;
 		this.searchAnalyzer = getAnalysisDefinitionRegistry().getAnalyzerDefinition( searchAnalyzerName );
 		if ( searchAnalyzer == null ) {
 			throw log.unknownAnalyzer( searchAnalyzerName, getBuildContext().getEventContext() );
@@ -123,6 +126,9 @@ class LuceneStringIndexFieldTypeOptionsStep
 			if ( resolvedAggregable ) {
 				throw log.cannotUseAnalyzerOnAggregableField( analyzerName, getBuildContext().getEventContext() );
 			}
+		}
+		else if ( searchAnalyzer != null ) {
+			throw log.searchAnalyzerWithoutAnalyzer( searchAnalyzerName, getBuildContext().getEventContext() );
 		}
 
 		Analyzer analyzerOrNormalizer = analyzer != null ? analyzer : normalizer;
