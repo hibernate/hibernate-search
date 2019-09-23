@@ -16,6 +16,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingStateProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
@@ -63,6 +64,9 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	private final TypeMetadataContributorProvider<PojoTypeMetadataContributor> contributorProvider;
 	private final boolean implicitProvidedId;
 	private final boolean multiTenancyEnabled;
+
+	private final ErrorHandler errorHandler;
+
 	private final PojoMapperDelegate<MPBS> delegate;
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
 	private final ContainerExtractorBinder extractorBinder;
@@ -88,6 +92,9 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		this.contributorProvider = contributorProvider;
 		this.implicitProvidedId = implicitProvidedId;
 		this.multiTenancyEnabled = multiTenancyEnabled;
+
+		this.errorHandler = buildContext.getErrorHandler();
+
 		this.delegate = delegate;
 
 		typeAdditionalMetadataProvider = new PojoTypeAdditionalMetadataProvider(
@@ -264,6 +271,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			}
 
 			mappingDelegate = new PojoMappingDelegateImpl(
+					errorHandler,
 					indexedTypeManagerContainerBuilder.build(),
 					containedTypeManagerContainerBuilder.build()
 			);

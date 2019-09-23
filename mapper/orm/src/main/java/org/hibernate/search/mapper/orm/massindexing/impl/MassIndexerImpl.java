@@ -176,7 +176,8 @@ public class MassIndexerImpl implements MassIndexer {
 				typesToIndexInParallel, documentBuilderThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,
 				optimizeAtEnd, purgeAtStart, optimizeAfterPurge,
-				monitor, idFetchSize, idLoadingTransactionTimeout
+				monitor,
+				idFetchSize, idLoadingTransactionTimeout
 		);
 	}
 

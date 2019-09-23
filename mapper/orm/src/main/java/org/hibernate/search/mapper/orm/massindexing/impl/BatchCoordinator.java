@@ -60,8 +60,10 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 			Set<Class<?>> rootEntities, PojoScopeWorkspace scopeWorkspace,
 			int typesToIndexInParallel, int documentBuilderThreads, CacheMode cacheMode,
 			int objectLoadingBatchSize, long objectsLimit, boolean optimizeAtEnd,
-			boolean purgeAtStart, boolean optimizeAfterPurge, MassIndexingMonitor monitor,
+			boolean purgeAtStart, boolean optimizeAfterPurge,
+			MassIndexingMonitor monitor,
 			int idFetchSize, Integer transactionTimeout) {
+		super( mappingContext.getErrorHandler() );
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
 		this.rootEntities = rootEntities;
@@ -136,7 +138,8 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 				indexedType, idAttributeOfIndexedType,
 				documentBuilderThreads, cacheMode,
 				objectLoadingBatchSize, endAllSignal,
-				monitor, objectsLimit, idFetchSize, transactionTimeout
+				monitor, getErrorHandler(),
+				objectsLimit, idFetchSize, transactionTimeout
 		);
 	}
 
