@@ -13,9 +13,11 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingFinalizationContext;
@@ -33,6 +35,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 
 	private final BeanProvider beanProvider;
 	private final BeanResolver beanResolver;
+	private final BeanHolder<? extends ErrorHandler> errorHandlerHolder;
 
 	private final Map<MappingKey<?, ?>, MappingPartialBuildState> partiallyBuiltMappings;
 	private final Map<MappingKey<?, ?>, MappingImplementor<?>> fullyBuiltMappings = new LinkedHashMap<>();
@@ -45,12 +48,14 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 
 	SearchIntegrationPartialBuildStateImpl(
 			BeanProvider beanProvider, BeanResolver beanResolver,
+			BeanHolder<? extends ErrorHandler> errorHandlerHolder,
 			Map<MappingKey<?, ?>, MappingPartialBuildState> partiallyBuiltMappings,
 			Map<String, BackendPartialBuildState> partiallyBuiltBackends,
 			Map<String, IndexManagerPartialBuildState> partiallyBuiltIndexManagers,
 			ConfigurationPropertyChecker partialConfigurationPropertyChecker) {
 		this.beanProvider = beanProvider;
 		this.beanResolver = beanResolver;
+		this.errorHandlerHolder = errorHandlerHolder;
 		this.partiallyBuiltMappings = partiallyBuiltMappings;
 		this.partiallyBuiltBackends = partiallyBuiltBackends;
 		this.partiallyBuiltIndexManagers = partiallyBuiltIndexManagers;
@@ -66,6 +71,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 			closer.pushAll( IndexManagerImplementor::close, fullyBuiltIndexManagers.values() );
 			closer.pushAll( BackendPartialBuildState::closeOnFailure, partiallyBuiltBackends.values() );
 			closer.pushAll( BackendImplementor::close, fullyBuiltBackends.values() );
+			closer.pushAll( BeanHolder::close, errorHandlerHolder );
 			closer.pushAll( BeanProvider::close, beanProvider );
 		}
 	}
@@ -147,6 +153,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 
 			return new SearchIntegrationImpl(
 					beanProvider,
+					errorHandlerHolder,
 					fullyBuiltMappings,
 					fullyBuiltBackends,
 					fullyBuiltIndexManagers

@@ -20,12 +20,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
-import org.hibernate.search.engine.common.spi.LogErrorHandler;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.impl.ConfiguredBeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
@@ -55,6 +58,12 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
+
+	private static final ConfigurationProperty<BeanReference<? extends ErrorHandler>> ERROR_HANDLER =
+			ConfigurationProperty.forKey( EngineSpiSettings.ERROR_HANDLER )
+					.asBeanReference( ErrorHandler.class )
+					.withDefault( EngineSpiSettings.Defaults.ERROR_HANDLER )
+					.build();
 
 	private static final int FAILURE_LIMIT = 100;
 
@@ -124,6 +133,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 	@Override
 	public SearchIntegrationPartialBuildState prepareBuild() {
+		BeanHolder<? extends ErrorHandler> errorHandlerHolder = null;
 		IndexManagerBuildingStateHolder indexManagerBuildingStateHolder = null;
 		// Use a LinkedHashMap for deterministic iteration
 		List<MappingBuildingState<?, ?>> mappingBuildingStates = new ArrayList<>();
@@ -160,7 +170,8 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			}
 
 			BeanResolver beanResolver = new ConfiguredBeanResolver( serviceResolver, beanProvider, propertySource );
-			ErrorHandler errorHandler = new LogErrorHandler();
+			errorHandlerHolder = ERROR_HANDLER.getAndTransform( propertySource, beanResolver::resolve );
+			ErrorHandler errorHandler = errorHandlerHolder.get();
 			RootBuildContext rootBuildContext = new RootBuildContext(
 					propertySource,
 					classResolver, resourceResolver, beanResolver,
@@ -225,6 +236,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 			return new SearchIntegrationPartialBuildStateImpl(
 					beanProvider, beanResolver,
+					errorHandlerHolder,
 					partiallyBuiltMappings,
 					indexManagerBuildingStateHolder.getBackendPartialBuildStates(),
 					indexManagerBuildingStateHolder.getIndexManagersByName(),
@@ -259,6 +271,8 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			}
 
 			SuppressingCloser closer = new SuppressingCloser( rethrownException );
+			// Release the error handler before aborting
+			closer.push( errorHandlerHolder );
 			// Close the mappers and mappings created so far before aborting
 			closer.pushAll( MappingPartialBuildState::closeOnFailure, partiallyBuiltMappings.values() );
 			closer.pushAll( MappingBuildingState::closeOnFailure, mappingBuildingStates );
