@@ -128,7 +128,8 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					typeFactoryProvider,
 					userFacingGson,
 					analysisDefinitionRegistry,
-					getMultiTenancyStrategy( name, propertySource )
+					getMultiTenancyStrategy( name, propertySource ),
+					buildContext.getErrorHandler()
 			);
 		}
 		catch (RuntimeException e) {

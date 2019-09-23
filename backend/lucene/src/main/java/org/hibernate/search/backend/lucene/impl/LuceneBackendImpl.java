@@ -26,7 +26,7 @@ import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
-import org.hibernate.search.engine.common.spi.LogErrorHandler;
+import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -53,7 +53,8 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 	LuceneBackendImpl(String name, BeanHolder<? extends DirectoryProvider> directoryProviderHolder,
 			LuceneWorkFactory workFactory,
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
-			MultiTenancyStrategy multiTenancyStrategy) {
+			MultiTenancyStrategy multiTenancyStrategy,
+			ErrorHandler errorHandler) {
 		this.name = name;
 		this.directoryProviderHolder = directoryProviderHolder;
 
@@ -69,8 +70,7 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 				eventContext, directoryProviderHolder.get(),
 				workFactory, multiTenancyStrategy,
 				analysisDefinitionRegistry,
-				// TODO the LogErrorHandler should be replaced with a user-configurable instance at some point. See HSEARCH-3110.
-				new LogErrorHandler(),
+				errorHandler,
 				readOrchestrator
 		);
 	}

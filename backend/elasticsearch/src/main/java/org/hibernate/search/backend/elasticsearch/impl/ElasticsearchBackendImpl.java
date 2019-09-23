@@ -29,7 +29,7 @@ import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
-import org.hibernate.search.engine.common.spi.LogErrorHandler;
+import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
@@ -67,15 +67,15 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 			ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
 			Gson userFacingGson,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
-			MultiTenancyStrategy multiTenancyStrategy) {
+			MultiTenancyStrategy multiTenancyStrategy,
+			ErrorHandler errorHandler) {
 		this.link = link;
 		this.name = name;
 
 		this.orchestratorProvider = new ElasticsearchWorkOrchestratorProvider(
 				"Elasticsearch parallel work orchestrator for backend " + name,
 				link,
-				// TODO the LogErrorHandler should be replaced with a user-configurable instance at some point. See HSEARCH-3110.
-				new LogErrorHandler()
+				errorHandler
 		);
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.multiTenancyStrategy = multiTenancyStrategy;
