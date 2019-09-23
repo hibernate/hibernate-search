@@ -13,7 +13,9 @@ import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
+import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
@@ -26,16 +28,19 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BeanProvider beanProvider;
+	private final BeanHolder<? extends ErrorHandler> errorHandlerHolder;
 
 	private final Map<MappingKey<?, ?>, MappingImplementor<?>> mappings;
 	private final Map<String, BackendImplementor<?>> backends;
 	private final Map<String, IndexManagerImplementor<?>> indexManagers;
 
 	SearchIntegrationImpl(BeanProvider beanProvider,
+			BeanHolder<? extends ErrorHandler> errorHandlerHolder,
 			Map<MappingKey<?, ?>, MappingImplementor<?>> mappings,
 			Map<String, BackendImplementor<?>> backends,
 			Map<String, IndexManagerImplementor<?>> indexManagers) {
 		this.beanProvider = beanProvider;
+		this.errorHandlerHolder = errorHandlerHolder;
 		this.mappings = mappings;
 		this.backends = backends;
 		this.indexManagers = indexManagers;
@@ -76,6 +81,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 			closer.pushAll( MappingImplementor::close, mappings.values() );
 			closer.pushAll( IndexManagerImplementor::close, indexManagers.values() );
 			closer.pushAll( BackendImplementor::close, backends.values() );
+			closer.pushAll( BeanHolder::close, errorHandlerHolder );
 			closer.pushAll( BeanProvider::close, beanProvider );
 		}
 	}

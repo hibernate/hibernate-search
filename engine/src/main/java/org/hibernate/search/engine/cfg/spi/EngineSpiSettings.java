@@ -9,6 +9,8 @@ package org.hibernate.search.engine.cfg.spi;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.search.engine.common.spi.ErrorHandler;
+import org.hibernate.search.engine.common.spi.LogErrorHandler;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 
@@ -33,6 +35,15 @@ public class EngineSpiSettings {
 	public static final String BEAN_CONFIGURERS = "bean_configurers";
 
 	/**
+	 * The {@link org.hibernate.search.engine.common.spi.ErrorHandler} instance to use at runtime.
+	 * <p>
+	 * Expects a reference to a bean of type {@link org.hibernate.search.engine.common.spi.ErrorHandler}.
+	 * <p>
+	 * Defaults to a logging handler.
+	 */
+	public static final String ERROR_HANDLER = "error_handler";
+
+	/**
 	 * Default values for the different settings if no values are given.
 	 */
 	public static final class Defaults {
@@ -41,5 +52,7 @@ public class EngineSpiSettings {
 		}
 
 		public static final List<BeanReference<? extends BeanConfigurer>> BEAN_CONFIGURERS = Collections.emptyList();
+
+		public static final BeanReference<? extends ErrorHandler> ERROR_HANDLER = BeanReference.of( LogErrorHandler.class );
 	}
 }
