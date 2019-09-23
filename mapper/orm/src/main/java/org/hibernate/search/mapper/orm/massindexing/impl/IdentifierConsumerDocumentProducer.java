@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.LongAdder;
 import javax.persistence.LockModeType;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -28,7 +29,6 @@ import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
-import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -205,10 +205,12 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		monitor.entitiesLoaded( entities.size() );
 		CompletableFuture<?>[] futures = new CompletableFuture<?>[entities.size()];
 
+		LongAdder failedEntitiesAdder = new LongAdder();
 		for ( int i = 0; i < entities.size(); i++ ) {
 			final E entity = entities.get( i );
 			futures[i] = index( indexer, entity );
 			futures[i].exceptionally( exception -> {
+				failedEntitiesAdder.increment();
 				handleException( entity, exception );
 				return null;
 			} );
@@ -219,7 +221,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 				.exceptionally( exception -> null )
 				.join();
 
-		monitor.documentsAdded( entities.size() );
+		monitor.documentsAdded( entities.size() - failedEntitiesAdder.longValue() );
 	}
 
 	private CompletableFuture<?> index(PojoIndexer indexer, E entity) throws InterruptedException {
@@ -229,9 +231,19 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			throw new InterruptedException();
 		}
 
-		CompletableFuture<?> future = Futures.create( () -> indexer.add( entity ) );
+		CompletableFuture<?> future;
+		try {
+			future = indexer.add( entity );
+		}
+		catch (RuntimeException e) {
+			future = new CompletableFuture<>();
+			future.completeExceptionally( e );
+			return future;
+		}
 
+		// Only if the above succeeded
 		monitor.documentsBuilt( 1 );
+
 		return future;
 	}
 
