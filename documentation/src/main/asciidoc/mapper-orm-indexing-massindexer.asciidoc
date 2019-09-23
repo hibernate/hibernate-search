@@ -180,6 +180,19 @@ should not cause any problem.
 value to avoid loading too many entities accidentally. The value defined must be greater than 0.
 The parameter is not used by default. It is equivalent to keyword `LIMIT` in SQL.
 
+|`monitor(MassIndexingMonitor)`
+|A logging monitor.
+|
+The component responsible for monitoring progress of mass indexing.
++
+As a `MassIndexer` can take some time to finish its job,
+it is often necessary to monitor its progress.
+The default, built-in monitor logs progress periodically at the `INFO` level,
+but a custom monitor can be set by implementing the `MassIndexingMonitor` interface
+and passing an instance using the `monitor` method.
++
+Implementations of `MassIndexingMonitor` must be threadsafe.
+
 |===
 
 [[mapper-orm-indexing-massindexer-tuning]]
