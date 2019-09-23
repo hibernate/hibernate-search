@@ -26,10 +26,10 @@ public class Book {
 	@GeneratedValue
 	private Integer id;
 
-	@Convert(converter = ISBNAttributeConverter.class)
-	@KeywordField( // <1>
-			valueBridge = @ValueBridgeRef(type = ISBNValueBridge.class), // <2>
-			normalizer = "isbn" // <3>
+	@Convert(converter = ISBNAttributeConverter.class) // <1>
+	@KeywordField( // <2>
+			valueBridge = @ValueBridgeRef(type = ISBNValueBridge.class), // <3>
+			normalizer = "isbn" // <4>
 	)
 	private ISBN isbn;
 

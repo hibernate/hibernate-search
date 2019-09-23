@@ -27,10 +27,10 @@ public class Book {
 	@GeneratedValue
 	private Integer id;
 
-	@Convert(converter = ISBNAttributeConverter.class)
-	@KeywordField( // <1>
-			valueBinder = @ValueBinderRef(type = ISBNValueBinder.class), // <2>
-			sortable = Sortable.YES // <3>
+	@Convert(converter = ISBNAttributeConverter.class) // <1>
+	@KeywordField( // <2>
+			valueBinder = @ValueBinderRef(type = ISBNValueBinder.class), // <3>
+			sortable = Sortable.YES // <4>
 	)
 	private ISBN isbn;
 
