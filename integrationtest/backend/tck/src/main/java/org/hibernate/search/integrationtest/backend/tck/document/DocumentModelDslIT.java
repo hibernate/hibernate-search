@@ -477,6 +477,32 @@ public class DocumentModelDslIT {
 	}
 
 	@Test
+	public void searchAnalyzerWithoutAnalyzer() {
+		SubTest.expectException(
+				"Setting a search analyzer, without setting an analyzer on the same field",
+				() -> setup( ctx -> {
+					IndexSchemaElement root = ctx.getSchemaElement();
+					root.field(
+							"myField",
+							f -> f.asString()
+									.searchAnalyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
+					)
+							.toReference();
+				} )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( TYPE_NAME )
+						.indexContext( INDEX_NAME )
+						.failure(
+								"Cannot apply a search analyzer if an analyzer has not been defined on the same field",
+								"'" + DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name + "'"
+						)
+						.build() );
+	}
+
+	@Test
 	public void missingGetReferenceCall() {
 		for ( Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, ?>> typedContextFunction : MAIN_TYPES ) {
 			SubTest.expectException(

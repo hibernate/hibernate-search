@@ -149,6 +149,10 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 			}
 		}
 		else {
+			if ( searchAnalyzerName != null ) {
+				throw log.searchAnalyzerWithoutAnalyzer( searchAnalyzerName, getBuildContext().getEventContext() );
+			}
+
 			mapping.setType( DataTypes.KEYWORD );
 			mapping.setNormalizer( normalizerName );
 			mapping.setDocValues( resolvedSortable || resolvedAggregable );
