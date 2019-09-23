@@ -7,16 +7,15 @@
 package org.hibernate.search.mapper.orm.massindexing.monitor;
 
 /**
- * As a MassIndexer can take some time to finish it's job,
- * a MassIndexerProgressMonitor can be defined in the configuration
- * property hibernate.search.worker.indexing.monitor
- * implementing this interface to track indexing performance.
+ * A component that monitors progress of mass indexing.
  * <p>
- * Implementations must:
- * <ul>
- * <li>	be threadsafe </li>
- * <li> have a no-arg constructor </li>
- * </ul>
+ * As a MassIndexer can take some time to finish its job,
+ * it is often necessary to monitor its progress.
+ * The default, built-in monitor logs progress periodically at the INFO level,
+ * but a custom monitor can be set by implementing this interface
+ * and passing an instance to {@link org.hibernate.search.mapper.orm.massindexing.MassIndexer#monitor(MassIndexingMonitor)}.
+ * <p>
+ * Implementations must be threadsafe.
  *
  * @author Sanne Grinovero
  * @author Hardy Ferentschik
