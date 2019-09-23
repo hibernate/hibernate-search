@@ -229,11 +229,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			throw new InterruptedException();
 		}
 
-		CompletableFuture<?> future = Futures.create( () -> indexer.add( entity )
-				.exceptionally( exception -> {
-					handleException( entity, exception );
-					return null;
-				} ) );
+		CompletableFuture<?> future = Futures.create( () -> indexer.add( entity ) );
 
 		monitor.documentsBuilt( 1 );
 		return future;
