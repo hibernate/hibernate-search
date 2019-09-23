@@ -60,9 +60,6 @@ public class MassIndexerImpl implements MassIndexer {
 		this.sessionContext = sessionContext;
 		this.rootEntities = toRootEntities( targetedIndexedTypes );
 		this.scopeWorkspace = scopeWorkspace;
-
-		// TODO HSEARCH-3057 use a JMX monitor if JMX is enabled (see Search 5)
-		this.monitor = new SimpleIndexingProgressMonitor();
 	}
 
 	/*
@@ -156,6 +153,12 @@ public class MassIndexerImpl implements MassIndexer {
 	}
 
 	@Override
+	public MassIndexer monitor(MassIndexingMonitor monitor) {
+		this.monitor = monitor;
+		return this;
+	}
+
+	@Override
 	public CompletableFuture<?> start() {
 		return CompletableFuture.runAsync( createCoordinator() );
 	}
@@ -176,7 +179,7 @@ public class MassIndexerImpl implements MassIndexer {
 				typesToIndexInParallel, documentBuilderThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,
 				optimizeAtEnd, purgeAtStart, optimizeAfterPurge,
-				monitor,
+				getOrCreateMonitor(),
 				idFetchSize, idLoadingTransactionTimeout
 		);
 	}
@@ -193,5 +196,14 @@ public class MassIndexerImpl implements MassIndexer {
 		// as special values which might be useful.
 		this.idFetchSize = idFetchSize;
 		return this;
+	}
+
+	private MassIndexingMonitor getOrCreateMonitor() {
+		if ( monitor != null ) {
+			return monitor;
+		}
+
+		// TODO HSEARCH-3057 use a JMX monitor if JMX is enabled (see Search 5)
+		return new SimpleIndexingProgressMonitor();
 	}
 }

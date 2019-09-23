@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.massindexing;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.CacheMode;
+import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 
 /**
  * A MassIndexer is useful to rebuild the indexes from the
@@ -126,4 +127,14 @@ public interface MassIndexer {
 	 * @return {@code this} for method chaining
 	 */
 	MassIndexer transactionTimeout(int timeoutInSeconds);
+
+	/**
+	 * Set the {@link MassIndexingMonitor}.
+	 * <p>
+	 * The default monitor just logs the progress.
+	 *
+	 * @param monitor The monitor that will track mass indexing progress.
+	 * @return {@code this} for method chaining
+	 */
+	MassIndexer monitor(MassIndexingMonitor monitor);
 }
