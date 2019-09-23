@@ -22,6 +22,8 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.common.spi.ErrorHandler;
+import org.hibernate.search.engine.common.spi.LogErrorHandler;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
@@ -158,10 +160,11 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			}
 
 			BeanResolver beanResolver = new ConfiguredBeanResolver( serviceResolver, beanProvider, propertySource );
+			ErrorHandler errorHandler = new LogErrorHandler();
 			RootBuildContext rootBuildContext = new RootBuildContext(
 					propertySource,
 					classResolver, resourceResolver, beanResolver,
-					failureCollector
+					failureCollector, errorHandler
 			);
 
 			indexManagerBuildingStateHolder = new IndexManagerBuildingStateHolder( beanResolver, propertySource, rootBuildContext );

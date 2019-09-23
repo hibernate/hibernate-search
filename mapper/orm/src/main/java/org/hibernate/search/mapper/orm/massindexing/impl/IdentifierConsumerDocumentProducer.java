@@ -238,9 +238,8 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 	private void handleException(Object entity, Throwable e) {
 		String errorMsg = log.massIndexerUnableToIndexInstance( entity.getClass().getName(), entity.toString() );
 
-		// TODO HSEARCH-3110 implements exception handler
-		// errorHandler.handleException( errorMsg, e );
-		// temporary re-throw the exception
+		errorHandler.handleException( errorMsg, e );
+		temporary re-throw the exception
 		throw new RuntimeException( errorMsg, e );
 	}
 }
