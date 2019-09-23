@@ -7,14 +7,14 @@
 package org.hibernate.search.integrationtest.showcase.library.model;
 
 import javax.persistence.Basic;
+import javax.persistence.Convert;
 import javax.persistence.Entity;
 
-import org.hibernate.annotations.Type;
+import org.hibernate.search.integrationtest.showcase.library.attributeconverter.ISBNAttributeConverter;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.integrationtest.showcase.library.bridge.ISBNBridge;
-import org.hibernate.search.integrationtest.showcase.library.usertype.ISBNUserType;
 
 /**
  * A mainly textual document.
@@ -26,7 +26,7 @@ import org.hibernate.search.integrationtest.showcase.library.usertype.ISBNUserTy
 public class Book extends Document<BookCopy> {
 
 	@Basic
-	@Type(type = ISBNUserType.NAME)
+	@Convert(converter = ISBNAttributeConverter.class)
 	@GenericField(valueBinder = @ValueBinderRef(type = ISBNBridge.Binder.class))
 	private ISBN isbn;
 
