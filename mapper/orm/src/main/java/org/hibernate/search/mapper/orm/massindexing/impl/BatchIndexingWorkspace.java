@@ -17,6 +17,7 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.CacheMode;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -66,8 +67,11 @@ public class BatchIndexingWorkspace<E, I> extends ErrorHandledRunnable {
 			DetachedBackendSessionContext sessionContext,
 			Class<E> type, SingularAttribute<? super E, I> idAttributeOfIndexedType,
 			int objectLoadingThreads, CacheMode cacheMode, int objectLoadingBatchSize,
-			CountDownLatch endAllSignal, MassIndexingMonitor monitor, long objectsLimit,
+			CountDownLatch endAllSignal,
+			MassIndexingMonitor monitor, ErrorHandler errorHandler,
+			long objectsLimit,
 			int idFetchSize, Integer transactionTimeout) {
+		super( errorHandler );
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
 
@@ -91,6 +95,7 @@ public class BatchIndexingWorkspace<E, I> extends ErrorHandledRunnable {
 		this.producerEndSignal = new CountDownLatch( documentBuilderThreads );
 
 		this.monitor = monitor;
+
 		this.objectsLimit = objectsLimit;
 	}
 
@@ -105,10 +110,8 @@ public class BatchIndexingWorkspace<E, I> extends ErrorHandledRunnable {
 					new BatchTransactionalContext( mappingContext.getSessionFactory() );
 			//first start the consumers, then the producers (reverse order):
 			//from primary keys to LuceneWork ADD operations:
-			//TODO HSEARCH-3110 implement and pass the error handler
 			startTransformationToLuceneWork();
 			//from class definition to all primary keys:
-			//TODO HSEARCH-3110 implement and pass the error handler
 			startProducingPrimaryKeys( transactionalContext );
 			try {
 				producerEndSignal.await(); //await for all work being sent to the backend
@@ -134,9 +137,12 @@ public class BatchIndexingWorkspace<E, I> extends ErrorHandledRunnable {
 	private void startProducingPrimaryKeys(BatchTransactionalContext transactionalContext) {
 		final Runnable primaryKeyOutputter = new OptionallyWrapInJTATransaction(
 				transactionalContext,
+				getErrorHandler(),
 				new IdentifierProducer<>(
 						primaryKeyStream, mappingContext.getSessionFactory(), objectLoadingBatchSize,
-						indexedType, idAttributeOfIndexedType, monitor, objectsLimit,
+						indexedType, idAttributeOfIndexedType,
+						monitor, getErrorHandler(),
+						objectsLimit,
 						idFetchSize, sessionContext.getTenantIdentifier()
 				),
 				transactionTimeout, sessionContext.getTenantIdentifier()
@@ -153,7 +159,8 @@ public class BatchIndexingWorkspace<E, I> extends ErrorHandledRunnable {
 
 	private void startTransformationToLuceneWork() {
 		final Runnable documentOutputter = new IdentifierConsumerDocumentProducer<>(
-				primaryKeyStream, monitor,
+				primaryKeyStream,
+				monitor, getErrorHandler(),
 				mappingContext,
 				producerEndSignal, cacheMode,
 				indexedType, idAttributeOfIndexedType,

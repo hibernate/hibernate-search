@@ -23,6 +23,7 @@ import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.query.Query;
+import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -52,6 +53,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 	private final Class<E> indexedType;
 	private final SingularAttribute<? super E, I> idAttributeOfIndexedType;
 	private final MassIndexingMonitor monitor;
+	private final ErrorHandler errorHandler;
 	private final long objectsLimit;
 	private final int idFetchSize;
 	private final String tenantId;
@@ -71,7 +73,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 			ProducerConsumerQueue<List<I>> fromIdentifierListToEntities, SessionFactory sessionFactory,
 			int objectLoadingBatchSize,
 			Class<E> indexedType, SingularAttribute<? super E, I> idAttributeOfIndexedType,
-			MassIndexingMonitor monitor,
+			MassIndexingMonitor monitor, ErrorHandler errorHandler,
 			long objectsLimit, int idFetchSize, String tenantId) {
 		this.destination = fromIdentifierListToEntities;
 		this.sessionFactory = sessionFactory;
@@ -79,6 +81,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 		this.indexedType = indexedType;
 		this.idAttributeOfIndexedType = idAttributeOfIndexedType;
 		this.monitor = monitor;
+		this.errorHandler = errorHandler;
 		this.objectsLimit = objectsLimit;
 		this.idFetchSize = idFetchSize;
 		this.tenantId = tenantId;
@@ -94,9 +97,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 		catch (Exception exception) {
 			String errorMessage = log.massIndexerExceptionWhileFetchingIds();
 
-			// TODO HSEARCH-3110 handle with an errorHandler
-			// temporary rethrowing a RuntimeException
-			throw new RuntimeException( errorMessage, exception );
+			errorHandler.handleException( errorMessage, exception );
 		}
 		finally {
 			destination.producerStopping();

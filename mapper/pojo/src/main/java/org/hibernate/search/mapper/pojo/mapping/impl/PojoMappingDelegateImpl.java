@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.Collection;
 
+import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoBackendMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeDelegateImpl;
@@ -21,11 +22,14 @@ import org.hibernate.search.util.common.impl.Closer;
 
 public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 
+	private final ErrorHandler errorHandler;
 	private final PojoIndexedTypeManagerContainer indexedTypeManagers;
 	private final PojoContainedTypeManagerContainer containedTypeManagers;
 
-	public PojoMappingDelegateImpl(PojoIndexedTypeManagerContainer indexedTypeManagers,
+	public PojoMappingDelegateImpl(ErrorHandler errorHandler,
+			PojoIndexedTypeManagerContainer indexedTypeManagers,
 			PojoContainedTypeManagerContainer containedTypeManagers) {
+		this.errorHandler = errorHandler;
 		this.indexedTypeManagers = indexedTypeManagers;
 		this.containedTypeManagers = containedTypeManagers;
 	}
@@ -36,6 +40,11 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 			closer.pushAll( PojoIndexedTypeManager::close, indexedTypeManagers.getAll() );
 			closer.pushAll( PojoContainedTypeManager::close, containedTypeManagers.getAll() );
 		}
+	}
+
+	@Override
+	public ErrorHandler getErrorHandler() {
+		return errorHandler;
 	}
 
 	@Override

@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.mapper.mapping.spi;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
@@ -39,6 +40,8 @@ public interface MappingBuildContext {
 	 * @return A failure collector.
 	 */
 	ContextualFailureCollector getFailureCollector();
+
+	ErrorHandler getErrorHandler();
 
 	ConfigurationPropertySource getConfigurationPropertySource();
 
