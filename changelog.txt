@@ -1,6 +1,65 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.Beta1 (23-09-2019)
+-------------------------
+
+** Bug
+    * HSEARCH-3670 Cannot index java.util.Date property when the value is a java.sql.Date 
+    * HSEARCH-2224 Indexing of collection of basic types not documented
+
+** Improvement
+    * HSEARCH-3708 Simplify the syntax of the range predicate DSL by leveraging the Range class
+    * HSEARCH-3707 Swap the limit and offset parameters in SearchQuery.fetch(Integer, Integer)
+    * HSEARCH-3706 Upgrade to Hibernate ORM 5.4.5.Final
+    * HSEARCH-3705 Use the entity name instead of the class name as default index name
+    * HSEARCH-3671 Make SearchScope session-independent
+    * HSEARCH-3669 Rename fetch()/fetchHits() methods in Query APIs to fetchAll/fetchAllHits
+    * HSEARCH-3667 Make Hibernate Search be compatible with Envers
+    * HSEARCH-3659 Manage the version of Jackson to the latest available version
+    * HSEARCH-3623 Harmonize the syntax of analysis definition DSLs
+    * HSEARCH-3606 Revisit the names of "SearchWriter" and "SearchSessionWritePlan"
+    * HSEARCH-3564 Refactoring to update code to make use of Java 8 features (and other..)
+    * HSEARCH-2254 Support (single-valued) sorts on fields within nested fields
+    * HSEARCH-1347 Apply package naming rules consistently 
+
+** Remove Feature
+    * HSEARCH-3691 Remove the ability to use @GeoPointBinding on properties of type GeoPoint
+
+** Sub-task
+    * HSEARCH-3692 Document custom bridges
+    * HSEARCH-3681 Document the MassIndexer
+    * HSEARCH-3679 Document container value extractors
+    * HSEARCH-3676 Document mapping in details
+    * HSEARCH-3675 Document core concepts
+    * HSEARCH-3674 Document analysis
+    * HSEARCH-3673 Document @IndexedEmbedded
+    * HSEARCH-3649 Add initial support for simple aggregations (count by value, count by range)
+    * HSEARCH-3615 Document the query DSL in details
+    * HSEARCH-2954 Faceting for the Java 8 date/time types
+    * HSEARCH-2472 Change facet mapping to allow for broader encoding selection
+    * HSEARCH-2446 Allow Numeric Faceting from FieldBridge
+    * HSEARCH-2111 FacetRange and RangeFacet need some love
+    * HSEARCH-1748 Validate preconditions of a field to allow a FacetingRequest
+    * HSEARCH-1372 Normalize names in faceting API
+
+** Task
+    * HSEARCH-3715 Restore support for custom mass indexing monitors
+    * HSEARCH-3714 Restore temporary, SPI-only support for error handlers
+    * HSEARCH-3713 Upgrade maven-checkstyle-plugin to 3.1.0
+    * HSEARCH-3704 Use less alarming wording in warnings about 6 being work in progress
+    * HSEARCH-3702 Upgrade to JBoss logging 3.4.0.Final
+    * HSEARCH-3697 Test Hibernate Search on JDK13 regularly on the CI
+    * HSEARCH-3690 Add a default identifier bridge for type String
+    * HSEARCH-3687 Add self types to DSL interfaces to make overrides by backends easier
+    * HSEARCH-3686 Upgrade to a staging version of ECJ 3.19.0 to work around Eclipse compiler bugs in 3.18.0
+    * HSEARCH-3685 Always include -Infinity/+Infinity in Range.of
+    * HSEARCH-3665 Use the method AutoFlushEvent#isFlushRequired to filter auto flush events
+    * HSEARCH-3441 Search 6 groundwork - Improve naming consistency of DSL/builder methods
+    * HSEARCH-3271 Search 6 groundwork - Restore support for faceting
+    * HSEARCH-3270 Search 6 groundwork - Document the main features of Hibernate Search 6
+    * HSEARCH-859 Review names and composition of configuration properties
+
 6.0.0.Alpha9 (23-08-2019)
 -------------------------
 
