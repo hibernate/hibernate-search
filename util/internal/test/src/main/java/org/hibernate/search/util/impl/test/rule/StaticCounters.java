@@ -71,7 +71,11 @@ public final class StaticCounters implements TestRule {
 	}
 
 	public void increment(Key key) {
-		counters.merge( key, 1, (left, right) -> left + right );
+		add( key, 1 );
+	}
+
+	public void add(Key key, int count) {
+		counters.merge( key, count, (left, right) -> left + right );
 	}
 
 	public int get(Key key) {
