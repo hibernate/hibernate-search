@@ -47,6 +47,7 @@ public class FullTextFieldIT {
 
 	private static final String INDEX_NAME = "IndexName";
 	private static final String ANALYZER_NAME = "myAnalyzer";
+	private static final String SEARCH_ANALYZER_NAME = "mySearchAnalyzer";
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
@@ -225,6 +226,31 @@ public class FullTextFieldIT {
 				.field( "moreOptions", String.class, f -> f.analyzerName( ANALYZER_NAME ).termVector( TermVector.WITH_POSITIONS_OFFSETS ) )
 				.field( "useDefault", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
 				.field( "implicit", String.class, f -> f.analyzerName( ANALYZER_NAME ) )
+		);
+		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void searchAnalyzer() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity	{
+			Integer id;
+			String text;
+
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+
+			@FullTextField(analyzer = ANALYZER_NAME, searchAnalyzer = SEARCH_ANALYZER_NAME)
+			public String getText() {
+				return text;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "text", String.class, f -> f.analyzerName( ANALYZER_NAME ).searchAnalyzerName( SEARCH_ANALYZER_NAME ) )
 		);
 		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
