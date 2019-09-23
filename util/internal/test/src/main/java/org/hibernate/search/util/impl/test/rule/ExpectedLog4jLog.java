@@ -69,10 +69,10 @@ public class ExpectedLog4jLog implements TestRule {
 	 * <p>
 	 * Defaults to expecting the event once or more.
 	 */
-	public void expectEvent(Level level,
+	public LogExpectation expectEvent(Level level,
 			Matcher<? super Throwable> throwableMatcher,
 			String containedString, String... otherContainedStrings) {
-		expectEvent( CoreMatchers.allOf(
+		return expectEvent( CoreMatchers.allOf(
 				eventLevelMatcher( level ),
 				eventThrowableMatcher( throwableMatcher ),
 				eventMessageMatcher( containsAllStrings( containedString, otherContainedStrings ) )
