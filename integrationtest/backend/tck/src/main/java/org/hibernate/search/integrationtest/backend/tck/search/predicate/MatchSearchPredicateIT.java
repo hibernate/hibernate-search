@@ -979,22 +979,32 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HSEARCH-2534" )
+	@TestForIssue( jiraKey = { "HSEARCH-2534", "HSEARCH-3042" } )
 	public void analyzerOverride_queryOnlyAnalyzer() {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.whitespaceLowercaseAnalyzedField.relativeFieldName;
+		String ngramFieldPath = indexMapping.ngramSearchAnalyzedField.relativeFieldName;
 
+		// Using the white space lower case analyzer, we don't have any matching.
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.match().field( absoluteFieldPath ).matching( "worldofwordcraft" ) )
 				.toQuery();
-
 		assertThat( query ).hasNoHits();
 
+		// Overriding the analyzer with a n-gram analyzer for the specific query,
+		// the same query matches all values.
 		query = scope.query()
 				.predicate( f -> f.match().field( absoluteFieldPath ).matching( "worldofwordcraft" )
 						.analyzer( OverrideAnalysisDefinitions.ANALYZER_NGRAM.name ) )
 				.toQuery();
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
+		// Defining a ngram search analyzer to override the analyzer,
+		// we expect the same result.
+		query = scope.query()
+				.predicate( f -> f.match().field( ngramFieldPath ).matching( "worldofwordcraft" ) )
+				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
@@ -1386,6 +1396,7 @@ public class MatchSearchPredicateIT {
 			indexMapping.whitespaceAnalyzedField.document1Value.write( document );
 			indexMapping.whitespaceLowercaseAnalyzedField.document1Value.write( document );
 			indexMapping.whitespaceLowercaseSearchAnalyzedField.document1Value.write( document );
+			indexMapping.ngramSearchAnalyzedField.document1Value.write( document );
 			indexMapping.scaledBigDecimal.document1Value.write( document );
 		} );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
@@ -1403,6 +1414,7 @@ public class MatchSearchPredicateIT {
 			indexMapping.whitespaceAnalyzedField.document2Value.write( document );
 			indexMapping.whitespaceLowercaseAnalyzedField.document2Value.write( document );
 			indexMapping.whitespaceLowercaseSearchAnalyzedField.document2Value.write( document );
+			indexMapping.ngramSearchAnalyzedField.document2Value.write( document );
 			indexMapping.scaledBigDecimal.document2Value.write( document );
 		} );
 		plan.add( referenceProvider( EMPTY ), document -> { } );
@@ -1418,6 +1430,7 @@ public class MatchSearchPredicateIT {
 			indexMapping.whitespaceAnalyzedField.document3Value.write( document );
 			indexMapping.whitespaceLowercaseAnalyzedField.document3Value.write( document );
 			indexMapping.whitespaceLowercaseSearchAnalyzedField.document3Value.write( document );
+			indexMapping.ngramSearchAnalyzedField.document3Value.write( document );
 			indexMapping.scaledBigDecimal.document3Value.write( document );
 		} );
 		plan.execute().join();
@@ -1509,6 +1522,7 @@ public class MatchSearchPredicateIT {
 		final MainFieldModel<String> whitespaceAnalyzedField;
 		final MainFieldModel<String> whitespaceLowercaseAnalyzedField;
 		final MainFieldModel<String> whitespaceLowercaseSearchAnalyzedField;
+		final MainFieldModel<String> ngramSearchAnalyzedField;
 
 		final MainFieldModel<BigDecimal> scaledBigDecimal;
 
@@ -1592,6 +1606,12 @@ public class MatchSearchPredicateIT {
 					"brave new world", "BRAVE NEW WORLD", "BRave NeW WoRlD"
 			)
 					.map( root, "whitespaceLowercaseSearchAnalyzed" );
+			ngramSearchAnalyzedField = MainFieldModel.mapper(
+					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
+							.searchAnalyzer( OverrideAnalysisDefinitions.ANALYZER_NGRAM.name ),
+					"brave new world", "BRAVE NEW WORLD", "BRave NeW WoRlD"
+			)
+					.map( root, "ngramSearchAnalyzed" );
 			scaledBigDecimal = MainFieldModel.mapper(
 					c -> c.asBigDecimal().decimalScale( 3 ),
 					new BigDecimal( "739.739" ), BigDecimal.ONE, BigDecimal.TEN
