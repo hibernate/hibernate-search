@@ -651,7 +651,7 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 		// Check IndexedEmbedded composition with path filter composition
 
 		includePaths.clear();
-		includePaths.add( "prefix2_level3" );
+		includePaths.add( "level3" );
 
 		level2Context = checkSimpleIndexedEmbeddedIncluded(
 				"level2", level1Context, typeModel2Mock, "level2.",
@@ -659,13 +659,13 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 		);
 		checkFooBarExcluded( "", level2Context );
 		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
-		checkLeafIncluded( "prefix2_level3", level2Context, "prefix2_level3" );
-		checkCompositeIncluded( "prefix2_level3", level2Context, "prefix2_level3" );
-		checkLeafExcluded( "prefix2_level3.foo", level2Context, "prefix2_level3.foo" );
-		checkCompositeExcluded( "prefix2_level3.foo", level2Context, "prefix2_level3.foo" );
+		checkLeafIncluded( "level3", level2Context, "level3" );
+		checkCompositeIncluded( "level3", level2Context, "level3" );
+		checkLeafExcluded( "level3.foo", level2Context, "level3.foo" );
+		checkCompositeExcluded( "level3.foo", level2Context, "level3.foo" );
 		// Excluded due to additional filters
-		checkLeafExcluded( "level3", level2Context, "level3" );
-		checkCompositeExcluded( "level3", level2Context, "level3" );
+		checkLeafExcluded( "prefix2_level3", level2Context, "prefix2_level3" );
+		checkCompositeExcluded( "prefix2_level3", level2Context, "prefix2_level3" );
 	}
 
 	@Test
