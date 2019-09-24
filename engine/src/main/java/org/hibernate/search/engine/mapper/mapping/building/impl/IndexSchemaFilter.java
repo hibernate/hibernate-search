@@ -213,7 +213,7 @@ class IndexSchemaFilter {
 		if ( composedRemainingDepth == null
 				|| nestedRemainingDepth != null && composedRemainingDepth > nestedRemainingDepth ) {
 			/*
-			 * ... but the nested filter can override it.
+			 * ... but the nested filter can reduce it.
 			 */
 			composedRemainingDepth = nestedRemainingDepth;
 		}
