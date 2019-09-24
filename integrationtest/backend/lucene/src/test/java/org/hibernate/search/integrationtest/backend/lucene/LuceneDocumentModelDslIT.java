@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.lucene;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
@@ -58,6 +59,25 @@ public class LuceneDocumentModelDslIT {
 						.typeContext( TYPE_NAME )
 						.indexContext( INDEX_NAME )
 						.failure( "Unknown normalizer" )
+						.build() );
+	}
+
+	@Test
+	public void unknownSearchAnalyzer() {
+		SubTest.expectException(
+				"Referencing an unknown search analyzer",
+				() -> setup( ctx -> {
+					ctx.createTypeFactory().asString()
+							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
+							.searchAnalyzer( "someNameThatIsClearlyNotAssignedToADefinition" );
+				} )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( TYPE_NAME )
+						.indexContext( INDEX_NAME )
+						.failure( "Unknown analyzer" )
 						.build() );
 	}
 
