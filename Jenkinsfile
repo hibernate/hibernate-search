@@ -180,12 +180,8 @@ stage('Configure') {
 					// See http://www.oracle.com/technetwork/java/javase/eol-135779.html
 					new JdkBuildEnvironment(version: '8', tool: 'OpenJDK 8 Latest', status: BuildEnvironmentStatus.USED_IN_DEFAULT_BUILD),
 					new JdkBuildEnvironment(version: '11', tool: 'OpenJDK 11 Latest', status: BuildEnvironmentStatus.SUPPORTED),
-					new JdkBuildEnvironment(version: '13', tool: 'OpenJDK 13 Latest', status: BuildEnvironmentStatus.SUPPORTED,
-							// Elasticsearch won't run on JDK13+
-							elasticsearchTool: 'OpenJDK 11 Latest'),
-					new JdkBuildEnvironment(version: '14', tool: 'OpenJDK 14 Latest', status: BuildEnvironmentStatus.EXPERIMENTAL,
-							// Elasticsearch won't run on JDK13+
-							elasticsearchTool: 'OpenJDK 11 Latest')
+					new JdkBuildEnvironment(version: '13', tool: 'OpenJDK 13 Latest', status: BuildEnvironmentStatus.SUPPORTED),
+					new JdkBuildEnvironment(version: '14', tool: 'OpenJDK 14 Latest', status: BuildEnvironmentStatus.EXPERIMENTAL)
 			],
 			compiler: [
 					new CompilerBuildEnvironment(name: 'eclipse', mavenProfile: 'compiler-eclipse', status: BuildEnvironmentStatus.SUPPORTED),
@@ -196,10 +192,14 @@ stage('Configure') {
 					new DatabaseBuildEnvironment(dbName: 'postgresql', mavenProfile: 'ci-postgresql', status: BuildEnvironmentStatus.SUPPORTED)
 			],
 			esLocal: [
-					new EsLocalBuildEnvironment(versionRange: '[5.6,6.0)', mavenProfile: 'elasticsearch-5.6', status: BuildEnvironmentStatus.SUPPORTED),
-					new EsLocalBuildEnvironment(versionRange: '[6.0,6.7)', mavenProfile: 'elasticsearch-6.0', status: BuildEnvironmentStatus.SUPPORTED),
-					new EsLocalBuildEnvironment(versionRange: '[6.7,7.0)', mavenProfile: 'elasticsearch-6.7', status: BuildEnvironmentStatus.SUPPORTED),
-					new EsLocalBuildEnvironment(versionRange: '[7.0,7.x)', mavenProfile: 'elasticsearch-7.0', status: BuildEnvironmentStatus.USED_IN_DEFAULT_BUILD)
+					new EsLocalBuildEnvironment(versionRange: '[5.6,6.0)', mavenProfile: 'elasticsearch-5.6',
+							jdkTool: 'OpenJDK 8 Latest', status: BuildEnvironmentStatus.SUPPORTED),
+					new EsLocalBuildEnvironment(versionRange: '[6.0,6.7)', mavenProfile: 'elasticsearch-6.0',
+							jdkTool: 'OpenJDK 8 Latest', status: BuildEnvironmentStatus.SUPPORTED),
+					new EsLocalBuildEnvironment(versionRange: '[6.7,7.0)', mavenProfile: 'elasticsearch-6.7',
+							jdkTool: 'OpenJDK 8 Latest', status: BuildEnvironmentStatus.SUPPORTED),
+					new EsLocalBuildEnvironment(versionRange: '[7.0,7.x)', mavenProfile: 'elasticsearch-7.0',
+							jdkTool: 'OpenJDK 11 Latest', status: BuildEnvironmentStatus.USED_IN_DEFAULT_BUILD)
 			],
 			esAws: [
 					new EsAwsBuildEnvironment(version: '5.6', mavenProfile: 'elasticsearch-5.6', status: BuildEnvironmentStatus.SUPPORTED),
@@ -393,6 +393,7 @@ stage('Default build') {
 					-Pdist -Pcoverage -Pjqassistant \
 					${enableDefaultBuildIT ? '' : '-DskipITs'} \
 					${enableDefaultBuildLegacyIT ? '-Dlegacy.skip=false' : ''} \
+					${toElasticsearchJdkArg(environments.content.jdk.default)} \
 			"""
 
 			// Don't try to report to Coveralls.io or SonarCloud if coverage data is missing
@@ -460,11 +461,9 @@ stage('Non-default environments') {
 	environments.content.jdk.enabled.each { JdkBuildEnvironment buildEnv ->
 		executions.put(buildEnv.tag, {
 			node(NODE_PATTERN_BASE) {
-				def elasticsearchJdkTool = buildEnv.elasticsearchTool ? tool(name: buildEnv.elasticsearchTool, type: 'jdk') : null
 				helper.withMavenWorkspace(jdk: buildEnv.tool) {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install --fail-at-end \
-							${elasticsearchJdkTool ? "-Dtest.elasticsearch.java_home=$elasticsearchJdkTool" : ""} \
 					"""
 				}
 			}
@@ -632,15 +631,26 @@ abstract class BuildEnvironment {
 	abstract String getTag()
 	boolean isDefault() { status == BuildEnvironmentStatus.USED_IN_DEFAULT_BUILD }
 	boolean requiresDefaultBuildArtifacts() { true }
+
+	String getMavenJdkTool(def allEnvironments) {
+		allEnvironments.content.jdk.default.tool
+	}
+
+	String getElasticsearchJdkTool(def allEnvironments) {
+		allEnvironments.content.esLocal.default.jdkTool
+	}
 }
 
 class JdkBuildEnvironment extends BuildEnvironment {
 	String version
 	String tool
-	String elasticsearchTool
 	String getTag() { "jdk-$version" }
 	@Override
 	boolean requiresDefaultBuildArtifacts() { false }
+	@Override
+	String getMavenJdkTool(def allEnvironments) {
+		tool
+	}
 }
 
 class CompilerBuildEnvironment extends BuildEnvironment {
@@ -661,8 +671,13 @@ class DatabaseBuildEnvironment extends BuildEnvironment {
 class EsLocalBuildEnvironment extends BuildEnvironment {
 	String versionRange
 	String mavenProfile
+	String jdkTool
 	@Override
 	String getTag() { "elasticsearch-local-$versionRange" }
+	@Override
+	String getElasticsearchJdkTool(def allEnvironments) {
+		jdkTool
+	}
 }
 
 class EsAwsBuildEnvironment extends BuildEnvironment {
@@ -672,6 +687,10 @@ class EsAwsBuildEnvironment extends BuildEnvironment {
 	String awsRegion = null
 	@Override
 	String getTag() { "elasticsearch-aws-$version" }
+	@Override
+	String getElasticsearchJdkTool(def allEnvironments) {
+		null // No JDK needed for Elasticsearch: the Elasticsearch instance is remote.
+	}
 	String getNameEmbeddableVersion() {
 		version.replaceAll('\\.', '')
 	}
@@ -763,7 +782,11 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args) {
 	// Add a suffix to tests to distinguish between different executions
 	// of the same test in different environments in reports
 	def testSuffix = buildEnv.tag.replaceAll('[^a-zA-Z0-9_\\-+]+', '_')
-	sh "mvn -Dsurefire.environment=$testSuffix $args"
+	sh """ \
+			mvn -Dsurefire.environment=$testSuffix \
+					${toElasticsearchJdkArg(buildEnv)} \
+					$args \
+	"""
 }
 
 String toMavenElasticsearchProfileArg(String mavenEsProfile) {
@@ -777,4 +800,15 @@ String toMavenElasticsearchProfileArg(String mavenEsProfile) {
 		// and Maven would end up disabling it.
 		''
 	}
+}
+
+String toElasticsearchJdkArg(BuildEnvironment buildEnv) {
+	String elasticsearchJdkTool = buildEnv.getElasticsearchJdkTool(environments)
+
+	if (elasticsearchJdkTool == null || buildEnv.getMavenJdkTool(environments) == elasticsearchJdkTool) {
+		return '' // No specific JDK needed
+	}
+
+	def elasticsearchJdkToolPath = tool(name: elasticsearchJdkTool, type: 'jdk')
+	return "-Dtest.elasticsearch.java_home=$elasticsearchJdkToolPath"
 }
