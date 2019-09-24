@@ -112,7 +112,7 @@ class ConfiguredIndexSchemaNestingContext implements IndexSchemaNestingContext {
 	}
 
 	public Set<String> getUselessIncludePaths() {
-		Set<String> includePaths = filter.getProperExplicitlyIncludedPaths();
+		Set<String> includePaths = filter.getLocalExplicitlyIncludedPaths();
 		Map<String, Boolean> encounteredFieldPaths = filter.getEncounteredFieldPaths();
 		Set<String> uselessIncludePaths = new LinkedHashSet<>();
 		for ( String path : includePaths ) {
