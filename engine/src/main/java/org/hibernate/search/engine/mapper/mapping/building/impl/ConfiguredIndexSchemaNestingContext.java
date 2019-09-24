@@ -81,7 +81,7 @@ class ConfiguredIndexSchemaNestingContext implements IndexSchemaNestingContext {
 			MappableTypeModel parentTypeModel, String relativePrefix,
 			Integer nestedMaxDepth, Set<String> nestedPathFilters,
 			NestedContextBuilder<T> contextBuilder) {
-		IndexSchemaFilter composedFilter = filter.composeWithNested(
+		IndexSchemaFilter composedFilter = filter.compose(
 				parentTypeModel, relativePrefix, nestedMaxDepth, nestedPathFilters
 		);
 		if ( !composedFilter.isEveryPathExcluded() ) {
