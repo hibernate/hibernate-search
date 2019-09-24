@@ -98,7 +98,7 @@ class IndexSchemaFilter {
 	/**
 	 * The {@code explicitlyIncludedPaths} that were included by this filter explicitly (not a parent filter).
 	 */
-	private final Set<String> properExplicitlyIncludedPaths;
+	private final Set<String> localExplicitlyIncludedPaths;
 
 	/**
 	 * The {@code paths} that were encountered, i.e. passed to {@link #isPathIncluded(String)}
@@ -109,13 +109,13 @@ class IndexSchemaFilter {
 
 	private IndexSchemaFilter(IndexSchemaFilter parent, MappableTypeModel parentTypeModel, String relativePrefix,
 			Integer remainingCompositionDepth, Set<String> explicitlyIncludedPaths,
-			Set<String> properExplicitlyIncludedPaths) {
+			Set<String> localExplicitlyIncludedPaths) {
 		this.parent = parent;
 		this.parentTypeModel = parentTypeModel;
 		this.relativePrefix = relativePrefix;
 		this.remainingCompositionDepth = remainingCompositionDepth;
 		this.explicitlyIncludedPaths = explicitlyIncludedPaths;
-		this.properExplicitlyIncludedPaths = properExplicitlyIncludedPaths;
+		this.localExplicitlyIncludedPaths = localExplicitlyIncludedPaths;
 	}
 
 	@Override
@@ -147,8 +147,8 @@ class IndexSchemaFilter {
 		return !isEveryPathIncludedByDefault( remainingCompositionDepth ) && !isAnyPathExplicitlyIncluded();
 	}
 
-	public Set<String> getProperExplicitlyIncludedPaths() {
-		return properExplicitlyIncludedPaths;
+	public Set<String> getLocalExplicitlyIncludedPaths() {
+		return localExplicitlyIncludedPaths;
 	}
 
 	public Map<String, Boolean> getEncounteredFieldPaths() {
@@ -222,7 +222,7 @@ class IndexSchemaFilter {
 		Set<String> composedFilterExplicitlyIncludedPaths = new HashSet<>();
 		// The subset of these included paths that were added by the nested filter (and not a parent filter)
 		// Use a LinkedHashSet, since the set will be exposed through a getter and may be iterated on
-		Set<String> composedFilterProperExplicitlyIncludedPaths = new LinkedHashSet<>();
+		Set<String> composedFilterLocalExplicitlyIncludedPaths = new LinkedHashSet<>();
 
 		/*
 		 * Add the nested filter's explicitly included paths to the composed filter's "explicitlyIncludedPaths",
@@ -231,7 +231,7 @@ class IndexSchemaFilter {
 		for ( String path : nullSafeIncludePaths ) {
 			if ( isPathIncluded( currentRemainingDepth, explicitlyIncludedPaths, relativePrefix + path ) ) {
 				composedFilterExplicitlyIncludedPaths.add( path );
-				composedFilterProperExplicitlyIncludedPaths.add( path );
+				composedFilterLocalExplicitlyIncludedPaths.add( path );
 				// Also add paths leading to this path (so that object nodes are not excluded)
 				int afterPreviousDotIndex = 0;
 				int nextDotIndex = path.indexOf( '.', afterPreviousDotIndex );
@@ -260,7 +260,7 @@ class IndexSchemaFilter {
 		return new IndexSchemaFilter(
 				this, parentTypeModel, relativePrefix,
 				composedRemainingDepth, composedFilterExplicitlyIncludedPaths,
-				composedFilterProperExplicitlyIncludedPaths
+				composedFilterLocalExplicitlyIncludedPaths
 		);
 	}
 
