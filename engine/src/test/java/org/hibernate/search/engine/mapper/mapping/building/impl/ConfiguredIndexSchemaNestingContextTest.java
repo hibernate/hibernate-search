@@ -761,6 +761,47 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 	}
 
 	@Test
+	public void indexedEmbedded_includePaths_embedding_includePaths() {
+		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+
+		Set<String> includePaths = new HashSet<>();
+
+		includePaths.add( "level2.level3" );
+		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+				"level1", rootContext, typeModel1Mock, "level1.",
+				null, includePaths
+		);
+		checkFooBarExcluded( "", level1Context );
+		checkFooBarIndexedEmbeddedExcluded( level1Context, typeModel2Mock );
+		checkLeafIncluded( "level2", level1Context, "level2" );
+
+		includePaths.clear();
+		includePaths.add( "level3" );
+		includePaths.add( "level3-alt.level4" );
+		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
+				"level2", level1Context, typeModel2Mock, "level2.",
+				null, includePaths
+		);
+		checkFooBarExcluded( "", level2Context );
+		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
+		checkLeafIncluded( "level3", level2Context, "level3" );
+		checkLeafExcluded( "level3-alt", level2Context, "level3-alt" );
+		checkCompositeExcluded( "level3-alt", level2Context, "level3-alt" );
+
+		// Also test a level 2 that has completely incompatible includePaths
+		includePaths.clear();
+		includePaths.add( "level3-alt.level4" );
+		checkSimpleIndexedEmbeddedExcluded(
+				level1Context, typeModel2Mock, "level2.",
+				null, includePaths
+		);
+
+		IndexSchemaNestingContext level3Context =
+				checkCompositeIncluded( "level3", level2Context, "level3" );
+		checkFooBarExcluded( "", level3Context );
+	}
+
+	@Test
 	public void indexedEmbedded_includePaths_embedding_depth1AndIncludePaths() {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
