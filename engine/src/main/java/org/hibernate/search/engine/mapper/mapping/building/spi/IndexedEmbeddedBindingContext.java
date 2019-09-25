@@ -7,7 +7,6 @@
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
 import java.util.Collection;
-import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 
@@ -22,15 +21,5 @@ public interface IndexedEmbeddedBindingContext extends IndexBindingContext {
 	 * @return The list of index object fields between the parent binding context and this context.
 	 */
 	Collection<IndexObjectFieldReference> getParentIndexObjectReferences();
-
-	/**
-	 * @return The set of {@code includePaths} filters that did not match anything so far.
-	 */
-	Set<String> getUselessIncludePaths();
-
-	/**
-	 * @return The set of encountered field paths so far.
-	 */
-	Set<String> getEncounteredFieldPaths();
 
 }

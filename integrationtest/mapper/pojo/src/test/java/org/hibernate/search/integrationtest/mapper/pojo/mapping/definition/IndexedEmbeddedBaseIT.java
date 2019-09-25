@@ -403,7 +403,6 @@ public class IndexedEmbeddedBaseIT {
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
-						.pathContext( ".level1" )
 						.failure(
 								"IndexedEmbedded defines includePaths filters that do not match anything",
 								"Non-matching includePaths filters:",

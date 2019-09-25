@@ -16,6 +16,7 @@ public interface IndexedEntityBindingContextProvider {
 			boolean multiTenancyEnabled);
 
 	IndexedEntityBindingContext createIndexedEntityBindingContext(
+			IndexedEntityBindingMapperContext mapperContext,
 			IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder);
 
 }
