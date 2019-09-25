@@ -9,11 +9,9 @@ package org.hibernate.search.engine.mapper.mapping.building.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.impl.IndexSchemaElementImpl;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
@@ -23,7 +21,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingConte
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexSchemaContributionListener;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedBindingContext;
-import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 
 abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilder> implements IndexBindingContext {
 
@@ -74,13 +72,16 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 	}
 
 	@Override
-	public Optional<IndexedEmbeddedBindingContext> addIndexedEmbeddedIfIncluded(
-			MappableTypeModel parentTypeModel, boolean multiValued,
-			String relativePrefix, ObjectFieldStorage storage, Integer maxDepth, Set<String> includePaths) {
+	public Optional<IndexedEmbeddedBindingContext> addIndexedEmbeddedIfIncluded(IndexedEmbeddedDefinition definition,
+			boolean multiValued) {
+		// FIXME HSEARCH-3684 share the path tracker among filters with the same definition
+		IndexedEmbeddedPathTracker pathTracker = new IndexedEmbeddedPathTracker( definition );
 		return nestingContext.addIndexedEmbeddedIfIncluded(
-				parentTypeModel, relativePrefix, maxDepth, includePaths,
+				definition,
+				pathTracker,
 				new NestedContextBuilderImpl(
-						indexSchemaRootNodeBuilder, indexSchemaObjectNodeBuilder, storage,
+						indexSchemaRootNodeBuilder, indexSchemaObjectNodeBuilder,
+						definition, pathTracker,
 						isParentMultivaluedAndWithoutObjectField() || multiValued
 				)
 		);
@@ -99,23 +100,27 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 
 		private final IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder;
 		private IndexSchemaObjectNodeBuilder currentNodeBuilder;
-		private final ObjectFieldStorage storage;
+		private final IndexedEmbeddedDefinition definition;
+		private final IndexedEmbeddedPathTracker pathTracker;
 		private final List<IndexObjectFieldReference> parentIndexObjectReferences = new ArrayList<>();
 		private boolean multiValued;
 
 		private NestedContextBuilderImpl(IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
-				IndexSchemaObjectNodeBuilder currentNodeBuilder, ObjectFieldStorage storage,
+				IndexSchemaObjectNodeBuilder currentNodeBuilder,
+				IndexedEmbeddedDefinition definition,
+				IndexedEmbeddedPathTracker pathTracker,
 				boolean multiValued) {
 			this.indexSchemaRootNodeBuilder = indexSchemaRootNodeBuilder;
 			this.currentNodeBuilder = currentNodeBuilder;
-			this.storage = storage;
+			this.definition = definition;
+			this.pathTracker = pathTracker;
 			this.multiValued = multiValued;
 		}
 
 		@Override
 		public void appendObject(String objectName) {
 			IndexSchemaObjectFieldNodeBuilder nextNodeBuilder =
-					currentNodeBuilder.addObjectField( objectName, storage );
+					currentNodeBuilder.addObjectField( objectName, definition.getStorage() );
 			if ( multiValued ) {
 				// Only mark the first object as multi-valued
 				multiValued = false;
@@ -130,6 +135,7 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 			return new IndexedEmbeddedBindingContextImpl(
 					indexSchemaRootNodeBuilder,
 					currentNodeBuilder, parentIndexObjectReferences, nestingContext,
+					pathTracker,
 					multiValued
 			);
 		}

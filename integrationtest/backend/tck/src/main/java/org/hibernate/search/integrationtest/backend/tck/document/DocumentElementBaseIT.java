@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedBindingContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
@@ -286,11 +287,13 @@ public class DocumentElementBaseIT {
 			nestedObject = new FirstLevelObjectMapping( nestedObjectField );
 
 			// Simulate an embedded context which excludes every subfield
-			IndexedEmbeddedBindingContext excludingEmbeddedContext = ctx.addIndexedEmbeddedIfIncluded(
-					new StubTypeModel( "embedded" ), true,
+			IndexedEmbeddedDefinition indexedEmbeddedDefinition = new IndexedEmbeddedDefinition(
+					new StubTypeModel( "embedded" ),
 					"excludingObject.", ObjectFieldStorage.FLATTENED,
 					null, Collections.singleton( "pathThatDoesNotMatchAnything" )
-			).get();
+			);
+			IndexedEmbeddedBindingContext excludingEmbeddedContext =
+					ctx.addIndexedEmbeddedIfIncluded( indexedEmbeddedDefinition, true ).get();
 			excludingObject = new FirstLevelObjectMapping(
 					excludingEmbeddedContext.getSchemaElement(),
 					excludingEmbeddedContext.getParentIndexObjectReferences().iterator().next()

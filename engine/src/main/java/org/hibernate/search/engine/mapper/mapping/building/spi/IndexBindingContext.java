@@ -7,12 +7,9 @@
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
 import java.util.Optional;
-import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
-import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
 /**
  * The binding context associated to a specific node in the entity tree.
@@ -52,16 +49,11 @@ public interface IndexBindingContext {
 	IndexSchemaElement getSchemaElement(IndexSchemaContributionListener listener);
 
 	/**
-	 * @param parentTypeModel The model representing the type holding the property with an indexed-embedded.
+	 * @param definition The indexed-embedded definition.
 	 * @param multiValued Whether the property with an indexed-embedded is to be considered as multi-valued
 	 * (i.e. multiple indexed-embedded objects may be processed for a single "embedding" object).
-	 * @param relativePrefix The prefix to apply to all index fields created in the context of the indexed-embedded.
-	 * @param storage The storage type to use for all object fields created as part of the {@code relativePrefix}.
-	 * @param maxDepth The maximum depth beyond which all created fields will be ignored. {@code null} for no limit.
-	 * @param includePaths The exhaustive list of paths of fields that are to be included. {@code null} for no limit.
-	 * @return The element in the index schema that this context points to.
+	 * @return A new indexed-embedded binding context, or {@code Optional.empty()}.
 	 */
-	Optional<IndexedEmbeddedBindingContext> addIndexedEmbeddedIfIncluded(
-			MappableTypeModel parentTypeModel, boolean multiValued,
-			String relativePrefix, ObjectFieldStorage storage, Integer maxDepth, Set<String> includePaths);
+	Optional<IndexedEmbeddedBindingContext> addIndexedEmbeddedIfIncluded(IndexedEmbeddedDefinition definition,
+			boolean multiValued);
 }

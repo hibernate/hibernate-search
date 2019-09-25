@@ -11,12 +11,14 @@ import java.util.Set;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 public interface PojoMappingCollectorValueNode extends PojoMappingCollector {
 
 	void valueBinder(ValueBinder binder,
 			String relativeFieldName, FieldModelContributor fieldModelContributor);
 
-	void indexedEmbedded(String relativePrefix, ObjectFieldStorage storage, Integer maxDepth, Set<String> includePaths);
+	void indexedEmbedded(PojoRawTypeModel<?> definingTypeModel, String relativePrefix, ObjectFieldStorage storage,
+			Integer maxDepth, Set<String> includePaths);
 
 }

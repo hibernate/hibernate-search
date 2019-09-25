@@ -107,4 +107,7 @@ public class TypeMappingStepImpl
 		return child;
 	}
 
+	PojoRawTypeModel<?> getTypeModel() {
+		return typeModel;
+	}
 }

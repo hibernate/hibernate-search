@@ -14,6 +14,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
@@ -27,6 +28,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollecto
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessorValueBridgeNode;
 import org.hibernate.search.util.common.impl.Closer;
@@ -79,18 +81,21 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 	}
 
 	@Override
-	public void indexedEmbedded(String relativePrefix, ObjectFieldStorage storage,
+	public void indexedEmbedded(PojoRawTypeModel<?> definingTypeModel, String relativePrefix,
+			ObjectFieldStorage storage,
 			Integer maxDepth, Set<String> includePaths) {
 		String defaultedRelativePrefix = relativePrefix;
 		if ( defaultedRelativePrefix == null ) {
 			defaultedRelativePrefix = modelPath.getParent().getPropertyModel().getName() + ".";
 		}
 
-		BoundPojoModelPathTypeNode<?> holderTypePath = modelPath.getParent().getParent();
+		IndexedEmbeddedDefinition definition = new IndexedEmbeddedDefinition(
+				definingTypeModel, defaultedRelativePrefix, storage,
+				maxDepth, includePaths
+		);
 
 		Optional<IndexedEmbeddedBindingContext> nestedBindingContextOptional = bindingContext.addIndexedEmbeddedIfIncluded(
-				holderTypePath.getTypeModel().getRawType(), multiValuedFromContainerExtractor,
-				defaultedRelativePrefix, storage, maxDepth, includePaths
+				definition, multiValuedFromContainerExtractor
 		);
 		nestedBindingContextOptional.ifPresent( nestedBindingContext -> {
 			BoundPojoModelPathTypeNode<V> embeddedTypeModelPath = modelPath.type();

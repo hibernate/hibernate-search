@@ -6,15 +6,12 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.impl;
 
-import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.model.dsl.impl.IndexSchemaNestingContext;
-import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 
 
 class ConfiguredIndexSchemaNestingContext implements IndexSchemaNestingContext {
@@ -78,14 +75,12 @@ class ConfiguredIndexSchemaNestingContext implements IndexSchemaNestingContext {
 	}
 
 	public <T> Optional<T> addIndexedEmbeddedIfIncluded(
-			MappableTypeModel parentTypeModel, String relativePrefix,
-			Integer nestedMaxDepth, Set<String> nestedPathFilters,
+			IndexedEmbeddedDefinition definition,
+			IndexedEmbeddedPathTracker pathTracker,
 			NestedContextBuilder<T> contextBuilder) {
-		IndexSchemaFilter composedFilter = filter.compose(
-				parentTypeModel, relativePrefix, nestedMaxDepth, nestedPathFilters
-		);
+		IndexSchemaFilter composedFilter = filter.compose( definition, pathTracker );
 		if ( !composedFilter.isEveryPathExcluded() ) {
-			String prefixToParse = unconsumedPrefix + relativePrefix;
+			String prefixToParse = unconsumedPrefix + definition.getRelativePrefix();
 			int afterPreviousDotIndex = 0;
 			int nextDotIndex = prefixToParse.indexOf( '.', afterPreviousDotIndex );
 			while ( nextDotIndex >= 0 ) {
@@ -109,24 +104,6 @@ class ConfiguredIndexSchemaNestingContext implements IndexSchemaNestingContext {
 		else {
 			return Optional.empty();
 		}
-	}
-
-	public Set<String> getUselessIncludePaths() {
-		Set<String> includePaths = filter.getConfiguredIncludedPaths();
-		Map<String, Boolean> encounteredFieldPaths = filter.getEncounteredFieldPaths();
-		Set<String> uselessIncludePaths = new LinkedHashSet<>();
-		for ( String path : includePaths ) {
-			Boolean included = encounteredFieldPaths.get( path );
-			if ( included == null /* not encountered */ || !included ) {
-				// An "includePaths" filter that does not result in inclusion is useless
-				uselessIncludePaths.add( path );
-			}
-		}
-		return uselessIncludePaths;
-	}
-
-	public Set<String> getEncounteredFieldPaths() {
-		return filter.getEncounteredFieldPaths().keySet();
 	}
 
 	public interface NestedContextBuilder<T> {
