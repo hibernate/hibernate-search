@@ -492,8 +492,8 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 	public void indexedEmbedded_depth0() {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
-		// Depth == 0 => do not allow IndexedEmbedded composition nor non-IndexedEmbedded nesting
-		// There is little use for this, but we test it as an edge case
+		// Depth == 0 => only include fields and nested indexed-embeddeds if they are explicitly included.
+		// There is little use for this without includePaths, but we test it as an edge case
 
 		checkSimpleIndexedEmbeddedExcluded(
 				rootContext, typeModel1Mock,
@@ -505,8 +505,9 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 	public void indexedEmbedded_depth1() {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
-		// Depth == 1 => do not allow IndexedEmbedded composition at all,
-		// but allow unlimited non-IndexedEmbedded nesting
+		// Depth == 1 => implicitly include all fields at the first level,
+		// but only include nested indexed-embeddeds and their fields if they are explicitly included.
+		// (which they won't, because we don't use includePaths here).
 
 		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
 				"level1", rootContext, typeModel1Mock,
