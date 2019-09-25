@@ -837,13 +837,16 @@ This mapping will declare the following fields in the `Human` index:
 
 * `name`
 * `nickname`
-* `parents.name` (explicitly included using `includePaths`)
-* `parents.nickname` (explicitly included using `includePaths`)
-* `parents.parents.name` (explicitly included using `includePaths`)
+* `parents.name`: explicitly included because `includePaths` on `parents` includes `name`.
+* `parents.nickname`: explicitly included because `includePaths` on `parents` includes `nickname`.
+* `parents.parents.name`: explicitly included because `includePaths` on `parents` includes `parents.name`.
 
-`parents.nickname`, `parents.parents.parents.name`
-and other fields not mentioned in the list above will be excluded,
-because `maxDepth` defaults to `0` when `includePaths` is used.
+The following fields in particular are excluded:
+
+* `parents.parents.nickname`: *not* implicitly included because `maxDepth` is not set and defaults to `0`,
+and *not* explicitly included either because `includePaths` on `parents` does not include `parents.nickname`.
+* `parents.parents.parents.name`: *not* implicitly included because `maxDepth` is not set and defaults to `0`,
+and *not* explicitly included either because `includePaths` on `parents` does not include `parents.parents.name`.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -858,15 +861,28 @@ This mapping will declare the following fields in the `Human` index:
 
 * `name`
 * `surname`
-* `parents.name` (implicitly included because `maxDepth >= 1`)
-* `parents.nickname` (implicitly included because `maxDepth >= 1`)
-* `parents.parents.name` (implicitly included because `maxDepth >= 2`)
-* `parents.parents.nickname` (implicitly included because `maxDepth >= 2`)
-* `parents.parents.parents.name` (explicitly included using `includePaths` even though `maxDepth < 3`)
+* `parents.name`: implicitly at depth `0` because `maxDepth > 0`
+(so `parents.*` is included implicitly).
+* `parents.nickname`: implicitly included at depth `0` because `maxDepth > 0`
+(so `parents.*` is included implicitly).
+* `parents.parents.name`: implicitly included at depth `1` because `maxDepth > 1`
+(so `parents.parents.*` is included implicitly).
+* `parents.parents.nickname`: implicitly included at depth `1` because `maxDepth > 1`
+(so `parents.parents.*` is included implicitly).
+* `parents.parents.parents.name`: *not* implicitly included at depth `2` because `maxDepth = 2`
+(so `parents.parents.parents` is included implicitly,
+but sub-fields can only be included explicitly)
+but explicitly included because `includePaths` on `parents` includes `parents.parents.name`.
 
-`parents.parents.parents.nickname`, `parents.parents.parents.parents.name`
-and other fields not mentioned in the list above will be excluded,
-because `maxDepth` is explicitly set to `3`.
+The following fields in particular are excluded:
+
+* `parents.parents.parents.nickname`: *not* implicitly included at depth `2` because `maxDepth = 2`
+(so `parents.parents.parents` is included implicitly, but sub-fields must be included explicitly)
+and *not* explicitly included either because `includePaths` on `parents` does not include `parents.parents.nickname`.
+* `parents.parents.parents.parents.name`: *not* implicitly included at depth `3` because `maxDepth = 2`
+(so `parents.parents.parents` is included implicitly,
+but `parents.parents.parents.parents` and sub-fields can only be included explicitly)
+and *not* explicitly included either because `includePaths` on `parents` does not include `parents.parents.parents.name`.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
