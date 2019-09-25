@@ -386,8 +386,8 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 		assertThat( level2IndexedEmbeddedContext.getUselessIncludePaths() )
 				.containsOnly(
 						"included",
-						"notEncountered"
-						// "excludedBecauseOfLevel1" should not be here: it was excluded by the parent filter.
+						"notEncountered",
+						"excludedBecauseOfLevel1"
 				);
 		assertThat( level1Context.getUselessIncludePaths() )
 				.containsOnly(
@@ -422,6 +422,7 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 				.containsOnly(
 						// "included" removed
 						"notEncountered"
+						// "excludedBecauseOfLevel1" removed
 				);
 		assertThat( level1Context.getUselessIncludePaths() )
 				.containsOnly(

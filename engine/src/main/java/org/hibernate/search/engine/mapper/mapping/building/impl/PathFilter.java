@@ -19,26 +19,50 @@ class PathFilter {
 		return UNCONSTRAINED;
 	}
 
+	static PathFilter of(Set<String> paths) {
+		if ( paths == null || paths.isEmpty() ) {
+			return unconstrained();
+		}
+
+		// The included paths in the filter
+		Set<String> includedPaths = new HashSet<>();
+		// The included paths in the filter that were explicitly mentioned in "paths"
+		// Use a LinkedHashSet, since the set will be exposed through a getter and may be iterated on
+		Set<String> localIncludedPaths = new LinkedHashSet<>();
+
+		for ( String path : paths ) {
+			includedPaths.add( path );
+			// Also add paths leading to this path (so that object nodes are not excluded)
+			addSubPathsFromRoot( includedPaths, path );
+
+			localIncludedPaths.add( path );
+		}
+
+		return new PathFilter( includedPaths, localIncludedPaths );
+	}
+
 	/**
 	 * Paths to be included even when the default behavior is to exclude paths.
 	 */
 	private final Set<String> includedPaths;
 
 	/**
-	 * The {@link #includedPaths} that were included by this filter explicitly (not a parent filter).
+	 * The {@link #includedPaths} that were included by this filter explicitly.
+	 * Does not include sub-paths derived automatically, in particular
+	 * ("a.b.c" => ["a", "a.b", "a.b.c"], but only "a.b.c" shows up here).
 	 */
-	private final Set<String> localIncludedPaths;
+	private final Set<String> configuredIncludedPaths;
 
-	private PathFilter(Set<String> includedPaths, Set<String> localIncludedPaths) {
+	private PathFilter(Set<String> includedPaths, Set<String> configuredIncludedPaths) {
 		this.includedPaths = includedPaths;
-		this.localIncludedPaths = localIncludedPaths;
+		this.configuredIncludedPaths = configuredIncludedPaths;
 	}
 
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "["
 				+ "includedPaths=" + includedPaths
-				+ ",localIncludedPaths=" + localIncludedPaths
+				+ ",localIncludedPaths=" + configuredIncludedPaths
 				+ "]";
 	}
 
@@ -50,60 +74,8 @@ class PathFilter {
 		return !includedPaths.isEmpty();
 	}
 
-	Set<String> getLocalIncludedPaths() {
-		return localIncludedPaths;
-	}
-
-	PathFilter increaseDepth(String relativePrefix) {
-		Set<String> newIncludedPaths = new HashSet<>();
-		Set<String> newLocalIncludedPaths = new LinkedHashSet<>();
-
-		// Only keep paths that start with the given prefix.
-		filterPathsByPrefix( newIncludedPaths, this.includedPaths, relativePrefix );
-		filterPathsByPrefix( newLocalIncludedPaths, this.localIncludedPaths, relativePrefix );
-
-		return new PathFilter( newIncludedPaths, newLocalIncludedPaths );
-	}
-
-	PathFilter combine(Set<String> includedPathsToCombine,
-			boolean includePathsToCombineByDefault, boolean includePathsOfThisByDefault) {
-		// The included paths in the new, combined filter
-		Set<String> combinedIncludedPaths = new HashSet<>();
-		// The included paths in the new, combined filter that were part of includedPathsToCombine
-		// (and not inherited from this filter)
-		// Use a LinkedHashSet, since the set will be exposed through a getter and may be iterated on
-		Set<String> combinedLocalIncludedPaths = new LinkedHashSet<>();
-
-		/*
-		 * Add the new included paths to the combined filter's included paths,
-		 * provided they are not filtered out by the current filter.
-		 */
-		for ( String path : includedPathsToCombine ) {
-			if ( includePathsToCombineByDefault || this.isExplicitlyIncluded( path ) ) {
-				combinedIncludedPaths.add( path );
-				// Also add paths leading to this path (so that object nodes are not excluded)
-				addSubPathsFromRoot( combinedIncludedPaths, path );
-
-				// Consider the other filter's paths as the local included paths in the combined filter
-				combinedLocalIncludedPaths.add( path );
-			}
-		}
-
-		/*
-		 * Add the current filter's included paths to the combined filter's included paths,
-		 * provided they are not filtered out by the new included paths.
-		 */
-		PathFilter otherFilter = new PathFilter( includedPathsToCombine, includedPathsToCombine );
-		for ( String path : this.includedPaths ) {
-			if ( includePathsOfThisByDefault || otherFilter.isExplicitlyIncluded( path ) ) {
-				combinedIncludedPaths.add( path );
-			}
-		}
-
-		return new PathFilter(
-				combinedIncludedPaths,
-				combinedLocalIncludedPaths
-		);
+	Set<String> getConfiguredIncludedPaths() {
+		return configuredIncludedPaths;
 	}
 
 	private static void addSubPathsFromRoot(Set<String> collector, String path) {
@@ -114,16 +86,6 @@ class PathFilter {
 			collector.add( subPath );
 			afterPreviousDotIndex = nextDotIndex + 1;
 			nextDotIndex = path.indexOf( '.', afterPreviousDotIndex );
-		}
-	}
-
-	private static void filterPathsByPrefix(Set<String> collector, Set<String> paths, String prefix) {
-		int prefixLength = prefix.length();
-		for ( String path : paths ) {
-			if ( path.startsWith( prefix ) ) {
-				String pathRelativeToNewDepth = path.substring( prefixLength );
-				collector.add( pathRelativeToNewDepth );
-			}
 		}
 	}
 }

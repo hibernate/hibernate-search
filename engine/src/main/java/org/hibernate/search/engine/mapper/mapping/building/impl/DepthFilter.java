@@ -18,39 +18,25 @@ class DepthFilter {
 		return new DepthFilter( maxDepth );
 	}
 
-	private final Integer remainingDepth;
+	private final Integer maxDepth;
 
-	private DepthFilter(Integer remainingDepth) {
-		this.remainingDepth = remainingDepth;
+	private DepthFilter(Integer maxDepth) {
+		this.maxDepth = maxDepth;
 	}
 
 	@Override
 	public String toString() {
 		return getClass().getSimpleName() + "["
-				+ "remainingDepth=" + remainingDepth
+				+ "maxDepth=" + maxDepth
 				+ "]";
 	}
 
-	boolean hasDepthRemaining() {
-		return remainingDepth == null || remainingDepth > 0;
+	boolean isEveryPathIncludedAtDepth(int relativeDepth) {
+		return maxDepth == null || maxDepth > relativeDepth;
 	}
 
 	boolean hasDepthLimit() {
-		return remainingDepth != null;
+		return maxDepth != null;
 	}
 
-	public DepthFilter increaseDepth() {
-		return new DepthFilter( remainingDepth == null ? null : remainingDepth - 1 );
-	}
-
-	public DepthFilter combine(DepthFilter otherFilter) {
-		Integer composedRemainingDepth = remainingDepth;
-		// Determine the minimum depth (null is highest)
-		if ( remainingDepth == null
-				|| otherFilter.remainingDepth != null && remainingDepth > otherFilter.remainingDepth ) {
-			composedRemainingDepth = otherFilter.remainingDepth;
-		}
-
-		return new DepthFilter( composedRemainingDepth );
-	}
 }
