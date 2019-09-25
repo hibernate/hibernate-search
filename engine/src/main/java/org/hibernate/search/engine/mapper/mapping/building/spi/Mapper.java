@@ -29,7 +29,7 @@ public interface Mapper<MPBS extends MappingPartialBuildState> {
 	 * Prepare for the mapping of indexed types
 	 * and inform the engine of the names of all backends this mapper depends on.
 	 * <p>
-	 * Called exactly once just before {@link #mapIndexedTypes(IndexManagerBuildingStateProvider)}.
+	 * Called exactly once just before {@link #mapIndexedTypes(IndexedEntityBindingContextProvider)}.
 	 *
 	 * @param backendNameCollector A collector of backend names, {@code Optional.empty()} means "the default backend".
 	 */
@@ -40,16 +40,16 @@ public interface Mapper<MPBS extends MappingPartialBuildState> {
 	 * <p>
 	 * Called exactly once just after {@link #prepareIndexedTypes(Consumer)} and before {@link #prepareBuild()}.
 	 *
-	 * @param indexManagerBuildingStateProvider A provider of index manager building states,
+	 * @param contextProvider A provider of context for binding indexed entities,
 	 * supporting all the backends declared in {@link #prepareIndexedTypes(Consumer)}.
 	 */
-	void mapIndexedTypes(IndexManagerBuildingStateProvider indexManagerBuildingStateProvider);
+	void mapIndexedTypes(IndexedEntityBindingContextProvider contextProvider);
 
 	/**
-	 * Partially build the mapping based on the {@link #mapIndexedTypes(IndexManagerBuildingStateProvider) indexex types}
+	 * Partially build the mapping based on the {@link #mapIndexedTypes(IndexedEntityBindingContextProvider) indexed types}
 	 * added so far.
 	 * <p>
-	 * Called exactly once just after {@link #mapIndexedTypes(IndexManagerBuildingStateProvider)}.
+	 * Called exactly once just after {@link #mapIndexedTypes(IndexedEntityBindingContextProvider)}.
 	 *
 	 * @return The partially-built mapping.
 	 * @throws MappingAbortedException When aborting the mapping due to

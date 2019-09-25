@@ -13,7 +13,8 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingStateProvider;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContextProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingAbortedException;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
@@ -69,11 +70,11 @@ class StubMapper implements Mapper<StubMappingPartialBuildState> {
 	}
 
 	@Override
-	public void mapIndexedTypes(IndexManagerBuildingStateProvider indexManagerBuildingStateProvider) {
+	public void mapIndexedTypes(IndexedEntityBindingContextProvider contextProvider) {
 		contributorProvider.getTypesContributedTo()
 				.forEach( type -> {
 					try {
-						mapTypeIfIndexed( type, indexManagerBuildingStateProvider );
+						mapTypeIfIndexed( type, contextProvider );
 					}
 					catch (RuntimeException e) {
 						failureCollector.withContext( EventContexts.fromType( type ) )
@@ -83,7 +84,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState> {
 	}
 
 	private void mapTypeIfIndexed(MappableTypeModel type,
-			IndexManagerBuildingStateProvider indexManagerBuildingStateProvider) {
+			IndexedEntityBindingContextProvider contextProvider) {
 		Set<StubTypeMetadataContributor> contributorSet = contributorProvider.get( type );
 		String indexName = null;
 		String backendName = null;
@@ -97,13 +98,16 @@ class StubMapper implements Mapper<StubMappingPartialBuildState> {
 		}
 		if ( indexName != null ) {
 			IndexManagerBuildingState<?> indexManagerBuildingState =
-					indexManagerBuildingStateProvider.getIndexManagerBuildingState(
+					contextProvider.getIndexManagerBuildingState(
 							Optional.ofNullable( backendName ),
 							indexName,
 							multiTenancyEnabled
 					);
+			IndexedEntityBindingContext bindingContext = contextProvider.createIndexedEntityBindingContext(
+					indexManagerBuildingState.getSchemaRootNodeBuilder()
+			);
 			indexManagerBuildingStates.put( (StubTypeModel) type, indexManagerBuildingState );
-			contributorProvider.get( type ).forEach( c -> c.contribute( indexManagerBuildingState ) );
+			contributorProvider.get( type ).forEach( c -> c.contribute( bindingContext ) );
 		}
 	}
 

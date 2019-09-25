@@ -8,7 +8,6 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 
@@ -31,8 +30,8 @@ class StubTypeMetadataContributor {
 		collector.collectContributor( typeIdentifier, this );
 	}
 
-	public void contribute(IndexManagerBuildingState<?> indexManagerBuildingState) {
-		delegate.accept( indexManagerBuildingState.getIndexedEntityBindingContext() );
+	public void contribute(IndexedEntityBindingContext bindingContext) {
+		delegate.accept( bindingContext );
 	}
 
 	public String getBackendName() {

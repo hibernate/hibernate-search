@@ -13,8 +13,8 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBind
 public class IndexedEntityBindingContextImpl extends AbstractIndexBindingContext<IndexSchemaRootNodeBuilder>
 		implements IndexedEntityBindingContext {
 
-	public IndexedEntityBindingContextImpl(IndexSchemaRootNodeBuilder indexSchemaObjectNodeBuilder) {
-		super( indexSchemaObjectNodeBuilder, indexSchemaObjectNodeBuilder, ConfiguredIndexSchemaNestingContext.root() );
+	public IndexedEntityBindingContextImpl(IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder) {
+		super( indexSchemaRootNodeBuilder, indexSchemaRootNodeBuilder, ConfiguredIndexSchemaNestingContext.root() );
 	}
 
 	@Override

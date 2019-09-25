@@ -29,10 +29,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.engine.mapper.mapping.building.impl.IndexedEntityBindingContextImpl;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingStateProvider;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -41,7 +38,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
 
-class IndexManagerBuildingStateHolder implements IndexManagerBuildingStateProvider {
+class IndexManagerBuildingStateHolder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -88,8 +85,7 @@ class IndexManagerBuildingStateHolder implements IndexManagerBuildingStateProvid
 		}
 	}
 
-	@Override
-	public IndexManagerBuildingState<?> getIndexManagerBuildingState(Optional<String> backendName, String indexName,
+	IndexManagerBuildingState<?> getIndexManagerBuildingState(Optional<String> backendName, String indexName,
 			boolean multiTenancyEnabled) {
 		return getBackend( backendName.orElseGet( this::getDefaultBackendName ) )
 				.getIndexManagerBuildingState( indexName, multiTenancyEnabled );
@@ -190,9 +186,8 @@ class IndexManagerBuildingStateHolder implements IndexManagerBuildingStateProvid
 						indexName, multiTenancyEnabled, backendBuildContext, indexPropertySource
 				);
 				IndexSchemaRootNodeBuilder schemaRootNodeBuilder = builder.getSchemaRootNodeBuilder();
-				IndexedEntityBindingContext bindingContext = new IndexedEntityBindingContextImpl( schemaRootNodeBuilder );
 
-				state = new IndexManagerInitialBuildState<>( backendName, indexName, builder, bindingContext );
+				state = new IndexManagerInitialBuildState<>( backendName, indexName, builder, schemaRootNodeBuilder );
 				indexManagerBuildStateByName.put( indexName, state );
 			}
 			return state;
@@ -213,17 +208,17 @@ class IndexManagerBuildingStateHolder implements IndexManagerBuildingStateProvid
 		private final String backendName;
 		private final String indexName;
 		private final IndexManagerBuilder<D> builder;
-		private final IndexedEntityBindingContext bindingContext;
+		private final IndexSchemaRootNodeBuilder schemaRootNodeBuilder;
 
 		private IndexManagerImplementor<D> indexManager;
 
 		IndexManagerInitialBuildState(String backendName, String indexName,
 				IndexManagerBuilder<D> builder,
-				IndexedEntityBindingContext bindingContext) {
+				IndexSchemaRootNodeBuilder schemaRootNodeBuilder) {
 			this.backendName = backendName;
 			this.indexName = indexName;
 			this.builder = builder;
-			this.bindingContext = bindingContext;
+			this.schemaRootNodeBuilder = schemaRootNodeBuilder;
 		}
 
 		void closeOnFailure(SuppressingCloser closer) {
@@ -241,8 +236,8 @@ class IndexManagerBuildingStateHolder implements IndexManagerBuildingStateProvid
 		}
 
 		@Override
-		public IndexedEntityBindingContext getIndexedEntityBindingContext() {
-			return bindingContext;
+		public IndexSchemaRootNodeBuilder getSchemaRootNodeBuilder() {
+			return schemaRootNodeBuilder;
 		}
 
 		@Override
