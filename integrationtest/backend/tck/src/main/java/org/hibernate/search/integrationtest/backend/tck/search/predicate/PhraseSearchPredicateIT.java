@@ -50,6 +50,7 @@ public class PhraseSearchPredicateIT {
 	private static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_NAME = "IndexWithCompatibleRawFields";
 	private static final String INCOMPATIBLE_ANALYZER_INDEX_NAME = "IndexWithIncompatibleAnalyzer";
+	private static final String COMPATIBLE_SEARCH_ANALYZER_INDEX_NAME = "IndexWithCompatibleSearchAnalyzer";
 	private static final String UNSEARCHABLE_FIELDS_INDEX_NAME = "IndexWithUnsearchableFields";
 
 	private static final String DOCUMENT_1 = "document1";
@@ -75,6 +76,7 @@ public class PhraseSearchPredicateIT {
 	private static final String COMPATIBLE_INDEX_DOCUMENT_1 = "compatible_1";
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 = "raw_field_compatible_1";
 	private static final String INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 = "incompatible_analyzer_1";
+	private static final String COMPATIBLE_SEARCH_ANALYZER_INDEX_DOCUMENT_1 = "compatible_search_analyzer_1";
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper( TckBackendHelper::createAnalysisOverrideBackendSetupStrategy );
@@ -90,6 +92,9 @@ public class PhraseSearchPredicateIT {
 
 	private OtherIndexMapping incompatibleAnalyzerIndexMapping;
 	private StubMappingIndexManager incompatibleAnalyzerIndexManager;
+
+	private OtherIndexMapping compatibleSearchAnalyzerIndexMapping;
+	private StubMappingIndexManager compatibleSearchAnalyzerIndexManager;
 
 	private StubMappingIndexManager unsearchableFieldsIndexManager;
 
@@ -118,6 +123,12 @@ public class PhraseSearchPredicateIT {
 						ctx -> this.incompatibleAnalyzerIndexMapping =
 								OtherIndexMapping.createIncompatibleAnalyzer( ctx.getSchemaElement() ),
 						indexManager -> this.incompatibleAnalyzerIndexManager = indexManager
+				)
+				.withIndex(
+						COMPATIBLE_SEARCH_ANALYZER_INDEX_NAME,
+						ctx -> this.compatibleSearchAnalyzerIndexMapping =
+								OtherIndexMapping.createCompatibleSearchAnalyzer( ctx.getSchemaElement() ),
+						indexManager -> this.compatibleSearchAnalyzerIndexManager = indexManager
 				)
 				.withIndex(
 						UNSEARCHABLE_FIELDS_INDEX_NAME,
@@ -716,6 +727,21 @@ public class PhraseSearchPredicateIT {
 	}
 
 	@Test
+	public void multiIndex_incompatibleAnalyzer_searchAnalyzer() {
+		StubMappingScope scope = indexManager.createScope( compatibleSearchAnalyzerIndexManager );
+		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.predicate( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1_UNIQUE_TERM ) )
+				.toQuery();
+
+		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
+			b.doc( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4 );
+			b.doc( COMPATIBLE_SEARCH_ANALYZER_INDEX_NAME, COMPATIBLE_SEARCH_ANALYZER_INDEX_DOCUMENT_1 );
+		} );
+	}
+
+	@Test
 	public void multiIndex_incompatibleAnalyzer_skipAnalysis() {
 		StubMappingScope scope = indexManager.createScope( incompatibleAnalyzerIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
@@ -801,6 +827,12 @@ public class PhraseSearchPredicateIT {
 		} );
 		plan.execute().join();
 
+		plan = compatibleSearchAnalyzerIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( COMPATIBLE_SEARCH_ANALYZER_INDEX_DOCUMENT_1 ), document -> {
+			document.addValue( compatibleSearchAnalyzerIndexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
+		} );
+		plan.execute().join();
+
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
@@ -808,18 +840,26 @@ public class PhraseSearchPredicateIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4, DOCUMENT_5, EMPTY );
+
 		query = compatibleIndexManager.createScope().query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
+
 		query = rawFieldCompatibleIndexManager.createScope().query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
+
 		query = incompatibleAnalyzerIndexManager.createScope().query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INCOMPATIBLE_ANALYZER_INDEX_NAME, INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 );
+
+		query = compatibleSearchAnalyzerIndexManager.createScope().query()
+				.predicate( f -> f.matchAll() )
+				.toQuery();
+		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_SEARCH_ANALYZER_INDEX_NAME, COMPATIBLE_SEARCH_ANALYZER_INDEX_DOCUMENT_1 );
 	}
 
 	private static void forEachTypeDescriptor(Consumer<FieldTypeDescriptor<?>> action) {
@@ -916,6 +956,18 @@ public class PhraseSearchPredicateIT {
 					MainFieldModel.mapper(
 							// Using a different analyzer
 							c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
+					)
+							.map( root, "analyzedString1" )
+			);
+		}
+
+		static OtherIndexMapping createCompatibleSearchAnalyzer(IndexSchemaElement root) {
+			return new OtherIndexMapping(
+					MainFieldModel.mapper(
+							// Using a different analyzer
+							c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
+									// Overriding it with a compatible one
+									.searchAnalyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 					)
 							.map( root, "analyzedString1" )
 			);

@@ -56,6 +56,7 @@ public class MatchSearchPredicateIT {
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_NAME = "IndexWithCompatibleRawFields";
 	private static final String INCOMPATIBLE_INDEX_NAME = "IndexWithIncompatibleFields";
 	private static final String INCOMPATIBLE_ANALYZER_INDEX_NAME = "IndexWithIncompatibleAnalyzer";
+	private static final String COMPATIBLE_SEARCH_ANALYZER_INDEX_NAME = "IndexWithCompatibleSearchAnalyzer";
 	private static final String INCOMPATIBLE_DECIMAL_SCALE_INDEX_NAME = "IndexWithIncompatibleDecimalScale";
 	private static final String UNSEARCHABLE_FIELDS_INDEX_NAME = "IndexWithUnsearchableFields";
 
@@ -67,6 +68,7 @@ public class MatchSearchPredicateIT {
 	private static final String COMPATIBLE_INDEX_DOCUMENT_1 = "compatible_1";
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 = "raw_field_compatible_1";
 	private static final String INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 = "incompatible_analyzer_1";
+	private static final String COMPATIBLE_SEARCH_ANALYZER_INDEX_DOCUMENT_1 = "compatible_search_analyzer_1";
 	private static final String INCOMPATIBLE_DECIMAL_SCALE_INDEX_DOCUMENT_1 = "incompatible_decimal_scale_1";
 
 	@Rule
@@ -85,6 +87,9 @@ public class MatchSearchPredicateIT {
 
 	private IncompatibleAnalyzerIndexMapping incompatibleAnalyzerIndexMapping;
 	private StubMappingIndexManager incompatibleAnalyzerIndexManager;
+
+	private CompatibleSearchAnalyzerIndexMapping compatibleSearchAnalyzerIndexMapping;
+	private StubMappingIndexManager compatibleSearchAnalyzerIndexManager;
 
 	private IncompatibleDecimalScaleIndexMapping incompatibleDecimalScaleIndexMapping;
 	private StubMappingIndexManager incompatibleDecimalScaleIndexManager;
@@ -118,6 +123,11 @@ public class MatchSearchPredicateIT {
 						INCOMPATIBLE_ANALYZER_INDEX_NAME,
 						ctx -> this.incompatibleAnalyzerIndexMapping = new IncompatibleAnalyzerIndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.incompatibleAnalyzerIndexManager = indexManager
+				)
+				.withIndex(
+						COMPATIBLE_SEARCH_ANALYZER_INDEX_NAME,
+						ctx -> this.compatibleSearchAnalyzerIndexMapping = new CompatibleSearchAnalyzerIndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.compatibleSearchAnalyzerIndexManager = indexManager
 				)
 				.withIndex(
 						INCOMPATIBLE_DECIMAL_SCALE_INDEX_NAME,
@@ -1323,6 +1333,21 @@ public class MatchSearchPredicateIT {
 	}
 
 	@Test
+	public void multiIndex_incompatibleAnalyzer_searchAnalyzer() {
+		StubMappingScope scope = indexManager.createScope( compatibleSearchAnalyzerIndexManager );
+		String absoluteFieldPath = indexMapping.analyzedStringField.relativeFieldName;
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.predicate( f -> f.match().field( absoluteFieldPath ).matching( "fox" ) )
+				.toQuery();
+
+		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
+			b.doc( INDEX_NAME, DOCUMENT_1 );
+			b.doc( COMPATIBLE_SEARCH_ANALYZER_INDEX_NAME, COMPATIBLE_SEARCH_ANALYZER_INDEX_DOCUMENT_1 );
+		} );
+	}
+
+	@Test
 	public void multiIndex_incompatibleAnalyzer_skipAnalysis() {
 		StubMappingScope scope = indexManager.createScope( incompatibleAnalyzerIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField.relativeFieldName;
@@ -1454,6 +1479,12 @@ public class MatchSearchPredicateIT {
 		} );
 		plan.execute().join();
 
+		plan = compatibleSearchAnalyzerIndexManager.createIndexingPlan();
+		plan.add( referenceProvider( COMPATIBLE_SEARCH_ANALYZER_INDEX_DOCUMENT_1 ), document -> {
+			compatibleSearchAnalyzerIndexMapping.analyzedStringField.document1Value.write( document );
+		} );
+		plan.execute().join();
+
 		plan = incompatibleDecimalScaleIndexManager.createIndexingPlan();
 		plan.add( referenceProvider( INCOMPATIBLE_DECIMAL_SCALE_INDEX_DOCUMENT_1 ), document -> {
 			incompatibleDecimalScaleIndexMapping.scaledBigDecimal.document1Value.write( document );
@@ -1465,18 +1496,27 @@ public class MatchSearchPredicateIT {
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+
 		query = compatibleIndexManager.createScope().query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
+
 		query = rawFieldCompatibleIndexManager.createScope().query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
+
 		query = incompatibleAnalyzerIndexManager.createScope().query()
 				.predicate( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INCOMPATIBLE_ANALYZER_INDEX_NAME, INCOMPATIBLE_ANALYZER_INDEX_DOCUMENT_1 );
+
+		query = compatibleSearchAnalyzerIndexManager.createScope().query()
+				.predicate( f -> f.matchAll() )
+				.toQuery();
+		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_SEARCH_ANALYZER_INDEX_NAME, COMPATIBLE_SEARCH_ANALYZER_INDEX_DOCUMENT_1 );
+
 		query = incompatibleDecimalScaleIndexManager.createScope().query()
 				.asEntityReference()
 				.predicate( f -> f.matchAll() )
@@ -1668,6 +1708,24 @@ public class MatchSearchPredicateIT {
 		IncompatibleAnalyzerIndexMapping(IndexSchemaElement root) {
 			analyzedStringField = MainFieldModel.mapper(
 					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name ),
+					"quick brown fox", "another word", "a"
+			)
+					.map( root, "analyzedString" );
+		}
+	}
+
+	private static class CompatibleSearchAnalyzerIndexMapping {
+		final MainFieldModel<String> analyzedStringField;
+
+		/*
+		 * Unlike IndexMapping#analyzedStringField,
+		 * we're using here a different analyzer for the field.
+		 */
+		CompatibleSearchAnalyzerIndexMapping(IndexSchemaElement root) {
+			analyzedStringField = MainFieldModel.mapper(
+					c -> c.asString().analyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE.name )
+						// Overriding it with a compatible one
+						.searchAnalyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ),
 					"quick brown fox", "another word", "a"
 			)
 					.map( root, "analyzedString" );
