@@ -13,7 +13,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoImplicitReindexingResolverBuildingHelper;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
@@ -50,6 +50,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 			PojoTypeAdditionalMetadata typeAdditionalMetadata,
 			PojoMappingHelper mappingHelper,
 			IndexManagerBuildingState<D> indexManagerBuildingState,
+			IndexedEntityBindingContext bindingContext,
 			PojoIndexedTypeExtendedMappingCollector extendedMappingCollector,
 			boolean implicitProvidedId) {
 		this.typeModel = typeModel;
@@ -59,10 +60,9 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 				typeModel,
 				typeAdditionalMetadata,
 				mappingHelper,
-				indexManagerBuildingState,
+				bindingContext,
 				implicitProvidedId
 		);
-		IndexBindingContext bindingContext = indexManagerBuildingState.getIndexedEntityBindingContext();
 		this.processorBuilder = new PojoIndexingProcessorTypeNodeBuilder<>(
 				BoundPojoModelPath.root( typeModel ),
 				mappingHelper, bindingContext,

@@ -35,4 +35,5 @@ public class PojoMappingHelper {
 	public FailureCollector getFailureCollector() {
 		return failureCollector;
 	}
+
 }

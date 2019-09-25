@@ -8,9 +8,14 @@ package org.hibernate.search.engine.mapper.mapping.building.spi;
 
 import java.util.Optional;
 
-public interface IndexManagerBuildingStateProvider {
+import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
+
+public interface IndexedEntityBindingContextProvider {
 
 	IndexManagerBuildingState<?> getIndexManagerBuildingState(Optional<String> backendName, String indexName,
 			boolean multiTenancyEnabled);
+
+	IndexedEntityBindingContext createIndexedEntityBindingContext(
+			IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder);
 
 }

@@ -18,7 +18,8 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingStateProvider;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContextProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingAbortedException;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
@@ -172,10 +173,10 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	}
 
 	@Override
-	public void mapIndexedTypes(IndexManagerBuildingStateProvider indexManagerBuildingStateProvider) {
+	public void mapIndexedTypes(IndexedEntityBindingContextProvider contextProvider) {
 		for ( PojoRawTypeModel<?> indexedEntityType : indexedEntityTypes ) {
 			try {
-				mapIndexedType( indexedEntityType, indexManagerBuildingStateProvider );
+				mapIndexedType( indexedEntityType, contextProvider );
 			}
 			catch (RuntimeException e) {
 				failureCollector.withContext( EventContexts.fromType( indexedEntityType ) )
@@ -185,22 +186,24 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	}
 
 	private void mapIndexedType(PojoRawTypeModel<?> indexedEntityType,
-			IndexManagerBuildingStateProvider indexManagerBuildingStateProvider) {
+			IndexedEntityBindingContextProvider contextProvider) {
 		PojoTypeAdditionalMetadata metadata = typeAdditionalMetadataProvider.get( indexedEntityType );
 		// This metadata is guaranteed to exist; see prepareEntityOrIndexedType()
 		PojoIndexedTypeAdditionalMetadata indexedTypeMetadata = metadata.getIndexedTypeMetadata().get();
 		PojoEntityTypeAdditionalMetadata entityTypeMetadata = metadata.getEntityTypeMetadata().get();
 
 		IndexManagerBuildingState<?> indexManagerBuildingState =
-				indexManagerBuildingStateProvider.getIndexManagerBuildingState(
+				contextProvider.getIndexManagerBuildingState(
 						indexedTypeMetadata.getBackendName(),
 						indexedTypeMetadata.getIndexName()
 								.orElse( entityTypeMetadata.getEntityName() ),
 						multiTenancyEnabled
 				);
-
+		IndexedEntityBindingContext bindingContext = contextProvider.createIndexedEntityBindingContext(
+				indexManagerBuildingState.getSchemaRootNodeBuilder()
+		);
 		PojoIndexedTypeManagerBuilder<?, ?> builder = createIndexedTypeManagerBuilder(
-				indexedEntityType, indexManagerBuildingState
+				indexedEntityType, indexManagerBuildingState, bindingContext
 		);
 		// Put the builder in the map before anything else, so it will be closed on error
 		indexedTypeManagerBuilders.put( indexedEntityType, builder );
@@ -334,12 +337,14 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	}
 
 	private <E, D extends DocumentElement> PojoIndexedTypeManagerBuilder<E, D> createIndexedTypeManagerBuilder(
-			PojoRawTypeModel<E> entityTypeModel, IndexManagerBuildingState<D> indexManagerBuildingState) {
+			PojoRawTypeModel<E> entityTypeModel, IndexManagerBuildingState<D> indexManagerBuildingState,
+			IndexedEntityBindingContext bindingContext) {
 		return new PojoIndexedTypeManagerBuilder<>(
 				entityTypeModel,
 				typeAdditionalMetadataProvider.get( entityTypeModel ),
 				mappingHelper,
 				indexManagerBuildingState,
+				bindingContext,
 				delegate.createIndexedTypeExtendedMappingCollector(
 						entityTypeModel, indexManagerBuildingState.getIndexName()
 				),
