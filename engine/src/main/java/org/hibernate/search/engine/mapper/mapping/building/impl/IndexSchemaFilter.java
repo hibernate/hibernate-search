@@ -103,34 +103,104 @@ class IndexSchemaFilter {
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "parentTypeModel=" ).append( parentTypeModel )
+				.append( ",parentTypeModel=" ).append( parentTypeModel )
 				.append( ",relativePrefix=" ).append( relativePrefix )
 				.append( ",depthFilter=" ).append( depthFilter )
 				.append( ",pathFilter=" ).append( pathFilter )
+				.append( ",parent=" ).append( parent )
 				.append( "]" )
 				.toString();
 	}
 
 	public boolean isPathIncluded(String relativePath) {
-		boolean included = depthFilter.hasDepthRemaining()
+		return isPathIncludedInternal( 0, relativePath, true, true );
+	}
+
+	/**
+	 * @param relativeDepth The number of indexed-embeddeds between this filter and the end of the path.
+	 * @param relativePath The path relative to this filter.
+	 * @param markAsEncountered Whether the path should be marked as encountered
+	 * ({@code true}), or not ({@code false}).
+	 * Useful when processing "theoretical" paths, such as the includePaths of a child filter, in particular.
+	 * @param includedByChild Whether a child filter included this path.
+	 * Useful when marking a path as encountered: if it is included by this filter,
+	 * but not by any children, the corresponding includePaths is not effective,
+	 * and thus we should consider the path as excluded for the purpose of detecting ineffective includePaths.
+	 * @return {@code true} if the path is included, {@code false} otherwise.
+	 */
+	private boolean isPathIncludedInternal(int relativeDepth, String relativePath,
+			boolean markAsEncountered, boolean includedByChild) {
+		boolean includedByThis = depthFilter.isEveryPathIncludedAtDepth( relativeDepth )
 				|| pathFilter.isExplicitlyIncluded( relativePath );
-		markAsEncountered( relativePath, included );
+
+		boolean includedByParent = true;
+		/*
+		 * The parent can filter out paths that are considered as included by a child,
+		 * by reducing the maxDepth in particular,
+		 * but it cannot include paths that are filtered out by a child.
+		 */
+		if ( parent != null ) {
+			includedByParent = parent.isPathIncludedInternal(
+					relativeDepth + 1,
+					relativePrefix + relativePath,
+					markAsEncountered, includedByThis
+			);
+		}
+
+		boolean included = includedByParent && includedByThis;
+
+		if ( markAsEncountered ) {
+			encounteredFieldPaths.merge(
+					relativePath, includedByThis && includedByChild,
+					(included1, included2) -> included1 || included2
+			);
+		}
+
 		return included;
 	}
 
-	private void markAsEncountered(String relativePath, boolean included) {
-		encounteredFieldPaths.put( relativePath, included );
-		if ( parent != null ) {
-			parent.markAsEncountered( relativePrefix + relativePath, included );
-		}
-	}
-
 	boolean isEveryPathExcluded() {
-		return !depthFilter.hasDepthRemaining() && !pathFilter.isAnyPathExplicitlyIncluded();
+		return !isEveryPathIncludedAtDepth( 0 )
+				&& !isAnyPathExplicitlyIncluded( "", this );
 	}
 
-	public Set<String> getLocalExplicitlyIncludedPaths() {
-		return pathFilter.getLocalIncludedPaths();
+	private boolean isAnyPathExplicitlyIncluded(String prefixToRemove, IndexSchemaFilter filter) {
+		int prefixLength = prefixToRemove.length();
+		/*
+		 * First check the explicitly included paths from this.
+		 * They may be excluded by the given filter (which is either this or a descendant).
+		 */
+		for ( String path : pathFilter.getConfiguredIncludedPaths() ) {
+			if ( !path.startsWith( prefixToRemove ) ) {
+				continue;
+			}
+			String pathWithoutPrefix = path.substring( prefixLength );
+			if ( filter.isPathIncludedInternal( 0, pathWithoutPrefix, false, true ) ) {
+				return true;
+			}
+		}
+		/*
+		 * Then the explicitly included paths from ancestors.
+		 * They may be excluded by the given filter (which is either this or a descendant),
+		 * but they may also be included.
+		 * This can happen for example
+		 * if @IndexedEmbedded(maxDepth = 0, includePaths = "embedded.foo")
+		 * embeds @IndexedEmbedded(maxDepth = 42):
+		 * the paths explicitly included by the parent will be included
+		 * even though they are not explicitly included by the child
+		 */
+		return parent != null
+				&& parent.isAnyPathExplicitlyIncluded( relativePrefix + prefixToRemove, filter );
+	}
+
+	private boolean isEveryPathIncludedAtDepth(int depth) {
+		return depthFilter.isEveryPathIncludedAtDepth( depth )
+				// The parent can reduce the max depth of a child.
+				&& ( parent == null || parent.isEveryPathIncludedAtDepth( depth + 1 ) );
+	}
+
+	public Set<String> getConfiguredIncludedPaths() {
+		return pathFilter.getConfiguredIncludedPaths();
 	}
 
 	public Map<String, Boolean> getEncounteredFieldPaths() {
@@ -172,11 +242,8 @@ class IndexSchemaFilter {
 
 		Set<String> nullSafeIncludedPathsToCompose = includedPathsToCompose == null ? Collections.emptySet() : includedPathsToCompose;
 
-		// The new depth filter at the new depth according to "this" only
-		DepthFilter thisNewDepthFilter = depthFilter.increaseDepth();
-
 		// The new depth filter according to the new max depth
-		DepthFilter otherDepthFilter;
+		DepthFilter newDepthFilter;
 		if ( maxDepthToCompose == null && !nullSafeIncludedPathsToCompose.isEmpty() ) {
 			/*
 			 * If no max depth was provided and included paths were provided,
@@ -184,31 +251,23 @@ class IndexSchemaFilter {
 			 * meaning no composition is allowed and paths are excluded unless
 			 * explicitly listed in "includePaths".
 			 */
-			otherDepthFilter = DepthFilter.of( 0 );
+			newDepthFilter = DepthFilter.of( 0 );
 		}
 		else {
-			otherDepthFilter = DepthFilter.of( maxDepthToCompose );
+			newDepthFilter = DepthFilter.of( maxDepthToCompose );
 		}
 
-		// The actual (composed) new depth filter
-		DepthFilter composedDepthFilter = thisNewDepthFilter.combine( otherDepthFilter );
-
-		// The new path filter at the new depth according to "this" only
-		PathFilter thisNewPathFilter = pathFilter.increaseDepth( relativePrefix );
-
-		// The actual (composed) new path filter
-		PathFilter composedPathFilter = thisNewPathFilter.combine(
-				nullSafeIncludedPathsToCompose,
-				thisNewDepthFilter.hasDepthRemaining(), otherDepthFilter.hasDepthRemaining()
-		);
+		// The new path filter according to the given includedPaths
+		PathFilter newPathFilter = PathFilter.of( includedPathsToCompose );
 
 		return new IndexSchemaFilter(
 				this, parentTypeModel, relativePrefix,
-				composedDepthFilter, composedPathFilter
+				newDepthFilter, newPathFilter
 		);
 	}
 
 	private boolean hasCompositionLimits() {
-		return depthFilter.hasDepthLimit() || pathFilter.isAnyPathExplicitlyIncluded();
+		return depthFilter.hasDepthLimit() || pathFilter.isAnyPathExplicitlyIncluded()
+				|| parent != null && parent.hasCompositionLimits();
 	}
 }
