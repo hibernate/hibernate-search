@@ -119,8 +119,6 @@ public class IndexedEmbeddedIncludePathsAndDepthIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" );
-		// TODO HSEARCH-3684: an exception should be thrown here, but isn't.
-		/*
 		SubTest.expectException(
 				() -> {
 					searchMapping.scope( Human.class ).predicate()
@@ -130,8 +128,6 @@ public class IndexedEmbeddedIncludePathsAndDepthIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" );
-		 */
-
 	}
 
 }
