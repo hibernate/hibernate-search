@@ -759,7 +759,6 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 				);
 	}
 
-
 	@Test
 	public void indexedEmbedded_includePaths_embedding_depth1AndIncludePaths() {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
@@ -791,6 +790,49 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 				checkCompositeIncluded( "level3", level2Context, "level3" );
 		checkFooBarExcluded( "", level3Context );
 
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3684")
+	public void indexedEmbedded_includePaths_embedding_depth2AndIncludePaths() {
+		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
+
+		Set<String> includePaths = new HashSet<>();
+
+		includePaths.add( "text" );
+		includePaths.add( "nested.nested.text" );
+		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
+				"level1", rootContext, typeModel1Mock, "level1.",
+				2, includePaths
+		);
+
+		// Same includePaths as above
+		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
+				"nested", level1Context, typeModel2Mock, "nested.",
+				2, includePaths
+		);
+		checkFooBarIncluded( "", level2Context );
+		checkFooBarIndexedEmbeddedExcluded( level2Context, typeModel3Mock );
+		checkLeafIncluded( "text", level2Context, "text" );
+		checkCompositeIncluded( "nested", level2Context, "nested" );
+
+		// Also check embedding a third level of @IndexedEmbedded
+		// Same includePaths as above
+		ConfiguredIndexSchemaNestingContext level3Context = checkSimpleIndexedEmbeddedIncluded(
+				"nested", level2Context, typeModel3Mock, "nested.",
+				2, includePaths
+		);
+		checkFooBarExcluded( "", level3Context );
+		checkFooBarIndexedEmbeddedExcluded( level3Context, typeModel3Mock );
+		checkLeafIncluded( "text", level3Context, "text" );
+		checkCompositeExcluded( "nested", level3Context, "nested" );
+
+		// A fourth level should be completely excluded
+		// Same includePaths as above
+		checkSimpleIndexedEmbeddedExcluded(
+				level3Context, typeModel4Mock, "nested.",
+				2, includePaths
+		);
 	}
 
 	private void checkLeafIncluded(String expectedPrefixedName, IndexSchemaNestingContext context,
