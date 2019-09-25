@@ -17,10 +17,13 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoPropertyMetadat
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingIndexedEmbeddedStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 
 class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingStep
 		implements PropertyMappingIndexedEmbeddedStep, PojoPropertyMetadataContributor {
+
+	private final PojoRawTypeModel<?> definingTypeModel;
 
 	private String prefix;
 
@@ -32,8 +35,9 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 
 	private ContainerExtractorPath extractorPath = ContainerExtractorPath.defaultExtractors();
 
-	PropertyMappingIndexedEmbeddedStepImpl(PropertyMappingStep parent) {
+	PropertyMappingIndexedEmbeddedStepImpl(PropertyMappingStep parent, PojoRawTypeModel<?> definingTypeModel) {
 		super( parent );
+		this.definingTypeModel = definingTypeModel;
 	}
 
 	@Override
@@ -44,11 +48,7 @@ class PropertyMappingIndexedEmbeddedStepImpl extends DelegatingPropertyMappingSt
 	@Override
 	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
 		collector.value( extractorPath ).indexedEmbedded(
-				prefix, storage, maxDepth, includePaths
-				/*
-				 * Ignore mapped types, we don't need to discover new mappings automatically
-				 * like in the annotation mappings.
-				 */
+				definingTypeModel, prefix, storage, maxDepth, includePaths
 		);
 	}
 

@@ -24,7 +24,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingKeywordFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingScaledNumberFieldOptionsStep;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
@@ -33,13 +32,13 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 class InitialPropertyMappingStep
 		implements PropertyMappingStep, PojoTypeMetadataContributor {
 
-	private final TypeMappingStep parent;
+	private final TypeMappingStepImpl parent;
 	private final PojoPropertyModel<?> propertyModel;
 
 	private final ErrorCollectingPojoPropertyMetadataContributor children =
 			new ErrorCollectingPojoPropertyMetadataContributor();
 
-	InitialPropertyMappingStep(TypeMappingStep parent, PojoPropertyModel<?> propertyModel) {
+	InitialPropertyMappingStep(TypeMappingStepImpl parent, PojoPropertyModel<?> propertyModel) {
 		this.parent = parent;
 		this.propertyModel = propertyModel;
 	}
@@ -141,7 +140,9 @@ class InitialPropertyMappingStep
 
 	@Override
 	public PropertyMappingIndexedEmbeddedStep indexedEmbedded() {
-		PropertyMappingIndexedEmbeddedStepImpl child = new PropertyMappingIndexedEmbeddedStepImpl( this );
+		PropertyMappingIndexedEmbeddedStepImpl child = new PropertyMappingIndexedEmbeddedStepImpl(
+				this, parent.getTypeModel()
+		);
 		children.add( child );
 		return child;
 	}

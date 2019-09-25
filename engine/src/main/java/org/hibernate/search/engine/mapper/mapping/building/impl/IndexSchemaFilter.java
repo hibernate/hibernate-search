@@ -7,13 +7,9 @@
 package org.hibernate.search.engine.mapper.mapping.building.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
 
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -29,7 +25,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *     <li>When a field is added by a bridge, the filter decides whether to include this field or not
  *     through its {@link #isPathIncluded(String)} method</li>
  *     <li>When a nested {@code @IndexedEmbedded} is requested, a new filter is created through the
- *     {@link #compose(MappableTypeModel, String, Integer, Set)} method, which may return a filter
+ *     {@link #compose(IndexedEmbeddedDefinition, IndexedEmbeddedPathTracker)} method, which may return a filter
  *     that {@link #isEveryPathExcluded() excludes every path}, meaning the {@code @IndexedEmbedded} will
  *     be ignored</li>
  * </ul>
@@ -59,7 +55,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * plus some added restrictions depending on the properties of the nested {@code IndexedEmbedded}.
  * <p>
  * For more information about how filters are composed, see
- * {@link #compose(MappableTypeModel, String, Integer, Set)}.
+ * {@link #compose(IndexedEmbeddedDefinition, IndexedEmbeddedPathTracker)}.
  *
  */
 class IndexSchemaFilter {
@@ -76,25 +72,19 @@ class IndexSchemaFilter {
 	}
 
 	private final IndexSchemaFilter parent;
-	private final MappableTypeModel parentTypeModel;
-	private final String relativePrefix;
+	private final IndexedEmbeddedDefinition definition;
+	private final IndexedEmbeddedPathTracker pathTracker;
 
 	private final DepthFilter depthFilter;
 
 	private final PathFilter pathFilter;
 
-	/**
-	 * The {@code paths} that were encountered, i.e. passed to {@link #isPathIncluded(String)}
-	 * or to the same method of a child filter.
-	 */
-	// Use a LinkedHashSet, since the set will be exposed through a getter and may be iterated on
-	private final Map<String, Boolean> encounteredFieldPaths = new LinkedHashMap<>();
-
-	private IndexSchemaFilter(IndexSchemaFilter parent, MappableTypeModel parentTypeModel, String relativePrefix,
+	private IndexSchemaFilter(IndexSchemaFilter parent,
+			IndexedEmbeddedDefinition definition, IndexedEmbeddedPathTracker pathTracker,
 			DepthFilter depthFilter, PathFilter pathFilter) {
 		this.parent = parent;
-		this.parentTypeModel = parentTypeModel;
-		this.relativePrefix = relativePrefix;
+		this.definition = definition;
+		this.pathTracker = pathTracker;
 		this.depthFilter = depthFilter;
 		this.pathFilter = pathFilter;
 	}
@@ -103,9 +93,7 @@ class IndexSchemaFilter {
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( ",parentTypeModel=" ).append( parentTypeModel )
-				.append( ",relativePrefix=" ).append( relativePrefix )
-				.append( ",depthFilter=" ).append( depthFilter )
+				.append( "depthFilter=" ).append( depthFilter )
 				.append( ",pathFilter=" ).append( pathFilter )
 				.append( ",parent=" ).append( parent )
 				.append( "]" )
@@ -142,17 +130,16 @@ class IndexSchemaFilter {
 		if ( parent != null ) {
 			includedByParent = parent.isPathIncludedInternal(
 					relativeDepth + 1,
-					relativePrefix + relativePath,
+					definition.getRelativePrefix() + relativePath,
 					markAsEncountered, includedByThis
 			);
 		}
 
 		boolean included = includedByParent && includedByThis;
 
-		if ( markAsEncountered ) {
-			encounteredFieldPaths.merge(
-					relativePath, includedByThis && includedByChild,
-					(included1, included2) -> included1 || included2
+		if ( markAsEncountered && pathTracker != null ) {
+			pathTracker.markAsEncountered(
+					relativePath, includedByThis && includedByChild
 			);
 		}
 
@@ -165,12 +152,17 @@ class IndexSchemaFilter {
 	}
 
 	private boolean isAnyPathExplicitlyIncluded(String prefixToRemove, IndexSchemaFilter filter) {
+		if ( definition == null ) {
+			// Root: return early to avoid annoying null checks
+			return false;
+		}
+
 		int prefixLength = prefixToRemove.length();
 		/*
 		 * First check the explicitly included paths from this.
 		 * They may be excluded by the given filter (which is either this or a descendant).
 		 */
-		for ( String path : pathFilter.getConfiguredIncludedPaths() ) {
+		for ( String path : definition.getIncludePaths() ) {
 			if ( !path.startsWith( prefixToRemove ) ) {
 				continue;
 			}
@@ -190,7 +182,7 @@ class IndexSchemaFilter {
 		 * even though they are not explicitly included by the child
 		 */
 		return parent != null
-				&& parent.isAnyPathExplicitlyIncluded( relativePrefix + prefixToRemove, filter );
+				&& parent.isAnyPathExplicitlyIncluded( definition.getRelativePrefix() + prefixToRemove, filter );
 	}
 
 	private boolean isEveryPathIncludedAtDepth(int depth) {
@@ -199,27 +191,18 @@ class IndexSchemaFilter {
 				&& ( parent == null || parent.isEveryPathIncludedAtDepth( depth + 1 ) );
 	}
 
-	public Set<String> getConfiguredIncludedPaths() {
-		return pathFilter.getConfiguredIncludedPaths();
-	}
-
-	public Map<String, Boolean> getEncounteredFieldPaths() {
-		return encounteredFieldPaths;
-	}
-
-	private String getPathFromSameIndexedEmbeddedSinceNoCompositionLimits(MappableTypeModel parentTypeModel, String relativePrefix) {
+	private String getPathFromSameIndexedEmbeddedSinceNoCompositionLimits(IndexedEmbeddedDefinition definition) {
 		if ( hasCompositionLimits() ) {
 			return null;
 		}
 		else if ( parent != null ) {
-			if ( this.relativePrefix.equals( relativePrefix )
-					&& this.parentTypeModel.isSubTypeOf( parentTypeModel ) ) {
+			if ( this.definition.equals( definition ) ) {
 				// Same IndexedEmbedded as the one passed as a parameter
-				return this.relativePrefix;
+				return this.definition.getRelativePrefix();
 			}
 			else {
-				String path = parent.getPathFromSameIndexedEmbeddedSinceNoCompositionLimits( parentTypeModel, relativePrefix );
-				return path == null ? null : path + this.relativePrefix;
+				String path = parent.getPathFromSameIndexedEmbeddedSinceNoCompositionLimits( definition );
+				return path == null ? null : path + this.definition.getRelativePrefix();
 			}
 		}
 		else {
@@ -232,36 +215,21 @@ class IndexSchemaFilter {
 		}
 	}
 
-	public IndexSchemaFilter compose(MappableTypeModel parentTypeModel, String relativePrefix,
-			Integer maxDepthToCompose, Set<String> includedPathsToCompose) {
-		String cyclicRecursionPath = getPathFromSameIndexedEmbeddedSinceNoCompositionLimits( parentTypeModel, relativePrefix );
+	public IndexSchemaFilter compose(IndexedEmbeddedDefinition definition, IndexedEmbeddedPathTracker pathTracker) {
+		String cyclicRecursionPath = getPathFromSameIndexedEmbeddedSinceNoCompositionLimits( definition );
 		if ( cyclicRecursionPath != null ) {
-			cyclicRecursionPath += relativePrefix;
-			throw log.indexedEmbeddedCyclicRecursion( cyclicRecursionPath, parentTypeModel );
+			cyclicRecursionPath += definition.getRelativePrefix();
+			throw log.indexedEmbeddedCyclicRecursion( cyclicRecursionPath, definition.getDefiningTypeModel() );
 		}
-
-		Set<String> nullSafeIncludedPathsToCompose = includedPathsToCompose == null ? Collections.emptySet() : includedPathsToCompose;
 
 		// The new depth filter according to the new max depth
-		DepthFilter newDepthFilter;
-		if ( maxDepthToCompose == null && !nullSafeIncludedPathsToCompose.isEmpty() ) {
-			/*
-			 * If no max depth was provided and included paths were provided,
-			 * the remaining composition depth is implicitly set to 0,
-			 * meaning no composition is allowed and paths are excluded unless
-			 * explicitly listed in "includePaths".
-			 */
-			newDepthFilter = DepthFilter.of( 0 );
-		}
-		else {
-			newDepthFilter = DepthFilter.of( maxDepthToCompose );
-		}
+		DepthFilter newDepthFilter = DepthFilter.of( definition.getMaxDepth() );
 
 		// The new path filter according to the given includedPaths
-		PathFilter newPathFilter = PathFilter.of( includedPathsToCompose );
+		PathFilter newPathFilter = PathFilter.of( definition.getIncludePaths() );
 
 		return new IndexSchemaFilter(
-				this, parentTypeModel, relativePrefix,
+				this, definition, pathTracker,
 				newDepthFilter, newPathFilter
 		);
 	}

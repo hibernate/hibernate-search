@@ -19,7 +19,9 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.impl.IndexSchemaNestingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.CollectionHelper;
@@ -101,16 +103,20 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 		checkFooBarIncluded( "prefix1_", level1Context );
 
 		resetAll();
-		EasyMock.expect( typeModel2Mock.getName() ).andReturn( "typeModel2Mock" );
-		EasyMock.expect( typeModel1Mock.isSubTypeOf( typeModel2Mock ) ).andReturn( true );
+		EasyMock.expect( typeModel1Mock.getName() ).andReturn( "typeModel1Mock" );
 		replayAll();
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Found an infinite IndexedEmbedded recursion" );
 		thrown.expectMessage( "path 'level1.prefix1_level1.prefix1_'" );
-		thrown.expectMessage( "type '" + typeModel2Mock.toString() + "'" );
+		thrown.expectMessage( "type '" + typeModel1Mock.toString() + "'" );
 		try {
-			level1Context.addIndexedEmbeddedIfIncluded( typeModel2Mock, "level1.prefix1_",
-					null, null, nestedContextBuilderMock
+			IndexedEmbeddedDefinition level1Definition = new IndexedEmbeddedDefinition(
+					typeModel1Mock, "level1.prefix1_", ObjectFieldStorage.DEFAULT,
+					null, null
+			);
+			level1Context.addIndexedEmbeddedIfIncluded(
+					level1Definition, new IndexedEmbeddedPathTracker( level1Definition ),
+					nestedContextBuilderMock
 			);
 		}
 		catch (SearchException e) {
@@ -134,16 +140,20 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 		);
 
 		resetAll();
-		EasyMock.expect( typeModel3Mock.getName() ).andReturn( "typeModel3Mock" );
-		EasyMock.expect( typeModel1Mock.isSubTypeOf( typeModel3Mock ) ).andReturn( true );
+		EasyMock.expect( typeModel1Mock.getName() ).andReturn( "typeModel1Mock" );
 		replayAll();
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Found an infinite IndexedEmbedded recursion" );
 		thrown.expectMessage( "path 'level1.prefix1_level2.prefix2_level1.prefix1_'" );
-		thrown.expectMessage( "type '" + typeModel3Mock.toString() + "'" );
+		thrown.expectMessage( "type '" + typeModel1Mock.toString() + "'" );
 		try {
-			level2Context.addIndexedEmbeddedIfIncluded( typeModel3Mock, "level1.prefix1_",
-					null, null, nestedContextBuilderMock
+			IndexedEmbeddedDefinition level2Definition = new IndexedEmbeddedDefinition(
+					typeModel1Mock, "level1.prefix1_", ObjectFieldStorage.DEFAULT,
+					null, null
+			);
+			level2Context.addIndexedEmbeddedIfIncluded(
+					level2Definition, new IndexedEmbeddedPathTracker( level2Definition ),
+					nestedContextBuilderMock
 			);
 		}
 		catch (SearchException e) {
@@ -170,8 +180,14 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 		EasyMock.expect( nestedContextBuilderMock.build( EasyMock.capture( nestedContextCapture ) ) )
 				.andReturn( expectedReturn );
 		replayAll();
-		actualReturn = rootContext.addIndexedEmbeddedIfIncluded( typeModel1Mock, "level1.level2.level3.prefix1_",
-				null, null, nestedContextBuilderMock );
+		IndexedEmbeddedDefinition definition = new IndexedEmbeddedDefinition(
+				typeModel1Mock, "level1.level2.level3.prefix1_", ObjectFieldStorage.DEFAULT,
+				null, null
+		);
+		actualReturn = rootContext.addIndexedEmbeddedIfIncluded(
+				definition, new IndexedEmbeddedPathTracker( definition ),
+				nestedContextBuilderMock
+		);
 		verifyAll();
 		assertNotNull( actualReturn );
 		assertTrue( actualReturn.isPresent() );
@@ -273,7 +289,6 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 		ConfiguredIndexSchemaNestingContext rootContext = ConfiguredIndexSchemaNestingContext.root();
 
 		Set<String> includePaths = new HashSet<>();
-
 		includePaths.add( "included" );
 		includePaths.add( "notEncountered" );
 		includePaths.add( "level2NonIndexedEmbedded" );
@@ -282,15 +297,18 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 		includePaths.add( "level2IndexedEmbedded.included" );
 		includePaths.add( "level2IndexedEmbedded.notEncountered" );
 		includePaths.add( "level2IndexedEmbedded.excludedBecauseOfLevel2" );
-
+		IndexedEmbeddedDefinition level1Definition = new IndexedEmbeddedDefinition(
+				typeModel1Mock, "level1.", ObjectFieldStorage.DEFAULT, null, includePaths
+		);
+		IndexedEmbeddedPathTracker level1PathTracker = new IndexedEmbeddedPathTracker( level1Definition );
 		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
-				"level1", rootContext, typeModel1Mock, "level1.",
-				null, includePaths
+				"level1", rootContext,
+				level1Definition, level1PathTracker
 		);
 		// Initially no path was encountered so all includePaths are useless
-		assertThat( level1Context.getEncounteredFieldPaths() )
+		assertThat( level1PathTracker.getEncounteredFieldPaths() )
 				.isEmpty();
-		assertThat( level1Context.getUselessIncludePaths() )
+		assertThat( level1PathTracker.getUselessIncludePaths() )
 				.containsOnly(
 						"included",
 						"notEncountered",
@@ -305,12 +323,12 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 		// Encounter "included" and "excludedBecauseOfLevel1"
 		checkLeafIncluded( "included", level1Context, "included" );
 		checkLeafExcluded( "excludedBecauseOfLevel1", level1Context, "excludedBecauseOfLevel1" );
-		assertThat( level1Context.getEncounteredFieldPaths() )
+		assertThat( level1PathTracker.getEncounteredFieldPaths() )
 				.containsOnly(
 						"included", // Added
 						"excludedBecauseOfLevel1" // Added
 				);
-		assertThat( level1Context.getUselessIncludePaths() )
+		assertThat( level1PathTracker.getUselessIncludePaths() )
 				.containsOnly(
 						// "included" removed
 						"notEncountered",
@@ -325,13 +343,13 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 		// Check non-IndexedEmbedded nesting
 		IndexSchemaNestingContext level2NonIndexedEmbeddedContext =
 				checkCompositeIncluded( "level2NonIndexedEmbedded", level1Context, "level2NonIndexedEmbedded" );
-		assertThat( level1Context.getEncounteredFieldPaths() )
+		assertThat( level1PathTracker.getEncounteredFieldPaths() )
 				.containsOnly(
 						"included",
 						"excludedBecauseOfLevel1",
 						"level2NonIndexedEmbedded" // Added
 				);
-		assertThat( level1Context.getUselessIncludePaths() )
+		assertThat( level1PathTracker.getUselessIncludePaths() )
 				.containsOnly(
 						"notEncountered",
 						// "level2NonIndexedEmbedded" removed
@@ -345,7 +363,7 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 		// Encounter "level2NonIndexedEmbedded.included" and "level2NonIndexedEmbedded.excludedBecauseOfLevel1"
 		checkLeafIncluded( "included", level2NonIndexedEmbeddedContext, "included" );
 		checkLeafExcluded( "excludedBecauseOfLevel1", level2NonIndexedEmbeddedContext, "excludedBecauseOfLevel1" );
-		assertThat( level1Context.getEncounteredFieldPaths() )
+		assertThat( level1PathTracker.getEncounteredFieldPaths() )
 				.containsOnly(
 						"included",
 						"excludedBecauseOfLevel1",
@@ -353,7 +371,7 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 						"level2NonIndexedEmbedded.included", // Added
 						"level2NonIndexedEmbedded.excludedBecauseOfLevel1" // Added
 				);
-		assertThat( level1Context.getUselessIncludePaths() )
+		assertThat( level1PathTracker.getUselessIncludePaths() )
 				.containsOnly(
 						"notEncountered",
 						// "level2NonIndexedEmbedded.included" removed
@@ -368,13 +386,18 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 		includePaths.add( "included" );
 		includePaths.add( "notEncountered" );
 		includePaths.add( "excludedBecauseOfLevel1" );
-		ConfiguredIndexSchemaNestingContext level2IndexedEmbeddedContext = checkSimpleIndexedEmbeddedIncluded(
-				"level2IndexedEmbedded", level1Context, typeModel2Mock, "level2IndexedEmbedded.",
+		IndexedEmbeddedDefinition level2Definition = new IndexedEmbeddedDefinition(
+				typeModel2Mock, "level2IndexedEmbedded.", ObjectFieldStorage.DEFAULT,
 				null, includePaths
 		);
-		assertThat( level2IndexedEmbeddedContext.getEncounteredFieldPaths() )
+		IndexedEmbeddedPathTracker level2PathTracker = new IndexedEmbeddedPathTracker( level2Definition );
+		ConfiguredIndexSchemaNestingContext level2IndexedEmbeddedContext = checkSimpleIndexedEmbeddedIncluded(
+				"level2IndexedEmbedded", level1Context,
+				level2Definition, level2PathTracker
+		);
+		assertThat( level2PathTracker.getEncounteredFieldPaths() )
 				.isEmpty();
-		assertThat( level1Context.getEncounteredFieldPaths() )
+		assertThat( level1PathTracker.getEncounteredFieldPaths() )
 				.containsOnly(
 						"included",
 						"excludedBecauseOfLevel1",
@@ -383,13 +406,13 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 						"level2NonIndexedEmbedded.excludedBecauseOfLevel1",
 						"level2IndexedEmbedded" // Added
 				);
-		assertThat( level2IndexedEmbeddedContext.getUselessIncludePaths() )
+		assertThat( level2PathTracker.getUselessIncludePaths() )
 				.containsOnly(
 						"included",
 						"notEncountered",
 						"excludedBecauseOfLevel1"
 				);
-		assertThat( level1Context.getUselessIncludePaths() )
+		assertThat( level1PathTracker.getUselessIncludePaths() )
 				.containsOnly(
 						// No change expected
 						"notEncountered",
@@ -402,12 +425,12 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 		// Encounter "level2IndexedEmbedded.included" and "level2IndexedEmbedded.excludedBecauseOfLevel1"
 		checkLeafIncluded( "included", level2IndexedEmbeddedContext, "included" );
 		checkLeafExcluded( "excludedBecauseOfLevel1", level2IndexedEmbeddedContext, "excludedBecauseOfLevel1" );
-		assertThat( level2IndexedEmbeddedContext.getEncounteredFieldPaths() )
+		assertThat( level2PathTracker.getEncounteredFieldPaths() )
 				.containsOnly(
 						"included", // Added
 						"excludedBecauseOfLevel1" // Added
 				);
-		assertThat( level1Context.getEncounteredFieldPaths() )
+		assertThat( level1PathTracker.getEncounteredFieldPaths() )
 				.containsOnly(
 						"included",
 						"excludedBecauseOfLevel1",
@@ -418,13 +441,13 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 						"level2IndexedEmbedded.included", // Added
 						"level2IndexedEmbedded.excludedBecauseOfLevel1" // Added
 				);
-		assertThat( level2IndexedEmbeddedContext.getUselessIncludePaths() )
+		assertThat( level2PathTracker.getUselessIncludePaths() )
 				.containsOnly(
 						// "included" removed
 						"notEncountered"
 						// "excludedBecauseOfLevel1" removed
 				);
-		assertThat( level1Context.getUselessIncludePaths() )
+		assertThat( level1PathTracker.getUselessIncludePaths() )
 				.containsOnly(
 						"notEncountered",
 						"level2NonIndexedEmbedded.notEncountered",
@@ -435,13 +458,13 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 
 		// Encounter "level2IndexedEmbedded.excludedBecauseOfLevel2"
 		checkLeafExcluded( "excludedBecauseOfLevel2", level2IndexedEmbeddedContext, "excludedBecauseOfLevel2" );
-		assertThat( level2IndexedEmbeddedContext.getEncounteredFieldPaths() )
+		assertThat( level2PathTracker.getEncounteredFieldPaths() )
 				.containsOnly(
 						"included",
 						"excludedBecauseOfLevel1",
 						"excludedBecauseOfLevel2" // Added
 				);
-		assertThat( level1Context.getEncounteredFieldPaths() )
+		assertThat( level1PathTracker.getEncounteredFieldPaths() )
 				.containsOnly(
 						"included",
 						"excludedBecauseOfLevel1",
@@ -453,12 +476,12 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 						"level2IndexedEmbedded.excludedBecauseOfLevel1",
 						"level2IndexedEmbedded.excludedBecauseOfLevel2" // Added
 				);
-		assertThat( level2IndexedEmbeddedContext.getUselessIncludePaths() )
+		assertThat( level2PathTracker.getUselessIncludePaths() )
 				.containsOnly(
 						// No change expected
 						"notEncountered"
 				);
-		assertThat( level1Context.getUselessIncludePaths() )
+		assertThat( level1PathTracker.getUselessIncludePaths() )
 				.containsOnly(
 						"notEncountered",
 						"level2NonIndexedEmbedded.notEncountered",
@@ -681,15 +704,18 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 		includePaths.add( "notEncountered" );
 		includePaths.add( "level2.level3.included" );
 		includePaths.add( "level2.level3.notEncountered" );
-
+		IndexedEmbeddedDefinition level1Definition = new IndexedEmbeddedDefinition(
+				typeModel1Mock, "level1.", ObjectFieldStorage.DEFAULT, 1, includePaths
+		);
+		IndexedEmbeddedPathTracker level1PathTracker = new IndexedEmbeddedPathTracker( level1Definition );
 		ConfiguredIndexSchemaNestingContext level1Context = checkSimpleIndexedEmbeddedIncluded(
-				"level1", rootContext, typeModel1Mock, "level1.",
-				1, includePaths
+				"level1", rootContext,
+				level1Definition, level1PathTracker
 		);
 		// Initially no path was encountered so all includePaths are useless
-		assertThat( level1Context.getEncounteredFieldPaths() )
+		assertThat( level1PathTracker.getEncounteredFieldPaths() )
 				.isEmpty();
-		assertThat( level1Context.getUselessIncludePaths() )
+		assertThat( level1PathTracker.getUselessIncludePaths() )
 				.containsOnly(
 						"included",
 						"notEncountered",
@@ -700,12 +726,12 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 		// Encounter "included" and "excludedBecauseOfLevel1"
 		checkLeafIncluded( "included", level1Context, "included" );
 		checkLeafIncluded( "includedBecauseOfDepth", level1Context, "includedBecauseOfDepth" );
-		assertThat( level1Context.getEncounteredFieldPaths() )
+		assertThat( level1PathTracker.getEncounteredFieldPaths() )
 				.containsOnly(
 						"included", // Added
 						"includedBecauseOfDepth" // Added
 				);
-		assertThat( level1Context.getUselessIncludePaths() )
+		assertThat( level1PathTracker.getUselessIncludePaths() )
 				.containsOnly(
 						// "included" removed
 						"notEncountered",
@@ -714,26 +740,33 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 				);
 
 		// Encounter a nested indexedEmbedded
+		IndexedEmbeddedDefinition level2Definition = new IndexedEmbeddedDefinition(
+				typeModel2Mock, "level2.", ObjectFieldStorage.DEFAULT, null, null
+		);
+		IndexedEmbeddedPathTracker level2PathTracker = new IndexedEmbeddedPathTracker( level2Definition );
 		ConfiguredIndexSchemaNestingContext level2Context = checkSimpleIndexedEmbeddedIncluded(
-				"level2", level1Context, typeModel2Mock, "level2.",
-				null, null
+				"level2", level1Context, level2Definition, level2PathTracker
 		);
+		IndexedEmbeddedDefinition level3Definition = new IndexedEmbeddedDefinition(
+				typeModel2Mock, "level3.", ObjectFieldStorage.DEFAULT, null, null
+		);
+		IndexedEmbeddedPathTracker level3PathTracker = new IndexedEmbeddedPathTracker( level3Definition );
 		ConfiguredIndexSchemaNestingContext level3Context = checkSimpleIndexedEmbeddedIncluded(
-				"level3", level2Context, typeModel2Mock, "level3.",
-				null, null
+				"level3", level2Context, level3Definition, level3PathTracker
+
 		);
-		assertThat( level3Context.getUselessIncludePaths() )
+		assertThat( level3PathTracker.getUselessIncludePaths() )
 				.isEmpty();
-		assertThat( level2Context.getUselessIncludePaths() )
+		assertThat( level2PathTracker.getUselessIncludePaths() )
 				.isEmpty();
-		assertThat( level1Context.getEncounteredFieldPaths() )
+		assertThat( level1PathTracker.getEncounteredFieldPaths() )
 				.containsOnly(
 						"included",
 						"includedBecauseOfDepth",
 						"level2", // Added
 						"level2.level3" // Added
 				);
-		assertThat( level1Context.getUselessIncludePaths() )
+		assertThat( level1PathTracker.getUselessIncludePaths() )
 				.containsOnly(
 						// No change expected
 						"notEncountered",
@@ -744,7 +777,7 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 		// Encounter "level2.level3.included" and "level2.level3.excludedBecauseOfLevel1"
 		checkLeafIncluded( "included", level3Context, "included" );
 		checkLeafExcluded( "excludedBecauseOfLevel1", level3Context, "excludedBecauseOfLevel1" );
-		assertThat( level1Context.getEncounteredFieldPaths() )
+		assertThat( level1PathTracker.getEncounteredFieldPaths() )
 				.containsOnly(
 						"included",
 						"includedBecauseOfDepth",
@@ -753,7 +786,7 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 						"level2.level3.included", // Added
 						"level2.level3.excludedBecauseOfLevel1" // Added
 				);
-		assertThat( level1Context.getUselessIncludePaths() )
+		assertThat( level1PathTracker.getUselessIncludePaths() )
 				.containsOnly(
 						"notEncountered",
 						// "level2.level3.included" removed
@@ -944,6 +977,19 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 	private ConfiguredIndexSchemaNestingContext checkSimpleIndexedEmbeddedIncluded(String expectedObjectName,
 			ConfiguredIndexSchemaNestingContext context, MappableTypeModel typeModel,
 			String relativePrefix, Integer depth, Set<String> includePaths) {
+		IndexedEmbeddedDefinition definition = new IndexedEmbeddedDefinition(
+				typeModel, relativePrefix, ObjectFieldStorage.DEFAULT,
+				depth, includePaths
+		);
+		return checkSimpleIndexedEmbeddedIncluded(
+				expectedObjectName, context, definition, new IndexedEmbeddedPathTracker( definition )
+		);
+	}
+
+	private ConfiguredIndexSchemaNestingContext checkSimpleIndexedEmbeddedIncluded(String expectedObjectName,
+			ConfiguredIndexSchemaNestingContext context,
+			IndexedEmbeddedDefinition definition,
+			IndexedEmbeddedPathTracker pathTracker) {
 		Capture<ConfiguredIndexSchemaNestingContext> nestedContextCapture = newCapture();
 		resetAll();
 		Object expectedReturn = new Object();
@@ -951,8 +997,9 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 		EasyMock.expect( nestedContextBuilderMock.build( EasyMock.capture( nestedContextCapture ) ) )
 				.andReturn( expectedReturn );
 		replayAll();
-		Optional<Object> actualReturn = context.addIndexedEmbeddedIfIncluded( typeModel, relativePrefix,
-				depth, includePaths, nestedContextBuilderMock );
+		Optional<Object> actualReturn = context.addIndexedEmbeddedIfIncluded(
+				definition, pathTracker, nestedContextBuilderMock
+		);
 		assertNotNull( "Expected addIndexedEmbeddedIfIncluded to return a non-null result", actualReturn );
 		assertTrue( "Expected the indexedEmbedded to be included in " + context, actualReturn.isPresent() );
 		verifyAll();
@@ -962,10 +1009,22 @@ public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
 
 	private void checkSimpleIndexedEmbeddedExcluded(ConfiguredIndexSchemaNestingContext context, MappableTypeModel typeModel,
 			String relativePrefix, Integer depth, Set<String> includePaths) {
+		IndexedEmbeddedDefinition definition = new IndexedEmbeddedDefinition(
+				typeModel, relativePrefix, ObjectFieldStorage.DEFAULT,
+				depth, includePaths
+		);
+		checkSimpleIndexedEmbeddedExcluded(
+				context, definition, new IndexedEmbeddedPathTracker( definition )
+		);
+	}
+
+	private void checkSimpleIndexedEmbeddedExcluded(ConfiguredIndexSchemaNestingContext context,
+			IndexedEmbeddedDefinition definition, IndexedEmbeddedPathTracker pathTracker) {
 		resetAll();
 		replayAll();
-		Optional<Object> actualReturn = context.addIndexedEmbeddedIfIncluded( typeModel, relativePrefix,
-				depth, includePaths, nestedContextBuilderMock );
+		Optional<Object> actualReturn = context.addIndexedEmbeddedIfIncluded(
+				definition, pathTracker, nestedContextBuilderMock
+		);
 		verifyAll();
 		assertNotNull( "Expected addIndexedEmbeddedIfIncluded to return a non-null result", actualReturn );
 		assertFalse( "Expected the indexedEmbedded to be excluded from " + context, actualReturn.isPresent() );
