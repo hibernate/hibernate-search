@@ -18,8 +18,11 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedPathTracker;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContextProvider;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingMapperContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingAbortedException;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
@@ -57,7 +60,8 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper<MPBS> {
+public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper<MPBS>,
+		IndexedEntityBindingMapperContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -79,6 +83,8 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<PojoRawTypeModel<?>,PojoIndexedTypeManagerBuilder<?, ?>> indexedTypeManagerBuilders =
 			new LinkedHashMap<>();
+	// Use a LinkedHashMap for deterministic iteration
+	private final Map<IndexedEmbeddedDefinition, IndexedEmbeddedPathTracker> pathTrackers = new LinkedHashMap<>();
 
 	private boolean closed = false;
 
@@ -183,6 +189,10 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 						.add( e );
 			}
 		}
+
+		if ( !failureCollector.hasFailure() ) {
+			checkPathTrackers();
+		}
 	}
 
 	private void mapIndexedType(PojoRawTypeModel<?> indexedEntityType,
@@ -200,7 +210,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 						multiTenancyEnabled
 				);
 		IndexedEntityBindingContext bindingContext = contextProvider.createIndexedEntityBindingContext(
-				indexManagerBuildingState.getSchemaRootNodeBuilder()
+				this, indexManagerBuildingState.getSchemaRootNodeBuilder()
 		);
 		PojoIndexedTypeManagerBuilder<?, ?> builder = createIndexedTypeManagerBuilder(
 				indexedEntityType, indexManagerBuildingState, bindingContext
@@ -306,6 +316,25 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 					.push( PojoMapperDelegate::closeOnFailure, delegate )
 					.push( mappingDelegate );
 			throw e;
+		}
+	}
+
+	@Override
+	public IndexedEmbeddedPathTracker getOrCreatePathTracker(IndexedEmbeddedDefinition definition) {
+		return pathTrackers.computeIfAbsent( definition, IndexedEmbeddedPathTracker::new );
+	}
+
+	private void checkPathTrackers() {
+		for ( Map.Entry<IndexedEmbeddedDefinition, IndexedEmbeddedPathTracker> entry : pathTrackers.entrySet() ) {
+			IndexedEmbeddedPathTracker pathTracker = entry.getValue();
+			Set<String> uselessIncludePaths = pathTracker.getUselessIncludePaths();
+			if ( !uselessIncludePaths.isEmpty() ) {
+				Set<String> encounteredFieldPaths = pathTracker.getEncounteredFieldPaths();
+				failureCollector.add( log.uselessIncludePathFilters(
+						uselessIncludePaths, encounteredFieldPaths,
+						EventContexts.fromType( entry.getKey().getDefiningTypeModel() )
+				) );
+			}
 		}
 	}
 

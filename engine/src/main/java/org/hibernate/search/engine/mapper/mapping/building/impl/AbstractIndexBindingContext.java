@@ -22,15 +22,20 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDef
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexSchemaContributionListener;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedPathTracker;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingMapperContext;
 
 abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilder> implements IndexBindingContext {
 
+	private final IndexedEntityBindingMapperContext mapperContext;
 	private final IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder;
 	final B indexSchemaObjectNodeBuilder;
 	final ConfiguredIndexSchemaNestingContext nestingContext;
 
-	AbstractIndexBindingContext(IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
+	AbstractIndexBindingContext(IndexedEntityBindingMapperContext mapperContext,
+			IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
 			B indexSchemaObjectNodeBuilder, ConfiguredIndexSchemaNestingContext nestingContext) {
+		this.mapperContext = mapperContext;
 		this.indexSchemaRootNodeBuilder = indexSchemaRootNodeBuilder;
 		this.indexSchemaObjectNodeBuilder = indexSchemaObjectNodeBuilder;
 		this.nestingContext = nestingContext;
@@ -75,13 +80,14 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 	public Optional<IndexedEmbeddedBindingContext> addIndexedEmbeddedIfIncluded(IndexedEmbeddedDefinition definition,
 			boolean multiValued) {
 		// FIXME HSEARCH-3684 share the path tracker among filters with the same definition
-		IndexedEmbeddedPathTracker pathTracker = new IndexedEmbeddedPathTracker( definition );
+		IndexedEmbeddedPathTracker pathTracker = mapperContext.getOrCreatePathTracker( definition );
 		return nestingContext.addIndexedEmbeddedIfIncluded(
 				definition,
 				pathTracker,
 				new NestedContextBuilderImpl(
+						mapperContext,
 						indexSchemaRootNodeBuilder, indexSchemaObjectNodeBuilder,
-						definition, pathTracker,
+						definition,
 						isParentMultivaluedAndWithoutObjectField() || multiValued
 				)
 		);
@@ -98,22 +104,22 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 	private static class NestedContextBuilderImpl
 			implements ConfiguredIndexSchemaNestingContext.NestedContextBuilder<IndexedEmbeddedBindingContext> {
 
+		private final IndexedEntityBindingMapperContext mapperContext;
 		private final IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder;
 		private IndexSchemaObjectNodeBuilder currentNodeBuilder;
 		private final IndexedEmbeddedDefinition definition;
-		private final IndexedEmbeddedPathTracker pathTracker;
 		private final List<IndexObjectFieldReference> parentIndexObjectReferences = new ArrayList<>();
 		private boolean multiValued;
 
-		private NestedContextBuilderImpl(IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
+		private NestedContextBuilderImpl(IndexedEntityBindingMapperContext mapperContext,
+				IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder,
 				IndexSchemaObjectNodeBuilder currentNodeBuilder,
 				IndexedEmbeddedDefinition definition,
-				IndexedEmbeddedPathTracker pathTracker,
 				boolean multiValued) {
+			this.mapperContext = mapperContext;
 			this.indexSchemaRootNodeBuilder = indexSchemaRootNodeBuilder;
 			this.currentNodeBuilder = currentNodeBuilder;
 			this.definition = definition;
-			this.pathTracker = pathTracker;
 			this.multiValued = multiValued;
 		}
 
@@ -133,9 +139,9 @@ abstract class AbstractIndexBindingContext<B extends IndexSchemaObjectNodeBuilde
 		@Override
 		public IndexedEmbeddedBindingContext build(ConfiguredIndexSchemaNestingContext nestingContext) {
 			return new IndexedEmbeddedBindingContextImpl(
+					mapperContext,
 					indexSchemaRootNodeBuilder,
 					currentNodeBuilder, parentIndexObjectReferences, nestingContext,
-					pathTracker,
 					multiValued
 			);
 		}

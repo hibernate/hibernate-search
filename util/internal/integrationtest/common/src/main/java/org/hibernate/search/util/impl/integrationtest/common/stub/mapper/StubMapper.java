@@ -12,6 +12,9 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedPathTracker;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingMapperContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContextProvider;
@@ -24,7 +27,7 @@ import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 
-class StubMapper implements Mapper<StubMappingPartialBuildState> {
+class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityBindingMapperContext {
 
 	private final ContextualFailureCollector failureCollector;
 	private final TypeMetadataContributorProvider<StubTypeMetadataContributor> contributorProvider;
@@ -32,6 +35,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState> {
 	private final boolean multiTenancyEnabled;
 
 	private final Map<StubTypeModel, IndexManagerBuildingState<?>> indexManagerBuildingStates = new HashMap<>();
+	private final Map<IndexedEmbeddedDefinition, IndexedEmbeddedPathTracker> pathTrackers = new HashMap<>();
 
 	StubMapper(MappingBuildContext buildContext,
 			TypeMetadataContributorProvider<StubTypeMetadataContributor> contributorProvider,
@@ -104,6 +108,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState> {
 							multiTenancyEnabled
 					);
 			IndexedEntityBindingContext bindingContext = contextProvider.createIndexedEntityBindingContext(
+					this,
 					indexManagerBuildingState.getSchemaRootNodeBuilder()
 			);
 			indexManagerBuildingStates.put( (StubTypeModel) type, indexManagerBuildingState );
@@ -133,5 +138,10 @@ class StubMapper implements Mapper<StubMappingPartialBuildState> {
 		}
 
 		return new StubMappingPartialBuildState( indexMappingsByTypeIdentifier );
+	}
+
+	@Override
+	public IndexedEmbeddedPathTracker getOrCreatePathTracker(IndexedEmbeddedDefinition definition) {
+		return pathTrackers.computeIfAbsent( definition, IndexedEmbeddedPathTracker::new );
 	}
 }

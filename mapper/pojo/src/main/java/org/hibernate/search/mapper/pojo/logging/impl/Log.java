@@ -28,6 +28,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.ToStringTreeAppendableMultilineFormatter;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
@@ -36,6 +37,7 @@ import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageLogger;
+import org.jboss.logging.annotations.Param;
 import org.jboss.logging.annotations.ValidIdRange;
 import org.jboss.logging.annotations.ValidIdRanges;
 
@@ -64,7 +66,8 @@ public interface Log extends BasicLogger {
 					+ " Encountered field paths: %2$s."
 					+ " Check the filters for typos, or remove them if they are not useful."
 	)
-	SearchException uselessIncludePathFilters(Set<String> nonMatchingIncludePaths, Set<String> encounteredFieldPaths);
+	SearchException uselessIncludePathFilters(Set<String> nonMatchingIncludePaths, Set<String> encounteredFieldPaths,
+			@Param EventContext eventContext);
 
 	@Message(id = ID_OFFSET_1 + 295, value = "String '$1%s' cannot be parsed into a '$2%s'")
 	SearchException parseException(String text, @FormatWith(ClassFormatter.class) Class<?> readerClass, @Cause Exception e);

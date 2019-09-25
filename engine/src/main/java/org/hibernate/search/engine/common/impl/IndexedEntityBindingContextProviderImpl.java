@@ -13,6 +13,7 @@ import org.hibernate.search.engine.mapper.mapping.building.impl.IndexedEntityBin
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContextProvider;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingMapperContext;
 
 class IndexedEntityBindingContextProviderImpl implements IndexedEntityBindingContextProvider {
 	private final IndexManagerBuildingStateHolder indexManagerBuildingStateHolder;
@@ -31,7 +32,8 @@ class IndexedEntityBindingContextProviderImpl implements IndexedEntityBindingCon
 
 	@Override
 	public IndexedEntityBindingContext createIndexedEntityBindingContext(
+			IndexedEntityBindingMapperContext mapperContext,
 			IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder) {
-		return new IndexedEntityBindingContextImpl( indexSchemaRootNodeBuilder );
+		return new IndexedEntityBindingContextImpl( mapperContext, indexSchemaRootNodeBuilder );
 	}
 }

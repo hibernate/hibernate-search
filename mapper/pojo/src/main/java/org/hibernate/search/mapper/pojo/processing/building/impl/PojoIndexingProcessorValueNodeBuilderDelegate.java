@@ -112,12 +112,6 @@ class PojoIndexingProcessorValueNodeBuilderDelegate<P, V> extends AbstractPojoPr
 				throw log.invalidIndexedEmbedded( modelPath.getTypeModel() );
 			}
 			contributors.forEach( c -> c.contributeMapping( nestedProcessorBuilder ) );
-
-			Set<String> uselessIncludePaths = nestedBindingContext.getUselessIncludePaths();
-			if ( !uselessIncludePaths.isEmpty() ) {
-				Set<String> encounteredFieldPaths = nestedBindingContext.getEncounteredFieldPaths();
-				throw log.uselessIncludePathFilters( uselessIncludePaths, encounteredFieldPaths );
-			}
 		} );
 	}
 

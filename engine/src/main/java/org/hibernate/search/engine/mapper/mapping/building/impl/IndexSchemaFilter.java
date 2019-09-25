@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedPathTracker;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
