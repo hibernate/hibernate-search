@@ -128,6 +128,21 @@ public class ProtocolBackwardCompatibilityTest {
 		SerializationTestHelper.assertLuceneWorkList( expectedWorkList, actualWorkList );
 	}
 
+	@Test
+	public void testDeserializingVersion12AvroVersion17ModelWithLatestDeserializer() throws Exception {
+		// expected
+		List<LuceneWork> expectedWorkList = buildV10Works();
+		expectedWorkList.addAll( buildV11Works() );
+		expectedWorkList.addAll( buildV12Works() );
+
+		byte[] serializedModelV12Avro17 = loadSerializedWorkForMajorMinorQualifier( 1, 2, "avro17" );
+
+		// actual
+		List<LuceneWork> actualWorkList = luceneWorkSerializer.toLuceneWorks( serializedModelV12Avro17 );
+
+		SerializationTestHelper.assertLuceneWorkList( expectedWorkList, actualWorkList );
+	}
+
 	private List<LuceneWork> buildV10Works() throws Exception {
 		List<LuceneWork> works = new ArrayList<>();
 		works.add( OptimizeLuceneWork.INSTANCE );
@@ -237,7 +252,16 @@ public class ProtocolBackwardCompatibilityTest {
 	}
 
 	private byte[] loadSerializedWorkForMajorMinor(int major, int minor) throws Exception {
-		URL url = getClass().getClassLoader().getResource( RESOURCE_BASE_NAME + major + "." + minor );
+		return loadSerializedWorkForMajorMinorQualifier( major, minor, null );
+	}
+
+	private byte[] loadSerializedWorkForMajorMinorQualifier(int major, int minor, String qualifier) throws Exception {
+		StringBuilder pathBuilder = new StringBuilder( RESOURCE_BASE_NAME + major + "." + minor );
+		if ( qualifier != null ) {
+			pathBuilder.append( "-" );
+			pathBuilder.append( qualifier );
+		}
+		URL url = getClass().getClassLoader().getResource( pathBuilder.toString() );
 		URI uri = url.toURI();
 		Path path = Paths.get( uri );
 		return Files.readAllBytes( path );
