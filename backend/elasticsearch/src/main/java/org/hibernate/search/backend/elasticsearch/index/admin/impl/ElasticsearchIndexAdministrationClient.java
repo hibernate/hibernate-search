@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -42,29 +44,34 @@ public class ElasticsearchIndexAdministrationClient {
 		this.expectedMetadata = expectedMetadata;
 	}
 
-	public void createIfAbsent(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
-		schemaCreator.createIndexIfAbsent( expectedMetadata, executionOptions );
+	public CompletableFuture<?> createIfAbsent(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
+		return schemaCreator.createIndexIfAbsent( expectedMetadata, executionOptions );
 	}
 
-	public void dropAndCreate(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
-		schemaDropper.dropIfExisting( elasticsearchIndexName );
-		schemaCreator.createIndex( expectedMetadata, executionOptions );
+	public CompletableFuture<?> dropAndCreate(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
+		return schemaDropper.dropIfExisting( elasticsearchIndexName )
+				.thenCompose( ignored -> schemaCreator.createIndex( expectedMetadata, executionOptions ) );
 	}
 
-	public void dropIfExisting(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
-		schemaDropper.dropIfExisting( elasticsearchIndexName );
+	public CompletableFuture<?> dropIfExisting(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
+		return schemaDropper.dropIfExisting( elasticsearchIndexName );
 	}
 
-	public void update(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
-		boolean createdIndex = schemaCreator.createIndexIfAbsent( expectedMetadata, executionOptions );
-		if ( !createdIndex ) {
-			schemaMigrator.migrate( expectedMetadata );
-		}
+	public CompletableFuture<?> update(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
+		return schemaCreator.createIndexIfAbsent( expectedMetadata, executionOptions )
+				.thenCompose( createdIndex -> {
+					if ( !createdIndex ) {
+						return schemaMigrator.migrate( expectedMetadata );
+					}
+					else {
+						return CompletableFuture.completedFuture( null );
+					}
+				} );
 	}
 
-	public void validate(ElasticsearchIndexLifecycleExecutionOptions executionOptions,
+	public CompletableFuture<?> validate(ElasticsearchIndexLifecycleExecutionOptions executionOptions,
 			ContextualFailureCollector failureCollector) {
-		schemaCreator.checkIndexExists( elasticsearchIndexName, executionOptions );
-		schemaValidator.validate( expectedMetadata, failureCollector );
+		return schemaCreator.checkIndexExists( elasticsearchIndexName, executionOptions )
+				.thenCompose( ignored -> schemaValidator.validate( expectedMetadata, failureCollector ) );
 	}
 }

@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.esnative.impl.AnalysisDefinition;
 import org.hibernate.search.backend.elasticsearch.analysis.model.esnative.impl.AnalyzerDefinition;
@@ -127,26 +128,26 @@ public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaVali
 	}
 
 	@Override
-	public void validate(IndexMetadata expectedIndexMetadata, ContextualFailureCollector contextualFailureCollector) {
+	public CompletableFuture<?> validate(IndexMetadata expectedIndexMetadata, ContextualFailureCollector contextualFailureCollector) {
 		URLEncodedString indexName = expectedIndexMetadata.getName();
-		IndexMetadata actualIndexMetadata = schemaAccessor.getCurrentIndexMetadata( indexName );
-
-
-		ValidationErrorCollector errorCollector = new ValidationErrorCollector(
-				contextualFailureCollector.withContext( ElasticsearchEventContexts.getSchemaValidation() )
-		);
-		validate( errorCollector, expectedIndexMetadata, actualIndexMetadata );
+		return schemaAccessor.getCurrentIndexMetadata( indexName )
+				.thenAccept( actualIndexMetadata -> {
+					ValidationErrorCollector errorCollector = new ValidationErrorCollector(
+							contextualFailureCollector.withContext( ElasticsearchEventContexts.getSchemaValidation() )
+					);
+					validate( errorCollector, expectedIndexMetadata, actualIndexMetadata );
+				} );
 	}
 
 	@Override
-	public boolean isSettingsValid(IndexMetadata expectedIndexMetadata) {
+	public CompletableFuture<Boolean> isSettingsValid(IndexMetadata expectedIndexMetadata) {
 		URLEncodedString indexName = expectedIndexMetadata.getName();
-		IndexMetadata actualIndexMetadata = schemaAccessor.getCurrentIndexMetadata( indexName );
-
-		ValidationErrorCollector errorCollector = new ValidationErrorCollector();
-		validateIndexSettings( errorCollector, expectedIndexMetadata.getSettings(), actualIndexMetadata.getSettings() );
-
-		return !errorCollector.hasError();
+		return schemaAccessor.getCurrentIndexMetadata( indexName )
+				.thenApply( actualIndexMetadata -> {
+					ValidationErrorCollector errorCollector = new ValidationErrorCollector();
+					validateIndexSettings( errorCollector, expectedIndexMetadata.getSettings(), actualIndexMetadata.getSettings() );
+					return !errorCollector.hasError();
+				} );
 	}
 
 	private void validate(ValidationErrorCollector errorCollector, IndexMetadata expectedIndexMetadata, IndexMetadata actualIndexMetadata) {

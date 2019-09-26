@@ -7,11 +7,14 @@
 package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.index.settings.esnative.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.common.impl.Throwables;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -33,40 +36,52 @@ public class ElasticsearchSchemaMigratorImpl implements ElasticsearchSchemaMigra
 	}
 
 	@Override
-	public void migrate(IndexMetadata indexMetadata) {
+	public CompletableFuture<?> migrate(IndexMetadata indexMetadata) {
 		URLEncodedString indexName = indexMetadata.getName();
 		IndexSettings settings = indexMetadata.getSettings();
 
-		try {
-			/*
-			 * We only update settings if it's really necessary, because closing the index,
-			 * even for just a moment, may hurt if other clients are using the index.
-			 */
-			if ( !settings.isEmpty() && !schemaValidator.isSettingsValid( indexMetadata ) ) {
-				schemaAccessor.closeIndex( indexName );
-				try {
-					schemaAccessor.updateSettings( indexName, settings );
-				}
-				catch (RuntimeException mainException) {
-					// Try not to leave the index closed if something failed
-					try {
-						schemaAccessor.openIndex( indexName );
-					}
-					catch (RuntimeException e) {
-						mainException.addSuppressed( e );
-					}
-					throw mainException;
-				}
-				// Re-open the index after the settings have been successfully updated
-				schemaAccessor.openIndex( indexName );
-			}
+		/*
+		 * We only update settings if it's really necessary, because closing the index,
+		 * even for just a moment, may hurt if other clients are using the index.
+		 */
+		CompletableFuture<?> settingsMigration;
+		if ( settings.isEmpty() ) {
+			settingsMigration = CompletableFuture.completedFuture( null );
+		}
+		else {
+			settingsMigration = schemaValidator.isSettingsValid( indexMetadata )
+					.thenCompose( valid -> {
+						if ( valid ) {
+							return CompletableFuture.completedFuture( null );
+						}
+						else {
+							return doMigrateSettings( indexName, settings );
+						}
+					} );
+		}
 
-			// Elasticsearch itself takes care of the actual merging
-			schemaAccessor.putMapping( indexName, indexMetadata.getMapping() );
-		}
-		catch (SearchException e) {
-			throw log.schemaUpdateFailed( indexName, e.getMessage(), e );
-		}
+		return settingsMigration.thenCompose( ignored -> doMigrateMapping( indexName, indexMetadata.getMapping() ) )
+				.exceptionally( e -> {
+					throw log.schemaUpdateFailed(
+							indexName, e.getMessage(),
+							Throwables.expectRuntimeException( e )
+					);
+				} );
+	}
+
+	private CompletableFuture<?> doMigrateSettings(URLEncodedString indexName, IndexSettings settings) {
+		return schemaAccessor.closeIndex( indexName )
+				.thenCompose( ignored -> Futures.whenCompleteExecute(
+						schemaAccessor.updateSettings( indexName, settings ),
+						// Re-open the index after the settings have been successfully updated
+						// ... or if the settings update fails.
+						() -> schemaAccessor.openIndex( indexName )
+				) );
+	}
+
+	private CompletableFuture<?> doMigrateMapping(URLEncodedString indexName, RootTypeMapping mapping) {
+		// Elasticsearch itself takes care of the actual merging
+		return schemaAccessor.putMapping( indexName, mapping );
 	}
 
 }

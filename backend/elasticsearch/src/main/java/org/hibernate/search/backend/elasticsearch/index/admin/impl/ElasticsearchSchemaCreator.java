@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.util.common.SearchException;
 
@@ -20,27 +22,32 @@ public interface ElasticsearchSchemaCreator {
 	 *
 	 * @param indexMetadata The expected index metadata.
 	 * @param executionOptions The execution options, giving more context information.
+	 * @return A future.
 	 * @throws SearchException If an error occurs.
 	 */
-	void createIndex(IndexMetadata indexMetadata, ElasticsearchIndexLifecycleExecutionOptions executionOptions);
+	CompletableFuture<?> createIndex(IndexMetadata indexMetadata,
+			ElasticsearchIndexLifecycleExecutionOptions executionOptions);
 
 	/**
 	 * Create an index and its mapping, but only if the index doesn't already exist.
 	 *
 	 * @param indexMetadata The expected index metadata.
 	 * @param executionOptions The execution options, giving more context information.
-	 * @return {@code true} if the index had to be created, {@code false} otherwise.
+	 * @return A future holding {@code true} if the index had to be created, {@code false} otherwise.
 	 * @throws SearchException If an error occurs.
 	 */
-	boolean createIndexIfAbsent(IndexMetadata indexMetadata, ElasticsearchIndexLifecycleExecutionOptions executionOptions);
+	CompletableFuture<Boolean> createIndexIfAbsent(IndexMetadata indexMetadata,
+			ElasticsearchIndexLifecycleExecutionOptions executionOptions);
 
 	/**
 	 * Checks that an index already exists.
 	 *
 	 * @param indexname The expected index name.
 	 * @param executionOptions The execution options, giving more context information.
+	 * @return A future.
 	 * @throws SearchException If the index doesn't exist, or if an error occurs.
 	 */
-	void checkIndexExists(URLEncodedString indexname, ElasticsearchIndexLifecycleExecutionOptions executionOptions);
+	CompletableFuture<?> checkIndexExists(URLEncodedString indexname,
+			ElasticsearchIndexLifecycleExecutionOptions executionOptions);
 
 }

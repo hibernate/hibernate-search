@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
 /**
@@ -21,13 +23,17 @@ public class ElasticsearchSchemaDropperImpl implements ElasticsearchSchemaDroppe
 	}
 
 	@Override
-	public void dropIfExisting(URLEncodedString indexName) {
-		// Not actually needed, but do it to avoid cluttering the ES log
-		if ( ! schemaAccessor.indexExists( indexName ) ) {
-			return;
-		}
-
-		schemaAccessor.dropIndexIfExisting( indexName );
+	public CompletableFuture<?> dropIfExisting(URLEncodedString indexName) {
+		// The first call is not actually needed, but do it to avoid cluttering the ES log
+		return schemaAccessor.indexExists( indexName )
+				.thenCompose( exists -> {
+					if ( exists ) {
+						return schemaAccessor.dropIndexIfExisting( indexName );
+					}
+					else {
+						return CompletableFuture.completedFuture( null );
+					}
+				} );
 	}
 
 }
