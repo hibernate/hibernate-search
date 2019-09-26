@@ -66,6 +66,7 @@ class ShardHolder implements Closeable, ReadIndexManagerContext, WorkExecutionIn
 			}
 
 			for ( Shard shard : shards.values() ) {
+				shard.start();
 				writeOrchestrators.add( shard.getWriteOrchestrator() );
 			}
 		}
