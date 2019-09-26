@@ -20,6 +20,7 @@ import org.apache.avro.Protocol;
 import org.apache.avro.Schema;
 import org.apache.avro.generic.GenericData;
 import org.apache.avro.generic.GenericDatumWriter;
+import org.apache.avro.generic.GenericEnumSymbol;
 import org.apache.avro.generic.GenericRecord;
 import org.apache.avro.io.BinaryEncoder;
 import org.apache.avro.io.EncoderFactory;
@@ -38,6 +39,10 @@ import org.hibernate.search.backend.LuceneWork;
 import org.hibernate.search.backend.spi.DeletionQuery;
 import org.hibernate.search.indexes.serialization.spi.LuceneFieldContext;
 import org.hibernate.search.indexes.serialization.spi.LuceneNumericFieldContext;
+import org.hibernate.search.indexes.serialization.spi.SerializableDocValuesType;
+import org.hibernate.search.indexes.serialization.spi.SerializableIndex;
+import org.hibernate.search.indexes.serialization.spi.SerializableStore;
+import org.hibernate.search.indexes.serialization.spi.SerializableTermVector;
 import org.hibernate.search.indexes.serialization.spi.Serializer;
 import org.hibernate.search.util.logging.impl.Log;
 import org.hibernate.search.util.logging.impl.LoggerFactory;
@@ -217,7 +222,7 @@ public class AvroSerializer implements Serializer {
 		GenericRecord numericField = new GenericData.Record( protocol.getType( schemaName ) );
 		numericField.put( "name", context.getName() );
 		numericField.put( "precisionStep", context.getPrecisionStep() );
-		numericField.put( "store", context.getStore() );
+		numericField.put( "store", toStoreEnumSymbol( context.getStore() ) );
 		numericField.put( "indexed", context.isIndexed() );
 		numericField.put( "boost", context.getBoost() );
 		numericField.put( "omitNorms", context.getOmitNorms() );
@@ -270,9 +275,9 @@ public class AvroSerializer implements Serializer {
 	public void addFieldWithStringData(LuceneFieldContext context) {
 		GenericRecord field = createNormalField( "StringField", context );
 		field.put( "value", context.getStringValue() );
-		field.put( "store", context.getStore() );
-		field.put( "index", context.getIndex() );
-		field.put( "termVector", context.getTermVector() );
+		field.put( "store", toStoreEnumSymbol( context.getStore() ) );
+		field.put( "index", toIndexEnumSymbol( context.getIndex() ) );
+		field.put( "termVector", toTermVectorEnumSymbol( context.getTermVector() ) );
 		fieldables.add( field );
 	}
 
@@ -289,7 +294,7 @@ public class AvroSerializer implements Serializer {
 			value.add( elements );
 		}
 		field.put( "value", value );
-		field.put( "termVector", context.getTermVector() );
+		field.put( "termVector", toTermVectorEnumSymbol( context.getTermVector() ) );
 		fieldables.add( field );
 	}
 
@@ -350,7 +355,7 @@ public class AvroSerializer implements Serializer {
 	public void addFieldWithSerializableReaderData(LuceneFieldContext context) {
 		GenericRecord field = createNormalField( "ReaderField", context );
 		field.put( "value", ByteBuffer.wrap( context.getReaderValue() ) );
-		field.put( "termVector", context.getTermVector() );
+		field.put( "termVector", toTermVectorEnumSymbol( context.getTermVector() ) );
 		fieldables.add( field );
 	}
 
@@ -365,7 +370,7 @@ public class AvroSerializer implements Serializer {
 	public void addDocValuesFieldWithBinaryValue(LuceneFieldContext context) {
 		GenericRecord record = new GenericData.Record( protocol.getType( "BinaryDocValuesField" ) );
 		record.put( "name", context.getName() );
-		record.put( "type", context.getDocValuesType() );
+		record.put( "type", toDocValuesTypeEnumSymbol( context.getDocValuesType() ) );
 
 		BytesRef binaryValue = context.getBinaryValue();
 		record.put( "value", ByteBuffer.wrap( binaryValue.bytes, binaryValue.offset, binaryValue.length ) );
@@ -378,7 +383,7 @@ public class AvroSerializer implements Serializer {
 	public void addDocValuesFieldWithNumericValue(long value, LuceneFieldContext context) {
 		GenericRecord record = new GenericData.Record( protocol.getType( "NumericDocValuesField" ) );
 		record.put( "name", context.getName() );
-		record.put( "type", context.getDocValuesType() );
+		record.put( "type", toDocValuesTypeEnumSymbol( context.getDocValuesType() ) );
 		record.put( "value", value );
 		fieldables.add( record );
 	}
@@ -397,5 +402,25 @@ public class AvroSerializer implements Serializer {
 	private void clearDocument() {
 		document = null;
 		fieldables = null;
+	}
+
+	private GenericEnumSymbol<?> toStoreEnumSymbol(SerializableStore value) {
+		return toEnumSymbol( protocol.getType( "Store" ), value );
+	}
+
+	private GenericEnumSymbol<?> toIndexEnumSymbol(SerializableIndex value) {
+		return toEnumSymbol( protocol.getType( "Index" ), value );
+	}
+
+	private GenericEnumSymbol<?> toTermVectorEnumSymbol(SerializableTermVector value) {
+		return toEnumSymbol( protocol.getType( "TermVector" ), value );
+	}
+
+	private GenericEnumSymbol<?> toDocValuesTypeEnumSymbol(SerializableDocValuesType value) {
+		return toEnumSymbol( protocol.getType( "DocValuesType" ), value );
+	}
+
+	private <E extends Enum<E>> GenericEnumSymbol<?> toEnumSymbol(Schema schema, E value) {
+		return value == null ? null : new GenericData.EnumSymbol( schema, value.name() );
 	}
 }
