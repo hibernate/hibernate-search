@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -28,43 +29,49 @@ public class ElasticsearchSchemaCreatorImpl implements ElasticsearchSchemaCreato
 	}
 
 	@Override
-	public void createIndex(IndexMetadata indexMetadata, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
+	public CompletableFuture<?> createIndex(IndexMetadata indexMetadata,
+			ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		URLEncodedString indexName = indexMetadata.getName();
 
-		schemaAccessor.createIndex(
+		return schemaAccessor.createIndex(
 				indexName, indexMetadata.getSettings(),
 				indexMetadata.getMapping()
-		);
-
-		schemaAccessor.waitForIndexStatus( indexName, executionOptions );
+		)
+				.thenCompose( ignored -> schemaAccessor.waitForIndexStatus( indexName, executionOptions ) );
 	}
 
 	@Override
-	public boolean createIndexIfAbsent(IndexMetadata indexMetadata, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
+	public CompletableFuture<Boolean> createIndexIfAbsent(IndexMetadata indexMetadata,
+			ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		URLEncodedString indexName = indexMetadata.getName();
 
-		boolean created = false;
-
-		if ( !schemaAccessor.indexExists( indexName ) ) {
-			created = schemaAccessor.createIndexIfAbsent(
-					indexName, indexMetadata.getSettings(),
-					indexMetadata.getMapping()
-			);
-		}
-
-		schemaAccessor.waitForIndexStatus( indexName, executionOptions );
-
-		return created;
+		return schemaAccessor.indexExists( indexName )
+				.thenCompose( exists -> {
+					if ( exists ) {
+						return CompletableFuture.completedFuture( false );
+					}
+					else {
+						return schemaAccessor.createIndexIfAbsent(
+								indexName, indexMetadata.getSettings(),
+								indexMetadata.getMapping()
+						);
+					}
+				} )
+				.thenCompose( created -> schemaAccessor.waitForIndexStatus( indexName, executionOptions )
+							.thenApply( ignored -> created ) );
 	}
 
 	@Override
-	public void checkIndexExists(URLEncodedString indexName, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
-		if ( schemaAccessor.indexExists( indexName ) ) {
-			schemaAccessor.waitForIndexStatus( indexName, executionOptions );
-		}
-		else {
-			throw log.indexMissing( indexName );
-		}
+	public CompletableFuture<?> checkIndexExists(URLEncodedString indexName, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
+		return schemaAccessor.indexExists( indexName )
+				.thenCompose( exists -> {
+					if ( exists ) {
+						return schemaAccessor.waitForIndexStatus( indexName, executionOptions );
+					}
+					else {
+						throw log.indexMissing( indexName );
+					}
+				} );
 	}
 
 }

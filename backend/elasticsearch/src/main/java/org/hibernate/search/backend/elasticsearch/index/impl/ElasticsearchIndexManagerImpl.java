@@ -36,6 +36,7 @@ import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionCon
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.impl.Closer;
@@ -112,7 +113,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 			 */
 			lifecycleStrategy = createLifecycleStrategy( context.getConfigurationPropertySource() );
 
-			lifecycleStrategy.onStart( administrationClient, context );
+			Futures.unwrappedExceptionJoin( lifecycleStrategy.onStart( administrationClient, context ) );
 			serialOrchestrator.start();
 			parallelOrchestrator.start();
 		}
