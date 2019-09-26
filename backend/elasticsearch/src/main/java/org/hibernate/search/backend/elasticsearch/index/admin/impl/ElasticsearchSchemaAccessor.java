@@ -72,28 +72,13 @@ public class ElasticsearchSchemaAccessor {
 	}
 
 	public IndexMetadata getCurrentIndexMetadata(URLEncodedString indexName) {
-		IndexMetadata indexMetadata = new IndexMetadata();
-		indexMetadata.setName( indexName );
-
-		ElasticsearchWork<RootTypeMapping> getMappingWork = getWorkFactory().getIndexTypeMapping( indexName ).build();
+		ElasticsearchWork<IndexMetadata> work = getWorkFactory().getIndexMetadata( indexName ).build();
 		try {
-			RootTypeMapping mapping = execute( getMappingWork );
-			indexMetadata.setMapping( mapping );
+			return execute( work );
 		}
 		catch (RuntimeException e) {
-			throw log.elasticsearchMappingRetrievalForValidationFailed( e );
+			throw log.elasticsearchIndexMetadataRetrievalForValidationFailed( e );
 		}
-
-		ElasticsearchWork<IndexSettings> getSettingsWork = getWorkFactory().getIndexSettings( indexName ).build();
-		try {
-			IndexSettings indexSettings = execute( getSettingsWork );
-			indexMetadata.setSettings( indexSettings );
-		}
-		catch (RuntimeException e) {
-			throw log.elasticsearchIndexSettingsRetrievalForValidationFailed( e );
-		}
-
-		return indexMetadata;
 	}
 
 	public void updateSettings(URLEncodedString indexName, IndexSettings settings) {

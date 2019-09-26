@@ -9,8 +9,8 @@ package org.hibernate.search.backend.elasticsearch.work.builder.factory.impl;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
+import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.index.settings.esnative.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.BulkWorkBuilder;
@@ -23,8 +23,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.DeleteWorkBu
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.DropIndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.ExplainWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.FlushWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexSettingsWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexTypeMappingWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexMetadataWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexExistsWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.OpenIndexWorkBuilder;
@@ -77,11 +76,9 @@ public interface ElasticsearchWorkBuilderFactory {
 
 	IndexExistsWorkBuilder indexExists(URLEncodedString indexName);
 
-	GetIndexSettingsWorkBuilder getIndexSettings(URLEncodedString indexName);
+	GetIndexMetadataWorkBuilder getIndexMetadata(URLEncodedString indexName);
 
 	PutIndexSettingsWorkBuilder putIndexSettings(URLEncodedString indexName, IndexSettings settings);
-
-	GetIndexTypeMappingWorkBuilder getIndexTypeMapping(URLEncodedString indexName);
 
 	PutIndexMappingWorkBuilder putIndexTypeMapping(URLEncodedString indexName, RootTypeMapping mapping);
 

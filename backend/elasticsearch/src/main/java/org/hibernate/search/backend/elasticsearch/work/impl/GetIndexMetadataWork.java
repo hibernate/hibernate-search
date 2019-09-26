@@ -9,20 +9,21 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 import java.lang.reflect.Type;
 import java.util.Map;
 
-import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.index.admin.impl.IndexMetadata;
+import org.hibernate.search.backend.elasticsearch.index.settings.esnative.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexTypeMappingWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexMetadataWorkBuilder;
 import org.hibernate.search.util.common.AssertionFailure;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-public class GetIndexTypeMappingWork extends AbstractSimpleElasticsearchWork<RootTypeMapping> {
+public class GetIndexMetadataWork extends AbstractSimpleElasticsearchWork<IndexMetadata> {
 
 	private static final TypeToken<Map<String, RootTypeMapping>> STRING_TO_TYPE_MAPPING_MAP_TYPE_TOKEN =
 			new TypeToken<Map<String, RootTypeMapping>>() {
@@ -32,20 +33,49 @@ public class GetIndexTypeMappingWork extends AbstractSimpleElasticsearchWork<Roo
 	private final URLEncodedString indexName;
 	private final URLEncodedString typeName;
 
-	protected GetIndexTypeMappingWork(Builder builder) {
+	private GetIndexMetadataWork(Builder builder) {
 		super( builder );
 		this.indexName = builder.indexName;
 		this.typeName = builder.typeName;
 	}
 
 	@Override
-	protected RootTypeMapping generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
+	protected IndexMetadata generateResult(ElasticsearchWorkExecutionContext context,
+			ElasticsearchResponse response) {
 		JsonObject body = response.getBody();
 		JsonElement index = body.get( indexName.original );
 		if ( index == null || !index.isJsonObject() ) {
-			throw new AssertionFailure( "Elasticsearch API call succeeded, but the requested index wasn't mentioned in the result: " + body );
+			throw new AssertionFailure(
+					"Elasticsearch API call succeeded, but the requested index wasn't mentioned in the result: " + body );
 		}
-		JsonElement mappings = index.getAsJsonObject().get( "mappings" );
+		JsonObject indexAsObject = index.getAsJsonObject();
+
+		IndexMetadata indexMetadata = new IndexMetadata();
+		indexMetadata.setName( indexName );
+		indexMetadata.setSettings( getSettings( context, indexAsObject ) );
+		indexMetadata.setMapping( getMapping( context, indexAsObject ) );
+		return indexMetadata;
+	}
+
+	private IndexSettings getSettings(ElasticsearchWorkExecutionContext context, JsonObject index) {
+		JsonElement settings = index.get( "settings" );
+		if ( settings == null || !settings.isJsonObject() ) {
+			throw new AssertionFailure( "Elasticsearch API call succeeded, but the requested settings weren't mentioned in the result: " + index );
+		}
+
+		JsonElement indexSettings = settings.getAsJsonObject().get( "index" );
+		if ( indexSettings != null ) {
+			GsonProvider gsonProvider = context.getGsonProvider();
+			return gsonProvider.getGson().fromJson( indexSettings, IndexSettings.class );
+		}
+		else {
+			// Empty settings
+			return new IndexSettings();
+		}
+	}
+
+	private RootTypeMapping getMapping(ElasticsearchWorkExecutionContext context, JsonObject index) {
+		JsonElement mappings = index.get( "mappings" );
 
 		if ( mappings != null ) {
 			GsonProvider gsonProvider = context.getGsonProvider();
@@ -67,7 +97,8 @@ public class GetIndexTypeMappingWork extends AbstractSimpleElasticsearchWork<Roo
 
 	public static class Builder
 			extends AbstractBuilder<Builder>
-			implements GetIndexTypeMappingWorkBuilder {
+			implements GetIndexMetadataWorkBuilder {
+
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;
 		private final Boolean includeTypeName;
@@ -95,8 +126,7 @@ public class GetIndexTypeMappingWork extends AbstractSimpleElasticsearchWork<Roo
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.get()
-					.pathComponent( indexName )
-					.pathComponent( Paths._MAPPING );
+					.pathComponent( indexName );
 			// ES6.7 and later 6.x only
 			if ( includeTypeName != null ) {
 				builder.param( "include_type_name", includeTypeName );
@@ -105,8 +135,8 @@ public class GetIndexTypeMappingWork extends AbstractSimpleElasticsearchWork<Roo
 		}
 
 		@Override
-		public GetIndexTypeMappingWork build() {
-			return new GetIndexTypeMappingWork( this );
+		public GetIndexMetadataWork build() {
+			return new GetIndexMetadataWork( this );
 		}
 	}
 }

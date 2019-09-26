@@ -109,9 +109,9 @@ public interface Log extends BasicLogger {
 			@Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 34,
-			value = "Could not retrieve the mappings from Elasticsearch for validation"
+			value = "Could not retrieve the index metadata from Elasticsearch for validation"
 	)
-	SearchException elasticsearchMappingRetrievalForValidationFailed(@Cause Exception cause);
+	SearchException elasticsearchIndexMetadataRetrievalForValidationFailed(@Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 35,
 			value = "Could not update mappings in index '%1$s': %2$s"
@@ -144,11 +144,6 @@ public interface Log extends BasicLogger {
 			value = "Could not update settings for index '%1$s'"
 	)
 	SearchException elasticsearchSettingsUpdateFailed(Object indexName, @Cause Exception e);
-
-	@Message(id = ID_OFFSET_2 + 68,
-			value = "Could not retrieve the index settings from Elasticsearch for validation"
-	)
-	SearchException elasticsearchIndexSettingsRetrievalForValidationFailed(@Cause Exception cause);
 
 	@LogMessage(level = Level.INFO)
 	@Message(id = ID_OFFSET_2 + 69,

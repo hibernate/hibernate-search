@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
-import org.hibernate.search.backend.elasticsearch.index.settings.esnative.impl.IndexSettings;
+import org.hibernate.search.backend.elasticsearch.index.admin.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 
 
-public interface GetIndexSettingsWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<IndexSettings>> {
+public interface GetIndexMetadataWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<IndexMetadata>> {
 
 }
