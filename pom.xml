@@ -205,7 +205,6 @@
         <version.org.apache.httpcomponents.httpclient>4.5.2</version.org.apache.httpcomponents.httpclient>
         <version.org.apache.httpcomponents.httpcore>4.4.4</version.org.apache.httpcomponents.httpcore>
         <version.org.apache.avro>1.9.1</version.org.apache.avro>
-        <version.org.codehaus.jackson>1.9.13</version.org.codehaus.jackson>
         <version.xml-apis>1.3.03</version.xml-apis>
 
         <version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.3_spec>1.0.1.Final</version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.3_spec>
@@ -631,18 +630,6 @@
                 <groupId>org.apache.avro</groupId>
                 <artifactId>avro</artifactId>
                 <version>${version.org.apache.avro}</version>
-            </dependency>
-            <dependency>
-                <!-- To force testing of Apache Avro integration with the version of Jackson used in WildFly -->
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-core-asl</artifactId>
-                <version>${version.org.codehaus.jackson}</version>
-            </dependency>
-            <dependency>
-                <!-- To force testing of Apache Avro integration with the version of Jackson used in WildFly -->
-                <groupId>org.codehaus.jackson</groupId>
-                <artifactId>jackson-mapper-asl</artifactId>
-                <version>${version.org.codehaus.jackson}</version>
             </dependency>
             <dependency>
                 <groupId>org.apache.commons</groupId>
