@@ -9,7 +9,7 @@ package org.hibernate.search.indexes.serialization.avro.impl;
 import org.apache.avro.Protocol;
 
 /**
- * Helper to build an Avro Protocol version 1.1 from all our resource
+ * Helper to build an Avro Protocol version 1.2 from all our resource
  * schemas.
  */
 class ProtocolBuilderV1_2 extends ProtocolBuilderV1_1 {
