@@ -17,6 +17,8 @@ import org.hibernate.search.util.common.reporting.EventContextElement;
  * Failure collectors allow to register (non-fatal) failures occurring during bootstrap in particular,
  * so as to remember that a failure occurred and the process should be aborted at some point,
  * while still continuing the process for some time to collect other errors that could be relevant to users.
+ * <p>
+ * Implementations are thread-safe.
  */
 public interface FailureCollector {
 

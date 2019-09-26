@@ -8,6 +8,8 @@ package org.hibernate.search.engine.reporting.spi;
 
 /**
  * A failure collector with an implicit context.
+ * <p>
+ * Implementations are thread-safe.
  *
  * @see FailureCollector
  */
