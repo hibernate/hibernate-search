@@ -143,6 +143,21 @@ public class ProtocolBackwardCompatibilityTest {
 		SerializationTestHelper.assertLuceneWorkList( expectedWorkList, actualWorkList );
 	}
 
+	@Test
+	public void testDeserializingVersion12AvroVersion19ModelWithLatestDeserializer() throws Exception {
+		// expected
+		List<LuceneWork> expectedWorkList = buildV10Works();
+		expectedWorkList.addAll( buildV11Works() );
+		expectedWorkList.addAll( buildV12Works() );
+
+		byte[] serializedModelV12Avro19 = loadSerializedWorkForMajorMinorQualifier( 1, 2, "avro19" );
+
+		// actual
+		List<LuceneWork> actualWorkList = luceneWorkSerializer.toLuceneWorks( serializedModelV12Avro19 );
+
+		SerializationTestHelper.assertLuceneWorkList( expectedWorkList, actualWorkList );
+	}
+
 	private List<LuceneWork> buildV10Works() throws Exception {
 		List<LuceneWork> works = new ArrayList<>();
 		works.add( OptimizeLuceneWork.INSTANCE );
