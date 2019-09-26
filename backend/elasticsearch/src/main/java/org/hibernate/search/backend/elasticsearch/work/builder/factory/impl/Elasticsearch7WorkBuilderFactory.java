@@ -9,9 +9,9 @@ package org.hibernate.search.backend.elasticsearch.work.builder.factory.impl;
 import java.util.List;
 import java.util.Set;
 
-import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.index.settings.esnative.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.BulkWorkBuilder;
@@ -24,8 +24,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.DeleteWorkBu
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.DropIndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.ExplainWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.FlushWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexSettingsWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexTypeMappingWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexMetadataWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexExistsWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.OpenIndexWorkBuilder;
@@ -38,7 +37,6 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBu
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.WaitForIndexStatusWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.backend.elasticsearch.work.impl.ClearScrollWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.CloseIndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.CountWork;
@@ -46,10 +44,10 @@ import org.hibernate.search.backend.elasticsearch.work.impl.CreateIndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.DeleteByQueryWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.DeleteWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.DropIndexWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.backend.elasticsearch.work.impl.ExplainWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.FlushWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.GetIndexSettingsWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.GetIndexTypeMappingWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.GetIndexMetadataWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.IndexExistsWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.IndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.OpenIndexWork;
@@ -157,18 +155,13 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 	}
 
 	@Override
-	public GetIndexSettingsWorkBuilder getIndexSettings(URLEncodedString indexName) {
-		return new GetIndexSettingsWork.Builder( indexName );
+	public GetIndexMetadataWorkBuilder getIndexMetadata(URLEncodedString indexName) {
+		return GetIndexMetadataWork.Builder.forElasticsearch7AndAbove( indexName );
 	}
 
 	@Override
 	public PutIndexSettingsWorkBuilder putIndexSettings(URLEncodedString indexName, IndexSettings settings) {
 		return new PutIndexSettingsWork.Builder( gsonProvider, indexName, settings );
-	}
-
-	@Override
-	public GetIndexTypeMappingWorkBuilder getIndexTypeMapping(URLEncodedString indexName) {
-		return GetIndexTypeMappingWork.Builder.forElasticsearch7AndAbove( indexName );
 	}
 
 	@Override

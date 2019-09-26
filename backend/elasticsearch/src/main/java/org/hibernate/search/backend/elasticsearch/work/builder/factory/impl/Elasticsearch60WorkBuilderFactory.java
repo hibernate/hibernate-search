@@ -11,11 +11,11 @@ import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.R
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.CreateIndexWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexTypeMappingWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexMetadataWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexExistsWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexMappingWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.impl.CreateIndexWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.GetIndexTypeMappingWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.GetIndexMetadataWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.IndexExistsWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.PutIndexTypeMappingWork;
 
@@ -45,8 +45,8 @@ public class Elasticsearch60WorkBuilderFactory extends Elasticsearch67WorkBuilde
 	}
 
 	@Override
-	public GetIndexTypeMappingWorkBuilder getIndexTypeMapping(URLEncodedString indexName) {
-		return GetIndexTypeMappingWork.Builder.forElasticsearch66AndBelow( indexName, Paths.DOC );
+	public GetIndexMetadataWorkBuilder getIndexMetadata(URLEncodedString indexName) {
+		return GetIndexMetadataWork.Builder.forElasticsearch66AndBelow( indexName, Paths.DOC );
 	}
 
 	@Override
