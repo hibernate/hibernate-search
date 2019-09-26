@@ -8,11 +8,11 @@ package org.hibernate.search.engine.reporting.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
@@ -43,15 +43,16 @@ public class RootFailureCollector implements FailureCollector {
 	 */
 	private final int failureLimit;
 
-	private NonRootFailureCollector delegate;
-	private int failureCount = 0;
+	private final NonRootFailureCollector delegate;
+	private final AtomicInteger failureCount = new AtomicInteger();
 
 	public RootFailureCollector(int failureLimit) {
 		this.failureLimit = failureLimit;
+		this.delegate = new NonRootFailureCollector( this );
 	}
 
 	public void checkNoFailure() {
-		if ( failureCount > 0 ) {
+		if ( failureCount.get() > 0 ) {
 			String renderedFailures = renderFailures();
 			throw log.bootstrapCollectedFailures( renderedFailures );
 		}
@@ -73,31 +74,26 @@ public class RootFailureCollector implements FailureCollector {
 
 	@Override
 	public ContextualFailureCollector withContext(EventContext context) {
-		if ( delegate == null ) {
-			delegate = new NonRootFailureCollector( this );
-		}
 		return delegate.withContext( context );
 	}
 
 	@Override
 	public ContextualFailureCollector withContext(EventContextElement contextElement) {
-		if ( delegate == null ) {
-			delegate = new NonRootFailureCollector( this );
-		}
 		return delegate.withContext( contextElement );
 	}
 
 	private void onAddFailure() {
-		++failureCount;
-		if ( failureCount >= failureLimit ) {
+		int theFailureCount = failureCount.incrementAndGet();
+		if ( theFailureCount >= failureLimit ) {
 			String renderedFailures = renderFailures();
-			throw log.boostrapCollectedFailureLimitReached( renderedFailures, failureCount );
+			throw log.boostrapCollectedFailureLimitReached( renderedFailures, theFailureCount );
 		}
 	}
 
 	private static class NonRootFailureCollector implements FailureCollector {
 		protected final RootFailureCollector root;
-		private Map<EventContextElement, ContextualFailureCollectorImpl> children;
+		// Use a LinkedHashMap for deterministic iteration
+		private final Map<EventContextElement, ContextualFailureCollectorImpl> children = new LinkedHashMap<>();
 
 		private NonRootFailureCollector(RootFailureCollector root) {
 			this.root = root;
@@ -108,7 +104,7 @@ public class RootFailureCollector implements FailureCollector {
 		}
 
 		@Override
-		public ContextualFailureCollectorImpl withContext(EventContext context) {
+		public synchronized ContextualFailureCollectorImpl withContext(EventContext context) {
 			List<EventContextElement> elements = context.getElements();
 			// This should not happen, but we want to be extra-cautious to avoid failures while handling failures
 			if ( elements.isEmpty() ) {
@@ -126,20 +122,11 @@ public class RootFailureCollector implements FailureCollector {
 		}
 
 		@Override
-		public ContextualFailureCollectorImpl withContext(EventContextElement contextElement) {
-			if ( children == null ) {
-				// Use a LinkedHashMap for deterministic iteration
-				children = new LinkedHashMap<>();
-			}
-			ContextualFailureCollectorImpl child = children.get( contextElement );
-			if ( child != null ) {
-				return child;
-			}
-			else {
-				child = new ContextualFailureCollectorImpl( this, contextElement );
-				children.put( contextElement, child );
-				return child;
-			}
+		public synchronized ContextualFailureCollectorImpl withContext(EventContextElement contextElement) {
+			return children.computeIfAbsent(
+					contextElement,
+					element -> new ContextualFailureCollectorImpl( this, element )
+			);
 		}
 
 		ContextualFailureCollectorImpl withDefaultContext() {
@@ -156,20 +143,18 @@ public class RootFailureCollector implements FailureCollector {
 			builder.endObject();
 		}
 
-		final void appendChildrenFailuresTo(ToStringTreeBuilder builder) {
-			if ( children != null ) {
-				for ( ContextualFailureCollectorImpl child : children.values() ) {
-					// Some contexts may have been mentioned without any failure being ever reported.
-					// Only display contexts that had at least one failure reported.
-					if ( child.hasFailure() ) {
-						child.appendFailuresTo( builder );
-					}
+		final synchronized void appendChildrenFailuresTo(ToStringTreeBuilder builder) {
+			for ( ContextualFailureCollectorImpl child : children.values() ) {
+				// Some contexts may have been mentioned without any failure being ever reported.
+				// Only display contexts that had at least one failure reported.
+				if ( child.hasFailure() ) {
+					child.appendFailuresTo( builder );
 				}
 			}
 		}
 
 		final Map<EventContextElement, ContextualFailureCollectorImpl> getChildren() {
-			return children != null ? children : Collections.emptyMap();
+			return children;
 		}
 	}
 
@@ -177,7 +162,7 @@ public class RootFailureCollector implements FailureCollector {
 		private final NonRootFailureCollector parent;
 		private final EventContextElement context;
 
-		private List<String> failureMessages;
+		private final List<String> failureMessages = new ArrayList<>();
 
 		private ContextualFailureCollectorImpl(NonRootFailureCollector parent, EventContextElement context) {
 			super( parent );
@@ -186,8 +171,8 @@ public class RootFailureCollector implements FailureCollector {
 		}
 
 		@Override
-		public boolean hasFailure() {
-			if ( failureMessages != null && !failureMessages.isEmpty() ) {
+		public synchronized boolean hasFailure() {
+			if ( !failureMessages.isEmpty() ) {
 				return true;
 			}
 			for ( ContextualFailureCollectorImpl child : getChildren().values() ) {
@@ -232,9 +217,9 @@ public class RootFailureCollector implements FailureCollector {
 		}
 
 		@Override
-		void appendFailuresTo(ToStringTreeBuilder builder) {
+		synchronized void appendFailuresTo(ToStringTreeBuilder builder) {
 			builder.startObject( context.render() );
-			if ( failureMessages != null ) {
+			if ( !failureMessages.isEmpty() ) {
 				builder.startList( ENGINE_MESSAGES.failureReportFailures() );
 				for ( String failureMessage : failureMessages ) {
 					builder.value( failureMessage );
@@ -245,7 +230,7 @@ public class RootFailureCollector implements FailureCollector {
 			builder.endObject();
 		}
 
-		private void doAdd(Throwable failure, String failureMessage) {
+		private synchronized void doAdd(Throwable failure, String failureMessage) {
 			StringJoiner contextJoiner = new StringJoiner( COMMON_MESSAGES.contextSeparator() );
 			appendContextTo( contextJoiner );
 			log.newBootstrapCollectedFailure( contextJoiner.toString(), failure );
@@ -253,10 +238,7 @@ public class RootFailureCollector implements FailureCollector {
 			doAdd( failureMessage );
 		}
 
-		private void doAdd(String failureMessage) {
-			if ( failureMessages == null ) {
-				failureMessages = new ArrayList<>();
-			}
+		private synchronized void doAdd(String failureMessage) {
 			failureMessages.add( failureMessage );
 
 			root.onAddFailure();
