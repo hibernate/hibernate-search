@@ -51,4 +51,7 @@ public final class HibernateSearchContextProviderService
 		}
 	}
 
+	SearchIntegration getIntegration() {
+		return integration;
+	}
 }

@@ -15,11 +15,14 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.SessionFactory;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.search.engine.backend.Backend;
+import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
+import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
@@ -141,6 +144,16 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
+	public IndexManager getIndexManager(String indexName) {
+		return getSearchIntegration().getIndexManager( indexName );
+	}
+
+	@Override
+	public Backend getBackend(String backendName) {
+		return getSearchIntegration().getBackend( backendName );
+	}
+
+	@Override
 	public HibernateOrmMapping toConcreteType() {
 		return this;
 	}
@@ -227,5 +240,9 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 				sessionImplementor,
 				synchronizationStrategy
 		);
+	}
+
+	private SearchIntegration getSearchIntegration() {
+		return HibernateSearchContextProviderService.get( getSessionFactory() ).getIntegration();
 	}
 }
