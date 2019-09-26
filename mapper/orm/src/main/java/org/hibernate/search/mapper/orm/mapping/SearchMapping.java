@@ -11,6 +11,8 @@ import java.util.Collections;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.search.engine.backend.Backend;
+import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 
 /**
@@ -52,4 +54,15 @@ public interface SearchMapping {
 	 */
 	SessionFactory toOrmSessionFactory();
 
+	/**
+	 * @param indexName The key to get the required {@link IndexManager} instance.
+	 * @return The index manager for the index having {@code indexName} as name.
+	 */
+	IndexManager getIndexManager(String indexName);
+
+	/**
+	 * @param backendName The key to get the required {@link Backend} instance.
+	 * @return The backend having {@code backendName} as name.
+	 */
+	Backend getBackend(String backendName);
 }
