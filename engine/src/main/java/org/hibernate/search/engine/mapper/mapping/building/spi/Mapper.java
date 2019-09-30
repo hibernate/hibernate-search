@@ -10,7 +10,6 @@ import java.util.Optional;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
 
 /**
  * @param <MPBS> The Java type of the partial build state of the produced mapping.

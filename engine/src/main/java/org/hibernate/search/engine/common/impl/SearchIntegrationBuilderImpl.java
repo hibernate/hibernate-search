@@ -47,9 +47,9 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurat
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataDiscoverer;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.reporting.impl.RootFailureCollector;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;

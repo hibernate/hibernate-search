@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.logging.spi;
 
-import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
 
 public class MappingKeyFormatter {
 

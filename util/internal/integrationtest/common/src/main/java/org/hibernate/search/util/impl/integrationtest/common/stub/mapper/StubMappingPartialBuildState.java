@@ -9,7 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 import java.util.Map;
 
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
 
 public class StubMappingPartialBuildState implements MappingPartialBuildState {
 

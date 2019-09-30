@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
-import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
 
 public final class StubMappingKey implements MappingKey<StubMappingPartialBuildState, StubMapping> {
 

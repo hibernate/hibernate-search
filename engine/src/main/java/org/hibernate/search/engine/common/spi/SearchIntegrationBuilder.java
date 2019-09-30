@@ -11,8 +11,8 @@ import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
 
 
 public interface SearchIntegrationBuilder {
