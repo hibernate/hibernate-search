@@ -13,7 +13,7 @@ public class EventContextFormatter {
 	private final String formatted;
 
 	public EventContextFormatter(EventContext typeModel) {
-		this.formatted = typeModel.render();
+		this.formatted = typeModel.renderWithPrefix();
 	}
 
 	@Override

@@ -27,7 +27,7 @@ public class SearchException extends RuntimeException {
 	}
 
 	public SearchException(String message, Throwable cause, EventContext context) {
-		super( context == null ? message : message + "\n" + context.render(), cause );
+		super( context == null ? message : message + "\n" + context.renderWithPrefix(), cause );
 		this.messageWithoutContext = message;
 		this.context = context;
 	}
