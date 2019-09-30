@@ -11,11 +11,8 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.impl.SearchIntegrationBuilderImpl;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 
 public interface SearchIntegration extends AutoCloseable {
-
-	<M> M getMapping(MappingKey<?, M> mappingKey);
 
 	Backend getBackend(String backendName);
 

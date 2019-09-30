@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.engine.common.impl;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
@@ -38,7 +40,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 	private final BeanHolder<? extends ErrorHandler> errorHandlerHolder;
 
 	private final Map<MappingKey<?, ?>, MappingPartialBuildState> partiallyBuiltMappings;
-	private final Map<MappingKey<?, ?>, MappingImplementor<?>> fullyBuiltMappings = new LinkedHashMap<>();
+	private final List<MappingImplementor<?>> fullyBuiltMappings = new ArrayList<>();
 	private final Map<String, BackendPartialBuildState> partiallyBuiltBackends;
 	private final ConfigurationPropertyChecker partialConfigurationPropertyChecker;
 
@@ -66,7 +68,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 	public void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.pushAll( MappingPartialBuildState::closeOnFailure, partiallyBuiltMappings.values() );
-			closer.pushAll( MappingImplementor::close, fullyBuiltMappings.values() );
+			closer.pushAll( MappingImplementor::close, fullyBuiltMappings );
 			closer.pushAll( IndexManagerPartialBuildState::closeOnFailure, partiallyBuiltIndexManagers.values() );
 			closer.pushAll( IndexManagerImplementor::close, fullyBuiltIndexManagers.values() );
 			closer.pushAll( BackendPartialBuildState::closeOnFailure, partiallyBuiltBackends.values() );
@@ -112,7 +114,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 			MappingFinalizationContext mappingFinalizationContext = new MappingFinalizationContextImpl( propertySource );
 
 			MappingImplementor<M> mapping = finalizer.finalizeMapping( mappingFinalizationContext, partiallyBuiltMapping );
-			fullyBuiltMappings.put( mappingKey, mapping );
+			fullyBuiltMappings.add( mapping );
 			partiallyBuiltMappings.remove( mappingKey );
 
 			return mapping.toConcreteType();
