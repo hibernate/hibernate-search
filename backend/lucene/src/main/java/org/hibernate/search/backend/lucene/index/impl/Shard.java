@@ -29,7 +29,7 @@ public final class Shard implements Closeable {
 					model.getIndexName(), shardId, model.getScopedAnalyzer()
 			);
 			writeOrchestrator = backendContext.createOrchestrator(
-					model.getIndexName(), shardId, indexAccessor.getIndexWriterDelegator()
+					model.getIndexName(), shardId, indexAccessor
 			);
 
 			return new Shard( writeOrchestrator, indexAccessor );

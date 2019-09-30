@@ -16,7 +16,6 @@ import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreat
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
-import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneBatchingWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
@@ -102,13 +101,13 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 
 	@Override
 	public LuceneWriteWorkOrchestratorImplementor createOrchestrator(String indexName, Optional<String> shardId,
-			IndexWriterDelegator indexWriterDelegator) {
+			IndexAccessor indexAccessor) {
+		EventContext indexEventContext = indexAccessor.getIndexEventContext();
 		return new LuceneBatchingWriteWorkOrchestrator(
-				"Lucene write work orchestrator for index " + indexName
-						+ ( shardId.isPresent() ? " - shard " + shardId.get() : "" ),
+				"Lucene write work orchestrator for " + indexEventContext.render(),
 				new LuceneWriteWorkProcessor(
-						EventContexts.fromIndexNameAndShardId( indexName, shardId ),
-						indexWriterDelegator,
+						indexEventContext,
+						indexAccessor.getIndexWriterDelegator(),
 						errorHandler
 				),
 				errorHandler
@@ -183,7 +182,10 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		);
 		directoryHolder = directoryProvider.createDirectoryHolder( context );
 		try {
-			return new IndexAccessor( indexName, directoryHolder, analyzer, errorHandler );
+			return new IndexAccessor(
+					directoryHolder, analyzer,
+					errorHandler, EventContexts.fromIndexNameAndShardId( indexName, shardId )
+			);
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e ).push( directoryHolder );

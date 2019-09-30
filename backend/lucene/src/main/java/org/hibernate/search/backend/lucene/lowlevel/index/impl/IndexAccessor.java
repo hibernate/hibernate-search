@@ -14,10 +14,10 @@ import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolde
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegatorImpl;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.DirectoryReader;
@@ -30,17 +30,21 @@ import org.apache.lucene.store.Directory;
 public class IndexAccessor implements AutoCloseable {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final String indexName;
 	private final DirectoryHolder directoryHolder;
 	private final IndexWriterDelegatorImpl indexWriterDelegator;
+	private final EventContext indexEventContext;
 
-	public IndexAccessor(String indexName, DirectoryHolder directoryHolder, Analyzer analyzer,
-			ErrorHandler errorHandler) {
-		this.indexName = indexName;
+	public IndexAccessor(DirectoryHolder directoryHolder, Analyzer analyzer,
+			ErrorHandler errorHandler, EventContext indexEventContext) {
 		this.directoryHolder = directoryHolder;
 		this.indexWriterDelegator = new IndexWriterDelegatorImpl(
-				indexName, directoryHolder, analyzer, errorHandler
+				directoryHolder, analyzer, errorHandler, indexEventContext
 		);
+		this.indexEventContext = indexEventContext;
+	}
+
+	public EventContext getIndexEventContext() {
+		return indexEventContext;
 	}
 
 	public void start() {
@@ -52,7 +56,7 @@ public class IndexAccessor implements AutoCloseable {
 			new SuppressingCloser( e ).push( directoryHolder );
 			throw log.unableToInitializeIndexDirectory(
 					e.getMessage(),
-					EventContexts.fromIndexName( indexName ),
+					indexEventContext,
 					e
 			);
 		}
@@ -97,5 +101,4 @@ public class IndexAccessor implements AutoCloseable {
 	public Directory getDirectoryForTests() {
 		return directoryHolder.get();
 	}
-
 }

@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
+import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -39,7 +40,7 @@ public interface WorkExecutionBackendContext {
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
 	LuceneWriteWorkOrchestratorImplementor createOrchestrator(String indexName, Optional<String> shardId,
-			IndexWriterDelegator indexWriterDelegator);
+			IndexAccessor indexAccessor);
 
 	IndexIndexer<LuceneRootDocumentBuilder> createIndexer(
 			WorkExecutionIndexManagerContext indexManagerContext,
