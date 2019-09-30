@@ -11,6 +11,7 @@ import java.util.Optional;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryCreationContextImpl;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreationContext;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
@@ -100,21 +101,6 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	}
 
 	@Override
-	public LuceneWriteWorkOrchestratorImplementor createOrchestrator(String indexName, Optional<String> shardId,
-			IndexAccessor indexAccessor) {
-		EventContext indexEventContext = indexAccessor.getIndexEventContext();
-		return new LuceneBatchingWriteWorkOrchestrator(
-				"Lucene write work orchestrator for " + indexEventContext.render(),
-				new LuceneWriteWorkProcessor(
-						indexEventContext,
-						indexAccessor.getIndexWriterDelegator(),
-						errorHandler
-				),
-				errorHandler
-		);
-	}
-
-	@Override
 	public IndexIndexer<LuceneRootDocumentBuilder> createIndexer(
 			WorkExecutionIndexManagerContext indexManagerContext,
 			LuceneIndexEntryFactory indexEntryFactory,
@@ -173,7 +159,31 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		return eventContext;
 	}
 
-	IndexAccessor createIndexAccessor(String indexName, Optional<String> shardId, Analyzer analyzer) {
+	LuceneIndexEntryFactory createLuceneIndexEntryFactory(String indexName, FacetsConfig facetsConfig) {
+		return new LuceneIndexEntryFactory( multiTenancyStrategy, indexName, facetsConfig );
+	}
+
+	Shard createShard(LuceneIndexModel model, Optional<String> shardId) {
+		LuceneWriteWorkOrchestratorImplementor writeOrchestrator = null;
+		IndexAccessor indexAccessor = null;
+
+		try {
+			indexAccessor = createIndexAccessor(
+					model.getIndexName(), shardId, model.getScopedAnalyzer()
+			);
+			writeOrchestrator = createWriteOrchestrator( indexAccessor );
+
+			return new Shard( indexAccessor, writeOrchestrator );
+		}
+		catch (RuntimeException e) {
+			new SuppressingCloser( e )
+					.push( writeOrchestrator )
+					.push( indexAccessor );
+			throw e;
+		}
+	}
+
+	private IndexAccessor createIndexAccessor(String indexName, Optional<String> shardId, Analyzer analyzer) {
 		DirectoryHolder directoryHolder;
 		DirectoryCreationContext context = new DirectoryCreationContextImpl(
 				shardId.isPresent() ? EventContexts.fromShardId( shardId.get() ) : null,
@@ -193,8 +203,17 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		}
 	}
 
-	LuceneIndexEntryFactory createLuceneIndexEntryFactory(String indexName, FacetsConfig facetsConfig) {
-		return new LuceneIndexEntryFactory( multiTenancyStrategy, indexName, facetsConfig );
+	private LuceneWriteWorkOrchestratorImplementor createWriteOrchestrator(IndexAccessor indexAccessor) {
+		EventContext indexEventContext = indexAccessor.getIndexEventContext();
+		return new LuceneBatchingWriteWorkOrchestrator(
+				"Lucene write work orchestrator for " + indexEventContext.render(),
+				new LuceneWriteWorkProcessor(
+						indexEventContext,
+						indexAccessor.getIndexWriterDelegator(),
+						errorHandler
+				),
+				errorHandler
+		);
 	}
 
 }
