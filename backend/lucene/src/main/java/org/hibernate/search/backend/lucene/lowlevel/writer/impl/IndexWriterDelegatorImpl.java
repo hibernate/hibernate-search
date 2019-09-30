@@ -72,6 +72,7 @@ public class IndexWriterDelegatorImpl implements Closeable, IndexWriterDelegator
 		 */
 	}
 
+	@Override
 	public void ensureIndexExists() throws IOException {
 		Directory directory = directoryHolder.get();
 

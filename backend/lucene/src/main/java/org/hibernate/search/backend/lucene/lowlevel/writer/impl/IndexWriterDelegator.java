@@ -22,6 +22,13 @@ import org.apache.lucene.search.Query;
  */
 public interface IndexWriterDelegator {
 
+	/**
+	 * Checks whether the index exists (on disk, ...), and creates it if necessary.
+	 * <p>
+	 * Should only be used when starting an index.
+	 */
+	void ensureIndexExists() throws IOException;
+
 	long addDocuments(Iterable<? extends Iterable<? extends IndexableField>> docs) throws IOException;
 
 	long updateDocuments(Term term, Iterable<? extends Iterable<? extends IndexableField>> docs) throws IOException;

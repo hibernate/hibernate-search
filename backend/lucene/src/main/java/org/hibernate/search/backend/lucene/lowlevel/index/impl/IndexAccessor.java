@@ -7,16 +7,12 @@
 package org.hibernate.search.backend.lucene.lowlevel.index.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegatorImpl;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -28,8 +24,6 @@ import org.apache.lucene.store.Directory;
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class IndexAccessor implements AutoCloseable {
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	private final DirectoryHolder directoryHolder;
 	private final IndexWriterDelegatorImpl indexWriterDelegator;
 	private final EventContext indexEventContext;
@@ -47,19 +41,8 @@ public class IndexAccessor implements AutoCloseable {
 		return indexEventContext;
 	}
 
-	public void start() {
-		try {
-			directoryHolder.start();
-			indexWriterDelegator.ensureIndexExists();
-		}
-		catch (IOException | RuntimeException e) {
-			new SuppressingCloser( e ).push( directoryHolder );
-			throw log.unableToInitializeIndexDirectory(
-					e.getMessage(),
-					indexEventContext,
-					e
-			);
-		}
+	public void start() throws IOException {
+		directoryHolder.start();
 	}
 
 	@Override

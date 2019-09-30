@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.index.spi.ShardingStrategy;
@@ -27,6 +28,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
+import org.hibernate.search.util.common.impl.Throwables;
 
 class ShardHolder implements Closeable, ReadIndexManagerContext, WorkExecutionIndexManagerContext {
 
@@ -47,7 +49,7 @@ class ShardHolder implements Closeable, ReadIndexManagerContext, WorkExecutionIn
 		return getClass().getSimpleName() + "[indexName=" + model.getIndexName() + "]";
 	}
 
-	void start(IndexManagerStartContext startContext) {
+	CompletableFuture<?> start(IndexManagerStartContext startContext) {
 		ConfigurationPropertySource propertySource = startContext.getConfigurationPropertySource();
 
 		try {
@@ -61,14 +63,23 @@ class ShardHolder implements Closeable, ReadIndexManagerContext, WorkExecutionIn
 			this.shardingStrategyHolder = initializationContext.create( shards );
 
 			if ( startContext.getFailureCollector().hasFailure() ) {
-				// At least one shard failed; abort.
-				return;
+				// At least one shard creation failed; abort and don't even try to start shards.
+				return CompletableFuture.completedFuture( null );
 			}
 
+			CompletableFuture<?>[] futures = new CompletableFuture[shards.size()];
+			int i = 0;
 			for ( Shard shard : shards.values() ) {
-				shard.start();
 				writeOrchestrators.add( shard.getWriteOrchestrator() );
+				futures[i] = shard.start()
+						.exceptionally( e -> {
+							startContext.getFailureCollector().add( Throwables.expectRuntimeException( e ) );
+							return null;
+						} );
+				i++;
 			}
+
+			return CompletableFuture.allOf( futures );
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
