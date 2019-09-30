@@ -31,6 +31,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
@@ -72,7 +73,7 @@ public class LuceneIndexManagerImpl
 
 	@Override
 	public void start(IndexManagerStartContext context) {
-		shardHolder.start( context );
+		Futures.unwrappedExceptionJoin( shardHolder.start( context ) );
 	}
 
 	@Override

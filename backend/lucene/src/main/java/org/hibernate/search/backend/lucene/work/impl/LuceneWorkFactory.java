@@ -14,6 +14,8 @@ import org.apache.lucene.search.Explanation;
 
 public interface LuceneWorkFactory {
 
+	LuceneWriteWork<?> ensureIndexExists();
+
 	LuceneWriteWork<?> add(String tenantId, String id, LuceneIndexEntry indexEntry);
 
 	LuceneWriteWork<?> update(String tenantId, String id, LuceneIndexEntry indexEntry);
