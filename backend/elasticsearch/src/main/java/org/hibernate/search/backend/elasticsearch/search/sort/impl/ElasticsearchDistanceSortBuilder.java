@@ -6,15 +6,18 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
+import java.util.List;
+
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchGeoPointFieldCodec;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchDistanceSortBuilder extends AbstractElasticsearchSearchSortBuilder
+public class ElasticsearchDistanceSortBuilder extends AbstractElasticsearchSearchNestedSortBuilder
 		implements DistanceSortBuilder<ElasticsearchSearchSortBuilder> {
 
 	private static final JsonObjectAccessor GEO_DISTANCE_ACCESSOR = JsonAccessor.root().property( "_geo_distance" ).asObject();
@@ -22,7 +25,8 @@ public class ElasticsearchDistanceSortBuilder extends AbstractElasticsearchSearc
 	private final String absoluteFieldPath;
 	private final GeoPoint location;
 
-	public ElasticsearchDistanceSortBuilder(String absoluteFieldPath, GeoPoint location) {
+	public ElasticsearchDistanceSortBuilder(ElasticsearchSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy, GeoPoint location) {
+		super( nestedPathHierarchy, searchContext.getJsonSyntaxHelper() );
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.location = location;
 	}

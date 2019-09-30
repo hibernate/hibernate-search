@@ -40,11 +40,11 @@ public class ElasticsearchGeoPointFieldSortBuilderFactory implements Elasticsear
 	}
 
 	@Override
-	public DistanceSortBuilder<ElasticsearchSearchSortBuilder> createDistanceSortBuilder(String absoluteFieldPath,
-			GeoPoint center) {
+	public DistanceSortBuilder<ElasticsearchSearchSortBuilder> createDistanceSortBuilder(ElasticsearchSearchContext searchContext,
+			String absoluteFieldPath, List<String> nestedPathHierarchy, GeoPoint center) {
 		checkSortable( absoluteFieldPath, sortable );
 
-		return new ElasticsearchDistanceSortBuilder( absoluteFieldPath, center );
+		return new ElasticsearchDistanceSortBuilder( searchContext, absoluteFieldPath, nestedPathHierarchy, center );
 	}
 
 	@Override

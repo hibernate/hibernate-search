@@ -37,8 +37,8 @@ public interface ElasticsearchFieldSortBuilderFactory {
 	FieldSortBuilder<ElasticsearchSearchSortBuilder> createFieldSortBuilder(
 			ElasticsearchSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy, ElasticsearchCompatibilityChecker converterChecker);
 
-	DistanceSortBuilder<ElasticsearchSearchSortBuilder> createDistanceSortBuilder(String absoluteFieldPath,
-			GeoPoint center);
+	DistanceSortBuilder<ElasticsearchSearchSortBuilder> createDistanceSortBuilder(ElasticsearchSearchContext searchContext,
+			String absoluteFieldPath, List<String> nestedPathHierarchy, GeoPoint center);
 
 	boolean hasCompatibleCodec(ElasticsearchFieldSortBuilderFactory other);
 

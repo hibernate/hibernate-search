@@ -83,7 +83,7 @@ public class ElasticsearchSearchSortBuilderFactoryImpl implements ElasticsearchS
 	public DistanceSortBuilder<ElasticsearchSearchSortBuilder> distance(String absoluteFieldPath, GeoPoint location) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createDistanceSortBuilder( absoluteFieldPath, location );
+				.getComponent().createDistanceSortBuilder( searchContext, absoluteFieldPath, scopeModel.getNestedPathHierarchy( absoluteFieldPath ), location );
 	}
 
 	@Override
