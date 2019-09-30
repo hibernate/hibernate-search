@@ -6,20 +6,15 @@
  */
 package org.hibernate.search.backend.lucene.work.execution.impl;
 
-import java.util.Optional;
-
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
-import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
-import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
-import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 
 /**
  * An interface with knowledge of the backend internals,
@@ -38,9 +33,6 @@ public interface WorkExecutionBackendContext {
 			LuceneIndexEntryFactory indexEntryFactory,
 			BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
-
-	LuceneWriteWorkOrchestratorImplementor createOrchestrator(String indexName, Optional<String> shardId,
-			IndexAccessor indexAccessor);
 
 	IndexIndexer<LuceneRootDocumentBuilder> createIndexer(
 			WorkExecutionIndexManagerContext indexManagerContext,

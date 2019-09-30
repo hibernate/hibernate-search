@@ -8,46 +8,21 @@ package org.hibernate.search.backend.lucene.index.impl;
 
 import java.io.Closeable;
 import java.io.IOException;
-import java.util.Optional;
 
-import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 import org.hibernate.search.backend.lucene.lowlevel.reader.spi.IndexReaderHolder;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 public final class Shard implements Closeable {
 
-	static Shard create(IndexManagerBackendContext backendContext, LuceneIndexModel model, Optional<String> shardId) {
-		LuceneWriteWorkOrchestratorImplementor writeOrchestrator = null;
-		IndexAccessor indexAccessor = null;
-
-		try {
-			indexAccessor = backendContext.createIndexAccessor(
-					model.getIndexName(), shardId, model.getScopedAnalyzer()
-			);
-			writeOrchestrator = backendContext.createOrchestrator(
-					model.getIndexName(), shardId, indexAccessor
-			);
-
-			return new Shard( writeOrchestrator, indexAccessor );
-		}
-		catch (RuntimeException e) {
-			new SuppressingCloser( e )
-					.push( writeOrchestrator )
-					.push( indexAccessor );
-			throw e;
-		}
-	}
-
-	private final LuceneWriteWorkOrchestratorImplementor writeOrchestrator;
 	private final IndexAccessor indexAccessor;
+	private final LuceneWriteWorkOrchestratorImplementor writeOrchestrator;
 
-	private Shard(LuceneWriteWorkOrchestratorImplementor writeOrchestrator, IndexAccessor indexAccessor) {
-		this.writeOrchestrator = writeOrchestrator;
+	Shard(IndexAccessor indexAccessor, LuceneWriteWorkOrchestratorImplementor writeOrchestrator) {
 		this.indexAccessor = indexAccessor;
+		this.writeOrchestrator = writeOrchestrator;
 	}
 
 	public void start() {
