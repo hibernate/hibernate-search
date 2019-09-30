@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.backend.index.spi;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -34,8 +36,9 @@ public interface IndexManagerImplementor<D extends DocumentElement> extends Auto
 	 * was called on the corresponding backend.
 	 *
 	 * @param context The start context.
+	 * @return A future that completes when the index manager is completely started.
 	 */
-	void start(IndexManagerStartContext context);
+	CompletableFuture<?> start(IndexManagerStartContext context);
 
 	/**
 	 * @return The object that should be exposed as API to users.

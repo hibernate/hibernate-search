@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.index.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
@@ -36,7 +37,6 @@ import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionCon
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
-import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.impl.Closer;
@@ -105,7 +105,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	}
 
 	@Override
-	public void start(IndexManagerStartContext context) {
+	public CompletableFuture<?> start(IndexManagerStartContext context) {
 		try {
 			/*
 			 * Create the lifecycle strategy late to allow the related settings to be changed
@@ -113,9 +113,9 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 			 */
 			lifecycleStrategy = createLifecycleStrategy( context.getConfigurationPropertySource() );
 
-			Futures.unwrappedExceptionJoin( lifecycleStrategy.onStart( administrationClient, context ) );
 			serialOrchestrator.start();
 			parallelOrchestrator.start();
+			return lifecycleStrategy.onStart( administrationClient, context );
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )

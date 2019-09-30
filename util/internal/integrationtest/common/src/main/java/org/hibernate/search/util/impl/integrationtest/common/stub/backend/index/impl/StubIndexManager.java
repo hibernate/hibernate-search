@@ -66,8 +66,9 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 	}
 
 	@Override
-	public void start(IndexManagerStartContext context) {
+	public CompletableFuture<?> start(IndexManagerStartContext context) {
 		// Nothing to do
+		return CompletableFuture.completedFuture( null );
 	}
 
 	@Override
