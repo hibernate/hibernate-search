@@ -30,6 +30,7 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
+import org.hibernate.search.engine.mapper.mapping.impl.MappedIndexManagerImpl;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.AssertionFailure;
