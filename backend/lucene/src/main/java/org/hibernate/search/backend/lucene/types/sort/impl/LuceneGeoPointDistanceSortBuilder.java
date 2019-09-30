@@ -9,10 +9,13 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.apache.lucene.document.LatLonDocValuesField;
+import org.apache.lucene.search.SortField;
+
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
+import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneGeoPointDistanceComparatorSource;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
@@ -25,11 +28,12 @@ public class LuceneGeoPointDistanceSortBuilder extends AbstractLuceneSearchSortB
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String absoluteFieldPath;
-
+	private final String nestedDocumentPath;
 	private final GeoPoint location;
 
-	LuceneGeoPointDistanceSortBuilder(String absoluteFieldPath, GeoPoint location) {
+	LuceneGeoPointDistanceSortBuilder(String absoluteFieldPath, String nestedDocumentPath, GeoPoint location) {
 		this.absoluteFieldPath = absoluteFieldPath;
+		this.nestedDocumentPath = nestedDocumentPath;
 		this.location = location;
 	}
 
@@ -45,7 +49,14 @@ public class LuceneGeoPointDistanceSortBuilder extends AbstractLuceneSearchSortB
 
 	@Override
 	public void buildAndContribute(LuceneSearchSortCollector collector) {
-		collector.collectSortField( LatLonDocValuesField.newDistanceSort( absoluteFieldPath, location.getLatitude(),
-				location.getLongitude() ) );
+		if ( nestedDocumentPath == null ) {
+			collector.collectSortField( LatLonDocValuesField.newDistanceSort( absoluteFieldPath, location.getLatitude(), location.getLongitude() ) );
+			return;
+		}
+
+		LuceneGeoPointDistanceComparatorSource fieldComparatorSource = new LuceneGeoPointDistanceComparatorSource(
+				nestedDocumentPath, location.getLatitude(), location.getLongitude() );
+		SortField sortField = new SortField( absoluteFieldPath, fieldComparatorSource, order == SortOrder.DESC );
+		collector.collectSortField( sortField, ( nestedDocumentPath == null ) ? null : fieldComparatorSource );
 	}
 }

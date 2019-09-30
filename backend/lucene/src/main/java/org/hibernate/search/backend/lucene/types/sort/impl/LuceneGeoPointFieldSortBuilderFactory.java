@@ -37,10 +37,10 @@ public class LuceneGeoPointFieldSortBuilderFactory implements LuceneFieldSortBui
 
 	@Override
 	public DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(String absoluteFieldPath,
-			GeoPoint center) {
+			String nestedDocumentPath, GeoPoint center) {
 		checkSortable( absoluteFieldPath );
 
-		return new LuceneGeoPointDistanceSortBuilder( absoluteFieldPath, center );
+		return new LuceneGeoPointDistanceSortBuilder( absoluteFieldPath, nestedDocumentPath, center );
 	}
 
 	@Override

@@ -56,4 +56,8 @@ public abstract class SortedNumericDoubleValues {
 	public static SortedNumericDoubleValues createFloat(NumericDocValues values) {
 		return new SingletonSortedNumericDoubleValues( new SingleFloatValues( values ) );
 	}
+
+	public static SortedNumericDoubleValues createDistance(GeoPointDistanceDocValues geoPointDistanceDocValues) {
+		return new SingletonSortedNumericDoubleValues( geoPointDistanceDocValues );
+	}
 }
