@@ -6,19 +6,18 @@
  */
 package org.hibernate.search.backend.lucene.index.impl;
 
-import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
-import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryCreationContextImpl;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreationContext;
-import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
+import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
+import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneBatchingWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
@@ -30,34 +29,29 @@ import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchPr
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
 import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexIndexer;
-import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexWorkspace;
 import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexIndexingPlan;
+import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexWorkspace;
 import org.hibernate.search.backend.lucene.work.execution.impl.WorkExecutionBackendContext;
 import org.hibernate.search.backend.lucene.work.execution.impl.WorkExecutionIndexManagerContext;
+import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
-import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
-import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
-import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.facet.FacetsConfig;
 
 public class IndexManagerBackendContext implements WorkExecutionBackendContext, SearchBackendContext {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final EventContext eventContext;
 
@@ -181,27 +175,18 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	}
 
 	IndexAccessor createIndexAccessor(String indexName, Optional<String> shardId, Analyzer analyzer) {
-		DirectoryHolder directory;
+		DirectoryHolder directoryHolder;
 		DirectoryCreationContext context = new DirectoryCreationContextImpl(
 				shardId.isPresent() ? EventContexts.fromShardId( shardId.get() ) : null,
 				indexName,
 				shardId
 		);
+		directoryHolder = directoryProvider.createDirectoryHolder( context );
 		try {
-			directory = directoryProvider.createDirectory( context );
-		}
-		catch (IOException | RuntimeException e) {
-			throw log.unableToInitializeIndexDirectory(
-					e.getMessage(),
-					context.getEventContext(),
-					e
-			);
-		}
-		try {
-			return new IndexAccessor( indexName, directory, analyzer, errorHandler );
+			return new IndexAccessor( indexName, directoryHolder, analyzer, errorHandler );
 		}
 		catch (RuntimeException e) {
-			new SuppressingCloser( e ).push( directory );
+			new SuppressingCloser( e ).push( directoryHolder );
 			throw e;
 		}
 	}

@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.directory.spi;
 
-import java.io.IOException;
-
 public interface DirectoryProvider extends AutoCloseable {
 
 	/**
@@ -30,8 +28,9 @@ public interface DirectoryProvider extends AutoCloseable {
 	}
 
 	/**
-	 * Creates a {@link DirectoryHolder} for a given name, allocating internal resources (filesystem directories, ...)
-	 * as necessary.
+	 * Creates a {@link DirectoryHolder} for a given name,
+	 * but do <strong>not</strong> allocate resources yet
+	 * (wait until {@link DirectoryHolder#start()} is called).
 	 * <p>
 	 * The provided index names are raw and do not take into account the limitations of the internal representation
 	 * of indexes. If some characters cannot be used in a given {@link DirectoryProvider},
@@ -42,9 +41,8 @@ public interface DirectoryProvider extends AutoCloseable {
 	 * as two index names differing only in case could end up using the same directory.
 	 *
 	 * @param context The creation context, giving access to configuration and environment.
-	 * @return The directory to use for that index name
-	 * @throws IOException If an error occurs while initializing the directory.
+	 * @return The directory holder to use for that index name
 	 */
-	DirectoryHolder createDirectory(DirectoryCreationContext context) throws IOException;
+	DirectoryHolder createDirectoryHolder(DirectoryCreationContext context);
 
 }

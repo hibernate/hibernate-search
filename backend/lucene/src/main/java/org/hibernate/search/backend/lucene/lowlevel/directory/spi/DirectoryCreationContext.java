@@ -6,13 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.directory.spi;
 
-import java.io.IOException;
 import java.util.Optional;
 
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reporting.EventContext;
-
-import org.apache.lucene.store.Directory;
 
 public interface DirectoryCreationContext {
 
@@ -30,14 +26,5 @@ public interface DirectoryCreationContext {
 	 * @return The identifier of the index shard, if relevant.
 	 */
 	Optional<String> getShardId();
-
-	/**
-	 * Initialize the Lucene Directory if it isn't already.
-	 *
-	 * @param directory the Directory to initialize
-	 * @throws IOException If an IOException is thrown while initializing the index.
-	 * @throws SearchException In case of lock acquisition timeouts, IOException, or if a corrupt index is found
-	 */
-	void initializeIndexIfNeeded(Directory directory) throws IOException;
 
 }

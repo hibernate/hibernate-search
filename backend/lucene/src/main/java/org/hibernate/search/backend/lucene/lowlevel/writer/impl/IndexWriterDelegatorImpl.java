@@ -13,12 +13,15 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
+import org.hibernate.search.backend.lucene.util.impl.AnalyzerConstants;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexWriterConfig;
 import org.apache.lucene.index.IndexWriterConfig.OpenMode;
@@ -27,6 +30,8 @@ import org.apache.lucene.index.MergeScheduler;
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.LockObtainFailedException;
+import org.apache.lucene.store.SleepingLockWrapper;
 
 /**
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
@@ -36,7 +41,7 @@ public class IndexWriterDelegatorImpl implements Closeable, IndexWriterDelegator
 
 	private final String indexName;
 	private final EventContext indexEventContext;
-	private final Directory directory;
+	private final DirectoryHolder directoryHolder;
 	private final Analyzer analyzer;
 	private final ErrorHandler errorHandler;
 
@@ -56,10 +61,11 @@ public class IndexWriterDelegatorImpl implements Closeable, IndexWriterDelegator
 	 */
 	private final ReentrantLock writerInitializationLock = new ReentrantLock();
 
-	public IndexWriterDelegatorImpl(String indexName, Directory directory, Analyzer analyzer, ErrorHandler errorHandler) {
+	public IndexWriterDelegatorImpl(String indexName, DirectoryHolder directoryHolder, Analyzer analyzer,
+			ErrorHandler errorHandler) {
 		this.indexName = indexName;
 		this.indexEventContext = EventContexts.fromIndexName( indexName );
-		this.directory = directory;
+		this.directoryHolder = directoryHolder;
 		this.analyzer = analyzer;
 		this.errorHandler = errorHandler;
 		/* TODO HSEARCH-3117 re-allow to configure index writers
@@ -67,6 +73,27 @@ public class IndexWriterDelegatorImpl implements Closeable, IndexWriterDelegator
 		this.indexParameters = luceneParameters.getIndexParameters();
 		this.similarity = indexManager.getSimilarity();
 		 */
+	}
+
+	public void ensureIndexExists() throws IOException {
+		Directory directory = directoryHolder.get();
+
+		if ( DirectoryReader.indexExists( directory ) ) {
+			return;
+		}
+
+		try {
+			IndexWriterConfig iwriterConfig = new IndexWriterConfig( AnalyzerConstants.KEYWORD_ANALYZER )
+					.setOpenMode( IndexWriterConfig.OpenMode.CREATE_OR_APPEND );
+			//Needs to have a timeout higher than zero to prevent race conditions over (network) RPCs
+			//for distributed indexes (Infinispan but probably also NFS and similar)
+			SleepingLockWrapper delayedDirectory = new SleepingLockWrapper( directory, 2000, 20 );
+			IndexWriter iw = new IndexWriter( delayedDirectory, iwriterConfig );
+			iw.close();
+		}
+		catch (LockObtainFailedException lofe) {
+			log.lockingFailureDuringInitialization( directory.toString(), indexEventContext );
+		}
 	}
 
 	@Override
@@ -176,7 +203,7 @@ public class IndexWriterDelegatorImpl implements Closeable, IndexWriterDelegator
 	private IndexWriter createNewIndexWriter() throws IOException {
 		// Each writer config can be attached only once to an IndexWriter
 		final IndexWriterConfig indexWriterConfig = createWriterConfig();
-		return new IndexWriter( directory, indexWriterConfig );
+		return new IndexWriter( directoryHolder.get(), indexWriterConfig );
 	}
 
 	private IndexWriterConfig createWriterConfig() {
