@@ -7,15 +7,20 @@
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 
-
-public interface IndexManagerBuildingState<D extends DocumentElement> {
+/**
+ * A builder for {@link org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager} instances,
+ * which will be the interface between the mapping and the index when indexing and searching.
+ * <p>
+ * Exposes in particular the {@link IndexedEntityBindingContext binding context},
+ * allowing the mapper to declare index fields that will be bound to entity properties.
+ */
+public interface MappedIndexManagerBuilder<D extends DocumentElement> {
 
 	String getIndexName();
 
-	IndexSchemaRootNodeBuilder getSchemaRootNodeBuilder();
+	IndexedEntityBindingContext getRootBindingContext();
 
 	MappedIndexManager<D> build();
 

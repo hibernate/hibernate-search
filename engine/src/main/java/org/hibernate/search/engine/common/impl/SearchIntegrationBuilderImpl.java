@@ -40,7 +40,7 @@ import org.hibernate.search.engine.environment.classpath.spi.DefaultResourceReso
 import org.hibernate.search.engine.environment.classpath.spi.DefaultServiceResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContextProvider;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerFactory;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingAbortedException;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
@@ -219,10 +219,10 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			checkingRootFailures = false;
 
 			// Step #5: map indexed types and create the corresponding index managers
-			IndexedEntityBindingContextProvider bindingContextProvider =
-					new IndexedEntityBindingContextProviderImpl( indexManagerBuildingStateHolder );
+			MappedIndexManagerFactory mappedIndexManagerFactory =
+					new MappedIndexManagerFactoryImpl( indexManagerBuildingStateHolder );
 			for ( MappingBuildingState<?, ?> mappingBuildingState : mappingBuildingStates ) {
-				mappingBuildingState.mapIndexedTypes( bindingContextProvider );
+				mappingBuildingState.mapIndexedTypes( mappedIndexManagerFactory );
 			}
 			checkingRootFailures = true;
 			failureCollector.checkNoFailure();
@@ -321,8 +321,8 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			mapper.prepareIndexedTypes( backendNames::add );
 		}
 
-		void mapIndexedTypes(IndexedEntityBindingContextProvider contextProvider) {
-			mapper.mapIndexedTypes( contextProvider );
+		void mapIndexedTypes(MappedIndexManagerFactory indexManagerFactory) {
+			mapper.mapIndexedTypes( indexManagerFactory );
 		}
 
 		void partiallyBuildAndAddTo(Map<MappingKey<?, ?>, MappingPartialBuildState> mappings) {

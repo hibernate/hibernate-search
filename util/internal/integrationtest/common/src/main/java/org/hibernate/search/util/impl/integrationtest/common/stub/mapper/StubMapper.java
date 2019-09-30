@@ -15,9 +15,8 @@ import java.util.function.Consumer;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedPathTracker;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingMapperContext;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContextProvider;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerFactory;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingAbortedException;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
@@ -34,7 +33,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 
 	private final boolean multiTenancyEnabled;
 
-	private final Map<StubTypeModel, IndexManagerBuildingState<?>> indexManagerBuildingStates = new HashMap<>();
+	private final Map<StubTypeModel, MappedIndexManagerBuilder<?>> indexManagerBuilders = new HashMap<>();
 	private final Map<IndexedEmbeddedDefinition, IndexedEmbeddedPathTracker> pathTrackers = new HashMap<>();
 
 	StubMapper(MappingBuildContext buildContext,
@@ -74,11 +73,11 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 	}
 
 	@Override
-	public void mapIndexedTypes(IndexedEntityBindingContextProvider contextProvider) {
+	public void mapIndexedTypes(MappedIndexManagerFactory indexManagerFactory) {
 		contributorProvider.getTypesContributedTo()
 				.forEach( type -> {
 					try {
-						mapTypeIfIndexed( type, contextProvider );
+						mapTypeIfIndexed( type, indexManagerFactory );
 					}
 					catch (RuntimeException e) {
 						failureCollector.withContext( EventContexts.fromType( type ) )
@@ -88,7 +87,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 	}
 
 	private void mapTypeIfIndexed(MappableTypeModel type,
-			IndexedEntityBindingContextProvider contextProvider) {
+			MappedIndexManagerFactory indexManagerFactory) {
 		Set<StubTypeMetadataContributor> contributorSet = contributorProvider.get( type );
 		String indexName = null;
 		String backendName = null;
@@ -101,25 +100,21 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 			}
 		}
 		if ( indexName != null ) {
-			IndexManagerBuildingState<?> indexManagerBuildingState =
-					contextProvider.getIndexManagerBuildingState(
-							Optional.ofNullable( backendName ),
-							indexName,
-							multiTenancyEnabled
-					);
-			IndexedEntityBindingContext bindingContext = contextProvider.createIndexedEntityBindingContext(
+			MappedIndexManagerBuilder<?> indexManagerBuilder = indexManagerFactory.createMappedIndexManager(
 					this,
-					indexManagerBuildingState.getSchemaRootNodeBuilder()
+					Optional.ofNullable( backendName ),
+					indexName,
+					multiTenancyEnabled
 			);
-			indexManagerBuildingStates.put( (StubTypeModel) type, indexManagerBuildingState );
-			contributorProvider.get( type ).forEach( c -> c.contribute( bindingContext ) );
+			indexManagerBuilders.put( (StubTypeModel) type, indexManagerBuilder );
+			contributorProvider.get( type ).forEach( c -> c.contribute( indexManagerBuilder.getRootBindingContext() ) );
 		}
 	}
 
 	@Override
 	public StubMappingPartialBuildState prepareBuild() throws MappingAbortedException {
 		Map<String, StubMappingIndexManager> indexMappingsByTypeIdentifier = new HashMap<>();
-		for ( Map.Entry<StubTypeModel, IndexManagerBuildingState<?>> entry : indexManagerBuildingStates.entrySet() ) {
+		for ( Map.Entry<StubTypeModel, MappedIndexManagerBuilder<?>> entry : indexManagerBuilders.entrySet() ) {
 			StubTypeModel typeModel = entry.getKey();
 			try {
 				MappedIndexManager<?> indexManager = entry.getValue().build();
