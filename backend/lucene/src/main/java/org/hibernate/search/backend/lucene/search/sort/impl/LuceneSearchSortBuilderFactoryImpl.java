@@ -83,7 +83,7 @@ public class LuceneSearchSortBuilderFactoryImpl implements LuceneSearchSortBuild
 	public DistanceSortBuilder<LuceneSearchSortBuilder> distance(String absoluteFieldPath, GeoPoint location) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, SORT_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createDistanceSortBuilder( absoluteFieldPath, location );
+				.getComponent().createDistanceSortBuilder( absoluteFieldPath, scopeModel.getNestedDocumentPath( absoluteFieldPath ), location );
 	}
 
 	@Override

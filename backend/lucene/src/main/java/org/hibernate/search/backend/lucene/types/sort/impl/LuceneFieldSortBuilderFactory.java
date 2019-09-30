@@ -36,7 +36,7 @@ public interface LuceneFieldSortBuilderFactory {
 	FieldSortBuilder<LuceneSearchSortBuilder> createFieldSortBuilder(
 			LuceneSearchContext searchContext, String absoluteFieldPath, String nestedDocumentPath, LuceneCompatibilityChecker converterChecker);
 
-	DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(String absoluteFieldPath, GeoPoint center);
+	DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(String absoluteFieldPath, String nestedDocumentPath, GeoPoint center);
 
 	boolean hasCompatibleCodec(LuceneFieldSortBuilderFactory other);
 

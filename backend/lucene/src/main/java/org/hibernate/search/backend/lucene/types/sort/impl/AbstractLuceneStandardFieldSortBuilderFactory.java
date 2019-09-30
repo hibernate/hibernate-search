@@ -45,7 +45,7 @@ abstract class AbstractLuceneStandardFieldSortBuilderFactory<F, C extends Lucene
 
 	@Override
 	public DistanceSortBuilder<LuceneSearchSortBuilder> createDistanceSortBuilder(String absoluteFieldPath,
-			GeoPoint center) {
+			String nestedDocumentPath, GeoPoint center) {
 		throw log.distanceOperationsNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
