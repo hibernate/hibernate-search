@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
@@ -30,6 +31,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBui
 import org.hibernate.search.engine.reporting.impl.RootFailureCollector;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.impl.Futures;
 
 class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartialBuildState {
 
@@ -142,14 +144,24 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 			failureCollector.checkNoFailure();
 
 			// Start indexes
+			CompletableFuture<?>[] indexManagerFutures = new CompletableFuture<?>[partiallyBuiltIndexManagers.size()];
+			int indexManagerIndex = 0;
+			// Start
+			for ( IndexManagerPartialBuildState state : partiallyBuiltIndexManagers.values() ) {
+				indexManagerFutures[indexManagerIndex] =
+						state.finalizeBuild( failureCollector, beanResolver, propertySource );
+				++indexManagerIndex;
+			}
+			// Wait for the starting operation to finish
+			Futures.unwrappedExceptionJoin( CompletableFuture.allOf( indexManagerFutures ) );
+			failureCollector.checkNoFailure();
+			// Everything went well: register the index managers
 			for ( Map.Entry<String, IndexManagerPartialBuildState> entry : partiallyBuiltIndexManagers.entrySet() ) {
-				// TODO HSEARCH-3084 perform index initialization in parallel for all indexes?
 				fullyBuiltIndexManagers.put(
 						entry.getKey(),
-						entry.getValue().finalizeBuild( failureCollector, beanResolver, propertySource )
+						entry.getValue().getIndexManager()
 				);
 			}
-			failureCollector.checkNoFailure();
 
 			propertyChecker.afterBoot( partialConfigurationPropertyChecker, propertySource );
 

@@ -11,6 +11,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
@@ -31,7 +32,6 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
-import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
@@ -72,8 +72,8 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public void start(IndexManagerStartContext context) {
-		Futures.unwrappedExceptionJoin( shardHolder.start( context ) );
+	public CompletableFuture<?> start(IndexManagerStartContext context) {
+		return shardHolder.start( context );
 	}
 
 	@Override
