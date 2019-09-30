@@ -16,7 +16,6 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.util.impl.AnalyzerConstants;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -39,11 +38,10 @@ import org.apache.lucene.store.SleepingLockWrapper;
 public class IndexWriterDelegatorImpl implements Closeable, IndexWriterDelegator {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final String indexName;
-	private final EventContext indexEventContext;
 	private final DirectoryHolder directoryHolder;
 	private final Analyzer analyzer;
 	private final ErrorHandler errorHandler;
+	private final EventContext indexEventContext;
 
 	/* TODO HSEARCH-3117 re-allow to configure index writers
 	private final Similarity similarity;
@@ -61,13 +59,12 @@ public class IndexWriterDelegatorImpl implements Closeable, IndexWriterDelegator
 	 */
 	private final ReentrantLock writerInitializationLock = new ReentrantLock();
 
-	public IndexWriterDelegatorImpl(String indexName, DirectoryHolder directoryHolder, Analyzer analyzer,
-			ErrorHandler errorHandler) {
-		this.indexName = indexName;
-		this.indexEventContext = EventContexts.fromIndexName( indexName );
+	public IndexWriterDelegatorImpl(DirectoryHolder directoryHolder, Analyzer analyzer,
+			ErrorHandler errorHandler, EventContext eventContext) {
 		this.directoryHolder = directoryHolder;
 		this.analyzer = analyzer;
 		this.errorHandler = errorHandler;
+		this.indexEventContext = eventContext;
 		/* TODO HSEARCH-3117 re-allow to configure index writers
 		this.luceneParameters = indexManager.getIndexingParameters();
 		this.indexParameters = luceneParameters.getIndexParameters();
@@ -216,7 +213,7 @@ public class IndexWriterDelegatorImpl implements Closeable, IndexWriterDelegator
 		LogByteSizeMergePolicy newMergePolicy = indexParameters.getNewMergePolicy(); //TODO HSEARCH-3117 make it possible to configure a different policy?
 		writerConfig.setMergePolicy( newMergePolicy );
 		 */
-		MergeScheduler mergeScheduler = new HibernateSearchConcurrentMergeScheduler( this.errorHandler, this.indexName );
+		MergeScheduler mergeScheduler = new HibernateSearchConcurrentMergeScheduler( this.errorHandler, indexEventContext.render() );
 		writerConfig.setMergeScheduler( mergeScheduler );
 		writerConfig.setOpenMode( OpenMode.CREATE_OR_APPEND );
 		return writerConfig;

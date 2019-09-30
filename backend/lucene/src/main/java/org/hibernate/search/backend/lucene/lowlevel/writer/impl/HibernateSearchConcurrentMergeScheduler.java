@@ -33,11 +33,11 @@ class HibernateSearchConcurrentMergeScheduler extends ConcurrentMergeScheduler {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ErrorHandler errorHandler;
-	private final String indexName;
+	private final String contextDescription;
 
-	HibernateSearchConcurrentMergeScheduler(ErrorHandler errorHandler, String indexName) {
+	HibernateSearchConcurrentMergeScheduler(ErrorHandler errorHandler, String contextDescription) {
 		this.errorHandler = errorHandler;
-		this.indexName = indexName;
+		this.contextDescription = contextDescription;
 	}
 
 	@Override
@@ -59,7 +59,7 @@ class HibernateSearchConcurrentMergeScheduler extends ConcurrentMergeScheduler {
 		thread.setDaemon( true );
 		thread.setName(
 				SearchThreadFactory.createName(
-						"Lucene Merge Thread for index " + indexName,
+						"Lucene Merge Thread for " + contextDescription,
 						mergeThreadCount++
 				)
 		);
