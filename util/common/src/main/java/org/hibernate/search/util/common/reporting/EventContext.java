@@ -82,7 +82,14 @@ public final class EventContext {
 		for ( EventContextElement element : getElements() ) {
 			contextJoiner.add( element.render() );
 		}
-		return MESSAGES.contextPrefix() + contextJoiner.toString();
+		return contextJoiner.toString();
+	}
+
+	/**
+	 * @return A human-readable representation of this context, with a "Context: " prefix.
+	 */
+	public String renderWithPrefix() {
+		return MESSAGES.contextPrefix() + render();
 	}
 
 	public EventContext append(EventContext other) {
