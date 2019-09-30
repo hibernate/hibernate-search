@@ -7,11 +7,16 @@
 package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.concurrent.CancellationException;
+import java.util.concurrent.CompletionException;
+import java.util.concurrent.ExecutionException;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.common.impl.Throwables;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -70,11 +75,14 @@ public class LuceneBatchingWriteWorkOrchestrator extends AbstractLuceneWriteWork
 
 	private void awaitCompletionBeforeClose() {
 		try {
-			executor.awaitCompletion();
+			executor.getCompletion().get();
 		}
 		catch (InterruptedException e) {
 			log.interruptedWhileWaitingForIndexActivity( getName(), e );
 			Thread.currentThread().interrupt();
+		}
+		catch (ExecutionException e) {
+			throw Throwables.expectRuntimeException( e.getCause() );
 		}
 	}
 

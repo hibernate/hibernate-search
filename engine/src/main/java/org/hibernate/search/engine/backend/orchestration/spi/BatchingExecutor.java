@@ -12,7 +12,6 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Phaser;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.hibernate.search.engine.common.spi.ErrorHandler;
@@ -40,14 +39,7 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 	private final AtomicBoolean processingScheduled;
 
 	private ExecutorService executorService;
-
-	private final Phaser phaser = new Phaser() {
-		@Override
-		protected boolean onAdvance(int phase, int registeredParties) {
-			// This phaser never terminates on its own, allowing re-use
-			return false;
-		}
-	};
+	private volatile CompletableFuture<?> emptyQueueFuture;
 
 	/**
 	 * @param name The name of the executor thread (and of this executor when reporting errors)
@@ -90,9 +82,12 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 			closer.push( ExecutorService::shutdownNow, executorService );
 			executorService = null;
 			workQueue.clear();
-			//It's possible that processing was successfully scheduled in the executor service but had no chance to run,
-			//so we need to release waiting threads:
-			closer.push( Phaser::forceTermination, phaser );
+			// It's possible that processing was successfully scheduled in the executor service but had no chance to run,
+			// so we need to release waiting threads:
+			if ( emptyQueueFuture != null ) {
+				emptyQueueFuture.cancel( false );
+				emptyQueueFuture = null;
+			}
 		}
 	}
 
@@ -115,79 +110,40 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 	}
 
 	/**
-	 * Block the current thread until the executor has completed all pending worksets.
-	 * <p>
-	 * Tasks submitted to the executor after entering this method
-	 * may delay the wait.
-	 *
-	 * TODO HSEARCH-3576 we should use child executors, sharing the same execution service but each with its own child phaser,
-	 *  allowing each child executor to only wait until all of its *own* worksets are completed.
-	 *  That would however require to register/deregister the phaser for each single workset,
-	 *  instead of for each scheduling of the processing like we do now.
-	 *  Phaser only support up to 65535 parties, so we would may need to use multiple phasers per child executor...
-	 *
-	 * @throws InterruptedException If the current thread is interrupted while waiting.
+	 * @return A future that completes when all works submitted to the executor so far are completely executed.
+	 * Works submitted to the executor after entering this method may delay the wait.
 	 */
-	public void awaitCompletion() throws InterruptedException {
-		int phaseBeforeUnarrivedPartiesCheck = phaser.getPhase();
-		if ( phaser.getUnarrivedParties() > 0 ) {
-			phaser.awaitAdvanceInterruptibly( phaseBeforeUnarrivedPartiesCheck );
+	public CompletableFuture<?> getCompletion() {
+		CompletableFuture<?> future = emptyQueueFuture;
+		if ( future == null ) {
+			// No processing in progress or scheduled.
+			return CompletableFuture.completedFuture( null );
+		}
+		else {
+			// Processing in progress or scheduled; the future will be completed when the queue becomes empty.
+			return future;
 		}
 	}
 
 	private void ensureProcessingScheduled() {
-		// Set up worker if needed
-		if ( !processingScheduled.get() ) {
-			/*
-			 * Register to the phaser exactly here:
-			 *  * registering after scheduling would mean running the risk
-			 *  of finishing the work processing before we even registered to the phaser,
-			 *  likely resulting in an exception when de-registering from the phaser;
-			 *  * registering after compareAndSet would mean running the risk
-			 *  of another thread calling this method just after we called compareAndSet,
-			 *  then moving on to a call to awaitCompletion() before we had the chance to
-			 *  register to the phaser. This other thread would thus believe that the submitted
-			 *  work was executed while in fact it wasn't.
-			 */
-			phaser.register();
+		if ( processingScheduled.compareAndSet( false, true ) ) {
+			// Our thread successfully flipped the boolean:
+			// processing wasn't scheduled, and we're now responsible for scheduling it.
 			try {
-				if ( processingScheduled.compareAndSet( false, true ) ) {
-					try {
-						executorService.submit( this::processBatch );
-					}
-					catch (Throwable e) {
-						/*
-						 * Make sure a failure to submit the processing task
-						 * to the executor service
-						 * doesn't leave other threads waiting indefinitely
-						 */
-						try {
-							processingScheduled.set( false );
-						}
-						catch (Throwable e2) {
-							e.addSuppressed( e2 );
-						}
-						throw e;
-					}
-				}
-				else {
-					/*
-					 * Corner case: another thread submitted a processing task
-					 * to the executor service
-					 * just after we registered the phaser.
-					 * Cancel our own registration.
-					 */
-					phaser.arriveAndDeregister();
-				}
+				emptyQueueFuture = new CompletableFuture<>();
+				executorService.submit( this::processBatch );
 			}
 			catch (Throwable e) {
 				/*
 				 * Make sure a failure to submit the processing task
 				 * to the executor service
-				 * doesn't leave other threads waiting indefinitely
+				 * doesn't leave other threads waiting indefinitely.
 				 */
 				try {
-					phaser.arriveAndDeregister();
+					CompletableFuture<?> future = emptyQueueFuture;
+					emptyQueueFuture = null;
+					processingScheduled.set( false );
+					future.completeExceptionally( e );
 				}
 				catch (Throwable e2) {
 					e.addSuppressed( e2 );
@@ -202,65 +158,34 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 	 */
 	private void processBatch() {
 		try {
-			CompletableFuture<?> future;
-			try {
-				synchronized (processor) {
-					processor.beginBatch();
-					workBuffer.clear();
+			CompletableFuture<?> batchFuture;
+			synchronized (processor) {
+				processor.beginBatch();
+				workBuffer.clear();
 
-					workQueue.drainTo( workBuffer, maxTasksPerBatch );
+				workQueue.drainTo( workBuffer, maxTasksPerBatch );
 
-					for ( W workset : workBuffer ) {
-						try {
-							workset.submitTo( processor );
-						}
-						catch (Throwable e) {
-							workset.markAsFailed( e );
-							throw e;
-						}
+				for ( W workset : workBuffer ) {
+					try {
+						workset.submitTo( processor );
 					}
-
-					// Nothing more to do, end the batch and terminate
-					future = processor.endBatch();
-				}
-			}
-			finally {
-				try {
-					/*
-					 * Allow processing to be scheduled immediately,
-					 * even if we didn't finish executing yet (see the join below).
-					 * This won't lead to concurrent processing,
-					 * since there's only one thread in the pool,
-					 * but it will make sure the processing delay runs from one
-					 * queue drain to the next, instead of from one batch to
-					 * the next, allowing higher throughput when batches take more
-					 * than 100ms to process.
-					 */
-					processingScheduled.set( false );
-
-					/*
-					 * Just in case works were added to the queue between
-					 * when we drained the queue and the resetting of
-					 * processingScheduled above.
-					 * This must be executed before we arrive at the phaser to ensure that
-					 * threads calling submit(), then awaitCompletion() will not be unblocked
-					 * before we called ensureProcessingScheduled() below.
-					 */
-					if ( !workQueue.isEmpty() ) {
-						ensureProcessingScheduled();
+					catch (Throwable e) {
+						workset.markAsFailed( e );
+						throw e;
 					}
 				}
-				catch (Throwable e) {
-					// This will only happen if there is a bug in this class, but we don't want to fail silently
-					errorHandler.handleException(
-							"Error while ensuring the next work submitted to executor '" + name + "' will be processed",
-							e
-					);
-				}
+
+				// Nothing more to do, end the batch and terminate
+				batchFuture = processor.endBatch();
 			}
 
-			// Note: timeout is handled by the client, so this "join" will not last forever
-			future.join();
+			/*
+			 * Wait for works to complete before trying to handle the next batch.
+			 * Note: timeout is expected to be handled by the processor
+			 * (the Elasticsearch client adds per-request timeouts, in particular),
+			 * so this "join" will not last forever
+			 */
+			batchFuture.join();
 		}
 		catch (Throwable e) {
 			// This will only happen if there is a bug in the processor
@@ -270,17 +195,27 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 			);
 		}
 		finally {
-			/*
-			 * Regardless of the outcome (exception or not),
-			 * arrive at the phaser after all the works completed.
-			 * Note that all works have a timeout, so this will be executed eventually.
-			 *
-			 * Also note this must be executed *after* the finally block above,
-			 * so we are sure we won't arrive at the phaser before ensuring we're not
-			 * in a situation where no processing is scheduled even though
-			 * the queue is not empty.
-			 */
-			phaser.arriveAndDeregister();
+			if ( workQueue.isEmpty() ) {
+				processingScheduled.set( false );
+				// Handle onCompletion()
+				CompletableFuture<?> future = this.emptyQueueFuture;
+				emptyQueueFuture = null;
+				future.complete( null );
+			}
+			else {
+				// There are more batches to process.
+				// Leave 'processingScheduled' as it is ('true') and schedule the next batch.
+				try {
+					executorService.submit( this::processBatch );
+				}
+				catch (Throwable e) {
+					// This will only happen if there is a bug in this class, but we don't want to fail silently
+					errorHandler.handleException(
+							"Error while ensuring the next works submitted to executor '" + name + "' will be processed",
+							e
+					);
+				}
+			}
 		}
 	}
 
