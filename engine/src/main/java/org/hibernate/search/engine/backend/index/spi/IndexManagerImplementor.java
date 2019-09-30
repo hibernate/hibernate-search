@@ -26,7 +26,7 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
  * <p>
  * This is the interface implemented by backends and provided to the engine.
  */
-public interface IndexManagerImplementor<D extends DocumentElement> extends AutoCloseable {
+public interface IndexManagerImplementor<D extends DocumentElement> {
 
 	/**
 	 * Start any resource necessary to operate the index manager at runtime.
@@ -39,6 +39,20 @@ public interface IndexManagerImplementor<D extends DocumentElement> extends Auto
 	 * @return A future that completes when the index manager is completely started.
 	 */
 	CompletableFuture<?> start(IndexManagerStartContext context);
+
+	/**
+	 * Prepare for {@link #stop()}.
+	 *
+	 * @return A future that completes when ongoing works complete.
+	 */
+	CompletableFuture<?> preStop();
+
+	/**
+	 * Stop and release any resource necessary to operate the backend at runtime.
+	 * <p>
+	 * Called by the engine once before shutdown.
+	 */
+	void stop();
 
 	/**
 	 * @return The object that should be exposed as API to users.
@@ -56,8 +70,5 @@ public interface IndexManagerImplementor<D extends DocumentElement> extends Auto
 	IndexScopeBuilder createScopeBuilder(BackendMappingContext mappingContext);
 
 	void addTo(IndexScopeBuilder builder);
-
-	@Override
-	void close();
 
 }

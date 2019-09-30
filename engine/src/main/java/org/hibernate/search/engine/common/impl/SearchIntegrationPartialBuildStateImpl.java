@@ -72,9 +72,9 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 			closer.pushAll( MappingPartialBuildState::closeOnFailure, partiallyBuiltMappings.values() );
 			closer.pushAll( MappingImplementor::close, fullyBuiltMappings );
 			closer.pushAll( IndexManagerPartialBuildState::closeOnFailure, partiallyBuiltIndexManagers.values() );
-			closer.pushAll( IndexManagerImplementor::close, fullyBuiltIndexManagers.values() );
+			closer.pushAll( IndexManagerImplementor::stop, fullyBuiltIndexManagers.values() );
 			closer.pushAll( BackendPartialBuildState::closeOnFailure, partiallyBuiltBackends.values() );
-			closer.pushAll( BackendImplementor::close, fullyBuiltBackends.values() );
+			closer.pushAll( BackendImplementor::stop, fullyBuiltBackends.values() );
 			closer.pushAll( BeanHolder::close, errorHandlerHolder );
 			closer.pushAll( BeanProvider::close, beanProvider );
 		}

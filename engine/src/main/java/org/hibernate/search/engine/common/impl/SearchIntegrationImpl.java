@@ -9,6 +9,7 @@ package org.hibernate.search.engine.common.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
@@ -21,6 +22,7 @@ import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class SearchIntegrationImpl implements SearchIntegration {
@@ -68,10 +70,32 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.pushAll( MappingImplementor::close, mappings );
-			closer.pushAll( IndexManagerImplementor::close, indexManagers.values() );
-			closer.pushAll( BackendImplementor::close, backends.values() );
+			closer.push( SearchIntegrationImpl::preStopIndexManagers, this );
+			closer.pushAll( IndexManagerImplementor::stop, indexManagers.values() );
+			closer.push( SearchIntegrationImpl::preStopBackends, this );
+			closer.pushAll( BackendImplementor::stop, backends.values() );
 			closer.pushAll( BeanHolder::close, errorHandlerHolder );
 			closer.pushAll( BeanProvider::close, beanProvider );
 		}
+	}
+
+	private void preStopIndexManagers() {
+		CompletableFuture<?>[] futures = new CompletableFuture[indexManagers.size()];
+		int i = 0;
+		for ( IndexManagerImplementor<?> indexManager : indexManagers.values() ) {
+			futures[i] = indexManager.preStop();
+			i++;
+		}
+		Futures.unwrappedExceptionJoin( CompletableFuture.allOf( futures ) );
+	}
+
+	private void preStopBackends() {
+		CompletableFuture<?>[] futures = new CompletableFuture[backends.size()];
+		int i = 0;
+		for ( BackendImplementor<?> backend : backends.values() ) {
+			futures[i] = backend.preStop();
+			i++;
+		}
+		Futures.unwrappedExceptionJoin( CompletableFuture.allOf( futures ) );
 	}
 }

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.backend.spi;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
@@ -14,7 +16,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.IndexSettings;
 
 
-public interface BackendImplementor<D extends DocumentElement> extends AutoCloseable {
+public interface BackendImplementor<D extends DocumentElement> {
 
 	/**
 	 * Start any resource necessary to operate the backend at runtime.
@@ -26,6 +28,20 @@ public interface BackendImplementor<D extends DocumentElement> extends AutoClose
 	 * @param context The start context.
 	 */
 	void start(BackendStartContext context);
+
+	/**
+	 * Prepare for {@link #stop()}.
+	 *
+	 * @return A future that completes when ongoing works complete.
+	 */
+	CompletableFuture<?> preStop();
+
+	/**
+	 * Stop and release any resource necessary to operate the backend at runtime.
+	 * <p>
+	 * Called by the engine once before shutdown.
+	 */
+	void stop();
 
 	/**
 	 * @return The object that should be exposed as API to users.
@@ -47,8 +63,5 @@ public interface BackendImplementor<D extends DocumentElement> extends AutoClose
 	 */
 	IndexManagerBuilder<D> createIndexManagerBuilder(String indexName, boolean multiTenancyEnabled, BackendBuildContext context,
 			ConfigurationPropertySource propertySource);
-
-	@Override
-	void close();
 
 }

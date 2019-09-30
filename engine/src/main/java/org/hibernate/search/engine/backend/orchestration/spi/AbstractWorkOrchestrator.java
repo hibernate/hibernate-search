@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.backend.orchestration.spi;
 
 import java.lang.invoke.MethodHandles;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
@@ -19,14 +20,14 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *
  * @param <W> The type of submitted worksets.
  */
-public abstract class AbstractWorkOrchestrator<W> implements AutoCloseable {
+public abstract class AbstractWorkOrchestrator<W> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String name;
 
-	private boolean open = true; // Guarded by shutdownLock
-	private final ReadWriteLock shutdownLock = new ReentrantReadWriteLock();
+	private State state = State.STOPPED; // Guarded by lifecycleLock
+	private final ReadWriteLock lifecycleLock = new ReentrantReadWriteLock();
 
 	protected AbstractWorkOrchestrator(String name) {
 		this.name = name;
@@ -36,34 +37,78 @@ public abstract class AbstractWorkOrchestrator<W> implements AutoCloseable {
 		return name;
 	}
 
-	@Override
-	public final void close() {
-		shutdownLock.writeLock().lock();
+	public final void start() {
+		lifecycleLock.writeLock().lock();
 		try {
-			if ( !open ) {
-				return;
+			switch ( state ) {
+				case RUNNING:
+					return;
+				case PRE_STOPPING:
+					throw new IllegalStateException( "Cannot start an orchestrator while it's stopping" );
+				case STOPPED:
+					state = State.RUNNING;
+					doStart();
+					break;
 			}
-			open = false;
-			doClose();
 		}
 		finally {
-			shutdownLock.writeLock().unlock();
+			lifecycleLock.writeLock().unlock();
 		}
 	}
 
+	public final CompletableFuture<?> preStop() {
+		lifecycleLock.writeLock().lock();
+		try {
+			switch ( state ) {
+				case RUNNING:
+					state = State.PRE_STOPPING;
+					return getCompletion();
+				case PRE_STOPPING:
+				case STOPPED:
+				default:
+					return getCompletion();
+			}
+		}
+		finally {
+			lifecycleLock.writeLock().unlock();
+		}
+	}
+
+	public final void stop() {
+		lifecycleLock.writeLock().lock();
+		try {
+			switch ( state ) {
+				case RUNNING:
+				case PRE_STOPPING:
+					state = State.STOPPED;
+					doStop();
+					break;
+				case STOPPED:
+					break;
+			}
+		}
+		finally {
+			lifecycleLock.writeLock().unlock();
+		}
+	}
+
+	protected abstract void doStart();
+
 	protected abstract void doSubmit(W workSet) throws InterruptedException;
 
-	protected abstract void doClose();
+	protected abstract CompletableFuture<?> getCompletion();
+
+	protected abstract void doStop();
 
 	protected final void submit(W workSet) {
-		if ( !shutdownLock.readLock().tryLock() ) {
-			// The orchestrator is shutting down: abort.
-			throw log.orchestratorShutDownBeforeSubmittingWorkset( name );
+		if ( !lifecycleLock.readLock().tryLock() ) {
+			// The orchestrator is starting, pre-stopping or stopping: abort.
+			throw log.submittedWorkToStoppedOrchestrator( name );
 		}
 		try {
-			if ( !open ) {
-				// The orchestrator has shut down: abort.
-				throw log.orchestratorShutDownBeforeSubmittingWorkset( name );
+			if ( !State.RUNNING.equals( state ) ) {
+				// The orchestrator is stopping or stopped: abort.
+				throw log.submittedWorkToStoppedOrchestrator( name );
 			}
 			doSubmit( workSet );
 		}
@@ -72,8 +117,14 @@ public abstract class AbstractWorkOrchestrator<W> implements AutoCloseable {
 			throw log.threadInterruptedWhileSubmittingWorkset( name );
 		}
 		finally {
-			shutdownLock.readLock().unlock();
+			lifecycleLock.readLock().unlock();
 		}
+	}
+
+	private enum State {
+		RUNNING,
+		PRE_STOPPING,
+		STOPPED;
 	}
 
 }

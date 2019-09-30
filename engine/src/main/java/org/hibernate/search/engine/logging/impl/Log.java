@@ -266,9 +266,9 @@ public interface Log extends BasicLogger {
 	SearchException threadInterruptedWhileSubmittingWorkset(String orchestratorName);
 
 	@Message(id = ID_OFFSET_2 + 63,
-			value = "A workset was submitted after shutdown was requested to '%1$s'."
+			value = "A workset was submitted to '%1$s', but this orchestrator was stopped."
 					+ " The workset has been discarded." )
-	SearchException orchestratorShutDownBeforeSubmittingWorkset(String orchestratorName);
+	SearchException submittedWorkToStoppedOrchestrator(String orchestratorName);
 
 	@Message(id = ID_OFFSET_2 + 64, value = "Unable to parse the provided geo-point value: '%1$s'. The expected format is latitude, longitude.")
 	SearchException unableToParseGeoPoint(String value);

@@ -25,7 +25,7 @@ class BackendPartialBuildState {
 	}
 
 	void closeOnFailure() {
-		partiallyBuiltBackend.close();
+		partiallyBuiltBackend.stop();
 	}
 
 	BackendImplementor<?> finalizeBuild(RootFailureCollector rootFailureCollector,

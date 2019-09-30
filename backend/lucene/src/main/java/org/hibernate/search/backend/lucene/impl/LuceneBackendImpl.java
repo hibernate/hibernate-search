@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaRootNodeBuilder;
@@ -91,9 +92,15 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 	}
 
 	@Override
-	public void close() {
+	public CompletableFuture<?> preStop() {
+		// Nothing to do
+		return CompletableFuture.completedFuture( null );
+	}
+
+	@Override
+	public void stop() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( LuceneReadWorkOrchestratorImplementor::close, readOrchestrator );
+			closer.push( LuceneReadWorkOrchestratorImplementor::stop, readOrchestrator );
 			closer.push( holder -> holder.get().close(), directoryProviderHolder );
 			closer.push( BeanHolder::close, directoryProviderHolder );
 		}

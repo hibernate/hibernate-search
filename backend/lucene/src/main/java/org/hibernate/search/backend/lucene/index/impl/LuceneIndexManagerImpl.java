@@ -77,9 +77,14 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public void close() {
+	public CompletableFuture<?> preStop() {
+		return shardHolder.preStop();
+	}
+
+	@Override
+	public void stop() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( ShardHolder::close, shardHolder );
+			closer.push( ShardHolder::stop, shardHolder );
 			closer.push( LuceneIndexModel::close, model );
 		}
 		catch (IOException | RuntimeException e) {

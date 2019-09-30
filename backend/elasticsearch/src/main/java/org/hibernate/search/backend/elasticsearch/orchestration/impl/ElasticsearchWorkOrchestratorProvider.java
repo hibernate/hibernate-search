@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
@@ -64,7 +65,7 @@ import org.hibernate.search.engine.common.spi.ErrorHandler;
  * they lead to a lesser throughput and can only guarantee ordering within a single JVM.
  * When multiple JVMs with multiple instances of Hibernate Search target the same index
  */
-public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
+public class ElasticsearchWorkOrchestratorProvider {
 
 	private static final int SERIAL_MIN_BULK_SIZE = 2;
 	/*
@@ -119,13 +120,16 @@ public class ElasticsearchWorkOrchestratorProvider implements AutoCloseable {
 		);
 	}
 
-	@Override
-	public void close() {
-		rootParallelOrchestrator.close();
-	}
-
 	public void start() {
 		rootParallelOrchestrator.start();
+	}
+
+	public CompletableFuture<?> preStop() {
+		return rootParallelOrchestrator.preStop();
+	}
+
+	public void stop() {
+		rootParallelOrchestrator.stop();
 	}
 
 	/**

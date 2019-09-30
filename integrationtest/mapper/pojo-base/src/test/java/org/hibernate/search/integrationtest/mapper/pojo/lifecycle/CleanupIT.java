@@ -98,7 +98,7 @@ public class CleanupIT {
 		assertEquals( 2, counters.get( StubIndexManagerBuilder.INSTANCE_COUNTER_KEY ) );
 		assertEquals( 0, counters.get( StubIndexManagerBuilder.CLOSE_ON_FAILURE_COUNTER_KEY ) );
 		assertEquals( 2, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY ) );
-		assertEquals( 0, counters.get( StubIndexManager.CLOSE_COUNTER_KEY ) );
+		assertEquals( 0, counters.get( StubIndexManager.STOP_COUNTER_KEY ) );
 
 		assertEquals( 2, counters.get( IDENTIFIER_BRIDGE_COUNTER_KEYS.instance ) );
 		assertEquals( 2, counters.get( ROUTING_KEY_BRIDGE_COUNTER_KEYS.instance ) );
@@ -441,7 +441,7 @@ public class CleanupIT {
 		assertEquals( 0, counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.instance )
 				- counters.get( CONTAINER_VALUE_EXTRACTOR_COUNTER_KEYS.holderClose ) );
 		assertEquals( 0, counters.get( StubIndexManager.INSTANCE_COUNTER_KEY )
-				- counters.get( StubIndexManager.CLOSE_COUNTER_KEY ) );
+				- counters.get( StubIndexManager.STOP_COUNTER_KEY ) );
 	}
 
 	public static class IndexedEntity {

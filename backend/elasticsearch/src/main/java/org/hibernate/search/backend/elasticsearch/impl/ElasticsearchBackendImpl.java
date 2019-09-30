@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
@@ -117,10 +118,18 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	}
 
 	@Override
-	public void close() {
+	public CompletableFuture<?> preStop() {
+		return CompletableFuture.allOf(
+				queryOrchestrator.preStop(),
+				orchestratorProvider.preStop()
+		);
+	}
+
+	@Override
+	public void stop() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( ElasticsearchWorkOrchestratorImplementor::close, queryOrchestrator );
-			closer.push( ElasticsearchWorkOrchestratorProvider::close, orchestratorProvider );
+			closer.push( ElasticsearchWorkOrchestratorImplementor::stop, queryOrchestrator );
+			closer.push( ElasticsearchWorkOrchestratorProvider::stop, orchestratorProvider );
 			// Close the client after the orchestrators, when we're sure all works have been performed
 			closer.push( ElasticsearchLinkImpl::onStop, link );
 		}

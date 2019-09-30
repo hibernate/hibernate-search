@@ -31,7 +31,7 @@ class IndexManagerPartialBuildState {
 	}
 
 	void closeOnFailure() {
-		partiallyBuiltIndexManager.close();
+		partiallyBuiltIndexManager.stop();
 	}
 
 	CompletableFuture<?> finalizeBuild(RootFailureCollector rootFailureCollector,

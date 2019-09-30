@@ -119,17 +119,25 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
-					.push( parallelOrchestrator )
-					.push( serialOrchestrator );
+					.push( ElasticsearchWorkOrchestratorImplementor::stop, parallelOrchestrator )
+					.push( ElasticsearchWorkOrchestratorImplementor::stop, serialOrchestrator );
 			throw e;
 		}
 	}
 
 	@Override
-	public void close() {
+	public CompletableFuture<?> preStop() {
+		return CompletableFuture.allOf(
+				serialOrchestrator.preStop(),
+				parallelOrchestrator.preStop()
+		);
+	}
+
+	@Override
+	public void stop() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( ElasticsearchWorkOrchestratorImplementor::close, serialOrchestrator );
-			closer.push( ElasticsearchWorkOrchestratorImplementor::close, parallelOrchestrator );
+			closer.push( ElasticsearchWorkOrchestratorImplementor::stop, serialOrchestrator );
+			closer.push( ElasticsearchWorkOrchestratorImplementor::stop, parallelOrchestrator );
 			closer.push( strategy -> strategy.onStop( administrationClient ), lifecycleStrategy );
 		}
 		catch (IOException e) {
