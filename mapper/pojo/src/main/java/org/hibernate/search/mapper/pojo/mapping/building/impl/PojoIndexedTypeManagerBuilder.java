@@ -12,8 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoImplicitReindexingResolverBuildingHelper;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
@@ -36,7 +35,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoRawTypeModel<E> typeModel;
-	private final IndexManagerBuildingState<D> indexManagerBuildingState;
+	private final MappedIndexManagerBuilder<D> indexManagerBuilder;
 	private final PojoIndexedTypeExtendedMappingCollector extendedMappingCollector;
 
 	private final PojoIdentityMappingCollectorImpl<E> identityMappingCollector;
@@ -49,23 +48,22 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 	PojoIndexedTypeManagerBuilder(PojoRawTypeModel<E> typeModel,
 			PojoTypeAdditionalMetadata typeAdditionalMetadata,
 			PojoMappingHelper mappingHelper,
-			IndexManagerBuildingState<D> indexManagerBuildingState,
-			IndexedEntityBindingContext bindingContext,
+			MappedIndexManagerBuilder<D> indexManagerBuilder,
 			PojoIndexedTypeExtendedMappingCollector extendedMappingCollector,
 			boolean implicitProvidedId) {
 		this.typeModel = typeModel;
-		this.indexManagerBuildingState = indexManagerBuildingState;
+		this.indexManagerBuilder = indexManagerBuilder;
 		this.extendedMappingCollector = extendedMappingCollector;
 		this.identityMappingCollector = new PojoIdentityMappingCollectorImpl<>(
 				typeModel,
 				typeAdditionalMetadata,
 				mappingHelper,
-				bindingContext,
+				indexManagerBuilder.getRootBindingContext(),
 				implicitProvidedId
 		);
 		this.processorBuilder = new PojoIndexingProcessorTypeNodeBuilder<>(
 				BoundPojoModelPath.root( typeModel ),
-				mappingHelper, bindingContext,
+				mappingHelper, indexManagerBuilder.getRootBindingContext(),
 				Optional.of( identityMappingCollector ),
 				Collections.emptyList()
 		);
@@ -131,7 +129,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 				identityMappingCollector.identifierMapping,
 				identityMappingCollector.routingKeyProvider,
 				preBuiltIndexingProcessor,
-				indexManagerBuildingState.build(),
+				indexManagerBuilder.build(),
 				reindexingResolverOptional.orElseGet( PojoImplicitReindexingResolver::noOp )
 		);
 		log.createdPojoIndexedTypeManager( typeManager );

@@ -29,9 +29,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexManagerBuildingState;
-import org.hibernate.search.engine.mapper.mapping.impl.MappedIndexManagerImpl;
-import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
+import org.hibernate.search.engine.mapper.mapping.building.impl.IndexManagerBuildingState;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
@@ -242,7 +240,7 @@ class IndexManagerBuildingStateHolder {
 		}
 
 		@Override
-		public MappedIndexManager<D> build() {
+		public IndexManagerImplementor<D> build() {
 			if ( indexManager != null ) {
 				throw new AssertionFailure(
 						"Trying to build index manager " + indexName + " twice."
@@ -250,7 +248,7 @@ class IndexManagerBuildingStateHolder {
 				);
 			}
 			indexManager = builder.build();
-			return new MappedIndexManagerImpl<>( indexManager );
+			return indexManager;
 		}
 
 		IndexManagerPartialBuildState getPartialBuildState() {
