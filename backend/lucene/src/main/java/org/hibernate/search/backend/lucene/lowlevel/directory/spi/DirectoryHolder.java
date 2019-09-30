@@ -14,6 +14,17 @@ import org.apache.lucene.store.Directory;
 public interface DirectoryHolder extends Closeable {
 
 	/**
+	 * Allocate internal resources (filesystem directories, ...) as necessary,
+	 * along with the directory itself.
+	 * <p>
+	 * After this method has been called, {@link #get()} can be safely called.
+	 *
+	 * @throws IOException If an error occurs while creating resources.
+	 * @throws RuntimeException If an error occurs while creating resources.
+	 */
+	void start() throws IOException;
+
+	/**
 	 * Release any resource currently held by the {@link DirectoryHolder},
 	 * including (but not limiting to) the directory itself.
 	 * <p>
@@ -29,14 +40,5 @@ public interface DirectoryHolder extends Closeable {
 	 * @return The directory held by this {@link DirectoryHolder}.
 	 */
 	Directory get();
-
-	/**
-	 * @param directory The {@link Directory} to hold.
-	 * @return A {@link DirectoryHolder} that returns the given directory when {@link #get()} is called
-	 * and simply closes the directory when {@link #close()} is called.
-	 */
-	static DirectoryHolder of(Directory directory) {
-		return new SimpleDirectoryHolder( directory );
-	}
 
 }

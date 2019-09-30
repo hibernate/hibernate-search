@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.directory.impl;
 
-import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -17,15 +15,13 @@ import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.directory.FileSystemAccessStrategyName;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreationContext;
-import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
+import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProviderInitializationContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.FSLockFactory;
 import org.apache.lucene.store.LockFactory;
 
@@ -65,7 +61,7 @@ public class LocalFileSystemDirectoryProvider implements DirectoryProvider {
 		this.lockFactory = context.createConfiguredLockFactory().orElseGet( FSLockFactory::getDefault );
 
 		try {
-			initializeWriteableDirectory( root );
+			FileSystemUtils.initializeWriteableDirectory( root );
 		}
 		catch (Exception e) {
 			throw log.unableToInitializeRootDirectory( root, e.getMessage(), e );
@@ -73,38 +69,15 @@ public class LocalFileSystemDirectoryProvider implements DirectoryProvider {
 	}
 
 	@Override
-	public DirectoryHolder createDirectory(DirectoryCreationContext context) throws IOException {
+	public DirectoryHolder createDirectoryHolder(DirectoryCreationContext context) {
 		Path directoryPath = root.resolve( context.getIndexName() );
 		Optional<String> shardId = context.getShardId();
 		if ( shardId.isPresent() ) {
 			directoryPath = directoryPath.resolve( shardId.get() );
 		}
-		try {
-			initializeWriteableDirectory( directoryPath );
-		}
-		catch (Exception e) {
-			throw log.unableToInitializeIndexDirectory( e.getMessage(), context.getEventContext(), e );
-		}
-		Directory directory = accessStrategy.createDirectory( directoryPath, lockFactory );
-		try {
-			context.initializeIndexIfNeeded( directory );
-			return DirectoryHolder.of( directory );
-		}
-		catch (IOException | RuntimeException e) {
-			new SuppressingCloser( e ).push( directory );
-			throw e;
-		}
-	}
-
-	private void initializeWriteableDirectory(Path rootDirectory) throws IOException {
-		if ( Files.exists( rootDirectory ) ) {
-			if ( !Files.isDirectory( rootDirectory ) || !Files.isWritable( rootDirectory ) ) {
-				throw log.pathIsNotWriteableDirectory( rootDirectory );
-			}
-		}
-		else {
-			Files.createDirectories( rootDirectory );
-		}
+		return new LocalFileSystemDirectoryHolder(
+				directoryPath, accessStrategy, lockFactory, context.getEventContext()
+		);
 	}
 
 }

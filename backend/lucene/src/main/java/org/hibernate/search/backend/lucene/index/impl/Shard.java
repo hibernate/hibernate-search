@@ -51,6 +51,7 @@ public final class Shard implements Closeable {
 	}
 
 	public void start() {
+		indexAccessor.start();
 		writeOrchestrator.start();
 	}
 

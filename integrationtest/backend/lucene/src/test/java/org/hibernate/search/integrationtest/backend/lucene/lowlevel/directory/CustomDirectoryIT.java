@@ -46,6 +46,7 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 		assertThat( staticCounters.get( CustomDirectoryProvider.CONSTRUCTOR_COUNTER_KEY ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( CustomDirectoryProvider.INITIALIZE_COUNTER_KEY ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( CustomDirectoryProvider.CREATE_DIRECTORY_COUNTER_KEY ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( CustomDirectoryProvider.DIRECTORY_HOLDER_START_COUNTER_KEY ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( CustomDirectoryProvider.DIRECTORY_HOLDER_CLOSE_COUNTER_KEY ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( CustomDirectoryProvider.CLOSE_COUNTER_KEY ) ).isEqualTo( 0 );
 
@@ -57,6 +58,7 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 		assertThat( staticCounters.get( CustomDirectoryProvider.CONSTRUCTOR_COUNTER_KEY ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( CustomDirectoryProvider.INITIALIZE_COUNTER_KEY ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( CustomDirectoryProvider.CREATE_DIRECTORY_COUNTER_KEY ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( CustomDirectoryProvider.DIRECTORY_HOLDER_START_COUNTER_KEY ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( CustomDirectoryProvider.DIRECTORY_HOLDER_CLOSE_COUNTER_KEY ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( CustomDirectoryProvider.CLOSE_COUNTER_KEY ) ).isEqualTo( 1 );
 	}
@@ -90,6 +92,7 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 		private static final StaticCounters.Key CONSTRUCTOR_COUNTER_KEY = StaticCounters.createKey();
 		private static final StaticCounters.Key INITIALIZE_COUNTER_KEY = StaticCounters.createKey();
 		private static final StaticCounters.Key CREATE_DIRECTORY_COUNTER_KEY = StaticCounters.createKey();
+		private static final StaticCounters.Key DIRECTORY_HOLDER_START_COUNTER_KEY = StaticCounters.createKey();
 		private static final StaticCounters.Key DIRECTORY_HOLDER_GET_COUNTER_KEY = StaticCounters.createKey();
 		private static final StaticCounters.Key DIRECTORY_HOLDER_CLOSE_COUNTER_KEY = StaticCounters.createKey();
 		private static final StaticCounters.Key CLOSE_COUNTER_KEY = StaticCounters.createKey();
@@ -115,12 +118,18 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 		}
 
 		@Override
-		public DirectoryHolder createDirectory(DirectoryCreationContext context) {
+		public DirectoryHolder createDirectoryHolder(DirectoryCreationContext context) {
 			StaticCounters.get().increment( CREATE_DIRECTORY_COUNTER_KEY );
 			assertThat( context ).isNotNull();
 			assertThat( context.getIndexName() ).isEqualTo( INDEX_NAME );
-			Directory directory = new ByteBuffersDirectory();
 			return new DirectoryHolder() {
+				Directory directory;
+				@Override
+				public void start() {
+					StaticCounters.get().increment( DIRECTORY_HOLDER_START_COUNTER_KEY );
+					directory = new ByteBuffersDirectory();
+				}
+
 				@Override
 				public void close() throws IOException {
 					StaticCounters.get().increment( DIRECTORY_HOLDER_CLOSE_COUNTER_KEY );
