@@ -30,13 +30,13 @@ import org.hibernate.search.util.impl.test.rule.StaticCounters;
 public class StubIndexManager implements IndexManagerImplementor<StubDocumentElement>, IndexManager {
 
 	public static final StaticCounters.Key INSTANCE_COUNTER_KEY = StaticCounters.createKey();
-	public static final StaticCounters.Key CLOSE_COUNTER_KEY = StaticCounters.createKey();
+	public static final StaticCounters.Key STOP_COUNTER_KEY = StaticCounters.createKey();
 
 	private final StubBackend backend;
 	private final String name;
 	private final StubIndexSchemaNode rootSchemaNode;
 
-	private boolean closed = false;
+	private boolean running = true;
 
 	StubIndexManager(StubBackend backend, String name, StubIndexSchemaNode rootSchemaNode) {
 		StaticCounters.get().increment( INSTANCE_COUNTER_KEY );
@@ -47,28 +47,33 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 	}
 
 	@Override
-	public void close() {
+	public CompletableFuture<?> start(IndexManagerStartContext context) {
+		// Nothing to do
+		return CompletableFuture.completedFuture( null );
+	}
 
+	@Override
+	public CompletableFuture<?> preStop() {
+		// Nothing to do
+		return CompletableFuture.completedFuture( null );
+	}
+
+	@Override
+	public void stop() {
 		/*
 		 * This is important so that multiple calls to close on a single index manager
 		 * won't be interpreted as closing multiple objects in test assertions.
 		 */
-		if ( closed ) {
+		if ( !running ) {
 			return;
 		}
-		StaticCounters.get().increment( CLOSE_COUNTER_KEY );
-		closed = true;
+		StaticCounters.get().increment( STOP_COUNTER_KEY );
+		running = false;
 	}
 
 	@Override
 	public String toString() {
 		return StubIndexManager.class.getSimpleName() + "[" + name + "]";
-	}
-
-	@Override
-	public CompletableFuture<?> start(IndexManagerStartContext context) {
-		// Nothing to do
-		return CompletableFuture.completedFuture( null );
 	}
 
 	@Override

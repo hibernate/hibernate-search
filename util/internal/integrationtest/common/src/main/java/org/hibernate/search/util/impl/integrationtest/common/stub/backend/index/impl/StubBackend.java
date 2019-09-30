@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl;
 
+import java.util.concurrent.CompletableFuture;
+
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
@@ -35,6 +37,17 @@ public class StubBackend implements BackendImplementor<StubDocumentElement>, Bac
 	}
 
 	@Override
+	public CompletableFuture<?> preStop() {
+		// Nothing to do
+		return CompletableFuture.completedFuture( null );
+	}
+
+	@Override
+	public void stop() {
+		// Nothing to do
+	}
+
+	@Override
 	public <T> T unwrap(Class<T> clazz) {
 		throw new AssertionFailure( getClass().getName() + " cannot be unwrapped" );
 	}
@@ -52,10 +65,5 @@ public class StubBackend implements BackendImplementor<StubDocumentElement>, Bac
 	public IndexManagerBuilder<StubDocumentElement> createIndexManagerBuilder(String indexName, boolean isMultiTenancyEnabled, BackendBuildContext context,
 			ConfigurationPropertySource propertySource) {
 		return new StubIndexManagerBuilder( this, indexName );
-	}
-
-	@Override
-	public void close() {
-		// No-op
 	}
 }

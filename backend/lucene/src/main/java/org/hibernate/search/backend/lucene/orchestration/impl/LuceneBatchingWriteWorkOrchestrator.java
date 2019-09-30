@@ -6,18 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.orchestration.impl;
 
-import java.lang.invoke.MethodHandles;
-import java.util.concurrent.CancellationException;
-import java.util.concurrent.CompletionException;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
-import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.common.impl.Throwables;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * An orchestrator that batches together worksets sent from other threads.
@@ -32,8 +24,6 @@ public class LuceneBatchingWriteWorkOrchestrator extends AbstractLuceneWriteWork
 
 	// TODO HSEARCH‌-3575 allow to configure this value
 	private static final int MAX_WORKSETS_PER_BATCH = 1000;
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BatchingExecutor<LuceneWorkSet, LuceneWriteWorkProcessor> executor;
 
@@ -56,7 +46,7 @@ public class LuceneBatchingWriteWorkOrchestrator extends AbstractLuceneWriteWork
 	}
 
 	@Override
-	public void start() {
+	protected void doStart() {
 		executor.start();
 	}
 
@@ -66,24 +56,13 @@ public class LuceneBatchingWriteWorkOrchestrator extends AbstractLuceneWriteWork
 	}
 
 	@Override
-	protected void doClose() {
-		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( LuceneBatchingWriteWorkOrchestrator::awaitCompletionBeforeClose, this );
-			closer.push( BatchingExecutor::stop, executor );
-		}
+	protected CompletableFuture<?> getCompletion() {
+		return executor.getCompletion();
 	}
 
-	private void awaitCompletionBeforeClose() {
-		try {
-			executor.getCompletion().get();
-		}
-		catch (InterruptedException e) {
-			log.interruptedWhileWaitingForIndexActivity( getName(), e );
-			Thread.currentThread().interrupt();
-		}
-		catch (ExecutionException e) {
-			throw Throwables.expectRuntimeException( e.getCause() );
-		}
+	@Override
+	protected void doStop() {
+		executor.stop();
 	}
 
 }

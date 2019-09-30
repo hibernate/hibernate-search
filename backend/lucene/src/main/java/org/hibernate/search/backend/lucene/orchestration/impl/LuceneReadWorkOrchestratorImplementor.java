@@ -7,8 +7,21 @@
 package org.hibernate.search.backend.lucene.orchestration.impl;
 
 
-public interface LuceneReadWorkOrchestratorImplementor extends AutoCloseable, LuceneReadWorkOrchestrator {
-	@Override
-	default void close() {
-	}
+public interface LuceneReadWorkOrchestratorImplementor extends LuceneReadWorkOrchestrator {
+
+	/**
+	 * Start any resource necessary to operate the orchestrator at runtime.
+	 * <p>
+	 * Called by the owner of this orchestrator once after bootstrap,
+	 * before any other method is called.
+	 */
+	void start();
+
+	/**
+	 * Forcibly shut down ongoing work and release any resource necessary to operate the orchestrator at runtime.
+	 * <p>
+	 * Called by the owner of this orchestrator on shutdown.
+	 */
+	void stop();
+
 }

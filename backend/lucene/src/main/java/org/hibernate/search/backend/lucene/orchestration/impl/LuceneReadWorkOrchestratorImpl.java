@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HolderMultiReader;
@@ -38,6 +39,7 @@ public class LuceneReadWorkOrchestratorImpl
 
 	public LuceneReadWorkOrchestratorImpl(String name) {
 		super( name );
+		start(); // Nothing to start, just force the superclass to go to the right state.
 	}
 
 	@Override
@@ -68,12 +70,23 @@ public class LuceneReadWorkOrchestratorImpl
 	}
 
 	@Override
+	protected void doStart() {
+		// Nothing to do
+	}
+
+	@Override
 	protected void doSubmit(ReadTask<?> task) {
 		task.execute();
 	}
 
 	@Override
-	protected void doClose() {
+	protected CompletableFuture<?> getCompletion() {
+		// Works are executed synchronously.
+		return CompletableFuture.completedFuture( null );
+	}
+
+	@Override
+	protected void doStop() {
 		// Nothing to do
 	}
 

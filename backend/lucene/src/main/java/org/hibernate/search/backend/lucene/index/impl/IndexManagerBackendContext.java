@@ -177,7 +177,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
-					.push( writeOrchestrator )
+					// No need to stop the orchestrator, we didn't start it
 					.push( indexAccessor );
 			throw e;
 		}

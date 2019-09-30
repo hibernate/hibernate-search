@@ -194,7 +194,7 @@ class IndexManagerBuildingStateHolder {
 		}
 
 		void closeOnFailure() {
-			backend.close();
+			backend.stop();
 		}
 
 		BackendPartialBuildState getPartiallyBuilt() {
@@ -222,7 +222,7 @@ class IndexManagerBuildingStateHolder {
 
 		void closeOnFailure(SuppressingCloser closer) {
 			if ( indexManager != null ) {
-				closer.push( IndexManagerImplementor::close, indexManager );
+				closer.push( IndexManagerImplementor::stop, indexManager );
 			}
 			else {
 				closer.push( IndexManagerBuilder::closeOnFailure, builder );

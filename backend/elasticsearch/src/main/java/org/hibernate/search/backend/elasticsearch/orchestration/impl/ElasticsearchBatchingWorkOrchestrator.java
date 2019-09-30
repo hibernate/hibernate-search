@@ -6,15 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
-import java.lang.invoke.MethodHandles;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.common.spi.ErrorHandler;
-import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.Throwables;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * An orchestrator sharing context across multiple threads,
@@ -28,9 +23,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *
  */
 class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrchestrator
-		implements ElasticsearchWorkOrchestratorImplementor, AutoCloseable {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+		implements ElasticsearchWorkOrchestratorImplementor {
 
 	private final BatchingExecutor<ElasticsearchWorkSet, ElasticsearchWorkProcessor> executor;
 
@@ -56,11 +49,6 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 		);
 	}
 
-	@Override
-	public void start() {
-		executor.start();
-	}
-
 	/**
 	 * Create a child orchestrator.
 	 * <p>
@@ -78,29 +66,23 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 	}
 
 	@Override
+	protected void doStart() {
+		executor.start();
+	}
+
+	@Override
 	protected void doSubmit(ElasticsearchWorkSet workSet) throws InterruptedException {
 		executor.submit( workSet );
 	}
 
 	@Override
-	protected void doClose() {
-		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( ElasticsearchBatchingWorkOrchestrator::awaitCompletionBeforeClose, this );
-			closer.push( BatchingExecutor::stop, executor );
-		}
+	protected CompletableFuture<?> getCompletion() {
+		return executor.getCompletion();
 	}
 
-	private void awaitCompletionBeforeClose() {
-		try {
-			executor.getCompletion().get();
-		}
-		catch (InterruptedException e) {
-			log.interruptedWhileWaitingForIndexActivity( getName(), e );
-			Thread.currentThread().interrupt();
-		}
-		catch (ExecutionException e) {
-			throw Throwables.expectRuntimeException( e.getCause() );
-		}
+	@Override
+	protected void doStop() {
+		executor.stop();
 	}
 
 	private class ElasticsearchChildBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrchestrator
@@ -111,7 +93,7 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 		}
 
 		@Override
-		public void start() {
+		protected void doStart() {
 			// uses the resources of the parent orchestrator
 		}
 
@@ -121,12 +103,17 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 		}
 
 		@Override
-		protected void doClose() {
+		protected CompletableFuture<?> getCompletion() {
 			/*
 			 * TODO HSEARCH-3576 this will wait for *all* tasks to finish, including tasks from other children.
 			 *  We should do better.
 			 */
-			ElasticsearchBatchingWorkOrchestrator.this.awaitCompletionBeforeClose();
+			return ElasticsearchBatchingWorkOrchestrator.this.getCompletion();
+		}
+
+		@Override
+		protected void doStop() {
+			// uses the resources of the parent orchestrator
 		}
 	}
 

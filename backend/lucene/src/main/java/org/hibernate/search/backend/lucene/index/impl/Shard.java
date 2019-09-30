@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.index.impl;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
@@ -23,7 +22,7 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public final class Shard implements Closeable {
+public final class Shard {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -38,7 +37,7 @@ public final class Shard implements Closeable {
 		this.writeOrchestrator = writeOrchestrator;
 	}
 
-	public CompletableFuture<?> start() {
+	CompletableFuture<?> start() {
 		try {
 			indexAccessor.start();
 			writeOrchestrator.start();
@@ -51,7 +50,7 @@ public final class Shard implements Closeable {
 		catch (IOException | RuntimeException e) {
 			new SuppressingCloser( e )
 					.push( indexAccessor )
-					.push( writeOrchestrator );
+					.push( LuceneWriteWorkOrchestratorImplementor::stop, writeOrchestrator );
 			throw log.unableToInitializeIndexDirectory(
 					e.getMessage(),
 					indexAccessor.getIndexEventContext(),
@@ -60,10 +59,13 @@ public final class Shard implements Closeable {
 		}
 	}
 
-	@Override
-	public void close() throws IOException {
+	CompletableFuture<?> preStop() {
+		return writeOrchestrator.preStop();
+	}
+
+	void stop() throws IOException {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( LuceneWriteWorkOrchestratorImplementor::close, writeOrchestrator );
+			closer.push( LuceneWriteWorkOrchestratorImplementor::stop, writeOrchestrator );
 			// Close the index writer after the orchestrators, when we're sure all works have been performed
 			closer.push( IndexAccessor::close, indexAccessor );
 		}

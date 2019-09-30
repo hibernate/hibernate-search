@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.index.impl;
 
-import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -30,7 +29,7 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.impl.Throwables;
 
-class ShardHolder implements Closeable, ReadIndexManagerContext, WorkExecutionIndexManagerContext {
+class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerContext {
 
 	private final IndexManagerBackendContext backendContext;
 	private final LuceneIndexModel model;
@@ -83,17 +82,26 @@ class ShardHolder implements Closeable, ReadIndexManagerContext, WorkExecutionIn
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
-					.pushAll( shards.values() );
+					.pushAll( Shard::stop, shards.values() );
 			shards.clear();
 			writeOrchestrators.clear();
 			throw e;
 		}
 	}
 
-	@Override
-	public void close() throws IOException {
+	CompletableFuture<?> preStop() {
+		CompletableFuture<?>[] futures = new CompletableFuture[shards.size()];
+		int i = 0;
+		for ( Shard shard : shards.values() ) {
+			futures[i] = shard.preStop();
+			i++;
+		}
+		return CompletableFuture.allOf( futures );
+	}
+
+	void stop() throws IOException {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.pushAll( Shard::close, shards.values() );
+			closer.pushAll( Shard::stop, shards.values() );
 			shards.clear();
 			writeOrchestrators.clear();
 		}
