@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.engine.common.spi;
 
-import org.hibernate.search.engine.mapper.mapping.spi.MappingFinalizer;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingFinalizer;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
 
 
 public interface SearchIntegrationFinalizer {

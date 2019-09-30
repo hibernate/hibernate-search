@@ -12,7 +12,7 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDefaultsProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundIdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundPropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundRoutingKeyBridge;

@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingFinalizationContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingFinalizationContext;
 
 class MappingFinalizationContextImpl implements MappingFinalizationContext {
 

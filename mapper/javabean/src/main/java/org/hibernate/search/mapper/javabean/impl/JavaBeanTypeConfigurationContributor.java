@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;

@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;

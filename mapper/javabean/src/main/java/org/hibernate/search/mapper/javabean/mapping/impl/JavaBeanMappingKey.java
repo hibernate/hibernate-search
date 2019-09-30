@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.javabean.mapping.impl;
 
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.log.impl.JavaBeanEventContextMessages;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
 
 import org.jboss.logging.Messages;
 

@@ -22,11 +22,11 @@ import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingFinalizationContext;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingFinalizer;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingFinalizationContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingFinalizer;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingPartialBuildState;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
 import org.hibernate.search.engine.reporting.impl.RootFailureCollector;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;

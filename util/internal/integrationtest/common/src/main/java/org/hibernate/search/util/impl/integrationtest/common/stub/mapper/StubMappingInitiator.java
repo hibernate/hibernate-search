@@ -15,7 +15,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurat
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 
 public class StubMappingInitiator implements MappingInitiator<StubTypeMetadataContributor, StubMappingPartialBuildState> {
 

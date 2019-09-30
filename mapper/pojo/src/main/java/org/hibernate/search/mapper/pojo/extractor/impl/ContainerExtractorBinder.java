@@ -16,7 +16,7 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingBuildContext;
+import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.CollectionElementExtractor;
