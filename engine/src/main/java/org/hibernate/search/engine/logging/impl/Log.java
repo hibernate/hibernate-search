@@ -14,9 +14,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoadingException;
 import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
-import org.hibernate.search.engine.logging.spi.MappingKeyFormatter;
 import org.hibernate.search.engine.logging.spi.SimpleNameClassFormatter;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -169,9 +167,6 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 30, value = "Unable to load class [%1$s]")
 	ClassLoadingException unableToLoadTheClass(String className, @Cause Throwable cause);
-
-	@Message(id = ID_OFFSET_2 + 32, value = "No mapping registered for mapping key: '%1$s'.")
-	SearchException noMappingRegistered(@FormatWith(MappingKeyFormatter.class) MappingKey<?, ?> mappingKey);
 
 	@Message(id = ID_OFFSET_2 + 33, value = "No backend registered for backend name: '%1$s'.")
 	SearchException noBackendRegistered(String backendName);

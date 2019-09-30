@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.common.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.engine.backend.Backend;
@@ -19,7 +20,6 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingKey;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -30,13 +30,13 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	private final BeanProvider beanProvider;
 	private final BeanHolder<? extends ErrorHandler> errorHandlerHolder;
 
-	private final Map<MappingKey<?, ?>, MappingImplementor<?>> mappings;
+	private final List<MappingImplementor<?>> mappings;
 	private final Map<String, BackendImplementor<?>> backends;
 	private final Map<String, IndexManagerImplementor<?>> indexManagers;
 
 	SearchIntegrationImpl(BeanProvider beanProvider,
 			BeanHolder<? extends ErrorHandler> errorHandlerHolder,
-			Map<MappingKey<?, ?>, MappingImplementor<?>> mappings,
+			List<MappingImplementor<?>> mappings,
 			Map<String, BackendImplementor<?>> backends,
 			Map<String, IndexManagerImplementor<?>> indexManagers) {
 		this.beanProvider = beanProvider;
@@ -44,17 +44,6 @@ public class SearchIntegrationImpl implements SearchIntegration {
 		this.mappings = mappings;
 		this.backends = backends;
 		this.indexManagers = indexManagers;
-	}
-
-	@Override
-	public <M> M getMapping(MappingKey<?, M> mappingKey) {
-		// See SearchIntegrationBuilderImpl: we are sure that, if there is a mapping, it implements MappingImplementor<M>
-		@SuppressWarnings("unchecked")
-		MappingImplementor<M> mappingImplementor = (MappingImplementor<M>) mappings.get( mappingKey );
-		if ( mappingImplementor == null ) {
-			throw log.noMappingRegistered( mappingKey );
-		}
-		return mappingImplementor.toConcreteType();
 	}
 
 	@Override
@@ -78,7 +67,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	@Override
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.pushAll( MappingImplementor::close, mappings.values() );
+			closer.pushAll( MappingImplementor::close, mappings );
 			closer.pushAll( IndexManagerImplementor::close, indexManagers.values() );
 			closer.pushAll( BackendImplementor::close, backends.values() );
 			closer.pushAll( BeanHolder::close, errorHandlerHolder );
