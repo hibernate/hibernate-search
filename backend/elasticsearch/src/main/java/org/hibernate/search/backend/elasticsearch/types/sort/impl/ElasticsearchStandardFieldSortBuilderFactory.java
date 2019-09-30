@@ -52,8 +52,8 @@ public class ElasticsearchStandardFieldSortBuilderFactory<F> implements Elastics
 	}
 
 	@Override
-	public DistanceSortBuilder<ElasticsearchSearchSortBuilder> createDistanceSortBuilder(String absoluteFieldPath,
-			GeoPoint center) {
+	public DistanceSortBuilder<ElasticsearchSearchSortBuilder> createDistanceSortBuilder(ElasticsearchSearchContext searchContext,
+			String absoluteFieldPath, List<String> nestedPathHierarchy, GeoPoint center) {
 		throw log.distanceOperationsNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
