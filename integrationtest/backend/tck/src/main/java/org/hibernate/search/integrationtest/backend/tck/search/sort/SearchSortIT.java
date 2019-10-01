@@ -429,11 +429,71 @@ public class SearchSortIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
 	}
 
-	// TODO HSEARCH-3694 public void byDistance_asc_nested()
-	// TODO HSEARCH-3694 public void byDistance_desc_nested(
+	@Test
+	public void byDistance_asc_nested() {
+		SearchQuery<DocumentReference> query = simpleQuery( b -> b.distance( "nestedObject.geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ) );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
 
-	// TODO HSEARCH-3694 public void byDistance_asc_nested_x2()
-	// TODO HSEARCH-3694 public void byDistance_desc_nested_x2()
+		query = simpleQuery( b -> b.distance( "nestedObject.geoPoint", 45.757864, 4.834496 ) );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
+
+		query = simpleQuery( b -> b.distance( "nestedObject.geoPoint", 45.757864, 4.834496 ).asc() );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
+	}
+
+	@Test
+	public void byDistance_desc_nested() {
+		Assume.assumeTrue(
+				"Descending distance sort is not supported, skipping.",
+				TckConfiguration.get().getBackendFeatures().distanceSortDesc()
+		);
+
+		SearchQuery<DocumentReference> query = simpleQuery(
+				b -> b.distance( "nestedObject.geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ).desc()
+		);
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
+
+		query = simpleQuery( b -> b.distance( "nestedObject.geoPoint", 45.757864, 4.834496 ).desc() );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
+	}
+
+	@Test
+	public void byDistance_asc_nested_x2() {
+		SearchQuery<DocumentReference> query = simpleQuery( b -> b.distance( "nestedObject.nestedObject.geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ) );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
+
+		query = simpleQuery( b -> b.distance( "nestedObject.nestedObject.geoPoint", 45.757864, 4.834496 ) );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
+
+		query = simpleQuery( b -> b.distance( "nestedObject.nestedObject.geoPoint", 45.757864, 4.834496 ).asc() );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
+	}
+
+	@Test
+	public void byDistance_desc_nested_x2() {
+		Assume.assumeTrue(
+				"Descending distance sort is not supported, skipping.",
+				TckConfiguration.get().getBackendFeatures().distanceSortDesc()
+		);
+
+		SearchQuery<DocumentReference> query = simpleQuery(
+				b -> b.distance( "nestedObject.nestedObject.geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ).desc()
+		);
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
+
+		query = simpleQuery( b -> b.distance( "nestedObject.nestedObject.geoPoint", 45.757864, 4.834496 ).desc() );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
+	}
 
 	@Test
 	public void extension() {
