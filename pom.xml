@@ -158,7 +158,7 @@
         <module>backend/elasticsearch</module>
         <module>backend/elasticsearch-aws</module>
         <module>backend/lucene</module>
-        <module>mapper/pojo</module>
+        <module>mapper/pojo-base</module>
         <module>mapper/javabean</module>
         <module>mapper/orm</module>
         <module>util/internal/integrationtest</module>
@@ -539,7 +539,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-mapper-pojo</artifactId>
+                <artifactId>hibernate-search-mapper-pojo-base</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
@@ -564,7 +564,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-mapper-pojo</artifactId>
+                <artifactId>hibernate-search-integrationtest-mapper-pojo-base</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
