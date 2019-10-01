@@ -14,9 +14,9 @@
         <version>6.0.0-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
-    <artifactId>hibernate-search-mapper-pojo</artifactId>
+    <artifactId>hibernate-search-mapper-pojo-base</artifactId>
 
-    <name>Hibernate Search Mapper - POJO</name>
+    <name>Hibernate Search Mapper - POJO Base</name>
     <description>Abstract base and common implementations for Hibernate Search Mappers for POJOs</description>
 
     <properties>

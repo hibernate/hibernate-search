@@ -14,15 +14,15 @@
         <version>6.0.0-SNAPSHOT</version>
         <relativePath>../..</relativePath>
     </parent>
-    <artifactId>hibernate-search-integrationtest-mapper-pojo</artifactId>
+    <artifactId>hibernate-search-integrationtest-mapper-pojo-base</artifactId>
 
-    <name>Hibernate Search Integration Tests - Mapper - POJO</name>
-    <description>Hibernate Search integration tests for the POJO Mapper</description>
+    <name>Hibernate Search Integration Tests - Mapper - POJO Base</name>
+    <description>Hibernate Search integration tests for the abstract base for POJO Mappers</description>
 
     <dependencies>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-mapper-pojo</artifactId>
+            <artifactId>hibernate-search-mapper-pojo-base</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

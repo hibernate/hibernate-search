@@ -80,10 +80,10 @@
             <useAllReactorProjects>true</useAllReactorProjects>
             <includes>
                 <!--
-                     We cannot just merge the -orm moduleSet with the -mapper-pojo moduleSet,
+                     We cannot just merge the -orm moduleSet with the -mapper-pojo-base moduleSet,
                      for the same reason as above with the -engine and utils moduleSets.
                  -->
-                <include>org.hibernate.search:hibernate-search-mapper-pojo</include>
+                <include>org.hibernate.search:hibernate-search-mapper-pojo-base</include>
             </includes>
             <binaries>
                 <outputDirectory>dist/mapper/orm</outputDirectory>
@@ -126,8 +126,8 @@
                             <exclude>org.hibernate.search:hibernate-search-engine</exclude>
                             <exclude>org.hibernate.search:hibernate-search-util-common</exclude>
                             <exclude>org.jboss.logging:jboss-logging</exclude>
-                            <!-- Do not include the mapper-pojo JAR, nor its dependencies that are already included above -->
-                            <exclude>org.hibernate.search:hibernate-search-mapper-pojo</exclude>
+                            <!-- Do not include the mapper-pojo-base JAR, nor its dependencies that are already included above -->
+                            <exclude>org.hibernate.search:hibernate-search-mapper-pojo-base</exclude>
                         </excludes>
                         <useStrictFiltering>true</useStrictFiltering>
                     </dependencySet>

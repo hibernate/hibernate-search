@@ -26,7 +26,7 @@
     <dependencies>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-mapper-pojo</artifactId>
+            <artifactId>hibernate-search-mapper-pojo-base</artifactId>
         </dependency>
         <dependency>
             <groupId>org.jboss.logging</groupId>

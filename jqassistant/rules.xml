@@ -201,7 +201,7 @@
                         WHEN 'hibernate-search-backend-lucene' THEN 'Lucene'
                         WHEN 'hibernate-search-backend-elasticsearch' THEN 'Elasticsearch'
                         WHEN 'hibernate-search-backend-elasticsearch-aws' THEN 'ElasticsearchAws'
-                        WHEN 'hibernate-search-mapper-pojo' THEN 'Pojo'
+                        WHEN 'hibernate-search-mapper-pojo-base' THEN 'Pojo'
                         WHEN 'hibernate-search-mapper-javabean' THEN 'JavaBean'
                         WHEN 'hibernate-search-mapper-orm' THEN 'HibernateOrm'
                         ELSE 'UNKNOWN-MODULE-SPECIFIC-KEYWORD-PLEASE-UPDATE-JQASSISTANT-RULES'

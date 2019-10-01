@@ -55,7 +55,7 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-mapper-pojo</artifactId>
+            <artifactId>hibernate-search-mapper-pojo-base</artifactId>
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
@@ -77,7 +77,7 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-integrationtest-mapper-pojo</artifactId>
+            <artifactId>hibernate-search-integrationtest-mapper-pojo-base</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
