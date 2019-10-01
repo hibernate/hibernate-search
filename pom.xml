@@ -575,7 +575,7 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-orm</artifactId>
+                <artifactId>hibernate-search-integrationtest-mapper-orm</artifactId>
                 <version>${project.version}</version>
             </dependency>
             <dependency>
