@@ -80,7 +80,7 @@
             <useAllReactorProjects>true</useAllReactorProjects>
             <includes>
                 <!--
-                     We cannot just merge the -orm moduleSet with the -mapper-pojo-base moduleSet,
+                     We cannot just merge the -mapper-orm moduleSet with the -mapper-pojo-base moduleSet,
                      for the same reason as above with the -engine and utils moduleSets.
                  -->
                 <include>org.hibernate.search:hibernate-search-mapper-pojo-base</include>
