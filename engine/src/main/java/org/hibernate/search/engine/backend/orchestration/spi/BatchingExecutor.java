@@ -171,7 +171,6 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 					}
 					catch (Throwable e) {
 						workset.markAsFailed( e );
-						throw e;
 					}
 				}
 
