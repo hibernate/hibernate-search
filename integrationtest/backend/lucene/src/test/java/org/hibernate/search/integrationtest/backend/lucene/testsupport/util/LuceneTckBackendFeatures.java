@@ -11,13 +11,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBack
 class LuceneTckBackendFeatures extends TckBackendFeatures {
 
 	@Override
-	public boolean distanceSortDesc() {
-		// we don't test the descending order here as it's currently not supported by Lucene
-		// see LuceneSearchSortIT
-		return false;
-	}
-
-	@Override
 	public boolean aggregationsOnMultiValuedFields(Class<?> fieldType) {
 		// TODO HSEARCH-1929 + HSEARCH-1927 Aggregations on multi-valued numeric fields are not supported at the moment
 		//  See in particular https://hibernate.atlassian.net/browse/HSEARCH-1927?focusedCommentId=88210&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-88210

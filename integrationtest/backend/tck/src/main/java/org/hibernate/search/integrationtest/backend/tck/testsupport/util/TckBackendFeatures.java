@@ -8,10 +8,6 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
 public class TckBackendFeatures {
 
-	public boolean distanceSortDesc() {
-		return true;
-	}
-
 	public boolean geoPointIndexNullAs() {
 		return true;
 	}

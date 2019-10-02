@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -21,19 +22,17 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
+import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.engine.search.sort.dsl.spi.DelegatingSearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
@@ -41,7 +40,6 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMap
 import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -369,11 +367,6 @@ public class SearchSortIT {
 
 	@Test
 	public void byDistance_desc() {
-		Assume.assumeTrue(
-				"Descending distance sort is not supported, skipping.",
-				TckConfiguration.get().getBackendFeatures().distanceSortDesc()
-		);
-
 		SearchQuery<DocumentReference> query = simpleQuery(
 				b -> b.distance( "geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ).desc()
 		);
@@ -413,11 +406,6 @@ public class SearchSortIT {
 
 	@Test
 	public void byDistance_desc_flattened() {
-		Assume.assumeTrue(
-				"Descending distance sort is not supported, skipping.",
-				TckConfiguration.get().getBackendFeatures().distanceSortDesc()
-		);
-
 		SearchQuery<DocumentReference> query = simpleQuery(
 				b -> b.distance( "flattenedObject.geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ).desc()
 		);
@@ -446,11 +434,6 @@ public class SearchSortIT {
 
 	@Test
 	public void byDistance_desc_nested() {
-		Assume.assumeTrue(
-				"Descending distance sort is not supported, skipping.",
-				TckConfiguration.get().getBackendFeatures().distanceSortDesc()
-		);
-
 		SearchQuery<DocumentReference> query = simpleQuery(
 				b -> b.distance( "nestedObject.geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ).desc()
 		);
@@ -479,11 +462,6 @@ public class SearchSortIT {
 
 	@Test
 	public void byDistance_desc_nested_x2() {
-		Assume.assumeTrue(
-				"Descending distance sort is not supported, skipping.",
-				TckConfiguration.get().getBackendFeatures().distanceSortDesc()
-		);
-
 		SearchQuery<DocumentReference> query = simpleQuery(
 				b -> b.distance( "nestedObject.nestedObject.geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ).desc()
 		);

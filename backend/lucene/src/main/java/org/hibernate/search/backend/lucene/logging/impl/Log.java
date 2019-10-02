@@ -316,10 +316,6 @@ public interface Log extends BasicLogger {
 			value = "Traditional sorting operations are not supported by the GeoPoint field type, use distance sorting instead.")
 	SearchException traditionalSortNotSupportedByGeoPoint(@Param EventContext context);
 
-	@Message(id = ID_OFFSET_2 + 43,
-			value = "Descending order is not supported for distance sort.")
-	SearchException descendingOrderNotSupportedByDistanceSort(@Param EventContext context);
-
 	@Message(id = ID_OFFSET_2 + 44,
 			value = "Computed minimum for minimumShouldMatch constraint is out of bounds:"
 					+ " expected a number between '1' and '%1$s', got '%2$s'.")
