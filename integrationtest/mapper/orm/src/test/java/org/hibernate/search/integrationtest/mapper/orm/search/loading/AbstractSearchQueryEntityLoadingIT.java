@@ -25,8 +25,8 @@ import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQueryH
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
-import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.orm.OrmSoftAssertions;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSoftAssertions;
 
 import org.junit.Rule;
 

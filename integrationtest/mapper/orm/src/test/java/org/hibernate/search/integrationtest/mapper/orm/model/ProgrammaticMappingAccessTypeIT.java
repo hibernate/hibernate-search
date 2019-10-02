@@ -24,8 +24,8 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationC
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.Assert;
 import org.junit.Before;

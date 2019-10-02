@@ -72,7 +72,7 @@
 
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-util-internal-integrationtest-orm</artifactId>
+            <artifactId>hibernate-search-util-internal-integrationtest-mapper-orm</artifactId>
             <scope>test</scope>
             <exclusions>
                 <!-- Spring Boot uses Mockito -->

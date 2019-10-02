@@ -31,8 +31,8 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
-import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.stat.Statistics;
 
 import org.junit.Assume;

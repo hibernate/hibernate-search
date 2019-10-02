@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
-import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Test;
