@@ -137,4 +137,15 @@ public interface MassIndexer {
 	 * @return {@code this} for method chaining
 	 */
 	MassIndexer monitor(MassIndexingMonitor monitor);
+
+	/**
+	 * Set the {@link MassIndexingFailureHandler}.
+	 * <p>
+	 * The default handler just forwards failures to the
+	 * {@link org.hibernate.search.engine.cfg.EngineSettings#BACKGROUND_FAILURE_HANDLER background failure handler}.
+	 *
+	 * @param failureHandler The handler for failures occurring during mass indexing.
+	 * @return {@code this} for method chaining
+	 */
+	MassIndexer failureHandler(MassIndexingFailureHandler failureHandler);
 }

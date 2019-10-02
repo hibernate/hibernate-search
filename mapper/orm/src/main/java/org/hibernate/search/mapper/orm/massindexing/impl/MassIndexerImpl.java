@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionCon
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.impl.Futures;
@@ -214,6 +215,11 @@ public class MassIndexerImpl implements MassIndexer {
 		// as special values which might be useful.
 		this.idFetchSize = idFetchSize;
 		return this;
+	}
+
+	@Override
+	public MassIndexer failureHandler(MassIndexingFailureHandler failureHandler) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	private MassIndexingMonitor getOrCreateMonitor() {
