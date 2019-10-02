@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.apache.lucene.document.LatLonDocValuesField;
 import org.apache.lucene.search.SortField;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
@@ -49,11 +48,6 @@ public class LuceneGeoPointDistanceSortBuilder extends AbstractLuceneSearchSortB
 
 	@Override
 	public void buildAndContribute(LuceneSearchSortCollector collector) {
-		if ( nestedDocumentPath == null ) {
-			collector.collectSortField( LatLonDocValuesField.newDistanceSort( absoluteFieldPath, location.getLatitude(), location.getLongitude() ) );
-			return;
-		}
-
 		LuceneGeoPointDistanceComparatorSource fieldComparatorSource = new LuceneGeoPointDistanceComparatorSource(
 				nestedDocumentPath, location.getLatitude(), location.getLongitude() );
 		SortField sortField = new SortField( absoluteFieldPath, fieldComparatorSource, order == SortOrder.DESC );

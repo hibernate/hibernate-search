@@ -21,6 +21,8 @@ import org.apache.lucene.util.BitSet;
 
 public class LuceneGeoPointDistanceComparatorSource extends LuceneFieldComparatorSource {
 
+	private static final double MISSING_VALUE_IMPLICIT_DISTANCE_VALUE = Double.POSITIVE_INFINITY;
+
 	private final double latitude;
 	private final double longitude;
 
@@ -32,7 +34,7 @@ public class LuceneGeoPointDistanceComparatorSource extends LuceneFieldComparato
 
 	@Override
 	public FieldComparator<?> newComparator(String fieldname, int numHits, int sortPos, boolean reversed) {
-		return new FieldComparator.DoubleComparator( numHits, fieldname, null ) {
+		return new FieldComparator.DoubleComparator( numHits, fieldname, MISSING_VALUE_IMPLICIT_DISTANCE_VALUE ) {
 
 			@Override
 			protected NumericDocValues getNumericDocValues(LeafReaderContext context, String field) throws IOException {
