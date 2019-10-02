@@ -130,7 +130,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 				} ) )
 				.sort( f -> f.composite( b -> {
 					if ( myLocation != null ) {
-						// TODO HSEARCH-2254 sort by distance once we implement nested support for sorts ("copies" is a nested object field)
+						// TODO HSEARCH-3103 sort by distance once we implement nested support for sorts ("copies" is a nested object field)
 						//b.add( f.byDistance( "copies.library.location", myLocation ) );
 					}
 					b.add( f.score() );
