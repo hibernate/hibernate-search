@@ -6,25 +6,18 @@
  */
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
-import java.lang.invoke.MethodHandles;
-
-import org.apache.lucene.search.SortField;
-
-import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneGeoPointDistanceComparatorSource;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+
+import org.apache.lucene.search.SortField;
 
 public class LuceneGeoPointDistanceSortBuilder extends AbstractLuceneSearchSortBuilder
 		implements DistanceSortBuilder<LuceneSearchSortBuilder> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String absoluteFieldPath;
 	private final String nestedDocumentPath;
@@ -34,16 +27,6 @@ public class LuceneGeoPointDistanceSortBuilder extends AbstractLuceneSearchSortB
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.nestedDocumentPath = nestedDocumentPath;
 		this.location = location;
-	}
-
-	@Override
-	public void order(SortOrder order) {
-		// TODO HSEARCH-3193 contribute the support of descending order to Lucene
-		if ( SortOrder.DESC == order ) {
-			throw log.descendingOrderNotSupportedByDistanceSort(
-					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-			);
-		}
 	}
 
 	@Override
