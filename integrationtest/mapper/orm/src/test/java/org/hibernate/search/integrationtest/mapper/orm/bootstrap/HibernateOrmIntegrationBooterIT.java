@@ -31,8 +31,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
-import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
-import org.hibernate.search.util.impl.integrationtest.orm.SimpleSessionFactoryBuilder;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
 
 import org.junit.After;
 import org.junit.Rule;

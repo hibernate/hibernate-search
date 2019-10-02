@@ -14,7 +14,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
 import javax.persistence.TypedQuery;
 
-import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 import org.junit.After;
 import org.junit.Before;

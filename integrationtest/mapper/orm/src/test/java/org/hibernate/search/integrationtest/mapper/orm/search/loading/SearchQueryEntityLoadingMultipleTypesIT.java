@@ -45,8 +45,8 @@ import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.mult
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Interface1;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.multipletypes.Interface2;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
-import org.hibernate.search.util.impl.integrationtest.orm.OrmSoftAssertions;
-import org.hibernate.search.util.impl.integrationtest.orm.OrmUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSoftAssertions;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;

@@ -40,7 +40,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.integrationtest.orm.OrmSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.Rule;
