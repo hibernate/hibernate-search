@@ -11,7 +11,7 @@ import java.util.Optional;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 
 import org.junit.rules.TestRule;
 

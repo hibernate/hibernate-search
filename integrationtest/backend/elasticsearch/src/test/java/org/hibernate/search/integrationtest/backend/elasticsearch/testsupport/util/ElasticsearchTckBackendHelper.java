@@ -15,14 +15,14 @@ import java.util.Optional;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.AnalysisCustomITAnalysisConfigurer;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.AnalysisOverrideITAnalysisConfigurer;
-import org.hibernate.search.util.impl.integrationtest.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
-import org.hibernate.search.util.impl.integrationtest.elasticsearch.dialect.ElasticsearchTestDialect;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendFeatures;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
-import org.hibernate.search.util.impl.integrationtest.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 
 import org.junit.rules.TestRule;
 

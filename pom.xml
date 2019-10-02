@@ -441,7 +441,7 @@
         <!--
              These properties are transparently passed as system properties to integration tests,
              and retrieved by a test utility:
-             org.hibernate.search.util.impl.integrationtest.elasticsearch.ElasticsearchTestHostConnectionConfiguration
+             org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration
              This is better than configuration files filtered by Maven,
              because we will be able to change the configuration without re-compiling the configuration file
              (which is located in a dependency of the integration tests modules).
@@ -2396,7 +2396,7 @@
             <id>elasticsearch-5.6</id>
             <properties>
                 <test.elasticsearch.host.version>5.6.8</test.elasticsearch.host.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.elasticsearch.dialect.Elasticsearch5TestDialect</test.elasticsearch.testdialect>
+                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch5TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
                 <pluginManagement>
@@ -2420,7 +2420,7 @@
             <id>elasticsearch-6.0</id>
             <properties>
                 <test.elasticsearch.host.version>6.6.2</test.elasticsearch.host.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.elasticsearch.dialect.Elasticsearch60TestDialect</test.elasticsearch.testdialect>
+                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch60TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
                 <pluginManagement>
@@ -2444,7 +2444,7 @@
             <id>elasticsearch-6.7</id>
             <properties>
                 <test.elasticsearch.host.version>6.8.1</test.elasticsearch.host.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.elasticsearch.dialect.Elasticsearch67TestDialect</test.elasticsearch.testdialect>
+                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch67TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
                 <pluginManagement>
@@ -2474,7 +2474,7 @@
             </activation>
             <properties>
                 <test.elasticsearch.host.version>${version.org.elasticsearch.main}</test.elasticsearch.host.version>
-                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.elasticsearch.dialect.Elasticsearch7TestDialect</test.elasticsearch.testdialect>
+                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch7TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
                 <pluginManagement>
