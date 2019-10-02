@@ -39,7 +39,7 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-util-internal-integrationtest-elasticsearch</artifactId>
+            <artifactId>hibernate-search-util-internal-integrationtest-backend-elasticsearch</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>

@@ -27,7 +27,7 @@
 
     <modules>
         <module>common</module>
-        <module>elasticsearch</module>
+        <module>backend/elasticsearch</module>
         <module>mapper/orm</module>
         <module>sharedresources</module>
     </modules>
