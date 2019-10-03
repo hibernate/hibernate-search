@@ -7,7 +7,6 @@
 package org.hibernate.search.engine.reporting.spi;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import org.hibernate.search.engine.reporting.IndexFailureContext;
@@ -17,9 +16,7 @@ public class IndexFailureContextBuilder {
 
 	private Throwable th;
 	private Object operationAtFault;
-	private Iterable<Object> workToBeDone;
 	private List<Object> failingOperations;
-	private List<Object> operationsThatWorked;
 
 	public IndexFailureContextBuilder throwable(Throwable th) {
 		this.th = th;
@@ -36,22 +33,6 @@ public class IndexFailureContextBuilder {
 		return this;
 	}
 
-	public IndexFailureContextBuilder addAllWorkThatFailed(List<Object> worksThatFailed) {
-		this.getFailingOperations().addAll( worksThatFailed );
-		return this;
-	}
-
-	public IndexFailureContextBuilder workCompleted(Object luceneWork) {
-		this.getOperationsThatWorked().add( luceneWork );
-		return this;
-
-	}
-
-	public IndexFailureContextBuilder allWorkToBeDone(Iterable<Object> workOnWriter) {
-		this.workToBeDone = workOnWriter;
-		return this;
-	}
-
 	public IndexFailureContext createFailureContext() {
 		IndexFailureContextImpl context = new IndexFailureContextImpl();
 
@@ -60,20 +41,6 @@ public class IndexFailureContextBuilder {
 		// for situation when there is a primary failure
 		if ( operationAtFault != null ) {
 			context.setOperationAtFault( operationAtFault );
-		}
-		else if ( workToBeDone != null ) {
-			List<Object> workLeft = new ArrayList<>();
-			for ( Object work : workToBeDone ) {
-				workLeft.add( work );
-			}
-			if ( operationsThatWorked != null ) {
-				workLeft.removeAll( operationsThatWorked );
-			}
-
-			if ( !workLeft.isEmpty() ) {
-				context.setOperationAtFault( workLeft.remove( 0 ) );
-				getFailingOperations().addAll( workLeft );
-			}
 		}
 		context.setFailingOperations( getFailingOperations() );
 		return context;
@@ -84,13 +51,6 @@ public class IndexFailureContextBuilder {
 			failingOperations = new ArrayList<>();
 		}
 		return failingOperations;
-	}
-
-	private List<Object> getOperationsThatWorked() {
-		if ( operationsThatWorked == null ) {
-			operationsThatWorked = new LinkedList<>();
-		}
-		return operationsThatWorked;
 	}
 
 }
