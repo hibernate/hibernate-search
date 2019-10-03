@@ -13,23 +13,23 @@ import org.hibernate.search.engine.reporting.IndexFailureContext;
 
 public class IndexFailureContextImpl implements IndexFailureContext {
 
-	private List<Object> failingOperations;
+	private Object failingOperation;
 
-	private Object operationAtFault;
+	private List<Object> uncommittedOperations;
 
 	private Throwable throwable;
 
 	@Override
-	public List<Object> getFailingOperations() {
-		if ( failingOperations == null ) {
-			return Collections.emptyList();
-		}
-		return Collections.unmodifiableList( failingOperations );
+	public Object getFailingOperation() {
+		return this.failingOperation;
 	}
 
 	@Override
-	public Object getOperationAtFault() {
-		return this.operationAtFault;
+	public List<Object> getUncommittedOperations() {
+		if ( uncommittedOperations == null ) {
+			return Collections.emptyList();
+		}
+		return Collections.unmodifiableList( uncommittedOperations );
 	}
 
 	@Override
@@ -37,16 +37,16 @@ public class IndexFailureContextImpl implements IndexFailureContext {
 		return this.throwable;
 	}
 
-	public void setFailingOperations(List<Object> failingOperations) {
-		this.failingOperations = failingOperations;
+	public void setFailingOperation(Object failingOperation) {
+		this.failingOperation = failingOperation;
 	}
 
 	public void setThrowable(Throwable th) {
 		this.throwable = th;
 	}
 
-	public void setOperationAtFault(Object operationAtFault) {
-		this.operationAtFault = operationAtFault;
+	public void setUncommittedOperations(List<Object> uncommittedOperations) {
+		this.uncommittedOperations = uncommittedOperations;
 	}
 
 }

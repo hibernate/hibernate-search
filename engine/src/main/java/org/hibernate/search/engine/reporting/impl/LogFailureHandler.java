@@ -25,31 +25,30 @@ public class LogFailureHandler implements FailureHandler {
 
 	@Override
 	public void handle(IndexFailureContext context) {
-
-		final List<Object> failingOperations = context.getFailingOperations();
-		final Object primaryFailure = context.getOperationAtFault();
-		final Throwable exceptionThatOccurred = context.getThrowable();
+		final List<Object> uncommittedOperations = context.getUncommittedOperations();
+		final Object failingOperation = context.getFailingOperation();
+		final Throwable throwable = context.getThrowable();
 
 		final StringBuilder errorMsg = new StringBuilder();
 
-		if ( exceptionThatOccurred != null ) {
+		if ( throwable != null ) {
 			errorMsg.append( "Exception occurred " )
-				.append( exceptionThatOccurred )
+				.append( throwable )
 				.append( "\n" );
 		}
-		if ( primaryFailure != null ) {
-			errorMsg.append( "Primary Failure:\n" );
-			appendFailureMessage( errorMsg, primaryFailure );
+		if ( failingOperation != null ) {
+			errorMsg.append( "Failing operation:\n" );
+			appendFailureMessage( errorMsg, failingOperation );
 		}
 
-		if ( ! failingOperations.isEmpty() ) {
-			errorMsg.append( "Subsequent failures:\n" );
-			for ( Object workThatFailed : failingOperations ) {
+		if ( ! uncommittedOperations.isEmpty() ) {
+			errorMsg.append( "Uncommitted operations as a result:\n" );
+			for ( Object workThatFailed : uncommittedOperations ) {
 				appendFailureMessage( errorMsg, workThatFailed );
 			}
 		}
 
-		handleException( errorMsg.toString(), exceptionThatOccurred );
+		handleException( errorMsg.toString(), throwable );
 	}
 
 	private static void appendFailureMessage(StringBuilder message, Object workThatFailed) {

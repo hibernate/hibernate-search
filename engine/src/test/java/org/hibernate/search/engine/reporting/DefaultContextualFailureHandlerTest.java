@@ -58,8 +58,8 @@ public class DefaultContextualFailureHandlerTest extends EasyMockSupport {
 		verifyAll();
 		IndexFailureContext failureContext = capture.getValue();
 		assertThat( failureContext.getThrowable() ).isSameAs( throwable );
-		assertThat( failureContext.getOperationAtFault() ).isSameAs( workInfo1 );
-		assertThat( failureContext.getFailingOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
+		assertThat( failureContext.getFailingOperation() ).isSameAs( workInfo1 );
+		assertThat( failureContext.getUncommittedOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
 	}
 
 	@Test
@@ -105,8 +105,8 @@ public class DefaultContextualFailureHandlerTest extends EasyMockSupport {
 		verifyAll();
 		IndexFailureContext failureContext = capture.getValue();
 		assertThat( failureContext.getThrowable() ).isSameAs( throwable );
-		assertThat( failureContext.getOperationAtFault() ).isNull();
-		assertThat( failureContext.getFailingOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
+		assertThat( failureContext.getFailingOperation() ).isNull();
+		assertThat( failureContext.getUncommittedOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
 	}
 
 	@Test
@@ -136,8 +136,8 @@ public class DefaultContextualFailureHandlerTest extends EasyMockSupport {
 		IndexFailureContext failureContext = capture.getValue();
 		assertThat( failureContext.getThrowable() ).isSameAs( throwable1 );
 		assertThat( throwable1.getSuppressed() ).containsExactlyInAnyOrder( throwable2 );
-		assertThat( failureContext.getOperationAtFault() ).isIn( workInfo1, workInfo2 );
-		assertThat( failureContext.getFailingOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
+		assertThat( failureContext.getFailingOperation() ).isIn( workInfo1, workInfo2 );
+		assertThat( failureContext.getUncommittedOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
 	}
 
 	@Test
@@ -172,8 +172,8 @@ public class DefaultContextualFailureHandlerTest extends EasyMockSupport {
 		IndexFailureContext failureContext = capture.getValue();
 		assertThat( failureContext.getThrowable() ).isSameAs( throwable1 );
 		assertThat( throwable1.getSuppressed() ).containsExactlyInAnyOrder( throwable2 );
-		assertThat( failureContext.getOperationAtFault() ).isSameAs( workInfo1 );
-		assertThat( failureContext.getFailingOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
+		assertThat( failureContext.getFailingOperation() ).isSameAs( workInfo1 );
+		assertThat( failureContext.getUncommittedOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
 	}
 
 	private Object workInfo(int index) {

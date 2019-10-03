@@ -15,21 +15,21 @@ import org.hibernate.search.engine.reporting.impl.IndexFailureContextImpl;
 public class IndexFailureContextBuilder {
 
 	private Throwable th;
-	private Object operationAtFault;
-	private List<Object> failingOperations;
+	private Object failingOperation;
+	private List<Object> uncommittedOperations;
 
 	public IndexFailureContextBuilder throwable(Throwable th) {
 		this.th = th;
 		return this;
 	}
 
-	public IndexFailureContextBuilder operationAtFault(Object operationAtFault) {
-		this.operationAtFault = operationAtFault;
+	public IndexFailureContextBuilder failingOperation(Object failingOperation) {
+		this.failingOperation = failingOperation;
 		return this;
 	}
 
-	public IndexFailureContextBuilder addWorkThatFailed(Object failedWork) {
-		this.getFailingOperations().add( failedWork );
+	public IndexFailureContextBuilder uncommittedOperation(Object uncommittedOperation) {
+		this.getUncommittedOperations().add( uncommittedOperation );
 		return this;
 	}
 
@@ -39,18 +39,18 @@ public class IndexFailureContextBuilder {
 		context.setThrowable( th );
 
 		// for situation when there is a primary failure
-		if ( operationAtFault != null ) {
-			context.setOperationAtFault( operationAtFault );
+		if ( failingOperation != null ) {
+			context.setFailingOperation( failingOperation );
 		}
-		context.setFailingOperations( getFailingOperations() );
+		context.setUncommittedOperations( getUncommittedOperations() );
 		return context;
 	}
 
-	private List<Object> getFailingOperations() {
-		if ( failingOperations == null ) {
-			failingOperations = new ArrayList<>();
+	private List<Object> getUncommittedOperations() {
+		if ( uncommittedOperations == null ) {
+			uncommittedOperations = new ArrayList<>();
 		}
-		return failingOperations;
+		return uncommittedOperations;
 	}
 
 }
