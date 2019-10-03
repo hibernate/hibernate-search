@@ -49,9 +49,4 @@ public class ErrorContextImpl implements ErrorContext {
 		this.operationAtFault = operationAtFault;
 	}
 
-	@Override
-	public boolean hasErrors() {
-		return failingOperations != null && !failingOperations.isEmpty();
-	}
-
 }
