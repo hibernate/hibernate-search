@@ -17,7 +17,7 @@ import javax.persistence.Table;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
+import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
@@ -117,7 +117,7 @@ public class MassIndexingMonitorIT {
 
 		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_STRATEGY, AutomaticIndexingStrategyName.NONE )
-				.withPropertyRadical( EngineSpiSettings.ERROR_HANDLER, errorHandler )
+				.withPropertyRadical( EngineSettings.ERROR_HANDLER, errorHandler )
 				.setup( Book.class );
 
 		backendMock.verifyExpectationsMet();

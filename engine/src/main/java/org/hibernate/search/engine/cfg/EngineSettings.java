@@ -6,6 +6,10 @@
  */
 package org.hibernate.search.engine.cfg;
 
+import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.reporting.ErrorHandler;
+import org.hibernate.search.engine.reporting.impl.LogErrorHandler;
+
 /**
  * Configuration properties for the Hibernate Search engine.
  */
@@ -48,6 +52,15 @@ public final class EngineSettings {
 			PREFIX + Radicals.CONFIGURATION_PROPERTY_CHECKING_STRATEGY;
 
 	/**
+	 * The {@link ErrorHandler} instance to use at runtime.
+	 * <p>
+	 * Expects a reference to a bean of type {@link ErrorHandler}.
+	 * <p>
+	 * Defaults to a logging handler.
+	 */
+	public static final String ERROR_HANDLER = PREFIX + Radicals.ERROR_HANDLER;
+
+	/**
 	 * Configuration property keys without the {@link #PREFIX prefix}.
 	 */
 	public static class Radicals {
@@ -58,6 +71,7 @@ public final class EngineSettings {
 		public static final String DEFAULT_BACKEND = "default_backend";
 		public static final String BACKENDS = "backends";
 		public static final String CONFIGURATION_PROPERTY_CHECKING_STRATEGY = "configuration_property_checking.strategy";
+		public static final String ERROR_HANDLER = "error_handler";
 	}
 
 	/**
@@ -67,6 +81,8 @@ public final class EngineSettings {
 
 		public static final ConfigurationPropertyCheckingStrategyName CONFIGURATION_PROPERTY_CHECKING_STRATEGY =
 				ConfigurationPropertyCheckingStrategyName.WARN;
+
+		public static final BeanReference<? extends ErrorHandler> ERROR_HANDLER = BeanReference.of( LogErrorHandler.class );
 
 		private Defaults() {
 		}
