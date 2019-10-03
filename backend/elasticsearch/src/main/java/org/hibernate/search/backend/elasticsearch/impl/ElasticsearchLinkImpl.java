@@ -17,7 +17,6 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.ElasticsearchProtocolDialect;
-import org.hibernate.search.backend.elasticsearch.gson.impl.DefaultGsonProvider;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -105,7 +104,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 			}
 
 			ElasticsearchProtocolDialect protocolDialect = dialectFactory.createProtocolDialect( elasticsearchVersion );
-			gsonProvider = DefaultGsonProvider.create( protocolDialect::createGsonBuilderBase, logPrettyPrinting );
+			gsonProvider = GsonProvider.create( protocolDialect::createGsonBuilderBase, logPrettyPrinting );
 			jsonSyntaxHelper = protocolDialect.createJsonSyntaxHelper();
 			workBuilderFactory = protocolDialect.createWorkBuilderFactory( gsonProvider );
 			searchResultExtractorFactory = protocolDialect.createSearchResultExtractorFactory();
