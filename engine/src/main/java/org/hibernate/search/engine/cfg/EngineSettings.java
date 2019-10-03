@@ -52,13 +52,15 @@ public final class EngineSettings {
 			PREFIX + Radicals.CONFIGURATION_PROPERTY_CHECKING_STRATEGY;
 
 	/**
-	 * The {@link FailureHandler} instance to use at runtime.
+	 * The {@link FailureHandler} instance that should be notified
+	 * of any failure occurring in a background process
+	 * (mainly index operations).
 	 * <p>
 	 * Expects a reference to a bean of type {@link FailureHandler}.
 	 * <p>
 	 * Defaults to a logging handler.
 	 */
-	public static final String FAILURE_HANDLER = PREFIX + Radicals.FAILURE_HANDLER;
+	public static final String BACKGROUND_FAILURE_HANDLER = PREFIX + Radicals.BACKGROUND_FAILURE_HANDLER;
 
 	/**
 	 * Configuration property keys without the {@link #PREFIX prefix}.
@@ -71,7 +73,7 @@ public final class EngineSettings {
 		public static final String DEFAULT_BACKEND = "default_backend";
 		public static final String BACKENDS = "backends";
 		public static final String CONFIGURATION_PROPERTY_CHECKING_STRATEGY = "configuration_property_checking.strategy";
-		public static final String FAILURE_HANDLER = "failure_handler";
+		public static final String BACKGROUND_FAILURE_HANDLER = "background_failure_handler";
 	}
 
 	/**
@@ -82,7 +84,8 @@ public final class EngineSettings {
 		public static final ConfigurationPropertyCheckingStrategyName CONFIGURATION_PROPERTY_CHECKING_STRATEGY =
 				ConfigurationPropertyCheckingStrategyName.WARN;
 
-		public static final BeanReference<? extends FailureHandler> FAILURE_HANDLER = BeanReference.of( LogFailureHandler.class );
+		public static final BeanReference<? extends FailureHandler> BACKGROUND_FAILURE_HANDLER =
+				BeanReference.of( LogFailureHandler.class );
 
 		private Defaults() {
 		}
