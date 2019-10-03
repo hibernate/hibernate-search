@@ -88,7 +88,7 @@ public interface Log extends BasicLogger {
 
 	/*
 	 * This is not an exception factory nor a logging statement.
-	 * The returned string is passed to the ErrorHandler,
+	 * The returned string is passed to the FailureHandler,
 	 * which is not necessarily using a logger but we still
 	 * want to internationalize the message.
 	 */

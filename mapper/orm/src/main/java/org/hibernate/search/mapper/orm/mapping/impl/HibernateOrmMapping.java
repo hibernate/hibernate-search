@@ -21,7 +21,7 @@ import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionCon
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.engine.reporting.ErrorHandler;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyName;
@@ -185,8 +185,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public ErrorHandler getErrorHandler() {
-		return getDelegate().getErrorHandler();
+	public FailureHandler getFailureHandler() {
+		return getDelegate().getFailureHandler();
 	}
 
 	@Override

@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.engine.reporting.ErrorHandler;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.impl.SearchThreadFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -20,10 +20,10 @@ import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.ThreadInterruptedException;
 
 /**
- * We customize Lucene's ConcurrentMergeScheduler to route eventual exceptions to our configurable error handler
+ * We customize Lucene's ConcurrentMergeScheduler to route eventual exceptions to our configurable failure handler
  * and override the name of merge threads.
  *
- * @see ErrorHandler
+ * @see FailureHandler
  * @since 3.3
  * @author Sanne Grinovero
  */
@@ -32,11 +32,11 @@ class HibernateSearchConcurrentMergeScheduler extends ConcurrentMergeScheduler {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ErrorHandler errorHandler;
+	private final FailureHandler failureHandler;
 	private final String contextDescription;
 
-	HibernateSearchConcurrentMergeScheduler(ErrorHandler errorHandler, String contextDescription) {
-		this.errorHandler = errorHandler;
+	HibernateSearchConcurrentMergeScheduler(FailureHandler failureHandler, String contextDescription) {
+		this.failureHandler = failureHandler;
 		this.contextDescription = contextDescription;
 	}
 
@@ -49,7 +49,7 @@ class HibernateSearchConcurrentMergeScheduler extends ConcurrentMergeScheduler {
 			Thread.currentThread().interrupt();
 		}
 		catch (Exception ex) {
-			errorHandler.handleException( log.exceptionDuringIndexMergeOperation(), ex );
+			failureHandler.handleException( log.exceptionDuringIndexMergeOperation(), ex );
 		}
 	}
 

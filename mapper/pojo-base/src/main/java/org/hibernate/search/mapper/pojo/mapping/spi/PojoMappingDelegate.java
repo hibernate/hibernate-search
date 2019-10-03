@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.spi;
 
 import java.util.Collection;
 
-import org.hibernate.search.engine.reporting.ErrorHandler;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoBackendMappingContext;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeExtendedContextProvider;
@@ -20,7 +20,7 @@ public interface PojoMappingDelegate extends AutoCloseable {
 	@Override
 	void close();
 
-	ErrorHandler getErrorHandler();
+	FailureHandler getFailureHandler();
 
 	<R, E, E2, C> PojoScopeDelegate<R, E2, C> createPojoScope(
 			AbstractPojoBackendMappingContext mappingContext,

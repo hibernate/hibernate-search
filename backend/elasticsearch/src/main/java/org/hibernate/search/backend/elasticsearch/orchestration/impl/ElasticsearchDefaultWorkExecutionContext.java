@@ -19,7 +19,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elas
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.RefreshWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
-import org.hibernate.search.engine.reporting.ErrorHandler;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -36,7 +36,7 @@ class ElasticsearchDefaultWorkExecutionContext implements ElasticsearchRefreshab
 
 	private final GsonProvider gsonProvider;
 
-	private final ErrorHandler errorHandler;
+	private final FailureHandler failureHandler;
 
 	private final ElasticsearchWorkBuilderFactory workFactory;
 
@@ -46,10 +46,10 @@ class ElasticsearchDefaultWorkExecutionContext implements ElasticsearchRefreshab
 
 	public ElasticsearchDefaultWorkExecutionContext(ElasticsearchClient client,
 			GsonProvider gsonProvider, ElasticsearchWorkBuilderFactory workFactory,
-			ErrorHandler errorHandler) {
+			FailureHandler failureHandler) {
 		this.client = client;
 		this.gsonProvider = gsonProvider;
-		this.errorHandler = errorHandler;
+		this.failureHandler = failureHandler;
 		this.workFactory = workFactory;
 		this.refreshExecutionContext = new ElasticsearchImmutableWorkExecutionContext( client, gsonProvider );
 	}
@@ -96,7 +96,7 @@ class ElasticsearchDefaultWorkExecutionContext implements ElasticsearchRefreshab
 				.handle( Futures.handler(
 						(result, throwable) -> {
 							if ( throwable != null ) {
-								errorHandler.handleException( "Refresh failed", throwable );
+								failureHandler.handleException( "Refresh failed", throwable );
 							}
 							return null;
 						}

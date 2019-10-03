@@ -12,20 +12,20 @@ package org.hibernate.search.engine.reporting;
  * @author Amin Mohammed-Coleman
  * @since 3.2
  */
-public interface ErrorHandler {
+public interface FailureHandler {
 
-	void handle(ErrorContext context);
+	void handle(FailureContext context);
 
 	/**
-	 * Suited to handle a single Exception, where no ErrorContext is needed.
+	 * Suited to handle a single Exception, where no FailureContext is needed.
 	 * @since 4.0
 	 * @param errorMsg any description which could be useful to identify what was happening
 	 * @param exception the error to be handled
 	 */
 	void handleException(String errorMsg, Throwable exception);
 
-	default ContextualErrorHandler createContextualHandler() {
-		return new DefaultContextualErrorHandler( this );
+	default ContextualFailureHandler createContextualHandler() {
+		return new DefaultContextualFailureHandler( this );
 	}
 
 }

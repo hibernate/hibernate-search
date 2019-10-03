@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.orm.massindexing.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.engine.reporting.ErrorHandler;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -16,20 +16,20 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * Common parent of all Runnable implementations for the batch indexing:
  * share the code for handling runtime exceptions.
  */
-abstract class ErrorHandledRunnable implements Runnable {
+abstract class FailureHandledRunnable implements Runnable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ErrorHandler errorHandler;
+	private final FailureHandler failureHandler;
 
-	protected ErrorHandledRunnable(ErrorHandler errorHandler) {
-		this.errorHandler = errorHandler;
+	protected FailureHandledRunnable(FailureHandler failureHandler) {
+		this.failureHandler = failureHandler;
 	}
 
 	@Override
 	public final void run() {
 		try {
-			runWithErrorHandler();
+			runWithFailureHandler();
 		}
 		catch (Exception re) {
 			try {
@@ -42,14 +42,14 @@ abstract class ErrorHandledRunnable implements Runnable {
 			// being this an async thread we want to make sure everything is somehow reported
 			String errorMessage = log.massIndexerUnexpectedErrorMessage();
 
-			errorHandler.handleException( errorMessage , re );
+			failureHandler.handleException( errorMessage , re );
 		}
 	}
 
-	protected abstract void runWithErrorHandler() throws Exception;
+	protected abstract void runWithFailureHandler() throws Exception;
 
-	protected ErrorHandler getErrorHandler() {
-		return errorHandler;
+	protected FailureHandler getFailureHandler() {
+		return failureHandler;
 	}
 
 	protected void cleanUpOnError() {

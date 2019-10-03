@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.hibernate.search.engine.reporting.ErrorContext;
-import org.hibernate.search.engine.reporting.impl.ErrorContextImpl;
+import org.hibernate.search.engine.reporting.FailureContext;
+import org.hibernate.search.engine.reporting.impl.FailureContextImpl;
 
-public class ErrorContextBuilder {
+public class FailureContextBuilder {
 
 	private Throwable th;
 	private Object operationAtFault;
@@ -21,39 +21,39 @@ public class ErrorContextBuilder {
 	private List<Object> failingOperations;
 	private List<Object> operationsThatWorked;
 
-	public ErrorContextBuilder errorThatOccurred(Throwable th) {
+	public FailureContextBuilder throwable(Throwable th) {
 		this.th = th;
 		return this;
 	}
 
-	public ErrorContextBuilder operationAtFault(Object operationAtFault) {
+	public FailureContextBuilder operationAtFault(Object operationAtFault) {
 		this.operationAtFault = operationAtFault;
 		return this;
 	}
 
-	public ErrorContextBuilder addWorkThatFailed(Object failedWork) {
+	public FailureContextBuilder addWorkThatFailed(Object failedWork) {
 		this.getFailingOperations().add( failedWork );
 		return this;
 	}
 
-	public ErrorContextBuilder addAllWorkThatFailed(List<Object> worksThatFailed) {
+	public FailureContextBuilder addAllWorkThatFailed(List<Object> worksThatFailed) {
 		this.getFailingOperations().addAll( worksThatFailed );
 		return this;
 	}
 
-	public ErrorContextBuilder workCompleted(Object luceneWork) {
+	public FailureContextBuilder workCompleted(Object luceneWork) {
 		this.getOperationsThatWorked().add( luceneWork );
 		return this;
 
 	}
 
-	public ErrorContextBuilder allWorkToBeDone(Iterable<Object> workOnWriter) {
+	public FailureContextBuilder allWorkToBeDone(Iterable<Object> workOnWriter) {
 		this.workToBeDone = workOnWriter;
 		return this;
 	}
 
-	public ErrorContext createErrorContext() {
-		ErrorContextImpl context = new ErrorContextImpl();
+	public FailureContext createFailureContext() {
+		FailureContextImpl context = new FailureContextImpl();
 
 		context.setThrowable( th );
 

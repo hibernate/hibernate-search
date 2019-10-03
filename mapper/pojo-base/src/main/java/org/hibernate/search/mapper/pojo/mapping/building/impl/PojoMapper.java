@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.reporting.ErrorHandler;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedDefinition;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEmbeddedPathTracker;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingMapperContext;
@@ -69,7 +69,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	private final boolean implicitProvidedId;
 	private final boolean multiTenancyEnabled;
 
-	private final ErrorHandler errorHandler;
+	private final FailureHandler failureHandler;
 
 	private final PojoMapperDelegate<MPBS> delegate;
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
@@ -99,7 +99,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		this.implicitProvidedId = implicitProvidedId;
 		this.multiTenancyEnabled = multiTenancyEnabled;
 
-		this.errorHandler = buildContext.getErrorHandler();
+		this.failureHandler = buildContext.getFailureHandler();
 
 		this.delegate = delegate;
 
@@ -280,7 +280,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			}
 
 			mappingDelegate = new PojoMappingDelegateImpl(
-					errorHandler,
+					failureHandler,
 					indexedTypeManagerContainerBuilder.build(),
 					containedTypeManagerContainerBuilder.build()
 			);

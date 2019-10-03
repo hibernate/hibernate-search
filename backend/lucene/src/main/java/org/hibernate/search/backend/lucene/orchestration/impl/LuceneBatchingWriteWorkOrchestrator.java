@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
-import org.hibernate.search.engine.reporting.ErrorHandler;
+import org.hibernate.search.engine.reporting.FailureHandler;
 
 /**
  * An orchestrator that batches together worksets sent from other threads.
@@ -30,18 +30,18 @@ public class LuceneBatchingWriteWorkOrchestrator extends AbstractLuceneWriteWork
 	/**
 	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)
 	 * @param processor A processor to use in the background thread.
-	 * @param errorHandler An error handler to report failures of the background thread.
+	 * @param failureHandler A failure handler to report failures of the background thread.
 	 */
 	public LuceneBatchingWriteWorkOrchestrator(
 			String name, LuceneWriteWorkProcessor processor,
-			ErrorHandler errorHandler) {
+			FailureHandler failureHandler) {
 		super( name );
 		this.executor = new BatchingExecutor<>(
 				name,
 				processor,
 				MAX_WORKSETS_PER_BATCH,
 				true,
-				errorHandler
+				failureHandler
 		);
 	}
 

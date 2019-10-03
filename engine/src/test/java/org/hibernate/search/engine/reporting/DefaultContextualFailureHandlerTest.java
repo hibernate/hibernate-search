@@ -16,9 +16,9 @@ import org.junit.Test;
 import org.easymock.Capture;
 import org.easymock.EasyMockSupport;
 
-public class DefaultContextualErrorHandlerTest extends EasyMockSupport {
+public class DefaultContextualFailureHandlerTest extends EasyMockSupport {
 
-	private ErrorHandler errorHandlerMock;
+	private FailureHandler failureHandlerMock;
 
 	private Object workInfo1;
 	private Object workInfo2;
@@ -26,7 +26,7 @@ public class DefaultContextualErrorHandlerTest extends EasyMockSupport {
 
 	@Before
 	public void initMocks() {
-		errorHandlerMock = createStrictMock( ErrorHandler.class );
+		failureHandlerMock = createStrictMock( FailureHandler.class );
 
 		workInfo1 = workInfo( 1 );
 		workInfo2 = workInfo( 2 );
@@ -35,11 +35,11 @@ public class DefaultContextualErrorHandlerTest extends EasyMockSupport {
 
 	@Test
 	public void singleError() {
-		Capture<ErrorContext> capture = newCapture();
+		Capture<FailureContext> capture = newCapture();
 
 		replayAll();
-		DefaultContextualErrorHandler handler =
-				new DefaultContextualErrorHandler( errorHandlerMock );
+		DefaultContextualFailureHandler handler =
+				new DefaultContextualFailureHandler( failureHandlerMock );
 		verifyAll();
 
 		Throwable throwable = new Throwable();
@@ -52,21 +52,21 @@ public class DefaultContextualErrorHandlerTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
-		errorHandlerMock.handle( capture( capture ) );
+		failureHandlerMock.handle( capture( capture ) );
 		replayAll();
 		handler.handle();
 		verifyAll();
-		ErrorContext errorContext = capture.getValue();
-		assertThat( errorContext.getThrowable() ).isSameAs( throwable );
-		assertThat( errorContext.getOperationAtFault() ).isSameAs( workInfo1 );
-		assertThat( errorContext.getFailingOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
+		FailureContext failureContext = capture.getValue();
+		assertThat( failureContext.getThrowable() ).isSameAs( throwable );
+		assertThat( failureContext.getOperationAtFault() ).isSameAs( workInfo1 );
+		assertThat( failureContext.getFailingOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
 	}
 
 	@Test
 	public void noError() {
 		replayAll();
-		DefaultContextualErrorHandler handler =
-				new DefaultContextualErrorHandler( errorHandlerMock );
+		DefaultContextualFailureHandler handler =
+				new DefaultContextualFailureHandler( failureHandlerMock );
 		verifyAll();
 
 		resetAll();
@@ -77,11 +77,11 @@ public class DefaultContextualErrorHandlerTest extends EasyMockSupport {
 
 	@Test
 	public void nonWorkError() {
-		Capture<ErrorContext> capture = newCapture();
+		Capture<FailureContext> capture = newCapture();
 
 		replayAll();
-		DefaultContextualErrorHandler handler =
-				new DefaultContextualErrorHandler( errorHandlerMock );
+		DefaultContextualFailureHandler handler =
+				new DefaultContextualFailureHandler( failureHandlerMock );
 		verifyAll();
 
 		Throwable throwable = new Throwable();
@@ -99,23 +99,23 @@ public class DefaultContextualErrorHandlerTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
-		errorHandlerMock.handle( capture( capture ) );
+		failureHandlerMock.handle( capture( capture ) );
 		replayAll();
 		handler.handle();
 		verifyAll();
-		ErrorContext errorContext = capture.getValue();
-		assertThat( errorContext.getThrowable() ).isSameAs( throwable );
-		assertThat( errorContext.getOperationAtFault() ).isNull();
-		assertThat( errorContext.getFailingOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
+		FailureContext failureContext = capture.getValue();
+		assertThat( failureContext.getThrowable() ).isSameAs( throwable );
+		assertThat( failureContext.getOperationAtFault() ).isNull();
+		assertThat( failureContext.getFailingOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
 	}
 
 	@Test
 	public void multipleErrors_works() {
-		Capture<ErrorContext> capture = newCapture();
+		Capture<FailureContext> capture = newCapture();
 
 		replayAll();
-		DefaultContextualErrorHandler handler =
-				new DefaultContextualErrorHandler( errorHandlerMock );
+		DefaultContextualFailureHandler handler =
+				new DefaultContextualFailureHandler( failureHandlerMock );
 		verifyAll();
 
 		Throwable throwable1 = new Throwable();
@@ -129,24 +129,24 @@ public class DefaultContextualErrorHandlerTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
-		errorHandlerMock.handle( capture( capture ) );
+		failureHandlerMock.handle( capture( capture ) );
 		replayAll();
 		handler.handle();
 		verifyAll();
-		ErrorContext errorContext = capture.getValue();
-		assertThat( errorContext.getThrowable() ).isSameAs( throwable1 );
+		FailureContext failureContext = capture.getValue();
+		assertThat( failureContext.getThrowable() ).isSameAs( throwable1 );
 		assertThat( throwable1.getSuppressed() ).containsExactlyInAnyOrder( throwable2 );
-		assertThat( errorContext.getOperationAtFault() ).isIn( workInfo1, workInfo2 );
-		assertThat( errorContext.getFailingOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
+		assertThat( failureContext.getOperationAtFault() ).isIn( workInfo1, workInfo2 );
+		assertThat( failureContext.getFailingOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
 	}
 
 	@Test
 	public void multipleErrors_workAndNotWork() {
-		Capture<ErrorContext> capture = newCapture();
+		Capture<FailureContext> capture = newCapture();
 
 		replayAll();
-		DefaultContextualErrorHandler handler =
-				new DefaultContextualErrorHandler( errorHandlerMock );
+		DefaultContextualFailureHandler handler =
+				new DefaultContextualFailureHandler( failureHandlerMock );
 		verifyAll();
 
 		Throwable throwable1 = new Throwable();
@@ -165,15 +165,15 @@ public class DefaultContextualErrorHandlerTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
-		errorHandlerMock.handle( capture( capture ) );
+		failureHandlerMock.handle( capture( capture ) );
 		replayAll();
 		handler.handle();
 		verifyAll();
-		ErrorContext errorContext = capture.getValue();
-		assertThat( errorContext.getThrowable() ).isSameAs( throwable1 );
+		FailureContext failureContext = capture.getValue();
+		assertThat( failureContext.getThrowable() ).isSameAs( throwable1 );
 		assertThat( throwable1.getSuppressed() ).containsExactlyInAnyOrder( throwable2 );
-		assertThat( errorContext.getOperationAtFault() ).isSameAs( workInfo1 );
-		assertThat( errorContext.getFailingOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
+		assertThat( failureContext.getOperationAtFault() ).isSameAs( workInfo1 );
+		assertThat( failureContext.getFailingOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
 	}
 
 	private Object workInfo(int index) {

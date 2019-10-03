@@ -15,7 +15,7 @@ import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
-import org.hibernate.search.engine.reporting.ErrorHandler;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
@@ -30,19 +30,19 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BeanProvider beanProvider;
-	private final BeanHolder<? extends ErrorHandler> errorHandlerHolder;
+	private final BeanHolder<? extends FailureHandler> failureHandlerHolder;
 
 	private final List<MappingImplementor<?>> mappings;
 	private final Map<String, BackendImplementor<?>> backends;
 	private final Map<String, IndexManagerImplementor<?>> indexManagers;
 
 	SearchIntegrationImpl(BeanProvider beanProvider,
-			BeanHolder<? extends ErrorHandler> errorHandlerHolder,
+			BeanHolder<? extends FailureHandler> failureHandlerHolder,
 			List<MappingImplementor<?>> mappings,
 			Map<String, BackendImplementor<?>> backends,
 			Map<String, IndexManagerImplementor<?>> indexManagers) {
 		this.beanProvider = beanProvider;
-		this.errorHandlerHolder = errorHandlerHolder;
+		this.failureHandlerHolder = failureHandlerHolder;
 		this.mappings = mappings;
 		this.backends = backends;
 		this.indexManagers = indexManagers;
@@ -74,7 +74,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 			closer.pushAll( IndexManagerImplementor::stop, indexManagers.values() );
 			closer.push( SearchIntegrationImpl::preStopBackends, this );
 			closer.pushAll( BackendImplementor::stop, backends.values() );
-			closer.pushAll( BeanHolder::close, errorHandlerHolder );
+			closer.pushAll( BeanHolder::close, failureHandlerHolder );
 			closer.pushAll( BeanProvider::close, beanProvider );
 		}
 	}

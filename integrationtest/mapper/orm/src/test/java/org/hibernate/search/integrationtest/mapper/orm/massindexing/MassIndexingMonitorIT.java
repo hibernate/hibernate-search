@@ -112,12 +112,12 @@ public class MassIndexingMonitorIT {
 		assertThat( staticCounters.get( StaticCountersMonitor.INDEXING_COMPLETED ) ).isEqualTo( 1 );
 	}
 
-	private SessionFactory setup(String errorHandler) {
+	private SessionFactory setup(String failureHandler) {
 		backendMock.expectAnySchema( Book.INDEX );
 
 		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_STRATEGY, AutomaticIndexingStrategyName.NONE )
-				.withPropertyRadical( EngineSettings.ERROR_HANDLER, errorHandler )
+				.withPropertyRadical( EngineSettings.FAILURE_HANDLER, failureHandler )
 				.setup( Book.class );
 
 		backendMock.verifyExpectationsMet();
