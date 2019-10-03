@@ -18,6 +18,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.reporting.ContextualFailureHandler;
 import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.engine.reporting.spi.FailureContextImpl;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -66,7 +67,10 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 			catch (RuntimeException e2) {
 				e.addSuppressed( e2 );
 			}
-			failureHandler.handleException( e.getMessage(), e );
+			FailureContextImpl.Builder failureContextBuilder = new FailureContextImpl.Builder();
+			failureContextBuilder.throwable( e );
+			failureContextBuilder.failingOperation( "Commit after a batch of index works" );
+			failureHandler.handle( failureContextBuilder.build() );
 		}
 		// Everything was already executed, so just return a completed future.
 		return CompletableFuture.completedFuture( null );

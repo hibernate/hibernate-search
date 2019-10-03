@@ -20,6 +20,7 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWorkExecutionCon
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.reporting.ContextualFailureHandler;
+import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.SearchException;
@@ -335,25 +336,26 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 		// Fail upon batch commit
 
-		Capture<String> stringCapture = Capture.newInstance();
-		Capture<Throwable> exceptionCapture = Capture.newInstance();
+		Capture<FailureContext> failureContextCapture = Capture.newInstance();
 		resetAll();
 		indexWriterDelegatorMock.commit();
 		expectLastCall().andThrow( commitException );
 		indexWriterDelegatorMock.forceLockRelease();
-		failureHandlerMock.handleException( capture( stringCapture ), capture( exceptionCapture ) );
+		failureHandlerMock.handle( capture( failureContextCapture ) );
 		replayAll();
 		processor.endBatch();
 		verifyAll();
 
-		assertThat( exceptionCapture.getValue() )
+		FailureContext failureContext = failureContextCapture.getValue();
+
+		assertThat( failureContext.getThrowable() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to commit" )
 				.hasMessageContaining( INDEX_NAME )
 				.hasCause( commitException );
 
-		assertThat( stringCapture.getValue() )
-				.isEqualTo( exceptionCapture.getValue().getMessage() );
+		assertThat( failureContext.getFailingOperation() ).asString()
+				.contains( "Commit after a batch of index works" );
 	}
 
 	@Test
@@ -380,25 +382,26 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 		// Fail upon batch commit AND forceLockRelease...
 
-		Capture<String> stringCapture = Capture.newInstance();
-		Capture<Throwable> exceptionCapture = Capture.newInstance();
+		Capture<FailureContext> failureContextCapture = Capture.newInstance();
 		resetAll();
 		indexWriterDelegatorMock.commit();
 		expectLastCall().andThrow( commitException );
 		indexWriterDelegatorMock.forceLockRelease();
 		expectLastCall().andThrow( forceLockReleaseException );
-		failureHandlerMock.handleException( capture( stringCapture ), capture( exceptionCapture ) );
+		failureHandlerMock.handle( capture( failureContextCapture ) );
 		replayAll();
 		processor.endBatch();
 		verifyAll();
 
-		assertThat( exceptionCapture.getValue() )
+		FailureContext failureContext = failureContextCapture.getValue();
+
+		assertThat( failureContext.getThrowable() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to commit" )
 				.hasMessageContaining( INDEX_NAME )
 				.hasCause( commitException );
 
-		assertThat( exceptionCapture.getValue().getSuppressed() )
+		assertThat( failureContext.getThrowable().getSuppressed() )
 				.hasSize( 1 )
 				.satisfies(
 						suppressed -> assertThat( suppressed[0] )
@@ -407,8 +410,8 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 								.hasCause( forceLockReleaseException )
 				);
 
-		assertThat( stringCapture.getValue() )
-				.isEqualTo( exceptionCapture.getValue().getMessage() );
+		assertThat( failureContext.getFailingOperation() ).asString()
+				.contains( "Commit after a batch of index works" );
 	}
 
 	private void testSuccessfulWorkSet(int workCount,

@@ -19,14 +19,19 @@ package org.hibernate.search.engine.reporting;
  */
 public interface FailureHandler {
 
-	void handle(IndexFailureContext context);
+	/**
+	 * Handle a generic failure.
+	 *
+	 * @param context Contextual information about the failure (throwable, operation, ...)
+	 */
+	void handle(FailureContext context);
 
 	/**
-	 * Suited to handle a single Exception, where no FailureContext is needed.
-	 * @param errorMsg any description which could be useful to identify what was happening
-	 * @param exception the error to be handled
+	 * Handle the failure of an index operation.
+	 *
+	 * @param context Contextual information about the failure (throwable, operation, ...)
 	 */
-	void handleException(String errorMsg, Throwable exception);
+	void handle(IndexFailureContext context);
 
 	default ContextualFailureHandler createContextualHandler() {
 		return new DefaultContextualFailureHandler( this );

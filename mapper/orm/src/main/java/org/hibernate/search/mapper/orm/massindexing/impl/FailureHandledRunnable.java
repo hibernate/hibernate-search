@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.massindexing.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.engine.reporting.spi.FailureContextImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -40,9 +41,10 @@ abstract class FailureHandledRunnable implements Runnable {
 			}
 
 			// being this an async thread we want to make sure everything is somehow reported
-			String errorMessage = log.massIndexerUnexpectedErrorMessage();
-
-			failureHandler.handleException( errorMessage , re );
+			FailureContextImpl.Builder contextBuilder = new FailureContextImpl.Builder();
+			contextBuilder.throwable( re );
+			contextBuilder.failingOperation( log.massIndexerOperation() );
+			failureHandler.handle( contextBuilder.build() );
 		}
 	}
 

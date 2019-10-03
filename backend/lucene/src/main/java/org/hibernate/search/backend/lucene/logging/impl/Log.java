@@ -105,8 +105,8 @@ public interface Log extends BasicLogger {
 	SearchException unableToLoadResource(String fileName);
 
 	@Message(id = ID_OFFSET_1 + 118,
-			value = "Exception during index Merge operation")
-	String exceptionDuringIndexMergeOperation();
+			value = "Index Merge operation")
+	String indexMergeOperation();
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ID_OFFSET_1 + 225,

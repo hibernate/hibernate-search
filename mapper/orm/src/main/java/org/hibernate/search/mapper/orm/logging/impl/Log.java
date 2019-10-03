@@ -92,17 +92,17 @@ public interface Log extends BasicLogger {
 	 * which is not necessarily using a logger but we still
 	 * want to internationalize the message.
 	 */
-	@Message(id = ID_OFFSET_1 + 116, value = "Unexpected error during MassIndexer operation")
-	String massIndexerUnexpectedErrorMessage();
+	@Message(id = ID_OFFSET_1 + 116, value = "MassIndexer operation")
+	String massIndexerOperation();
 
-	@Message(id = ID_OFFSET_1 + 183, value = "Unable to index instance of type %s while batch indexing: %s")
-	String massIndexerUnableToIndexInstance(String clazz, String value);
+	@Message(id = ID_OFFSET_1 + 183, value = "Indexing instance of type %s while mass indexing: %s")
+	String massIndexerIndexingInstance(String clazz, String value);
 
-	@Message(id = ID_OFFSET_1 + 211, value = "An exception occurred while the MassIndexer was fetching the primary identifiers list")
-	String massIndexerExceptionWhileFetchingIds();
+	@Message(id = ID_OFFSET_1 + 211, value = "Fetching the primary identifiers list")
+	String massIndexerFetchingIds();
 
-	@Message(id = ID_OFFSET_1 + 212, value = "An exception occurred while the MassIndexer was transforming identifiers to Lucene Documents")
-	String massIndexerExceptionWhileTransformingIds();
+	@Message(id = ID_OFFSET_1 + 212, value = "Transforming identifiers to Lucene Documents")
+	String massIndexerTransformingIds();
 
 	@Message(id = ID_OFFSET_1 + 276, value = "No transaction is active while indexing entity type '%1$s'; Consider increasing the connection time-out")
 	SearchException transactionNotActiveWhileProducingIdsForBatchIndexing(@FormatWith(ClassFormatter.class) Class<?> entityType);

@@ -6,20 +6,23 @@
  */
 package org.hibernate.search.engine.backend.orchestration.spi;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
+import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 
+import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.impl.test.FutureAssert;
 
 import org.junit.After;
 import org.junit.Test;
 
-import org.easymock.EasyMock;
+import org.easymock.Capture;
 import org.easymock.EasyMockSupport;
 
 @SuppressWarnings({"unchecked", "rawtypes"}) // Raw types are the only way to mock parameterized types with EasyMock
@@ -112,13 +115,11 @@ public class BatchingExecutorTest extends EasyMockSupport {
 
 		StubWorkSet workSet1Mock = createMock( StubWorkSet.class );
 		CompletableFuture<Object> batch1Future = new CompletableFuture<>();
+		Capture<FailureContext> failureContextCapture = Capture.newInstance();
 		resetAll();
 		processorMock.beginBatch();
 		expectLastCall().andThrow( simulatedFailure );
-		failureHandlerMock.handleException(
-				EasyMock.contains( "Error while processing works in executor '" + NAME + "'" ),
-				EasyMock.same( simulatedFailure )
-		);
+		failureHandlerMock.handle( capture( failureContextCapture ) );
 		// The next worksets should not be submitted to the processor: something is very wrong
 		// ... but we expect the executor to try again in the next batch:
 		processorMock.beginBatch();
@@ -128,6 +129,12 @@ public class BatchingExecutorTest extends EasyMockSupport {
 		executor.submit( workSet1Mock );
 		unblockExecutorSwitch.run();
 		verifyAllAsynchronously();
+
+		FailureContext failureContext = failureContextCapture.getValue();
+		assertThat( failureContext.getThrowable() )
+				.isSameAs( simulatedFailure );
+		assertThat( failureContext.getFailingOperation() ).asString()
+				.contains( "Work processing in executor '" + NAME + "'" );
 
 		// The executor should still try to process submitted worksets, even after a failure
 		StubWorkSet workSet3Mock = createMock( StubWorkSet.class );
@@ -195,20 +202,24 @@ public class BatchingExecutorTest extends EasyMockSupport {
 
 		StubWorkSet workSet1Mock = createMock( StubWorkSet.class );
 		StubWorkSet workSet2Mock = createMock( StubWorkSet.class );
+		Capture<FailureContext> failureContextCapture = Capture.newInstance();
 		resetAll();
 		processorMock.beginBatch();
 		workSet1Mock.submitTo( processorMock );
 		workSet2Mock.submitTo( processorMock );
 		expect( processorMock.endBatch() ).andThrow( simulatedFailure );
-		failureHandlerMock.handleException(
-				EasyMock.contains( "Error while processing works in executor '" + NAME + "'" ),
-				EasyMock.same( simulatedFailure )
-		);
+		failureHandlerMock.handle( capture( failureContextCapture ) );
 		replayAll();
 		executor.submit( workSet1Mock );
 		executor.submit( workSet2Mock );
 		unblockExecutorSwitch.run();
 		verifyAllAsynchronously();
+
+		FailureContext failureContext = failureContextCapture.getValue();
+		assertThat( failureContext.getThrowable() )
+				.isSameAs( simulatedFailure );
+		assertThat( failureContext.getFailingOperation() ).asString()
+				.contains( "Work processing in executor '" + NAME + "'" );
 
 		// The executor should still try to process submitted worksets, even after a failure
 		StubWorkSet workSet4Mock = createMock( StubWorkSet.class );

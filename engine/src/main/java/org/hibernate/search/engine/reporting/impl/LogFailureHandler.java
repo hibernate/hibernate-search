@@ -9,6 +9,7 @@ package org.hibernate.search.engine.reporting.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 
+import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.IndexFailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -24,40 +25,47 @@ public class LogFailureHandler implements FailureHandler {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
-	public void handle(IndexFailureContext context) {
-		final List<Object> uncommittedOperations = context.getUncommittedOperations();
-		final Object failingOperation = context.getFailingOperation();
-		final Throwable throwable = context.getThrowable();
-
-		final StringBuilder errorMsg = new StringBuilder();
-
-		if ( throwable != null ) {
-			errorMsg.append( "Exception occurred " )
-				.append( throwable )
-				.append( "\n" );
-		}
-		if ( failingOperation != null ) {
-			errorMsg.append( "Failing operation:\n" );
-			appendFailureMessage( errorMsg, failingOperation );
-		}
-
-		if ( ! uncommittedOperations.isEmpty() ) {
-			errorMsg.append( "Uncommitted operations as a result:\n" );
-			for ( Object workThatFailed : uncommittedOperations ) {
-				appendFailureMessage( errorMsg, workThatFailed );
-			}
-		}
-
-		handleException( errorMsg.toString(), throwable );
-	}
-
-	private static void appendFailureMessage(StringBuilder message, Object workThatFailed) {
-		message.append( workThatFailed.toString() );
+	public void handle(FailureContext context) {
+		log.exceptionOccurred( formatMessage( context ).toString(), context.getThrowable() );
 	}
 
 	@Override
-	public void handleException(String errorMsg, Throwable exception) {
-		log.exceptionOccurred( errorMsg, exception );
+	public void handle(IndexFailureContext context) {
+		log.exceptionOccurred( formatMessage( context ).toString(), context.getThrowable() );
+	}
+
+	private StringBuilder formatMessage(FailureContext context) {
+		final Throwable throwable = context.getThrowable();
+		final Object failingOperation = context.getFailingOperation();
+
+		final StringBuilder messageBuilder = new StringBuilder();
+
+		if ( throwable != null ) {
+			messageBuilder.append( "Exception occurred " )
+					.append( throwable )
+					.append( "\n" );
+		}
+		if ( failingOperation != null ) {
+			messageBuilder.append( "Failing operation:\n" );
+			messageBuilder.append( failingOperation );
+		}
+
+		return messageBuilder;
+	}
+
+	private StringBuilder formatMessage(IndexFailureContext context) {
+		final List<Object> uncommittedOperations = context.getUncommittedOperations();
+
+		final StringBuilder messageBuilder = formatMessage( (FailureContext) context );
+
+		if ( ! uncommittedOperations.isEmpty() ) {
+			messageBuilder.append( "Uncommitted operations as a result:\n" );
+			for ( Object operation : uncommittedOperations ) {
+				messageBuilder.append( operation );
+			}
+		}
+
+		return messageBuilder;
 	}
 
 }
