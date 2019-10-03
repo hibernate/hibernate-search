@@ -59,10 +59,10 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
-	private static final ConfigurationProperty<BeanReference<? extends FailureHandler>> FAILURE_HANDLER =
-			ConfigurationProperty.forKey( EngineSettings.Radicals.FAILURE_HANDLER )
+	private static final ConfigurationProperty<BeanReference<? extends FailureHandler>> BACKGROUND_FAILURE_HANDLER =
+			ConfigurationProperty.forKey( EngineSettings.Radicals.BACKGROUND_FAILURE_HANDLER )
 					.asBeanReference( FailureHandler.class )
-					.withDefault( EngineSettings.Defaults.FAILURE_HANDLER )
+					.withDefault( EngineSettings.Defaults.BACKGROUND_FAILURE_HANDLER )
 					.build();
 
 	private static final int FAILURE_LIMIT = 100;
@@ -175,7 +175,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			}
 
 			BeanResolver beanResolver = new ConfiguredBeanResolver( serviceResolver, beanProvider, propertySource );
-			failureHandlerHolder = FAILURE_HANDLER.getAndTransform( propertySource, beanResolver::resolve );
+			failureHandlerHolder = BACKGROUND_FAILURE_HANDLER.getAndTransform( propertySource, beanResolver::resolve );
 			FailureHandler failureHandler = failureHandlerHolder.get();
 			RootBuildContext rootBuildContext = new RootBuildContext(
 					propertySource,
