@@ -10,7 +10,6 @@ package org.hibernate.search.engine.reporting;
  * Implementations handle errors and exceptions occurring during indexing.
  *
  * @author Amin Mohammed-Coleman
- * @since 3.2
  */
 public interface FailureHandler {
 
@@ -18,7 +17,6 @@ public interface FailureHandler {
 
 	/**
 	 * Suited to handle a single Exception, where no FailureContext is needed.
-	 * @since 4.0
 	 * @param errorMsg any description which could be useful to identify what was happening
 	 * @param exception the error to be handled
 	 */
