@@ -4,16 +4,16 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.reporting;
+package org.hibernate.search.engine.reporting.spi;
 
-import org.hibernate.search.engine.reporting.spi.IndexFailureContextImpl;
+import org.hibernate.search.engine.reporting.FailureHandler;
 
 /**
  * Registers the failures during an execution ultimately passes them to a failure handler.
  * <p>
  * This context is mutable and is not thread-safe.
  */
-class DefaultContextualFailureHandler implements ContextualFailureHandler {
+public class ContextualFailureHandler {
 
 	private final FailureHandler failureHandler;
 
@@ -21,11 +21,10 @@ class DefaultContextualFailureHandler implements ContextualFailureHandler {
 
 	private Throwable errorThatOccurred;
 
-	DefaultContextualFailureHandler(FailureHandler failureHandler) {
+	public ContextualFailureHandler(FailureHandler failureHandler) {
 		this.failureHandler = failureHandler;
 	}
 
-	@Override
 	public void markAsFailed(Object workInfo, Throwable throwable) {
 		if ( workInfo != null ) {
 			getFailureContextBuilder().failingOperation( workInfo );
@@ -34,14 +33,12 @@ class DefaultContextualFailureHandler implements ContextualFailureHandler {
 		addThrowable( throwable );
 	}
 
-	@Override
 	public void markAsSkipped(Object workInfo) {
 		if ( workInfo != null ) {
 			getFailureContextBuilder().uncommittedOperation( workInfo );
 		}
 	}
 
-	@Override
 	public void addThrowable(Throwable throwable) {
 		if ( errorThatOccurred == null ) {
 			errorThatOccurred = throwable;
@@ -51,7 +48,6 @@ class DefaultContextualFailureHandler implements ContextualFailureHandler {
 		}
 	}
 
-	@Override
 	public void handle() {
 		if ( failureContextBuilder != null || errorThatOccurred != null ) {
 			if ( errorThatOccurred != null ) {

@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
-import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.engine.reporting.spi.ContextualFailureHandler;
 import org.hibernate.search.engine.reporting.FailureHandler;
 
 /**
@@ -187,7 +187,7 @@ public class ElasticsearchWorkOrchestratorProvider {
 	private ElasticsearchWorkSequenceBuilder createSequenceBuilder(Supplier<ElasticsearchRefreshableWorkExecutionContext> contextSupplier) {
 		return new ElasticsearchDefaultWorkSequenceBuilder(
 				contextSupplier,
-				failureHandler::createContextualHandler
+				() -> new ContextualFailureHandler( failureHandler )
 		);
 	}
 
