@@ -28,8 +28,8 @@ class DefaultContextualFailureHandler implements ContextualFailureHandler {
 	@Override
 	public void markAsFailed(Object workInfo, Throwable throwable) {
 		if ( workInfo != null ) {
-			getFailureContextBuilder().operationAtFault( workInfo );
-			getFailureContextBuilder().addWorkThatFailed( workInfo );
+			getFailureContextBuilder().failingOperation( workInfo );
+			getFailureContextBuilder().uncommittedOperation( workInfo );
 		}
 		addThrowable( throwable );
 	}
@@ -37,7 +37,7 @@ class DefaultContextualFailureHandler implements ContextualFailureHandler {
 	@Override
 	public void markAsSkipped(Object workInfo) {
 		if ( workInfo != null ) {
-			getFailureContextBuilder().addWorkThatFailed( workInfo );
+			getFailureContextBuilder().uncommittedOperation( workInfo );
 		}
 	}
 

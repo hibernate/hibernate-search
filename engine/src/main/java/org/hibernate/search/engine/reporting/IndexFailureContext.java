@@ -13,10 +13,22 @@ import java.util.List;
  */
 public interface IndexFailureContext {
 
-	List<Object> getFailingOperations();
-
-	Object getOperationAtFault();
-
+	/**
+	 * @return The {@link Exception} or {@link Error} thrown when the operation failed.
+	 */
 	Throwable getThrowable();
+
+	/**
+	 * @return The operation that triggered the failure.
+	 * Use {@link Object#toString()} to get a textual representation.
+	 */
+	Object getFailingOperation();
+
+	/**
+	 * @return The list of index operations that weren't committed yet when the failure occurred.
+	 * These operations may not have been applied to the index.
+	 * Use {@link Object#toString()} to get a textual representation of each operation.
+	 */
+	List<Object> getUncommittedOperations();
 
 }
