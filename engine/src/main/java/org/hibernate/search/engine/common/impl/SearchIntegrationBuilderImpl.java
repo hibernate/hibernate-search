@@ -20,11 +20,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
-import org.hibernate.search.engine.common.spi.ErrorHandler;
+import org.hibernate.search.engine.reporting.ErrorHandler;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
@@ -60,9 +60,9 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
 public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 	private static final ConfigurationProperty<BeanReference<? extends ErrorHandler>> ERROR_HANDLER =
-			ConfigurationProperty.forKey( EngineSpiSettings.ERROR_HANDLER )
+			ConfigurationProperty.forKey( EngineSettings.Radicals.ERROR_HANDLER )
 					.asBeanReference( ErrorHandler.class )
-					.withDefault( EngineSpiSettings.Defaults.ERROR_HANDLER )
+					.withDefault( EngineSettings.Defaults.ERROR_HANDLER )
 					.build();
 
 	private static final int FAILURE_LIMIT = 100;

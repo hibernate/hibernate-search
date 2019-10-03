@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.Collection;
 
-import org.hibernate.search.engine.common.spi.ErrorHandler;
+import org.hibernate.search.engine.reporting.ErrorHandler;
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoBackendMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeDelegateImpl;

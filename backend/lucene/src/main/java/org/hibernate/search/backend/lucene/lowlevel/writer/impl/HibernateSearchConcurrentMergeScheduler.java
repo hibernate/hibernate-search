@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.engine.common.spi.ErrorHandler;
+import org.hibernate.search.engine.reporting.ErrorHandler;
 import org.hibernate.search.util.common.impl.SearchThreadFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 

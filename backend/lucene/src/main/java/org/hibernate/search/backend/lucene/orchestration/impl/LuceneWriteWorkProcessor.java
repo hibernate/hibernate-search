@@ -16,8 +16,8 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
-import org.hibernate.search.engine.common.spi.ContextualErrorHandler;
-import org.hibernate.search.engine.common.spi.ErrorHandler;
+import org.hibernate.search.engine.reporting.ContextualErrorHandler;
+import org.hibernate.search.engine.reporting.ErrorHandler;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 

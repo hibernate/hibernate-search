@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
-import org.hibernate.search.engine.common.spi.ErrorHandler;
+import org.hibernate.search.engine.reporting.ErrorHandler;
 
 /**
  * An orchestrator sharing context across multiple threads,

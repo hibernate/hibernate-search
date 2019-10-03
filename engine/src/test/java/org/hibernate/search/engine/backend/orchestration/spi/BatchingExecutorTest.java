@@ -13,7 +13,7 @@ import static org.easymock.EasyMock.expectLastCall;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 
-import org.hibernate.search.engine.common.spi.ErrorHandler;
+import org.hibernate.search.engine.reporting.ErrorHandler;
 import org.hibernate.search.util.impl.test.FutureAssert;
 
 import org.junit.After;

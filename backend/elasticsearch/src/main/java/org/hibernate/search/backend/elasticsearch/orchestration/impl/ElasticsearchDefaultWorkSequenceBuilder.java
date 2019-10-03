@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearc
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResultItemExtractor;
-import org.hibernate.search.engine.common.spi.ContextualErrorHandler;
+import org.hibernate.search.engine.reporting.ContextualErrorHandler;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
