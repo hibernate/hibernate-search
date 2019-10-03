@@ -9,9 +9,9 @@ package org.hibernate.search.engine.reporting.impl;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.search.engine.reporting.FailureContext;
+import org.hibernate.search.engine.reporting.IndexFailureContext;
 
-public class FailureContextImpl implements FailureContext {
+public class IndexFailureContextImpl implements IndexFailureContext {
 
 	private List<Object> failingOperations;
 

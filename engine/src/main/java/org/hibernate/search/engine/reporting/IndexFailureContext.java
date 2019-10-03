@@ -8,7 +8,10 @@ package org.hibernate.search.engine.reporting;
 
 import java.util.List;
 
-public interface FailureContext {
+/**
+ * Contextual information about a failing index operation.
+ */
+public interface IndexFailureContext {
 
 	List<Object> getFailingOperations();
 
