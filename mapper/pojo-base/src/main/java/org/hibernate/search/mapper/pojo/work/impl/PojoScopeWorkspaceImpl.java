@@ -50,7 +50,7 @@ public class PojoScopeWorkspaceImpl implements PojoScopeWorkspace {
 			futures[typeCounter++] = operation.apply( delegate );
 		}
 
-		// TODO HSEARCH-3110 use an ErrorHandler here?
+		// TODO HSEARCH-3110 use a FailureHandler here?
 		return CompletableFuture.allOf( futures );
 	}
 

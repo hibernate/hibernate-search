@@ -32,7 +32,7 @@ import javax.persistence.metamodel.SingularAttribute;
  *
  * @author Sanne Grinovero
  */
-public class BatchCoordinator extends ErrorHandledRunnable {
+public class BatchCoordinator extends FailureHandledRunnable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -63,7 +63,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 			boolean purgeAtStart, boolean optimizeAfterPurge,
 			MassIndexingMonitor monitor,
 			int idFetchSize, Integer transactionTimeout) {
-		super( mappingContext.getErrorHandler() );
+		super( mappingContext.getFailureHandler() );
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
 		this.rootEntities = rootEntities;
@@ -84,7 +84,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 	}
 
 	@Override
-	public void runWithErrorHandler() {
+	public void runWithFailureHandler() {
 		if ( !indexingTasks.isEmpty() ) {
 			throw new AssertionFailure( "BatchCoordinator instance not expected to be reused - indexingTasks should be empty" );
 		}
@@ -138,7 +138,7 @@ public class BatchCoordinator extends ErrorHandledRunnable {
 				indexedType, idAttributeOfIndexedType,
 				documentBuilderThreads, cacheMode,
 				objectLoadingBatchSize, endAllSignal,
-				monitor, getErrorHandler(),
+				monitor, getFailureHandler(),
 				objectsLimit, idFetchSize, transactionTimeout
 		);
 	}

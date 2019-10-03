@@ -25,7 +25,7 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
 import org.hibernate.query.Query;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
-import org.hibernate.search.engine.reporting.ErrorHandler;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
@@ -52,7 +52,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 	private final CacheMode cacheMode;
 	private final Class<E> type;
 	private final MassIndexingMonitor monitor;
-	private final ErrorHandler errorHandler;
+	private final FailureHandler failureHandler;
 	private final SingularAttribute<? super E, I> idAttributeOfIndexedType;
 	private final CountDownLatch producerEndSignal;
 	private final Integer transactionTimeout;
@@ -65,7 +65,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 
 	IdentifierConsumerDocumentProducer(
 			ProducerConsumerQueue<List<I>> fromIdentifierListToEntities,
-			MassIndexingMonitor monitor, ErrorHandler errorHandler,
+			MassIndexingMonitor monitor, FailureHandler failureHandler,
 			HibernateOrmMassIndexingMappingContext mappingContext,
 			CountDownLatch producerEndSignal, CacheMode cacheMode,
 			Class<E> indexedType, SingularAttribute<? super E, I> idAttributeOfIndexedType, Integer transactionTimeout,
@@ -75,7 +75,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		this.cacheMode = cacheMode;
 		this.type = indexedType;
 		this.monitor = monitor;
-		this.errorHandler = errorHandler;
+		this.failureHandler = failureHandler;
 		this.idAttributeOfIndexedType = idAttributeOfIndexedType;
 		this.producerEndSignal = producerEndSignal;
 		this.transactionTimeout = transactionTimeout;
@@ -104,7 +104,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		catch (Exception exception) {
 			String logMessage = log.massIndexerExceptionWhileTransformingIds();
 
-			errorHandler.handleException( logMessage, exception );
+			failureHandler.handleException( logMessage, exception );
 		}
 		finally {
 			producerEndSignal.countDown();
@@ -250,6 +250,6 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 	private void handleException(Object entity, Throwable e) {
 		String errorMsg = log.massIndexerUnableToIndexInstance( entity.getClass().getName(), entity.toString() );
 
-		errorHandler.handleException( errorMsg, e );
+		failureHandler.handleException( errorMsg, e );
 	}
 }

@@ -16,8 +16,8 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
-import org.hibernate.search.engine.reporting.ContextualErrorHandler;
-import org.hibernate.search.engine.reporting.ErrorHandler;
+import org.hibernate.search.engine.reporting.ContextualFailureHandler;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -33,20 +33,20 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 	private final EventContext indexEventContext;
 	private final IndexWriterDelegator indexWriterDelegator;
 	private final LuceneWriteWorkExecutionContextImpl context;
-	private final ErrorHandler errorHandler;
+	private final FailureHandler failureHandler;
 
 	private boolean hasUncommittedWorks;
 
 	private Throwable workSetFailure;
-	private ContextualErrorHandler workSetContextualErrorHandler;
+	private ContextualFailureHandler workSetContextualFailureHandler;
 	private boolean workSetForcesCommit;
 
 	public LuceneWriteWorkProcessor(EventContext indexEventContext, IndexWriterDelegator indexWriterDelegator,
-			ErrorHandler errorHandler) {
+			FailureHandler failureHandler) {
 		this.indexEventContext = indexEventContext;
 		this.indexWriterDelegator = indexWriterDelegator;
 		this.context = new LuceneWriteWorkExecutionContextImpl( indexEventContext, indexWriterDelegator );
-		this.errorHandler = errorHandler;
+		this.failureHandler = failureHandler;
 	}
 
 	@Override
@@ -66,7 +66,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 			catch (RuntimeException e2) {
 				e.addSuppressed( e2 );
 			}
-			errorHandler.handleException( e.getMessage(), e );
+			failureHandler.handleException( e.getMessage(), e );
 		}
 		// Everything was already executed, so just return a completed future.
 		return CompletableFuture.completedFuture( null );
@@ -74,7 +74,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 
 	void beforeWorkSet(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		workSetFailure = null;
-		workSetContextualErrorHandler = null;
+		workSetContextualFailureHandler = null;
 		workSetForcesCommit = DocumentCommitStrategy.FORCE.equals( commitStrategy )
 				// We need to commit in order to make the changes visible
 				// TODO HSEARCH-3117 this may not be true with the NRT implementation from Search 5
@@ -110,13 +110,13 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 			catch (RuntimeException e) {
 				workSetFailure = e;
 				// TODO HSEARCH-1375 report the index name?
-				//workSetContextualErrorHandler.indexManager( resources.getIndexManager() );
-				getWorkSetContextualErrorHandler().markAsFailed( work.getInfo(), e );
+				//workSetContextualFailureHandler.indexManager( resources.getIndexManager() );
+				getWorkSetContextualFailureHandler().markAsFailed( work.getInfo(), e );
 				return null;
 			}
 		}
 		else {
-			getWorkSetContextualErrorHandler().markAsSkipped( work.getInfo() );
+			getWorkSetContextualFailureHandler().markAsSkipped( work.getInfo() );
 			return null;
 		}
 	}
@@ -128,7 +128,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 			}
 			catch (RuntimeException e) {
 				workSetFailure = e;
-				getWorkSetContextualErrorHandler().addThrowable( e );
+				getWorkSetContextualFailureHandler().addThrowable( e );
 			}
 		}
 		if ( workSetFailure != null ) {
@@ -139,7 +139,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 				workSetFailure.addSuppressed( e );
 			}
 			future.completeExceptionally( workSetFailure );
-			getWorkSetContextualErrorHandler().handle();
+			getWorkSetContextualFailureHandler().handle();
 		}
 		else {
 			future.complete( resultIfSuccess );
@@ -173,10 +173,10 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 		}
 	}
 
-	private ContextualErrorHandler getWorkSetContextualErrorHandler() {
-		if ( workSetContextualErrorHandler == null ) {
-			workSetContextualErrorHandler = errorHandler.createContextualHandler();
+	private ContextualFailureHandler getWorkSetContextualFailureHandler() {
+		if ( workSetContextualFailureHandler == null ) {
+			workSetContextualFailureHandler = failureHandler.createContextualHandler();
 		}
-		return workSetContextualErrorHandler;
+		return workSetContextualFailureHandler;
 	}
 }

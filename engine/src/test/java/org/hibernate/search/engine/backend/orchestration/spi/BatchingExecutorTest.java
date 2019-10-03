@@ -13,7 +13,7 @@ import static org.easymock.EasyMock.expectLastCall;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 
-import org.hibernate.search.engine.reporting.ErrorHandler;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.impl.test.FutureAssert;
 
 import org.junit.After;
@@ -28,7 +28,7 @@ public class BatchingExecutorTest extends EasyMockSupport {
 	private static final String NAME = "executor-name";
 
 	private final StubWorkProcessor processorMock = createMock( StubWorkProcessor.class );
-	private final ErrorHandler errorHandlerMock = createMock( ErrorHandler.class );
+	private final FailureHandler failureHandlerMock = createMock( FailureHandler.class );
 
 	// To execute code asynchronously. Just use more threads than we'll ever need, we don't care about performance.
 	private final ForkJoinPool asyncExecutor = new ForkJoinPool( 12 );
@@ -115,7 +115,7 @@ public class BatchingExecutorTest extends EasyMockSupport {
 		resetAll();
 		processorMock.beginBatch();
 		expectLastCall().andThrow( simulatedFailure );
-		errorHandlerMock.handleException(
+		failureHandlerMock.handleException(
 				EasyMock.contains( "Error while processing works in executor '" + NAME + "'" ),
 				EasyMock.same( simulatedFailure )
 		);
@@ -200,7 +200,7 @@ public class BatchingExecutorTest extends EasyMockSupport {
 		workSet1Mock.submitTo( processorMock );
 		workSet2Mock.submitTo( processorMock );
 		expect( processorMock.endBatch() ).andThrow( simulatedFailure );
-		errorHandlerMock.handleException(
+		failureHandlerMock.handleException(
 				EasyMock.contains( "Error while processing works in executor '" + NAME + "'" ),
 				EasyMock.same( simulatedFailure )
 		);
@@ -325,7 +325,7 @@ public class BatchingExecutorTest extends EasyMockSupport {
 
 	private void createAndStartExecutor(int maxTasksPerBatch, boolean fair) {
 		this.executor = new BatchingExecutor<>(
-				NAME, processorMock, maxTasksPerBatch, fair, errorHandlerMock
+				NAME, processorMock, maxTasksPerBatch, fair, failureHandlerMock
 		);
 
 		resetAll();

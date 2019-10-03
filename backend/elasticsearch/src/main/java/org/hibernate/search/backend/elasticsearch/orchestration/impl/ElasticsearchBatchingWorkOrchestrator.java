@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
-import org.hibernate.search.engine.reporting.ErrorHandler;
+import org.hibernate.search.engine.reporting.FailureHandler;
 
 /**
  * An orchestrator sharing context across multiple threads,
@@ -36,16 +36,16 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 	 * @param fair if {@code true} worksets are always submitted to the
 	 * delegate in FIFO order, if {@code false} worksets submitted
 	 * when the internal queue is full may be submitted out of order.
-	 * @param errorHandler An error handler to report failures of the background thread.
+	 * @param failureHandler A failure handler to report failures of the background thread.
 	 */
 	public ElasticsearchBatchingWorkOrchestrator(
 			String name, ElasticsearchWorkProcessor processor,
 			int maxWorksetsPerBatch, boolean fair,
-			ErrorHandler errorHandler) {
+			FailureHandler failureHandler) {
 		super( name );
 		this.executor = new BatchingExecutor<>(
 				name, processor, maxWorksetsPerBatch, fair,
-				errorHandler
+				failureHandler
 		);
 	}
 

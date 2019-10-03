@@ -42,7 +42,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
-import org.hibernate.search.engine.reporting.ErrorHandler;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
@@ -59,7 +59,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	private final LuceneWorkFactory workFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
-	private final ErrorHandler errorHandler;
+	private final FailureHandler failureHandler;
 	private final LuceneReadWorkOrchestrator readOrchestrator;
 
 	public IndexManagerBackendContext(EventContext eventContext,
@@ -67,14 +67,14 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 			LuceneWorkFactory workFactory,
 			MultiTenancyStrategy multiTenancyStrategy,
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
-			ErrorHandler errorHandler,
+			FailureHandler failureHandler,
 			LuceneReadWorkOrchestrator readOrchestrator) {
 		this.eventContext = eventContext;
 		this.directoryProvider = directoryProvider;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.workFactory = workFactory;
-		this.errorHandler = errorHandler;
+		this.failureHandler = failureHandler;
 		this.readOrchestrator = readOrchestrator;
 	}
 
@@ -194,7 +194,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		try {
 			return new IndexAccessor(
 					directoryHolder, analyzer,
-					errorHandler, EventContexts.fromIndexNameAndShardId( indexName, shardId )
+					failureHandler, EventContexts.fromIndexNameAndShardId( indexName, shardId )
 			);
 		}
 		catch (RuntimeException e) {
@@ -210,9 +210,9 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 				new LuceneWriteWorkProcessor(
 						indexEventContext,
 						indexAccessor.getIndexWriterDelegator(),
-						errorHandler
+						failureHandler
 				),
-				errorHandler
+				failureHandler
 		);
 	}
 

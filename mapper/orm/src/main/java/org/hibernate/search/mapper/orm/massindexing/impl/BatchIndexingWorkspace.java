@@ -17,7 +17,7 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.CacheMode;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
-import org.hibernate.search.engine.reporting.ErrorHandler;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -33,7 +33,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *
  * @author Sanne Grinovero
  */
-public class BatchIndexingWorkspace<E, I> extends ErrorHandledRunnable {
+public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -68,10 +68,10 @@ public class BatchIndexingWorkspace<E, I> extends ErrorHandledRunnable {
 			Class<E> type, SingularAttribute<? super E, I> idAttributeOfIndexedType,
 			int objectLoadingThreads, CacheMode cacheMode, int objectLoadingBatchSize,
 			CountDownLatch endAllSignal,
-			MassIndexingMonitor monitor, ErrorHandler errorHandler,
+			MassIndexingMonitor monitor, FailureHandler failureHandler,
 			long objectsLimit,
 			int idFetchSize, Integer transactionTimeout) {
-		super( errorHandler );
+		super( failureHandler );
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
 
@@ -100,7 +100,7 @@ public class BatchIndexingWorkspace<E, I> extends ErrorHandledRunnable {
 	}
 
 	@Override
-	public void runWithErrorHandler() {
+	public void runWithFailureHandler() {
 		if ( !tasks.isEmpty() ) {
 			throw new AssertionFailure( "BatchIndexingWorkspace instance not expected to be reused - tasks should be empty" );
 		}
@@ -137,11 +137,11 @@ public class BatchIndexingWorkspace<E, I> extends ErrorHandledRunnable {
 	private void startProducingPrimaryKeys(BatchTransactionalContext transactionalContext) {
 		final Runnable primaryKeyOutputter = new OptionallyWrapInJTATransaction(
 				transactionalContext,
-				getErrorHandler(),
+				getFailureHandler(),
 				new IdentifierProducer<>(
 						primaryKeyStream, mappingContext.getSessionFactory(), objectLoadingBatchSize,
 						indexedType, idAttributeOfIndexedType,
-						monitor, getErrorHandler(),
+						monitor, getFailureHandler(),
 						objectsLimit,
 						idFetchSize, sessionContext.getTenantIdentifier()
 				),
@@ -160,7 +160,7 @@ public class BatchIndexingWorkspace<E, I> extends ErrorHandledRunnable {
 	private void startTransformationToLuceneWork() {
 		final Runnable documentOutputter = new IdentifierConsumerDocumentProducer<>(
 				primaryKeyStream,
-				monitor, getErrorHandler(),
+				monitor, getFailureHandler(),
 				mappingContext,
 				producerEndSignal, cacheMode,
 				indexedType, idAttributeOfIndexedType,

@@ -18,8 +18,8 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.cfg.EngineSettings;
-import org.hibernate.search.engine.reporting.ErrorContext;
-import org.hibernate.search.engine.reporting.ErrorHandler;
+import org.hibernate.search.engine.reporting.FailureContext;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
@@ -39,7 +39,7 @@ import org.junit.Test;
 
 import org.apache.log4j.Level;
 
-public class MassIndexingErrorHandlerIT {
+public class MassIndexingFailureHandlerIT {
 
 	public static final String TITLE_1 = "Oliver Twist";
 	public static final String AUTHOR_1 = "Charles Dickens";
@@ -125,15 +125,15 @@ public class MassIndexingErrorHandlerIT {
 
 	@Test
 	public void custom() {
-		assertThat( staticCounters.get( CountingErrorHandler.CREATE ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingErrorHandler.HANDLE_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingErrorHandler.HANDLE_EXCEPTION ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_EXCEPTION ) ).isEqualTo( 0 );
 
-		SessionFactory sessionFactory = setup( CountingErrorHandler.class.getName() );
+		SessionFactory sessionFactory = setup( CountingFailureHandler.class.getName() );
 
-		assertThat( staticCounters.get( CountingErrorHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( CountingErrorHandler.HANDLE_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingErrorHandler.HANDLE_EXCEPTION ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_EXCEPTION ) ).isEqualTo( 0 );
 
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
@@ -184,17 +184,17 @@ public class MassIndexingErrorHandlerIT {
 
 		backendMock.verifyExpectationsMet();
 
-		assertThat( staticCounters.get( CountingErrorHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( CountingErrorHandler.HANDLE_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingErrorHandler.HANDLE_EXCEPTION ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_EXCEPTION ) ).isEqualTo( 1 );
 	}
 
-	private SessionFactory setup(String errorHandler) {
+	private SessionFactory setup(String failureHandler) {
 		backendMock.expectAnySchema( Book.INDEX );
 
 		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_STRATEGY, AutomaticIndexingStrategyName.NONE )
-				.withPropertyRadical( EngineSettings.Radicals.ERROR_HANDLER, errorHandler )
+				.withPropertyRadical( EngineSettings.Radicals.FAILURE_HANDLER, failureHandler )
 				.setup( Book.class );
 
 		backendMock.verifyExpectationsMet();
@@ -246,18 +246,18 @@ public class MassIndexingErrorHandlerIT {
 		}
 	}
 
-	public static class CountingErrorHandler implements ErrorHandler {
+	public static class CountingFailureHandler implements FailureHandler {
 
 		public static StaticCounters.Key CREATE = StaticCounters.createKey();
 		public static StaticCounters.Key HANDLE_CONTEXT = StaticCounters.createKey();
 		public static StaticCounters.Key HANDLE_EXCEPTION = StaticCounters.createKey();
 
-		public CountingErrorHandler() {
+		public CountingFailureHandler() {
 			StaticCounters.get().increment( CREATE );
 		}
 
 		@Override
-		public void handle(ErrorContext context) {
+		public void handle(FailureContext context) {
 			StaticCounters.get().increment( HANDLE_CONTEXT );
 		}
 

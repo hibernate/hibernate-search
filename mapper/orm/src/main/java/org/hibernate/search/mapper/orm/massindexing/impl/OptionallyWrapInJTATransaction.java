@@ -10,7 +10,7 @@ import java.lang.invoke.MethodHandles;
 import javax.transaction.SystemException;
 
 import org.hibernate.StatelessSession;
-import org.hibernate.search.engine.reporting.ErrorHandler;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -25,7 +25,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard
  */
-public class OptionallyWrapInJTATransaction extends ErrorHandledRunnable {
+public class OptionallyWrapInJTATransaction extends FailureHandledRunnable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -36,10 +36,10 @@ public class OptionallyWrapInJTATransaction extends ErrorHandledRunnable {
 	private final String tenantId;
 
 	public OptionallyWrapInJTATransaction(BatchTransactionalContext batchContext,
-			ErrorHandler errorHandler,
+			FailureHandler failureHandler,
 			StatelessSessionAwareRunnable statelessSessionAwareRunnable,
 			Integer transactionTimeout, String tenantId) {
-		super( errorHandler );
+		super( failureHandler );
 		/*
 		 * Unfortunately we need to access SessionFactoryImplementor to detect:
 		 *  - whether or not we need to start the JTA transaction
@@ -53,7 +53,7 @@ public class OptionallyWrapInJTATransaction extends ErrorHandledRunnable {
 	}
 
 	@Override
-	public void runWithErrorHandler() throws Exception {
+	public void runWithFailureHandler() throws Exception {
 		if ( wrapInTransaction ) {
 			try ( StatelessSession statelessSession = batchContext.factory.withStatelessOptions()
 					.tenantIdentifier( tenantId )

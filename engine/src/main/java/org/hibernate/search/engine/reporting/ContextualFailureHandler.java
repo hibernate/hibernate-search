@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.reporting;
 
-public interface ContextualErrorHandler {
+public interface ContextualFailureHandler {
 
 	void markAsFailed(Object workInfo, Throwable throwable);
 

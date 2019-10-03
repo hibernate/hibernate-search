@@ -84,7 +84,7 @@ public class LuceneBackendFactory implements BackendFactory {
 				new LuceneWorkFactoryImpl( multiTenancyStrategy ),
 				analysisDefinitionRegistry,
 				multiTenancyStrategy,
-				buildContext.getErrorHandler()
+				buildContext.getFailureHandler()
 		);
 	}
 

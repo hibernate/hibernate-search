@@ -8,7 +8,7 @@ package org.hibernate.search.engine.reporting;
 
 import java.util.List;
 
-public interface ErrorContext {
+public interface FailureContext {
 
 	List<Object> getFailingOperations();
 

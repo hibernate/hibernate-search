@@ -19,8 +19,8 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWorkExecutionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.reporting.ContextualErrorHandler;
-import org.hibernate.search.engine.reporting.ErrorHandler;
+import org.hibernate.search.engine.reporting.ContextualFailureHandler;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -37,11 +37,11 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 	private EventContext indexEventContext = EventContexts.fromIndexName( INDEX_NAME );
 	private IndexWriterDelegator indexWriterDelegatorMock = createStrictMock( IndexWriterDelegator.class );
-	private ErrorHandler errorHandlerMock = createStrictMock( ErrorHandler.class );
-	private ContextualErrorHandler contextualErrorHandlerMock = createMock( ContextualErrorHandler.class );
+	private FailureHandler failureHandlerMock = createStrictMock( FailureHandler.class );
+	private ContextualFailureHandler contextualFailureHandlerMock = createMock( ContextualFailureHandler.class );
 
 	private LuceneWriteWorkProcessor processor =
-			new LuceneWriteWorkProcessor( indexEventContext, indexWriterDelegatorMock, errorHandlerMock );
+			new LuceneWriteWorkProcessor( indexEventContext, indexWriterDelegatorMock, failureHandlerMock );
 
 	@Test
 	public void simple() throws IOException {
@@ -166,7 +166,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		resetAll();
 		indexWriterDelegatorMock.forceLockRelease();
 		expectLastCall().andThrow( forceLockReleaseException );
-		contextualErrorHandlerMock.handle();
+		contextualFailureHandlerMock.handle();
 		replayAll();
 		processor.afterWorkSet( workSetFuture, workSetResult );
 		verifyAll();
@@ -226,9 +226,9 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		indexWriterDelegatorMock.commit();
 		expectLastCall().andThrow( commitException );
 		indexWriterDelegatorMock.forceLockRelease();
-		expect( errorHandlerMock.createContextualHandler() ).andReturn( contextualErrorHandlerMock );
-		contextualErrorHandlerMock.addThrowable( capture( exceptionCapture ) );
-		contextualErrorHandlerMock.handle();
+		expect( failureHandlerMock.createContextualHandler() ).andReturn( contextualFailureHandlerMock );
+		contextualFailureHandlerMock.addThrowable( capture( exceptionCapture ) );
+		contextualFailureHandlerMock.handle();
 		// We don't expect any commit when a workset fails
 		replayAll();
 		processor.afterWorkSet( workSetFuture, workSetResult );
@@ -280,9 +280,9 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		expectLastCall().andThrow( commitException );
 		indexWriterDelegatorMock.forceLockRelease();
 		expectLastCall().andThrow( forceLockReleaseException );
-		expect( errorHandlerMock.createContextualHandler() ).andReturn( contextualErrorHandlerMock );
-		contextualErrorHandlerMock.addThrowable( capture( exceptionCapture ) );
-		contextualErrorHandlerMock.handle();
+		expect( failureHandlerMock.createContextualHandler() ).andReturn( contextualFailureHandlerMock );
+		contextualFailureHandlerMock.addThrowable( capture( exceptionCapture ) );
+		contextualFailureHandlerMock.handle();
 		// We don't expect any commit when a workset fails
 		replayAll();
 		processor.afterWorkSet( workSetFuture, workSetResult );
@@ -341,7 +341,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		indexWriterDelegatorMock.commit();
 		expectLastCall().andThrow( commitException );
 		indexWriterDelegatorMock.forceLockRelease();
-		errorHandlerMock.handleException( capture( stringCapture ), capture( exceptionCapture ) );
+		failureHandlerMock.handleException( capture( stringCapture ), capture( exceptionCapture ) );
 		replayAll();
 		processor.endBatch();
 		verifyAll();
@@ -387,7 +387,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		expectLastCall().andThrow( commitException );
 		indexWriterDelegatorMock.forceLockRelease();
 		expectLastCall().andThrow( forceLockReleaseException );
-		errorHandlerMock.handleException( capture( stringCapture ), capture( exceptionCapture ) );
+		failureHandlerMock.handleException( capture( stringCapture ), capture( exceptionCapture ) );
 		replayAll();
 		processor.endBatch();
 		verifyAll();
@@ -437,8 +437,8 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		resetAll();
 		expect( failingWork.execute( capture( contextCapture ) ) ).andThrow( workException );
 		expect( failingWork.getInfo() ).andReturn( failingWorkInfo );
-		expect( errorHandlerMock.createContextualHandler() ).andReturn( contextualErrorHandlerMock );
-		contextualErrorHandlerMock.markAsFailed( failingWorkInfo, workException );
+		expect( failureHandlerMock.createContextualHandler() ).andReturn( contextualFailureHandlerMock );
+		contextualFailureHandlerMock.markAsFailed( failingWorkInfo, workException );
 		replayAll();
 		assertThat( processor.submit( failingWork ) ).isNull();
 		verifyAll();
@@ -475,7 +475,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 			resetAll();
 			expect( work.getInfo() ).andReturn( workInfo );
-			contextualErrorHandlerMock.markAsSkipped( workInfo );
+			contextualFailureHandlerMock.markAsSkipped( workInfo );
 			replayAll();
 			assertThat( processor.submit( work ) ).isNull();
 			verifyAll();
@@ -487,7 +487,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		Object workSetResult = new Object();
 		resetAll();
 		indexWriterDelegatorMock.forceLockRelease();
-		contextualErrorHandlerMock.handle();
+		contextualFailureHandlerMock.handle();
 		replayAll();
 		processor.afterWorkSet( workSetFuture, workSetResult );
 		verifyAll();

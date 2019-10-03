@@ -14,7 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import org.hibernate.search.engine.reporting.ErrorHandler;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Executors;
@@ -31,7 +31,7 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 	private final String name;
 
 	private final P processor;
-	private final ErrorHandler errorHandler;
+	private final FailureHandler failureHandler;
 	private final int maxTasksPerBatch;
 
 	private final BlockingQueue<W> workQueue;
@@ -49,13 +49,13 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 	 * @param fair if {@code true} tasks are always submitted to the
 	 * processor in FIFO order, if {@code false} tasks submitted
 	 * when the internal queue is full may be submitted out of order.
-	 * @param errorHandler An error handler to report failures of the background thread.
+	 * @param failureHandler A failure handler to report failures of the background thread.
 	 */
 	public BatchingExecutor(String name, P processor, int maxTasksPerBatch, boolean fair,
-			ErrorHandler errorHandler) {
+			FailureHandler failureHandler) {
 		this.name = name;
 		this.processor = processor;
-		this.errorHandler = errorHandler;
+		this.failureHandler = failureHandler;
 		this.maxTasksPerBatch = maxTasksPerBatch;
 		workQueue = new ArrayBlockingQueue<>( maxTasksPerBatch, fair );
 		workBuffer = new ArrayList<>( maxTasksPerBatch );
@@ -197,7 +197,7 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 		}
 		catch (Throwable e) {
 			// This will only happen if there is a bug in the processor
-			errorHandler.handleException(
+			failureHandler.handleException(
 					"Error while processing works in executor '" + name + "'",
 					e
 			);
@@ -224,7 +224,7 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 				}
 				catch (Throwable e) {
 					// This will only happen if there is a bug in this class, but we don't want to fail silently
-					errorHandler.handleException(
+					failureHandler.handleException(
 							"Error while ensuring the next works submitted to executor '" + name + "' will be processed",
 							e
 					);

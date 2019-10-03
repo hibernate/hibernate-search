@@ -9,8 +9,8 @@ package org.hibernate.search.engine.reporting.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 
-import org.hibernate.search.engine.reporting.ErrorContext;
-import org.hibernate.search.engine.reporting.ErrorHandler;
+import org.hibernate.search.engine.reporting.FailureContext;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.logging.impl.Log;
 
@@ -19,12 +19,12 @@ import org.hibernate.search.util.common.logging.impl.Log;
  * @author Sanne Grinovero
  * @since 3.2
  */
-public class LogErrorHandler implements ErrorHandler {
+public class LogFailureHandler implements FailureHandler {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
-	public void handle(ErrorContext context) {
+	public void handle(FailureContext context) {
 
 		final List<Object> failingOperations = context.getFailingOperations();
 		final Object primaryFailure = context.getOperationAtFault();

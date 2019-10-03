@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.Collection;
 
-import org.hibernate.search.engine.reporting.ErrorHandler;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoBackendMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeDelegateImpl;
@@ -22,14 +22,14 @@ import org.hibernate.search.util.common.impl.Closer;
 
 public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 
-	private final ErrorHandler errorHandler;
+	private final FailureHandler failureHandler;
 	private final PojoIndexedTypeManagerContainer indexedTypeManagers;
 	private final PojoContainedTypeManagerContainer containedTypeManagers;
 
-	public PojoMappingDelegateImpl(ErrorHandler errorHandler,
+	public PojoMappingDelegateImpl(FailureHandler failureHandler,
 			PojoIndexedTypeManagerContainer indexedTypeManagers,
 			PojoContainedTypeManagerContainer containedTypeManagers) {
-		this.errorHandler = errorHandler;
+		this.failureHandler = failureHandler;
 		this.indexedTypeManagers = indexedTypeManagers;
 		this.containedTypeManagers = containedTypeManagers;
 	}
@@ -43,8 +43,8 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
-	public ErrorHandler getErrorHandler() {
-		return errorHandler;
+	public FailureHandler getFailureHandler() {
+		return failureHandler;
 	}
 
 	@Override

@@ -10,7 +10,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
-import org.hibernate.search.engine.reporting.ErrorHandler;
+import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.engine.reporting.FailureHandler;
 
 /**
  * Provides access to various orchestrators.
@@ -96,15 +97,15 @@ public class ElasticsearchWorkOrchestratorProvider {
 	private static final int PARALLEL_MAX_WORKSETS_PER_BATCH = 20 * MAX_BULK_SIZE;
 
 	private final ElasticsearchLink link;
-	private final ErrorHandler errorHandler;
+	private final FailureHandler failureHandler;
 
 	private final ElasticsearchBatchingWorkOrchestrator rootParallelOrchestrator;
 
 	public ElasticsearchWorkOrchestratorProvider(String rootParallelOrchestratorName,
 			ElasticsearchLink link,
-			ErrorHandler errorHandler) {
+			FailureHandler failureHandler) {
 		this.link = link;
-		this.errorHandler = errorHandler;
+		this.failureHandler = failureHandler;
 
 		/*
 		 * The following orchestrator doesn't require a strict execution ordering
@@ -167,7 +168,7 @@ public class ElasticsearchWorkOrchestratorProvider {
 			String name, ElasticsearchWorkProcessor processor,
 			int maxWorksetsPerBatch, boolean fair) {
 		return new ElasticsearchBatchingWorkOrchestrator(
-				name, processor, maxWorksetsPerBatch, fair, errorHandler
+				name, processor, maxWorksetsPerBatch, fair, failureHandler
 		);
 	}
 
@@ -186,7 +187,7 @@ public class ElasticsearchWorkOrchestratorProvider {
 	private ElasticsearchWorkSequenceBuilder createSequenceBuilder(Supplier<ElasticsearchRefreshableWorkExecutionContext> contextSupplier) {
 		return new ElasticsearchDefaultWorkSequenceBuilder(
 				contextSupplier,
-				errorHandler::createContextualHandler
+				failureHandler::createContextualHandler
 		);
 	}
 
@@ -201,7 +202,7 @@ public class ElasticsearchWorkOrchestratorProvider {
 
 	private ElasticsearchRefreshableWorkExecutionContext createRefreshingWorkExecutionContext() {
 		return new ElasticsearchDefaultWorkExecutionContext(
-				link.getClient(), link.getGsonProvider(), link.getWorkBuilderFactory(), errorHandler
+				link.getClient(), link.getGsonProvider(), link.getWorkBuilderFactory(), failureHandler
 		);
 	}
 
