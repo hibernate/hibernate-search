@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.reporting;
 
-import org.hibernate.search.engine.reporting.spi.IndexFailureContextBuilder;
+import org.hibernate.search.engine.reporting.spi.IndexFailureContextImpl;
 
 /**
  * Registers the failures during an execution ultimately passes them to a failure handler.
@@ -17,7 +17,7 @@ class DefaultContextualFailureHandler implements ContextualFailureHandler {
 
 	private final FailureHandler failureHandler;
 
-	private IndexFailureContextBuilder failureContextBuilder;
+	private IndexFailureContextImpl.Builder failureContextBuilder;
 
 	private Throwable errorThatOccurred;
 
@@ -57,13 +57,13 @@ class DefaultContextualFailureHandler implements ContextualFailureHandler {
 			if ( errorThatOccurred != null ) {
 				getFailureContextBuilder().throwable( errorThatOccurred );
 			}
-			failureHandler.handle( getFailureContextBuilder().createFailureContext() );
+			failureHandler.handle( getFailureContextBuilder().build() );
 		}
 	}
 
-	private IndexFailureContextBuilder getFailureContextBuilder() {
+	private IndexFailureContextImpl.Builder getFailureContextBuilder() {
 		if ( failureContextBuilder == null ) {
-			failureContextBuilder = new IndexFailureContextBuilder();
+			failureContextBuilder = new IndexFailureContextImpl.Builder();
 		}
 		return failureContextBuilder;
 	}
