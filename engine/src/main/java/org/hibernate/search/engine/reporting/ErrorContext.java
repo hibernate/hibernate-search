@@ -16,6 +16,4 @@ public interface ErrorContext {
 
 	Throwable getThrowable();
 
-	boolean hasErrors();
-
 }
