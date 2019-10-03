@@ -33,8 +33,4 @@ public interface FailureHandler {
 	 */
 	void handle(IndexFailureContext context);
 
-	default ContextualFailureHandler createContextualHandler() {
-		return new DefaultContextualFailureHandler( this );
-	}
-
 }

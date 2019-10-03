@@ -4,11 +4,14 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.reporting;
+package org.hibernate.search.engine.reporting.spi;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.newCapture;
+
+import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.engine.reporting.IndexFailureContext;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +19,7 @@ import org.junit.Test;
 import org.easymock.Capture;
 import org.easymock.EasyMockSupport;
 
-public class DefaultContextualFailureHandlerTest extends EasyMockSupport {
+public class ContextualFailureHandlerTest extends EasyMockSupport {
 
 	private FailureHandler failureHandlerMock;
 
@@ -38,8 +41,8 @@ public class DefaultContextualFailureHandlerTest extends EasyMockSupport {
 		Capture<IndexFailureContext> capture = newCapture();
 
 		replayAll();
-		DefaultContextualFailureHandler handler =
-				new DefaultContextualFailureHandler( failureHandlerMock );
+		ContextualFailureHandler handler =
+				new ContextualFailureHandler( failureHandlerMock );
 		verifyAll();
 
 		Throwable throwable = new Throwable();
@@ -65,8 +68,8 @@ public class DefaultContextualFailureHandlerTest extends EasyMockSupport {
 	@Test
 	public void noError() {
 		replayAll();
-		DefaultContextualFailureHandler handler =
-				new DefaultContextualFailureHandler( failureHandlerMock );
+		ContextualFailureHandler handler =
+				new ContextualFailureHandler( failureHandlerMock );
 		verifyAll();
 
 		resetAll();
@@ -80,8 +83,8 @@ public class DefaultContextualFailureHandlerTest extends EasyMockSupport {
 		Capture<IndexFailureContext> capture = newCapture();
 
 		replayAll();
-		DefaultContextualFailureHandler handler =
-				new DefaultContextualFailureHandler( failureHandlerMock );
+		ContextualFailureHandler handler =
+				new ContextualFailureHandler( failureHandlerMock );
 		verifyAll();
 
 		Throwable throwable = new Throwable();
@@ -114,8 +117,8 @@ public class DefaultContextualFailureHandlerTest extends EasyMockSupport {
 		Capture<IndexFailureContext> capture = newCapture();
 
 		replayAll();
-		DefaultContextualFailureHandler handler =
-				new DefaultContextualFailureHandler( failureHandlerMock );
+		ContextualFailureHandler handler =
+				new ContextualFailureHandler( failureHandlerMock );
 		verifyAll();
 
 		Throwable throwable1 = new Throwable();
@@ -145,8 +148,8 @@ public class DefaultContextualFailureHandlerTest extends EasyMockSupport {
 		Capture<IndexFailureContext> capture = newCapture();
 
 		replayAll();
-		DefaultContextualFailureHandler handler =
-				new DefaultContextualFailureHandler( failureHandlerMock );
+		ContextualFailureHandler handler =
+				new ContextualFailureHandler( failureHandlerMock );
 		verifyAll();
 
 		Throwable throwable1 = new Throwable();

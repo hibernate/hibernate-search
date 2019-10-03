@@ -18,6 +18,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.cfg.EngineSettings;
+import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.IndexFailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.Search;
@@ -126,14 +127,14 @@ public class MassIndexingFailureHandlerIT {
 	@Test
 	public void custom() {
 		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_EXCEPTION ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 
 		SessionFactory sessionFactory = setup( CountingFailureHandler.class.getName() );
 
 		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_EXCEPTION ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
@@ -185,8 +186,8 @@ public class MassIndexingFailureHandlerIT {
 		backendMock.verifyExpectationsMet();
 
 		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_EXCEPTION ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
 	}
 
 	private SessionFactory setup(String failureHandler) {
@@ -249,22 +250,23 @@ public class MassIndexingFailureHandlerIT {
 	public static class CountingFailureHandler implements FailureHandler {
 
 		public static StaticCounters.Key CREATE = StaticCounters.createKey();
-		public static StaticCounters.Key HANDLE_CONTEXT = StaticCounters.createKey();
-		public static StaticCounters.Key HANDLE_EXCEPTION = StaticCounters.createKey();
+		public static StaticCounters.Key HANDLE_GENERIC_CONTEXT = StaticCounters.createKey();
+		public static StaticCounters.Key HANDLE_INDEX_CONTEXT = StaticCounters.createKey();
 
 		public CountingFailureHandler() {
 			StaticCounters.get().increment( CREATE );
 		}
 
 		@Override
-		public void handle(IndexFailureContext context) {
-			StaticCounters.get().increment( HANDLE_CONTEXT );
+		public void handle(FailureContext context) {
+			StaticCounters.get().increment( HANDLE_GENERIC_CONTEXT );
 		}
 
 		@Override
-		public void handleException(String errorMsg, Throwable exception) {
-			StaticCounters.get().increment( HANDLE_EXCEPTION );
+		public void handle(IndexFailureContext context) {
+			StaticCounters.get().increment( HANDLE_INDEX_CONTEXT );
 		}
+
 	}
 
 	private static class SimulatedFailure extends RuntimeException {
