@@ -12,29 +12,15 @@ import java.util.List;
 
 import org.hibernate.search.engine.reporting.IndexFailureContext;
 
-public class IndexFailureContextImpl implements IndexFailureContext {
-
-	private final Throwable throwable;
-
-	private final Object failingOperation;
+public class IndexFailureContextImpl extends FailureContextImpl
+		implements IndexFailureContext {
 
 	private final List<Object> uncommittedOperations;
 
 	private IndexFailureContextImpl(Builder builder) {
-		this.throwable = builder.throwable;
-		this.failingOperation = builder.failingOperation;
+		super( builder );
 		this.uncommittedOperations = builder.uncommittedOperations == null
 				? Collections.emptyList() : Collections.unmodifiableList( builder.uncommittedOperations );
-	}
-
-	@Override
-	public Throwable getThrowable() {
-		return this.throwable;
-	}
-
-	@Override
-	public Object getFailingOperation() {
-		return this.failingOperation;
 	}
 
 	@Override
@@ -42,19 +28,9 @@ public class IndexFailureContextImpl implements IndexFailureContext {
 		return uncommittedOperations;
 	}
 
-	public static class Builder {
+	public static class Builder extends FailureContextImpl.Builder {
 
-		private Throwable throwable;
-		private Object failingOperation;
 		private List<Object> uncommittedOperations;
-
-		public void throwable(Throwable th) {
-			this.throwable = th;
-		}
-
-		public void failingOperation(Object failingOperation) {
-			this.failingOperation = failingOperation;
-		}
 
 		public void uncommittedOperation(Object uncommittedOperation) {
 			if ( uncommittedOperations == null ) {
@@ -63,6 +39,7 @@ public class IndexFailureContextImpl implements IndexFailureContext {
 			uncommittedOperations.add( uncommittedOperation );
 		}
 
+		@Override
 		public IndexFailureContext build() {
 			return new IndexFailureContextImpl( this );
 		}
