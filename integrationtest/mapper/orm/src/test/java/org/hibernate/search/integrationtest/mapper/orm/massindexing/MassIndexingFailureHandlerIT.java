@@ -107,7 +107,7 @@ public class MassIndexingFailureHandlerIT {
 					ExceptionMatcherBuilder.isException( SimulatedFailure.class )
 							.withMessage( "Indexing error" )
 							.build(),
-					"Unable to index instance of type " + Book.class.getName()
+					"Indexing instance of type " + Book.class.getName()
 			)
 					.once();
 
