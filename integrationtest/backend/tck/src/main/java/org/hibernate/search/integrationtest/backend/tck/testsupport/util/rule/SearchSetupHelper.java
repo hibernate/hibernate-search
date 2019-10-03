@@ -86,21 +86,26 @@ public class SearchSetupHelper implements TestRule {
 		Statement wrapped = new Statement() {
 			@Override
 			public void evaluate() throws Throwable {
-				try ( Closer<RuntimeException> closer = new Closer<>() ) {
-					try {
-						base.evaluate();
-					}
-					finally {
-						closer.pushAll(
-								SearchIntegrationPartialBuildState::closeOnFailure, integrationPartialBuildStates );
-						integrationPartialBuildStates.clear();
-						closer.pushAll( SearchIntegration::close, integrations );
-						integrations.clear();
-					}
+				try {
+					base.evaluate();
+				}
+				finally {
+					cleanUp();
 				}
 			}
 		};
 		return delegateRule.apply( wrapped, description );
+	}
+
+	public void cleanUp() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll(
+					SearchIntegrationPartialBuildState::closeOnFailure, integrationPartialBuildStates
+			);
+			integrationPartialBuildStates.clear();
+			closer.pushAll( SearchIntegration::close, integrations );
+			integrations.clear();
+		}
 	}
 
 	public class SetupContext {
