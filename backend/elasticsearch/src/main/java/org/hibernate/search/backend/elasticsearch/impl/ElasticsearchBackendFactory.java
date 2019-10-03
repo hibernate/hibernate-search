@@ -20,7 +20,6 @@ import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSp
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
-import org.hibernate.search.backend.elasticsearch.gson.impl.DefaultGsonProvider;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.DiscriminatorMultiTenancyStrategy;
@@ -85,7 +84,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		 * vice-versa, it doesn't need a Gson instance that was specially
 		 * configured for a particular Elasticsearch version.
 		 */
-		GsonProvider defaultGsonProvider = DefaultGsonProvider.create( GsonBuilder::new, logPrettyPrinting );
+		GsonProvider defaultGsonProvider = GsonProvider.create( GsonBuilder::new, logPrettyPrinting );
 
 		Optional<ElasticsearchVersion> configuredVersion = VERSION.get( propertySource );
 
