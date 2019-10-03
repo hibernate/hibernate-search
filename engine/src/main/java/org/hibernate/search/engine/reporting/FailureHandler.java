@@ -19,7 +19,7 @@ package org.hibernate.search.engine.reporting;
  */
 public interface FailureHandler {
 
-	void handle(FailureContext context);
+	void handle(IndexFailureContext context);
 
 	/**
 	 * Suited to handle a single Exception, where no FailureContext is needed.

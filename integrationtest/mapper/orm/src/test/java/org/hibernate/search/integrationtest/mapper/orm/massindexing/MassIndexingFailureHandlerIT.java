@@ -18,7 +18,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.cfg.EngineSettings;
-import org.hibernate.search.engine.reporting.FailureContext;
+import org.hibernate.search.engine.reporting.IndexFailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
@@ -257,7 +257,7 @@ public class MassIndexingFailureHandlerIT {
 		}
 
 		@Override
-		public void handle(FailureContext context) {
+		public void handle(IndexFailureContext context) {
 			StaticCounters.get().increment( HANDLE_CONTEXT );
 		}
 

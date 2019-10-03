@@ -10,10 +10,10 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.hibernate.search.engine.reporting.FailureContext;
-import org.hibernate.search.engine.reporting.impl.FailureContextImpl;
+import org.hibernate.search.engine.reporting.IndexFailureContext;
+import org.hibernate.search.engine.reporting.impl.IndexFailureContextImpl;
 
-public class FailureContextBuilder {
+public class IndexFailureContextBuilder {
 
 	private Throwable th;
 	private Object operationAtFault;
@@ -21,39 +21,39 @@ public class FailureContextBuilder {
 	private List<Object> failingOperations;
 	private List<Object> operationsThatWorked;
 
-	public FailureContextBuilder throwable(Throwable th) {
+	public IndexFailureContextBuilder throwable(Throwable th) {
 		this.th = th;
 		return this;
 	}
 
-	public FailureContextBuilder operationAtFault(Object operationAtFault) {
+	public IndexFailureContextBuilder operationAtFault(Object operationAtFault) {
 		this.operationAtFault = operationAtFault;
 		return this;
 	}
 
-	public FailureContextBuilder addWorkThatFailed(Object failedWork) {
+	public IndexFailureContextBuilder addWorkThatFailed(Object failedWork) {
 		this.getFailingOperations().add( failedWork );
 		return this;
 	}
 
-	public FailureContextBuilder addAllWorkThatFailed(List<Object> worksThatFailed) {
+	public IndexFailureContextBuilder addAllWorkThatFailed(List<Object> worksThatFailed) {
 		this.getFailingOperations().addAll( worksThatFailed );
 		return this;
 	}
 
-	public FailureContextBuilder workCompleted(Object luceneWork) {
+	public IndexFailureContextBuilder workCompleted(Object luceneWork) {
 		this.getOperationsThatWorked().add( luceneWork );
 		return this;
 
 	}
 
-	public FailureContextBuilder allWorkToBeDone(Iterable<Object> workOnWriter) {
+	public IndexFailureContextBuilder allWorkToBeDone(Iterable<Object> workOnWriter) {
 		this.workToBeDone = workOnWriter;
 		return this;
 	}
 
-	public FailureContext createFailureContext() {
-		FailureContextImpl context = new FailureContextImpl();
+	public IndexFailureContext createFailureContext() {
+		IndexFailureContextImpl context = new IndexFailureContextImpl();
 
 		context.setThrowable( th );
 

@@ -35,7 +35,7 @@ public class DefaultContextualFailureHandlerTest extends EasyMockSupport {
 
 	@Test
 	public void singleError() {
-		Capture<FailureContext> capture = newCapture();
+		Capture<IndexFailureContext> capture = newCapture();
 
 		replayAll();
 		DefaultContextualFailureHandler handler =
@@ -56,7 +56,7 @@ public class DefaultContextualFailureHandlerTest extends EasyMockSupport {
 		replayAll();
 		handler.handle();
 		verifyAll();
-		FailureContext failureContext = capture.getValue();
+		IndexFailureContext failureContext = capture.getValue();
 		assertThat( failureContext.getThrowable() ).isSameAs( throwable );
 		assertThat( failureContext.getOperationAtFault() ).isSameAs( workInfo1 );
 		assertThat( failureContext.getFailingOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
@@ -77,7 +77,7 @@ public class DefaultContextualFailureHandlerTest extends EasyMockSupport {
 
 	@Test
 	public void nonWorkError() {
-		Capture<FailureContext> capture = newCapture();
+		Capture<IndexFailureContext> capture = newCapture();
 
 		replayAll();
 		DefaultContextualFailureHandler handler =
@@ -103,7 +103,7 @@ public class DefaultContextualFailureHandlerTest extends EasyMockSupport {
 		replayAll();
 		handler.handle();
 		verifyAll();
-		FailureContext failureContext = capture.getValue();
+		IndexFailureContext failureContext = capture.getValue();
 		assertThat( failureContext.getThrowable() ).isSameAs( throwable );
 		assertThat( failureContext.getOperationAtFault() ).isNull();
 		assertThat( failureContext.getFailingOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
@@ -111,7 +111,7 @@ public class DefaultContextualFailureHandlerTest extends EasyMockSupport {
 
 	@Test
 	public void multipleErrors_works() {
-		Capture<FailureContext> capture = newCapture();
+		Capture<IndexFailureContext> capture = newCapture();
 
 		replayAll();
 		DefaultContextualFailureHandler handler =
@@ -133,7 +133,7 @@ public class DefaultContextualFailureHandlerTest extends EasyMockSupport {
 		replayAll();
 		handler.handle();
 		verifyAll();
-		FailureContext failureContext = capture.getValue();
+		IndexFailureContext failureContext = capture.getValue();
 		assertThat( failureContext.getThrowable() ).isSameAs( throwable1 );
 		assertThat( throwable1.getSuppressed() ).containsExactlyInAnyOrder( throwable2 );
 		assertThat( failureContext.getOperationAtFault() ).isIn( workInfo1, workInfo2 );
@@ -142,7 +142,7 @@ public class DefaultContextualFailureHandlerTest extends EasyMockSupport {
 
 	@Test
 	public void multipleErrors_workAndNotWork() {
-		Capture<FailureContext> capture = newCapture();
+		Capture<IndexFailureContext> capture = newCapture();
 
 		replayAll();
 		DefaultContextualFailureHandler handler =
@@ -169,7 +169,7 @@ public class DefaultContextualFailureHandlerTest extends EasyMockSupport {
 		replayAll();
 		handler.handle();
 		verifyAll();
-		FailureContext failureContext = capture.getValue();
+		IndexFailureContext failureContext = capture.getValue();
 		assertThat( failureContext.getThrowable() ).isSameAs( throwable1 );
 		assertThat( throwable1.getSuppressed() ).containsExactlyInAnyOrder( throwable2 );
 		assertThat( failureContext.getOperationAtFault() ).isSameAs( workInfo1 );
