@@ -11,18 +11,7 @@ import java.util.List;
 /**
  * Contextual information about a failing index operation.
  */
-public interface IndexFailureContext {
-
-	/**
-	 * @return The {@link Exception} or {@link Error} thrown when the operation failed.
-	 */
-	Throwable getThrowable();
-
-	/**
-	 * @return The operation that triggered the failure.
-	 * Use {@link Object#toString()} to get a textual representation.
-	 */
-	Object getFailingOperation();
+public interface IndexFailureContext extends FailureContext {
 
 	/**
 	 * @return The list of index operations that weren't committed yet when the failure occurred.
