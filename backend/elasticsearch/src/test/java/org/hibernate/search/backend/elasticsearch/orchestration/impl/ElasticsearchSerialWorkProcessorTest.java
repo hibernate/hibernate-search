@@ -54,7 +54,7 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 		CompletableFuture<Void> sequenceFuture = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchSerialWorkProcessor strategy =
+		ElasticsearchSerialWorkProcessor processor =
 				new ElasticsearchSerialWorkProcessor( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
@@ -70,14 +70,14 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequenceFuture );
 		replayAll();
-		CompletableFuture<Void> returnedSequenceFuture = strategy.submit( workset1 );
+		CompletableFuture<Void> returnedSequenceFuture = processor.submit( workset1 );
 		verifyAll();
 		assertThat( returnedSequenceFuture ).isSameAs( sequenceFuture );
 
 		resetAll();
 		bulkerMock.finalizeBulkWork();
 		replayAll();
-		CompletableFuture<Void> futureAll = strategy.endBatch();
+		CompletableFuture<Void> futureAll = processor.endBatch();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequenceFuture );
 	}
@@ -94,7 +94,7 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 		CompletableFuture<Void> sequence2Future = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchSerialWorkProcessor strategy =
+		ElasticsearchSerialWorkProcessor processor =
 				new ElasticsearchSerialWorkProcessor( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
@@ -107,7 +107,7 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 		expect( bulkerMock.addWorksToSequence() ).andReturn( false );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
 		replayAll();
-		CompletableFuture<Void> returnedSequence1Future = strategy.submit( workset1 );
+		CompletableFuture<Void> returnedSequence1Future = processor.submit( workset1 );
 		verifyAll();
 		assertThat( returnedSequence1Future ).isSameAs( sequence1Future );
 
@@ -119,14 +119,14 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
 		replayAll();
-		CompletableFuture<Void> returnedSequence2Future = strategy.submit( workset2 );
+		CompletableFuture<Void> returnedSequence2Future = processor.submit( workset2 );
 		verifyAll();
 		assertThat( returnedSequence2Future ).isSameAs( sequence2Future );
 
 		resetAll();
 		bulkerMock.finalizeBulkWork();
 		replayAll();
-		CompletableFuture<Void> futureAll = strategy.endBatch();
+		CompletableFuture<Void> futureAll = processor.endBatch();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequence2Future );
 	}
@@ -143,7 +143,7 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 		CompletableFuture<Void> sequence2Future = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchSerialWorkProcessor strategy =
+		ElasticsearchSerialWorkProcessor processor =
 				new ElasticsearchSerialWorkProcessor( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
@@ -155,7 +155,7 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
 		replayAll();
-		CompletableFuture<Void> returnedSequence1Future = strategy.submit( workset1 );
+		CompletableFuture<Void> returnedSequence1Future = processor.submit( workset1 );
 		verifyAll();
 		assertThat( returnedSequence1Future ).isSameAs( sequence1Future );
 
@@ -167,14 +167,14 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
 		replayAll();
-		CompletableFuture<Void> returnedSequence2Future = strategy.submit( workset2 );
+		CompletableFuture<Void> returnedSequence2Future = processor.submit( workset2 );
 		verifyAll();
 		assertThat( returnedSequence2Future ).isSameAs( sequence2Future );
 
 		resetAll();
 		bulkerMock.finalizeBulkWork();
 		replayAll();
-		CompletableFuture<Void> futureAll = strategy.endBatch();
+		CompletableFuture<Void> futureAll = processor.endBatch();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequence2Future );
 	}
@@ -189,7 +189,7 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchSerialWorkProcessor strategy =
+		ElasticsearchSerialWorkProcessor processor =
 				new ElasticsearchSerialWorkProcessor( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
@@ -209,14 +209,14 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
 		replayAll();
-		CompletableFuture<Void> returnedSequence1Future = strategy.submit( workset1 );
+		CompletableFuture<Void> returnedSequence1Future = processor.submit( workset1 );
 		verifyAll();
 		assertThat( returnedSequence1Future ).isSameAs( sequence1Future );
 
 		resetAll();
 		bulkerMock.finalizeBulkWork();
 		replayAll();
-		CompletableFuture<Void> futureAll = strategy.endBatch();
+		CompletableFuture<Void> futureAll = processor.endBatch();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequence1Future );
 	}
@@ -233,7 +233,7 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 		CompletableFuture<Void> sequence2Future = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchSerialWorkProcessor strategy =
+		ElasticsearchSerialWorkProcessor processor =
 				new ElasticsearchSerialWorkProcessor( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
@@ -245,7 +245,7 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
 		replayAll();
-		CompletableFuture<Void> returnedSequence1Future = strategy.submit( workset1 );
+		CompletableFuture<Void> returnedSequence1Future = processor.submit( workset1 );
 		verifyAll();
 		assertThat( returnedSequence1Future ).isSameAs( sequence1Future );
 
@@ -262,14 +262,14 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 		expect( bulkerMock.addWorksToSequence() ).andReturn( false );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
 		replayAll();
-		CompletableFuture<Void> returnedSequence2Future = strategy.submit( workset2 );
+		CompletableFuture<Void> returnedSequence2Future = processor.submit( workset2 );
 		verifyAll();
 		assertThat( returnedSequence2Future ).isSameAs( sequence2Future );
 
 		resetAll();
 		bulkerMock.finalizeBulkWork();
 		replayAll();
-		CompletableFuture<Void> futureAll = strategy.endBatch();
+		CompletableFuture<Void> futureAll = processor.endBatch();
 		verifyAll();
 		assertThat( futureAll ).isSameAs( sequence2Future );
 	}
