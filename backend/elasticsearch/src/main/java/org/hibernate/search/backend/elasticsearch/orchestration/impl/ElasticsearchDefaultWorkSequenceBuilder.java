@@ -115,7 +115,11 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 				currentlyBuildingSequenceTail.thenCombine( workFuture, (ignored, work) -> work )
 				// ... execute the bulk work
 				.thenCompose( work -> work.execute( currentSequenceAttributes.executionContext ) );
-		currentlyBuildingSequenceTail = bulkWorkResultFuture;
+		// Do not propagate the exception as is: we expect the exception to be handled by each bulked work separately.
+		// ... but still propagate *something*, in case a *previous* work failed.
+		currentlyBuildingSequenceTail = bulkWorkResultFuture.exceptionally( Futures.handler( throwable -> {
+			throw new PreviousWorkException( throwable );
+		} ) );
 		return bulkWorkResultFuture;
 	}
 

@@ -519,7 +519,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( sequenceFuture ).isPending();
 
 		resetAll();
-		failureHandlerMock.addThrowable( exception );
 		failureHandlerMock.handle();
 		replayAll();
 		refreshFuture.complete( null );
@@ -602,7 +601,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( sequenceFuture ).isPending();
 
 		resetAll();
-		failureHandlerMock.addThrowable( exception );
 		failureHandlerMock.handle();
 		replayAll();
 		refreshFuture.complete( null );
