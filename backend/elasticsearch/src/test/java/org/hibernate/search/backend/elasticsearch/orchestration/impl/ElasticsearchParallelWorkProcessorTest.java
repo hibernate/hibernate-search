@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.getCurrentArguments;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThat;
 
@@ -47,8 +46,8 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 
 	@Test
 	public void simple() {
-		ElasticsearchWork<?> work1 = work( 1 );
-		BulkableElasticsearchWork<?> work2 = bulkableWork( 2 );
+		ElasticsearchWork<Object> work1 = work( 1 );
+		BulkableElasticsearchWork<Object> work2 = bulkableWork( 2 );
 		List<ElasticsearchWork<?>> workset1 = Arrays.asList( work1, work2 );
 
 		CompletableFuture<Void> sequenceFuture = new CompletableFuture<>();
@@ -60,12 +59,10 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 
 		resetAll();
 		sequenceBuilderMock.init( anyObject() );
-		work1.aggregate( anyObject() );
-		expectLastCall().andAnswer( nonBulkableAggregateAnswer( work1 ) );
+		expect( work1.aggregate( anyObject() ) ).andAnswer( nonBulkableAggregateAnswer( work1 ) );
 		expect( bulkerMock.addWorksToSequence() ).andReturn( false );
 		expect( sequenceBuilderMock.addNonBulkExecution( work1 ) ).andReturn( unusedReturnValue() );
-		work2.aggregate( anyObject() );
-		expectLastCall().andAnswer( bulkableAggregateAnswer( work2 ) );
+		expect( work2.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work2 ) );
 		expect( bulkerMock.add( work2 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequenceFuture );
@@ -86,10 +83,10 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 
 	@Test
 	public void parallelSequenceBetweenWorkset() {
-		ElasticsearchWork<?> work1 = work( 1 );
+		ElasticsearchWork<Object> work1 = work( 1 );
 		List<ElasticsearchWork<?>> workset1 = Arrays.asList( work1 );
 
-		BulkableElasticsearchWork<?> work2 = bulkableWork( 2 );
+		BulkableElasticsearchWork<Object> work2 = bulkableWork( 2 );
 		List<ElasticsearchWork<?>> workset2 = Arrays.asList( work2 );
 
 		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
@@ -102,8 +99,7 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 
 		resetAll();
 		sequenceBuilderMock.init( anyObject() );
-		work1.aggregate( anyObject() );
-		expectLastCall().andAnswer( nonBulkableAggregateAnswer( work1 ) );
+		expect( work1.aggregate( anyObject() ) ).andAnswer( nonBulkableAggregateAnswer( work1 ) );
 		expect( bulkerMock.addWorksToSequence() ).andReturn( false );
 		expect( sequenceBuilderMock.addNonBulkExecution( work1 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.addWorksToSequence() ).andReturn( false );
@@ -115,8 +111,7 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 
 		resetAll();
 		sequenceBuilderMock.init( anyObject() );
-		work2.aggregate( anyObject() );
-		expectLastCall().andAnswer( bulkableAggregateAnswer( work2 ) );
+		expect( work2.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work2 ) );
 		expect( bulkerMock.add( work2 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
@@ -139,10 +134,10 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 
 	@Test
 	public void reuseBulkAcrossSequences() {
-		BulkableElasticsearchWork<?> work1 = bulkableWork( 1 );
+		BulkableElasticsearchWork<Object> work1 = bulkableWork( 1 );
 		List<ElasticsearchWork<?>> workset1 = Arrays.asList( work1 );
 
-		BulkableElasticsearchWork<?> work2 = bulkableWork( 2 );
+		BulkableElasticsearchWork<Object> work2 = bulkableWork( 2 );
 		List<ElasticsearchWork<?>> workset2 = Arrays.asList( work2 );
 
 		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
@@ -155,8 +150,7 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 
 		resetAll();
 		sequenceBuilderMock.init( anyObject() );
-		work1.aggregate( anyObject() );
-		expectLastCall().andAnswer( bulkableAggregateAnswer( work1 ) );
+		expect( work1.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work1 ) );
 		expect( bulkerMock.add( work1 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
@@ -167,8 +161,7 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 
 		resetAll();
 		sequenceBuilderMock.init( anyObject() );
-		work2.aggregate( anyObject() );
-		expectLastCall().andAnswer( bulkableAggregateAnswer( work2 ) );
+		expect( work2.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work2 ) );
 		expect( bulkerMock.add( work2 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
@@ -199,9 +192,9 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 
 	@Test
 	public void newBulkIfNonBulkable_sameWorkset() {
-		BulkableElasticsearchWork<?> work1 = bulkableWork( 1 );
-		ElasticsearchWork<?> work2 = work( 2 );
-		BulkableElasticsearchWork<?> work3 = bulkableWork( 3 );
+		BulkableElasticsearchWork<Object> work1 = bulkableWork( 1 );
+		ElasticsearchWork<Object> work2 = work( 2 );
+		BulkableElasticsearchWork<Object> work3 = bulkableWork( 3 );
 		List<ElasticsearchWork<?>> workset1 = Arrays.asList( work1, work2, work3 );
 
 		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
@@ -213,15 +206,12 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 
 		resetAll();
 		sequenceBuilderMock.init( anyObject() );
-		work1.aggregate( anyObject() );
-		expectLastCall().andAnswer( bulkableAggregateAnswer( work1 ) );
+		expect( work1.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work1 ) );
 		expect( bulkerMock.add( work1 ) ).andReturn( unusedReturnValue() );
-		work2.aggregate( anyObject() );
-		expectLastCall().andAnswer( nonBulkableAggregateAnswer( work2 ) );
+		expect( work2.aggregate( anyObject() ) ).andAnswer( nonBulkableAggregateAnswer( work2 ) );
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.addNonBulkExecution( work2 ) ).andReturn( unusedReturnValue() );
-		work3.aggregate( anyObject() );
-		expectLastCall().andAnswer( bulkableAggregateAnswer( work3 ) );
+		expect( work3.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work3 ) );
 		bulkerMock.finalizeBulkWork();
 		expect( bulkerMock.add( work3 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
@@ -247,10 +237,10 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 
 	@Test
 	public void newBulkIfNonBulkable_differentWorksets() {
-		BulkableElasticsearchWork<?> work1 = bulkableWork( 1 );
+		BulkableElasticsearchWork<Object> work1 = bulkableWork( 1 );
 		List<ElasticsearchWork<?>> workset1 = Arrays.asList( work1 );
-		ElasticsearchWork<?> work2 = work( 2 );
-		BulkableElasticsearchWork<?> work3 = bulkableWork( 3 );
+		ElasticsearchWork<Object> work2 = work( 2 );
+		BulkableElasticsearchWork<Object> work3 = bulkableWork( 3 );
 		List<ElasticsearchWork<?>> workset2 = Arrays.asList( work2, work3 );
 
 		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
@@ -263,8 +253,7 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 
 		resetAll();
 		sequenceBuilderMock.init( anyObject() );
-		work1.aggregate( anyObject() );
-		expectLastCall().andAnswer( bulkableAggregateAnswer( work1 ) );
+		expect( work1.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work1 ) );
 		expect( bulkerMock.add( work1 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
@@ -275,12 +264,10 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 
 		resetAll();
 		sequenceBuilderMock.init( anyObject() );
-		work2.aggregate( anyObject() );
-		expectLastCall().andAnswer( nonBulkableAggregateAnswer( work2 ) );
+		expect( work2.aggregate( anyObject() ) ).andAnswer( nonBulkableAggregateAnswer( work2 ) );
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.addNonBulkExecution( work2 ) ).andReturn( unusedReturnValue() );
-		work3.aggregate( anyObject() );
-		expectLastCall().andAnswer( bulkableAggregateAnswer( work3 ) );
+		expect( work3.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work3 ) );
 		bulkerMock.finalizeBulkWork();
 		expect( bulkerMock.add( work3 ) ).andReturn( unusedReturnValue() );
 		expect( bulkerMock.addWorksToSequence() ).andReturn( false );
@@ -318,19 +305,17 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 		return createStrictMock( "bulkableWork" + index, BulkableElasticsearchWork.class );
 	}
 
-	private IAnswer<Void> nonBulkableAggregateAnswer(ElasticsearchWork<?> mock) {
+	private <T> IAnswer<CompletableFuture<T>> nonBulkableAggregateAnswer(ElasticsearchWork<T> mock) {
 		return () -> {
 			ElasticsearchWorkAggregator aggregator = (ElasticsearchWorkAggregator) getCurrentArguments()[0];
-			aggregator.addNonBulkable( mock );
-			return null;
+			return aggregator.addNonBulkable( mock );
 		};
 	}
 
-	private IAnswer<Void> bulkableAggregateAnswer(BulkableElasticsearchWork<?> mock) {
+	private <T> IAnswer<CompletableFuture<T>> bulkableAggregateAnswer(BulkableElasticsearchWork<T> mock) {
 		return () -> {
 			ElasticsearchWorkAggregator aggregator = (ElasticsearchWorkAggregator) getCurrentArguments()[0];
-			aggregator.addBulkable( mock );
-			return null;
+			return aggregator.addBulkable( mock );
 		};
 	}
 }
