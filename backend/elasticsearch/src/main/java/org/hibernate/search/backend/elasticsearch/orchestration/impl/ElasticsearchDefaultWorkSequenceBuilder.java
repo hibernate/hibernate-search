@@ -7,6 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
@@ -15,7 +17,9 @@ import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearc
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResultItemExtractor;
-import org.hibernate.search.engine.reporting.spi.ContextualFailureHandler;
+import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.engine.reporting.spi.FailureContextImpl;
+import org.hibernate.search.engine.reporting.spi.IndexFailureContextImpl;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -30,16 +34,16 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Supplier<ElasticsearchRefreshableWorkExecutionContext> contextSupplier;
-	private final Supplier<ContextualFailureHandler> failureHandlerSupplier;
+	private final FailureHandler failureHandler;
 	private final BulkResultExtractionStepImpl bulkResultExtractionStep = new BulkResultExtractionStepImpl();
 
 	private CompletableFuture<?> currentlyBuildingSequenceTail;
 	private SequenceContext currentlyBuildingSequenceContext;
 
 	public ElasticsearchDefaultWorkSequenceBuilder(Supplier<ElasticsearchRefreshableWorkExecutionContext> contextSupplier,
-			Supplier<ContextualFailureHandler> failureHandlerSupplier) {
+			FailureHandler failureHandler) {
 		this.contextSupplier = contextSupplier;
-		this.failureHandlerSupplier = failureHandlerSupplier;
+		this.failureHandler = failureHandler;
 	}
 
 	@Override
@@ -47,7 +51,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		// We only use the previous stage to delay the execution of the sequence, but we ignore its result
 		this.currentlyBuildingSequenceTail = previous.handle( (ignoredResult, ignoredThrowable) -> null );
 		this.currentlyBuildingSequenceContext = new SequenceContext(
-				contextSupplier.get(), failureHandlerSupplier.get()
+				contextSupplier.get(), failureHandler
 		);
 	}
 
@@ -171,7 +175,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		 *
 		 * Make sure to return the resulting stage, and not executedWorkStage,
 		 * so that exception handling happens before the end of the sequence,
-		 * meaning failureHandler.markAsFailed() is guaranteed to be called before failureHandler.handle().
+		 * meaning notifyWorkFailed() is guaranteed to be called before notifySequenceFailed().
 		 */
 		return workExecutionFuture.exceptionally( Futures.handler( throwable -> {
 			sequenceContext.notifyWorkFailed( work, throwable, workFutureForCaller );
@@ -226,7 +230,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 			/*
 			 * Make sure that the sequence will only advance to the next work
 			 * after both the work and *all* the handlers are executed,
-			 * because otherwise failureHandler.handle() could be called before all failed/skipped works are reported.
+			 * because otherwise failureHandler.handle(...) could be called before all failed/skipped works are reported.
 			 */
 			currentlyBuildingSequenceTail = CompletableFuture.allOf(
 					currentlyBuildingSequenceTail,
@@ -256,12 +260,19 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 	 */
 	private static final class SequenceContext {
 		private final ElasticsearchRefreshableWorkExecutionContext executionContext;
-		private final ContextualFailureHandler failureHandler;
+		private final FailureHandler failureHandler;
 		private final CompletableFuture<Void> refreshFuture;
+		/*
+		 * There may be multiple failures in a sequence, but only when works are bulked.
+		 *
+		 * This list and builders may be used from different threads handling different works,
+		 * but never concurrently,
+		 * because each work is executed strictly after the previous one.
+		 */
+		private volatile List<IndexFailureContextImpl.Builder> failureContextBuilders;
 
-		SequenceContext(
-				ElasticsearchRefreshableWorkExecutionContext executionContext,
-				ContextualFailureHandler failureHandler) {
+		SequenceContext(ElasticsearchRefreshableWorkExecutionContext executionContext,
+				FailureHandler failureHandler) {
 			this.executionContext = executionContext;
 			this.failureHandler = failureHandler;
 			this.refreshFuture = new CompletableFuture<>();
@@ -273,21 +284,52 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 			workFutureForCaller.completeExceptionally(
 					log.elasticsearchSkippedBecauseOfPreviousWork( skippingCause )
 			);
-			failureHandler.markAsSkipped( work );
+			// Consider that skipped works were skipped because of the very first failure in the sequence.
+			IndexFailureContextImpl.Builder contextBuilder = getFirstFailureContextBuilder();
+			contextBuilder.uncommittedOperation( work.getInfo() );
 		}
 
 		<R> void notifyWorkFailed(ElasticsearchWork<R> work, Throwable throwable,
 				CompletableFuture<R> workFutureForCaller) {
 			workFutureForCaller.completeExceptionally( throwable );
-			failureHandler.markAsFailed( work, throwable );
+			IndexFailureContextImpl.Builder contextBuilder = addFailure();
+			contextBuilder.throwable( throwable );
+			Object workInfo = work.getInfo();
+			contextBuilder.failingOperation( workInfo );
+			contextBuilder.uncommittedOperation( workInfo );
 		}
 
 		void notifySequenceFailed(Throwable throwable) {
+			if ( failureContextBuilders != null ) {
+				for ( IndexFailureContextImpl.Builder failureContextBuilder : failureContextBuilders ) {
+					failureHandler.handle( failureContextBuilder.build() );
+				}
+			}
 			if ( !( throwable instanceof PreviousWorkException) ) {
 				// Something else than a work failed, mention it
-				failureHandler.addThrowable( throwable );
+				FailureContextImpl.Builder failureContextBuilder = new FailureContextImpl.Builder();
+				failureContextBuilder.throwable( throwable );
+				failureHandler.handle( failureContextBuilder.build() );
 			}
-			failureHandler.handle();
+		}
+
+		private IndexFailureContextImpl.Builder addFailure() {
+			if ( failureContextBuilders == null ) {
+				failureContextBuilders = new ArrayList<>();
+			}
+			IndexFailureContextImpl.Builder builder = new IndexFailureContextImpl.Builder();
+			failureContextBuilders.add( builder );
+			return builder;
+		}
+
+		private IndexFailureContextImpl.Builder getFirstFailureContextBuilder() {
+			if ( failureContextBuilders != null && !failureContextBuilders.isEmpty() ) {
+				return failureContextBuilders.get( 0 );
+			}
+			else {
+				// Shouldn't happen, but let's not throw exceptions while reporting failures...
+				return addFailure();
+			}
 		}
 	}
 }
