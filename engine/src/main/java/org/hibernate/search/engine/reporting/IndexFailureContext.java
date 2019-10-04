@@ -15,6 +15,7 @@ public interface IndexFailureContext extends FailureContext {
 
 	/**
 	 * @return The list of index operations that weren't committed yet when the failure occurred.
+	 * Never {@code null}, but may be empty.
 	 * These operations may not have been applied to the index.
 	 * Use {@link Object#toString()} to get a textual representation of each operation.
 	 */

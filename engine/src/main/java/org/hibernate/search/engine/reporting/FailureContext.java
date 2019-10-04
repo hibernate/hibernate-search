@@ -13,11 +13,13 @@ public interface FailureContext {
 
 	/**
 	 * @return The {@link Exception} or {@link Error} thrown when the operation failed.
+	 * Never {@code null}.
 	 */
 	Throwable getThrowable();
 
 	/**
 	 * @return The operation that triggered the failure.
+	 * Never {@code null}.
 	 * Use {@link Object#toString()} to get a textual representation.
 	 */
 	Object getFailingOperation();
