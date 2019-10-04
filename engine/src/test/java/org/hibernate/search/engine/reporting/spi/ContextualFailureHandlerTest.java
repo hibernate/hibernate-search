@@ -108,7 +108,8 @@ public class ContextualFailureHandlerTest extends EasyMockSupport {
 		verifyAll();
 		IndexFailureContext failureContext = capture.getValue();
 		assertThat( failureContext.getThrowable() ).isSameAs( throwable );
-		assertThat( failureContext.getFailingOperation() ).isNull();
+		assertThat( failureContext.getFailingOperation() ).asString()
+				.contains( "Unknown operation" ); // Automatically replaces 'null'
 		assertThat( failureContext.getUncommittedOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
 	}
 

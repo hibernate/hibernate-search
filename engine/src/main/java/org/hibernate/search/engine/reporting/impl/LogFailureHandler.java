@@ -40,15 +40,11 @@ public class LogFailureHandler implements FailureHandler {
 
 		final StringBuilder messageBuilder = new StringBuilder();
 
-		if ( throwable != null ) {
-			messageBuilder.append( "Exception occurred " )
-					.append( throwable )
-					.append( "\n" );
-		}
-		if ( failingOperation != null ) {
-			messageBuilder.append( "Failing operation:\n" );
-			messageBuilder.append( failingOperation );
-		}
+		messageBuilder.append( "Exception occurred " )
+				.append( throwable )
+				.append( "\n" );
+		messageBuilder.append( "Failing operation:\n" );
+		messageBuilder.append( failingOperation );
 
 		return messageBuilder;
 	}
