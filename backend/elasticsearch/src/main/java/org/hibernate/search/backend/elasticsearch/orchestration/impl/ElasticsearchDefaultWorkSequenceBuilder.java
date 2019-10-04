@@ -215,7 +215,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 						}
 						else {
 							// The bulk work failed; mark the bulked work as failed too
-							sequenceContext.notifyWorkFailed( bulkedWork, throwable, workFutureForCaller );
+							sequenceContext.notifyWorkFailedBecauseBulkFailed( bulkedWork, throwable, workFutureForCaller );
 						}
 					} ) )
 					// If the bulk work succeeds, then extract the bulked work result and notify as necessary
@@ -287,6 +287,15 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 			// Consider that skipped works were skipped because of the very first failure in the sequence.
 			IndexFailureContextImpl.Builder contextBuilder = getFirstFailureContextBuilder();
 			contextBuilder.uncommittedOperation( work.getInfo() );
+		}
+
+		<R> void notifyWorkFailedBecauseBulkFailed(BulkableElasticsearchWork<R> work, Throwable throwable,
+				CompletableFuture<R> workFutureForCaller) {
+			notifyWorkFailed(
+					work,
+					log.elasticsearchFailedBecauseOfBulkFailure( throwable ),
+					workFutureForCaller
+			);
 		}
 
 		<R> void notifyWorkFailed(ElasticsearchWork<R> work, Throwable throwable,

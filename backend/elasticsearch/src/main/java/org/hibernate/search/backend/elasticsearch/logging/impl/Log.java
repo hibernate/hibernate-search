@@ -590,4 +590,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 87, value = "Cannot apply a search analyzer if an analyzer has not been defined on the same field." +
 			" Search analyzer: '%1$s'.")
 	SearchException searchAnalyzerWithoutAnalyzer(String searchAnalyzer, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 88, value = "The operation failed due to the failure of the call to the bulk REST API.")
+	SearchException elasticsearchFailedBecauseOfBulkFailure(@Cause Throwable bulkFailure);
 }

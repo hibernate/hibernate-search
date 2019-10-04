@@ -27,6 +27,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.HamcrestCondition;
 import org.easymock.Capture;
 import org.easymock.EasyMockSupport;
 
@@ -520,9 +521,21 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		bulkWorkFuture.completeExceptionally( exception );
 		verifyAll();
 		assertThat( sequenceBuilderBulkResultFuture ).isFailed( exception );
-		assertThat( work1FutureFromSequenceBuilder ).isFailed( exception );
-		assertThat( work2FutureFromSequenceBuilder ).isFailed( exception );
-		assertThat( work3FutureFromSequenceBuilder ).isFailed( exception );
+		assertThat( work1FutureFromSequenceBuilder ).isFailed(
+				ExceptionMatcherBuilder.isException( SearchException.class )
+						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
+						.causedBy( exception ).build()
+		);
+		assertThat( work2FutureFromSequenceBuilder ).isFailed(
+				ExceptionMatcherBuilder.isException( SearchException.class )
+						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
+						.causedBy( exception ).build()
+		);
+		assertThat( work3FutureFromSequenceBuilder ).isFailed(
+				ExceptionMatcherBuilder.isException( SearchException.class )
+						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
+						.causedBy( exception ).build()
+		);
 		assertThat( sequenceFuture ).isPending();
 
 		Capture<IndexFailureContext> failureContext1Capture = Capture.newInstance();
@@ -539,7 +552,11 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( sequenceFuture ).isSuccessful();
 
 		IndexFailureContext failureContext1 = failureContext1Capture.getValue();
-		Assertions.assertThat( failureContext1.getThrowable() ).isSameAs( exception );
+		Assertions.assertThat( failureContext1.getThrowable() ).satisfies( new HamcrestCondition<>(
+				ExceptionMatcherBuilder.isException( SearchException.class )
+						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
+						.causedBy( exception ).build()
+		) );
 		Assertions.assertThat( failureContext1.getFailingOperation() )
 				.isEqualTo( "work1" );
 		Assertions.<Object>assertThat( failureContext1.getUncommittedOperations() )
@@ -547,14 +564,22 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 				.containsExactly( "work1", "work4" );
 
 		IndexFailureContext failureContext2 = failureContext2Capture.getValue();
-		Assertions.assertThat( failureContext2.getThrowable() ).isSameAs( exception );
+		Assertions.assertThat( failureContext2.getThrowable() ).satisfies( new HamcrestCondition<>(
+				ExceptionMatcherBuilder.isException( SearchException.class )
+						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
+						.causedBy( exception ).build()
+		) );
 		Assertions.assertThat( failureContext2.getFailingOperation() )
 				.isEqualTo( "work2" );
 		Assertions.<Object>assertThat( failureContext2.getUncommittedOperations() )
 				.containsExactly( "work2" );
 
 		IndexFailureContext failureContext3 = failureContext3Capture.getValue();
-		Assertions.assertThat( failureContext3.getThrowable() ).isSameAs( exception );
+		Assertions.assertThat( failureContext3.getThrowable() ).satisfies( new HamcrestCondition<>(
+				ExceptionMatcherBuilder.isException( SearchException.class )
+						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
+						.causedBy( exception ).build()
+		) );
 		Assertions.assertThat( failureContext3.getFailingOperation() )
 				.isEqualTo( "work3" );
 		Assertions.<Object>assertThat( failureContext3.getUncommittedOperations() )
@@ -631,9 +656,21 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		bulkResultFuture.completeExceptionally( exception );
 		verifyAll();
 		assertThat( sequenceBuilderBulkResultFuture ).isFailed( exception );
-		assertThat( work1FutureFromSequenceBuilder ).isFailed( exception );
-		assertThat( work2FutureFromSequenceBuilder ).isFailed( exception );
-		assertThat( work3FutureFromSequenceBuilder ).isFailed( exception );
+		assertThat( work1FutureFromSequenceBuilder ).isFailed(
+				ExceptionMatcherBuilder.isException( SearchException.class )
+						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
+						.causedBy( exception ).build()
+		);
+		assertThat( work2FutureFromSequenceBuilder ).isFailed(
+				ExceptionMatcherBuilder.isException( SearchException.class )
+						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
+						.causedBy( exception ).build()
+		);
+		assertThat( work3FutureFromSequenceBuilder ).isFailed(
+				ExceptionMatcherBuilder.isException( SearchException.class )
+						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
+						.causedBy( exception ).build()
+		);
 		assertThat( sequenceFuture ).isPending();
 
 		Capture<IndexFailureContext> failureContext1Capture = Capture.newInstance();
@@ -650,7 +687,11 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( sequenceFuture ).isSuccessful();
 
 		IndexFailureContext failureContext1 = failureContext1Capture.getValue();
-		Assertions.assertThat( failureContext1.getThrowable() ).isSameAs( exception );
+		Assertions.assertThat( failureContext1.getThrowable() ).satisfies( new HamcrestCondition<>(
+				ExceptionMatcherBuilder.isException( SearchException.class )
+						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
+						.causedBy( exception ).build()
+		) );
 		Assertions.assertThat( failureContext1.getFailingOperation() )
 				.isEqualTo( "work1" );
 		Assertions.<Object>assertThat( failureContext1.getUncommittedOperations() )
@@ -658,14 +699,22 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 				.containsExactly( "work1", "work4" );
 
 		IndexFailureContext failureContext2 = failureContext2Capture.getValue();
-		Assertions.assertThat( failureContext2.getThrowable() ).isSameAs( exception );
+		Assertions.assertThat( failureContext2.getThrowable() ).satisfies( new HamcrestCondition<>(
+				ExceptionMatcherBuilder.isException( SearchException.class )
+						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
+						.causedBy( exception ).build()
+		) );
 		Assertions.assertThat( failureContext2.getFailingOperation() )
 				.isEqualTo( "work2" );
 		Assertions.<Object>assertThat( failureContext2.getUncommittedOperations() )
 				.containsExactly( "work2" );
 
 		IndexFailureContext failureContext3 = failureContext3Capture.getValue();
-		Assertions.assertThat( failureContext3.getThrowable() ).isSameAs( exception );
+		Assertions.assertThat( failureContext3.getThrowable() ).satisfies( new HamcrestCondition<>(
+				ExceptionMatcherBuilder.isException( SearchException.class )
+						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
+						.causedBy( exception ).build()
+		) );
 		Assertions.assertThat( failureContext3.getFailingOperation() )
 				.isEqualTo( "work3" );
 		Assertions.<Object>assertThat( failureContext3.getUncommittedOperations() )
