@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThat;
 
 import java.util.concurrent.CompletableFuture;
@@ -1032,51 +1031,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		verifyAll();
 		// Errors MUST NOT be propagated if they've been handled
 		assertThat( sequenceFuture ).isSuccessful();
-	}
-
-	@Test
-	public void error_handler() {
-		ElasticsearchWork<Void> work1 = work( 1 );
-		BulkableElasticsearchWork<Void> work2 = bulkableWork( 2 );
-
-		// Futures returned by mocks: we will complete them
-		CompletableFuture<?> previousFuture = new CompletableFuture<>();
-		CompletableFuture<Void> work1Future = new CompletableFuture<>();
-		CompletableFuture<Void> refreshFuture = new CompletableFuture<>();
-
-		MyException exception = new MyException();
-		IllegalStateException handlerException = new IllegalStateException();
-
-		expect( contextSupplierMock.get() ).andReturn( contextMock );
-		expect( failureHandlerSupplierMock.get() ).andReturn( failureHandlerMock );
-		expect( work1.execute( contextMock ) ).andReturn( (CompletableFuture) work1Future );
-		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder(
-				contextSupplierMock, failureHandlerSupplierMock );
-		builder.init( previousFuture );
-		builder.addNonBulkExecution( work1 );
-		builder.addNonBulkExecution( work2 );
-		CompletableFuture<Void> sequenceFuture = builder.build();
-		previousFuture.complete( null );
-		assertThat( sequenceFuture ).isPending();
-
-		resetAll();
-		failureHandlerMock.markAsFailed( work1, exception );
-		failureHandlerMock.markAsSkipped( work2 );
-		expect( contextMock.executePendingRefreshes() ).andReturn( refreshFuture );
-		replayAll();
-		work1Future.completeExceptionally( exception );
-		verifyAll();
-		assertThat( sequenceFuture ).isPending();
-
-		resetAll();
-		failureHandlerMock.handle();
-		expectLastCall().andThrow( handlerException );
-		replayAll();
-		refreshFuture.complete( null );
-		verifyAll();
-		// Errors MUST be propagated if they originated from the handler (critical failure)
-		assertThat( sequenceFuture ).isFailed( handlerException );
 	}
 
 	/**

@@ -14,6 +14,11 @@ package org.hibernate.search.engine.reporting;
  * The default failure handler simply logs failures at the {@code ERROR} level,
  * but it can be replaced with a custom implementations through
  * {@link org.hibernate.search.engine.cfg.EngineSettings#BACKGROUND_FAILURE_HANDLER a configuration property}.
+ * <p>
+ * Handlers should <strong>never</strong> throw any exception:
+ * doing so will lead to undetermined behavior in Hibernate Search background threads.
+ * <p>
+ * Handlers can be called from multiple threads simultaneously: implementations must be thread-safe.
  *
  * @author Amin Mohammed-Coleman
  */
@@ -21,6 +26,13 @@ public interface FailureHandler {
 
 	/**
 	 * Handle a generic failure.
+	 * <p>
+	 * This method is expected to report the failure somewhere (logs, ...),
+	 * then return as quickly as possible.
+	 * Heavy error processing (sending emails, ...), if any, should be done asynchronously.
+	 * <p>
+	 * This method should <strong>never</strong> throw any exception:
+	 * doing so will lead to undetermined behavior in Hibernate Search background threads.
 	 *
 	 * @param context Contextual information about the failure (throwable, operation, ...)
 	 */
@@ -28,6 +40,13 @@ public interface FailureHandler {
 
 	/**
 	 * Handle the failure of an index operation.
+	 * <p>
+	 * This method is expected to report the failure somewhere (logs, ...),
+	 * then return as quickly as possible.
+	 * Heavy error processing (sending emails, ...), if any, should be done asynchronously.
+	 * <p>
+	 * This method should <strong>never</strong> throw any exception:
+	 * doing so will lead to undetermined behavior in Hibernate Search background threads.
 	 *
 	 * @param context Contextual information about the failure (throwable, operation, ...)
 	 */
