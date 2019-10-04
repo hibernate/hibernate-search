@@ -49,7 +49,8 @@ class ElasticsearchParallelWorkProcessor implements ElasticsearchWorkProcessor {
 	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
 		aggregator.initSequence();
 		CompletableFuture<T> workFuture = work.aggregate( aggregator );
-		aggregator.buildSequence();
+		CompletableFuture<Void> future = aggregator.buildSequence();
+		sequenceFutures.add( future );
 		return workFuture;
 	}
 
