@@ -12,16 +12,16 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
 
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWorkExecutionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.reporting.spi.ContextualFailureHandler;
-import org.hibernate.search.engine.reporting.FailureContext;
+import org.hibernate.search.engine.reporting.IndexFailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.SearchException;
@@ -30,7 +30,9 @@ import org.hibernate.search.util.impl.test.FutureAssert;
 
 import org.junit.Test;
 
+import org.assertj.core.api.Assertions;
 import org.easymock.Capture;
+import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 
 public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
@@ -40,13 +42,13 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 	private EventContext indexEventContext = EventContexts.fromIndexName( INDEX_NAME );
 	private IndexWriterDelegator indexWriterDelegatorMock = createStrictMock( IndexWriterDelegator.class );
 	private FailureHandler failureHandlerMock = createStrictMock( FailureHandler.class );
-	private ContextualFailureHandler contextualFailureHandlerMock = createMock( ContextualFailureHandler.class );
-	private Supplier<ContextualFailureHandler> failureHandlerSupplierMock = createStrictMock( Supplier.class );
 
 	private LuceneWriteWorkProcessor processor = new LuceneWriteWorkProcessor(
 			indexEventContext, indexWriterDelegatorMock,
-			failureHandlerMock, failureHandlerSupplierMock
+			failureHandlerMock
 	);
+
+	private List<LuceneWriteWork<?>> workMocks = new ArrayList<>();
 
 	@Test
 	public void simple() throws IOException {
@@ -96,12 +98,49 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		processor.beginBatch();
 		verifyAll();
 
+		// Execute a successful, committed workset
+		testSuccessfulWorkSet(
+				2,
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE,
+				true
+		);
+
+		// Execute a successful, uncommitted workset
+		testSuccessfulWorkSet(
+				2,
+				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
+				false
+		);
+
 		// Execute a workset where one work fails
+		Capture<IndexFailureContext> failureContextCapture = Capture.newInstance();
 		RuntimeException workException = new RuntimeException( "Some message" );
-		testWorkSetBeginning( 2, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
+		CompletableFuture<Object> workSetFuture = new CompletableFuture<>();
+		testWorkSetBeginning( 3, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
 		testFailingWork( workException );
-		testSkippedWorks( 4 );
-		testWorkSetEndingAfterWorkFailure( workException );
+		testSkippedWorks( 5 );
+		resetAll();
+		indexWriterDelegatorMock.forceLockRelease();
+		expectWorkGetInfo( 2, 2 + 3 + 1 + 5 );
+		failureHandlerMock.handle( capture( failureContextCapture ) );
+		replayAll();
+		processor.afterWorkSet( workSetFuture, new Object() );
+		verifyAll();
+
+		IndexFailureContext failureContext = failureContextCapture.getValue();
+		assertThat( failureContext.getThrowable() ).isSameAs( workException );
+		assertThat( failureContext.getFailingOperation() )
+				.isEqualTo( workInfo( 7 ) );
+		Assertions.<Object>assertThat( failureContext.getUncommittedOperations() )
+				.containsExactly(
+						// Works from the previous, uncommitted workset
+						workInfo( 2 ), workInfo( 3 ),
+						// Works from the current workset
+						workInfo( 4 ), workInfo( 5 ), workInfo( 6 ), workInfo( 7 ),
+						workInfo( 8 ), workInfo( 9 ), workInfo( 10 ), workInfo( 11 ),
+						workInfo( 12 )
+				);
+		FutureAssert.assertThat( workSetFuture ).isFailed( workException );
 
 		// Subsequent worksets must be executed regardless of previous failures in the same batch
 		testSuccessfulWorkSet(
@@ -110,7 +149,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 				false
 		);
 
-		// A work may have failed, but there were still successful changes, before and after the failure: these must be committed
+		// A work may have failed, but there were still successful changes after the failure: these must be committed
 		resetAll();
 		indexWriterDelegatorMock.commit();
 		replayAll();
@@ -128,12 +167,49 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		processor.beginBatch();
 		verifyAll();
 
+		// Execute a successful, committed workset
+		testSuccessfulWorkSet(
+				2,
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE,
+				true
+		);
+
+		// Execute a successful, uncommitted workset
+		testSuccessfulWorkSet(
+				2,
+				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
+				false
+		);
+
 		// Execute a workset where one work fails
+		Capture<IndexFailureContext> failureContextCapture = Capture.newInstance();
 		RuntimeException workException = new RuntimeException( "Some message" );
+		CompletableFuture<Object> workSetFuture = new CompletableFuture<>();
 		testWorkSetBeginning( 3, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE );
 		testFailingWork( workException );
 		testSkippedWorks( 5 );
-		testWorkSetEndingAfterWorkFailure( workException );
+		resetAll();
+		indexWriterDelegatorMock.forceLockRelease();
+		expectWorkGetInfo( 2, 2 + 3 + 1 + 5 );
+		failureHandlerMock.handle( capture( failureContextCapture ) );
+		replayAll();
+		processor.afterWorkSet( workSetFuture, new Object() );
+		verifyAll();
+
+		IndexFailureContext failureContext = failureContextCapture.getValue();
+		assertThat( failureContext.getThrowable() ).isSameAs( workException );
+		assertThat( failureContext.getFailingOperation() )
+				.isEqualTo( workInfo( 7 ) );
+		Assertions.<Object>assertThat( failureContext.getUncommittedOperations() )
+				.containsExactly(
+						// Works from the previous, uncommitted workset
+						workInfo( 2 ), workInfo( 3 ),
+						// Works from the current workset
+						workInfo( 4 ), workInfo( 5 ), workInfo( 6 ),
+						workInfo( 7 ),
+						workInfo( 8 ), workInfo( 9 ), workInfo( 10 ), workInfo( 11 ), workInfo( 12 )
+				);
+		FutureAssert.assertThat( workSetFuture ).isFailed( workException );
 
 		// Subsequent worksets must be executed regardless of previous failures in the same batch
 		testSuccessfulWorkSet(
@@ -142,14 +218,13 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 				false
 		);
 
-		// A work may have failed, but there still were successful changes, before and after the failure: these must be committed
+		// A work may have failed, but there still were successful changes after the failure: these must be committed
 		resetAll();
 		indexWriterDelegatorMock.commit();
 		replayAll();
 		processor.endBatch();
 		verifyAll();
 	}
-
 
 	@Test
 	public void error_workExecuteAndForceLockRelease() throws IOException {
@@ -158,6 +233,20 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		processor.beginBatch();
 		verifyAll();
 
+		// Execute a successful, committed workset
+		testSuccessfulWorkSet(
+				2,
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE,
+				true
+		);
+
+		// Execute a successful, uncommitted workset
+		testSuccessfulWorkSet(
+				2,
+				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
+				false
+		);
+
 		// Execute a workset where one work fails
 		RuntimeException workException = new RuntimeException( "Some message" );
 		testWorkSetBeginning( 2, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
@@ -165,19 +254,35 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		testSkippedWorks( 4 );
 
 		// When ending the workset, forceLockRelease fails...
+		Capture<IndexFailureContext> failureContextCapture = Capture.newInstance();
 		RuntimeException forceLockReleaseException = new RuntimeException( "Some other message" );
 		CompletableFuture<Object> workSetFuture = new CompletableFuture<>();
 		Object workSetResult = new Object();
 		resetAll();
 		indexWriterDelegatorMock.forceLockRelease();
 		expectLastCall().andThrow( forceLockReleaseException );
-		contextualFailureHandlerMock.handle();
+		expectWorkGetInfo( 2, 2 + 2 + 1 + 4 );
+		failureHandlerMock.handle( capture( failureContextCapture ) );
 		replayAll();
 		processor.afterWorkSet( workSetFuture, workSetResult );
 		verifyAll();
 
 		FutureAssert.assertThat( workSetFuture ).isFailed( workException );
-		assertThat( workException.getSuppressed() )
+
+		IndexFailureContext failureContext = failureContextCapture.getValue();
+		assertThat( failureContext.getThrowable() ).isSameAs( workException );
+		assertThat( failureContext.getFailingOperation() )
+				.isEqualTo( workInfo( 6 ) );
+		Assertions.<Object>assertThat( failureContext.getUncommittedOperations() )
+				.containsExactly(
+						// Works from the previous, uncommitted workset
+						workInfo( 2 ), workInfo( 3 ),
+						// Works from the current workset
+						workInfo( 4 ), workInfo( 5 ), workInfo( 6 ), workInfo( 7 ),
+						workInfo( 8 ), workInfo( 9 ), workInfo( 10 )
+				);
+
+		assertThat( failureContext.getThrowable().getSuppressed() )
 				.hasSize( 1 )
 				.satisfies(
 						suppressed -> assertThat( suppressed[0] )
@@ -208,8 +313,16 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		processor.beginBatch();
 		verifyAll();
 
+		// Execute a successful, committed workset
 		testSuccessfulWorkSet(
-				4,
+				2,
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE,
+				true
+		);
+
+		// Execute a successful, uncommitted workset
+		testSuccessfulWorkSet(
+				2,
 				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
 				false
 		);
@@ -224,28 +337,38 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 		RuntimeException commitException = new RuntimeException( "Some message" );
 
-		Capture<Throwable> exceptionCapture = Capture.newInstance();
+		Capture<IndexFailureContext> failureContextCapture = Capture.newInstance();
 		CompletableFuture<Object> workSetFuture = new CompletableFuture<>();
 		Object workSetResult = new Object();
 		resetAll();
 		indexWriterDelegatorMock.commit();
 		expectLastCall().andThrow( commitException );
 		indexWriterDelegatorMock.forceLockRelease();
-		expect( failureHandlerSupplierMock.get() ).andReturn( contextualFailureHandlerMock );
-		contextualFailureHandlerMock.addThrowable( capture( exceptionCapture ) );
-		contextualFailureHandlerMock.handle();
+		expectWorkGetInfo( 2, 2 + 6 );
+		failureHandlerMock.handle( capture( failureContextCapture ) );
 		// We don't expect any commit when a workset fails
 		replayAll();
 		processor.afterWorkSet( workSetFuture, workSetResult );
 		verifyAll();
 
-		assertThat( exceptionCapture.getValue() )
+		IndexFailureContext failureContext = failureContextCapture.getValue();
+		assertThat( failureContext.getThrowable() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to commit" )
 				.hasMessageContaining( INDEX_NAME )
 				.hasCause( commitException );
+		assertThat( failureContext.getFailingOperation() ).asString()
+				.contains( "Commit after a set of index works" );
+		Assertions.<Object>assertThat( failureContext.getUncommittedOperations() )
+				.containsExactly(
+						// Works from the previous, uncommitted workset
+						workInfo( 2 ), workInfo( 3 ),
+						// Works from the current workset
+						workInfo( 4 ), workInfo( 5 ), workInfo( 6 ),
+						workInfo( 7 ), workInfo( 8 ), workInfo( 9 )
+				);
 
-		FutureAssert.assertThat( workSetFuture ).isFailed( exceptionCapture.getValue() );
+		FutureAssert.assertThat( workSetFuture ).isFailed( failureContext.getThrowable() );
 
 		resetAll();
 		replayAll();
@@ -260,8 +383,16 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		processor.beginBatch();
 		verifyAll();
 
+		// Execute a successful, committed workset
 		testSuccessfulWorkSet(
-				4,
+				2,
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE,
+				true
+		);
+
+		// Execute a successful, uncommitted workset
+		testSuccessfulWorkSet(
+				2,
 				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
 				false
 		);
@@ -277,7 +408,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		RuntimeException commitException = new RuntimeException( "Some message" );
 		RuntimeException forceLockReleaseException = new RuntimeException( "Some other message" );
 
-		Capture<Throwable> exceptionCapture = Capture.newInstance();
+		Capture<IndexFailureContext> failureContextCapture = Capture.newInstance();
 		CompletableFuture<Object> workSetFuture = new CompletableFuture<>();
 		Object workSetResult = new Object();
 		resetAll();
@@ -285,21 +416,31 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		expectLastCall().andThrow( commitException );
 		indexWriterDelegatorMock.forceLockRelease();
 		expectLastCall().andThrow( forceLockReleaseException );
-		expect( failureHandlerSupplierMock.get() ).andReturn( contextualFailureHandlerMock );
-		contextualFailureHandlerMock.addThrowable( capture( exceptionCapture ) );
-		contextualFailureHandlerMock.handle();
+		expectWorkGetInfo( 2, 2 + 6 );
+		failureHandlerMock.handle( capture( failureContextCapture ) );
 		// We don't expect any commit when a workset fails
 		replayAll();
 		processor.afterWorkSet( workSetFuture, workSetResult );
 		verifyAll();
 
-		assertThat( exceptionCapture.getValue() )
+		IndexFailureContext failureContext = failureContextCapture.getValue();
+		assertThat( failureContext.getThrowable() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to commit" )
 				.hasMessageContaining( INDEX_NAME )
 				.hasCause( commitException );
+		assertThat( failureContext.getFailingOperation() ).asString()
+				.contains( "Commit after a set of index works" );
+		Assertions.<Object>assertThat( failureContext.getUncommittedOperations() )
+				.containsExactly(
+						// Works from the previous, uncommitted workset
+						workInfo( 2 ), workInfo( 3 ),
+						// Works from the current workset
+						workInfo( 4 ), workInfo( 5 ), workInfo( 6 ),
+						workInfo( 7 ), workInfo( 8 ), workInfo( 9 )
+				);
 
-		assertThat( exceptionCapture.getValue().getSuppressed() )
+		assertThat( failureContext.getThrowable().getSuppressed() )
 				.hasSize( 1 )
 				.satisfies(
 						suppressed -> assertThat( suppressed[0] )
@@ -308,8 +449,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 								.hasCause( forceLockReleaseException )
 				);
 
-
-		FutureAssert.assertThat( workSetFuture ).isFailed( exceptionCapture.getValue() );
+		FutureAssert.assertThat( workSetFuture ).isFailed( failureContext.getThrowable() );
 
 		resetAll();
 		replayAll();
@@ -328,6 +468,11 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 		// Execute worksets
 		testSuccessfulWorkSet(
+				2,
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE,
+				true
+		);
+		testSuccessfulWorkSet(
 				4,
 				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
 				false
@@ -340,26 +485,35 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 		// Fail upon batch commit
 
-		Capture<FailureContext> failureContextCapture = Capture.newInstance();
+		Capture<IndexFailureContext> failureContextCapture = Capture.newInstance();
 		resetAll();
 		indexWriterDelegatorMock.commit();
 		expectLastCall().andThrow( commitException );
 		indexWriterDelegatorMock.forceLockRelease();
+		expectWorkGetInfo( 2, 4 + 6 );
 		failureHandlerMock.handle( capture( failureContextCapture ) );
 		replayAll();
 		processor.endBatch();
 		verifyAll();
 
-		FailureContext failureContext = failureContextCapture.getValue();
+		IndexFailureContext failureContext = failureContextCapture.getValue();
 
 		assertThat( failureContext.getThrowable() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to commit" )
 				.hasMessageContaining( INDEX_NAME )
 				.hasCause( commitException );
-
 		assertThat( failureContext.getFailingOperation() ).asString()
 				.contains( "Commit after a batch of index works" );
+		// Uncommitted operations must include works from all previous works since the last commit
+		Assertions.<Object>assertThat( failureContext.getUncommittedOperations() )
+				.containsExactly(
+						// First uncommitted workset
+						workInfo( 2 ), workInfo( 3 ), workInfo( 4 ), workInfo( 5 ),
+						// Second uncommitted workset
+						workInfo( 6 ), workInfo( 7 ), workInfo( 8 ), workInfo( 9 ),
+						workInfo( 10 ), workInfo( 11 )
+				);
 	}
 
 	@Test
@@ -374,6 +528,11 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 		// Execute worksets
 		testSuccessfulWorkSet(
+				2,
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE,
+				true
+		);
+		testSuccessfulWorkSet(
 				4,
 				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
 				false
@@ -386,24 +545,36 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 		// Fail upon batch commit AND forceLockRelease...
 
-		Capture<FailureContext> failureContextCapture = Capture.newInstance();
+		Capture<IndexFailureContext> failureContextCapture = Capture.newInstance();
 		resetAll();
 		indexWriterDelegatorMock.commit();
 		expectLastCall().andThrow( commitException );
 		indexWriterDelegatorMock.forceLockRelease();
 		expectLastCall().andThrow( forceLockReleaseException );
 		failureHandlerMock.handle( capture( failureContextCapture ) );
+		expectWorkGetInfo( 2, 4 + 6 );
 		replayAll();
 		processor.endBatch();
 		verifyAll();
 
-		FailureContext failureContext = failureContextCapture.getValue();
+		IndexFailureContext failureContext = failureContextCapture.getValue();
 
 		assertThat( failureContext.getThrowable() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to commit" )
 				.hasMessageContaining( INDEX_NAME )
 				.hasCause( commitException );
+		assertThat( failureContext.getFailingOperation() ).asString()
+				.contains( "Commit after a batch of index works" );
+		// Uncommitted operations must include works from all previous works since the last commit
+		Assertions.<Object>assertThat( failureContext.getUncommittedOperations() )
+				.containsExactly(
+						// First uncommitted workset
+						workInfo( 2 ), workInfo( 3 ), workInfo( 4 ), workInfo( 5 ),
+						// Second uncommitted workset
+						workInfo( 6 ), workInfo( 7 ), workInfo( 8 ), workInfo( 9 ),
+						workInfo( 10 ), workInfo( 11 )
+				);
 
 		assertThat( failureContext.getThrowable().getSuppressed() )
 				.hasSize( 1 )
@@ -438,14 +609,11 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 	private void testFailingWork(RuntimeException workException) throws IOException {
 		Capture<LuceneWriteWorkExecutionContext> contextCapture = Capture.newInstance();
 
-		LuceneWriteWork<Object> failingWork = work( "failing" );
-		Object failingWorkInfo = new Object();
+		LuceneWriteWork<Object> failingWork = createWorkMock();
 
 		resetAll();
 		expect( failingWork.execute( capture( contextCapture ) ) ).andThrow( workException );
-		expect( failingWork.getInfo() ).andReturn( failingWorkInfo );
-		expect( failureHandlerSupplierMock.get() ).andReturn( contextualFailureHandlerMock );
-		contextualFailureHandlerMock.markAsFailed( failingWorkInfo, workException );
+		expect( failingWork.getInfo() ).andReturn( workInfo( failingWork ) );
 		replayAll();
 		assertThat( processor.submit( failingWork ) ).isNull();
 		verifyAll();
@@ -462,7 +630,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		verifyAll();
 
 		for ( int i = 0; i < workCount; ++i ) {
-			LuceneWriteWork<Object> work = work( "begin_" + i );
+			LuceneWriteWork<Object> work = createWorkMock();
 			Object workResult = new Object();
 
 			resetAll();
@@ -475,30 +643,22 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		}
 	}
 
-	private void testSkippedWorks(int workCount) throws IOException {
+	private void testSkippedWorks(int workCount) {
 		for ( int i = 0; i < workCount; ++i ) {
-			LuceneWriteWork<Object> work = work( "skipped_" + i );
-			Object workInfo = new Object();
+			LuceneWriteWork<Object> work = createWorkMock();
 
 			resetAll();
-			expect( work.getInfo() ).andReturn( workInfo );
-			contextualFailureHandlerMock.markAsSkipped( workInfo );
 			replayAll();
 			assertThat( processor.submit( work ) ).isNull();
 			verifyAll();
 		}
 	}
 
-	private void testWorkSetEndingAfterWorkFailure(Throwable workException) throws IOException {
-		CompletableFuture<Object> workSetFuture = new CompletableFuture<>();
-		Object workSetResult = new Object();
-		resetAll();
-		indexWriterDelegatorMock.forceLockRelease();
-		contextualFailureHandlerMock.handle();
-		replayAll();
-		processor.afterWorkSet( workSetFuture, workSetResult );
-		verifyAll();
-		FutureAssert.assertThat( workSetFuture ).isFailed( workException );
+	private void expectWorkGetInfo(int firstId, int workCount) {
+		for ( int i = firstId; i < firstId + workCount; ++i ) {
+			LuceneWriteWork<?> workMock = workMocks.get( i );
+			EasyMock.expect( workMock.getInfo() ).andReturn( workInfo( i ) );
+		}
 	}
 
 	private void testContext(LuceneWriteWorkExecutionContext context) throws IOException {
@@ -508,8 +668,19 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		verifyAll();
 	}
 
-	private <T> LuceneWriteWork<T> work(String name) {
-		return createStrictMock( "work_" + name, LuceneWriteWork.class );
+	private <T> LuceneWriteWork<T> createWorkMock() {
+		String workName = workInfo( workMocks.size() );
+		LuceneWriteWork<T> workMock = createStrictMock( workName, LuceneWriteWork.class );
+		workMocks.add( workMock );
+		return workMock;
+	}
+
+	private String workInfo(LuceneWriteWork<?> work) {
+		return workInfo( workMocks.indexOf( work ) );
+	}
+
+	private String workInfo(int index) {
+		return "work_" + index;
 	}
 
 }
