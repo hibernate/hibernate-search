@@ -19,6 +19,6 @@ public interface IndexFailureContext extends FailureContext {
 	 * These operations may not have been applied to the index.
 	 * Use {@link Object#toString()} to get a textual representation of each operation.
 	 */
-	List<Object> getUncommittedOperations();
+	List<?> getUncommittedOperations();
 
 }
