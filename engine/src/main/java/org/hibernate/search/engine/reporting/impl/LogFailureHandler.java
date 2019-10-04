@@ -50,7 +50,7 @@ public class LogFailureHandler implements FailureHandler {
 	}
 
 	private StringBuilder formatMessage(IndexFailureContext context) {
-		final List<Object> uncommittedOperations = context.getUncommittedOperations();
+		final List<?> uncommittedOperations = context.getUncommittedOperations();
 
 		final StringBuilder messageBuilder = formatMessage( (FailureContext) context );
 

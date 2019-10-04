@@ -16,6 +16,7 @@ import org.hibernate.search.engine.reporting.IndexFailureContext;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.assertj.core.api.Assertions;
 import org.easymock.Capture;
 import org.easymock.EasyMockSupport;
 
@@ -62,7 +63,8 @@ public class ContextualFailureHandlerTest extends EasyMockSupport {
 		IndexFailureContext failureContext = capture.getValue();
 		assertThat( failureContext.getThrowable() ).isSameAs( throwable );
 		assertThat( failureContext.getFailingOperation() ).isSameAs( workInfo1 );
-		assertThat( failureContext.getUncommittedOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
+		Assertions.<Object>assertThat( failureContext.getUncommittedOperations() )
+				.containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
 	}
 
 	@Test
@@ -110,7 +112,8 @@ public class ContextualFailureHandlerTest extends EasyMockSupport {
 		assertThat( failureContext.getThrowable() ).isSameAs( throwable );
 		assertThat( failureContext.getFailingOperation() ).asString()
 				.contains( "Unknown operation" ); // Automatically replaces 'null'
-		assertThat( failureContext.getUncommittedOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
+		Assertions.<Object>assertThat( failureContext.getUncommittedOperations() )
+				.containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
 	}
 
 	@Test
@@ -141,7 +144,8 @@ public class ContextualFailureHandlerTest extends EasyMockSupport {
 		assertThat( failureContext.getThrowable() ).isSameAs( throwable1 );
 		assertThat( throwable1.getSuppressed() ).containsExactlyInAnyOrder( throwable2 );
 		assertThat( failureContext.getFailingOperation() ).isIn( workInfo1, workInfo2 );
-		assertThat( failureContext.getUncommittedOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
+		Assertions.<Object>assertThat( failureContext.getUncommittedOperations() )
+				.containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
 	}
 
 	@Test
@@ -177,7 +181,8 @@ public class ContextualFailureHandlerTest extends EasyMockSupport {
 		assertThat( failureContext.getThrowable() ).isSameAs( throwable1 );
 		assertThat( throwable1.getSuppressed() ).containsExactlyInAnyOrder( throwable2 );
 		assertThat( failureContext.getFailingOperation() ).isSameAs( workInfo1 );
-		assertThat( failureContext.getUncommittedOperations() ).containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
+		Assertions.<Object>assertThat( failureContext.getUncommittedOperations() )
+				.containsExactlyInAnyOrder( workInfo1, workInfo2, workInfo3 );
 	}
 
 	private Object workInfo(int index) {
