@@ -199,7 +199,7 @@
         <version.com.fasterxml.jackson.databind>2.9.9.3</version.com.fasterxml.jackson.databind>
 
         <!-- >>> ORM -->
-        <version.org.hibernate>5.4.5.Final</version.org.hibernate>
+        <version.org.hibernate>5.4.6.Final</version.org.hibernate>
         <javadoc.org.hibernate.url>http://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/javadocs/</javadoc.org.hibernate.url>
         <documentation.org.hibernate.url>http://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.url>
         <version.org.hibernate.commons.annotations>5.1.0.Final</version.org.hibernate.commons.annotations>
@@ -334,7 +334,7 @@
         <maven.compiler.argument.source>${maven.compiler.source}</maven.compiler.argument.source>
         <maven.compiler.argument.testTarget>${maven.compiler.testTarget}</maven.compiler.argument.testTarget>
         <maven.compiler.argument.testSource>${maven.compiler.testSource}</maven.compiler.argument.testSource>
-        
+
         <!--
                 Options to compile with the Eclipse compiler when building with maven (not with the IDE).
                 See profile "compiler-eclipse".
@@ -1984,7 +1984,7 @@
                 <javadoc.additionalOptions.java-version>-html5 -source 8</javadoc.additionalOptions.java-version>
             </properties>
         </profile>
-        
+
         <profile>
             <id>compiler-eclipse</id>
             <build>
