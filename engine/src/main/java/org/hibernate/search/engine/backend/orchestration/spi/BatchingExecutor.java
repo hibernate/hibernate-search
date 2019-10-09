@@ -36,10 +36,10 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 
 	private final BlockingQueue<W> workQueue;
 	private final List<W> workBuffer;
-	private final AtomicBoolean processingScheduled;
+	private final AtomicBoolean processingInProgress;
 
 	private ExecutorService executorService;
-	private volatile CompletableFuture<?> emptyQueueFuture;
+	private volatile CompletableFuture<?> completionFuture;
 
 	/**
 	 * @param name The name of the executor thread (and of this executor when reporting errors)
@@ -59,7 +59,7 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 		this.maxTasksPerBatch = maxTasksPerBatch;
 		workQueue = new ArrayBlockingQueue<>( maxTasksPerBatch, fair );
 		workBuffer = new ArrayList<>( maxTasksPerBatch );
-		processingScheduled = new AtomicBoolean( false );
+		processingInProgress = new AtomicBoolean( false );
 	}
 
 	/**
@@ -84,9 +84,9 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 			workQueue.clear();
 			// It's possible that processing was successfully scheduled in the executor service but had no chance to run,
 			// so we need to release waiting threads:
-			if ( emptyQueueFuture != null ) {
-				emptyQueueFuture.cancel( false );
-				emptyQueueFuture = null;
+			if ( completionFuture != null ) {
+				completionFuture.cancel( false );
+				completionFuture = null;
 			}
 		}
 	}
@@ -114,7 +114,7 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 	 * Works submitted to the executor after entering this method may delay the wait.
 	 */
 	public CompletableFuture<?> getCompletion() {
-		CompletableFuture<?> future = emptyQueueFuture;
+		CompletableFuture<?> future = completionFuture;
 		if ( future == null ) {
 			// No processing in progress or scheduled.
 			return CompletableFuture.completedFuture( null );
@@ -126,11 +126,20 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 	}
 
 	private void ensureProcessingScheduled() {
-		if ( processingScheduled.compareAndSet( false, true ) ) {
-			// Our thread successfully flipped the boolean:
-			// processing wasn't scheduled, and we're now responsible for scheduling it.
+		if ( processingInProgress.compareAndSet( false, true ) ) {
+			/*
+			 * Our thread successfully flipped the boolean:
+			 * processing wasn't in progress, and we're now responsible for scheduling it.
+			 */
 			try {
-				emptyQueueFuture = new CompletableFuture<>();
+				if ( completionFuture == null ) {
+					/*
+					 * The executor was previously idle:
+					 * we need to create a new future for the completion of the queue.
+					 * This is not executed when re-scheduling processing between two batches.
+					 */
+					completionFuture = new CompletableFuture<>();
+				}
 				executorService.submit( this::processBatch );
 			}
 			catch (Throwable e) {
@@ -140,9 +149,9 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 				 * doesn't leave other threads waiting indefinitely.
 				 */
 				try {
-					CompletableFuture<?> future = emptyQueueFuture;
-					emptyQueueFuture = null;
-					processingScheduled.set( false );
+					CompletableFuture<?> future = completionFuture;
+					completionFuture = null;
+					processingInProgress.set( false );
 					future.completeExceptionally( e );
 				}
 				catch (Throwable e2) {
@@ -194,18 +203,24 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 			);
 		}
 		finally {
+			// We're done executing this batch.
 			if ( workQueue.isEmpty() ) {
-				processingScheduled.set( false );
-				// Handle onCompletion()
-				CompletableFuture<?> future = this.emptyQueueFuture;
-				emptyQueueFuture = null;
-				future.complete( null );
+				// We're done executing the whole queue: handle getCompletion().
+				CompletableFuture<?> justFinishedQueueFuture = this.completionFuture;
+				completionFuture = null;
+				justFinishedQueueFuture.complete( null );
 			}
-			else {
-				// There are more batches to process.
-				// Leave 'processingScheduled' as it is ('true') and schedule the next batch.
+			// Allow this thread (or others) to schedule processing again.
+			processingInProgress.set( false );
+			if ( !workQueue.isEmpty() ) {
+				/*
+				 * Either the work queue wasn't empty and the "if" block above wasn't executed,
+				 * or the "if" block above was executed but someone submitted new work between
+				 * the call to workQueue.isEmpty() and the call to processingInProgress.set( false ).
+				 * In either case, we need to re-schedule processing, because no one else will.
+				 */
 				try {
-					executorService.submit( this::processBatch );
+					ensureProcessingScheduled();
 				}
 				catch (Throwable e) {
 					// This will only happen if there is a bug in this class, but we don't want to fail silently
