@@ -85,6 +85,11 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 	}
 
 	@Override
+	public ConfigurationPropertySource getMaskedPropertySource() {
+		return propertySource;
+	}
+
+	@Override
 	public SearchIntegrationBuilder setClassResolver(ClassResolver classResolver) {
 		this.classResolver = classResolver;
 		return this;
