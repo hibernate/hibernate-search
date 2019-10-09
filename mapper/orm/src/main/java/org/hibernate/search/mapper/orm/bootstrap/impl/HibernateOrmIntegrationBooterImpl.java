@@ -66,7 +66,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 	private final ServiceRegistryImplementor serviceRegistry;
 	private final ReflectionManager reflectionManager;
 	private final ConfigurationService ormConfigurationService;
-	private final ConfigurationPropertySource propertySource;
+	private final ConfigurationPropertySource rootPropertySource;
 	private final ConfigurationPropertyChecker propertyChecker;
 
 	private final Optional<EnvironmentSynchronizer> environmentSynchronizer;
@@ -93,7 +93,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		this.metadata = metadata;
 		this.serviceRegistry = (ServiceRegistryImplementor) bootstrapContext.getServiceRegistry();
 		this.reflectionManager = bootstrapContext.getReflectionManager();
-		this.propertySource = checkerWrappedPropertySource;
+		this.rootPropertySource = checkerWrappedPropertySource;
 		this.propertyChecker = propertyChecker;
 		this.ormConfigurationService = serviceRegistry.getService( ConfigurationService.class );
 
@@ -183,7 +183,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 
 	private HibernateSearchContextProviderService bootNow(SessionFactoryImplementor sessionFactoryImplementor) {
 		Optional<HibernateOrmIntegrationPartialBuildState> partialBuildStateOptional =
-				INTEGRATION_PARTIAL_BUILD_STATE.get( propertySource );
+				INTEGRATION_PARTIAL_BUILD_STATE.get( rootPropertySource );
 
 		HibernateOrmIntegrationPartialBuildState partialBuildState;
 		if ( partialBuildStateOptional.isPresent() ) {
@@ -214,11 +214,12 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 		BeanProvider beanProvider = null;
 		SearchIntegrationPartialBuildState searchIntegrationPartialBuildState = null;
 		try {
-			SearchIntegrationBuilder builder = SearchIntegration.builder( propertySource, propertyChecker );
+			SearchIntegrationBuilder builder = SearchIntegration.builder( rootPropertySource, propertyChecker );
 
 			HibernateOrmMappingKey mappingKey = new HibernateOrmMappingKey();
 			HibernateOrmMappingInitiator mappingInitiator = HibernateOrmMappingInitiator.create(
-					metadata, reflectionManager, ormConfigurationService, propertySource
+					metadata, reflectionManager, ormConfigurationService,
+					builder.getMaskedPropertySource()
 			);
 			builder.addMappingInitiator( mappingKey, mappingInitiator );
 
@@ -266,7 +267,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 			HibernateOrmIntegrationPartialBuildState partialBuildState,
 			SessionFactoryImplementor sessionFactoryImplementor) {
 		SearchIntegrationFinalizer finalizer =
-				partialBuildState.integrationBuildState.finalizer( propertySource, propertyChecker );
+				partialBuildState.integrationBuildState.finalizer( rootPropertySource, propertyChecker );
 
 		HibernateOrmMapping mapping = finalizer.finalizeMapping(
 				partialBuildState.mappingKey,
