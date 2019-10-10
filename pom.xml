@@ -1468,6 +1468,10 @@
                                         so that they can opt out
                                      -->
                                     <exclude>**/MethodHandleValueReadHandleFactory.class</exclude>
+                                    <!--
+                                        Class allowed to use CompletableFuture#join()
+                                     -->
+                                    <exclude>**/Futures.class</exclude>
                                 </excludes>
                                 <bundledSignatures>
                                     <!-- These signatures on the top are not specific to any JDK version -->

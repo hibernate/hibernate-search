@@ -77,3 +77,7 @@ java.lang.invoke.MethodHandles$Lookup#unreflectGetter(java.lang.reflect.Field)
 java.lang.invoke.MethodHandles$Lookup#unreflectSetter(java.lang.reflect.Field)
 java.lang.invoke.MethodHandles$Lookup#revealDirect(java.lang.invoke.MethodHandle)
 java.lang.invoke.MethodHandles$Lookup#findStatic(java.lang.Class, java.lang.String, java.lang.invoke.MethodType)
+
+################################################################################################################
+@defaultMessage CompletableFuture#join() wraps exceptions with CompletionException, which is generally not what we want (we want the original exception). Use Futures.unwrappedExceptionJoin() instead.
+java.util.concurrent.CompletableFuture#join()
