@@ -81,6 +81,26 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 				|| DocumentRefreshStrategy.FORCE.equals( refreshStrategy );
 	}
 
+	/**
+	 * This bypasses the normal {@link #submit(LuceneWriteWork)} method in order
+	 * to avoid setting {@link #hasUncommittedWorks} to {@code true},
+	 * so that we skip the end-of-batch commit and thus avoid the creation of an IndexWriter,
+	 * which would be pointless in this case.
+	 */
+	void ensureIndexExists() {
+		try {
+			indexWriterDelegator.ensureIndexExists();
+		}
+		catch (IOException | RuntimeException e) {
+			workSetFailure = log.unableToInitializeIndexDirectory(
+					e.getMessage(), indexEventContext, e
+			);
+			// TODO HSEARCH-1375 report the index name?
+			//workSetContextualErrorHandler.indexManager( resources.getIndexManager() );
+			getWorkSetContextualErrorHandler().markAsFailed( "Index initialization", e );
+		}
+	}
+
 	<T> T submit(LuceneWriteWork<T> work) {
 		if ( workSetFailure == null ) {
 			try {
