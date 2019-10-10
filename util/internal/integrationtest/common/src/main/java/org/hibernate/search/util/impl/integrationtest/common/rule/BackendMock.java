@@ -323,41 +323,35 @@ public class BackendMock implements TestRule {
 		}
 
 		public IndexScopeWorkCallListContext optimize() {
-			return optimize( CompletableFuture.completedFuture( null ) );
+			return indexScopeWork( StubIndexScopeWork.Type.OPTIMIZE );
 		}
 
 		public IndexScopeWorkCallListContext optimize(CompletableFuture<?> future) {
-			return work(
-					StubIndexScopeWork.builder( StubIndexScopeWork.Type.OPTIMIZE ).build(),
-					future
-			);
+			return indexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, future );
 		}
 
 		public IndexScopeWorkCallListContext purge() {
-			return purge( CompletableFuture.completedFuture( null ) );
+			return indexScopeWork( StubIndexScopeWork.Type.PURGE );
 		}
 
 		public IndexScopeWorkCallListContext purge(CompletableFuture<?> future) {
-			return work(
-					StubIndexScopeWork.builder( StubIndexScopeWork.Type.PURGE )
-							.tenantIdentifier( tenantIdentifier )
-							.build(),
-					future
-			);
+			return indexScopeWork( StubIndexScopeWork.Type.PURGE, future );
 		}
 
 		public IndexScopeWorkCallListContext flush() {
-			return flush( CompletableFuture.completedFuture( null ) );
+			return indexScopeWork( StubIndexScopeWork.Type.FLUSH );
 		}
 
 		public IndexScopeWorkCallListContext flush(CompletableFuture<?> future) {
-			return work(
-					StubIndexScopeWork.builder( StubIndexScopeWork.Type.FLUSH ).build(),
-					future
-			);
+			return indexScopeWork( StubIndexScopeWork.Type.FLUSH, future );
 		}
 
-		private IndexScopeWorkCallListContext work(StubIndexScopeWork work, CompletableFuture<?> future) {
+		public IndexScopeWorkCallListContext indexScopeWork(StubIndexScopeWork.Type type) {
+			return indexScopeWork( type, CompletableFuture.completedFuture( null ) );
+		}
+
+		public IndexScopeWorkCallListContext indexScopeWork(StubIndexScopeWork.Type type, CompletableFuture<?> future) {
+			StubIndexScopeWork work = StubIndexScopeWork.builder( type ).build();
 			expectationConsumer.accept( new IndexScopeWorkCall( indexNames, work, future ) );
 			return this;
 		}
