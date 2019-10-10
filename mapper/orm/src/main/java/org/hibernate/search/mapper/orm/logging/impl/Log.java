@@ -92,16 +92,16 @@ public interface Log extends BasicLogger {
 	 * which is not necessarily using a logger but we still
 	 * want to internationalize the message.
 	 */
-	@Message(id = ID_OFFSET_1 + 116, value = "MassIndexer operation")
+	@Message(value = "MassIndexer operation")
 	String massIndexerOperation();
 
-	@Message(id = ID_OFFSET_1 + 183, value = "Indexing instance of type %s while mass indexing: %s")
+	@Message(value = "Indexing instance of type %s while mass indexing: %s")
 	String massIndexerIndexingInstance(String clazz, String value);
 
-	@Message(id = ID_OFFSET_1 + 211, value = "Fetching the primary identifiers list")
+	@Message(value = "Fetching the primary identifiers list")
 	String massIndexerFetchingIds();
 
-	@Message(id = ID_OFFSET_1 + 212, value = "Transforming identifiers to Lucene Documents")
+	@Message(value = "Transforming identifiers to Lucene Documents")
 	String massIndexerTransformingIds();
 
 	@Message(id = ID_OFFSET_1 + 276, value = "No transaction is active while indexing entity type '%1$s'; Consider increasing the connection time-out")
