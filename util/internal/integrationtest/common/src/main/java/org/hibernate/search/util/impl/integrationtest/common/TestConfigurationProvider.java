@@ -74,20 +74,31 @@ public final class TestConfigurationProvider implements TestRule {
 			throw new IllegalStateException( "Error loading test properties file: " + propertyFilePath, e );
 		}
 
-		Map<String, Object> overriddenProperties = new LinkedHashMap<>();
+		Map<String, Object> propertiesAsMap = new LinkedHashMap<>();
+		properties.forEach( (k, v) -> {
+			if ( k instanceof String ) {
+				propertiesAsMap.put( (String) k, v );
+			}
+		} );
+
+		return interpolateProperties( propertiesAsMap );
+	}
+
+	public Map<String, Object> interpolateProperties(Map<String, Object> properties) {
+		Map<String, Object> interpolatedProperties = new LinkedHashMap<>();
 
 		properties.forEach( (k, v) -> {
 			if ( v instanceof String ) {
-				overriddenProperties.put(
-						(String) k,
+				interpolatedProperties.put(
+						k,
 						( (String) v ).replace( "#{tck.test.id}", testId )
 								.replace( "#{tck.startup.timestamp}", STARTUP_TIMESTAMP ) );
 			}
 			else {
-				overriddenProperties.put( (String) k, v );
+				interpolatedProperties.put( k, v );
 			}
 		} );
 
-		return overriddenProperties;
+		return interpolatedProperties;
 	}
 }

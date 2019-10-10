@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
-import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
@@ -22,13 +21,5 @@ public interface TckBackendSetupStrategy {
 	ConfigurationPropertySource createBackendConfigurationPropertySource(TestConfigurationProvider configurationProvider);
 
 	SearchSetupHelper.SetupContext startSetup(SearchSetupHelper.SetupContext setupHelper);
-
-	static TckBackendSetupStrategy of(String propertiesClasspathResourcePath) {
-		return of( propertiesClasspathResourcePath, null );
-	}
-
-	static TckBackendSetupStrategy of(String propertiesClasspathResourcePath, Map<String, Object> overrides) {
-		return new DefaultTckBackendSetupStrategy( propertiesClasspathResourcePath, overrides );
-	}
 
 }

@@ -169,11 +169,9 @@ public class ElasticsearchContentLengthIT {
 	}
 
 	private ElasticsearchClientImplementor createClient() {
-		ConfigurationPropertySource defaultBackendProperties = ConfigurationPropertySource.fromMap(
-				testConfigurationProvider.getPropertiesFromFile(
-						ElasticsearchTckBackendHelper.DEFAULT_BACKEND_PROPERTIES_PATH
-				)
-		);
+		ConfigurationPropertySource defaultBackendProperties =
+				new ElasticsearchTckBackendHelper().createDefaultBackendSetupStrategy()
+						.createBackendConfigurationPropertySource( testConfigurationProvider );
 
 		// Redirect requests to Wiremock
 		Map<String, Object> configurationOverride = new HashMap<>();
