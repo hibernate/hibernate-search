@@ -503,12 +503,15 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		Statement wrapped = new Statement() {
 			@Override
 			public void evaluate() throws Throwable {
-				try {
-					open( configurationProvider );
-					base.evaluate();
-				}
-				finally {
-					close();
+				// Using the closer like this allows to suppress exceptions thrown by the 'finally' block.
+				try ( Closer<IOException> closer = new Closer<>() ) {
+					try {
+						open( configurationProvider );
+						base.evaluate();
+					}
+					finally {
+						close( closer );
+					}
 				}
 			}
 		};
@@ -539,13 +542,17 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 	@Override
 	public void close() throws IOException {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.pushAll( this::tryDeleteESIndex, createdIndicesNames );
-			createdIndicesNames.clear();
-			closer.pushAll( this::tryDeleteESTemplate, createdTemplatesNames );
-			createdTemplatesNames.clear();
-			closer.push( this::tryCloseClient, client );
-			client = null;
+			close( closer );
 		}
+	}
+
+	private void close(Closer<IOException> closer) {
+		closer.pushAll( this::tryDeleteESIndex, createdIndicesNames );
+		createdIndicesNames.clear();
+		closer.pushAll( this::tryDeleteESTemplate, createdTemplatesNames );
+		createdTemplatesNames.clear();
+		closer.push( this::tryCloseClient, client );
+		client = null;
 	}
 
 	private void tryDeleteESIndex(URLEncodedString indexName) {
