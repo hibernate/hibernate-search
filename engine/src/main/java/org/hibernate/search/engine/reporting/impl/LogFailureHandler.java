@@ -45,6 +45,7 @@ public class LogFailureHandler implements FailureHandler {
 				.append( "\n" );
 		messageBuilder.append( "Failing operation:\n" );
 		messageBuilder.append( failingOperation );
+		messageBuilder.append( "\n" );
 
 		return messageBuilder;
 	}
@@ -58,6 +59,7 @@ public class LogFailureHandler implements FailureHandler {
 			messageBuilder.append( "Uncommitted operations as a result:\n" );
 			for ( Object operation : uncommittedOperations ) {
 				messageBuilder.append( operation );
+				messageBuilder.append( "\n" );
 			}
 		}
 
