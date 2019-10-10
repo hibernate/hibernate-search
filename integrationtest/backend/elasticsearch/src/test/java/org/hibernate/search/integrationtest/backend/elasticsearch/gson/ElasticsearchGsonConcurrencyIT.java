@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.gson;
 
+import java.io.IOException;
+
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -54,7 +56,7 @@ public class ElasticsearchGsonConcurrencyIT {
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Test
-	public void repeatedlyStartMultipleIndexesSerializingWithGsonInParallel() {
+	public void repeatedlyStartMultipleIndexesSerializingWithGsonInParallel() throws IOException {
 		for ( int i = 0; i < REPRODUCER_ATTEMPTS; i++ ) {
 			startMultipleIndexesSerializingWithGsonInParallel();
 			setupHelper.cleanUp();

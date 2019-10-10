@@ -18,6 +18,8 @@ public interface TckBackendSetupStrategy {
 
 	Optional<TestRule> getTestRule();
 
+	TckBackendAccessor createBackendAccessor(TestConfigurationProvider configurationProvider);
+
 	ConfigurationPropertySource createBackendConfigurationPropertySource(TestConfigurationProvider configurationProvider);
 
 	SearchSetupHelper.SetupContext startSetup(SearchSetupHelper.SetupContext setupHelper);

@@ -12,9 +12,11 @@ import java.util.Optional;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.DefaultITAnalysisConfigurer;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
 import org.junit.rules.TestRule;
@@ -49,6 +51,13 @@ class ElasticsearchTckBackendSetupStrategy implements TckBackendSetupStrategy {
 		return ConfigurationPropertySource.fromMap(
 				configurationProvider.interpolateProperties( properties )
 		);
+	}
+
+	@Override
+	public TckBackendAccessor createBackendAccessor(TestConfigurationProvider configurationProvider) {
+		TestElasticsearchClient client = new TestElasticsearchClient();
+		client.open( configurationProvider );
+		return new ElasticsearchTckBackendAccessor( client );
 	}
 
 	@Override
