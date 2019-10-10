@@ -19,9 +19,6 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.cfg.EngineSettings;
-import org.hibernate.search.engine.reporting.FailureContext;
-import org.hibernate.search.engine.reporting.IndexFailureContext;
-import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
@@ -31,6 +28,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.stub.StubFailureHandler;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScopeWork;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
@@ -89,15 +87,15 @@ public class MassIndexingFailureIT {
 
 	@Test
 	public void indexing_customHandler() {
-		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 
-		SessionFactory sessionFactory = setup( CountingFailureHandler.class.getName() );
+		SessionFactory sessionFactory = setup( StubFailureHandler.class.getName() );
 
-		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 
 		doMassIndexing(
 				sessionFactory,
@@ -108,9 +106,9 @@ public class MassIndexingFailureIT {
 				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.SUCCEED )
 		);
 
-		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
 	}
 
 	@Test
@@ -133,21 +131,21 @@ public class MassIndexingFailureIT {
 
 	@Test
 	public void getId_customHandler() {
-		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 
-		SessionFactory sessionFactory = setup( CountingFailureHandler.class.getName() );
+		SessionFactory sessionFactory = setup( StubFailureHandler.class.getName() );
 
-		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 
 		doMassIndexingWithBook2GetIdFailure( sessionFactory );
 
-		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
 	}
 
 	@Test
@@ -170,21 +168,21 @@ public class MassIndexingFailureIT {
 
 	@Test
 	public void getTitle_customHandler() {
-		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 
-		SessionFactory sessionFactory = setup( CountingFailureHandler.class.getName() );
+		SessionFactory sessionFactory = setup( StubFailureHandler.class.getName() );
 
-		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 
 		doMassIndexingWithBook2GetTitleFailure( sessionFactory );
 
-		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
 	}
 
 	@Test
@@ -208,24 +206,24 @@ public class MassIndexingFailureIT {
 
 	@Test
 	public void purge_customHandler() {
-		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 
-		SessionFactory sessionFactory = setup( CountingFailureHandler.class.getName() );
+		SessionFactory sessionFactory = setup( StubFailureHandler.class.getName() );
 
-		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 
 		doMassIndexing(
 				sessionFactory,
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.FAIL )
 		);
 
-		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
 	}
 
 	@Test
@@ -250,15 +248,15 @@ public class MassIndexingFailureIT {
 
 	@Test
 	public void optimizeBefore_customHandler() {
-		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 
-		SessionFactory sessionFactory = setup( CountingFailureHandler.class.getName() );
+		SessionFactory sessionFactory = setup( StubFailureHandler.class.getName() );
 
-		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 
 		doMassIndexing(
 				sessionFactory,
@@ -266,9 +264,9 @@ public class MassIndexingFailureIT {
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.FAIL )
 		);
 
-		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
 	}
 
 	@Test
@@ -295,15 +293,15 @@ public class MassIndexingFailureIT {
 
 	@Test
 	public void optimizeAfter_customHandler() {
-		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 
-		SessionFactory sessionFactory = setup( CountingFailureHandler.class.getName() );
+		SessionFactory sessionFactory = setup( StubFailureHandler.class.getName() );
 
-		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 
 		doMassIndexing(
 				sessionFactory,
@@ -313,9 +311,9 @@ public class MassIndexingFailureIT {
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.FAIL )
 		);
 
-		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
 	}
 
 	@Test
@@ -343,15 +341,15 @@ public class MassIndexingFailureIT {
 
 	@Test
 	public void flush_customHandler() {
-		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 
-		SessionFactory sessionFactory = setup( CountingFailureHandler.class.getName() );
+		SessionFactory sessionFactory = setup( StubFailureHandler.class.getName() );
 
-		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 
 		doMassIndexing(
 				sessionFactory,
@@ -362,9 +360,9 @@ public class MassIndexingFailureIT {
 				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.FAIL )
 		);
 
-		assertThat( staticCounters.get( CountingFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( CountingFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
 	}
 
 	private void doMassIndexing(SessionFactory sessionFactory, Runnable ... expectationSetters) {
@@ -592,28 +590,6 @@ public class MassIndexingFailureIT {
 		public void setAuthor(String author) {
 			this.author = author;
 		}
-	}
-
-	public static class CountingFailureHandler implements FailureHandler {
-
-		public static StaticCounters.Key CREATE = StaticCounters.createKey();
-		public static StaticCounters.Key HANDLE_GENERIC_CONTEXT = StaticCounters.createKey();
-		public static StaticCounters.Key HANDLE_INDEX_CONTEXT = StaticCounters.createKey();
-
-		public CountingFailureHandler() {
-			StaticCounters.get().increment( CREATE );
-		}
-
-		@Override
-		public void handle(FailureContext context) {
-			StaticCounters.get().increment( HANDLE_GENERIC_CONTEXT );
-		}
-
-		@Override
-		public void handle(IndexFailureContext context) {
-			StaticCounters.get().increment( HANDLE_INDEX_CONTEXT );
-		}
-
 	}
 
 	private static class SimulatedFailure extends RuntimeException {
