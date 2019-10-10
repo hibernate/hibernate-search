@@ -464,6 +464,10 @@
         <!-- Control how integration tests format the requests sent to Elasticsearch -->
         <test.elasticsearch.testdialect></test.elasticsearch.testdialect>
 
+        <!-- Lucene tests properties -->
+
+        <test.lucene.indexes.path>${project.build.directory}/test-indexes/</test.lucene.indexes.path>
+
         <!-- Eclipse plugin options -->
 
         <m2e.apt.activation>jdt_apt</m2e.apt.activation>
