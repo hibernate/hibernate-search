@@ -30,6 +30,7 @@ import org.hibernate.search.engine.reporting.spi.FailureContextImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
+import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -218,10 +219,11 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			} );
 		}
 
-		CompletableFuture.allOf( futures )
-				// We handle exceptions on a per-entity basis, so we ignore them here.
-				.exceptionally( exception -> null )
-				.join();
+		Futures.unwrappedExceptionJoin(
+				CompletableFuture.allOf( futures )
+						// We handle exceptions on a per-entity basis, so we ignore them here.
+						.exceptionally( exception -> null )
+		);
 
 		monitor.documentsAdded( entities.size() - failedEntitiesAdder.longValue() );
 	}

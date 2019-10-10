@@ -17,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRespon
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.Gson;
@@ -52,7 +53,7 @@ public class ElasticsearchClientUtils {
 			ElasticsearchRequest request = ElasticsearchRequest.get().build();
 			ElasticsearchResponse response = null;
 			try {
-				response = client.submit( request ).join();
+				response = Futures.unwrappedExceptionJoin( client.submit( request ) );
 
 				if ( !ElasticsearchClientUtils.isSuccessCode( response.getStatusCode() ) ) {
 					throw log.elasticsearchResponseIndicatesFailure();

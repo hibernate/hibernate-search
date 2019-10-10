@@ -54,7 +54,7 @@ public class ElasticsearchBootstrapFailureIT {
 						.failure(
 								"Failed to detect the Elasticsearch version running on the cluster",
 								"Elasticsearch request failed",
-								"java.net.ConnectException: Connection refused"
+								"Connection refused"
 						)
 						.build()
 				);

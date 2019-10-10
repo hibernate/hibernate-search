@@ -20,6 +20,7 @@ import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Executors;
+import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
 import javax.persistence.metamodel.IdentifiableType;
@@ -148,16 +149,16 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	 */
 	private void afterBatch() {
 		if ( this.optimizeAtEnd ) {
-			scopeWorkspace.optimize().join();
+			Futures.unwrappedExceptionJoin( scopeWorkspace.optimize() );
 		}
-		scopeWorkspace.flush().join();
+		Futures.unwrappedExceptionJoin( scopeWorkspace.flush() );
 	}
 
 	/**
 	 * batch indexing has been interrupted : flush to apply all index update realized before interruption
 	 */
 	private void afterBatchOnInterruption() {
-		scopeWorkspace.flush().join();
+		Futures.unwrappedExceptionJoin( scopeWorkspace.flush() );
 	}
 
 	/**
@@ -165,9 +166,9 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	 */
 	private void beforeBatch() {
 		if ( this.purgeAtStart ) {
-			scopeWorkspace.purge().join();
+			Futures.unwrappedExceptionJoin( scopeWorkspace.purge() );
 			if ( this.optimizeAfterPurge ) {
-				scopeWorkspace.optimize().join();
+				Futures.unwrappedExceptionJoin( scopeWorkspace.optimize() );
 			}
 		}
 	}

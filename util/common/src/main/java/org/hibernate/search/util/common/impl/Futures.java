@@ -184,7 +184,7 @@ public final class Futures {
 			return future.join();
 		}
 		catch (CompletionException e) {
-			throw Throwables.expectRuntimeException( e.getCause() );
+			throw Throwables.toRuntimeException( e.getCause() );
 		}
 	}
 

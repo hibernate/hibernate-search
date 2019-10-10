@@ -121,7 +121,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				.query( filteredPayload )
 				.routingKeys( routingKeys )
 				.build();
-		return queryOrchestrator.submit( work ).join();
+		return Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) );
 	}
 
 	@Override
