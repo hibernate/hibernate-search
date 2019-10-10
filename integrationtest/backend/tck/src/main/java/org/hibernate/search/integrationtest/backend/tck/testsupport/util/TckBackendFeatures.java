@@ -39,4 +39,12 @@ public class TckBackendFeatures {
 	public boolean nonDefaultOrderInTermsAggregations() {
 		return true;
 	}
+
+	public boolean flushWillFailIfAppliedToDeletedIndex() {
+		return true;
+	}
+
+	public boolean optimizeWillFailIfAppliedToDeletedIndex() {
+		return true;
+	}
 }

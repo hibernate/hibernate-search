@@ -23,4 +23,25 @@ class LuceneTckBackendFeatures extends TckBackendFeatures {
 		return false;
 	}
 
+	@Override
+	public boolean flushWillFailIfAppliedToDeletedIndex() {
+		/*
+		 * Lucene has optimizations in place to not apply flushes when there are no pending change in the writer.
+		 * Thus, even if we ruthlessly delete the index from the filesystem,
+		 * executing a flush will work most of the time,
+		 * because most of the time changes are already committed when the flush executes.
+		 */
+		return false;
+	}
+
+	@Override
+	public boolean optimizeWillFailIfAppliedToDeletedIndex() {
+		/*
+		 * Lucene has optimizations in place to not apply optimize() when there is only one segment.
+		 * Thus, even if we ruthlessly delete the index from the filesystem,
+		 * executing optimize() will work most of the time,
+		 * because most of the time we will only have one segment.
+		 */
+		return false;
+	}
 }
