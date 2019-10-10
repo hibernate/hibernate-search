@@ -19,6 +19,7 @@ import org.hibernate.search.engine.reporting.spi.FailureContextImpl;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Executors;
+import org.hibernate.search.util.common.impl.Futures;
 
 /**
  * An executor of works that accepts works from multiple threads, puts them in a queue,
@@ -194,7 +195,7 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 			 * (the Elasticsearch client adds per-request timeouts, in particular),
 			 * so this "join" will not last forever
 			 */
-			batchFuture.join();
+			Futures.unwrappedExceptionJoin( batchFuture );
 		}
 		catch (Throwable e) {
 			// This will only happen if there is a bug in the processor

@@ -8,6 +8,8 @@ package org.hibernate.search.mapper.orm.event.impl;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.util.common.impl.Futures;
+
 /**
  * This EventsHibernateSearchState is useful to hold for requests
  * onto the actual {@link HibernateOrmListenerContextProvider}
@@ -25,7 +27,7 @@ final class InitializingHibernateSearchState implements EventsHibernateSearchSta
 
 	@Override
 	public HibernateOrmListenerContextProvider getContextProvider() {
-		return contextProviderFuture.join();
+		return Futures.unwrappedExceptionJoin( contextProviderFuture );
 	}
 
 }

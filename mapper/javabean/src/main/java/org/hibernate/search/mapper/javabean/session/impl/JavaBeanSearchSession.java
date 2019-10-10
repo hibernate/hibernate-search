@@ -28,6 +28,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.impl.Futures;
 
 public class JavaBeanSearchSession extends AbstractPojoSearchSession
 		implements SearchSession, ReferenceHitMapper<EntityReference> {
@@ -51,7 +52,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 	public void close() {
 		if ( indexingPlan != null ) {
 			CompletableFuture<?> future = indexingPlan.execute();
-			future.join();
+			Futures.unwrappedExceptionJoin( future );
 		}
 	}
 
