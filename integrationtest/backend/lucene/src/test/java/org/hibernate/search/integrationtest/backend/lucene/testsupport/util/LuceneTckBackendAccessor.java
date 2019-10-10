@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.testsupport.util;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
