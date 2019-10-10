@@ -102,4 +102,29 @@ abstract class AbstractLuceneWriteWorkOrchestrator
 		}
 	}
 
+	/**
+	 * A special workset that won't trigger the creation of the index writer.
+	 * <p>
+	 * Useful to make sure that read-only applications never create any index writer.
+	 */
+	static class LuceneEnsureIndexExistsWorkSet implements LuceneWorkSet {
+		private final CompletableFuture<?> future;
+
+		LuceneEnsureIndexExistsWorkSet(CompletableFuture<?> future) {
+			this.future = future;
+		}
+
+		@Override
+		public void submitTo(LuceneWriteWorkProcessor processor) {
+			processor.beforeWorkSet( DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
+			processor.ensureIndexExists();
+			processor.afterWorkSet( future, null );
+		}
+
+		@Override
+		public void markAsFailed(Throwable t) {
+			future.completeExceptionally( t );
+		}
+	}
+
 }

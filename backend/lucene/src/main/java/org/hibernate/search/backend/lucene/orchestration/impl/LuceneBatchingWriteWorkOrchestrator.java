@@ -46,6 +46,13 @@ public class LuceneBatchingWriteWorkOrchestrator extends AbstractLuceneWriteWork
 	}
 
 	@Override
+	public CompletableFuture<?> ensureIndexExists() {
+		CompletableFuture<Object> future = new CompletableFuture<>();
+		submit( new LuceneEnsureIndexExistsWorkSet( future ) );
+		return future;
+	}
+
+	@Override
 	protected void doStart() {
 		executor.start();
 	}

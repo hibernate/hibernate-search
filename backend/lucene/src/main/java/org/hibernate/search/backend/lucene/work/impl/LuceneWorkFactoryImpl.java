@@ -21,11 +21,6 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	}
 
 	@Override
-	public LuceneWriteWork<?> ensureIndexExists() {
-		return new LuceneEnsureIndexExistsWork();
-	}
-
-	@Override
 	public LuceneWriteWork<?> add(String tenantId, String id,
 			LuceneIndexEntry indexEntry) {
 		return new LuceneAddEntryWork( tenantId, id, indexEntry );

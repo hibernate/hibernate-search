@@ -16,8 +16,6 @@ import org.hibernate.search.backend.lucene.lowlevel.reader.spi.IndexReaderHolder
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
-import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -41,11 +39,7 @@ public final class Shard {
 		try {
 			indexAccessor.start();
 			writeOrchestrator.start();
-			return writeOrchestrator.submit(
-					workFactory.ensureIndexExists(),
-					DocumentCommitStrategy.NONE,
-					DocumentRefreshStrategy.NONE
-			);
+			return writeOrchestrator.ensureIndexExists();
 		}
 		catch (IOException | RuntimeException e) {
 			new SuppressingCloser( e )
