@@ -96,11 +96,14 @@ public class SearchSetupHelper implements TestRule {
 		Statement wrapped = new Statement() {
 			@Override
 			public void evaluate() throws Throwable {
-				try {
-					base.evaluate();
-				}
-				finally {
-					cleanUp();
+				// Using the closer like this allows to suppress exceptions thrown by the 'finally' block.
+				try ( Closer<IOException> closer = new Closer<>() ) {
+					try {
+						base.evaluate();
+					}
+					finally {
+						cleanUp( closer );
+					}
 				}
 			}
 		};
@@ -109,15 +112,19 @@ public class SearchSetupHelper implements TestRule {
 
 	public void cleanUp() throws IOException {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.pushAll(
-					SearchIntegrationPartialBuildState::closeOnFailure, integrationPartialBuildStates
-			);
-			integrationPartialBuildStates.clear();
-			closer.pushAll( SearchIntegration::close, integrations );
-			integrations.clear();
-			closer.push( TckBackendAccessor::close, backendAccessor );
-			backendAccessor = null;
+			cleanUp( closer );
 		}
+	}
+
+	private void cleanUp(Closer<IOException> closer) {
+		closer.pushAll(
+				SearchIntegrationPartialBuildState::closeOnFailure, integrationPartialBuildStates
+		);
+		integrationPartialBuildStates.clear();
+		closer.pushAll( SearchIntegration::close, integrations );
+		integrations.clear();
+		closer.push( TckBackendAccessor::close, backendAccessor );
+		backendAccessor = null;
 	}
 
 	public class SetupContext {
