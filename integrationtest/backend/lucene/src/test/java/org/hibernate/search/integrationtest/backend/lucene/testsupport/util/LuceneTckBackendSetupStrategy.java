@@ -6,12 +6,15 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.testsupport.util;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.configuration.DefaultITAnalysisConfigurer;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
@@ -45,6 +48,14 @@ class LuceneTckBackendSetupStrategy implements TckBackendSetupStrategy {
 		return ConfigurationPropertySource.fromMap(
 				configurationProvider.interpolateProperties( properties )
 		);
+	}
+
+	@Override
+	public TckBackendAccessor createBackendAccessor(TestConfigurationProvider configurationProvider) {
+		Path indexesPath = Paths.get(
+				(String) configurationProvider.interpolateProperties( properties ).get( "directory.root" )
+		);
+		return new LuceneTckBackendAccessor( indexesPath );
 	}
 
 	@Override

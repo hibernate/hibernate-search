@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -21,6 +22,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -46,6 +48,7 @@ public class SearchSetupHelper implements TestRule {
 
 	private final List<SearchIntegrationPartialBuildState> integrationPartialBuildStates = new ArrayList<>();
 	private final List<SearchIntegration> integrations = new ArrayList<>();
+	private TckBackendAccessor backendAccessor;
 
 	public SearchSetupHelper() {
 		this( TckBackendHelper::createDefaultBackendSetupStrategy );
@@ -77,6 +80,13 @@ public class SearchSetupHelper implements TestRule {
 		return setupStrategy.startSetup( setupContext );
 	}
 
+	public TckBackendAccessor getBackendAccessor() {
+		if ( backendAccessor == null ) {
+			backendAccessor = setupStrategy.createBackendAccessor( configurationProvider );
+		}
+		return backendAccessor;
+	}
+
 	@Override
 	public Statement apply(Statement base, Description description) {
 		return statement( base, description );
@@ -97,14 +107,16 @@ public class SearchSetupHelper implements TestRule {
 		return delegateRule.apply( wrapped, description );
 	}
 
-	public void cleanUp() {
-		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+	public void cleanUp() throws IOException {
+		try ( Closer<IOException> closer = new Closer<>() ) {
 			closer.pushAll(
 					SearchIntegrationPartialBuildState::closeOnFailure, integrationPartialBuildStates
 			);
 			integrationPartialBuildStates.clear();
 			closer.pushAll( SearchIntegration::close, integrations );
 			integrations.clear();
+			closer.push( TckBackendAccessor::close, backendAccessor );
+			backendAccessor = null;
 		}
 	}
 

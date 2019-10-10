@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule;
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -48,11 +49,9 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class TestElasticsearchClient implements TestRule {
+public class TestElasticsearchClient implements TestRule, Closeable {
 
 	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
-
-	private final TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
 
 	private ElasticsearchClientImplementor client;
 
@@ -66,6 +65,10 @@ public class TestElasticsearchClient implements TestRule {
 
 	public IndexClient index(String indexName) {
 		return new IndexClient( URLEncodedString.fromString( ElasticsearchIndexNameNormalizer.normalize( indexName ) ) );
+	}
+
+	public ClusterSettingsClient clusterSettings(String settingsPath) {
+		return new ClusterSettingsClient( settingsPath );
 	}
 
 	public class IndexClient {
@@ -91,6 +94,11 @@ public class TestElasticsearchClient implements TestRule {
 			return this;
 		}
 
+		public IndexClient delete() {
+			TestElasticsearchClient.this.deleteIndex( indexName );
+			return this;
+		}
+
 		public IndexClient ensureDoesNotExist() {
 			TestElasticsearchClient.this.ensureIndexDoesNotExist( indexName );
 			return this;
@@ -105,12 +113,12 @@ public class TestElasticsearchClient implements TestRule {
 			return new TypeClient( this );
 		}
 
-		public SettingsClient settings() {
+		public IndexSettingsClient settings() {
 			return settings( "" );
 		}
 
-		public SettingsClient settings(String settingsPath) {
-			return new SettingsClient( this, settingsPath );
+		public IndexSettingsClient settings(String settingsPath) {
+			return new IndexSettingsClient( this, settingsPath );
 		}
 	}
 
@@ -142,13 +150,13 @@ public class TestElasticsearchClient implements TestRule {
 		}
 	}
 
-	public class SettingsClient {
+	public class IndexSettingsClient {
 
 		private final IndexClient indexClient;
 
 		private final String settingsPath;
 
-		public SettingsClient(IndexClient indexClient, String settingsPath) {
+		public IndexSettingsClient(IndexClient indexClient, String settingsPath) {
 			this.indexClient = indexClient;
 			this.settingsPath = settingsPath;
 		}
@@ -167,7 +175,7 @@ public class TestElasticsearchClient implements TestRule {
 		public void putDynamic(String settings) {
 			URLEncodedString indexName = indexClient.indexName;
 			JsonObject settingsAsJsonObject = buildSettings( settingsPath, settings );
-			TestElasticsearchClient.this.putDynamicSettings( indexName, settingsAsJsonObject );
+			TestElasticsearchClient.this.putIndexSettingsDynamic( indexName, settingsAsJsonObject );
 		}
 
 		/**
@@ -179,7 +187,7 @@ public class TestElasticsearchClient implements TestRule {
 		public void putNonDynamic(String settings) {
 			URLEncodedString indexName = indexClient.indexName;
 			JsonObject settingsAsJsonObject = buildSettings( settingsPath, settings );
-			TestElasticsearchClient.this.putNonDynamicSettings( indexName, settingsAsJsonObject );
+			TestElasticsearchClient.this.putIndexSettingsNonDynamic( indexName, settingsAsJsonObject );
 		}
 	}
 
@@ -200,6 +208,26 @@ public class TestElasticsearchClient implements TestRule {
 
 		public JsonElement getStoredField(String fieldName) {
 			return TestElasticsearchClient.this.getDocumentField( typeClient.indexClient.indexName, id, fieldName );
+		}
+	}
+
+	public class ClusterSettingsClient {
+
+		private final String settingsPath;
+
+		public ClusterSettingsClient(String settingsPath) {
+			this.settingsPath = settingsPath;
+		}
+
+		/**
+		 * Put cluster settings.
+		 *
+		 * @param settings The settings value to put
+		 * @throws IOException
+		 */
+		public void put(String settings) {
+			JsonObject settingsAsJsonObject = buildSettings( "transient." + settingsPath, settings );
+			TestElasticsearchClient.this.putClusterSettings( settingsAsJsonObject );
 		}
 	}
 
@@ -260,13 +288,18 @@ public class TestElasticsearchClient implements TestRule {
 	}
 
 	private void doDeleteAndCreateIndex(URLEncodedString indexName, ElasticsearchRequest createRequest) {
-		// Ignore the result: if the deletion fails, we don't care unless the creation just after also fails
+		// We're okay with deletion failing if it's just because the index doesn't exist yet
 		tryDeleteESIndex( indexName );
 
 		registerIndexForCleanup( indexName );
 		performRequest( createRequest );
 
 		waitForRequiredIndexStatus( indexName );
+	}
+
+	private void deleteIndex(URLEncodedString indexName) {
+		// We're okay with deletion failing if it's just because the index doesn't exist yet
+		tryDeleteESIndex( indexName );
 	}
 
 	private void createTemplate(String templateName, String templateString, int templateOrder, JsonObject settings) {
@@ -370,14 +403,14 @@ public class TestElasticsearchClient implements TestRule {
 		}
 	}
 
-	private void putDynamicSettings(URLEncodedString indexName, JsonObject settingsJsonObject) {
+	private void putIndexSettingsDynamic(URLEncodedString indexName, JsonObject settingsJsonObject) {
 		performRequest( ElasticsearchRequest.put()
 				.pathComponent( indexName ).pathComponent( Paths._SETTINGS )
 				.body( settingsJsonObject )
 				.build() );
 	}
 
-	private void putNonDynamicSettings(URLEncodedString indexName, JsonObject settingsJsonObject) {
+	private void putIndexSettingsNonDynamic(URLEncodedString indexName, JsonObject settingsJsonObject) {
 		performRequest( ElasticsearchRequest.post()
 				.pathComponent( indexName )
 				.pathComponent( Paths._CLOSE )
@@ -391,6 +424,14 @@ public class TestElasticsearchClient implements TestRule {
 		performRequest( ElasticsearchRequest.post()
 				.pathComponent( indexName )
 				.pathComponent( Paths._OPEN )
+				.build() );
+	}
+
+	private void putClusterSettings(JsonObject settingsJsonObject) {
+		performRequest( ElasticsearchRequest.put()
+				.pathComponent( URLEncodedString.fromString( "_cluster" ) )
+				.pathComponent( URLEncodedString.fromString( "settings" ) )
+				.body( settingsJsonObject )
 				.build() );
 	}
 
@@ -458,24 +499,23 @@ public class TestElasticsearchClient implements TestRule {
 
 	@Override
 	public Statement apply(Statement base, Description description) {
+		TestConfigurationProvider configurationProvider = new TestConfigurationProvider();
 		Statement wrapped = new Statement() {
 			@Override
 			public void evaluate() throws Throwable {
-				try ( Closer<IOException> closer = new Closer<>() ) {
-					try {
-						before();
-						base.evaluate();
-					}
-					finally {
-						after( closer );
-					}
+				try {
+					open( configurationProvider );
+					base.evaluate();
+				}
+				finally {
+					close();
 				}
 			}
 		};
 		return configurationProvider.apply( wrapped, description );
 	}
 
-	private void before() {
+	public void open(TestConfigurationProvider configurationProvider) {
 		Map<String, Object> map = new LinkedHashMap<>();
 		ElasticsearchTestHostConnectionConfiguration.get().addToBackendProperties( map );
 		ConfigurationPropertySource backendProperties = ConfigurationPropertySource.fromMap( map );
@@ -496,13 +536,16 @@ public class TestElasticsearchClient implements TestRule {
 		}
 	}
 
-	private void after(Closer<IOException> closer) {
-		closer.pushAll( this::tryDeleteESIndex, createdIndicesNames );
-		createdIndicesNames.clear();
-		closer.pushAll( this::tryDeleteESTemplate, createdTemplatesNames );
-		createdTemplatesNames.clear();
-		closer.push( this::tryCloseClient, client );
-		client = null;
+	@Override
+	public void close() throws IOException {
+		try ( Closer<IOException> closer = new Closer<>() ) {
+			closer.pushAll( this::tryDeleteESIndex, createdIndicesNames );
+			createdIndicesNames.clear();
+			closer.pushAll( this::tryDeleteESTemplate, createdTemplatesNames );
+			createdTemplatesNames.clear();
+			closer.push( this::tryCloseClient, client );
+			client = null;
+		}
 	}
 
 	private void tryDeleteESIndex(URLEncodedString indexName) {
