@@ -15,6 +15,7 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.reporting.impl.RootFailureCollector;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.Throwables;
 
 class IndexManagerPartialBuildState {
@@ -51,10 +52,10 @@ class IndexManagerPartialBuildState {
 				indexFailureCollector, beanResolver, indexPropertySource
 		);
 		return partiallyBuiltIndexManager.start( startContext )
-				.exceptionally( e -> {
-					indexFailureCollector.add( Throwables.expectRuntimeException( e ) );
+				.exceptionally( Futures.handler( e -> {
+					indexFailureCollector.add( Throwables.expectException( e ) );
 					return null;
-				} );
+				} ) );
 	}
 
 	public IndexManagerImplementor<?> getIndexManager() {

@@ -111,7 +111,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 34,
 			value = "Could not retrieve the index metadata from Elasticsearch for validation"
 	)
-	SearchException elasticsearchIndexMetadataRetrievalForValidationFailed(@Cause Exception cause);
+	SearchException elasticsearchIndexMetadataRetrievalForValidationFailed(@Cause Throwable cause);
 
 	@Message(id = ID_OFFSET_2 + 35,
 			value = "Could not update mappings in index '%1$s': %2$s"

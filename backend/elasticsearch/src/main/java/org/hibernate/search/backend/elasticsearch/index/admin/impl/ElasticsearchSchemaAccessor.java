@@ -19,6 +19,7 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.CreateIndexResult;
+import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.Throwables;
 
@@ -72,31 +73,31 @@ public class ElasticsearchSchemaAccessor {
 	public CompletableFuture<IndexMetadata> getCurrentIndexMetadata(URLEncodedString indexName) {
 		ElasticsearchWork<IndexMetadata> work = getWorkFactory().getIndexMetadata( indexName ).build();
 		return execute( work )
-				.exceptionally( e -> {
+				.exceptionally( Futures.handler( e -> {
 					throw log.elasticsearchIndexMetadataRetrievalForValidationFailed(
-							Throwables.expectRuntimeException( e )
+							Throwables.expectException( e )
 					);
-				} );
+				} ) );
 	}
 
 	public CompletableFuture<?> updateSettings(URLEncodedString indexName, IndexSettings settings) {
 		ElasticsearchWork<?> work = getWorkFactory().putIndexSettings( indexName, settings ).build();
 		return execute( work )
-				.exceptionally( e -> {
+				.exceptionally( Futures.handler( e -> {
 					throw log.elasticsearchSettingsUpdateFailed(
-							indexName.original, Throwables.expectRuntimeException( e )
+							indexName.original, Throwables.expectException( e )
 					);
-				} );
+				} ) );
 	}
 
 	public CompletableFuture<?> putMapping(URLEncodedString indexName, RootTypeMapping mapping) {
 		ElasticsearchWork<?> work = getWorkFactory().putIndexTypeMapping( indexName, mapping ).build();
 		return execute( work )
-				.exceptionally( e -> {
+				.exceptionally( Futures.handler( e -> {
 					throw log.elasticsearchMappingCreationFailed(
-							indexName.original, e.getMessage(), Throwables.expectRuntimeException( e )
+							indexName.original, e.getMessage(), Throwables.expectException( e )
 					);
-				} );
+				} ) );
 	}
 
 	public CompletableFuture<?> waitForIndexStatus(final URLEncodedString indexName, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
@@ -107,12 +108,12 @@ public class ElasticsearchSchemaAccessor {
 				getWorkFactory().waitForIndexStatusWork( indexName, requiredIndexStatus, timeoutAndUnit )
 				.build();
 		return execute( work )
-				.exceptionally( e -> {
+				.exceptionally( Futures.handler( e -> {
 					throw log.unexpectedIndexStatus(
 							indexName.original, requiredIndexStatus.getElasticsearchString(), timeoutAndUnit,
-							Throwables.expectRuntimeException( e )
+							Throwables.expectException( e )
 					);
-				} );
+				} ) );
 	}
 
 	public CompletableFuture<?> dropIndexIfExisting(URLEncodedString indexName) {

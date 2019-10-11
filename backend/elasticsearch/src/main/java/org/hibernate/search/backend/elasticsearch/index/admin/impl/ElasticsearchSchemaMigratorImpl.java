@@ -61,12 +61,12 @@ public class ElasticsearchSchemaMigratorImpl implements ElasticsearchSchemaMigra
 		}
 
 		return settingsMigration.thenCompose( ignored -> doMigrateMapping( indexName, indexMetadata.getMapping() ) )
-				.exceptionally( e -> {
+				.exceptionally( Futures.handler( e -> {
 					throw log.schemaUpdateFailed(
 							indexName, e.getMessage(),
-							Throwables.expectRuntimeException( e )
+							Throwables.expectException( e )
 					);
-				} );
+				} ) );
 	}
 
 	private CompletableFuture<?> doMigrateSettings(URLEncodedString indexName, IndexSettings settings) {
