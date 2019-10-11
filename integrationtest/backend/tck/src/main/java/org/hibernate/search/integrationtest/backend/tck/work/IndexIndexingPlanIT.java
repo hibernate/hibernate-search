@@ -118,8 +118,7 @@ public class IndexIndexingPlanIT {
 
 		// The operation should fail.
 		// Just check the failure is reported through the completable future.
-		// TODO HSEARCH-3736 Exceptions are not propagated to the future when using the Elasticsearch backend
-		//FutureAssert.assertThat( future ).isFailed();
+		FutureAssert.assertThat( future ).isFailed();
 
 		try {
 			setupHelper.cleanUp();
@@ -151,8 +150,7 @@ public class IndexIndexingPlanIT {
 
 		// The operation should fail.
 		// Just check the failure is reported through the completable future.
-		// TODO HSEARCH-3736 Exceptions are not propagated to the future when using the Elasticsearch backend
-		//FutureAssert.assertThat( future ).isFailed();
+		FutureAssert.assertThat( future ).isFailed();
 
 		// The custom failure handler should have received a failure.
 		// The ES backend may report multiple failures because it executes all works in bulk.
