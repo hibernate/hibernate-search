@@ -100,7 +100,7 @@ public abstract class AbstractWorkOrchestrator<W> {
 
 	protected abstract void doStop();
 
-	protected final void submit(W workSet) {
+	public final void submit(W workSet) {
 		if ( !lifecycleLock.readLock().tryLock() ) {
 			// The orchestrator is starting, pre-stopping or stopping: abort.
 			throw log.submittedWorkToStoppedOrchestrator( name );

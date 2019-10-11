@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
@@ -35,37 +34,23 @@ class ElasticsearchSerialWorkProcessor implements ElasticsearchWorkProcessor {
 	}
 
 	@Override
-	public CompletableFuture<Void> submit(List<ElasticsearchWork<?>> nonBulkedWorks) {
-		aggregator.initSequence( future );
-		for ( ElasticsearchWork<?> work : nonBulkedWorks ) {
-			work.aggregate( aggregator );
-		}
-		CompletableFuture<Void> sequenceFuture = aggregator.buildSequence();
-		appendSequence( sequenceFuture );
-		return sequenceFuture;
-	}
-
-	@Override
-	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
-		aggregator.initSequence( future );
-		CompletableFuture<T> workFuture = work.aggregate( aggregator );
-		CompletableFuture<Void> sequenceFuture = aggregator.buildSequence();
-		appendSequence( sequenceFuture );
-		return workFuture;
-	}
-
-	@Override
-	public CompletableFuture<Void> endBatch() {
-		aggregator.finalizeBulkWork();
-		return future;
-	}
-
-	@Override
 	public void beginBatch() {
 		aggregator.reset();
 	}
 
-	private void appendSequence(CompletableFuture<Void> sequenceFuture) {
+	@Override
+	public void beforeWorkSet() {
+		aggregator.initSequence( future );
+	}
+
+	@Override
+	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
+		return work.aggregate( aggregator );
+	}
+
+	@Override
+	public CompletableFuture<Void> afterWorkSet() {
+		CompletableFuture<Void> sequenceFuture = aggregator.buildSequence();
 		/*
 		 * The sequence gets its failures reported independently:
 		 * there's no need to propagate the failure to the executor.
@@ -73,6 +58,13 @@ class ElasticsearchSerialWorkProcessor implements ElasticsearchWorkProcessor {
 		 * failed.
 		 */
 		future = sequenceFuture.exceptionally( e -> null );
+		return sequenceFuture;
+	}
+
+	@Override
+	public CompletableFuture<Void> endBatch() {
+		aggregator.finalizeBulkWork();
+		return future;
 	}
 
 	private static class BulkAndSequenceAggregator implements ElasticsearchWorkAggregator {

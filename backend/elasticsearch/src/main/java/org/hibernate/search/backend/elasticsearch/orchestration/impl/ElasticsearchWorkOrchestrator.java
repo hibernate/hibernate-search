@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
@@ -16,8 +15,12 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
  */
 public interface ElasticsearchWorkOrchestrator {
 
-	<T> CompletableFuture<T> submit(ElasticsearchWork<T> work);
+	default <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
+		CompletableFuture<T> future = new CompletableFuture<>();
+		submit( new ElasticsearchSingleWorkSet<>( work, future ) );
+		return future;
+	}
 
-	CompletableFuture<?> submit(List<ElasticsearchWork<?>> work);
+	void submit(ElasticsearchWorkSet workSet);
 
 }

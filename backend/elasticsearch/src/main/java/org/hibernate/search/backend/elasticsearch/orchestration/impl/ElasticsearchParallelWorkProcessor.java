@@ -29,29 +29,36 @@ class ElasticsearchParallelWorkProcessor implements ElasticsearchWorkProcessor {
 	private final BulkAndSequenceAggregator aggregator;
 	private final List<CompletableFuture<?>> sequenceFutures = new ArrayList<>();
 
-	public ElasticsearchParallelWorkProcessor(ElasticsearchWorkSequenceBuilder sequenceBuilder,
+	ElasticsearchParallelWorkProcessor(ElasticsearchWorkSequenceBuilder sequenceBuilder,
 			ElasticsearchWorkBulker bulker) {
 		this.aggregator = new BulkAndSequenceAggregator( sequenceBuilder, bulker );
 	}
 
 	@Override
-	public CompletableFuture<Void> submit(List<ElasticsearchWork<?>> nonBulkedWorks) {
+	public void beginBatch() {
+		aggregator.reset();
+		sequenceFutures.clear();
+	}
+
+	@Override
+	public void beforeWorkSet() {
 		aggregator.initSequence();
-		for ( ElasticsearchWork<?> work : nonBulkedWorks ) {
-			work.aggregate( aggregator );
-		}
-		CompletableFuture<Void> sequenceFuture = aggregator.buildSequence();
-		addSequence( sequenceFuture );
-		return sequenceFuture;
 	}
 
 	@Override
 	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
-		aggregator.initSequence();
-		CompletableFuture<T> workFuture = work.aggregate( aggregator );
+		return work.aggregate( aggregator );
+	}
+
+	@Override
+	public CompletableFuture<Void> afterWorkSet() {
 		CompletableFuture<Void> sequenceFuture = aggregator.buildSequence();
-		addSequence( sequenceFuture );
-		return workFuture;
+		/*
+		 * The sequence gets its failures reported independently:
+		 * there's no need to propagate the failure to the executor.
+		 */
+		sequenceFutures.add( sequenceFuture.exceptionally( e -> null ) );
+		return sequenceFuture;
 	}
 
 	@Override
@@ -61,20 +68,6 @@ class ElasticsearchParallelWorkProcessor implements ElasticsearchWorkProcessor {
 		sequenceFutures.clear();
 		aggregator.startSequences();
 		return future;
-	}
-
-	@Override
-	public void beginBatch() {
-		aggregator.reset();
-		sequenceFutures.clear();
-	}
-
-	private void addSequence(CompletableFuture<Void> sequenceFuture) {
-		/*
-		 * The sequence gets its failures reported independently:
-		 * there's no need to propagate the failure to the executor.
-		 */
-		sequenceFutures.add( sequenceFuture.exceptionally( e -> null ) );
 	}
 
 	private static class BulkAndSequenceAggregator implements ElasticsearchWorkAggregator {

@@ -88,7 +88,9 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan<Elastic
 	@Override
 	public CompletableFuture<?> execute() {
 		try {
-			return orchestrator.submit( works );
+			CompletableFuture<Object> future = new CompletableFuture<>();
+			orchestrator.submit( new ElasticsearchIndexingPlanWorkSet( works, future ) );
+			return future;
 		}
 		finally {
 			works.clear();
