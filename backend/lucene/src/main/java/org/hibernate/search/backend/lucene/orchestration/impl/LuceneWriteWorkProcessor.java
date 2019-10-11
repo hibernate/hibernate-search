@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.reporting.IndexFailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.IndexFailureContextImpl;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -38,10 +39,11 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 	private final LuceneWriteWorkExecutionContextImpl context;
 	private final FailureHandler failureHandler;
 
-	private List<LuceneWriteWork<?>> uncommittedWorks = new ArrayList<>();
+	private List<LuceneWriteWork<?>> previousWorkSetsUncommittedWorks = new ArrayList<>();
 
 	private boolean workSetForcesCommit;
-	private IndexFailureContextImpl.Builder workSetFailureContextBuilder;
+	private List<LuceneWriteWork<?>> workSetUncommittedWorks = new ArrayList<>();
+	private boolean workSetHasFailure;
 
 	public LuceneWriteWorkProcessor(EventContext indexEventContext, IndexWriterDelegator indexWriterDelegator,
 			FailureHandler failureHandler) {
@@ -51,6 +53,11 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 		this.failureHandler = failureHandler;
 	}
 
+	// FIXME HSEARCH-3735 This is temporary and should be removed when failures are reported to the mapper directly
+	public FailureHandler getFailureHandler() {
+		return failureHandler;
+	}
+
 	@Override
 	public void beginBatch() {
 		// Nothing to do
@@ -58,23 +65,18 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 
 	@Override
 	public CompletableFuture<?> endBatch() {
-		try {
-			commitIfNecessary();
-		}
-		catch (RuntimeException e) {
-			IndexFailureContextImpl.Builder failureContextBuilder = new IndexFailureContextImpl.Builder();
-			failureContextBuilder.throwable( e );
-			failureContextBuilder.failingOperation( "Commit after a batch of index works" );
-			for ( LuceneWriteWork<?> work : uncommittedWorks ) {
-				failureContextBuilder.uncommittedOperation( work.getInfo() );
-			}
+		if ( !previousWorkSetsUncommittedWorks.isEmpty() ) {
 			try {
-				cleanUpAfterError();
+				commit();
 			}
-			catch (RuntimeException e2) {
-				e.addSuppressed( e2 );
+			catch (RuntimeException e) {
+				cleanUpAfterFailure( e, "Commit after a batch of index works" );
+				// The exception was reported to the failure handler, no need to propagate it.
 			}
-			failureHandler.handle( failureContextBuilder.build() );
+			finally {
+				// Only clear the lists after the commit succeeds or failures are reported.
+				previousWorkSetsUncommittedWorks.clear();
+			}
 		}
 		// Everything was already executed, so just return a completed future.
 		return CompletableFuture.completedFuture( null );
@@ -85,7 +87,8 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 				// We need to commit in order to make the changes visible
 				// TODO HSEARCH-3117 this may not be true with the NRT implementation from Search 5
 				|| DocumentRefreshStrategy.FORCE.equals( refreshStrategy );
-		workSetFailureContextBuilder = null;
+		workSetUncommittedWorks.clear();
+		workSetHasFailure = false;
 	}
 
 	/**
@@ -99,82 +102,62 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 			indexWriterDelegator.ensureIndexExists();
 		}
 		catch (IOException | RuntimeException e) {
-			workSetFailureContextBuilder = new IndexFailureContextImpl.Builder();
-			workSetFailureContextBuilder.throwable( log.unableToInitializeIndexDirectory(
+			throw log.unableToInitializeIndexDirectory(
 					e.getMessage(), indexEventContext, e
-			) );
-			workSetFailureContextBuilder.failingOperation( "Index initialization" );
+			);
 		}
 	}
 
 	public <T> T submit(LuceneWriteWork<T> work) {
-		uncommittedWorks.add( work );
-		if ( workSetFailureContextBuilder != null ) {
-			// Skip the work: a previous work in the workset failed, so we'll give up on all works in this workset.
-			return null;
+		if ( workSetHasFailure ) {
+			throw new AssertionFailure(
+					"A work was submitted to the processor after a failure occurred in the current workset."
+							+ " There is a bug in Hibernate Search, please report it."
+			);
 		}
 		try {
+			workSetUncommittedWorks.add( work );
 			return work.execute( context );
 		}
 		catch (RuntimeException e) {
-			workSetFailureContextBuilder = new IndexFailureContextImpl.Builder();
-			workSetFailureContextBuilder.throwable( e );
-			workSetFailureContextBuilder.failingOperation( work.getInfo() );
-			return null;
+			cleanUpAfterFailure( e, work.getInfo() );
+			throw e;
 		}
 	}
 
-	public <T> void afterWorkSet(CompletableFuture<T> future, T resultIfSuccess) {
-		if ( workSetFailureContextBuilder == null && workSetForcesCommit ) {
+	public void afterSuccessfulWorkSet() {
+		if ( workSetForcesCommit ) {
 			try {
-				commitIfNecessary();
+				commit();
 			}
 			catch (RuntimeException e) {
-				workSetFailureContextBuilder = new IndexFailureContextImpl.Builder();
-				workSetFailureContextBuilder.throwable( e );
-				workSetFailureContextBuilder.failingOperation( "Commit after a set of index works" );
+				cleanUpAfterFailure( e, "Commit after a set of index works" );
+				throw e;
 			}
-		}
-		if ( workSetFailureContextBuilder != null ) {
-			// TODO HSEARCH-1375 report the index name?
-			//failureContextBuilder.indexManager( resources.getIndexManager() );
-			for ( LuceneWriteWork<?> work : uncommittedWorks ) {
-				workSetFailureContextBuilder.uncommittedOperation( work.getInfo() );
+			finally {
+				// Only clear the lists after the commit succeeds or failures are reported.
+				previousWorkSetsUncommittedWorks.clear();
+				workSetUncommittedWorks.clear();
 			}
-			IndexFailureContext failureContext = workSetFailureContextBuilder.build();
-			workSetFailureContextBuilder = null;
-			try {
-				cleanUpAfterError();
-			}
-			catch (RuntimeException e) {
-				failureContext.getThrowable().addSuppressed( e );
-			}
-			future.completeExceptionally( failureContext.getThrowable() );
-			failureHandler.handle( failureContext );
 		}
 		else {
-			future.complete( resultIfSuccess );
+			previousWorkSetsUncommittedWorks.addAll( workSetUncommittedWorks );
+			workSetUncommittedWorks.clear();
 		}
 	}
 
-	private void commitIfNecessary() {
-		if ( !uncommittedWorks.isEmpty() ) {
-			try {
-				// TODO HSEARCH-3117 restore the commit policy feature to allow scheduled commits?
-				indexWriterDelegator.commit();
-				// Only clear the list after the commit succeeds:
-				// if it fails, we want to report uncommitted works.
-				uncommittedWorks.clear();
-			}
-			catch (RuntimeException | IOException e) {
-				throw log.unableToCommitIndex( indexEventContext, e );
-			}
-		}
-	}
-
-	private void cleanUpAfterError() {
+	private void commit() {
 		try {
-			uncommittedWorks.clear();
+			// TODO HSEARCH-3117 restore the commit policy feature to allow scheduled commits?
+			indexWriterDelegator.commit();
+		}
+		catch (RuntimeException | IOException e) {
+			throw log.unableToCommitIndex( indexEventContext, e );
+		}
+	}
+
+	private void cleanUpAfterFailure(Throwable throwable, Object failingOperation) {
+		try {
 			/*
 			 * Note this will close the index writer,
 			 * which with the default settings will trigger a commit.
@@ -182,7 +165,27 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 			indexWriterDelegator.forceLockRelease();
 		}
 		catch (RuntimeException | IOException e) {
-			throw log.unableToCleanUpAfterError( indexEventContext, e );
+			throwable.addSuppressed( log.unableToCleanUpAfterError( indexEventContext, e ) );
 		}
+
+		if ( previousWorkSetsUncommittedWorks.isEmpty() ) {
+			// The failure will be reported elsewhere with all the necessary context.
+			return;
+		}
+
+		/*
+		 * The failure will be reported elsewhere,
+		 * but that report will not mention that some works from previous worksets may have been affected too.
+		 * Report the failure again, just to warn about previous worksets potentially being affected.
+		 */
+		IndexFailureContextImpl.Builder failureContextBuilder = new IndexFailureContextImpl.Builder();
+		failureContextBuilder.throwable( throwable );
+		failureContextBuilder.failingOperation( failingOperation );
+		for ( LuceneWriteWork<?> work : previousWorkSetsUncommittedWorks ) {
+			failureContextBuilder.uncommittedOperation( work.getInfo() );
+		}
+		previousWorkSetsUncommittedWorks.clear();
+		IndexFailureContext failureContext = failureContextBuilder.build();
+		failureHandler.handle( failureContext );
 	}
 }

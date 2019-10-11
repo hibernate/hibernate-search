@@ -15,6 +15,7 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkSet
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.reporting.spi.IndexFailureContextImpl;
 
 class LuceneIndexingPlanWriteWorkSet implements LuceneWriteWorkSet {
 	private final List<LuceneWriteWork<?>> works;
@@ -33,10 +34,47 @@ class LuceneIndexingPlanWriteWorkSet implements LuceneWriteWorkSet {
 	@Override
 	public void submitTo(LuceneWriteWorkProcessor processor) {
 		processor.beforeWorkSet( commitStrategy, refreshStrategy );
+
+		Throwable throwable = null;
+		Object failingOperation = null;
+
 		for ( LuceneWriteWork<?> work : works ) {
-			processor.submit( work );
+			try {
+				processor.submit( work );
+			}
+			catch (RuntimeException e) {
+				throwable = e;
+				failingOperation = work.getInfo();
+				break; // Don't even try to submit the next works
+			}
 		}
-		processor.afterWorkSet( future, null );
+
+		if ( throwable == null ) {
+			try {
+				processor.afterSuccessfulWorkSet();
+			}
+			catch (RuntimeException e) {
+				throwable = e;
+				failingOperation = "Commit after a set of index works";
+			}
+		}
+
+		if ( throwable == null ) {
+			future.complete( null );
+		}
+		else {
+			markAsFailed( throwable );
+			// FIXME HSEARCH-3735 This is temporary and should be removed when all failures are reported to the mapper directly
+			IndexFailureContextImpl.Builder failureContextBuilder = new IndexFailureContextImpl.Builder();
+			failureContextBuilder.throwable( throwable );
+			failureContextBuilder.failingOperation( failingOperation );
+			// Even if some works succeeded, there's no guarantee they were actually committed to the index.
+			// Report all works as uncommitted.
+			for ( LuceneWriteWork<?> work : works ) {
+				failureContextBuilder.uncommittedOperation( work.getInfo() );
+			}
+			processor.getFailureHandler().handle( failureContextBuilder.build() );
+		}
 	}
 
 	@Override

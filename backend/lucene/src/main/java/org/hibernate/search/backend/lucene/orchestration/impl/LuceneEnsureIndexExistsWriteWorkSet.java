@@ -8,8 +8,7 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.reporting.spi.IndexFailureContextImpl;
 
 /**
  * A special workset that won't trigger the creation of the index writer.
@@ -17,6 +16,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
  * Useful to make sure that read-only applications never create any index writer.
  */
 class LuceneEnsureIndexExistsWriteWorkSet implements LuceneWriteWorkSet {
+
 	private final CompletableFuture<?> future;
 
 	LuceneEnsureIndexExistsWriteWorkSet(CompletableFuture<?> future) {
@@ -25,9 +25,18 @@ class LuceneEnsureIndexExistsWriteWorkSet implements LuceneWriteWorkSet {
 
 	@Override
 	public void submitTo(LuceneWriteWorkProcessor processor) {
-		processor.beforeWorkSet( DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
-		processor.ensureIndexExists();
-		processor.afterWorkSet( future, null );
+		try {
+			processor.ensureIndexExists();
+			future.complete( null );
+		}
+		catch (RuntimeException e) {
+			markAsFailed( e );
+			// FIXME HSEARCH-3735 This is temporary and should be removed when all failures are reported to the mapper directly
+			IndexFailureContextImpl.Builder failureContextBuilder = new IndexFailureContextImpl.Builder();
+			failureContextBuilder.throwable( e );
+			failureContextBuilder.failingOperation( "Index initialization" );
+			processor.getFailureHandler().handle( failureContextBuilder.build() );
+		}
 	}
 
 	@Override
