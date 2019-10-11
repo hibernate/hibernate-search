@@ -26,6 +26,7 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.impl.Throwables;
 
@@ -71,10 +72,10 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 			for ( Shard shard : shards.values() ) {
 				writeOrchestrators.add( shard.getWriteOrchestrator() );
 				futures[i] = shard.start()
-						.exceptionally( e -> {
-							startContext.getFailureCollector().add( Throwables.expectRuntimeException( e ) );
+						.exceptionally( Futures.handler( e -> {
+							startContext.getFailureCollector().add( Throwables.expectException( e ) );
 							return null;
-						} );
+						} ) );
 				i++;
 			}
 
