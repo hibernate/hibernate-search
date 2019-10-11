@@ -41,7 +41,7 @@ class ElasticsearchSerialWorkProcessor implements ElasticsearchWorkProcessor {
 			work.aggregate( aggregator );
 		}
 		CompletableFuture<Void> sequenceFuture = aggregator.buildSequence();
-		future = sequenceFuture;
+		appendSequence( sequenceFuture );
 		return sequenceFuture;
 	}
 
@@ -49,7 +49,8 @@ class ElasticsearchSerialWorkProcessor implements ElasticsearchWorkProcessor {
 	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
 		aggregator.initSequence( future );
 		CompletableFuture<T> workFuture = work.aggregate( aggregator );
-		future = aggregator.buildSequence();
+		CompletableFuture<Void> sequenceFuture = aggregator.buildSequence();
+		appendSequence( sequenceFuture );
 		return workFuture;
 	}
 
@@ -62,6 +63,16 @@ class ElasticsearchSerialWorkProcessor implements ElasticsearchWorkProcessor {
 	@Override
 	public void beginBatch() {
 		aggregator.reset();
+	}
+
+	private void appendSequence(CompletableFuture<Void> sequenceFuture) {
+		/*
+		 * The sequence gets its failures reported independently:
+		 * there's no need to propagate the failure to the executor.
+		 * Also, we don't want later works to be cancelled just because this workset
+		 * failed.
+		 */
+		future = sequenceFuture.exceptionally( e -> null );
 	}
 
 	private static class BulkAndSequenceAggregator implements ElasticsearchWorkAggregator {

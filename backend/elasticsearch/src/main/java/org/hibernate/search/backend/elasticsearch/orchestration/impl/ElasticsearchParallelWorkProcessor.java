@@ -40,17 +40,17 @@ class ElasticsearchParallelWorkProcessor implements ElasticsearchWorkProcessor {
 		for ( ElasticsearchWork<?> work : nonBulkedWorks ) {
 			work.aggregate( aggregator );
 		}
-		CompletableFuture<Void> future = aggregator.buildSequence();
-		sequenceFutures.add( future );
-		return future;
+		CompletableFuture<Void> sequenceFuture = aggregator.buildSequence();
+		addSequence( sequenceFuture );
+		return sequenceFuture;
 	}
 
 	@Override
 	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
 		aggregator.initSequence();
 		CompletableFuture<T> workFuture = work.aggregate( aggregator );
-		CompletableFuture<Void> future = aggregator.buildSequence();
-		sequenceFutures.add( future );
+		CompletableFuture<Void> sequenceFuture = aggregator.buildSequence();
+		addSequence( sequenceFuture );
 		return workFuture;
 	}
 
@@ -67,6 +67,14 @@ class ElasticsearchParallelWorkProcessor implements ElasticsearchWorkProcessor {
 	public void beginBatch() {
 		aggregator.reset();
 		sequenceFutures.clear();
+	}
+
+	private void addSequence(CompletableFuture<Void> sequenceFuture) {
+		/*
+		 * The sequence gets its failures reported independently:
+		 * there's no need to propagate the failure to the executor.
+		 */
+		sequenceFutures.add( sequenceFuture.exceptionally( e -> null ) );
 	}
 
 	private static class BulkAndSequenceAggregator implements ElasticsearchWorkAggregator {

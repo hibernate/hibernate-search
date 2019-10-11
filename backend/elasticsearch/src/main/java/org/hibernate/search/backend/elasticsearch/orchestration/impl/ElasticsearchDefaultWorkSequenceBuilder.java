@@ -21,6 +21,7 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.FailureContextImpl;
 import org.hibernate.search.engine.reporting.spi.IndexFailureContextImpl;
 import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.common.impl.Throwables;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -271,6 +272,13 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		 */
 		private volatile List<IndexFailureContextImpl.Builder> failureContextBuilders;
 
+		/*
+		 * This variable may be used from different threads handling different works,
+		 * but never concurrently,
+		 * because each work is executed strictly after the previous one.
+		 */
+		private volatile Throwable sequenceThrowable;
+
 		SequenceContext(ElasticsearchRefreshableWorkExecutionContext executionContext,
 				FailureHandler failureHandler) {
 			this.executionContext = executionContext;
@@ -306,6 +314,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 			Object workInfo = work.getInfo();
 			contextBuilder.failingOperation( workInfo );
 			contextBuilder.uncommittedOperation( workInfo );
+			addSequenceThrowable( throwable );
 		}
 
 		void notifySequenceFailed(Throwable throwable) {
@@ -319,6 +328,10 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 				FailureContextImpl.Builder failureContextBuilder = new FailureContextImpl.Builder();
 				failureContextBuilder.throwable( throwable );
 				failureHandler.handle( failureContextBuilder.build() );
+				addSequenceThrowable( throwable );
+			}
+			if ( sequenceThrowable != null ) {
+				throw Throwables.toRuntimeException( sequenceThrowable );
 			}
 		}
 
@@ -338,6 +351,15 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 			else {
 				// Shouldn't happen, but let's not throw exceptions while reporting failures...
 				return addFailure();
+			}
+		}
+
+		private void addSequenceThrowable(Throwable throwable) {
+			if ( sequenceThrowable == null ) {
+				sequenceThrowable = throwable;
+			}
+			else {
+				sequenceThrowable.addSuppressed( throwable );
 			}
 		}
 	}
