@@ -237,3 +237,54 @@ for beans injected into Hibernate Search.
 Beans <<configuration-bean-resolution,resolved by Hibernate Search>>
 using a <<configuration-bean-frameworks,supported framework>>
 can take advantage of injection features of this framework.
+
+[[configuration-background-failure-handling]]
+== Background failure handling
+// Search 5 anchors backward compatibility
+[[exception-handling]]
+
+Hibernate Search generally propagates exceptions occurring in background threads to the user thread,
+but in some cases, such as Lucene segment merging failures,
+the exception in background threads cannot be propagated.
+By default, when that happens, the failure is logged at the `ERROR` level.
+
+To customize background failure handling, you will need to:
+
+* Define a class that implements the `org.hibernate.search.engine.reporting.FailureHandler` interface.
+* Configure the backend to use that implementation by setting the configuration property
+`hibernate.search.background_failure_handler`
+to a <<configuration-property-types,bean reference>> pointing to the implementation.
+
+Hibernate Search will call the `handle` methods whenever a failure occurs.
+
+[CAUTION]
+====
+Failure handlers should *never* throw *any* exception.
+Doing so will result in undetermined behavior,
+so make sure to catch any exception occurring in failure handlers.
+====
+
+.Implementing and using a `FailureHandler`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/reporting/failurehandler/MyFailureHandler.java[tags=include]
+----
+<1> `handle(FailureContext)` is called for failures that are not related to one index in particular.
+<2> Get a description of the failing operation from the context.
+<3> Get the throwable thrown when the operation failed from the context.
+<4> Use the context-provided information to report the failure in any relevant way.
+<5> Make sure to catch any exception occurring in the failure handler.
+<6> `handle(IndexFailureContext)` is called for failures that are related to one index in particular.
+<7> On top of the failing operation and throwable,
+the index context also lists operations that could not be committed because of the failure.
+These are operations that were applied before the failure, but weren't committed yet.
+<8> Use the context-provided information to report the failure in any relevant way.
+<9> Make sure to catch any exception occurring in the failure handler.
+
+[source, XML, indent=0, subs="+callouts"]
+----
+include::{resourcesdir}/reporting/failurehandler.properties[]
+----
+<1> Assign the background failure handler using a Hibernate Search configuration property.
+====
