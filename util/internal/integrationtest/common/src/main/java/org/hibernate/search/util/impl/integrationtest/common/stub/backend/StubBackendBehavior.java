@@ -7,7 +7,6 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -37,21 +36,21 @@ public abstract class StubBackendBehavior {
 		}
 
 		@Override
-		public void processDocumentWorks(String indexName, List<StubDocumentWork> works) {
-			throw new IllegalStateException( "The stub backend behavior was not set when works were prepared for index '"
-					+ indexName + "': " + works );
+		public void processDocumentWork(String indexName, StubDocumentWork work) {
+			throw new IllegalStateException( "The stub backend behavior was not set when a work was prepared for index '"
+					+ indexName + "': " + work );
 		}
 
 		@Override
-		public void discardDocumentWorks(String indexName, List<StubDocumentWork> works) {
-			throw new IllegalStateException( "The stub backend behavior was not set when works were discarded from index '"
-					+ indexName + "': " + works );
+		public void discardDocumentWork(String indexName, StubDocumentWork work) {
+			throw new IllegalStateException( "The stub backend behavior was not set when a work was discarded from index '"
+					+ indexName + "': " + work );
 		}
 
 		@Override
-		public CompletableFuture<?> executeDocumentWorks(String indexName, List<StubDocumentWork> works) {
-			throw new IllegalStateException( "The stub backend behavior was not set when works were executed for index '"
-					+ indexName + "': " + works );
+		public CompletableFuture<?> executeDocumentWork(String indexName, StubDocumentWork work) {
+			throw new IllegalStateException( "The stub backend behavior was not set when a work was executed for index '"
+					+ indexName + "': " + work );
 		}
 
 		@Override
@@ -102,11 +101,11 @@ public abstract class StubBackendBehavior {
 
 	public abstract void pushSchema(String indexName, StubIndexSchemaNode rootSchemaNode);
 
-	public abstract void processDocumentWorks(String indexName, List<StubDocumentWork> works);
+	public abstract void processDocumentWork(String indexName, StubDocumentWork work);
 
-	public abstract void discardDocumentWorks(String indexName, List<StubDocumentWork> works);
+	public abstract void discardDocumentWork(String indexName, StubDocumentWork work);
 
-	public abstract CompletableFuture<?> executeDocumentWorks(String indexName, List<StubDocumentWork> works);
+	public abstract CompletableFuture<?> executeDocumentWork(String indexName, StubDocumentWork work);
 
 	public abstract CompletableFuture<?> processAndExecuteDocumentWork(String indexName, StubDocumentWork work);
 

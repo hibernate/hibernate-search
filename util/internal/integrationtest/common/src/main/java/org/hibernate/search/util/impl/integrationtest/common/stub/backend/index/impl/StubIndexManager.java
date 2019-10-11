@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl;
 
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -24,7 +23,6 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 public class StubIndexManager implements IndexManagerImplementor<StubDocumentElement>, IndexManager {
@@ -79,13 +77,13 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 	@Override
 	public IndexIndexingPlan<StubDocumentElement> createIndexingPlan(BackendSessionContext context,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		return new StubIndexIndexingPlan( this, context, commitStrategy, refreshStrategy );
+		return new StubIndexIndexingPlan( name, backend.getBehavior(), context, commitStrategy, refreshStrategy );
 	}
 
 	@Override
 	public IndexIndexer<StubDocumentElement> createIndexer(BackendSessionContext context,
 			DocumentCommitStrategy commitStrategy) {
-		return new StubIndexIndexer( this, context, commitStrategy );
+		return new StubIndexIndexer( name, backend.getBehavior(), context, commitStrategy );
 	}
 
 	@Override
@@ -117,19 +115,4 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 		throw new SearchException( "Cannot unwrap " + this + " to " + clazz );
 	}
 
-	void process(List<StubDocumentWork> works) {
-		backend.getBehavior().processDocumentWorks( name, works );
-	}
-
-	CompletableFuture<?> execute(List<StubDocumentWork> works) {
-		return backend.getBehavior().executeDocumentWorks( name, works );
-	}
-
-	CompletableFuture<?> prepareAndExecuteWork(StubDocumentWork work) {
-		return backend.getBehavior().processAndExecuteDocumentWork( name, work );
-	}
-
-	public void discard(List<StubDocumentWork> works) {
-		backend.getBehavior().discardDocumentWorks( name, works );
-	}
 }

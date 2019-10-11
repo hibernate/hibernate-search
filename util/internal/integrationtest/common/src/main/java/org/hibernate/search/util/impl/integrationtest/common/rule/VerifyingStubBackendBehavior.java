@@ -8,7 +8,6 @@ package org.hibernate.search.util.impl.integrationtest.common.rule;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -105,41 +104,33 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	}
 
 	@Override
-	public void processDocumentWorks(String indexName, List<StubDocumentWork> works) {
+	public void processDocumentWork(String indexName, StubDocumentWork work) {
 		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
-		works.stream()
-				.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PROCESS, work ) )
-				.forEach( call -> callQueue.verify(
-						call,
-						DocumentWorkCall::verify,
-						noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
-				) );
+		callQueue.verify(
+				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PROCESS, work ),
+				DocumentWorkCall::verify,
+				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
+		);
 	}
 
 	@Override
-	public void discardDocumentWorks(String indexName, List<StubDocumentWork> works) {
+	public void discardDocumentWork(String indexName, StubDocumentWork work) {
 		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
-		works.stream()
-				.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.DISCARD, work ) )
-				.forEach( call -> callQueue.verify(
-						call,
-						DocumentWorkCall::verify,
-						noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
-				) );
+		callQueue.verify(
+				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.DISCARD, work ),
+				DocumentWorkCall::verify,
+				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
+		);
 	}
 
 	@Override
-	public CompletableFuture<?> executeDocumentWorks(String indexName, List<StubDocumentWork> works) {
+	public CompletableFuture<?> executeDocumentWork(String indexName, StubDocumentWork work) {
 		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
-		return works.stream()
-				.map( work -> new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work ) )
-				.<CompletableFuture<?>>map( call -> callQueue.verify(
-						call,
-						DocumentWorkCall::verify,
-						noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
-				) )
-				.reduce( (first, second) -> second )
-				.orElseGet( () -> CompletableFuture.completedFuture( null ) );
+		return callQueue.verify(
+				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work ),
+				DocumentWorkCall::verify,
+				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
+		);
 	}
 
 	@Override

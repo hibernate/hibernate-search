@@ -16,12 +16,14 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 
 class StubIndexIndexingPlan implements IndexIndexingPlan<StubDocumentElement> {
-	private final StubIndexManager indexManager;
+	private final String indexName;
+	private final StubBackendBehavior behavior;
 	private final BackendSessionContext sessionContext;
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
@@ -30,10 +32,11 @@ class StubIndexIndexingPlan implements IndexIndexingPlan<StubDocumentElement> {
 
 	private int preparedIndex = 0;
 
-	StubIndexIndexingPlan(StubIndexManager indexManager, BackendSessionContext sessionContext,
+	StubIndexIndexingPlan(String indexName, StubBackendBehavior behavior, BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		this.sessionContext = sessionContext;
-		this.indexManager = indexManager;
+		this.indexName = indexName;
+		this.behavior = behavior;
 		this.commitStrategy = commitStrategy;
 		this.refreshStrategy = refreshStrategy;
 	}
@@ -77,22 +80,28 @@ class StubIndexIndexingPlan implements IndexIndexingPlan<StubDocumentElement> {
 
 	@Override
 	public void process() {
-		indexManager.process( works.subList( preparedIndex, works.size() ) );
+		for ( StubDocumentWork work : works.subList( preparedIndex, works.size() ) ) {
+			behavior.processDocumentWork( indexName, work );
+		}
 		preparedIndex = works.size();
 	}
 
 	@Override
 	public CompletableFuture<?> execute() {
 		process();
-		CompletableFuture<?> future = indexManager.execute( works );
+		CompletableFuture<?>[] workFutures = works.stream()
+				.map( work -> behavior.executeDocumentWork( indexName, work ) )
+				.toArray( CompletableFuture<?>[]::new );
 		works.clear();
 		preparedIndex = 0;
-		return future;
+		return CompletableFuture.allOf( workFutures );
 	}
 
 	@Override
 	public void discard() {
-		indexManager.discard( works );
+		for ( StubDocumentWork work : works ) {
+			behavior.discardDocumentWork( indexName, work );
+		}
 		works.clear();
 	}
 

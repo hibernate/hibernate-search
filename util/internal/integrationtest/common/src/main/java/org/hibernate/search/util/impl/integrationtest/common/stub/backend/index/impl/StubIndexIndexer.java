@@ -14,18 +14,22 @@ import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceP
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 
 public class StubIndexIndexer implements IndexIndexer<StubDocumentElement> {
-	private final StubIndexManager indexManager;
+	private final String indexName;
+	private final StubBackendBehavior behavior;
 	private final BackendSessionContext sessionContext;
 	private final DocumentCommitStrategy commitStrategy;
 
-	public StubIndexIndexer(StubIndexManager indexManager, BackendSessionContext sessionContext,
+	StubIndexIndexer(String indexName, StubBackendBehavior behavior,
+			BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy) {
-		this.indexManager = indexManager;
+		this.indexName = indexName;
+		this.behavior = behavior;
 		this.sessionContext = sessionContext;
 		this.commitStrategy = commitStrategy;
 	}
@@ -45,6 +49,6 @@ public class StubIndexIndexer implements IndexIndexer<StubDocumentElement> {
 				.refresh( DocumentRefreshStrategy.NONE )
 				.build();
 
-		return indexManager.prepareAndExecuteWork( work );
+		return behavior.processAndExecuteDocumentWork( indexName, work );
 	}
 }
