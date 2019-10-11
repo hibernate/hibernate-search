@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
 import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.expect;
+import static org.hibernate.search.util.impl.test.ExceptionMatcherBuilder.isException;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThat;
 
 import java.util.concurrent.CompletableFuture;
@@ -21,7 +22,6 @@ import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResultIte
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.IndexFailureContext;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -438,7 +438,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( work1FutureFromSequenceBuilder ).isFailed( exception );
 		// Subsequent works that haven't been executed must get a specific exception
 		assertThat( work2FutureFromSequenceBuilder ).isFailed(
-				ExceptionMatcherBuilder.isException( SearchException.class )
+				isException( SearchException.class )
 						.withMessage( "operation was skipped due to the failure of a previous work in the same workset" )
 						.causedBy( exception ).build()
 		);
@@ -453,8 +453,12 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		verifyAll();
 		// Works that happened before the error must be considered as successful if the refresh is successful
 		assertThat( work0FutureFromSequenceBuilder ).isSuccessful( work0Result );
-		// Errors MUST NOT be propagated to the sequence future if they've been handled successfully
-		assertThat( sequenceFuture ).isSuccessful();
+		// Errors MUST be propagated to the sequence future
+		assertThat( sequenceFuture ).isFailed(
+				isException( SearchException.class )
+						.causedBy( exception )
+						.build()
+		);
 
 		IndexFailureContext failureContext = failureContextCapture.getValue();
 		Assertions.assertThat( failureContext.getThrowable() ).isSameAs( exception );
@@ -522,17 +526,17 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		verifyAll();
 		assertThat( sequenceBuilderBulkResultFuture ).isFailed( exception );
 		assertThat( work1FutureFromSequenceBuilder ).isFailed(
-				ExceptionMatcherBuilder.isException( SearchException.class )
+				isException( SearchException.class )
 						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
 						.causedBy( exception ).build()
 		);
 		assertThat( work2FutureFromSequenceBuilder ).isFailed(
-				ExceptionMatcherBuilder.isException( SearchException.class )
+				isException( SearchException.class )
 						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
 						.causedBy( exception ).build()
 		);
 		assertThat( work3FutureFromSequenceBuilder ).isFailed(
-				ExceptionMatcherBuilder.isException( SearchException.class )
+				isException( SearchException.class )
 						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
 						.causedBy( exception ).build()
 		);
@@ -548,12 +552,16 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		replayAll();
 		refreshFuture.complete( null );
 		verifyAll();
-		// Errors MUST NOT be propagated if they've been handled
-		assertThat( sequenceFuture ).isSuccessful();
+		// Errors MUST be propagated to the sequence future
+		assertThat( sequenceFuture ).isFailed(
+				isException( SearchException.class )
+						.causedBy( exception )
+						.build()
+		);
 
 		IndexFailureContext failureContext1 = failureContext1Capture.getValue();
 		Assertions.assertThat( failureContext1.getThrowable() ).satisfies( new HamcrestCondition<>(
-				ExceptionMatcherBuilder.isException( SearchException.class )
+				isException( SearchException.class )
 						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
 						.causedBy( exception ).build()
 		) );
@@ -565,7 +573,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 		IndexFailureContext failureContext2 = failureContext2Capture.getValue();
 		Assertions.assertThat( failureContext2.getThrowable() ).satisfies( new HamcrestCondition<>(
-				ExceptionMatcherBuilder.isException( SearchException.class )
+				isException( SearchException.class )
 						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
 						.causedBy( exception ).build()
 		) );
@@ -576,7 +584,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 		IndexFailureContext failureContext3 = failureContext3Capture.getValue();
 		Assertions.assertThat( failureContext3.getThrowable() ).satisfies( new HamcrestCondition<>(
-				ExceptionMatcherBuilder.isException( SearchException.class )
+				isException( SearchException.class )
 						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
 						.causedBy( exception ).build()
 		) );
@@ -657,17 +665,17 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		verifyAll();
 		assertThat( sequenceBuilderBulkResultFuture ).isFailed( exception );
 		assertThat( work1FutureFromSequenceBuilder ).isFailed(
-				ExceptionMatcherBuilder.isException( SearchException.class )
+				isException( SearchException.class )
 						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
 						.causedBy( exception ).build()
 		);
 		assertThat( work2FutureFromSequenceBuilder ).isFailed(
-				ExceptionMatcherBuilder.isException( SearchException.class )
+				isException( SearchException.class )
 						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
 						.causedBy( exception ).build()
 		);
 		assertThat( work3FutureFromSequenceBuilder ).isFailed(
-				ExceptionMatcherBuilder.isException( SearchException.class )
+				isException( SearchException.class )
 						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
 						.causedBy( exception ).build()
 		);
@@ -683,12 +691,16 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		replayAll();
 		refreshFuture.complete( null );
 		verifyAll();
-		// Errors MUST NOT be propagated if they've been handled
-		assertThat( sequenceFuture ).isSuccessful();
+		// Errors MUST be propagated to the sequence future
+		assertThat( sequenceFuture ).isFailed(
+				isException( SearchException.class )
+						.causedBy( exception )
+						.build()
+		);
 
 		IndexFailureContext failureContext1 = failureContext1Capture.getValue();
 		Assertions.assertThat( failureContext1.getThrowable() ).satisfies( new HamcrestCondition<>(
-				ExceptionMatcherBuilder.isException( SearchException.class )
+				isException( SearchException.class )
 						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
 						.causedBy( exception ).build()
 		) );
@@ -700,7 +712,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 		IndexFailureContext failureContext2 = failureContext2Capture.getValue();
 		Assertions.assertThat( failureContext2.getThrowable() ).satisfies( new HamcrestCondition<>(
-				ExceptionMatcherBuilder.isException( SearchException.class )
+				isException( SearchException.class )
 						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
 						.causedBy( exception ).build()
 		) );
@@ -711,7 +723,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 		IndexFailureContext failureContext3 = failureContext3Capture.getValue();
 		Assertions.assertThat( failureContext3.getThrowable() ).satisfies( new HamcrestCondition<>(
-				ExceptionMatcherBuilder.isException( SearchException.class )
+				isException( SearchException.class )
 						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
 						.causedBy( exception ).build()
 		) );
@@ -825,7 +837,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( work1FutureFromSequenceBuilder ).isPending();
 		assertThat( work3FutureFromSequenceBuilder ).isPending(); // Still pending, waiting for refresh
 		assertThat( work4FutureFromSequenceBuilder ).isFailed(
-				ExceptionMatcherBuilder.isException( SearchException.class )
+				isException( SearchException.class )
 						.withMessage( "operation was skipped due to the failure of a previous work in the same workset" )
 						.causedBy( exception ).build()
 		);
@@ -839,8 +851,8 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		verifyAll();
 		assertThat( work1FutureFromSequenceBuilder ).isSuccessful( work1Result );
 		assertThat( work3FutureFromSequenceBuilder ).isSuccessful( work3Result );
-		// Errors MUST NOT be propagated if they've been handled
-		assertThat( sequenceFuture ).isSuccessful();
+		// Errors MUST be propagated to the sequence future
+		assertThat( sequenceFuture ).isFailed( exception );
 
 		IndexFailureContext failureContext = failureContextCapture.getValue();
 		Assertions.assertThat( failureContext.getThrowable() ).isSameAs( exception );
@@ -924,8 +936,8 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		replayAll();
 		refreshFuture.complete( null );
 		verifyAll();
-		// Errors MUST NOT be propagated if they've been handled
-		assertThat( sequenceFuture ).isSuccessful();
+		// Errors MUST be propagated to the sequence future
+		assertThat( sequenceFuture ).isFailed( exception1 );
 
 		IndexFailureContext failureContext1 = failureContext1Capture.getValue();
 		Assertions.assertThat( failureContext1.getThrowable() ).isSameAs( exception1 );
@@ -1060,7 +1072,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( work1FutureFromSequenceBuilder ).isPending();
 		assertThat( work3FutureFromSequenceBuilder ).isPending(); // Still waiting for the refresh
 		assertThat( work4FutureFromSequenceBuilder ).isFailed(
-				ExceptionMatcherBuilder.isException( SearchException.class )
+				isException( SearchException.class )
 						.withMessage( "operation was skipped due to the failure of a previous work in the same workset" )
 						.causedBy( exception ).build()
 		);
@@ -1074,8 +1086,12 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		verifyAll();
 		assertThat( work1FutureFromSequenceBuilder ).isSuccessful( work1Result );
 		assertThat( work3FutureFromSequenceBuilder ).isSuccessful( work3Result );
-		// Errors MUST NOT be propagated if they've been handled
-		assertThat( sequenceFuture ).isSuccessful();
+		// Errors MUST be propagated to the sequence future
+		assertThat( sequenceFuture ).isFailed(
+				isException( SearchException.class )
+						.causedBy( exception )
+						.build()
+		);
 
 		IndexFailureContext failureContext = failureContextCapture.getValue();
 		Assertions.assertThat( failureContext.getThrowable() ).isSameAs( exception );
@@ -1173,8 +1189,13 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		replayAll();
 		refreshFuture.complete( null );
 		verifyAll();
-		// Errors MUST NOT be propagated if they've been handled
-		assertThat( sequenceFuture ).isSuccessful();
+		// Errors MUST be propagated to the sequence future
+		assertThat( sequenceFuture ).isFailed(
+				isException( SearchException.class )
+						.causedBy( exception2 )
+						.withSuppressed( exception1 )
+						.build()
+		);
 
 		IndexFailureContext failureContext2 = failureContext2Capture.getValue();
 		Assertions.assertThat( failureContext2.getThrowable() ).isSameAs( exception2 );
