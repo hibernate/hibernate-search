@@ -80,7 +80,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 		return CompletableFuture.completedFuture( null );
 	}
 
-	void beforeWorkSet(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+	public void beforeWorkSet(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		workSetForcesCommit = DocumentCommitStrategy.FORCE.equals( commitStrategy )
 				// We need to commit in order to make the changes visible
 				// TODO HSEARCH-3117 this may not be true with the NRT implementation from Search 5
@@ -107,7 +107,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 		}
 	}
 
-	<T> T submit(LuceneWriteWork<T> work) {
+	public <T> T submit(LuceneWriteWork<T> work) {
 		uncommittedWorks.add( work );
 		if ( workSetFailureContextBuilder != null ) {
 			// Skip the work: a previous work in the workset failed, so we'll give up on all works in this workset.
@@ -124,7 +124,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 		}
 	}
 
-	<T> void afterWorkSet(CompletableFuture<T> future, T resultIfSuccess) {
+	public <T> void afterWorkSet(CompletableFuture<T> future, T resultIfSuccess) {
 		if ( workSetFailureContextBuilder == null && workSetForcesCommit ) {
 			try {
 				commitIfNecessary();

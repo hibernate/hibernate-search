@@ -91,7 +91,11 @@ public class LuceneIndexIndexingPlan implements IndexIndexingPlan<LuceneRootDocu
 			for ( Map.Entry<LuceneWriteWorkOrchestrator, List<LuceneWriteWork<?>>> entry : worksByOrchestrator.entrySet() ) {
 				LuceneWriteWorkOrchestrator orchestrator = entry.getKey();
 				List<LuceneWriteWork<?>> works = entry.getValue();
-				futures.add( orchestrator.submit( works, commitStrategy, refreshStrategy ) );
+				CompletableFuture<Object> future = new CompletableFuture<>();
+				orchestrator.submit( new LuceneIndexingPlanWriteWorkSet(
+						works, future, commitStrategy, refreshStrategy
+				) );
+				futures.add( future );
 			}
 			return CompletableFuture.allOf( futures.toArray( new CompletableFuture<?>[0] ) );
 		}

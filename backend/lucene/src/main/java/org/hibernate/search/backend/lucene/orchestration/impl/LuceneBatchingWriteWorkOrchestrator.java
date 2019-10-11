@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.orchestration.spi.AbstractWorkOrchestrator;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.reporting.FailureHandler;
 
@@ -19,13 +20,14 @@ import org.hibernate.search.engine.reporting.FailureHandler;
  * This allows to process multiple worksets and only commit once,
  * potentially reducing the frequency of commits.
  */
-public class LuceneBatchingWriteWorkOrchestrator extends AbstractLuceneWriteWorkOrchestrator
+public class LuceneBatchingWriteWorkOrchestrator
+		extends AbstractWorkOrchestrator<LuceneWriteWorkSet>
 		implements LuceneWriteWorkOrchestratorImplementor {
 
 	// TODO HSEARCH‌-3575 allow to configure this value
 	private static final int MAX_WORKSETS_PER_BATCH = 1000;
 
-	private final BatchingExecutor<LuceneWorkSet, LuceneWriteWorkProcessor> executor;
+	private final BatchingExecutor<LuceneWriteWorkSet, LuceneWriteWorkProcessor> executor;
 
 	/**
 	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)
@@ -48,7 +50,7 @@ public class LuceneBatchingWriteWorkOrchestrator extends AbstractLuceneWriteWork
 	@Override
 	public CompletableFuture<?> ensureIndexExists() {
 		CompletableFuture<Object> future = new CompletableFuture<>();
-		submit( new LuceneEnsureIndexExistsWorkSet( future ) );
+		submit( new LuceneEnsureIndexExistsWriteWorkSet( future ) );
 		return future;
 	}
 
@@ -58,7 +60,7 @@ public class LuceneBatchingWriteWorkOrchestrator extends AbstractLuceneWriteWork
 	}
 
 	@Override
-	protected void doSubmit(LuceneWorkSet workSet) throws InterruptedException {
+	protected void doSubmit(LuceneWriteWorkSet workSet) throws InterruptedException {
 		executor.submit( workSet );
 	}
 
