@@ -118,6 +118,11 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 	}
 
 	@Override
+	public String getIndexName() {
+		return model.getIndexName();
+	}
+
+	@Override
 	public LuceneWriteWorkOrchestrator getWriteOrchestrator(String documentId, String routingKey) {
 		return toShard( documentId, routingKey ).getWriteOrchestrator();
 	}

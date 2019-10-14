@@ -13,6 +13,7 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
+import org.hibernate.search.backend.lucene.work.impl.LuceneSingleDocumentWriteWork;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -21,9 +22,9 @@ import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceP
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
-import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 
 public class LuceneIndexIndexingPlan implements IndexIndexingPlan<LuceneRootDocumentBuilder> {
 
@@ -34,7 +35,7 @@ public class LuceneIndexIndexingPlan implements IndexIndexingPlan<LuceneRootDocu
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 
-	private final Map<LuceneWriteWorkOrchestrator, List<LuceneWriteWork<?>>> worksByOrchestrator = new HashMap<>();
+	private final Map<LuceneWriteWorkOrchestrator, List<LuceneSingleDocumentWriteWork<?>>> worksByOrchestrator = new HashMap<>();
 
 	public LuceneIndexIndexingPlan(LuceneWorkFactory factory,
 			WorkExecutionIndexManagerContext indexManagerContext,
@@ -85,19 +86,19 @@ public class LuceneIndexIndexingPlan implements IndexIndexingPlan<LuceneRootDocu
 	}
 
 	@Override
-	public CompletableFuture<?> execute() {
+	public CompletableFuture<IndexIndexingPlanExecutionReport> executeAndReport() {
 		try {
-			List<CompletableFuture<?>> futures = new ArrayList<>();
-			for ( Map.Entry<LuceneWriteWorkOrchestrator, List<LuceneWriteWork<?>>> entry : worksByOrchestrator.entrySet() ) {
+			List<CompletableFuture<IndexIndexingPlanExecutionReport>> shardReportFutures = new ArrayList<>();
+			for ( Map.Entry<LuceneWriteWorkOrchestrator, List<LuceneSingleDocumentWriteWork<?>>> entry : worksByOrchestrator.entrySet() ) {
 				LuceneWriteWorkOrchestrator orchestrator = entry.getKey();
-				List<LuceneWriteWork<?>> works = entry.getValue();
-				CompletableFuture<Object> future = new CompletableFuture<>();
+				List<LuceneSingleDocumentWriteWork<?>> works = entry.getValue();
+				CompletableFuture<IndexIndexingPlanExecutionReport> shardReportFuture = new CompletableFuture<>();
 				orchestrator.submit( new LuceneIndexingPlanWriteWorkSet(
-						works, future, commitStrategy, refreshStrategy
+						indexManagerContext.getIndexName(), works, shardReportFuture, commitStrategy, refreshStrategy
 				) );
-				futures.add( future );
+				shardReportFutures.add( shardReportFuture );
 			}
-			return CompletableFuture.allOf( futures.toArray( new CompletableFuture<?>[0] ) );
+			return IndexIndexingPlanExecutionReport.allOf( shardReportFutures );
 		}
 		finally {
 			worksByOrchestrator.clear();
@@ -109,11 +110,11 @@ public class LuceneIndexIndexingPlan implements IndexIndexingPlan<LuceneRootDocu
 		worksByOrchestrator.clear();
 	}
 
-	private void collect(String documentId, String routingKey, LuceneWriteWork<?> work) {
+	private void collect(String documentId, String routingKey, LuceneSingleDocumentWriteWork<?> work) {
 		// Route the work to the appropriate shard
 		LuceneWriteWorkOrchestrator orchestrator = indexManagerContext.getWriteOrchestrator( documentId, routingKey );
 
-		List<LuceneWriteWork<?>> works = worksByOrchestrator.get( orchestrator );
+		List<LuceneSingleDocumentWriteWork<?>> works = worksByOrchestrator.get( orchestrator );
 		if ( works == null ) {
 			works = new ArrayList<>();
 			worksByOrchestrator.put( orchestrator, works );

@@ -15,12 +15,13 @@ import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDoc
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentElasticsearchWork;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 
 import com.google.gson.JsonObject;
 
@@ -31,22 +32,22 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan<Elastic
 	private final ElasticsearchWorkBuilderFactory builderFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final ElasticsearchWorkOrchestrator orchestrator;
-	private final URLEncodedString indexName;
+	private final WorkExecutionIndexManagerContext indexManagerContext;
 	private final DocumentRefreshStrategy refreshStrategy;
 	private final String tenantId;
 
-	private final List<ElasticsearchWork<?>> works = new ArrayList<>();
+	private final List<SingleDocumentElasticsearchWork<?>> works = new ArrayList<>();
 
 	public ElasticsearchIndexIndexingPlan(ElasticsearchWorkBuilderFactory builderFactory,
 			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestrator orchestrator,
-			URLEncodedString indexName,
+			WorkExecutionIndexManagerContext indexManagerContext,
 			DocumentRefreshStrategy refreshStrategy,
 			BackendSessionContext sessionContext) {
 		this.builderFactory = builderFactory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
-		this.indexName = indexName;
+		this.indexManagerContext = indexManagerContext;
 		this.refreshStrategy = refreshStrategy;
 		this.tenantId = sessionContext.getTenantIdentifier();
 	}
@@ -70,7 +71,9 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan<Elastic
 
 		collect(
 				builderFactory.delete(
-						indexName, URLEncodedString.fromString( elasticsearchId ), routingKey
+						indexManagerContext.getHibernateSearchIndexName(),
+						indexManagerContext.getElasticsearchIndexName(),
+						URLEncodedString.fromString( elasticsearchId ), routingKey
 				)
 						.refresh( refreshStrategy )
 						.build()
@@ -86,9 +89,9 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan<Elastic
 	}
 
 	@Override
-	public CompletableFuture<?> execute() {
+	public CompletableFuture<IndexIndexingPlanExecutionReport> executeAndReport() {
 		try {
-			CompletableFuture<Object> future = new CompletableFuture<>();
+			CompletableFuture<IndexIndexingPlanExecutionReport> future = new CompletableFuture<>();
 			orchestrator.submit( new ElasticsearchIndexingPlanWorkSet( works, future ) );
 			return future;
 		}
@@ -114,14 +117,16 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan<Elastic
 
 		collect(
 				builderFactory.index(
-						indexName, URLEncodedString.fromString( elasticsearchId ), routingKey, document
+						indexManagerContext.getHibernateSearchIndexName(),
+						indexManagerContext.getElasticsearchIndexName(),
+						URLEncodedString.fromString( elasticsearchId ), routingKey, document
 				)
 						.refresh( refreshStrategy )
 						.build()
 		);
 	}
 
-	private void collect(ElasticsearchWork<?> work) {
+	private void collect(SingleDocumentElasticsearchWork<?> work) {
 		works.add( work );
 	}
 

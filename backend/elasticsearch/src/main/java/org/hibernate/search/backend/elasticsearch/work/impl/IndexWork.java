@@ -9,16 +9,24 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchDocumentReference;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexWorkBuilder;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 
 import com.google.gson.JsonObject;
 
 
-public class IndexWork extends AbstractSimpleBulkableElasticsearchWork<Void> {
+public class IndexWork extends AbstractSimpleBulkableElasticsearchWork<Void>
+		implements SingleDocumentElasticsearchWork<Void> {
 
-	public IndexWork(Builder builder) {
+	private final String hibernateSearchIndexName;
+	private final URLEncodedString id;
+
+	private IndexWork(Builder builder) {
 		super( builder );
+		this.hibernateSearchIndexName = builder.hibernateSearchIndexName;
+		this.id = builder.id;
 	}
 
 	@Override
@@ -31,28 +39,38 @@ public class IndexWork extends AbstractSimpleBulkableElasticsearchWork<Void> {
 		return null;
 	}
 
+	@Override
+	public DocumentReference getDocumentReference() {
+		return new ElasticsearchDocumentReference( hibernateSearchIndexName, id.original );
+	}
+
 	public static class Builder
 			extends AbstractSimpleBulkableElasticsearchWork.AbstractBuilder<Builder>
 			implements IndexWorkBuilder {
+		private final String hibernateSearchIndexName;
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;
 		private final URLEncodedString id;
 		private final String routingKey;
 		private final JsonObject document;
 
-		public static Builder forElasticsearch67AndBelow(URLEncodedString indexName, URLEncodedString typeName,
-				URLEncodedString id, String routingKey, JsonObject document) {
-			return new Builder( indexName, typeName, id, routingKey, document );
+		public static Builder forElasticsearch67AndBelow(String hibernateSearchIndexName,
+				URLEncodedString elasticsearchIndexName, URLEncodedString typeName, URLEncodedString id, String routingKey,
+				JsonObject document) {
+			return new Builder( hibernateSearchIndexName, elasticsearchIndexName, typeName, id, routingKey, document );
 		}
 
-		public static Builder forElasticsearch7AndAbove(URLEncodedString indexName,
-				URLEncodedString id, String routingKey, JsonObject document) {
-			return new Builder( indexName, null, id, routingKey, document );
+		public static Builder forElasticsearch7AndAbove(String hibernateSearchIndexName,
+				URLEncodedString elasticsearchIndexName, URLEncodedString id, String routingKey,
+				JsonObject document) {
+			return new Builder( hibernateSearchIndexName, elasticsearchIndexName, null, id, routingKey, document );
 		}
 
-		private Builder(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, String routingKey, JsonObject document) {
-			super( indexName, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
-			this.indexName = indexName;
+		private Builder(String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName,
+					URLEncodedString typeName, URLEncodedString id, String routingKey, JsonObject document) {
+			super( elasticsearchIndexName, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			this.hibernateSearchIndexName = hibernateSearchIndexName;
+			this.indexName = elasticsearchIndexName;
 			this.typeName = typeName;
 			this.id = id;
 			this.routingKey = routingKey;

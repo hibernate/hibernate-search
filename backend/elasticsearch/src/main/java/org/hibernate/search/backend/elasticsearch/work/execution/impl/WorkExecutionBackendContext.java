@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.work.execution.impl;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
@@ -31,16 +30,17 @@ public interface WorkExecutionBackendContext {
 
 	IndexIndexingPlan<ElasticsearchDocumentObjectBuilder> createIndexingPlan(
 			ElasticsearchWorkOrchestrator orchestrator,
-			URLEncodedString indexName,
+			WorkExecutionIndexManagerContext indexManagerContext,
 			DocumentRefreshStrategy refreshStrategy,
 			BackendSessionContext sessionContext);
 
 	IndexIndexer<ElasticsearchDocumentObjectBuilder> createIndexer(
 			ElasticsearchWorkOrchestrator orchestrator,
-			URLEncodedString indexName,
+			WorkExecutionIndexManagerContext indexManagerContext,
 			BackendSessionContext sessionContext);
 
-	IndexWorkspace createWorkspace(ElasticsearchWorkOrchestrator orchestrator, URLEncodedString indexName,
+	IndexWorkspace createWorkspace(ElasticsearchWorkOrchestrator orchestrator,
+			WorkExecutionIndexManagerContext indexManagerContext,
 			DetachedBackendSessionContext sessionContext);
 
 }

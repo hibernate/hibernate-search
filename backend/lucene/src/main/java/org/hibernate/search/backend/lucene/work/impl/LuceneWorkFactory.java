@@ -14,11 +14,11 @@ import org.apache.lucene.search.Explanation;
 
 public interface LuceneWorkFactory {
 
-	LuceneWriteWork<?> add(String tenantId, String id, LuceneIndexEntry indexEntry);
+	LuceneSingleDocumentWriteWork<?> add(String tenantId, String id, LuceneIndexEntry indexEntry);
 
-	LuceneWriteWork<?> update(String tenantId, String id, LuceneIndexEntry indexEntry);
+	LuceneSingleDocumentWriteWork<?> update(String tenantId, String id, LuceneIndexEntry indexEntry);
 
-	LuceneWriteWork<?> delete(String tenantId, String id);
+	LuceneSingleDocumentWriteWork<?> delete(String tenantId, String id);
 
 	LuceneWriteWork<?> deleteAll(String tenantId);
 

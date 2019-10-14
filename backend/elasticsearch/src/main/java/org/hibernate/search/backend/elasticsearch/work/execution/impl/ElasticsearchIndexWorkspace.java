@@ -27,12 +27,12 @@ public class ElasticsearchIndexWorkspace implements IndexWorkspace {
 
 	public ElasticsearchIndexWorkspace(ElasticsearchWorkBuilderFactory builderFactory,
 			MultiTenancyStrategy multiTenancyStrategy, ElasticsearchWorkOrchestrator orchestrator,
-			URLEncodedString indexName,
+			WorkExecutionIndexManagerContext indexManagerContext,
 			DetachedBackendSessionContext sessionContext) {
 		this.builderFactory = builderFactory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
-		this.indexName = indexName;
+		this.indexName = indexManagerContext.getElasticsearchIndexName();
 		this.sessionContext = sessionContext;
 	}
 

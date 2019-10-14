@@ -29,6 +29,7 @@ import org.hibernate.search.backend.elasticsearch.work.execution.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.ElasticsearchIndexWorkspace;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.ElasticsearchIndexIndexingPlan;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.WorkExecutionBackendContext;
+import org.hibernate.search.backend.elasticsearch.work.execution.impl.WorkExecutionIndexManagerContext;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
@@ -81,14 +82,14 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	@Override
 	public IndexIndexingPlan<ElasticsearchDocumentObjectBuilder> createIndexingPlan(
 			ElasticsearchWorkOrchestrator orchestrator,
-			URLEncodedString indexName,
+			WorkExecutionIndexManagerContext indexManagerContext,
 			DocumentRefreshStrategy refreshStrategy,
 			BackendSessionContext sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		return new ElasticsearchIndexIndexingPlan(
 				link.getWorkBuilderFactory(), multiTenancyStrategy, orchestrator,
-				indexName,
+				indexManagerContext,
 				refreshStrategy,
 				sessionContext
 		);
@@ -97,21 +98,22 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	@Override
 	public IndexIndexer<ElasticsearchDocumentObjectBuilder> createIndexer(
 			ElasticsearchWorkOrchestrator orchestrator,
-			URLEncodedString indexName,
+			WorkExecutionIndexManagerContext indexManagerContext,
 			BackendSessionContext sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		return new ElasticsearchIndexIndexer( link.getWorkBuilderFactory(), multiTenancyStrategy, orchestrator,
-				indexName, sessionContext );
+				indexManagerContext, sessionContext );
 	}
 
 	@Override
-	public IndexWorkspace createWorkspace(ElasticsearchWorkOrchestrator orchestrator, URLEncodedString indexName,
+	public IndexWorkspace createWorkspace(ElasticsearchWorkOrchestrator orchestrator,
+			WorkExecutionIndexManagerContext indexManagerContext,
 			DetachedBackendSessionContext sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		return new ElasticsearchIndexWorkspace(
-				link.getWorkBuilderFactory(), multiTenancyStrategy, orchestrator, indexName,
+				link.getWorkBuilderFactory(), multiTenancyStrategy, orchestrator, indexManagerContext,
 				sessionContext
 		);
 	}

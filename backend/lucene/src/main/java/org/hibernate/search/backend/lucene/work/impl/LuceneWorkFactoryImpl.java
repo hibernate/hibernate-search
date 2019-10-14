@@ -21,19 +21,19 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	}
 
 	@Override
-	public LuceneWriteWork<?> add(String tenantId, String id,
+	public LuceneSingleDocumentWriteWork<?> add(String tenantId, String id,
 			LuceneIndexEntry indexEntry) {
 		return new LuceneAddEntryWork( tenantId, id, indexEntry );
 	}
 
 	@Override
-	public LuceneWriteWork<?> update(String tenantId, String id,
+	public LuceneSingleDocumentWriteWork<?> update(String tenantId, String id,
 			LuceneIndexEntry indexEntry) {
 		return multiTenancyStrategy.createUpdateEntryLuceneWork( tenantId, id, indexEntry );
 	}
 
 	@Override
-	public LuceneWriteWork<?> delete(String tenantId, String id) {
+	public LuceneSingleDocumentWriteWork<?> delete(String tenantId, String id) {
 		return multiTenancyStrategy.createDeleteEntryLuceneWork( tenantId, id );
 	}
 

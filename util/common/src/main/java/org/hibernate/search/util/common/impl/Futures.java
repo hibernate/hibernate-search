@@ -197,4 +197,16 @@ public final class Futures {
 		}
 	}
 
+	public static Throwable getThrowableNow(CompletableFuture<?> future) {
+		try {
+			future.getNow( null );
+			return null;
+		}
+		catch (CompletionException e) {
+			return e.getCause();
+		}
+		catch (Throwable t) {
+			return t;
+		}
+	}
 }

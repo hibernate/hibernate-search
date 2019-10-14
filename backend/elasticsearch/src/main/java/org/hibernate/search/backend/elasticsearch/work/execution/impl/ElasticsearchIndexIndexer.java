@@ -26,17 +26,17 @@ public class ElasticsearchIndexIndexer implements IndexIndexer<ElasticsearchDocu
 	private final ElasticsearchWorkBuilderFactory factory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final ElasticsearchWorkOrchestrator orchestrator;
-	private final URLEncodedString indexName;
+	private final WorkExecutionIndexManagerContext indexManagerContext;
 	private final String tenantId;
 
 	public ElasticsearchIndexIndexer(ElasticsearchWorkBuilderFactory factory, MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestrator orchestrator,
-			URLEncodedString indexName,
+			WorkExecutionIndexManagerContext indexManagerContext,
 			BackendSessionContext sessionContext) {
 		this.factory = factory;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
-		this.indexName = indexName;
+		this.indexManagerContext = indexManagerContext;
 		this.tenantId = sessionContext.getTenantIdentifier();
 	}
 
@@ -50,7 +50,12 @@ public class ElasticsearchIndexIndexer implements IndexIndexer<ElasticsearchDocu
 		documentContributor.contribute( builder );
 		JsonObject document = builder.build( multiTenancyStrategy, tenantId, id );
 
-		ElasticsearchWork<Void> work = factory.index( indexName, URLEncodedString.fromString( elasticsearchId ), routingKey, document ).build();
+		ElasticsearchWork<Void> work = factory.index(
+				indexManagerContext.getHibernateSearchIndexName(),
+				indexManagerContext.getElasticsearchIndexName(),
+				URLEncodedString.fromString( elasticsearchId ), routingKey, document
+		)
+				.build();
 		return orchestrator.submit( work );
 	}
 }

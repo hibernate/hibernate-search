@@ -4,15 +4,13 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.work.execution.impl;
+package org.hibernate.search.backend.elasticsearch.work.execution.impl;
 
-import java.util.Collection;
-
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
 /**
  * An interface with knowledge of the index manager internals,
- * able to retrieve components related to work execution.
+ * able to retrieve information necessary for work execution on this index.
  * <p>
  * Note this interface exists mainly to more cleanly pass information
  * from the index manager to the various work execution components.
@@ -23,10 +21,8 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrc
  */
 public interface WorkExecutionIndexManagerContext {
 
-	String getIndexName();
+	String getHibernateSearchIndexName();
 
-	LuceneWriteWorkOrchestrator getWriteOrchestrator(String documentId, String routingKey);
-
-	Collection<LuceneWriteWorkOrchestrator> getAllWriteOrchestrators();
+	URLEncodedString getElasticsearchIndexName();
 
 }

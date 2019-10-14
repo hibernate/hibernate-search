@@ -8,6 +8,8 @@ package org.hibernate.search.engine.backend.work.execution.spi;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.util.common.impl.Throwables;
+
 /**
  * A set of works to be executed on a single index.
  * <p>
@@ -56,8 +58,25 @@ public interface IndexIndexingPlan<D> {
 	 * Start executing all the works in this plan, and clear the plan so that it can be re-used.
 	 *
 	 * @return A {@link CompletableFuture} that will be completed when all the works are complete.
+	 * The future will be completed with an exception if a work failed.
 	 */
-	CompletableFuture<?> execute();
+	default CompletableFuture<?> execute() {
+		return executeAndReport().thenApply( report -> {
+				report.getThrowable().ifPresent( t -> {
+					throw Throwables.toRuntimeException( t );
+				} );
+				return null;
+			} );
+	}
+
+	/**
+	 * Start executing all the works in this plan, and clear the plan so that it can be re-used.
+	 *
+	 * @return A {@link CompletableFuture} that will hold an execution report when all the works are complete.
+	 * The future will be completed normally even if a work failed,
+	 * but the report will contain an exception.
+	 */
+	CompletableFuture<IndexIndexingPlanExecutionReport> executeAndReport();
 
 	/**
 	 * Discard all works that are present in this plan.

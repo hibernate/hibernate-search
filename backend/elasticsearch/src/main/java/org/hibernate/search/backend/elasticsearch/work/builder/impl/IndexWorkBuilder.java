@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentElasticsearchWork;
 
 
-public interface IndexWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<Void>>, IndexWriteWorkBuilder<IndexWorkBuilder> {
+public interface IndexWorkBuilder extends ElasticsearchWorkBuilder<SingleDocumentElasticsearchWork<Void>>, IndexWriteWorkBuilder<IndexWorkBuilder> {
 
 }

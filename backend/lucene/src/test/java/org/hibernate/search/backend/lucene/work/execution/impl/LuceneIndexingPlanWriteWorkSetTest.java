@@ -16,9 +16,12 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkProcessor;
-import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
+import org.hibernate.search.backend.lucene.search.impl.LuceneDocumentReference;
+import org.hibernate.search.backend.lucene.work.impl.LuceneSingleDocumentWriteWork;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.IndexFailureContext;
 import org.hibernate.search.util.impl.test.FutureAssert;
@@ -26,6 +29,7 @@ import org.hibernate.search.util.impl.test.FutureAssert;
 import org.junit.Test;
 
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.SoftAssertions;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
@@ -35,10 +39,12 @@ import org.easymock.EasyMockSupport;
  */
 public class LuceneIndexingPlanWriteWorkSetTest extends EasyMockSupport {
 
+	private static final String INDEX_NAME = "SomeIndexName";
+
 	private LuceneWriteWorkProcessor processorMock = createStrictMock( LuceneWriteWorkProcessor.class );
 	private FailureHandler failureHandlerMock = createStrictMock( FailureHandler.class );
 
-	private List<LuceneWriteWork<?>> workMocks = new ArrayList<>();
+	private List<LuceneSingleDocumentWriteWork<?>> workMocks = new ArrayList<>();
 
 	@Test
 	public void success_commitNone_refreshNone() {
@@ -56,10 +62,10 @@ public class LuceneIndexingPlanWriteWorkSetTest extends EasyMockSupport {
 	}
 
 	private void doTestSuccess(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		CompletableFuture<Object> workSetFuture = new CompletableFuture<>();
+		CompletableFuture<IndexIndexingPlanExecutionReport> workSetFuture = new CompletableFuture<>();
 
 		LuceneIndexingPlanWriteWorkSet workSet = new LuceneIndexingPlanWriteWorkSet(
-				createWorkMocks( 3 ), workSetFuture,
+				INDEX_NAME, createWorkMocks( 3 ), workSetFuture,
 				commitStrategy, refreshStrategy
 		);
 
@@ -75,15 +81,21 @@ public class LuceneIndexingPlanWriteWorkSetTest extends EasyMockSupport {
 		workSet.submitTo( processorMock );
 		verifyAll();
 
-		FutureAssert.assertThat( workSetFuture ).isSuccessful();
+		FutureAssert.assertThat( workSetFuture ).isSuccessful( report -> {
+			assertThat( report ).isNotNull();
+			SoftAssertions.assertSoftly( softly -> {
+				softly.assertThat( report.getThrowable() ).isEmpty();
+				softly.assertThat( report.getFailingDocuments() ).isEmpty();
+			} );
+		} );
 	}
 
 	@Test
 	public void markAsFailed() {
-		CompletableFuture<Object> workSetFuture = new CompletableFuture<>();
+		CompletableFuture<IndexIndexingPlanExecutionReport> workSetFuture = new CompletableFuture<>();
 
 		LuceneIndexingPlanWriteWorkSet workSet = new LuceneIndexingPlanWriteWorkSet(
-				createWorkMocks( 3 ), workSetFuture,
+				INDEX_NAME, createWorkMocks( 3 ), workSetFuture,
 				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 		);
 
@@ -101,10 +113,10 @@ public class LuceneIndexingPlanWriteWorkSetTest extends EasyMockSupport {
 
 	@Test
 	public void failure_work() {
-		CompletableFuture<Object> workSetFuture = new CompletableFuture<>();
+		CompletableFuture<IndexIndexingPlanExecutionReport> workSetFuture = new CompletableFuture<>();
 
 		LuceneIndexingPlanWriteWorkSet workSet = new LuceneIndexingPlanWriteWorkSet(
-				createWorkMocks( 3 ), workSetFuture,
+				INDEX_NAME, createWorkMocks( 3 ), workSetFuture,
 				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 		);
 
@@ -132,15 +144,26 @@ public class LuceneIndexingPlanWriteWorkSetTest extends EasyMockSupport {
 						// All works from the current workset, even successful ones
 						workInfo( 0 ), workInfo( 1 ), workInfo( 2 )
 				);
-		FutureAssert.assertThat( workSetFuture ).isFailed( workException );
+
+		FutureAssert.assertThat( workSetFuture ).isSuccessful( report -> {
+			assertThat( report ).isNotNull();
+			SoftAssertions.assertSoftly( softly -> {
+				softly.assertThat( report.getThrowable() ).containsSame( workException );
+				softly.assertThat( report.getFailingDocuments() )
+						.containsExactly(
+								// All documents from the current workset, even ones from successful works
+								docReference( 0 ), docReference( 1 ), docReference( 2 )
+						);
+			} );
+		} );
 	}
 
 	@Test
 	public void failure_commit() {
-		CompletableFuture<Object> workSetFuture = new CompletableFuture<>();
+		CompletableFuture<IndexIndexingPlanExecutionReport> workSetFuture = new CompletableFuture<>();
 
 		LuceneIndexingPlanWriteWorkSet workSet = new LuceneIndexingPlanWriteWorkSet(
-				createWorkMocks( 3 ), workSetFuture,
+				INDEX_NAME, createWorkMocks( 3 ), workSetFuture,
 				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE
 		);
 
@@ -171,29 +194,45 @@ public class LuceneIndexingPlanWriteWorkSetTest extends EasyMockSupport {
 						// All works from the current workset, even successful ones
 						workInfo( 0 ), workInfo( 1 ), workInfo( 2 )
 				);
-		FutureAssert.assertThat( workSetFuture ).isFailed( commitException );
+
+		FutureAssert.assertThat( workSetFuture ).isSuccessful( report -> {
+			assertThat( report ).isNotNull();
+			SoftAssertions.assertSoftly( softly -> {
+				softly.assertThat( report.getThrowable() ).containsSame( commitException );
+				softly.assertThat( report.getFailingDocuments() )
+						.containsExactly(
+								// All documents from the current workset, even ones from successful works
+								docReference( 0 ), docReference( 1 ), docReference( 2 )
+						);
+			} );
+		} );
 	}
 
 	private void expectWorkGetInfo(int ... ids) {
 		for ( int id : ids ) {
-			LuceneWriteWork<?> workMock = workMocks.get( id );
+			LuceneSingleDocumentWriteWork<?> workMock = workMocks.get( id );
 			EasyMock.expect( workMock.getInfo() ).andStubReturn( workInfo( id ) );
+			EasyMock.expect( workMock.getDocumentId() ).andStubReturn( String.valueOf( id ) );
 		}
 	}
 
-	private List<LuceneWriteWork<?>> createWorkMocks(int count) {
-		List<LuceneWriteWork<?>> result = new ArrayList<>();
+	private List<LuceneSingleDocumentWriteWork<?>> createWorkMocks(int count) {
+		List<LuceneSingleDocumentWriteWork<?>> result = new ArrayList<>();
 		for ( int i = 0; i < count; i++ ) {
 			result.add( createWorkMock() );
 		}
 		return result;
 	}
 
-	private <T> LuceneWriteWork<T> createWorkMock() {
+	private <T> LuceneSingleDocumentWriteWork<T> createWorkMock() {
 		String workName = workInfo( workMocks.size() );
-		LuceneWriteWork<T> workMock = createStrictMock( workName, LuceneWriteWork.class );
+		LuceneSingleDocumentWriteWork<T> workMock = createStrictMock( workName, LuceneSingleDocumentWriteWork.class );
 		workMocks.add( workMock );
 		return workMock;
+	}
+
+	private DocumentReference docReference(int id) {
+		return new LuceneDocumentReference( INDEX_NAME, String.valueOf( id ) );
 	}
 
 	private String workInfo(int index) {

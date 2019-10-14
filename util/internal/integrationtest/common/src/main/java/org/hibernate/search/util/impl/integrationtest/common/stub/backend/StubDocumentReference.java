@@ -10,12 +10,12 @@ import java.util.Objects;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 
-class StubDocumentReference implements DocumentReference {
+public class StubDocumentReference implements DocumentReference {
 
 	private final String indexName;
 	private final String id;
 
-	StubDocumentReference(String indexName, String id) {
+	public StubDocumentReference(String indexName, String id) {
 		this.indexName = indexName;
 		this.id = id;
 	}

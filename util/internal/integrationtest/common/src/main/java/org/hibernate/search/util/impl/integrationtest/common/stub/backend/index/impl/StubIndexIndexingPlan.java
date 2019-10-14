@@ -17,6 +17,9 @@ import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributo
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
+import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubDocumentReference;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
@@ -87,14 +90,35 @@ class StubIndexIndexingPlan implements IndexIndexingPlan<StubDocumentElement> {
 	}
 
 	@Override
-	public CompletableFuture<?> execute() {
+	public CompletableFuture<IndexIndexingPlanExecutionReport> executeAndReport() {
 		process();
-		CompletableFuture<?>[] workFutures = works.stream()
-				.map( work -> behavior.executeDocumentWork( indexName, work ) )
-				.toArray( CompletableFuture<?>[]::new );
+		List<StubDocumentWork> worksToExecute = new ArrayList<>( works );
 		works.clear();
 		preparedIndex = 0;
-		return CompletableFuture.allOf( workFutures );
+		CompletableFuture<?>[] workFutures = worksToExecute.stream()
+				.map( work -> behavior.executeDocumentWork( indexName, work ) )
+				.toArray( CompletableFuture<?>[]::new );
+		return CompletableFuture.allOf( workFutures )
+				.handle( Futures.handler( (ignored1, ignored2) -> {
+					// The throwable is ignored, because it comes from a work future and we'll address this below.
+					return buildResult( worksToExecute, workFutures );
+				} ) );
+	}
+
+	private IndexIndexingPlanExecutionReport buildResult(List<StubDocumentWork> worksToExecute,
+			CompletableFuture<?>[] finishedWorkFutures) {
+		IndexIndexingPlanExecutionReport.Builder builder = IndexIndexingPlanExecutionReport.builder();
+		for ( int i = 0; i < finishedWorkFutures.length; i++ ) {
+			CompletableFuture<?> future = finishedWorkFutures[i];
+			if ( future.isCompletedExceptionally() ) {
+				builder.throwable( Futures.getThrowableNow( future ) );
+				StubDocumentWork work = worksToExecute.get( i );
+				builder.failingDocument(
+						new StubDocumentReference( indexName, work.getIdentifier() )
+				);
+			}
+		}
+		return builder.build();
 	}
 
 	@Override
