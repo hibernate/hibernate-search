@@ -141,7 +141,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		// since the execute phase is supposed to be triggered by the transaction commit
 		if ( !session.isTransactionInProgress() ) {
 			// out of transaction it will trigger both of them
-			contextProvider.getConfiguredAutomaticIndexingSynchronizationStrategy()
+			contextProvider.getCurrentAutomaticIndexingSynchronizationStrategy( session )
 					.executeAndSynchronize( plan );
 		}
 	}

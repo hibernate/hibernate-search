@@ -14,8 +14,9 @@ public interface HibernateOrmListenerContextProvider {
 
 	<E> HibernateOrmListenerTypeContext getTypeContext(Class<E> type);
 
-	ConfiguredAutomaticIndexingSynchronizationStrategy getConfiguredAutomaticIndexingSynchronizationStrategy();
-
 	PojoIndexingPlan getCurrentIndexingPlan(SessionImplementor session, boolean createIfDoesNotExist);
+
+	ConfiguredAutomaticIndexingSynchronizationStrategy getCurrentAutomaticIndexingSynchronizationStrategy(
+			SessionImplementor session);
 
 }
