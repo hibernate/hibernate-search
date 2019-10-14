@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.stub;
 
-import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
+import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 
 /**
  * The only purpose of this class is to avoid unchecked cast warnings when creating mocks.
  */
-public interface StubReferenceHitMapper
-		extends ReferenceHitMapper<StubTransformedReference> {
+public interface StubDocumentReferenceConverter
+		extends DocumentReferenceConverter<StubTransformedReference> {
 }

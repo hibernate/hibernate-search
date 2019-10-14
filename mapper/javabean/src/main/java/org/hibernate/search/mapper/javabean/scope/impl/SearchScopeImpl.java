@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
-import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
+import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.search.loading.context.impl.JavaBeanLoadingContext;
@@ -47,7 +47,7 @@ public class SearchScopeImpl implements SearchScope {
 	}
 
 	public SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?> search(BackendSessionContext sessionContext,
-			ReferenceHitMapper<EntityReference> referenceHitMapper) {
-		return delegate.search( sessionContext, new JavaBeanLoadingContext.Builder( referenceHitMapper ) );
+			DocumentReferenceConverter<EntityReference> documentReferenceConverter) {
+		return delegate.search( sessionContext, new JavaBeanLoadingContext.Builder( documentReferenceConverter ) );
 	}
 }

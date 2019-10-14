@@ -10,29 +10,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 public final class DefaultProjectionHitMapper<R, E> implements ProjectionHitMapper<R, E> {
 
-	private final ReferenceHitMapper<R> referenceHitMapper;
+	private final DocumentReferenceConverter<R> documentReferenceConverter;
 	private final EntityLoader<R, ? extends E> objectLoader;
 
 	private final List<R> referencesToLoad = new ArrayList<>();
 
-	public DefaultProjectionHitMapper(ReferenceHitMapper<R> referenceHitMapper,
+	public DefaultProjectionHitMapper(DocumentReferenceConverter<R> documentReferenceConverter,
 			EntityLoader<R, ? extends E> objectLoader) {
-		this.referenceHitMapper = referenceHitMapper;
+		this.documentReferenceConverter = documentReferenceConverter;
 		this.objectLoader = objectLoader;
 	}
 
 	@Override
 	public R convertReference(DocumentReference reference) {
-		return referenceHitMapper.fromDocumentReference( reference );
+		return documentReferenceConverter.fromDocumentReference( reference );
 	}
 
 	@Override
 	public Object planLoading(DocumentReference reference) {
-		referencesToLoad.add( referenceHitMapper.fromDocumentReference( reference ) );
+		referencesToLoad.add( documentReferenceConverter.fromDocumentReference( reference ) );
 		return referencesToLoad.size() - 1;
 	}
 

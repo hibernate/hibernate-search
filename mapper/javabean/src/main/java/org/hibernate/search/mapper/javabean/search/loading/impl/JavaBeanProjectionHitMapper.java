@@ -11,7 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
-import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
+import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -21,15 +21,15 @@ public class JavaBeanProjectionHitMapper implements ProjectionHitMapper<EntityRe
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ReferenceHitMapper<EntityReference> referenceHitMapper;
+	private final DocumentReferenceConverter<EntityReference> documentReferenceConverter;
 
-	public JavaBeanProjectionHitMapper(ReferenceHitMapper<EntityReference> referenceHitMapper) {
-		this.referenceHitMapper = referenceHitMapper;
+	public JavaBeanProjectionHitMapper(DocumentReferenceConverter<EntityReference> documentReferenceConverter) {
+		this.documentReferenceConverter = documentReferenceConverter;
 	}
 
 	@Override
 	public EntityReference convertReference(DocumentReference reference) {
-		return referenceHitMapper.fromDocumentReference( reference );
+		return documentReferenceConverter.fromDocumentReference( reference );
 	}
 
 	@Override

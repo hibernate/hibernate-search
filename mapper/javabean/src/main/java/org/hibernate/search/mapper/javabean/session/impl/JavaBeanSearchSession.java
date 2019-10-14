@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
-import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
+import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.scope.impl.SearchScopeImpl;
@@ -31,7 +31,7 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
 
 public class JavaBeanSearchSession extends AbstractPojoSearchSession
-		implements SearchSession, ReferenceHitMapper<EntityReference> {
+		implements SearchSession, DocumentReferenceConverter<EntityReference> {
 
 	private final JavaBeanSearchSessionMappingContext mappingContext;
 	private final JavaBeanSearchSessionTypeContextProvider typeContextProvider;

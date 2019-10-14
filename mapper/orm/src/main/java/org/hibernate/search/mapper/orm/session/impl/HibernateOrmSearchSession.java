@@ -25,7 +25,7 @@ import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionCon
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
+import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
@@ -55,7 +55,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		implements SearchSession, HibernateOrmScopeSessionContext, SearchIndexingPlanContext,
-				ReferenceHitMapper<EntityReference> {
+		DocumentReferenceConverter<EntityReference> {
 
 	/**
 	 * @param sessionImplementor A Hibernate session
@@ -186,7 +186,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public ReferenceHitMapper<EntityReference> getReferenceHitMapper() {
+	public DocumentReferenceConverter<EntityReference> getReferenceHitMapper() {
 		return this;
 	}
 

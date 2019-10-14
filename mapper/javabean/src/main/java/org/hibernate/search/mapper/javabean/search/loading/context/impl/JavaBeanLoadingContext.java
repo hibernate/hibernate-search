@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.javabean.search.loading.context.impl;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
-import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
+import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.mapper.javabean.search.loading.impl.JavaBeanProjectionHitMapper;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 
@@ -27,16 +27,16 @@ public final class JavaBeanLoadingContext implements LoadingContext<EntityRefere
 	}
 
 	public static final class Builder implements LoadingContextBuilder<EntityReference, Void> {
-		private final ReferenceHitMapper<EntityReference> referenceHitMapper;
+		private final DocumentReferenceConverter<EntityReference> documentReferenceConverter;
 
-		public Builder(ReferenceHitMapper<EntityReference> referenceHitMapper) {
-			this.referenceHitMapper = referenceHitMapper;
+		public Builder(DocumentReferenceConverter<EntityReference> documentReferenceConverter) {
+			this.documentReferenceConverter = documentReferenceConverter;
 		}
 
 		@Override
 		public LoadingContext<EntityReference, Void> build() {
 			ProjectionHitMapper<EntityReference, Void> projectionHitMapper =
-					new JavaBeanProjectionHitMapper( referenceHitMapper );
+					new JavaBeanProjectionHitMapper( documentReferenceConverter );
 			return new JavaBeanLoadingContext( projectionHitMapper );
 		}
 	}

@@ -21,7 +21,7 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
-import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
+import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils;
 
 import org.easymock.EasyMock;
@@ -50,7 +50,7 @@ public final class StubMapperUtils {
 	@SuppressWarnings({"unchecked", "rawtypes"})
 	public static <R, E> void expectHitMapping(
 			LoadingContext<R, E> loadingContextMock,
-			ReferenceHitMapper<R> referenceTransformerMock,
+			DocumentReferenceConverter<R> referenceTransformerMock,
 			EntityLoader<R, E> objectLoaderMock,
 			Consumer<HitMappingDefinitionContext<R, E>> hitMappingDefinition) {
 		/*

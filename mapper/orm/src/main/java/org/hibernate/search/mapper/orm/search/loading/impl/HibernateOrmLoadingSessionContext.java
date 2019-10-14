@@ -7,13 +7,13 @@
 package org.hibernate.search.mapper.orm.search.loading.impl;
 
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
+import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 
 public interface HibernateOrmLoadingSessionContext {
 
 	SessionImplementor getSession();
 
-	ReferenceHitMapper<EntityReference> getReferenceHitMapper();
+	DocumentReferenceConverter<EntityReference> getReferenceHitMapper();
 
 }

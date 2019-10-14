@@ -28,7 +28,7 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
-import org.hibernate.search.engine.search.loading.spi.ReferenceHitMapper;
+import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
@@ -36,7 +36,7 @@ import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilderFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubReferenceHitMapper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubDocumentReferenceConverter;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubEntityLoader;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubLoadedObject;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
@@ -173,8 +173,8 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 		LoadingContext<StubTransformedReference, StubLoadedObject> loadingContextMock =
 				createMock( LoadingContext.class );
-		ReferenceHitMapper<StubTransformedReference> referenceHitMapperMock =
-				createMock( StubReferenceHitMapper.class );
+		DocumentReferenceConverter<StubTransformedReference> documentReferenceConverterMock =
+				createMock( StubDocumentReferenceConverter.class );
 		EntityLoader<StubTransformedReference, StubLoadedObject> objectLoaderMock =
 				createMock( StubEntityLoader.class );
 
@@ -206,7 +206,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 		resetAll();
 		StubMapperUtils.expectHitMapping(
-				loadingContextMock, referenceHitMapperMock, objectLoaderMock,
+				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				/*
 				 * Expect each reference to be transformed because of the reference projection,
 				 * but also loaded because of the entity projection.
