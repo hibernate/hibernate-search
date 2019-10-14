@@ -17,6 +17,12 @@ public interface EntityReference {
 	Class<?> getType();
 
 	/**
+	 * @return The name of the referenced entity in the Hibernate ORM mapping.
+	 * @see javax.persistence.Entity#name()
+	 */
+	String getName();
+
+	/**
 	 * @return The identifier of the referenced entity,
 	 * Generally this is the entity ID,
 	 * but a different value may be returned if another property than the entity ID is defined as {@code @DocumentId}.

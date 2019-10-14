@@ -201,15 +201,16 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		PojoIndexedTypeAdditionalMetadata indexedTypeMetadata = metadata.getIndexedTypeMetadata().get();
 		PojoEntityTypeAdditionalMetadata entityTypeMetadata = metadata.getEntityTypeMetadata().get();
 
+		String entityName = entityTypeMetadata.getEntityName();
 		MappedIndexManagerBuilder<?> indexManagerBuilder = indexManagerFactory.createMappedIndexManager(
 				this,
 				indexedTypeMetadata.getBackendName(),
 				indexedTypeMetadata.getIndexName()
-						.orElse( entityTypeMetadata.getEntityName() ),
+						.orElse( entityName ),
 				multiTenancyEnabled
 		);
 		PojoIndexedTypeManagerBuilder<?, ?> builder = createIndexedTypeManagerBuilder(
-				indexedEntityType, indexManagerBuilder
+				indexedEntityType, entityTypeMetadata, indexManagerBuilder
 		);
 		// Put the builder in the map before anything else, so it will be closed on error
 		indexedTypeManagerBuilders.put( indexedEntityType, builder );
@@ -342,15 +343,15 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		 * TODO offer more flexibility to mapper implementations, allowing them to define their own dirtiness state?
 		 * Note this will require to allow them to define their own indexing plan APIs.
 		 */
-		PojoPathFilterFactory<Set<String>> pathFilterFactory = typeAdditionalMetadataProvider.get( entityType )
-				.getEntityTypeMetadata().orElseThrow( () -> log.missingEntityTypeMetadata( entityType ) )
-				.getPathFilterFactory();
+		PojoEntityTypeAdditionalMetadata entityTypeMetadata = typeAdditionalMetadataProvider.get( entityType )
+				.getEntityTypeMetadata().orElseThrow( () -> log.missingEntityTypeMetadata( entityType ) );
+		PojoPathFilterFactory<Set<String>> pathFilterFactory = entityTypeMetadata.getPathFilterFactory();
 		Optional<? extends PojoImplicitReindexingResolver<T, Set<String>>> reindexingResolverOptional =
 				reindexingResolverBuildingHelper.build( entityType, pathFilterFactory );
 		if ( reindexingResolverOptional.isPresent() ) {
 			// Nothing to contribute to contained types at the moment,
 			// but create the collector just so the mapper knows the type is contained
-			delegate.createContainedTypeExtendedMappingCollector( entityType );
+			delegate.createContainedTypeExtendedMappingCollector( entityType, entityTypeMetadata.getEntityName() );
 
 			PojoContainedTypeManager<T> typeManager = new PojoContainedTypeManager<>(
 					entityType.getJavaClass(), entityType.getCaster(),
@@ -362,14 +363,15 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	}
 
 	private <E, D extends DocumentElement> PojoIndexedTypeManagerBuilder<E, D> createIndexedTypeManagerBuilder(
-			PojoRawTypeModel<E> entityTypeModel, MappedIndexManagerBuilder<D> indexManagerBuilder) {
+			PojoRawTypeModel<E> entityTypeModel, PojoEntityTypeAdditionalMetadata entityTypeMetadata,
+			MappedIndexManagerBuilder<D> indexManagerBuilder) {
 		return new PojoIndexedTypeManagerBuilder<>(
 				entityTypeModel,
-				typeAdditionalMetadataProvider.get( entityTypeModel ),
+				entityTypeMetadata,
 				mappingHelper,
 				indexManagerBuilder,
 				delegate.createIndexedTypeExtendedMappingCollector(
-						entityTypeModel, indexManagerBuilder.getIndexName()
+						entityTypeModel, entityTypeMetadata.getEntityName(), indexManagerBuilder.getIndexName()
 				),
 				implicitProvidedId
 		);

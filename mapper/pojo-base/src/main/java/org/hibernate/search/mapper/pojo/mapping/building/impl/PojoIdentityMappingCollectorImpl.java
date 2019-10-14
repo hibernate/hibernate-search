@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.impl.RoutingKeyProvider;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
@@ -45,7 +45,7 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 	RoutingKeyProvider<E> routingKeyProvider;
 
 	PojoIdentityMappingCollectorImpl(PojoRawTypeModel<E> typeModel,
-			PojoTypeAdditionalMetadata typeAdditionalMetadata,
+			PojoEntityTypeAdditionalMetadata entityTypeMetadata,
 			PojoMappingHelper mappingHelper,
 			IndexedEntityBindingContext bindingContext,
 			boolean implicitProvidedId) {
@@ -54,9 +54,7 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 		this.bindingContext = bindingContext;
 		this.implicitProvidedId = implicitProvidedId;
 
-		Optional<String> entityIdPropertyName = typeAdditionalMetadata.getEntityTypeMetadata()
-				.orElseThrow( () -> log.missingEntityTypeMetadata( typeModel ) )
-				.getEntityIdPropertyName();
+		Optional<String> entityIdPropertyName = entityTypeMetadata.getEntityIdPropertyName();
 		if ( entityIdPropertyName.isPresent() ) {
 			this.entityIdPropertyPath = BoundPojoModelPath.root( typeModel ).property( entityIdPropertyName.get() );
 		}

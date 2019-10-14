@@ -72,16 +72,17 @@ class HibernateOrmTypeContextContainer implements HibernateOrmSessionTypeContext
 		Builder() {
 		}
 
-		<E> HibernateOrmIndexedTypeContext.Builder<E> addIndexed(PojoRawTypeModel<E> typeModel, String indexName) {
+		<E> HibernateOrmIndexedTypeContext.Builder<E> addIndexed(PojoRawTypeModel<E> typeModel, String entityName,
+				String indexName) {
 			HibernateOrmIndexedTypeContext.Builder<E> builder =
-					new HibernateOrmIndexedTypeContext.Builder<>( typeModel.getJavaClass(), indexName );
+					new HibernateOrmIndexedTypeContext.Builder<>( typeModel.getJavaClass(), entityName, indexName );
 			indexedTypeContextBuilders.add( builder );
 			return builder;
 		}
 
-		<E> HibernateOrmContainedTypeContext.Builder<E> addContained(PojoRawTypeModel<E> typeModel) {
+		<E> HibernateOrmContainedTypeContext.Builder<E> addContained(PojoRawTypeModel<E> typeModel, String entityName) {
 			HibernateOrmContainedTypeContext.Builder<E> builder =
-					new HibernateOrmContainedTypeContext.Builder<>( typeModel.getJavaClass() );
+					new HibernateOrmContainedTypeContext.Builder<>( typeModel.getJavaClass(), entityName );
 			containedTypeContextBuilders.add( builder );
 			return builder;
 		}

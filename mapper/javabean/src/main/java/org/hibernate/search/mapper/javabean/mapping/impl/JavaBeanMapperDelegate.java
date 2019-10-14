@@ -25,13 +25,13 @@ public final class JavaBeanMapperDelegate
 
 	@Override
 	public <E> PojoIndexedTypeExtendedMappingCollector createIndexedTypeExtendedMappingCollector(
-			PojoRawTypeModel<E> rawTypeModel, String indexName) {
-		return typeContextContainerBuilder.addIndexed( rawTypeModel, indexName );
+			PojoRawTypeModel<E> rawTypeModel, String entityName, String indexName) {
+		return typeContextContainerBuilder.addIndexed( rawTypeModel, entityName, indexName );
 	}
 
 	@Override
 	public <E> PojoContainedTypeExtendedMappingCollector createContainedTypeExtendedMappingCollector(
-			PojoRawTypeModel<E> rawTypeModel) {
+			PojoRawTypeModel<E> rawTypeModel, String entityName) {
 		// This is a placeholder: we don't care about contained types at the moment.
 		return new JavaBeanContainedTypeContext.Builder<>();
 	}

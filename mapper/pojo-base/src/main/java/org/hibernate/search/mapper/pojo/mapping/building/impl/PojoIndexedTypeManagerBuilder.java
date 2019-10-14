@@ -21,6 +21,7 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollecto
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManagerContainer;
+import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoEntityTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
@@ -46,7 +47,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 	private boolean closed = false;
 
 	PojoIndexedTypeManagerBuilder(PojoRawTypeModel<E> typeModel,
-			PojoTypeAdditionalMetadata typeAdditionalMetadata,
+			PojoEntityTypeAdditionalMetadata entityTypeMetadata,
 			PojoMappingHelper mappingHelper,
 			MappedIndexManagerBuilder<D> indexManagerBuilder,
 			PojoIndexedTypeExtendedMappingCollector extendedMappingCollector,
@@ -56,7 +57,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 		this.extendedMappingCollector = extendedMappingCollector;
 		this.identityMappingCollector = new PojoIdentityMappingCollectorImpl<>(
 				typeModel,
-				typeAdditionalMetadata,
+				entityTypeMetadata,
 				mappingHelper,
 				indexManagerBuilder.getRootBindingContext(),
 				implicitProvidedId

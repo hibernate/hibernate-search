@@ -13,7 +13,7 @@ class HibernateOrmContainedTypeContext<E> extends AbstractHibernateOrmTypeContex
 		implements HibernateOrmScopeContainedTypeContext<E> {
 
 	private HibernateOrmContainedTypeContext(HibernateOrmContainedTypeContext.Builder<E> builder) {
-		super( builder.javaClass );
+		super( builder.javaClass, builder.entityName );
 	}
 
 	@Override
@@ -25,9 +25,11 @@ class HibernateOrmContainedTypeContext<E> extends AbstractHibernateOrmTypeContex
 
 	static class Builder<E> implements PojoContainedTypeExtendedMappingCollector {
 		private final Class<E> javaClass;
+		private final String entityName;
 
-		Builder(Class<E> javaClass) {
+		Builder(Class<E> javaClass, String entityName) {
 			this.javaClass = javaClass;
+			this.entityName = entityName;
 		}
 
 		HibernateOrmContainedTypeContext<E> build() {

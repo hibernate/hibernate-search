@@ -15,6 +15,8 @@ public interface HibernateOrmSessionIndexedTypeContext<E> {
 
 	Class<E> getJavaClass();
 
+	String getEntityName();
+
 	IdentifierMapping getIdentifierMapping();
 
 }

@@ -12,18 +12,30 @@ import org.hibernate.search.mapper.orm.common.EntityReference;
 
 public class EntityReferenceImpl implements EntityReference {
 
+	public static EntityReference withDefaultName(Class<?> type, Object id) {
+		return new EntityReferenceImpl( type, type.getSimpleName(), id );
+	}
+
 	private final Class<?> type;
+
+	private final String name;
 
 	private final Object id;
 
-	public EntityReferenceImpl(Class<?> type, Object id) {
+	public EntityReferenceImpl(Class<?> type, String name, Object id) {
 		this.type = type;
+		this.name = name;
 		this.id = id;
 	}
 
 	@Override
 	public Class<?> getType() {
 		return type;
+	}
+
+	@Override
+	public String getName() {
+		return name;
 	}
 
 	@Override
@@ -37,22 +49,18 @@ public class EntityReferenceImpl implements EntityReference {
 			return false;
 		}
 		EntityReferenceImpl other = (EntityReferenceImpl) obj;
-		return type.equals( other.type ) && Objects.equals( id, other.id );
+		return name.equals( other.name ) && Objects.equals( id, other.id );
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash( type, id );
+		return Objects.hash( name, id );
 	}
 
 	@Override
 	public String toString() {
-		return new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "type=" ).append( type )
-				.append( ", id=" ).append( id )
-				.append( "]" )
-				.toString();
+		// Apparently this is the usual format for references to Hibernate ORM entities.
+		return name + "#" + id;
 	}
 
 }

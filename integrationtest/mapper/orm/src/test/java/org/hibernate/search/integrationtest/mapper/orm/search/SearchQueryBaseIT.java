@@ -15,7 +15,6 @@ import java.util.Objects;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Table;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
@@ -77,7 +76,7 @@ public class SearchQueryBaseIT {
 
 	@Before
 	public void setup() {
-		backendMock.expectAnySchema( Book.INDEX );
+		backendMock.expectAnySchema( Book.NAME );
 
 		sessionFactory = ormSetupHelper.start()
 				.setup( Book.class );
@@ -98,13 +97,13 @@ public class SearchQueryBaseIT {
 					.toQuery();
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( Book.INDEX ),
+					Arrays.asList( Book.NAME ),
 					b -> { },
 					StubSearchWorkBehavior.of(
 							3L,
-							reference( Book.INDEX, "1" ),
-							reference( Book.INDEX, "2" ),
-							reference( Book.INDEX, "3" )
+							reference( Book.NAME, "1" ),
+							reference( Book.NAME, "2" ),
+							reference( Book.NAME, "3" )
 					)
 			);
 
@@ -131,7 +130,7 @@ public class SearchQueryBaseIT {
 					.toQuery();
 
 			backendMock.expectSearchProjection(
-					Arrays.asList( Book.INDEX ),
+					Arrays.asList( Book.NAME ),
 					b -> { },
 					StubSearchWorkBehavior.of(
 							3L,
@@ -167,26 +166,26 @@ public class SearchQueryBaseIT {
 					.toQuery();
 
 			backendMock.expectSearchProjection(
-					Arrays.asList( Book.INDEX ),
+					Arrays.asList( Book.NAME ),
 					b -> { },
 					StubSearchWorkBehavior.of(
 							3L,
 							Arrays.asList(
 									TITLE_4_3_2_1,
-									reference( Book.INDEX, "1" ),
-									reference( Book.INDEX, "1" ),
+									reference( Book.NAME, "1" ),
+									reference( Book.NAME, "1" ),
 									AUTHOR_4_3_2_1
 							),
 							Arrays.asList(
 									TITLE_CIDER_HOUSE,
-									reference( Book.INDEX, "2" ),
-									reference( Book.INDEX, "2" ),
+									reference( Book.NAME, "2" ),
+									reference( Book.NAME, "2" ),
 									AUTHOR_CIDER_HOUSE
 							),
 							Arrays.asList(
 									TITLE_AVENUE_OF_MYSTERIES,
-									reference( Book.INDEX, "3" ),
-									reference( Book.INDEX, "3" ),
+									reference( Book.NAME, "3" ),
+									reference( Book.NAME, "3" ),
 									AUTHOR_AVENUE_OF_MYSTERIES
 							)
 					)
@@ -195,20 +194,20 @@ public class SearchQueryBaseIT {
 			Assertions.assertThat( query.fetchAllHits() ).containsExactly(
 					Arrays.asList(
 							TITLE_4_3_2_1,
-							new EntityReferenceImpl( Book.class, 1 ),
-							reference( Book.INDEX, "1" ),
+							new EntityReferenceImpl( Book.class, Book.NAME, 1 ),
+							reference( Book.NAME, "1" ),
 							AUTHOR_4_3_2_1
 					),
 					Arrays.asList(
 							TITLE_CIDER_HOUSE,
-							new EntityReferenceImpl( Book.class, 2 ),
-							reference( Book.INDEX, "2" ),
+							new EntityReferenceImpl( Book.class, Book.NAME, 2 ),
+							reference( Book.NAME, "2" ),
 							AUTHOR_CIDER_HOUSE
 					),
 					Arrays.asList(
 							TITLE_AVENUE_OF_MYSTERIES,
-							new EntityReferenceImpl( Book.class, 3 ),
-							reference( Book.INDEX, "3" ),
+							new EntityReferenceImpl( Book.class, Book.NAME, 3 ),
+							reference( Book.NAME, "3" ),
 							AUTHOR_AVENUE_OF_MYSTERIES
 					)
 			);
@@ -236,20 +235,20 @@ public class SearchQueryBaseIT {
 					.toQuery();
 
 			backendMock.expectSearchProjection(
-					Arrays.asList( Book.INDEX ),
+					Arrays.asList( Book.NAME ),
 					b -> { },
 					StubSearchWorkBehavior.of(
 							3L,
 							Arrays.asList(
-									Arrays.asList( StubBackendUtils.reference( Book.INDEX, "1" ), AUTHOR_4_3_2_1 ),
+									Arrays.asList( StubBackendUtils.reference( Book.NAME, "1" ), AUTHOR_4_3_2_1 ),
 									4.0F
 							),
 							Arrays.asList(
-									Arrays.asList( StubBackendUtils.reference( Book.INDEX, "2" ), AUTHOR_CIDER_HOUSE ),
+									Arrays.asList( StubBackendUtils.reference( Book.NAME, "2" ), AUTHOR_CIDER_HOUSE ),
 									5.0F
 							),
 							Arrays.asList(
-									Arrays.asList( StubBackendUtils.reference( Book.INDEX, "3" ), AUTHOR_AVENUE_OF_MYSTERIES ),
+									Arrays.asList( StubBackendUtils.reference( Book.NAME, "3" ), AUTHOR_AVENUE_OF_MYSTERIES ),
 									6.0F
 							)
 					)
@@ -284,20 +283,20 @@ public class SearchQueryBaseIT {
 					.toQuery();
 
 			backendMock.expectSearchProjection(
-					Arrays.asList( Book.INDEX ),
+					Arrays.asList( Book.NAME ),
 					b -> { },
 					StubSearchWorkBehavior.of(
 							3L,
 							Arrays.asList(
-									Arrays.asList( StubBackendUtils.reference( Book.INDEX, "1" ), AUTHOR_4_3_2_1 ),
+									Arrays.asList( StubBackendUtils.reference( Book.NAME, "1" ), AUTHOR_4_3_2_1 ),
 									4.0F
 							),
 							Arrays.asList(
-									Arrays.asList( StubBackendUtils.reference( Book.INDEX, "2" ), AUTHOR_CIDER_HOUSE ),
+									Arrays.asList( StubBackendUtils.reference( Book.NAME, "2" ), AUTHOR_CIDER_HOUSE ),
 									5.0F
 							),
 							Arrays.asList(
-									Arrays.asList( StubBackendUtils.reference( Book.INDEX, "3" ), AUTHOR_AVENUE_OF_MYSTERIES ),
+									Arrays.asList( StubBackendUtils.reference( Book.NAME, "3" ), AUTHOR_AVENUE_OF_MYSTERIES ),
 									6.0F
 							)
 					)
@@ -353,20 +352,20 @@ public class SearchQueryBaseIT {
 					.toQuery();
 
 			backendMock.expectSearchProjection(
-					Arrays.asList( Book.INDEX ),
+					Arrays.asList( Book.NAME ),
 					b -> { },
 					StubSearchWorkBehavior.of(
 							3L,
-							StubBackendUtils.reference( Book.INDEX, "1" ),
-							StubBackendUtils.reference( Book.INDEX, "2" ),
-							StubBackendUtils.reference( Book.INDEX, "3" )
+							StubBackendUtils.reference( Book.NAME, "1" ),
+							StubBackendUtils.reference( Book.NAME, "2" ),
+							StubBackendUtils.reference( Book.NAME, "3" )
 					)
 			);
 
 			Assertions.assertThat( query.fetchAllHits() ).containsExactlyInAnyOrder(
-					new EntityReferenceImpl( Book.class, 1 ),
-					new EntityReferenceImpl( Book.class, 2 ),
-					new EntityReferenceImpl( Book.class, 3 )
+					new EntityReferenceImpl( Book.class, Book.NAME, 1 ),
+					new EntityReferenceImpl( Book.class, Book.NAME, 2 ),
+					new EntityReferenceImpl( Book.class, Book.NAME, 3 )
 			);
 		} );
 	}
@@ -377,7 +376,7 @@ public class SearchQueryBaseIT {
 			session.persist( new Book( 2, TITLE_CIDER_HOUSE, AUTHOR_CIDER_HOUSE ) );
 			session.persist( new Book( 3, TITLE_AVENUE_OF_MYSTERIES, AUTHOR_AVENUE_OF_MYSTERIES ) );
 
-			backendMock.expectWorks( Book.INDEX )
+			backendMock.expectWorks( Book.NAME )
 					.add( "1", b -> b
 							.field( "title", TITLE_4_3_2_1 )
 							.field( "author", AUTHOR_4_3_2_1 )
@@ -396,12 +395,11 @@ public class SearchQueryBaseIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-	@Entity
-	@Table(name = "book")
-	@Indexed(index = Book.INDEX)
+	@Entity(name = Book.NAME)
+	@Indexed(index = Book.NAME)
 	public static class Book {
 
-		public static final String INDEX = "Book";
+		public static final String NAME = "Book";
 
 		@Id
 		private Integer id;

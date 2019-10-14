@@ -77,7 +77,7 @@ public class ProvidedIdIT {
 					.toQuery();
 
 			assertThat( query.fetchAll().getHits() )
-					.containsExactly( new EntityReferenceImpl( IndexedEntity.class, "42" ) );
+					.containsExactly( EntityReferenceImpl.withDefaultName( IndexedEntity.class, "42" ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}

@@ -438,8 +438,8 @@ public class ProgrammaticMappingSmokeIT {
 			SearchResult<EntityReference> result = query.fetch( 3, 2 );
 			assertThat( result.getHits() )
 					.containsExactly(
-							new EntityReferenceImpl( IndexedEntity.class, 0 ),
-							new EntityReferenceImpl( YetAnotherIndexedEntity.class, 1 )
+							EntityReferenceImpl.withDefaultName( IndexedEntity.class, 0 ),
+							EntityReferenceImpl.withDefaultName( YetAnotherIndexedEntity.class, 1 )
 					);
 			assertThat( result.getTotalHitCount() ).isEqualTo( 6L );
 
@@ -526,14 +526,14 @@ public class ProgrammaticMappingSmokeIT {
 					.containsExactly(
 							Arrays.asList(
 									"text1",
-									new EntityReferenceImpl( IndexedEntity.class, 0 ),
+									EntityReferenceImpl.withDefaultName( IndexedEntity.class, 0 ),
 									LocalDate.of( 2017, 11, 1 ),
 									reference( IndexedEntity.INDEX, "0" ),
 									"text2"
 							),
 							Arrays.asList(
 									null,
-									new EntityReferenceImpl( YetAnotherIndexedEntity.class, 1 ),
+									EntityReferenceImpl.withDefaultName( YetAnotherIndexedEntity.class, 1 ),
 									LocalDate.of( 2017, 11, 2 ),
 									reference( YetAnotherIndexedEntity.INDEX, "1" ),
 									null

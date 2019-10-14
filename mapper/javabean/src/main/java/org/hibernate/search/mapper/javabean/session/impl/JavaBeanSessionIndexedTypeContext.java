@@ -15,6 +15,8 @@ public interface JavaBeanSessionIndexedTypeContext<E> {
 
 	Class<E> getJavaClass();
 
+	String getEntityName();
+
 	IdentifierMapping getIdentifierMapping();
 
 }

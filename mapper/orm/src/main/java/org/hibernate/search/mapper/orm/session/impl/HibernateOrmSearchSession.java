@@ -204,7 +204,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		}
 		Object id = typeContext.getIdentifierMapping()
 				.fromDocumentIdentifier( reference.getId(), sessionContext );
-		return new EntityReferenceImpl( typeContext.getJavaClass(), id );
+		return new EntityReferenceImpl( typeContext.getJavaClass(), typeContext.getEntityName(), id );
 	}
 
 	public PojoIndexer createIndexer(DocumentCommitStrategy commitStrategy) {

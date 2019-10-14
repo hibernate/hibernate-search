@@ -156,10 +156,10 @@ public class ProjectionDslIT {
 					.fetchHits( 20 );
 			// end::reference[]
 			assertThat( hits ).containsExactlyInAnyOrder(
-					new EntityReferenceImpl( Book.class, BOOK1_ID ),
-					new EntityReferenceImpl( Book.class, BOOK2_ID ),
-					new EntityReferenceImpl( Book.class, BOOK3_ID ),
-					new EntityReferenceImpl( Book.class, BOOK4_ID )
+					EntityReferenceImpl.withDefaultName( Book.class, BOOK1_ID ),
+					EntityReferenceImpl.withDefaultName( Book.class, BOOK2_ID ),
+					EntityReferenceImpl.withDefaultName( Book.class, BOOK3_ID ),
+					EntityReferenceImpl.withDefaultName( Book.class, BOOK4_ID )
 			);
 		} );
 	}
