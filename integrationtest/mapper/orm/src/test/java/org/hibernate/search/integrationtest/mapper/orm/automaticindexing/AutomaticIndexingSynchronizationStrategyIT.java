@@ -92,19 +92,10 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 		CompletableFuture<?> transactionFuture = runTransactionInDifferentThread(
 				sessionFactory,
-				new AutomaticIndexingSynchronizationStrategy() {
-					@Override
-					public DocumentCommitStrategy getDocumentCommitStrategy() {
-						return DocumentCommitStrategy.FORCE;
-					}
-
-					@Override
-					public DocumentRefreshStrategy getDocumentRefreshStrategy() {
-						return DocumentRefreshStrategy.FORCE;
-					}
-
-					@Override
-					public void handleFuture(CompletableFuture<?> future) {
+				context -> {
+					context.documentCommitStrategy( DocumentCommitStrategy.FORCE );
+					context.documentRefreshStrategy( DocumentRefreshStrategy.FORCE );
+					context.indexingFutureHandler( future -> {
 						// try to wait for the future to complete for a small duration...
 						try {
 							future.get( SMALL_DURATION_VALUE, SMALL_DURATION_UNIT );
@@ -120,7 +111,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 						catch (InterruptedException | ExecutionException e) {
 							Assertions.fail( "Unexpected exception: " + e, e );
 						}
-					}
+					} );
 				},
 				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE,
 				workFuture,

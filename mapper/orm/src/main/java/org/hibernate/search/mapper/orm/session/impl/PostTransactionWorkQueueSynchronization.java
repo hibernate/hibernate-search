@@ -8,12 +8,10 @@ package org.hibernate.search.mapper.orm.session.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -22,18 +20,18 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard
  */
-public class PostTransactionWorkQueueSynchronization implements Synchronization {
+class PostTransactionWorkQueueSynchronization implements Synchronization {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoIndexingPlan indexingPlan;
 	private final Map<?, ?> indexingPlanPerTransaction;
 	private final Object transactionIdentifier;
-	private final AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
+	private final ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 
-	public PostTransactionWorkQueueSynchronization(PojoIndexingPlan indexingPlan,
+	PostTransactionWorkQueueSynchronization(PojoIndexingPlan indexingPlan,
 			Map<?, ?> indexingPlanPerTransaction, Object transactionIdentifier,
-			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
+			ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		this.indexingPlan = indexingPlan;
 		this.indexingPlanPerTransaction = indexingPlanPerTransaction;
 		this.transactionIdentifier = transactionIdentifier;
@@ -51,8 +49,7 @@ public class PostTransactionWorkQueueSynchronization implements Synchronization 
 		try {
 			if ( Status.STATUS_COMMITTED == i ) {
 				log.tracef( "Processing Transaction's afterCompletion() phase for %s. Performing work.", this );
-				CompletableFuture<?> future = indexingPlan.execute();
-				synchronizationStrategy.handleFuture( future );
+				synchronizationStrategy.executeAndSynchronize( indexingPlan );
 			}
 			else {
 				log.tracef(

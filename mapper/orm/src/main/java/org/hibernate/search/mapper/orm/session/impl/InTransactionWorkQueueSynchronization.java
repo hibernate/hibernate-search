@@ -9,11 +9,9 @@ package org.hibernate.search.mapper.orm.session.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import javax.transaction.Synchronization;
 
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -22,18 +20,18 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *
  * @author Emmanuel Bernard
  */
-public class InTransactionWorkQueueSynchronization implements Synchronization {
+class InTransactionWorkQueueSynchronization implements Synchronization {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoIndexingPlan indexingPlan;
 	private final Map<?, ?> indexingPlanPerTransaction;
 	private final Object transactionIdentifier;
-	private final AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
+	private final ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 
-	public InTransactionWorkQueueSynchronization(PojoIndexingPlan indexingPlan,
+	InTransactionWorkQueueSynchronization(PojoIndexingPlan indexingPlan,
 			Map<?, ?> indexingPlanPerTransaction, Object transactionIdentifier,
-			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
+			ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		this.indexingPlan = indexingPlan;
 		this.indexingPlanPerTransaction = indexingPlanPerTransaction;
 		this.transactionIdentifier = transactionIdentifier;
@@ -47,8 +45,7 @@ public class InTransactionWorkQueueSynchronization implements Synchronization {
 			log.tracef(
 					"Processing Transaction's beforeCompletion() phase for %s. Performing work.", this
 			);
-			CompletableFuture<?> future = indexingPlan.execute();
-			synchronizationStrategy.handleFuture( future );
+			synchronizationStrategy.executeAndSynchronize( indexingPlan );
 		}
 		finally {
 			//clean the Synchronization per Transaction

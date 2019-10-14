@@ -35,7 +35,6 @@ import org.hibernate.event.spi.PostUpdateEvent;
 import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -142,8 +141,8 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		// since the execute phase is supposed to be triggered by the transaction commit
 		if ( !session.isTransactionInProgress() ) {
 			// out of transaction it will trigger both of them
-			AutomaticIndexingSynchronizationStrategy synchronizationStrategy = contextProvider.getSynchronizationStrategy();
-			synchronizationStrategy.handleFuture( plan.execute() );
+			contextProvider.getConfiguredAutomaticIndexingSynchronizationStrategy()
+					.executeAndSynchronize( plan );
 		}
 	}
 

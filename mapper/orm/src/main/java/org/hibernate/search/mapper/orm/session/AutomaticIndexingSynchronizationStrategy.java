@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.session;
 
-import java.util.concurrent.CompletableFuture;
-
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.util.common.impl.Futures;
@@ -20,48 +18,19 @@ import org.hibernate.search.util.common.impl.Futures;
  */
 public interface AutomaticIndexingSynchronizationStrategy {
 
-	/**
-	 * @return A strategy describing how commits should be handled after document changes are applied.
-	 */
-	DocumentCommitStrategy getDocumentCommitStrategy();
-
-	/**
-	 * @return A strategy describing how refresh should be handled after document changes are applied.
-	 */
-	DocumentRefreshStrategy getDocumentRefreshStrategy();
-
-	/**
-	 * Handle the result of the (asynchronous) indexing.
-	 * <p>
-	 * This typically involves waiting on the given future,
-	 * to prevent the thread from resuming execution until indexing is complete.
-	 *
-	 * @param future A future that will be completed once all document changes are applied
-	 * and the commit/refresh requirements defined by {@link #getDocumentCommitStrategy()}
-	 * and {@link #getDocumentRefreshStrategy()} are satisfied.
-	 */
-	void handleFuture(CompletableFuture<?> future);
+	void apply(AutomaticIndexingSynchronizationConfigurationContext context);
 
 	/**
 	 * @return A strategy that only waits for indexing requests to be queued in the backend.
 	 * See the reference documentation for details.
 	 */
 	static AutomaticIndexingSynchronizationStrategy queued() {
-		return new AutomaticIndexingSynchronizationStrategy() {
-			@Override
-			public DocumentCommitStrategy getDocumentCommitStrategy() {
-				return DocumentCommitStrategy.NONE;
-			}
-
-			@Override
-			public DocumentRefreshStrategy getDocumentRefreshStrategy() {
-				return DocumentRefreshStrategy.NONE;
-			}
-
-			@Override
-			public void handleFuture(CompletableFuture<?> future) {
-				// Nothing to do: works are queued, we're fine.
-			}
+		return context -> {
+			context.documentCommitStrategy( DocumentCommitStrategy.NONE );
+			context.documentCommitStrategy( DocumentCommitStrategy.NONE );
+			context.indexingFutureHandler( future -> {
+				// Nothing to do: once works are queued, we're done.
+			} );
 		};
 	}
 
@@ -70,21 +39,14 @@ public interface AutomaticIndexingSynchronizationStrategy {
 	 * See the reference documentation for details.
 	 */
 	static AutomaticIndexingSynchronizationStrategy committed() {
-		return new AutomaticIndexingSynchronizationStrategy() {
-			@Override
-			public DocumentCommitStrategy getDocumentCommitStrategy() {
-				return DocumentCommitStrategy.FORCE;
-			}
-
-			@Override
-			public DocumentRefreshStrategy getDocumentRefreshStrategy() {
-				return DocumentRefreshStrategy.NONE;
-			}
-
-			@Override
-			public void handleFuture(CompletableFuture<?> future) {
+		return context -> {
+			// Request indexing to force a commit, but not necessarily a refresh.
+			context.documentCommitStrategy( DocumentCommitStrategy.FORCE );
+			context.documentRefreshStrategy( DocumentRefreshStrategy.NONE );
+			context.indexingFutureHandler( future -> {
+				// Wait for the result of indexing, so that we're sure changes were committed.
 				Futures.unwrappedExceptionJoin( future );
-			}
+			} );
 		};
 	}
 
@@ -93,21 +55,14 @@ public interface AutomaticIndexingSynchronizationStrategy {
 	 * See the reference documentation for details.
 	 */
 	static AutomaticIndexingSynchronizationStrategy searchable() {
-		return new AutomaticIndexingSynchronizationStrategy() {
-			@Override
-			public DocumentCommitStrategy getDocumentCommitStrategy() {
-				return DocumentCommitStrategy.FORCE;
-			}
-
-			@Override
-			public DocumentRefreshStrategy getDocumentRefreshStrategy() {
-				return DocumentRefreshStrategy.FORCE;
-			}
-
-			@Override
-			public void handleFuture(CompletableFuture<?> future) {
+		return context -> {
+			// Request indexing to force a commit and a refresh.
+			context.documentCommitStrategy( DocumentCommitStrategy.FORCE );
+			context.documentRefreshStrategy( DocumentRefreshStrategy.FORCE );
+			context.indexingFutureHandler( future -> {
+				// Wait for the result of indexing, so that we're sure changes were committed and refreshed.
 				Futures.unwrappedExceptionJoin( future );
-			}
+			} );
 		};
 	}
 

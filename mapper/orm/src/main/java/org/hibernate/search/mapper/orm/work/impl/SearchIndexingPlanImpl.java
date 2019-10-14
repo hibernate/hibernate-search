@@ -47,8 +47,7 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 		if ( plan == null ) {
 			return;
 		}
-		context.getAutomaticIndexingSynchronizationStrategy().handleFuture(
-				plan.execute()
-		);
+		context.getConfiguredAutomaticIndexingSynchronizationStrategy()
+				.executeAndSynchronize( plan );
 	}
 }

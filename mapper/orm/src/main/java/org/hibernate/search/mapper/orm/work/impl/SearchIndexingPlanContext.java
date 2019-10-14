@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.mapper.orm.work.impl;
 
-import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 
 public interface SearchIndexingPlanContext {
 
-	AutomaticIndexingSynchronizationStrategy getAutomaticIndexingSynchronizationStrategy();
+	ConfiguredAutomaticIndexingSynchronizationStrategy getConfiguredAutomaticIndexingSynchronizationStrategy();
 
 	PojoIndexingPlan getCurrentIndexingPlan(boolean createIfDoesNotExist);
 

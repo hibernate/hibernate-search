@@ -94,7 +94,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	private final HibernateOrmSearchSessionMappingContext mappingContext;
 	private final HibernateOrmSessionTypeContextProvider typeContextProvider;
 	private final HibernateOrmSessionContextImpl sessionContext;
-	private AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
+	private ConfiguredAutomaticIndexingSynchronizationStrategy configuredAutomaticIndexingSynchronizationStrategy;
 
 	/*
 	 * FIXME HSEARCH-3317 support "enlist in transaction"? This only makes sense when index managers support it,
@@ -114,7 +114,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		this.mappingContext = builder.mappingContext;
 		this.typeContextProvider = builder.typeContextProvider;
 		this.sessionContext = backendSessionContext;
-		this.synchronizationStrategy = builder.synchronizationStrategy;
+		this.configuredAutomaticIndexingSynchronizationStrategy = builder.configuredAutomaticIndexingSynchronizationStrategy;
 	}
 
 	public void close() {
@@ -172,7 +172,10 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	@Override
 	public void setAutomaticIndexingSynchronizationStrategy(
 			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
-		this.synchronizationStrategy = synchronizationStrategy;
+		ConfiguredAutomaticIndexingSynchronizationStrategy.Builder builder =
+				new ConfiguredAutomaticIndexingSynchronizationStrategy.Builder();
+		synchronizationStrategy.apply( builder );
+		this.configuredAutomaticIndexingSynchronizationStrategy = builder.build();
 	}
 
 	@Override
@@ -238,16 +241,18 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 			return null;
 		}
 
-		AutomaticIndexingSynchronizationStrategy planSynchronizationStrategy = synchronizationStrategy;
+		ConfiguredAutomaticIndexingSynchronizationStrategy currentSynchronizationStrategy =
+				configuredAutomaticIndexingSynchronizationStrategy;
 		plan = createIndexingPlan(
-				planSynchronizationStrategy.getDocumentCommitStrategy(),
-				planSynchronizationStrategy.getDocumentRefreshStrategy()
+				currentSynchronizationStrategy.getDocumentCommitStrategy(),
+				currentSynchronizationStrategy.getDocumentRefreshStrategy()
 		);
 		planPerTransaction.put( transactionIdentifier, plan );
 
 		if ( sessionImplementor.isTransactionInProgress() ) {
 			Synchronization txSync = createTransactionWorkQueueSynchronization(
-					plan, planPerTransaction, transactionIdentifier, planSynchronizationStrategy
+					plan, planPerTransaction, transactionIdentifier,
+					currentSynchronizationStrategy
 			);
 			registerSynchronization( sessionImplementor, txSync );
 		}
@@ -255,8 +260,8 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public AutomaticIndexingSynchronizationStrategy getAutomaticIndexingSynchronizationStrategy() {
-		return synchronizationStrategy;
+	public ConfiguredAutomaticIndexingSynchronizationStrategy getConfiguredAutomaticIndexingSynchronizationStrategy() {
+		return configuredAutomaticIndexingSynchronizationStrategy;
 	}
 
 	private PojoIndexingPlan createIndexingPlan(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
@@ -265,7 +270,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	private Synchronization createTransactionWorkQueueSynchronization(PojoIndexingPlan indexingPlan,
 			Map<Transaction, PojoIndexingPlan> indexingPlanPerTransaction, Transaction transactionIdentifier,
-			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
+			ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		if ( enlistInTransaction ) {
 			return new InTransactionWorkQueueSynchronization(
 					indexingPlan, indexingPlanPerTransaction, transactionIdentifier,
@@ -335,18 +340,18 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		private final HibernateOrmSearchSessionMappingContext mappingContext;
 		private final HibernateOrmSessionTypeContextProvider typeContextProvider;
 		private final SessionImplementor sessionImplementor;
-		private final AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
+		private final ConfiguredAutomaticIndexingSynchronizationStrategy configuredAutomaticIndexingSynchronizationStrategy;
 
 		public HibernateOrmSearchSessionBuilder(PojoMappingDelegate mappingDelegate,
 				HibernateOrmSearchSessionMappingContext mappingContext,
 				HibernateOrmSessionTypeContextProvider typeContextProvider,
 				SessionImplementor sessionImplementor,
-				AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
+				ConfiguredAutomaticIndexingSynchronizationStrategy configuredAutomaticIndexingSynchronizationStrategy) {
 			super( mappingDelegate );
 			this.mappingContext = mappingContext;
 			this.typeContextProvider = typeContextProvider;
 			this.sessionImplementor = sessionImplementor;
-			this.synchronizationStrategy = synchronizationStrategy;
+			this.configuredAutomaticIndexingSynchronizationStrategy = configuredAutomaticIndexingSynchronizationStrategy;
 		}
 
 		private HibernateOrmSessionContextImpl buildBackendSessionContext() {

@@ -39,6 +39,7 @@ import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContex
 import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSession;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSessionMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
@@ -101,29 +102,35 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 		int fetchSize = QUERY_LOADING_FETCH_SIZE.get( propertySource );
 
+		ConfiguredAutomaticIndexingSynchronizationStrategy.Builder configuredSyncStrategyBuilder =
+				new ConfiguredAutomaticIndexingSynchronizationStrategy.Builder();
+		synchronizationStrategy.apply( configuredSyncStrategyBuilder );
+		ConfiguredAutomaticIndexingSynchronizationStrategy configuredSynchronizationStrategy =
+				configuredSyncStrategyBuilder.build();
+
 		return new HibernateOrmMapping(
 				mappingDelegate, typeContextContainer, sessionFactory,
-				synchronizationStrategy,
+				configuredSynchronizationStrategy,
 				cacheLookupStrategy, fetchSize
 		);
 	}
 
 	private final HibernateOrmMappingContextImpl backendMappingContext;
 	private final HibernateOrmTypeContextContainer typeContextContainer;
-	private final AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
+	private final ConfiguredAutomaticIndexingSynchronizationStrategy configuredAutomaticIndexingSynchronizationStrategy;
 	private final EntityLoadingCacheLookupStrategy cacheLookupStrategy;
 	private final int fetchSize;
 
 	private HibernateOrmMapping(PojoMappingDelegate mappingDelegate,
 			HibernateOrmTypeContextContainer typeContextContainer,
 			SessionFactoryImplementor sessionFactory,
-			AutomaticIndexingSynchronizationStrategy synchronizationStrategy,
+			ConfiguredAutomaticIndexingSynchronizationStrategy configuredAutomaticIndexingSynchronizationStrategy,
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			int fetchSize) {
 		super( mappingDelegate );
 		this.typeContextContainer = typeContextContainer;
 		this.backendMappingContext = new HibernateOrmMappingContextImpl( sessionFactory );
-		this.synchronizationStrategy = synchronizationStrategy;
+		this.configuredAutomaticIndexingSynchronizationStrategy = configuredAutomaticIndexingSynchronizationStrategy;
 		this.cacheLookupStrategy = cacheLookupStrategy;
 		this.fetchSize = fetchSize;
 	}
@@ -165,8 +172,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public AutomaticIndexingSynchronizationStrategy getSynchronizationStrategy() {
-		return synchronizationStrategy;
+	public ConfiguredAutomaticIndexingSynchronizationStrategy getConfiguredAutomaticIndexingSynchronizationStrategy() {
+		return configuredAutomaticIndexingSynchronizationStrategy;
 	}
 
 	@Override
@@ -238,7 +245,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		return new HibernateOrmSearchSession.HibernateOrmSearchSessionBuilder(
 				getDelegate(), this, typeContextContainer,
 				sessionImplementor,
-				synchronizationStrategy
+				configuredAutomaticIndexingSynchronizationStrategy
 		);
 	}
 
