@@ -173,7 +173,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	public void setAutomaticIndexingSynchronizationStrategy(
 			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		ConfiguredAutomaticIndexingSynchronizationStrategy.Builder builder =
-				new ConfiguredAutomaticIndexingSynchronizationStrategy.Builder();
+				new ConfiguredAutomaticIndexingSynchronizationStrategy.Builder( this );
 		synchronizationStrategy.apply( builder );
 		this.configuredAutomaticIndexingSynchronizationStrategy = builder.build();
 	}

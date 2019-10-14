@@ -8,7 +8,9 @@ package org.hibernate.search.mapper.orm.session;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport;
 import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.common.impl.Throwables;
 
 /**
  * Determines how the thread will block upon committing a transaction
@@ -45,7 +47,10 @@ public interface AutomaticIndexingSynchronizationStrategy {
 			context.documentRefreshStrategy( DocumentRefreshStrategy.NONE );
 			context.indexingFutureHandler( future -> {
 				// Wait for the result of indexing, so that we're sure changes were committed.
-				Futures.unwrappedExceptionJoin( future );
+				SearchIndexingPlanExecutionReport report = Futures.unwrappedExceptionJoin( future );
+				report.getThrowable().ifPresent( t -> {
+					throw Throwables.toRuntimeException( t );
+				} );
 			} );
 		};
 	}
@@ -61,7 +66,10 @@ public interface AutomaticIndexingSynchronizationStrategy {
 			context.documentRefreshStrategy( DocumentRefreshStrategy.FORCE );
 			context.indexingFutureHandler( future -> {
 				// Wait for the result of indexing, so that we're sure changes were committed and refreshed.
-				Futures.unwrappedExceptionJoin( future );
+				SearchIndexingPlanExecutionReport report = Futures.unwrappedExceptionJoin( future );
+				report.getThrowable().ifPresent( t -> {
+					throw Throwables.toRuntimeException( t );
+				} );
 			} );
 		};
 	}

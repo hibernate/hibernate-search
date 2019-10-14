@@ -17,6 +17,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
@@ -132,14 +133,14 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 	}
 
 	@Override
-	public CompletableFuture<?> execute() {
+	public CompletableFuture<IndexIndexingPlanExecutionReport> executeAndReport() {
 		try {
 			process();
-			List<CompletableFuture<?>> futures = new ArrayList<>();
+			List<CompletableFuture<IndexIndexingPlanExecutionReport>> futures = new ArrayList<>();
 			for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
-				futures.add( delegate.execute() );
+				futures.add( delegate.executeAndReport() );
 			}
-			return CompletableFuture.allOf( futures.toArray( new CompletableFuture<?>[0] ) );
+			return IndexIndexingPlanExecutionReport.allOf( futures );
 		}
 		finally {
 			indexedTypeDelegates.clear();

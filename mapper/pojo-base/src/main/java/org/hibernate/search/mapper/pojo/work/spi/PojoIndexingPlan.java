@@ -8,6 +8,8 @@ package org.hibernate.search.mapper.pojo.work.spi;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
+
 /**
  * An interface for indexing entities in the context of a session in a POJO mapper.
  * <p>
@@ -17,11 +19,11 @@ import java.util.concurrent.CompletableFuture;
  * the entities will be processed and index documents will be built
  * and stored in an internal buffer.
  * <p>
- * When {@link #execute()} is called,
+ * When {@link #executeAndReport()} is called,
  * the operations will be actually sent to the index.
  * <p>
- * Note that {@link #execute()} will implicitly trigger processing of documents that weren't processed yet,
- * if any, so calling {@link #process()} is not necessary if you call {@link #execute()} just next.
+ * Note that {@link #executeAndReport()} will implicitly trigger processing of documents that weren't processed yet,
+ * if any, so calling {@link #process()} is not necessary if you call {@link #executeAndReport()} just next.
  * <p>
  * Implementations may not be thread-safe.
  */
@@ -140,7 +142,7 @@ public interface PojoIndexingPlan {
 	 * In particular, ensure that all data is extracted from the POJOs
 	 * and converted to the backend-specific format.
 	 * <p>
-	 * Calling this method is optional: the {@link #execute()} method
+	 * Calling this method is optional: the {@link #executeAndReport()} method
 	 * will perform the processing if necessary.
 	 */
 	void process();
@@ -150,9 +152,9 @@ public interface PojoIndexingPlan {
 	 * without waiting for a Hibernate ORM flush event or transaction commit,
 	 * and clear the plan so that it can be re-used.
 	 *
-	 * @return A {@link CompletableFuture} that will be completed when all the works are complete.
+	 * @return A {@link CompletableFuture} that will be completed with an execution report when all the works are complete.
 	 */
-	CompletableFuture<?> execute();
+	CompletableFuture<IndexIndexingPlanExecutionReport> executeAndReport();
 
 	/**
 	 * Discard all plans of indexing.

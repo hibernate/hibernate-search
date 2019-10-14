@@ -16,6 +16,7 @@ import java.util.function.Supplier;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 
@@ -94,13 +95,13 @@ public class PojoIndexedTypeIndexingPlan<I, E, D extends DocumentElement> extend
 		getDelegate().process();
 	}
 
-	CompletableFuture<?> execute() {
+	CompletableFuture<IndexIndexingPlanExecutionReport> executeAndReport() {
 		sendCommandsToDelegate();
 		/*
 		 * No need to call prepare() here:
 		 * delegates are supposed to handle execute() even without a prior call to prepare().
 		 */
-		return delegate.execute();
+		return delegate.executeAndReport();
 	}
 
 	void discard() {

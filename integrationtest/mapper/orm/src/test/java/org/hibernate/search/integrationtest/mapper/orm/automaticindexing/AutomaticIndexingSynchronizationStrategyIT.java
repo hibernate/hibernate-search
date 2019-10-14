@@ -27,6 +27,7 @@ import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchr
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationConfigurationContext;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.impl.Throwables;
@@ -475,6 +476,10 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 				// try to wait for the future to complete for a small duration...
 				try {
 					future.get( SMALL_DURATION_VALUE, SMALL_DURATION_UNIT );
+					SearchIndexingPlanExecutionReport report = future.get( SMALL_DURATION_VALUE, SMALL_DURATION_UNIT );
+					report.getThrowable().ifPresent( t -> {
+						throw Throwables.toRuntimeException( t );
+					} );
 				}
 				catch (TimeoutException e) {
 					/*

@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
+import org.hibernate.search.util.common.impl.Throwables;
 
 public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
@@ -60,6 +61,11 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	}
 
 	public CompletableFuture<?> execute() {
-		return delegate.execute();
+		return delegate.executeAndReport().thenApply( report -> {
+			report.getThrowable().ifPresent( t -> {
+				throw Throwables.toRuntimeException( t );
+			} );
+			return null;
+		} );
 	}
 }

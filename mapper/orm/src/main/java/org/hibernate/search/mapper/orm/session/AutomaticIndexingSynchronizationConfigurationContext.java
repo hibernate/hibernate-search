@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport;
 
 public interface AutomaticIndexingSynchronizationConfigurationContext {
 
@@ -34,10 +35,12 @@ public interface AutomaticIndexingSynchronizationConfigurationContext {
 	 *
 	 * @param handler A handler that will be passed a future representing the progress of indexing.
 	 * Defaults to a no-op handler.
-	 * The future will be completed once all document changes are applied
-	 * and the commit/refresh requirements defined by {@link #documentCommitStrategy(DocumentCommitStrategy)}
-	 * and {@link #documentRefreshStrategy(DocumentRefreshStrategy)} are satisfied.
+	 * The future will be completed with an execution report once all document changes are applied.
+	 * If any document change or the commit/refresh required by{@link #documentCommitStrategy(DocumentCommitStrategy)}
+	 * and {@link #documentRefreshStrategy(DocumentRefreshStrategy)} failed,
+	 * the report will {@link SearchIndexingPlanExecutionReport#getThrowable() contain a throwable}
+	 * and (if applicable) {@link SearchIndexingPlanExecutionReport#getFailingEntities() a list of failing entities}.
 	 */
-	void indexingFutureHandler(Consumer<CompletableFuture<?>> handler);
+	void indexingFutureHandler(Consumer<CompletableFuture<SearchIndexingPlanExecutionReport>> handler);
 
 }
