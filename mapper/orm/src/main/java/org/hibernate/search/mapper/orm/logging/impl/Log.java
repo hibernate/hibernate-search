@@ -16,6 +16,7 @@ import java.util.List;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.mapping.Value;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
@@ -190,4 +191,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 21, value = "Error trying to access Hibernate ORM session factory." )
 	SearchException hibernateSessionFactoryAccessError(@Cause IllegalStateException cause);
+
+	@Message(id = ID_OFFSET_2 + 22, value = "Indexing failure: %1$s.\nThe following entities may not have been updated correctly in the index: %2$s." )
+	SearchException indexingFailure(String causeMessage, List<EntityReference> failingEntities, @Cause Throwable cause);
+
+	@Message(value = "Automatic indexing of Hibernate ORM entities")
+	String automaticIndexing();
 }

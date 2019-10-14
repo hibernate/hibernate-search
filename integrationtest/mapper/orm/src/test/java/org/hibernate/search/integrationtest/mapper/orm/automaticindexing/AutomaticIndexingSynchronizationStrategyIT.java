@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThat;
 
+import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
@@ -25,23 +26,32 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationConfigurationContext;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Throwables;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
 import org.junit.Rule;
 import org.junit.Test;
 
+import org.apache.log4j.Level;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.InstanceOfAssertFactory;
 import org.awaitility.Awaitility;
+import org.hamcrest.CoreMatchers;
 
 public class AutomaticIndexingSynchronizationStrategyIT {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// Let's say 3 seconds are long enough to consider that, if nothing changed after this time, nothing ever will.
 	private static final long ALMOST_FOREVER_VALUE = 3L;
@@ -55,6 +65,9 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
+
+	@Rule
+	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
 	public void success_queued() throws InterruptedException, ExecutionException, TimeoutException {
@@ -184,6 +197,15 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.QUEUED );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
+
+		logged.expectEvent(
+				Level.ERROR,
+				CoreMatchers.sameInstance( indexingWorkException ),
+				"Failing operation:",
+				"Automatic indexing of Hibernate ORM entities",
+				"Entities that could not be indexed correctly:",
+				IndexedEntity.NAME + "#" + 1
+		);
 
 		// This should be ignored by the transaction (see below)
 		indexingWorkFuture.completeExceptionally( indexingWorkException );
@@ -388,7 +410,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 				session.persist( entity1 );
 
-				backendMock.expectWorks( IndexedEntity.INDEX, expectedCommitStrategy, expectedRefreshStrategy )
+				backendMock.expectWorks( IndexedEntity.NAME, expectedCommitStrategy, expectedRefreshStrategy )
 						.add( "1", b -> b
 								.field( "indexedField", entity1.getIndexedField() )
 						)
@@ -413,7 +435,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 			);
 		}
 
-		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
+		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "indexedField", String.class )
 		);
 		SessionFactory sessionFactory = setupContext.setup( IndexedEntity.class );
@@ -425,14 +447,19 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	private static Consumer<Throwable> transactionSynchronizationExceptionMatcher(Throwable indexingWorkException) {
 		return throwable -> Assertions.assertThat( throwable ).isInstanceOf( org.hibernate.AssertionFailure.class )
 				.extracting( Throwable::getCause ).isInstanceOf( HibernateException.class )
+				.extracting( Throwable::getCause ).asInstanceOf( new InstanceOfAssertFactory<>( SearchException.class, Assertions::assertThat ) )
+						.hasMessageContainingAll(
+								"Indexing failure: " + indexingWorkException.getMessage(),
+								"The following entities may not have been updated correctly in the index: [" + IndexedEntity.NAME + "#" + 1 + "]"
+						)
 				.extracting( Throwable::getCause ).isSameAs( indexingWorkException );
 	}
 
-	@Entity(name = "indexed")
-	@Indexed(index = IndexedEntity.INDEX)
+	@Entity(name = IndexedEntity.NAME)
+	@Indexed(index = IndexedEntity.NAME)
 	public static class IndexedEntity {
 
-		static final String INDEX = "IndexedEntity";
+		static final String NAME = "IndexedEntity";
 
 		@Id
 		private Integer id;
@@ -478,7 +505,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 					future.get( SMALL_DURATION_VALUE, SMALL_DURATION_UNIT );
 					SearchIndexingPlanExecutionReport report = future.get( SMALL_DURATION_VALUE, SMALL_DURATION_UNIT );
 					report.getThrowable().ifPresent( t -> {
-						throw Throwables.toRuntimeException( t );
+						throw log.indexingFailure( t.getMessage(), report.getFailingEntities(), t );
 					} );
 				}
 				catch (TimeoutException e) {

@@ -6,16 +6,22 @@
  */
 package org.hibernate.search.mapper.orm.session.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationConfigurationContext;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.common.impl.Throwables;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class SearchableAutomaticIndexingSynchronizationStrategy
 		implements AutomaticIndexingSynchronizationStrategy {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	public static final AutomaticIndexingSynchronizationStrategy INSTANCE = new SearchableAutomaticIndexingSynchronizationStrategy();
 
 	private SearchableAutomaticIndexingSynchronizationStrategy() {
@@ -35,7 +41,7 @@ public final class SearchableAutomaticIndexingSynchronizationStrategy
 			// Wait for the result of indexing, so that we're sure changes were committed and refreshed.
 			SearchIndexingPlanExecutionReport report = Futures.unwrappedExceptionJoin( future );
 			report.getThrowable().ifPresent( t -> {
-				throw Throwables.toRuntimeException( t );
+				throw log.indexingFailure( t.getMessage(), report.getFailingEntities(), t );
 			} );
 		} );
 	}
