@@ -134,7 +134,13 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	public void onFlush(FlushEvent event) {
 		HibernateOrmListenerContextProvider contextProvider = state.getContextProvider();
 		EventSource session = event.getSession();
-		PojoIndexingPlan plan = getCurrentIndexingPlan( contextProvider, session );
+
+		PojoIndexingPlan plan = getCurrentIndexingPlanIfExisting( contextProvider, session );
+		if ( plan == null ) {
+			// Nothing to flush
+			return;
+		}
+
 		plan.process();
 
 		// flush within a transaction should trigger only the prepare phase,
