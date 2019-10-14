@@ -30,6 +30,23 @@ public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Futur
 		super( actual, FutureAssert.class );
 	}
 
+	public FutureAssert<T> isComplete() {
+		try {
+			getNow();
+			// All's good
+		}
+		catch (TimeoutException e) {
+			failWithCauseAndMessage( e, "future <%s> should be complete, but instead it's still pending", actual, e );
+		}
+		catch (CancellationException e) {
+			failWithCauseAndMessage( e, "future <%s> should be complete, but instead it's been cancelled", actual, e );
+		}
+		catch (ExecutionException e) {
+			// All's good
+		}
+		return this;
+	}
+
 	public FutureAssert<T> isPending() {
 		try {
 			Object result = getNow();

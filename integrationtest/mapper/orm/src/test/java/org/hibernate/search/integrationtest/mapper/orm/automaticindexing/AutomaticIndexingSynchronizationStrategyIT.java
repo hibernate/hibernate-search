@@ -23,6 +23,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationConfigurationContext;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -34,6 +35,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import org.assertj.core.api.Assertions;
+import org.awaitility.Awaitility;
 
 public class AutomaticIndexingSynchronizationStrategyIT {
 
@@ -53,149 +55,167 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	@Test
 	public void queued() throws InterruptedException, ExecutionException, TimeoutException {
 		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.QUEUED );
-		testAsynchronous( sessionFactory, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
+		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
+
+		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingNoBlock(
+				sessionFactory, null,
+				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, indexingWorkFuture
+		);
+
+		// The transaction thread should proceed successfully,
+		// regardless of the indexing work.
+		assertThat( transactionThreadFuture ).isSuccessful();
 	}
 
 	@Test
 	public void committed_default() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( null );
-		testSynchronous( sessionFactory, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE );
+		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
+
+		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingBlock(
+				sessionFactory, null,
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE, indexingWorkFuture
+		);
+
+		// The transaction thread should be blocked because the indexing work is not complete
+		assertThat( transactionThreadFuture ).isPending();
+
+		// Completing the work should allow the synchronization strategy to unblock the transaction thread
+		indexingWorkFuture.complete( null );
+		Awaitility.await().atMost( ALMOST_FOREVER_VALUE, ALMOST_FOREVER_UNIT )
+				.until( transactionThreadFuture::isDone );
+		// The transaction thread should proceed successfully,
+		// because the indexing work was successful.
+		assertThat( transactionThreadFuture ).isSuccessful();
 	}
 
 	@Test
 	public void committed_explicit() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.COMMITTED );
-		testSynchronous( sessionFactory, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE );
+		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
+
+		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingBlock(
+				sessionFactory, null,
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE, indexingWorkFuture
+		);
+
+		// The transaction thread should be blocked because the indexing work is not complete
+		assertThat( transactionThreadFuture ).isPending();
+
+		// Completing the work should allow the synchronization strategy to unblock the transaction thread
+		indexingWorkFuture.complete( null );
+		Awaitility.await().atMost( ALMOST_FOREVER_VALUE, ALMOST_FOREVER_UNIT )
+				.until( transactionThreadFuture::isDone );
+		// The transaction thread should proceed successfully,
+		// because the indexing work was successful.
+		assertThat( transactionThreadFuture ).isSuccessful();
 	}
 
 	@Test
 	public void searchable() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.SEARCHABLE );
-		testSynchronous( sessionFactory, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE );
+		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
+
+		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingBlock(
+				sessionFactory, null,
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, indexingWorkFuture
+		);
+
+		// The transaction thread should be blocked because the indexing work is not complete
+		assertThat( transactionThreadFuture ).isPending();
+
+		// Completing the work should allow the synchronization strategy to unblock the transaction thread
+		indexingWorkFuture.complete( null );
+		Awaitility.await().atMost( ALMOST_FOREVER_VALUE, ALMOST_FOREVER_UNIT )
+				.until( transactionThreadFuture::isDone );
+		// The transaction thread should proceed successfully,
+		// because the indexing work was successful.
+		assertThat( transactionThreadFuture ).isSuccessful();
 	}
 
 	@Test
 	public void override_committedToSearchable() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.COMMITTED );
-		testSynchronous(
+		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
+
+		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingBlock(
 				sessionFactory, AutomaticIndexingSynchronizationStrategy.searchable(),
-				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, indexingWorkFuture
 		);
+
+		// The transaction thread should be blocked because the indexing work is not complete
+		assertThat( transactionThreadFuture ).isPending();
+
+		// Completing the work should allow the synchronization strategy to unblock the transaction thread
+		indexingWorkFuture.complete( null );
+		Awaitility.await().atMost( ALMOST_FOREVER_VALUE, ALMOST_FOREVER_UNIT )
+				.until( transactionThreadFuture::isDone );
+		// The transaction thread should proceed successfully,
+		// because the indexing work was successful.
+		assertThat( transactionThreadFuture ).isSuccessful();
 	}
 
 	@Test
 	public void override_committedToCustom() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.COMMITTED );
-		CompletableFuture<?> workFuture = new CompletableFuture<>();
+		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
-		AtomicReference<CompletableFuture<?>> futurePushedToBackgroundServiceReference = new AtomicReference<>( null );
+		AtomicReference<CompletableFuture<?>> futureThatTookTooLong = new AtomicReference<>( null );
 
-		CompletableFuture<?> transactionFuture = runTransactionInDifferentThread(
-				sessionFactory,
-				context -> {
-					context.documentCommitStrategy( DocumentCommitStrategy.FORCE );
-					context.documentRefreshStrategy( DocumentRefreshStrategy.FORCE );
-					context.indexingFutureHandler( future -> {
-						// try to wait for the future to complete for a small duration...
-						try {
-							future.get( SMALL_DURATION_VALUE, SMALL_DURATION_UNIT );
-						}
-						catch (TimeoutException e) {
-							/*
-							 * If it takes too long, push the the completable future to some background service
-							 * to wait on it and report errors asynchronously if necessary.
-							 * Here we just simulate this by setting an AtomicReference.
-							 */
-							futurePushedToBackgroundServiceReference.set( future );
-						}
-						catch (InterruptedException | ExecutionException e) {
-							Assertions.fail( "Unexpected exception: " + e, e );
-						}
-					} );
-				},
-				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE,
-				workFuture,
-				/*
-				 * With this synchronization strategy, the transaction will unblock the thread
-				 * before the work future is complete.
-				 */
-				() -> assertThat( workFuture ).isPending()
+		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingNoBlock(
+				sessionFactory, new CustomAutomaticIndexingSynchronizationStrategy( futureThatTookTooLong ),
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, indexingWorkFuture
 		);
 
-		/*
-		 * We didn't complete the work, but the transaction should unblock the thread anyway after some time.
-		 * Note that this will throw an ExecutionException it the transaction failed
-		 * or an assertion failed in the other thread.
-		 */
-		transactionFuture.get( ALMOST_FOREVER_VALUE, ALMOST_FOREVER_UNIT );
-		// The strategy should have timed out and it should have set the future on this reference
-		Assertions.assertThat( futurePushedToBackgroundServiceReference ).isNotNull();
+		// The transaction thread should unblock and proceed successfully,
+		// because the indexing work took too long to execute
+		// (this is how the custom automatic indexing strategy is implemented)
+		assertThat( transactionThreadFuture ).isSuccessful();
+
+		// Upon timing out, the strategy should have set this reference
+		Assertions.assertThat( futureThatTookTooLong ).doesNotHaveValue( null );
 	}
 
-	private void testSynchronous(SessionFactory sessionFactory,
-			DocumentCommitStrategy expectedCommitStrategy,
-			DocumentRefreshStrategy expectedRefreshStrategy)
-			throws InterruptedException, ExecutionException, TimeoutException {
-		testSynchronous( sessionFactory, null, expectedCommitStrategy, expectedRefreshStrategy );
-	}
-
-	private void testSynchronous(SessionFactory sessionFactory,
+	private CompletableFuture<?> runTransactionInDifferentThreadExpectingBlock(SessionFactory sessionFactory,
 			AutomaticIndexingSynchronizationStrategy customStrategy,
 			DocumentCommitStrategy expectedCommitStrategy,
-			DocumentRefreshStrategy expectedRefreshStrategy)
+			DocumentRefreshStrategy expectedRefreshStrategy,
+			CompletableFuture<?> indexingWorkFuture)
 			throws InterruptedException, ExecutionException, TimeoutException {
-		CompletableFuture<?> workFuture = new CompletableFuture<>();
-
-		CompletableFuture<?> transactionFuture = runTransactionInDifferentThread(
+		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThread(
 				sessionFactory,
 				customStrategy,
 				expectedCommitStrategy, expectedRefreshStrategy,
-				workFuture,
-				/*
-				 * With this synchronization strategy, the transaction may NOT unblock the thread
-				 * until the work future is complete.
-				 */
-				() -> assertThat( workFuture ).isSuccessful()
+				indexingWorkFuture
 		);
+
+		// Wait for some time...
+		ALMOST_FOREVER_UNIT.sleep( ALMOST_FOREVER_VALUE );
 
 		// We expect the transaction to block forever, because the work future isn't complete
-		ALMOST_FOREVER_UNIT.sleep( ALMOST_FOREVER_VALUE );
-		assertThat( transactionFuture ).isPending();
+		assertThat( transactionThreadFuture ).isPending();
 
-		// Completing the work should allow the transaction to unblock the thread
-		workFuture.complete( null );
-		/*
-		 * Note that this will throw an ExecutionException it the transaction failed
-		 * or an assertion failed in the other thread.
-		 */
-		transactionFuture.get( ALMOST_FOREVER_VALUE, ALMOST_FOREVER_UNIT );
-		assertThat( transactionFuture ).isSuccessful();
+		return transactionThreadFuture;
 	}
 
-	private void testAsynchronous(SessionFactory sessionFactory,
+	private CompletableFuture<?> runTransactionInDifferentThreadExpectingNoBlock(SessionFactory sessionFactory,
+			AutomaticIndexingSynchronizationStrategy customStrategy,
 			DocumentCommitStrategy expectedCommitStrategy,
-			DocumentRefreshStrategy expectedRefreshStrategy)
+			DocumentRefreshStrategy expectedRefreshStrategy,
+			CompletableFuture<?> indexingWorkFuture)
 			throws InterruptedException, ExecutionException, TimeoutException {
-		CompletableFuture<?> workFuture = new CompletableFuture<>();
-
-		CompletableFuture<?> transactionFuture = runTransactionInDifferentThread(
+		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThread(
 				sessionFactory,
-				null,
+				customStrategy,
 				expectedCommitStrategy, expectedRefreshStrategy,
-				workFuture,
-				/*
-				 * With this synchronization strategy, the transaction will unblock the thread
-				 * before the work future is complete.
-				 */
-				() -> assertThat( workFuture ).isPending()
+				indexingWorkFuture
 		);
 
-		/*
-		 * We didn't complete the work, but the transaction should unblock the thread anyway.
-		 * Note that this will throw an ExecutionException it the transaction failed
-		 * or an assertion failed in the other thread.
-		 */
-		transactionFuture.get( ALMOST_FOREVER_VALUE, ALMOST_FOREVER_UNIT );
+		// We expect the transaction to complete even if the indexing work isn't completed
+		Awaitility.await().atMost( ALMOST_FOREVER_VALUE, ALMOST_FOREVER_UNIT )
+				.until( transactionThreadFuture::isDone );
+
+		return transactionThreadFuture;
 	}
 
 	/*
@@ -205,11 +225,10 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 			AutomaticIndexingSynchronizationStrategy customStrategy,
 			DocumentCommitStrategy expectedCommitStrategy,
 			DocumentRefreshStrategy expectedRefreshStrategy,
-			CompletableFuture<?> workFuture,
-			Runnable afterTransactionAssertion)
+			CompletableFuture<?> indexingWorkFuture)
 			throws InterruptedException, ExecutionException, TimeoutException {
 		CompletableFuture<?> justBeforeTransactionCommitFuture = new CompletableFuture<>();
-		CompletableFuture<?> transactionFuture = CompletableFuture.runAsync( () -> {
+		CompletableFuture<?> transactionThreadFuture = CompletableFuture.runAsync( () -> {
 			OrmUtils.withinTransaction( sessionFactory, session -> {
 				if ( customStrategy != null ) {
 					Search.session( session ).setAutomaticIndexingSynchronizationStrategy( customStrategy );
@@ -224,18 +243,16 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 						.add( "1", b -> b
 								.field( "indexedField", entity1.getIndexedField() )
 						)
-						.processedThenExecuted( workFuture );
+						.processedThenExecuted( indexingWorkFuture );
 				justBeforeTransactionCommitFuture.complete( null );
 			} );
 			backendMock.verifyExpectationsMet();
-
-			afterTransactionAssertion.run();
 		} );
 
 		// Ensure the transaction at least reached the point just before commit
 		justBeforeTransactionCommitFuture.get( ALMOST_FOREVER_VALUE, ALMOST_FOREVER_UNIT );
 
-		return transactionFuture;
+		return transactionThreadFuture;
 	}
 
 	private SessionFactory setup(AutomaticIndexingSynchronizationStrategyName strategyName) {
@@ -285,5 +302,38 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 			this.indexedField = indexedField;
 		}
 
+	}
+
+	private class CustomAutomaticIndexingSynchronizationStrategy implements AutomaticIndexingSynchronizationStrategy {
+
+		private final AtomicReference<CompletableFuture<?>> futureThatTookTooLong;
+
+		private CustomAutomaticIndexingSynchronizationStrategy(
+				AtomicReference<CompletableFuture<?>> futureThatTookTooLong) {
+			this.futureThatTookTooLong = futureThatTookTooLong;
+		}
+
+		@Override
+		public void apply(AutomaticIndexingSynchronizationConfigurationContext context) {
+			context.documentCommitStrategy( DocumentCommitStrategy.FORCE );
+			context.documentRefreshStrategy( DocumentRefreshStrategy.FORCE );
+			context.indexingFutureHandler( future -> {
+				// try to wait for the future to complete for a small duration...
+				try {
+					future.get( SMALL_DURATION_VALUE, SMALL_DURATION_UNIT );
+				}
+				catch (TimeoutException e) {
+					/*
+					 * If it takes too long, push the the completable future to some background service
+					 * to wait on it and report errors asynchronously if necessary.
+					 * Here we just simulate this by setting an AtomicReference.
+					 */
+					futureThatTookTooLong.set( future );
+				}
+				catch (InterruptedException | ExecutionException e) {
+					Assertions.fail( "Unexpected exception: " + e, e );
+				}
+			} );
+		}
 	}
 }
