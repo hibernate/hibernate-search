@@ -30,15 +30,6 @@ public interface SimpleQueryStringPredicateOptionsStep<S extends SimpleQueryStri
 	S defaultOperator(BooleanOperator operator);
 
 	/**
-	 * @deprecated Use {@code defaultOperator(BooleanOperator.AND)} instead.
-	 * @return {@code this}, for method chaining.
-	 */
-	@Deprecated
-	default S withAndAsDefaultOperator() {
-		return defaultOperator( BooleanOperator.AND );
-	}
-
-	/**
 	 * Define an analyzer to use at query time to interpret the value to match.
 	 * <p>
 	 * If this method is not called, the analyzer defined on the field will be used.

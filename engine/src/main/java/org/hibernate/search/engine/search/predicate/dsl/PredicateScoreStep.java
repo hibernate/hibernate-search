@@ -24,13 +24,4 @@ public interface PredicateScoreStep<S> extends PredicateBoostStep<S> {
 	 */
 	S constantScore();
 
-	/**
-	 * @deprecated Use {@link #constantScore()} instead.
-	 * @return {@code this}, for method chaining.
-	 */
-	@Deprecated
-	default S withConstantScore() {
-		return constantScore();
-	}
-
 }
