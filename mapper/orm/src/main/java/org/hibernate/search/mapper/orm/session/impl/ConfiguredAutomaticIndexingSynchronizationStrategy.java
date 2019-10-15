@@ -14,6 +14,7 @@ import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationConfigurationContext;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport;
@@ -52,6 +53,7 @@ public class ConfiguredAutomaticIndexingSynchronizationStrategy {
 	public static class Builder
 			implements AutomaticIndexingSynchronizationConfigurationContext {
 
+		private final FailureHandler failureHandler;
 		private final Function<IndexIndexingPlanExecutionReport, SearchIndexingPlanExecutionReport> reportFactory;
 
 		private DocumentCommitStrategy documentCommitStrategy = DocumentCommitStrategy.NONE;
@@ -59,7 +61,9 @@ public class ConfiguredAutomaticIndexingSynchronizationStrategy {
 		private Consumer<CompletableFuture<SearchIndexingPlanExecutionReport>> indexingFutureHandler = future -> {
 		};
 
-		Builder(DocumentReferenceConverter<EntityReference> documentReferenceConverter) {
+		Builder(FailureHandler failureHandler,
+				DocumentReferenceConverter<EntityReference> documentReferenceConverter) {
+			this.failureHandler = failureHandler;
 			this.reportFactory = SearchIndexingPlanExecutionReportImpl.factory( documentReferenceConverter );
 		}
 
@@ -79,6 +83,11 @@ public class ConfiguredAutomaticIndexingSynchronizationStrategy {
 		public void indexingFutureHandler(Consumer<CompletableFuture<SearchIndexingPlanExecutionReport>> handler) {
 			Contracts.assertNotNull( handler, "handler" );
 			this.indexingFutureHandler = handler;
+		}
+
+		@Override
+		public FailureHandler getFailureHandler() {
+			return failureHandler;
 		}
 
 		public ConfiguredAutomaticIndexingSynchronizationStrategy build() {

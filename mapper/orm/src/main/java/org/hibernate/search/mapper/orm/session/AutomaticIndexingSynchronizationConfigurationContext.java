@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport;
 
 public interface AutomaticIndexingSynchronizationConfigurationContext {
@@ -42,5 +43,11 @@ public interface AutomaticIndexingSynchronizationConfigurationContext {
 	 * and (if applicable) {@link SearchIndexingPlanExecutionReport#getFailingEntities() a list of failing entities}.
 	 */
 	void indexingFutureHandler(Consumer<CompletableFuture<SearchIndexingPlanExecutionReport>> handler);
+
+	/**
+	 * @return The failure handler.
+	 * Use this to report failures that cannot be propagated by the {@link #indexingFutureHandler(Consumer)}.
+	 */
+	FailureHandler getFailureHandler();
 
 }
