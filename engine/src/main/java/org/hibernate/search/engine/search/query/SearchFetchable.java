@@ -101,15 +101,6 @@ public interface SearchFetchable<H> {
 	SearchResult<H> fetchAll();
 
 	/**
-	 * @deprecated Use {@link #fetchAll()} instead, or (preferably) {@link #fetch(Integer)}.
-	 * @return The {@link SearchResult}.
-	 */
-	@Deprecated
-	default SearchResult<H> fetch() {
-		return fetchAll();
-	}
-
-	/**
 	 * Execute the query and return <strong>all</strong> hits as a {@link List},
 	 * without any sort of limit.
 	 * <p>
@@ -122,14 +113,5 @@ public interface SearchFetchable<H> {
 	 * e.g. HibernateException/PersistenceException for the Hibernate ORM mapper.
 	 */
 	List<H> fetchAllHits();
-
-	/**
-	 * @deprecated Use {@link #fetchAllHits()} instead, or (preferably) {@link #fetchHits(Integer)}.
-	 * @return The {@link SearchResult}.
-	 */
-	@Deprecated
-	default List<H> fetchHits() {
-		return fetchAllHits();
-	}
 
 }

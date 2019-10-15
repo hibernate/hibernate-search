@@ -24,10 +24,4 @@ public interface ExtendedSearchFetchable<H, R extends SearchResult<H>> extends S
 	@Override
 	R fetchAll();
 
-	@Deprecated
-	@Override
-	default R fetch() {
-		return fetchAll();
-	}
-
 }
