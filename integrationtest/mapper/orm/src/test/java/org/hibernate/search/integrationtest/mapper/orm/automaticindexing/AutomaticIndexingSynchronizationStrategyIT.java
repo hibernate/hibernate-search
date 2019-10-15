@@ -19,7 +19,6 @@ import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
-import org.hibernate.HibernateException;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -446,7 +445,12 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	private static Consumer<Throwable> transactionSynchronizationExceptionMatcher(Throwable indexingWorkException) {
 		return throwable -> Assertions.assertThat( throwable ).isInstanceOf( org.hibernate.AssertionFailure.class )
-				.extracting( Throwable::getCause ).isInstanceOf( HibernateException.class )
+				.extracting( Throwable::getCause ).asInstanceOf( new InstanceOfAssertFactory<>( SearchException.class, Assertions::assertThat ) )
+						.hasMessageContainingAll(
+								"Automatic indexing failed after transaction completion: ",
+								"Indexing failure: " + indexingWorkException.getMessage(),
+								"The following entities may not have been updated correctly in the index: [" + IndexedEntity.NAME + "#" + 1 + "]"
+						)
 				.extracting( Throwable::getCause ).asInstanceOf( new InstanceOfAssertFactory<>( SearchException.class, Assertions::assertThat ) )
 						.hasMessageContainingAll(
 								"Indexing failure: " + indexingWorkException.getMessage(),

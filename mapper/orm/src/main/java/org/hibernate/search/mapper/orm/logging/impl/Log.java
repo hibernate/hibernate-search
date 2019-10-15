@@ -197,4 +197,10 @@ public interface Log extends BasicLogger {
 
 	@Message(value = "Automatic indexing of Hibernate ORM entities")
 	String automaticIndexing();
+
+	@Message(id = ID_OFFSET_2 + 23, value = "Automatic indexing failed before transaction completion: %1$s" )
+	SearchException synchronizationBeforeTransactionFailure(String causeMessage, @Cause Throwable cause);
+
+	@Message(id = ID_OFFSET_2 + 24, value = "Automatic indexing failed after transaction completion: %1$s" )
+	SearchException synchronizationAfterTransactionFailure(String causeMessage, @Cause Throwable cause);
 }

@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
-import org.hibernate.HibernateException;
 import org.hibernate.action.spi.AfterTransactionCompletionProcess;
 import org.hibernate.action.spi.BeforeTransactionCompletionProcess;
 import org.hibernate.engine.spi.SessionImplementor;
@@ -57,8 +56,8 @@ class SynchronizationAdapter implements Synchronization,
 		try {
 			doBeforeCompletion();
 		}
-		catch (Exception e) {
-			throw new HibernateException( "Error while indexing in Hibernate Search (before transaction completion)", e );
+		catch (RuntimeException e) {
+			throw log.synchronizationBeforeTransactionFailure( e.getMessage(), e );
 		}
 	}
 	@Override
@@ -66,8 +65,8 @@ class SynchronizationAdapter implements Synchronization,
 		try {
 			doAfterCompletion( success ? Status.STATUS_COMMITTED : Status.STATUS_ROLLEDBACK );
 		}
-		catch (Exception e) {
-			throw new HibernateException( "Error while indexing in Hibernate Search (after transaction completion)", e );
+		catch (RuntimeException e) {
+			throw log.synchronizationAfterTransactionFailure( e.getMessage(), e );
 		}
 	}
 
