@@ -57,7 +57,7 @@ public class IndexSearchLibraryRepositoryImpl implements IndexSearchLibraryRepos
 						);
 					}
 					if ( minCollectionSize != null ) {
-						b.must( f.range().field( "collectionSize" ).above( minCollectionSize ) );
+						b.must( f.range().field( "collectionSize" ).atLeast( minCollectionSize ) );
 					}
 					// Nested query + must loop
 					if ( libraryServices != null && !libraryServices.isEmpty() ) {

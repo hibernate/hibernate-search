@@ -72,9 +72,9 @@ public class GeoPointBindingMultipleIT {
 
 			List<Author> result = searchSession.search( Author.class )
 					.predicate( f -> f.bool()
-							.must( f.spatial().within().onField( "placeOfBirth" )
+							.must( f.spatial().within().field( "placeOfBirth" )
 									.circle( 53.970000, 32.150000, 50, DistanceUnit.KILOMETERS ) )
-							.must( f.spatial().within().onField( "placeOfDeath" )
+							.must( f.spatial().within().field( "placeOfDeath" )
 									.circle( 40.6500000, -73.9800000, 50, DistanceUnit.KILOMETERS ) )
 					)
 					.fetchAllHits();

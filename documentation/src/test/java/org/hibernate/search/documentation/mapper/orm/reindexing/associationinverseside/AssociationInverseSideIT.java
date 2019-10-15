@@ -80,8 +80,8 @@ public class AssociationInverseSideIT {
 
 			List<Book> result = searchSession.search( Book.class )
 					.predicate( f -> f.bool()
-							.must( f.match().onField( "editionsForSale.label" ).matching( "paperback" ) )
-							.must( f.match().onField( "editionsForSale.label" ).matching( "kindle" ) )
+							.must( f.match().field( "editionsForSale.label" ).matching( "paperback" ) )
+							.must( f.match().field( "editionsForSale.label" ).matching( "kindle" ) )
 					)
 					.fetchHits( 20 );
 			assertThat( result ).hasSize( 1 );

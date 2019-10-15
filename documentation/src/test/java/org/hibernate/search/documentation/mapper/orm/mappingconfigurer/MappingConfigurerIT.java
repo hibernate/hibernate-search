@@ -71,7 +71,7 @@ public class MappingConfigurerIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.match().onField( "title" ).matching( "steel" ) )
+					.predicate( f -> f.match().field( "title" ).matching( "steel" ) )
 					.fetchHits( 20 );
 			assertThat( result ).hasSize( 1 );
 		} );

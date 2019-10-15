@@ -262,7 +262,7 @@ public class QueryDslIT {
 			LuceneSearchQuery<Book> query = searchSession.search( Book.class )
 					.extension( LuceneExtension.get() ) // <1>
 					.predicate( f -> f.match()
-							.onField( "title" )
+							.field( "title" )
 							.matching( "robot" ) )
 					.toQuery(); // <2>
 
@@ -290,7 +290,7 @@ public class QueryDslIT {
 			ElasticsearchSearchQuery<Book> query = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() ) // <1>
 					.predicate( f -> f.match()
-							.onField( "title" )
+							.field( "title" )
 							.matching( "robot" ) )
 					.toQuery(); // <2>
 

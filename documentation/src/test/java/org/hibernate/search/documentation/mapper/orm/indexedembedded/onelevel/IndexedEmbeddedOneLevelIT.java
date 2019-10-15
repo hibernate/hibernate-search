@@ -75,8 +75,8 @@ public class IndexedEmbeddedOneLevelIT {
 
 			List<Book> result = searchSession.search( Book.class )
 					.predicate( f -> f.bool()
-							.must( f.match().onField( "title" ).matching( "robot" ) )
-							.must( f.match().onField( "authors.name" ).matching( "isaac" ) )
+							.must( f.match().field( "title" ).matching( "robot" ) )
+							.must( f.match().field( "authors.name" ).matching( "isaac" ) )
 					)
 					.fetchHits( 20 );
 			assertThat( result ).hasSize( 1 );

@@ -80,9 +80,9 @@ public class IndexedEmbeddedTwoLevelsIT {
 
 			List<Book> result = searchSession.search( Book.class )
 					.predicate( f -> f.bool()
-							.must( f.match().onField( "title" ).matching( "robot" ) )
-							.must( f.match().onField( "authors.name" ).matching( "isaac" ) )
-							.must( f.match().onField( "authors.placeOfBirth.country" ).matching( "russia" ) )
+							.must( f.match().field( "title" ).matching( "robot" ) )
+							.must( f.match().field( "authors.name" ).matching( "isaac" ) )
+							.must( f.match().field( "authors.placeOfBirth.country" ).matching( "russia" ) )
 					)
 					.fetchHits( 20 );
 			assertThat( result ).hasSize( 1 );

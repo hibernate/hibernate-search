@@ -69,7 +69,7 @@ public class DerivedFromIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.match().onField( "mainAuthor" ).matching( "Daniel Abraham" ) )
+					.predicate( f -> f.match().field( "mainAuthor" ).matching( "Daniel Abraham" ) )
 					.fetchHits( 20 );
 			assertThat( result ).hasSize( 1 );
 		} );

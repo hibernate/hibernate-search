@@ -304,7 +304,7 @@ public class PredicateDslIT {
 						}
 						if ( searchParameters.getPageCountMaxFilter() != null ) {
 							b.must( f.range().field( "pageCount" )
-									.below( searchParameters.getPageCountMaxFilter() ) );
+									.atMost( searchParameters.getPageCountMaxFilter() ) );
 						}
 					} ) )
 					.fetchHits( 20 ); // <5>

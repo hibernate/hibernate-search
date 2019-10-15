@@ -109,8 +109,8 @@ public class DecimalScaleIT {
 
 		// decimal scale is 3, affecting the search precision
 		// so the provided value 739.11111 will be treated as if it were 739.111
-		matchAbove( new BigDecimal( "739.11" ) );
-		doNotMatchAbove( new BigDecimal( "739.111" ) );
+		matchGreaterThan( new BigDecimal( "739.11" ) );
+		doNotMatchGreaterThan( new BigDecimal( "739.111" ) );
 	}
 
 	@Test
@@ -127,8 +127,8 @@ public class DecimalScaleIT {
 
 		// decimal scale is 0, affecting the search precision
 		// so the provided value 739.11111 will be treated as if it were 739
-		matchAbove( new BigDecimal( "738" ) );
-		doNotMatchAbove( new BigDecimal( "739" ) );
+		matchGreaterThan( new BigDecimal( "738" ) );
+		doNotMatchGreaterThan( new BigDecimal( "739" ) );
 	}
 
 	@Test
@@ -145,8 +145,8 @@ public class DecimalScaleIT {
 
 		// decimal scale is 0, affecting the search precision
 		// so the provided value 739 will be treated as if it were 739
-		matchAbove( new BigInteger( "738" ) );
-		doNotMatchAbove( new BigInteger( "739" ) );
+		matchGreaterThan( new BigInteger( "738" ) );
+		doNotMatchGreaterThan( new BigInteger( "739" ) );
 	}
 
 	@Test
@@ -163,8 +163,8 @@ public class DecimalScaleIT {
 
 		// decimal scale is -3, affecting the search precision
 		// so the provided value 11111.11111 will be treated as if it were 11000
-		matchAbove( new BigDecimal( "10000" ) );
-		doNotMatchAbove( new BigDecimal( "11000" ) );
+		matchGreaterThan( new BigDecimal( "10000" ) );
+		doNotMatchGreaterThan( new BigDecimal( "11000" ) );
 	}
 
 	@Test
@@ -181,8 +181,8 @@ public class DecimalScaleIT {
 
 		// decimal scale is -3, affecting the search precision
 		// so the provided value 11111 will be treated as if it were 11000
-		matchAbove( new BigInteger( "10000" ) );
-		doNotMatchAbove( new BigInteger( "11000" ) );
+		matchGreaterThan( new BigInteger( "10000" ) );
+		doNotMatchGreaterThan( new BigInteger( "11000" ) );
 	}
 
 	@Test
@@ -221,8 +221,8 @@ public class DecimalScaleIT {
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, originalValue ) );
 		plan.execute().join();
 
-		matchAbove( indexedValueLowerBound );
-		doNotMatchAbove( indexedValueUpperBound );
+		matchGreaterThan( indexedValueLowerBound );
+		doNotMatchGreaterThan( indexedValueUpperBound );
 	}
 
 	@Test
@@ -261,8 +261,8 @@ public class DecimalScaleIT {
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, originalValue ) );
 		plan.execute().join();
 
-		matchAbove( indexedValueLowerBound );
-		doNotMatchAbove( indexedValueUpperBound );
+		matchGreaterThan( indexedValueLowerBound );
+		doNotMatchGreaterThan( indexedValueUpperBound );
 	}
 
 	@Test
@@ -301,8 +301,8 @@ public class DecimalScaleIT {
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, originalValue ) );
 		plan.execute().join();
 
-		matchAbove( indexedValueLowerBound );
-		doNotMatchAbove( indexedValueUpperBound );
+		matchGreaterThan( indexedValueLowerBound );
+		doNotMatchGreaterThan( indexedValueUpperBound );
 	}
 
 	@Test
@@ -370,8 +370,8 @@ public class DecimalScaleIT {
 		plan.execute().join();
 
 		// the precision is supposed to be preserved
-		matchAbove( largeDecimal.subtract( BigDecimal.ONE ) );
-		doNotMatchAbove( largeDecimal );
+		matchGreaterThan( largeDecimal.subtract( BigDecimal.ONE ) );
+		doNotMatchGreaterThan( largeDecimal );
 	}
 
 	@Test
@@ -391,8 +391,8 @@ public class DecimalScaleIT {
 		plan.execute().join();
 
 		// the precision is supposed to be preserved
-		matchAbove( largeInteger.subtract( BigInteger.ONE ) );
-		doNotMatchAbove( largeInteger );
+		matchGreaterThan( largeInteger.subtract( BigInteger.ONE ) );
+		doNotMatchGreaterThan( largeInteger );
 	}
 
 	@Test
@@ -435,7 +435,7 @@ public class DecimalScaleIT {
 		SubTest.expectException( () -> {
 			indexManager.createScope()
 					.query().asEntityReference()
-					.predicate( p -> p.range().field( "scaled" ).below( tooLargeDecimal ) );
+					.predicate( p -> p.range().field( "scaled" ).atMost( tooLargeDecimal ) );
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -524,7 +524,7 @@ public class DecimalScaleIT {
 		SubTest.expectException( () -> {
 			indexManager.createScope()
 					.query().asEntityReference()
-					.predicate( p -> p.range().field( "scaled" ).above( tooLargeInteger ) );
+					.predicate( p -> p.range().field( "scaled" ).atLeast( tooLargeInteger ) );
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -592,7 +592,7 @@ public class DecimalScaleIT {
 		SubTest.expectException( () -> {
 			indexManager.createScope()
 					.query().asEntityReference()
-					.predicate( p -> p.range().field( "scaled" ).above( tooLargeDecimal ) );
+					.predicate( p -> p.range().field( "scaled" ).atLeast( tooLargeDecimal ) );
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -639,7 +639,7 @@ public class DecimalScaleIT {
 		SubTest.expectException( () -> {
 			indexManager.createScope()
 					.query().asEntityReference()
-					.predicate( p -> p.range().field( "scaled" ).below( tooLargeInteger ) );
+					.predicate( p -> p.range().field( "scaled" ).atMost( tooLargeInteger ) );
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -681,8 +681,8 @@ public class DecimalScaleIT {
 
 		// default decimal scale is 2, affecting the search precision
 		// so the provided value 739.11111 will be treated as if it were 739.11
-		matchAbove( new BigDecimal( "739.1" ) );
-		doNotMatchAbove( new BigDecimal( "739.11" ) );
+		matchGreaterThan( new BigDecimal( "739.1" ) );
+		doNotMatchGreaterThan( new BigDecimal( "739.11" ) );
 	}
 
 	@Test
@@ -699,8 +699,8 @@ public class DecimalScaleIT {
 
 		// default decimal scale is -2, affecting the search precision
 		// so the provided value 7391111 will be treated as if it were 7391100
-		matchAbove( new BigInteger( "7391000" ) );
-		doNotMatchAbove( new BigInteger( "7391100" ) );
+		matchGreaterThan( new BigInteger( "7391000" ) );
+		doNotMatchGreaterThan( new BigInteger( "7391100" ) );
 	}
 
 	@Test
@@ -718,8 +718,8 @@ public class DecimalScaleIT {
 		// default decimal scale is 2
 		// decimal scale has been set to 3, overriding the default and affecting the search precision
 		// so the provided value 739.11111 will be treated as if it were 739.111
-		matchAbove( new BigDecimal( "739.11" ) );
-		doNotMatchAbove( new BigDecimal( "739.111" ) );
+		matchGreaterThan( new BigDecimal( "739.11" ) );
+		doNotMatchGreaterThan( new BigDecimal( "739.111" ) );
 	}
 
 	@Test
@@ -737,8 +737,8 @@ public class DecimalScaleIT {
 		// default decimal scale is -2,
 		// decimal scale has been set to -3, overriding the default and affecting the search precision
 		// so the provided value 7391111 will be treated as if it were 7391000
-		matchAbove( new BigInteger( "7390000" ) );
-		doNotMatchAbove( new BigInteger( "7391000" ) );
+		matchGreaterThan( new BigInteger( "7390000" ) );
+		doNotMatchGreaterThan( new BigInteger( "7391000" ) );
 	}
 
 	@Test
@@ -773,34 +773,34 @@ public class DecimalScaleIT {
 		projection( new BigInteger( "73911111" ) );
 	}
 
-	private void matchAbove(BigDecimal value) {
+	private void matchGreaterThan(BigDecimal value) {
 		SearchQuery<DocumentReference> query = indexManager.createScope()
 				.query().asEntityReference()
-				.predicate( p -> p.range().field( "scaled" ).above( value ).excludeLimit() )
+				.predicate( p -> p.range().field( "scaled" ).greaterThan( value ) )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, "1" );
 	}
 
-	private void matchAbove(BigInteger value) {
+	private void matchGreaterThan(BigInteger value) {
 		SearchQuery<DocumentReference> query = indexManager.createScope()
 				.query().asEntityReference()
-				.predicate( p -> p.range().field( "scaled" ).above( value ).excludeLimit() )
+				.predicate( p -> p.range().field( "scaled" ).greaterThan( value ) )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, "1" );
 	}
 
-	public void doNotMatchAbove(BigDecimal value) {
+	public void doNotMatchGreaterThan(BigDecimal value) {
 		SearchQuery<DocumentReference> query = indexManager.createScope()
 				.query().asEntityReference()
-				.predicate( p -> p.range().field( "scaled" ).above( value ).excludeLimit() )
+				.predicate( p -> p.range().field( "scaled" ).greaterThan( value ) )
 				.toQuery();
 		assertThat( query ).hasNoHits();
 	}
 
-	public void doNotMatchAbove(BigInteger value) {
+	public void doNotMatchGreaterThan(BigInteger value) {
 		SearchQuery<DocumentReference> query = indexManager.createScope()
 				.query().asEntityReference()
-				.predicate( p -> p.range().field( "scaled" ).above( value ).excludeLimit() )
+				.predicate( p -> p.range().field( "scaled" ).greaterThan( value ) )
 				.toQuery();
 		assertThat( query ).hasNoHits();
 	}

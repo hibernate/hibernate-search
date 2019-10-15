@@ -74,7 +74,7 @@ public class IndexedEmbeddedNoneIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.match().onField( "title" )
+					.predicate( f -> f.match().field( "title" )
 							.matching( "robot" ) )
 					.fetchHits( 20 );
 			assertThat( result ).hasSize( 1 );
