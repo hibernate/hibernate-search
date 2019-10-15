@@ -26,18 +26,4 @@ public interface ElasticsearchAnalyzerTokenizerStep {
 	 */
 	ElasticsearchAnalyzerOptionalComponentsStep tokenizer(String name);
 
-	/**
-	 * @deprecated Use {@link #tokenizer(String)} instead.
-	 * @param name The name of the tokenizer.
-	 * There must be a corresponding tokenizer definition on the Elasticsearch server.
-	 * This can be achieved by defining the tokenizer
-	 * {@link ElasticsearchAnalysisConfigurationContext#tokenizer(String) from Hibernate Search},
-	 * by configuring the Elasticsearch server directly, or by using built-in tokenizers.
-	 * @return The next step.
-	 */
-	@Deprecated
-	default ElasticsearchAnalyzerOptionalComponentsStep withTokenizer(String name) {
-		return tokenizer( name );
-	}
-
 }

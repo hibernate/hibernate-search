@@ -28,20 +28,6 @@ public interface ElasticsearchAnalysisOptionalComponentsStep {
 	ElasticsearchAnalysisOptionalComponentsStep charFilters(String... names);
 
 	/**
-	 * @deprecated Use {@link #charFilters(String...)} instead.
-	 * @param names The name of each char filters to use, in order.
-	 * There must be a corresponding char filter definition on the Elasticsearch server.
-	 * This can be achieved by defining the char filter
-	 * {@link ElasticsearchAnalysisConfigurationContext#charFilter(String) from Hibernate Search},
-	 * by configuring the Elasticsearch server directly, or by using built-in tokenizers.
-	 * @return {@code this}, for method chaining.
-	 */
-	@Deprecated
-	default ElasticsearchAnalysisOptionalComponentsStep withCharFilters(String... names) {
-		return charFilters( names );
-	}
-
-	/**
 	 * Set the token filters that the normalizer will use.
 	 *
 	 * @param names The name of the token filters to use, in order.
@@ -52,19 +38,5 @@ public interface ElasticsearchAnalysisOptionalComponentsStep {
 	 * @return {@code this}, for method chaining.
 	 */
 	ElasticsearchAnalysisOptionalComponentsStep tokenFilters(String... names);
-
-	/**
-	 * @deprecated Use {@link #tokenFilters(String...)} instead.
-	 * @param names The name of the token filters to use, in order.
-	 * There must be a corresponding token filter definition on the Elasticsearch server.
-	 * This can be achieved by defining the token filter
-	 * {@link ElasticsearchAnalysisConfigurationContext#tokenFilter(String) from Hibernate Search},
-	 * by configuring the Elasticsearch server, or by using built-in tokenizers.
-	 * @return {@code this}, for method chaining.
-	 */
-	@Deprecated
-	default ElasticsearchAnalysisOptionalComponentsStep withTokenFilters(String... names) {
-		return tokenFilters( names );
-	}
 
 }
