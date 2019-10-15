@@ -140,23 +140,6 @@ public interface SearchSession {
 	<T> SearchScope<T> scope(Collection<? extends Class<? extends T>> types);
 
 	/**
-	 * Creates a {@link MassIndexer} to rebuild the indexes of some or all indexed entity types.
-	 * <p>
-	 * The indexer will apply to the indexes mapped to the given types, or to any of their sub-types.
-	 * <p>
-	 * {@link MassIndexer} instances cannot be reused.
-	 *
-	 * @param types An array of indexed types, or supertypes of all indexed types that will be reindexed.
-	 * If empty, all indexed types will be reindexed.
-	 * @return The created mass indexer.
-	 * @deprecated Use {@link #massIndexer()} or {@link #massIndexer(Class[])} instead.
-	 */
-	@Deprecated
-	default MassIndexer createIndexer(Class<?>... types) {
-		return types.length == 0 ? massIndexer() : massIndexer( types );
-	}
-
-	/**
 	 * @return The indexing plan for this session, allowing to explicitly index entities or delete them from the index,
 	 * or to process entity changes or even write to the indexes before the transaction is committed.
 	 */
