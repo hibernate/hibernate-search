@@ -26,14 +26,4 @@ public interface NestedPredicateFieldStep<N extends NestedPredicateNestStep<?>> 
 	 */
 	N objectField(String absoluteFieldPath);
 
-	/**
-	 * @deprecated Use {@link #objectField(String)} instead.
-	 * @param absoluteFieldPath The path to the object.
-	 * @return The next step.
-	 */
-	@Deprecated
-	default N onObjectField(String absoluteFieldPath) {
-		return objectField( absoluteFieldPath );
-	}
-
 }
