@@ -22,14 +22,4 @@ public interface ExistsPredicateFieldStep<N extends ExistsPredicateOptionsStep<?
 	 */
 	N field(String absoluteFieldPath);
 
-	/**
-	 * @deprecated Use {@link #field(String)} instead.
-	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
-	 * @return The next step.
-	 */
-	@Deprecated
-	default N onField(String absoluteFieldPath) {
-		return field( absoluteFieldPath );
-	}
-
 }

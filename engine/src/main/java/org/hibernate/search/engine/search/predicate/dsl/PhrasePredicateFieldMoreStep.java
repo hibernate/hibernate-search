@@ -39,16 +39,6 @@ public interface PhrasePredicateFieldMoreStep<
 	}
 
 	/**
-	 * @deprecated Use {@link #field(String)} instead.
-	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
-	 * @return The next step.
-	 */
-	@Deprecated
-	default S orField(String absoluteFieldPath) {
-		return field( absoluteFieldPath );
-	}
-
-	/**
 	 * Target the given fields in the phrase predicate,
 	 * as an alternative to the already-targeted fields.
 	 * <p>
@@ -62,15 +52,5 @@ public interface PhrasePredicateFieldMoreStep<
 	 * @see PhrasePredicateFieldStep#fields(String...)
 	 */
 	S fields(String... absoluteFieldPaths);
-
-	/**
-	 * @deprecated Use {@link #fields(String...)} instead.
-	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
-	 * @return The next step.
-	 */
-	@Deprecated
-	default S orFields(String... absoluteFieldPaths) {
-		return fields( absoluteFieldPaths );
-	}
 
 }

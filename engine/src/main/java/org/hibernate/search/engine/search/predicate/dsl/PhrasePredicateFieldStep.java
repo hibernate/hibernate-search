@@ -32,16 +32,6 @@ public interface PhrasePredicateFieldStep<N extends PhrasePredicateFieldMoreStep
 	}
 
 	/**
-	 * @deprecated Use {@link #field(String)} instead.
-	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
-	 * @return The next step.
-	 */
-	@Deprecated
-	default N onField(String absoluteFieldPath) {
-		return field( absoluteFieldPath );
-	}
-
-	/**
 	 * Target the given fields in the phrase predicate.
 	 * <p>
 	 * Only text fields are supported.
@@ -58,15 +48,5 @@ public interface PhrasePredicateFieldStep<N extends PhrasePredicateFieldMoreStep
 	 * @see #field(String)
 	 */
 	N fields(String... absoluteFieldPaths);
-
-	/**
-	 * @deprecated Use {@link #fields(String...)} instead.
-	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
-	 * @return The next step.
-	 */
-	@Deprecated
-	default N onFields(String... absoluteFieldPaths) {
-		return fields( absoluteFieldPaths );
-	}
 
 }

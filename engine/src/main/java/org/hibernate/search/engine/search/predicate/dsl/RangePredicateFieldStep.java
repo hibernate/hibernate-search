@@ -31,16 +31,6 @@ public interface RangePredicateFieldStep<N extends RangePredicateFieldMoreStep<?
 	}
 
 	/**
-	 * @deprecated Use {@link #field(String)} instead.
-	 * @param absoluteFieldPath The absolute path (from the document root) of the targeted field.
-	 * @return The next step.
-	 */
-	@Deprecated
-	default N onField(String absoluteFieldPath) {
-		return field( absoluteFieldPath );
-	}
-
-	/**
 	 * Target the given fields in the range predicate.
 	 * <p>
 	 * Equivalent to {@link #field(String)} followed by multiple calls to
@@ -55,14 +45,4 @@ public interface RangePredicateFieldStep<N extends RangePredicateFieldMoreStep<?
 	 * @see #field(String)
 	 */
 	N fields(String ... absoluteFieldPaths);
-
-	/**
-	 * @deprecated Use {@link #fields(String...)} instead.
-	 * @param absoluteFieldPaths The absolute paths (from the document root) of the targeted fields.
-	 * @return The next step.
-	 */
-	@Deprecated
-	default N onFields(String ... absoluteFieldPaths) {
-		return fields( absoluteFieldPaths );
-	}
 }
