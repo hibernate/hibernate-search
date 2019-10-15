@@ -88,30 +88,6 @@ public final class Search {
 	}
 
 	/**
-	 * Retrieve the {@link SearchSession} from a Hibernate ORM {@link Session}.
-	 * @param session A Hibernate ORM session.
-	 * @return The corresponding {@link SearchSession}.
-	 * @throws org.hibernate.search.util.common.SearchException if the session NOT {@link Session#isOpen()}.
-	 * @deprecated Use {@link #session(Session)} instead.
-	 */
-	@Deprecated
-	public static SearchSession getSearchSession(Session session) {
-		return session( session );
-	}
-
-	/**
-	 * Retrieve the {@link SearchSession} from a Hibernate ORM {@link Session}.
-	 * @param entityManager A JPA entity manager.
-	 * @return The corresponding {@link SearchSession}.
-	 * @throws org.hibernate.search.util.common.SearchException if the entity manager NOT {@link EntityManager#isOpen()}.
-	 * @deprecated Use {@link #session(EntityManager)} instead.
-	 */
-	@Deprecated
-	public static SearchSession getSearchSession(EntityManager entityManager) {
-		return session( entityManager );
-	}
-
-	/**
 	 * Convert a {@link SearchQuery} to a {@link TypedQuery JPA query}.
 	 * <p>
 	 * Note that the resulting query <strong>does not support all operations</strong>
