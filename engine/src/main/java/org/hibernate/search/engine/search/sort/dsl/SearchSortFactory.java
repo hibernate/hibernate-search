@@ -28,29 +28,11 @@ public interface SearchSortFactory {
 	ScoreSortOptionsStep<?> score();
 
 	/**
-	 * @deprecated Use {@link #score()} instead.
-	 * @return A DSL step where the "score" sort can be defined in more details.
-	 */
-	@Deprecated
-	default ScoreSortOptionsStep<?> byScore() {
-		return score();
-	}
-
-	/**
 	 * Order elements by their internal index order.
 	 *
 	 * @return A DSL step where the "index order" sort can be defined in more details.
 	 */
 	SortThenStep indexOrder();
-
-	/**
-	 * @deprecated Use {@link #indexOrder()} instead.
-	 * @return A DSL step where the "index order" sort can be defined in more details.
-	 */
-	@Deprecated
-	default SortThenStep byIndexOrder() {
-		return indexOrder();
-	}
 
 	/**
 	 * Order elements by the value of a specific field.
@@ -64,17 +46,6 @@ public interface SearchSortFactory {
 	FieldSortOptionsStep<?> field(String absoluteFieldPath);
 
 	/**
-	 * @deprecated Use {@link #field(String)} instead.
-	 * @param absoluteFieldPath The absolute path of the index field to sort by
-	 * @return A DSL step where the "field" sort can be defined in more details.
-	 * @throws SearchException If the field doesn't exist or cannot be sorted on.
-	 */
-	@Deprecated
-	default FieldSortOptionsStep<?> byField(String absoluteFieldPath) {
-		return byField( absoluteFieldPath );
-	}
-
-	/**
 	 * Order elements by the distance from the location stored in the specified field to the location specified.
 	 * <p>
 	 * The default order is <strong>ascending</strong>.
@@ -85,18 +56,6 @@ public interface SearchSortFactory {
 	 * @throws SearchException If the field type does not constitute a valid location.
 	 */
 	DistanceSortOptionsStep<?> distance(String absoluteFieldPath, GeoPoint location);
-
-	/**
-	 * @deprecated Use {@link #distance(String, GeoPoint)} instead.
-	 * @param absoluteFieldPath The absolute path of the indexed location field to sort by.
-	 * @param location The location to which we want to compute the distance.
-	 * @return A DSL step where the "distance" sort can be defined in more details.
-	 * @throws SearchException If the field type does not constitute a valid location.
-	 */
-	@Deprecated
-	default DistanceSortOptionsStep<?> byDistance(String absoluteFieldPath, GeoPoint location) {
-		return distance( absoluteFieldPath, location );
-	}
 
 	/**
 	 * Order elements by the distance from the location stored in the specified field to the location specified.
@@ -114,19 +73,6 @@ public interface SearchSortFactory {
 	}
 
 	/**
-	 * @deprecated Use {@link #distance(String, double, double)} instead.
-	 * @param absoluteFieldPath The absolute path of the indexed location field to sort by.
-	 * @param latitude The latitude of the location to which we want to compute the distance.
-	 * @param longitude The longitude of the location to which we want to compute the distance.
-	 * @return A DSL step where the "distance" sort can be defined in more details.
-	 * @throws SearchException If the field type does not constitute a valid location.
-	 */
-	@Deprecated
-	default DistanceSortOptionsStep<?> byDistance(String absoluteFieldPath, double latitude, double longitude) {
-		return distance( absoluteFieldPath, latitude, longitude );
-	}
-
-	/**
 	 * Order by a sort composed of several elements.
 	 * <p>
 	 * Note that, in general, calling this method is not necessary as you can chain sorts by calling
@@ -137,15 +83,6 @@ public interface SearchSortFactory {
 	 * @return A DSL step where the "composite" sort can be defined in more details.
 	 */
 	CompositeSortComponentsStep<?> composite();
-
-	/**
-	 * @deprecated Use {@link #byComposite()} instead.
-	 * @return A DSL step where the "composite" sort can be defined in more details.
-	 */
-	@Deprecated
-	default CompositeSortComponentsStep<?> byComposite() {
-		return composite();
-	}
 
 	/**
 	 * Order by a sort composed of several elements,
@@ -169,17 +106,6 @@ public interface SearchSortFactory {
 	 * @return A DSL step where the "composite" sort can be defined in more details.
 	 */
 	SortThenStep composite(Consumer<? super CompositeSortComponentsStep<?>> elementContributor);
-
-	/**
-	 * @deprecated Use {@link #byComposite(Consumer)} instead.
-	 * @param elementContributor A consumer that will add clauses to the step passed in parameter.
-	 * Should generally be a lambda expression.
-	 * @return A DSL step where the "composite" sort can be defined in more details.
-	 */
-	@Deprecated
-	default SortThenStep byComposite(Consumer<? super CompositeSortComponentsStep<?>> elementContributor) {
-		return composite( elementContributor );
-	}
 
 	/**
 	 * Extend the current factory with the given extension,
