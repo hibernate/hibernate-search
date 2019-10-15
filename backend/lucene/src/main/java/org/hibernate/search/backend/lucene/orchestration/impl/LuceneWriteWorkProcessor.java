@@ -52,11 +52,6 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 		this.failureHandler = failureHandler;
 	}
 
-	// FIXME HSEARCH-3735 This is temporary and should be removed when failures are reported to the mapper directly
-	public FailureHandler getFailureHandler() {
-		return failureHandler;
-	}
-
 	@Override
 	public void beginBatch() {
 		// Nothing to do

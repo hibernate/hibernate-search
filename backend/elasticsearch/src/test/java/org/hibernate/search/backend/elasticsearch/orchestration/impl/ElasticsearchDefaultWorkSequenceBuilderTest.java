@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
-import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.expect;
 import static org.hibernate.search.util.impl.test.ExceptionMatcherBuilder.isException;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThat;
@@ -19,16 +18,11 @@ import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearc
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResultItemExtractor;
-import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.engine.reporting.IndexFailureContext;
 import org.hibernate.search.util.common.SearchException;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import org.assertj.core.api.Assertions;
-import org.assertj.core.api.HamcrestCondition;
-import org.easymock.Capture;
 import org.easymock.EasyMockSupport;
 
 
@@ -37,13 +31,11 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 	private ElasticsearchRefreshableWorkExecutionContext contextMock;
 	private Supplier<ElasticsearchRefreshableWorkExecutionContext> contextSupplierMock;
-	private FailureHandler failureHandlerMock;
 
 	@Before
 	public void initMocks() {
 		contextMock = createStrictMock( ElasticsearchRefreshableWorkExecutionContext.class );
 		contextSupplierMock = createStrictMock( Supplier.class );
-		failureHandlerMock = createStrictMock( FailureHandler.class );
 	}
 
 	@Test
@@ -65,8 +57,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		CompletableFuture<Object> work2FutureFromSequenceBuilder;
 
 		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder(
-				contextSupplierMock, failureHandlerMock );
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextSupplierMock );
 		verifyAll();
 
 		resetAll();
@@ -164,8 +155,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		CompletableFuture<Object> work4FutureFromSequenceBuilder;
 
 		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder(
-				contextSupplierMock, failureHandlerMock );
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextSupplierMock );
 		verifyAll();
 
 		resetAll();
@@ -306,8 +296,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		CompletableFuture<Void> sequence2refreshFuture = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder(
-				contextSupplierMock, failureHandlerMock );
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextSupplierMock );
 		verifyAll();
 
 		resetAll();
@@ -402,8 +391,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		expect( contextSupplierMock.get() ).andReturn( contextMock );
 		expect( work0.execute( contextMock ) ).andReturn( (CompletableFuture) work0Future );
 		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder(
-				contextSupplierMock, failureHandlerMock );
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextSupplierMock );
 		builder.init( previousFuture );
 		work0FutureFromSequenceBuilder = builder.addNonBulkExecution( work0 );
 		work1FutureFromSequenceBuilder = builder.addNonBulkExecution( work1 );
@@ -427,8 +415,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( sequenceFuture ).isPending();
 
 		resetAll();
-		expect( work1.getInfo() ).andReturn( "work1" );
-		expect( work2.getInfo() ).andReturn( "work2" );
 		expect( contextMock.executePendingRefreshes() ).andReturn( refreshFuture );
 		replayAll();
 		work1Future.completeExceptionally( exception );
@@ -445,9 +431,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		// But the sequence future must wait for the refresh to happen
 		assertThat( sequenceFuture ).isPending();
 
-		Capture<IndexFailureContext> failureContextCapture = Capture.newInstance();
 		resetAll();
-		failureHandlerMock.handle( capture( failureContextCapture ) );
 		replayAll();
 		refreshFuture.complete( null );
 		verifyAll();
@@ -459,13 +443,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 						.causedBy( exception )
 						.build()
 		);
-
-		IndexFailureContext failureContext = failureContextCapture.getValue();
-		Assertions.assertThat( failureContext.getThrowable() ).isSameAs( exception );
-		Assertions.assertThat( failureContext.getFailingOperation() )
-				.isEqualTo( "work1" );
-		Assertions.<Object>assertThat( failureContext.getUncommittedOperations() )
-				.containsExactly( "work1", "work2" );
 	}
 
 	@Test
@@ -488,8 +465,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		MyException exception = new MyException();
 
 		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder(
-				contextSupplierMock, failureHandlerMock );
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextSupplierMock );
 		verifyAll();
 
 		resetAll();
@@ -516,10 +492,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( sequenceFuture ).isPending();
 
 		resetAll();
-		expect( work1.getInfo() ).andReturn( "work1" );
-		expect( work2.getInfo() ).andReturn( "work2" );
-		expect( work3.getInfo() ).andReturn( "work3" );
-		expect( work4.getInfo() ).andReturn( "work4" );
 		expect( contextMock.executePendingRefreshes() ).andReturn( refreshFuture );
 		replayAll();
 		bulkWorkFuture.completeExceptionally( exception );
@@ -542,13 +514,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		);
 		assertThat( sequenceFuture ).isPending();
 
-		Capture<IndexFailureContext> failureContext1Capture = Capture.newInstance();
-		Capture<IndexFailureContext> failureContext2Capture = Capture.newInstance();
-		Capture<IndexFailureContext> failureContext3Capture = Capture.newInstance();
 		resetAll();
-		failureHandlerMock.handle( capture( failureContext1Capture ) );
-		failureHandlerMock.handle( capture( failureContext2Capture ) );
-		failureHandlerMock.handle( capture( failureContext3Capture ) );
 		replayAll();
 		refreshFuture.complete( null );
 		verifyAll();
@@ -558,40 +524,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 						.causedBy( exception )
 						.build()
 		);
-
-		IndexFailureContext failureContext1 = failureContext1Capture.getValue();
-		Assertions.assertThat( failureContext1.getThrowable() ).satisfies( new HamcrestCondition<>(
-				isException( SearchException.class )
-						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
-						.causedBy( exception ).build()
-		) );
-		Assertions.assertThat( failureContext1.getFailingOperation() )
-				.isEqualTo( "work1" );
-		Assertions.<Object>assertThat( failureContext1.getUncommittedOperations() )
-				// Skipped works are blamed on the first failed work
-				.containsExactly( "work1", "work4" );
-
-		IndexFailureContext failureContext2 = failureContext2Capture.getValue();
-		Assertions.assertThat( failureContext2.getThrowable() ).satisfies( new HamcrestCondition<>(
-				isException( SearchException.class )
-						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
-						.causedBy( exception ).build()
-		) );
-		Assertions.assertThat( failureContext2.getFailingOperation() )
-				.isEqualTo( "work2" );
-		Assertions.<Object>assertThat( failureContext2.getUncommittedOperations() )
-				.containsExactly( "work2" );
-
-		IndexFailureContext failureContext3 = failureContext3Capture.getValue();
-		Assertions.assertThat( failureContext3.getThrowable() ).satisfies( new HamcrestCondition<>(
-				isException( SearchException.class )
-						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
-						.causedBy( exception ).build()
-		) );
-		Assertions.assertThat( failureContext3.getFailingOperation() )
-				.isEqualTo( "work3" );
-		Assertions.<Object>assertThat( failureContext3.getUncommittedOperations() )
-				.containsExactly( "work3" );
 	}
 
 	@Test
@@ -616,8 +548,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		MyException exception = new MyException();
 
 		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder(
-				contextSupplierMock, failureHandlerMock );
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextSupplierMock );
 		verifyAll();
 
 		resetAll();
@@ -655,10 +586,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( sequenceFuture ).isPending();
 
 		resetAll();
-		expect( work1.getInfo() ).andReturn( "work1" );
-		expect( work2.getInfo() ).andReturn( "work2" );
-		expect( work3.getInfo() ).andReturn( "work3" );
-		expect( work4.getInfo() ).andReturn( "work4" );
 		expect( contextMock.executePendingRefreshes() ).andReturn( refreshFuture );
 		replayAll();
 		bulkResultFuture.completeExceptionally( exception );
@@ -681,13 +608,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		);
 		assertThat( sequenceFuture ).isPending();
 
-		Capture<IndexFailureContext> failureContext1Capture = Capture.newInstance();
-		Capture<IndexFailureContext> failureContext2Capture = Capture.newInstance();
-		Capture<IndexFailureContext> failureContext3Capture = Capture.newInstance();
 		resetAll();
-		failureHandlerMock.handle( capture( failureContext1Capture ) );
-		failureHandlerMock.handle( capture( failureContext2Capture ) );
-		failureHandlerMock.handle( capture( failureContext3Capture ) );
 		replayAll();
 		refreshFuture.complete( null );
 		verifyAll();
@@ -697,40 +618,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 						.causedBy( exception )
 						.build()
 		);
-
-		IndexFailureContext failureContext1 = failureContext1Capture.getValue();
-		Assertions.assertThat( failureContext1.getThrowable() ).satisfies( new HamcrestCondition<>(
-				isException( SearchException.class )
-						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
-						.causedBy( exception ).build()
-		) );
-		Assertions.assertThat( failureContext1.getFailingOperation() )
-				.isEqualTo( "work1" );
-		Assertions.<Object>assertThat( failureContext1.getUncommittedOperations() )
-				// Skipped works are blamed on the first failed work
-				.containsExactly( "work1", "work4" );
-
-		IndexFailureContext failureContext2 = failureContext2Capture.getValue();
-		Assertions.assertThat( failureContext2.getThrowable() ).satisfies( new HamcrestCondition<>(
-				isException( SearchException.class )
-						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
-						.causedBy( exception ).build()
-		) );
-		Assertions.assertThat( failureContext2.getFailingOperation() )
-				.isEqualTo( "work2" );
-		Assertions.<Object>assertThat( failureContext2.getUncommittedOperations() )
-				.containsExactly( "work2" );
-
-		IndexFailureContext failureContext3 = failureContext3Capture.getValue();
-		Assertions.assertThat( failureContext3.getThrowable() ).satisfies( new HamcrestCondition<>(
-				isException( SearchException.class )
-						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
-						.causedBy( exception ).build()
-		) );
-		Assertions.assertThat( failureContext3.getFailingOperation() )
-				.isEqualTo( "work3" );
-		Assertions.<Object>assertThat( failureContext3.getUncommittedOperations() )
-				.containsExactly( "work3" );
 	}
 
 	@Test
@@ -763,8 +650,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		MyRuntimeException exception = new MyRuntimeException();
 
 		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder(
-				contextSupplierMock, failureHandlerMock );
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextSupplierMock );
 		verifyAll();
 
 		resetAll();
@@ -808,7 +694,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		expect( bulkResultItemExtractorMock.extract( work1, 0 ) ).andReturn( work1Future );
 		expect( bulkResultItemExtractorMock.extract( work2, 1 ) ).andThrow( exception );
 		expect( bulkResultItemExtractorMock.extract( work3, 2 ) ).andReturn( work3Future );
-		expect( work2.getInfo() ).andReturn( "work2" );
 		replayAll();
 		bulkResultFuture.complete( bulkResultMock );
 		verifyAll();
@@ -829,7 +714,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( sequenceFuture ).isPending();
 
 		resetAll();
-		expect( work4.getInfo() ).andReturn( "work4" );
 		expect( contextMock.executePendingRefreshes() ).andReturn( refreshFuture );
 		replayAll();
 		work3Future.complete( work3Result );
@@ -843,9 +727,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		);
 		assertThat( sequenceFuture ).isPending();
 
-		Capture<IndexFailureContext> failureContextCapture = Capture.newInstance();
 		resetAll();
-		failureHandlerMock.handle( capture( failureContextCapture ) );
 		replayAll();
 		refreshFuture.complete( null );
 		verifyAll();
@@ -853,14 +735,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( work3FutureFromSequenceBuilder ).isSuccessful( work3Result );
 		// Errors MUST be propagated to the sequence future
 		assertThat( sequenceFuture ).isFailed( exception );
-
-		IndexFailureContext failureContext = failureContextCapture.getValue();
-		Assertions.assertThat( failureContext.getThrowable() ).isSameAs( exception );
-		Assertions.assertThat( failureContext.getFailingOperation() )
-				.isEqualTo( "work2" );
-		Assertions.<Object>assertThat( failureContext.getUncommittedOperations() )
-				// Skipped works are blamed on the first failed work
-				.containsExactly( "work2", "work4" );
 	}
 
 	@Test
@@ -888,8 +762,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		MyRuntimeException exception2 = new MyRuntimeException();
 
 		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder(
-				contextSupplierMock, failureHandlerMock );
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextSupplierMock );
 		verifyAll();
 
 		resetAll();
@@ -929,9 +802,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		expect( bulkResultMock.withContext( contextMock ) ).andReturn( bulkItemResultExtractorMock );
 		expect( bulkItemResultExtractorMock.extract( work1, 0 ) ).andThrow( exception1 );
 		expect( bulkItemResultExtractorMock.extract( work2, 1 ) ).andThrow( exception2 );
-		expect( work1.getInfo() ).andReturn( "work1" );
-		expect( work2.getInfo() ).andReturn( "work2" );
-		expect( work3.getInfo() ).andReturn( "work3" );
 		expect( contextMock.executePendingRefreshes() ).andReturn( refreshFuture );
 		replayAll();
 		bulkResultFuture.complete( bulkResultMock );
@@ -946,31 +816,12 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		);
 		assertThat( sequenceFuture ).isPending();
 
-		Capture<IndexFailureContext> failureContext1Capture = Capture.newInstance();
-		Capture<IndexFailureContext> failureContext2Capture = Capture.newInstance();
 		resetAll();
-		failureHandlerMock.handle( capture( failureContext1Capture ) );
-		failureHandlerMock.handle( capture( failureContext2Capture ) );
 		replayAll();
 		refreshFuture.complete( null );
 		verifyAll();
 		// Errors MUST be propagated to the sequence future
 		assertThat( sequenceFuture ).isFailed( exception1 );
-
-		IndexFailureContext failureContext1 = failureContext1Capture.getValue();
-		Assertions.assertThat( failureContext1.getThrowable() ).isSameAs( exception1 );
-		Assertions.assertThat( failureContext1.getFailingOperation() )
-				.isEqualTo( "work1" );
-		Assertions.<Object>assertThat( failureContext1.getUncommittedOperations() )
-				// Skipped works are blamed on the first failed work
-				.containsExactly( "work1", "work3" );
-
-		IndexFailureContext failureContext2 = failureContext2Capture.getValue();
-		Assertions.assertThat( failureContext2.getThrowable() ).isSameAs( exception2 );
-		Assertions.assertThat( failureContext2.getFailingOperation() )
-				.isEqualTo( "work2" );
-		Assertions.<Object>assertThat( failureContext2.getUncommittedOperations() )
-				.containsExactly( "work2" );
 	}
 
 
@@ -1005,8 +856,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		MyException exception = new MyException();
 
 		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder(
-				contextSupplierMock, failureHandlerMock );
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextSupplierMock );
 		verifyAll();
 
 		resetAll();
@@ -1071,7 +921,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( sequenceFuture ).isPending();
 
 		resetAll();
-		expect( work2.getInfo() ).andReturn( "work2" );
 		replayAll();
 		work2Future.completeExceptionally( exception );
 		verifyAll();
@@ -1082,7 +931,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( sequenceFuture ).isPending();
 
 		resetAll();
-		expect( work4.getInfo() ).andReturn( "work4" );
 		expect( contextMock.executePendingRefreshes() ).andReturn( refreshFuture );
 		replayAll();
 		work3Future.complete( work3Result );
@@ -1096,9 +944,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		);
 		assertThat( sequenceFuture ).isPending();
 
-		Capture<IndexFailureContext> failureContextCapture = Capture.newInstance();
 		resetAll();
-		failureHandlerMock.handle( capture( failureContextCapture ) );
 		replayAll();
 		refreshFuture.complete( null );
 		verifyAll();
@@ -1110,14 +956,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 						.causedBy( exception )
 						.build()
 		);
-
-		IndexFailureContext failureContext = failureContextCapture.getValue();
-		Assertions.assertThat( failureContext.getThrowable() ).isSameAs( exception );
-		Assertions.assertThat( failureContext.getFailingOperation() )
-				.isEqualTo( "work2" );
-		Assertions.<Object>assertThat( failureContext.getUncommittedOperations() )
-				// Skipped works are blamed on the first failed work
-				.containsExactly( "work2", "work4" );
 	}
 
 	@Test
@@ -1147,8 +985,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		MyException exception2 = new MyException();
 
 		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder(
-				contextSupplierMock, failureHandlerMock );
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextSupplierMock );
 		verifyAll();
 
 		resetAll();
@@ -1198,7 +1035,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( sequenceFuture ).isPending();
 
 		resetAll();
-		expect( work2.getInfo() ).andReturn( "work2" );
 		replayAll();
 		work2Future.completeExceptionally( exception2 );
 		verifyAll();
@@ -1208,8 +1044,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( sequenceFuture ).isPending();
 
 		resetAll();
-		expect( work1.getInfo() ).andReturn( "work1" );
-		expect( work3.getInfo() ).andReturn( "work3" );
 		expect( contextMock.executePendingRefreshes() ).andReturn( refreshFuture );
 		replayAll();
 		work1Future.completeExceptionally( exception1 );
@@ -1222,11 +1056,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		);
 		assertThat( sequenceFuture ).isPending();
 
-		Capture<IndexFailureContext> failureContext2Capture = Capture.newInstance();
-		Capture<IndexFailureContext> failureContext1Capture = Capture.newInstance();
 		resetAll();
-		failureHandlerMock.handle( capture( failureContext2Capture ) );
-		failureHandlerMock.handle( capture( failureContext1Capture ) );
 		replayAll();
 		refreshFuture.complete( null );
 		verifyAll();
@@ -1237,21 +1067,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 						.withSuppressed( exception1 )
 						.build()
 		);
-
-		IndexFailureContext failureContext2 = failureContext2Capture.getValue();
-		Assertions.assertThat( failureContext2.getThrowable() ).isSameAs( exception2 );
-		Assertions.assertThat( failureContext2.getFailingOperation() )
-				.isEqualTo( "work2" );
-		Assertions.<Object>assertThat( failureContext2.getUncommittedOperations() )
-				// Skipped works are blamed on the first failed work (in execution order)
-				.containsExactly( "work2", "work3" );
-
-		IndexFailureContext failureContext1 = failureContext1Capture.getValue();
-		Assertions.assertThat( failureContext1.getThrowable() ).isSameAs( exception1 );
-		Assertions.assertThat( failureContext1.getFailingOperation() )
-				.isEqualTo( "work1" );
-		Assertions.<Object>assertThat( failureContext1.getUncommittedOperations() )
-				.containsExactly( "work1" );
 	}
 
 	/**
@@ -1289,8 +1104,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		CompletableFuture<Object> work3FutureFromSequenceBuilder;
 
 		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder(
-				contextSupplierMock, failureHandlerMock );
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextSupplierMock );
 		verifyAll();
 
 		// Build and start the first sequence and simulate a long-running first work

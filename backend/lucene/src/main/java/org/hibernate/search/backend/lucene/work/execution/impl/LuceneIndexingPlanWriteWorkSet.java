@@ -18,7 +18,6 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
-import org.hibernate.search.engine.reporting.IndexFailureContext;
 
 class LuceneIndexingPlanWriteWorkSet implements LuceneWriteWorkSet {
 	private final String indexName;
@@ -44,7 +43,6 @@ class LuceneIndexingPlanWriteWorkSet implements LuceneWriteWorkSet {
 		processor.beforeWorkSet( commitStrategy, refreshStrategy );
 
 		Throwable throwable = null;
-		Object failingOperation = null;
 
 		for ( LuceneWriteWork<?> work : works ) {
 			try {
@@ -53,7 +51,6 @@ class LuceneIndexingPlanWriteWorkSet implements LuceneWriteWorkSet {
 			catch (RuntimeException e) {
 				reportBuilder.throwable( e );
 				throwable = e;
-				failingOperation = work.getInfo();
 				break; // Don't even try to submit the next works
 			}
 		}
@@ -65,27 +62,19 @@ class LuceneIndexingPlanWriteWorkSet implements LuceneWriteWorkSet {
 			catch (RuntimeException e) {
 				reportBuilder.throwable( e );
 				throwable = e;
-				failingOperation = "Commit after a set of index works";
 			}
 		}
-
 
 		if ( throwable == null ) {
 			indexingPlanFuture.complete( reportBuilder.build() );
 		}
 		else {
-			// FIXME HSEARCH-3735 This is temporary and should be removed when all failures are reported to the mapper directly
-			IndexFailureContext.Builder failureContextBuilder = IndexFailureContext.builder();
-			failureContextBuilder.throwable( throwable );
-			failureContextBuilder.failingOperation( failingOperation );
 			// Even if some works succeeded, there's no guarantee they were actually committed to the index.
 			// Report all works as uncommitted.
 			for ( LuceneSingleDocumentWriteWork<?> work : works ) {
 				reportBuilder.failingDocument( new LuceneDocumentReference( indexName, work.getDocumentId() ) );
-				failureContextBuilder.uncommittedOperation( work.getInfo() );
 			}
 			indexingPlanFuture.complete( reportBuilder.build() );
-			processor.getFailureHandler().handle( failureContextBuilder.build() );
 		}
 	}
 

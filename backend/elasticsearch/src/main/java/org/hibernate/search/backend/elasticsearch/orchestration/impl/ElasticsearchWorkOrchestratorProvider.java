@@ -185,8 +185,7 @@ public class ElasticsearchWorkOrchestratorProvider {
 
 	private ElasticsearchWorkSequenceBuilder createSequenceBuilder(Supplier<ElasticsearchRefreshableWorkExecutionContext> contextSupplier) {
 		return new ElasticsearchDefaultWorkSequenceBuilder(
-				contextSupplier,
-				failureHandler
+				contextSupplier
 		);
 	}
 

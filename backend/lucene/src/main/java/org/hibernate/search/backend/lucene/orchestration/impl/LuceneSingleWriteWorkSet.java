@@ -11,7 +11,6 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.reporting.IndexFailureContext;
 
 class LuceneSingleWriteWorkSet<T> implements LuceneWriteWorkSet {
 	private final LuceneWriteWork<T> work;
@@ -37,12 +36,6 @@ class LuceneSingleWriteWorkSet<T> implements LuceneWriteWorkSet {
 		}
 		catch (RuntimeException e) {
 			markAsFailed( e );
-			// FIXME HSEARCH-3735 This is temporary and should be removed when all failures are reported to the mapper directly
-			IndexFailureContext.Builder failureContextBuilder = IndexFailureContext.builder();
-			failureContextBuilder.throwable( e );
-			failureContextBuilder.failingOperation( work.getInfo() );
-			IndexFailureContext failureContext = failureContextBuilder.build();
-			processor.getFailureHandler().handle( failureContext );
 		}
 	}
 

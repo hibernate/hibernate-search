@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.work.execution.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.expectLastCall;
 
@@ -22,15 +21,11 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
-import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.engine.reporting.IndexFailureContext;
 import org.hibernate.search.util.impl.test.FutureAssert;
 
 import org.junit.Test;
 
-import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
-import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 
@@ -42,7 +37,6 @@ public class LuceneIndexingPlanWriteWorkSetTest extends EasyMockSupport {
 	private static final String INDEX_NAME = "SomeIndexName";
 
 	private LuceneWriteWorkProcessor processorMock = createStrictMock( LuceneWriteWorkProcessor.class );
-	private FailureHandler failureHandlerMock = createStrictMock( FailureHandler.class );
 
 	private List<LuceneSingleDocumentWriteWork<?>> workMocks = new ArrayList<>();
 
@@ -122,28 +116,15 @@ public class LuceneIndexingPlanWriteWorkSetTest extends EasyMockSupport {
 
 		FutureAssert.assertThat( workSetFuture ).isPending();
 
-		Capture<IndexFailureContext> failureContextCapture = Capture.newInstance();
 		RuntimeException workException = new RuntimeException( "Some message" );
 		resetAll();
 		processorMock.beforeWorkSet( DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
 		expect( processorMock.submit( workMocks.get( 0 ) ) ).andReturn( null );
 		expect( processorMock.submit( workMocks.get( 1 ) ) ).andThrow( workException );
 		expectWorkGetInfo( 0, 1, 2 );
-		expect( processorMock.getFailureHandler() ).andReturn( failureHandlerMock );
-		failureHandlerMock.handle( capture( failureContextCapture ) );
 		replayAll();
 		workSet.submitTo( processorMock );
 		verifyAll();
-
-		IndexFailureContext failureContext = failureContextCapture.getValue();
-		assertThat( failureContext.getThrowable() ).isSameAs( workException );
-		assertThat( failureContext.getFailingOperation() )
-				.isEqualTo( workInfo( 1 ) );
-		Assertions.<Object>assertThat( failureContext.getUncommittedOperations() )
-				.containsExactly(
-						// All works from the current workset, even successful ones
-						workInfo( 0 ), workInfo( 1 ), workInfo( 2 )
-				);
 
 		FutureAssert.assertThat( workSetFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();
@@ -169,7 +150,6 @@ public class LuceneIndexingPlanWriteWorkSetTest extends EasyMockSupport {
 
 		FutureAssert.assertThat( workSetFuture ).isPending();
 
-		Capture<IndexFailureContext> failureContextCapture = Capture.newInstance();
 		RuntimeException commitException = new RuntimeException( "Some message" );
 		resetAll();
 		processorMock.beforeWorkSet( DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE );
@@ -179,21 +159,9 @@ public class LuceneIndexingPlanWriteWorkSetTest extends EasyMockSupport {
 		processorMock.afterSuccessfulWorkSet();
 		expectLastCall().andThrow( commitException );
 		expectWorkGetInfo( 0, 1, 2 );
-		expect( processorMock.getFailureHandler() ).andReturn( failureHandlerMock );
-		failureHandlerMock.handle( capture( failureContextCapture ) );
 		replayAll();
 		workSet.submitTo( processorMock );
 		verifyAll();
-
-		IndexFailureContext failureContext = failureContextCapture.getValue();
-		assertThat( failureContext.getThrowable() ).isSameAs( commitException );
-		assertThat( failureContext.getFailingOperation() ).asString()
-				.isEqualTo( "Commit after a set of index works" );
-		Assertions.<Object>assertThat( failureContext.getUncommittedOperations() )
-				.containsExactly(
-						// All works from the current workset, even successful ones
-						workInfo( 0 ), workInfo( 1 ), workInfo( 2 )
-				);
 
 		FutureAssert.assertThat( workSetFuture ).isSuccessful( report -> {
 			assertThat( report ).isNotNull();

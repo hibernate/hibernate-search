@@ -8,8 +8,6 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.reporting.IndexFailureContext;
-
 /**
  * A special workset that won't trigger the creation of the index writer.
  * <p>
@@ -31,11 +29,6 @@ class LuceneEnsureIndexExistsWriteWorkSet implements LuceneWriteWorkSet {
 		}
 		catch (RuntimeException e) {
 			markAsFailed( e );
-			// FIXME HSEARCH-3735 This is temporary and should be removed when all failures are reported to the mapper directly
-			IndexFailureContext.Builder failureContextBuilder = IndexFailureContext.builder();
-			failureContextBuilder.throwable( e );
-			failureContextBuilder.failingOperation( "Index initialization" );
-			processor.getFailureHandler().handle( failureContextBuilder.build() );
 		}
 	}
 
