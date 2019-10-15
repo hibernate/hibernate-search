@@ -437,12 +437,8 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		verifyAll();
 		// Works that happened before the error must be considered as successful if the refresh is successful
 		assertThat( work0FutureFromSequenceBuilder ).isSuccessful( work0Result );
-		// Errors MUST be propagated to the sequence future
-		assertThat( sequenceFuture ).isFailed(
-				isException( SearchException.class )
-						.causedBy( exception )
-						.build()
-		);
+		// Only refresh failures should be propagated to the sequence future
+		assertThat( sequenceFuture ).isSuccessful();
 	}
 
 	@Test
@@ -518,12 +514,8 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		replayAll();
 		refreshFuture.complete( null );
 		verifyAll();
-		// Errors MUST be propagated to the sequence future
-		assertThat( sequenceFuture ).isFailed(
-				isException( SearchException.class )
-						.causedBy( exception )
-						.build()
-		);
+		// Only refresh failures should be propagated to the sequence future
+		assertThat( sequenceFuture ).isSuccessful();
 	}
 
 	@Test
@@ -612,12 +604,8 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		replayAll();
 		refreshFuture.complete( null );
 		verifyAll();
-		// Errors MUST be propagated to the sequence future
-		assertThat( sequenceFuture ).isFailed(
-				isException( SearchException.class )
-						.causedBy( exception )
-						.build()
-		);
+		// Only refresh failures should be propagated to the sequence future
+		assertThat( sequenceFuture ).isSuccessful();
 	}
 
 	@Test
@@ -733,8 +721,8 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		verifyAll();
 		assertThat( work1FutureFromSequenceBuilder ).isSuccessful( work1Result );
 		assertThat( work3FutureFromSequenceBuilder ).isSuccessful( work3Result );
-		// Errors MUST be propagated to the sequence future
-		assertThat( sequenceFuture ).isFailed( exception );
+		// Only refresh failures should be propagated to the sequence future
+		assertThat( sequenceFuture ).isSuccessful();
 	}
 
 	@Test
@@ -820,8 +808,8 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		replayAll();
 		refreshFuture.complete( null );
 		verifyAll();
-		// Errors MUST be propagated to the sequence future
-		assertThat( sequenceFuture ).isFailed( exception1 );
+		// Only refresh failures should be propagated to the sequence future
+		assertThat( sequenceFuture ).isSuccessful();
 	}
 
 
@@ -950,12 +938,8 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		verifyAll();
 		assertThat( work1FutureFromSequenceBuilder ).isSuccessful( work1Result );
 		assertThat( work3FutureFromSequenceBuilder ).isSuccessful( work3Result );
-		// Errors MUST be propagated to the sequence future
-		assertThat( sequenceFuture ).isFailed(
-				isException( SearchException.class )
-						.causedBy( exception )
-						.build()
-		);
+		// Only refresh failures should be propagated to the sequence future
+		assertThat( sequenceFuture ).isSuccessful();
 	}
 
 	@Test
@@ -1060,13 +1044,8 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		replayAll();
 		refreshFuture.complete( null );
 		verifyAll();
-		// Errors MUST be propagated to the sequence future
-		assertThat( sequenceFuture ).isFailed(
-				isException( SearchException.class )
-						.causedBy( exception2 )
-						.withSuppressed( exception1 )
-						.build()
-		);
+		// Only refresh failures should be propagated to the sequence future
+		assertThat( sequenceFuture ).isSuccessful();
 	}
 
 	/**

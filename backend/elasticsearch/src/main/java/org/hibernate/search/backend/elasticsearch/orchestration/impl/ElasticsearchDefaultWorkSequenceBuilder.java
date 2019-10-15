@@ -255,13 +255,6 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		private final ElasticsearchRefreshableWorkExecutionContext executionContext;
 		private final CompletableFuture<Void> refreshFuture;
 
-		/*
-		 * This variable may be used from different threads handling different works,
-		 * but never concurrently,
-		 * because each work is executed strictly after the previous one.
-		 */
-		private volatile Throwable sequenceThrowable;
-
 		SequenceContext(ElasticsearchRefreshableWorkExecutionContext executionContext) {
 			this.executionContext = executionContext;
 			this.refreshFuture = new CompletableFuture<>();
@@ -287,22 +280,11 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		<R> void notifyWorkFailed(ElasticsearchWork<R> work, Throwable throwable,
 				CompletableFuture<R> workFutureForCaller) {
 			workFutureForCaller.completeExceptionally( throwable );
-			addSequenceThrowable( throwable );
 		}
 
 		void notifySequenceFailed(Throwable throwable) {
 			if ( !(throwable instanceof PreviousWorkException) ) {
-				addSequenceThrowable( throwable );
-			}
-			throw Throwables.toRuntimeException( sequenceThrowable );
-		}
-
-		private void addSequenceThrowable(Throwable throwable) {
-			if ( sequenceThrowable == null ) {
-				sequenceThrowable = throwable;
-			}
-			else {
-				sequenceThrowable.addSuppressed( throwable );
+				throw Throwables.toRuntimeException( throwable );
 			}
 		}
 	}
