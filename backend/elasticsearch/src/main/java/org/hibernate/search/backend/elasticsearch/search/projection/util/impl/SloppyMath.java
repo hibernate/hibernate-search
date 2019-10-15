@@ -45,26 +45,6 @@ public class SloppyMath {
 		return TO_METERS * 2 * asin( Math.min( 1, Math.sqrt( sortKey * 0.5 ) ) );
 	}
 
-	/**
-	 * Returns the Haversine distance in kilometers between two points
-	 * specified in decimal degrees (latitude/longitude).  This works correctly
-	 * even if the dateline is between the two points.
-	 *
-	 * @param lat1 Latitude of the first point.
-	 * @param lon1 Longitude of the first point.
-	 * @param lat2 Latitude of the second point.
-	 * @param lon2 Longitude of the second point.
-	 *
-	 * @return distance in kilometers.
-	 *
-	 * @deprecated Use {@link #haversinMeters(double, double, double, double) instead}
-	 */
-	@Deprecated
-	public static double haversinKilometers(double lat1, double lon1, double lat2, double lon2) {
-		double h = haversinSortKey( lat1, lon1, lat2, lon2 );
-		return TO_KILOMETERS * 2 * asin( Math.min( 1, Math.sqrt( h * 0.5 ) ) );
-	}
-
 	public static double haversinSortKey(double lat1, double lon1, double lat2, double lon2) {
 		double x1 = lat1 * TO_RADIANS;
 		double x2 = lat2 * TO_RADIANS;
