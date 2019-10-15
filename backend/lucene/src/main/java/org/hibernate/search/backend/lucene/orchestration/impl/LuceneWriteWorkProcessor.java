@@ -20,7 +20,6 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.reporting.IndexFailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.engine.reporting.spi.IndexFailureContextImpl;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -178,7 +177,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 		 * but that report will not mention that some works from previous worksets may have been affected too.
 		 * Report the failure again, just to warn about previous worksets potentially being affected.
 		 */
-		IndexFailureContextImpl.Builder failureContextBuilder = new IndexFailureContextImpl.Builder();
+		IndexFailureContext.Builder failureContextBuilder = IndexFailureContext.builder();
 		failureContextBuilder.throwable( throwable );
 		failureContextBuilder.failingOperation( failingOperation );
 		for ( LuceneWriteWork<?> work : previousWorkSetsUncommittedWorks ) {

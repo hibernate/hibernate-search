@@ -19,8 +19,8 @@ import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elas
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.RefreshWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
+import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.engine.reporting.spi.FailureContextImpl;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -96,7 +96,7 @@ class ElasticsearchDefaultWorkExecutionContext implements ElasticsearchRefreshab
 		return work.execute( refreshExecutionContext )
 				.handle( Futures.handler( (result, throwable) -> {
 					if ( throwable != null ) {
-						FailureContextImpl.Builder contextBuilder = new FailureContextImpl.Builder();
+						FailureContext.Builder contextBuilder = FailureContext.builder();
 						contextBuilder.throwable( throwable );
 						contextBuilder.failingOperation( work );
 						failureHandler.handle( contextBuilder.build() );

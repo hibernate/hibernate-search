@@ -18,7 +18,7 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
-import org.hibernate.search.engine.reporting.spi.IndexFailureContextImpl;
+import org.hibernate.search.engine.reporting.IndexFailureContext;
 
 class LuceneIndexingPlanWriteWorkSet implements LuceneWriteWorkSet {
 	private final String indexName;
@@ -75,7 +75,7 @@ class LuceneIndexingPlanWriteWorkSet implements LuceneWriteWorkSet {
 		}
 		else {
 			// FIXME HSEARCH-3735 This is temporary and should be removed when all failures are reported to the mapper directly
-			IndexFailureContextImpl.Builder failureContextBuilder = new IndexFailureContextImpl.Builder();
+			IndexFailureContext.Builder failureContextBuilder = IndexFailureContext.builder();
 			failureContextBuilder.throwable( throwable );
 			failureContextBuilder.failingOperation( failingOperation );
 			// Even if some works succeeded, there's no guarantee they were actually committed to the index.

@@ -14,8 +14,8 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.engine.reporting.spi.FailureContextImpl;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Executors;
@@ -199,7 +199,7 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 		}
 		catch (Throwable e) {
 			// This will only happen if there is a bug in the processor
-			FailureContextImpl.Builder contextBuilder = new FailureContextImpl.Builder();
+			FailureContext.Builder contextBuilder = FailureContext.builder();
 			contextBuilder.throwable( e );
 			contextBuilder.failingOperation( "Work processing in executor '" + name + "'" );
 			failureHandler.handle( contextBuilder.build() );
@@ -226,7 +226,7 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 				}
 				catch (Throwable e) {
 					// This will only happen if there is a bug in this class, but we don't want to fail silently
-					FailureContextImpl.Builder contextBuilder = new FailureContextImpl.Builder();
+					FailureContext.Builder contextBuilder = FailureContext.builder();
 					contextBuilder.throwable( e );
 					contextBuilder.failingOperation( "Scheduling the next batch in executor '" + name + "'" );
 					failureHandler.handle( contextBuilder.build() );

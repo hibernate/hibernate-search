@@ -25,8 +25,8 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
 import org.hibernate.query.Query;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.engine.reporting.spi.FailureContextImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
@@ -104,7 +104,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			loadAllFromQueue( session );
 		}
 		catch (Exception exception) {
-			FailureContextImpl.Builder failureContextBuilder = new FailureContextImpl.Builder();
+			FailureContext.Builder failureContextBuilder = FailureContext.builder();
 			failureContextBuilder.throwable( exception );
 			failureContextBuilder.failingOperation( log.massIndexerTransformingIds() );
 			failureHandler.handle( failureContextBuilder.build() );
@@ -252,7 +252,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 	}
 
 	private void handleException(Object entity, Throwable e) {
-		FailureContextImpl.Builder contextBuilder = new FailureContextImpl.Builder();
+		FailureContext.Builder contextBuilder = FailureContext.builder();
 		contextBuilder.throwable( e );
 		contextBuilder.failingOperation(
 				log.massIndexerIndexingInstance( entity.getClass().getName(), entity.toString() )

@@ -17,9 +17,9 @@ import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearc
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResultItemExtractor;
+import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.engine.reporting.spi.FailureContextImpl;
-import org.hibernate.search.engine.reporting.spi.IndexFailureContextImpl;
+import org.hibernate.search.engine.reporting.IndexFailureContext;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.Throwables;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -270,7 +270,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		 * but never concurrently,
 		 * because each work is executed strictly after the previous one.
 		 */
-		private volatile List<IndexFailureContextImpl.Builder> failureContextBuilders;
+		private volatile List<IndexFailureContext.Builder> failureContextBuilders;
 
 		/*
 		 * This variable may be used from different threads handling different works,
@@ -293,7 +293,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 					log.elasticsearchSkippedBecauseOfPreviousWork( skippingCause )
 			);
 			// Consider that skipped works were skipped because of the very first failure in the sequence.
-			IndexFailureContextImpl.Builder contextBuilder = getFirstFailureContextBuilder();
+			IndexFailureContext.Builder contextBuilder = getFirstFailureContextBuilder();
 			contextBuilder.uncommittedOperation( work.getInfo() );
 		}
 
@@ -309,7 +309,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		<R> void notifyWorkFailed(ElasticsearchWork<R> work, Throwable throwable,
 				CompletableFuture<R> workFutureForCaller) {
 			workFutureForCaller.completeExceptionally( throwable );
-			IndexFailureContextImpl.Builder contextBuilder = addFailure();
+			IndexFailureContext.Builder contextBuilder = addFailure();
 			contextBuilder.throwable( throwable );
 			Object workInfo = work.getInfo();
 			contextBuilder.failingOperation( workInfo );
@@ -319,13 +319,13 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 
 		void notifySequenceFailed(Throwable throwable) {
 			if ( failureContextBuilders != null ) {
-				for ( IndexFailureContextImpl.Builder failureContextBuilder : failureContextBuilders ) {
+				for ( IndexFailureContext.Builder failureContextBuilder : failureContextBuilders ) {
 					failureHandler.handle( failureContextBuilder.build() );
 				}
 			}
 			if ( !( throwable instanceof PreviousWorkException) ) {
 				// Something else than a work failed, mention it
-				FailureContextImpl.Builder failureContextBuilder = new FailureContextImpl.Builder();
+				FailureContext.Builder failureContextBuilder = FailureContext.builder();
 				failureContextBuilder.throwable( throwable );
 				failureHandler.handle( failureContextBuilder.build() );
 				addSequenceThrowable( throwable );
@@ -335,16 +335,16 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 			}
 		}
 
-		private IndexFailureContextImpl.Builder addFailure() {
+		private IndexFailureContext.Builder addFailure() {
 			if ( failureContextBuilders == null ) {
 				failureContextBuilders = new ArrayList<>();
 			}
-			IndexFailureContextImpl.Builder builder = new IndexFailureContextImpl.Builder();
+			IndexFailureContext.Builder builder = IndexFailureContext.builder();
 			failureContextBuilders.add( builder );
 			return builder;
 		}
 
-		private IndexFailureContextImpl.Builder getFirstFailureContextBuilder() {
+		private IndexFailureContext.Builder getFirstFailureContextBuilder() {
 			if ( failureContextBuilders != null && !failureContextBuilders.isEmpty() ) {
 				return failureContextBuilders.get( 0 );
 			}

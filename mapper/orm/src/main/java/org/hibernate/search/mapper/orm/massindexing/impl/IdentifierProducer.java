@@ -23,8 +23,8 @@ import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.query.Query;
+import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.engine.reporting.spi.FailureContextImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -96,7 +96,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 			inTransactionWrapper( upperSession );
 		}
 		catch (Exception exception) {
-			FailureContextImpl.Builder contextBuilder = new FailureContextImpl.Builder();
+			FailureContext.Builder contextBuilder = FailureContext.builder();
 			contextBuilder.throwable( exception );
 			contextBuilder.failingOperation( log.massIndexerFetchingIds() );
 			failureHandler.handle( contextBuilder.build() );

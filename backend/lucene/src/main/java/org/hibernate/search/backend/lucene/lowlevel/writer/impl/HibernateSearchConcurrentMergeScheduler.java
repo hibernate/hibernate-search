@@ -9,8 +9,8 @@ package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.engine.reporting.spi.FailureContextImpl;
 import org.hibernate.search.util.common.impl.SearchThreadFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -50,7 +50,7 @@ class HibernateSearchConcurrentMergeScheduler extends ConcurrentMergeScheduler {
 			Thread.currentThread().interrupt();
 		}
 		catch (Exception ex) {
-			FailureContextImpl.Builder contextBuilder = new FailureContextImpl.Builder();
+			FailureContext.Builder contextBuilder = FailureContext.builder();
 			contextBuilder.throwable( ex );
 			contextBuilder.failingOperation( log.indexMergeOperation() );
 			failureHandler.handle( contextBuilder.build() );

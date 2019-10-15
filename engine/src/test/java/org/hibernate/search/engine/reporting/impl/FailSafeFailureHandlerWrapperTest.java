@@ -13,8 +13,6 @@ import static org.hamcrest.CoreMatchers.sameInstance;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.IndexFailureContext;
-import org.hibernate.search.engine.reporting.spi.FailureContextImpl;
-import org.hibernate.search.engine.reporting.spi.IndexFailureContextImpl;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
 import org.junit.Rule;
@@ -45,7 +43,7 @@ public class FailSafeFailureHandlerWrapperTest extends EasyMockSupport {
 		failureHandlerMock.handle( anyObject( FailureContext.class ) );
 		expectLastCall().andThrow( failure );
 		replayAll();
-		wrapper.handle( new FailureContextImpl.Builder().build() );
+		wrapper.handle( FailureContext.builder().build() );
 		verifyAll();
 	}
 
@@ -61,7 +59,7 @@ public class FailSafeFailureHandlerWrapperTest extends EasyMockSupport {
 		failureHandlerMock.handle( anyObject( FailureContext.class ) );
 		expectLastCall().andThrow( failure );
 		replayAll();
-		wrapper.handle( new FailureContextImpl.Builder().build() );
+		wrapper.handle( FailureContext.builder().build() );
 		verifyAll();
 	}
 
@@ -77,7 +75,7 @@ public class FailSafeFailureHandlerWrapperTest extends EasyMockSupport {
 		failureHandlerMock.handle( anyObject( IndexFailureContext.class ) );
 		expectLastCall().andThrow( failure );
 		replayAll();
-		wrapper.handle( new IndexFailureContextImpl.Builder().build() );
+		wrapper.handle( IndexFailureContext.builder().build() );
 		verifyAll();
 	}
 
@@ -93,7 +91,7 @@ public class FailSafeFailureHandlerWrapperTest extends EasyMockSupport {
 		failureHandlerMock.handle( anyObject( IndexFailureContext.class ) );
 		expectLastCall().andThrow( failure );
 		replayAll();
-		wrapper.handle( new IndexFailureContextImpl.Builder().build() );
+		wrapper.handle( IndexFailureContext.builder().build() );
 		verifyAll();
 	}
 
