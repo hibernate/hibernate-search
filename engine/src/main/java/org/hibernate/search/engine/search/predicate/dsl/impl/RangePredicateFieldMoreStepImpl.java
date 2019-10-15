@@ -13,16 +13,12 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.dsl.RangePredicateLastLimitExcludeStep;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFieldMoreStep;
-import org.hibernate.search.engine.search.predicate.dsl.RangePredicateFromToStep;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.util.common.data.Range;
-import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -67,27 +63,6 @@ class RangePredicateFieldMoreStepImpl<B>
 	}
 
 	@Override
-	public RangePredicateFromToStep from(Object value, ValueConvert convert) {
-		commonState.getOrCreateLegacySyntaxState().lowerBoundValue = value;
-		commonState.getOrCreateLegacySyntaxState().lowerBoundConvert = convert;
-		return new RangePredicateFromToStepImpl<>( commonState );
-	}
-
-	@Override
-	public RangePredicateLastLimitExcludeStep above(Object value, ValueConvert convert) {
-		commonState.getOrCreateLegacySyntaxState().lowerBoundValue = value;
-		commonState.getOrCreateLegacySyntaxState().lowerBoundConvert = convert;
-		return new RangePredicateSingleLimitExcludeStep<>( commonState, false );
-	}
-
-	@Override
-	public RangePredicateLastLimitExcludeStep below(Object value, ValueConvert convert) {
-		commonState.getOrCreateLegacySyntaxState().upperBoundValue = value;
-		commonState.getOrCreateLegacySyntaxState().upperBoundConvert = convert;
-		return new RangePredicateSingleLimitExcludeStep<>( commonState, true );
-	}
-
-	@Override
 	public List<String> getAbsoluteFieldPaths() {
 		return absoluteFieldPaths;
 	}
@@ -106,8 +81,6 @@ class RangePredicateFieldMoreStepImpl<B>
 			extends AbstractBooleanMultiFieldPredicateCommonState<CommonState<B>, B, RangePredicateFieldMoreStepImpl<B>>
 			implements RangePredicateOptionsStep<CommonState<B>> {
 
-		private LegacySyntaxState legacySyntaxState;
-
 		CommonState(SearchPredicateBuilderFactory<?, B> builderFactory) {
 			super( builderFactory );
 		}
@@ -125,18 +98,8 @@ class RangePredicateFieldMoreStepImpl<B>
 			return this;
 		}
 
-		LegacySyntaxState getOrCreateLegacySyntaxState() {
-			if ( legacySyntaxState == null ) {
-				legacySyntaxState = new LegacySyntaxState();
-			}
-			return legacySyntaxState;
-		}
-
 		@Override
 		protected B toImplementation() {
-			if ( legacySyntaxState != null ) {
-				legacySyntaxState.contribute( this );
-			}
 			return super.toImplementation();
 		}
 
@@ -146,79 +109,4 @@ class RangePredicateFieldMoreStepImpl<B>
 		}
 	}
 
-	static class RangePredicateFromToStepImpl<B> implements RangePredicateFromToStep {
-
-		private final CommonState<B> commonState;
-
-		RangePredicateFromToStepImpl(CommonState<B> commonState) {
-			this.commonState = commonState;
-		}
-
-		@Override
-		public RangePredicateLastLimitExcludeStep to(Object value, ValueConvert convert) {
-			commonState.getOrCreateLegacySyntaxState().upperBoundValue = value;
-			commonState.getOrCreateLegacySyntaxState().upperBoundConvert = convert;
-			return new RangePredicateSingleLimitExcludeStep<>( commonState, true );
-		}
-
-		@Override
-		public RangePredicateFromToStep excludeLimit() {
-			commonState.getOrCreateLegacySyntaxState().lowerBoundInclusion = RangeBoundInclusion.EXCLUDED;
-			return this;
-		}
-	}
-
-	static class RangePredicateSingleLimitExcludeStep<B> implements RangePredicateLastLimitExcludeStep {
-
-		private final CommonState<B> commonState;
-
-		private final boolean isUpperBound;
-
-		RangePredicateSingleLimitExcludeStep(CommonState<B> commonState, boolean isUpperBound) {
-			this.commonState = commonState;
-			this.isUpperBound = isUpperBound;
-		}
-
-		@Override
-		public RangePredicateOptionsStep<?> boost(float boost) {
-			commonState.boost( boost );
-			return this;
-		}
-
-		@Override
-		public RangePredicateOptionsStep<?> excludeLimit() {
-			if ( isUpperBound ) {
-				commonState.getOrCreateLegacySyntaxState().upperBoundInclusion = RangeBoundInclusion.EXCLUDED;
-			}
-			else {
-				commonState.getOrCreateLegacySyntaxState().lowerBoundInclusion = RangeBoundInclusion.EXCLUDED;
-			}
-			return this;
-		}
-
-		@Override
-		public SearchPredicate toPredicate() {
-			return commonState.toPredicate();
-		}
-	}
-
-	private static class LegacySyntaxState {
-		private Object lowerBoundValue = null;
-		private RangeBoundInclusion lowerBoundInclusion = RangeBoundInclusion.INCLUDED;
-		private ValueConvert lowerBoundConvert = ValueConvert.YES;
-		private Object upperBoundValue = null;
-		private RangeBoundInclusion upperBoundInclusion = RangeBoundInclusion.INCLUDED;
-		private ValueConvert upperBoundConvert = ValueConvert.YES;
-
-		public <B> void contribute(CommonState<B> commonState) {
-			commonState.range(
-					Range.between(
-							lowerBoundValue, lowerBoundInclusion,
-							upperBoundValue, upperBoundInclusion
-					),
-					lowerBoundConvert,
-					upperBoundConvert
-			);
-		}
-	}
 }
