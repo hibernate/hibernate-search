@@ -73,7 +73,7 @@ public class ReindexOnUpdateIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			long hitCount = searchSession.search( Book.class )
-					.predicate( f -> f.match().onField( "category.name" ).matching( "science" ) )
+					.predicate( f -> f.match().field( "category.name" ).matching( "science" ) )
 					.fetchTotalHitCount();
 			assertThat( hitCount ).isEqualTo( 100L );
 		} );
@@ -88,7 +88,7 @@ public class ReindexOnUpdateIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			long hitCount = searchSession.search( Book.class )
-					.predicate( f -> f.match().onField( "category.name" ).matching( "science" ) )
+					.predicate( f -> f.match().field( "category.name" ).matching( "science" ) )
 					.fetchTotalHitCount();
 			// The books haven't been reindexed, as expected.
 			assertThat( hitCount ).isEqualTo( 100L );

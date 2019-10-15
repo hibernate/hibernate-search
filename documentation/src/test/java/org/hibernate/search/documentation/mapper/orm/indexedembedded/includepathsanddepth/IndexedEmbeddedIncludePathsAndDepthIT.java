@@ -96,13 +96,13 @@ public class IndexedEmbeddedIncludePathsAndDepthIT {
 
 			List<Human> result = searchSession.search( Human.class )
 					.predicate( f -> f.bool()
-							.must( f.match().onField( "name" ).matching( "fourth" ) )
-							.must( f.match().onField( "nickname" ).matching( "babe" ) )
-							.must( f.match().onField( "parents.name" ).matching( "third" ) )
-							.must( f.match().onField( "parents.nickname" ).matching( "young" ) )
-							.must( f.match().onField( "parents.parents.name" ).matching( "junior" ) )
-							.must( f.match().onField( "parents.parents.nickname" ).matching( "old" ) )
-							.must( f.match().onField( "parents.parents.parents.name" ).matching( "senior" ) )
+							.must( f.match().field( "name" ).matching( "fourth" ) )
+							.must( f.match().field( "nickname" ).matching( "babe" ) )
+							.must( f.match().field( "parents.name" ).matching( "third" ) )
+							.must( f.match().field( "parents.nickname" ).matching( "young" ) )
+							.must( f.match().field( "parents.parents.name" ).matching( "junior" ) )
+							.must( f.match().field( "parents.parents.nickname" ).matching( "old" ) )
+							.must( f.match().field( "parents.parents.parents.name" ).matching( "senior" ) )
 					)
 					.fetchHits( 20 );
 			assertThat( result ).hasSize( 1 );
@@ -113,7 +113,7 @@ public class IndexedEmbeddedIncludePathsAndDepthIT {
 		SubTest.expectException(
 				() -> {
 					searchMapping.scope( Human.class ).predicate()
-							.match().onField( "parents.parents.parents.nickname" );
+							.match().field( "parents.parents.parents.nickname" );
 				}
 		)
 				.assertThrown()
@@ -122,7 +122,7 @@ public class IndexedEmbeddedIncludePathsAndDepthIT {
 		SubTest.expectException(
 				() -> {
 					searchMapping.scope( Human.class ).predicate()
-							.match().onField( "parents.parents.parents.parents.name" );
+							.match().field( "parents.parents.parents.parents.name" );
 				}
 		)
 				.assertThrown()

@@ -363,7 +363,7 @@ public class SearchQueryBaseIT {
 					)
 			);
 
-			Assertions.assertThat( query.fetchHits() ).containsExactlyInAnyOrder(
+			Assertions.assertThat( query.fetchAllHits() ).containsExactlyInAnyOrder(
 					new EntityReferenceImpl( Book.class, 1 ),
 					new EntityReferenceImpl( Book.class, 2 ),
 					new EntityReferenceImpl( Book.class, 3 )

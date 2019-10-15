@@ -271,7 +271,7 @@ public class SearchQueryFetchIT {
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?> matchFirstHalfQuery() {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
-				.predicate( f -> f.range().field( "integer" ).below( DOCUMENT_COUNT / 2 ).excludeLimit() )
+				.predicate( f -> f.range().field( "integer" ).lessThan( DOCUMENT_COUNT / 2 ) )
 				.sort( f -> f.field( "integer" ).asc() );
 	}
 

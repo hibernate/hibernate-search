@@ -79,9 +79,9 @@ public class ContainerExtractorIT {
 
 			List<Book> result = searchSession.search( Book.class )
 					.predicate( f -> f.bool()
-							.must( f.match().onField( "availableFormats" ).matching( BookFormat.AUDIOBOOK ) )
-							.must( f.match().onField( "availableFormats" ).matching( BookFormat.HARDCOVER ) )
-							.must( f.match().onField( "authorCount" ).matching( 1, ValueConvert.NO ) )
+							.must( f.match().field( "availableFormats" ).matching( BookFormat.AUDIOBOOK ) )
+							.must( f.match().field( "availableFormats" ).matching( BookFormat.HARDCOVER ) )
+							.must( f.match().field( "authorCount" ).matching( 1, ValueConvert.NO ) )
 					)
 					.fetchHits( 20 );
 			assertThat( result ).hasSize( 1 );
