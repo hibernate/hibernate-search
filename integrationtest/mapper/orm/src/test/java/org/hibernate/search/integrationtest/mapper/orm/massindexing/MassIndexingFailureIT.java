@@ -13,7 +13,6 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.Table;
 
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -71,7 +70,9 @@ public class MassIndexingFailureIT {
 				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
 						.withMessage( "Indexing failure" )
 						.build(),
-				"Indexing instance of type " + Book.class.getName()
+				"Indexing instance of type " + Book.class.getName(),
+				"Entities that could not be indexed correctly:",
+				Book.NAME + "#2"
 		)
 				.once();
 
@@ -90,12 +91,14 @@ public class MassIndexingFailureIT {
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 0 );
 
 		SessionFactory sessionFactory = setup( StubFailureHandler.class.getName() );
 
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 0 );
 
 		doMassIndexing(
 				sessionFactory,
@@ -108,7 +111,8 @@ public class MassIndexingFailureIT {
 
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 1 );
 	}
 
 	@Test
@@ -122,7 +126,10 @@ public class MassIndexingFailureIT {
 						.causedBy( SimulatedFailure.class )
 								.withMessage( "getId failure" )
 						.build(),
-				"Indexing instance of type " + Book.class.getName()
+				"Indexing instance of type " + Book.class.getName(),
+				"Entities that could not be indexed correctly:",
+				Book.NAME + "#2"
+
 		)
 				.once();
 
@@ -134,18 +141,21 @@ public class MassIndexingFailureIT {
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 0 );
 
 		SessionFactory sessionFactory = setup( StubFailureHandler.class.getName() );
 
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 0 );
 
 		doMassIndexingWithBook2GetIdFailure( sessionFactory );
 
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 1 );
 	}
 
 	@Test
@@ -159,7 +169,9 @@ public class MassIndexingFailureIT {
 						.causedBy( SimulatedFailure.class )
 								.withMessage( "getTitle failure" )
 						.build(),
-				"Indexing instance of type " + Book.class.getName()
+				"Indexing instance of type " + Book.class.getName(),
+				"Entities that could not be indexed correctly:",
+				Book.NAME + "#2"
 		)
 				.once();
 
@@ -171,18 +183,21 @@ public class MassIndexingFailureIT {
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 0 );
 
 		SessionFactory sessionFactory = setup( StubFailureHandler.class.getName() );
 
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 0 );
 
 		doMassIndexingWithBook2GetTitleFailure( sessionFactory );
 
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 1 );
 	}
 
 	@Test
@@ -430,13 +445,13 @@ public class MassIndexingFailureIT {
 		return () -> {
 			switch ( executionExpectation ) {
 				case SUCCEED:
-					backendMock.expectIndexScopeWorks( Book.INDEX )
+					backendMock.expectIndexScopeWorks( Book.NAME )
 							.indexScopeWork( type );
 					break;
 				case FAIL:
 					CompletableFuture<?> failingFuture = new CompletableFuture<>();
 					failingFuture.completeExceptionally( new SimulatedFailure( "Index-scope operation failure" ) );
-					backendMock.expectIndexScopeWorks( Book.INDEX )
+					backendMock.expectIndexScopeWorks( Book.NAME )
 							.indexScopeWork( type, failingFuture );
 					break;
 				case SKIP:
@@ -450,7 +465,7 @@ public class MassIndexingFailureIT {
 			switch ( workTwoExecutionExpectation ) {
 				case SUCCEED:
 					backendMock.expectWorksAnyOrder(
-							Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+							Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 					)
 							.add( "1", b -> b
 									.field( "title", TITLE_1 )
@@ -470,7 +485,7 @@ public class MassIndexingFailureIT {
 					CompletableFuture<?> failingFuture = new CompletableFuture<>();
 					failingFuture.completeExceptionally( new SimulatedFailure( "Indexing failure" ) );
 					backendMock.expectWorksAnyOrder(
-							Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+							Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 					)
 							.add( "1", b -> b
 									.field( "title", TITLE_1 )
@@ -482,7 +497,7 @@ public class MassIndexingFailureIT {
 							)
 							.processedThenExecuted();
 					backendMock.expectWorksAnyOrder(
-							Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+							Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 					)
 							.add( "2", b -> b
 									.field( "title", TITLE_2 )
@@ -492,7 +507,7 @@ public class MassIndexingFailureIT {
 					break;
 				case SKIP:
 					backendMock.expectWorksAnyOrder(
-							Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+							Book.NAME, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
 					)
 							.add( "1", b -> b
 									.field( "title", TITLE_1 )
@@ -509,7 +524,7 @@ public class MassIndexingFailureIT {
 	}
 
 	private SessionFactory setup(String failureHandler) {
-		backendMock.expectAnySchema( Book.INDEX );
+		backendMock.expectAnySchema( Book.NAME );
 
 		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_STRATEGY, AutomaticIndexingStrategyName.NONE )
@@ -533,12 +548,11 @@ public class MassIndexingFailureIT {
 		SKIP;
 	}
 
-	@Entity
-	@Table(name = "book")
-	@Indexed(index = Book.INDEX)
+	@Entity(name = Book.NAME)
+	@Indexed(index = Book.NAME)
 	public static class Book {
 
-		public static final String INDEX = "Book";
+		public static final String NAME = "Book";
 
 		private static final AtomicBoolean failOnBook2GetId = new AtomicBoolean( false );
 		private static final AtomicBoolean failOnBook2GetTitle = new AtomicBoolean( false );

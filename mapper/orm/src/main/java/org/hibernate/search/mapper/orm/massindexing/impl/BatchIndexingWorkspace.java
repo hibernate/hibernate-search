@@ -44,6 +44,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 
 	private final int documentBuilderThreads;
 	private final Class<E> indexedType;
+	private final String entityName;
 	private final SingularAttribute<? super E, I> idAttributeOfIndexedType;
 
 	// status control
@@ -65,7 +66,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 
 	BatchIndexingWorkspace(HibernateOrmMassIndexingMappingContext mappingContext,
 			DetachedBackendSessionContext sessionContext,
-			Class<E> type, SingularAttribute<? super E, I> idAttributeOfIndexedType,
+			Class<E> type, String entityName, SingularAttribute<? super E, I> idAttributeOfIndexedType,
 			int objectLoadingThreads, CacheMode cacheMode, int objectLoadingBatchSize,
 			CountDownLatch endAllSignal,
 			MassIndexingMonitor monitor, FailureHandler failureHandler,
@@ -76,6 +77,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 		this.sessionContext = sessionContext;
 
 		this.indexedType = type;
+		this.entityName = entityName;
 		this.idAttributeOfIndexedType = idAttributeOfIndexedType;
 		this.idFetchSize = idFetchSize;
 		this.transactionTimeout = transactionTimeout;
@@ -163,7 +165,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 				monitor, getFailureHandler(),
 				mappingContext,
 				producerEndSignal, cacheMode,
-				indexedType, idAttributeOfIndexedType,
+				indexedType, entityName, idAttributeOfIndexedType,
 				transactionTimeout,
 				sessionContext.getTenantIdentifier()
 		);

@@ -96,8 +96,8 @@ public interface Log extends BasicLogger {
 	@Message(value = "MassIndexer operation")
 	String massIndexerOperation();
 
-	@Message(value = "Indexing instance of type %s while mass indexing: %s")
-	String massIndexerIndexingInstance(String clazz, String value);
+	@Message(value = "Indexing instance of type %s while mass indexing")
+	String massIndexerIndexingInstance(@FormatWith(ClassFormatter.class) Class<?> entityType);
 
 	@Message(value = "Fetching the primary identifiers list")
 	String massIndexerFetchingIds();

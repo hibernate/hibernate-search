@@ -23,7 +23,7 @@ import org.hibernate.search.util.common.impl.Executors;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
-import javax.persistence.metamodel.IdentifiableType;
+import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.SingularAttribute;
 
 /**
@@ -131,12 +131,13 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	}
 
 	private <E> BatchIndexingWorkspace<E, ?> createBatchIndexingWorkspace(Class<E> indexedType) {
-		IdentifiableType<E> indexTypeModel = mappingContext.getSessionFactory().getMetamodel().entity( indexedType );
+		EntityType<E> indexTypeModel = mappingContext.getSessionFactory().getMetamodel().entity( indexedType );
+		String entityName = indexTypeModel.getName();
 		SingularAttribute<? super E, ?> idAttributeOfIndexedType = indexTypeModel.getId( indexTypeModel.getIdType().getJavaType() );
 
 		return new BatchIndexingWorkspace<>(
 				mappingContext, sessionContext,
-				indexedType, idAttributeOfIndexedType,
+				indexedType, entityName, idAttributeOfIndexedType,
 				documentBuilderThreads, cacheMode,
 				objectLoadingBatchSize, endAllSignal,
 				monitor, getFailureHandler(),
