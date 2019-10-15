@@ -23,13 +23,4 @@ public interface FieldSortOptionsStep<S extends FieldSortOptionsStep<?>>
 	 */
 	FieldSortMissingValueBehaviorStep<S> missing();
 
-	/**
-	 * @deprecated Use {@link #missing()} instead.
-	 * @return The next step.
-	 */
-	@Deprecated
-	default FieldSortMissingValueBehaviorStep<S> onMissingValue() {
-		return missing();
-	}
-
 }

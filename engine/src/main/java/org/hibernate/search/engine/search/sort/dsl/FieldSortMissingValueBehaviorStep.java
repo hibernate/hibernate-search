@@ -29,15 +29,6 @@ public interface FieldSortMissingValueBehaviorStep<N> {
 	N last();
 
 	/**
-	 * @deprecated Use {@link #last()} instead.
-	 * @return The next step.
-	 */
-	@Deprecated
-	default N sortLast() {
-		return last();
-	}
-
-	/**
 	 * Put documents with missing values first in the sorting.
 	 *
 	 * <p>This instruction is independent of whether the sort is being ascending
@@ -46,15 +37,6 @@ public interface FieldSortMissingValueBehaviorStep<N> {
 	 * @return The next step.
 	 */
 	N first();
-
-	/**
-	 * @deprecated Use {@link #first()} instead.
-	 * @return The next step.
-	 */
-	@Deprecated
-	default N sortFirst() {
-		return first();
-	}
 
 	/**
 	 * When documents are missing a value on the sort field, use the given value instead.
