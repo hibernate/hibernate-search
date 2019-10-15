@@ -245,6 +245,7 @@ can take advantage of injection features of this framework.
 
 Hibernate Search generally propagates exceptions occurring in background threads to the user thread,
 but in some cases, such as Lucene segment merging failures,
+or when indexing in <<mapper-orm-indexing-automatic-synchronization-queued,fully asynchronous mode>>,
 the exception in background threads cannot be propagated.
 By default, when that happens, the failure is logged at the `ERROR` level.
 

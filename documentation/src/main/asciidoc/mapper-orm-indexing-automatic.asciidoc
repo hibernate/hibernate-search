@@ -120,13 +120,18 @@ i.e. to control the minimum progress of indexing before the application thread i
 You can define a default strategy for all sessions by setting the configuration property
 `hibernate.search.automatic_indexing.synchronization.strategy`:
 
-* when set to `queued`, the application thread will be resumed as soon as
+* [[mapper-orm-indexing-automatic-synchronization-queued]] when set to `queued`, the application thread will be resumed as soon as
 the index changes are queued in the backend.
 +
 This strategy offers no guarantee as to whether indexing will be performed successfully,
 or even whether indexing will be performed at all:
 the local JVM may crash before the works are executed, in which case the indexing requests will be forgotten,
 or indexing may simply fail.
++
+With this strategy, failures to extract data from entities will lead to an exception being thrown in the application thread,
+but failures to perform indexing in the backend (i.e. I/O operations on the index)
+will be forwarded to the <<configuration-background-failure-handling,failure handler>>,
+which by default will simply log them.
 * by default or when set to `committed`, the application thread will be resumed as soon as
 the index changes are committed to disk.
 +
@@ -144,6 +149,8 @@ may return outdated information.
 This is true in particular with the Elasticsearch backend,
 which is link:{elasticsearchDocUrl}/getting-started-concepts.html#_near_realtime_nrt[near-real-time]
 by default.
++
+With this strategy, indexing failures will lead to an exception being thrown in the application thread.
 * when set to `searchable`, the application thread will be resumed as soon as
 the index changes are committed to disk
 *and* the relevant documents are searchable.
@@ -156,6 +163,8 @@ because the backend may not be optimized for frequent, on-demand index refreshes
 That is why this strategy is only recommended if you know your backend is optimized for it
 (for example this is true for the default configuration of the Lucene backend, but not for the Elasticsearch backend),
 or for integration tests.
++
+With this strategy, indexing failures will lead to an exception being thrown in the application thread.
 
 While the above configuration property defines a default,
 it is possible to override this default on a particular session
