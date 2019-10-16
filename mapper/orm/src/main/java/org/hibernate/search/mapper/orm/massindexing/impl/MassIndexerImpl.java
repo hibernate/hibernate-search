@@ -33,6 +33,8 @@ public class MassIndexerImpl implements MassIndexer {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	static final String THREAD_NAME_PREFIX = "Mass indexing - ";
+
 	private final HibernateOrmMassIndexingMappingContext mappingContext;
 	private final DetachedBackendSessionContext sessionContext;
 

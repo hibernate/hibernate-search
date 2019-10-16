@@ -122,7 +122,7 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	 */
 	private void doBatchWork() throws InterruptedException {
 		ExecutorService executor = mappingContext.getThreadPoolProvider()
-				.newFixedThreadPool( typesToIndexInParallel, "BatchIndexingWorkspace" );
+				.newFixedThreadPool( typesToIndexInParallel, MassIndexerImpl.THREAD_NAME_PREFIX + "Workspace" );
 		for ( Class<?> type : rootEntities ) {
 			indexingTasks.add( executor.submit( createBatchIndexingWorkspace( type ) ) );
 		}
