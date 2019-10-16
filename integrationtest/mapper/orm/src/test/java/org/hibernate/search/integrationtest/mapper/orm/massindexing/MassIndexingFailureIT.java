@@ -18,6 +18,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.cfg.EngineSettings;
+import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
@@ -27,6 +28,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.rule.ThreadSpy;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubFailureHandler;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScopeWork;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
@@ -39,6 +41,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import org.apache.log4j.Level;
+import org.awaitility.Awaitility;
 
 public class MassIndexingFailureIT {
 
@@ -61,6 +64,9 @@ public class MassIndexingFailureIT {
 	@Rule
 	public StaticCounters staticCounters = new StaticCounters();
 
+	@Rule
+	public ThreadSpy threadSpy = new ThreadSpy();
+
 	@Test
 	public void indexing_defaultHandler() {
 		SessionFactory sessionFactory = setup( null );
@@ -76,8 +82,9 @@ public class MassIndexingFailureIT {
 		)
 				.once();
 
-		doMassIndexing(
+		doMassIndexingWithFailure(
 				sessionFactory,
+				ThreadExpectation.CREATED_AND_TERMINATED,
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.FAIL ),
@@ -100,8 +107,9 @@ public class MassIndexingFailureIT {
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 0 );
 
-		doMassIndexing(
+		doMassIndexingWithFailure(
 				sessionFactory,
+				ThreadExpectation.CREATED_AND_TERMINATED,
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.FAIL ),
@@ -213,8 +221,9 @@ public class MassIndexingFailureIT {
 		)
 				.once();
 
-		doMassIndexing(
+		doMassIndexingWithFailure(
 				sessionFactory,
+				ThreadExpectation.NOT_CREATED,
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.FAIL )
 		);
 	}
@@ -231,8 +240,9 @@ public class MassIndexingFailureIT {
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 
-		doMassIndexing(
+		doMassIndexingWithFailure(
 				sessionFactory,
+				ThreadExpectation.NOT_CREATED,
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.FAIL )
 		);
 
@@ -254,8 +264,9 @@ public class MassIndexingFailureIT {
 		)
 				.once();
 
-		doMassIndexing(
+		doMassIndexingWithFailure(
 				sessionFactory,
+				ThreadExpectation.NOT_CREATED,
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.FAIL )
 		);
@@ -273,8 +284,9 @@ public class MassIndexingFailureIT {
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 
-		doMassIndexing(
+		doMassIndexingWithFailure(
 				sessionFactory,
+				ThreadExpectation.NOT_CREATED,
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.FAIL )
 		);
@@ -297,8 +309,9 @@ public class MassIndexingFailureIT {
 		)
 				.once();
 
-		doMassIndexing(
+		doMassIndexingWithFailure(
 				sessionFactory,
+				ThreadExpectation.CREATED_AND_TERMINATED,
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
@@ -318,8 +331,9 @@ public class MassIndexingFailureIT {
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 
-		doMassIndexing(
+		doMassIndexingWithFailure(
 				sessionFactory,
+				ThreadExpectation.CREATED_AND_TERMINATED,
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
@@ -344,8 +358,9 @@ public class MassIndexingFailureIT {
 		)
 				.once();
 
-		doMassIndexing(
+		doMassIndexingWithFailure(
 				sessionFactory,
+				ThreadExpectation.CREATED_AND_TERMINATED,
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
@@ -366,8 +381,9 @@ public class MassIndexingFailureIT {
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 
-		doMassIndexing(
+		doMassIndexingWithFailure(
 				sessionFactory,
+				ThreadExpectation.CREATED_AND_TERMINATED,
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
@@ -380,17 +396,20 @@ public class MassIndexingFailureIT {
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
 	}
 
-	private void doMassIndexing(SessionFactory sessionFactory, Runnable ... expectationSetters) {
-		doMassIndexing(
+	private void doMassIndexingWithFailure(SessionFactory sessionFactory, ThreadExpectation threadExpectation,
+			Runnable ... expectationSetters) {
+		doMassIndexingWithFailure(
 				sessionFactory,
+				threadExpectation,
 				ExecutionExpectation.SUCCEED, ExecutionExpectation.SUCCEED,
 				expectationSetters
 		);
 	}
 
 	private void doMassIndexingWithBook2GetIdFailure(SessionFactory sessionFactory) {
-		doMassIndexing(
+		doMassIndexingWithFailure(
 				sessionFactory,
+				ThreadExpectation.CREATED_AND_TERMINATED,
 				ExecutionExpectation.FAIL, ExecutionExpectation.SKIP,
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
@@ -401,8 +420,9 @@ public class MassIndexingFailureIT {
 	}
 
 	private void doMassIndexingWithBook2GetTitleFailure(SessionFactory sessionFactory) {
-		doMassIndexing(
+		doMassIndexingWithFailure(
 				sessionFactory,
+				ThreadExpectation.CREATED_AND_TERMINATED,
 				ExecutionExpectation.SUCCEED, ExecutionExpectation.FAIL,
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
@@ -412,11 +432,12 @@ public class MassIndexingFailureIT {
 		);
 	}
 
-	private void doMassIndexing(SessionFactory sessionFactory,
+	private void doMassIndexingWithFailure(SessionFactory sessionFactory, ThreadExpectation threadExpectation,
 			ExecutionExpectation book2GetIdExpectation, ExecutionExpectation book2GetTitleExpectation,
 			Runnable ... expectationSetters) {
 		Book.failOnBook2GetId.set( ExecutionExpectation.FAIL.equals( book2GetIdExpectation ) );
 		Book.failOnBook2GetTitle.set( ExecutionExpectation.FAIL.equals( book2GetTitleExpectation ) );
+		AssertionError assertionError = null;
 		try {
 			OrmUtils.withinSession( sessionFactory, session -> {
 				SearchSession searchSession = Search.session( session );
@@ -435,9 +456,34 @@ public class MassIndexingFailureIT {
 			} );
 			backendMock.verifyExpectationsMet();
 		}
+		catch (AssertionError e) {
+			assertionError = e;
+			throw e;
+		}
 		finally {
 			Book.failOnBook2GetId.set( false );
 			Book.failOnBook2GetTitle.set( false );
+
+			if ( assertionError == null ) {
+				switch ( threadExpectation ) {
+					case CREATED_AND_TERMINATED:
+						Awaitility.await().untilAsserted(
+								() -> assertThat( threadSpy.getCreatedThreads( "mass index" ) )
+										.as( "Mass indexing threads" )
+										.isNotEmpty()
+										.allSatisfy( t -> assertThat( t )
+												.extracting( Thread::getState )
+												.isEqualTo( Thread.State.TERMINATED )
+										)
+						);
+						break;
+					case NOT_CREATED:
+						assertThat( threadSpy.getCreatedThreads( "mass index" ) )
+								.as( "Mass indexing threads" )
+								.isEmpty();
+						break;
+				}
+			}
 		}
 	}
 
@@ -529,6 +575,7 @@ public class MassIndexingFailureIT {
 		SessionFactory sessionFactory = ormSetupHelper.start()
 				.withPropertyRadical( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_STRATEGY, AutomaticIndexingStrategyName.NONE )
 				.withPropertyRadical( EngineSettings.Radicals.BACKGROUND_FAILURE_HANDLER, failureHandler )
+				.withPropertyRadical( EngineSpiSettings.Radicals.THREAD_PROVIDER, threadSpy.getThreadProvider() )
 				.setup( Book.class );
 
 		backendMock.verifyExpectationsMet();
@@ -546,6 +593,11 @@ public class MassIndexingFailureIT {
 		SUCCEED,
 		FAIL,
 		SKIP;
+	}
+
+	private enum ThreadExpectation {
+		CREATED_AND_TERMINATED,
+		NOT_CREATED;
 	}
 
 	@Entity(name = Book.NAME)
