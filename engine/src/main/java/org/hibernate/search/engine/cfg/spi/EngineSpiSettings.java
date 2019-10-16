@@ -9,6 +9,7 @@ package org.hibernate.search.engine.cfg.spi;
 import java.util.Collections;
 import java.util.List;
 
+import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 
@@ -21,6 +22,11 @@ public class EngineSpiSettings {
 	}
 
 	/**
+	 * The prefix expected for the key of every Hibernate Search configuration property.
+	 */
+	public static final String PREFIX = EngineSettings.PREFIX;
+
+	/**
 	 * The {@link BeanConfigurer} instances used to programmatically assign names to beans.
 	 * <p>
 	 * Expects a multi-valued reference to a bean of type {@link BeanConfigurer}.
@@ -30,7 +36,18 @@ public class EngineSpiSettings {
 	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
 	 * which includes a description of the "multi-valued bean reference" properties and accepted values.
 	 */
-	public static final String BEAN_CONFIGURERS = "bean_configurers";
+	public static final String BEAN_CONFIGURERS = PREFIX + Radicals.BEAN_CONFIGURERS;
+
+	/**
+	 * Configuration property keys without the {@link #PREFIX prefix}.
+	 */
+	public static class Radicals {
+
+		private Radicals() {
+		}
+
+		public static final String BEAN_CONFIGURERS = "bean_configurers";
+	}
 
 	/**
 	 * Default values for the different settings if no values are given.
