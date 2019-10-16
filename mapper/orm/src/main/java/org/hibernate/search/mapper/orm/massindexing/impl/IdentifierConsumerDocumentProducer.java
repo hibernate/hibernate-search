@@ -218,7 +218,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			indexingFutures[i] = index( indexer, entity );
 		}
 
-		Futures.unwrappedExceptionJoin(
+		Futures.unwrappedExceptionGet(
 				CompletableFuture.allOf( indexingFutures )
 						// We handle exceptions on a per-entity basis below, so we ignore them here.
 						.exceptionally( exception -> null )

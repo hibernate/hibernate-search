@@ -102,12 +102,18 @@ public class BatchCoordinator extends FailureHandledRunnable {
 					task.cancel( true );
 				}
 			}
-			// try afterBatch stuff - indexation realized before interruption will be commited - index should be in a
+			// try afterBatch stuff - indexation realized before interruption will be committed - index should be in a
 			// coherent state (not corrupted)
-			afterBatchOnInterruption();
-
-			// restore interruption signal:
-			Thread.currentThread().interrupt();
+			try {
+				afterBatchOnInterruption();
+			}
+			catch (InterruptedException e2) {
+				// Ignore
+			}
+			finally {
+				// restore interruption signal:
+				Thread.currentThread().interrupt();
+			}
 		}
 		finally {
 			monitor.indexingCompleted();
@@ -148,28 +154,28 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	/**
 	 * Operations to do after all subthreads finished their work on index
 	 */
-	private void afterBatch() {
+	private void afterBatch() throws InterruptedException {
 		if ( this.optimizeAtEnd ) {
-			Futures.unwrappedExceptionJoin( scopeWorkspace.optimize() );
+			Futures.unwrappedExceptionGet( scopeWorkspace.optimize() );
 		}
-		Futures.unwrappedExceptionJoin( scopeWorkspace.flush() );
+		Futures.unwrappedExceptionGet( scopeWorkspace.flush() );
 	}
 
 	/**
 	 * batch indexing has been interrupted : flush to apply all index update realized before interruption
 	 */
-	private void afterBatchOnInterruption() {
-		Futures.unwrappedExceptionJoin( scopeWorkspace.flush() );
+	private void afterBatchOnInterruption() throws InterruptedException {
+		Futures.unwrappedExceptionGet( scopeWorkspace.flush() );
 	}
 
 	/**
 	 * Optional operations to do before the multiple-threads start indexing
 	 */
-	private void beforeBatch() {
+	private void beforeBatch() throws InterruptedException {
 		if ( this.purgeAtStart ) {
-			Futures.unwrappedExceptionJoin( scopeWorkspace.purge() );
+			Futures.unwrappedExceptionGet( scopeWorkspace.purge() );
 			if ( this.optimizeAfterPurge ) {
-				Futures.unwrappedExceptionJoin( scopeWorkspace.optimize() );
+				Futures.unwrappedExceptionGet( scopeWorkspace.optimize() );
 			}
 		}
 	}

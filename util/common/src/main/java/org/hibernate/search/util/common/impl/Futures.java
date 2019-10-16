@@ -9,6 +9,7 @@ package org.hibernate.search.util.common.impl;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
+import java.util.concurrent.ExecutionException;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -184,6 +185,24 @@ public final class Futures {
 			return future.join();
 		}
 		catch (CompletionException e) {
+			throw Throwables.toRuntimeException( e.getCause() );
+		}
+	}
+
+	/**
+	 * Call {@link CompletableFuture#get()} and unwrap any {@link java.util.concurrent.ExecutionException},
+	 * expecting the exception to be a {@link RuntimeException}.
+	 * @param future The future to join on.
+	 * @param <T> The type of result the future will return.
+	 * @return The result returned by the future.
+	 * @throws RuntimeException If the future fails.
+	 * @throws InterruptedException If the thread is interrupted.
+	 */
+	public static <T> T unwrappedExceptionGet(CompletableFuture<T> future) throws InterruptedException {
+		try {
+			return future.get();
+		}
+		catch (ExecutionException e) {
 			throw Throwables.toRuntimeException( e.getCause() );
 		}
 	}
