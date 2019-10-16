@@ -95,14 +95,13 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 	@Override
 	public void run() {
 		log.trace( "started" );
-		SessionImplementor session = (SessionImplementor) mappingContext.getSessionFactory()
+		try ( SessionImplementor session = (SessionImplementor) mappingContext.getSessionFactory()
 				.withOptions()
 				.tenantIdentifier( tenantId )
-				.openSession();
-		session.setHibernateFlushMode( FlushMode.MANUAL );
-		session.setCacheMode( cacheMode );
-		session.setDefaultReadOnly( true );
-		try {
+				.openSession() ) {
+			session.setHibernateFlushMode( FlushMode.MANUAL );
+			session.setCacheMode( cacheMode );
+			session.setDefaultReadOnly( true );
 			loadAllFromQueue( session );
 		}
 		catch (Exception exception) {
@@ -110,9 +109,6 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			failureContextBuilder.throwable( exception );
 			failureContextBuilder.failingOperation( log.massIndexingLoadingAndExtractingEntityData( entityName ) );
 			failureHandler.handle( failureContextBuilder.build() );
-		}
-		finally {
-			session.close();
 		}
 		log.trace( "finished" );
 	}
