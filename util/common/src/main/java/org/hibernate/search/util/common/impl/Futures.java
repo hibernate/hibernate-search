@@ -10,6 +10,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -207,6 +210,25 @@ public final class Futures {
 		}
 	}
 
+	/**
+	 * Similar to {@link CompletableFuture#runAsync(Runnable, Executor)},
+	 * but calling {@link CompletableFuture#cancel(boolean)} on the returned future actually has an effect
+	 * and may interrupt the thread.
+	 * <p>
+	 * This is mainly useful when the task to execute includes blocking calls,
+	 * which is usually not the case when dealing with {@link CompletableFuture}.
+	 *
+	 * @param runnable the task to submit
+	 * @param executor an executor to submit the task to
+	 * @return a {@link CompletableFuture} that will complete once the given runnable has finished executing,
+	 * potentially with an exception.
+	 * @throws RejectedExecutionException if the task cannot be scheduled for execution.
+	 * @throws NullPointerException if the task is null.
+	 */
+	public static CompletableFuture<Void> runAsync(Runnable runnable, ExecutorService executor) {
+		return new CancellableExecutionCompletableFuture<>( runnable, executor );
+	}
+
 	private static RuntimeException wrap(Throwable throwable) {
 		if ( throwable instanceof RuntimeException ) {
 			return (RuntimeException) throwable;
@@ -228,4 +250,5 @@ public final class Futures {
 			return t;
 		}
 	}
+
 }

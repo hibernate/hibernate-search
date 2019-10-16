@@ -130,6 +130,24 @@ public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Futur
 		return this;
 	}
 
+	public FutureAssert<T> isCancelled() {
+		Object result;
+		try {
+			result = getNow();
+			failWithMessage( "future <%s> should have been cancelled, but instead it succeeded with result <%s>", actual, result );
+		}
+		catch (TimeoutException e) {
+			failWithMessage( "future <%s> should have been cancelled, but instead it's still pending", actual );
+		}
+		catch (CancellationException e) {
+			// All's good
+		}
+		catch (ExecutionException e) {
+			failWithMessage( "future <%s> should have been cancelled, but instead it has failed", actual );
+		}
+		return this;
+	}
+
 	private T getNow() throws TimeoutException, CancellationException, ExecutionException {
 		try {
 			return actual.get( 0, TimeUnit.NANOSECONDS );
