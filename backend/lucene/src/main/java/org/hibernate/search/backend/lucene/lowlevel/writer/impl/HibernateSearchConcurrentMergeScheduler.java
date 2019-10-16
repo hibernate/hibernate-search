@@ -9,9 +9,9 @@ package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.util.common.impl.SearchThreadFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.ConcurrentMergeScheduler;
@@ -33,10 +33,13 @@ class HibernateSearchConcurrentMergeScheduler extends ConcurrentMergeScheduler {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final ThreadProvider threadProvider;
 	private final FailureHandler failureHandler;
 	private final String contextDescription;
 
-	HibernateSearchConcurrentMergeScheduler(FailureHandler failureHandler, String contextDescription) {
+	HibernateSearchConcurrentMergeScheduler(ThreadProvider threadProvider,
+			FailureHandler failureHandler, String contextDescription) {
+		this.threadProvider = threadProvider;
 		this.failureHandler = failureHandler;
 		this.contextDescription = contextDescription;
 	}
@@ -62,7 +65,7 @@ class HibernateSearchConcurrentMergeScheduler extends ConcurrentMergeScheduler {
 		final MergeThread thread = new MergeThread( writer, merge );
 		thread.setDaemon( true );
 		thread.setName(
-				SearchThreadFactory.createName(
+				threadProvider.createThreadName(
 						"Lucene Merge Thread for " + contextDescription,
 						mergeThreadCount++
 				)

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.backend.spi;
 
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
@@ -21,6 +22,8 @@ public interface BackendBuildContext {
 	ResourceResolver getResourceResolver();
 
 	BeanResolver getBeanResolver();
+
+	ThreadPoolProvider getThreadPoolProvider();
 
 	FailureHandler getFailureHandler();
 

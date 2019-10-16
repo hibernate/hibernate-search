@@ -34,6 +34,9 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.environment.thread.impl.DefaultThreadProvider;
+import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresNoRequestPostProcessing;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresRequestPostProcessing;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckBackendHelper;
@@ -172,6 +175,9 @@ public class ElasticsearchContentLengthIT {
 		ConfigurationPropertySource defaultBackendProperties =
 				new ElasticsearchTckBackendHelper().createDefaultBackendSetupStrategy()
 						.createBackendConfigurationPropertySource( testConfigurationProvider );
+		ThreadPoolProvider threadPoolProvider = new ThreadPoolProviderImpl(
+				new DefaultThreadProvider( ElasticsearchContentLengthIT.class.getName() + ": " )
+		);
 
 		// Redirect requests to Wiremock
 		Map<String, Object> configurationOverride = new HashMap<>();
@@ -183,7 +189,8 @@ public class ElasticsearchContentLengthIT {
 		try ( BeanHolder<ElasticsearchClientFactory> factoryHolder =
 				beanResolver.resolve( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
 			return factoryHolder.get().create(
-					backendProperties, GsonProvider.create( GsonBuilder::new, true )
+					backendProperties, threadPoolProvider,
+					GsonProvider.create( GsonBuilder::new, true )
 			);
 		}
 	}

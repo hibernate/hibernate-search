@@ -34,6 +34,9 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.environment.thread.impl.DefaultThreadProvider;
+import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -540,6 +543,9 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		Map<String, Object> map = new LinkedHashMap<>();
 		ElasticsearchTestHostConnectionConfiguration.get().addToBackendProperties( map );
 		ConfigurationPropertySource backendProperties = ConfigurationPropertySource.fromMap( map );
+		ThreadPoolProvider threadPoolProvider = new ThreadPoolProviderImpl(
+				new DefaultThreadProvider( "Test Elasticsearch client: " )
+		);
 
 		BeanResolver beanResolver = configurationProvider.createBeanResolverForTest();
 		/*
@@ -552,7 +558,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		try ( BeanHolder<ElasticsearchClientFactory> factoryHolder =
 				beanResolver.resolve( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
 			client = factoryHolder.get().create(
-					backendProperties, GsonProvider.create( GsonBuilder::new, true )
+					backendProperties, threadPoolProvider, GsonProvider.create( GsonBuilder::new, true )
 			);
 		}
 	}

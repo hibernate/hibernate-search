@@ -11,10 +11,13 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 
 public interface HibernateOrmMassIndexingMappingContext {
 
 	SessionFactoryImplementor getSessionFactory();
+
+	ThreadPoolProvider getThreadPoolProvider();
 
 	FailureHandler getFailureHandler();
 

@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
+import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
@@ -31,6 +32,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 
 	private final BeanProvider beanProvider;
 	private final BeanHolder<? extends FailureHandler> failureHandlerHolder;
+	private final BeanHolder<? extends ThreadProvider> threadProviderHolder;
 
 	private final List<MappingImplementor<?>> mappings;
 	private final Map<String, BackendImplementor<?>> backends;
@@ -38,11 +40,13 @@ public class SearchIntegrationImpl implements SearchIntegration {
 
 	SearchIntegrationImpl(BeanProvider beanProvider,
 			BeanHolder<? extends FailureHandler> failureHandlerHolder,
+			BeanHolder<? extends ThreadProvider> threadProviderHolder,
 			List<MappingImplementor<?>> mappings,
 			Map<String, BackendImplementor<?>> backends,
 			Map<String, IndexManagerImplementor<?>> indexManagers) {
 		this.beanProvider = beanProvider;
 		this.failureHandlerHolder = failureHandlerHolder;
+		this.threadProviderHolder = threadProviderHolder;
 		this.mappings = mappings;
 		this.backends = backends;
 		this.indexManagers = indexManagers;
@@ -74,6 +78,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 			closer.pushAll( IndexManagerImplementor::stop, indexManagers.values() );
 			closer.push( SearchIntegrationImpl::preStopBackends, this );
 			closer.pushAll( BackendImplementor::stop, backends.values() );
+			closer.pushAll( BeanHolder::close, threadProviderHolder );
 			closer.pushAll( BeanHolder::close, failureHandlerHolder );
 			closer.pushAll( BeanProvider::close, beanProvider );
 		}

@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.client.spi;
 
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 
 /**
  * Creates the Elasticsearch client.
@@ -15,6 +16,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
  */
 public interface ElasticsearchClientFactory {
 
-	ElasticsearchClientImplementor create(ConfigurationPropertySource propertySource, GsonProvider gsonProvider);
+	ElasticsearchClientImplementor create(ConfigurationPropertySource propertySource,
+			ThreadPoolProvider threadPoolProvider, GsonProvider gsonProvider);
 
 }

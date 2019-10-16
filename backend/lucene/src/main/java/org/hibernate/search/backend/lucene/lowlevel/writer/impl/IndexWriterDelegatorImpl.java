@@ -15,6 +15,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.util.impl.AnalyzerConstants;
+import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -40,6 +41,7 @@ public class IndexWriterDelegatorImpl implements Closeable, IndexWriterDelegator
 
 	private final DirectoryHolder directoryHolder;
 	private final Analyzer analyzer;
+	private final ThreadProvider threadProvider;
 	private final FailureHandler failureHandler;
 	private final EventContext indexEventContext;
 
@@ -60,9 +62,11 @@ public class IndexWriterDelegatorImpl implements Closeable, IndexWriterDelegator
 	private final ReentrantLock writerInitializationLock = new ReentrantLock();
 
 	public IndexWriterDelegatorImpl(DirectoryHolder directoryHolder, Analyzer analyzer,
+			ThreadProvider threadProvider,
 			FailureHandler failureHandler, EventContext eventContext) {
 		this.directoryHolder = directoryHolder;
 		this.analyzer = analyzer;
+		this.threadProvider = threadProvider;
 		this.failureHandler = failureHandler;
 		this.indexEventContext = eventContext;
 		/* TODO HSEARCH-3117 re-allow to configure index writers
@@ -214,7 +218,9 @@ public class IndexWriterDelegatorImpl implements Closeable, IndexWriterDelegator
 		LogByteSizeMergePolicy newMergePolicy = indexParameters.getNewMergePolicy(); //TODO HSEARCH-3117 make it possible to configure a different policy?
 		writerConfig.setMergePolicy( newMergePolicy );
 		 */
-		MergeScheduler mergeScheduler = new HibernateSearchConcurrentMergeScheduler( this.failureHandler, indexEventContext.render() );
+		MergeScheduler mergeScheduler = new HibernateSearchConcurrentMergeScheduler(
+				threadProvider, failureHandler, indexEventContext.render()
+		);
 		writerConfig.setMergeScheduler( mergeScheduler );
 		writerConfig.setOpenMode( OpenMode.CREATE_OR_APPEND );
 		return writerConfig;

@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.orchestration.spi.AbstractWorkOrchestrator;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 
 /**
@@ -27,17 +28,21 @@ public class LuceneBatchingWriteWorkOrchestrator
 	// TODO HSEARCH‌-3575 allow to configure this value
 	private static final int MAX_WORKSETS_PER_BATCH = 1000;
 
+	private final ThreadPoolProvider threadPoolProvider;
 	private final BatchingExecutor<LuceneWriteWorkSet, LuceneWriteWorkProcessor> executor;
 
 	/**
 	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)
+	 * @param threadPoolProvider A provider of thread pools.
 	 * @param processor A processor to use in the background thread.
 	 * @param failureHandler A failure handler to report failures of the background thread.
 	 */
 	public LuceneBatchingWriteWorkOrchestrator(
 			String name, LuceneWriteWorkProcessor processor,
+			ThreadPoolProvider threadPoolProvider,
 			FailureHandler failureHandler) {
 		super( name );
+		this.threadPoolProvider = threadPoolProvider;
 		this.executor = new BatchingExecutor<>(
 				name,
 				processor,
@@ -56,7 +61,7 @@ public class LuceneBatchingWriteWorkOrchestrator
 
 	@Override
 	protected void doStart() {
-		executor.start();
+		executor.start( threadPoolProvider );
 	}
 
 	@Override

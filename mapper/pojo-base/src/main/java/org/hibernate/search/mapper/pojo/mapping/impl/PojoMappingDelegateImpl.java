@@ -17,18 +17,22 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeExtendedContextPr
 import org.hibernate.search.mapper.pojo.session.impl.PojoSearchSessionDelegateImpl;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionDelegate;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.util.common.impl.Closer;
 
 
 public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 
+	private final ThreadPoolProvider threadPoolProvider;
 	private final FailureHandler failureHandler;
 	private final PojoIndexedTypeManagerContainer indexedTypeManagers;
 	private final PojoContainedTypeManagerContainer containedTypeManagers;
 
-	public PojoMappingDelegateImpl(FailureHandler failureHandler,
+	public PojoMappingDelegateImpl(ThreadPoolProvider threadPoolProvider,
+			FailureHandler failureHandler,
 			PojoIndexedTypeManagerContainer indexedTypeManagers,
 			PojoContainedTypeManagerContainer containedTypeManagers) {
+		this.threadPoolProvider = threadPoolProvider;
 		this.failureHandler = failureHandler;
 		this.indexedTypeManagers = indexedTypeManagers;
 		this.containedTypeManagers = containedTypeManagers;
@@ -40,6 +44,11 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 			closer.pushAll( PojoIndexedTypeManager::close, indexedTypeManagers.getAll() );
 			closer.pushAll( PojoContainedTypeManager::close, containedTypeManagers.getAll() );
 		}
+	}
+
+	@Override
+	public ThreadPoolProvider getThreadPoolProvider() {
+		return threadPoolProvider;
 	}
 
 	@Override

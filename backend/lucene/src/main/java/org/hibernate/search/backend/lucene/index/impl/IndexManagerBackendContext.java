@@ -42,6 +42,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
@@ -59,6 +60,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	private final LuceneWorkFactory workFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
+	private final ThreadPoolProvider threadPoolProvider;
 	private final FailureHandler failureHandler;
 	private final LuceneReadWorkOrchestrator readOrchestrator;
 
@@ -67,6 +69,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 			LuceneWorkFactory workFactory,
 			MultiTenancyStrategy multiTenancyStrategy,
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
+			ThreadPoolProvider threadPoolProvider,
 			FailureHandler failureHandler,
 			LuceneReadWorkOrchestrator readOrchestrator) {
 		this.eventContext = eventContext;
@@ -74,6 +77,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.workFactory = workFactory;
+		this.threadPoolProvider = threadPoolProvider;
 		this.failureHandler = failureHandler;
 		this.readOrchestrator = readOrchestrator;
 	}
@@ -193,7 +197,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		directoryHolder = directoryProvider.createDirectoryHolder( context );
 		try {
 			return new IndexAccessor(
-					directoryHolder, analyzer,
+					directoryHolder, analyzer, threadPoolProvider.getThreadProvider(),
 					failureHandler, EventContexts.fromIndexNameAndShardId( indexName, shardId )
 			);
 		}
@@ -212,6 +216,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 						indexAccessor.getIndexWriterDelegator(),
 						failureHandler
 				),
+				threadPoolProvider,
 				failureHandler
 		);
 	}

@@ -55,6 +55,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcherFactory;
 import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -70,6 +71,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	private final boolean multiTenancyEnabled;
 
 	private final FailureHandler failureHandler;
+	private final ThreadPoolProvider threadPoolProvider;
 
 	private final PojoMapperDelegate<MPBS> delegate;
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
@@ -100,6 +102,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		this.multiTenancyEnabled = multiTenancyEnabled;
 
 		this.failureHandler = buildContext.getFailureHandler();
+		this.threadPoolProvider = buildContext.getThreadPoolProvider();
 
 		this.delegate = delegate;
 
@@ -281,7 +284,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			}
 
 			mappingDelegate = new PojoMappingDelegateImpl(
-					failureHandler,
+					threadPoolProvider, failureHandler,
 					indexedTypeManagerContainerBuilder.build(),
 					containedTypeManagerContainerBuilder.build()
 			);

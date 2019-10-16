@@ -12,6 +12,8 @@ import java.util.List;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
+import org.hibernate.search.engine.environment.thread.impl.DefaultThreadProvider;
+import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 
 /**
  * Configuration properties for the Hibernate Search engine that are considered SPI (and not API).
@@ -39,6 +41,15 @@ public class EngineSpiSettings {
 	public static final String BEAN_CONFIGURERS = PREFIX + Radicals.BEAN_CONFIGURERS;
 
 	/**
+	 * The {@link ThreadProvider} used to create threads.
+	 * <p>
+	 * Expects a reference to a bean of type {@link ThreadProvider}.
+	 * <p>
+	 * Defaults to {@link Defaults#THREAD_PROVIDER}.
+	 */
+	public static final String THREAD_PROVIDER = PREFIX + Radicals.THREAD_PROVIDER;
+
+	/**
 	 * Configuration property keys without the {@link #PREFIX prefix}.
 	 */
 	public static class Radicals {
@@ -47,6 +58,7 @@ public class EngineSpiSettings {
 		}
 
 		public static final String BEAN_CONFIGURERS = "bean_configurers";
+		public static final String THREAD_PROVIDER = "thread_provider";
 	}
 
 	/**
@@ -58,5 +70,7 @@ public class EngineSpiSettings {
 		}
 
 		public static final List<BeanReference<? extends BeanConfigurer>> BEAN_CONFIGURERS = Collections.emptyList();
+		public static final BeanReference<? extends ThreadProvider> THREAD_PROVIDER =
+				BeanReference.of( DefaultThreadProvider.class );
 	}
 }

@@ -81,6 +81,7 @@ public class LuceneBackendFactory implements BackendFactory {
 		return new LuceneBackendImpl(
 				name,
 				directoryProviderHolder,
+				buildContext.getThreadPoolProvider(),
 				new LuceneWorkFactoryImpl( multiTenancyStrategy ),
 				analysisDefinitionRegistry,
 				multiTenancyStrategy,

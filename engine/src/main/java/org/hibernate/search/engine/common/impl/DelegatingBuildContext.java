@@ -11,6 +11,7 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 
 class DelegatingBuildContext {
 
@@ -34,6 +35,10 @@ class DelegatingBuildContext {
 
 	public ConfigurationPropertySource getConfigurationPropertySource() {
 		return delegate.getConfigurationPropertySource();
+	}
+
+	public ThreadPoolProvider getThreadPoolProvider() {
+		return delegate.getThreadPoolProvider();
 	}
 
 	public FailureHandler getFailureHandler() {
