@@ -35,35 +35,41 @@ public final class Executors {
 
 	/**
 	 * Creates a new fixed size ThreadPoolExecutor.
-	 * It's using a blockingqueue of maximum 1000 elements and the rejection
-	 * policy is set to CallerRunsPolicy for the case the queue is full.
+	 * <p>
+	 * It's using a blocking queue of maximum 1000 elements and the rejection
+	 * policy is set to block until the queue can accept the task.
 	 * These settings are required to cap the queue, to make sure the
 	 * timeouts are reasonable for most jobs.
 	 *
 	 * @param threads the number of threads
-	 * @param groupname a label to identify the threadpool; useful for profiling.
+	 * @param threadNamePrefix a label to identify the threads; useful for profiling.
 	 * @return the new ExecutorService
 	 */
-	public static ThreadPoolExecutor newFixedThreadPool(int threads, String groupname) {
-		return newFixedThreadPool( threads, groupname, QUEUE_MAX_LENGTH );
+	public static ThreadPoolExecutor newFixedThreadPool(int threads, String threadNamePrefix) {
+		return newFixedThreadPool( threads, threadNamePrefix, QUEUE_MAX_LENGTH );
 	}
 
 	/**
-	 * Creates a new fixed size ThreadPoolExecutor
+	 * Creates a new fixed size ThreadPoolExecutor.
+	 * <p>
+	 * It's using a blocking queue of maximum {@code queueSize} elements and the rejection
+	 * policy is set to block until the queue can accept the task.
+	 * These settings are required to cap the queue, to make sure the
+	 * timeouts are reasonable for most jobs.
 	 *
 	 * @param threads the number of threads
-	 * @param groupname a label to identify the threadpool; useful for profiling.
+	 * @param threadNamePrefix a label to identify the threads; useful for profiling.
 	 * @param queueSize the size of the queue to store Runnables when all threads are busy
 	 * @return the new ExecutorService
 	 */
-	public static ThreadPoolExecutor newFixedThreadPool(int threads, String groupname, int queueSize) {
+	public static ThreadPoolExecutor newFixedThreadPool(int threads, String threadNamePrefix, int queueSize) {
 		return new ThreadPoolExecutor(
 				threads,
 				threads,
 				0L,
 				TimeUnit.MILLISECONDS,
 				new LinkedBlockingQueue<>( queueSize ),
-				new SearchThreadFactory( groupname ),
+				new SearchThreadFactory( threadNamePrefix ),
 				new BlockPolicy()
 		);
 	}
@@ -71,32 +77,11 @@ public final class Executors {
 	/**
 	 * Creates an executor for recurring tasks
 	 *
-	 * @param groupname a label to identify the threadpool; useful for profiling.
+	 * @param threadNamePrefix a label to identify the threads; useful for profiling.
 	 * @return instance of {@link ScheduledThreadPoolExecutor}
 	 */
-	public static ScheduledExecutorService newScheduledThreadPool(String groupname) {
-		return new ScheduledThreadPoolExecutor( 1, new SearchThreadFactory( groupname ) );
-	}
-
-	/**
-	 * Creates a dynamically scalable threadpool having an upper bound of threads and queue size
-	 * which ultimately falls back to a CallerRunsPolicy.
-	 * @param threadsMin initial and minimum threadpool size
-	 * @param threadsMax maximumx threadpool size
-	 * @param groupname used to assign nice names to the threads to help diagnostics and tuning
-	 * @param queueSize maximum size of the blocking queue holding the work
-	 * @return the new Executor instance
-	 */
-	public static ThreadPoolExecutor newScalableThreadPool(int threadsMin, int threadsMax, String groupname, int queueSize) {
-		return new ThreadPoolExecutor(
-				threadsMin,
-				threadsMax,
-				30,
-				TimeUnit.SECONDS,
-				new LinkedBlockingQueue<>( queueSize ),
-				new SearchThreadFactory( groupname ),
-				new ThreadPoolExecutor.CallerRunsPolicy()
-				);
+	public static ScheduledExecutorService newScheduledThreadPool(String threadNamePrefix) {
+		return new ScheduledThreadPoolExecutor( 1, new SearchThreadFactory( threadNamePrefix ) );
 	}
 
 	/**
