@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.orm.massindexing.impl;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
@@ -48,12 +48,11 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	private final boolean optimizeAtEnd;
 	private final boolean purgeAtStart;
 	private final boolean optimizeAfterPurge;
-	private final CountDownLatch endAllSignal;
 	private final MassIndexingMonitor monitor;
 	private final long objectsLimit;
 	private final int idFetchSize;
 	private final Integer transactionTimeout;
-	private final List<Future<?>> indexingTasks = new ArrayList<>();
+	private final List<CompletableFuture<?>> indexingFutures = new ArrayList<>();
 
 	public BatchCoordinator(HibernateOrmMassIndexingMappingContext mappingContext,
 			DetachedBackendSessionContext sessionContext,
@@ -80,13 +79,12 @@ public class BatchCoordinator extends FailureHandledRunnable {
 		this.optimizeAfterPurge = optimizeAfterPurge;
 		this.monitor = monitor;
 		this.objectsLimit = objectsLimit;
-		this.endAllSignal = new CountDownLatch( rootEntities.size() );
 	}
 
 	@Override
 	public void runWithFailureHandler() {
-		if ( !indexingTasks.isEmpty() ) {
-			throw new AssertionFailure( "BatchCoordinator instance not expected to be reused - indexingTasks should be empty" );
+		if ( !indexingFutures.isEmpty() ) {
+			throw new AssertionFailure( "BatchCoordinator instance not expected to be reused" );
 		}
 
 		try {
@@ -97,7 +95,7 @@ public class BatchCoordinator extends FailureHandledRunnable {
 		catch (InterruptedException e) {
 			log.interruptedBatchIndexing();
 			// on thread interruption cancel each pending task - thread executing the task must be interrupted
-			for ( Future<?> task : indexingTasks ) {
+			for ( Future<?> task : indexingFutures ) {
 				if ( !task.isDone() ) {
 					task.cancel( true );
 				}
@@ -130,10 +128,16 @@ public class BatchCoordinator extends FailureHandledRunnable {
 		ExecutorService executor = mappingContext.getThreadPoolProvider()
 				.newFixedThreadPool( typesToIndexInParallel, MassIndexerImpl.THREAD_NAME_PREFIX + "Workspace" );
 		for ( Class<?> type : rootEntities ) {
-			indexingTasks.add( executor.submit( createBatchIndexingWorkspace( type ) ) );
+			indexingFutures.add( Futures.runAsync( createBatchIndexingWorkspace( type ), executor ) );
 		}
 		executor.shutdown();
-		endAllSignal.await(); //waits for the executor to finish
+
+		// Wait for the executor to finish
+		Futures.unwrappedExceptionGet(
+				CompletableFuture.allOf( indexingFutures.toArray( new CompletableFuture[0] ) )
+						// Exceptions are handled by each runnable
+						.exceptionally( ignored -> null )
+		);
 	}
 
 	private <E> BatchIndexingWorkspace<E, ?> createBatchIndexingWorkspace(Class<E> indexedType) {
@@ -145,7 +149,7 @@ public class BatchCoordinator extends FailureHandledRunnable {
 				mappingContext, sessionContext,
 				indexedType, entityName, idAttributeOfIndexedType,
 				documentBuilderThreads, cacheMode,
-				objectLoadingBatchSize, endAllSignal,
+				objectLoadingBatchSize,
 				monitor, getFailureHandler(),
 				objectsLimit, idFetchSize, transactionTimeout
 		);
