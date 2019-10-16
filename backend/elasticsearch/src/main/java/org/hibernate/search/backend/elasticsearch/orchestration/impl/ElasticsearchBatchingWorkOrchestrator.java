@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 
 /**
@@ -25,11 +26,13 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrchestrator
 		implements ElasticsearchWorkOrchestratorImplementor {
 
+	private final ThreadPoolProvider threadPoolProvider;
 	private final BatchingExecutor<ElasticsearchWorkSet, ElasticsearchWorkProcessor> executor;
 
 	/**
 	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)
 	 * @param processor A work processor to use in the background thread.
+	 * @param threadPoolProvider A provider of thread pools.
 	 * @param maxWorksetsPerBatch The maximum number of worksets to
 	 * process in a single batch. Higher values mean lesser chance of transport
 	 * thread starvation, but higher heap consumption.
@@ -38,11 +41,12 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 	 * when the internal queue is full may be submitted out of order.
 	 * @param failureHandler A failure handler to report failures of the background thread.
 	 */
-	public ElasticsearchBatchingWorkOrchestrator(
-			String name, ElasticsearchWorkProcessor processor,
+	ElasticsearchBatchingWorkOrchestrator(
+			String name, ElasticsearchWorkProcessor processor, ThreadPoolProvider threadPoolProvider,
 			int maxWorksetsPerBatch, boolean fair,
 			FailureHandler failureHandler) {
 		super( name );
+		this.threadPoolProvider = threadPoolProvider;
 		this.executor = new BatchingExecutor<>(
 				name, processor, maxWorksetsPerBatch, fair,
 				failureHandler
@@ -67,7 +71,7 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 
 	@Override
 	protected void doStart() {
-		executor.start();
+		executor.start( threadPoolProvider );
 	}
 
 	@Override

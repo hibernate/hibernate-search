@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.common.impl;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
@@ -22,18 +23,20 @@ class RootBuildContext {
 	private final BeanResolver beanResolver;
 
 	private final FailureCollector failureCollector;
+	private final ThreadPoolProvider threadPoolProvider;
 	private final FailureHandler failureHandler;
 
 	RootBuildContext(ConfigurationPropertySource propertySource,
 			ClassResolver classResolver, ResourceResolver resourceResolver,
 			BeanResolver beanResolver,
 			FailureCollector failureCollector,
-			FailureHandler failureHandler) {
+			ThreadPoolProvider threadPoolProvider, FailureHandler failureHandler) {
 		this.propertySource = propertySource;
 		this.classResolver = classResolver;
 		this.resourceResolver = resourceResolver;
 		this.beanResolver = beanResolver;
 		this.failureCollector = failureCollector;
+		this.threadPoolProvider = threadPoolProvider;
 		this.failureHandler = failureHandler;
 	}
 
@@ -55,6 +58,10 @@ class RootBuildContext {
 
 	FailureCollector getFailureCollector() {
 		return failureCollector;
+	}
+
+	ThreadPoolProvider getThreadPoolProvider() {
+		return threadPoolProvider;
 	}
 
 	FailureHandler getFailureHandler() {

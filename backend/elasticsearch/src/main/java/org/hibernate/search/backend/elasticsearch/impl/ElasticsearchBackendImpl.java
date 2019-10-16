@@ -30,6 +30,7 @@ import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -63,8 +64,9 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	private final EventContext eventContext;
 	private final IndexManagerBackendContext indexManagerBackendContext;
 
-	ElasticsearchBackendImpl(ElasticsearchLinkImpl link,
-			String name,
+	ElasticsearchBackendImpl(String name,
+			ElasticsearchLinkImpl link,
+			ThreadPoolProvider threadPoolProvider,
 			ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
 			Gson userFacingGson,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
@@ -76,6 +78,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		this.orchestratorProvider = new ElasticsearchWorkOrchestratorProvider(
 				"Elasticsearch parallel work orchestrator for backend " + name,
 				link,
+				threadPoolProvider,
 				failureHandler
 		);
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;

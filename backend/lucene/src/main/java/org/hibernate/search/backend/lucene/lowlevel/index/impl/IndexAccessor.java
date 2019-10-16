@@ -11,6 +11,7 @@ import java.io.IOException;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegatorImpl;
+import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -29,10 +30,11 @@ public class IndexAccessor implements AutoCloseable {
 	private final EventContext indexEventContext;
 
 	public IndexAccessor(DirectoryHolder directoryHolder, Analyzer analyzer,
+			ThreadProvider threadProvider,
 			FailureHandler failureHandler, EventContext indexEventContext) {
 		this.directoryHolder = directoryHolder;
 		this.indexWriterDelegator = new IndexWriterDelegatorImpl(
-				directoryHolder, analyzer, failureHandler, indexEventContext
+				directoryHolder, analyzer, threadProvider, failureHandler, indexEventContext
 		);
 		this.indexEventContext = indexEventContext;
 	}

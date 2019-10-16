@@ -33,7 +33,8 @@ import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.util.common.impl.SearchThreadFactory;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
+import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 
 /**
  * @author Gunnar Morling
@@ -114,30 +115,33 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 	private final List<ElasticsearchHttpClientConfigurer> httpClientConfigurers;
 
-	public ElasticsearchClientFactoryImpl(
-			List<ElasticsearchHttpClientConfigurer> httpClientConfigurers) {
+	ElasticsearchClientFactoryImpl(List<ElasticsearchHttpClientConfigurer> httpClientConfigurers) {
 		this.httpClientConfigurers = httpClientConfigurers;
 	}
 
 	@Override
-	public ElasticsearchClientImplementor create(ConfigurationPropertySource propertySource, GsonProvider gsonProvider) {
+	public ElasticsearchClientImplementor create(ConfigurationPropertySource propertySource,
+			ThreadPoolProvider threadPoolProvider, GsonProvider gsonProvider) {
 		int requestTimeoutMs = REQUEST_TIMEOUT.get( propertySource );
 
-		RestClient restClient = createClient( propertySource, requestTimeoutMs );
+		RestClient restClient = createClient( propertySource, threadPoolProvider.getThreadProvider() );
 		Sniffer sniffer = createSniffer( restClient, propertySource );
 
-		return new ElasticsearchClientImpl( restClient, sniffer, requestTimeoutMs, TimeUnit.MILLISECONDS,
-				gsonProvider.getGson(), gsonProvider.getLogHelper() );
+		return new ElasticsearchClientImpl(
+				restClient, sniffer, threadPoolProvider,
+				requestTimeoutMs, TimeUnit.MILLISECONDS,
+				gsonProvider.getGson(), gsonProvider.getLogHelper()
+		);
 	}
 
 	private RestClient createClient(ConfigurationPropertySource propertySource,
-			int maxRetryTimeoutMillis) {
+			ThreadProvider threadProvider) {
 		ServerUris hosts = ServerUris.fromStrings( HOST.get( propertySource ) );
 
 		return RestClient.builder( hosts.asHostsArray() )
 				.setRequestConfigCallback( b -> customizeRequestConfig( b, propertySource ) )
 				.setHttpClientConfigCallback(
-						b -> customizeHttpClientConfig( b, httpClientConfigurers, propertySource, hosts )
+						b -> customizeHttpClientConfig( b, httpClientConfigurers, propertySource, hosts, threadProvider )
 				)
 				.build();
 	}
@@ -169,10 +173,11 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 	private HttpAsyncClientBuilder customizeHttpClientConfig(HttpAsyncClientBuilder builder,
 			Iterable<ElasticsearchHttpClientConfigurer> configurers,
-			ConfigurationPropertySource propertySource, ServerUris hosts) {
+			ConfigurationPropertySource propertySource, ServerUris hosts,
+			ThreadProvider threadProvider) {
 		builder.setMaxConnTotal( MAX_TOTAL_CONNECTION.get( propertySource ) )
 				.setMaxConnPerRoute( MAX_TOTAL_CONNECTION_PER_ROUTE.get( propertySource ) )
-				.setThreadFactory( new SearchThreadFactory( "Elasticsearch transport thread" ) );
+				.setThreadFactory( threadProvider.createThreadFactory( "Elasticsearch transport thread" ) );
 		if ( !hosts.isAnyRequiringSSL() ) {
 			// In this case disable the SSL capability as it might have an impact on
 			// bootstrap time, for example consuming entropy for no reason

@@ -14,11 +14,14 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeExtendedContextProvider;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionDelegate;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 
 public interface PojoMappingDelegate extends AutoCloseable {
 
 	@Override
 	void close();
+
+	ThreadPoolProvider getThreadPoolProvider();
 
 	FailureHandler getFailureHandler();
 

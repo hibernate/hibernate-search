@@ -28,6 +28,7 @@ import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -51,7 +52,9 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 	private final EventContext eventContext;
 	private final IndexManagerBackendContext indexManagerBackendContext;
 
-	LuceneBackendImpl(String name, BeanHolder<? extends DirectoryProvider> directoryProviderHolder,
+	LuceneBackendImpl(String name,
+			BeanHolder<? extends DirectoryProvider> directoryProviderHolder,
+			ThreadPoolProvider threadPoolProvider,
 			LuceneWorkFactory workFactory,
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy,
@@ -71,6 +74,7 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 				eventContext, directoryProviderHolder.get(),
 				workFactory, multiTenancyStrategy,
 				analysisDefinitionRegistry,
+				threadPoolProvider,
 				failureHandler,
 				readOrchestrator
 		);

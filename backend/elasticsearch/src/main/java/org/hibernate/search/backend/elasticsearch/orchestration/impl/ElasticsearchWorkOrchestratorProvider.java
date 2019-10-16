@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 
 /**
@@ -96,14 +97,17 @@ public class ElasticsearchWorkOrchestratorProvider {
 	private static final int PARALLEL_MAX_WORKSETS_PER_BATCH = 20 * MAX_BULK_SIZE;
 
 	private final ElasticsearchLink link;
+	private final ThreadPoolProvider threadPoolProvider;
 	private final FailureHandler failureHandler;
 
 	private final ElasticsearchBatchingWorkOrchestrator rootParallelOrchestrator;
 
 	public ElasticsearchWorkOrchestratorProvider(String rootParallelOrchestratorName,
 			ElasticsearchLink link,
+			ThreadPoolProvider threadPoolProvider,
 			FailureHandler failureHandler) {
 		this.link = link;
+		this.threadPoolProvider = threadPoolProvider;
 		this.failureHandler = failureHandler;
 
 		/*
@@ -167,7 +171,9 @@ public class ElasticsearchWorkOrchestratorProvider {
 			String name, ElasticsearchWorkProcessor processor,
 			int maxWorksetsPerBatch, boolean fair) {
 		return new ElasticsearchBatchingWorkOrchestrator(
-				name, processor, maxWorksetsPerBatch, fair, failureHandler
+				name, processor, threadPoolProvider,
+				maxWorksetsPerBatch, fair,
+				failureHandler
 		);
 	}
 

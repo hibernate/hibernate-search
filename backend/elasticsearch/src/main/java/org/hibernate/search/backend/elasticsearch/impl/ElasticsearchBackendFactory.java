@@ -96,7 +96,8 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 			ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();
 			link = new ElasticsearchLinkImpl(
-					clientFactoryHolder, defaultGsonProvider, logPrettyPrinting, dialectFactory, configuredVersion
+					clientFactoryHolder, buildContext.getThreadPoolProvider(), defaultGsonProvider, logPrettyPrinting,
+					dialectFactory, configuredVersion
 			);
 
 			ElasticsearchModelDialect dialect;
@@ -122,8 +123,9 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					getAnalysisDefinitionRegistry( buildContext, propertySource );
 
 			return new ElasticsearchBackendImpl(
-					link,
 					name,
+					link,
+					buildContext.getThreadPoolProvider(),
 					typeFactoryProvider,
 					userFacingGson,
 					analysisDefinitionRegistry,

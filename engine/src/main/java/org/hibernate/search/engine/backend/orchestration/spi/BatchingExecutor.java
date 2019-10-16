@@ -18,7 +18,7 @@ import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.Executors;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.util.common.impl.Futures;
 
 /**
@@ -53,7 +53,8 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 	 * when the internal queue is full may be submitted out of order.
 	 * @param failureHandler A failure handler to report failures of the background thread.
 	 */
-	public BatchingExecutor(String name, P processor, int maxTasksPerBatch, boolean fair,
+	public BatchingExecutor(String name,
+			P processor, int maxTasksPerBatch, boolean fair,
 			FailureHandler failureHandler) {
 		this.name = name;
 		this.processor = processor;
@@ -67,9 +68,11 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 	/**
 	 * Start the executor, allowing works to be submitted
 	 * through {@link #submit(WorkSet)}.
+	 *
+	 * @param threadPoolProvider A provider of thread pools.
 	 */
-	public synchronized void start() {
-		executorService = Executors.newFixedThreadPool( 1, name );
+	public synchronized void start(ThreadPoolProvider threadPoolProvider) {
+		executorService = threadPoolProvider.newFixedThreadPool( 1, name );
 	}
 
 	/**

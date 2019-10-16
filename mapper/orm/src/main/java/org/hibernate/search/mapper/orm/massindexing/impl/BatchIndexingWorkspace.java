@@ -21,7 +21,6 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.impl.Executors;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -150,7 +149,8 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 				transactionTimeout, sessionContext.getTenantIdentifier()
 		);
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
-		final ThreadPoolExecutor execIdentifiersLoader = Executors.newFixedThreadPool( 1, "identifierloader" );
+		final ThreadPoolExecutor execIdentifiersLoader = mappingContext.getThreadPoolProvider()
+				.newFixedThreadPool( 1, "identifierloader" );
 		try {
 			tasks.add( execIdentifiersLoader.submit( primaryKeyOutputter ) );
 		}
@@ -169,7 +169,8 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 				transactionTimeout,
 				sessionContext.getTenantIdentifier()
 		);
-		final ThreadPoolExecutor execFirstLoader = Executors.newFixedThreadPool( documentBuilderThreads, "entityloader" );
+		final ThreadPoolExecutor execFirstLoader = mappingContext.getThreadPoolProvider()
+				.newFixedThreadPool( documentBuilderThreads, "entityloader" );
 		try {
 			for ( int i = 0; i < documentBuilderThreads; i++ ) {
 				tasks.add( execFirstLoader.submit( documentOutputter ) );

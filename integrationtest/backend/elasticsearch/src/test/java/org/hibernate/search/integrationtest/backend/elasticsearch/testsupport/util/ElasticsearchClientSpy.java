@@ -19,6 +19,7 @@ import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.util.impl.integrationtest.common.rule.CallQueue;
 
 import org.junit.rules.TestRule;
@@ -93,9 +94,11 @@ public class ElasticsearchClientSpy implements TestRule {
 
 		@Override
 		public ElasticsearchClientImplementor create(ConfigurationPropertySource propertySource,
-				GsonProvider initialGsonProvider) {
+				ThreadPoolProvider threadPoolProvider, GsonProvider gsonProvider) {
 			createdClientCount.incrementAndGet();
-			return new SpyingElasticsearchClient( delegate.create( propertySource, initialGsonProvider ) );
+			return new SpyingElasticsearchClient(
+					delegate.create( propertySource, threadPoolProvider, gsonProvider )
+			);
 		}
 	}
 

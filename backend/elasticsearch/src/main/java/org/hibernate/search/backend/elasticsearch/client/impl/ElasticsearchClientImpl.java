@@ -37,7 +37,7 @@ import org.hibernate.search.backend.elasticsearch.gson.spi.JsonLogHelper;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchLogCategories;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.Executors;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -63,12 +63,13 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	private final Gson gson;
 	private final JsonLogHelper jsonLogHelper;
 
-	public ElasticsearchClientImpl(RestClient restClient, Sniffer sniffer,
+	ElasticsearchClientImpl(RestClient restClient, Sniffer sniffer,
+			ThreadPoolProvider threadPoolProvider,
 			int requestTimeoutValue, TimeUnit requestTimeoutUnit,
 			Gson gson, JsonLogHelper jsonLogHelper) {
 		this.restClient = restClient;
 		this.sniffer = sniffer;
-		this.timeoutExecutorService = Executors.newScheduledThreadPool( "Elasticsearch request timeout executor" );
+		this.timeoutExecutorService = threadPoolProvider.newScheduledThreadPool( "Elasticsearch request timeout executor" );
 		this.requestTimeoutValue = requestTimeoutValue;
 		this.requestTimeoutUnit = requestTimeoutUnit;
 		this.gson = gson;

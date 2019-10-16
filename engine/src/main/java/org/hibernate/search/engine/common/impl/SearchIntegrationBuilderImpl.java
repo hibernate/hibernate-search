@@ -24,6 +24,8 @@ import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
+import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
@@ -56,6 +58,7 @@ import org.hibernate.search.engine.reporting.impl.RootFailureCollector;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 
 public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
@@ -64,6 +67,12 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			ConfigurationProperty.forKey( EngineSettings.Radicals.BACKGROUND_FAILURE_HANDLER )
 					.asBeanReference( FailureHandler.class )
 					.withDefault( EngineSettings.Defaults.BACKGROUND_FAILURE_HANDLER )
+					.build();
+
+	private static final ConfigurationProperty<BeanReference<? extends ThreadProvider>> THREAD_PROVIDER =
+			ConfigurationProperty.forKey( EngineSpiSettings.Radicals.THREAD_PROVIDER )
+					.asBeanReference( ThreadProvider.class )
+					.withDefault( EngineSpiSettings.Defaults.THREAD_PROVIDER )
 					.build();
 
 	private static final int FAILURE_LIMIT = 100;
@@ -140,6 +149,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 	@Override
 	public SearchIntegrationPartialBuildState prepareBuild() {
 		BeanHolder<? extends FailureHandler> failureHandlerHolder = null;
+		BeanHolder<? extends ThreadProvider> threadProviderHolder = null;
 		IndexManagerBuildingStateHolder indexManagerBuildingStateHolder = null;
 		// Use a LinkedHashMap for deterministic iteration
 		List<MappingBuildingState<?, ?>> mappingBuildingStates = new ArrayList<>();
@@ -176,15 +186,20 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			}
 
 			BeanResolver beanResolver = new ConfiguredBeanResolver( serviceResolver, beanProvider, propertySource );
+
 			failureHandlerHolder = BACKGROUND_FAILURE_HANDLER.getAndTransform( propertySource, beanResolver::resolve );
 			// Wrap the failure handler to prevent it from throwing exceptions
 			failureHandlerHolder = BeanHolder.of( new FailSafeFailureHandlerWrapper( failureHandlerHolder.get() ) )
 					.withDependencyAutoClosing( failureHandlerHolder );
 			FailureHandler failureHandler = failureHandlerHolder.get();
+
+			threadProviderHolder = THREAD_PROVIDER.getAndTransform( propertySource, beanResolver::resolve );
+			ThreadPoolProviderImpl executorProvider = new ThreadPoolProviderImpl( threadProviderHolder.get() );
+
 			RootBuildContext rootBuildContext = new RootBuildContext(
 					propertySource,
 					classResolver, resourceResolver, beanResolver,
-					failureCollector, failureHandler
+					failureCollector, executorProvider, failureHandler
 			);
 
 			indexManagerBuildingStateHolder = new IndexManagerBuildingStateHolder( beanResolver, propertySource, rootBuildContext );
@@ -248,6 +263,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			return new SearchIntegrationPartialBuildStateImpl(
 					beanProvider, beanResolver,
 					failureHandlerHolder,
+					threadProviderHolder,
 					partiallyBuiltMappings,
 					indexManagerBuildingStateHolder.getBackendPartialBuildStates(),
 					indexManagerBuildingStateHolder.getIndexManagersByName(),
@@ -289,7 +305,8 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			closer.pushAll( MappingBuildingState::closeOnFailure, mappingBuildingStates );
 			// Close the resources contained in the index manager building state before aborting
 			closer.pushAll( holder -> holder.closeOnFailure( closer ), indexManagerBuildingStateHolder );
-			// Close the bean resolver before aborting
+			// Close environment resources before aborting
+			closer.pushAll( BeanHolder::close, threadProviderHolder );
 			closer.pushAll( BeanProvider::close, beanProvider );
 
 			throw rethrownException;

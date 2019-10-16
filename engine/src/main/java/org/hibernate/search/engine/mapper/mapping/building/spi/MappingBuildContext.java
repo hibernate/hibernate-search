@@ -13,6 +13,7 @@ import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 
 /**
  * A build context for mappings.
@@ -42,6 +43,8 @@ public interface MappingBuildContext {
 	ContextualFailureCollector getFailureCollector();
 
 	FailureHandler getFailureHandler();
+
+	ThreadPoolProvider getThreadPoolProvider();
 
 	ConfigurationPropertySource getConfigurationPropertySource();
 

@@ -48,6 +48,7 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class HibernateOrmMapping extends AbstractPojoMappingImplementor<HibernateOrmMapping>
@@ -178,6 +179,11 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	@Override
 	public SessionFactoryImplementor getSessionFactory() {
 		return backendMappingContext.getSessionFactory();
+	}
+
+	@Override
+	public ThreadPoolProvider getThreadPoolProvider() {
+		return getDelegate().getThreadPoolProvider();
 	}
 
 	@Override

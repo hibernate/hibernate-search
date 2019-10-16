@@ -19,7 +19,6 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.impl.Executors;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import java.lang.invoke.MethodHandles;
@@ -122,7 +121,8 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	 * @throws InterruptedException if interrupted while waiting for endAllSignal.
 	 */
 	private void doBatchWork() throws InterruptedException {
-		ExecutorService executor = Executors.newFixedThreadPool( typesToIndexInParallel, "BatchIndexingWorkspace" );
+		ExecutorService executor = mappingContext.getThreadPoolProvider()
+				.newFixedThreadPool( typesToIndexInParallel, "BatchIndexingWorkspace" );
 		for ( Class<?> type : rootEntities ) {
 			indexingTasks.add( executor.submit( createBatchIndexingWorkspace( type ) ) );
 		}
