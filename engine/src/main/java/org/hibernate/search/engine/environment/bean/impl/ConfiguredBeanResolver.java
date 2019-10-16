@@ -28,7 +28,7 @@ import org.hibernate.search.util.common.impl.Contracts;
 public final class ConfiguredBeanResolver implements BeanResolver {
 
 	private static final ConfigurationProperty<List<BeanReference<? extends BeanConfigurer>>> BEAN_CONFIGURERS =
-			ConfigurationProperty.forKey( EngineSpiSettings.BEAN_CONFIGURERS )
+			ConfigurationProperty.forKey( EngineSpiSettings.Radicals.BEAN_CONFIGURERS )
 					.asBeanReference( BeanConfigurer.class )
 					.multivalued( Pattern.compile( "\\s+" ) )
 					.withDefault( EngineSpiSettings.Defaults.BEAN_CONFIGURERS )

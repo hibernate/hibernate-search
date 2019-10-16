@@ -47,7 +47,7 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 		resetAll();
 		expect( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
 				.andStubReturn( Collections.emptyList() );
-		expect( configurationSourceMock.get( EngineSpiSettings.BEAN_CONFIGURERS ) )
+		expect( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
 				.andStubReturn( Optional.empty() );
 		replayAll();
 		BeanResolver beanResolver =
@@ -114,7 +114,7 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 		resetAll();
 		expect( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
 				.andReturn( Collections.singletonList( beanConfigurer1Mock ) );
-		expect( configurationSourceMock.get( EngineSpiSettings.BEAN_CONFIGURERS ) )
+		expect( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
 				.andReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2Mock ) ) );
 		beanConfigurer1Mock.configure( EasyMock.anyObject() );
 		expectLastCall().andAnswer( () -> {
@@ -187,7 +187,7 @@ public class ConfiguredBeanResolverTest extends EasyMockSupport {
 		resetAll();
 		expect( serviceResolverMock.loadJavaServices( BeanConfigurer.class ) )
 				.andReturn( Collections.singletonList( beanConfigurer1Mock ) );
-		expect( configurationSourceMock.get( EngineSpiSettings.BEAN_CONFIGURERS ) )
+		expect( configurationSourceMock.get( EngineSpiSettings.Radicals.BEAN_CONFIGURERS ) )
 				.andReturn( (Optional) Optional.of( Collections.singletonList( beanConfigurer2Mock ) ) );
 		beanConfigurer1Mock.configure( EasyMock.anyObject() );
 		expectLastCall().andAnswer( () -> {
