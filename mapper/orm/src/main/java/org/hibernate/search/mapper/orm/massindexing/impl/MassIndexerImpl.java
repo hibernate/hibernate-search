@@ -11,7 +11,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ExecutorService;
 
 import org.hibernate.CacheMode;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
@@ -164,7 +164,16 @@ public class MassIndexerImpl implements MassIndexer {
 
 	@Override
 	public CompletableFuture<?> start() {
-		return Futures.runAsync( createCoordinator(), ForkJoinPool.commonPool() );
+		BatchCoordinator coordinator = createCoordinator();
+		ExecutorService executor = mappingContext.getThreadPoolProvider()
+				.newFixedThreadPool( 1, THREAD_NAME_PREFIX + "Coordinator" );
+		try {
+			return Futures.runAsync( coordinator, executor );
+		}
+		finally {
+			executor.shutdown();
+		}
+
 	}
 
 	@Override
