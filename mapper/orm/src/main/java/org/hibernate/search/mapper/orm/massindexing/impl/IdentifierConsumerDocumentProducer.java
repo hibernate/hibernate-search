@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.orm.massindexing.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.CountDownLatch;
 import javax.persistence.LockModeType;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -59,7 +58,6 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 	private final MassIndexingMonitor monitor;
 	private final FailureHandler failureHandler;
 	private final SingularAttribute<? super E, I> idAttributeOfIndexedType;
-	private final CountDownLatch producerEndSignal;
 	private final Integer transactionTimeout;
 	private final String tenantId;
 
@@ -72,7 +70,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			ProducerConsumerQueue<List<I>> fromIdentifierListToEntities,
 			MassIndexingMonitor monitor, FailureHandler failureHandler,
 			HibernateOrmMassIndexingMappingContext mappingContext,
-			CountDownLatch producerEndSignal, CacheMode cacheMode,
+			CacheMode cacheMode,
 			Class<E> indexedType, String entityName, SingularAttribute<? super E, I> idAttributeOfIndexedType,
 			Integer transactionTimeout,
 			String tenantId) {
@@ -84,7 +82,6 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		this.monitor = monitor;
 		this.failureHandler = failureHandler;
 		this.idAttributeOfIndexedType = idAttributeOfIndexedType;
-		this.producerEndSignal = producerEndSignal;
 		this.transactionTimeout = transactionTimeout;
 		this.tenantId = tenantId;
 		this.transactionManager = mappingContext.getSessionFactory()
@@ -115,7 +112,6 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			failureHandler.handle( failureContextBuilder.build() );
 		}
 		finally {
-			producerEndSignal.countDown();
 			session.close();
 		}
 		log.trace( "finished" );

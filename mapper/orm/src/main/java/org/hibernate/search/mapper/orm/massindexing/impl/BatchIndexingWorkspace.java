@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.orm.massindexing.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -21,6 +21,7 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -46,10 +47,6 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 	private final String entityName;
 	private final SingularAttribute<? super E, I> idAttributeOfIndexedType;
 
-	// status control
-	private final CountDownLatch producerEndSignal; //released when we stop adding Documents to Index
-	private final CountDownLatch endAllSignal; //released when we release all locks and IndexWriter
-
 	private final MassIndexingMonitor monitor;
 
 	// loading options
@@ -61,13 +58,13 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 	private final int idFetchSize;
 	private final Integer transactionTimeout;
 
-	private final List<Future<?>> tasks = new ArrayList<>();
+	private final List<CompletableFuture<?>> identifierProducingFutures = new ArrayList<>();
+	private final List<CompletableFuture<?>> indexingFutures = new ArrayList<>();
 
 	BatchIndexingWorkspace(HibernateOrmMassIndexingMappingContext mappingContext,
 			DetachedBackendSessionContext sessionContext,
 			Class<E> type, String entityName, SingularAttribute<? super E, I> idAttributeOfIndexedType,
 			int objectLoadingThreads, CacheMode cacheMode, int objectLoadingBatchSize,
-			CountDownLatch endAllSignal,
 			MassIndexingMonitor monitor, FailureHandler failureHandler,
 			long objectsLimit,
 			int idFetchSize, Integer transactionTimeout) {
@@ -91,10 +88,6 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 		//pipelining queues:
 		this.primaryKeyStream = new ProducerConsumerQueue<>( 1 );
 
-		//end signal shared with other instances:
-		this.endAllSignal = endAllSignal;
-		this.producerEndSignal = new CountDownLatch( documentBuilderThreads );
-
 		this.monitor = monitor;
 
 		this.objectsLimit = objectsLimit;
@@ -102,36 +95,35 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 
 	@Override
 	public void runWithFailureHandler() {
-		if ( !tasks.isEmpty() ) {
-			throw new AssertionFailure( "BatchIndexingWorkspace instance not expected to be reused - tasks should be empty" );
+		if ( !identifierProducingFutures.isEmpty() || !indexingFutures.isEmpty() ) {
+			throw new AssertionFailure( "BatchIndexingWorkspace instance not expected to be reused" );
 		}
 
+		final BatchTransactionalContext transactionalContext =
+				new BatchTransactionalContext( mappingContext.getSessionFactory() );
+		// First start the consumers, then the producers (reverse order):
+		startIndexing();
+		startProducingPrimaryKeys( transactionalContext );
 		try {
-			final BatchTransactionalContext transactionalContext =
-					new BatchTransactionalContext( mappingContext.getSessionFactory() );
-			//first start the consumers, then the producers (reverse order):
-			//from primary keys to LuceneWork ADD operations:
-			startTransformationToLuceneWork();
-			//from class definition to all primary keys:
-			startProducingPrimaryKeys( transactionalContext );
-			try {
-				producerEndSignal.await(); //await for all work being sent to the backend
-				log.debugf( "All work for type %s has been produced", indexedType.getName() );
-			}
-			catch (InterruptedException e) {
-				// on thread interruption cancel each pending task - thread executing the task must be interrupted
-				for ( Future<?> task : tasks ) {
-					if ( !task.isDone() ) {
-						task.cancel( true );
-					}
-				}
-				//restore interruption signal:
-				Thread.currentThread().interrupt();
-				throw log.interruptedBatchIndexingException( e );
-			}
+			// Wait for indexing to finish.
+			Futures.unwrappedExceptionGet(
+					CompletableFuture.allOf( indexingFutures.toArray( new CompletableFuture[0] ) )
+							// Exceptions are handled by each runnable
+							.exceptionally( ignored -> null )
+			);
+			log.debugf( "Indexing for %s is done", indexedType.getName() );
 		}
-		finally {
-			endAllSignal.countDown();
+		catch (InterruptedException e) {
+			// on thread interruption cancel each pending task - thread executing the task must be interrupted
+			for ( Future<?> task : identifierProducingFutures ) {
+				task.cancel( true );
+			}
+			for ( Future<?> task : indexingFutures ) {
+				task.cancel( true );
+			}
+			//restore interruption signal:
+			Thread.currentThread().interrupt();
+			throw log.interruptedBatchIndexingException( e );
 		}
 	}
 
@@ -149,35 +141,35 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 				transactionTimeout, sessionContext.getTenantIdentifier()
 		);
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
-		final ThreadPoolExecutor execIdentifiersLoader = mappingContext.getThreadPoolProvider()
+		final ThreadPoolExecutor identifierProducingExecutor = mappingContext.getThreadPoolProvider()
 				.newFixedThreadPool( 1, MassIndexerImpl.THREAD_NAME_PREFIX + entityName + " - ID loading" );
 		try {
-			tasks.add( execIdentifiersLoader.submit( primaryKeyOutputter ) );
+			identifierProducingFutures.add( Futures.runAsync( primaryKeyOutputter, identifierProducingExecutor ) );
 		}
 		finally {
-			execIdentifiersLoader.shutdown();
+			identifierProducingExecutor.shutdown();
 		}
 	}
 
-	private void startTransformationToLuceneWork() {
+	private void startIndexing() {
 		final Runnable documentOutputter = new IdentifierConsumerDocumentProducer<>(
 				primaryKeyStream,
 				monitor, getFailureHandler(),
 				mappingContext,
-				producerEndSignal, cacheMode,
+				cacheMode,
 				indexedType, entityName, idAttributeOfIndexedType,
 				transactionTimeout,
 				sessionContext.getTenantIdentifier()
 		);
-		final ThreadPoolExecutor execFirstLoader = mappingContext.getThreadPoolProvider()
+		final ThreadPoolExecutor indexingExecutor = mappingContext.getThreadPoolProvider()
 				.newFixedThreadPool( documentBuilderThreads, MassIndexerImpl.THREAD_NAME_PREFIX + entityName + " - Entity loading" );
 		try {
 			for ( int i = 0; i < documentBuilderThreads; i++ ) {
-				tasks.add( execFirstLoader.submit( documentOutputter ) );
+				indexingFutures.add( Futures.runAsync( documentOutputter, indexingExecutor ) );
 			}
 		}
 		finally {
-			execFirstLoader.shutdown();
+			indexingExecutor.shutdown();
 		}
 	}
 }
