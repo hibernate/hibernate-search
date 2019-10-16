@@ -150,7 +150,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 		);
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
 		final ThreadPoolExecutor execIdentifiersLoader = mappingContext.getThreadPoolProvider()
-				.newFixedThreadPool( 1, "identifierloader" );
+				.newFixedThreadPool( 1, MassIndexerImpl.THREAD_NAME_PREFIX + entityName + " - ID loading" );
 		try {
 			tasks.add( execIdentifiersLoader.submit( primaryKeyOutputter ) );
 		}
@@ -170,7 +170,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 				sessionContext.getTenantIdentifier()
 		);
 		final ThreadPoolExecutor execFirstLoader = mappingContext.getThreadPoolProvider()
-				.newFixedThreadPool( documentBuilderThreads, "entityloader" );
+				.newFixedThreadPool( documentBuilderThreads, MassIndexerImpl.THREAD_NAME_PREFIX + entityName + " - Entity loading" );
 		try {
 			for ( int i = 0; i < documentBuilderThreads; i++ ) {
 				tasks.add( execFirstLoader.submit( documentOutputter ) );
