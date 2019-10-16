@@ -81,3 +81,8 @@ java.lang.invoke.MethodHandles$Lookup#findStatic(java.lang.Class, java.lang.Stri
 ################################################################################################################
 @defaultMessage CompletableFuture#join() wraps exceptions with CompletionException, which is generally not what we want (we want the original exception). Use Futures.unwrappedExceptionJoin() instead.
 java.util.concurrent.CompletableFuture#join()
+
+################################################################################################################
+@defaultMessage CompletableFuture#runAsync(...) returns a CompletableFuture whose cancel() method will never actually cancel the task. Use Futures.runAsync(...) instead.
+java.util.concurrent.CompletableFuture#runAsync(java.lang.Runnable)
+java.util.concurrent.CompletableFuture#runAsync(java.lang.Runnable, java.util.concurrent.Executor)
