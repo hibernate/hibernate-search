@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ForkJoinPool;
 
 import org.hibernate.CacheMode;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
@@ -19,6 +20,7 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.mapper.orm.massindexing.monitor.impl.SimpleIndexingProgressMonitor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
+import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -162,7 +164,7 @@ public class MassIndexerImpl implements MassIndexer {
 
 	@Override
 	public CompletableFuture<?> start() {
-		return CompletableFuture.runAsync( createCoordinator() );
+		return Futures.runAsync( createCoordinator(), ForkJoinPool.commonPool() );
 	}
 
 	@Override
