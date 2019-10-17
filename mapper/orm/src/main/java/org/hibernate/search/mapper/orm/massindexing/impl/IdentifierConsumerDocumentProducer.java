@@ -23,13 +23,7 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
 import org.hibernate.query.Query;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
-import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
-import org.hibernate.search.engine.reporting.FailureContext;
-import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.mapper.orm.common.EntityReference;
-import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -50,16 +44,16 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ProducerConsumerQueue<List<I>> source;
 	private final HibernateOrmMassIndexingMappingContext mappingContext;
+	private final String tenantId;
+	private final MassIndexingNotifier notifier;
+
+	private final ProducerConsumerQueue<List<I>> source;
 	private final CacheMode cacheMode;
 	private final Class<E> type;
 	private final String entityName;
-	private final MassIndexingMonitor monitor;
-	private final FailureHandler failureHandler;
 	private final SingularAttribute<? super E, I> idAttributeOfIndexedType;
 	private final Integer transactionTimeout;
-	private final String tenantId;
 
 	/**
 	 * The JTA transaction manager or {@code null} if not in a JTA environment
@@ -67,23 +61,22 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 	private final TransactionManager transactionManager;
 
 	IdentifierConsumerDocumentProducer(
+			HibernateOrmMassIndexingMappingContext mappingContext, String tenantId,
+			MassIndexingNotifier notifier,
 			ProducerConsumerQueue<List<I>> fromIdentifierListToEntities,
-			MassIndexingMonitor monitor, FailureHandler failureHandler,
-			HibernateOrmMassIndexingMappingContext mappingContext,
 			CacheMode cacheMode,
 			Class<E> indexedType, String entityName, SingularAttribute<? super E, I> idAttributeOfIndexedType,
-			Integer transactionTimeout,
-			String tenantId) {
-		this.source = fromIdentifierListToEntities;
+			Integer transactionTimeout
+			) {
 		this.mappingContext = mappingContext;
+		this.tenantId = tenantId;
+		this.notifier = notifier;
+		this.source = fromIdentifierListToEntities;
 		this.cacheMode = cacheMode;
 		this.type = indexedType;
 		this.entityName = entityName;
-		this.monitor = monitor;
-		this.failureHandler = failureHandler;
 		this.idAttributeOfIndexedType = idAttributeOfIndexedType;
 		this.transactionTimeout = transactionTimeout;
-		this.tenantId = tenantId;
 		this.transactionManager = mappingContext.getSessionFactory()
 				.getServiceRegistry()
 				.getService( JtaPlatform.class )
@@ -105,10 +98,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			loadAllFromQueue( session );
 		}
 		catch (Exception exception) {
-			FailureContext.Builder failureContextBuilder = FailureContext.builder();
-			failureContextBuilder.throwable( exception );
-			failureContextBuilder.failingOperation( log.massIndexingLoadingAndExtractingEntityData( entityName ) );
-			failureHandler.handle( failureContextBuilder.build() );
+			notifier.notifyRunnableFailure( exception, log.massIndexingLoadingAndExtractingEntityData( entityName ) );
 		}
 		log.trace( "finished" );
 	}
@@ -202,7 +192,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			return;
 		}
 
-		monitor.entitiesLoaded( entities.size() );
+		notifier.notifyEntitiesLoaded( entities.size() );
 		CompletableFuture<?>[] indexingFutures = new CompletableFuture<?>[entities.size()];
 
 		for ( int i = 0; i < entities.size(); i++ ) {
@@ -221,14 +211,18 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			CompletableFuture<?> future = indexingFutures[i];
 
 			if ( future.isCompletedExceptionally() ) {
-				handleIndexingFailure( session, entities.get( i ), Futures.getThrowableNow( future ) );
+				notifier.notifyEntityIndexingFailure(
+						type, entityName,
+						session, entities.get( i ),
+						Futures.getThrowableNow( future )
+				);
 			}
 			else {
 				++successfulEntities;
 			}
 		}
 
-		monitor.documentsAdded( successfulEntities );
+		notifier.notifyDocumentsAdded( successfulEntities );
 	}
 
 	private CompletableFuture<?> index(PojoIndexer indexer, E entity) throws InterruptedException {
@@ -249,34 +243,9 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		}
 
 		// Only if the above succeeded
-		monitor.documentsBuilt( 1 );
+		notifier.notifyDocumentBuilt();
 
 		return future;
 	}
 
-	private void handleIndexingFailure(Session session, Object entity, Throwable throwable) {
-		EntityIndexingFailureContext.Builder contextBuilder = EntityIndexingFailureContext.builder();
-		contextBuilder.throwable( throwable );
-		// Add minimal information here, but information we're sure we can get
-		contextBuilder.failingOperation( log.massIndexerIndexingInstance( entityName ) );
-		// Add more information here, but information that may not be available if the session completely broke down
-		// (we're being extra careful here because we don't want to throw an exception while handling and exception)
-		EntityReference entityReference = extractReferenceOrSuppress( session, entity, throwable );
-		if ( entityReference != null ) {
-			contextBuilder.entityReference( entityReference );
-		}
-		failureHandler.handle( contextBuilder.build() );
-	}
-
-	private EntityReference extractReferenceOrSuppress(Session session, Object entity, Throwable throwable) {
-		try {
-			return new EntityReferenceImpl( type, entityName, session.getIdentifier( entity ) );
-		}
-		catch (RuntimeException e) {
-			// We failed to extract a reference.
-			// Let's just give up and suppress the exception.
-			throwable.addSuppressed( e );
-			return null;
-		}
-	}
 }

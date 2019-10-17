@@ -186,13 +186,17 @@ public class MassIndexerImpl implements MassIndexer {
 	}
 
 	protected BatchCoordinator createCoordinator() {
+		MassIndexingNotifier notifier = new MassIndexingNotifier(
+				mappingContext.getFailureHandler(),
+				getOrCreateMonitor()
+		);
 		return new BatchCoordinator(
 				mappingContext, sessionContext,
+				notifier,
 				rootEntities, scopeWorkspace,
 				typesToIndexInParallel, documentBuilderThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,
 				optimizeAtEnd, purgeAtStart, optimizeAfterPurge,
-				getOrCreateMonitor(),
 				idFetchSize, idLoadingTransactionTimeout
 		);
 	}

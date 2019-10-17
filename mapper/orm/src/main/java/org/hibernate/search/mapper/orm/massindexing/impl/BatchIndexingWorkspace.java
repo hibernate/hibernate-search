@@ -17,9 +17,7 @@ import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.CacheMode;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
-import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -47,8 +45,6 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 	private final String entityName;
 	private final SingularAttribute<? super E, I> idAttributeOfIndexedType;
 
-	private final MassIndexingMonitor monitor;
-
 	// loading options
 	private final CacheMode cacheMode;
 	private final int objectLoadingBatchSize;
@@ -63,12 +59,12 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 
 	BatchIndexingWorkspace(HibernateOrmMassIndexingMappingContext mappingContext,
 			DetachedBackendSessionContext sessionContext,
+			MassIndexingNotifier notifier,
 			Class<E> type, String entityName, SingularAttribute<? super E, I> idAttributeOfIndexedType,
 			int objectLoadingThreads, CacheMode cacheMode, int objectLoadingBatchSize,
-			MassIndexingMonitor monitor, FailureHandler failureHandler,
 			long objectsLimit,
 			int idFetchSize, Integer transactionTimeout) {
-		super( failureHandler );
+		super( notifier );
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
 
@@ -87,8 +83,6 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 
 		//pipelining queues:
 		this.primaryKeyStream = new ProducerConsumerQueue<>( 1 );
-
-		this.monitor = monitor;
 
 		this.objectsLimit = objectsLimit;
 	}
@@ -136,13 +130,15 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 	private void startProducingPrimaryKeys(BatchTransactionalContext transactionalContext) {
 		final Runnable primaryKeyOutputter = new OptionallyWrapInJTATransaction(
 				transactionalContext,
-				getFailureHandler(),
+				getNotifier(),
 				new IdentifierProducer<>(
-						primaryKeyStream, mappingContext.getSessionFactory(), objectLoadingBatchSize,
+						mappingContext.getSessionFactory(), sessionContext.getTenantIdentifier(),
+						getNotifier(),
+						primaryKeyStream,
+						objectLoadingBatchSize,
 						indexedType, entityName, idAttributeOfIndexedType,
-						monitor, getFailureHandler(),
 						objectsLimit,
-						idFetchSize, sessionContext.getTenantIdentifier()
+						idFetchSize
 				),
 				transactionTimeout, sessionContext.getTenantIdentifier()
 		);
@@ -159,13 +155,12 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 
 	private void startIndexing() {
 		final Runnable documentOutputter = new IdentifierConsumerDocumentProducer<>(
+				mappingContext, sessionContext.getTenantIdentifier(),
+				getNotifier(),
 				primaryKeyStream,
-				monitor, getFailureHandler(),
-				mappingContext,
 				cacheMode,
 				indexedType, entityName, idAttributeOfIndexedType,
-				transactionTimeout,
-				sessionContext.getTenantIdentifier()
+				transactionTimeout
 		);
 		final ThreadPoolExecutor indexingExecutor = mappingContext.getThreadPoolProvider()
 				.newFixedThreadPool( documentBuilderThreads, MassIndexerImpl.THREAD_NAME_PREFIX + entityName + " - Entity loading" );
