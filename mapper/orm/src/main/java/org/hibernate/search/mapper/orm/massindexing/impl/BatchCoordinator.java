@@ -84,14 +84,9 @@ public class BatchCoordinator extends FailureHandledRunnable {
 			throw new AssertionFailure( "BatchCoordinator instance not expected to be reused" );
 		}
 
-		try {
-			beforeBatch(); // purgeAll and pre-optimize activities
-			doBatchWork();
-			afterBatch();
-		}
-		finally {
-			getNotifier().notifyIndexingComplete();
-		}
+		beforeBatch(); // purgeAll and pre-optimize activities
+		doBatchWork();
+		afterBatch();
 	}
 
 	@Override
@@ -108,8 +103,18 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	}
 
 	@Override
+	protected void notifySuccess() {
+		getNotifier().notifyIndexingCompletedSuccessfully();
+	}
+
+	@Override
 	protected void notifyInterrupted(InterruptedException exception) {
-		log.interruptedBatchIndexing();
+		getNotifier().notifyIndexingCompletedWithInterruption();
+	}
+
+	@Override
+	protected void notifyFailure(RuntimeException exception) {
+		getNotifier().notifyIndexingCompletedWithFailure( exception );
 	}
 
 	private void cancelPendingTasks() {

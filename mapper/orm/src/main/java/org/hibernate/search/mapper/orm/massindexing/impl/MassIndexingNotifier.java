@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
 
 import org.hibernate.Session;
@@ -17,6 +18,7 @@ import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class MassIndexingNotifier {
@@ -26,7 +28,9 @@ class MassIndexingNotifier {
 	private final FailureHandler failureHandler;
 	private final MassIndexingMonitor monitor;
 
-	private final LongAdder failureCount = new LongAdder();
+	private final AtomicReference<RecordedEntityIndexingFailure> entityIndexingFirstFailure =
+			new AtomicReference<>( null );
+	private final LongAdder entityIndexingFailureCount = new LongAdder();
 
 	MassIndexingNotifier(FailureHandler failureHandler,
 			MassIndexingMonitor monitor) {
@@ -59,7 +63,10 @@ class MassIndexingNotifier {
 
 	<T> void notifyEntityIndexingFailure(Class<T> entityType, String entityName,
 			Session session, T entity, Throwable throwable) {
-		failureCount.increment();
+		RecordedEntityIndexingFailure recordedFailure = new RecordedEntityIndexingFailure( throwable );
+		entityIndexingFirstFailure.compareAndSet( null, recordedFailure );
+		entityIndexingFailureCount.increment();
+
 		EntityIndexingFailureContext.Builder contextBuilder = EntityIndexingFailureContext.builder();
 		contextBuilder.throwable( throwable );
 		// Add minimal information here, but information we're sure we can get
@@ -69,12 +76,50 @@ class MassIndexingNotifier {
 		EntityReference entityReference = extractReferenceOrSuppress( entityType, entityName, session, entity, throwable );
 		if ( entityReference != null ) {
 			contextBuilder.entityReference( entityReference );
+			recordedFailure.entityReference = entityReference;
 		}
 		failureHandler.handle( contextBuilder.build() );
 	}
 
-	void notifyIndexingComplete() {
+	void notifyIndexingCompletedSuccessfully() {
 		monitor.indexingCompleted();
+
+		SearchException entityIndexingException = createEntityIndexingExceptionOrNull();
+		if ( entityIndexingException != null ) {
+			throw entityIndexingException;
+		}
+	}
+
+	void notifyIndexingCompletedWithInterruption() {
+		log.interruptedBatchIndexing();
+		notifyIndexingCompletedSuccessfully();
+	}
+
+	void notifyIndexingCompletedWithFailure(Throwable throwable) {
+		// TODO HSEARCH-3729 Call a different method when indexing failed?
+		monitor.indexingCompleted();
+
+		SearchException entityIndexingException = createEntityIndexingExceptionOrNull();
+		if ( entityIndexingException != null ) {
+			throwable.addSuppressed( entityIndexingException );
+		}
+
+		FailureContext.Builder contextBuilder = FailureContext.builder();
+		contextBuilder.throwable( throwable );
+		contextBuilder.failingOperation( log.massIndexerOperation() );
+		failureHandler.handle( contextBuilder.build() );
+	}
+
+	private SearchException createEntityIndexingExceptionOrNull() {
+		RecordedEntityIndexingFailure firstFailure = entityIndexingFirstFailure.get();
+		if ( firstFailure == null ) {
+			return null;
+		}
+		return log.massIndexingEntityFailures(
+				entityIndexingFailureCount.longValue(),
+				firstFailure.entityReference,
+				firstFailure.throwable.getMessage(), firstFailure.throwable
+		);
 	}
 
 	private <T> EntityReference extractReferenceOrSuppress(Class<T> entityType, String entityName,
@@ -87,6 +132,15 @@ class MassIndexingNotifier {
 			// Let's just give up and suppress the exception.
 			throwable.addSuppressed( e );
 			return null;
+		}
+	}
+
+	private static class RecordedEntityIndexingFailure {
+		private Throwable throwable;
+		private EntityReference entityReference;
+
+		RecordedEntityIndexingFailure(Throwable throwable) {
+			this.throwable = throwable;
 		}
 	}
 }

@@ -26,6 +26,7 @@ import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
@@ -97,6 +98,9 @@ public class MassIndexingMonitorIT {
 			try {
 				indexer.monitor( new StaticCountersMonitor() )
 						.startAndWait();
+			}
+			catch (SearchException ignored) {
+				// Expected, but not relevant to this test
 			}
 			catch (InterruptedException e) {
 				fail( "Unexpected InterruptedException: " + e.getMessage() );
