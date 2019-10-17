@@ -38,7 +38,8 @@ public class IndexAccessor implements AutoCloseable {
 		this.indexEventContext = indexEventContext;
 		this.directoryHolder = directoryHolder;
 		this.indexWriterDelegator = new IndexWriterDelegatorImpl(
-				directoryHolder, analyzer, threadProvider, failureHandler, indexEventContext
+				indexName, indexEventContext,
+				directoryHolder, analyzer, threadProvider, failureHandler
 		);
 	}
 

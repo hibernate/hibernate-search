@@ -39,11 +39,12 @@ import org.apache.lucene.store.SleepingLockWrapper;
 public class IndexWriterDelegatorImpl implements Closeable, IndexWriterDelegator {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final String indexName;
+	private final EventContext indexEventContext;
 	private final DirectoryHolder directoryHolder;
 	private final Analyzer analyzer;
 	private final ThreadProvider threadProvider;
 	private final FailureHandler failureHandler;
-	private final EventContext indexEventContext;
 
 	/* TODO HSEARCH-3117 re-allow to configure index writers
 	private final Similarity similarity;
@@ -61,14 +62,17 @@ public class IndexWriterDelegatorImpl implements Closeable, IndexWriterDelegator
 	 */
 	private final ReentrantLock writerInitializationLock = new ReentrantLock();
 
-	public IndexWriterDelegatorImpl(DirectoryHolder directoryHolder, Analyzer analyzer,
+	public IndexWriterDelegatorImpl(
+			String indexName, EventContext indexEventContext,
+			DirectoryHolder directoryHolder, Analyzer analyzer,
 			ThreadProvider threadProvider,
-			FailureHandler failureHandler, EventContext eventContext) {
+			FailureHandler failureHandler) {
+		this.indexName = indexName;
+		this.indexEventContext = indexEventContext;
 		this.directoryHolder = directoryHolder;
 		this.analyzer = analyzer;
 		this.threadProvider = threadProvider;
 		this.failureHandler = failureHandler;
-		this.indexEventContext = eventContext;
 		/* TODO HSEARCH-3117 re-allow to configure index writers
 		this.luceneParameters = indexManager.getIndexingParameters();
 		this.indexParameters = luceneParameters.getIndexParameters();
@@ -219,7 +223,8 @@ public class IndexWriterDelegatorImpl implements Closeable, IndexWriterDelegator
 		writerConfig.setMergePolicy( newMergePolicy );
 		 */
 		MergeScheduler mergeScheduler = new HibernateSearchConcurrentMergeScheduler(
-				threadProvider, failureHandler, indexEventContext.render()
+				indexName, indexEventContext.render(),
+				threadProvider, failureHandler
 		);
 		writerConfig.setMergeScheduler( mergeScheduler );
 		writerConfig.setOpenMode( OpenMode.CREATE_OR_APPEND );

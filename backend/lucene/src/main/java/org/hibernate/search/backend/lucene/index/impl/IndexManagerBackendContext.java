@@ -197,9 +197,9 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		directoryHolder = directoryProvider.createDirectoryHolder( context );
 		try {
 			return new IndexAccessor(
-					indexName, threadPoolProvider.getThreadProvider(),
-					EventContexts.fromIndexNameAndShardId( indexName, shardId ),
+					indexName, EventContexts.fromIndexNameAndShardId( indexName, shardId ),
 					directoryHolder, analyzer,
+					threadPoolProvider.getThreadProvider(),
 					failureHandler
 			);
 		}

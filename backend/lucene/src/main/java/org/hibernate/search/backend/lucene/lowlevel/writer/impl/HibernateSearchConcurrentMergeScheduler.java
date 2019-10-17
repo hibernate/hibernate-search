@@ -10,8 +10,8 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
-import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.engine.reporting.IndexFailureContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.index.ConcurrentMergeScheduler;
@@ -33,15 +33,18 @@ class HibernateSearchConcurrentMergeScheduler extends ConcurrentMergeScheduler {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final String indexName;
+	private final String contextDescription;
 	private final ThreadProvider threadProvider;
 	private final FailureHandler failureHandler;
-	private final String contextDescription;
 
-	HibernateSearchConcurrentMergeScheduler(ThreadProvider threadProvider,
-			FailureHandler failureHandler, String contextDescription) {
+	HibernateSearchConcurrentMergeScheduler(String indexName, String contextDescription,
+			ThreadProvider threadProvider,
+			FailureHandler failureHandler) {
+		this.indexName = indexName;
+		this.contextDescription = contextDescription;
 		this.threadProvider = threadProvider;
 		this.failureHandler = failureHandler;
-		this.contextDescription = contextDescription;
 	}
 
 	@Override
@@ -53,7 +56,8 @@ class HibernateSearchConcurrentMergeScheduler extends ConcurrentMergeScheduler {
 			Thread.currentThread().interrupt();
 		}
 		catch (Exception ex) {
-			FailureContext.Builder contextBuilder = FailureContext.builder();
+			IndexFailureContext.Builder contextBuilder = IndexFailureContext.builder();
+			contextBuilder.indexName( indexName );
 			contextBuilder.throwable( ex );
 			contextBuilder.failingOperation( log.indexMergeOperation() );
 			failureHandler.handle( contextBuilder.build() );
