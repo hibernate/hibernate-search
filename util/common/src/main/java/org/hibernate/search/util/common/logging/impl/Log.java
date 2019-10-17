@@ -77,7 +77,7 @@ public interface Log extends BasicLogger {
 	IllegalArgumentException arrayMustNotBeNullNorEmpty(String objectDescription);
 
 	@Message(id = ID_OFFSET_2 + 5, value = "Exception while invoking '%1$s' on '%2$s'.")
-	SearchException errorInvokingMember(Member member, Object component, @Cause Throwable e);
+	SearchException errorInvokingMember(Member member, String componentAsString, @Cause Throwable e);
 
 	@Message(id = ID_OFFSET_2 + 6,
 			value = "Requested type argument %3$s to type %2$s"

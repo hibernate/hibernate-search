@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
+import org.hibernate.search.util.common.impl.Throwables;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
@@ -35,7 +36,7 @@ public final class MethodValueReadHandle<T> implements ValueReadHandle<T> {
 			return (T) method.invoke( thiz );
 		}
 		catch (RuntimeException | IllegalAccessException e) {
-			throw log.errorInvokingMember( method, thiz, e );
+			throw log.errorInvokingMember( method, Throwables.safeToString( e, thiz ), e );
 		}
 		catch (InvocationTargetException e) {
 			Throwable thrown = e.getCause();
@@ -43,7 +44,7 @@ public final class MethodValueReadHandle<T> implements ValueReadHandle<T> {
 				throw (Error) thrown;
 			}
 			else {
-				throw log.errorInvokingMember( method, thiz, thrown );
+				throw log.errorInvokingMember( method, Throwables.safeToString( thrown, thiz ), thrown );
 			}
 		}
 	}

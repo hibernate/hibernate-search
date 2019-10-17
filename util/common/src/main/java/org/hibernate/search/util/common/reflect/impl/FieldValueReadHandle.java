@@ -9,6 +9,7 @@ package org.hibernate.search.util.common.reflect.impl;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 
+import org.hibernate.search.util.common.impl.Throwables;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
@@ -34,7 +35,7 @@ public final class FieldValueReadHandle<T> implements ValueReadHandle<T> {
 			return (T) field.get( thiz );
 		}
 		catch (RuntimeException | IllegalAccessException e) {
-			throw log.errorInvokingMember( field, thiz, e );
+			throw log.errorInvokingMember( field, Throwables.safeToString( e, thiz ), e );
 		}
 	}
 

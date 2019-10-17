@@ -72,4 +72,17 @@ public final class Throwables {
 		return t.getMessage();
 	}
 
+	public static String safeToString(Throwable throwableBeingHandled, Object object) {
+		if ( object == null ) {
+			return "null";
+		}
+		try {
+			return object.toString();
+		}
+		catch (Throwable t) {
+			throwableBeingHandled.addSuppressed( t );
+			return "<" + object.getClass().getSimpleName() + "#toString() threw " + t.getClass().getSimpleName() + ">";
+		}
+	}
+
 }
