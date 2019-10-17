@@ -180,7 +180,7 @@ public class MassIndexerImpl implements MassIndexer {
 	public void startAndWait() throws InterruptedException {
 		BatchCoordinator coordinator = createCoordinator();
 		coordinator.run();
-		if ( Thread.currentThread().isInterrupted() ) {
+		if ( Thread.interrupted() ) {
 			throw new InterruptedException();
 		}
 	}
