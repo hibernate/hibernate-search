@@ -31,16 +31,16 @@ public class UnusedPropertiesIT {
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Rule
-	public ExpectedLog4jLog log = ExpectedLog4jLog.create();
+	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
 	public void checkDisabled_unusedProperty() {
 		String unusedPropertyKey = "hibernate.search.indexes.myIndex.foo";
-		log.expectMessage(
+		logged.expectMessage(
 				"Some properties in the Hibernate Search configuration were not used"
 		)
 				.never();
-		log.expectMessage( "Configuration property tracking is disabled" )
+		logged.expectMessage( "Configuration property tracking is disabled" )
 				.once();
 		setup( builder -> {
 			builder.setProperty( EngineSettings.CONFIGURATION_PROPERTY_CHECKING_STRATEGY, "ignore" );
@@ -51,15 +51,15 @@ public class UnusedPropertiesIT {
 	@Test
 	public void checkEnabledByDefault_unusedProperty() {
 		String unusedPropertyKey = "hibernate.search.indexes.myIndex.foo";
-		log.expectMessage(
+		logged.expectMessage(
 				"Some properties in the Hibernate Search configuration were not used",
 				"[" + unusedPropertyKey + "]"
 		)
 				.once();
-		log.expectMessage( "Configuration property tracking is disabled" )
+		logged.expectMessage( "Configuration property tracking is disabled" )
 				.never();
 		// Also check that used properties are not reported as unused
-		log.expectMessage( "not used", EngineSettings.DEFAULT_BACKEND )
+		logged.expectMessage( "not used", EngineSettings.DEFAULT_BACKEND )
 				.never();
 
 		setup( builder -> {
@@ -74,9 +74,9 @@ public class UnusedPropertiesIT {
 		 * This is a corner case worth testing, since the property may legitimately be accessed before
 		 * we start tracking property usage.
  		 */
-		log.expectMessage( "Some properties in the Hibernate Search configuration were not used" )
+		logged.expectMessage( "Some properties in the Hibernate Search configuration were not used" )
 				.never();
-		log.expectMessage( "Configuration property tracking is disabled" )
+		logged.expectMessage( "Configuration property tracking is disabled" )
 				.never();
 		setup( builder -> {
 			builder.setProperty( EngineSettings.CONFIGURATION_PROPERTY_CHECKING_STRATEGY, "warn" );

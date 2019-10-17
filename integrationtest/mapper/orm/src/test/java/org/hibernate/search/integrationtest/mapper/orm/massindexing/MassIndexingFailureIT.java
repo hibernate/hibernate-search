@@ -59,7 +59,7 @@ public class MassIndexingFailureIT {
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
 	@Rule
-	public ExpectedLog4jLog log = ExpectedLog4jLog.create();
+	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Rule
 	public StaticCounters staticCounters = new StaticCounters();
@@ -71,7 +71,7 @@ public class MassIndexingFailureIT {
 	public void indexing_defaultHandler() {
 		SessionFactory sessionFactory = setup( null );
 
-		log.expectEvent(
+		logged.expectEvent(
 				Level.ERROR,
 				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
 						.withMessage( "Indexing failure" )
@@ -127,7 +127,7 @@ public class MassIndexingFailureIT {
 	public void getId_defaultHandler() {
 		SessionFactory sessionFactory = setup( null );
 
-		log.expectEvent(
+		logged.expectEvent(
 				Level.ERROR,
 				ExceptionMatcherBuilder.isException( SearchException.class )
 						.withMessage( "Exception while invoking" )
@@ -170,7 +170,7 @@ public class MassIndexingFailureIT {
 	public void getTitle_defaultHandler() {
 		SessionFactory sessionFactory = setup( null );
 
-		log.expectEvent(
+		logged.expectEvent(
 				Level.ERROR,
 				ExceptionMatcherBuilder.isException( SearchException.class )
 						.withMessage( "Exception while invoking" )
@@ -212,7 +212,7 @@ public class MassIndexingFailureIT {
 	public void purge_defaultHandler() {
 		SessionFactory sessionFactory = setup( null );
 
-		log.expectEvent(
+		logged.expectEvent(
 				Level.ERROR,
 				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
 						.withMessage( "Index-scope operation failure" )
@@ -255,7 +255,7 @@ public class MassIndexingFailureIT {
 	public void optimizeBefore_defaultHandler() {
 		SessionFactory sessionFactory = setup( null );
 
-		log.expectEvent(
+		logged.expectEvent(
 				Level.ERROR,
 				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
 						.withMessage( "Index-scope operation failure" )
@@ -300,7 +300,7 @@ public class MassIndexingFailureIT {
 	public void optimizeAfter_defaultHandler() {
 		SessionFactory sessionFactory = setup( null );
 
-		log.expectEvent(
+		logged.expectEvent(
 				Level.ERROR,
 				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
 						.withMessage( "Index-scope operation failure" )
@@ -349,7 +349,7 @@ public class MassIndexingFailureIT {
 	public void flush_defaultHandler() {
 		SessionFactory sessionFactory = setup( null );
 
-		log.expectEvent(
+		logged.expectEvent(
 				Level.ERROR,
 				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
 						.withMessage( "Index-scope operation failure" )
