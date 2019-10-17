@@ -80,7 +80,7 @@ public interface Log extends BasicLogger {
 	void cannotGuessTransactionStatus(@Cause Exception e);
 
 	@LogMessage(level = ERROR)
-	@Message(id = ID_OFFSET_1 + 62, value = "Batch indexing was interrupted")
+	@Message(id = ID_OFFSET_1 + 62, value = "Mass indexing was interrupted")
 	void interruptedBatchIndexing();
 
 	@LogMessage(level = ERROR)
@@ -155,8 +155,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 12, value = "Exception while retrieving property type model for '%1$s' on '%2$s'.")
 	SearchException errorRetrievingPropertyTypeModel(String propertyModelName, @FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> parentTypeModel, @Cause Exception cause);
 
-	@Message(id = ID_OFFSET_2 + 13, value = "Interrupted on batch Indexing; index will be left in unknown state!")
-	SearchException interruptedBatchIndexingException(@Cause Exception cause);
+	@Message(id = ID_OFFSET_2 + 13, value = "Mass indexing was interrupted; index will be left in unknown state!")
+	SearchException massIndexingThreadInterrupted(@Cause InterruptedException e);
 
 	@Message(id = ID_OFFSET_2 + 15,
 			value = "Invalid reflection strategy name: '%1$s'. Valid names are: %2$s.")
@@ -203,4 +203,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 24, value = "Automatic indexing failed after transaction completion: %1$s" )
 	SearchException synchronizationAfterTransactionFailure(String causeMessage, @Cause Throwable cause);
+
+	@Message(id = ID_OFFSET_2 + 25, value = "Exception while handling transactions: %1$s")
+	SearchException massIndexingTransactionHandlingException(String causeMessage, @Cause Throwable cause);
 }

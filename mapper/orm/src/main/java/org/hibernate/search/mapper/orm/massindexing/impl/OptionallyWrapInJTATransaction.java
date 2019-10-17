@@ -7,6 +7,10 @@
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
 import java.lang.invoke.MethodHandles;
+import javax.transaction.HeuristicMixedException;
+import javax.transaction.HeuristicRollbackException;
+import javax.transaction.NotSupportedException;
+import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 
 import org.hibernate.StatelessSession;
@@ -53,7 +57,7 @@ public class OptionallyWrapInJTATransaction extends FailureHandledRunnable {
 	}
 
 	@Override
-	public void runWithFailureHandler() throws Exception {
+	public void runWithFailureHandler() {
 		if ( wrapInTransaction ) {
 			try ( StatelessSession statelessSession = batchContext.factory.withStatelessOptions()
 					.tenantIdentifier( tenantId )
@@ -65,6 +69,11 @@ public class OptionallyWrapInJTATransaction extends FailureHandledRunnable {
 				statelessSessionAwareRunnable.run( statelessSession );
 				batchContext.transactionManager.commit();
 			}
+			// Just let runtime exceptions fall through
+			catch (NotSupportedException | SystemException | RollbackException | HeuristicMixedException
+					| HeuristicRollbackException e) {
+				throw log.massIndexingTransactionHandlingException( e.getMessage(), e );
+			}
 		}
 		else {
 			statelessSessionAwareRunnable.run( null );
@@ -72,7 +81,16 @@ public class OptionallyWrapInJTATransaction extends FailureHandledRunnable {
 	}
 
 	@Override
-	protected void cleanUpOnError() {
+	protected void cleanUpOnInterruption() {
+		rollback();
+	}
+
+	@Override
+	protected void cleanUpOnFailure() {
+		rollback();
+	}
+
+	private void rollback() {
 		if ( wrapInTransaction ) {
 			try {
 				batchContext.transactionManager.rollback();

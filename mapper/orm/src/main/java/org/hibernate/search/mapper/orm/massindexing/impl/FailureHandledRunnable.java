@@ -29,33 +29,65 @@ abstract class FailureHandledRunnable implements Runnable {
 
 	@Override
 	public final void run() {
+		boolean interrupted = false;
 		try {
 			runWithFailureHandler();
 		}
-		catch (Exception re) {
+		catch (InterruptedException e) {
+			interrupted = true;
 			try {
-				cleanUpOnError();
+				cleanUpOnInterruption();
 			}
-			catch (RuntimeException e) {
-				re.addSuppressed( e );
+			catch (RuntimeException | InterruptedException e2) {
+				e.addSuppressed( e2 );
 			}
 
-			// being this an async thread we want to make sure everything is somehow reported
-			FailureContext.Builder contextBuilder = FailureContext.builder();
-			contextBuilder.throwable( re );
-			contextBuilder.failingOperation( log.massIndexerOperation() );
-			failureHandler.handle( contextBuilder.build() );
+			notifyInterrupted( e );
+		}
+		catch (RuntimeException e) {
+			try {
+				cleanUpOnFailure();
+			}
+			catch (RuntimeException e2) {
+				e.addSuppressed( e2 );
+			}
+			catch (InterruptedException e2) {
+				interrupted = true;
+				e.addSuppressed( e2 );
+			}
+
+			notifyFailure( e );
+		}
+		finally {
+			if ( interrupted ) {
+				// Restore interruption signal
+				Thread.currentThread().interrupt();
+			}
 		}
 	}
 
-	protected abstract void runWithFailureHandler() throws Exception;
+	protected abstract void runWithFailureHandler() throws InterruptedException;
 
-	protected FailureHandler getFailureHandler() {
+	protected abstract void cleanUpOnInterruption() throws InterruptedException;
+
+	protected abstract void cleanUpOnFailure() throws InterruptedException;
+
+	protected final FailureHandler getFailureHandler() {
 		return failureHandler;
 	}
 
-	protected void cleanUpOnError() {
-		//no-op unless overridden
+	protected void notifyInterrupted(InterruptedException exception) {
+		FailureContext.Builder contextBuilder = FailureContext.builder();
+		contextBuilder.throwable( log.massIndexingThreadInterrupted( exception ) );
+		contextBuilder.failingOperation( log.massIndexerOperation() );
+		failureHandler.handle( contextBuilder.build() );
+	}
+
+	protected void notifyFailure(RuntimeException exception) {
+		FailureContext.Builder contextBuilder = FailureContext.builder();
+		contextBuilder.throwable( exception );
+		contextBuilder.failingOperation( log.massIndexerOperation() );
+		failureHandler.handle( contextBuilder.build() );
 	}
 
 }

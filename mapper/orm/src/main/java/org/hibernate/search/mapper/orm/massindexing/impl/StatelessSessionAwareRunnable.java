@@ -13,6 +13,6 @@ import org.hibernate.StatelessSession;
  */
 public interface StatelessSessionAwareRunnable {
 
-	void run(StatelessSession session) throws Exception;
+	void run(StatelessSession session);
 
 }
