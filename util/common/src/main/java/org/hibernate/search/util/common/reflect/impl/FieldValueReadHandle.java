@@ -33,13 +33,7 @@ public final class FieldValueReadHandle<T> implements ValueReadHandle<T> {
 		try {
 			return (T) field.get( thiz );
 		}
-		catch (Error e) {
-			throw e;
-		}
-		catch (Throwable e) {
-			if ( e instanceof InterruptedException ) {
-				Thread.currentThread().interrupt();
-			}
+		catch (RuntimeException | IllegalAccessException e) {
 			throw log.errorInvokingMember( field, thiz, e );
 		}
 	}

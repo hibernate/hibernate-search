@@ -7,6 +7,7 @@
 package org.hibernate.search.util.common.reflect.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import org.hibernate.search.util.common.logging.impl.Log;
@@ -33,14 +34,17 @@ public final class MethodValueReadHandle<T> implements ValueReadHandle<T> {
 		try {
 			return (T) method.invoke( thiz );
 		}
-		catch (Error e) {
-			throw e;
-		}
-		catch (Throwable e) {
-			if ( e instanceof InterruptedException ) {
-				Thread.currentThread().interrupt();
-			}
+		catch (RuntimeException | IllegalAccessException e) {
 			throw log.errorInvokingMember( method, thiz, e );
+		}
+		catch (InvocationTargetException e) {
+			Throwable thrown = e.getCause();
+			if ( thrown instanceof Error ) {
+				throw (Error) thrown;
+			}
+			else {
+				throw log.errorInvokingMember( method, thiz, thrown );
+			}
 		}
 	}
 
