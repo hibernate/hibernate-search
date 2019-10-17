@@ -101,8 +101,6 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 		// Wait for indexing to finish.
 		Futures.unwrappedExceptionGet(
 				CompletableFuture.allOf( indexingFutures.toArray( new CompletableFuture[0] ) )
-						// Exceptions are handled by each runnable
-						.exceptionally( ignored -> null )
 		);
 		log.debugf( "Indexing for %s is done", indexedType.getName() );
 	}

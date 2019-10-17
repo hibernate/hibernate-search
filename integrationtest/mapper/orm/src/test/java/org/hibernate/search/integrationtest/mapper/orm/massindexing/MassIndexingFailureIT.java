@@ -11,6 +11,7 @@ import static org.assertj.core.api.Fail.fail;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Consumer;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -34,6 +35,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
+import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
@@ -85,6 +87,7 @@ public class MassIndexingFailureIT {
 		doMassIndexingWithFailure(
 				sessionFactory,
 				ThreadExpectation.CREATED_AND_TERMINATED,
+				null, // TODO HSEARCH-3728 expect an exception when at least one entity failed to index
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.FAIL ),
@@ -110,6 +113,7 @@ public class MassIndexingFailureIT {
 		doMassIndexingWithFailure(
 				sessionFactory,
 				ThreadExpectation.CREATED_AND_TERMINATED,
+				null, // TODO HSEARCH-3728 expect an exception when at least one entity failed to index
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.FAIL ),
@@ -215,7 +219,7 @@ public class MassIndexingFailureIT {
 		logged.expectEvent(
 				Level.ERROR,
 				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
-						.withMessage( "Index-scope operation failure" )
+						.withMessage( "PURGE failure" )
 						.build(),
 				"MassIndexer operation"
 		)
@@ -224,6 +228,8 @@ public class MassIndexingFailureIT {
 		doMassIndexingWithFailure(
 				sessionFactory,
 				ThreadExpectation.NOT_CREATED,
+				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
+						.hasMessageContaining( "PURGE failure" ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.FAIL )
 		);
 	}
@@ -243,6 +249,8 @@ public class MassIndexingFailureIT {
 		doMassIndexingWithFailure(
 				sessionFactory,
 				ThreadExpectation.NOT_CREATED,
+				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
+						.hasMessageContaining( "PURGE failure" ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.FAIL )
 		);
 
@@ -258,7 +266,7 @@ public class MassIndexingFailureIT {
 		logged.expectEvent(
 				Level.ERROR,
 				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
-						.withMessage( "Index-scope operation failure" )
+						.withMessage( "OPTIMIZE failure" )
 						.build(),
 				"MassIndexer operation"
 		)
@@ -267,6 +275,8 @@ public class MassIndexingFailureIT {
 		doMassIndexingWithFailure(
 				sessionFactory,
 				ThreadExpectation.NOT_CREATED,
+				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
+						.hasMessageContaining( "OPTIMIZE failure" ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.FAIL )
 		);
@@ -287,6 +297,8 @@ public class MassIndexingFailureIT {
 		doMassIndexingWithFailure(
 				sessionFactory,
 				ThreadExpectation.NOT_CREATED,
+				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
+						.hasMessageContaining( "OPTIMIZE failure" ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.FAIL )
 		);
@@ -303,7 +315,7 @@ public class MassIndexingFailureIT {
 		logged.expectEvent(
 				Level.ERROR,
 				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
-						.withMessage( "Index-scope operation failure" )
+						.withMessage( "OPTIMIZE failure" )
 						.build(),
 				"MassIndexer operation"
 		)
@@ -312,6 +324,8 @@ public class MassIndexingFailureIT {
 		doMassIndexingWithFailure(
 				sessionFactory,
 				ThreadExpectation.CREATED_AND_TERMINATED,
+				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
+						.hasMessageContaining( "OPTIMIZE failure" ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
@@ -334,6 +348,8 @@ public class MassIndexingFailureIT {
 		doMassIndexingWithFailure(
 				sessionFactory,
 				ThreadExpectation.CREATED_AND_TERMINATED,
+				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
+						.hasMessageContaining( "OPTIMIZE failure" ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
@@ -352,7 +368,7 @@ public class MassIndexingFailureIT {
 		logged.expectEvent(
 				Level.ERROR,
 				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
-						.withMessage( "Index-scope operation failure" )
+						.withMessage( "FLUSH failure" )
 						.build(),
 				"MassIndexer operation"
 		)
@@ -361,6 +377,8 @@ public class MassIndexingFailureIT {
 		doMassIndexingWithFailure(
 				sessionFactory,
 				ThreadExpectation.CREATED_AND_TERMINATED,
+				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
+						.hasMessageContaining( "FLUSH failure" ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
@@ -384,6 +402,8 @@ public class MassIndexingFailureIT {
 		doMassIndexingWithFailure(
 				sessionFactory,
 				ThreadExpectation.CREATED_AND_TERMINATED,
+				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
+						.hasMessageContaining( "FLUSH failure" ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
@@ -396,11 +416,14 @@ public class MassIndexingFailureIT {
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
 	}
 
-	private void doMassIndexingWithFailure(SessionFactory sessionFactory, ThreadExpectation threadExpectation,
+	private void doMassIndexingWithFailure(SessionFactory sessionFactory,
+			ThreadExpectation threadExpectation,
+			Consumer<Throwable> thrownExpectation,
 			Runnable ... expectationSetters) {
 		doMassIndexingWithFailure(
 				sessionFactory,
 				threadExpectation,
+				thrownExpectation,
 				ExecutionExpectation.SUCCEED, ExecutionExpectation.SUCCEED,
 				expectationSetters
 		);
@@ -410,6 +433,7 @@ public class MassIndexingFailureIT {
 		doMassIndexingWithFailure(
 				sessionFactory,
 				ThreadExpectation.CREATED_AND_TERMINATED,
+				null, // TODO HSEARCH-3728 expect an exception when at least one entity failed to index
 				ExecutionExpectation.FAIL, ExecutionExpectation.SKIP,
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
@@ -423,6 +447,7 @@ public class MassIndexingFailureIT {
 		doMassIndexingWithFailure(
 				sessionFactory,
 				ThreadExpectation.CREATED_AND_TERMINATED,
+				null, // TODO HSEARCH-3728 expect an exception when at least one entity failed to index
 				ExecutionExpectation.SUCCEED, ExecutionExpectation.FAIL,
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
@@ -432,7 +457,9 @@ public class MassIndexingFailureIT {
 		);
 	}
 
-	private void doMassIndexingWithFailure(SessionFactory sessionFactory, ThreadExpectation threadExpectation,
+	private void doMassIndexingWithFailure(SessionFactory sessionFactory,
+			ThreadExpectation threadExpectation,
+			Consumer<Throwable> thrownExpectation,
 			ExecutionExpectation book2GetIdExpectation, ExecutionExpectation book2GetTitleExpectation,
 			Runnable ... expectationSetters) {
 		Book.failOnBook2GetId.set( ExecutionExpectation.FAIL.equals( book2GetIdExpectation ) );
@@ -447,11 +474,22 @@ public class MassIndexingFailureIT {
 					expectationSetter.run();
 				}
 
-				try {
-					indexer.startAndWait();
+				// TODO HSEARCH-3728 simplify this when even indexing exceptions are propagated
+				Runnable runnable = () -> {
+					try {
+						indexer.startAndWait();
+					}
+					catch (InterruptedException e) {
+						fail( "Unexpected InterruptedException: " + e.getMessage() );
+					}
+				};
+				if ( thrownExpectation == null ) {
+					runnable.run();
 				}
-				catch (InterruptedException e) {
-					fail( "Unexpected InterruptedException: " + e.getMessage() );
+				else {
+					SubTest.expectException( runnable )
+							.assertThrown()
+							.satisfies( thrownExpectation );
 				}
 			} );
 			backendMock.verifyExpectationsMet();
@@ -496,7 +534,7 @@ public class MassIndexingFailureIT {
 					break;
 				case FAIL:
 					CompletableFuture<?> failingFuture = new CompletableFuture<>();
-					failingFuture.completeExceptionally( new SimulatedFailure( "Index-scope operation failure" ) );
+					failingFuture.completeExceptionally( new SimulatedFailure( type.name() + " failure" ) );
 					backendMock.expectIndexScopeWorks( Book.NAME )
 							.indexScopeWork( type, failingFuture );
 					break;

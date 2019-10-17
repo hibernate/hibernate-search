@@ -137,8 +137,6 @@ public class BatchCoordinator extends FailureHandledRunnable {
 		// Wait for the executor to finish
 		Futures.unwrappedExceptionGet(
 				CompletableFuture.allOf( indexingFutures.toArray( new CompletableFuture[0] ) )
-						// Exceptions are handled by each runnable
-						.exceptionally( ignored -> null )
 		);
 	}
 
