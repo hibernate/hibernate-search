@@ -25,18 +25,25 @@ import org.apache.lucene.store.Directory;
  * @author Sanne Grinovero (C) 2011 Red Hat Inc.
  */
 public class IndexAccessor implements AutoCloseable {
+	private final String indexName;
+	private final EventContext indexEventContext;
 	private final DirectoryHolder directoryHolder;
 	private final IndexWriterDelegatorImpl indexWriterDelegator;
-	private final EventContext indexEventContext;
 
-	public IndexAccessor(DirectoryHolder directoryHolder, Analyzer analyzer,
+	public IndexAccessor(String indexName, EventContext indexEventContext,
+			DirectoryHolder directoryHolder, Analyzer analyzer,
 			ThreadProvider threadProvider,
-			FailureHandler failureHandler, EventContext indexEventContext) {
+			FailureHandler failureHandler) {
+		this.indexName = indexName;
+		this.indexEventContext = indexEventContext;
 		this.directoryHolder = directoryHolder;
 		this.indexWriterDelegator = new IndexWriterDelegatorImpl(
 				directoryHolder, analyzer, threadProvider, failureHandler, indexEventContext
 		);
-		this.indexEventContext = indexEventContext;
+	}
+
+	public String getIndexName() {
+		return indexName;
 	}
 
 	public EventContext getIndexEventContext() {

@@ -43,7 +43,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 	private FailureHandler failureHandlerMock = createStrictMock( FailureHandler.class );
 
 	private LuceneWriteWorkProcessor processor = new LuceneWriteWorkProcessor(
-			indexEventContext, indexWriterDelegatorMock,
+			INDEX_NAME, indexEventContext, indexWriterDelegatorMock,
 			failureHandlerMock
 	);
 
@@ -131,6 +131,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		// Note that callers are not supposed to call any method on the processor after a failure in a workset
 
 		IndexFailureContext failureContext = failureContextCapture.getValue();
+		assertThat( failureContext.getIndexName() ).isEqualTo( INDEX_NAME );
 		assertThat( failureContext.getThrowable() ).isSameAs( workException );
 		assertThat( failureContext.getFailingOperation() )
 				.isEqualTo( workInfo( 7 ) );
@@ -200,6 +201,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		// Note that callers are not supposed to call any method on the processor after a failure in a workset
 
 		IndexFailureContext failureContext = failureContextCapture.getValue();
+		assertThat( failureContext.getIndexName() ).isEqualTo( INDEX_NAME );
 		assertThat( failureContext.getThrowable() ).isSameAs( workException );
 		assertThat( failureContext.getFailingOperation() )
 				.isEqualTo( workInfo( 7 ) );
@@ -269,6 +271,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		// Note that callers are not supposed to call any method on the processor after a failure in a workset
 
 		IndexFailureContext failureContext = failureContextCapture.getValue();
+		assertThat( failureContext.getIndexName() ).isEqualTo( INDEX_NAME );
 		assertThat( failureContext.getThrowable() ).isSameAs( workException );
 		assertThat( failureContext.getFailingOperation() )
 				.isEqualTo( workInfo( 6 ) );
@@ -349,6 +352,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		verifyAll();
 
 		IndexFailureContext failureContext = failureContextCapture.getValue();
+		assertThat( failureContext.getIndexName() ).isEqualTo( INDEX_NAME );
 		assertThat( failureContext.getThrowable() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to commit" )
@@ -419,6 +423,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		verifyAll();
 
 		IndexFailureContext failureContext = failureContextCapture.getValue();
+		assertThat( failureContext.getIndexName() ).isEqualTo( INDEX_NAME );
 		assertThat( failureContext.getThrowable() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to commit" )
@@ -488,7 +493,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		verifyAll();
 
 		IndexFailureContext failureContext = failureContextCapture.getValue();
-
+		assertThat( failureContext.getIndexName() ).isEqualTo( INDEX_NAME );
 		assertThat( failureContext.getThrowable() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to commit" )
@@ -549,7 +554,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		verifyAll();
 
 		IndexFailureContext failureContext = failureContextCapture.getValue();
-
+		assertThat( failureContext.getIndexName() ).isEqualTo( INDEX_NAME );
 		assertThat( failureContext.getThrowable() )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to commit" )

@@ -197,8 +197,10 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		directoryHolder = directoryProvider.createDirectoryHolder( context );
 		try {
 			return new IndexAccessor(
-					directoryHolder, analyzer, threadPoolProvider.getThreadProvider(),
-					failureHandler, EventContexts.fromIndexNameAndShardId( indexName, shardId )
+					indexName, threadPoolProvider.getThreadProvider(),
+					EventContexts.fromIndexNameAndShardId( indexName, shardId ),
+					directoryHolder, analyzer,
+					failureHandler
 			);
 		}
 		catch (RuntimeException e) {
@@ -212,6 +214,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		return new LuceneBatchingWriteWorkOrchestrator(
 				"Lucene write work orchestrator for " + indexEventContext.render(),
 				new LuceneWriteWorkProcessor(
+						indexAccessor.getIndexName(),
 						indexEventContext,
 						indexAccessor.getIndexWriterDelegator(),
 						failureHandler

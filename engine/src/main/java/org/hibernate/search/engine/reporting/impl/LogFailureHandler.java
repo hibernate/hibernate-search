@@ -77,6 +77,10 @@ public class LogFailureHandler implements FailureHandler {
 
 		final StringBuilder messageBuilder = formatMessage( (FailureContext) context );
 
+		messageBuilder.append( "Index: " )
+				.append( context.getIndexName() )
+				.append( "\n" );
+
 		if ( ! uncommittedOperations.isEmpty() ) {
 			messageBuilder.append( "Uncommitted operations as a result:\n" );
 			for ( Object operation : uncommittedOperations ) {

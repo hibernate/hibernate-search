@@ -19,12 +19,22 @@ public class IndexFailureContext extends FailureContext {
 		return new Builder();
 	}
 
+	private String indexName;
 	private final List<Object> uncommittedOperations;
 
 	private IndexFailureContext(Builder builder) {
 		super( builder );
+		this.indexName = builder.indexName == null ? "Unknown index" : builder.indexName;
 		this.uncommittedOperations = builder.uncommittedOperations == null
 				? Collections.emptyList() : Collections.unmodifiableList( builder.uncommittedOperations );
+	}
+
+	/**
+	 * @return The name of the index where the failure occurred.
+	 * Never {@code null}.
+	 */
+	public String getIndexName() {
+		return indexName;
 	}
 
 	/**
@@ -39,9 +49,14 @@ public class IndexFailureContext extends FailureContext {
 
 	public static class Builder extends FailureContext.Builder {
 
+		private String indexName;
 		private List<Object> uncommittedOperations;
 
 		private Builder() {
+		}
+
+		public void indexName(String indexName) {
+			this.indexName = indexName;
 		}
 
 		public void uncommittedOperation(Object uncommittedOperation) {

@@ -33,6 +33,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final String indexName;
 	private final EventContext indexEventContext;
 	private final IndexWriterDelegator indexWriterDelegator;
 	private final LuceneWriteWorkExecutionContextImpl context;
@@ -44,8 +45,10 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 	private List<LuceneWriteWork<?>> workSetUncommittedWorks = new ArrayList<>();
 	private boolean workSetHasFailure;
 
-	public LuceneWriteWorkProcessor(EventContext indexEventContext, IndexWriterDelegator indexWriterDelegator,
+	public LuceneWriteWorkProcessor(String indexName, EventContext indexEventContext,
+			IndexWriterDelegator indexWriterDelegator,
 			FailureHandler failureHandler) {
+		this.indexName = indexName;
 		this.indexEventContext = indexEventContext;
 		this.indexWriterDelegator = indexWriterDelegator;
 		this.context = new LuceneWriteWorkExecutionContextImpl( indexEventContext, indexWriterDelegator );
@@ -173,6 +176,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 		 * Report the failure again, just to warn about previous worksets potentially being affected.
 		 */
 		IndexFailureContext.Builder failureContextBuilder = IndexFailureContext.builder();
+		failureContextBuilder.indexName( indexName );
 		failureContextBuilder.throwable( throwable );
 		failureContextBuilder.failingOperation( failingOperation );
 		for ( LuceneWriteWork<?> work : previousWorkSetsUncommittedWorks ) {
