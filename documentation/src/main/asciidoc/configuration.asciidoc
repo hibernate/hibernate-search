@@ -257,13 +257,6 @@ to a <<configuration-property-types,bean reference>> pointing to the implementat
 
 Hibernate Search will call the `handle` methods whenever a failure occurs.
 
-[CAUTION]
-====
-Failure handlers should *never* throw *any* exception.
-Doing so will result in undetermined behavior,
-so make sure to catch any exception occurring in failure handlers.
-====
-
 .Implementing and using a `FailureHandler`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -274,17 +267,22 @@ include::{sourcedir}/org/hibernate/search/documentation/reporting/failurehandler
 <2> Get a description of the failing operation from the context.
 <3> Get the throwable thrown when the operation failed from the context.
 <4> Use the context-provided information to report the failure in any relevant way.
-<5> Make sure to catch any exception occurring in the failure handler.
-<6> `handle(IndexFailureContext)` is called for failures that are related to one index in particular.
-<7> On top of the failing operation and throwable,
+<5> `handle(IndexFailureContext)` is called for failures that are related to one index in particular.
+<6> On top of the failing operation and throwable,
 the index context also lists operations that could not be committed because of the failure.
 These are operations that were applied before the failure, but weren't committed yet.
-<8> Use the context-provided information to report the failure in any relevant way.
-<9> Make sure to catch any exception occurring in the failure handler.
+<7> Use the context-provided information to report the failure in any relevant way.
 
 [source, XML, indent=0, subs="+callouts"]
 ----
 include::{resourcesdir}/reporting/failurehandler.properties[]
 ----
 <1> Assign the background failure handler using a Hibernate Search configuration property.
+====
+
+[NOTE]
+====
+When a failure handler's `handle` method throws an error or exception,
+Hibernate Search will catch it and log it at the ERROR level.
+It will not be propagated.
 ====
