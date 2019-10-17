@@ -8,8 +8,6 @@ package org.hibernate.search.mapper.orm.massindexing.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.engine.reporting.FailureContext;
-import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -21,10 +19,10 @@ abstract class FailureHandledRunnable implements Runnable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final FailureHandler failureHandler;
+	private final MassIndexingNotifier notifier;
 
-	protected FailureHandledRunnable(FailureHandler failureHandler) {
-		this.failureHandler = failureHandler;
+	protected FailureHandledRunnable(MassIndexingNotifier notifier) {
+		this.notifier = notifier;
 	}
 
 	@Override
@@ -72,22 +70,22 @@ abstract class FailureHandledRunnable implements Runnable {
 
 	protected abstract void cleanUpOnFailure() throws InterruptedException;
 
-	protected final FailureHandler getFailureHandler() {
-		return failureHandler;
+	protected final MassIndexingNotifier getNotifier() {
+		return notifier;
 	}
 
 	protected void notifyInterrupted(InterruptedException exception) {
-		FailureContext.Builder contextBuilder = FailureContext.builder();
-		contextBuilder.throwable( log.massIndexingThreadInterrupted( exception ) );
-		contextBuilder.failingOperation( log.massIndexerOperation() );
-		failureHandler.handle( contextBuilder.build() );
+		notifier.notifyRunnableFailure(
+				log.massIndexingThreadInterrupted( exception ),
+				log.massIndexerOperation()
+		);
 	}
 
 	protected void notifyFailure(RuntimeException exception) {
-		FailureContext.Builder contextBuilder = FailureContext.builder();
-		contextBuilder.throwable( exception );
-		contextBuilder.failingOperation( log.massIndexerOperation() );
-		failureHandler.handle( contextBuilder.build() );
+		notifier.notifyRunnableFailure(
+				exception,
+				log.massIndexerOperation()
+		);
 	}
 
 }

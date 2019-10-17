@@ -14,7 +14,6 @@ import javax.transaction.RollbackException;
 import javax.transaction.SystemException;
 
 import org.hibernate.StatelessSession;
-import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -40,10 +39,10 @@ public class OptionallyWrapInJTATransaction extends FailureHandledRunnable {
 	private final String tenantId;
 
 	public OptionallyWrapInJTATransaction(BatchTransactionalContext batchContext,
-			FailureHandler failureHandler,
+			MassIndexingNotifier notifier,
 			StatelessSessionAwareRunnable statelessSessionAwareRunnable,
 			Integer transactionTimeout, String tenantId) {
-		super( failureHandler );
+		super( notifier );
 		/*
 		 * Unfortunately we need to access SessionFactoryImplementor to detect:
 		 *  - whether or not we need to start the JTA transaction

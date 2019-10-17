@@ -16,7 +16,6 @@ import java.util.concurrent.Future;
 import org.hibernate.CacheMode;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
@@ -48,21 +47,20 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	private final boolean optimizeAtEnd;
 	private final boolean purgeAtStart;
 	private final boolean optimizeAfterPurge;
-	private final MassIndexingMonitor monitor;
 	private final long objectsLimit;
 	private final int idFetchSize;
 	private final Integer transactionTimeout;
 	private final List<CompletableFuture<?>> indexingFutures = new ArrayList<>();
 
-	public BatchCoordinator(HibernateOrmMassIndexingMappingContext mappingContext,
+	BatchCoordinator(HibernateOrmMassIndexingMappingContext mappingContext,
 			DetachedBackendSessionContext sessionContext,
+			MassIndexingNotifier notifier,
 			Set<Class<?>> rootEntities, PojoScopeWorkspace scopeWorkspace,
 			int typesToIndexInParallel, int documentBuilderThreads, CacheMode cacheMode,
 			int objectLoadingBatchSize, long objectsLimit, boolean optimizeAtEnd,
 			boolean purgeAtStart, boolean optimizeAfterPurge,
-			MassIndexingMonitor monitor,
 			int idFetchSize, Integer transactionTimeout) {
-		super( mappingContext.getFailureHandler() );
+		super( notifier );
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
 		this.rootEntities = rootEntities;
@@ -77,7 +75,6 @@ public class BatchCoordinator extends FailureHandledRunnable {
 		this.optimizeAtEnd = optimizeAtEnd;
 		this.purgeAtStart = purgeAtStart;
 		this.optimizeAfterPurge = optimizeAfterPurge;
-		this.monitor = monitor;
 		this.objectsLimit = objectsLimit;
 	}
 
@@ -93,7 +90,7 @@ public class BatchCoordinator extends FailureHandledRunnable {
 			afterBatch();
 		}
 		finally {
-			monitor.indexingCompleted();
+			getNotifier().notifyIndexingComplete();
 		}
 	}
 
@@ -151,11 +148,10 @@ public class BatchCoordinator extends FailureHandledRunnable {
 		SingularAttribute<? super E, ?> idAttributeOfIndexedType = indexTypeModel.getId( indexTypeModel.getIdType().getJavaType() );
 
 		return new BatchIndexingWorkspace<>(
-				mappingContext, sessionContext,
+				mappingContext, sessionContext, getNotifier(),
 				indexedType, entityName, idAttributeOfIndexedType,
 				documentBuilderThreads, cacheMode,
 				objectLoadingBatchSize,
-				monitor, getFailureHandler(),
 				objectsLimit, idFetchSize, transactionTimeout
 		);
 	}

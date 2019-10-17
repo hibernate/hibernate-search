@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.orm.massindexing.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
-
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Path;
@@ -23,10 +22,7 @@ import org.hibernate.StatelessSession;
 import org.hibernate.Transaction;
 import org.hibernate.engine.spi.SharedSessionContractImplementor;
 import org.hibernate.query.Query;
-import org.hibernate.search.engine.reporting.FailureContext;
-import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -48,47 +44,46 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ProducerConsumerQueue<List<I>> destination;
 	private final SessionFactory sessionFactory;
+	private final MassIndexingNotifier notifier;
+	private final String tenantId;
+
+	private final ProducerConsumerQueue<List<I>> destination;
 	private final int batchSize;
 	private final Class<E> indexedType;
 	private final String entityName;
 	private final SingularAttribute<? super E, I> idAttributeOfIndexedType;
-	private final MassIndexingMonitor monitor;
-	private final FailureHandler failureHandler;
 	private final long objectsLimit;
 	private final int idFetchSize;
-	private final String tenantId;
 
 	/**
-	 * @param fromIdentifierListToEntities the target queue where the produced identifiers are sent to
 	 * @param sessionFactory the Hibernate SessionFactory to use to load entities
+	 * @param tenantId the tenant identifier
+	 * @param notifier the mass indexing notifier
+	 * @param fromIdentifierListToEntities the target queue where the produced identifiers are sent to
 	 * @param objectLoadingBatchSize affects mostly the next consumer: IdentifierConsumerEntityProducer
 	 * @param indexedType the entity type whose identifiers are to be loaded
 	 * @param entityName the name of the entity whose identifiers are to be loaded
 	 * @param idAttributeOfIndexedType the id attribute to be loaded
-	 * @param monitor the indexing monitor
 	 * @param objectsLimit if not zero
 	 * @param idFetchSize the fetch size
-	 * @param tenantId the tenant identifier
 	 */
-	public IdentifierProducer(
-			ProducerConsumerQueue<List<I>> fromIdentifierListToEntities, SessionFactory sessionFactory,
+	IdentifierProducer(SessionFactory sessionFactory, String tenantId,
+			MassIndexingNotifier notifier,
+			ProducerConsumerQueue<List<I>> fromIdentifierListToEntities,
 			int objectLoadingBatchSize,
 			Class<E> indexedType, String entityName, SingularAttribute<? super E, I> idAttributeOfIndexedType,
-			MassIndexingMonitor monitor, FailureHandler failureHandler,
-			long objectsLimit, int idFetchSize, String tenantId) {
-		this.destination = fromIdentifierListToEntities;
+			long objectsLimit, int idFetchSize) {
 		this.sessionFactory = sessionFactory;
+		this.tenantId = tenantId;
+		this.notifier = notifier;
+		this.destination = fromIdentifierListToEntities;
 		this.batchSize = objectLoadingBatchSize;
 		this.indexedType = indexedType;
 		this.entityName = entityName;
 		this.idAttributeOfIndexedType = idAttributeOfIndexedType;
-		this.monitor = monitor;
-		this.failureHandler = failureHandler;
 		this.objectsLimit = objectsLimit;
 		this.idFetchSize = idFetchSize;
-		this.tenantId = tenantId;
 		log.trace( "created" );
 	}
 
@@ -99,10 +94,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 			inTransactionWrapper( upperSession );
 		}
 		catch (RuntimeException exception) {
-			FailureContext.Builder contextBuilder = FailureContext.builder();
-			contextBuilder.throwable( exception );
-			contextBuilder.failingOperation( log.massIndexerFetchingIds( entityName ) );
-			failureHandler.handle( contextBuilder.build() );
+			notifier.notifyRunnableFailure( exception, log.massIndexerFetchingIds( entityName ) );
 		}
 		finally {
 			destination.producerStopping();
@@ -157,7 +149,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 		if ( log.isDebugEnabled() ) {
 			log.debugf( "going to fetch %d primary keys", (Long) totalCount );
 		}
-		monitor.addToTotalCount( totalCount );
+		notifier.notifyAddedTotalCount( totalCount );
 
 		ArrayList<I> destinationList = new ArrayList<>( batchSize );
 		long counter = 0;
