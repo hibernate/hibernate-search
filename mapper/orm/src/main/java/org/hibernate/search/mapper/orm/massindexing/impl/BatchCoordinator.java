@@ -82,7 +82,7 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	}
 
 	@Override
-	public void runWithFailureHandler() {
+	public void runWithFailureHandler() throws InterruptedException {
 		if ( !indexingFutures.isEmpty() ) {
 			throw new AssertionFailure( "BatchCoordinator instance not expected to be reused" );
 		}
@@ -92,29 +92,34 @@ public class BatchCoordinator extends FailureHandledRunnable {
 			doBatchWork();
 			afterBatch();
 		}
-		catch (InterruptedException e) {
-			log.interruptedBatchIndexing();
-			// on thread interruption cancel each pending task - thread executing the task must be interrupted
-			for ( Future<?> task : indexingFutures ) {
-				if ( !task.isDone() ) {
-					task.cancel( true );
-				}
-			}
-			// try afterBatch stuff - indexation realized before interruption will be committed - index should be in a
-			// coherent state (not corrupted)
-			try {
-				afterBatchOnInterruption();
-			}
-			catch (InterruptedException e2) {
-				// Ignore
-			}
-			finally {
-				// restore interruption signal:
-				Thread.currentThread().interrupt();
-			}
-		}
 		finally {
 			monitor.indexingCompleted();
+		}
+	}
+
+	@Override
+	protected void cleanUpOnInterruption() throws InterruptedException {
+		cancelPendingTasks();
+		// Indexing performed before the exception must still be committed,
+		// in order to leave the index in a consistent state
+		afterBatchOnInterruption();
+	}
+
+	@Override
+	protected void cleanUpOnFailure() {
+		cancelPendingTasks();
+	}
+
+	@Override
+	protected void notifyInterrupted(InterruptedException exception) {
+		log.interruptedBatchIndexing();
+	}
+
+	private void cancelPendingTasks() {
+		for ( Future<?> task : indexingFutures ) {
+			if ( !task.isDone() ) {
+				task.cancel( true );
+			}
 		}
 	}
 

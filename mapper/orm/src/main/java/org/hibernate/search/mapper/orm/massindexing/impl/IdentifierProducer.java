@@ -98,7 +98,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 		try {
 			inTransactionWrapper( upperSession );
 		}
-		catch (Exception exception) {
+		catch (RuntimeException exception) {
 			FailureContext.Builder contextBuilder = FailureContext.builder();
 			contextBuilder.throwable( exception );
 			contextBuilder.failingOperation( log.massIndexerFetchingIds( entityName ) );

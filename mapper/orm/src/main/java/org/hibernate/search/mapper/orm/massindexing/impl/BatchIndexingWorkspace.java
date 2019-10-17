@@ -94,7 +94,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 	}
 
 	@Override
-	public void runWithFailureHandler() {
+	public void runWithFailureHandler() throws InterruptedException {
 		if ( !identifierProducingFutures.isEmpty() || !indexingFutures.isEmpty() ) {
 			throw new AssertionFailure( "BatchIndexingWorkspace instance not expected to be reused" );
 		}
@@ -104,26 +104,32 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 		// First start the consumers, then the producers (reverse order):
 		startIndexing();
 		startProducingPrimaryKeys( transactionalContext );
-		try {
-			// Wait for indexing to finish.
-			Futures.unwrappedExceptionGet(
-					CompletableFuture.allOf( indexingFutures.toArray( new CompletableFuture[0] ) )
-							// Exceptions are handled by each runnable
-							.exceptionally( ignored -> null )
-			);
-			log.debugf( "Indexing for %s is done", indexedType.getName() );
+		// Wait for indexing to finish.
+		Futures.unwrappedExceptionGet(
+				CompletableFuture.allOf( indexingFutures.toArray( new CompletableFuture[0] ) )
+						// Exceptions are handled by each runnable
+						.exceptionally( ignored -> null )
+		);
+		log.debugf( "Indexing for %s is done", indexedType.getName() );
+	}
+
+	@Override
+	protected void cleanUpOnInterruption() {
+		cancelPendingTasks();
+	}
+
+	@Override
+	protected void cleanUpOnFailure() {
+		cancelPendingTasks();
+	}
+
+	private void cancelPendingTasks() {
+		// Cancel each pending task - threads executing the tasks must be interrupted
+		for ( Future<?> task : identifierProducingFutures ) {
+			task.cancel( true );
 		}
-		catch (InterruptedException e) {
-			// on thread interruption cancel each pending task - thread executing the task must be interrupted
-			for ( Future<?> task : identifierProducingFutures ) {
-				task.cancel( true );
-			}
-			for ( Future<?> task : indexingFutures ) {
-				task.cancel( true );
-			}
-			//restore interruption signal:
-			Thread.currentThread().interrupt();
-			throw log.interruptedBatchIndexingException( e );
+		for ( Future<?> task : indexingFutures ) {
+			task.cancel( true );
 		}
 	}
 
