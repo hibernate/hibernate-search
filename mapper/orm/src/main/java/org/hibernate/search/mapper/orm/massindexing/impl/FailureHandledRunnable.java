@@ -55,6 +55,9 @@ abstract class FailureHandledRunnable implements Runnable {
 			}
 
 			notifyFailure( e );
+
+			// Also propagate the exception
+			throw e;
 		}
 		finally {
 			if ( interrupted ) {
