@@ -43,6 +43,8 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import org.apache.log4j.Level;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.InstanceOfAssertFactory;
 import org.awaitility.Awaitility;
 
 public class MassIndexingFailureIT {
@@ -87,7 +89,14 @@ public class MassIndexingFailureIT {
 		doMassIndexingWithFailure(
 				sessionFactory,
 				ThreadExpectation.CREATED_AND_TERMINATED,
-				null, // TODO HSEARCH-3728 expect an exception when at least one entity failed to index
+				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
+						.hasMessageContainingAll(
+								"1 entities could not be indexed",
+								"See the logs for details.",
+								"First failure on entity 'Book#2': ",
+								"Indexing failure"
+						)
+						.hasCauseInstanceOf( SimulatedFailure.class ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.FAIL ),
@@ -113,7 +122,13 @@ public class MassIndexingFailureIT {
 		doMassIndexingWithFailure(
 				sessionFactory,
 				ThreadExpectation.CREATED_AND_TERMINATED,
-				null, // TODO HSEARCH-3728 expect an exception when at least one entity failed to index
+				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
+						.hasMessageContainingAll(
+								"1 entities could not be indexed",
+								"See the logs for details.",
+								"First failure on entity 'Book#2': ",
+								"Indexing failure"
+						),
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.FAIL ),
@@ -433,7 +448,15 @@ public class MassIndexingFailureIT {
 		doMassIndexingWithFailure(
 				sessionFactory,
 				ThreadExpectation.CREATED_AND_TERMINATED,
-				null, // TODO HSEARCH-3728 expect an exception when at least one entity failed to index
+				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
+						.hasMessageContainingAll(
+								"1 entities could not be indexed",
+								"See the logs for details.",
+								"First failure on entity 'Book#2': ",
+								"Exception while invoking"
+						)
+						.extracting( Throwable::getCause ).asInstanceOf( new InstanceOfAssertFactory<>( SearchException.class, Assertions::assertThat ) )
+						.hasMessageContaining( "Exception while invoking" ),
 				ExecutionExpectation.FAIL, ExecutionExpectation.SKIP,
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
@@ -447,7 +470,15 @@ public class MassIndexingFailureIT {
 		doMassIndexingWithFailure(
 				sessionFactory,
 				ThreadExpectation.CREATED_AND_TERMINATED,
-				null, // TODO HSEARCH-3728 expect an exception when at least one entity failed to index
+				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
+						.hasMessageContainingAll(
+								"1 entities could not be indexed",
+								"See the logs for details.",
+								"First failure on entity 'Book#2': ",
+								"Exception while invoking"
+						)
+						.extracting( Throwable::getCause ).asInstanceOf( new InstanceOfAssertFactory<>( SearchException.class, Assertions::assertThat ) )
+						.hasMessageContaining( "Exception while invoking" ),
 				ExecutionExpectation.SUCCEED, ExecutionExpectation.FAIL,
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),

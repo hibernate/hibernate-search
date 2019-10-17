@@ -206,4 +206,10 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 25, value = "Exception while handling transactions: %1$s")
 	SearchException massIndexingTransactionHandlingException(String causeMessage, @Cause Throwable cause);
+
+	@Message(id = ID_OFFSET_2 + 26, value = "%1$s entities could not be indexed. See the logs for details."
+			+ " First failure on entity '%2$s': %3$s")
+	SearchException massIndexingEntityFailures(long finalFailureCount,
+			EntityReference firstFailureEntity, String firstFailureMessage,
+			@Cause Throwable firstFailure);
 }

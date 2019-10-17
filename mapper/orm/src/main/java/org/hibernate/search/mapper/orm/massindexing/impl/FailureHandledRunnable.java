@@ -28,8 +28,10 @@ abstract class FailureHandledRunnable implements Runnable {
 	@Override
 	public final void run() {
 		boolean interrupted = false;
+		boolean successful = false;
 		try {
 			runWithFailureHandler();
+			successful = true;
 		}
 		catch (InterruptedException e) {
 			interrupted = true;
@@ -40,6 +42,7 @@ abstract class FailureHandledRunnable implements Runnable {
 				e.addSuppressed( e2 );
 			}
 
+			// This may throw an exception, and we're fine with not catching it.
 			notifyInterrupted( e );
 		}
 		catch (RuntimeException e) {
@@ -54,6 +57,7 @@ abstract class FailureHandledRunnable implements Runnable {
 				e.addSuppressed( e2 );
 			}
 
+			// This may throw an exception, and we're fine with not catching it.
 			notifyFailure( e );
 
 			// Also propagate the exception
@@ -65,6 +69,11 @@ abstract class FailureHandledRunnable implements Runnable {
 				Thread.currentThread().interrupt();
 			}
 		}
+
+		if ( successful ) {
+			// This may throw an exception, and we're fine with not catching it.
+			notifySuccess();
+		}
 	}
 
 	protected abstract void runWithFailureHandler() throws InterruptedException;
@@ -75,6 +84,10 @@ abstract class FailureHandledRunnable implements Runnable {
 
 	protected final MassIndexingNotifier getNotifier() {
 		return notifier;
+	}
+
+	protected void notifySuccess() {
+		// Do nothing by default
 	}
 
 	protected void notifyInterrupted(InterruptedException exception) {
