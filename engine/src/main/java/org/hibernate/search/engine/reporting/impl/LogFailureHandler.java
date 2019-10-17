@@ -9,6 +9,7 @@ package org.hibernate.search.engine.reporting.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 
+import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.IndexFailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
@@ -30,6 +31,11 @@ public class LogFailureHandler implements FailureHandler {
 	}
 
 	@Override
+	public void handle(EntityIndexingFailureContext context) {
+		log.exceptionOccurred( formatMessage( context ).toString(), context.getThrowable() );
+	}
+
+	@Override
 	public void handle(IndexFailureContext context) {
 		log.exceptionOccurred( formatMessage( context ).toString(), context.getThrowable() );
 	}
@@ -46,6 +52,22 @@ public class LogFailureHandler implements FailureHandler {
 		messageBuilder.append( "Failing operation:\n" );
 		messageBuilder.append( failingOperation );
 		messageBuilder.append( "\n" );
+
+		return messageBuilder;
+	}
+
+	private StringBuilder formatMessage(EntityIndexingFailureContext context) {
+		final List<?> entityReferences = context.getEntityReferences();
+
+		final StringBuilder messageBuilder = formatMessage( (FailureContext) context );
+
+		if ( ! entityReferences.isEmpty() ) {
+			messageBuilder.append( "Entities that could not be indexed correctly:\n" );
+			for ( Object entityReference : entityReferences ) {
+				messageBuilder.append( entityReference );
+				messageBuilder.append( " " );
+			}
+		}
 
 		return messageBuilder;
 	}

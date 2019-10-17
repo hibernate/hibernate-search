@@ -263,15 +263,20 @@ Hibernate Search will call the `handle` methods whenever a failure occurs.
 ----
 include::{sourcedir}/org/hibernate/search/documentation/reporting/failurehandler/MyFailureHandler.java[tags=include]
 ----
-<1> `handle(FailureContext)` is called for failures that are not related to one index in particular.
+<1> `handle(FailureContext)` is called for generic failures that do not fit any other specialized `handle` method.
 <2> Get a description of the failing operation from the context.
 <3> Get the throwable thrown when the operation failed from the context.
 <4> Use the context-provided information to report the failure in any relevant way.
-<5> `handle(IndexFailureContext)` is called for failures that are related to one index in particular.
+<5> `handle(EntityIndexingFailureContext)` is called for failures occurring when indexing entities.
 <6> On top of the failing operation and throwable,
+the context also lists references to entities that could not be indexed correctly because of the failure.
+<7> Use the context-provided information to report the failure in any relevant way.
+<8> `handle(IndexFailureContext)` is called for failures that are related to one index in particular.
+<9> On top of the failing operation and throwable,
 the index context also lists operations that could not be committed because of the failure.
 These are operations that were applied before the failure, but weren't committed yet.
-<7> Use the context-provided information to report the failure in any relevant way.
+<10> Use the context-provided information to report the failure in any relevant way.
+
 
 [source, XML, indent=0, subs="+callouts"]
 ----

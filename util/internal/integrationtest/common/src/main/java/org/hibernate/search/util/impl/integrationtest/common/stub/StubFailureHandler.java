@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub;
 
+import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.IndexFailureContext;
@@ -15,6 +16,7 @@ public class StubFailureHandler implements FailureHandler {
 
 	public static StaticCounters.Key CREATE = StaticCounters.createKey();
 	public static StaticCounters.Key HANDLE_GENERIC_CONTEXT = StaticCounters.createKey();
+	public static StaticCounters.Key HANDLE_ENTITY_INDEXING_CONTEXT = StaticCounters.createKey();
 	public static StaticCounters.Key HANDLE_INDEX_CONTEXT = StaticCounters.createKey();
 
 	public StubFailureHandler() {
@@ -24,6 +26,11 @@ public class StubFailureHandler implements FailureHandler {
 	@Override
 	public void handle(FailureContext context) {
 		StaticCounters.get().increment( HANDLE_GENERIC_CONTEXT );
+	}
+
+	@Override
+	public void handle(EntityIndexingFailureContext context) {
+		StaticCounters.get().increment( HANDLE_ENTITY_INDEXING_CONTEXT );
 	}
 
 	@Override

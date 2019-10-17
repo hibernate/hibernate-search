@@ -10,6 +10,7 @@ import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expectLastCall;
 import static org.hamcrest.CoreMatchers.sameInstance;
 
+import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.IndexFailureContext;
@@ -60,6 +61,38 @@ public class FailSafeFailureHandlerWrapperTest extends EasyMockSupport {
 		expectLastCall().andThrow( failure );
 		replayAll();
 		wrapper.handle( FailureContext.builder().build() );
+		verifyAll();
+	}
+
+	@Test
+	public void entityIndexingContext_runtimeException() {
+		RuntimeException failure = new SimulatedRuntimeException();
+
+		logged.expectEvent(
+				Level.ERROR, sameInstance( failure ), "failure handler threw an exception"
+		);
+
+		resetAll();
+		failureHandlerMock.handle( anyObject( EntityIndexingFailureContext.class ) );
+		expectLastCall().andThrow( failure );
+		replayAll();
+		wrapper.handle( EntityIndexingFailureContext.builder().build() );
+		verifyAll();
+	}
+
+	@Test
+	public void entityIndexingContext_error() {
+		Error failure = new SimulatedError();
+
+		logged.expectEvent(
+				Level.ERROR, sameInstance( failure ), "failure handler threw an exception"
+		);
+
+		resetAll();
+		failureHandlerMock.handle( anyObject( EntityIndexingFailureContext.class ) );
+		expectLastCall().andThrow( failure );
+		replayAll();
+		wrapper.handle( EntityIndexingFailureContext.builder().build() );
 		verifyAll();
 	}
 

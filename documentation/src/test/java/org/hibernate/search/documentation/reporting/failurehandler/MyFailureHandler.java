@@ -10,6 +10,7 @@ package org.hibernate.search.documentation.reporting.failurehandler;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.IndexFailureContext;
@@ -33,15 +34,27 @@ public class MyFailureHandler implements FailureHandler {
 	}
 
 	@Override
-	public void handle(IndexFailureContext context) { // <5>
+	public void handle(EntityIndexingFailureContext context) { // <5>
 		String failingOperationDescription = context.getFailingOperation().toString();
 		Throwable throwable = context.getThrowable();
-		List<String> uncommittedOperationsDescriptions = new ArrayList<>();
-		for ( Object uncommittedOperation : context.getUncommittedOperations() ) { // <6>
-			uncommittedOperationsDescriptions.add( uncommittedOperation.toString() );
+		List<String> entityReferencesAsStrings = new ArrayList<>();
+		for ( Object entityReference : context.getEntityReferences() ) { // <6>
+			entityReferencesAsStrings.add( entityReference.toString() );
 		}
 
 		// ... report the failure ... // <7>
+	}
+
+	@Override
+	public void handle(IndexFailureContext context) { // <8>
+		String failingOperationDescription = context.getFailingOperation().toString();
+		Throwable throwable = context.getThrowable();
+		List<String> uncommittedOperationsDescriptions = new ArrayList<>();
+		for ( Object uncommittedOperation : context.getUncommittedOperations() ) { // <9>
+			uncommittedOperationsDescriptions.add( uncommittedOperation.toString() );
+		}
+
+		// ... report the failure ... // <10>
 	}
 }
 // end::include[]

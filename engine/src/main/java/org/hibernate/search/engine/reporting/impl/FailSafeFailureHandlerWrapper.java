@@ -9,6 +9,7 @@ package org.hibernate.search.engine.reporting.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.IndexFailureContext;
@@ -26,6 +27,16 @@ public class FailSafeFailureHandlerWrapper implements FailureHandler {
 
 	@Override
 	public void handle(FailureContext context) {
+		try {
+			delegate.handle( context );
+		}
+		catch (Throwable t) {
+			log.failureInFailureHandler( t );
+		}
+	}
+
+	@Override
+	public void handle(EntityIndexingFailureContext context) {
 		try {
 			delegate.handle( context );
 		}
