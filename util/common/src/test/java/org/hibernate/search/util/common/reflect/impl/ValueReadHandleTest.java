@@ -16,13 +16,20 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
+import org.hibernate.search.util.impl.test.SubTest;
 
+import org.junit.Assume;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.InstanceOfAssertFactory;
 
 @RunWith(Parameterized.class)
 public class ValueReadHandleTest {
@@ -44,65 +51,163 @@ public class ValueReadHandleTest {
 
 	@Test
 	public void privateField() throws Exception {
-		testFieldValueReadHandle( "privateField" );
+		testFieldValueReadHandleSuccess( "privateField" );
 	}
 
 	@Test
 	public void privateFinalField() throws Exception {
-		testFieldValueReadHandle( "privateFinalField" );
+		testFieldValueReadHandleSuccess( "privateFinalField" );
 	}
 
 	@Test
 	public void packagePrivateField() throws Exception {
-		testFieldValueReadHandle( "packagePrivateField" );
+		testFieldValueReadHandleSuccess( "packagePrivateField" );
 	}
 
 	@Test
 	public void packagePrivateFinalField() throws Exception {
-		testFieldValueReadHandle( "packagePrivateFinalField" );
+		testFieldValueReadHandleSuccess( "packagePrivateFinalField" );
 	}
 
 	@Test
 	public void protectedField() throws Exception {
-		testFieldValueReadHandle( "protectedField" );
+		testFieldValueReadHandleSuccess( "protectedField" );
 	}
 
 	@Test
 	public void protectedFinalField() throws Exception {
-		testFieldValueReadHandle( "protectedFinalField" );
+		testFieldValueReadHandleSuccess( "protectedFinalField" );
 	}
 
 	@Test
 	public void publicField() throws Exception {
-		testFieldValueReadHandle( "publicField" );
+		testFieldValueReadHandleSuccess( "publicField" );
 	}
 
 	@Test
 	public void publicFinalField() throws Exception {
-		testFieldValueReadHandle( "publicFinalField" );
+		testFieldValueReadHandleSuccess( "publicFinalField" );
 	}
 
 	@Test
 	public void privateMethod() throws Exception {
-		testMethodValueReadHandle( "privateMethod" );
+		testMethodValueReadHandleSuccess( "privateMethod" );
 	}
 
 	@Test
 	public void packagePrivateMethod() throws Exception {
-		testMethodValueReadHandle( "packagePrivateMethod" );
+		testMethodValueReadHandleSuccess( "packagePrivateMethod" );
 	}
 
 	@Test
 	public void protectedMethod() throws Exception {
-		testMethodValueReadHandle( "protectedMethod" );
+		testMethodValueReadHandleSuccess( "protectedMethod" );
 	}
 
 	@Test
 	public void publicMethod() throws Exception {
-		testMethodValueReadHandle( "publicMethod" );
+		testMethodValueReadHandleSuccess( "publicMethod" );
 	}
 
-	private void testFieldValueReadHandle(String fieldName) throws IllegalAccessException, NoSuchFieldException {
+	@Test
+	public void failure_method_error() throws Exception {
+		Method method = EntityType.class.getDeclaredMethod( "errorThrowingMethod" );
+		setAccessible( method );
+
+		ValueReadHandle<?> valueReadHandle = factory.createForMethod( method );
+
+		EntityType entity = new EntityType();
+		SubTest.expectThrowable( () -> valueReadHandle.get( entity ) )
+				.assertThrown()
+				.isInstanceOf( SimulatedError.class )
+				.hasMessageContaining( "errorThrowingMethod" );
+	}
+
+	@Test
+	public void failure_method_runtimeException() throws Exception {
+		Method method = EntityType.class.getDeclaredMethod( "runtimeExceptionThrowingMethod" );
+		setAccessible( method );
+
+		ValueReadHandle<?> valueReadHandle = factory.createForMethod( method );
+
+		EntityType entity = new EntityType( () -> "toStringResult" );
+		SubTest.expectThrowable( () -> valueReadHandle.get( entity ) )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining(
+						"Exception while invoking '" + method.toString() + "' on 'toStringResult'"
+				)
+				.extracting( Throwable::getCause ).asInstanceOf( new InstanceOfAssertFactory<>( SimulatedRuntimeException.class, Assertions::assertThat ) )
+				.hasMessageContaining( "runtimeExceptionThrowingMethod" );
+	}
+
+	@Test
+	public void failure_method_illegalAccessException() throws Exception {
+		Assume.assumeFalse(
+				"Cannot test IllegalAccessException with MethodHandles: "
+						+ " if we don't use setAccessible(true), we can't create the handle,"
+						+ " and if we do use setAccessible(true), the handle has full access to the field/method.",
+				factory.getClass().getSimpleName().contains( "MethodHandle" )
+		);
+
+		Method method = EntityType.class.getDeclaredMethod( "illegalAccessExceptionThrowingMethod" );
+
+		ValueReadHandle<?> valueReadHandle = factory.createForMethod( method );
+
+		EntityType entity = new EntityType( () -> "toStringResult" );
+		SubTest.expectThrowable( () -> valueReadHandle.get( entity ) )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining(
+						"Exception while invoking '" + method.toString() + "' on 'toStringResult'"
+				)
+				.extracting( Throwable::getCause ).isInstanceOf( IllegalAccessException.class );
+	}
+
+	@Test
+	public void failure_field_illegalAccessException() throws Exception {
+		Assume.assumeFalse(
+				"Cannot test IllegalAccessException with MethodHandles: "
+						+ " if we don't use setAccessible(true), we can't create the handle,"
+						+ " and if we do use setAccessible(true), the handle has full access to the field/method.",
+				factory.getClass().getSimpleName().contains( "MethodHandle" )
+		);
+
+		Field field = EntityType.class.getDeclaredField( "illegalAccessExceptionThrowingField" );
+
+		ValueReadHandle<?> valueReadHandle = factory.createForField( field );
+
+		EntityType entity = new EntityType( () -> "toStringResult" );
+		SubTest.expectThrowable( () -> valueReadHandle.get( entity ) )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining(
+						"Exception while invoking '" + field.toString() + "' on 'toStringResult'"
+				)
+				.extracting( Throwable::getCause ).isInstanceOf( IllegalAccessException.class );
+	}
+
+	@Test
+	public void failure_method_secondFailureInToString_runtimeException() throws Exception {
+		Method method = EntityType.class.getDeclaredMethod( "runtimeExceptionThrowingMethod" );
+		setAccessible( method );
+
+		ValueReadHandle<?> valueReadHandle = factory.createForMethod( method );
+
+		SimulatedRuntimeException toStringRuntimeException = new SimulatedRuntimeException( "toString" );
+		EntityType entity = new EntityType( () -> { throw toStringRuntimeException; } );
+		SubTest.expectThrowable( () -> valueReadHandle.get( entity ) )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining(
+						"Exception while invoking '" + method.toString() + "' on '<EntityType#toString() threw SimulatedRuntimeException>'"
+				)
+				.extracting( Throwable::getCause ).asInstanceOf( new InstanceOfAssertFactory<>( SimulatedRuntimeException.class, Assertions::assertThat ) )
+				.hasMessageContaining( "runtimeExceptionThrowingMethod" )
+				.hasSuppressedException( toStringRuntimeException );
+	}
+
+	private void testFieldValueReadHandleSuccess(String fieldName) throws IllegalAccessException, NoSuchFieldException {
 		String expectedValue = fieldName + "Value";
 		Field field = EntityType.class.getDeclaredField( fieldName );
 		setAccessible( field );
@@ -124,7 +229,7 @@ public class ValueReadHandleTest {
 		assertThat( valueReadHandle ).isNotEqualTo( differentFieldValueReadHandle );
 	}
 
-	private void testMethodValueReadHandle(String methodName) throws IllegalAccessException, NoSuchMethodException {
+	private void testMethodValueReadHandleSuccess(String methodName) throws IllegalAccessException, NoSuchMethodException {
 		String expectedValue = methodName + "Value";
 		Method method = EntityType.class.getDeclaredMethod( methodName );
 		setAccessible( method );
@@ -152,6 +257,8 @@ public class ValueReadHandleTest {
 	}
 
 	private static class EntityType {
+		private final Supplier<String> toString;
+
 		private String privateField = "privateFieldValue";
 		private final String privateFinalField = "privateFinalFieldValue";
 		String packagePrivateField = "packagePrivateFieldValue";
@@ -161,6 +268,20 @@ public class ValueReadHandleTest {
 		public String publicField = "publicFieldValue";
 		public final String publicFinalField = "publicFinalFieldValue";
 		private String otherField;
+		private String illegalAccessExceptionThrowingField = "illegalAccessExceptionThrowingField";
+
+		private EntityType() {
+			this.toString = () -> Assertions.fail( "Unexpected call to 'toString()'" );
+		}
+
+		private EntityType(Supplier<String> toString) {
+			this.toString = toString;
+		}
+
+		@Override
+		public String toString() {
+			return toString.get();
+		}
 
 		private String privateMethod() {
 			return "privateMethodValue";
@@ -176,6 +297,27 @@ public class ValueReadHandleTest {
 		}
 		public String otherMethod() {
 			return "otherMethod";
+		}
+		public String runtimeExceptionThrowingMethod() {
+			throw new SimulatedRuntimeException( "runtimeExceptionThrowingMethod" );
+		}
+		public String errorThrowingMethod() {
+			throw new SimulatedError( "errorThrowingMethod" );
+		}
+		private String illegalAccessExceptionThrowingMethod() {
+			return Assertions.fail( "This method is inaccessible and should not be called" );
+		}
+	}
+
+	private static class SimulatedRuntimeException extends RuntimeException {
+		public SimulatedRuntimeException(String message) {
+			super( message );
+		}
+	}
+
+	private static class SimulatedError extends Error {
+		public SimulatedError(String message) {
+			super( message );
 		}
 	}
 }

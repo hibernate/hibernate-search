@@ -67,13 +67,43 @@ public class SubTest {
 	public static ExceptionThrowingSubTest expectException(String description, Callable<?> callable) {
 		try {
 			callable.call();
-			fail( "'" + description + "' should have thrown an exception" );
-			throw new IllegalStateException( "This should never happen" );
 		}
 		catch (Exception e) {
 			log.infof( e, "SubTest caught exception (an exception was expected; type/message checks will follow):", e );
 			return new ExceptionThrowingSubTest( "Exception thrown by '" + description + "'", e );
 		}
+		fail( "'" + description + "' should have thrown an exception" );
+		throw new IllegalStateException( "This should never happen" );
+	}
+
+	public static ExceptionThrowingSubTest expectThrowable(Runnable runnable) {
+		return expectThrowable( runnable.toString(), runnable );
+	}
+
+	public static ExceptionThrowingSubTest expectThrowable(String description, Runnable runnable) {
+		return expectThrowable(
+				description,
+				() -> {
+					runnable.run();
+					return null;
+				}
+		);
+	}
+
+	public static ExceptionThrowingSubTest expectThrowable(Callable<?> callable) {
+		return expectThrowable( callable.toString(), callable );
+	}
+
+	public static ExceptionThrowingSubTest expectThrowable(String description, Callable<?> callable) {
+		try {
+			callable.call();
+		}
+		catch (Throwable e) {
+			log.infof( e, "SubTest caught throwable (a throwable was expected; type/message checks will follow):", e );
+			return new ExceptionThrowingSubTest( "Exception thrown by '" + description + "'", e );
+		}
+		fail( "'" + description + "' should have thrown a throwable" );
+		throw new IllegalStateException( "This should never happen" );
 	}
 
 	private SubTest() {
