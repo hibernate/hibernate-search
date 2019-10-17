@@ -26,32 +26,22 @@ public class MyFailureHandler implements FailureHandler {
 
 	@Override
 	public void handle(FailureContext context) { // <1>
-		try {
-			String failingOperationDescription = context.getFailingOperation().toString(); // <2>
-			Throwable throwable = context.getThrowable(); // <3>
+		String failingOperationDescription = context.getFailingOperation().toString(); // <2>
+		Throwable throwable = context.getThrowable(); // <3>
 
-			// ... report the failure ... // <4>
-		}
-		catch (Throwable t) {
-			// ... handle the failure and do *not* propagate the throwable ... // <5>
-		}
+		// ... report the failure ... // <4>
 	}
 
 	@Override
-	public void handle(IndexFailureContext context) { // <6>
-		try {
-			String failingOperationDescription = context.getFailingOperation().toString();
-			Throwable throwable = context.getThrowable();
-			List<String> uncommittedOperationsDescriptions = new ArrayList<>();
-			for ( Object uncommittedOperation : context.getUncommittedOperations() ) { // <7>
-				uncommittedOperationsDescriptions.add( uncommittedOperation.toString() );
-			}
+	public void handle(IndexFailureContext context) { // <5>
+		String failingOperationDescription = context.getFailingOperation().toString();
+		Throwable throwable = context.getThrowable();
+		List<String> uncommittedOperationsDescriptions = new ArrayList<>();
+		for ( Object uncommittedOperation : context.getUncommittedOperations() ) { // <6>
+			uncommittedOperationsDescriptions.add( uncommittedOperation.toString() );
+		}
 
-			// ... report the failure ... // <8>
-		}
-		catch (Throwable t) {
-			// ... handle the failure and do *not* propagate the throwable ... // <9>
-		}
+		// ... report the failure ... // <7>
 	}
 }
 // end::include[]

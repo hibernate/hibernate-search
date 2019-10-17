@@ -293,4 +293,10 @@ public interface Log extends BasicLogger {
 					+ " To disable this warning, set the property '%2$s' to '%3$s'.")
 	void configurationPropertyTrackingUnusedProperties(Set<String> propertyKeys, String disableWarningKey,
 			String disableWarningValue);
+
+	@LogMessage(level = Logger.Level.ERROR)
+	@Message(id = ID_OFFSET_2 + 69,
+			value = "The background failure handler threw an exception while handling a previous failure."
+					+ " The failure may not have been reported.")
+	void failureInFailureHandler(@Cause Throwable t);
 }

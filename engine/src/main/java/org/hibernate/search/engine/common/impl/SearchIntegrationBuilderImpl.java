@@ -51,6 +51,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildConte
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.engine.reporting.impl.FailSafeFailureHandlerWrapper;
 import org.hibernate.search.engine.reporting.impl.RootFailureCollector;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -176,6 +177,9 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 			BeanResolver beanResolver = new ConfiguredBeanResolver( serviceResolver, beanProvider, propertySource );
 			failureHandlerHolder = BACKGROUND_FAILURE_HANDLER.getAndTransform( propertySource, beanResolver::resolve );
+			// Wrap the failure handler to prevent it from throwing exceptions
+			failureHandlerHolder = BeanHolder.of( new FailSafeFailureHandlerWrapper( failureHandlerHolder.get() ) )
+					.withDependencyAutoClosing( failureHandlerHolder );
 			FailureHandler failureHandler = failureHandlerHolder.get();
 			RootBuildContext rootBuildContext = new RootBuildContext(
 					propertySource,
