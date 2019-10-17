@@ -96,14 +96,14 @@ public interface Log extends BasicLogger {
 	@Message(value = "MassIndexer operation")
 	String massIndexerOperation();
 
-	@Message(value = "Indexing instance of type %s while mass indexing")
-	String massIndexerIndexingInstance(@FormatWith(ClassFormatter.class) Class<?> entityType);
+	@Message(value = "Indexing instance of entity '%s' during mass indexing")
+	String massIndexerIndexingInstance(String entityName);
 
-	@Message(value = "Fetching the primary identifiers list")
-	String massIndexerFetchingIds();
+	@Message(value = "Fetching identifiers of entities to index for entity '%s' during mass indexing")
+	String massIndexerFetchingIds(String entityName);
 
-	@Message(value = "Transforming identifiers to Lucene Documents")
-	String massIndexerTransformingIds();
+	@Message(value = "Loading and extracting entity data for entity '%s' during mass indexing")
+	String massIndexingLoadingAndExtractingEntityData(String entityName);
 
 	@Message(id = ID_OFFSET_1 + 276, value = "No transaction is active while indexing entity type '%1$s'; Consider increasing the connection time-out")
 	SearchException transactionNotActiveWhileProducingIdsForBatchIndexing(@FormatWith(ClassFormatter.class) Class<?> entityType);

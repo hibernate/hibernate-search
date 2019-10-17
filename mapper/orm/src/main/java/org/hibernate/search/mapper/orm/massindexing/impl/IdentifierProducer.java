@@ -52,6 +52,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 	private final SessionFactory sessionFactory;
 	private final int batchSize;
 	private final Class<E> indexedType;
+	private final String entityName;
 	private final SingularAttribute<? super E, I> idAttributeOfIndexedType;
 	private final MassIndexingMonitor monitor;
 	private final FailureHandler failureHandler;
@@ -64,6 +65,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 	 * @param sessionFactory the Hibernate SessionFactory to use to load entities
 	 * @param objectLoadingBatchSize affects mostly the next consumer: IdentifierConsumerEntityProducer
 	 * @param indexedType the entity type whose identifiers are to be loaded
+	 * @param entityName the name of the entity whose identifiers are to be loaded
 	 * @param idAttributeOfIndexedType the id attribute to be loaded
 	 * @param monitor the indexing monitor
 	 * @param objectsLimit if not zero
@@ -73,13 +75,14 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 	public IdentifierProducer(
 			ProducerConsumerQueue<List<I>> fromIdentifierListToEntities, SessionFactory sessionFactory,
 			int objectLoadingBatchSize,
-			Class<E> indexedType, SingularAttribute<? super E, I> idAttributeOfIndexedType,
+			Class<E> indexedType, String entityName, SingularAttribute<? super E, I> idAttributeOfIndexedType,
 			MassIndexingMonitor monitor, FailureHandler failureHandler,
 			long objectsLimit, int idFetchSize, String tenantId) {
 		this.destination = fromIdentifierListToEntities;
 		this.sessionFactory = sessionFactory;
 		this.batchSize = objectLoadingBatchSize;
 		this.indexedType = indexedType;
+		this.entityName = entityName;
 		this.idAttributeOfIndexedType = idAttributeOfIndexedType;
 		this.monitor = monitor;
 		this.failureHandler = failureHandler;
@@ -98,7 +101,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 		catch (Exception exception) {
 			FailureContext.Builder contextBuilder = FailureContext.builder();
 			contextBuilder.throwable( exception );
-			contextBuilder.failingOperation( log.massIndexerFetchingIds() );
+			contextBuilder.failingOperation( log.massIndexerFetchingIds( entityName ) );
 			failureHandler.handle( contextBuilder.build() );
 		}
 		finally {

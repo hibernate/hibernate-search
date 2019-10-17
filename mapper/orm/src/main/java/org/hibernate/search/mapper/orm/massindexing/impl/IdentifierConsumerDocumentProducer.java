@@ -111,7 +111,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		catch (Exception exception) {
 			FailureContext.Builder failureContextBuilder = FailureContext.builder();
 			failureContextBuilder.throwable( exception );
-			failureContextBuilder.failingOperation( log.massIndexerTransformingIds() );
+			failureContextBuilder.failingOperation( log.massIndexingLoadingAndExtractingEntityData( entityName ) );
 			failureHandler.handle( failureContextBuilder.build() );
 		}
 		finally {
@@ -266,7 +266,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		EntityIndexingFailureContext.Builder contextBuilder = EntityIndexingFailureContext.builder();
 		contextBuilder.throwable( throwable );
 		// Add minimal information here, but information we're sure we can get
-		contextBuilder.failingOperation( log.massIndexerIndexingInstance( this.type ) );
+		contextBuilder.failingOperation( log.massIndexerIndexingInstance( entityName ) );
 		// Add more information here, but information that may not be available if the session completely broke down
 		// (we're being extra careful here because we don't want to throw an exception while handling and exception)
 		EntityReference entityReference = extractReferenceOrSuppress( session, entity, throwable );

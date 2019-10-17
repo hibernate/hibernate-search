@@ -70,7 +70,7 @@ public class MassIndexingFailureIT {
 				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
 						.withMessage( "Indexing failure" )
 						.build(),
-				"Indexing instance of type " + Book.class.getName(),
+				"Indexing instance of entity '" + Book.NAME + "'",
 				"Entities that could not be indexed correctly:",
 				Book.NAME + "#2"
 		)
@@ -126,7 +126,7 @@ public class MassIndexingFailureIT {
 						.causedBy( SimulatedFailure.class )
 								.withMessage( "getId failure" )
 						.build(),
-				"Indexing instance of type " + Book.class.getName(),
+				"Indexing instance of entity '" + Book.NAME + "'",
 				"Entities that could not be indexed correctly:",
 				Book.NAME + "#2"
 
@@ -169,7 +169,7 @@ public class MassIndexingFailureIT {
 						.causedBy( SimulatedFailure.class )
 								.withMessage( "getTitle failure" )
 						.build(),
-				"Indexing instance of type " + Book.class.getName(),
+				"Indexing instance of entity '" + Book.NAME + "'",
 				"Entities that could not be indexed correctly:",
 				Book.NAME + "#2"
 		)

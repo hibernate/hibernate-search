@@ -142,7 +142,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 				getFailureHandler(),
 				new IdentifierProducer<>(
 						primaryKeyStream, mappingContext.getSessionFactory(), objectLoadingBatchSize,
-						indexedType, idAttributeOfIndexedType,
+						indexedType, entityName, idAttributeOfIndexedType,
 						monitor, getFailureHandler(),
 						objectsLimit,
 						idFetchSize, sessionContext.getTenantIdentifier()
