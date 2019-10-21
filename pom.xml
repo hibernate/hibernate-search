@@ -327,11 +327,17 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <maven.compiler.source>1.8</maven.compiler.source>
+        <!-- Set statically: we want our code to comply with this version -->
+        <java-version.baseline.major>1.8</java-version.baseline.major>
+        <!-- Updated dynamically depending on the current JDK using profiles (see further down) -->
+        <java-version.jdk.major>1.8</java-version.jdk.major>
+
+        <maven.compiler.target>${java-version.baseline.major}</maven.compiler.target>
+        <maven.compiler.source>${java-version.baseline.major}</maven.compiler.source>
         <!-- This is used to generate a link to the standard Java library javadoc -->
         <javadoc.javase.url>http://download.oracle.com/javase/8/docs/api/</javadoc.javase.url>
-        <maven.compiler.testTarget>${maven.compiler.target}</maven.compiler.testTarget>
+        <!-- Generate Java 13/14 bytecode for tests when building with JDK13/14 -->
+        <maven.compiler.testTarget>${java-version.jdk.major}</maven.compiler.testTarget>
         <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>
         <!--
                 Options to override the compiler arguments directly on the compiler argument line to separate between what
@@ -1936,6 +1942,17 @@
             <modules>
                 <!-- Nothing at the moment -->
             </modules>
+        </profile>
+
+        <profile>
+            <id>jdk9+</id>
+            <activation>
+                <jdk>[9,)</jdk>
+            </activation>
+            <properties>
+                <!-- 'java.specification.version' is only correct from Java 9 onwards -->
+                <java-version.jdk.major>${java.specification.version}</java-version.jdk.major>
+            </properties>
         </profile>
 
         <profile>
