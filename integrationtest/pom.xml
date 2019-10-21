@@ -15,6 +15,10 @@
     <properties>
         <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
         <maven.javadoc.skip>true</maven.javadoc.skip>
+
+        <!-- Apply the test source/target settings to all code in integration test utils, even code in src/main -->
+        <maven.compiler.argument.source>${maven.compiler.argument.testSource}</maven.compiler.argument.source>
+        <maven.compiler.argument.target>${maven.compiler.argument.testTarget}</maven.compiler.argument.target>
     </properties>
 
     <modules>
