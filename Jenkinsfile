@@ -169,7 +169,7 @@ stage('Configure') {
 					new JdkBuildEnvironment(version: '13', tool: 'OpenJDK 13 Latest', status: BuildEnvironmentStatus.SUPPORTED,
 							// Elasticsearch won't run on JDK13+
 							elasticsearchTool: 'OpenJDK 11 Latest'),
-					new JdkBuildEnvironment(version: '14', tool: 'OpenJDK 14 Latest', status: BuildEnvironmentStatus.EXPERIMENTAL,
+					new JdkBuildEnvironment(version: '14', tool: 'OpenJDK 14 Latest', status: BuildEnvironmentStatus.SUPPORTED,
 							// Elasticsearch won't run on JDK13+
 							elasticsearchTool: 'OpenJDK 11 Latest')
 			],
