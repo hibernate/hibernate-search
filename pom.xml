@@ -205,7 +205,7 @@
         <version.com.fasterxml.jackson.databind>${version.com.fasterxml.jackson}</version.com.fasterxml.jackson.databind>
 
         <!-- >>> ORM -->
-        <version.org.hibernate>5.4.6.Final</version.org.hibernate>
+        <version.org.hibernate>5.4.7.Final</version.org.hibernate>
         <javadoc.org.hibernate.url>http://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/javadocs/</javadoc.org.hibernate.url>
         <documentation.org.hibernate.url>http://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.url>
         <version.org.hibernate.commons.annotations>5.1.0.Final</version.org.hibernate.commons.annotations>
