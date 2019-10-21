@@ -12,15 +12,6 @@
     <name>Hibernate Search Integration Tests - Backend TCK</name>
     <description>Hibernate Search backend TCK, including tests for every feature common to all the backends</description>
 
-    <properties>
-        <!--
-            Consider all sources as tests during Sonar analysis.
-            This is important because some analysis rules do not apply to test code.
-         -->
-        <sonar.sources>${rootProject.emptySubdirectory}</sonar.sources>
-        <sonar.tests>${project.build.sourceDirectory}</sonar.tests>
-    </properties>
-
     <dependencies>
         <dependency>
             <groupId>org.hibernate.search</groupId>
