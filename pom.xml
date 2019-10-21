@@ -1445,7 +1445,7 @@
                         <execution>
                             <id>verify-forbidden-apis</id>
                             <configuration>
-                                <targetVersion>10</targetVersion>
+                                <targetVersion>13</targetVersion>
                                 <!-- if the used Java version is too new, don't fail, just do nothing: -->
                                 <failOnUnsupportedJava>false</failOnUnsupportedJava>
                                 <excludes>
@@ -1489,16 +1489,22 @@
                                     <bundledSignature>jdk-unsafe-9</bundledSignature>
                                     <bundledSignature>jdk-unsafe-10</bundledSignature>
                                     <bundledSignature>jdk-unsafe-11</bundledSignature>
+                                    <bundledSignature>jdk-unsafe-12</bundledSignature>
+                                    <bundledSignature>jdk-unsafe-13</bundledSignature>
 
                                     <bundledSignature>jdk-deprecated-1.8</bundledSignature>
                                     <bundledSignature>jdk-deprecated-9</bundledSignature>
                                     <bundledSignature>jdk-deprecated-10</bundledSignature>
                                     <bundledSignature>jdk-deprecated-11</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-12</bundledSignature>
+                                    <bundledSignature>jdk-deprecated-13</bundledSignature>
 
                                     <bundledSignature>jdk-internal-1.8</bundledSignature>
                                     <bundledSignature>jdk-internal-9</bundledSignature>
                                     <bundledSignature>jdk-internal-10</bundledSignature>
                                     <bundledSignature>jdk-internal-11</bundledSignature>
+                                    <bundledSignature>jdk-internal-12</bundledSignature>
+                                    <bundledSignature>jdk-internal-13</bundledSignature>
                                 </bundledSignatures>
                                 <failOnMissingClasses>false</failOnMissingClasses>
                                 <failOnUnresolvableSignatures>false</failOnUnresolvableSignatures>
