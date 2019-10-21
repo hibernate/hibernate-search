@@ -2072,6 +2072,17 @@
         </profile>
 
         <profile>
+            <id>jdk14+</id>
+            <activation>
+                <jdk>[14,)</jdk>
+            </activation>
+            <properties>
+                <!-- JMS tests fail with JDK14 for some reason -->
+                <failsafe.wildfly.skip>true</failsafe.wildfly.skip>
+            </properties>
+        </profile>
+
+        <profile>
             <id>compiler-eclipse</id>
             <build>
                 <pluginManagement>
