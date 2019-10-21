@@ -2006,6 +2006,17 @@
         </profile>
 
         <profile>
+            <id>jdk14+</id>
+            <activation>
+                <jdk>[14,)</jdk>
+            </activation>
+            <properties>
+                <!-- ForbiddenAPIs doesn't provide bundled signatures for JDK14... yet. -->
+                <forbiddenapis.skip>true</forbiddenapis.skip>
+            </properties>
+        </profile>
+
+        <profile>
             <id>compiler-eclipse</id>
             <build>
                 <pluginManagement>
