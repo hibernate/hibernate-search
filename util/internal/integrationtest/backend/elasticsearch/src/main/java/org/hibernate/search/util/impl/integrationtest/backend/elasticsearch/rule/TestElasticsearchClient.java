@@ -89,7 +89,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		}
 
 		public IndexClient deleteAndCreate(String settingsPath, String settings) {
-			JsonObject settingsAsJsonObject = buildSettings( settingsPath, settings );
+			JsonObject settingsAsJsonObject = buildStructuredSettings( settingsPath, settings );
 			TestElasticsearchClient.this.deleteAndCreateIndex( indexName, settingsAsJsonObject );
 			return this;
 		}
@@ -174,7 +174,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		 */
 		public void putDynamic(String settings) {
 			URLEncodedString indexName = indexClient.indexName;
-			JsonObject settingsAsJsonObject = buildSettings( settingsPath, settings );
+			JsonObject settingsAsJsonObject = buildStructuredSettings( settingsPath, settings );
 			TestElasticsearchClient.this.putIndexSettingsDynamic( indexName, settingsAsJsonObject );
 		}
 
@@ -186,7 +186,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		 */
 		public void putNonDynamic(String settings) {
 			URLEncodedString indexName = indexClient.indexName;
-			JsonObject settingsAsJsonObject = buildSettings( settingsPath, settings );
+			JsonObject settingsAsJsonObject = buildStructuredSettings( settingsPath, settings );
 			TestElasticsearchClient.this.putIndexSettingsNonDynamic( indexName, settingsAsJsonObject );
 		}
 	}
@@ -226,7 +226,14 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		 * @throws IOException
 		 */
 		public void put(String settings) {
-			JsonObject settingsAsJsonObject = buildSettings( "transient." + settingsPath, settings );
+			/*
+			 * We must use a "flat" structure in the payload,
+			 * e.g. "action.auto-create-index": "value"
+			 * rather than "action": { "auto-create-index": "value" }
+			 * otherwise AWS will reject our request because the security layer doesn't recognize the setting
+			 * and rejects it by default.
+			 */
+			JsonObject settingsAsJsonObject = buildFlatSettings( "transient", settingsPath, settings );
 			TestElasticsearchClient.this.putClusterSettings( settingsAsJsonObject );
 		}
 	}
@@ -435,7 +442,19 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 				.build() );
 	}
 
-	private JsonObject buildSettings(String settingsPath, String settings) {
+	private JsonObject buildFlatSettings(String categoryKey, String settingKey, String settings) {
+		JsonElement settingsJsonElement = toJsonElement( settings );
+
+		JsonObject categoryObject = new JsonObject();
+		categoryObject.add( settingKey, settingsJsonElement );
+
+		JsonObject payloadObject = new JsonObject();
+		payloadObject.add( categoryKey, categoryObject );
+
+		return payloadObject;
+	}
+
+	private JsonObject buildStructuredSettings(String settingsPath, String settings) {
 		JsonElement settingsJsonElement = toJsonElement( settings );
 
 		List<String> components = Arrays.asList( settingsPath.split( "\\." ) );
