@@ -223,7 +223,6 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		 * Put cluster settings.
 		 *
 		 * @param settings The settings value to put
-		 * @throws IOException
 		 */
 		public void put(String settings) {
 			/*
