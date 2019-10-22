@@ -13,7 +13,7 @@
     <description>Hibernate Search showcase based on the ORM and Elasticsearch integrations, using libraries and books as business objects</description>
 
     <properties>
-        <version.org.springframework.boot>2.1.2.RELEASE</version.org.springframework.boot>
+        <version.org.springframework.boot>2.2.0.RELEASE</version.org.springframework.boot>
 
         <!--
             Remove Hibernate system properties from parent settings:
