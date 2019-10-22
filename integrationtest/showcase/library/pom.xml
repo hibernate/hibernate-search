@@ -126,6 +126,7 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <configuration>
+                    <skip>${failsafe.spring.skip}</skip>
                     <!--
                         Since we do not pass the Hibernate ORM settings through system properties directly
                         (see the override of the failsafe.jvm.args.hibernate-orm near the top of this file),

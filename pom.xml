@@ -419,6 +419,9 @@
         <surefire.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${surefire.jvm.args.jacoco}</surefire.jvm.args>
         <failsafe.jvm.args>${surefire.jvm.args.memory} ${surefire.jvm.args.java-version} ${failsafe.jvm.args.jacoco} ${failsafe.jvm.args.hibernate-orm}</failsafe.jvm.args>
 
+        <!-- Disable integration tests selectively. To be set in specific profile, e.g. for a specific JDK version. -->
+        <failsafe.spring.skip>${skipITs}</failsafe.spring.skip>
+
         <!--
             Should be set by submodules.
             Used by integration tests modules that execute tests from another module.
@@ -2072,6 +2075,8 @@
             <properties>
                 <!-- ForbiddenAPIs doesn't provide bundled signatures for JDK14... yet. -->
                 <forbiddenapis.skip>true</forbiddenapis.skip>
+                <!-- Spring isn't ready for JDK14 yet: https://github.com/spring-projects/spring-framework/issues/23678 -->
+                <failsafe.spring.skip>true</failsafe.spring.skip>
             </properties>
         </profile>
 
