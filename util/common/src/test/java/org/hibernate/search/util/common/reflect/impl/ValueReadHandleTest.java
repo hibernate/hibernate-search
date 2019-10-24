@@ -29,7 +29,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 import org.assertj.core.api.Assertions;
-import org.assertj.core.api.InstanceOfAssertFactory;
+import org.assertj.core.api.InstanceOfAssertFactories;
 
 @RunWith(Parameterized.class)
 public class ValueReadHandleTest {
@@ -137,7 +137,8 @@ public class ValueReadHandleTest {
 				.hasMessageContaining(
 						"Exception while invoking '" + method.toString() + "' on 'toStringResult'"
 				)
-				.extracting( Throwable::getCause ).asInstanceOf( new InstanceOfAssertFactory<>( SimulatedRuntimeException.class, Assertions::assertThat ) )
+				.extracting( Throwable::getCause ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
+				.isInstanceOf( SimulatedRuntimeException.class )
 				.hasMessageContaining( "runtimeExceptionThrowingMethod" );
 	}
 
@@ -202,7 +203,8 @@ public class ValueReadHandleTest {
 				.hasMessageContaining(
 						"Exception while invoking '" + method.toString() + "' on '<EntityType#toString() threw SimulatedRuntimeException>'"
 				)
-				.extracting( Throwable::getCause ).asInstanceOf( new InstanceOfAssertFactory<>( SimulatedRuntimeException.class, Assertions::assertThat ) )
+				.extracting( Throwable::getCause ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
+				.isInstanceOf( SimulatedRuntimeException.class )
 				.hasMessageContaining( "runtimeExceptionThrowingMethod" )
 				.hasSuppressedException( toStringRuntimeException );
 	}
