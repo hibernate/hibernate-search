@@ -44,7 +44,7 @@ class LuceneTckBackendAccessor implements TckBackendAccessor {
 					return FileVisitResult.CONTINUE;
 				}
 			} );
-			// Create a non-directory fail to prevent HSearch from re-creating the index automatically.
+			// Create a non-directory file to prevent HSearch from re-creating the index automatically.
 			Files.createFile( indexPath );
 		}
 		catch (RuntimeException | IOException e) {
