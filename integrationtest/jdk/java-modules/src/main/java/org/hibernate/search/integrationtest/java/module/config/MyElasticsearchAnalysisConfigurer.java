@@ -16,8 +16,8 @@ public class MyElasticsearchAnalysisConfigurer implements ElasticsearchAnalysisC
 	@Override
 	public void configure(ElasticsearchAnalysisConfigurationContext context) {
 		context.analyzer( MY_ANALYZER ).custom()
-				.withTokenizer( "standard" )
-				.withTokenFilters( "lowercase", "mySnowballFilter", "asciifolding" );
+				.tokenizer( "standard" )
+				.tokenFilters( "lowercase", "mySnowballFilter", "asciifolding" );
 
 		context.tokenFilter( "mySnowballFilter" )
 				.type( "snowball" )

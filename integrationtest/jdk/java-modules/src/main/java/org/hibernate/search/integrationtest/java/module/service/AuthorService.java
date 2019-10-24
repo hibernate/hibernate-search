@@ -59,13 +59,13 @@ public class AuthorService implements AutoCloseable {
 
 	public List<Author> search(String term) {
 		try ( Session session = sessionFactory.openSession() ) {
-			SearchSession ftSession = Search.getSearchSession( session );
+			SearchSession ftSession = Search.session( session );
 			SearchQuery<Author> query = ftSession.search( Author.class )
 					.asEntity()
 					.predicate( p -> p.match().field( "name" ).matching( term ) )
 					.toQuery();
 
-			return query.fetchHits();
+			return query.fetchAllHits();
 		}
 	}
 
