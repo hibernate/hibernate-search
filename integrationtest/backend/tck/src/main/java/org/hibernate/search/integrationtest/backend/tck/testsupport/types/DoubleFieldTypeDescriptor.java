@@ -50,9 +50,7 @@ public class DoubleFieldTypeDescriptor extends FieldTypeDescriptor<Double> {
 				Math.nextDown( 0.0 ),
 				Math.nextUp( 0.0 ),
 				42.42,
-				1584514514.000000184,
-				// This is ugly, but we test it on purpose
-				new Double( 44.0 )
+				1584514514.000000184
 		) );
 	}
 

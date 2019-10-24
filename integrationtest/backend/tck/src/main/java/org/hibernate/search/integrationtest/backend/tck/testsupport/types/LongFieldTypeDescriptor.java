@@ -43,9 +43,7 @@ public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 		return Optional.of( new IndexingExpectations<>(
 				Long.MIN_VALUE, Long.MAX_VALUE,
 				(long) Integer.MIN_VALUE, (long) Integer.MAX_VALUE,
-				-251_484_254L, -42L, -1L, 0L, 1L, 3L, 42L, 151_484_254L,
-				// This is ugly, but we test it on purpose
-				new Long( 44L )
+				-251_484_254L, -42L, -1L, 0L, 1L, 3L, 42L, 151_484_254L
 		) );
 	}
 

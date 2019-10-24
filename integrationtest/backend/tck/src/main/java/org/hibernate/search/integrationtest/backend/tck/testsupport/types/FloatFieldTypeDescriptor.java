@@ -50,9 +50,7 @@ public class FloatFieldTypeDescriptor extends FieldTypeDescriptor<Float> {
 				Math.nextDown( 0.0f ),
 				Math.nextUp( 0.0f ),
 				42.42f,
-				1584514514.000000184f,
-				// This is ugly, but we test it on purpose
-				new Float( 44.0f )
+				1584514514.000000184f
 		) );
 	}
 
