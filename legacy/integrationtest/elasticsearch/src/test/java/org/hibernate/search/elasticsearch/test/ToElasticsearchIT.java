@@ -194,8 +194,8 @@ public class ToElasticsearchIT extends SearchTestBase {
 			List<Letter> letters = fullTextQuery.list();
 
 			assertThat( letters ).hasSize( 2 );
-			assertThat( letters.get( 0 ) ).extracting( "signature" ).containsExactly( "Gunnar Morling" );
-			assertThat( letters.get( 1 ) ).extracting( "signature" ).containsExactly( "Gunnar Morling" );
+			assertThat( letters.get( 0 ) ).extracting( "signature" ).isEqualTo( "Gunnar Morling" );
+			assertThat( letters.get( 1 ) ).extracting( "signature" ).isEqualTo( "Gunnar Morling" );
 		}
 	}
 
