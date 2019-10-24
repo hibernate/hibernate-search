@@ -42,9 +42,7 @@ public class IntegerFieldTypeDescriptor extends FieldTypeDescriptor<Integer> {
 	public Optional<IndexingExpectations<Integer>> getIndexingExpectations() {
 		return Optional.of( new IndexingExpectations<>(
 				Integer.MIN_VALUE, Integer.MAX_VALUE,
-				-251_484_254, -42, -1, 0, 1, 3, 42, 151_484_254,
-				// This is ugly, but we test it on purpose
-				new Integer( 44 )
+				-251_484_254, -42, -1, 0, 1, 3, 42, 151_484_254
 		) );
 	}
 

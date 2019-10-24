@@ -42,9 +42,7 @@ public class ByteFieldTypeDescriptor extends FieldTypeDescriptor<Byte> {
 	public Optional<IndexingExpectations<Byte>> getIndexingExpectations() {
 		return Optional.of( new IndexingExpectations<>(
 				Byte.MIN_VALUE, Byte.MAX_VALUE,
-				(byte) -42, (byte) -1, (byte) 0, (byte) 1, (byte) 3, (byte) 42,
-				// This is ugly, but we test it on purpose
-				new Byte( (byte) 44 )
+				(byte) -42, (byte) -1, (byte) 0, (byte) 1, (byte) 3, (byte) 42
 		) );
 	}
 

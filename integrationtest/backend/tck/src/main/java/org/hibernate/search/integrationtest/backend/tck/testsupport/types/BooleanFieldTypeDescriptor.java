@@ -33,10 +33,7 @@ public class BooleanFieldTypeDescriptor extends FieldTypeDescriptor<Boolean> {
 	public Optional<IndexingExpectations<Boolean>> getIndexingExpectations() {
 		return Optional.of( new IndexingExpectations<>(
 				true,
-				false,
-				// This is ugly, but we test it on purpose
-				new Boolean( true ),
-				new Boolean( false )
+				false
 		) );
 	}
 
