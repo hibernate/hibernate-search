@@ -45,7 +45,7 @@ import org.junit.Test;
 
 import org.apache.log4j.Level;
 import org.assertj.core.api.Assertions;
-import org.assertj.core.api.InstanceOfAssertFactory;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.awaitility.Awaitility;
 import org.hamcrest.CoreMatchers;
 
@@ -446,13 +446,15 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	private static Consumer<Throwable> transactionSynchronizationExceptionMatcher(Throwable indexingWorkException) {
 		return throwable -> Assertions.assertThat( throwable ).isInstanceOf( HibernateException.class )
-				.extracting( Throwable::getCause ).asInstanceOf( new InstanceOfAssertFactory<>( SearchException.class, Assertions::assertThat ) )
+				.extracting( Throwable::getCause ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
+						.isInstanceOf( SearchException.class )
 						.hasMessageContainingAll(
 								"Automatic indexing failed after transaction completion: ",
 								"Indexing failure: " + indexingWorkException.getMessage(),
 								"The following entities may not have been updated correctly in the index: [" + IndexedEntity.NAME + "#" + 1 + "]"
 						)
-				.extracting( Throwable::getCause ).asInstanceOf( new InstanceOfAssertFactory<>( SearchException.class, Assertions::assertThat ) )
+				.extracting( Throwable::getCause ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
+						.isInstanceOf( SearchException.class )
 						.hasMessageContainingAll(
 								"Indexing failure: " + indexingWorkException.getMessage(),
 								"The following entities may not have been updated correctly in the index: [" + IndexedEntity.NAME + "#" + 1 + "]"
