@@ -26,7 +26,7 @@
             This is important because some analysis rules do not apply to test code.
          -->
         <sonar.sources>${rootProject.emptySubdirectory}</sonar.sources>
-        <sonar.tests>${project.build.sourceDirectory}</sonar.tests>
+        <sonar.tests>${project.basedir}/src</sonar.tests>
     </properties>
 
     <modules>
