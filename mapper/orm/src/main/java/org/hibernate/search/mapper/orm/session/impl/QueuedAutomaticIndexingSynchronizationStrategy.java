@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.session.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.common.EntityReference;
@@ -36,7 +37,7 @@ public final class QueuedAutomaticIndexingSynchronizationStrategy
 	@Override
 	public void apply(AutomaticIndexingSynchronizationConfigurationContext context) {
 		context.documentCommitStrategy( DocumentCommitStrategy.NONE );
-		context.documentCommitStrategy( DocumentCommitStrategy.NONE );
+		context.documentRefreshStrategy( DocumentRefreshStrategy.NONE );
 		FailureHandler failureHandler = context.getFailureHandler();
 		context.indexingFutureHandler( future -> {
 			future.whenComplete( Futures.handler( (result, throwable) -> {
