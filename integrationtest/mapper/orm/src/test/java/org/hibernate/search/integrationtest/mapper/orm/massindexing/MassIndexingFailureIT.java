@@ -44,6 +44,7 @@ import org.junit.Test;
 
 import org.apache.log4j.Level;
 import org.assertj.core.api.Assertions;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.assertj.core.api.InstanceOfAssertFactory;
 import org.awaitility.Awaitility;
 
@@ -429,6 +430,99 @@ public class MassIndexingFailureIT {
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
+	}
+
+	@Test
+	public void indexingAndFlush_defaultHandler() {
+		SessionFactory sessionFactory = setup( null );
+
+		logged.expectEvent(
+				Level.ERROR,
+				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
+						.withMessage( "Indexing failure" )
+						.build(),
+				"Indexing instance of entity '" + Book.NAME + "'",
+				"Entities that could not be indexed correctly:",
+				Book.NAME + "#2"
+		)
+				.once();
+
+		logged.expectEvent(
+				Level.ERROR,
+				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
+						.withMessage( "FLUSH failure" )
+						.build(),
+				"MassIndexer operation"
+		)
+				.once();
+
+		doMassIndexingWithFailure(
+				sessionFactory,
+				ThreadExpectation.CREATED_AND_TERMINATED,
+				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
+						.hasMessageContaining( "FLUSH failure" )
+						// Indexing failure should also be mentioned as a suppressed exception
+						.extracting( Throwable::getSuppressed ).asInstanceOf( InstanceOfAssertFactories.ARRAY )
+						.anySatisfy( suppressed -> assertThat( suppressed ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
+								.isInstanceOf( SearchException.class )
+								.hasMessageContainingAll(
+										"1 entities could not be indexed",
+										"See the logs for details.",
+										"First failure on entity 'Book#2': ",
+										"Indexing failure"
+								)
+								.hasCauseInstanceOf( SimulatedFailure.class )
+						),
+				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
+				expectIndexingWorks( ExecutionExpectation.FAIL ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.FAIL )
+		);
+	}
+
+	@Test
+	public void indexingAndFlush_customHandler() {
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 0 );
+
+		SessionFactory sessionFactory = setup( StubFailureHandler.class.getName() );
+
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 0 );
+
+		doMassIndexingWithFailure(
+				sessionFactory,
+				ThreadExpectation.CREATED_AND_TERMINATED,
+				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
+						.hasMessageContaining( "FLUSH failure" )
+						// Indexing failure should also be mentioned as a suppressed exception
+						.extracting( Throwable::getSuppressed ).asInstanceOf( InstanceOfAssertFactories.ARRAY )
+						.anySatisfy( suppressed -> assertThat( suppressed ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
+								.isInstanceOf( SearchException.class )
+								.hasMessageContainingAll(
+										"1 entities could not be indexed",
+										"See the logs for details.",
+										"First failure on entity 'Book#2': ",
+										"Indexing failure"
+								)
+								.hasCauseInstanceOf( SimulatedFailure.class )
+						),
+				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
+				expectIndexingWorks( ExecutionExpectation.FAIL ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.FAIL )
+		);
+
+		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
+		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 1 );
 	}
 
 	private void doMassIndexingWithFailure(SessionFactory sessionFactory,
