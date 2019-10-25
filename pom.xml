@@ -279,6 +279,7 @@
         <version.source.plugin>3.0.1</version.source.plugin>
         <!-- Surefire versions are a minefield of bugs: be careful with upgrades -->
         <version.surefire.plugin>2.22.2</version.surefire.plugin>
+        <version.surefire.plugin.java-version.asm>7.2</version.surefire.plugin.java-version.asm>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.org.wildfly.build-tools>1.2.9.Final</version.org.wildfly.build-tools>
         <version.jacoco.plugin>0.8.3</version.jacoco.plugin>
@@ -2003,6 +2004,47 @@
                 <!-- https://bugs.openjdk.java.net/browse/JDK-8212233?focusedCommentId=14245762 -->
                 <javadoc.additionalOptions.java-version>-html5 -source 8</javadoc.additionalOptions.java-version>
             </properties>
+        </profile>
+
+        <profile>
+            <id>jdk13+</id>
+            <activation>
+                <jdk>[13,)</jdk>
+            </activation>
+            <build>
+                <!--
+                     maven-surefire-plugin and maven-failsafe-plugin use an older version of ASM
+                     that cannot handle Java 13/14 bytecode.
+                     Let's upgrade that dependency and hope for the best;
+                     if it doesn't work, the build is very likely to fail and we'll know about it.
+                 -->
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-surefire-plugin</artifactId>
+                            <dependencies>
+                                <dependency>
+                                    <groupId>org.ow2.asm</groupId>
+                                    <artifactId>asm</artifactId>
+                                    <version>${version.surefire.plugin.java-version.asm}</version>
+                                </dependency>
+                            </dependencies>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.apache.maven.plugins</groupId>
+                            <artifactId>maven-failsafe-plugin</artifactId>
+                            <dependencies>
+                                <dependency>
+                                    <groupId>org.ow2.asm</groupId>
+                                    <artifactId>asm</artifactId>
+                                    <version>${version.surefire.plugin.java-version.asm}</version>
+                                </dependency>
+                            </dependencies>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
         </profile>
 
         <profile>
