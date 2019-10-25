@@ -1,6 +1,51 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.Beta2 (25-10-2019)
+-------------------------
+
+** Bug
+    * HSEARCH-3736 Lucene startup creates an unnecessary IndexWriter
+    * HSEARCH-3734 Configuration property hibernate.search.reflection.strategy is ignored
+    * HSEARCH-3733 BatchExecutor sometimes forgets to schedule the processor since HSEARCH-3084
+    * HSEARCH-3727 Elasticsearch orchestrators do not wait for single-work worksets to finish with ElasticsearchParallelWorkProcessor
+    * HSEARCH-3726 Exceptions are not propagated from the Elasticsearch backend to the mapper when using IndexingPlan or automatic indexing
+    * HSEARCH-3725 IllegalStateException thrown by Gson while encoding Elasticsearch requests
+    * HSEARCH-3684 @IndexedEmbedded.includePaths includes fields one level too deep in some cases
+    * HSEARCH-1108 programmatic API doesn't work correctly for entities with @MappedSuperclass parent
+
+** Improvement
+    * HSEARCH-3741 Expose the index name in IndexFailureContext
+    * HSEARCH-3735 Report failures in work executions only once, at the mapper level
+    * HSEARCH-3730 Upgrade to Hibernate ORM 5.4.6
+    * HSEARCH-3728 All background operations should propagate exceptions from the mapper to the user thread
+    * HSEARCH-3724 Upgrade to Jackson 2.9.10
+    * HSEARCH-3723 Upgrade to Elasticsearch 7.4.0
+    * HSEARCH-3720 Rename the mapper-pojo artifact to make it clearer that it's just an abstract base
+    * HSEARCH-3694 Support distance sorts on single-valued fields in nested documents
+    * HSEARCH-3640 Expose backends/indexes through the ORM mapper APIs
+    * HSEARCH-3193 Search 6 groundwork - Contribute descending sort support for Lucene's LatLonPointSortField
+
+** New Feature
+    * HSEARCH-3042 Allow the definition of one "search" analyzer per field as part of the mapping
+
+** Sub-task
+    * HSEARCH-1375 Improve design of ErrorHandler
+    * HSEARCH-1353 Document the expected behaviour of ErrorHandler
+
+** Task
+    * HSEARCH-3745 Fix test failures on AWS related to PUT /_cluster/settings
+    * HSEARCH-3744 Upgrade integration tests to Spring 2.2.0
+    * HSEARCH-3743 Generate Java 13/14 bytecode for tests when building with JDK13/14
+    * HSEARCH-3742 Upgrade to Hibernate ORM 5.4.7.Final
+    * HSEARCH-3739 Test MassIndexer interruption/cancellation and fix it if necessary
+    * HSEARCH-3722 Fix the artifact ID of the ORM mapper integration tests module 
+    * HSEARCH-3721 Remove deprecated methods that were already present in 6.0.0.Beta1
+    * HSEARCH-3653 Run Elasticsearch in JDK11 by default in the Jenkinsfile
+    * HSEARCH-3486 Upgrade to forbiddenApis 2.7 and configure JDK12/13 signatures
+    * HSEARCH-3110 Search 6 groundwork - Restore support for ErrorHandler
+    * HSEARCH-3084 Initialize and close index managers / backends in parallel
+
 6.0.0.Beta1 (23-09-2019)
 -------------------------
 
