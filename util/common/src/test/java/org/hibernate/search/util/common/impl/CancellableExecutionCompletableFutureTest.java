@@ -7,6 +7,9 @@
 package org.hibernate.search.util.common.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.ARRAY;
+import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
+import static org.assertj.core.api.InstanceOfAssertFactories.THROWABLE;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -14,6 +17,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Function;
 
 import org.hibernate.search.util.impl.test.FutureAssert;
 
@@ -21,6 +25,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.awaitility.Awaitility;
 
 public class CancellableExecutionCompletableFutureTest {
@@ -132,5 +137,18 @@ public class CancellableExecutionCompletableFutureTest {
 		Awaitility.await().until( future::isDone );
 		FutureAssert.assertThat( future ).isCancelled();
 		Awaitility.await().untilTrue( finished );
+
+		// Also test that the failure triggered by the cancellation ultimately
+		// gets reported as a suppressed exception.
+		Awaitility.await().untilAsserted( () ->
+				assertThat( Futures.getThrowableNow( future ) )
+						.extracting( Throwable::getSuppressed ).asInstanceOf( InstanceOfAssertFactories.ARRAY )
+						.hasSize( 1 )
+						.extracting( Function.identity() ) // Hack to get access to the ".first()" method
+						.first()
+						.asInstanceOf( InstanceOfAssertFactories.THROWABLE )
+						.isInstanceOf( RuntimeException.class )
+						.hasCauseInstanceOf( InterruptedException.class )
+		);
 	}
 }

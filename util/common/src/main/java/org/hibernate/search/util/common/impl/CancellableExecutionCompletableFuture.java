@@ -24,11 +24,14 @@ class CancellableExecutionCompletableFuture<T> extends CompletableFuture<T> {
 
 	@Override
 	public boolean cancel(boolean mayInterruptIfRunning) {
-		boolean taskCancelled = future.cancel( mayInterruptIfRunning );
-		if ( taskCancelled ) {
-			super.cancel( mayInterruptIfRunning );
-		}
-		return taskCancelled;
+		/*
+		 * Calling future.cancel() may trigger an exception in the operation that may
+		 * end up setting 'this' as completed exceptionally because of the failure...
+		 * Thus we mark 'this' as cancelled *first*, so that any exception in the operation
+		 * from now on will be ignored.
+		 */
+		super.cancel( mayInterruptIfRunning );
+		return future.cancel( mayInterruptIfRunning );
 	}
 
 	private static class CompletingRunnable<T> implements Runnable {
@@ -47,7 +50,14 @@ class CancellableExecutionCompletableFuture<T> extends CompletableFuture<T> {
 				future.complete( null );
 			}
 			catch (Throwable t) {
-				future.completeExceptionally( t );
+				if ( future.isCancelled() ) {
+					// The operation probably failed because of the cancellation,
+					// but try to keep track of the failure anyway.
+					Futures.getThrowableNow( future ).addSuppressed( t );
+				}
+				else {
+					future.completeExceptionally( t );
+				}
 			}
 		}
 	}
