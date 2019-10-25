@@ -278,7 +278,7 @@
         <version.site.plugin>3.6</version.site.plugin>
         <version.source.plugin>3.0.1</version.source.plugin>
         <!-- Surefire versions are a minefield of bugs: be careful with upgrades -->
-        <version.surefire.plugin>2.21.0</version.surefire.plugin>
+        <version.surefire.plugin>2.22.2</version.surefire.plugin>
         <version.failsafe.plugin>${version.surefire.plugin}</version.failsafe.plugin>
         <version.org.wildfly.build-tools>1.2.9.Final</version.org.wildfly.build-tools>
         <version.jacoco.plugin>0.8.3</version.jacoco.plugin>
