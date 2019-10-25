@@ -7,9 +7,6 @@
 package org.hibernate.search.util.common.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.InstanceOfAssertFactories.ARRAY;
-import static org.assertj.core.api.InstanceOfAssertFactories.LIST;
-import static org.assertj.core.api.InstanceOfAssertFactories.THROWABLE;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
