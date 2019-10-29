@@ -313,7 +313,7 @@ stage('Default build') {
 		helper.markStageSkipped()
 		return
 	}
-	node(NODE_PATTERN_BASE) {
+	runBuildOnNode {
 		helper.withMavenWorkspace {
 			sh """ \
 					mvn clean install \
@@ -334,7 +334,7 @@ stage('Non-default environment ITs') {
 	// Test with multiple JDKs
 	environments.content.jdk.enabled.each { JdkITEnvironment itEnv ->
 		executions.put(itEnv.tag, {
-			node(NODE_PATTERN_BASE) {
+			runBuildOnNode {
 				helper.withMavenWorkspace(jdk: itEnv.tool) {
 					mavenNonDefaultIT itEnv, """ \
 							clean install --fail-at-end \
@@ -347,7 +347,7 @@ stage('Non-default environment ITs') {
 	// Test ORM integration with multiple databases
 	environments.content.database.enabled.each { DatabaseITEnvironment itEnv ->
 		executions.put(itEnv.tag, {
-			node(NODE_PATTERN_BASE) {
+			runBuildOnNode {
 				helper.withMavenWorkspace {
 					resumeFromDefaultBuild()
 					mavenNonDefaultIT itEnv, """ \
@@ -361,7 +361,7 @@ stage('Non-default environment ITs') {
 	// Test Elasticsearch integration with multiple versions in a local instance
 	environments.content.esLocal.enabled.each { EsLocalITEnvironment itEnv ->
 		executions.put(itEnv.tag, {
-			node(NODE_PATTERN_BASE) {
+			runBuildOnNode {
 				helper.withMavenWorkspace {
 					resumeFromDefaultBuild()
 					mavenNonDefaultIT itEnv, """ \
@@ -385,7 +385,7 @@ stage('Non-default environment ITs') {
 stage('Deploy') {
 	if (deploySnapshot) {
 		echo "Deploying snapshots"
-		node(NODE_PATTERN_BASE) {
+		runBuildOnNode {
 			helper.withMavenWorkspace(mavenSettingsConfig: helper.configuration.file.deployment.maven.settingsId) {
 				sh "mvn clean deploy -Pdist -DskipTests"
 			}
@@ -393,7 +393,7 @@ stage('Deploy') {
 	}
 	else if (performRelease) {
 		echo "Performing full release for version ${releaseVersion.toString()}"
-		node(NODE_PATTERN_BASE) {
+		runBuildOnNode {
 			helper.withMavenWorkspace(mavenSettingsConfig: params.RELEASE_DRY_RUN ? null : helper.configuration.file.deployment.maven.settingsId) {
 				sh "git clone https://github.com/hibernate/hibernate-noorm-release-scripts.git"
 				sh "bash -xe hibernate-noorm-release-scripts/prepare-release.sh search ${releaseVersion.toString()}"
@@ -475,6 +475,16 @@ class EsLocalITEnvironment extends ITEnvironment {
 void resumeFromDefaultBuild() {
 	dir(helper.configuration.maven.localRepositoryPath) {
 		unstash name:'main-build'
+	}
+}
+
+void runBuildOnNode(Closure body) {
+	runBuildOnNode( NODE_PATTERN_BASE, body )
+}
+
+void runBuildOnNode(String label, Closure body) {
+	node( label ) {
+		timeout( [time: 1, unit: 'HOURS'], body )
 	}
 }
 
