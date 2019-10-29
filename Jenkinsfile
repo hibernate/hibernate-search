@@ -445,16 +445,21 @@ stage('Non-default environment ITs') {
 										 usernameVariable: 'AWS_ACCESS_KEY_ID',
 										 passwordVariable: 'AWS_SECRET_ACCESS_KEY'
 						]]) {
-							mavenNonDefaultIT itEnv, """ \
-								clean install -pl org.hibernate:hibernate-search-integrationtest-elasticsearch \
-								${toMavenElasticsearchProfileArg(itEnv.mavenProfile)} \
-								-Dtest.elasticsearch.host.provided=true \
-								-Dtest.elasticsearch.host.url=$itEnv.endpointUrl \
-								-Dtest.elasticsearch.host.aws.signing.enabled=true \
-								-Dtest.elasticsearch.host.aws.access_key=$AWS_ACCESS_KEY_ID \
-								-Dtest.elasticsearch.host.aws.secret_key=$AWS_SECRET_ACCESS_KEY \
-								-Dtest.elasticsearch.host.aws.region=$itEnv.awsRegion \
-							"""
+							// Tests may fail because of hourly AWS snapshots,
+							// which prevent deleting indexes while they are being executed.
+							// So if this fails, we re-try twice.
+							retry(count: 3) {
+								mavenNonDefaultIT itEnv, """ \
+									clean install -pl org.hibernate:hibernate-search-integrationtest-elasticsearch \
+									${toMavenElasticsearchProfileArg(itEnv.mavenProfile)} \
+									-Dtest.elasticsearch.host.provided=true \
+									-Dtest.elasticsearch.host.url=$itEnv.endpointUrl \
+									-Dtest.elasticsearch.host.aws.signing.enabled=true \
+									-Dtest.elasticsearch.host.aws.access_key=$AWS_ACCESS_KEY_ID \
+									-Dtest.elasticsearch.host.aws.secret_key=$AWS_SECRET_ACCESS_KEY \
+									-Dtest.elasticsearch.host.aws.region=$itEnv.awsRegion \
+								"""
+							}
 						}
 					}
 				}
