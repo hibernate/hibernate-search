@@ -1282,10 +1282,8 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/types/
 <1> Define the data type as `String`.
 <2> Define a DSL converter that converts from `ISBN` to `String`.
 This converter will be used transparently by the search DSLs.
-<3> Define how to tell if a given input type is valid for this converter.
-<4> Define how to convert an `ISBN` to a `String`.
-<5> Define how to convert an object of unknown type to a `String`.
-Here we just cast the object to an `ISBN`.
+<3> Define the input type as `ISBN` by passing `ISBN.class` as the first parameter.
+<4> Define how to convert an `ISBN` to a `String` by passing a converter as the second parameter.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -1333,8 +1331,8 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/types/
 <1> Define the data type as `String`.
 <2> Define a projection converter that converts from `String` to `ISBN`.
 This converter will be used transparently by the search DSLs.
-<3> Define how to tell if converted values are assignable to a given type.
-<4> Define how to convert a `String` to an `ISBN`.
+<3> Define the converted type as `ISBN` by passing `ISBN.class` as the first parameter.
+<4> Define how to convert a `String` to an `ISBN` by passing a converter as the second parameter.
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----

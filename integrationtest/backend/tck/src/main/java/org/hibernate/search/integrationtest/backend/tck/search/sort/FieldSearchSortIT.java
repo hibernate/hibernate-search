@@ -783,7 +783,7 @@ public class FieldSearchSortIT {
 					}
 			);
 			mapByTypeFields(
-					root, "byType_converted_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() ),
+					root, "byType_converted_", c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() ),
 					(typeDescriptor, expectations, model) -> {
 						if ( expectations.isFieldSortSupported() ) {
 							supportedFieldWithDslConverterModels.add( model );
@@ -842,7 +842,7 @@ public class FieldSearchSortIT {
 			 * but with an incompatible DSL converter.
 			 */
 			mapByTypeFields(
-					root, "byType_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() ),
+					root, "byType_", c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() ),
 					(typeDescriptor, expectations, model) -> {
 						if ( expectations.isFieldSortSupported() ) {
 							supportedFieldModels.add( model );

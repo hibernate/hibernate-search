@@ -1143,7 +1143,7 @@ public class RangeSearchPredicateIT {
 					}
 			);
 			mapByTypeFields(
-					root, "byType_converted_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() ),
+					root, "byType_converted_", c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() ),
 					(typeDescriptor, expectations, model) -> {
 						if ( expectations.isRangePredicateSupported() ) {
 							supportedFieldWithDslConverterModels.add( model );
@@ -1157,12 +1157,12 @@ public class RangeSearchPredicateIT {
 			string3Field = MainFieldModel.mapper( "eee", "ooo", "zzz" )
 					.map( root, "string3" );
 			string1FieldWithDslConverter = MainFieldModel.mapper(
-					c -> c.asString().dslConverter( ValueWrapper.toIndexFieldConverter() ),
+					c -> c.asString().dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() ),
 					"ccc", "mmm", "xxx"
 			)
 					.map( root, "string1FieldWithDslConverter" );
 			string2FieldWithDslConverter = MainFieldModel.mapper(
-					c -> c.asString().dslConverter( ValueWrapper.toIndexFieldConverter() ),
+					c -> c.asString().dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() ),
 					"ddd", "nnn", "yyy"
 			)
 					.map( root, "string2FieldWithDslConverter" );
@@ -1183,7 +1183,7 @@ public class RangeSearchPredicateIT {
 			 * but with an incompatible DSL converter.
 			 */
 			mapByTypeFields(
-					root, "byType_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() ),
+					root, "byType_", c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() ),
 					(typeDescriptor, expectations, model) -> {
 						if ( expectations.isRangePredicateSupported() ) {
 							supportedFieldModels.add( model );

@@ -859,8 +859,8 @@ public class SingleFieldAggregationBaseIT<F> {
 			fieldWithConverterModel = mapField(
 					root, "converted_",
 					c -> c.aggregable( Aggregable.YES )
-							.dslConverter( ValueWrapper.toIndexFieldConverter() )
-							.projectionConverter( ValueWrapper.fromIndexFieldConverter() )
+							.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
+							.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() )
 			);
 			fieldWithAggregationDisabledModel = mapField(
 					root, "nonAggregable_",
@@ -898,18 +898,13 @@ public class SingleFieldAggregationBaseIT<F> {
 			fieldWithConverterModel = mapField(
 					root, "converted_",
 					c -> c.aggregable( Aggregable.YES )
-							.dslConverter( ValueWrapper.toIndexFieldConverter() )
-							.projectionConverter( new IncompatibleProjectionConverter() )
+							.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
+							.projectionConverter( ValueWrapper.class, new IncompatibleProjectionConverter() )
 			);
 		}
 
 		private class IncompatibleProjectionConverter
-				implements FromDocumentFieldValueConverter<F, ValueWrapper<F>> {
-			@Override
-			public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
-				return superTypeCandidate.isAssignableFrom( ValueWrapper.class );
-			}
-
+				implements FromDocumentFieldValueConverter<F, ValueWrapper> {
 			@Override
 			public ValueWrapper<F> convert(F value, FromDocumentFieldValueConvertContext context) {
 				return null;

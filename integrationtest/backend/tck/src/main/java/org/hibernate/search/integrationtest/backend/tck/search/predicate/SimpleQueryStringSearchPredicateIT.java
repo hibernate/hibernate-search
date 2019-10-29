@@ -1018,7 +1018,7 @@ public class SimpleQueryStringSearchPredicateIT {
 					.map( root, "analyzedString4" );
 			analyzedStringFieldWithDslConverter = MainFieldModel.mapper(
 					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
-							.dslConverter( ValueWrapper.toIndexFieldConverter() )
+							.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
 			)
 					.map( root, "analyzedStringWithDslConverter" );
 			whitespaceAnalyzedField = MainFieldModel.mapper(
@@ -1052,7 +1052,7 @@ public class SimpleQueryStringSearchPredicateIT {
 					MainFieldModel.mapper(
 							c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 									// Using a different DSL converter
-									.dslConverter( ValueWrapper.toIndexFieldConverter() )
+									.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
 					)
 							.map( root, "analyzedString1" )
 			);

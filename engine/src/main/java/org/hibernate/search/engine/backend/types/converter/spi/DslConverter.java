@@ -9,6 +9,7 @@ package org.hibernate.search.engine.backend.types.converter.spi;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContextExtension;
+import org.hibernate.search.util.common.impl.Contracts;
 
 /**
  * A converter for values passed to the DSL.
@@ -17,15 +18,19 @@ import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFie
  * @param <F> The type of converted values passed to the backend.
  */
 public final class DslConverter<V, F> {
+	private final Class<V> valueType;
 	private final ToDocumentFieldValueConverter<V, F> delegate;
 
-	public DslConverter(ToDocumentFieldValueConverter<V, F> delegate) {
+	public DslConverter(Class<V> valueType, ToDocumentFieldValueConverter<V, F> delegate) {
+		Contracts.assertNotNull( valueType, "valueType" );
+		Contracts.assertNotNull( delegate, "delegate" );
+		this.valueType = valueType;
 		this.delegate = delegate;
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[delegate=" + delegate + "]";
+		return getClass().getSimpleName() + "[valueType=" + valueType.getName() + ",delegate=" + delegate + "]";
 	}
 
 	/**
@@ -38,7 +43,7 @@ public final class DslConverter<V, F> {
 	 * {@code false} otherwise.
 	 */
 	public boolean isValidInputType(Class<?> inputTypeCandidate) {
-		return delegate.isValidInputType( inputTypeCandidate );
+		return valueType.isAssignableFrom( inputTypeCandidate );
 	}
 
 	/**
@@ -65,7 +70,7 @@ public final class DslConverter<V, F> {
 	 * @throws RuntimeException If the value does not match the expected type.
 	 */
 	public F convertUnknown(Object value, ToDocumentFieldValueConvertContext context) {
-		return delegate.convertUnknown( value, context );
+		return delegate.convert( valueType.cast( value ), context );
 	}
 
 	/**

@@ -23,10 +23,12 @@ public interface IndexFieldTypeConverterStep<S extends IndexFieldTypeConverterSt
 	 * <p>
 	 * When not set, users are expected to pass the field's value type directly.
 	 *
-	 * @param toIndexConverter A converter.
+	 * @param valueType The type of values that can be passed to the DSL.
+	 * @param toIndexConverter A converter from the given value type to the index field type.
+	 * @param <V> The type of values that can be passed to the DSL.
 	 * @return {@code this}, for method chaining.
 	 */
-	S dslConverter(ToDocumentFieldValueConverter<?, ? extends F> toIndexConverter);
+	<V> S dslConverter(Class<V> valueType, ToDocumentFieldValueConverter<V, ? extends F> toIndexConverter);
 
 	/**
 	 * Define how values returned when projecting on fields of this type
@@ -34,9 +36,11 @@ public interface IndexFieldTypeConverterStep<S extends IndexFieldTypeConverterSt
 	 * <p>
 	 * When not set, users will be returned the field's value type directly.
 	 *
-	 * @param fromIndexConverter A converter.
+	 * @param valueType The type of values that will be returned when projecting on fields of this type.
+	 * @param fromIndexConverter A converter from the index field type to the given value type.
+	 * @param <V> The type of values that will be returned when projecting on fields of this type.
 	 * @return {@code this}, for method chaining.
 	 */
-	S projectionConverter(FromDocumentFieldValueConverter<? super F, ?> fromIndexConverter);
+	<V> S projectionConverter(Class<V> valueType, FromDocumentFieldValueConverter<? super F, V> fromIndexConverter);
 
 }

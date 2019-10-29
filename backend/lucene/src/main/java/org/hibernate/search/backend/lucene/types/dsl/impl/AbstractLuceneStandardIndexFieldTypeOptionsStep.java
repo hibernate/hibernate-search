@@ -44,16 +44,16 @@ abstract class AbstractLuceneStandardIndexFieldTypeOptionsStep<S extends Abstrac
 	}
 
 	@Override
-	public S dslConverter(ToDocumentFieldValueConverter<?, ? extends F> toIndexConverter) {
+	public <V> S dslConverter(Class<V> valueType, ToDocumentFieldValueConverter<V, ? extends F> toIndexConverter) {
 		Contracts.assertNotNull( toIndexConverter, "toIndexConverter" );
-		this.dslConverter = new DslConverter<>( toIndexConverter );
+		this.dslConverter = new DslConverter<>( valueType, toIndexConverter );
 		return thisAsS();
 	}
 
 	@Override
-	public S projectionConverter(FromDocumentFieldValueConverter<? super F, ?> fromIndexConverter) {
+	public <V> S projectionConverter(Class<V> valueType, FromDocumentFieldValueConverter<? super F, V> fromIndexConverter) {
 		Contracts.assertNotNull( fromIndexConverter, "fromIndexConverter" );
-		this.projectionConverter = new ProjectionConverter<>( fromIndexConverter );
+		this.projectionConverter = new ProjectionConverter<>( valueType, fromIndexConverter );
 		return thisAsS();
 	}
 
@@ -95,7 +95,7 @@ abstract class AbstractLuceneStandardIndexFieldTypeOptionsStep<S extends Abstrac
 	}
 
 	protected final DslConverter<F, ? extends F> createRawDslConverter() {
-		return new DslConverter<>( new PassThroughToDocumentFieldValueConverter<>( fieldType ) );
+		return new DslConverter<>( fieldType, new PassThroughToDocumentFieldValueConverter<>() );
 	}
 
 	protected final ProjectionConverter<? super F, ?> createProjectionConverter() {
@@ -103,7 +103,7 @@ abstract class AbstractLuceneStandardIndexFieldTypeOptionsStep<S extends Abstrac
 	}
 
 	protected final ProjectionConverter<? super F, F> createRawProjectionConverter() {
-		return new ProjectionConverter<>( new PassThroughFromDocumentFieldValueConverter<>( fieldType ) );
+		return new ProjectionConverter<>( fieldType, new PassThroughFromDocumentFieldValueConverter<>() );
 	}
 
 	protected static boolean resolveDefault(Projectable projectable) {

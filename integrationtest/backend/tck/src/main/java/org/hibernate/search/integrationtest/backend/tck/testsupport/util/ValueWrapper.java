@@ -19,51 +19,34 @@ import org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils;
 
 /**
  * A value wrapper used when testing
- * {@link IndexFieldTypeConverterStep#dslConverter(ToDocumentFieldValueConverter) DSL converters}
- * and {@link IndexFieldTypeConverterStep#projectionConverter(FromDocumentFieldValueConverter) projection converters}.
+ * {@link IndexFieldTypeConverterStep#dslConverter(Class, ToDocumentFieldValueConverter)  DSL converters}
+ * and {@link IndexFieldTypeConverterStep#projectionConverter(Class, FromDocumentFieldValueConverter)  projection converters}.
  */
 public final class ValueWrapper<T> implements Normalizable<ValueWrapper<T>> {
-	public static <T> ToDocumentFieldValueConverter<ValueWrapper<T>, T> toIndexFieldConverter() {
-		return new ToDocumentFieldValueConverter<ValueWrapper<T>, T>() {
+	public static <T> ToDocumentFieldValueConverter<ValueWrapper, T> toIndexFieldConverter() {
+		return new ToDocumentFieldValueConverter<ValueWrapper, T>() {
 			@Override
-			public boolean isValidInputType(Class<?> inputTypeCandidate) {
-				return ValueWrapper.class.isAssignableFrom( inputTypeCandidate );
-			}
-
-			@Override
-			public T convert(ValueWrapper<T> value, ToDocumentFieldValueConvertContext context) {
-				return value.getValue();
-			}
-
-			@SuppressWarnings("unchecked")
-			@Override
-			public T convertUnknown(Object value, ToDocumentFieldValueConvertContext context) {
-				return ( (ValueWrapper<T>) value ).getValue();
+			public T convert(ValueWrapper value, ToDocumentFieldValueConvertContext context) {
+				return (T) value.getValue();
 			}
 
 			@Override
 			public boolean isCompatibleWith(ToDocumentFieldValueConverter<?, ?> other) {
-				return other != null && getClass().equals( other.getClass() );
+				return getClass().equals( other.getClass() );
 			}
 		};
 	}
 
-	public static <T> FromDocumentFieldValueConverter<T, ValueWrapper<T>> fromIndexFieldConverter() {
-		return new FromDocumentFieldValueConverter<T, ValueWrapper<T>>() {
+	public static <T> FromDocumentFieldValueConverter<T, ValueWrapper> fromIndexFieldConverter() {
+		return new FromDocumentFieldValueConverter<T, ValueWrapper>() {
 			@Override
-			public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
-				return superTypeCandidate.isAssignableFrom( ValueWrapper.class );
-			}
-
-			@Override
-			public ValueWrapper<T> convert(T indexedValue,
-					FromDocumentFieldValueConvertContext context) {
+			public ValueWrapper<T> convert(T indexedValue, FromDocumentFieldValueConvertContext context) {
 				return new ValueWrapper<>( indexedValue );
 			}
 
 			@Override
 			public boolean isCompatibleWith(FromDocumentFieldValueConverter<?, ?> other) {
-				return other != null && getClass().equals( other.getClass() );
+				return getClass().equals( other.getClass() );
 			}
 		};
 	}

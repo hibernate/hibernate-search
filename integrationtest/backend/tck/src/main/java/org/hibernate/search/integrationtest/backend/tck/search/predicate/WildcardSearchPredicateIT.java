@@ -604,7 +604,7 @@ public class WildcardSearchPredicateIT {
 					.map( root, "analyzedString3" );
 			analyzedStringFieldWithDslConverter = MainFieldModel.mapper(
 					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
-							.dslConverter( ValueWrapper.toIndexFieldConverter() )
+							.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
 			)
 					.map( root, "analyzedStringWithDslConverter" );
 			normalizedField = MainFieldModel.mapper(
@@ -629,7 +629,7 @@ public class WildcardSearchPredicateIT {
 					MainFieldModel.mapper(
 							c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 									// Using a different DSL converter
-									.dslConverter( ValueWrapper.toIndexFieldConverter() )
+									.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
 					)
 							.map( root, "analyzedString1" )
 			);

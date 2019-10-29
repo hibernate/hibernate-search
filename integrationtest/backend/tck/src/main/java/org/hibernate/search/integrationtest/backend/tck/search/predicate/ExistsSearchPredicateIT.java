@@ -571,7 +571,7 @@ public class ExistsSearchPredicateIT {
 			 * but with an incompatible DSL converter.
 			 */
 			mapByTypeFields(
-					root, "byType_", c -> c.dslConverter( ValueWrapper.toIndexFieldConverter() ),
+					root, "byType_", c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() ),
 					(typeDescriptor, expectations, model) -> {
 						// All types are supported
 						supportedFieldModels.add( model );

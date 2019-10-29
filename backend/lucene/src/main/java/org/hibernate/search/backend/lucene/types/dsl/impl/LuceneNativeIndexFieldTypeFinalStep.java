@@ -26,7 +26,9 @@ class LuceneNativeIndexFieldTypeFinalStep<F>
 
 	LuceneNativeIndexFieldTypeFinalStep(Class<F> fieldType,
 			LuceneFieldContributor<F> fieldContributor, LuceneFieldValueExtractor<F> fieldValueExtractor) {
-		this.projectionConverter = new ProjectionConverter<>( new PassThroughFromDocumentFieldValueConverter<>( fieldType ) );
+		this.projectionConverter = new ProjectionConverter<>(
+				fieldType, new PassThroughFromDocumentFieldValueConverter<>()
+		);
 		this.fieldContributor = fieldContributor;
 		this.fieldValueExtractor = fieldValueExtractor;
 	}

@@ -551,8 +551,8 @@ public class RangeAggregationSpecificsIT<F> {
 			fieldWithConverterModel = mapField(
 					root, "converted_",
 					c -> c.aggregable( Aggregable.YES )
-							.dslConverter( ValueWrapper.toIndexFieldConverter() )
-							.projectionConverter( ValueWrapper.fromIndexFieldConverter() )
+							.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
+							.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() )
 			);
 			fieldWithAggregationDisabledModel = mapField(
 					root, "nonAggregable_",

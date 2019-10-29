@@ -11,10 +11,7 @@ import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentF
 
 public final class PassThroughFromDocumentFieldValueConverter<F> implements FromDocumentFieldValueConverter<F, F> {
 
-	private final Class<F> fieldType;
-
-	public PassThroughFromDocumentFieldValueConverter(Class<F> fieldType) {
-		this.fieldType = fieldType;
+	public PassThroughFromDocumentFieldValueConverter() {
 	}
 
 	@Override
@@ -23,16 +20,7 @@ public final class PassThroughFromDocumentFieldValueConverter<F> implements From
 	}
 
 	@Override
-	public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
-		return superTypeCandidate.isAssignableFrom( fieldType );
-	}
-
-	@Override
 	public boolean isCompatibleWith(FromDocumentFieldValueConverter<?, ?> other) {
-		if ( !getClass().equals( other.getClass() ) ) {
-			return false;
-		}
-		PassThroughFromDocumentFieldValueConverter<?> castedOther = (PassThroughFromDocumentFieldValueConverter<?>) other;
-		return fieldType.equals( castedOther.fieldType );
+		return getClass().equals( other.getClass() );
 	}
 }

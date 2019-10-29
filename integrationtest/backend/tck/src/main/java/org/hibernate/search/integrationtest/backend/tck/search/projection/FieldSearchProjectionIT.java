@@ -699,7 +699,7 @@ public class FieldSearchProjectionIT {
 					}
 			);
 			mapByTypeFields(
-					root, "byType_converted_", c -> c.projectionConverter( ValueWrapper.fromIndexFieldConverter() ),
+					root, "byType_converted_", c -> c.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() ),
 					(typeDescriptor, expectations, model) -> {
 						supportedFieldWithProjectionConverterModels.add( model );
 					}
@@ -746,7 +746,7 @@ public class FieldSearchProjectionIT {
 			 * but with an incompatible projection converter.
 			 */
 			mapByTypeFields(
-					root, "byType_converted_", c -> c.projectionConverter( new IncompatibleProjectionConverter<>() ),
+					root, "byType_converted_", c -> c.projectionConverter( ValueWrapper.class, new IncompatibleProjectionConverter<>() ),
 					(typeDescriptor, expectations, model) -> {
 						supportedFieldWithProjectionConverterModels.add( model );
 					}
@@ -754,14 +754,9 @@ public class FieldSearchProjectionIT {
 		}
 
 		private static class IncompatibleProjectionConverter<F> implements
-				FromDocumentFieldValueConverter<F, ValueWrapper<F>> {
+				FromDocumentFieldValueConverter<F, ValueWrapper> {
 			@Override
-			public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
-				return superTypeCandidate.isAssignableFrom( ValueWrapper.class );
-			}
-
-			@Override
-			public ValueWrapper<F> convert(F value, FromDocumentFieldValueConvertContext context) {
+			public ValueWrapper convert(F value, FromDocumentFieldValueConvertContext context) {
 				return null;
 			}
 		}

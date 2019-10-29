@@ -48,8 +48,8 @@ public interface ValueBindingContext<V> extends BindingContext {
 	 * {@code null} to let Hibernate Search derive the expectations
 	 * from the {@code ValueBridge}'s generic type parameters.
 	 * <p>
-	 * Note the {@link IndexFieldTypeConverterStep#dslConverter(ToDocumentFieldValueConverter) DSL converter}
-	 * and {@link IndexFieldTypeConverterStep#projectionConverter(FromDocumentFieldValueConverter) projection converter}
+	 * Note the {@link IndexFieldTypeConverterStep#dslConverter(Class, ToDocumentFieldValueConverter) DSL converter}
+	 * and {@link IndexFieldTypeConverterStep#projectionConverter(Class, FromDocumentFieldValueConverter) projection converter}
 	 * will be ignored, since they are already implemented by the value bridge itself
 	 * through its {@link ValueBridge#toIndexedValue(Object, ValueBridgeToIndexedValueContext)}
 	 * and {@link ValueBridge#fromIndexedValue(Object, ValueBridgeFromIndexedValueContext)} methods.
@@ -73,8 +73,8 @@ public interface ValueBindingContext<V> extends BindingContext {
 	 * {@code null} to let Hibernate Search derive the expectations
 	 * from the {@code ValueBridge}'s generic type parameters.
 	 * <p>
-	 * Note the {@link IndexFieldTypeConverterStep#dslConverter(ToDocumentFieldValueConverter) DSL converter}
-	 * and {@link IndexFieldTypeConverterStep#projectionConverter(FromDocumentFieldValueConverter) projection converter}
+	 * Note the {@link IndexFieldTypeConverterStep#dslConverter(Class, ToDocumentFieldValueConverter) DSL converter}
+	 * and {@link IndexFieldTypeConverterStep#projectionConverter(Class, FromDocumentFieldValueConverter) projection converter}
 	 * will be ignored, since they are already implemented by the value bridge itself
 	 * through its {@link ValueBridge#toIndexedValue(Object, ValueBridgeToIndexedValueContext)}
 	 * and {@link ValueBridge#fromIndexedValue(Object, ValueBridgeFromIndexedValueContext)} methods.

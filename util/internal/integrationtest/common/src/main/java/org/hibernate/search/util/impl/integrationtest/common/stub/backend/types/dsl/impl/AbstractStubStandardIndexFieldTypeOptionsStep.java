@@ -42,10 +42,11 @@ abstract class AbstractStubStandardIndexFieldTypeOptionsStep<S extends AbstractS
 				b -> b.converter( new StubFieldConverter<>(
 						inputType,
 						dslConverter == null
-								? new DslConverter<>( new PassThroughToDocumentFieldValueConverter<>( inputType ) )
+								? new DslConverter<>( inputType, new PassThroughToDocumentFieldValueConverter<>() )
 								: dslConverter,
 						projectionConverter == null
-								? new ProjectionConverter<>( new PassThroughFromDocumentFieldValueConverter<>( inputType ) )
+								? new ProjectionConverter<>(
+								inputType, new PassThroughFromDocumentFieldValueConverter<>() )
 								: projectionConverter
 				) )
 		);
@@ -54,14 +55,14 @@ abstract class AbstractStubStandardIndexFieldTypeOptionsStep<S extends AbstractS
 	abstract S thisAsS();
 
 	@Override
-	public S dslConverter(ToDocumentFieldValueConverter<?, ? extends F> toIndexConverter) {
-		this.dslConverter = new DslConverter<>( toIndexConverter );
+	public <V> S dslConverter(Class<V> valueType, ToDocumentFieldValueConverter<V, ? extends F> toIndexConverter) {
+		this.dslConverter = new DslConverter<>( valueType, toIndexConverter );
 		return thisAsS();
 	}
 
 	@Override
-	public S projectionConverter(FromDocumentFieldValueConverter<? super F, ?> fromIndexConverter) {
-		this.projectionConverter = new ProjectionConverter<>( fromIndexConverter );
+	public <V> S projectionConverter(Class<V> valueType, FromDocumentFieldValueConverter<? super F, V> fromIndexConverter) {
+		this.projectionConverter = new ProjectionConverter<>( valueType, fromIndexConverter );
 		return thisAsS();
 	}
 

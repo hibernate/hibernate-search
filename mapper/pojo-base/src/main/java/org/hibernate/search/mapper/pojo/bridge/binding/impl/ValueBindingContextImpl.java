@@ -152,12 +152,12 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 
 		// Then register the bridge itself as a converter to use in the DSL
 		fieldTypeOptionsStep.dslConverter(
-				new PojoValueBridgeToDocumentFieldValueConverter<>( bridge, expectedValueType )
+				expectedValueType, new PojoValueBridgeToDocumentFieldValueConverter<>( bridge )
 		);
 
 		// Then register the bridge itself as a converter to use in projections
 		fieldTypeOptionsStep.projectionConverter(
-				new PojoValueBridgeFromDocumentFieldValueConverter<>( bridge, expectedValueType )
+				expectedValueType, new PojoValueBridgeFromDocumentFieldValueConverter<>( bridge )
 		);
 
 		// Then give the mapping a chance to override some of the model (add storage, ...)

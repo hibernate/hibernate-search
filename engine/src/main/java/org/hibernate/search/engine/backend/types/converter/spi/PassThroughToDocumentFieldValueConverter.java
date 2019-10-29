@@ -8,24 +8,10 @@ package org.hibernate.search.engine.backend.types.converter.spi;
 
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
-import org.hibernate.search.util.common.impl.Contracts;
 
 public final class PassThroughToDocumentFieldValueConverter<F> implements ToDocumentFieldValueConverter<F, F> {
-	private final Class<F> valueType;
 
-	public PassThroughToDocumentFieldValueConverter(Class<F> valueType) {
-		Contracts.assertNotNull( valueType, "valueType" );
-		this.valueType = valueType;
-	}
-
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "[" + valueType + "]";
-	}
-
-	@Override
-	public boolean isValidInputType(Class<?> inputTypeCandidate) {
-		return valueType.isAssignableFrom( inputTypeCandidate );
+	public PassThroughToDocumentFieldValueConverter() {
 	}
 
 	@Override
@@ -34,16 +20,7 @@ public final class PassThroughToDocumentFieldValueConverter<F> implements ToDocu
 	}
 
 	@Override
-	public F convertUnknown(Object value, ToDocumentFieldValueConvertContext context) {
-		return valueType.cast( value );
-	}
-
-	@Override
 	public boolean isCompatibleWith(ToDocumentFieldValueConverter<?, ?> other) {
-		if ( !getClass().equals( other.getClass() ) ) {
-			return false;
-		}
-		PassThroughToDocumentFieldValueConverter<?> castedOther = (PassThroughToDocumentFieldValueConverter<?>) other;
-		return valueType.equals( castedOther.valueType );
+		return getClass().equals( other.getClass() );
 	}
 }

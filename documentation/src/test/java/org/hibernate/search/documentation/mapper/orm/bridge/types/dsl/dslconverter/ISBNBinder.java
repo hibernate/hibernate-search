@@ -11,8 +11,6 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
@@ -29,22 +27,10 @@ public class ISBNBinder implements PropertyBinder<ISBNBinding> {
 				.asString() // <1>
 				.normalizer( "isbn" )
 				.sortable( Sortable.YES )
-				.dslConverter( new ToDocumentFieldValueConverter<ISBN, String>() { // <2>
-					@Override
-					public boolean isValidInputType(Class<?> inputTypeCandidate) { // <3>
-						return ISBN.class.isAssignableFrom( inputTypeCandidate );
-					}
-
-					@Override
-					public String convert(ISBN value, ToDocumentFieldValueConvertContext context) { // <4>
-						return value.getStringValue();
-					}
-
-					@Override
-					public String convertUnknown(Object value, ToDocumentFieldValueConvertContext context) { // <5>
-						return convert( (ISBN) value, context );
-					}
-				} )
+				.dslConverter( // <2>
+						ISBN.class, // <3>
+						(value, convertContext) -> value.getStringValue() // <4>
+				)
 				.toIndexFieldType();
 		//end::include[]
 

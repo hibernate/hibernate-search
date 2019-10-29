@@ -18,17 +18,6 @@ import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentF
 public interface FromDocumentFieldValueConverter<F, V> {
 
 	/**
-	 * Check whether converted values can be assigned to the given type.
-	 * <p>
-	 * This method is generally implemented like this:
-	 * {@code return superTypeCandidate.isAssignableFrom( TheConvertedType.class )}.
-	 * @param superTypeCandidate A candidate type for assignment of converted values.
-	 * @return {@code true} if the converted type {@link V} is a subtype of {@code superTypeCandidate},
-	 * {@code false} otherwise.
-	 */
-	boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate);
-
-	/**
 	 * @param value The index field value to convert.
 	 * @param context A context that can be
 	 * {@link FromDocumentFieldValueConvertContext#extension(FromDocumentFieldValueConvertContextExtension) extended}
@@ -40,12 +29,11 @@ public interface FromDocumentFieldValueConverter<F, V> {
 	/**
 	 * @param other Another {@link ToDocumentFieldValueConverter}, never {@code null}.
 	 * @return {@code true} if the given object behaves exactly the same as this object,
-	 * i.e. its {@link #isConvertedTypeAssignableTo(Class)} and {@link #convert(Object, FromDocumentFieldValueConvertContext)}
-	 * methods are guaranteed to always return the same value as this object's
+	 * i.e. its {@link #convert(Object, FromDocumentFieldValueConvertContext)}
+	 * method is guaranteed to always return the same value as this object's
 	 * when given the same input. {@code false} otherwise, or when in doubt.
 	 */
-	default boolean isCompatibleWith(
-			FromDocumentFieldValueConverter<?, ?> other) {
+	default boolean isCompatibleWith(FromDocumentFieldValueConverter<?, ?> other) {
 		return equals( other );
 	}
 

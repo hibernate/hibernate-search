@@ -9,6 +9,7 @@ package org.hibernate.search.engine.backend.types.converter.spi;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContextExtension;
+import org.hibernate.search.util.common.impl.Contracts;
 
 /**
  * A converter from a value obtained from the backend to a projected value.
@@ -18,15 +19,19 @@ import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentF
  */
 public final class ProjectionConverter<F, V> {
 
+	private final Class<V> valueType;
 	private final FromDocumentFieldValueConverter<F, V> delegate;
 
-	public ProjectionConverter(FromDocumentFieldValueConverter<F, V> delegate) {
+	public ProjectionConverter(Class<V> valueType, FromDocumentFieldValueConverter<F, V> delegate) {
+		Contracts.assertNotNull( valueType, "valueType" );
+		Contracts.assertNotNull( delegate, "delegate" );
+		this.valueType = valueType;
 		this.delegate = delegate;
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[delegate=" + delegate + "]";
+		return getClass().getSimpleName() + "[valueType=" + valueType.getName() + ",delegate=" + delegate + "]";
 	}
 
 	/**
@@ -36,7 +41,7 @@ public final class ProjectionConverter<F, V> {
 	 * {@code false} otherwise.
 	 */
 	public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
-		return delegate.isConvertedTypeAssignableTo( superTypeCandidate );
+		return superTypeCandidate.isAssignableFrom( valueType );
 	}
 
 	/**

@@ -175,7 +175,7 @@ public class FieldDefaultBridgeIT<V, F> {
 		DslConverter<?, ?> compatibleDslConverter =
 				index2FieldSchemaNode.getConverter().getDslConverter();
 		DslConverter<?, ?> incompatibleDslConverter =
-				new DslConverter<>( new IncompatibleToDocumentFieldValueConverter() );
+				new DslConverter<>( typeDescriptor.getJavaType(), new IncompatibleToDocumentFieldValueConverter<>() );
 		ToDocumentFieldValueConvertContext toDocumentConvertContext =
 				new ToDocumentFieldValueConvertContextImpl( new JavaBeanBackendMappingContext() );
 
@@ -225,7 +225,7 @@ public class FieldDefaultBridgeIT<V, F> {
 		ProjectionConverter<?, ?> compatibleIndexToProjectionConverter =
 				index2FieldSchemaNode.getConverter().getProjectionConverter();
 		ProjectionConverter<?, ?> incompatibleIndexToProjectionConverter =
-				new ProjectionConverter<>( new IncompatibleFromDocumentFieldValueConverter() );
+				new ProjectionConverter<>( typeDescriptor.getJavaType(), new IncompatibleFromDocumentFieldValueConverter<>() );
 		FromDocumentFieldValueConvertContext fromDocumentConvertContext =
 				new FromDocumentFieldValueConvertContextImpl(
 						new JavaBeanBackendSessionContext(
@@ -291,33 +291,18 @@ public class FieldDefaultBridgeIT<V, F> {
 	private static final class IncompatibleType {
 	}
 
-	private static class IncompatibleToDocumentFieldValueConverter
-			implements ToDocumentFieldValueConverter<Object, Object> {
+	private static class IncompatibleToDocumentFieldValueConverter<V>
+			implements ToDocumentFieldValueConverter<V, Object> {
 		@Override
-		public boolean isValidInputType(Class<?> inputTypeCandidate) {
-			return Object.class.isAssignableFrom( inputTypeCandidate );
-		}
-
-		@Override
-		public Object convert(Object value, ToDocumentFieldValueConvertContext context) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Object convertUnknown(Object value, ToDocumentFieldValueConvertContext context) {
+		public Object convert(V value, ToDocumentFieldValueConvertContext context) {
 			throw new UnsupportedOperationException();
 		}
 	}
 
-	private static class IncompatibleFromDocumentFieldValueConverter
-			implements FromDocumentFieldValueConverter<Object, Object> {
+	private static class IncompatibleFromDocumentFieldValueConverter<V>
+			implements FromDocumentFieldValueConverter<Object, V> {
 		@Override
-		public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
-			throw new UnsupportedOperationException();
-		}
-
-		@Override
-		public Object convert(Object value, FromDocumentFieldValueConvertContext context) {
+		public V convert(Object value, FromDocumentFieldValueConvertContext context) {
 			throw new UnsupportedOperationException();
 		}
 

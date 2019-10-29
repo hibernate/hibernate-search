@@ -11,8 +11,6 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
@@ -28,17 +26,10 @@ public class ISBNBinder implements PropertyBinder<ISBNBinding> {
 		IndexFieldType<String> type = context.getTypeFactory()
 				.asString() // <1>
 				.projectable( Projectable.YES )
-				.projectionConverter( new FromDocumentFieldValueConverter<String, ISBN>() { // <2>
-					@Override
-					public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) { // <3>
-						return superTypeCandidate.isAssignableFrom( ISBN.class );
-					}
-
-					@Override
-					public ISBN convert(String value, FromDocumentFieldValueConvertContext context) { // <4>
-						return ISBN.parse( value );
-					}
-				} )
+				.projectionConverter( // <2>
+						ISBN.class, // <3>
+						(value, convertContext) -> ISBN.parse( value ) // <4>
+				)
 				.toIndexFieldType();
 		//end::include[]
 
