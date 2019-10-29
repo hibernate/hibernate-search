@@ -348,7 +348,7 @@ stage('Default build') {
 		helper.markStageSkipped()
 		return
 	}
-	node(NODE_PATTERN_BASE) {
+	runBuildOnNode {
 		helper.withMavenWorkspace {
 			sh """ \
 					mvn clean install \
@@ -390,7 +390,7 @@ stage('Non-default environments') {
 	// Test with multiple JDKs
 	environments.content.jdk.enabled.each { JdkBuildEnvironment buildEnv ->
 		executions.put(buildEnv.tag, {
-			node(NODE_PATTERN_BASE) {
+			runBuildOnNode {
 				def elasticsearchJdkTool = buildEnv.elasticsearchTool ? tool(name: buildEnv.elasticsearchTool, type: 'jdk') : null
 				helper.withMavenWorkspace(jdk: buildEnv.tool) {
 					mavenNonDefaultBuild buildEnv, """ \
@@ -405,7 +405,7 @@ stage('Non-default environments') {
 	// Test ORM integration with multiple databases
 	environments.content.database.enabled.each { DatabaseBuildEnvironment buildEnv ->
 		executions.put(buildEnv.tag, {
-			node(NODE_PATTERN_BASE) {
+			runBuildOnNode {
 				helper.withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install -pl org.hibernate:hibernate-search-orm -P$buildEnv.mavenProfile \
@@ -418,7 +418,7 @@ stage('Non-default environments') {
 	// Test Elasticsearch integration with multiple versions in a local instance
 	environments.content.esLocal.enabled.each { EsLocalBuildEnvironment buildEnv ->
 		executions.put(buildEnv.tag, {
-			node(NODE_PATTERN_BASE) {
+			runBuildOnNode {
 				helper.withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install -pl org.hibernate:hibernate-search-integrationtest-elasticsearch \
@@ -444,7 +444,7 @@ stage('Non-default environments') {
 		}
 		executions.put(buildEnv.tag, {
 			lock(label: buildEnv.lockedResourcesLabel) {
-				node(NODE_PATTERN_BASE + '&&AWS') {
+				runBuildOnNode(NODE_PATTERN_BASE + '&&AWS') {
 					helper.withMavenWorkspace {
 						withCredentials([[$class: 'AmazonWebServicesCredentialsBinding',
 										 credentialsId   : awsCredentialsId,
@@ -485,7 +485,7 @@ stage('Non-default environments') {
 stage('Deploy') {
 	if (deploySnapshot) {
 		echo "Deploying snapshots"
-		node(NODE_PATTERN_BASE) {
+		runBuildOnNode {
 			helper.withMavenWorkspace(mavenSettingsConfig: helper.configuration.file.deployment.maven.settingsId) {
 				sh "mvn clean deploy -Pdist -DskipTests"
 			}
@@ -493,7 +493,7 @@ stage('Deploy') {
 	}
 	else if (performRelease) {
 		echo "Performing full release for version ${releaseVersion.toString()}"
-		node(NODE_PATTERN_BASE) {
+		runBuildOnNode {
 			helper.withMavenWorkspace(mavenSettingsConfig: params.RELEASE_DRY_RUN ? null : helper.configuration.file.deployment.maven.settingsId) {
 				sh "git clone https://github.com/hibernate/hibernate-noorm-release-scripts.git"
 				sh "bash -xe hibernate-noorm-release-scripts/prepare-release.sh search ${releaseVersion.toString()}"
@@ -659,6 +659,16 @@ void keepOnlyEnvironmentsFromSet(String environmentSetName) {
 		if (!enableExperimentalBuildEnv) {
 			envSet.enabled.removeAll { buildEnv -> buildEnv.status == BuildEnvironmentStatus.EXPERIMENTAL }
 		}
+	}
+}
+
+void runBuildOnNode(Closure body) {
+	runBuildOnNode( NODE_PATTERN_BASE, body )
+}
+
+void runBuildOnNode(String label, Closure body) {
+	node( label ) {
+		timeout( [time: 1, unit: 'HOURS'], body )
 	}
 }
 
