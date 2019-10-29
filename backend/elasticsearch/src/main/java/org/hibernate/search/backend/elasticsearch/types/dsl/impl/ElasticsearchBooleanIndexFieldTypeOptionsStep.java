@@ -12,8 +12,8 @@ import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.Elastic
 import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchBooleanFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 
 class ElasticsearchBooleanIndexFieldTypeOptionsStep
 		extends
@@ -35,10 +35,10 @@ class ElasticsearchBooleanIndexFieldTypeOptionsStep
 
 	@Override
 	protected ElasticsearchFieldAggregationBuilderFactory createAggregationBuilderFactory(boolean resolvedAggregable,
-			ToDocumentFieldValueConverter<?, ? extends Boolean> dslToIndexConverter,
-			ToDocumentFieldValueConverter<Boolean, ? extends Boolean> rawDslToIndexConverter,
-			FromDocumentFieldValueConverter<? super Boolean, ?> indexToProjectionConverter,
-			FromDocumentFieldValueConverter<? super Boolean, Boolean> rawIndexToProjectionConverter,
+			DslConverter<?, ? extends Boolean> dslToIndexConverter,
+			DslConverter<Boolean, ? extends Boolean> rawDslToIndexConverter,
+			ProjectionConverter<? super Boolean, ?> indexToProjectionConverter,
+			ProjectionConverter<? super Boolean, Boolean> rawIndexToProjectionConverter,
 			ElasticsearchFieldCodec<Boolean> codec) {
 		return new ElasticsearchBooleanFieldAggregationBuilderFactory(
 				resolvedAggregable,

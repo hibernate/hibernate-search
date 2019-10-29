@@ -11,8 +11,8 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
@@ -28,10 +28,10 @@ public class LuceneTextFieldAggregationBuilderFactory
 	private final boolean tokenized;
 
 	public LuceneTextFieldAggregationBuilderFactory(boolean aggregable,
-			ToDocumentFieldValueConverter<?, ? extends String> toFieldValueConverter,
-			ToDocumentFieldValueConverter<? super String, ? extends String> rawToFieldValueConverter,
-			FromDocumentFieldValueConverter<? super String, ?> fromFieldValueConverter,
-			FromDocumentFieldValueConverter<? super String, String> rawFromFieldValueConverter,
+			DslConverter<?, ? extends String> toFieldValueConverter,
+			DslConverter<? super String, ? extends String> rawToFieldValueConverter,
+			ProjectionConverter<? super String, ?> fromFieldValueConverter,
+			ProjectionConverter<? super String, String> rawFromFieldValueConverter,
 			LuceneFieldCodec<String> codec,
 			boolean tokenized) {
 		super( aggregable, toFieldValueConverter, rawToFieldValueConverter, fromFieldValueConverter,
@@ -52,7 +52,7 @@ public class LuceneTextFieldAggregationBuilderFactory
 
 		checkAggregable( absoluteFieldPath );
 
-		FromDocumentFieldValueConverter<? super String, ? extends K> fromFieldValueConverter =
+		ProjectionConverter<? super String, ? extends K> fromFieldValueConverter =
 				getFromFieldValueConverter( absoluteFieldPath, expectedType, convert );
 
 		return new LuceneTextTermsAggregation.Builder<>(

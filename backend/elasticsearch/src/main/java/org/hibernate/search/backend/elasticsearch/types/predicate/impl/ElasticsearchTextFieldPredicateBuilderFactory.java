@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.scope.model.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
@@ -26,8 +26,8 @@ public class ElasticsearchTextFieldPredicateBuilderFactory
 	private final String normalizer;
 
 	public ElasticsearchTextFieldPredicateBuilderFactory( boolean searchable,
-			ToDocumentFieldValueConverter<?, ? extends String> converter,
-			ToDocumentFieldValueConverter<String, ? extends String> rawConverter,
+			DslConverter<?, ? extends String> converter,
+			DslConverter<String, ? extends String> rawConverter,
 			ElasticsearchFieldCodec<String> codec, PropertyMapping mapping) {
 		super( searchable, converter, rawConverter, codec );
 		this.type = mapping.getType();

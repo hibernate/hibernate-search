@@ -14,8 +14,8 @@ import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexF
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchGeoPointFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchGeoPointFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchGeoPointFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 
@@ -33,24 +33,24 @@ class ElasticsearchGeoPointIndexFieldTypeOptionsStep
 		// We need doc values for the projection script when not sorting on the same field
 		mapping.setDocValues( resolvedSortable || resolvedProjectable );
 
-		ToDocumentFieldValueConverter<?, ? extends GeoPoint> dslToIndexConverter =
-				createDslToIndexConverter();
-		FromDocumentFieldValueConverter<? super GeoPoint, ?> indexToProjectionConverter =
-				createIndexToProjectionConverter();
-		FromDocumentFieldValueConverter<? super GeoPoint, GeoPoint> rawIndexToProjectionConverter =
-				createFromDocumentRawConverter();
+		DslConverter<?, ? extends GeoPoint> dslConverter =
+				createDslConverter();
+		ProjectionConverter<? super GeoPoint, ?> projectionConverter =
+				createProjectionConverter();
+		ProjectionConverter<? super GeoPoint, GeoPoint> rawProjectionConverter =
+				createRawProjectionConverter();
 
 		return new ElasticsearchIndexFieldType<>(
 				codec,
 				new ElasticsearchGeoPointFieldPredicateBuilderFactory( resolvedSearchable ),
 				new ElasticsearchGeoPointFieldSortBuilderFactory( resolvedSortable ),
 				new ElasticsearchGeoPointFieldProjectionBuilderFactory(
-						resolvedProjectable, indexToProjectionConverter, rawIndexToProjectionConverter, codec
+						resolvedProjectable, projectionConverter, rawProjectionConverter, codec
 				),
 				new ElasticsearchGeoPointFieldAggregationBuilderFactory(
 						resolvedAggregable,
-						dslToIndexConverter,
-						indexToProjectionConverter,
+						dslConverter,
+						projectionConverter,
 						codec
 				),
 				mapping

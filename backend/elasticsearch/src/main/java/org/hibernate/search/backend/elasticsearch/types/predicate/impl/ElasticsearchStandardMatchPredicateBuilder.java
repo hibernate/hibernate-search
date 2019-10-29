@@ -17,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Abstract
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
@@ -40,8 +40,8 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 
 	private final ElasticsearchSearchContext searchContext;
 
-	private final ToDocumentFieldValueConverter<?, ? extends F> converter;
-	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
+	private final DslConverter<?, ? extends F> converter;
+	private final DslConverter<F, ? extends F> rawConverter;
 	private final ElasticsearchCompatibilityChecker converterChecker;
 
 	private final ElasticsearchFieldCodec<F> codec;
@@ -50,7 +50,7 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 
 	ElasticsearchStandardMatchPredicateBuilder(ElasticsearchSearchContext searchContext,
 			String absoluteFieldPath,
-			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
+			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchFieldCodec<F> codec) {
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
@@ -77,7 +77,7 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 
 	@Override
 	public void value(Object value, ValueConvert convert) {
-		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( convert );
+		DslConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( convert );
 		try {
 			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
 			this.value = codec.encode( converted );
@@ -101,7 +101,7 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 		return outerObject;
 	}
 
-	private ToDocumentFieldValueConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {
+	private DslConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {
 		switch ( convert ) {
 			case NO:
 				return rawConverter;

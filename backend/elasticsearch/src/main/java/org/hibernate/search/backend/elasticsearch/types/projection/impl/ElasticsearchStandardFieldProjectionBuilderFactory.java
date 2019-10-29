@@ -12,7 +12,7 @@ import java.util.Set;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchFieldProjectionBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
@@ -26,13 +26,13 @@ public class ElasticsearchStandardFieldProjectionBuilderFactory<F> implements El
 
 	private final boolean projectable;
 
-	private final FromDocumentFieldValueConverter<? super F, ?> converter;
-	private final FromDocumentFieldValueConverter<? super F, F> rawConverter;
+	private final ProjectionConverter<? super F, ?> converter;
+	private final ProjectionConverter<? super F, F> rawConverter;
 
 	private final ElasticsearchFieldCodec<F> codec;
 
 	public ElasticsearchStandardFieldProjectionBuilderFactory(boolean projectable,
-			FromDocumentFieldValueConverter<? super F, ?> converter, FromDocumentFieldValueConverter<? super F, F> rawConverter,
+			ProjectionConverter<? super F, ?> converter, ProjectionConverter<? super F, F> rawConverter,
 			ElasticsearchFieldCodec<F> codec) {
 		this.projectable = projectable;
 		this.converter = converter;
@@ -46,7 +46,7 @@ public class ElasticsearchStandardFieldProjectionBuilderFactory<F> implements El
 			Class<T> expectedType, ValueConvert convert) {
 		checkProjectable( absoluteFieldPath, projectable );
 
-		FromDocumentFieldValueConverter<? super F, ?> requestConverter = getConverter( convert );
+		ProjectionConverter<? super F, ?> requestConverter = getConverter( convert );
 		if ( !requestConverter.isConvertedTypeAssignableTo( expectedType ) ) {
 			throw log.invalidProjectionInvalidType( absoluteFieldPath, expectedType,
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
@@ -90,7 +90,7 @@ public class ElasticsearchStandardFieldProjectionBuilderFactory<F> implements El
 		}
 	}
 
-	private FromDocumentFieldValueConverter<? super F, ?> getConverter(ValueConvert convert) {
+	private ProjectionConverter<? super F, ?> getConverter(ValueConvert convert) {
 		switch ( convert ) {
 			case NO:
 				return rawConverter;

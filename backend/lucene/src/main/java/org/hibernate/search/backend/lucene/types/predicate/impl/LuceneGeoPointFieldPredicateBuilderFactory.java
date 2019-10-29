@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneGeoPointFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
@@ -29,11 +29,11 @@ public final class LuceneGeoPointFieldPredicateBuilderFactory
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ToDocumentFieldValueConverter<?, ? extends GeoPoint> converter;
+	private final DslConverter<?, ? extends GeoPoint> converter;
 	private final LuceneGeoPointFieldCodec codec;
 
 	public LuceneGeoPointFieldPredicateBuilderFactory( boolean searchable,
-			ToDocumentFieldValueConverter<?, ? extends GeoPoint> converter,
+			DslConverter<?, ? extends GeoPoint> converter,
 			LuceneGeoPointFieldCodec codec) {
 		super( searchable );
 		this.converter = converter;
@@ -83,7 +83,7 @@ public final class LuceneGeoPointFieldPredicateBuilderFactory
 	}
 
 	@Override
-	protected ToDocumentFieldValueConverter<?, ?> getConverter() {
+	protected DslConverter<?, ?> getConverter() {
 		return converter;
 	}
 }

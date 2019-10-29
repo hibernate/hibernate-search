@@ -10,7 +10,7 @@ import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityC
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 
 /**
@@ -23,7 +23,7 @@ public final class LuceneNumericFieldPredicateBuilderFactory<F, E extends Number
 		extends AbstractLuceneStandardFieldPredicateBuilderFactory<F, AbstractLuceneNumericFieldCodec<F, E>> {
 
 	public LuceneNumericFieldPredicateBuilderFactory( boolean searchable,
-			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
+			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			AbstractLuceneNumericFieldCodec<F, E> codec) {
 		super( searchable, converter, rawConverter, codec );
 	}

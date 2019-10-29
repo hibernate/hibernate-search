@@ -11,8 +11,8 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
@@ -27,13 +27,13 @@ public class ElasticsearchGeoPointFieldAggregationBuilderFactory
 
 	private final boolean aggregable;
 
-	private final ToDocumentFieldValueConverter<?, ? extends GeoPoint> toFieldValueConverter;
-	private final FromDocumentFieldValueConverter<? super GeoPoint, ?> fromFieldValueConverter;
+	private final DslConverter<?, ? extends GeoPoint> toFieldValueConverter;
+	private final ProjectionConverter<? super GeoPoint, ?> fromFieldValueConverter;
 	private final ElasticsearchFieldCodec<GeoPoint> codec;
 
 	public ElasticsearchGeoPointFieldAggregationBuilderFactory(boolean aggregable,
-			ToDocumentFieldValueConverter<?, ? extends GeoPoint> toFieldValueConverter,
-			FromDocumentFieldValueConverter<? super GeoPoint, ?> fromFieldValueConverter,
+			DslConverter<?, ? extends GeoPoint> toFieldValueConverter,
+			ProjectionConverter<? super GeoPoint, ?> fromFieldValueConverter,
 			ElasticsearchFieldCodec<GeoPoint> codec) {
 		this.aggregable = aggregable;
 		this.toFieldValueConverter = toFieldValueConverter;

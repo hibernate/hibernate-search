@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
@@ -37,8 +37,8 @@ public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearc
 
 	private final String absoluteFieldPath;
 
-	private final ToDocumentFieldValueConverter<?, ? extends F> converter;
-	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
+	private final DslConverter<?, ? extends F> converter;
+	private final DslConverter<F, ? extends F> rawConverter;
 	private final ElasticsearchCompatibilityChecker converterChecker;
 
 	private final ElasticsearchFieldCodec<F> codec;
@@ -47,7 +47,7 @@ public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearc
 
 	public ElasticsearchFieldSortBuilder(ElasticsearchSearchContext searchContext,
 			String absoluteFieldPath, List<String> nestedPathHierarchy,
-			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
+			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchFieldCodec<F> codec) {
 		super( nestedPathHierarchy, searchContext.getJsonSyntaxHelper() );
 		this.searchContext = searchContext;
@@ -70,7 +70,7 @@ public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearc
 
 	@Override
 	public void missingAs(Object value, ValueConvert convert) {
-		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( convert );
+		DslConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( convert );
 		try {
 			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
 			this.missing = codec.encodeForMissing( converted );
@@ -98,7 +98,7 @@ public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearc
 		}
 	}
 
-	private ToDocumentFieldValueConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {
+	private DslConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {
 		switch ( convert ) {
 			case NO:
 				return rawConverter;

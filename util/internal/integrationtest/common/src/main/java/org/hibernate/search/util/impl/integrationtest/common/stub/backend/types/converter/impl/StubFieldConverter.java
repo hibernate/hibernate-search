@@ -6,36 +6,36 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.converter.impl;
 
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 
 public class StubFieldConverter<F> {
 	private final Class<F> type;
-	private final ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter;
-	private final FromDocumentFieldValueConverter<? super F, ?> indexToProjectionConverter;
+	private final DslConverter<?, ? extends F> dslConverter;
+	private final ProjectionConverter<? super F, ?> projectionConverter;
 
 	public StubFieldConverter(Class<F> type,
-			ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter,
-			FromDocumentFieldValueConverter<? super F, ?> indexToProjectionConverter) {
+			DslConverter<?, ? extends F> dslConverter,
+			ProjectionConverter<? super F, ?> projectionConverter) {
 		this.type = type;
-		this.dslToIndexConverter = dslToIndexConverter;
-		this.indexToProjectionConverter = indexToProjectionConverter;
+		this.dslConverter = dslConverter;
+		this.projectionConverter = projectionConverter;
 	}
 
 	public Object convertIndexToProjection(Object indexValue, FromDocumentFieldValueConvertContext context) {
-		return indexToProjectionConverter.convert( type.cast( indexValue ), context );
+		return projectionConverter.convert( type.cast( indexValue ), context );
 	}
 
 	public boolean isConvertIndexToProjectionCompatibleWith(StubFieldConverter<?> other) {
-		return indexToProjectionConverter.isCompatibleWith( other.indexToProjectionConverter );
+		return projectionConverter.isCompatibleWith( other.projectionConverter );
 	}
 
-	public ToDocumentFieldValueConverter<?, ? extends F> getDslToIndexConverter() {
-		return dslToIndexConverter;
+	public DslConverter<?, ? extends F> getDslConverter() {
+		return dslConverter;
 	}
 
-	public FromDocumentFieldValueConverter<? super F, ?> getIndexToProjectionConverter() {
-		return indexToProjectionConverter;
+	public ProjectionConverter<? super F, ?> getProjectionConverter() {
+		return projectionConverter;
 	}
 }

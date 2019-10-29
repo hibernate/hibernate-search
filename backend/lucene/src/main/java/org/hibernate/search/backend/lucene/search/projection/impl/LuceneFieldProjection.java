@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollecto
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -25,10 +25,10 @@ class LuceneFieldProjection<F, V> implements LuceneSearchProjection<F, V> {
 
 	private final LuceneFieldCodec<F> codec;
 
-	private final FromDocumentFieldValueConverter<? super F, V> converter;
+	private final ProjectionConverter<? super F, V> converter;
 
 	LuceneFieldProjection(Set<String> indexNames, String absoluteFieldPath, String nestedDocumentPath,
-			LuceneFieldCodec<F> codec, FromDocumentFieldValueConverter<? super F, V> converter) {
+			LuceneFieldCodec<F> codec, ProjectionConverter<? super F, V> converter) {
 		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.nestedDocumentPath = nestedDocumentPath;

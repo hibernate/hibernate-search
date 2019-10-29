@@ -12,10 +12,12 @@ import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.Projectable;
-import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.PassThroughToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
+import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Contracts;
 
@@ -29,8 +31,8 @@ abstract class AbstractLuceneStandardIndexFieldTypeOptionsStep<S extends Abstrac
 	private final LuceneIndexFieldTypeBuildContext buildContext;
 	private final Class<F> fieldType;
 
-	private ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter;
-	private FromDocumentFieldValueConverter<? super F, ?> indexToProjectionConverter;
+	private DslConverter<?, ? extends F> dslConverter;
+	private ProjectionConverter<? super F, ?> projectionConverter;
 	protected Projectable projectable = Projectable.DEFAULT;
 	protected Searchable searchable = Searchable.DEFAULT;
 	protected Aggregable aggregable = Aggregable.DEFAULT;
@@ -44,14 +46,14 @@ abstract class AbstractLuceneStandardIndexFieldTypeOptionsStep<S extends Abstrac
 	@Override
 	public S dslConverter(ToDocumentFieldValueConverter<?, ? extends F> toIndexConverter) {
 		Contracts.assertNotNull( toIndexConverter, "toIndexConverter" );
-		this.dslToIndexConverter = toIndexConverter;
+		this.dslConverter = new DslConverter<>( toIndexConverter );
 		return thisAsS();
 	}
 
 	@Override
 	public S projectionConverter(FromDocumentFieldValueConverter<? super F, ?> fromIndexConverter) {
 		Contracts.assertNotNull( fromIndexConverter, "fromIndexConverter" );
-		this.indexToProjectionConverter = fromIndexConverter;
+		this.projectionConverter = new ProjectionConverter<>( fromIndexConverter );
 		return thisAsS();
 	}
 
@@ -88,20 +90,20 @@ abstract class AbstractLuceneStandardIndexFieldTypeOptionsStep<S extends Abstrac
 		return buildContext;
 	}
 
-	protected final ToDocumentFieldValueConverter<?, ? extends F> createDslToIndexConverter() {
-		return dslToIndexConverter == null ? createToDocumentRawConverter() : dslToIndexConverter;
+	protected final DslConverter<?, ? extends F> createDslConverter() {
+		return dslConverter == null ? createRawDslConverter() : dslConverter;
 	}
 
-	protected final ToDocumentFieldValueConverter<F, ? extends F> createToDocumentRawConverter() {
-		return new PassThroughToDocumentFieldValueConverter<>( fieldType );
+	protected final DslConverter<F, ? extends F> createRawDslConverter() {
+		return new DslConverter<>( new PassThroughToDocumentFieldValueConverter<>( fieldType ) );
 	}
 
-	protected final FromDocumentFieldValueConverter<? super F, ?> createIndexToProjectionConverter() {
-		return indexToProjectionConverter == null ? createFromDocumentRawConverter() : indexToProjectionConverter;
+	protected final ProjectionConverter<? super F, ?> createProjectionConverter() {
+		return projectionConverter == null ? createRawProjectionConverter() : projectionConverter;
 	}
 
-	protected final FromDocumentFieldValueConverter<? super F, F> createFromDocumentRawConverter() {
-		return new PassThroughFromDocumentFieldValueConverter<>( fieldType );
+	protected final ProjectionConverter<? super F, F> createRawProjectionConverter() {
+		return new ProjectionConverter<>( new PassThroughFromDocumentFieldValueConverter<>( fieldType ) );
 	}
 
 	protected static boolean resolveDefault(Projectable projectable) {

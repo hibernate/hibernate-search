@@ -14,8 +14,8 @@ import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexF
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 
 import com.google.gson.Gson;
@@ -43,27 +43,27 @@ class ElasticsearchNativeIndexFieldTypeOptionsStepImpl
 		Gson gson = getBuildContext().getUserFacingGson();
 		PropertyMapping mapping = gson.fromJson( mappingJsonString, PropertyMapping.class );
 
-		ToDocumentFieldValueConverter<?, ? extends String> dslToIndexConverter =
-				createDslToIndexConverter();
-		ToDocumentFieldValueConverter<String, ? extends String> rawDslToIndexConverter =
-				createToDocumentRawConverter();
-		FromDocumentFieldValueConverter<? super String, ?> indexToProjectionConverter =
-				createIndexToProjectionConverter();
-		FromDocumentFieldValueConverter<? super String, String> rawIndexToProjectionConverter =
-				createFromDocumentRawConverter();
+		DslConverter<?, ? extends String> dslConverter =
+				createDslConverter();
+		DslConverter<String, ? extends String> rawDslConverter =
+				createRawDslConverter();
+		ProjectionConverter<? super String, ?> projectionConverter =
+				createProjectionConverter();
+		ProjectionConverter<? super String, String> rawProjectionConverter =
+				createRawProjectionConverter();
 		ElasticsearchJsonStringFieldCodec codec = new ElasticsearchJsonStringFieldCodec( gson );
 
 		return new ElasticsearchIndexFieldType<>(
 				codec,
-				new ElasticsearchStandardFieldPredicateBuilderFactory<>( true, dslToIndexConverter, createToDocumentRawConverter(), codec ),
-				new ElasticsearchStandardFieldSortBuilderFactory<>( true, dslToIndexConverter, createToDocumentRawConverter(), codec ),
+				new ElasticsearchStandardFieldPredicateBuilderFactory<>( true, dslConverter, rawDslConverter, codec ),
+				new ElasticsearchStandardFieldSortBuilderFactory<>( true, dslConverter, rawDslConverter, codec ),
 				new ElasticsearchStandardFieldProjectionBuilderFactory<>(
-						true, indexToProjectionConverter, createFromDocumentRawConverter(), codec
+						true, projectionConverter, rawProjectionConverter, codec
 				),
 				new ElasticsearchStandardFieldAggregationBuilderFactory<>(
 						true,
-						dslToIndexConverter, rawDslToIndexConverter,
-						indexToProjectionConverter, rawIndexToProjectionConverter,
+						dslConverter, rawDslConverter,
+						projectionConverter, rawProjectionConverter,
 						codec
 				),
 				mapping

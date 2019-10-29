@@ -21,7 +21,7 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollecto
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.util.common.data.Range;
@@ -88,14 +88,14 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 
 		private final String absoluteFieldPath;
 
-		private final ToDocumentFieldValueConverter<?, ? extends F> toFieldValueConverter;
+		private final DslConverter<?, ? extends F> toFieldValueConverter;
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
 		private final List<Range<K>> rangesInOrder = new ArrayList<>();
 		private final List<Range<E>> encodedRangesInOrder = new ArrayList<>();
 
 		public Builder(LuceneSearchContext searchContext, String absoluteFieldPath,
-				ToDocumentFieldValueConverter<?, ? extends F> toFieldValueConverter,
+				DslConverter<?, ? extends F> toFieldValueConverter,
 				AbstractLuceneNumericFieldCodec<F, E> codec) {
 			super( searchContext );
 			this.absoluteFieldPath = absoluteFieldPath;

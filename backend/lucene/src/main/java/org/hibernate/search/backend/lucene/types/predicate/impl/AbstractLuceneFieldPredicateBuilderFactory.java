@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityC
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
@@ -115,7 +115,7 @@ abstract class AbstractLuceneFieldPredicateBuilderFactory
 
 	protected abstract LuceneFieldCodec<?> getCodec();
 
-	protected abstract ToDocumentFieldValueConverter<?, ?> getConverter();
+	protected abstract DslConverter<?, ?> getConverter();
 
 	protected void checkSearchable(String absoluteFieldPath) {
 		if ( !searchable ) {

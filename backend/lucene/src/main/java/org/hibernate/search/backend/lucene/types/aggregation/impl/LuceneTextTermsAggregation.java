@@ -12,7 +12,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 
 import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.facet.FacetsCollector;
@@ -103,7 +103,7 @@ public class LuceneTextTermsAggregation<K>
 			extends AbstractBuilder<String, String, K> {
 
 		public Builder(LuceneSearchContext searchContext, String absoluteFieldPath,
-				FromDocumentFieldValueConverter<? super String, ? extends K> fromFieldValueConverter) {
+				ProjectionConverter<? super String, ? extends K> fromFieldValueConverter) {
 			super( searchContext, absoluteFieldPath, fromFieldValueConverter );
 		}
 

@@ -16,7 +16,7 @@ import java.util.function.Function;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.util.common.data.Range;
@@ -77,14 +77,14 @@ public class ElasticsearchRangeAggregation<F, K>
 
 		private final String absoluteFieldPath;
 
-		private final ToDocumentFieldValueConverter<?, ? extends F> toFieldValueConverter;
+		private final DslConverter<?, ? extends F> toFieldValueConverter;
 		private final ElasticsearchFieldCodec<F> codec;
 
 		private final List<Range<K>> rangesInOrder = new ArrayList<>();
 		private final JsonArray rangesJson = new JsonArray();
 
 		public Builder(ElasticsearchSearchContext searchContext, String absoluteFieldPath,
-				ToDocumentFieldValueConverter<?, ? extends F> toFieldValueConverter,
+				DslConverter<?, ? extends F> toFieldValueConverter,
 				ElasticsearchFieldCodec<F> codec) {
 			super( searchContext );
 			this.absoluteFieldPath = absoluteFieldPath;

@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchDistanceToFieldProjectionBuilder;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchFieldProjectionBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
@@ -27,12 +27,12 @@ public class ElasticsearchGeoPointFieldProjectionBuilderFactory implements Elast
 
 	private final boolean projectable;
 
-	private final FromDocumentFieldValueConverter<? super GeoPoint, ?> converter;
-	private final FromDocumentFieldValueConverter<? super GeoPoint, GeoPoint> rawConverter;
+	private final ProjectionConverter<? super GeoPoint, ?> converter;
+	private final ProjectionConverter<? super GeoPoint, GeoPoint> rawConverter;
 	private final ElasticsearchFieldCodec<GeoPoint> codec;
 
 	public ElasticsearchGeoPointFieldProjectionBuilderFactory(boolean projectable,
-			FromDocumentFieldValueConverter<? super GeoPoint, ?> converter, FromDocumentFieldValueConverter<? super GeoPoint, GeoPoint> rawConverter,
+			ProjectionConverter<? super GeoPoint, ?> converter, ProjectionConverter<? super GeoPoint, GeoPoint> rawConverter,
 			ElasticsearchFieldCodec<GeoPoint> codec) {
 		this.projectable = projectable;
 		this.converter = converter;
@@ -46,7 +46,7 @@ public class ElasticsearchGeoPointFieldProjectionBuilderFactory implements Elast
 			Class<T> expectedType, ValueConvert convert) {
 		checkProjectable( absoluteFieldPath, projectable );
 
-		FromDocumentFieldValueConverter<? super GeoPoint, ?> requestConverter = getConverter( convert );
+		ProjectionConverter<? super GeoPoint, ?> requestConverter = getConverter( convert );
 		if ( !requestConverter.isConvertedTypeAssignableTo( expectedType ) ) {
 			throw log.invalidProjectionInvalidType( absoluteFieldPath, expectedType,
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
@@ -90,7 +90,7 @@ public class ElasticsearchGeoPointFieldProjectionBuilderFactory implements Elast
 		}
 	}
 
-	private FromDocumentFieldValueConverter<? super GeoPoint, ?> getConverter(ValueConvert convert) {
+	private ProjectionConverter<? super GeoPoint, ?> getConverter(ValueConvert convert) {
 		switch ( convert ) {
 			case NO:
 				return rawConverter;

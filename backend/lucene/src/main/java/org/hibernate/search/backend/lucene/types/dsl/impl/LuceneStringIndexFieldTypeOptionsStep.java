@@ -21,8 +21,8 @@ import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardF
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneTextFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.TermVector;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -133,14 +133,14 @@ class LuceneStringIndexFieldTypeOptionsStep
 
 		Analyzer analyzerOrNormalizer = analyzer != null ? analyzer : normalizer;
 
-		ToDocumentFieldValueConverter<?, ? extends String> dslToIndexConverter =
-				createDslToIndexConverter();
-		ToDocumentFieldValueConverter<String, ? extends String> rawDslToIndexConverter =
-				createToDocumentRawConverter();
-		FromDocumentFieldValueConverter<? super String, ?> indexToProjectionConverter =
-				createIndexToProjectionConverter();
-		FromDocumentFieldValueConverter<? super String, String> rawIndexToProjectionConverter =
-				createFromDocumentRawConverter();
+		DslConverter<?, ? extends String> dslConverter =
+				createDslConverter();
+		DslConverter<String, ? extends String> rawDslConverter =
+				createRawDslConverter();
+		ProjectionConverter<? super String, ?> projectionConverter =
+				createProjectionConverter();
+		ProjectionConverter<? super String, String> rawProjectionConverter =
+				createRawProjectionConverter();
 		LuceneStringFieldCodec codec = new LuceneStringFieldCodec(
 				resolvedSearchable, resolvedSortable, resolvedAggregable,
 				getFieldType( resolvedProjectable, resolvedSearchable, analyzer != null, resolvedNorms, resolvedTermVector ), indexNullAsValue,
@@ -150,19 +150,19 @@ class LuceneStringIndexFieldTypeOptionsStep
 		return new LuceneIndexFieldType<>(
 				codec,
 				new LuceneTextFieldPredicateBuilderFactory<>(
-						resolvedSearchable, dslToIndexConverter, rawDslToIndexConverter, codec,
+						resolvedSearchable, dslConverter, rawDslConverter, codec,
 						( searchAnalyzer != null ) ? searchAnalyzer : analyzerOrNormalizer
 				),
 				new LuceneTextFieldSortBuilderFactory<>(
-						resolvedSortable, dslToIndexConverter, rawDslToIndexConverter, codec
+						resolvedSortable, dslConverter, rawDslConverter, codec
 				),
 				new LuceneStandardFieldProjectionBuilderFactory<>(
-						resolvedProjectable, indexToProjectionConverter, rawIndexToProjectionConverter, codec
+						resolvedProjectable, projectionConverter, rawProjectionConverter, codec
 				),
 				new LuceneTextFieldAggregationBuilderFactory(
 						resolvedAggregable,
-						dslToIndexConverter, rawDslToIndexConverter,
-						indexToProjectionConverter, rawIndexToProjectionConverter,
+						dslConverter, rawDslConverter,
+						projectionConverter, rawProjectionConverter,
 						codec,
 						analyzer != null
 				),

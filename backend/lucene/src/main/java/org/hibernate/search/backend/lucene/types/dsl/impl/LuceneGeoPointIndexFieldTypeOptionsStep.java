@@ -13,8 +13,8 @@ import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneGeoPointFi
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneGeoPointFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneGeoPointFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 
@@ -40,12 +40,12 @@ class LuceneGeoPointIndexFieldTypeOptionsStep
 		boolean resolvedSearchable = resolveDefault( searchable );
 		boolean resolvedAggregable = resolveDefault( aggregable );
 
-		ToDocumentFieldValueConverter<?, ? extends GeoPoint> dslToIndexConverter =
-				createDslToIndexConverter();
-		FromDocumentFieldValueConverter<? super GeoPoint, ?> indexToProjectionConverter =
-				createIndexToProjectionConverter();
-		FromDocumentFieldValueConverter<? super GeoPoint, GeoPoint> rawIndexToProjectionConverter =
-				createFromDocumentRawConverter();
+		DslConverter<?, ? extends GeoPoint> dslConverter =
+				createDslConverter();
+		ProjectionConverter<? super GeoPoint, ?> projectionConverter =
+				createProjectionConverter();
+		ProjectionConverter<? super GeoPoint, GeoPoint> rawProjectionConverter =
+				createRawProjectionConverter();
 		LuceneGeoPointFieldCodec codec = new LuceneGeoPointFieldCodec(
 				resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue
 		);
@@ -53,14 +53,14 @@ class LuceneGeoPointIndexFieldTypeOptionsStep
 		return new LuceneIndexFieldType<>(
 				codec,
 				new LuceneGeoPointFieldPredicateBuilderFactory(
-						resolvedSearchable, dslToIndexConverter, codec
+						resolvedSearchable, dslConverter, codec
 				),
 				new LuceneGeoPointFieldSortBuilderFactory( resolvedSortable ),
 				new LuceneGeoPointFieldProjectionBuilderFactory(
-						resolvedProjectable, codec, indexToProjectionConverter, rawIndexToProjectionConverter
+						resolvedProjectable, codec, projectionConverter, rawProjectionConverter
 				),
 				new LuceneGeoPointFieldAggregationBuilderFactory(
-						resolvedAggregable, dslToIndexConverter, indexToProjectionConverter, codec
+						resolvedAggregable, dslConverter, projectionConverter, codec
 				),
 				resolvedAggregable
 		);

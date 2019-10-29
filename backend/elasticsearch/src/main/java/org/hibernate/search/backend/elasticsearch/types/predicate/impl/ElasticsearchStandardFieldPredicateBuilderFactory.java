@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchRangePredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
@@ -25,15 +25,15 @@ public class ElasticsearchStandardFieldPredicateBuilderFactory<F>
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	protected final ToDocumentFieldValueConverter<?, ? extends F> converter;
-	protected final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
+	protected final DslConverter<?, ? extends F> converter;
+	protected final DslConverter<F, ? extends F> rawConverter;
 
 	protected final ElasticsearchFieldCodec<F> codec;
 
 	private final boolean searchable;
 
 	public ElasticsearchStandardFieldPredicateBuilderFactory(boolean searchable,
-			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
+			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			ElasticsearchFieldCodec<F> codec) {
 		this.searchable = searchable;
 		this.converter = converter;

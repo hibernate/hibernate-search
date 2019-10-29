@@ -15,7 +15,7 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchFieldSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
@@ -28,13 +28,13 @@ public class ElasticsearchStandardFieldSortBuilderFactory<F> implements Elastics
 
 	private final boolean sortable;
 
-	private final ToDocumentFieldValueConverter<?, ? extends F> converter;
-	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
+	private final DslConverter<?, ? extends F> converter;
+	private final DslConverter<F, ? extends F> rawConverter;
 
 	private final ElasticsearchFieldCodec<F> codec;
 
 	public ElasticsearchStandardFieldSortBuilderFactory(boolean sortable,
-			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
+			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			ElasticsearchFieldCodec<F> codec) {
 		this.sortable = sortable;
 		this.converter = converter;

@@ -11,7 +11,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneTextFieldComparatorSource;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 
 import org.apache.lucene.search.SortField;
@@ -21,7 +21,7 @@ public class LuceneTextFieldSortBuilder<F>
 
 	LuceneTextFieldSortBuilder(LuceneSearchContext searchContext,
 			String absoluteFieldPath, String nestedDocumentPath,
-			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
+			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			LuceneCompatibilityChecker converterChecker, LuceneTextFieldCodec<F> codec) {
 		super( searchContext, absoluteFieldPath, nestedDocumentPath, converter, rawConverter, converterChecker, codec, SortField.STRING_FIRST, SortField.STRING_LAST );
 	}

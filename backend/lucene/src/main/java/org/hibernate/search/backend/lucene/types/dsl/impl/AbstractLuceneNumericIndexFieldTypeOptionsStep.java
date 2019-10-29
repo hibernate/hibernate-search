@@ -13,8 +13,8 @@ import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneNumericFie
 import org.hibernate.search.backend.lucene.types.projection.impl.LuceneStandardFieldProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.types.sort.impl.LuceneNumericFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 
 abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends AbstractLuceneNumericIndexFieldTypeOptionsStep<S, F>, F>
 		extends AbstractLuceneStandardIndexFieldTypeOptionsStep<S, F> {
@@ -38,14 +38,14 @@ abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends Abstract
 		boolean resolvedSearchable = resolveDefault( searchable );
 		boolean resolvedAggregable = resolveDefault( aggregable );
 
-		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter =
-				createDslToIndexConverter();
-		ToDocumentFieldValueConverter<F, ? extends F> rawDslToIndexConverter =
-				createToDocumentRawConverter();
-		FromDocumentFieldValueConverter<? super F, ?> indexToProjectionConverter =
-				createIndexToProjectionConverter();
-		FromDocumentFieldValueConverter<? super F, F> rawIndexToProjectionConverter =
-				createFromDocumentRawConverter();
+		DslConverter<?, ? extends F> dslToIndexConverter =
+				createDslConverter();
+		DslConverter<F, ? extends F> rawDslToIndexConverter =
+				createRawDslConverter();
+		ProjectionConverter<? super F, ?> indexToProjectionConverter =
+				createProjectionConverter();
+		ProjectionConverter<? super F, F> rawIndexToProjectionConverter =
+				createRawProjectionConverter();
 		AbstractLuceneNumericFieldCodec<F, ?> codec = createCodec(
 				resolvedProjectable,
 				resolvedSearchable,
@@ -81,10 +81,10 @@ abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends Abstract
 
 	protected LuceneNumericFieldAggregationBuilderFactory<F> createAggregationBuilderFactory(
 			boolean resolvedAggregable,
-			ToDocumentFieldValueConverter<?,? extends F> dslToIndexConverter,
-			ToDocumentFieldValueConverter<F,? extends F> rawDslToIndexConverter,
-			FromDocumentFieldValueConverter<? super F,?> indexToProjectionConverter,
-			FromDocumentFieldValueConverter<? super F,F> rawIndexToProjectionConverter,
+			DslConverter<?,? extends F> dslToIndexConverter,
+			DslConverter<F,? extends F> rawDslToIndexConverter,
+			ProjectionConverter<? super F,?> indexToProjectionConverter,
+			ProjectionConverter<? super F,F> rawIndexToProjectionConverter,
 			AbstractLuceneNumericFieldCodec<F, ?> codec) {
 		return new LuceneNumericFieldAggregationBuilderFactory<>(
 				resolvedAggregable,

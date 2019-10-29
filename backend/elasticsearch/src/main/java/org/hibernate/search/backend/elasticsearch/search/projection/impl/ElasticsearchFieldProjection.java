@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.UnknownTypeJsonAccessor;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -33,11 +33,11 @@ class ElasticsearchFieldProjection<F, V> implements ElasticsearchSearchProjectio
 	private final String absoluteFieldPath;
 	private final UnknownTypeJsonAccessor hitFieldValueAccessor;
 
-	private final FromDocumentFieldValueConverter<? super F, V> converter;
+	private final ProjectionConverter<? super F, V> converter;
 	private final ElasticsearchFieldCodec<F> codec;
 
 	ElasticsearchFieldProjection(Set<String> indexNames, String absoluteFieldPath,
-			FromDocumentFieldValueConverter<? super F, V> converter,
+			ProjectionConverter<? super F, V> converter,
 			ElasticsearchFieldCodec<F> codec) {
 		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;

@@ -19,7 +19,7 @@ import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationEx
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorFactory;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 
@@ -38,7 +38,7 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		extends AbstractLuceneBucketAggregation<K, Long> {
 
 	protected final String absoluteFieldPath;
-	private final FromDocumentFieldValueConverter<? super F, ? extends K> fromFieldValueConverter;
+	private final ProjectionConverter<? super F, ? extends K> fromFieldValueConverter;
 
 	private final BucketOrder order;
 	private final int maxTermCount;
@@ -168,14 +168,14 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 
 		private final String absoluteFieldPath;
 
-		private final FromDocumentFieldValueConverter<? super F, ? extends K> fromFieldValueConverter;
+		private final ProjectionConverter<? super F, ? extends K> fromFieldValueConverter;
 
 		private BucketOrder order = BucketOrder.COUNT_DESC;
 		private int minDocCount = 1;
 		private int maxTermCount = 100;
 
 		AbstractBuilder(LuceneSearchContext searchContext, String absoluteFieldPath,
-				FromDocumentFieldValueConverter<? super F, ? extends K> fromFieldValueConverter) {
+				ProjectionConverter<? super F, ? extends K> fromFieldValueConverter) {
 			super( searchContext );
 			this.absoluteFieldPath = absoluteFieldPath;
 			this.fromFieldValueConverter = fromFieldValueConverter;

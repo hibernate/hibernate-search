@@ -13,8 +13,8 @@ import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.Elasti
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchTermsAggregation;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
@@ -28,17 +28,17 @@ public class ElasticsearchStandardFieldAggregationBuilderFactory<F>
 
 	private final boolean aggregable;
 
-	private final ToDocumentFieldValueConverter<?, ? extends F> toFieldValueConverter;
-	private final ToDocumentFieldValueConverter<? super F, ? extends F> rawToFieldValueConverter;
-	private final FromDocumentFieldValueConverter<? super F, ?> fromFieldValueConverter;
-	private final FromDocumentFieldValueConverter<? super F, F> rawFromFieldValueConverter;
+	private final DslConverter<?, ? extends F> toFieldValueConverter;
+	private final DslConverter<? super F, ? extends F> rawToFieldValueConverter;
+	private final ProjectionConverter<? super F, ?> fromFieldValueConverter;
+	private final ProjectionConverter<? super F, F> rawFromFieldValueConverter;
 	private final ElasticsearchFieldCodec<F> codec;
 
 	public ElasticsearchStandardFieldAggregationBuilderFactory(boolean aggregable,
-			ToDocumentFieldValueConverter<?, ? extends F> toFieldValueConverter,
-			ToDocumentFieldValueConverter<? super F, ? extends F> rawToFieldValueConverter,
-			FromDocumentFieldValueConverter<? super F, ?> fromFieldValueConverter,
-			FromDocumentFieldValueConverter<? super F, F> rawFromFieldValueConverter,
+			DslConverter<?, ? extends F> toFieldValueConverter,
+			DslConverter<? super F, ? extends F> rawToFieldValueConverter,
+			ProjectionConverter<? super F, ?> fromFieldValueConverter,
+			ProjectionConverter<? super F, F> rawFromFieldValueConverter,
 			ElasticsearchFieldCodec<F> codec) {
 		this.aggregable = aggregable;
 		this.toFieldValueConverter = toFieldValueConverter;
@@ -53,7 +53,7 @@ public class ElasticsearchStandardFieldAggregationBuilderFactory<F>
 			String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
 		checkAggregable( absoluteFieldPath, aggregable );
 
-		FromDocumentFieldValueConverter<? super F, ? extends K> fromFieldValueConverter = getFromFieldValueConverter(
+		ProjectionConverter<? super F, ? extends K> fromFieldValueConverter = getFromFieldValueConverter(
 				absoluteFieldPath, expectedType, convert
 		);
 
@@ -67,7 +67,7 @@ public class ElasticsearchStandardFieldAggregationBuilderFactory<F>
 			String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
 		checkAggregable( absoluteFieldPath, aggregable );
 
-		ToDocumentFieldValueConverter<?, ? extends F> toFieldValueConverter = getToFieldValueConverter(
+		DslConverter<?, ? extends F> toFieldValueConverter = getToFieldValueConverter(
 				absoluteFieldPath, expectedType, convert
 		);
 
@@ -104,9 +104,9 @@ public class ElasticsearchStandardFieldAggregationBuilderFactory<F>
 		}
 	}
 
-	private <T> ToDocumentFieldValueConverter<?, ? extends F> getToFieldValueConverter(
+	private <T> DslConverter<?, ? extends F> getToFieldValueConverter(
 			String absoluteFieldPath, Class<T> expectedType, ValueConvert convert) {
-		ToDocumentFieldValueConverter<?, ? extends F> result;
+		DslConverter<?, ? extends F> result;
 		switch ( convert ) {
 			case NO:
 				result = rawToFieldValueConverter;
@@ -125,9 +125,9 @@ public class ElasticsearchStandardFieldAggregationBuilderFactory<F>
 	}
 
 	@SuppressWarnings("unchecked") // We check the cast is legal by asking the converter
-	private <T> FromDocumentFieldValueConverter<? super F, ? extends T> getFromFieldValueConverter(
+	private <T> ProjectionConverter<? super F, ? extends T> getFromFieldValueConverter(
 			String absoluteFieldPath, Class<T> expectedType, ValueConvert convert) {
-		FromDocumentFieldValueConverter<? super F, ?> result;
+		ProjectionConverter<? super F, ?> result;
 		switch ( convert ) {
 			case NO:
 				result = rawFromFieldValueConverter;
@@ -142,6 +142,6 @@ public class ElasticsearchStandardFieldAggregationBuilderFactory<F>
 					absoluteFieldPath, expectedType, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 			);
 		}
-		return (FromDocumentFieldValueConverter<? super F, ? extends T>) result;
+		return (ProjectionConverter<? super F, ? extends T>) result;
 	}
 }

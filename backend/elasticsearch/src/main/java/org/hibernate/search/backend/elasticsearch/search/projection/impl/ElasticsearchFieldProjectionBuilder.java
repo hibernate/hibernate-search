@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 
@@ -19,11 +19,11 @@ public class ElasticsearchFieldProjectionBuilder<F, V> implements FieldProjectio
 	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
 
-	private final FromDocumentFieldValueConverter<? super F, V> converter;
+	private final ProjectionConverter<? super F, V> converter;
 	private final ElasticsearchFieldCodec<F> codec;
 
 	public ElasticsearchFieldProjectionBuilder(Set<String> indexNames, String absoluteFieldPath,
-			FromDocumentFieldValueConverter<? super F, V> converter,
+			ProjectionConverter<? super F, V> converter,
 			ElasticsearchFieldCodec<F> codec) {
 		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;

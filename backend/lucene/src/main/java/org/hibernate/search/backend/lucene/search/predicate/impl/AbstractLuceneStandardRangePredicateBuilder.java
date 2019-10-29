@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
@@ -36,8 +36,8 @@ public abstract class AbstractLuceneStandardRangePredicateBuilder<F, E, C extend
 
 	protected final String absoluteFieldPath;
 
-	private final ToDocumentFieldValueConverter<?, ? extends F> converter;
-	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
+	private final DslConverter<?, ? extends F> converter;
+	private final DslConverter<F, ? extends F> rawConverter;
 	private final LuceneCompatibilityChecker converterChecker;
 
 	protected final C codec;
@@ -47,7 +47,7 @@ public abstract class AbstractLuceneStandardRangePredicateBuilder<F, E, C extend
 	protected AbstractLuceneStandardRangePredicateBuilder(
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath,
-			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
+			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			LuceneCompatibilityChecker converterChecker, C codec) {
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
@@ -72,7 +72,7 @@ public abstract class AbstractLuceneStandardRangePredicateBuilder<F, E, C extend
 			return null;
 		}
 		Object value = valueOptional.get();
-		ToDocumentFieldValueConverter<?, ? extends F> toFieldValueConverter = getDslToIndexConverter( convert );
+		DslConverter<?, ? extends F> toFieldValueConverter = getDslToIndexConverter( convert );
 		try {
 			F converted = toFieldValueConverter.convertUnknown(
 					value, searchContext.getToDocumentFieldValueConvertContext()
@@ -86,7 +86,7 @@ public abstract class AbstractLuceneStandardRangePredicateBuilder<F, E, C extend
 		}
 	}
 
-	private ToDocumentFieldValueConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {
+	private DslConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {
 		switch ( convert ) {
 			case NO:
 				return rawConverter;

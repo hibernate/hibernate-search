@@ -10,8 +10,8 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -23,16 +23,16 @@ abstract class AbstractLuceneStandardFieldAggregationBuilderFactory<F>
 
 	private final boolean aggregable;
 
-	private final ToDocumentFieldValueConverter<?, ? extends F> toFieldValueConverter;
-	private final ToDocumentFieldValueConverter<? super F, ? extends F> rawToFieldValueConverter;
-	private final FromDocumentFieldValueConverter<? super F, ?> fromFieldValueConverter;
-	private final FromDocumentFieldValueConverter<? super F, F> rawFromFieldValueConverter;
+	private final DslConverter<?, ? extends F> toFieldValueConverter;
+	private final DslConverter<? super F, ? extends F> rawToFieldValueConverter;
+	private final ProjectionConverter<? super F, ?> fromFieldValueConverter;
+	private final ProjectionConverter<? super F, F> rawFromFieldValueConverter;
 
 	AbstractLuceneStandardFieldAggregationBuilderFactory(boolean aggregable,
-			ToDocumentFieldValueConverter<?, ? extends F> toFieldValueConverter,
-			ToDocumentFieldValueConverter<? super F, ? extends F> rawToFieldValueConverter,
-			FromDocumentFieldValueConverter<? super F, ?> fromFieldValueConverter,
-			FromDocumentFieldValueConverter<? super F, F> rawFromFieldValueConverter) {
+			DslConverter<?, ? extends F> toFieldValueConverter,
+			DslConverter<? super F, ? extends F> rawToFieldValueConverter,
+			ProjectionConverter<? super F, ?> fromFieldValueConverter,
+			ProjectionConverter<? super F, F> rawFromFieldValueConverter) {
 		this.aggregable = aggregable;
 		this.toFieldValueConverter = toFieldValueConverter;
 		this.rawToFieldValueConverter = rawToFieldValueConverter;
@@ -70,9 +70,9 @@ abstract class AbstractLuceneStandardFieldAggregationBuilderFactory<F>
 		}
 	}
 
-	protected <T> ToDocumentFieldValueConverter<?, ? extends F> getToFieldValueConverter(
+	protected <T> DslConverter<?, ? extends F> getToFieldValueConverter(
 			String absoluteFieldPath, Class<T> expectedType, ValueConvert convert) {
-		ToDocumentFieldValueConverter<?, ? extends F> result;
+		DslConverter<?, ? extends F> result;
 		switch ( convert ) {
 			case NO:
 				result = rawToFieldValueConverter;
@@ -91,9 +91,9 @@ abstract class AbstractLuceneStandardFieldAggregationBuilderFactory<F>
 	}
 
 	@SuppressWarnings("unchecked") // We check the cast is legal by asking the converter
-	protected <T> FromDocumentFieldValueConverter<? super F, ? extends T> getFromFieldValueConverter(
+	protected <T> ProjectionConverter<? super F, ? extends T> getFromFieldValueConverter(
 			String absoluteFieldPath, Class<T> expectedType, ValueConvert convert) {
-		FromDocumentFieldValueConverter<? super F, ?> result;
+		ProjectionConverter<? super F, ?> result;
 		switch ( convert ) {
 			case NO:
 				result = rawFromFieldValueConverter;
@@ -108,6 +108,6 @@ abstract class AbstractLuceneStandardFieldAggregationBuilderFactory<F>
 					absoluteFieldPath, expectedType, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 			);
 		}
-		return (FromDocumentFieldValueConverter<? super F, ? extends T>) result;
+		return (ProjectionConverter<? super F, ? extends T>) result;
 	}
 }

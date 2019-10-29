@@ -4,29 +4,40 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.backend.types.converter;
+package org.hibernate.search.engine.backend.types.converter.spi;
 
+import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContextExtension;
 
 /**
- * A converter from a source index field value to a different value.
+ * A converter from a value obtained from the backend to a projected value.
  *
- * @param <F> The type of source, index field values.
- * @param <V> The type of target values.
+ * @param <F> The type of source values obtained from the backend.
+ * @param <V> The type of projected values.
  */
-public interface FromDocumentFieldValueConverter<F, V> {
+public final class ProjectionConverter<F, V> {
+
+	private final FromDocumentFieldValueConverter<F, V> delegate;
+
+	public ProjectionConverter(FromDocumentFieldValueConverter<F, V> delegate) {
+		this.delegate = delegate;
+	}
+
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "[delegate=" + delegate + "]";
+	}
 
 	/**
 	 * Check whether converted values can be assigned to the given type.
-	 * <p>
-	 * This method is generally implemented like this:
-	 * {@code return superTypeCandidate.isAssignableFrom( TheConvertedType.class )}.
 	 * @param superTypeCandidate A candidate type for assignment of converted values.
 	 * @return {@code true} if the converted type {@link V} is a subtype of {@code superTypeCandidate},
 	 * {@code false} otherwise.
 	 */
-	boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate);
+	public boolean isConvertedTypeAssignableTo(Class<?> superTypeCandidate) {
+		return delegate.isConvertedTypeAssignableTo( superTypeCandidate );
+	}
 
 	/**
 	 * @param value The index field value to convert.
@@ -35,18 +46,19 @@ public interface FromDocumentFieldValueConverter<F, V> {
 	 * to a more useful type, giving access to such things as a Hibernate ORM Session (if using the Hibernate ORM mapper).
 	 * @return The converted value.
 	 */
-	V convert(F value, FromDocumentFieldValueConvertContext context);
+	public V convert(F value, FromDocumentFieldValueConvertContext context) {
+		return delegate.convert( value, context );
+	}
 
 	/**
-	 * @param other Another {@link ToDocumentFieldValueConverter}, never {@code null}.
+	 * @param other Another {@link DslConverter}, never {@code null}.
 	 * @return {@code true} if the given object behaves exactly the same as this object,
 	 * i.e. its {@link #isConvertedTypeAssignableTo(Class)} and {@link #convert(Object, FromDocumentFieldValueConvertContext)}
 	 * methods are guaranteed to always return the same value as this object's
 	 * when given the same input. {@code false} otherwise, or when in doubt.
 	 */
-	default boolean isCompatibleWith(
-			FromDocumentFieldValueConverter<?, ?> other) {
-		return equals( other );
+	public boolean isCompatibleWith(ProjectionConverter<?, ?> other) {
+		return delegate.isCompatibleWith( other.delegate );
 	}
-
 }
+

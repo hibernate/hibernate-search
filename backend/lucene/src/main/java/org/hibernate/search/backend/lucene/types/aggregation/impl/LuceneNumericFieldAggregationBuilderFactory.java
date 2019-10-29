@@ -8,8 +8,8 @@ package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -21,10 +21,10 @@ public class LuceneNumericFieldAggregationBuilderFactory<F>
 	private final AbstractLuceneNumericFieldCodec<F, ?> codec;
 
 	public LuceneNumericFieldAggregationBuilderFactory(boolean aggregable,
-			ToDocumentFieldValueConverter<?, ? extends F> toFieldValueConverter,
-			ToDocumentFieldValueConverter<? super F, ? extends F> rawToFieldValueConverter,
-			FromDocumentFieldValueConverter<? super F, ?> fromFieldValueConverter,
-			FromDocumentFieldValueConverter<? super F, F> rawFromFieldValueConverter,
+			DslConverter<?, ? extends F> toFieldValueConverter,
+			DslConverter<? super F, ? extends F> rawToFieldValueConverter,
+			ProjectionConverter<? super F, ?> fromFieldValueConverter,
+			ProjectionConverter<? super F, F> rawFromFieldValueConverter,
 			AbstractLuceneNumericFieldCodec<F, ?> codec) {
 		super( aggregable, toFieldValueConverter, rawToFieldValueConverter, fromFieldValueConverter,
 				rawFromFieldValueConverter );
@@ -36,7 +36,7 @@ public class LuceneNumericFieldAggregationBuilderFactory<F>
 			String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
 		checkAggregable( absoluteFieldPath );
 
-		FromDocumentFieldValueConverter<? super F, ? extends K> fromFieldValueConverter =
+		ProjectionConverter<? super F, ? extends K> fromFieldValueConverter =
 				getFromFieldValueConverter( absoluteFieldPath, expectedType, convert );
 
 		return new LuceneNumericTermsAggregation.Builder<>(
@@ -49,7 +49,7 @@ public class LuceneNumericFieldAggregationBuilderFactory<F>
 			String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
 		checkAggregable( absoluteFieldPath );
 
-		ToDocumentFieldValueConverter<?, ? extends F> toFieldValueConverter =
+		DslConverter<?, ? extends F> toFieldValueConverter =
 				getToFieldValueConverter( absoluteFieldPath, expectedType, convert );
 
 		return new LuceneNumericRangeAggregation.Builder<>(

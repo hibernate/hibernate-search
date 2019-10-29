@@ -25,7 +25,7 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPre
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
 import org.hibernate.search.backend.lucene.util.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.util.impl.FuzzyQueryBuilder;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -46,7 +46,7 @@ class LuceneTextMatchPredicateBuilder<F>
 	LuceneTextMatchPredicateBuilder(
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath,
-			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
+			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			LuceneCompatibilityChecker converterChecker, LuceneTextFieldCodec<F> codec,
 			Analyzer analyzerOrNormalizer, LuceneCompatibilityChecker analyzerChecker) {
 		super( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );

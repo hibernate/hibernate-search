@@ -11,8 +11,8 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
@@ -27,10 +27,10 @@ public class ElasticsearchTextFieldAggregationBuilderFactory
 	private final boolean tokenized;
 
 	public ElasticsearchTextFieldAggregationBuilderFactory(boolean aggregable,
-			ToDocumentFieldValueConverter<?, ? extends String> toFieldValueConverter,
-			ToDocumentFieldValueConverter<? super String, ? extends String> rawToFieldValueConverter,
-			FromDocumentFieldValueConverter<? super String, ?> fromFieldValueConverter,
-			FromDocumentFieldValueConverter<? super String, String> rawFromFieldValueConverter,
+			DslConverter<?, ? extends String> toFieldValueConverter,
+			DslConverter<? super String, ? extends String> rawToFieldValueConverter,
+			ProjectionConverter<? super String, ?> fromFieldValueConverter,
+			ProjectionConverter<? super String, String> rawFromFieldValueConverter,
 			ElasticsearchFieldCodec<String> codec,
 			boolean tokenized) {
 		super( aggregable, toFieldValueConverter, rawToFieldValueConverter, fromFieldValueConverter,

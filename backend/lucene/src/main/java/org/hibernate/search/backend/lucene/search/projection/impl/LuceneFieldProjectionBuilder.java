@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.FieldProjectionBuilder;
 
@@ -19,11 +19,11 @@ public class LuceneFieldProjectionBuilder<F, V> implements FieldProjectionBuilde
 	private final String absoluteFieldPath;
 	private final String nestedDocumentPath;
 
-	private final FromDocumentFieldValueConverter<? super F, V> converter;
+	private final ProjectionConverter<? super F, V> converter;
 	private final LuceneFieldCodec<F> codec;
 
 	public LuceneFieldProjectionBuilder(Set<String> indexNames, String absoluteFieldPath, String nestedDocumentPath,
-			FromDocumentFieldValueConverter<? super F, V> converter,
+			ProjectionConverter<? super F, V> converter,
 			LuceneFieldCodec<F> codec) {
 		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;

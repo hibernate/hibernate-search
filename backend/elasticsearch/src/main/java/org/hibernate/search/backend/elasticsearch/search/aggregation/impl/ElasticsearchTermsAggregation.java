@@ -10,7 +10,7 @@ import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.util.common.impl.CollectionHelper;
@@ -29,7 +29,7 @@ public class ElasticsearchTermsAggregation<F, K>
 
 	private final String absoluteFieldPath;
 
-	private final FromDocumentFieldValueConverter<? super F, ? extends K> fromFieldValueConverter;
+	private final ProjectionConverter<? super F, ? extends K> fromFieldValueConverter;
 	private final ElasticsearchFieldCodec<F> codec;
 
 	private final JsonObject order;
@@ -82,7 +82,7 @@ public class ElasticsearchTermsAggregation<F, K>
 
 		private final String absoluteFieldPath;
 
-		private final FromDocumentFieldValueConverter<? super F, ? extends K> fromFieldValueConverter;
+		private final ProjectionConverter<? super F, ? extends K> fromFieldValueConverter;
 		private final ElasticsearchFieldCodec<F> codec;
 
 		private JsonObject order;
@@ -90,7 +90,7 @@ public class ElasticsearchTermsAggregation<F, K>
 		private int size = 100;
 
 		public Builder(ElasticsearchSearchContext searchContext, String absoluteFieldPath,
-				FromDocumentFieldValueConverter<? super F, ? extends K> fromFieldValueConverter,
+				ProjectionConverter<? super F, ? extends K> fromFieldValueConverter,
 				ElasticsearchFieldCodec<F> codec) {
 			super( searchContext );
 			this.absoluteFieldPath = absoluteFieldPath;

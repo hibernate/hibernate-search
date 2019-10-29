@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityC
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.predicate.spi.PhrasePredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
 
@@ -24,7 +24,7 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 	private final Analyzer analyzerOrNormalizer;
 
 	public LuceneTextFieldPredicateBuilderFactory(boolean searchable,
-			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
+			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			LuceneTextFieldCodec<F> codec, Analyzer analyzerOrNormalizer) {
 		super( searchable, converter, rawConverter, codec );
 		this.analyzerOrNormalizer = analyzerOrNormalizer;

@@ -14,7 +14,7 @@ import java.util.TreeSet;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 
 import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.facet.FacetsCollector;
@@ -96,7 +96,7 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
 		public Builder(LuceneSearchContext searchContext, String absoluteFieldPath,
-				FromDocumentFieldValueConverter<? super F, ? extends K> fromFieldValueConverter,
+				ProjectionConverter<? super F, ? extends K> fromFieldValueConverter,
 				AbstractLuceneNumericFieldCodec<F, E> codec) {
 			super( searchContext, absoluteFieldPath, fromFieldValueConverter );
 			this.codec = codec;

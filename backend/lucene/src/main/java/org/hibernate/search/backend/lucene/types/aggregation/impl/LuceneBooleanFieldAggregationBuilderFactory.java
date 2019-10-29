@@ -11,8 +11,8 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -24,10 +24,10 @@ public class LuceneBooleanFieldAggregationBuilderFactory
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public LuceneBooleanFieldAggregationBuilderFactory(boolean aggregable,
-			ToDocumentFieldValueConverter<?, ? extends Boolean> toFieldValueConverter,
-			ToDocumentFieldValueConverter<? super Boolean, ? extends Boolean> rawToFieldValueConverter,
-			FromDocumentFieldValueConverter<? super Boolean, ?> fromFieldValueConverter,
-			FromDocumentFieldValueConverter<? super Boolean, Boolean> rawFromFieldValueConverter,
+			DslConverter<?, ? extends Boolean> toFieldValueConverter,
+			DslConverter<? super Boolean, ? extends Boolean> rawToFieldValueConverter,
+			ProjectionConverter<? super Boolean, ?> fromFieldValueConverter,
+			ProjectionConverter<? super Boolean, Boolean> rawFromFieldValueConverter,
 			AbstractLuceneNumericFieldCodec<Boolean, ?> codec) {
 		super( aggregable, toFieldValueConverter, rawToFieldValueConverter, fromFieldValueConverter,
 				rawFromFieldValueConverter, codec

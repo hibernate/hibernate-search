@@ -16,7 +16,7 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.backend.elasticsearch.util.impl.AnalyzerConstants;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -40,7 +40,7 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 	ElasticsearchTextMatchPredicateBuilder(
 			ElasticsearchSearchContext searchContext,
 			String absoluteFieldPath,
-			ToDocumentFieldValueConverter<?, ? extends String> converter, ToDocumentFieldValueConverter<String, ? extends String> rawConverter,
+			DslConverter<?, ? extends String> converter, DslConverter<String, ? extends String> rawConverter,
 			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchFieldCodec<String> codec,
 			String type, ElasticsearchCompatibilityChecker analyzerChecker) {
 		super( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );

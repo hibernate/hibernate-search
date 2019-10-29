@@ -21,6 +21,8 @@ import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentF
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentFieldValueConvertContextImpl;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.PropertyTypeDescriptor;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
@@ -165,41 +167,41 @@ public class FieldDefaultBridgeIT<V, F> {
 
 	// Test behavior that backends expect from our bridges when using the DSLs
 	@Test
-	public void dslToIndexConverter() {
+	public void dslConverter() {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
-		ToDocumentFieldValueConverter<V, ?> dslToIndexConverter =
-				(ToDocumentFieldValueConverter<V, ?>) index1FieldSchemaNode.getConverter().getDslToIndexConverter();
-		ToDocumentFieldValueConverter<?, ?> compatibleDslToIndexConverter =
-				index2FieldSchemaNode.getConverter().getDslToIndexConverter();
+		DslConverter<V, ?> dslConverter =
+				(DslConverter<V, ?>) index1FieldSchemaNode.getConverter().getDslConverter();
+		DslConverter<?, ?> compatibleDslConverter =
+				index2FieldSchemaNode.getConverter().getDslConverter();
+		DslConverter<?, ?> incompatibleDslConverter =
+				new DslConverter<>( new IncompatibleToDocumentFieldValueConverter() );
 		ToDocumentFieldValueConvertContext toDocumentConvertContext =
 				new ToDocumentFieldValueConvertContextImpl( new JavaBeanBackendMappingContext() );
 
 		// isCompatibleWith must return true when appropriate
-		assertThat( dslToIndexConverter.isCompatibleWith( dslToIndexConverter ) ).isTrue();
-		assertThat( dslToIndexConverter.isCompatibleWith( compatibleDslToIndexConverter ) ).isTrue();
-		assertThat(
-				dslToIndexConverter.isCompatibleWith( new IncompatibleToDocumentFieldValueConverter() ) )
-				.isFalse();
+		assertThat( dslConverter.isCompatibleWith( dslConverter ) ).isTrue();
+		assertThat( dslConverter.isCompatibleWith( compatibleDslConverter ) ).isTrue();
+		assertThat( dslConverter.isCompatibleWith( incompatibleDslConverter ) ).isFalse();
 
 		// convert and convertUnknown must behave appropriately on valid input
 		assertThat(
-				dslToIndexConverter.convert( null, toDocumentConvertContext )
+				dslConverter.convert( null, toDocumentConvertContext )
 		)
 				.isNull();
 		assertThat(
-				dslToIndexConverter.convertUnknown( null, toDocumentConvertContext )
+				dslConverter.convertUnknown( null, toDocumentConvertContext )
 		)
 				.isNull();
 		Iterator<F> fieldValuesIterator = getDocumentFieldValues().iterator();
 		for ( V propertyValue : getPropertyValues() ) {
 			F fieldValue = fieldValuesIterator.next();
 			assertThat(
-					dslToIndexConverter.convert( propertyValue, toDocumentConvertContext )
+					dslConverter.convert( propertyValue, toDocumentConvertContext )
 			)
 					.isEqualTo( fieldValue );
 			assertThat(
-					dslToIndexConverter.convertUnknown( propertyValue, toDocumentConvertContext )
+					dslConverter.convertUnknown( propertyValue, toDocumentConvertContext )
 			)
 					.isEqualTo( fieldValue );
 		}
@@ -207,7 +209,7 @@ public class FieldDefaultBridgeIT<V, F> {
 		// convertUnknown must throw a runtime exception on invalid input
 		SubTest.expectException(
 				"convertUnknown on invalid input",
-				() -> dslToIndexConverter.convertUnknown( new Object(), toDocumentConvertContext )
+				() -> dslConverter.convertUnknown( new Object(), toDocumentConvertContext )
 		)
 				.assertThrown()
 				.isInstanceOf( RuntimeException.class );
@@ -218,10 +220,12 @@ public class FieldDefaultBridgeIT<V, F> {
 	public void indexToProjectionConverter() {
 		// This cast may be unsafe, but only if something is deeply wrong, and then an exception will be thrown below
 		@SuppressWarnings("unchecked")
-		FromDocumentFieldValueConverter<F, V> indexToProjectionConverter =
-				(FromDocumentFieldValueConverter<F, V>) index1FieldSchemaNode.getConverter().getIndexToProjectionConverter();
-		FromDocumentFieldValueConverter<?, ?> compatibleIndexToProjectionConverter =
-				index2FieldSchemaNode.getConverter().getIndexToProjectionConverter();
+		ProjectionConverter<F, V> indexToProjectionConverter =
+				(ProjectionConverter<F, V>) index1FieldSchemaNode.getConverter().getProjectionConverter();
+		ProjectionConverter<?, ?> compatibleIndexToProjectionConverter =
+				index2FieldSchemaNode.getConverter().getProjectionConverter();
+		ProjectionConverter<?, ?> incompatibleIndexToProjectionConverter =
+				new ProjectionConverter<>( new IncompatibleFromDocumentFieldValueConverter() );
 		FromDocumentFieldValueConvertContext fromDocumentConvertContext =
 				new FromDocumentFieldValueConvertContextImpl(
 						new JavaBeanBackendSessionContext(
@@ -235,8 +239,7 @@ public class FieldDefaultBridgeIT<V, F> {
 		assertThat( indexToProjectionConverter.isCompatibleWith( indexToProjectionConverter ) ).isTrue();
 		assertThat( indexToProjectionConverter.isCompatibleWith( compatibleIndexToProjectionConverter ) )
 				.isTrue();
-		assertThat( indexToProjectionConverter.isCompatibleWith( new IncompatibleFromDocumentFieldValueConverter() ) )
-				.isFalse();
+		assertThat( indexToProjectionConverter.isCompatibleWith( incompatibleIndexToProjectionConverter ) ).isFalse();
 
 		// isConvertedTypeAssignableTo must return true for compatible types and false for clearly incompatible types
 		assertThat( indexToProjectionConverter.isConvertedTypeAssignableTo( Object.class ) ).isTrue();

@@ -14,9 +14,11 @@ import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.PassThroughToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
@@ -30,8 +32,8 @@ abstract class AbstractStubStandardIndexFieldTypeOptionsStep<S extends AbstractS
 	final List<Consumer<StubIndexSchemaNode.Builder>> modifiers;
 	private final Class<F> inputType;
 
-	private ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter;
-	private FromDocumentFieldValueConverter<? super F, ?> projectionFromIndexConverter;
+	private DslConverter<?, ? extends F> dslConverter;
+	private ProjectionConverter<? super F, ?> projectionConverter;
 
 	AbstractStubStandardIndexFieldTypeOptionsStep(Class<F> inputType) {
 		this.modifiers = new ArrayList<>();
@@ -39,12 +41,12 @@ abstract class AbstractStubStandardIndexFieldTypeOptionsStep<S extends AbstractS
 		modifiers.add(
 				b -> b.converter( new StubFieldConverter<>(
 						inputType,
-						dslToIndexConverter == null
-								? new PassThroughToDocumentFieldValueConverter<>( inputType )
-								: dslToIndexConverter,
-						projectionFromIndexConverter == null
-								? new PassThroughFromDocumentFieldValueConverter<>( inputType )
-								: projectionFromIndexConverter
+						dslConverter == null
+								? new DslConverter<>( new PassThroughToDocumentFieldValueConverter<>( inputType ) )
+								: dslConverter,
+						projectionConverter == null
+								? new ProjectionConverter<>( new PassThroughFromDocumentFieldValueConverter<>( inputType ) )
+								: projectionConverter
 				) )
 		);
 	}
@@ -53,13 +55,13 @@ abstract class AbstractStubStandardIndexFieldTypeOptionsStep<S extends AbstractS
 
 	@Override
 	public S dslConverter(ToDocumentFieldValueConverter<?, ? extends F> toIndexConverter) {
-		this.dslToIndexConverter = toIndexConverter;
+		this.dslConverter = new DslConverter<>( toIndexConverter );
 		return thisAsS();
 	}
 
 	@Override
 	public S projectionConverter(FromDocumentFieldValueConverter<? super F, ?> fromIndexConverter) {
-		this.projectionFromIndexConverter = fromIndexConverter;
+		this.projectionConverter = new ProjectionConverter<>( fromIndexConverter );
 		return thisAsS();
 	}
 

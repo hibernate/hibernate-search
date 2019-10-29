@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneDistanceToFieldProjectionBuilder;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneFieldProjectionBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.spi.DistanceToFieldProjectionBuilder;
@@ -27,13 +27,13 @@ public class LuceneGeoPointFieldProjectionBuilderFactory implements LuceneFieldP
 
 	private final boolean projectable;
 
-	private final FromDocumentFieldValueConverter<? super GeoPoint, ?> converter;
-	private final FromDocumentFieldValueConverter<? super GeoPoint, GeoPoint> rawConverter;
+	private final ProjectionConverter<? super GeoPoint, ?> converter;
+	private final ProjectionConverter<? super GeoPoint, GeoPoint> rawConverter;
 	private final LuceneFieldCodec<GeoPoint> codec;
 
 	public LuceneGeoPointFieldProjectionBuilderFactory(boolean projectable,
 			LuceneFieldCodec<GeoPoint> codec,
-			FromDocumentFieldValueConverter<? super GeoPoint, ?> converter, FromDocumentFieldValueConverter<? super GeoPoint, GeoPoint> rawConverter) {
+			ProjectionConverter<? super GeoPoint, ?> converter, ProjectionConverter<? super GeoPoint, GeoPoint> rawConverter) {
 		this.projectable = projectable;
 		this.converter = converter;
 		this.rawConverter = rawConverter;
@@ -46,7 +46,7 @@ public class LuceneGeoPointFieldProjectionBuilderFactory implements LuceneFieldP
 			Class<T> expectedType, ValueConvert convert) {
 		checkProjectable( absoluteFieldPath, projectable );
 
-		FromDocumentFieldValueConverter<? super GeoPoint, ?> requestConverter = getConverter( convert );
+		ProjectionConverter<? super GeoPoint, ?> requestConverter = getConverter( convert );
 		if ( !requestConverter.isConvertedTypeAssignableTo( expectedType ) ) {
 			throw log.invalidProjectionInvalidType( absoluteFieldPath, expectedType,
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
@@ -90,7 +90,7 @@ public class LuceneGeoPointFieldProjectionBuilderFactory implements LuceneFieldP
 		}
 	}
 
-	private FromDocumentFieldValueConverter<? super GeoPoint, ?> getConverter(ValueConvert convert) {
+	private ProjectionConverter<? super GeoPoint, ?> getConverter(ValueConvert convert) {
 		switch ( convert ) {
 			case NO:
 				return rawConverter;

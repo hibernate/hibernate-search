@@ -11,7 +11,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -29,13 +29,13 @@ abstract class AbstractLuceneStandardFieldSortBuilderFactory<F, C extends Lucene
 
 	private final boolean sortable;
 
-	protected final ToDocumentFieldValueConverter<?, ? extends F> converter;
-	protected final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
+	protected final DslConverter<?, ? extends F> converter;
+	protected final DslConverter<F, ? extends F> rawConverter;
 
 	protected final C codec;
 
 	protected AbstractLuceneStandardFieldSortBuilderFactory(boolean sortable,
-			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
+			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			C codec) {
 		this.sortable = sortable;
 		this.converter = converter;

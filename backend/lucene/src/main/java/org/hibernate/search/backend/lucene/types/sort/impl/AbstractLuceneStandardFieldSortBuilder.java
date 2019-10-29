@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -38,8 +38,8 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 	protected final String absoluteFieldPath;
 	protected final String nestedDocumentPath;
 
-	protected final ToDocumentFieldValueConverter<?, ? extends F> converter;
-	private final ToDocumentFieldValueConverter<F, ? extends F> rawConverter;
+	protected final DslConverter<?, ? extends F> converter;
+	private final DslConverter<F, ? extends F> rawConverter;
 	private final LuceneCompatibilityChecker converterChecker;
 
 	protected final C codec;
@@ -51,7 +51,7 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 	protected AbstractLuceneStandardFieldSortBuilder(
 			LuceneSearchContext searchContext,
 			String absoluteFieldPath, String nestedDocumentPath,
-			ToDocumentFieldValueConverter<?, ? extends F> converter, ToDocumentFieldValueConverter<F, ? extends F> rawConverter,
+			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			LuceneCompatibilityChecker converterChecker, C codec,
 			Object sortMissingValueFirstPlaceholder, Object sortMissingValueLastPlaceholder) {
 		this.searchContext = searchContext;
@@ -77,7 +77,7 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 
 	@Override
 	public void missingAs(Object value, ValueConvert convert) {
-		ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( convert );
+		DslConverter<?, ? extends F> dslToIndexConverter = getDslToIndexConverter( convert );
 		try {
 			F converted = dslToIndexConverter.convertUnknown( value, searchContext.getToDocumentFieldValueConvertContext() );
 			missingValue = encodeMissingAs( converted );
@@ -107,7 +107,7 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 		return effectiveMissingValue;
 	}
 
-	private ToDocumentFieldValueConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {
+	private DslConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {
 		switch ( convert ) {
 			case NO:
 				return rawConverter;

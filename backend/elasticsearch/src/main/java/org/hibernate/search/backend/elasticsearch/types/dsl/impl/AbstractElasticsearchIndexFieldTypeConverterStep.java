@@ -10,6 +10,8 @@ import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValu
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.PassThroughToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterStep;
 import org.hibernate.search.util.common.impl.Contracts;
 
@@ -18,8 +20,8 @@ abstract class AbstractElasticsearchIndexFieldTypeConverterStep<S extends Abstra
 	private final ElasticsearchIndexFieldTypeBuildContext buildContext;
 	private final Class<F> fieldType;
 
-	private ToDocumentFieldValueConverter<?, ? extends F> dslToIndexConverter;
-	private FromDocumentFieldValueConverter<? super F, ?> indexToProjectionConverter;
+	private DslConverter<?, ? extends F> dslConverter;
+	private ProjectionConverter<? super F, ?> projectionConverter;
 
 	AbstractElasticsearchIndexFieldTypeConverterStep(ElasticsearchIndexFieldTypeBuildContext buildContext,
 			Class<F> fieldType) {
@@ -30,14 +32,14 @@ abstract class AbstractElasticsearchIndexFieldTypeConverterStep<S extends Abstra
 	@Override
 	public S dslConverter(ToDocumentFieldValueConverter<?, ? extends F> toIndexConverter) {
 		Contracts.assertNotNull( toIndexConverter, "toIndexConverter" );
-		this.dslToIndexConverter = toIndexConverter;
+		this.dslConverter = new DslConverter<>( toIndexConverter );
 		return thisAsS();
 	}
 
 	@Override
 	public S projectionConverter(FromDocumentFieldValueConverter<? super F, ?> fromIndexConverter) {
 		Contracts.assertNotNull( fromIndexConverter, "fromIndexConverter" );
-		this.indexToProjectionConverter = fromIndexConverter;
+		this.projectionConverter = new ProjectionConverter<>( fromIndexConverter );
 		return thisAsS();
 	}
 
@@ -51,19 +53,19 @@ abstract class AbstractElasticsearchIndexFieldTypeConverterStep<S extends Abstra
 		return buildContext;
 	}
 
-	final ToDocumentFieldValueConverter<?, ? extends F> createDslToIndexConverter() {
-		return dslToIndexConverter == null ? createToDocumentRawConverter() : dslToIndexConverter;
+	final DslConverter<?, ? extends F> createDslConverter() {
+		return dslConverter == null ? createRawDslConverter() : dslConverter;
 	}
 
-	final ToDocumentFieldValueConverter<F, ? extends F> createToDocumentRawConverter() {
-		return new PassThroughToDocumentFieldValueConverter<>( fieldType );
+	final DslConverter<F, ? extends F> createRawDslConverter() {
+		return new DslConverter<>( new PassThroughToDocumentFieldValueConverter<>( fieldType ) );
 	}
 
-	final FromDocumentFieldValueConverter<? super F, ?> createIndexToProjectionConverter() {
-		return indexToProjectionConverter == null ? createFromDocumentRawConverter() : indexToProjectionConverter;
+	final ProjectionConverter<? super F, ?> createProjectionConverter() {
+		return projectionConverter == null ? createRawProjectionConverter() : projectionConverter;
 	}
 
-	final FromDocumentFieldValueConverter<? super F, F> createFromDocumentRawConverter() {
-		return new PassThroughFromDocumentFieldValueConverter<>( fieldType );
+	final ProjectionConverter<? super F, F> createRawProjectionConverter() {
+		return new ProjectionConverter<>( new PassThroughFromDocumentFieldValueConverter<>( fieldType ) );
 	}
 }

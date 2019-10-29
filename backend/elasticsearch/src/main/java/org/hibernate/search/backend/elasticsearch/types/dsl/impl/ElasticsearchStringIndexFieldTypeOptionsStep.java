@@ -24,8 +24,8 @@ import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.TermVector;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -165,31 +165,31 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 			mapping.setNullValue( new JsonPrimitive( indexNullAs ) );
 		}
 
-		ToDocumentFieldValueConverter<?, ? extends String> dslToIndexConverter =
-				createDslToIndexConverter();
-		ToDocumentFieldValueConverter<String, ? extends String> rawDslToIndexConverter =
-				createToDocumentRawConverter();
-		FromDocumentFieldValueConverter<? super String, ?> indexToProjectionConverter =
-				createIndexToProjectionConverter();
-		FromDocumentFieldValueConverter<? super String, String> rawIndexToProjectionConverter =
-				createFromDocumentRawConverter();
+		DslConverter<?, ? extends String> dslConverter =
+				createDslConverter();
+		DslConverter<String, ? extends String> rawDslConverter =
+				createRawDslConverter();
+		ProjectionConverter<? super String, ?> projectionConverter =
+				createProjectionConverter();
+		ProjectionConverter<? super String, String> rawProjectionConverter =
+				createRawProjectionConverter();
 		ElasticsearchStringFieldCodec codec = ElasticsearchStringFieldCodec.INSTANCE;
 
 		return new ElasticsearchIndexFieldType<>(
 				codec,
 				new ElasticsearchTextFieldPredicateBuilderFactory(
-						resolvedSearchable, dslToIndexConverter, rawDslToIndexConverter, codec, mapping
+						resolvedSearchable, dslConverter, rawDslConverter, codec, mapping
 				),
 				new ElasticsearchStandardFieldSortBuilderFactory<>(
-						resolvedSortable, dslToIndexConverter, rawDslToIndexConverter, codec
+						resolvedSortable, dslConverter, rawDslConverter, codec
 				),
 				new ElasticsearchStandardFieldProjectionBuilderFactory<>(
-						resolvedProjectable, indexToProjectionConverter, rawIndexToProjectionConverter, codec
+						resolvedProjectable, projectionConverter, rawProjectionConverter, codec
 				),
 				new ElasticsearchTextFieldAggregationBuilderFactory(
 						resolvedAggregable,
-						dslToIndexConverter, rawDslToIndexConverter,
-						indexToProjectionConverter, rawIndexToProjectionConverter,
+						dslConverter, rawDslConverter,
+						projectionConverter, rawProjectionConverter,
 						codec,
 						analyzerName != null
 				),
