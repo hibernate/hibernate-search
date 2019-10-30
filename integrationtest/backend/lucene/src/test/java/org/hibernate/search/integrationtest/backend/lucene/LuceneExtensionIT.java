@@ -48,8 +48,10 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.backend.lucene.LuceneExtension;
@@ -500,6 +502,30 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
+	public void projection_nativeField_withProjectionConverters_enabled() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<ValueWrapper> query = scope.query()
+				.asProjection( f -> f.field( "nativeField_converted", ValueWrapper.class ) )
+				.predicate( f -> f.match().field( "string" ).matching( "text 1" ) )
+				.toQuery();
+
+		assertThat( query ).hasHitsAnyOrder( new ValueWrapper<>( 37 ) );
+	}
+
+	@Test
+	public void projection_nativeField_withProjectionConverters_disabled() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<Integer> query = scope.query()
+				.asProjection( f -> f.field( "nativeField_converted", Integer.class, ValueConvert.NO ) )
+				.predicate( f -> f.match().field( "string" ).matching( "text 1" ) )
+				.toQuery();
+
+		assertThat( query ).hasHitsAnyOrder( 37 );
+	}
+
+	@Test
 	public void projection_nativeField_unsupportedProjection() {
 		StubMappingScope scope = indexManager.createScope();
 
@@ -544,6 +570,7 @@ public class LuceneExtensionIT {
 						FIRST_ID,
 						doc -> doc.hasField( "string", "text 1" )
 								.hasField( "nativeField", "37" )
+								.hasField( "nativeField_converted", "37" )
 								.hasField( "nativeField_unsupportedProjection", "37" )
 								.andOnlyInternalFields()
 				) )
@@ -551,12 +578,14 @@ public class LuceneExtensionIT {
 						SECOND_ID,
 						doc -> doc.hasField( "integer", 2 )
 								.hasField( "nativeField", "78" )
+								.hasField( "nativeField_converted", "78" )
 								.hasField( "nativeField_unsupportedProjection", "78" )
 								.andOnlyInternalFields()
 				) )
 				.satisfies( containsDocument(
 						THIRD_ID,
 						doc -> doc.hasField( "nativeField", "13" )
+								.hasField( "nativeField_converted", "13" )
 								.hasField( "nativeField_unsupportedProjection", "13" )
 								// Geo points are stored as two internal fields
 								.hasInternalField( "geoPoint_latitude", 40.12 )
@@ -566,6 +595,7 @@ public class LuceneExtensionIT {
 				.satisfies( containsDocument(
 						FOURTH_ID,
 						doc -> doc.hasField( "nativeField", "89" )
+								.hasField( "nativeField_converted", "89" )
 								.hasField( "nativeField_unsupportedProjection", "89" )
 								.andOnlyInternalFields()
 				) )
@@ -607,6 +637,7 @@ public class LuceneExtensionIT {
 						FIRST_ID,
 						doc -> doc.hasField( "string", "text 1" )
 								.hasField( "nativeField", "37" )
+								.hasField( "nativeField_converted", "37" )
 								.hasField( "nativeField_unsupportedProjection", "37" )
 								.andOnlyInternalFields()
 				) );
@@ -685,6 +716,7 @@ public class LuceneExtensionIT {
 			document.addValue( indexMapping.string, "text 1" );
 
 			document.addValue( indexMapping.nativeField, 37 );
+			document.addValue( indexMapping.nativeField_converted, 37 );
 			document.addValue( indexMapping.nativeField_unsupportedProjection, 37 );
 
 			document.addValue( indexMapping.sort1, "a" );
@@ -695,6 +727,7 @@ public class LuceneExtensionIT {
 			document.addValue( indexMapping.integer, 2 );
 
 			document.addValue( indexMapping.nativeField, 78 );
+			document.addValue( indexMapping.nativeField_converted, 78 );
 			document.addValue( indexMapping.nativeField_unsupportedProjection, 78 );
 
 			document.addValue( indexMapping.sort1, "z" );
@@ -705,6 +738,7 @@ public class LuceneExtensionIT {
 			document.addValue( indexMapping.geoPoint, GeoPoint.of( 40.12, -71.34 ) );
 
 			document.addValue( indexMapping.nativeField, 13 );
+			document.addValue( indexMapping.nativeField_converted, 13 );
 			document.addValue( indexMapping.nativeField_unsupportedProjection, 13 );
 
 			document.addValue( indexMapping.sort1, "z" );
@@ -713,6 +747,7 @@ public class LuceneExtensionIT {
 		} );
 		plan.add( referenceProvider( FOURTH_ID ), document -> {
 			document.addValue( indexMapping.nativeField, 89 );
+			document.addValue( indexMapping.nativeField_converted, 89 );
 			document.addValue( indexMapping.nativeField_unsupportedProjection, 89 );
 
 			document.addValue( indexMapping.sort1, "z" );
@@ -748,6 +783,7 @@ public class LuceneExtensionIT {
 		final IndexFieldReference<String> string;
 		final IndexFieldReference<GeoPoint> geoPoint;
 		final IndexFieldReference<Integer> nativeField;
+		final IndexFieldReference<Integer> nativeField_converted;
 		final IndexFieldReference<Integer> nativeField_unsupportedProjection;
 		final IndexFieldReference<Integer> nativeField_invalidFieldPath;
 
@@ -775,6 +811,13 @@ public class LuceneExtensionIT {
 					"nativeField",
 					f -> f.extension( LuceneExtension.get() )
 							.asNative( Integer.class, LuceneExtensionIT::contributeNativeField, LuceneExtensionIT::fromNativeField )
+			)
+					.toReference();
+			nativeField_converted = root.field(
+					"nativeField_converted",
+					f -> f.extension( LuceneExtension.get() )
+							.asNative( Integer.class, LuceneExtensionIT::contributeNativeField, LuceneExtensionIT::fromNativeField )
+							.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() )
 			)
 					.toReference();
 			nativeField_unsupportedProjection = root.field(
