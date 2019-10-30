@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValu
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterStep;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
@@ -57,7 +57,7 @@ public interface ValueBindingContext<V> extends BindingContext {
 	 * @param <F> The type of index field values, on the index side of the bridge.
 	 */
 	<V2, F> void setBridge(Class<V2> expectedValueType, ValueBridge<V2, F> bridge,
-			StandardIndexFieldTypeOptionsStep<?, F> fieldTypeOptionsStep);
+			IndexFieldTypeOptionsStep<?, F> fieldTypeOptionsStep);
 
 	/**
 	 * Sets the bridge implementing the value/index binding.
@@ -82,7 +82,7 @@ public interface ValueBindingContext<V> extends BindingContext {
 	 * @param <F> The type of index field values, on the index side of the bridge.
 	 */
 	<V2, F> void setBridge(Class<V2> expectedValueType, BeanHolder<? extends ValueBridge<V2, F>> bridgeHolder,
-			StandardIndexFieldTypeOptionsStep<?, F> fieldTypeOptionsStep);
+			IndexFieldTypeOptionsStep<?, F> fieldTypeOptionsStep);
 
 	/**
 	 * @return An entry point allowing to inspect the type of values that will be passed to this bridge.
