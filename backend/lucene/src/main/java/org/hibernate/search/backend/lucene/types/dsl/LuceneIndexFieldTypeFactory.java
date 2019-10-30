@@ -11,7 +11,7 @@ import org.hibernate.search.backend.lucene.search.sort.dsl.LuceneSearchSortFacto
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributor;
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
@@ -43,9 +43,9 @@ public interface LuceneIndexFieldTypeFactory extends IndexFieldTypeFactory {
 	 * @param fieldContributor The field contributor.
 	 * @param fieldValueExtractor The field value extractor used when projecting on this field.
 	 * @param <F> The type of the value.
-	 * @return The final step of the index field type DSL.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	<F> IndexFieldTypeFinalStep<F> asNative(Class<F> valueType,
+	<F> IndexFieldTypeOptionsStep<?, F> asNative(Class<F> valueType,
 			LuceneFieldContributor<F> fieldContributor,
 			LuceneFieldValueExtractor<F> fieldValueExtractor);
 
@@ -57,9 +57,9 @@ public interface LuceneIndexFieldTypeFactory extends IndexFieldTypeFactory {
 	 * @param valueType The type of the value.
 	 * @param fieldContributor The field contributor.
 	 * @param <F> The type of the value.
-	 * @return The final step of the index field type DSL.
+	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	default <F> IndexFieldTypeFinalStep<F> asNative(Class<F> valueType,
+	default <F> IndexFieldTypeOptionsStep<?, F> asNative(Class<F> valueType,
 			LuceneFieldContributor<F> fieldContributor) {
 		return asNative( valueType, fieldContributor, null );
 	}
