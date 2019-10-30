@@ -6,23 +6,16 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import java.lang.invoke.MethodHandles;
-
-import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
+import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingScaledNumberFieldOptionsStep;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
 class PropertyMappingScaledNumberFieldOptionsStepImpl
-		extends AbstractPropertyMappingNonFullTextFieldOptionsStep<PropertyMappingScaledNumberFieldOptionsStep, ScaledNumberIndexFieldTypeOptionsStep<?, ?>>
+		extends AbstractPropertyMappingNonFullTextFieldOptionsStep<PropertyMappingScaledNumberFieldOptionsStep>
 		implements PropertyMappingScaledNumberFieldOptionsStep {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	PropertyMappingScaledNumberFieldOptionsStepImpl(PropertyMappingStep parent, String relativeFieldName) {
-		super( parent, relativeFieldName, PropertyMappingScaledNumberFieldOptionsStepImpl::castIndexFieldTypeOptionsStep );
+		super( parent, relativeFieldName, FieldModelContributorContext::getScaledNumberTypeOptionsStep );
 	}
 
 	@Override
@@ -32,19 +25,7 @@ class PropertyMappingScaledNumberFieldOptionsStepImpl
 
 	@Override
 	public PropertyMappingScaledNumberFieldOptionsStep decimalScale(int decimalScale) {
-		fieldModelContributor.add( (c, b) -> c.decimalScale( decimalScale ) );
+		fieldModelContributor.add( c -> c.getScaledNumberTypeOptionsStep().decimalScale( decimalScale ) );
 		return thisAsS();
-	}
-
-	private static ScaledNumberIndexFieldTypeOptionsStep<?, ?> castIndexFieldTypeOptionsStep(
-			StandardIndexFieldTypeOptionsStep<?,?> optionsStep) {
-		if ( optionsStep instanceof ScaledNumberIndexFieldTypeOptionsStep ) {
-			return (ScaledNumberIndexFieldTypeOptionsStep<?, ?>) optionsStep;
-		}
-		else {
-			throw log.invalidFieldEncodingForScaledNumberFieldMapping(
-					optionsStep, ScaledNumberIndexFieldTypeOptionsStep.class
-			);
-		}
 	}
 }

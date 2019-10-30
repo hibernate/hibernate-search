@@ -162,8 +162,7 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 
 		// Then give the mapping a chance to override some of the model (add storage, ...)
 		contributor.contribute(
-				fieldTypeOptionsStep,
-				new FieldModelContributorBridgeContextImpl<>( bridge, fieldTypeOptionsStep )
+				new FieldModelContributorContextImpl<>( bridge, fieldTypeOptionsStep )
 		);
 
 		// Finally, create the field

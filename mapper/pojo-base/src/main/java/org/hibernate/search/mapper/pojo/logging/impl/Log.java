@@ -255,23 +255,13 @@ public interface Log extends BasicLogger {
 			@FormatWith(PojoModelPathFormatter.class) PojoModelPathValueNode path);
 
 	@Message(id = ID_OFFSET_2 + 31,
-			value = "This property is mapped to a full-text field,"
-					+ " but with a value bridge that binds to a non-String or otherwise incompatible field."
-					+ " Make sure to use a compatible bridge."
+			value = "This property's mapping expects a standard String type for the index field,"
+					+ " but the assigned value bridge or value binder declares a non-standard or non-String type."
+					+ " Make sure to use a compatible bridge or binder."
 					+ " Details: encountered type DSL step '%1$s',"
 					+ " which does not extend the expected '%2$s' interface."
 	)
-	SearchException invalidFieldEncodingForFullTextFieldMapping(StandardIndexFieldTypeOptionsStep<?, ?> context,
-			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
-
-	@Message(id = ID_OFFSET_2 + 32,
-			value = "This property is mapped to a keyword field,"
-					+ " but with a value bridge that binds to a non-String or otherwise incompatible field."
-					+ " Make sure to use a compatible bridge."
-					+ " Details: encountered type DSL step '%1$s',"
-					+ " which does not extend the expected '%2$s' interface."
-	)
-	SearchException invalidFieldEncodingForKeywordFieldMapping(StandardIndexFieldTypeOptionsStep<?, ?> context,
+	SearchException invalidFieldEncodingForStringFieldMapping(StandardIndexFieldTypeOptionsStep<?, ?> context,
 			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
 
 	@Message(id = ID_OFFSET_2 + 34, value = "Could not find a property with the '%1$s' marker for field '%2$s' (marker set: '%3$s').")
@@ -355,9 +345,9 @@ public interface Log extends BasicLogger {
 	SearchException inconsistentBridgeDependencyDeclaration();
 
 	@Message(id = ID_OFFSET_2 + 51,
-			value = "This property is mapped to a scaled number field,"
-					+ " but with a value bridge that binds neither to a BigDecimal nor to a BigInteger field."
-					+ " Make sure to use a compatible bridge."
+			value = "This property's mapping expects a scaled number type (BigDecimal or BigInteger) for the index field,"
+					+ " but the assigned value bridge or value binder declares a non-scaled type."
+					+ " Make sure to use a compatible bridge or binder."
 					+ " Details: encountered type DSL step '%1$s',"
 					+ " which does not extend the expected '%2$s' interface."
 	)

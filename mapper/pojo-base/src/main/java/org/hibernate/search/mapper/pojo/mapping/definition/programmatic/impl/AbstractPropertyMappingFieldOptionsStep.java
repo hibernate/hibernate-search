@@ -6,14 +6,12 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import java.util.function.Function;
-
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
@@ -24,26 +22,26 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 
 
-abstract class AbstractPropertyMappingFieldOptionsStep<
-				S extends PropertyMappingFieldOptionsStep<?>,
-				C extends StandardIndexFieldTypeOptionsStep<?, ?>
-		>
+abstract class AbstractPropertyMappingFieldOptionsStep<S extends PropertyMappingFieldOptionsStep<?>>
 		extends DelegatingPropertyMappingStep
 		implements PojoPropertyMetadataContributor, PropertyMappingFieldOptionsStep<S> {
 
 	private final String relativeFieldName;
 
-	private ValueBinder binder;
+	final PojoCompositeFieldModelContributor fieldModelContributor;
 
-	final PojoCompositeFieldModelContributor<C> fieldModelContributor;
+	private ValueBinder binder;
 
 	private ContainerExtractorPath extractorPath = ContainerExtractorPath.defaultExtractors();
 
 	AbstractPropertyMappingFieldOptionsStep(PropertyMappingStep parent, String relativeFieldName,
-			Function<StandardIndexFieldTypeOptionsStep<?, ?>, C> typeOptionsStepCaster) {
+			FieldModelContributor fieldTypeChecker) {
 		super( parent );
 		this.relativeFieldName = relativeFieldName;
-		this.fieldModelContributor = new PojoCompositeFieldModelContributor<>( typeOptionsStepCaster );
+		this.fieldModelContributor = new PojoCompositeFieldModelContributor();
+		// The very first field contributor will just check that the field type is appropriate.
+		// It is only useful if no option is set, since setting an option will perform that check too.
+		this.fieldModelContributor.add( fieldTypeChecker );
 	}
 
 	@Override
@@ -61,19 +59,19 @@ abstract class AbstractPropertyMappingFieldOptionsStep<
 
 	@Override
 	public S projectable(Projectable projectable) {
-		fieldModelContributor.add( (c, b) -> c.projectable( projectable ) );
+		fieldModelContributor.add( c -> c.getStandardTypeOptionsStep().projectable( projectable ) );
 		return thisAsS();
 	}
 
 	@Override
 	public S searchable(Searchable searchable) {
-		fieldModelContributor.add( (c, b) -> c.searchable( searchable ) );
+		fieldModelContributor.add( c -> c.getStandardTypeOptionsStep().searchable( searchable ) );
 		return thisAsS();
 	}
 
 	@Override
 	public S aggregable(Aggregable aggregable) {
-		fieldModelContributor.add( (c, b) -> c.aggregable( aggregable ) );
+		fieldModelContributor.add( c -> c.getStandardTypeOptionsStep().aggregable( aggregable ) );
 		return thisAsS();
 	}
 
