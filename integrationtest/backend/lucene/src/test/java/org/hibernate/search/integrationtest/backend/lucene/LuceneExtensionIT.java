@@ -408,7 +408,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void predicate_nativeField_throwsException() {
+	public void predicate_nativeField() {
 		StubMappingScope scope = indexManager.createScope();
 
 		SubTest.expectException(
@@ -426,26 +426,7 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
-	public void sort_nativeField_throwsException() {
-		StubMappingScope scope = indexManager.createScope();
-
-		SubTest.expectException(
-				"sort on unsupported native field",
-				() -> scope.query()
-						.predicate( f -> f.matchAll() )
-						.sort( f -> f.field( "nativeField" ) )
-						.toQuery()
-				)
-				.assertThrown()
-				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Native fields do not support defining sorts with the DSL: use the Lucene extension and a native sort." )
-				.satisfies( FailureReportUtils.hasContext(
-						EventContexts.fromIndexFieldAbsolutePath( "nativeField" )
-				) );
-	}
-
-	@Test
-	public void predicate_nativeField_nativeQuery() {
+	public void predicate_nativeField_fromLuceneQuery() {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -472,6 +453,38 @@ public class LuceneExtensionIT {
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexFieldAbsolutePath( "nativeField" )
 				) );
+	}
+
+	@Test
+	public void sort_nativeField() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SubTest.expectException(
+				"sort on unsupported native field",
+				() -> scope.query()
+						.predicate( f -> f.matchAll() )
+						.sort( f -> f.field( "nativeField" ) )
+						.toQuery()
+				)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Native fields do not support defining sorts with the DSL: use the Lucene extension and a native sort." )
+				.satisfies( FailureReportUtils.hasContext(
+						EventContexts.fromIndexFieldAbsolutePath( "nativeField" )
+				) );
+	}
+
+	@Test
+	public void sort_nativeField_fromLuceneSortField() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.predicate( f -> f.matchAll() )
+				.sort( f -> f.extension( LuceneExtension.get() ).fromLuceneSortField( new SortField( "nativeField", Type.LONG ) ) )
+				.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, FIFTH_ID, THIRD_ID, FIRST_ID, SECOND_ID, FOURTH_ID );
 	}
 
 	@Test
@@ -511,19 +524,6 @@ public class LuceneExtensionIT {
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexFieldAbsolutePath( "nativeField_unsupportedProjection" )
 				) );
-	}
-
-	@Test
-	public void sort_nativeField_nativeSort() {
-		StubMappingScope scope = indexManager.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
-				.sort( f -> f.extension( LuceneExtension.get() ).fromLuceneSortField( new SortField( "nativeField", Type.LONG ) ) )
-				.toQuery();
-
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIFTH_ID, THIRD_ID, FIRST_ID, SECOND_ID, FOURTH_ID );
 	}
 
 	@Test
