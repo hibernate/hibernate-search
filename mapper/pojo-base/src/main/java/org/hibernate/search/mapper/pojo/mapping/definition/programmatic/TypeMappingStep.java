@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
-import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
-import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -47,43 +44,11 @@ public interface TypeMappingStep {
 	TypeMappingStep indexed(String backendName, String indexName);
 
 	/**
-	 * @param bridgeClass The class of the bridge to use.
-	 * @return {@code this}, for method chaining.
-	 * @see RoutingKeyBridge
-	 */
-	TypeMappingStep routingKeyBridge(Class<? extends RoutingKeyBridge> bridgeClass);
-
-	/**
-	 * @param bridgeReference A {@link BeanReference} pointing to the bridge to use.
-	 * See the static "ofXXX()" methods of {@link BeanReference} for details about the various type of references
-	 * (by name, by type, ...).
-	 * @return {@code this}, for method chaining.
-	 * @see RoutingKeyBridge
-	 */
-	TypeMappingStep routingKeyBridge(BeanReference<? extends RoutingKeyBridge> bridgeReference);
-
-	/**
 	 * @param binder A {@link RoutingKeyBinder} responsible for creating a bridge.
 	 * @return {@code this}, for method chaining.
 	 * @see RoutingKeyBinder
 	 */
 	TypeMappingStep routingKeyBinder(RoutingKeyBinder<?> binder);
-
-	/**
-	 * @param bridgeClass The class of the bridge to use.
-	 * @return {@code this}, for method chaining.
-	 * @see TypeBridge
-	 */
-	TypeMappingStep bridge(Class<? extends TypeBridge> bridgeClass);
-
-	/**
-	 * @param bridgeReference A {@link BeanReference} pointing to the bridge to use.
-	 * See the static "ofXXX()" methods of {@link BeanReference} for details about the various type of references
-	 * (by name, by type, ...).
-	 * @return {@code this}, for method chaining.
-	 * @see TypeBridge
-	 */
-	TypeMappingStep bridge(BeanReference<? extends TypeBridge> bridgeReference);
 
 	/**
 	 * @param binder A {@link TypeBinder} responsible for creating a bridge.

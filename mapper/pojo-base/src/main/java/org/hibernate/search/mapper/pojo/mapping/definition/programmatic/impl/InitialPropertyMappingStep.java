@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojoPropertyMetadataContributor;
@@ -66,16 +63,6 @@ class InitialPropertyMappingStep
 	@Override
 	public PropertyMappingStep property(String propertyName) {
 		return parent.property( propertyName );
-	}
-
-	@Override
-	public PropertyMappingStep bridge(Class<? extends PropertyBridge> bridgeClass) {
-		return bridge( BeanReference.of( bridgeClass ) );
-	}
-
-	@Override
-	public PropertyMappingStep bridge(BeanReference<? extends PropertyBridge> bridgeReference) {
-		return binder( new BeanBinder( bridgeReference ) );
 	}
 
 	@Override

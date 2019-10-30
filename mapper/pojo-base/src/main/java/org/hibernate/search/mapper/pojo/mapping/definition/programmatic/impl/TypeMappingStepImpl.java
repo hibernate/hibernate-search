@@ -6,12 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
-import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
-import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
-import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojoTypeMetadataContributor;
@@ -68,29 +64,9 @@ public class TypeMappingStepImpl
 	}
 
 	@Override
-	public TypeMappingStep routingKeyBridge(Class<? extends RoutingKeyBridge> bridgeClass) {
-		return routingKeyBridge( BeanReference.of( bridgeClass ) );
-	}
-
-	@Override
-	public TypeMappingStep routingKeyBridge(BeanReference<? extends RoutingKeyBridge> bridgeReference) {
-		return routingKeyBinder( new BeanBinder( bridgeReference ) );
-	}
-
-	@Override
 	public TypeMappingStep routingKeyBinder(RoutingKeyBinder<?> binder) {
 		children.add( new RoutingKeyBridgeMappingContributor( binder ) );
 		return this;
-	}
-
-	@Override
-	public TypeMappingStep bridge(Class<? extends TypeBridge> bridgeClass) {
-		return bridge( BeanReference.of( bridgeClass ) );
-	}
-
-	@Override
-	public TypeMappingStep bridge(BeanReference<? extends TypeBridge> bridgeReference) {
-		return binder( new BeanBinder( bridgeReference ) );
 	}
 
 	@Override
