@@ -287,7 +287,7 @@ public class ScaledNumberFieldIT {
 				return id;
 			}
 
-			@ScaledNumberField(decimalScale = 3, valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplictFieldTypeBinder.class))
+			@ScaledNumberField(decimalScale = 3, valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplicitFieldTypeBinder.class))
 			public WrappedValue getWrap() {
 				return wrap;
 			}
@@ -348,7 +348,7 @@ public class ScaledNumberFieldIT {
 				return id;
 			}
 
-			@ScaledNumberField(decimalScale = 3, valueBinder = @ValueBinderRef(type = InvalidTypeBridge.ExplictFieldTypeBinder.class))
+			@ScaledNumberField(decimalScale = 3, valueBinder = @ValueBinderRef(type = InvalidTypeBridge.ExplicitFieldTypeBinder.class))
 			public WrappedValue getWrap() {
 				return wrap;
 			}
@@ -378,7 +378,7 @@ public class ScaledNumberFieldIT {
 			return value == null ? null : value.wrapped;
 		}
 
-		public static class ExplictFieldTypeBinder implements ValueBinder {
+		public static class ExplicitFieldTypeBinder implements ValueBinder {
 			@Override
 			public void bind(ValueBindingContext<?> context) {
 				context.setBridge( WrappedValue.class, new ValidTypeBridge(), context.getTypeFactory().asBigDecimal() );
@@ -392,7 +392,7 @@ public class ScaledNumberFieldIT {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
 
-		public static class ExplictFieldTypeBinder implements ValueBinder {
+		public static class ExplicitFieldTypeBinder implements ValueBinder {
 			@Override
 			public void bind(ValueBindingContext<?> context) {
 				context.setBridge( WrappedValue.class, new InvalidTypeBridge(), context.getTypeFactory().asInteger() );

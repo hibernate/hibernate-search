@@ -285,7 +285,7 @@ public class KeywordFieldIT {
 			}
 
 			@KeywordField(normalizer = NORMALIZER_NAME,
-					valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplictFieldTypeBinder.class))
+					valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplicitFieldTypeBinder.class))
 			public WrappedValue getWrap() {
 				return wrap;
 			}
@@ -384,7 +384,7 @@ public class KeywordFieldIT {
 			}
 
 			@KeywordField(normalizer = NORMALIZER_NAME,
-					valueBinder = @ValueBinderRef(type = InvalidTypeBridge.ExplictFieldTypeBinder.class))
+					valueBinder = @ValueBinderRef(type = InvalidTypeBridge.ExplicitFieldTypeBinder.class))
 			public WrappedValue getWrap() {
 				return wrap;
 			}
@@ -440,7 +440,7 @@ public class KeywordFieldIT {
 			return value == null ? null : value.wrapped;
 		}
 
-		public static class ExplictFieldTypeBinder implements ValueBinder {
+		public static class ExplicitFieldTypeBinder implements ValueBinder {
 			@Override
 			public void bind(ValueBindingContext<?> context) {
 				context.setBridge( WrappedValue.class, new ValidTypeBridge(), context.getTypeFactory().asString() );
@@ -454,7 +454,7 @@ public class KeywordFieldIT {
 			throw new UnsupportedOperationException( "Should not be called" );
 		}
 
-		public static class ExplictFieldTypeBinder implements ValueBinder {
+		public static class ExplicitFieldTypeBinder implements ValueBinder {
 			@Override
 			public void bind(ValueBindingContext<?> context) {
 				context.setBridge( WrappedValue.class, new InvalidTypeBridge(), context.getTypeFactory().asInteger() );
