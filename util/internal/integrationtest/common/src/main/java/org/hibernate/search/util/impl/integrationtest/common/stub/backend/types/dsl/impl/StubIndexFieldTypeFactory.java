@@ -20,6 +20,7 @@ import java.time.YearMonth;
 import java.time.ZonedDateTime;
 
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
@@ -47,7 +48,7 @@ public class StubIndexFieldTypeFactory implements IndexFieldTypeFactory {
 			return (StandardIndexFieldTypeOptionsStep<?, F>) asBigInteger();
 		}
 		else {
-			return new StubGenericIndexFieldTypeOptionsStep<>( valueType );
+			return new StubGenericStandardIndexFieldTypeOptionsStep<>( valueType );
 		}
 	}
 
@@ -154,5 +155,9 @@ public class StubIndexFieldTypeFactory implements IndexFieldTypeFactory {
 	@Override
 	public ScaledNumberIndexFieldTypeOptionsStep<?, BigInteger> asBigInteger() {
 		return new StubScaledNumberIndexFieldTypeOptionsStep<>( BigInteger.class, defaultsProvider );
+	}
+
+	public <T> IndexFieldTypeOptionsStep<?, T> asNonStandard(Class<T> fieldValueType) {
+		return new StubGenericNonStandardIndexFieldTypeOptionsStep<>( fieldValueType );
 	}
 }

@@ -6,15 +6,15 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.dsl.impl;
 
-class StubGenericIndexFieldTypeOptionsStep<F>
-		extends AbstractStubStandardIndexFieldTypeOptionsStep<StubGenericIndexFieldTypeOptionsStep<F>, F> {
+class StubGenericStandardIndexFieldTypeOptionsStep<F>
+		extends AbstractStubStandardIndexFieldTypeOptionsStep<StubGenericStandardIndexFieldTypeOptionsStep<F>, F> {
 
-	StubGenericIndexFieldTypeOptionsStep(Class<F> inputType) {
+	StubGenericStandardIndexFieldTypeOptionsStep(Class<F> inputType) {
 		super( inputType );
 	}
 
 	@Override
-	StubGenericIndexFieldTypeOptionsStep<F> thisAsS() {
+	StubGenericStandardIndexFieldTypeOptionsStep<F> thisAsS() {
 		return this;
 	}
 
