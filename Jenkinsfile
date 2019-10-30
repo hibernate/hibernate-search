@@ -209,7 +209,8 @@ stage('Configure') {
 					// ES 6.4 has a bug that prevents our integration tests from passing. See https://github.com/hibernate/hibernate-search/pull/1981/
 					new EsAwsBuildEnvironment(version: '6.4', mavenProfile: 'elasticsearch-6.0', status: BuildEnvironmentStatus.EXPERIMENTAL),
 					new EsAwsBuildEnvironment(version: '6.5', mavenProfile: 'elasticsearch-6.0', status: BuildEnvironmentStatus.SUPPORTED),
-					new EsAwsBuildEnvironment(version: '6.7', mavenProfile: 'elasticsearch-6.7', status: BuildEnvironmentStatus.SUPPORTED)
+					new EsAwsBuildEnvironment(version: '6.7', mavenProfile: 'elasticsearch-6.7', status: BuildEnvironmentStatus.SUPPORTED),
+					new EsAwsBuildEnvironment(version: '7.1', mavenProfile: 'elasticsearch-7.0', status: BuildEnvironmentStatus.SUPPORTED)
 			]
 	])
 
