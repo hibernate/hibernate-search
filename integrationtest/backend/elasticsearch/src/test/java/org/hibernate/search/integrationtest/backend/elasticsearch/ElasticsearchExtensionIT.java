@@ -121,7 +121,7 @@ public class ElasticsearchExtensionIT {
 				context2.predicate( f -> f.fromJson( "{'match_all': {}}" ) );
 		// Note we can use Elasticsearch-specific sorts immediately
 		ElasticsearchSearchQueryOptionsStep<DocumentReference> context4 =
-				context3.sort( f -> f.fromJson( "{'sort1': 'asc'}" ) );
+				context3.sort( f -> f.fromJson( "{'nativeField_sort1': 'asc'}" ) );
 
 		// Put the query and result into variables to check they have the right type
 		ElasticsearchSearchQuery<DocumentReference> query = context4.toQuery();
@@ -282,17 +282,17 @@ public class ElasticsearchExtensionIT {
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.bool()
 						.should( f.extension( ElasticsearchExtension.get() )
-								.fromJson( "{'match': {'string': 'text 1'}}" )
+								.fromJson( "{'match': {'nativeField_string': 'text 1'}}" )
 						)
 						.should( f.extension( ElasticsearchExtension.get() )
-								.fromJson( "{'match': {'integer': 2}}" )
+								.fromJson( "{'match': {'nativeField_integer': 2}}" )
 						)
 						.should( f.extension( ElasticsearchExtension.get() )
 								.fromJson(
 										"{"
 											+ "'geo_distance': {"
 												+ "'distance': '200km',"
-												+ "'geoPoint': {"
+												+ "'nativeField_geoPoint': {"
 													+ "'lat': 40,"
 													+ "'lon': -70"
 												+ "}"
@@ -301,7 +301,7 @@ public class ElasticsearchExtensionIT {
 								)
 						)
 						// Also test using the standard DSL on a field defined with the extension
-						.should( f.match().field( "dateWithColons" ).matching( "'2018:01:12'" ) )
+						.should( f.match().field( "nativeField_dateWithColons" ).matching( "'2018:01:12'" ) )
 				)
 				.toQuery();
 		assertThat( query )
@@ -314,15 +314,15 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchPredicate predicate1 = scope.predicate().extension( ElasticsearchExtension.get() )
-				.fromJson( "{'match': {'string': 'text 1'}}" ).toPredicate();
+				.fromJson( "{'match': {'nativeField_string': 'text 1'}}" ).toPredicate();
 		SearchPredicate predicate2 = scope.predicate().extension( ElasticsearchExtension.get() )
-				.fromJson( "{'match': {'integer': 2}}" ).toPredicate();
+				.fromJson( "{'match': {'nativeField_integer': 2}}" ).toPredicate();
 		SearchPredicate predicate3 = scope.predicate().extension( ElasticsearchExtension.get() )
 				.fromJson(
 						"{"
 							+ "'geo_distance': {"
 								+ "'distance': '200km',"
-								+ "'geoPoint': {"
+								+ "'nativeField_geoPoint': {"
 									+ "'lat': 40,"
 									+ "'lon': -70"
 								+ "}"
@@ -331,7 +331,7 @@ public class ElasticsearchExtensionIT {
 				)
 				.toPredicate();
 		// Also test using the standard DSL on a field defined with the extension
-		SearchPredicate predicate4 = scope.predicate().match().field( "dateWithColons" )
+		SearchPredicate predicate4 = scope.predicate().match().field( "nativeField_dateWithColons" )
 				.matching( "'2018:01:12'" ).toPredicate();
 		SearchPredicate booleanPredicate = scope.predicate().bool()
 				.should( predicate1 )
@@ -356,14 +356,14 @@ public class ElasticsearchExtensionIT {
 				.predicate( f -> f.matchAll() )
 				.sort( f -> f
 						.extension( ElasticsearchExtension.get() )
-								.fromJson( "{'sort1': 'asc'}" )
+								.fromJson( "{'nativeField_sort1': 'asc'}" )
 						.then().extension( ElasticsearchExtension.get() )
-								.fromJson( "{'sort2': 'asc'}" )
+								.fromJson( "{'nativeField_sort2': 'asc'}" )
 						.then().extension( ElasticsearchExtension.get() )
-								.fromJson( "{'sort3': 'asc'}" )
+								.fromJson( "{'nativeField_sort3': 'asc'}" )
 						// Also test using the standard DSL on a field defined with the extension
-						.then().field( "sort4" ).asc().missing().last()
-						.then().field( "sort5" ).asc().missing().first()
+						.then().field( "nativeField_sort4" ).asc().missing().last()
+						.then().field( "nativeField_sort5" ).asc().missing().first()
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
@@ -375,13 +375,13 @@ public class ElasticsearchExtensionIT {
 				.predicate( f -> f.matchAll() )
 				.sort( f -> f
 						.extension( ElasticsearchExtension.get() )
-								.fromJson( "{'sort1': 'desc'}" )
+								.fromJson( "{'nativeField_sort1': 'desc'}" )
 						.then().extension( ElasticsearchExtension.get() )
-								.fromJson( "{'sort2': 'desc'}" )
+								.fromJson( "{'nativeField_sort2': 'desc'}" )
 						.then().extension( ElasticsearchExtension.get() )
-								.fromJson( "{'sort3': 'desc'}" )
-						.then().field( "sort4" ).desc().missing().last()
-						.then().field( "sort5" ).asc().missing().first()
+								.fromJson( "{'nativeField_sort3': 'desc'}" )
+						.then().field( "nativeField_sort4" ).desc().missing().last()
+						.then().field( "nativeField_sort5" ).asc().missing().first()
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
@@ -395,18 +395,18 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchSort sort1Asc = scope.sort().extension( ElasticsearchExtension.get() )
-				.fromJson( "{'sort1': 'asc'}" )
+				.fromJson( "{'nativeField_sort1': 'asc'}" )
 				.toSort();
 		SearchSort sort2Asc = scope.sort().extension( ElasticsearchExtension.get() )
-				.fromJson( "{'sort2': 'asc'}" )
+				.fromJson( "{'nativeField_sort2': 'asc'}" )
 				.toSort();
 		SearchSort sort3Asc = scope.sort().extension( ElasticsearchExtension.get() )
-				.fromJson( "{'sort3': 'asc'}" )
+				.fromJson( "{'nativeField_sort3': 'asc'}" )
 				.toSort();
 		// Also test using the standard DSL on a field defined with the extension
 		SearchSort sort4Asc = scope.sort()
-				.field( "sort4" ).asc().missing().last()
-				.then().field( "sort5" ).asc().missing().first()
+				.field( "nativeField_sort4" ).asc().missing().last()
+				.then().field( "nativeField_sort5" ).asc().missing().first()
 				.toSort();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -417,17 +417,17 @@ public class ElasticsearchExtensionIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID );
 
 		SearchSort sort1Desc = scope.sort().extension( ElasticsearchExtension.get() )
-				.fromJson( "{'sort1': 'desc'}" )
+				.fromJson( "{'nativeField_sort1': 'desc'}" )
 				.toSort();
 		SearchSort sort2Desc = scope.sort().extension( ElasticsearchExtension.get() )
-				.fromJson( "{'sort2': 'desc'}" )
+				.fromJson( "{'nativeField_sort2': 'desc'}" )
 				.toSort();
 		SearchSort sort3Desc = scope.sort().extension( ElasticsearchExtension.get() )
-				.fromJson( "{'sort3': 'desc'}" )
+				.fromJson( "{'nativeField_sort3': 'desc'}" )
 				.toSort();
 		SearchSort sort4Desc = scope.sort()
-				.field( "sort4" ).desc().missing().last()
-				.then().field( "sort5" ).asc().missing().first()
+				.field( "nativeField_sort4" ).desc().missing().last()
+				.then().field( "nativeField_sort5" ).asc().missing().first()
 				.toSort();
 
 		query = scope.query()
@@ -453,12 +453,12 @@ public class ElasticsearchExtensionIT {
 		Assertions.assertThat( result ).hasSize( 1 );
 		JSONAssert.assertEquals(
 				"{"
-						+ "'string': 'text 2',"
-						+ "'integer': 1,"
-						+ "'geoPoint': {'lat': 45.12, 'lon': -75.34},"
-						+ "'dateWithColons': '2018:01:25',"
-						+ "'unsupportedType': 'foobar',"
-						+ "'sort5': 'z'"
+						+ "'nativeField_string': 'text 2',"
+						+ "'nativeField_integer': 1,"
+						+ "'nativeField_geoPoint': {'lat': 45.12, 'lon': -75.34},"
+						+ "'nativeField_dateWithColons': '2018:01:25',"
+						+ "'nativeField_unsupportedType': 'foobar',"
+						+ "'nativeField_sort5': 'z'"
 						+ "}",
 				result.get( 0 ),
 				JSONCompareMode.STRICT
@@ -477,7 +477,7 @@ public class ElasticsearchExtensionIT {
 				.asProjection( f ->
 						f.composite(
 								f.extension( ElasticsearchExtension.get() ).source(),
-								f.field( "string" )
+								f.field( "nativeField_string" )
 						)
 				)
 				.predicate( f -> f.id().matching( FIFTH_ID ) )
@@ -489,12 +489,12 @@ public class ElasticsearchExtensionIT {
 		Assertions.assertThat( result ).hasSize( 1 );
 		JSONAssert.assertEquals(
 				"{"
-						+ "'string': 'text 2',"
-						+ "'integer': 1,"
-						+ "'geoPoint': {'lat': 45.12, 'lon': -75.34},"
-						+ "'dateWithColons': '2018:01:25',"
-						+ "'unsupportedType': 'foobar',"
-						+ "'sort5': 'z'"
+						+ "'nativeField_string': 'text 2',"
+						+ "'nativeField_integer': 1,"
+						+ "'nativeField_geoPoint': {'lat': 45.12, 'lon': -75.34},"
+						+ "'nativeField_dateWithColons': '2018:01:25',"
+						+ "'nativeField_unsupportedType': 'foobar',"
+						+ "'nativeField_sort5': 'z'"
 						+ "}",
 				result.get( 0 ),
 				JSONCompareMode.STRICT
@@ -581,51 +581,51 @@ public class ElasticsearchExtensionIT {
 	private void initData() {
 		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( SECOND_ID ), document -> {
-			document.addValue( indexMapping.integer, "2" );
-			document.addValue( indexMapping.unsupportedType, "42" );
+			document.addValue( indexMapping.nativeField_integer, "2" );
+			document.addValue( indexMapping.nativeField_unsupportedType, "42" );
 
-			document.addValue( indexMapping.sort1, "z" );
-			document.addValue( indexMapping.sort2, "a" );
-			document.addValue( indexMapping.sort3, "z" );
-			document.addValue( indexMapping.sort4, "z" );
-			document.addValue( indexMapping.sort5, "a" );
+			document.addValue( indexMapping.nativeField_sort1, "z" );
+			document.addValue( indexMapping.nativeField_sort2, "a" );
+			document.addValue( indexMapping.nativeField_sort3, "z" );
+			document.addValue( indexMapping.nativeField_sort4, "z" );
+			document.addValue( indexMapping.nativeField_sort5, "a" );
 		} );
 		plan.add( referenceProvider( FIRST_ID ), document -> {
-			document.addValue( indexMapping.string, "'text 1'" );
+			document.addValue( indexMapping.nativeField_string, "'text 1'" );
 
-			document.addValue( indexMapping.sort1, "a" );
-			document.addValue( indexMapping.sort2, "z" );
-			document.addValue( indexMapping.sort3, "z" );
-			document.addValue( indexMapping.sort4, "z" );
-			document.addValue( indexMapping.sort5, "a" );
+			document.addValue( indexMapping.nativeField_sort1, "a" );
+			document.addValue( indexMapping.nativeField_sort2, "z" );
+			document.addValue( indexMapping.nativeField_sort3, "z" );
+			document.addValue( indexMapping.nativeField_sort4, "z" );
+			document.addValue( indexMapping.nativeField_sort5, "a" );
 		} );
 		plan.add( referenceProvider( THIRD_ID ), document -> {
-			document.addValue( indexMapping.geoPoint, "{'lat': 40.12, 'lon': -71.34}" );
+			document.addValue( indexMapping.nativeField_geoPoint, "{'lat': 40.12, 'lon': -71.34}" );
 
-			document.addValue( indexMapping.sort1, "z" );
-			document.addValue( indexMapping.sort2, "z" );
-			document.addValue( indexMapping.sort3, "a" );
-			document.addValue( indexMapping.sort4, "z" );
-			document.addValue( indexMapping.sort5, "a" );
+			document.addValue( indexMapping.nativeField_sort1, "z" );
+			document.addValue( indexMapping.nativeField_sort2, "z" );
+			document.addValue( indexMapping.nativeField_sort3, "a" );
+			document.addValue( indexMapping.nativeField_sort4, "z" );
+			document.addValue( indexMapping.nativeField_sort5, "a" );
 		} );
 		plan.add( referenceProvider( FOURTH_ID ), document -> {
-			document.addValue( indexMapping.dateWithColons, "'2018:01:12'" );
+			document.addValue( indexMapping.nativeField_dateWithColons, "'2018:01:12'" );
 
-			document.addValue( indexMapping.sort1, "z" );
-			document.addValue( indexMapping.sort2, "z" );
-			document.addValue( indexMapping.sort3, "z" );
-			document.addValue( indexMapping.sort4, "a" );
-			document.addValue( indexMapping.sort5, "a" );
+			document.addValue( indexMapping.nativeField_sort1, "z" );
+			document.addValue( indexMapping.nativeField_sort2, "z" );
+			document.addValue( indexMapping.nativeField_sort3, "z" );
+			document.addValue( indexMapping.nativeField_sort4, "a" );
+			document.addValue( indexMapping.nativeField_sort5, "a" );
 		} );
 		plan.add( referenceProvider( FIFTH_ID ), document -> {
 			// This document should not match any query
-			document.addValue( indexMapping.string, "'text 2'" );
-			document.addValue( indexMapping.integer, "1" );
-			document.addValue( indexMapping.geoPoint, "{'lat': 45.12, 'lon': -75.34}" );
-			document.addValue( indexMapping.dateWithColons, "'2018:01:25'" );
-			document.addValue( indexMapping.unsupportedType, "'foobar'" ); // ignore_malformed is enabled, this should be ignored
+			document.addValue( indexMapping.nativeField_string, "'text 2'" );
+			document.addValue( indexMapping.nativeField_integer, "1" );
+			document.addValue( indexMapping.nativeField_geoPoint, "{'lat': 45.12, 'lon': -75.34}" );
+			document.addValue( indexMapping.nativeField_dateWithColons, "'2018:01:25'" );
+			document.addValue( indexMapping.nativeField_unsupportedType, "'foobar'" ); // ignore_malformed is enabled, this should be ignored
 
-			document.addValue( indexMapping.sort5, "z" );
+			document.addValue( indexMapping.nativeField_sort5, "z" );
 		} );
 		plan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
@@ -643,76 +643,76 @@ public class ElasticsearchExtensionIT {
 	}
 
 	private static class IndexMapping {
-		final IndexFieldReference<String> integer;
-		final IndexFieldReference<String> string;
-		final IndexFieldReference<String> geoPoint;
-		final IndexFieldReference<String> dateWithColons;
-		final IndexFieldReference<String> unsupportedType;
+		final IndexFieldReference<String> nativeField_integer;
+		final IndexFieldReference<String> nativeField_string;
+		final IndexFieldReference<String> nativeField_geoPoint;
+		final IndexFieldReference<String> nativeField_dateWithColons;
+		final IndexFieldReference<String> nativeField_unsupportedType;
 
-		final IndexFieldReference<String> sort1;
-		final IndexFieldReference<String> sort2;
-		final IndexFieldReference<String> sort3;
-		final IndexFieldReference<String> sort4;
-		final IndexFieldReference<String> sort5;
+		final IndexFieldReference<String> nativeField_sort1;
+		final IndexFieldReference<String> nativeField_sort2;
+		final IndexFieldReference<String> nativeField_sort3;
+		final IndexFieldReference<String> nativeField_sort4;
+		final IndexFieldReference<String> nativeField_sort5;
 
 		IndexMapping(IndexSchemaElement root) {
-			integer = root.field(
-					"integer",
+			nativeField_integer = root.field(
+					"nativeField_integer",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asNative( "{'type': 'integer'}" )
 			)
 					.toReference();
-			string = root.field(
-					"string",
+			nativeField_string = root.field(
+					"nativeField_string",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asNative( "{'type': 'keyword'}" )
 			)
 					.toReference();
-			geoPoint = root.field(
-					"geoPoint",
+			nativeField_geoPoint = root.field(
+					"nativeField_geoPoint",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asNative( "{'type': 'geo_point'}" )
 			)
 					.toReference();
-			dateWithColons = root.field(
-					"dateWithColons",
+			nativeField_dateWithColons = root.field(
+					"nativeField_dateWithColons",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asNative( "{'type': 'date', 'format': 'yyyy:MM:dd'}" )
 			)
 					.toReference();
-			unsupportedType = root.field(
-					"unsupportedType",
+			nativeField_unsupportedType = root.field(
+					"nativeField_unsupportedType",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asNative( "{'type': 'half_float', 'ignore_malformed': true}" )
 			)
 					.toReference();
 
-			sort1 = root.field(
-					"sort1",
+			nativeField_sort1 = root.field(
+					"nativeField_sort1",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asNative( "{'type': 'keyword', 'doc_values': true}" )
 			)
 					.toReference();
-			sort2 = root.field(
-					"sort2",
+			nativeField_sort2 = root.field(
+					"nativeField_sort2",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asNative( "{'type': 'keyword', 'doc_values': true}" )
 			)
 					.toReference();
-			sort3 = root.field(
-					"sort3",
+			nativeField_sort3 = root.field(
+					"nativeField_sort3",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asNative( "{'type': 'keyword', 'doc_values': true}" )
 			)
 					.toReference();
-			sort4 = root.field(
-					"sort4",
+			nativeField_sort4 = root.field(
+					"nativeField_sort4",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asNative( "{'type': 'keyword', 'doc_values': true}" )
 			)
 					.toReference();
-			sort5 = root.field(
-					"sort5",
+			nativeField_sort5 = root.field(
+					"nativeField_sort5",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asNative( "{'type': 'keyword', 'doc_values': true}" )
 			)
