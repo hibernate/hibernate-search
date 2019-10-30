@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextFi
  * when the index field is a full-text field.
  */
 public interface PropertyMappingFullTextFieldOptionsStep
-		extends PropertyMappingFieldOptionsStep<PropertyMappingFullTextFieldOptionsStep> {
+		extends PropertyMappingStandardFieldOptionsStep<PropertyMappingFullTextFieldOptionsStep> {
 
 	/**
 	 * @param analyzerName A reference to the analyzer to use for this field.

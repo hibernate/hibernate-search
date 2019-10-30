@@ -13,7 +13,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 
 
 class PropertyMappingKeywordFieldOptionsStepImpl
-		extends AbstractPropertyMappingNonFullTextFieldOptionsStep<PropertyMappingKeywordFieldOptionsStep>
+		extends AbstractPropertyMappingNonFullTextStandardFieldOptionsStep<PropertyMappingKeywordFieldOptionsStep>
 		implements PropertyMappingKeywordFieldOptionsStep {
 
 	PropertyMappingKeywordFieldOptionsStepImpl(PropertyMappingStep parent, String relativeFieldName) {

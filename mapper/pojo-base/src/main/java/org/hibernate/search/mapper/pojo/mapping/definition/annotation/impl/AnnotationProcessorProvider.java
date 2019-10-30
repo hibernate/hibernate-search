@@ -46,10 +46,12 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.NonStandardField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ScaledNumberField;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStandardFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFullTextFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingKeywordFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingNonFullTextFieldOptionsStep;
@@ -88,6 +90,7 @@ class AnnotationProcessorProvider {
 				new FullTextFieldProcessor( helper ),
 				new KeywordFieldProcessor( helper ),
 				new ScaledNumberFieldProcessor( helper ),
+				new NonStandardFieldProcessor( helper ),
 				new IndexedEmbeddedProcessor( helper )
 		) );
 	}
@@ -336,13 +339,13 @@ class AnnotationProcessorProvider {
 		}
 	}
 
-	private static class FullTextFieldProcessor extends PropertyFieldAnnotationProcessor<FullTextField> {
+	private static class FullTextFieldProcessor extends PropertyStandardFieldAnnotationProcessor<FullTextField> {
 		FullTextFieldProcessor(AnnotationProcessorHelper helper) {
 			super( helper, FullTextField.class );
 		}
 
 		@Override
-		PropertyMappingFieldOptionsStep<?> initFieldMappingContext(PropertyMappingStep mappingContext,
+		PropertyMappingStandardFieldOptionsStep<?> initStandardFieldMappingContext(PropertyMappingStep mappingContext,
 				PojoPropertyModel<?> propertyModel, FullTextField annotation, String fieldName) {
 			PropertyMappingFullTextFieldOptionsStep fieldContext = mappingContext.fullTextField( fieldName )
 					.analyzer( annotation.analyzer() );
@@ -522,6 +525,38 @@ class AnnotationProcessorProvider {
 
 		@Override
 		ContainerExtraction getExtraction(ScaledNumberField annotation) {
+			return annotation.extraction();
+		}
+	}
+
+	private static class NonStandardFieldProcessor extends PropertyFieldAnnotationProcessor<NonStandardField> {
+		NonStandardFieldProcessor(AnnotationProcessorHelper helper) {
+			super( helper, NonStandardField.class );
+		}
+
+		@Override
+		PropertyMappingFieldOptionsStep<?> initFieldMappingContext(PropertyMappingStep mappingContext,
+				PojoPropertyModel<?> propertyModel, NonStandardField annotation, String fieldName) {
+			return mappingContext.nonStandardField( fieldName );
+		}
+
+		@Override
+		String getName(NonStandardField annotation) {
+			return annotation.name();
+		}
+
+		@Override
+		ValueBridgeRef getValueBridge(NonStandardField annotation) {
+			return null;
+		}
+
+		@Override
+		ValueBinderRef getValueBinder(NonStandardField annotation) {
+			return annotation.valueBinder();
+		}
+
+		@Override
+		ContainerExtraction getExtraction(NonStandardField annotation) {
 			return annotation.extraction();
 		}
 	}

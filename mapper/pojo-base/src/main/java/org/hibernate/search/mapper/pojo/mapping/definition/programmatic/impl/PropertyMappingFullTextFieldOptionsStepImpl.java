@@ -8,14 +8,13 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.TermVector;
-import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFullTextFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
 
 class PropertyMappingFullTextFieldOptionsStepImpl
-		extends AbstractPropertyMappingFieldOptionsStep<PropertyMappingFullTextFieldOptionsStep>
+		extends AbstractPropertyMappingStandardFieldOptionsStep<PropertyMappingFullTextFieldOptionsStep>
 		implements PropertyMappingFullTextFieldOptionsStep {
 
 	PropertyMappingFullTextFieldOptionsStepImpl(PropertyMappingStep parent, String relativeFieldName) {

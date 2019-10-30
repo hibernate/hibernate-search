@@ -11,18 +11,19 @@ import java.lang.annotation.Annotation;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationDefaultValues;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStandardFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingNonFullTextFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
-abstract class PropertyNotFullTextFieldAnnotationProcessor<A extends Annotation> extends PropertyFieldAnnotationProcessor<A> {
+abstract class PropertyNotFullTextFieldAnnotationProcessor<A extends Annotation> extends
+		PropertyStandardFieldAnnotationProcessor<A> {
 	PropertyNotFullTextFieldAnnotationProcessor(AnnotationProcessorHelper helper, Class<A> annotationType) {
 		super( helper, annotationType );
 	}
 
 	@Override
-	final PropertyMappingFieldOptionsStep<?> initFieldMappingContext(PropertyMappingStep mappingContext,
+	final PropertyMappingStandardFieldOptionsStep<?> initStandardFieldMappingContext(PropertyMappingStep mappingContext,
 			PojoPropertyModel<?> propertyModel, A annotation, String fieldName) {
 		PropertyMappingNonFullTextFieldOptionsStep<?> fieldContext = initSortableFieldMappingContext(
 				mappingContext, propertyModel, annotation, fieldName

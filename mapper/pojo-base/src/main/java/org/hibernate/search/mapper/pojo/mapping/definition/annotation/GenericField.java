@@ -24,7 +24,7 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerEx
 /**
  * Maps an entity property to a field in the index.
  * <p>
- * This is a generic annotation that will work for any type of field supported by the backend:
+ * This is a generic annotation that will work for any standard field type supported by the backend:
  * {@link String}, {@link Integer}, {@link java.time.LocalDate}, ...
  * <p>
  * Note that this annotation, being generic, does not offer configuration options

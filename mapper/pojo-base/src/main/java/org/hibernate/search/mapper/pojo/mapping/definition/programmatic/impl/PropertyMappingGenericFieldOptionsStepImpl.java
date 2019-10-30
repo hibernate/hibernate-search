@@ -11,7 +11,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
 class PropertyMappingGenericFieldOptionsStepImpl
-		extends AbstractPropertyMappingNonFullTextFieldOptionsStep<PropertyMappingGenericFieldOptionsStep>
+		extends AbstractPropertyMappingNonFullTextStandardFieldOptionsStep<PropertyMappingGenericFieldOptionsStep>
 		implements PropertyMappingGenericFieldOptionsStep {
 
 	PropertyMappingGenericFieldOptionsStepImpl(PropertyMappingStep parent, String relativeFieldName) {

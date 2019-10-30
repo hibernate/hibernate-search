@@ -439,4 +439,14 @@ public interface Log extends BasicLogger {
 	SearchException invalidFieldEncodingForStandardFieldMapping(IndexFieldTypeOptionsStep<?, ?> step,
 			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
 
+	@Message(id = ID_OFFSET_2 + 66,
+			value = "This property's mapping expects a non-standard type for the index field,"
+					+ " but the assigned value bridge or value binder declares a standard type."
+					+ " Switch to a standard field annotation such as @GenericField."
+					+ " Details: encountered type DSL step '%1$s',"
+					+ " which does extend the '%2$s' interface."
+	)
+	SearchException invalidFieldEncodingForNonStandardFieldMapping(IndexFieldTypeOptionsStep<?, ?> step,
+			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
+
 }

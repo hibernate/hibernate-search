@@ -19,4 +19,6 @@ public interface FieldModelContributorContext {
 	StringIndexFieldTypeOptionsStep<?> getStringTypeOptionsStep();
 
 	ScaledNumberIndexFieldTypeOptionsStep<?, ?> getScaledNumberTypeOptionsStep();
+
+	void checkNonStandardTypeOptionsStep();
 }

@@ -11,7 +11,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
 class PropertyMappingScaledNumberFieldOptionsStepImpl
-		extends AbstractPropertyMappingNonFullTextFieldOptionsStep<PropertyMappingScaledNumberFieldOptionsStep>
+		extends AbstractPropertyMappingNonFullTextStandardFieldOptionsStep<PropertyMappingScaledNumberFieldOptionsStep>
 		implements PropertyMappingScaledNumberFieldOptionsStep {
 
 	PropertyMappingScaledNumberFieldOptionsStepImpl(PropertyMappingStep parent, String relativeFieldName) {
