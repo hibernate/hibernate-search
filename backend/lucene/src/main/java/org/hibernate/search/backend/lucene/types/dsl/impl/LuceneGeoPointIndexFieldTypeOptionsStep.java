@@ -40,12 +40,9 @@ class LuceneGeoPointIndexFieldTypeOptionsStep
 		boolean resolvedSearchable = resolveDefault( searchable );
 		boolean resolvedAggregable = resolveDefault( aggregable );
 
-		DslConverter<?, ? extends GeoPoint> dslConverter =
-				createDslConverter();
-		ProjectionConverter<? super GeoPoint, ?> projectionConverter =
-				createProjectionConverter();
-		ProjectionConverter<? super GeoPoint, GeoPoint> rawProjectionConverter =
-				createRawProjectionConverter();
+		DslConverter<?, ? extends GeoPoint> dslConverter = createDslConverter();
+		ProjectionConverter<? super GeoPoint, ?> projectionConverter = createProjectionConverter();
+		ProjectionConverter<? super GeoPoint, GeoPoint> rawProjectionConverter = createRawProjectionConverter();
 		LuceneGeoPointFieldCodec codec = new LuceneGeoPointFieldCodec(
 				resolvedProjectable, resolvedSearchable, resolvedSortable, indexNullAsValue
 		);

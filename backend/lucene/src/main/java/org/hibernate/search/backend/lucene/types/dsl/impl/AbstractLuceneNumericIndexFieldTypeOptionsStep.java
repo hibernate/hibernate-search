@@ -38,14 +38,10 @@ abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends Abstract
 		boolean resolvedSearchable = resolveDefault( searchable );
 		boolean resolvedAggregable = resolveDefault( aggregable );
 
-		DslConverter<?, ? extends F> dslToIndexConverter =
-				createDslConverter();
-		DslConverter<F, ? extends F> rawDslToIndexConverter =
-				createRawDslConverter();
-		ProjectionConverter<? super F, ?> indexToProjectionConverter =
-				createProjectionConverter();
-		ProjectionConverter<? super F, F> rawIndexToProjectionConverter =
-				createRawProjectionConverter();
+		DslConverter<?, ? extends F> dslToIndexConverter = createDslConverter();
+		DslConverter<F, ? extends F> rawDslToIndexConverter = createRawDslConverter();
+		ProjectionConverter<? super F, ?> indexToProjectionConverter = createProjectionConverter();
+		ProjectionConverter<? super F, F> rawIndexToProjectionConverter = createRawProjectionConverter();
 		AbstractLuceneNumericFieldCodec<F, ?> codec = createCodec(
 				resolvedProjectable,
 				resolvedSearchable,

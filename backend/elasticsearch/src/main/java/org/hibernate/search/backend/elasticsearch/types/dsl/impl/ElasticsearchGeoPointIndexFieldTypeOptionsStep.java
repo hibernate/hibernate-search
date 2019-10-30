@@ -33,12 +33,9 @@ class ElasticsearchGeoPointIndexFieldTypeOptionsStep
 		// We need doc values for the projection script when not sorting on the same field
 		mapping.setDocValues( resolvedSortable || resolvedProjectable );
 
-		DslConverter<?, ? extends GeoPoint> dslConverter =
-				createDslConverter();
-		ProjectionConverter<? super GeoPoint, ?> projectionConverter =
-				createProjectionConverter();
-		ProjectionConverter<? super GeoPoint, GeoPoint> rawProjectionConverter =
-				createRawProjectionConverter();
+		DslConverter<?, ? extends GeoPoint> dslConverter = createDslConverter();
+		ProjectionConverter<? super GeoPoint, ?> projectionConverter = createProjectionConverter();
+		ProjectionConverter<? super GeoPoint, GeoPoint> rawProjectionConverter = createRawProjectionConverter();
 
 		return new ElasticsearchIndexFieldType<>(
 				codec,

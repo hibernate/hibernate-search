@@ -165,14 +165,10 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 			mapping.setNullValue( new JsonPrimitive( indexNullAs ) );
 		}
 
-		DslConverter<?, ? extends String> dslConverter =
-				createDslConverter();
-		DslConverter<String, ? extends String> rawDslConverter =
-				createRawDslConverter();
-		ProjectionConverter<? super String, ?> projectionConverter =
-				createProjectionConverter();
-		ProjectionConverter<? super String, String> rawProjectionConverter =
-				createRawProjectionConverter();
+		DslConverter<?, ? extends String> dslConverter = createDslConverter();
+		DslConverter<String, ? extends String> rawDslConverter = createRawDslConverter();
+		ProjectionConverter<? super String, ?> projectionConverter = createProjectionConverter();
+		ProjectionConverter<? super String, String> rawProjectionConverter = createRawProjectionConverter();
 		ElasticsearchStringFieldCodec codec = ElasticsearchStringFieldCodec.INSTANCE;
 
 		return new ElasticsearchIndexFieldType<>(

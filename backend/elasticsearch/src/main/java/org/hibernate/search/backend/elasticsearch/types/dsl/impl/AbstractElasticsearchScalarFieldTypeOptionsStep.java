@@ -29,14 +29,10 @@ abstract class AbstractElasticsearchScalarFieldTypeOptionsStep<S extends Abstrac
 	protected final ElasticsearchIndexFieldType<F> toIndexFieldType(PropertyMapping mapping) {
 		ElasticsearchFieldCodec<F> codec = complete( mapping );
 
-		DslConverter<?, ? extends F> dslConverter =
-				createDslConverter();
-		DslConverter<F, ? extends F> rawDslConverter =
-				createRawDslConverter();
-		ProjectionConverter<? super F, ?> projectionConverter =
-				createProjectionConverter();
-		ProjectionConverter<? super F, F> rawProjectionConverter =
-				createRawProjectionConverter();
+		DslConverter<?, ? extends F> dslConverter = createDslConverter();
+		DslConverter<F, ? extends F> rawDslConverter = createRawDslConverter();
+		ProjectionConverter<? super F, ?> projectionConverter = createProjectionConverter();
+		ProjectionConverter<? super F, F> rawProjectionConverter = createRawProjectionConverter();
 
 		return new ElasticsearchIndexFieldType<>(
 				codec,

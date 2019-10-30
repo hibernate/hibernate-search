@@ -43,14 +43,10 @@ class ElasticsearchNativeIndexFieldTypeOptionsStepImpl
 		Gson gson = getBuildContext().getUserFacingGson();
 		PropertyMapping mapping = gson.fromJson( mappingJsonString, PropertyMapping.class );
 
-		DslConverter<?, ? extends String> dslConverter =
-				createDslConverter();
-		DslConverter<String, ? extends String> rawDslConverter =
-				createRawDslConverter();
-		ProjectionConverter<? super String, ?> projectionConverter =
-				createProjectionConverter();
-		ProjectionConverter<? super String, String> rawProjectionConverter =
-				createRawProjectionConverter();
+		DslConverter<?, ? extends String> dslConverter = createDslConverter();
+		DslConverter<String, ? extends String> rawDslConverter = createRawDslConverter();
+		ProjectionConverter<? super String, ?> projectionConverter = createProjectionConverter();
+		ProjectionConverter<? super String, String> rawProjectionConverter = createRawProjectionConverter();
 		ElasticsearchJsonStringFieldCodec codec = new ElasticsearchJsonStringFieldCodec( gson );
 
 		return new ElasticsearchIndexFieldType<>(
