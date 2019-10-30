@@ -509,7 +509,7 @@ stage('Non-default environments') {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install \
 							-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
-							${toMavenElasticsearchProfileArg(buildEnv.mavenProfile)} \
+							${toElasticsearchVersionArgs(buildEnv.mavenProfile, null)} \
 					"""
 				}
 			}
@@ -544,10 +544,9 @@ stage('Non-default environments') {
 								mavenNonDefaultBuild buildEnv, """ \
 									clean install \
 									-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
-									${toMavenElasticsearchProfileArg(buildEnv.mavenProfile)} \
+									${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
 									-Dtest.elasticsearch.host.provided=true \
 									-Dtest.elasticsearch.host.url=$buildEnv.endpointUrl \
-									-Dtest.elasticsearch.host.version=$buildEnv.version \
 									-Dtest.elasticsearch.host.aws.signing.enabled=true \
 									-Dtest.elasticsearch.host.aws.signing.access_key=$AWS_ACCESS_KEY_ID \
 									-Dtest.elasticsearch.host.aws.signing.secret_key=$AWS_SECRET_ACCESS_KEY \
@@ -805,9 +804,14 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args) {
 	"""
 }
 
-String toMavenElasticsearchProfileArg(String mavenEsProfile) {
+String toElasticsearchVersionArgs(String mavenEsProfile, String version) {
 	String defaultEsProfile = environments.content.esLocal.default.mavenProfile
-	if (mavenEsProfile != defaultEsProfile) {
+	if ( version ) {
+		// The default profile is disabled, because a version is passed explicitly
+		// We just need to set the correct profile and pass the version
+		"-P$mavenEsProfile -Dtest.elasticsearch.host.version=$version"
+	}
+	else if ( mavenEsProfile != defaultEsProfile) {
 		// Disable the default profile to avoid conflicting configurations
 		"-P!$defaultEsProfile,$mavenEsProfile"
 	}
