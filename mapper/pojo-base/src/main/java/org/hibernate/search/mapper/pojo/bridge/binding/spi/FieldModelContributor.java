@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.binding.spi;
 
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-
 public interface FieldModelContributor {
 
-	void contribute(StandardIndexFieldTypeOptionsStep<?, ?> fieldTypeContext, FieldModelContributorBridgeContext bridgeContext);
+	void contribute(FieldModelContributorContext context);
 
 }

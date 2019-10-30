@@ -325,7 +325,8 @@ public class KeywordFieldIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".notString" )
 						.failure(
-								"This property is mapped to a keyword field, but with a value bridge that binds to a non-String or otherwise incompatible field",
+								"This property's mapping expects a standard String type for the index field",
+								"but the assigned value bridge or value binder declares a non-standard or non-String type",
 								"encountered type DSL step '",
 								"expected '" + StringIndexFieldTypeOptionsStep.class.getName() + "'"
 						)
@@ -361,7 +362,8 @@ public class KeywordFieldIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".wrap" )
 						.failure(
-								"This property is mapped to a keyword field, but with a value bridge that binds to a non-String or otherwise incompatible field",
+								"This property's mapping expects a standard String type for the index field",
+								"but the assigned value bridge or value binder declares a non-standard or non-String type",
 								"encountered type DSL step '",
 								"expected '" + StringIndexFieldTypeOptionsStep.class.getName() + "'"
 						)
@@ -397,7 +399,8 @@ public class KeywordFieldIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.pathContext( ".wrap" )
 						.failure(
-								"This property is mapped to a keyword field, but with a value bridge that binds to a non-String or otherwise incompatible field",
+								"This property's mapping expects a standard String type for the index field",
+								"but the assigned value bridge or value binder declares a non-standard or non-String type",
 								"encountered type DSL step '",
 								"expected '" + StringIndexFieldTypeOptionsStep.class.getName() + "'"
 						)

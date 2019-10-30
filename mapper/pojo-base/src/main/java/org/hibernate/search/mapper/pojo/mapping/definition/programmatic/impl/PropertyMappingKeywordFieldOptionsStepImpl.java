@@ -6,25 +6,18 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import java.lang.invoke.MethodHandles;
-
 import org.hibernate.search.engine.backend.types.Norms;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingKeywordFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
 class PropertyMappingKeywordFieldOptionsStepImpl
-		extends AbstractPropertyMappingNonFullTextFieldOptionsStep<PropertyMappingKeywordFieldOptionsStep, StringIndexFieldTypeOptionsStep<?>>
+		extends AbstractPropertyMappingNonFullTextFieldOptionsStep<PropertyMappingKeywordFieldOptionsStep>
 		implements PropertyMappingKeywordFieldOptionsStep {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
 	PropertyMappingKeywordFieldOptionsStepImpl(PropertyMappingStep parent, String relativeFieldName) {
-		super( parent, relativeFieldName, PropertyMappingKeywordFieldOptionsStepImpl::castIndexFieldTypeOptionsStep );
+		super( parent, relativeFieldName, FieldModelContributorContext::getStringTypeOptionsStep );
 	}
 
 	@Override
@@ -34,26 +27,14 @@ class PropertyMappingKeywordFieldOptionsStepImpl
 
 	@Override
 	public PropertyMappingKeywordFieldOptionsStep normalizer(String normalizerName) {
-		fieldModelContributor.add( (c, b) -> c.normalizer( normalizerName ) );
+		fieldModelContributor.add( c -> c.getStringTypeOptionsStep().normalizer( normalizerName ) );
 		return thisAsS();
 	}
 
 	@Override
 	public PropertyMappingKeywordFieldOptionsStep norms(Norms norms) {
-		fieldModelContributor.add( (c, b) -> c.norms( norms ) );
+		fieldModelContributor.add( c -> c.getStringTypeOptionsStep().norms( norms ) );
 		return thisAsS();
-	}
-
-	private static StringIndexFieldTypeOptionsStep<?> castIndexFieldTypeOptionsStep(
-			StandardIndexFieldTypeOptionsStep<?,?> optionsStep) {
-		if ( optionsStep instanceof StringIndexFieldTypeOptionsStep ) {
-			return (StringIndexFieldTypeOptionsStep<?>) optionsStep;
-		}
-		else {
-			throw log.invalidFieldEncodingForKeywordFieldMapping(
-					optionsStep, StringIndexFieldTypeOptionsStep.class
-			);
-		}
 	}
 
 }

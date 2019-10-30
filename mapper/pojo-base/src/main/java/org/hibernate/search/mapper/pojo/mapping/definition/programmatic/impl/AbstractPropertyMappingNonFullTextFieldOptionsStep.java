@@ -6,35 +6,32 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import java.util.function.Function;
-
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingNonFullTextFieldOptionsStep;
 
 
 abstract class AbstractPropertyMappingNonFullTextFieldOptionsStep<
-				S extends PropertyMappingNonFullTextFieldOptionsStep<?>,
-				C extends StandardIndexFieldTypeOptionsStep<?, ?>
+				S extends PropertyMappingNonFullTextFieldOptionsStep<?>
 		>
-		extends AbstractPropertyMappingFieldOptionsStep<S, C>
+		extends AbstractPropertyMappingFieldOptionsStep<S>
 		implements PropertyMappingNonFullTextFieldOptionsStep<S> {
 
 	AbstractPropertyMappingNonFullTextFieldOptionsStep(PropertyMappingStep parent, String relativeFieldName,
-			Function<StandardIndexFieldTypeOptionsStep<?, ?>, C> typeOptionsStepCaster) {
-		super( parent, relativeFieldName, typeOptionsStepCaster );
+			FieldModelContributor fieldTypeChecker) {
+		super( parent, relativeFieldName, fieldTypeChecker );
 	}
 
 	@Override
 	public S sortable(Sortable sortable) {
-		fieldModelContributor.add( (c, b) -> c.sortable( sortable ) );
+		fieldModelContributor.add( c -> c.getStandardTypeOptionsStep().sortable( sortable ) );
 		return thisAsS();
 	}
 
 	@Override
 	public S indexNullAs(String indexNullAs) {
-		fieldModelContributor.add( (c, b) -> b.indexNullAs( indexNullAs ) );
+		fieldModelContributor.add( c -> c.indexNullAs( indexNullAs ) );
 		return thisAsS();
 	}
 }
