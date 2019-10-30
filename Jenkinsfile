@@ -423,7 +423,7 @@ stage('Non-default environments') {
 				helper.withMavenWorkspace {
 					mavenNonDefaultBuild buildEnv, """ \
 							clean install -pl org.hibernate:hibernate-search-integrationtest-elasticsearch \
-							${toMavenElasticsearchProfileArg(buildEnv.mavenProfile)} \
+							${toElasticsearchVersionArgs(buildEnv.mavenProfile, null)} \
 							${buildEnv.version ? "-Dtest.elasticsearch.host.version=$buildEnv.version" : ''} \
 					"""
 				}
@@ -458,7 +458,7 @@ stage('Non-default environments') {
 							retry(count: 3) {
 								mavenNonDefaultBuild buildEnv, """ \
 									clean install -pl org.hibernate:hibernate-search-integrationtest-elasticsearch \
-									${toMavenElasticsearchProfileArg(buildEnv.mavenProfile)} \
+									${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
 									-Dtest.elasticsearch.host.provided=true \
 									-Dtest.elasticsearch.host.url=$buildEnv.endpointUrl \
 									-Dtest.elasticsearch.host.aws.signing.enabled=true \
@@ -713,9 +713,14 @@ void mavenNonDefaultBuild(BuildEnvironment buildEnv, String args) {
 	"""
 }
 
-String toMavenElasticsearchProfileArg(String mavenEsProfile) {
+String toElasticsearchVersionArgs(String mavenEsProfile, String version) {
 	String defaultEsProfile = environments.content.esLocal.default.mavenProfile
-	if (mavenEsProfile != defaultEsProfile) {
+	if ( version ) {
+		// The default profile is disabled, because a version is passed explicitly
+		// We just need to set the correct profile and pass the version
+		"-P$mavenEsProfile -Dtest.elasticsearch.host.version=$version"
+	}
+	else if ( mavenEsProfile != defaultEsProfile) {
 		// Disable the default profile to avoid conflicting configurations
 		"-P!$defaultEsProfile,$mavenEsProfile"
 	}
