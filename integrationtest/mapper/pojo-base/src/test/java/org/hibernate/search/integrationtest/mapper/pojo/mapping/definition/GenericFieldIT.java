@@ -12,11 +12,22 @@ import java.time.LocalDate;
 
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
+import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendExtension;
+import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -123,4 +134,128 @@ public class GenericFieldIT {
 		setupHelper.start().setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
 	}
+
+
+	@Test
+	public void customBridge_implicitFieldType() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			WrappedValue wrap;
+
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+
+			@GenericField(valueBridge = @ValueBridgeRef(type = ValidTypeBridge.class))
+			public WrappedValue getWrap() {
+				return wrap;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "wrap", String.class )
+		);
+		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void customBridge_explicitFieldType() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			WrappedValue wrap;
+
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+
+			@GenericField(valueBinder = @ValueBinderRef(type = ValidTypeBridge.ExplicitFieldTypeBinder.class))
+			public WrappedValue getWrap() {
+				return wrap;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> b
+				.field( "wrap", String.class )
+		);
+		setupHelper.start().setup( IndexedEntity.class );
+		backendMock.verifyExpectationsMet();
+	}
+
+
+	@Test
+	public void customBridge_explicitFieldType_invalid() {
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			WrappedValue wrap;
+
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+
+			@GenericField(valueBinder = @ValueBinderRef(type = InvalidTypeBridge.ExplicitFieldTypeBinder.class))
+			public WrappedValue getWrap() {
+				return wrap;
+			}
+		}
+
+		SubTest.expectException(
+				() -> setupHelper.start().setup( IndexedEntity.class )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.typeContext( IndexedEntity.class.getName() )
+						.pathContext( ".wrap" )
+						.failure(
+								"This property's mapping expects a standard type for the index field",
+								"but the assigned value bridge or value binder declares a non-standard type",
+								"encountered type DSL step '",
+								"expected '" + StandardIndexFieldTypeOptionsStep.class.getName() + "'"
+						)
+						.build()
+				);
+	}
+
+	public static class ValidTypeBridge implements ValueBridge<WrappedValue, String> {
+		@Override
+		public String toIndexedValue(WrappedValue value, ValueBridgeToIndexedValueContext context) {
+			return value == null ? null : value.wrapped;
+		}
+
+		public static class ExplicitFieldTypeBinder implements ValueBinder {
+			@Override
+			public void bind(ValueBindingContext<?> context) {
+				context.setBridge( WrappedValue.class, new ValidTypeBridge(), context.getTypeFactory().asString() );
+			}
+		}
+	}
+
+	public static class InvalidTypeBridge implements ValueBridge<WrappedValue, Integer> {
+		@Override
+		public Integer toIndexedValue(WrappedValue value, ValueBridgeToIndexedValueContext context) {
+			throw new UnsupportedOperationException( "Should not be called" );
+		}
+
+		public static class ExplicitFieldTypeBinder implements ValueBinder {
+			@Override
+			public void bind(ValueBindingContext<?> context) {
+				context.setBridge(
+						WrappedValue.class, new InvalidTypeBridge(),
+						context.getTypeFactory().extension( StubBackendExtension.get() ).asNonStandard( Integer.class )
+				);
+			}
+		}
+	}
+
+	private static class WrappedValue {
+		private String wrapped;
+	}
+
 }
