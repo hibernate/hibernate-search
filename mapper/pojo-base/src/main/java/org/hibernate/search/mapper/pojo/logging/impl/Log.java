@@ -13,7 +13,7 @@ import java.util.Collection;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.logging.spi.OptionalEmptyAsDefaultFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
@@ -261,7 +261,7 @@ public interface Log extends BasicLogger {
 					+ " Details: encountered type DSL step '%1$s',"
 					+ " which does not extend the expected '%2$s' interface."
 	)
-	SearchException invalidFieldEncodingForStringFieldMapping(StandardIndexFieldTypeOptionsStep<?, ?> context,
+	SearchException invalidFieldEncodingForStringFieldMapping(IndexFieldTypeOptionsStep<?, ?> step,
 			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
 
 	@Message(id = ID_OFFSET_2 + 34, value = "Could not find a property with the '%1$s' marker for field '%2$s' (marker set: '%3$s').")
@@ -351,7 +351,7 @@ public interface Log extends BasicLogger {
 					+ " Details: encountered type DSL step '%1$s',"
 					+ " which does not extend the expected '%2$s' interface."
 	)
-	SearchException invalidFieldEncodingForScaledNumberFieldMapping(StandardIndexFieldTypeOptionsStep<?, ?> context,
+	SearchException invalidFieldEncodingForScaledNumberFieldMapping(IndexFieldTypeOptionsStep<?, ?> step,
 			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
 
 	@Message(id = ID_OFFSET_2 + 52,
@@ -428,5 +428,15 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 64, value = "Multiple entity names assigned to the same type: '%1$s', '%2$s'.")
 	SearchException multipleEntityNames(String entityName, String otherEntityName);
+
+	@Message(id = ID_OFFSET_2 + 65,
+			value = "This property's mapping expects a standard type for the index field,"
+					+ " but the assigned value bridge or value binder declares a non-standard type."
+					+ " Make sure to use a compatible bridge or binder."
+					+ " Details: encountered type DSL step '%1$s',"
+					+ " which does not extend the expected '%2$s' interface."
+	)
+	SearchException invalidFieldEncodingForStandardFieldMapping(IndexFieldTypeOptionsStep<?, ?> step,
+			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
 
 }

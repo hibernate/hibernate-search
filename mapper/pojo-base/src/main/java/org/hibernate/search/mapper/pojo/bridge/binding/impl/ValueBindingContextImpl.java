@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
@@ -75,13 +75,13 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 
 	@Override
 	public <V2, F> void setBridge(Class<V2> expectedValueType, ValueBridge<V2, F> bridge,
-			StandardIndexFieldTypeOptionsStep<?, F> fieldTypeOptionsStep) {
+			IndexFieldTypeOptionsStep<?, F> fieldTypeOptionsStep) {
 		setBridge( expectedValueType, BeanHolder.of( bridge ), fieldTypeOptionsStep );
 	}
 
 	@Override
 	public <V2, F> void setBridge(Class<V2> expectedValueType, BeanHolder<? extends ValueBridge<V2, F>> bridgeHolder,
-			StandardIndexFieldTypeOptionsStep<?, F> fieldTypeOptionsStep) {
+			IndexFieldTypeOptionsStep<?, F> fieldTypeOptionsStep) {
 		try {
 			// TODO HSEARCH-3243 perform more precise checks, we're just comparing raw types here and we might miss some type errors
 			if ( !valueTypeModel.getRawType().isSubTypeOf( expectedValueType ) ) {
@@ -144,7 +144,7 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 	}
 
 	private <V2, F> IndexFieldReference<F> createFieldReference(Class<V2> expectedValueType,
-			ValueBridge<V2, F> bridge, StandardIndexFieldTypeOptionsStep<?, F> fieldTypeOptionsStep) {
+			ValueBridge<V2, F> bridge, IndexFieldTypeOptionsStep<?, F> fieldTypeOptionsStep) {
 		// If the bridge did not contribute anything, infer the field type using reflection on the bridge
 		if ( fieldTypeOptionsStep == null ) {
 			fieldTypeOptionsStep = inferFieldType( bridge );
@@ -174,7 +174,7 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 		return fieldContext.toReference();
 	}
 
-	private <F> StandardIndexFieldTypeOptionsStep<?, F> inferFieldType(ValueBridge<?, F> bridge) {
+	private <F> IndexFieldTypeOptionsStep<?, F> inferFieldType(ValueBridge<?, F> bridge) {
 		GenericTypeContext bridgeTypeContext = new GenericTypeContext( bridge.getClass() );
 		// TODO HSEARCH-3243 We're assuming the field type is raw here, maybe we should enforce it?
 		@SuppressWarnings( "unchecked" ) // We ensure this cast is safe through reflection
