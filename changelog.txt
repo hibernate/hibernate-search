@@ -13,6 +13,7 @@ Hibernate Search Changelog
     * HSEARCH-3725 IllegalStateException thrown by Gson while encoding Elasticsearch requests
     * HSEARCH-3684 @IndexedEmbedded.includePaths includes fields one level too deep in some cases
     * HSEARCH-1108 programmatic API doesn't work correctly for entities with @MappedSuperclass parent
+    * HSEARCH-3740 ValueReadHandle fails to report exceptions if the call to entity.toString() fails
 
 ** Improvement
     * HSEARCH-3741 Expose the index name in IndexFailureContext
