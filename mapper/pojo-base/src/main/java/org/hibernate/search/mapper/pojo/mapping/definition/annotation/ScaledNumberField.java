@@ -100,7 +100,7 @@ public @interface ScaledNumberField {
 	/**
 	 * @return A reference to the value binder to use for this field.
 	 * Must not be set if {@link #valueBridge()} is set.
-	 * @see GenericField#valueBridge()
+	 * @see GenericField#valueBinder()
 	 * @see ValueBinderRef
 	 */
 	ValueBinderRef valueBinder() default @ValueBinderRef;
