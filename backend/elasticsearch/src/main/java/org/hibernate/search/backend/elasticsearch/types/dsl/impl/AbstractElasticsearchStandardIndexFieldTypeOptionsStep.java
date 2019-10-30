@@ -15,7 +15,7 @@ import org.hibernate.search.util.common.AssertionFailure;
 
 
 abstract class AbstractElasticsearchStandardIndexFieldTypeOptionsStep<S extends AbstractElasticsearchStandardIndexFieldTypeOptionsStep<?, F>, F>
-		extends AbstractElasticsearchIndexFieldTypeConverterStep<S, F>
+		extends AbstractElasticsearchIndexFieldTypeOptionsStep<S, F>
 		implements ElasticsearchStandardIndexFieldTypeOptionsStep<S, F> {
 
 	AbstractElasticsearchStandardIndexFieldTypeOptionsStep(ElasticsearchIndexFieldTypeBuildContext buildContext,

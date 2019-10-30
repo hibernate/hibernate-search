@@ -21,7 +21,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
  * @param <F> The type of field values.
  */
 public interface StandardIndexFieldTypeOptionsStep<S extends StandardIndexFieldTypeOptionsStep<?, F>, F>
-		extends IndexFieldTypeConverterStep<S, F>, IndexFieldTypeFinalStep<F> {
+		extends IndexFieldTypeOptionsStep<S, F> {
 
 	/**
 	 * @param projectable Whether projections are enabled for this field.
