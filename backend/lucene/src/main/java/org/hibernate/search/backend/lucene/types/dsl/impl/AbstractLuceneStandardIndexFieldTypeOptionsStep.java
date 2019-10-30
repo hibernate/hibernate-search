@@ -10,51 +10,28 @@ import org.hibernate.search.backend.lucene.types.dsl.LuceneStandardIndexFieldTyp
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
-import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.PassThroughToDocumentFieldValueConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.impl.Contracts;
 
 /**
  * @param <S> The "self" type (the actual exposed type of this step).
  * @param <F> The type of field values.
  */
 abstract class AbstractLuceneStandardIndexFieldTypeOptionsStep<S extends AbstractLuceneStandardIndexFieldTypeOptionsStep<?, F>, F>
+		extends AbstractLuceneIndexFieldTypeOptionsStep<S, F>
 		implements LuceneStandardIndexFieldTypeOptionsStep<S, F> {
 
 	private final LuceneIndexFieldTypeBuildContext buildContext;
-	private final Class<F> fieldType;
 
-	private DslConverter<?, ? extends F> dslConverter;
-	private ProjectionConverter<? super F, ?> projectionConverter;
 	protected Projectable projectable = Projectable.DEFAULT;
 	protected Searchable searchable = Searchable.DEFAULT;
 	protected Aggregable aggregable = Aggregable.DEFAULT;
 	protected F indexNullAsValue = null;
 
 	AbstractLuceneStandardIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext, Class<F> fieldType) {
+		super( fieldType );
 		this.buildContext = buildContext;
-		this.fieldType = fieldType;
-	}
-
-	@Override
-	public <V> S dslConverter(Class<V> valueType, ToDocumentFieldValueConverter<V, ? extends F> toIndexConverter) {
-		Contracts.assertNotNull( toIndexConverter, "toIndexConverter" );
-		this.dslConverter = new DslConverter<>( valueType, toIndexConverter );
-		return thisAsS();
-	}
-
-	@Override
-	public <V> S projectionConverter(Class<V> valueType, FromDocumentFieldValueConverter<? super F, V> fromIndexConverter) {
-		Contracts.assertNotNull( fromIndexConverter, "fromIndexConverter" );
-		this.projectionConverter = new ProjectionConverter<>( valueType, fromIndexConverter );
-		return thisAsS();
 	}
 
 	@Override
@@ -84,26 +61,8 @@ abstract class AbstractLuceneStandardIndexFieldTypeOptionsStep<S extends Abstrac
 	@Override
 	public abstract LuceneIndexFieldType<F> toIndexFieldType();
 
-	protected abstract S thisAsS();
-
 	protected final LuceneIndexFieldTypeBuildContext getBuildContext() {
 		return buildContext;
-	}
-
-	protected final DslConverter<?, ? extends F> createDslConverter() {
-		return dslConverter == null ? createRawDslConverter() : dslConverter;
-	}
-
-	protected final DslConverter<F, ? extends F> createRawDslConverter() {
-		return new DslConverter<>( fieldType, new PassThroughToDocumentFieldValueConverter<>() );
-	}
-
-	protected final ProjectionConverter<? super F, ?> createProjectionConverter() {
-		return projectionConverter == null ? createRawProjectionConverter() : projectionConverter;
-	}
-
-	protected final ProjectionConverter<? super F, F> createRawProjectionConverter() {
-		return new ProjectionConverter<>( fieldType, new PassThroughFromDocumentFieldValueConverter<>() );
 	}
 
 	protected static boolean resolveDefault(Projectable projectable) {

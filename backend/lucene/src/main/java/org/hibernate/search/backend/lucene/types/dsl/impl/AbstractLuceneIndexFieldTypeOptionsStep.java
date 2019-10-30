@@ -4,28 +4,24 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
+package org.hibernate.search.backend.lucene.types.dsl.impl;
 
 import org.hibernate.search.engine.backend.types.converter.FromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.ToDocumentFieldValueConverter;
+import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.PassThroughFromDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.PassThroughToDocumentFieldValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
-import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeConverterStep;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 import org.hibernate.search.util.common.impl.Contracts;
 
-abstract class AbstractElasticsearchIndexFieldTypeConverterStep<S extends AbstractElasticsearchIndexFieldTypeConverterStep<?, F>, F>
-		implements IndexFieldTypeConverterStep<S, F> {
-	private final ElasticsearchIndexFieldTypeBuildContext buildContext;
+abstract class AbstractLuceneIndexFieldTypeOptionsStep<S extends AbstractLuceneIndexFieldTypeOptionsStep<?, F>, F>
+		implements IndexFieldTypeOptionsStep<S, F> {
 	private final Class<F> fieldType;
-
 	private DslConverter<?, ? extends F> dslConverter;
 	private ProjectionConverter<? super F, ?> projectionConverter;
 
-	AbstractElasticsearchIndexFieldTypeConverterStep(ElasticsearchIndexFieldTypeBuildContext buildContext,
-			Class<F> fieldType) {
-		this.buildContext = buildContext;
+	AbstractLuceneIndexFieldTypeOptionsStep(Class<F> fieldType) {
 		this.fieldType = fieldType;
 	}
 
@@ -44,14 +40,6 @@ abstract class AbstractElasticsearchIndexFieldTypeConverterStep<S extends Abstra
 	}
 
 	protected abstract S thisAsS();
-
-	final Class<F> getFieldType() {
-		return fieldType;
-	}
-
-	final ElasticsearchIndexFieldTypeBuildContext getBuildContext() {
-		return buildContext;
-	}
 
 	final DslConverter<?, ? extends F> createDslConverter() {
 		return dslConverter == null ? createRawDslConverter() : dslConverter;

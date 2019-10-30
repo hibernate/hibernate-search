@@ -22,7 +22,7 @@ import com.google.gson.Gson;
 
 
 class ElasticsearchNativeIndexFieldTypeOptionsStepImpl
-		extends AbstractElasticsearchIndexFieldTypeConverterStep<ElasticsearchNativeIndexFieldTypeOptionsStepImpl, String>
+		extends AbstractElasticsearchIndexFieldTypeOptionsStep<ElasticsearchNativeIndexFieldTypeOptionsStepImpl, String>
 		implements ElasticsearchNativeIndexFieldTypeOptionsStep<ElasticsearchNativeIndexFieldTypeOptionsStepImpl> {
 
 	private final String mappingJsonString;
