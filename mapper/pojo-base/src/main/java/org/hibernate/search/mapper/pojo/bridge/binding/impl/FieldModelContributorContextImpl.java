@@ -75,4 +75,13 @@ final class FieldModelContributorContextImpl<F> implements FieldModelContributor
 			);
 		}
 	}
+
+	@Override
+	public void checkNonStandardTypeOptionsStep() {
+		if ( fieldTypeOptionsStep instanceof StandardIndexFieldTypeOptionsStep ) {
+			throw log.invalidFieldEncodingForNonStandardFieldMapping(
+					fieldTypeOptionsStep, StandardIndexFieldTypeOptionsStep.class
+			);
+		}
+	}
 }

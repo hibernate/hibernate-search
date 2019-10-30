@@ -11,6 +11,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBind
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.AssociationInverseSideOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.IndexingDependencyOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingDocumentIdOptionsStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFullTextFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingGenericFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingIndexedEmbeddedStep;
@@ -87,6 +88,16 @@ class DelegatingPropertyMappingStep implements PropertyMappingStep {
 	@Override
 	public PropertyMappingScaledNumberFieldOptionsStep scaledNumberField(String relativeFieldName) {
 		return delegate.scaledNumberField( relativeFieldName );
+	}
+
+	@Override
+	public PropertyMappingFieldOptionsStep<?> nonStandardField() {
+		return delegate.nonStandardField();
+	}
+
+	@Override
+	public PropertyMappingFieldOptionsStep<?> nonStandardField(String relativeFieldName) {
+		return delegate.nonStandardField( relativeFieldName );
 	}
 
 	@Override

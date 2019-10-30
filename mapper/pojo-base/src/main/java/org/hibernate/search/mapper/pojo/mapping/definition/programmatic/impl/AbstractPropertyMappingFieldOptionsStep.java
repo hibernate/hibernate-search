@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import org.hibernate.search.engine.backend.types.Aggregable;
-import org.hibernate.search.engine.backend.types.Searchable;
-import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
@@ -21,22 +18,17 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorPropertyNode;
 
-
 abstract class AbstractPropertyMappingFieldOptionsStep<S extends PropertyMappingFieldOptionsStep<?>>
 		extends DelegatingPropertyMappingStep
 		implements PojoPropertyMetadataContributor, PropertyMappingFieldOptionsStep<S> {
-
-	private final String relativeFieldName;
-
+	protected final String relativeFieldName;
 	final PojoCompositeFieldModelContributor fieldModelContributor;
-
 	private ValueBinder binder;
-
 	private ContainerExtractorPath extractorPath = ContainerExtractorPath.defaultExtractors();
 
-	AbstractPropertyMappingFieldOptionsStep(PropertyMappingStep parent, String relativeFieldName,
+	AbstractPropertyMappingFieldOptionsStep(PropertyMappingStep delegate, String relativeFieldName,
 			FieldModelContributor fieldTypeChecker) {
-		super( parent );
+		super( delegate );
 		this.relativeFieldName = relativeFieldName;
 		this.fieldModelContributor = new PojoCompositeFieldModelContributor();
 		// The very first field contributor will just check that the field type is appropriate.
@@ -53,26 +45,6 @@ abstract class AbstractPropertyMappingFieldOptionsStep<S extends PropertyMapping
 	public void contributeMapping(PojoMappingCollectorPropertyNode collector) {
 		collector.value( extractorPath )
 				.valueBinder( binder, relativeFieldName, fieldModelContributor );
-	}
-
-	abstract S thisAsS();
-
-	@Override
-	public S projectable(Projectable projectable) {
-		fieldModelContributor.add( c -> c.getStandardTypeOptionsStep().projectable( projectable ) );
-		return thisAsS();
-	}
-
-	@Override
-	public S searchable(Searchable searchable) {
-		fieldModelContributor.add( c -> c.getStandardTypeOptionsStep().searchable( searchable ) );
-		return thisAsS();
-	}
-
-	@Override
-	public S aggregable(Aggregable aggregable) {
-		fieldModelContributor.add( c -> c.getStandardTypeOptionsStep().aggregable( aggregable ) );
-		return thisAsS();
 	}
 
 	@Override
@@ -96,4 +68,6 @@ abstract class AbstractPropertyMappingFieldOptionsStep<S extends PropertyMapping
 		this.extractorPath = extractorPath;
 		return thisAsS();
 	}
+
+	abstract S thisAsS();
 }

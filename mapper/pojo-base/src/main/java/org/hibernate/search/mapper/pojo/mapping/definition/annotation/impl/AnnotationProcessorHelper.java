@@ -215,11 +215,14 @@ class AnnotationProcessorHelper {
 			ValueBridgeRef bridgeReferenceAnnotation,
 			ValueBinderRef binderReferenceAnnotation,
 			PojoPropertyModel<?> annotationHolder) {
-		Optional<BeanReference<? extends ValueBridge>> bridgeReference = toBeanReference(
-				ValueBridge.class,
-				ValueBridgeRef.UndefinedBridgeImplementationType.class,
-				bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
-		);
+		Optional<BeanReference<? extends ValueBridge>> bridgeReference = Optional.empty();
+		if ( bridgeReferenceAnnotation != null ) {
+			bridgeReference = toBeanReference(
+					ValueBridge.class,
+					ValueBridgeRef.UndefinedBridgeImplementationType.class,
+					bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
+			);
+		}
 		Optional<BeanReference<? extends ValueBinder>> binderReference = toBeanReference(
 				ValueBinder.class,
 				ValueBinderRef.UndefinedBinderImplementationType.class,

@@ -17,6 +17,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.NonStandardField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ScaledNumberField;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
@@ -61,7 +62,7 @@ public interface PropertyMappingStep {
 	PropertyMappingStep marker(MarkerBinder<?> binder);
 
 	/**
-	 * Maps the property to a field in the index with the same name as this property.
+	 * Maps the property to a field of standard type in the index with the same name as this property.
 	 * @return A DSL step where the field mapping can be defined in more details,
 	 * or where other elements can be mapped to the property.
 	 * @see GenericField
@@ -69,7 +70,7 @@ public interface PropertyMappingStep {
 	PropertyMappingGenericFieldOptionsStep genericField();
 
 	/**
-	 * Maps the property to a field in the index with a custom name.
+	 * Maps the property to a field of standard type in the index with a custom name.
 	 * @param relativeFieldName The name of the index field.
 	 * @return A DSL step where the field mapping can be defined in more details,
 	 * or where other elements can be mapped to the property.
@@ -131,6 +132,28 @@ public interface PropertyMappingStep {
 	 * @see ScaledNumberField#name()
 	 */
 	PropertyMappingScaledNumberFieldOptionsStep scaledNumberField(String relativeFieldName);
+
+	/**
+	 * Maps the property to a field of non-standard type in the index with the same name as this property.
+	 * <p>
+	 * This is for advanced use cases, when defining a field whose type is only supported in a specific backend.
+	 * @return A DSL step where the field mapping can be defined in more details,
+	 * or where other elements can be mapped to the property.
+	 * @see NonStandardField
+	 */
+	PropertyMappingFieldOptionsStep<?> nonStandardField();
+
+	/**
+	 * Maps the property to a field of non-standard type in the index with a custom name.
+	 * <p>
+	 * This is for advanced use cases, when defining a field whose type is only supported in a specific backend.
+	 * @param relativeFieldName The name of the index field.
+	 * @return A DSL step where the field mapping can be defined in more details,
+	 * or where other elements can be mapped to the property.
+	 * @see NonStandardField
+	 * @see NonStandardField#name()
+	 */
+	PropertyMappingFieldOptionsStep<?> nonStandardField(String relativeFieldName);
 
 	/**
 	 * Maps the property to an object field whose fields are the same as those defined in the property type.

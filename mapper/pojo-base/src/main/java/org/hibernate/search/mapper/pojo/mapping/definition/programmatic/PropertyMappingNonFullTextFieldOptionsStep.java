@@ -16,7 +16,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
  * @param <S> The "self" type (the actual exposed type of this step).
  */
 public interface PropertyMappingNonFullTextFieldOptionsStep<S extends PropertyMappingNonFullTextFieldOptionsStep<?>>
-		extends PropertyMappingFieldOptionsStep<S> {
+		extends PropertyMappingStandardFieldOptionsStep<S> {
 
 	/**
 	 * @param sortable Whether this field should be sortable.
