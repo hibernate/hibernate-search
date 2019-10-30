@@ -25,7 +25,7 @@ import org.hibernate.search.backend.lucene.types.converter.LuceneFieldContributo
 import org.hibernate.search.backend.lucene.types.converter.LuceneFieldValueExtractor;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactory;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
+import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.ScaledNumberIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.StringIndexFieldTypeOptionsStep;
@@ -229,10 +229,10 @@ public class LuceneIndexFieldTypeFactoryImpl
 	}
 
 	@Override
-	public <F> IndexFieldTypeFinalStep<F> asNative(Class<F> indexFieldType,
+	public <F> IndexFieldTypeOptionsStep<?, F> asNative(Class<F> indexFieldType,
 			LuceneFieldContributor<F> fieldContributor,
 			LuceneFieldValueExtractor<F> fieldValueExtractor) {
-		return new LuceneNativeIndexFieldTypeFinalStep<>(
+		return new LuceneNativeIndexFieldTypeOptionsStep<>(
 				indexFieldType, fieldContributor, fieldValueExtractor
 		);
 	}
