@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl;
 
-import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.AssociationInverseSideOptionsStep;
@@ -39,16 +37,6 @@ class DelegatingPropertyMappingStep implements PropertyMappingStep {
 	@Override
 	public PropertyMappingStep property(String propertyName) {
 		return delegate.property( propertyName );
-	}
-
-	@Override
-	public PropertyMappingStep bridge(Class<? extends PropertyBridge> bridgeClass) {
-		return delegate.bridge( bridgeClass );
-	}
-
-	@Override
-	public PropertyMappingStep bridge(BeanReference<? extends PropertyBridge> bridgeReference) {
-		return delegate.bridge( bridgeReference );
 	}
 
 	@Override

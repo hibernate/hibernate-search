@@ -6,25 +6,14 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.mapping.impl;
 
-import java.lang.annotation.Annotation;
-
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
-import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
-import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
@@ -35,9 +24,7 @@ import org.hibernate.search.util.common.reflect.impl.ReflectionUtils;
  * A binder that simply retrieves the bridge as a bean from the bean provider.
  */
 public final class BeanBinder
-		implements TypeBinder<Annotation>, PropertyBinder<Annotation>,
-		RoutingKeyBinder<Annotation>,
-		IdentifierBinder, ValueBinder {
+		implements IdentifierBinder, ValueBinder {
 
 	private final BeanReference<?> beanReference;
 
@@ -51,58 +38,11 @@ public final class BeanBinder
 	}
 
 	@Override
-	public void initialize(Annotation annotation) {
-		throw new AssertionFailure( "This method should not be called on this object." );
-	}
-
-	@Override
-	public void bind(TypeBindingContext context) {
-		BeanHolder<? extends TypeBridge> bridgeHolder = doBuild( context.getBeanResolver(), TypeBridge.class );
-		try {
-			context.setBridge( bridgeHolder );
-		}
-		catch (RuntimeException e) {
-			new SuppressingCloser( e )
-					.push( holder -> holder.get().close(), bridgeHolder )
-					.push( bridgeHolder );
-			throw e;
-		}
-	}
-
-	@Override
-	public void bind(PropertyBindingContext context) {
-		BeanHolder<? extends PropertyBridge> bridgeHolder = doBuild( context.getBeanResolver(), PropertyBridge.class );
-		try {
-			context.setBridge( bridgeHolder );
-		}
-		catch (RuntimeException e) {
-			new SuppressingCloser( e )
-					.push( holder -> holder.get().close(), bridgeHolder )
-					.push( bridgeHolder );
-			throw e;
-		}
-	}
-
-	@Override
 	@SuppressWarnings({"unchecked"})
 	public void bind(IdentifierBindingContext<?> context) {
 		BeanHolder<? extends IdentifierBridge> bridgeHolder = doBuild( context.getBeanResolver(), IdentifierBridge.class );
 		try {
 			doBind( bridgeHolder, context );
-		}
-		catch (RuntimeException e) {
-			new SuppressingCloser( e )
-					.push( holder -> holder.get().close(), bridgeHolder )
-					.push( bridgeHolder );
-			throw e;
-		}
-	}
-
-	@Override
-	public void bind(RoutingKeyBindingContext context) {
-		BeanHolder<? extends RoutingKeyBridge> bridgeHolder = doBuild( context.getBeanResolver(), RoutingKeyBridge.class );
-		try {
-			context.setBridge( bridgeHolder );
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )

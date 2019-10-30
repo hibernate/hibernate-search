@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 
-import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.GeoPointBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
@@ -45,22 +43,6 @@ public interface PropertyMappingStep {
 	 * @see DocumentId
 	 */
 	PropertyMappingDocumentIdOptionsStep documentId();
-
-	/**
-	 * @param bridgeClass The class of the bridge to use.
-	 * @return {@code this}, for method chaining.
-	 * @see PropertyBridge
-	 */
-	PropertyMappingStep bridge(Class<? extends PropertyBridge> bridgeClass);
-
-	/**
-	 * @param bridgeReference A {@link BeanReference} pointing to the bridge to use.
-	 * See the static "ofXXX()" methods of {@link BeanReference} for details about the various type of references
-	 * (by name, by type, ...).
-	 * @return {@code this}, for method chaining.
-	 * @see PropertyBridge
-	 */
-	PropertyMappingStep bridge(BeanReference<? extends PropertyBridge> bridgeReference);
 
 	/**
 	 * @param binder A {@link PropertyBinder} responsible for creating a bridge.
