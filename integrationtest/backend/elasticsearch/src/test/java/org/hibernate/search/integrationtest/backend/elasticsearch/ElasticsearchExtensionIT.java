@@ -30,11 +30,13 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
@@ -288,6 +290,30 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
+	public void predicate_nativeField_withDslConverter_enabled() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.predicate( f -> f.match().field( "nativeField_integer_converted" ).matching( new ValueWrapper<>( "2" ) ) )
+				.toQuery();
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, SECOND_ID )
+				.hasTotalHitCount( 1 );
+	}
+
+	@Test
+	public void predicate_nativeField_withDslConverter_disabled() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.predicate( f -> f.match().field( "nativeField_integer_converted" ).matching( "2", ValueConvert.NO ) )
+				.toQuery();
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, SECOND_ID )
+				.hasTotalHitCount( 1 );
+	}
+
+	@Test
 	public void predicate_nativeField_fromJson() {
 		StubMappingScope scope = indexManager.createScope();
 
@@ -496,6 +522,30 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
+	public void projection_nativeField_withProjectionConverters_enabled() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<ValueWrapper> query = scope.query()
+				.asProjection( f -> f.field( "nativeField_integer_converted", ValueWrapper.class ) )
+				.predicate( f -> f.id().matching( SECOND_ID ) )
+				.toQuery();
+
+		assertThat( query ).hasHitsAnyOrder( new ValueWrapper<>( "2" ) );
+	}
+
+	@Test
+	public void projection_nativeField_withProjectionConverters_disabled() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<String> query = scope.query()
+				.asProjection( f -> f.field( "nativeField_integer_converted", String.class, ValueConvert.NO ) )
+				.predicate( f -> f.id().matching( SECOND_ID ) )
+				.toQuery();
+
+		assertThat( query ).hasHitsAnyOrder( "2" );
+	}
+
+	@Test
 	public void projection_document() throws JSONException {
 		StubMappingScope scope = indexManager.createScope();
 
@@ -639,6 +689,7 @@ public class ElasticsearchExtensionIT {
 		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( SECOND_ID ), document -> {
 			document.addValue( indexMapping.nativeField_integer, "2" );
+			document.addValue( indexMapping.nativeField_integer_converted, "2" );
 			document.addValue( indexMapping.nativeField_unsupportedType, "42" );
 
 			document.addValue( indexMapping.nativeField_sort1, "z" );
@@ -701,6 +752,7 @@ public class ElasticsearchExtensionIT {
 
 	private static class IndexMapping {
 		final IndexFieldReference<String> nativeField_integer;
+		final IndexFieldReference<String> nativeField_integer_converted;
 		final IndexFieldReference<String> nativeField_string;
 		final IndexFieldReference<String> nativeField_geoPoint;
 		final IndexFieldReference<String> nativeField_dateWithColons;
@@ -717,6 +769,14 @@ public class ElasticsearchExtensionIT {
 					"nativeField_integer",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asNative( "{'type': 'integer'}" )
+			)
+					.toReference();
+			nativeField_integer_converted = root.field(
+					"nativeField_integer_converted",
+					f -> f.extension( ElasticsearchExtension.get() )
+							.asNative( "{'type': 'integer'}" )
+							.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
+							.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() )
 			)
 					.toReference();
 			nativeField_string = root.field(
