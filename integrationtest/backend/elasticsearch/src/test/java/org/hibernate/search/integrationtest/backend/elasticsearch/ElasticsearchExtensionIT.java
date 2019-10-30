@@ -276,7 +276,19 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void predicate_fromJson() {
+	public void predicate_nativeField() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.predicate( f -> f.match().field( "nativeField_dateWithColons" ).matching( "'2018:01:12'" ) )
+				.toQuery();
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, FOURTH_ID )
+				.hasTotalHitCount( 1 );
+	}
+
+	@Test
+	public void predicate_nativeField_fromJson() {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -300,17 +312,15 @@ public class ElasticsearchExtensionIT {
 										+ "}"
 								)
 						)
-						// Also test using the standard DSL on a field defined with the extension
-						.should( f.match().field( "nativeField_dateWithColons" ).matching( "'2018:01:12'" ) )
 				)
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID )
-				.hasTotalHitCount( 4 );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
+				.hasTotalHitCount( 3 );
 	}
 
 	@Test
-	public void predicate_fromJson_separatePredicate() {
+	public void predicate_nativeField_fromJson_separatePredicate() {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchPredicate predicate1 = scope.predicate().extension( ElasticsearchExtension.get() )
@@ -330,26 +340,55 @@ public class ElasticsearchExtensionIT {
 						+ "}"
 				)
 				.toPredicate();
-		// Also test using the standard DSL on a field defined with the extension
-		SearchPredicate predicate4 = scope.predicate().match().field( "nativeField_dateWithColons" )
-				.matching( "'2018:01:12'" ).toPredicate();
 		SearchPredicate booleanPredicate = scope.predicate().bool()
 				.should( predicate1 )
 				.should( predicate2 )
 				.should( predicate3 )
-				.should( predicate4 )
 				.toPredicate();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( booleanPredicate )
 				.toQuery();
 		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID )
-				.hasTotalHitCount( 4 );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
+				.hasTotalHitCount( 3 );
 	}
 
 	@Test
-	public void sort_fromJson() {
+	public void sort_nativeField() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.predicate( f -> f.matchAll() )
+				.sort( f -> f.field( "nativeField_sort1" )
+						.then().field( "nativeField_sort2" ).asc()
+						.then().field( "nativeField_sort3" )
+						.then().field( "nativeField_sort4" ).asc().missing().last()
+						.then().field( "nativeField_sort5" ).asc().missing().first()
+				)
+				.toQuery();
+		assertThat( query ).hasDocRefHitsExactOrder(
+				INDEX_NAME,
+				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, EMPTY_ID, FIFTH_ID
+		);
+
+		query = scope.query()
+				.predicate( f -> f.matchAll() )
+				.sort( f -> f.field( "nativeField_sort1" ).desc()
+						.then().field( "nativeField_sort2" ).desc()
+						.then().field( "nativeField_sort3" ).desc()
+						.then().field( "nativeField_sort4" ).desc().missing().last()
+						.then().field( "nativeField_sort5" ).asc().missing().first()
+				)
+				.toQuery();
+		assertThat( query ).hasDocRefHitsExactOrder(
+				INDEX_NAME,
+				FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID
+		);
+	}
+
+	@Test
+	public void sort_nativeField_fromJson() {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -361,9 +400,10 @@ public class ElasticsearchExtensionIT {
 								.fromJson( "{'nativeField_sort2': 'asc'}" )
 						.then().extension( ElasticsearchExtension.get() )
 								.fromJson( "{'nativeField_sort3': 'asc'}" )
-						// Also test using the standard DSL on a field defined with the extension
-						.then().field( "nativeField_sort4" ).asc().missing().last()
-						.then().field( "nativeField_sort5" ).asc().missing().first()
+						.then().extension( ElasticsearchExtension.get() )
+								.fromJson( "{'nativeField_sort4': {'order': 'asc', 'missing': '_last'}}" )
+						.then().extension( ElasticsearchExtension.get() )
+								.fromJson( "{'nativeField_sort5': {'order': 'asc', 'missing': '_first'}}" )
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
@@ -380,8 +420,10 @@ public class ElasticsearchExtensionIT {
 								.fromJson( "{'nativeField_sort2': 'desc'}" )
 						.then().extension( ElasticsearchExtension.get() )
 								.fromJson( "{'nativeField_sort3': 'desc'}" )
-						.then().field( "nativeField_sort4" ).desc().missing().last()
-						.then().field( "nativeField_sort5" ).asc().missing().first()
+						.then().extension( ElasticsearchExtension.get() )
+								.fromJson( "{'nativeField_sort4': {'order': 'desc', 'missing': '_last'}}" )
+						.then().extension( ElasticsearchExtension.get() )
+								.fromJson( "{'nativeField_sort5': {'order': 'asc', 'missing': '_first'}}" )
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
@@ -391,7 +433,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void sort_fromJson_separateSort() {
+	public void sort_nativeField_fromJson_separateSort() {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchSort sort1Asc = scope.sort().extension( ElasticsearchExtension.get() )
@@ -403,10 +445,11 @@ public class ElasticsearchExtensionIT {
 		SearchSort sort3Asc = scope.sort().extension( ElasticsearchExtension.get() )
 				.fromJson( "{'nativeField_sort3': 'asc'}" )
 				.toSort();
-		// Also test using the standard DSL on a field defined with the extension
 		SearchSort sort4Asc = scope.sort()
-				.field( "nativeField_sort4" ).asc().missing().last()
-				.then().field( "nativeField_sort5" ).asc().missing().first()
+				.extension( ElasticsearchExtension.get() )
+						.fromJson( "{'nativeField_sort4': {'order': 'asc', 'missing': '_last'}}" )
+				.then().extension( ElasticsearchExtension.get() )
+						.fromJson( "{'nativeField_sort5': {'order': 'asc', 'missing': '_first'}}" )
 				.toSort();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -426,8 +469,10 @@ public class ElasticsearchExtensionIT {
 				.fromJson( "{'nativeField_sort3': 'desc'}" )
 				.toSort();
 		SearchSort sort4Desc = scope.sort()
-				.field( "nativeField_sort4" ).desc().missing().last()
-				.then().field( "nativeField_sort5" ).asc().missing().first()
+				.extension( ElasticsearchExtension.get() )
+						.fromJson( "{'nativeField_sort4': {'order': 'desc', 'missing': '_last'}}" )
+				.then().extension( ElasticsearchExtension.get() )
+						.fromJson( "{'nativeField_sort5': {'order': 'asc', 'missing': '_first'}}" )
 				.toSort();
 
 		query = scope.query()
@@ -436,6 +481,18 @@ public class ElasticsearchExtensionIT {
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID, FIFTH_ID );
+	}
+
+	@Test
+	public void projection_nativeField() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<String> query = scope.query()
+				.asProjection( f -> f.field( "nativeField_integer", String.class ) )
+				.predicate( f -> f.id().matching( SECOND_ID ) )
+				.toQuery();
+
+		assertThat( query ).hasHitsAnyOrder( "2" );
 	}
 
 	@Test
