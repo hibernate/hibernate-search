@@ -246,7 +246,7 @@ For more details about available attributes,
 see <<mapper-orm-directfieldmapping-annotation-attributes>>.
 
 `@GenericField`::
-A good default choice that will work for every supported property type.
+A good default choice that will work for every property type with built-in support.
 +
 Fields mapped using this annotation do not provide any advanced features such as full-text search:
 matches on a generic field are exact matches.
@@ -297,6 +297,21 @@ Values that are too large to be indexed  will trigger a runtime exception.
 Values that have trailing decimal digits will be rounded to the nearest integer.
 +
 This annotation allows to set <<mapper-orm-directfieldmapping-decimalscale, the decimalScale attribute>>.
+
+`@NonStandardField`::
+An annotation for advanced use cases
+where a <<mapper-orm-bridge-valuebridge-valuebinder,value binder>> is used
+and that binder is expected to define an index field type that does not support
+any of the standard options: `searchable`, `sortable`, ...
++
+This annotation is very useful for cases when a field type native to the backend is necessary:
+<<backend-elasticsearch-field-types-extension,defining the mapping directly as JSON>> for Elasticsearch,
+or <<backend-lucene-field-types-extension,manipulating `IndexableField` directly>> for Lucene.
++
+Fields mapped using this annotation have very limited configuration options from the annotation
+(no `searchable`/`sortable`/etc.),
+but the value binder will be able to pick a non-standard field type,
+which generally gives much more flexibility.
 
 [[mapper-orm-directfieldmapping-annotation-attributes]]
 === Field annotation attributes
