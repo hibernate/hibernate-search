@@ -270,6 +270,7 @@
                         <wildflyUrl>https://wildfly.org/</wildflyUrl>
                         <quarkusUrl>https://quarkus.io/</quarkusUrl>
                         <springUrl>https://spring.io/</springUrl>
+                        <gsonUrl>https://github.com/google/gson</gsonUrl>
                     </attributes>
                 </configuration>
             </plugin>

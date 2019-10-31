@@ -360,6 +360,18 @@ which is supported by the Elasticsearch backend.
 See <<mapper-orm-directfieldmapping-supported-types>> for more information.
 ====
 
+[NOTE]
+====
+Field types that are not in this list can still be used with a little bit more work:
+
+* If a property in the entity model has an unsupported type,
+but can be converted to a supported type, you will need a bridge.
+See <<mapper-orm-bridge>>.
+* If you need an index field with a specific type that is not supported by Hibernate Search,
+you will need a bridge that defines a native field type.
+See <<backend-elasticsearch-field-types-extension>>.
+====
+
 [cols="l,1",options="header"]
 .Field types supported by the Elasticsearch backend
 |====
@@ -420,8 +432,51 @@ The Elasticsearch `date` type does not support the whole range of years that can
 [[backend-elasticsearch-field-types-extension]]
 === Index field type DSL extension
 
-include::todo-placeholder.asciidoc[]
-// TODO HSEARCH-3711 also document "extension" types
+Not all Elasticsearch field types have built-in support in Hibernate Search.
+Unsupported field types can still be used, however,
+by taking advantage of the "native" field type.
+Using this field type, the Elasticsearch "mapping" can be defined as JSON directly,
+giving access to everything Elasticsearch can offer.
+
+Below is an example of how to use the Elasticearch "native" type.
+
+.Using the Elasticearch "native" type
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/type/asnative/IpAddressValueBinder.java[tags=include]
+----
+<1> Define a <<mapper-orm-bridge,custom binder>> and its bridge.
+The "native" type can only be used from a binder,
+it cannot be used directly with annotation mapping.
+Here we're defining a <<mapper-orm-bridge-valuebridge,value binder>>,
+but a <<mapper-orm-bridge-typebridge,type binder>>,
+or a <<mapper-orm-bridge-propertybridge,property binder>>
+would work as well.
+<2> Get the context's type factory.
+<3> Apply the Elasticsearch extension to the type factory.
+<4> Call `asNative` to start defining a native type.
+<5> Pass the Elasticsearch mapping as JSON.
+<6> Values of native fields are represented as strings in Hibernate Search,
+but those strings are expected to be JSON.
+Do not forget to format them correctly before you pass them to the backend.
+Here we're using link:{gsonUrl}[Gson]
+to convert the string to a JSON string,
+escaping characters as appropriate,
+but any JSON library will do.
+<7> Same goes for projections: JSON is passed to the bridge,
+and it should be parsed appropriately.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/type/asnative/CompanyServer.java[tags=include,!getters-setters]
+----
+<1> Map the property to an index field.
+Note that value bridges using a non-standard type (such as Elasticsearch's "native" type)
+must be mapped using the `@NonStandardField` annotation:
+other annotations such as `@GenericField` will fail.
+<2> Instruct Hibernate Search to use our custom value binder.
+====
 
 [[backend-elasticsearch-analysis]]
 == Analysis
