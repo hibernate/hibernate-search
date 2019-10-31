@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.logging.impl;
 
+import static org.jboss.logging.Logger.Level.INFO;
+
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Collection;
@@ -48,6 +50,10 @@ public interface Log extends BasicLogger {
 	// DO NOT ADD ANY NEW MESSAGES HERE
 	// -----------------------------------
 	int ID_OFFSET_1 = MessageConstants.ENGINE_ID_RANGE_MIN;
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET_1 + 34, value = "Hibernate Search {%1$s}")
+	void version(String versionString);
 
 	@Message(id = ID_OFFSET_1 + 242,
 			value = "Hibernate Search failed to initialize component '%1$s' as class '%2$s' doesn't have a public no-arguments constructor")
