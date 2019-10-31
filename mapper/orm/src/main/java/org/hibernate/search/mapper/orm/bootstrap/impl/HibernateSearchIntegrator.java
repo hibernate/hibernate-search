@@ -19,6 +19,7 @@ import org.hibernate.event.service.spi.DuplicationStrategy;
 import org.hibernate.event.service.spi.EventListenerRegistry;
 import org.hibernate.event.spi.EventType;
 import org.hibernate.integrator.spi.Integrator;
+import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
@@ -61,10 +62,13 @@ public class HibernateSearchIntegrator implements Integrator {
 
 	@Override
 	public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
+		Version.logVersion();
+
 		ConfigurationPropertyChecker propertyChecker = ConfigurationPropertyChecker.create();
 		ConfigurationPropertySource propertySource = HibernateOrmIntegrationBooterImpl.getPropertySource(
 				serviceRegistry, propertyChecker
 		);
+
 		if ( ! ENABLED.get( propertySource ) ) {
 			log.debug( "Hibernate Search is disabled through configuration properties." );
 			return;
