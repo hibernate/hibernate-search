@@ -4,16 +4,16 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.documentation.mapper.orm.bridge.propertybridge.parameter;
+package org.hibernate.search.documentation.mapper.orm.bridge.valuebridge.binder;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.math.BigDecimal;
 import java.util.List;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
+import org.hibernate.search.documentation.testsupport.data.ISBN;
 import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
@@ -29,7 +29,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
 @RunWith(Parameterized.class)
-public class PropertyBridgeSimpleIT {
+public class ValueBridgeBinderIT {
 	@Parameterized.Parameters(name = "{0}")
 	public static Object[] backendConfigurations() {
 		return BackendConfigurations.simple().toArray();
@@ -40,7 +40,7 @@ public class PropertyBridgeSimpleIT {
 
 	private EntityManagerFactory entityManagerFactory;
 
-	public PropertyBridgeSimpleIT(BackendConfiguration backendConfiguration) {
+	public ValueBridgeBinderIT(BackendConfiguration backendConfiguration) {
 		this.setupHelper = OrmSetupHelper.withSingleBackend( backendConfiguration );
 	}
 
@@ -51,34 +51,23 @@ public class PropertyBridgeSimpleIT {
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
 						AutomaticIndexingSynchronizationStrategyName.SEARCHABLE
 				)
-				.setup( Invoice.class );
+				.setup( Book.class );
 	}
 
 	@Test
 	public void smoke() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
-			Invoice invoice = new Invoice();
-			invoice.getLineItems()
-					.add( new InvoiceLineItem( InvoiceLineItemCategory.BOOK, new BigDecimal( "5.99" ) ) );
-			invoice.getLineItems()
-					.add( new InvoiceLineItem( InvoiceLineItemCategory.BOOK, new BigDecimal( "8.99" ) ) );
-			invoice.getLineItems()
-					.add( new InvoiceLineItem( InvoiceLineItemCategory.BOOK, new BigDecimal( "15.99" ) ) );
-			invoice.getLineItems()
-					.add( new InvoiceLineItem( InvoiceLineItemCategory.SHIPPING, new BigDecimal( "7.99" ) ) );
-			entityManager.persist( invoice );
+			Book book = new Book();
+			book.setIsbn( ISBN.parse( "978-0-58-600835-5" ) );
+			entityManager.persist( book );
 		} );
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 
-			List<Invoice> result = searchSession.search( Invoice.class )
-					.predicate( f -> f.bool()
-							.must( f.range().field( "itemSummary.total" )
-									.atLeast( new BigDecimal( "20.0" ) ) )
-							.must( f.range().field( "itemSummary.shipping" )
-									.atMost( new BigDecimal( "10.0" ) ) )
-					)
+			List<Book> result = searchSession.search( Book.class )
+					.predicate( f -> f.match().field( "isbn" )
+							.matching( ISBN.parse( "978-0-58-600835-5" ) ) )
 					.fetchHits( 20 );
 
 			assertThat( result ).hasSize( 1 );
