@@ -841,7 +841,7 @@ So far we only covered the process of how to create your Lucene query (see <<sec
 However, this is only the first step in the chain of actions. Let's now see how
 to build the Hibernate Search query from the Lucene query.
 
-===== Generality
+===== Basics
 
 Once the Lucene query is built, it needs to be wrapped into an Hibernate Query. If not specified
 otherwise, the query will be executed against all indexed entities, potentially returning all types
