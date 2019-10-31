@@ -330,6 +330,18 @@ which is supported by the Elasticsearch backend.
 See <<mapper-orm-directfieldmapping-supported-types>> for more information.
 ====
 
+[NOTE]
+====
+Field types that are not in this list can still be used with a little bit more work:
+
+* If a property in the entity model has an unsupported type,
+but can be converted to a supported type, you will need a bridge.
+See <<mapper-orm-bridge>>.
+* If you need an index field with a specific type that is not supported by Hibernate Search,
+you will need a bridge that defines a native field type.
+See <<backend-lucene-field-types-extension>>.
+====
+
 [cols="l",options="header"]
 .Field types supported by the Lucene backend
 |====
@@ -368,8 +380,49 @@ Date/time types do not support the whole range of years that can be represented 
 [[backend-lucene-field-types-extension]]
 === Index field type DSL extensions
 
-include::todo-placeholder.asciidoc[]
-// TODO HSEARCH-3711 also document "extension" types
+Not all Lucene field types have built-in support in Hibernate Search.
+Unsupported field types can still be used, however,
+by taking advantage of the "native" field type.
+Using this field type, Lucene `IndexableField` instances can be created directly,
+giving access to everything Lucene can offer.
+
+Below is an example of how to use the Lucene "native" type.
+
+.Using the Lucene "native" type
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/type/asnative/PageRankValueBinder.java[tags=include]
+----
+<1> Define a <<mapper-orm-bridge,custom binder>> and its bridge.
+The "native" type can only be used from a binder,
+it cannot be used directly with annotation mapping.
+Here we're defining a <<mapper-orm-bridge-valuebridge,value binder>>,
+but a <<mapper-orm-bridge-typebridge,type binder>>,
+or a <<mapper-orm-bridge-propertybridge,property binder>>
+would work as well.
+<2> Get the context's type factory.
+<3> Apply the Lucene extension to the type factory.
+<4> Call `asNative` to start defining a native type.
+<5> Define the field value type.
+<6> Define the `LuceneFieldContributor`.
+The contributor will be called upon indexing to add as many fields as necessary to the document.
+All fields must be named after the `absoluteFieldPath` passed to the contributor.
+<7> Optionally, if projections are necessary, define the `LuceneFieldValueExtractor`.
+The extractor will be called upon projecting to extract the projected value from a *single* stored field.
+<8> The value bridge is free to apply a preliminary conversion
+before passing the value to Hibernate Search, which will pass it along to the `LuceneFieldContributor`.
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/lucene/type/asnative/WebPage.java[tags=include,!getters-setters]
+----
+<1> Map the property to an index field.
+Note that value bridges using a non-standard field type (such as Lucene's "native" type)
+must be mapped using the `@NonStandardField` annotation:
+other annotations such as `@GenericField` will fail.
+<2> Instruct Hibernate Search to use our custom value binder.
+====
 
 [[backend-lucene-analysis]]
 == Analysis
