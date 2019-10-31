@@ -16,7 +16,7 @@ effectively offering a new type of query for Hibernate ORM entities.
 [[search-query]]
 
 [[search-dsl-query-generality]]
-=== Generality
+=== Basics
 // Search 5 anchors backward compatibility
 [[_building_a_hibernate_search_query]]
 
@@ -533,7 +533,7 @@ you can instead use the Elasticsearch extension on the `SearchQuery` to convert 
 // TODO add more than just examples in the sub-sections
 
 [[search-dsl-predicate-concepts]]
-=== Generality
+=== Basics
 
 The main component of a search query is the _predicate_,
 i.e. the condition that every document must satisfy in order to be included in search results.
@@ -1120,7 +1120,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 // TODO add more than just examples in the sub-sections
 
 [[search-dsl-sort-concepts]]
-=== Generality
+=== Basics
 
 By default, query results are sorted by relevance.
 Other sorts, including the sort by field value, can be configured when building the search query:
@@ -1323,7 +1323,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 // TODO add more than just examples in the sub-sections
 
 [[search-dsl-projection-concepts]]
-=== Generality
+=== Basics
 
 For some use cases, you only need the query to return a small subset of the data contained in your domain object.
 In these cases, returning managed entities and extracting data from these entities may be overkill:
@@ -1584,7 +1584,7 @@ include::todo-placeholder.asciidoc[]
 // TODO add more than just examples in the sub-sections
 
 [[search-dsl-aggregation-concepts]]
-=== Generality
+=== Basics
 
 Sometimes, you don't just need to list query hits directly:
 you also need to group and aggregate the hits.
