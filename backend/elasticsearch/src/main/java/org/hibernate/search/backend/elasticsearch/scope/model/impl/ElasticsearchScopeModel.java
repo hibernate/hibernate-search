@@ -129,6 +129,18 @@ public class ElasticsearchScopeModel {
 		return scopedIndexFieldComponent;
 	}
 
+	public boolean hasSchemaObjectNodeComponent(String absoluteFieldPath) {
+		for ( ElasticsearchIndexModel indexModel : indexModels ) {
+			ElasticsearchIndexSchemaObjectNode objectNode = indexModel.getObjectNode( absoluteFieldPath );
+			// TODO HSEARCH-2389 check multi-indexes model incompatibility
+			if ( objectNode != null ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	public void checkNestedField(String absoluteFieldPath) {
 		boolean found = false;
 

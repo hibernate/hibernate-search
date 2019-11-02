@@ -99,7 +99,7 @@ public class ExistsPredicateIT {
 		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
-	// TODO HSEARCH-2389 allows @Test
+	@Test
 	public void nested() {
 		StubMappingScope scope = indexManager.createScope();
 
@@ -111,7 +111,7 @@ public class ExistsPredicateIT {
 		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 	}
 
-	// TODO HSEARCH-2389 allows @Test
+	@Test
 	public void flattened() {
 		StubMappingScope scope = indexManager.createScope();
 
