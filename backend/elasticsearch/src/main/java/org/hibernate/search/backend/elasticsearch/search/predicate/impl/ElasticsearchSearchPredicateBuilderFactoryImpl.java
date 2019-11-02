@@ -127,9 +127,11 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public ExistsPredicateBuilder<ElasticsearchSearchPredicateBuilder> exists(String absoluteFieldPath) {
-		// Make sure to fail for fields with different type or for unknown fields
-		// We may be able to relax this constraint, but that would require more extensive testing
-		scopeModel.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+		if ( !scopeModel.hasSchemaObjectNodeComponent( absoluteFieldPath ) ) {
+			// Make sure to fail for fields with different type or for unknown fields
+			// We may be able to relax this constraint, but that would require more extensive testing
+			scopeModel.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+		}
 		return new ElasticsearchExistsPredicateBuilder( absoluteFieldPath );
 	}
 
