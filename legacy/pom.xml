@@ -149,7 +149,7 @@
         <version.simple-jndi>0.11.4.1</version.simple-jndi>
         <version.com.github.tomakehurst.wiremock>2.5.1</version.com.github.tomakehurst.wiremock>
         <!-- Fixes dependency convergence within Wiremock, see below -->
-        <version.com.fasterxml.jackson>2.8.6</version.com.fasterxml.jackson>
+        <version.com.fasterxml.jackson>2.10.0</version.com.fasterxml.jackson>
         <version.org.jboss.byteman>4.0.4</version.org.jboss.byteman>
 
         <!-- Integration test dependencies -->
