@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.logging.impl;
 
+import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.INFO;
 
 import java.time.format.DateTimeFormatter;
@@ -54,6 +55,14 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = INFO)
 	@Message(id = ID_OFFSET_1 + 34, value = "Hibernate Search {%1$s}")
 	void version(String versionString);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET_1 + 230, value = "Starting executor '%1$s'" )
+	void startingExecutor(String name);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET_1 + 231, value = "Stopping executor '%1$s'")
+	void stoppingExecutor(String indexName);
 
 	@Message(id = ID_OFFSET_1 + 242,
 			value = "Hibernate Search failed to initialize component '%1$s' as class '%2$s' doesn't have a public no-arguments constructor")
