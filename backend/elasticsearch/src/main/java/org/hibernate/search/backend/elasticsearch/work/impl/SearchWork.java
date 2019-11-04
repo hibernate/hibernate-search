@@ -25,7 +25,7 @@ import com.google.gson.JsonObject;
 
 public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 
-	private static final Log QUERY_LOG = LoggerFactory.make( Log.class, DefaultLogCategories.QUERY );
+	private static final Log queryLog = LoggerFactory.make( Log.class, DefaultLogCategories.QUERY );
 
 	private final ElasticsearchSearchResultExtractor<R> resultExtractor;
 
@@ -36,7 +36,7 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 
 	@Override
 	protected CompletableFuture<?> beforeExecute(ElasticsearchWorkExecutionContext executionContext, ElasticsearchRequest request) {
-		QUERY_LOG.executingElasticsearchQuery(
+		queryLog.executingElasticsearchQuery(
 				request.getPath(),
 				request.getParameters(),
 				executionContext.getGsonProvider().getLogHelper().toString( request.getBodyParts() )
