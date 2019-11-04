@@ -98,6 +98,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 				);
 		}
 
+		log.defaultAutomaticIndexingSynchronizationStrategy( synchronizationStrategyName );
+
 		EntityLoadingCacheLookupStrategy cacheLookupStrategy =
 				QUERY_LOADING_CACHE_LOOKUP_STRATEGY.get( propertySource );
 

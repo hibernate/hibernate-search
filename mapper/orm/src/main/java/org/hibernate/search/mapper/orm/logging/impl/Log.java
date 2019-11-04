@@ -7,6 +7,7 @@
 
 package org.hibernate.search.mapper.orm.logging.impl;
 
+import static org.jboss.logging.Logger.Level.DEBUG;
 import static org.jboss.logging.Logger.Level.ERROR;
 import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.WARN;
@@ -26,7 +27,6 @@ import org.hibernate.search.util.common.logging.impl.MessageConstants;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 
 import org.jboss.logging.BasicLogger;
-import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
@@ -47,6 +47,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = 116, max = 116),
 		@ValidIdRange(min = 183, max = 183),
 		@ValidIdRange(min = 211, max = 212),
+		@ValidIdRange(min = 235, max = 235),
 		@ValidIdRange(min = 276, max = 276),
 		@ValidIdRange(min = 348, max = 349)
 		// TODO HSEARCH-3308 add exceptions here for legacy messages from Search 5. See the Lucene logger for examples.
@@ -104,6 +105,10 @@ public interface Log extends BasicLogger {
 
 	@Message(value = "Loading and extracting entity data for entity '%s' during mass indexing")
 	String massIndexingLoadingAndExtractingEntityData(String entityName);
+
+	@LogMessage(level = DEBUG)
+	@Message(id = ID_OFFSET_1 + 235, value = "Default automatic indexing synchronization strategy set to '%s'." )
+	void defaultAutomaticIndexingSynchronizationStrategy(Object strategy);
 
 	@Message(id = ID_OFFSET_1 + 276, value = "No transaction is active while indexing entity type '%1$s'; Consider increasing the connection time-out")
 	SearchException transactionNotActiveWhileProducingIdsForBatchIndexing(@FormatWith(ClassFormatter.class) Class<?> entityType);
@@ -172,7 +177,7 @@ public interface Log extends BasicLogger {
 			value = "Invalid automatic indexing synchronization strategy name: '%1$s'. Valid names are: %2$s.")
 	SearchException invalidAutomaticIndexingSynchronizationStrategyName(String invalidRepresentation, List<String> validRepresentations);
 
-	@LogMessage(level = Logger.Level.DEBUG)
+	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET_2 + 19,
 			value = "The entity loader for '%1$s' will ignore the cache lookup strategy '%2$s',"
 					+ " because document IDs are distinct from entity IDs "
@@ -181,7 +186,7 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassFormatter.class) Class<?> entityType,
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy);
 
-	@LogMessage(level = Logger.Level.DEBUG)
+	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET_2 + 20,
 			value = "The entity loader for '%1$s' will ignore the second-level cache "
 					+ " even though it was instructed to use it,"
