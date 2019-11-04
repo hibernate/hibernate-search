@@ -61,6 +61,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = 225, max = 225),
 		@ValidIdRange(min = 228, max = 228),
 		@ValidIdRange(min = 265, max = 265),
+		@ValidIdRange(min = 274, max = 274),
 		@ValidIdRange(min = 284, max = 284),
 		@ValidIdRange(min = 320, max = 320),
 		@ValidIdRange(min = 321, max = 321),
@@ -129,6 +130,10 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_1 + 265,
 			value = "Unable to build Lucene Document due to facet indexing error")
 	SearchException errorDuringFacetingIndexing(@Cause Exception e );
+
+	@LogMessage(level = Level.DEBUG)
+	@Message(id = ID_OFFSET_1 + 274, value = "Executing Lucene query '%s'" )
+	void executingLuceneQuery(Query luceneQuery);
 
 	@Message(id = ID_OFFSET_1 + 284,
 			value = "An exception occurred while opening multiple indexes." )
