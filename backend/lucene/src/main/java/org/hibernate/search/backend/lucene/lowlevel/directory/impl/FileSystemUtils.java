@@ -21,14 +21,15 @@ final class FileSystemUtils {
 	private FileSystemUtils() {
 	}
 
-	static void initializeWriteableDirectory(Path rootDirectory) throws IOException {
-		if ( Files.exists( rootDirectory ) ) {
-			if ( !Files.isDirectory( rootDirectory ) || !Files.isWritable( rootDirectory ) ) {
-				throw log.pathIsNotWriteableDirectory( rootDirectory );
+	static void initializeWriteableDirectory(Path directory) throws IOException {
+		if ( Files.exists( directory ) ) {
+			if ( !Files.isDirectory( directory ) || !Files.isWritable( directory ) ) {
+				throw log.pathIsNotWriteableDirectory( directory );
 			}
 		}
 		else {
-			Files.createDirectories( rootDirectory );
+			log.indexDirectoryNotFoundCreatingNewOne( directory );
+			Files.createDirectories( directory );
 		}
 	}
 

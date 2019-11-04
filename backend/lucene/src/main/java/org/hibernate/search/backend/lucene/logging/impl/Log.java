@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.logging.impl;
 
+import static org.jboss.logging.Logger.Level.INFO;
 import static org.jboss.logging.Logger.Level.WARN;
 
 import java.io.IOException;
@@ -50,6 +51,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = MessageConstants.BACKEND_LUCENE_ID_RANGE_MIN, max = MessageConstants.BACKEND_LUCENE_ID_RANGE_MAX),
 		// Exceptions for legacy messages from Search 5
 		@ValidIdRange(min = 35, max = 35),
+		@ValidIdRange(min = 41, max = 41),
 		@ValidIdRange(min = 49, max = 49),
 		@ValidIdRange(min = 52, max = 52),
 		@ValidIdRange(min = 55, max = 55),
@@ -79,6 +81,10 @@ public interface Log extends BasicLogger {
 	// DO NOT ADD ANY NEW MESSAGES HERE
 	// -----------------------------------
 	int ID_OFFSET_1 = MessageConstants.ENGINE_ID_RANGE_MIN;
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET_1 + 41, value = "Index directory not found, creating: '%1$s'")
+	void indexDirectoryNotFoundCreatingNewOne(Path absolutePath);
 
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET_1 + 49,
