@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.backend.orchestration.spi;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
@@ -14,12 +15,14 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * An executor of works that accepts works from multiple threads, puts them in a queue,
@@ -29,6 +32,8 @@ import org.hibernate.search.util.common.impl.Futures;
  * or when they should never be executed in parallel (writes to a Lucene index).
  */
 public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P>, P extends BatchingExecutor.WorkProcessor> {
+
+	private final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String name;
 
@@ -72,6 +77,7 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 	 * @param threadPoolProvider A provider of thread pools.
 	 */
 	public synchronized void start(ThreadPoolProvider threadPoolProvider) {
+		log.startingExecutor( name );
 		executorService = threadPoolProvider.newFixedThreadPool( 1, name );
 	}
 
@@ -83,6 +89,7 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 	 * and will remove pending works from the queue.
 	 */
 	public synchronized void stop() {
+		log.stoppingExecutor( name );
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.push( ExecutorService::shutdownNow, executorService );
 			executorService = null;
