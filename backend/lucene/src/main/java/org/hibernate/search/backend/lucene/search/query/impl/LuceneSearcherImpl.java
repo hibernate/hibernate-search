@@ -31,6 +31,7 @@ import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.util.common.logging.impl.DefaultLogCategories;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.document.Document;
@@ -47,6 +48,7 @@ import org.apache.lucene.search.TopDocs;
 class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult<H>> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final Log queryLog = LoggerFactory.make( Log.class, DefaultLogCategories.QUERY );
 
 	private static final Set<String> ID_FIELD_SET = Collections.singleton( LuceneFields.idFieldName() );
 
@@ -79,6 +81,8 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	@Override
 	public LuceneLoadableSearchResult<H> search(IndexSearcher indexSearcher, int offset, Integer limit)
 			throws IOException {
+		queryLog.executingLuceneQuery( requestContext.getLuceneQuery() );
+
 		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, offset, limit );
 
 		luceneCollectors.collect( indexSearcher, requestContext.getLuceneQuery(), offset, limit );
@@ -102,6 +106,8 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 	@Override
 	public int count(IndexSearcher indexSearcher) throws IOException {
+		queryLog.executingLuceneQuery( requestContext.getLuceneQuery() );
+
 		// TODO HSEARCH-3352 implement timeout handling... somehow?
 		//  We may have to use search() instead of count() with a TotalHitCountCollector wrapped with the timeout limiting one
 		return indexSearcher.count( requestContext.getLuceneQuery() );
