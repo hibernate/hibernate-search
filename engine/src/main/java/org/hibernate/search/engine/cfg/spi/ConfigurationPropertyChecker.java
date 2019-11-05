@@ -39,6 +39,8 @@ public class ConfigurationPropertyChecker {
 		return new ConfigurationPropertyChecker();
 	}
 
+	private String configurationPropertyCheckingStrategyPropertyName;
+
 	private final Set<String> availablePropertyKeys = ConcurrentHashMap.newKeySet();
 	private final Set<String> consumedPropertyKeys = ConcurrentHashMap.newKeySet();
 
@@ -54,6 +56,8 @@ public class ConfigurationPropertyChecker {
 				);
 		ConfigurationPropertyCheckingStrategyName checkingStrategy =
 				CONFIGURATION_PROPERTY_CHECKING_STRATEGY.get( trackingSource );
+		this.configurationPropertyCheckingStrategyPropertyName =
+				CONFIGURATION_PROPERTY_CHECKING_STRATEGY.resolveOrRaw( source );
 		switch ( checkingStrategy ) {
 			case WARN:
 				this.warn = true;
@@ -74,7 +78,7 @@ public class ConfigurationPropertyChecker {
 		}
 	}
 
-	public void afterBoot(ConfigurationPropertyChecker firstPhaseChecker, ConfigurationPropertySource propertySource) {
+	public void afterBoot(ConfigurationPropertyChecker firstPhaseChecker) {
 		if ( !warn ) {
 			return;
 		}
@@ -96,7 +100,7 @@ public class ConfigurationPropertyChecker {
 		if ( !unconsumedPropertyKeys.isEmpty() ) {
 			log.configurationPropertyTrackingUnusedProperties(
 					unconsumedPropertyKeys,
-					CONFIGURATION_PROPERTY_CHECKING_STRATEGY.resolveOrRaw( propertySource ),
+					configurationPropertyCheckingStrategyPropertyName,
 					ConfigurationPropertyCheckingStrategyName.IGNORE.getExternalRepresentation()
 			);
 		}
