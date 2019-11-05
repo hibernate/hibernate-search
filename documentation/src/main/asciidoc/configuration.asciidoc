@@ -119,8 +119,10 @@ or a reference by type as a `java.lang.Class`
 |Whitespace separated string containing bean references (see above)
 |===============
 
+[[configuration-property-checking]]
+== Configuration property checking
+// Backward compatibility with an older version of the documentation
 [[configuration-property-tracking]]
-== Configuration property tracking
 
 Hibernate Search will track the parts of the provided configuration that are actually used
 and will log a warning if any configuration property starting with "hibernate.search." is never used,
