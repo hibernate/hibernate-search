@@ -53,7 +53,9 @@ public class UnusedPropertiesIT {
 		String unusedPropertyKey = "hibernate.search.indexes.myIndex.foo";
 		logged.expectMessage(
 				"Some properties in the Hibernate Search configuration were not used",
-				"[" + unusedPropertyKey + "]"
+				"[" + unusedPropertyKey + "]",
+				"To disable this warning, set the property '"
+						+ EngineSettings.CONFIGURATION_PROPERTY_CHECKING_STRATEGY + "' to 'ignore'"
 		)
 				.once();
 		logged.expectMessage( "Configuration property tracking is disabled" )
