@@ -168,7 +168,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 				);
 			}
 
-			propertyChecker.afterBoot( partialConfigurationPropertyChecker, propertySource );
+			propertyChecker.afterBoot( partialConfigurationPropertyChecker );
 
 			return new SearchIntegrationImpl(
 					beanProvider,
