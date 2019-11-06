@@ -64,7 +64,6 @@ public class LuceneIndexSchemaObjectNode {
 		return nestedDocumentPath;
 	}
 
-	// TODO HSEARCH-2389 use this in a subsequent commit
 	public List<String> getChildrenAbsolutePaths() {
 		return childrenAbsolutePaths;
 	}
