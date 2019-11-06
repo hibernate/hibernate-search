@@ -74,6 +74,30 @@ public class LuceneScopeModel {
 		return selectedIdConverter;
 	}
 
+	public <T> LuceneScopedIndexObjectComponent<T> getSchemaObjectNodeComponent(String absoluteFieldPath,
+			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
+		for ( LuceneIndexModel indexModel : indexModels ) {
+			// TODO HSEARCH-2389 check multi-indexes model incompatibility
+			LuceneIndexSchemaObjectNode objectNode = indexModel.getObjectNode( absoluteFieldPath );
+			if ( objectNode == null ) {
+				continue;
+			}
+
+			LuceneScopedIndexObjectComponent<T> scopedIndexObjectComponent = new LuceneScopedIndexObjectComponent<>();
+			for ( String childPath : objectNode.getChildrenAbsolutePaths() ) {
+				LuceneIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( childPath );
+				if ( schemaNode == null ) {
+					continue;
+				}
+
+				T component = componentRetrievalStrategy.extractComponent( schemaNode );
+				scopedIndexObjectComponent.addFieldComponent( childPath, component );
+			}
+			return scopedIndexObjectComponent;
+		}
+		return null;
+	}
+
 	public <T> LuceneScopedIndexFieldComponent<T> getSchemaNodeComponent(String absoluteFieldPath,
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
 		LuceneIndexModel indexModelForSelectedSchemaNode = null;
