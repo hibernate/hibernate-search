@@ -6,14 +6,19 @@
  */
 package org.hibernate.search.backend.lucene.document.model.impl;
 
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 
 
 public class LuceneIndexSchemaObjectNode {
 
 	private static final LuceneIndexSchemaObjectNode ROOT =
-			new LuceneIndexSchemaObjectNode( null, null, null, null, false );
+			// we do not store childrenPaths for the root node
+			new LuceneIndexSchemaObjectNode( null, null, null, Collections.emptyList(), null, false );
 
 	public static LuceneIndexSchemaObjectNode root() {
 		return ROOT;
@@ -25,17 +30,22 @@ public class LuceneIndexSchemaObjectNode {
 
 	private final String nestedDocumentPath;
 
+	private final List<String> childrenAbsolutePaths;
+
 	private final ObjectFieldStorage storage;
 
 	private final boolean multiValued;
 
-	public LuceneIndexSchemaObjectNode(LuceneIndexSchemaObjectNode parent, String absolutePath, String nestedDocumentPath,
+	public LuceneIndexSchemaObjectNode(LuceneIndexSchemaObjectNode parent, String absolutePath, String nestedDocumentPath, List<String> childrenAbsolutePaths,
 			ObjectFieldStorage storage, boolean multiValued) {
 		this.parent = parent;
 		this.absolutePath = absolutePath;
 		this.nestedDocumentPath = nestedDocumentPath;
 		this.storage = storage;
 		this.multiValued = multiValued;
+		this.childrenAbsolutePaths = childrenAbsolutePaths.stream()
+				.map( relativeFieldName -> LuceneFields.compose( absolutePath, relativeFieldName ) )
+				.collect( Collectors.toList() );
 	}
 
 	public LuceneIndexSchemaObjectNode getParent() {
@@ -52,6 +62,11 @@ public class LuceneIndexSchemaObjectNode {
 
 	public String getNestedDocumentPath() {
 		return nestedDocumentPath;
+	}
+
+	// TODO HSEARCH-2389 use this in a subsequent commit
+	public List<String> getChildrenAbsolutePaths() {
+		return childrenAbsolutePaths;
 	}
 
 	public ObjectFieldStorage getStorage() {

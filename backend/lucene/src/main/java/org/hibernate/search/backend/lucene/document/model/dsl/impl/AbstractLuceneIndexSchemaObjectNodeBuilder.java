@@ -7,7 +7,9 @@
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
@@ -81,6 +83,11 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 		for ( LuceneIndexSchemaNodeContributor contributor : content.values() ) {
 			contributor.contribute( collector, node );
 		}
+	}
+
+	final List<String> getChildrenNames() {
+		// The Map#keySet() method for LinkedHashMap will return the set in insertion order
+		return new ArrayList<>( content.keySet() );
 	}
 
 	private void putField(String name, LuceneIndexSchemaNodeContributor contributor) {
