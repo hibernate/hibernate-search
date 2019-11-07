@@ -6,7 +6,20 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query;
 
+import java.time.Duration;
+
 import org.hibernate.search.engine.search.query.SearchResult;
 
 public interface ElasticsearchSearchResult<H> extends SearchResult<H> {
+
+	/**
+	 * @return the time the Elasticsearch server took to process the request, as a {@link Duration}
+	 */
+	Duration getTook();
+
+	/**
+	 * @return whether or not a timeout occurred on the server side processing the request.
+	 */
+	boolean isTimedOut();
+
 }

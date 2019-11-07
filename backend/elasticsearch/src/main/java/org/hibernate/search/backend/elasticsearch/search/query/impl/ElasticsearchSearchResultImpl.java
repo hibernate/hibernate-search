@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +16,23 @@ import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
 
 class ElasticsearchSearchResultImpl<H> extends SimpleSearchResult<H>
 		implements ElasticsearchSearchResult<H> {
-	ElasticsearchSearchResultImpl(long hitCount, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults) {
+
+	private final Duration took;
+	private final boolean timedOut;
+
+	ElasticsearchSearchResultImpl(long hitCount, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults, Integer took, Boolean timedOut) {
 		super( hitCount, hits, aggregationResults );
+		this.took = Duration.ofMillis( took );
+		this.timedOut = ( timedOut != null ) ? timedOut : false;
+	}
+
+	@Override
+	public Duration getTook() {
+		return took;
+	}
+
+	@Override
+	public boolean isTimedOut() {
+		return timedOut;
 	}
 }

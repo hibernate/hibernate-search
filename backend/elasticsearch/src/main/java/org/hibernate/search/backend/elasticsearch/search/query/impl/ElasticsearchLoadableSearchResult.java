@@ -36,17 +36,22 @@ public class ElasticsearchLoadableSearchResult<H> {
 	private final long hitCount;
 	private List<Object> extractedHits;
 	private final Map<AggregationKey<?>, ?> extractedAggregations;
+	private final Integer took;
+	private final Boolean timedOut;
 
 	ElasticsearchLoadableSearchResult(ElasticsearchSearchQueryExtractContext extractContext,
 			ElasticsearchSearchProjection<?, H> rootProjection,
 			long hitCount,
 			List<Object> extractedHits,
-			Map<AggregationKey<?>, ?> extractedAggregations) {
+			Map<AggregationKey<?>, ?> extractedAggregations,
+			Integer took, Boolean timedOut) {
 		this.extractContext = extractContext;
 		this.rootProjection = rootProjection;
 		this.hitCount = hitCount;
 		this.extractedHits = extractedHits;
 		this.extractedAggregations = extractedAggregations;
+		this.took = took;
+		this.timedOut = timedOut;
 	}
 
 	ElasticsearchSearchResult<H> loadBlocking() {
@@ -83,6 +88,6 @@ public class ElasticsearchLoadableSearchResult<H> {
 		// Make sure that if someone uses this object incorrectly, it will always fail, and will fail early.
 		extractedHits = null;
 
-		return new ElasticsearchSearchResultImpl<>( hitCount, loadedHits, extractedAggregations );
+		return new ElasticsearchSearchResultImpl<>( hitCount, loadedHits, extractedAggregations, took, timedOut );
 	}
 }
