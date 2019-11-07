@@ -39,6 +39,12 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 	private static final JsonObjectAccessor AGGREGATIONS_ACCESSOR =
 			JsonAccessor.root().property( "aggregations" ).asObject();
 
+	private static final JsonAccessor<Integer> TOOK_ACCESSOR =
+			JsonAccessor.root().property( "took" ).asInteger();
+
+	private static final JsonAccessor<Boolean> TIMED_OUT_ACCESSOR =
+			JsonAccessor.root().property( "timed_out" ).asBoolean();
+
 	private final ElasticsearchSearchQueryRequestContext requestContext;
 
 	private final ElasticsearchSearchProjection<?, H> rootProjection;
@@ -67,12 +73,16 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 		Map<AggregationKey<?>, ?> extractedAggregations = aggregations.isEmpty() ?
 				Collections.emptyMap() : extractAggregations( extractContext, responseBody );
 
+		Integer took = TOOK_ACCESSOR.get( responseBody ).get();
+		Boolean timedOut = TIMED_OUT_ACCESSOR.get( responseBody ).get();
+
 		return new ElasticsearchLoadableSearchResult<>(
 				extractContext,
 				rootProjection,
 				hitCount,
 				extractedHits,
-				extractedAggregations
+				extractedAggregations,
+				took, timedOut
 		);
 	}
 
