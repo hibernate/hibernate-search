@@ -76,14 +76,33 @@ public class LuceneScopeModel {
 
 	public <T> LuceneScopedIndexObjectComponent<T> getSchemaObjectNodeComponent(String absoluteFieldPath,
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
+		LuceneScopedIndexObjectComponent<T> result = null;
+		String selectedIndexName = null;
+		LuceneIndexSchemaObjectNode selectedObjectNode = null;
+
 		for ( LuceneIndexModel indexModel : indexModels ) {
-			// TODO HSEARCH-2389 check multi-indexes model incompatibility
+			String indexName = indexModel.getIndexName();
+
 			LuceneIndexSchemaObjectNode objectNode = indexModel.getObjectNode( absoluteFieldPath );
+
+			if ( selectedIndexName != null ) {
+				if ( ( selectedObjectNode == null && objectNode != null ) ||
+						( selectedObjectNode != null && objectNode == null ) ) {
+					throw log.conflictingObjectFieldModel( absoluteFieldPath,
+							selectedObjectNode, objectNode,
+							EventContexts.fromIndexNames( selectedIndexName, indexName )
+					);
+				}
+				continue;
+			}
+			selectedIndexName = indexName;
+			selectedObjectNode = objectNode;
+
 			if ( objectNode == null ) {
 				continue;
 			}
 
-			LuceneScopedIndexObjectComponent<T> scopedIndexObjectComponent = new LuceneScopedIndexObjectComponent<>();
+			result = new LuceneScopedIndexObjectComponent<>();
 			for ( String childPath : objectNode.getChildrenAbsolutePaths() ) {
 				LuceneIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( childPath );
 				if ( schemaNode == null ) {
@@ -91,11 +110,10 @@ public class LuceneScopeModel {
 				}
 
 				T component = componentRetrievalStrategy.extractComponent( schemaNode );
-				scopedIndexObjectComponent.addFieldComponent( childPath, component );
+				result.addFieldComponent( childPath, component );
 			}
-			return scopedIndexObjectComponent;
 		}
-		return null;
+		return result;
 	}
 
 	public <T> LuceneScopedIndexFieldComponent<T> getSchemaNodeComponent(String absoluteFieldPath,
