@@ -17,6 +17,8 @@ import java.util.Set;
 
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.Version;
+
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
@@ -582,4 +584,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 104, value = "Cannot apply a search analyzer if an analyzer has not been defined on the same field." +
 			" Search analyzer: '%1$s'.")
 	SearchException searchAnalyzerWithoutAnalyzer(String searchAnalyzer, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 105,
+			value = "Multiple conflicting models for object field '%1$s': '%2$s' vs. '%3$s'.")
+	SearchException conflictingObjectFieldModel(String absoluteFieldPath,
+			LuceneIndexSchemaObjectNode index1Model, LuceneIndexSchemaObjectNode index2Model, @Param EventContext context);
 }
