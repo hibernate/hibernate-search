@@ -19,17 +19,23 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
+import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ExistsPredicateIT {
+public class ObjectExistsSearchPredicateIT {
 
 	private static final String INDEX_NAME = "IndexName";
+	private static final String COMPATIBLE_INDEX_NAME = "CompatibleIndexName";
+	private static final String INCOMPATIBLE_INDEX_NAME = "IncompatibleIndexName";
 
 	// this document is empty
 	private static final String DOCUMENT_0 = "0";
@@ -51,7 +57,10 @@ public class ExistsPredicateIT {
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	private IndexMapping indexMapping;
+
 	private StubMappingIndexManager indexManager;
+	private StubMappingIndexManager compatibleIndexManager;
+	private StubMappingIndexManager incompatibleIndexManager;
 
 	@Before
 	public void setup() {
@@ -61,42 +70,19 @@ public class ExistsPredicateIT {
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
+				.withIndex(
+						COMPATIBLE_INDEX_NAME,
+						ctx -> new IndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.compatibleIndexManager = indexManager
+				)
+				.withIndex(
+						INCOMPATIBLE_INDEX_NAME,
+						ctx -> new IncompatibleIndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.incompatibleIndexManager = indexManager
+				)
 				.setup();
 
 		initData();
-	}
-
-	@Test
-	public void matchAll() {
-		StubMappingScope scope = indexManager.createScope();
-
-		List<DocumentReference> docs = scope.query().asEntityReference()
-				.predicate( p -> p.matchAll() )
-				.fetchAllHits();
-
-		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_0, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-	}
-
-	@Test
-	public void string() {
-		StubMappingScope scope = indexManager.createScope();
-
-		List<DocumentReference> docs = scope.query().asEntityReference()
-				.predicate( p -> p.exists().field( "string" ) )
-				.fetchAllHits();
-
-		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-	}
-
-	@Test
-	public void numeric() {
-		StubMappingScope scope = indexManager.createScope();
-
-		List<DocumentReference> docs = scope.query().asEntityReference()
-				.predicate( p -> p.exists().field( "numeric" ) )
-				.fetchAllHits();
-
-		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
 	@Test
@@ -112,6 +98,34 @@ public class ExistsPredicateIT {
 	}
 
 	@Test
+	public void nested_multiIndexes_compatibleIndexMapping() {
+		StubMappingScope scope = indexManager.createScope( compatibleIndexManager );
+
+		List<DocumentReference> docs = scope.query().asEntityReference()
+				.predicate( p -> p.nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) ) )
+				.fetchAllHits();
+
+		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
+		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+	}
+
+	@Test
+	public void nested_multiIndexes_incompatibleIndexMapping() {
+		StubMappingScope scope = indexManager.createScope( incompatibleIndexManager );
+
+		SubTest.expectException(
+				() -> scope.predicate().nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Multiple conflicting models for field" )
+				.hasMessageContaining( "'nested'" )
+				.satisfies( FailureReportUtils.hasContext(
+						EventContexts.fromIndexNames( INDEX_NAME, INCOMPATIBLE_INDEX_NAME )
+				) );
+	}
+
+	@Test
 	public void flattened() {
 		StubMappingScope scope = indexManager.createScope();
 
@@ -124,47 +138,31 @@ public class ExistsPredicateIT {
 	}
 
 	@Test
-	public void nestedString() {
-		StubMappingScope scope = indexManager.createScope();
+	public void flattened_multiIndexes_compatibleIndexMapping() {
+		StubMappingScope scope = compatibleIndexManager.createScope( indexManager );
 
 		List<DocumentReference> docs = scope.query().asEntityReference()
-				.predicate( p -> p.nested().objectField( "nested" ).nest( f -> f.exists().field( "nested.string" ) ) )
+				.predicate( p -> p.exists().field( "flattened" ) )
 				.fetchAllHits();
 
+		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
 		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 	}
 
 	@Test
-	public void nestedNumeric() {
-		StubMappingScope scope = indexManager.createScope();
+	public void flattened_multiIndexes_incompatibleIndexMapping() {
+		StubMappingScope scope = incompatibleIndexManager.createScope( indexManager );
 
-		List<DocumentReference> docs = scope.query().asEntityReference()
-				.predicate( p -> p.nested().objectField( "nested" ).nest( f -> f.exists().field( "nested.numeric" ) ) )
-				.fetchAllHits();
-
-		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
-	}
-
-	@Test
-	public void flattenedString() {
-		StubMappingScope scope = indexManager.createScope();
-
-		List<DocumentReference> docs = scope.query().asEntityReference()
-				.predicate( p -> p.exists().field( "flattened.string" ) )
-				.fetchAllHits();
-
-		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
-	}
-
-	@Test
-	public void flattenedNumeric() {
-		StubMappingScope scope = indexManager.createScope();
-
-		List<DocumentReference> docs = scope.query().asEntityReference()
-				.predicate( p -> p.exists().field( "flattened.numeric" ) )
-				.fetchAllHits();
-
-		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+		SubTest.expectException(
+				() -> scope.predicate().exists().field( "flattened" )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Multiple conflicting models for field" )
+				.hasMessageContaining( "'flattened'" )
+				.satisfies( FailureReportUtils.hasContext(
+						EventContexts.fromIndexNames( INCOMPATIBLE_INDEX_NAME, INDEX_NAME )
+				) );
 	}
 
 	private void initData() {
@@ -196,6 +194,15 @@ public class ExistsPredicateIT {
 		} );
 
 		plan.execute().join();
+		checkDocumentsCreation();
+	}
+
+	private void checkDocumentsCreation() {
+		List<DocumentReference> docs = indexManager.createScope().query().asEntityReference()
+				.predicate( p -> p.matchAll() )
+				.fetchAllHits();
+
+		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_0, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}
 
 	private static class IndexMapping {
@@ -205,10 +212,12 @@ public class ExistsPredicateIT {
 		final IndexObjectFieldReference nested;
 		final IndexFieldReference<String> nestedString;
 		final IndexFieldReference<Integer> nestedNumeric;
+		final IndexObjectFieldReference nestedX2;
 
 		final IndexObjectFieldReference flattened;
 		final IndexFieldReference<String> flattenedString;
 		final IndexFieldReference<Integer> flattenedNumeric;
+		final IndexObjectFieldReference flattenedX2;
 
 		IndexMapping(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString() ).toReference();
@@ -218,11 +227,23 @@ public class ExistsPredicateIT {
 			nested = nestedObject.toReference();
 			nestedString = nestedObject.field( "string", f -> f.asString() ).toReference();
 			nestedNumeric = nestedObject.field( "numeric", f -> f.asInteger() ).toReference();
+			nestedX2 = nestedObject.objectField( "nestedX2" ).toReference();
 
 			IndexSchemaObjectField flattenedObject = root.objectField( "flattened", ObjectFieldStorage.FLATTENED );
 			flattened = flattenedObject.toReference();
 			flattenedString = flattenedObject.field( "string", f -> f.asString() ).toReference();
 			flattenedNumeric = flattenedObject.field( "numeric", f -> f.asInteger() ).toReference();
+			flattenedX2 = nestedObject.objectField( "flattenedX2" ).toReference();
+		}
+	}
+
+	private static class IncompatibleIndexMapping {
+		IncompatibleIndexMapping(IndexSchemaElement root) {
+			// Define a field instead of an object for the path "nested"
+			root.field( "nested", f -> f.asString() ).toReference();
+
+			// Define a field instead of an object for the path "flattened"
+			root.field( "flattened", f -> f.asString() ).toReference();
 		}
 	}
 }
