@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.search.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -18,6 +19,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.cfg.AvailableSettings;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
+import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
@@ -303,6 +305,31 @@ public class QueryDslIT {
 			assertThat( explanation1 ).contains( "title" );
 			assertThat( explanation2 ).contains( "title" );
 			assertThat( elasticsearchQuery ).isNotNull();
+		} );
+	}
+
+	@Test
+	public void tookAndTimedOut_elasticsearch() {
+		Assume.assumeTrue( backendConfiguration instanceof ElasticsearchBackendConfiguration );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::explain-took-timedOut[]
+			SearchQuery<Book> query = searchSession.search( Book.class )
+					.predicate( f -> f.match()
+							.field( "title" )
+							.matching( "robot" ) )
+					.toQuery();
+
+			ElasticsearchSearchQuery<Book> elasticsearchQuery = query.extension( ElasticsearchExtension.get() ); // <1>
+			ElasticsearchSearchResult<Book> result = elasticsearchQuery.fetchAll(); // <2>
+
+			Duration took = result.getTook(); // <3>
+			Boolean timedOut = result.isTimedOut(); // <4>
+			// end::explain-took-timedOut[]
+
+			assertThat( took ).isNotNull();
+			assertThat( timedOut ).isNotNull();
 		} );
 	}
 
