@@ -525,6 +525,20 @@ but also by the name of the index it's located in.
 you can instead use the Elasticsearch extension on the `SearchQuery` to convert it after its creation.
 ====
 
+==== Elasticsearch: `took` and `explanation`
+
+.Returning query took time and if the time out has occurred
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=explain-took-timedOut]
+----
+<1> Extract the `ElasticsearchSearchQuery` using the `ElasticsearchExtension`.
+<2> Invoke `fetchAll()` to get a `ElasticsearchSearchResult`.
+<3> Extract *took*.
+<4> Extract *timedOut*.
+====
+
 [[search-dsl-predicate]]
 == Predicate DSL
 // Search 5 anchors backward compatibility
