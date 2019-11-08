@@ -37,6 +37,7 @@ public class ObjectExistsSearchPredicateIT {
 	private static final String COMPATIBLE_INDEX_NAME = "CompatibleIndexName";
 	private static final String INCOMPATIBLE_INDEX_NAME = "IncompatibleIndexName";
 	private static final String EMPTY_INDEX_NAME = "EmptyIndexName";
+	private static final String INVERTED_INDEX_NAME = "InvertedIndexName";
 
 	// this document is empty
 	private static final String DOCUMENT_0 = "0";
@@ -67,6 +68,7 @@ public class ObjectExistsSearchPredicateIT {
 	private StubMappingIndexManager compatibleIndexManager;
 	private StubMappingIndexManager incompatibleIndexManager;
 	private StubMappingIndexManager emptyIndexManager;
+	private StubMappingIndexManager invertedIndexManager;
 
 	@Before
 	public void setup() {
@@ -90,6 +92,11 @@ public class ObjectExistsSearchPredicateIT {
 						EMPTY_INDEX_NAME,
 						ctx -> { /* do not define any mapping here */ },
 						indexManager -> this.emptyIndexManager = indexManager
+				)
+				.withIndex(
+						INVERTED_INDEX_NAME,
+						ctx -> new InvertedIndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.invertedIndexManager = indexManager
 				)
 				.setup();
 
@@ -160,6 +167,22 @@ public class ObjectExistsSearchPredicateIT {
 	}
 
 	@Test
+	public void nested_multiIndexes_wrongStorageType() {
+		StubMappingScope scope = indexManager.createScope( invertedIndexManager );
+
+		SubTest.expectException(
+				() -> scope.predicate().exists().field( "nested" )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Multiple conflicting models for object field" )
+				.hasMessageContaining( "'nested'" )
+				.satisfies( FailureReportUtils.hasContext(
+						EventContexts.fromIndexNames( INDEX_NAME, INVERTED_INDEX_NAME )
+				) );
+	}
+
+	@Test
 	public void flattened() {
 		StubMappingScope scope = indexManager.createScope();
 
@@ -220,6 +243,22 @@ public class ObjectExistsSearchPredicateIT {
 
 		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
 		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+	}
+
+	@Test
+	public void flattened_multiIndexes_wrongStorageType() {
+		StubMappingScope scope = invertedIndexManager.createScope( indexManager );
+
+		SubTest.expectException(
+				() -> scope.predicate().exists().field( "flattened" )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Multiple conflicting models for object field" )
+				.hasMessageContaining( "'flattened'" )
+				.satisfies( FailureReportUtils.hasContext(
+						EventContexts.fromIndexNames( INVERTED_INDEX_NAME, INDEX_NAME )
+				) );
 	}
 
 	private void initData() {
@@ -311,6 +350,16 @@ public class ObjectExistsSearchPredicateIT {
 
 			// Define a field instead of an object for the path "flattened"
 			root.field( "flattened", f -> f.asString() ).toReference();
+		}
+	}
+
+	private static class InvertedIndexMapping {
+		InvertedIndexMapping(IndexSchemaElement root) {
+			// Use FLATTENED for nested
+			root.objectField( "nested", ObjectFieldStorage.FLATTENED ).toReference();
+
+			// Use NESTED for flattened
+			root.objectField( "flattened", ObjectFieldStorage.NESTED ).toReference();
 		}
 	}
 }
