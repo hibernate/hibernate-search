@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
+import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.util.List;
 import java.util.Optional;
@@ -56,8 +57,6 @@ import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.json.JSONException;
-import org.skyscreamer.jsonassert.JSONAssert;
-import org.skyscreamer.jsonassert.JSONCompareMode;
 
 public class ElasticsearchExtensionIT {
 
@@ -558,7 +557,7 @@ public class ElasticsearchExtensionIT {
 
 		List<String> result = query.fetchAll().getHits();
 		Assertions.assertThat( result ).hasSize( 1 );
-		JSONAssert.assertEquals(
+		assertJsonEquals(
 				"{"
 						+ "'nativeField_string': 'text 2',"
 						+ "'nativeField_integer': 1,"
@@ -567,8 +566,7 @@ public class ElasticsearchExtensionIT {
 						+ "'nativeField_unsupportedType': 'foobar',"
 						+ "'nativeField_sort5': 'z'"
 						+ "}",
-				result.get( 0 ),
-				JSONCompareMode.STRICT
+				result.get( 0 )
 		);
 	}
 
@@ -577,7 +575,7 @@ public class ElasticsearchExtensionIT {
 	 * even if there is a field projection, which would usually trigger source filtering.
 	 */
 	@Test
-	public void projection_documentAndField() throws JSONException {
+	public void projection_documentAndField() {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
@@ -594,7 +592,7 @@ public class ElasticsearchExtensionIT {
 				.map( list -> (String) list.get( 0 ) )
 				.collect( Collectors.toList() );
 		Assertions.assertThat( result ).hasSize( 1 );
-		JSONAssert.assertEquals(
+		assertJsonEquals(
 				"{"
 						+ "'nativeField_string': 'text 2',"
 						+ "'nativeField_integer': 1,"
@@ -603,8 +601,7 @@ public class ElasticsearchExtensionIT {
 						+ "'nativeField_unsupportedType': 'foobar',"
 						+ "'nativeField_sort5': 'z'"
 						+ "}",
-				result.get( 0 ),
-				JSONCompareMode.STRICT
+				result.get( 0 )
 		);
 	}
 
