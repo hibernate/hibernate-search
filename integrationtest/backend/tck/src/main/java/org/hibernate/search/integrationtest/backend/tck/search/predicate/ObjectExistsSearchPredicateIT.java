@@ -53,6 +53,10 @@ public class ObjectExistsSearchPredicateIT {
 	// string and numeric within both nested and flattened objects
 	private static final String DOCUMENT_3 = "3";
 
+	// this document has only a field within an object field
+	// that is, in turn, within an object field
+	private static final String DOCUMENT_4 = "4";
+
 	// this document has only an object field with no child,
 	// it will never be matched by an exists predicate
 	private static final String DOCUMENT_5 = "5";
@@ -119,6 +123,7 @@ public class ObjectExistsSearchPredicateIT {
 				.fetchAllHits();
 
 		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
+		// DOCUMENT_4 won't be matched either, since we use a nested storage for the inner object field
 		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 	}
 
@@ -142,6 +147,7 @@ public class ObjectExistsSearchPredicateIT {
 				.fetchAllHits();
 
 		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
+		// DOCUMENT_4 won't be matched either, since we use a nested storage for the inner object field
 		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 	}
 
@@ -170,6 +176,7 @@ public class ObjectExistsSearchPredicateIT {
 				.fetchAllHits();
 
 		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
+		// DOCUMENT_4 won't be matched either, since we use a nested storage for the inner object field
 		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 	}
 
@@ -214,7 +221,8 @@ public class ObjectExistsSearchPredicateIT {
 				.fetchAllHits();
 
 		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
-		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+		// DOCUMENT_4 will match, even if the matching field is not a direct field of the targeted path
+		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_4 );
 	}
 
 	@Test
@@ -237,7 +245,8 @@ public class ObjectExistsSearchPredicateIT {
 				.fetchAllHits();
 
 		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
-		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+		// DOCUMENT_4 will match, even if the matching field is not a direct field of the targeted path
+		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_4 );
 	}
 
 	@Test
@@ -265,7 +274,8 @@ public class ObjectExistsSearchPredicateIT {
 				.fetchAllHits();
 
 		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
-		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+		// DOCUMENT_4 will match, even if the matching field is not a direct field of the targeted path
+		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_4 );
 	}
 
 	@Test
@@ -327,6 +337,15 @@ public class ObjectExistsSearchPredicateIT {
 			flattedDocument.addValue( indexMapping.flattenedString, ANY_STRING );
 			flattedDocument.addValue( indexMapping.flattenedNumeric, ANY_INTEGER );
 		} );
+		plan.add( referenceProvider( DOCUMENT_4 ), document -> {
+			DocumentElement nestedDocument = document.addObject( indexMapping.nested );
+			DocumentElement nestedX2Document = nestedDocument.addObject( indexMapping.nestedX2 );
+			nestedX2Document.addValue( indexMapping.nestedX2String, ANY_STRING );
+
+			DocumentElement flattedDocument = document.addObject( indexMapping.flattened );
+			DocumentElement flattedX2Document = flattedDocument.addObject( indexMapping.flattenedX2 );
+			flattedX2Document.addValue( indexMapping.flattenedX2String, ANY_STRING );
+		} );
 		plan.add( referenceProvider( DOCUMENT_5 ), document -> {
 			document.addObject( indexMapping.nestedNoChild );
 			document.addObject( indexMapping.flattenedNoChild );
@@ -341,7 +360,7 @@ public class ObjectExistsSearchPredicateIT {
 				.predicate( p -> p.matchAll() )
 				.fetchAllHits();
 
-		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_0, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_5 );
+		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_0, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4, DOCUMENT_5 );
 	}
 
 	private static class IndexMapping {
@@ -351,34 +370,46 @@ public class ObjectExistsSearchPredicateIT {
 		final IndexObjectFieldReference nested;
 		final IndexFieldReference<String> nestedString;
 		final IndexFieldReference<Integer> nestedNumeric;
+
 		final IndexObjectFieldReference nestedX2;
+		final IndexFieldReference<String> nestedX2String;
 
 		final IndexObjectFieldReference nestedNoChild;
 
 		final IndexObjectFieldReference flattened;
 		final IndexFieldReference<String> flattenedString;
 		final IndexFieldReference<Integer> flattenedNumeric;
+
 		final IndexObjectFieldReference flattenedX2;
+		final IndexFieldReference<String> flattenedX2String;
 
 		final IndexObjectFieldReference flattenedNoChild;
 
 		IndexMapping(IndexSchemaElement root) {
-			string = root.field( "string", f -> f.asString() ).toReference();
-			numeric = root.field( "numeric", f -> f.asInteger() ).toReference();
+			this.string = root.field( "string", f -> f.asString() ).toReference();
+			this.numeric = root.field( "numeric", f -> f.asInteger() ).toReference();
 
 			IndexSchemaObjectField nestedObject = root.objectField( "nested", ObjectFieldStorage.NESTED );
-			nested = nestedObject.toReference();
-			nestedString = nestedObject.field( "string", f -> f.asString() ).toReference();
-			nestedNumeric = nestedObject.field( "numeric", f -> f.asInteger() ).toReference();
-			nestedX2 = nestedObject.objectField( "nestedX2", ObjectFieldStorage.NESTED ).toReference();
-			nestedNoChild = root.objectField( "nestedNoChild", ObjectFieldStorage.NESTED ).toReference();
+			this.nested = nestedObject.toReference();
+			this.nestedString = nestedObject.field( "string", f -> f.asString() ).toReference();
+			this.nestedNumeric = nestedObject.field( "numeric", f -> f.asInteger() ).toReference();
+
+			IndexSchemaObjectField nestedX2Object = nestedObject.objectField( "nestedX2", ObjectFieldStorage.NESTED );
+			this.nestedX2 = nestedX2Object.toReference();
+			this.nestedX2String = nestedX2Object.field( "string", f -> f.asString() ).toReference();
+
+			this.nestedNoChild = root.objectField( "nestedNoChild", ObjectFieldStorage.NESTED ).toReference();
 
 			IndexSchemaObjectField flattenedObject = root.objectField( "flattened", ObjectFieldStorage.FLATTENED );
-			flattened = flattenedObject.toReference();
-			flattenedString = flattenedObject.field( "string", f -> f.asString() ).toReference();
-			flattenedNumeric = flattenedObject.field( "numeric", f -> f.asInteger() ).toReference();
-			flattenedX2 = nestedObject.objectField( "flattenedX2", ObjectFieldStorage.FLATTENED ).toReference();
-			flattenedNoChild = root.objectField( "flattenedNoChild", ObjectFieldStorage.FLATTENED ).toReference();
+			this.flattened = flattenedObject.toReference();
+			this.flattenedString = flattenedObject.field( "string", f -> f.asString() ).toReference();
+			this.flattenedNumeric = flattenedObject.field( "numeric", f -> f.asInteger() ).toReference();
+
+			IndexSchemaObjectField flattenedX2Object = flattenedObject.objectField( "flattenedX2", ObjectFieldStorage.FLATTENED );
+			this.flattenedX2 = flattenedX2Object.toReference();
+			this.flattenedX2String = flattenedX2Object.field( "string", f -> f.asString() ).toReference();
+
+			this.flattenedNoChild = root.objectField( "flattenedNoChild", ObjectFieldStorage.FLATTENED ).toReference();
 		}
 	}
 
