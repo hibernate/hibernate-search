@@ -36,6 +36,7 @@ public class ObjectExistsSearchPredicateIT {
 	private static final String INDEX_NAME = "IndexName";
 	private static final String COMPATIBLE_INDEX_NAME = "CompatibleIndexName";
 	private static final String INCOMPATIBLE_INDEX_NAME = "IncompatibleIndexName";
+	private static final String EMPTY_INDEX_NAME = "EmptyIndexName";
 
 	// this document is empty
 	private static final String DOCUMENT_0 = "0";
@@ -65,6 +66,7 @@ public class ObjectExistsSearchPredicateIT {
 	private StubMappingIndexManager indexManager;
 	private StubMappingIndexManager compatibleIndexManager;
 	private StubMappingIndexManager incompatibleIndexManager;
+	private StubMappingIndexManager emptyIndexManager;
 
 	@Before
 	public void setup() {
@@ -83,6 +85,11 @@ public class ObjectExistsSearchPredicateIT {
 						INCOMPATIBLE_INDEX_NAME,
 						ctx -> new IncompatibleIndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.incompatibleIndexManager = indexManager
+				)
+				.withIndex(
+						EMPTY_INDEX_NAME,
+						ctx -> { /* do not define any mapping here */ },
+						indexManager -> this.emptyIndexManager = indexManager
 				)
 				.setup();
 
@@ -141,6 +148,18 @@ public class ObjectExistsSearchPredicateIT {
 	}
 
 	@Test
+	public void nested_multiIndexes_emptyIndexMapping() {
+		StubMappingScope scope = indexManager.createScope( emptyIndexManager );
+
+		List<DocumentReference> docs = scope.query().asEntityReference()
+				.predicate( p -> p.nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) ) )
+				.fetchAllHits();
+
+		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
+		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+	}
+
+	@Test
 	public void flattened() {
 		StubMappingScope scope = indexManager.createScope();
 
@@ -189,6 +208,18 @@ public class ObjectExistsSearchPredicateIT {
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( INCOMPATIBLE_INDEX_NAME, INDEX_NAME )
 				) );
+	}
+
+	@Test
+	public void flattened_multiIndexes_emptyIndexMapping() {
+		StubMappingScope scope = indexManager.createScope( emptyIndexManager );
+
+		List<DocumentReference> docs = scope.query().asEntityReference()
+				.predicate( p -> p.exists().field( "flattened" ) )
+				.fetchAllHits();
+
+		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
+		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 	}
 
 	private void initData() {
