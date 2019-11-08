@@ -27,7 +27,9 @@ public class ElasticsearchSearchAggregationFactoryImpl
 
 	@Override
 	public AggregationFinalStep<String> fromJson(String jsonString) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return new ElasticsearchJsonStringAggregationFinalStep(
+				dslContext.getBuilderFactory().fromJson( jsonString )
+		);
 	}
 
 	// TODO HSEARCH-3661/HSEARCH-3662 implement extensions to the aggregation DSL for Elasticsearch

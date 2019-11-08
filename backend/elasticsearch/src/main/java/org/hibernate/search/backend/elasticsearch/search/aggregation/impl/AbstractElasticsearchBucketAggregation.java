@@ -7,10 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
 import java.util.Map;
-import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilder;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -19,16 +17,15 @@ import com.google.gson.JsonObject;
  * @param <K> The type of keys in the returned map.
  * @param <V> The type of values in the returned map.
  */
-public abstract class AbstractElasticsearchBucketAggregation<K, V> implements ElasticsearchSearchAggregation<Map<K, V>> {
-
-	private final Set<String> indexNames;
+public abstract class AbstractElasticsearchBucketAggregation<K, V>
+		extends AbstractElasticsearchAggregation<Map<K, V>> {
 
 	AbstractElasticsearchBucketAggregation(AbstractBuilder<K, V> builder) {
-		this.indexNames = builder.searchContext.getHibernateSearchIndexNames();
+		super( builder );
 	}
 
 	@Override
-	public JsonObject request(AggregationRequestContext context) {
+	public final JsonObject request(AggregationRequestContext context) {
 		JsonObject outerObject = new JsonObject();
 		JsonObject innerObject = new JsonObject();
 
@@ -38,15 +35,10 @@ public abstract class AbstractElasticsearchBucketAggregation<K, V> implements El
 	}
 
 	@Override
-	public Map<K, V> extract(JsonObject aggregationResult, AggregationExtractContext context) {
+	public final Map<K, V> extract(JsonObject aggregationResult, AggregationExtractContext context) {
 		JsonElement buckets = aggregationResult.get( "buckets" );
 
 		return doExtract( context, aggregationResult, buckets );
-	}
-
-	@Override
-	public Set<String> getIndexNames() {
-		return indexNames;
 	}
 
 	protected abstract void doRequest(AggregationRequestContext context, JsonObject outerObject, JsonObject innerObject);
@@ -54,12 +46,11 @@ public abstract class AbstractElasticsearchBucketAggregation<K, V> implements El
 	protected abstract Map<K, V> doExtract(AggregationExtractContext context,
 			JsonObject outerObject, JsonElement buckets);
 
-	public abstract static class AbstractBuilder<K, V> implements SearchAggregationBuilder<Map<K, V>> {
-
-		protected final ElasticsearchSearchContext searchContext;
+	public abstract static class AbstractBuilder<K, V>
+			extends AbstractElasticsearchAggregation.AbstractBuilder<Map<K, V>> {
 
 		public AbstractBuilder(ElasticsearchSearchContext searchContext) {
-			this.searchContext = searchContext;
+			super( searchContext );
 		}
 
 		@Override

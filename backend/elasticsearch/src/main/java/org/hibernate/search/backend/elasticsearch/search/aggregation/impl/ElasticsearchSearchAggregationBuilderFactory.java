@@ -18,6 +18,7 @@ import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.Elastic
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
+import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -79,6 +80,10 @@ public class ElasticsearchSearchAggregationBuilderFactory
 		return fieldComponent.getComponent().createRangeAggregationBuilder(
 				searchContext, absoluteFieldPath, expectedType, convert
 		);
+	}
+
+	public SearchAggregationBuilder<String> fromJson(String jsonString) {
+		return new ElasticsearchUserProvidedJsonAggregation.Builder( searchContext, jsonString );
 	}
 
 	private void checkConverterCompatibility(
