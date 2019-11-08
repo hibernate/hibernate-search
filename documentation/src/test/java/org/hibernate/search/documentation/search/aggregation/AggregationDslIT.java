@@ -8,6 +8,7 @@ package org.hibernate.search.documentation.search.aggregation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.sql.Date;
 import java.time.Instant;
@@ -17,7 +18,9 @@ import java.util.Map;
 import java.util.function.Consumer;
 import javax.persistence.EntityManagerFactory;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
+import org.hibernate.search.documentation.testsupport.ElasticsearchBackendConfiguration;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.query.SearchResult;
@@ -32,6 +35,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfigu
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,10 +58,13 @@ public class AggregationDslIT {
 	@Rule
 	public OrmSetupHelper setupHelper;
 
+	private BackendConfiguration backendConfiguration;
+
 	private EntityManagerFactory entityManagerFactory;
 
 	public AggregationDslIT(BackendConfiguration backendConfiguration) {
 		this.setupHelper = OrmSetupHelper.withSingleBackend( backendConfiguration );
+		this.backendConfiguration = backendConfiguration;
 	}
 
 	@Before
@@ -360,6 +367,47 @@ public class AggregationDslIT {
 									1L
 							)
 					);
+		} );
+	}
+
+	@Test
+	public void elasticsearch() {
+		Assume.assumeTrue( backendConfiguration instanceof ElasticsearchBackendConfiguration );
+
+		withinSearchSession( searchSession -> {
+			// tag::elasticsearch-fromJson[]
+			AggregationKey<String> countsByPriceHistogramKey = AggregationKey.of( "countsByPriceHistogram" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.extension( ElasticsearchExtension.get() )
+					.predicate( f -> f.matchAll() )
+					.aggregation( countsByPriceHistogramKey, f -> f.fromJson( "{"
+									+ "\"histogram\": {"
+											+ "\"field\": \"price\","
+											+ "\"interval\": 10"
+									+ "}"
+							+ "}" ) )
+					.fetch( 20 );
+			String countsByPriceHistogram = result.getAggregation( countsByPriceHistogramKey ); // <1>
+			// end::elasticsearch-fromJson[]
+			assertJsonEquals(
+					"{"
+							+ "\"buckets\": ["
+									+ "{"
+											+ "\"key\": 0.0,"
+											+ "\"doc_count\": 1"
+									+ "},"
+									+ "{"
+											+ "\"key\": 10.0,"
+											+ "\"doc_count\": 2"
+									+ "},"
+									+ "{"
+											+ "\"key\": 20.0,"
+											+ "\"doc_count\": 1"
+									+ "}"
+							+ "]"
+					+ "}",
+					countsByPriceHistogram
+			);
 		} );
 	}
 
