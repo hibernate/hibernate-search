@@ -11,6 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -31,6 +32,7 @@ import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
@@ -53,6 +55,7 @@ import org.junit.rules.ExpectedException;
 import org.apache.http.nio.client.HttpAsyncClient;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.HamcrestCondition;
+import org.assertj.core.api.InstanceOfAssertFactories;
 import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
@@ -623,6 +626,51 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
+	public void aggregation_nativeField() {
+		StubMappingScope scope = indexManager.createScope();
+
+		AggregationKey<Map<String, Long>> documentCountPerValue = AggregationKey.of( "documentCountPerValue" );
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.predicate( f -> f.matchAll() )
+				.aggregation( documentCountPerValue, f -> f.terms().field( "nativeField_aggregation", String.class ) )
+				.toQuery();
+		assertThat( query ).aggregation( documentCountPerValue )
+				.asInstanceOf( InstanceOfAssertFactories.map( String.class, Long.class ) )
+				.containsExactly(
+						// There are extra quotes because it's a native field: these are JSON-formatted strings representing string values
+						Assertions.entry( "\"value-for-doc-1-and-2\"", 2L ),
+						Assertions.entry( "\"value-for-doc-3\"", 1L )
+				);
+	}
+
+	@Test
+	public void aggregation_nativeField_fromJson() throws JSONException {
+		StubMappingScope scope = indexManager.createScope();
+
+		AggregationKey<String> documentCountPerValue = AggregationKey.of( "documentCountPerValue" );
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.extension( ElasticsearchExtension.get() )
+				.predicate( f -> f.matchAll() )
+				.aggregation( documentCountPerValue, f -> f.fromJson(
+						"{"
+								+ "'value_count' : {"
+										+ "'field' : 'nativeField_aggregation'"
+								+ " }"
+								+ "}"
+				) )
+				.toQuery();
+		String aggregationResult = query.fetchAll().getAggregation( documentCountPerValue );
+		assertJsonEquals(
+				"{"
+						+ "'value': 3,"
+						+ "}",
+				aggregationResult
+		);
+	}
+
+	@Test
 	public void backend_unwrap() {
 		Backend backend = integration.getBackend( BACKEND_NAME );
 		Assertions.assertThat( backend.unwrap( ElasticsearchBackend.class ) )
@@ -694,6 +742,8 @@ public class ElasticsearchExtensionIT {
 			document.addValue( indexMapping.nativeField_sort3, "z" );
 			document.addValue( indexMapping.nativeField_sort4, "z" );
 			document.addValue( indexMapping.nativeField_sort5, "a" );
+
+			document.addValue( indexMapping.nativeField_aggregation, "value-for-doc-1-and-2" );
 		} );
 		plan.add( referenceProvider( FIRST_ID ), document -> {
 			document.addValue( indexMapping.nativeField_string, "'text 1'" );
@@ -703,6 +753,8 @@ public class ElasticsearchExtensionIT {
 			document.addValue( indexMapping.nativeField_sort3, "z" );
 			document.addValue( indexMapping.nativeField_sort4, "z" );
 			document.addValue( indexMapping.nativeField_sort5, "a" );
+
+			document.addValue( indexMapping.nativeField_aggregation, "value-for-doc-1-and-2" );
 		} );
 		plan.add( referenceProvider( THIRD_ID ), document -> {
 			document.addValue( indexMapping.nativeField_geoPoint, "{'lat': 40.12, 'lon': -71.34}" );
@@ -712,6 +764,8 @@ public class ElasticsearchExtensionIT {
 			document.addValue( indexMapping.nativeField_sort3, "a" );
 			document.addValue( indexMapping.nativeField_sort4, "z" );
 			document.addValue( indexMapping.nativeField_sort5, "a" );
+
+			document.addValue( indexMapping.nativeField_aggregation, "value-for-doc-3" );
 		} );
 		plan.add( referenceProvider( FOURTH_ID ), document -> {
 			document.addValue( indexMapping.nativeField_dateWithColons, "'2018:01:12'" );
@@ -760,6 +814,8 @@ public class ElasticsearchExtensionIT {
 		final IndexFieldReference<String> nativeField_sort3;
 		final IndexFieldReference<String> nativeField_sort4;
 		final IndexFieldReference<String> nativeField_sort5;
+
+		final IndexFieldReference<String> nativeField_aggregation;
 
 		IndexMapping(IndexSchemaElement root) {
 			nativeField_integer = root.field(
@@ -827,6 +883,13 @@ public class ElasticsearchExtensionIT {
 					.toReference();
 			nativeField_sort5 = root.field(
 					"nativeField_sort5",
+					f -> f.extension( ElasticsearchExtension.get() )
+							.asNative( "{'type': 'keyword', 'doc_values': true}" )
+			)
+					.toReference();
+
+			nativeField_aggregation = root.field(
+					"nativeField_aggregation",
 					f -> f.extension( ElasticsearchExtension.get() )
 							.asNative( "{'type': 'keyword', 'doc_values': true}" )
 			)
