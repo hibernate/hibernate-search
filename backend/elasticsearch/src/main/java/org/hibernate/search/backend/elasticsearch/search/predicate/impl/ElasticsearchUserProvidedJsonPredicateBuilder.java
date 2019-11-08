@@ -9,11 +9,11 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 import com.google.gson.JsonObject;
 
 
-class ElasticsearchUserProvidedJsonPredicateContributor implements ElasticsearchSearchPredicateBuilder {
+class ElasticsearchUserProvidedJsonPredicateBuilder implements ElasticsearchSearchPredicateBuilder {
 
 	private final JsonObject json;
 
-	ElasticsearchUserProvidedJsonPredicateContributor(JsonObject json) {
+	ElasticsearchUserProvidedJsonPredicateBuilder(JsonObject json) {
 		this.json = json;
 	}
 
