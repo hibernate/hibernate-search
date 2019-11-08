@@ -38,6 +38,7 @@ public class ObjectExistsSearchPredicateIT {
 	private static final String INCOMPATIBLE_INDEX_NAME = "IncompatibleIndexName";
 	private static final String EMPTY_INDEX_NAME = "EmptyIndexName";
 	private static final String INVERTED_INDEX_NAME = "InvertedIndexName";
+	private static final String DIFFERENT_FIELDS_INDEX_NAME = "DifferentFieldsIndexName";
 
 	// this document is empty
 	private static final String DOCUMENT_0 = "0";
@@ -69,6 +70,7 @@ public class ObjectExistsSearchPredicateIT {
 	private StubMappingIndexManager incompatibleIndexManager;
 	private StubMappingIndexManager emptyIndexManager;
 	private StubMappingIndexManager invertedIndexManager;
+	private StubMappingIndexManager differentFieldsIndexManager;
 
 	@Before
 	public void setup() {
@@ -97,6 +99,11 @@ public class ObjectExistsSearchPredicateIT {
 						INVERTED_INDEX_NAME,
 						ctx -> new InvertedIndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.invertedIndexManager = indexManager
+				)
+				.withIndex(
+						DIFFERENT_FIELDS_INDEX_NAME,
+						ctx -> new DifferentFieldsMapping( ctx.getSchemaElement() ),
+						indexManager -> this.differentFieldsIndexManager = indexManager
 				)
 				.setup();
 
@@ -183,6 +190,22 @@ public class ObjectExistsSearchPredicateIT {
 	}
 
 	@Test
+	public void nested_multiIndexes_differentFields() {
+		StubMappingScope scope = indexManager.createScope( differentFieldsIndexManager );
+
+		SubTest.expectException(
+				() -> scope.predicate().nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Multiple conflicting models for object field" )
+				.hasMessageContaining( "'nested'" )
+				.satisfies( FailureReportUtils.hasContext(
+						EventContexts.fromIndexNames( INDEX_NAME, DIFFERENT_FIELDS_INDEX_NAME )
+				) );
+	}
+
+	@Test
 	public void flattened() {
 		StubMappingScope scope = indexManager.createScope();
 
@@ -258,6 +281,22 @@ public class ObjectExistsSearchPredicateIT {
 				.hasMessageContaining( "'flattened'" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( INVERTED_INDEX_NAME, INDEX_NAME )
+				) );
+	}
+
+	@Test
+	public void flattened_multiIndexes_differentFields() {
+		StubMappingScope scope = differentFieldsIndexManager.createScope( indexManager );
+
+		SubTest.expectException(
+				() -> scope.predicate().exists().field( "flattened" )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Multiple conflicting models for object field" )
+				.hasMessageContaining( "'flattened'" )
+				.satisfies( FailureReportUtils.hasContext(
+						EventContexts.fromIndexNames( DIFFERENT_FIELDS_INDEX_NAME, INDEX_NAME )
 				) );
 	}
 
@@ -360,6 +399,30 @@ public class ObjectExistsSearchPredicateIT {
 
 			// Use NESTED for flattened
 			root.objectField( "flattened", ObjectFieldStorage.NESTED ).toReference();
+		}
+	}
+
+	private static class DifferentFieldsMapping {
+		DifferentFieldsMapping(IndexSchemaElement root) {
+			IndexSchemaObjectField nestedObject = root.objectField( "nested", ObjectFieldStorage.NESTED );
+			nestedObject.toReference();
+
+			// change field string into stringDifferentName
+			nestedObject.field( "stringDifferentName", f -> f.asString() ).toReference();
+			// change field numeric into numericDifferentName
+			nestedObject.field( "numericDifferentName", f -> f.asInteger() ).toReference();
+
+			nestedObject.objectField( "nestedX2", ObjectFieldStorage.NESTED ).toReference();
+
+			IndexSchemaObjectField flattenedObject = root.objectField( "flattened", ObjectFieldStorage.FLATTENED );
+			flattenedObject.toReference();
+
+			// change field string into stringDifferentName
+			flattenedObject.field( "stringDifferentName", f -> f.asString() ).toReference();
+			// change field numeric into numericDifferentName
+			flattenedObject.field( "numericDifferentName", f -> f.asInteger() ).toReference();
+
+			nestedObject.objectField( "flattenedX2", ObjectFieldStorage.FLATTENED ).toReference();
 		}
 	}
 }
