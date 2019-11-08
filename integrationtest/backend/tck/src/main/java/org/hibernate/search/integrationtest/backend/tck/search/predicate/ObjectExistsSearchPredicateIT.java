@@ -50,6 +50,10 @@ public class ObjectExistsSearchPredicateIT {
 	// string and numeric within both nested and flattened objects
 	private static final String DOCUMENT_3 = "3";
 
+	// this document has only an object field with no child,
+	// it will never be matched by an exists predicate
+	private static final String DOCUMENT_5 = "5";
+
 	public static final String ANY_STRING = "Any String";
 	public static final int ANY_INTEGER = 173173;
 
@@ -98,6 +102,17 @@ public class ObjectExistsSearchPredicateIT {
 	}
 
 	@Test
+	public void nested_noChild() {
+		StubMappingScope scope = indexManager.createScope();
+
+		List<DocumentReference> docs = scope.query().asEntityReference()
+				.predicate( p -> p.nested().objectField( "nestedNoChild" ).nest( f -> f.exists().field( "nestedNoChild" ) ) )
+				.fetchAllHits();
+
+		assertThat( docs ).isEmpty();
+	}
+
+	@Test
 	public void nested_multiIndexes_compatibleIndexMapping() {
 		StubMappingScope scope = indexManager.createScope( compatibleIndexManager );
 
@@ -135,6 +150,17 @@ public class ObjectExistsSearchPredicateIT {
 
 		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
 		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+	}
+
+	@Test
+	public void flattened_noChild() {
+		StubMappingScope scope = indexManager.createScope();
+
+		List<DocumentReference> docs = scope.query().asEntityReference()
+				.predicate( p -> p.exists().field( "flattenedNoChild" ) )
+				.fetchAllHits();
+
+		assertThat( docs ).isEmpty();
 	}
 
 	@Test
@@ -192,6 +218,10 @@ public class ObjectExistsSearchPredicateIT {
 			flattedDocument.addValue( indexMapping.flattenedString, ANY_STRING );
 			flattedDocument.addValue( indexMapping.flattenedNumeric, ANY_INTEGER );
 		} );
+		plan.add( referenceProvider( DOCUMENT_5 ), document -> {
+			document.addObject( indexMapping.nestedNoChild );
+			document.addObject( indexMapping.flattenedNoChild );
+		} );
 
 		plan.execute().join();
 		checkDocumentsCreation();
@@ -202,7 +232,7 @@ public class ObjectExistsSearchPredicateIT {
 				.predicate( p -> p.matchAll() )
 				.fetchAllHits();
 
-		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_0, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_0, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_5 );
 	}
 
 	private static class IndexMapping {
@@ -214,10 +244,14 @@ public class ObjectExistsSearchPredicateIT {
 		final IndexFieldReference<Integer> nestedNumeric;
 		final IndexObjectFieldReference nestedX2;
 
+		final IndexObjectFieldReference nestedNoChild;
+
 		final IndexObjectFieldReference flattened;
 		final IndexFieldReference<String> flattenedString;
 		final IndexFieldReference<Integer> flattenedNumeric;
 		final IndexObjectFieldReference flattenedX2;
+
+		final IndexObjectFieldReference flattenedNoChild;
 
 		IndexMapping(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString() ).toReference();
@@ -227,13 +261,15 @@ public class ObjectExistsSearchPredicateIT {
 			nested = nestedObject.toReference();
 			nestedString = nestedObject.field( "string", f -> f.asString() ).toReference();
 			nestedNumeric = nestedObject.field( "numeric", f -> f.asInteger() ).toReference();
-			nestedX2 = nestedObject.objectField( "nestedX2" ).toReference();
+			nestedX2 = nestedObject.objectField( "nestedX2", ObjectFieldStorage.NESTED ).toReference();
+			nestedNoChild = root.objectField( "nestedNoChild", ObjectFieldStorage.NESTED ).toReference();
 
 			IndexSchemaObjectField flattenedObject = root.objectField( "flattened", ObjectFieldStorage.FLATTENED );
 			flattened = flattenedObject.toReference();
 			flattenedString = flattenedObject.field( "string", f -> f.asString() ).toReference();
 			flattenedNumeric = flattenedObject.field( "numeric", f -> f.asInteger() ).toReference();
-			flattenedX2 = nestedObject.objectField( "flattenedX2" ).toReference();
+			flattenedX2 = nestedObject.objectField( "flattenedX2", ObjectFieldStorage.FLATTENED ).toReference();
+			flattenedNoChild = root.objectField( "flattenedNoChild", ObjectFieldStorage.FLATTENED ).toReference();
 		}
 	}
 
