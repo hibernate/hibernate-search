@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.ElasticsearchSearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.DelegatingSearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
@@ -22,6 +23,11 @@ public class ElasticsearchSearchAggregationFactoryImpl
 			SearchAggregationDslContext<ElasticsearchSearchAggregationBuilderFactory> dslContext) {
 		super( delegate );
 		this.dslContext = dslContext;
+	}
+
+	@Override
+	public AggregationFinalStep<String> fromJson(String jsonString) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	// TODO HSEARCH-3661/HSEARCH-3662 implement extensions to the aggregation DSL for Elasticsearch

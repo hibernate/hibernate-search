@@ -6,7 +6,21 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.aggregation.dsl;
 
+import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 
 public interface ElasticsearchSearchAggregationFactory extends SearchAggregationFactory {
+
+	/**
+	 * Create an aggregation from JSON.
+	 * <p>
+	 * The created aggregation will return the result as a JSON-formatted string.
+	 *
+	 * @param jsonString A string representing an Elasticsearch aggregation as a JSON object.
+	 * The JSON object must be a syntactically correct Elasticsearch aggregation.
+	 * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html">the Elasticsearch documentation</a>.
+	 * @return The final step of the aggregation DSL.
+	 */
+	AggregationFinalStep<String> fromJson(String jsonString);
+
 }
