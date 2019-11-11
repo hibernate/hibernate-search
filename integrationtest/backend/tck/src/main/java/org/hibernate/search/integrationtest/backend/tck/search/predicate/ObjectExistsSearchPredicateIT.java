@@ -18,6 +18,7 @@ import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -39,6 +40,7 @@ public class ObjectExistsSearchPredicateIT {
 	private static final String EMPTY_INDEX_NAME = "EmptyIndexName";
 	private static final String INVERTED_INDEX_NAME = "InvertedIndexName";
 	private static final String DIFFERENT_FIELDS_INDEX_NAME = "DifferentFieldsIndexName";
+	private static final String INCOMPATIBLE_FIELDS_INDEX_NAME = "IncompatibleFieldsIndexName";
 
 	// this document is empty
 	private static final String DOCUMENT_0 = "0";
@@ -75,6 +77,7 @@ public class ObjectExistsSearchPredicateIT {
 	private StubMappingIndexManager emptyIndexManager;
 	private StubMappingIndexManager invertedIndexManager;
 	private StubMappingIndexManager differentFieldsIndexManager;
+	private StubMappingIndexManager incompatibleFieldsIndexManager;
 
 	@Before
 	public void setup() {
@@ -108,6 +111,11 @@ public class ObjectExistsSearchPredicateIT {
 						DIFFERENT_FIELDS_INDEX_NAME,
 						ctx -> new DifferentFieldsMapping( ctx.getSchemaElement() ),
 						indexManager -> this.differentFieldsIndexManager = indexManager
+				)
+				.withIndex(
+						INCOMPATIBLE_FIELDS_INDEX_NAME,
+						ctx -> new IncompatibleFieldsMapping( ctx.getSchemaElement() ),
+						indexManager -> this.incompatibleFieldsIndexManager = indexManager
 				)
 				.setup();
 
@@ -213,6 +221,22 @@ public class ObjectExistsSearchPredicateIT {
 	}
 
 	@Test
+	public void nested_multiIndexes_incompatibleFields() {
+		StubMappingScope scope = indexManager.createScope( incompatibleFieldsIndexManager );
+
+		SubTest.expectException(
+				() -> scope.predicate().nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Multiple conflicting models for object field" )
+				.hasMessageContaining( "'nested'" )
+				.satisfies( FailureReportUtils.hasContext(
+						EventContexts.fromIndexNames( INDEX_NAME, INCOMPATIBLE_FIELDS_INDEX_NAME )
+				) );
+	}
+
+	@Test
 	public void flattened() {
 		StubMappingScope scope = indexManager.createScope();
 
@@ -307,6 +331,22 @@ public class ObjectExistsSearchPredicateIT {
 				.hasMessageContaining( "'flattened'" )
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( DIFFERENT_FIELDS_INDEX_NAME, INDEX_NAME )
+				) );
+	}
+
+	@Test
+	public void flattened_multiIndexes_incompatibleFields() {
+		StubMappingScope scope = incompatibleFieldsIndexManager.createScope( indexManager );
+
+		SubTest.expectException(
+				() -> scope.predicate().exists().field( "flattened" )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Multiple conflicting models for object field" )
+				.hasMessageContaining( "'flattened'" )
+				.satisfies( FailureReportUtils.hasContext(
+						EventContexts.fromIndexNames( INCOMPATIBLE_FIELDS_INDEX_NAME, INDEX_NAME )
 				) );
 	}
 
@@ -452,6 +492,28 @@ public class ObjectExistsSearchPredicateIT {
 			flattenedObject.field( "stringDifferentName", f -> f.asString() ).toReference();
 			// change field numeric into numericDifferentName
 			flattenedObject.field( "numericDifferentName", f -> f.asInteger() ).toReference();
+
+			nestedObject.objectField( "flattenedX2", ObjectFieldStorage.FLATTENED ).toReference();
+		}
+	}
+
+	private static class IncompatibleFieldsMapping {
+		IncompatibleFieldsMapping(IndexSchemaElement root) {
+			IndexSchemaObjectField nestedObject = root.objectField( "nested", ObjectFieldStorage.NESTED );
+			nestedObject.toReference();
+
+			// field has same name, but with an incompatible exists predicates: string vs BigDecimal
+			nestedObject.field( "string", f -> f.asBigDecimal().decimalScale( 3 ) ).toReference();
+			nestedObject.field( "numeric", f -> f.asInteger() ).toReference();
+
+			nestedObject.objectField( "nestedX2", ObjectFieldStorage.NESTED ).toReference();
+
+			IndexSchemaObjectField flattenedObject = root.objectField( "flattened", ObjectFieldStorage.FLATTENED );
+			flattenedObject.toReference();
+
+			flattenedObject.field( "string", f -> f.asString() ).toReference();
+			// field has same name, but with an incompatible exists predicates: unSortable vs Sortable
+			flattenedObject.field( "numeric", f -> f.asInteger().sortable( Sortable.YES ) ).toReference();
 
 			nestedObject.objectField( "flattenedX2", ObjectFieldStorage.FLATTENED ).toReference();
 		}
