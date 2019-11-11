@@ -18,6 +18,7 @@ import java.util.Set;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.Version;
 
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneFieldAggregationBuilderFactory;
@@ -589,4 +590,9 @@ public interface Log extends BasicLogger {
 			value = "Multiple conflicting models for object field '%1$s': '%2$s' vs. '%3$s'.")
 	SearchException conflictingObjectFieldModel(String absoluteFieldPath,
 			LuceneIndexSchemaObjectNode index1Model, LuceneIndexSchemaObjectNode index2Model, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 106,
+			value = "Multiple conflicting models for field '%1$s': '%2$s' vs. '%3$s'.")
+	SearchException conflictingFieldModel(String absoluteFieldPath,
+			LuceneIndexSchemaObjectNode objectNode, LuceneIndexSchemaFieldNode fieldNode, @Param EventContext context);
 }
