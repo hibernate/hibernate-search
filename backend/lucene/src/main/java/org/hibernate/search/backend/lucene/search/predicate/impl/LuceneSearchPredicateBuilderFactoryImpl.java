@@ -7,18 +7,16 @@
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Map;
 
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexFieldComponent;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexObjectComponent;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
-import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneExistsCompositePredicateBuilder;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactory;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
@@ -129,16 +127,9 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 	@Override
 	public ExistsPredicateBuilder<LuceneSearchPredicateBuilder> exists(String absoluteFieldPath) {
 		// trying object node first
-		LuceneScopedIndexObjectComponent<LuceneFieldPredicateBuilderFactory> schemaObjectNodeComponent = scopeModel.getSchemaObjectNodeComponent(
-				absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		if ( schemaObjectNodeComponent != null ) {
-			LuceneExistsCompositePredicateBuilder objectPredicateBuilder = new LuceneExistsCompositePredicateBuilder();
-			for ( Map.Entry<String, LuceneFieldPredicateBuilderFactory> fieldComponentEntry : schemaObjectNodeComponent.getFieldComponents().entrySet() ) {
-				ExistsPredicateBuilder<LuceneSearchPredicateBuilder> existsPredicateBuilder = fieldComponentEntry.getValue().createExistsPredicateBuilder(
-						fieldComponentEntry.getKey() );
-				objectPredicateBuilder.addChild( existsPredicateBuilder );
-			}
-			return objectPredicateBuilder;
+		LuceneObjectPredicateBuilderFactory objectPredicateBuilderFactory = scopeModel.getObjectPredicateBuilderFactory( absoluteFieldPath );
+		if ( objectPredicateBuilderFactory != null ) {
+			return objectPredicateBuilderFactory.createExistsPredicateBuilder();
 		}
 
 		return scopeModel

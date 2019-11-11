@@ -17,6 +17,8 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactory;
+import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactoryImpl;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -74,43 +76,52 @@ public class LuceneScopeModel {
 		return selectedIdConverter;
 	}
 
-	public <T> LuceneScopedIndexObjectComponent<T> getSchemaObjectNodeComponent(String absoluteFieldPath,
-			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
-		LuceneScopedIndexObjectComponent<T> result = null;
-		String selectedIndexName = null;
-		LuceneIndexSchemaObjectNode selectedObjectNode = null;
+	public LuceneObjectPredicateBuilderFactory getObjectPredicateBuilderFactory(String absoluteFieldPath) {
+		LuceneObjectPredicateBuilderFactory result = null;
+
+		LuceneIndexSchemaObjectNode objectNode = null;
+		String objectNodeIndexName = null;
+		LuceneIndexSchemaFieldNode<?> fieldNode = null;
+		String fieldNodeIndexName = null;
 
 		for ( LuceneIndexModel indexModel : indexModels ) {
 			String indexName = indexModel.getIndexName();
 
-			LuceneIndexSchemaObjectNode objectNode = indexModel.getObjectNode( absoluteFieldPath );
-
-			if ( selectedIndexName != null ) {
-				if ( ( selectedObjectNode == null && objectNode != null ) ||
-						( selectedObjectNode != null && objectNode == null ) ) {
-					throw log.conflictingObjectFieldModel( absoluteFieldPath,
-							selectedObjectNode, objectNode,
-							EventContexts.fromIndexNames( selectedIndexName, indexName )
+			LuceneIndexSchemaFieldNode<?> currentFieldNode = indexModel.getFieldNode( absoluteFieldPath );
+			if ( currentFieldNode != null ) {
+				fieldNode = currentFieldNode;
+				fieldNodeIndexName = indexName;
+				if ( objectNode != null ) {
+					throw log.conflictingFieldModel( absoluteFieldPath, objectNode, fieldNode,
+							EventContexts.fromIndexNames( objectNodeIndexName, indexName )
 					);
 				}
 				continue;
 			}
-			selectedIndexName = indexName;
-			selectedObjectNode = objectNode;
 
-			if ( objectNode == null ) {
+			LuceneIndexSchemaObjectNode currentObjectNode = indexModel.getObjectNode( absoluteFieldPath );
+			if ( currentObjectNode == null ) {
 				continue;
 			}
 
-			result = new LuceneScopedIndexObjectComponent<>();
-			for ( String childPath : objectNode.getChildrenAbsolutePaths() ) {
-				LuceneIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( childPath );
-				if ( schemaNode == null ) {
-					continue;
-				}
+			if ( fieldNode != null ) {
+				throw log.conflictingFieldModel( absoluteFieldPath, currentObjectNode, fieldNode,
+						EventContexts.fromIndexNames( fieldNodeIndexName, indexName )
+				);
+			}
 
-				T component = componentRetrievalStrategy.extractComponent( schemaNode );
-				result.addFieldComponent( childPath, component );
+			LuceneObjectPredicateBuilderFactoryImpl predicateBuilderFactory = new LuceneObjectPredicateBuilderFactoryImpl( indexModel, currentObjectNode );
+			if ( result == null ) {
+				result = predicateBuilderFactory;
+				objectNode = currentObjectNode;
+				objectNodeIndexName = indexName;
+				continue;
+			}
+
+			if ( !result.isCompatibleWith( predicateBuilderFactory ) ) {
+				throw log.conflictingObjectFieldModel( absoluteFieldPath, objectNode, currentObjectNode,
+						EventContexts.fromIndexNames( objectNodeIndexName, indexName )
+				);
 			}
 		}
 		return result;
