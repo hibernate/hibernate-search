@@ -55,7 +55,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import org.apache.http.nio.client.HttpAsyncClient;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.HamcrestCondition;
@@ -310,7 +312,8 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.match().field( "nativeField_dateWithColons" ).matching( "'2018:01:12'" ) )
+				.predicate( f -> f.match().field( "nativeField_dateWithColons" )
+						.matching( new JsonPrimitive( "2018:01:12" ) ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FOURTH_ID )
@@ -322,7 +325,8 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.match().field( "nativeField_integer_converted" ).matching( new ValueWrapper<>( "2" ) ) )
+				.predicate( f -> f.match().field( "nativeField_integer_converted" )
+						.matching( new ValueWrapper<>( new JsonPrimitive( 2 ) ) ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, SECOND_ID )
@@ -334,7 +338,8 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.match().field( "nativeField_integer_converted" ).matching( "2", ValueConvert.NO ) )
+				.predicate( f -> f.match().field( "nativeField_integer_converted" )
+						.matching( new JsonPrimitive( 2 ), ValueConvert.NO ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, SECOND_ID )
@@ -727,12 +732,12 @@ public class ElasticsearchExtensionIT {
 	public void projection_nativeField() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SearchQuery<String> query = scope.query()
-				.asProjection( f -> f.field( "nativeField_integer", String.class ) )
+		SearchQuery<JsonElement> query = scope.query()
+				.asProjection( f -> f.field( "nativeField_integer", JsonElement.class ) )
 				.predicate( f -> f.id().matching( SECOND_ID ) )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder( "2" );
+		assertThat( query ).hasHitsAnyOrder( new JsonPrimitive( 2 ) );
 	}
 
 	@Test
@@ -744,19 +749,19 @@ public class ElasticsearchExtensionIT {
 				.predicate( f -> f.id().matching( SECOND_ID ) )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder( new ValueWrapper<>( "2" ) );
+		assertThat( query ).hasHitsAnyOrder( new ValueWrapper<>( new JsonPrimitive( 2 ) ) );
 	}
 
 	@Test
 	public void projection_nativeField_withProjectionConverters_disabled() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SearchQuery<String> query = scope.query()
-				.asProjection( f -> f.field( "nativeField_integer_converted", String.class, ValueConvert.NO ) )
+		SearchQuery<JsonElement> query = scope.query()
+				.asProjection( f -> f.field( "nativeField_integer_converted", JsonElement.class, ValueConvert.NO ) )
 				.predicate( f -> f.id().matching( SECOND_ID ) )
 				.toQuery();
 
-		assertThat( query ).hasHitsAnyOrder( "2" );
+		assertThat( query ).hasHitsAnyOrder( new JsonPrimitive( 2 ) );
 	}
 
 	@Test
@@ -841,18 +846,18 @@ public class ElasticsearchExtensionIT {
 	public void aggregation_nativeField() {
 		StubMappingScope scope = indexManager.createScope();
 
-		AggregationKey<Map<String, Long>> documentCountPerValue = AggregationKey.of( "documentCountPerValue" );
+		AggregationKey<Map<JsonElement, Long>> documentCountPerValue = AggregationKey.of( "documentCountPerValue" );
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.predicate( f -> f.matchAll() )
-				.aggregation( documentCountPerValue, f -> f.terms().field( "nativeField_aggregation", String.class ) )
+				.aggregation( documentCountPerValue, f -> f.terms().field( "nativeField_aggregation", JsonElement.class ) )
 				.toQuery();
 		assertThat( query ).aggregation( documentCountPerValue )
-				.asInstanceOf( InstanceOfAssertFactories.map( String.class, Long.class ) )
+				.asInstanceOf( InstanceOfAssertFactories.map( JsonElement.class, Long.class ) )
 				.containsExactly(
 						// There are extra quotes because it's a native field: these are JSON-formatted strings representing string values
-						Assertions.entry( "\"value-for-doc-1-and-2\"", 2L ),
-						Assertions.entry( "\"value-for-doc-3\"", 1L )
+						Assertions.entry( new JsonPrimitive( "value-for-doc-1-and-2" ), 2L ),
+						Assertions.entry( new JsonPrimitive( "value-for-doc-3" ), 1L )
 				);
 	}
 
@@ -973,58 +978,58 @@ public class ElasticsearchExtensionIT {
 	private void initData() {
 		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( SECOND_ID ), document -> {
-			document.addValue( indexMapping.nativeField_integer, "2" );
-			document.addValue( indexMapping.nativeField_integer_converted, "2" );
-			document.addValue( indexMapping.nativeField_unsupportedType, "42" );
+			document.addValue( indexMapping.nativeField_integer, new JsonPrimitive( 2 ) );
+			document.addValue( indexMapping.nativeField_integer_converted, new JsonPrimitive( 2 ) );
+			document.addValue( indexMapping.nativeField_unsupportedType, new JsonPrimitive( "42" ) );
 
-			document.addValue( indexMapping.nativeField_sort1, "z" );
-			document.addValue( indexMapping.nativeField_sort2, "a" );
-			document.addValue( indexMapping.nativeField_sort3, "z" );
-			document.addValue( indexMapping.nativeField_sort4, "z" );
-			document.addValue( indexMapping.nativeField_sort5, "a" );
+			document.addValue( indexMapping.nativeField_sort1, new JsonPrimitive( "z" ) );
+			document.addValue( indexMapping.nativeField_sort2, new JsonPrimitive( "a" ) );
+			document.addValue( indexMapping.nativeField_sort3, new JsonPrimitive( "z" ) );
+			document.addValue( indexMapping.nativeField_sort4, new JsonPrimitive( "z" ) );
+			document.addValue( indexMapping.nativeField_sort5, new JsonPrimitive( "a" ) );
 
-			document.addValue( indexMapping.nativeField_aggregation, "value-for-doc-1-and-2" );
+			document.addValue( indexMapping.nativeField_aggregation, new JsonPrimitive( "value-for-doc-1-and-2" ) );
 		} );
 		plan.add( referenceProvider( FIRST_ID ), document -> {
-			document.addValue( indexMapping.nativeField_string, "'text 1'" );
+			document.addValue( indexMapping.nativeField_string, new JsonPrimitive( "text 1" ) );
 
-			document.addValue( indexMapping.nativeField_sort1, "a" );
-			document.addValue( indexMapping.nativeField_sort2, "z" );
-			document.addValue( indexMapping.nativeField_sort3, "z" );
-			document.addValue( indexMapping.nativeField_sort4, "z" );
-			document.addValue( indexMapping.nativeField_sort5, "a" );
+			document.addValue( indexMapping.nativeField_sort1, new JsonPrimitive( "a" ) );
+			document.addValue( indexMapping.nativeField_sort2, new JsonPrimitive( "z" ) );
+			document.addValue( indexMapping.nativeField_sort3, new JsonPrimitive( "z" ) );
+			document.addValue( indexMapping.nativeField_sort4, new JsonPrimitive( "z" ) );
+			document.addValue( indexMapping.nativeField_sort5, new JsonPrimitive( "a" ) );
 
-			document.addValue( indexMapping.nativeField_aggregation, "value-for-doc-1-and-2" );
+			document.addValue( indexMapping.nativeField_aggregation, new JsonPrimitive( "value-for-doc-1-and-2" ) );
 		} );
 		plan.add( referenceProvider( THIRD_ID ), document -> {
-			document.addValue( indexMapping.nativeField_geoPoint, "{'lat': 40.12, 'lon': -71.34}" );
+			document.addValue( indexMapping.nativeField_geoPoint, gson.fromJson( "{'lat': 40.12, 'lon': -71.34}", JsonObject.class ) );
 
-			document.addValue( indexMapping.nativeField_sort1, "z" );
-			document.addValue( indexMapping.nativeField_sort2, "z" );
-			document.addValue( indexMapping.nativeField_sort3, "a" );
-			document.addValue( indexMapping.nativeField_sort4, "z" );
-			document.addValue( indexMapping.nativeField_sort5, "a" );
+			document.addValue( indexMapping.nativeField_sort1, new JsonPrimitive( "z" ) );
+			document.addValue( indexMapping.nativeField_sort2, new JsonPrimitive( "z" ) );
+			document.addValue( indexMapping.nativeField_sort3, new JsonPrimitive( "a" ) );
+			document.addValue( indexMapping.nativeField_sort4, new JsonPrimitive( "z" ) );
+			document.addValue( indexMapping.nativeField_sort5, new JsonPrimitive( "a" ) );
 
-			document.addValue( indexMapping.nativeField_aggregation, "value-for-doc-3" );
+			document.addValue( indexMapping.nativeField_aggregation, new JsonPrimitive( "value-for-doc-3" ) );
 		} );
 		plan.add( referenceProvider( FOURTH_ID ), document -> {
-			document.addValue( indexMapping.nativeField_dateWithColons, "'2018:01:12'" );
+			document.addValue( indexMapping.nativeField_dateWithColons, new JsonPrimitive( "2018:01:12" ) );
 
-			document.addValue( indexMapping.nativeField_sort1, "z" );
-			document.addValue( indexMapping.nativeField_sort2, "z" );
-			document.addValue( indexMapping.nativeField_sort3, "z" );
-			document.addValue( indexMapping.nativeField_sort4, "a" );
-			document.addValue( indexMapping.nativeField_sort5, "a" );
+			document.addValue( indexMapping.nativeField_sort1, new JsonPrimitive( "z" ) );
+			document.addValue( indexMapping.nativeField_sort2, new JsonPrimitive( "z" ) );
+			document.addValue( indexMapping.nativeField_sort3, new JsonPrimitive( "z" ) );
+			document.addValue( indexMapping.nativeField_sort4, new JsonPrimitive( "a" ) );
+			document.addValue( indexMapping.nativeField_sort5, new JsonPrimitive( "a" ) );
 		} );
 		plan.add( referenceProvider( FIFTH_ID ), document -> {
 			// This document should not match any query
-			document.addValue( indexMapping.nativeField_string, "'text 2'" );
-			document.addValue( indexMapping.nativeField_integer, "1" );
-			document.addValue( indexMapping.nativeField_geoPoint, "{'lat': 45.12, 'lon': -75.34}" );
-			document.addValue( indexMapping.nativeField_dateWithColons, "'2018:01:25'" );
-			document.addValue( indexMapping.nativeField_unsupportedType, "'foobar'" ); // ignore_malformed is enabled, this should be ignored
+			document.addValue( indexMapping.nativeField_string, new JsonPrimitive( "text 2" ) );
+			document.addValue( indexMapping.nativeField_integer, new JsonPrimitive( 1 ) );
+			document.addValue( indexMapping.nativeField_geoPoint, gson.fromJson( "{'lat': 45.12, 'lon': -75.34}", JsonObject.class ) );
+			document.addValue( indexMapping.nativeField_dateWithColons, new JsonPrimitive( "2018:01:25" ) );
+			document.addValue( indexMapping.nativeField_unsupportedType, new JsonPrimitive( "foobar" ) ); // ignore_malformed is enabled, this should be ignored
 
-			document.addValue( indexMapping.nativeField_sort5, "z" );
+			document.addValue( indexMapping.nativeField_sort5, new JsonPrimitive( "z" ) );
 		} );
 		plan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
@@ -1042,20 +1047,20 @@ public class ElasticsearchExtensionIT {
 	}
 
 	private static class IndexMapping {
-		final IndexFieldReference<String> nativeField_integer;
-		final IndexFieldReference<String> nativeField_integer_converted;
-		final IndexFieldReference<String> nativeField_string;
-		final IndexFieldReference<String> nativeField_geoPoint;
-		final IndexFieldReference<String> nativeField_dateWithColons;
-		final IndexFieldReference<String> nativeField_unsupportedType;
+		final IndexFieldReference<JsonElement> nativeField_integer;
+		final IndexFieldReference<JsonElement> nativeField_integer_converted;
+		final IndexFieldReference<JsonElement> nativeField_string;
+		final IndexFieldReference<JsonElement> nativeField_geoPoint;
+		final IndexFieldReference<JsonElement> nativeField_dateWithColons;
+		final IndexFieldReference<JsonElement> nativeField_unsupportedType;
 
-		final IndexFieldReference<String> nativeField_sort1;
-		final IndexFieldReference<String> nativeField_sort2;
-		final IndexFieldReference<String> nativeField_sort3;
-		final IndexFieldReference<String> nativeField_sort4;
-		final IndexFieldReference<String> nativeField_sort5;
+		final IndexFieldReference<JsonElement> nativeField_sort1;
+		final IndexFieldReference<JsonElement> nativeField_sort2;
+		final IndexFieldReference<JsonElement> nativeField_sort3;
+		final IndexFieldReference<JsonElement> nativeField_sort4;
+		final IndexFieldReference<JsonElement> nativeField_sort5;
 
-		final IndexFieldReference<String> nativeField_aggregation;
+		final IndexFieldReference<JsonElement> nativeField_aggregation;
 
 		IndexMapping(IndexSchemaElement root) {
 			nativeField_integer = root.field(
