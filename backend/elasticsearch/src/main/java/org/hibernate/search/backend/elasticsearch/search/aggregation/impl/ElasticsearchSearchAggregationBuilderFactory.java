@@ -26,6 +26,8 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
+import com.google.gson.JsonObject;
+
 public class ElasticsearchSearchAggregationBuilderFactory
 		implements SearchAggregationBuilderFactory<ElasticsearchSearchAggregationCollector> {
 
@@ -82,8 +84,12 @@ public class ElasticsearchSearchAggregationBuilderFactory
 		);
 	}
 
+	public SearchAggregationBuilder<String> fromJson(JsonObject jsonObject) {
+		return new ElasticsearchUserProvidedJsonAggregation.Builder( searchContext, jsonObject );
+	}
+
 	public SearchAggregationBuilder<String> fromJson(String jsonString) {
-		return new ElasticsearchUserProvidedJsonAggregation.Builder( searchContext, jsonString );
+		return fromJson( searchContext.getUserFacingGson().fromJson( jsonString, JsonObject.class ) );
 	}
 
 	private void checkConverterCompatibility(

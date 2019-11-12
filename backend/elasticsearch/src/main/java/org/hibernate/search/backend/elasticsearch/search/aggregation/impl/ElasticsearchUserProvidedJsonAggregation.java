@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.search.aggregation.impl;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 
@@ -37,9 +36,9 @@ class ElasticsearchUserProvidedJsonAggregation extends AbstractElasticsearchAggr
 
 		private final JsonObject json;
 
-		Builder(ElasticsearchSearchContext searchContext, String jsonString) {
+		Builder(ElasticsearchSearchContext searchContext, JsonObject json) {
 			super( searchContext );
-			this.json = searchContext.getUserFacingGson().fromJson( jsonString, JsonObject.class );
+			this.json = json;
 		}
 
 		@Override
