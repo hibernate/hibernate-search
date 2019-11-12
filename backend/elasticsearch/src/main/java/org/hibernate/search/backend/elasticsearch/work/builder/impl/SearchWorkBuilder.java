@@ -8,7 +8,9 @@ package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.function.Function;
 
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 
@@ -22,5 +24,7 @@ public interface SearchWorkBuilder<R> extends ElasticsearchWorkBuilder<Elasticse
 	SearchWorkBuilder<R> scrolling(int scrollSize, String scrollTimeout);
 
 	SearchWorkBuilder<R> routingKeys(Set<String> routingKeys);
+
+	SearchWorkBuilder<R> requestTransformer(Function<ElasticsearchRequest, ElasticsearchRequest> requestTransformer);
 
 }

@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.query.dsl.impl;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.ElasticsearchSearchAggregationFactory;
 import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
-import org.hibernate.search.backend.elasticsearch.client.ElasticsearchRequestTransformer;
+import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryOptionsStep;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryPredicateStep;
 import org.hibernate.search.backend.elasticsearch.search.sort.dsl.ElasticsearchSearchSortFactory;
@@ -44,8 +44,9 @@ class ElasticsearchSearchQueryOptionsStepImpl<H>
 	}
 
 	@Override
-	public ElasticsearchSearchQueryOptionsStep<H> requestTransformer(ElasticsearchRequestTransformer transformer) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+	public ElasticsearchSearchQueryOptionsStep<H> requestTransformer(ElasticsearchSearchRequestTransformer transformer) {
+		searchQueryBuilder.requestTransformer( transformer );
+		return thisAsS();
 	}
 
 	@Override

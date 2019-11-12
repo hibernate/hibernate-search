@@ -7,7 +7,9 @@
 package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
 import java.util.Set;
+import java.util.function.Function;
 
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 
 import com.google.gson.JsonObject;
@@ -17,5 +19,7 @@ public interface CountWorkBuilder extends ElasticsearchWorkBuilder<Elasticsearch
 	CountWorkBuilder query(JsonObject query);
 
 	CountWorkBuilder routingKeys(Set<String> routingKeys);
+
+	CountWorkBuilder requestTransformer(Function<ElasticsearchRequest, ElasticsearchRequest> requestTransformer);
 
 }

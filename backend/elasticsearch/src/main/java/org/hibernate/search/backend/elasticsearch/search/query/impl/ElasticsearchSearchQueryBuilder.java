@@ -13,6 +13,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 
+import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
@@ -32,6 +33,7 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.impl.CollectionHelper;
+import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonArray;
@@ -61,6 +63,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private JsonArray jsonSort;
 	private Map<DistanceSortKey, Integer> distanceSorts;
 	private Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations;
+	private ElasticsearchSearchRequestTransformer requestTransformer;
 
 	public ElasticsearchSearchQueryBuilder(
 			ElasticsearchWorkBuilderFactory workFactory,
@@ -136,6 +139,11 @@ public class ElasticsearchSearchQueryBuilder<H>
 		}
 	}
 
+	public void requestTransformer(ElasticsearchSearchRequestTransformer transformer) {
+		Contracts.assertNotNull( transformer, "transformer" );
+		this.requestTransformer = transformer;
+	}
+
 	@Override
 	public ElasticsearchSearchQuery<H> build() {
 		JsonObject payload = new JsonObject();
@@ -179,9 +187,8 @@ public class ElasticsearchSearchQueryBuilder<H>
 		return new ElasticsearchSearchQueryImpl<>(
 				workFactory, queryOrchestrator,
 				searchContext, sessionContext, loadingContext, routingKeys,
-				payload,
+				payload, requestTransformer,
 				searchResultExtractor
 		);
 	}
-
 }

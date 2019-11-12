@@ -40,6 +40,10 @@ public final class ElasticsearchRequest {
 		return new Builder( "HEAD" );
 	}
 
+	public static Builder builder(String method) {
+		return new Builder( method );
+	}
+
 	private final String method;
 	private final String path;
 	private final Map<String, String> parameters;
@@ -91,6 +95,12 @@ public final class ElasticsearchRequest {
 		private Builder(String method) {
 			super();
 			this.method = method;
+		}
+
+		public Builder wholeEncodedPath(String path) {
+			pathBuilder.setLength( 0 );
+			pathBuilder.append( path );
+			return this;
 		}
 
 		public Builder pathComponent(URLEncodedString pathComponent) {

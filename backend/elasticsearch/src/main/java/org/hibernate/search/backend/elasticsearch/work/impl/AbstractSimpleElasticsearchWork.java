@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
@@ -33,7 +34,7 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 	protected final DocumentRefreshStrategy refreshStrategy;
 
 	protected AbstractSimpleElasticsearchWork(AbstractBuilder<?> builder) {
-		this.request = builder.buildRequest();
+		this.request = builder.buildRequestAndTransformIfNecessary();
 		this.refreshedIndexName = builder.refreshedIndexName;
 		this.resultAssessor = builder.resultAssessor;
 		this.refreshStrategy = builder.refreshStrategy;
@@ -126,6 +127,8 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 
 		protected DocumentRefreshStrategy refreshStrategy = DocumentRefreshStrategy.NONE;
 
+		private Function<ElasticsearchRequest, ElasticsearchRequest> requestTransformer;
+
 		public AbstractBuilder(URLEncodedString refreshedIndexName, ElasticsearchRequestSuccessAssessor resultAssessor) {
 			this.refreshedIndexName = refreshedIndexName;
 			this.resultAssessor = resultAssessor;
@@ -134,6 +137,19 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 		public B refresh(DocumentRefreshStrategy refreshStrategy) {
 			this.refreshStrategy = refreshStrategy;
 			return (B) this;
+		}
+
+		public B requestTransformer(Function<ElasticsearchRequest, ElasticsearchRequest> requestTransformer) {
+			this.requestTransformer = requestTransformer;
+			return (B) this;
+		}
+
+		private ElasticsearchRequest buildRequestAndTransformIfNecessary() {
+			ElasticsearchRequest request = buildRequest();
+			if ( requestTransformer != null ) {
+				request = requestTransformer.apply( request );
+			}
+			return request;
 		}
 
 		protected abstract ElasticsearchRequest buildRequest();

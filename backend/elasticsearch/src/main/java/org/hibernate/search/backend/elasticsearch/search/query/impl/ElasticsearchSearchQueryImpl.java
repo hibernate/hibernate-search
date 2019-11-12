@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -52,6 +53,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	private final LoadingContext<?, ?> loadingContext;
 	private final Set<String> routingKeys;
 	private final JsonObject payload;
+	private final ElasticsearchSearchRequestTransformer requestTransformer;
 	private final ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor;
 
 	ElasticsearchSearchQueryImpl(ElasticsearchWorkBuilderFactory workFactory,
@@ -61,6 +63,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			LoadingContext<?, ?> loadingContext,
 			Set<String> routingKeys,
 			JsonObject payload,
+			ElasticsearchSearchRequestTransformer requestTransformer,
 			ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
@@ -69,6 +72,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		this.loadingContext = loadingContext;
 		this.routingKeys = routingKeys;
 		this.payload = payload;
+		this.requestTransformer = requestTransformer;
 		this.searchResultExtractor = searchResultExtractor;
 	}
 
@@ -96,6 +100,9 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				.indexes( searchContext.getIndexNames() )
 				.paging( defaultedLimit( limit, offset ), offset )
 				.routingKeys( routingKeys )
+				.requestTransformer(
+						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
+				)
 				.build();
 
 		return Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) )
@@ -120,6 +127,9 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		ElasticsearchWork<Long> work = workFactory.count( searchContext.getIndexNames() )
 				.query( filteredPayload )
 				.routingKeys( routingKeys )
+				.requestTransformer(
+						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
+				)
 				.build();
 		return Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) );
 	}
@@ -177,6 +187,9 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 		ElasticsearchWork<ExplainResult> work = workFactory.explain( encodedIndexName, elasticsearchId, payload )
 				.routingKeys( routingKeys )
+				.requestTransformer(
+						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
+				)
 				.build();
 
 		ExplainResult explainResult = Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) );
