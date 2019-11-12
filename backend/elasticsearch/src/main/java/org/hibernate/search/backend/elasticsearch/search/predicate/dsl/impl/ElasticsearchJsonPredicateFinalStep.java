@@ -11,12 +11,19 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.impl.Elastics
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 
-final class ElasticsearchJsonStringPredicateFinalStep
+import com.google.gson.JsonObject;
+
+final class ElasticsearchJsonPredicateFinalStep
 		extends AbstractPredicateFinalStep<ElasticsearchSearchPredicateBuilder>
 		implements PredicateFinalStep {
 	private final ElasticsearchSearchPredicateBuilder builder;
 
-	ElasticsearchJsonStringPredicateFinalStep(ElasticsearchSearchPredicateBuilderFactory factory, String jsonString) {
+	ElasticsearchJsonPredicateFinalStep(ElasticsearchSearchPredicateBuilderFactory factory, JsonObject jsonObject) {
+		super( factory );
+		this.builder = factory.fromJson( jsonObject );
+	}
+
+	ElasticsearchJsonPredicateFinalStep(ElasticsearchSearchPredicateBuilderFactory factory, String jsonString) {
 		super( factory );
 		this.builder = factory.fromJson( jsonString );
 	}

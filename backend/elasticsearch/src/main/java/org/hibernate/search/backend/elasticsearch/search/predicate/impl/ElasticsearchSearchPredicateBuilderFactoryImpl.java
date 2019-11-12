@@ -166,10 +166,13 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	}
 
 	@Override
+	public ElasticsearchSearchPredicateBuilder fromJson(JsonObject jsonObject) {
+		return new ElasticsearchUserProvidedJsonPredicateBuilder( jsonObject );
+	}
+
+	@Override
 	public ElasticsearchSearchPredicateBuilder fromJson(String jsonString) {
-		return new ElasticsearchUserProvidedJsonPredicateBuilder(
-				searchContext.getUserFacingGson().fromJson( jsonString, JsonObject.class )
-		);
+		return fromJson( searchContext.getUserFacingGson().fromJson( jsonString, JsonObject.class ) );
 	}
 
 	private static class PredicateBuilderFactoryRetrievalStrategy

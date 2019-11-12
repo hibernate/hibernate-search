@@ -8,9 +8,13 @@ package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
+import com.google.gson.JsonObject;
+
 public interface ElasticsearchSearchPredicateBuilderFactory
 		extends
 		SearchPredicateBuilderFactory<ElasticsearchSearchPredicateCollector, ElasticsearchSearchPredicateBuilder> {
+
+	ElasticsearchSearchPredicateBuilder fromJson(JsonObject jsonObject);
 
 	ElasticsearchSearchPredicateBuilder fromJson(String jsonString);
 
