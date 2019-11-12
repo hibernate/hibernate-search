@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
+import static org.junit.Assume.assumeFalse;
 
 import java.util.List;
 
@@ -21,6 +22,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
@@ -161,6 +163,7 @@ public class ObjectExistsSearchPredicateIT {
 
 	@Test
 	public void nested_multiIndexes_incompatibleIndexMapping() {
+		assumeFullMultiIndexCompatibilityCheck();
 		StubMappingScope scope = indexManager.createScope( incompatibleIndexManager );
 
 		SubTest.expectException(
@@ -190,6 +193,7 @@ public class ObjectExistsSearchPredicateIT {
 
 	@Test
 	public void nested_multiIndexes_wrongStorageType() {
+		assumeFullMultiIndexCompatibilityCheck();
 		StubMappingScope scope = indexManager.createScope( invertedIndexManager );
 
 		SubTest.expectException(
@@ -206,6 +210,7 @@ public class ObjectExistsSearchPredicateIT {
 
 	@Test
 	public void nested_multiIndexes_differentFields() {
+		assumeFullMultiIndexCompatibilityCheck();
 		StubMappingScope scope = indexManager.createScope( differentFieldsIndexManager );
 
 		SubTest.expectException(
@@ -222,6 +227,7 @@ public class ObjectExistsSearchPredicateIT {
 
 	@Test
 	public void nested_multiIndexes_incompatibleFields() {
+		assumeFullMultiIndexCompatibilityCheck();
 		StubMappingScope scope = indexManager.createScope( incompatibleFieldsIndexManager );
 
 		SubTest.expectException(
@@ -245,7 +251,7 @@ public class ObjectExistsSearchPredicateIT {
 				.fetchAllHits();
 
 		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
-		// DOCUMENT_4 will match, even if the matching field is not a direct field of the targeted path
+		// DOCUMENT_4 will match, even if the matching field is not a direct child of the targeted path
 		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_4 );
 	}
 
@@ -269,12 +275,13 @@ public class ObjectExistsSearchPredicateIT {
 				.fetchAllHits();
 
 		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
-		// DOCUMENT_4 will match, even if the matching field is not a direct field of the targeted path
+		// DOCUMENT_4 will match, even if the matching field is not a direct child of the targeted path
 		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_4 );
 	}
 
 	@Test
 	public void flattened_multiIndexes_incompatibleIndexMapping() {
+		assumeFullMultiIndexCompatibilityCheck();
 		StubMappingScope scope = incompatibleIndexManager.createScope( indexManager );
 
 		SubTest.expectException(
@@ -298,12 +305,13 @@ public class ObjectExistsSearchPredicateIT {
 				.fetchAllHits();
 
 		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
-		// DOCUMENT_4 will match, even if the matching field is not a direct field of the targeted path
+		// DOCUMENT_4 will match, even if the matching field is not a direct child of the targeted path
 		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_4 );
 	}
 
 	@Test
 	public void flattened_multiIndexes_wrongStorageType() {
+		assumeFullMultiIndexCompatibilityCheck();
 		StubMappingScope scope = invertedIndexManager.createScope( indexManager );
 
 		SubTest.expectException(
@@ -320,6 +328,7 @@ public class ObjectExistsSearchPredicateIT {
 
 	@Test
 	public void flattened_multiIndexes_differentFields() {
+		assumeFullMultiIndexCompatibilityCheck();
 		StubMappingScope scope = differentFieldsIndexManager.createScope( indexManager );
 
 		SubTest.expectException(
@@ -336,6 +345,7 @@ public class ObjectExistsSearchPredicateIT {
 
 	@Test
 	public void flattened_multiIndexes_incompatibleFields() {
+		assumeFullMultiIndexCompatibilityCheck();
 		StubMappingScope scope = incompatibleFieldsIndexManager.createScope( indexManager );
 
 		SubTest.expectException(
@@ -401,6 +411,13 @@ public class ObjectExistsSearchPredicateIT {
 				.fetchAllHits();
 
 		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_0, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4, DOCUMENT_5 );
+	}
+
+	private void assumeFullMultiIndexCompatibilityCheck() {
+		assumeFalse(
+				"We do not test some Multi-indexing compatibility checks if the backend allows these",
+				TckConfiguration.get().getBackendFeatures().lenientOnMultiIndexesCompatibilityChecks()
+		);
 	}
 
 	private static class IndexMapping {

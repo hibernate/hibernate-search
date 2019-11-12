@@ -132,7 +132,9 @@ public class ElasticsearchScopeModel {
 	public boolean hasSchemaObjectNodeComponent(String absoluteFieldPath) {
 		for ( ElasticsearchIndexModel indexModel : indexModels ) {
 			ElasticsearchIndexSchemaObjectNode objectNode = indexModel.getObjectNode( absoluteFieldPath );
-			// TODO HSEARCH-2389 check multi-indexes model incompatibility
+			// Even if we have an inconsistency with the Lucene backend,
+			// we decide to be very lenient here,
+			// allowing ALL the model incompatibilities Elasticsearch allows.
 			if ( objectNode != null ) {
 				return true;
 			}

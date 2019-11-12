@@ -50,4 +50,9 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		// Elasticsearch only supports [a, b), (-Infinity, b), [a, +Infinity), but not [a, b] for example.
 		return false;
 	}
+
+	@Override
+	public boolean lenientOnMultiIndexesCompatibilityChecks() {
+		return true;
+	}
 }
