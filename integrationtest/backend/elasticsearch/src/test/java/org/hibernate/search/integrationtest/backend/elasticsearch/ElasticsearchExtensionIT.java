@@ -182,7 +182,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void tookAndTimedOut() {
+	public void query_tookAndTimedOut() {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> genericQuery = scope.query()
@@ -195,6 +195,19 @@ public class ElasticsearchExtensionIT {
 		assertNotNull( result.getTook() );
 		assertNotNull( result.isTimedOut() );
 		assertFalse( result.isTimedOut() );
+	}
+
+	@Test
+	public void query_gsonResponseBody() {
+		StubMappingScope scope = indexManager.createScope();
+
+		ElasticsearchSearchResult<DocumentReference> result = scope.query().extension( ElasticsearchExtension.get() )
+				.predicate( f -> f.matchAll() )
+				.fetchAll();
+
+		Assertions.assertThat( result.getResponseBody() )
+				.isNotNull()
+				.extracting( body -> body.get( "_shards" ) ).isInstanceOf( JsonObject.class );
 	}
 
 	@Test
