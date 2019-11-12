@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchStandardFieldAggregationBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchJsonStringFieldCodec;
+import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchJsonElementFieldCodec;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchNativeIndexFieldTypeOptionsStep;
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchStandardFieldPredicateBuilderFactory;
@@ -19,18 +19,18 @@ import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.google.gson.JsonElement;
 
 
 class ElasticsearchNativeIndexFieldTypeOptionsStepImpl
-		extends AbstractElasticsearchIndexFieldTypeOptionsStep<ElasticsearchNativeIndexFieldTypeOptionsStepImpl, String>
+		extends AbstractElasticsearchIndexFieldTypeOptionsStep<ElasticsearchNativeIndexFieldTypeOptionsStepImpl, JsonElement>
 		implements ElasticsearchNativeIndexFieldTypeOptionsStep<ElasticsearchNativeIndexFieldTypeOptionsStepImpl> {
 
 	private final PropertyMapping mapping;
 
 	ElasticsearchNativeIndexFieldTypeOptionsStepImpl(ElasticsearchIndexFieldTypeBuildContext buildContext,
 			PropertyMapping mapping) {
-		super( buildContext, String.class );
+		super( buildContext, JsonElement.class );
 		this.mapping = mapping;
 	}
 
@@ -40,14 +40,14 @@ class ElasticsearchNativeIndexFieldTypeOptionsStepImpl
 	}
 
 	@Override
-	public IndexFieldType<String> toIndexFieldType() {
+	public IndexFieldType<JsonElement> toIndexFieldType() {
 		Gson gson = getBuildContext().getUserFacingGson();
 
-		DslConverter<?, ? extends String> dslConverter = createDslConverter();
-		DslConverter<String, ? extends String> rawDslConverter = createRawDslConverter();
-		ProjectionConverter<? super String, ?> projectionConverter = createProjectionConverter();
-		ProjectionConverter<? super String, String> rawProjectionConverter = createRawProjectionConverter();
-		ElasticsearchJsonStringFieldCodec codec = new ElasticsearchJsonStringFieldCodec( gson );
+		DslConverter<?, ? extends JsonElement> dslConverter = createDslConverter();
+		DslConverter<JsonElement, ? extends JsonElement> rawDslConverter = createRawDslConverter();
+		ProjectionConverter<? super JsonElement, ?> projectionConverter = createProjectionConverter();
+		ProjectionConverter<? super JsonElement, JsonElement> rawProjectionConverter = createRawProjectionConverter();
+		ElasticsearchJsonElementFieldCodec codec = new ElasticsearchJsonElementFieldCodec( gson );
 
 		return new ElasticsearchIndexFieldType<>(
 				codec,

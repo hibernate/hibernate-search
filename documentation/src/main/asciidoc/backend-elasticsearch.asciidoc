@@ -457,15 +457,15 @@ would work as well.
 <3> Apply the Elasticsearch extension to the type factory.
 <4> Call `asNative` to start defining a native type.
 <5> Pass the Elasticsearch mapping as JSON.
-<6> Values of native fields are represented as strings in Hibernate Search,
-but those strings are expected to be JSON.
+<6> Values of native fields are represented as a `JsonElement` in Hibernate Search.
+`JsonElement` is a type from the link:{gsonUrl}[Gson] library.
 Do not forget to format them correctly before you pass them to the backend.
-Here we're using link:{gsonUrl}[Gson]
-to convert the string to a JSON string,
-escaping characters as appropriate,
-but any JSON library will do.
-<7> Same goes for projections: JSON is passed to the bridge,
-and it should be parsed appropriately.
+Here we are creating a `JsonPrimitive` (a subtype of `JsonElement`) from a `String`
+because we just need a JSON string,
+but it's completely possible to handle more complex objects,
+or even to convert directly from POJOs to JSON using Gson.
+<7> For nicer projections, you can also implement this method to convert
+from `JsonElement` to the mapped type (here, `String`).
 
 [source, JAVA, indent=0, subs="+callouts"]
 ----

@@ -13,7 +13,8 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 
-import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 
 //tag::include[]
 public class IpAddressValueBinder implements ValueBinder { // <1>
@@ -29,17 +30,15 @@ public class IpAddressValueBinder implements ValueBinder { // <1>
 		);
 	}
 
-	private static class IpAddressValueBridge implements ValueBridge<String, String> {
-		private static final Gson GSON = new Gson();
-
+	private static class IpAddressValueBridge implements ValueBridge<String, JsonElement> {
 		@Override
-		public String toIndexedValue(String value, ValueBridgeToIndexedValueContext context) {
-			return value == null ? null : GSON.toJson( value ); // <6>
+		public JsonElement toIndexedValue(String value, ValueBridgeToIndexedValueContext context) {
+			return value == null ? null : new JsonPrimitive( value ); // <6>
 		}
 
 		@Override
-		public String fromIndexedValue(String value, ValueBridgeFromIndexedValueContext context) {
-			return value == null ? null : GSON.fromJson( value, String.class ); // <7>
+		public String fromIndexedValue(JsonElement value, ValueBridgeFromIndexedValueContext context) {
+			return value == null ? null : value.getAsString(); // <7>
 		}
 	}
 }

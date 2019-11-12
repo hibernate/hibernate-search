@@ -10,28 +10,28 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 
-public class ElasticsearchJsonStringFieldCodec implements ElasticsearchFieldCodec<String> {
+public class ElasticsearchJsonElementFieldCodec implements ElasticsearchFieldCodec<JsonElement> {
 
 	private final Gson gson;
 
-	public ElasticsearchJsonStringFieldCodec(Gson gson) {
+	public ElasticsearchJsonElementFieldCodec(Gson gson) {
 		this.gson = gson;
 	}
 
 	@Override
-	public JsonElement encode(String value) {
+	public JsonElement encode(JsonElement value) {
 		if ( value == null ) {
 			return JsonNull.INSTANCE;
 		}
-		return gson.fromJson( value, JsonElement.class );
+		return value;
 	}
 
 	@Override
-	public String decode(JsonElement element) {
+	public JsonElement decode(JsonElement element) {
 		if ( element == null || element.isJsonNull() ) {
 			return null;
 		}
-		return gson.toJson( element );
+		return element;
 	}
 
 	@Override
@@ -43,7 +43,7 @@ public class ElasticsearchJsonStringFieldCodec implements ElasticsearchFieldCode
 			return false;
 		}
 
-		ElasticsearchJsonStringFieldCodec castedOther = (ElasticsearchJsonStringFieldCodec) other;
+		ElasticsearchJsonElementFieldCodec castedOther = (ElasticsearchJsonElementFieldCodec) other;
 		return gson.equals( castedOther.gson );
 	}
 }
