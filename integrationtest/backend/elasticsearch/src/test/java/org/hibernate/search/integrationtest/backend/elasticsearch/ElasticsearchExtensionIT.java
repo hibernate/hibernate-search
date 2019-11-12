@@ -1061,13 +1061,13 @@ public class ElasticsearchExtensionIT {
 			nativeField_integer = root.field(
 					"nativeField_integer",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asNative( "{'type': 'integer'}" )
+							.asNative().mapping( "{'type': 'integer'}" )
 			)
 					.toReference();
 			nativeField_integer_converted = root.field(
 					"nativeField_integer_converted",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asNative( "{'type': 'integer'}" )
+							.asNative().mapping( "{'type': 'integer'}" )
 							.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
 							.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() )
 			)
@@ -1075,63 +1075,63 @@ public class ElasticsearchExtensionIT {
 			nativeField_string = root.field(
 					"nativeField_string",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asNative( "{'type': 'keyword'}" )
+							.asNative().mapping( "{'type': 'keyword'}" )
 			)
 					.toReference();
 			nativeField_geoPoint = root.field(
 					"nativeField_geoPoint",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asNative( "{'type': 'geo_point'}" )
+							.asNative().mapping( "{'type': 'geo_point'}" )
 			)
 					.toReference();
 			nativeField_dateWithColons = root.field(
 					"nativeField_dateWithColons",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asNative( "{'type': 'date', 'format': 'yyyy:MM:dd'}" )
+							.asNative().mapping( "{'type': 'date', 'format': 'yyyy:MM:dd'}" )
 			)
 					.toReference();
 			nativeField_unsupportedType = root.field(
 					"nativeField_unsupportedType",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asNative( "{'type': 'half_float', 'ignore_malformed': true}" )
+							.asNative().mapping( "{'type': 'half_float', 'ignore_malformed': true}" )
 			)
 					.toReference();
 
 			nativeField_sort1 = root.field(
 					"nativeField_sort1",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asNative( "{'type': 'keyword', 'doc_values': true}" )
+							.asNative().mapping( "{'type': 'keyword', 'doc_values': true}" )
 			)
 					.toReference();
 			nativeField_sort2 = root.field(
 					"nativeField_sort2",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asNative( "{'type': 'keyword', 'doc_values': true}" )
+							.asNative().mapping( "{'type': 'keyword', 'doc_values': true}" )
 			)
 					.toReference();
 			nativeField_sort3 = root.field(
 					"nativeField_sort3",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asNative( "{'type': 'keyword', 'doc_values': true}" )
+							.asNative().mapping( "{'type': 'keyword', 'doc_values': true}" )
 			)
 					.toReference();
 			nativeField_sort4 = root.field(
 					"nativeField_sort4",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asNative( "{'type': 'keyword', 'doc_values': true}" )
+							.asNative().mapping( "{'type': 'keyword', 'doc_values': true}" )
 			)
 					.toReference();
 			nativeField_sort5 = root.field(
 					"nativeField_sort5",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asNative( "{'type': 'keyword', 'doc_values': true}" )
+							.asNative().mapping( "{'type': 'keyword', 'doc_values': true}" )
 			)
 					.toReference();
 
 			nativeField_aggregation = root.field(
 					"nativeField_aggregation",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asNative( "{'type': 'keyword', 'doc_values': true}" )
+							.asNative().mapping( "{'type': 'keyword', 'doc_values': true}" )
 			)
 					.toReference();
 		}
