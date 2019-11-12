@@ -12,6 +12,8 @@ import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.spi.DelegatingSearchProjectionFactory;
 
+import com.google.gson.JsonObject;
+
 public class ElasticsearchSearchProjectionFactoryImpl<R, E>
 		extends DelegatingSearchProjectionFactory<R, E>
 		implements ElasticsearchSearchProjectionFactory<R, E> {
@@ -25,12 +27,12 @@ public class ElasticsearchSearchProjectionFactoryImpl<R, E>
 	}
 
 	@Override
-	public ProjectionFinalStep<String> source() {
+	public ProjectionFinalStep<JsonObject> source() {
 		return new ElasticsearchSourceProjectionFinalStep( factory );
 	}
 
 	@Override
-	public ProjectionFinalStep<String> explanation() {
+	public ProjectionFinalStep<JsonObject> explanation() {
 		return new ElasticsearchExplanationProjectionFinalStep( factory );
 	}
 }

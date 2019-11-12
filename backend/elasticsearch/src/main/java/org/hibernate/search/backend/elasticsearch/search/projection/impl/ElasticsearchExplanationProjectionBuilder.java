@@ -11,19 +11,19 @@ import java.util.Set;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 
-import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 
-class ElasticsearchExplanationProjectionBuilder implements SearchProjectionBuilder<String> {
+class ElasticsearchExplanationProjectionBuilder implements SearchProjectionBuilder<JsonObject> {
 
 	private final ElasticsearchExplanationProjection projection;
 
-	ElasticsearchExplanationProjectionBuilder(Set<String> indexNames, Gson gson) {
-		this.projection = new ElasticsearchExplanationProjection( indexNames, gson );
+	ElasticsearchExplanationProjectionBuilder(Set<String> indexNames) {
+		this.projection = new ElasticsearchExplanationProjection( indexNames );
 	}
 
 	@Override
-	public SearchProjection<String> build() {
+	public SearchProjection<JsonObject> build() {
 		return projection;
 	}
 }

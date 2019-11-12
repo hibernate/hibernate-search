@@ -54,6 +54,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.google.gson.JsonObject;
 import org.apache.http.nio.client.HttpAsyncClient;
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.HamcrestCondition;
@@ -569,14 +570,14 @@ public class ElasticsearchExtensionIT {
 	public void projection_document() throws JSONException {
 		StubMappingScope scope = indexManager.createScope();
 
-		SearchQuery<String> query = scope.query()
+		SearchQuery<JsonObject> query = scope.query()
 				.asProjection(
 						f -> f.extension( ElasticsearchExtension.get() ).source()
 				)
 				.predicate( f -> f.id().matching( FIFTH_ID ) )
 				.toQuery();
 
-		List<String> result = query.fetchAll().getHits();
+		List<JsonObject> result = query.fetchAll().getHits();
 		Assertions.assertThat( result ).hasSize( 1 );
 		assertJsonEquals(
 				"{"
@@ -587,7 +588,7 @@ public class ElasticsearchExtensionIT {
 						+ "'nativeField_unsupportedType': 'foobar',"
 						+ "'nativeField_sort5': 'z'"
 						+ "}",
-				result.get( 0 )
+				result.get( 0 ).toString()
 		);
 	}
 
@@ -609,8 +610,8 @@ public class ElasticsearchExtensionIT {
 				.predicate( f -> f.id().matching( FIFTH_ID ) )
 				.toQuery();
 
-		List<String> result = query.fetchAll().getHits().stream()
-				.map( list -> (String) list.get( 0 ) )
+		List<JsonObject> result = query.fetchAll().getHits().stream()
+				.map( list -> (JsonObject) list.get( 0 ) )
 				.collect( Collectors.toList() );
 		Assertions.assertThat( result ).hasSize( 1 );
 		assertJsonEquals(
@@ -622,7 +623,7 @@ public class ElasticsearchExtensionIT {
 						+ "'nativeField_unsupportedType': 'foobar',"
 						+ "'nativeField_sort5': 'z'"
 						+ "}",
-				result.get( 0 )
+				result.get( 0 ).toString()
 		);
 	}
 
@@ -630,12 +631,12 @@ public class ElasticsearchExtensionIT {
 	public void projection_explanation() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SearchQuery<String> query = scope.query()
+		SearchQuery<JsonObject> query = scope.query()
 				.asProjection( f -> f.extension( ElasticsearchExtension.get() ).explanation() )
 				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
-		List<String> result = query.fetchAll().getHits();
+		List<JsonObject> result = query.fetchAll().getHits();
 		Assertions.assertThat( result ).hasSize( 1 );
 		Assertions.assertThat( result.get( 0 ) )
 				.asString()

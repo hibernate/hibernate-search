@@ -11,15 +11,17 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
 
-public class ElasticsearchExplanationProjectionFinalStep implements ProjectionFinalStep<String> {
-	private final SearchProjectionBuilder<String> builder;
+import com.google.gson.JsonObject;
+
+public class ElasticsearchExplanationProjectionFinalStep implements ProjectionFinalStep<JsonObject> {
+	private final SearchProjectionBuilder<JsonObject> builder;
 
 	ElasticsearchExplanationProjectionFinalStep(ElasticsearchSearchProjectionBuilderFactory factory) {
 		this.builder = factory.explanation();
 	}
 
 	@Override
-	public SearchProjection<String> toProjection() {
+	public SearchProjection<JsonObject> toProjection() {
 		return builder.build();
 	}
 }

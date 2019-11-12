@@ -44,6 +44,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import com.google.gson.JsonObject;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Explanation;
 
@@ -387,7 +388,7 @@ public class ProjectionDslIT {
 
 		withinSearchSession( searchSession -> {
 			// tag::elasticsearch-source[]
-			List<String> hits = searchSession.search( Book.class )
+			List<JsonObject> hits = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() )
 					.asProjection( f -> f.source() )
 					.predicate( f -> f.matchAll() )
@@ -398,7 +399,7 @@ public class ProjectionDslIT {
 
 		withinSearchSession( searchSession -> {
 			// tag::elasticsearch-explanation[]
-			List<String> hits = searchSession.search( Book.class )
+			List<JsonObject> hits = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() )
 					.asProjection( f -> f.explanation() )
 					.predicate( f -> f.matchAll() )

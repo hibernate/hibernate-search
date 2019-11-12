@@ -15,23 +15,20 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-class ElasticsearchSourceProjection implements ElasticsearchSearchProjection<String, String> {
+class ElasticsearchSourceProjection implements ElasticsearchSearchProjection<JsonObject, JsonObject> {
 
 	private static final JsonArrayAccessor REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asArray();
 	private static final JsonObjectAccessor HIT_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" ).asObject();
 	private static final JsonPrimitive WILDCARD_ALL = new JsonPrimitive( "*" );
 
 	private final Set<String> indexNames;
-	private final Gson gson;
 
-	ElasticsearchSourceProjection(Set<String> indexNames, Gson gson) {
+	ElasticsearchSourceProjection(Set<String> indexNames) {
 		this.indexNames = indexNames;
-		this.gson = gson;
 	}
 
 	@Override
@@ -43,11 +40,11 @@ class ElasticsearchSourceProjection implements ElasticsearchSearchProjection<Str
 	}
 
 	@Override
-	public String extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
+	public JsonObject extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
 			SearchProjectionExtractContext context) {
 		Optional<JsonObject> sourceElement = HIT_SOURCE_ACCESSOR.get( hit );
 		if ( sourceElement.isPresent() ) {
-			return gson.toJson( sourceElement.get() );
+			return sourceElement.get();
 		}
 		else {
 			return null;
@@ -55,7 +52,7 @@ class ElasticsearchSourceProjection implements ElasticsearchSearchProjection<Str
 	}
 
 	@Override
-	public String transform(LoadingResult<?> loadingResult, String extractedData,
+	public JsonObject transform(LoadingResult<?> loadingResult, JsonObject extractedData,
 			SearchProjectionTransformContext context) {
 		return extractedData;
 	}

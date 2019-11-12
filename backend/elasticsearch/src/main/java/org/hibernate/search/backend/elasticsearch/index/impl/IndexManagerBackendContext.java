@@ -69,8 +69,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		this.documentReferenceExtractorHelper =
 				new DocumentReferenceExtractorHelper( indexNameConverter, multiTenancyStrategy );
 		this.searchProjectionBackendContext = new SearchProjectionBackendContext(
-				documentReferenceExtractorHelper,
-				userFacingGson
+				documentReferenceExtractorHelper
 		);
 	}
 
