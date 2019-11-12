@@ -1299,7 +1299,7 @@ include::todo-placeholder.asciidoc[]
 [[search-dsl-sort-extensions-lucene-from-lucene-sort]]
 ==== Lucene: `fromLuceneSort`
 
-.Matching a native `org.apache.lucene.search.Sort`
+.Sorting by a native `org.apache.lucene.search.Sort`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -1312,7 +1312,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 // Search 5 anchors backward compatibility
 [[_using_native_sorts_within_the_sort_dsl]]
 
-.Matching a native `org.apache.lucene.search.SortField`
+.Sorting by a native `org.apache.lucene.search.SortField`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -1323,7 +1323,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 [[search-dsl-sort-extensions-elasticsearch-from-json]]
 ==== Elasticsearch: `fromJson`
 
-.Matching a native Elasticsearch JSON sort
+.Sorting by a native Elasticsearch JSON sort
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
