@@ -857,7 +857,35 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void aggregation_nativeField_fromJson() throws JSONException {
+	public void aggregation_nativeField_fromJson_jsonObject() {
+		StubMappingScope scope = indexManager.createScope();
+
+		AggregationKey<String> documentCountPerValue = AggregationKey.of( "documentCountPerValue" );
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.extension( ElasticsearchExtension.get() )
+				.predicate( f -> f.matchAll() )
+				.aggregation( documentCountPerValue, f -> f.fromJson( gson.fromJson(
+						"{"
+								+ "'value_count' : {"
+										+ "'field' : 'nativeField_aggregation'"
+								+ " }"
+								+ "}",
+						JsonObject.class
+				) ) )
+				.toQuery();
+		String aggregationResult = query.fetchAll().getAggregation( documentCountPerValue );
+		assertJsonEquals(
+				"{"
+						+ "'value': 3,"
+						+ "}",
+				aggregationResult
+		);
+	}
+
+
+	@Test
+	public void aggregation_nativeField_fromJson_string() {
 		StubMappingScope scope = indexManager.createScope();
 
 		AggregationKey<String> documentCountPerValue = AggregationKey.of( "documentCountPerValue" );

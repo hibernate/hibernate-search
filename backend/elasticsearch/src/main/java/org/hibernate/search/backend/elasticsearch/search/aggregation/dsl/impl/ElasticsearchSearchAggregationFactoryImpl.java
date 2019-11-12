@@ -13,6 +13,8 @@ import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFacto
 import org.hibernate.search.engine.search.aggregation.dsl.spi.DelegatingSearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 
+import com.google.gson.JsonObject;
+
 public class ElasticsearchSearchAggregationFactoryImpl
 		extends DelegatingSearchAggregationFactory
 		implements ElasticsearchSearchAggregationFactory {
@@ -23,6 +25,13 @@ public class ElasticsearchSearchAggregationFactoryImpl
 			SearchAggregationDslContext<ElasticsearchSearchAggregationBuilderFactory> dslContext) {
 		super( delegate );
 		this.dslContext = dslContext;
+	}
+
+	@Override
+	public AggregationFinalStep<String> fromJson(JsonObject jsonObject) {
+		return new ElasticsearchJsonStringAggregationFinalStep(
+				dslContext.getBuilderFactory().fromJson( jsonObject )
+		);
 	}
 
 	@Override

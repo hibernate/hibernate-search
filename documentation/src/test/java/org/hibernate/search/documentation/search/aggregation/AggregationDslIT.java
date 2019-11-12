@@ -42,6 +42,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+
 @RunWith(Parameterized.class)
 public class AggregationDslIT {
 
@@ -375,7 +378,51 @@ public class AggregationDslIT {
 		Assume.assumeTrue( backendConfiguration instanceof ElasticsearchBackendConfiguration );
 
 		withinSearchSession( searchSession -> {
-			// tag::elasticsearch-fromJson[]
+			// tag::elasticsearch-fromJson-jsonObject[]
+			JsonObject jsonObject =
+					// end::elasticsearch-fromJson-jsonObject[]
+					new Gson().fromJson(
+							"{"
+									+ "\"histogram\": {"
+											+ "\"field\": \"price\","
+											+ "\"interval\": 10"
+									+ "}"
+							+ "}",
+							JsonObject.class
+					)
+					// tag::elasticsearch-fromJson-jsonObject[]
+					/* ... */;
+			AggregationKey<String> countsByPriceHistogramKey = AggregationKey.of( "countsByPriceHistogram" );
+			SearchResult<Book> result = searchSession.search( Book.class )
+					.extension( ElasticsearchExtension.get() )
+					.predicate( f -> f.matchAll() )
+					.aggregation( countsByPriceHistogramKey, f -> f.fromJson( jsonObject ) )
+					.fetch( 20 );
+			String countsByPriceHistogram = result.getAggregation( countsByPriceHistogramKey ); // <1>
+			// end::elasticsearch-fromJson-jsonObject[]
+			assertJsonEquals(
+					"{"
+							+ "\"buckets\": ["
+									+ "{"
+											+ "\"key\": 0.0,"
+											+ "\"doc_count\": 1"
+									+ "},"
+									+ "{"
+											+ "\"key\": 10.0,"
+											+ "\"doc_count\": 2"
+									+ "},"
+									+ "{"
+											+ "\"key\": 20.0,"
+											+ "\"doc_count\": 1"
+									+ "}"
+							+ "]"
+					+ "}",
+					countsByPriceHistogram
+			);
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::elasticsearch-fromJson-string[]
 			AggregationKey<String> countsByPriceHistogramKey = AggregationKey.of( "countsByPriceHistogram" );
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() )
@@ -388,7 +435,7 @@ public class AggregationDslIT {
 							+ "}" ) )
 					.fetch( 20 );
 			String countsByPriceHistogram = result.getAggregation( countsByPriceHistogramKey ); // <1>
-			// end::elasticsearch-fromJson[]
+			// end::elasticsearch-fromJson-string[]
 			assertJsonEquals(
 					"{"
 							+ "\"buckets\": ["
