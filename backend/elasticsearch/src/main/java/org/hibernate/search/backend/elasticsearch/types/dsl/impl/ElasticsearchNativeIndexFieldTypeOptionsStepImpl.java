@@ -19,18 +19,19 @@ import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 
 class ElasticsearchNativeIndexFieldTypeOptionsStepImpl
 		extends AbstractElasticsearchIndexFieldTypeOptionsStep<ElasticsearchNativeIndexFieldTypeOptionsStepImpl, String>
 		implements ElasticsearchNativeIndexFieldTypeOptionsStep<ElasticsearchNativeIndexFieldTypeOptionsStepImpl> {
 
-	private final String mappingJsonString;
+	private final PropertyMapping mapping;
 
 	ElasticsearchNativeIndexFieldTypeOptionsStepImpl(ElasticsearchIndexFieldTypeBuildContext buildContext,
-			String mappingJsonString) {
+			PropertyMapping mapping) {
 		super( buildContext, String.class );
-		this.mappingJsonString = mappingJsonString;
+		this.mapping = mapping;
 	}
 
 	@Override
@@ -41,7 +42,6 @@ class ElasticsearchNativeIndexFieldTypeOptionsStepImpl
 	@Override
 	public IndexFieldType<String> toIndexFieldType() {
 		Gson gson = getBuildContext().getUserFacingGson();
-		PropertyMapping mapping = gson.fromJson( mappingJsonString, PropertyMapping.class );
 
 		DslConverter<?, ? extends String> dslConverter = createDslConverter();
 		DslConverter<String, ? extends String> rawDslConverter = createRawDslConverter();

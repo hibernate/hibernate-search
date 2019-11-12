@@ -24,9 +24,8 @@ public class IpAddressValueBinder implements ValueBinder { // <1>
 				new IpAddressValueBridge(),
 				context.getTypeFactory() // <2>
 						.extension( ElasticsearchExtension.get() ) // <3>
-						.asNative( // <4>
-								"{\"type\": \"ip\"}" // <5>
-						)
+						.asNative() // <4>
+								.mapping( "{\"type\": \"ip\"}" ) // <5>
 		);
 	}
 

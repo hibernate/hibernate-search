@@ -29,12 +29,8 @@ public interface ElasticsearchIndexFieldTypeFactory extends IndexFieldTypeFactor
 	 *     using {@link ElasticsearchSearchPredicateFactory#fromJson(String)}
 	 *     or {@link ElasticsearchSearchSortFactory#fromJson(String)}</li>
 	 * </ul>
-	 *
-	 * @param mappingJsonString A string representing an Elasticsearch field mapping as a JSON object.
-	 * The JSON object must be a syntactically correct Elasticsearch field mapping.
-	 * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/mapping.html">the Elasticsearch documentation</a>.
 	 * @return A DSL step where the index field type can be defined in more details.
 	 */
-	ElasticsearchNativeIndexFieldTypeOptionsStep<?> asNative(String mappingJsonString);
+	ElasticsearchNativeIndexFieldTypeMappingStep asNative();
 
 }

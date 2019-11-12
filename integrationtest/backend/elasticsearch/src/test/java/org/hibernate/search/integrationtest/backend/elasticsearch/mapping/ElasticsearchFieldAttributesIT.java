@@ -83,7 +83,7 @@ public class ElasticsearchFieldAttributesIT {
 			root.field(
 					"native",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asNative( "{\"type\": \"half_float\",\"ignore_malformed\": true}" )
+							.asNative().mapping( "{\"type\": \"half_float\",\"ignore_malformed\": true}" )
 			)
 					.toReference();
 		}, properties );

@@ -130,7 +130,7 @@ public class ElasticsearchFieldTypesIT {
 			root.field(
 					"unsupportedType",
 					f -> f.extension( ElasticsearchExtension.get() )
-							.asNative( "{\"type\": \"half_float\"}" )
+							.asNative().mapping( "{\"type\": \"half_float\"}" )
 			)
 					.toReference();
 		}
