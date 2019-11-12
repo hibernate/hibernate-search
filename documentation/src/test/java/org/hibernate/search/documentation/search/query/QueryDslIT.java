@@ -44,6 +44,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import com.google.gson.JsonObject;
 import org.apache.lucene.search.Explanation;
 
 @RunWith(Parameterized.class)
@@ -296,14 +297,14 @@ public class QueryDslIT {
 							.matching( "robot" ) )
 					.toQuery(); // <2>
 
-			String explanation1 = query.explain( "1" ); // <3>
-			String explanation2 = query.explain( "Book", "1" ); // <4>
+			JsonObject explanation1 = query.explain( "1" ); // <3>
+			JsonObject explanation2 = query.explain( "Book", "1" ); // <4>
 
 			ElasticsearchSearchQuery<Book> elasticsearchQuery = query.extension( ElasticsearchExtension.get() ); // <5>
 			// end::explain-elasticsearch[]
 
-			assertThat( explanation1 ).contains( "title" );
-			assertThat( explanation2 ).contains( "title" );
+			assertThat( explanation1 ).asString().contains( "title" );
+			assertThat( explanation2 ).asString().contains( "title" );
 			assertThat( elasticsearchQuery ).isNotNull();
 		} );
 	}

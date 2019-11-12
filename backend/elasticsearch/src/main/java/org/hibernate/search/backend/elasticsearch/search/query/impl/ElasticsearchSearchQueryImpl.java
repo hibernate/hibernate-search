@@ -125,7 +125,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	}
 
 	@Override
-	public String explain(String id) {
+	public JsonObject explain(String id) {
 		Contracts.assertNotNull( id, "id" );
 
 		Set<URLEncodedString> targetedIndexNames = searchContext.getIndexNames();
@@ -137,7 +137,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	}
 
 	@Override
-	public String explain(String indexName, String id) {
+	public JsonObject explain(String indexName, String id) {
 		Contracts.assertNotNull( indexName, "indexName" );
 		Contracts.assertNotNull( id, "id" );
 
@@ -170,7 +170,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		}
 	}
 
-	private String doExplain(URLEncodedString encodedIndexName, String id) {
+	private JsonObject doExplain(URLEncodedString encodedIndexName, String id) {
 		URLEncodedString elasticsearchId = URLEncodedString.fromString(
 				searchContext.toElasticsearchId( sessionContext.getTenantIdentifier(), id )
 		);
@@ -180,6 +180,6 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				.build();
 
 		ExplainResult explainResult = Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) );
-		return searchContext.getUserFacingGson().toJson( explainResult.getJsonObject() );
+		return explainResult.getJsonObject();
 	}
 }
