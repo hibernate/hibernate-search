@@ -1331,11 +1331,19 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 [[search-dsl-sort-extensions-elasticsearch-from-json]]
 ==== Elasticsearch: `fromJson`
 
-.Sorting by a native Elasticsearch JSON sort
+.Sorting by a native Elasticsearch JSON sort provided as a `JsonObject`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=elasticsearch-fromJson]
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=elasticsearch-fromJson-jsonObject]
+----
+====
+
+.Sorting by a native Elasticsearch JSON sort provided as a JSON-formatted string
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=elasticsearch-fromJson-string]
 ----
 ====
 

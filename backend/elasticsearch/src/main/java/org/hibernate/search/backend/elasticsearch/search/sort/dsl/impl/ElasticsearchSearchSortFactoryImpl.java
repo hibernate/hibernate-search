@@ -15,6 +15,8 @@ import org.hibernate.search.engine.search.sort.dsl.spi.DelegatingSearchSortFacto
 import org.hibernate.search.engine.search.sort.dsl.spi.StaticSortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 
+import com.google.gson.JsonObject;
+
 
 public class ElasticsearchSearchSortFactoryImpl
 		extends DelegatingSearchSortFactory
@@ -26,6 +28,11 @@ public class ElasticsearchSearchSortFactoryImpl
 			SearchSortDslContext<ElasticsearchSearchSortBuilderFactory, ElasticsearchSearchSortBuilder> dslContext) {
 		super( delegate );
 		this.dslContext = dslContext;
+	}
+
+	@Override
+	public SortThenStep fromJson(JsonObject jsonObject) {
+		return staticThenStep( dslContext.getBuilderFactory().fromJson( jsonObject ) );
 	}
 
 	@Override

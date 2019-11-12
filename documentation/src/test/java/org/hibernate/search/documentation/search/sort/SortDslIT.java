@@ -36,6 +36,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 
@@ -317,7 +319,30 @@ public class SortDslIT {
 		Assume.assumeTrue( backendConfiguration instanceof ElasticsearchBackendConfiguration );
 
 		withinSearchSession( searchSession -> {
-			// tag::elasticsearch-fromJson[]
+			// tag::elasticsearch-fromJson-jsonObject[]
+			JsonObject jsonObject =
+					// end::elasticsearch-fromJson-jsonObject[]
+					new Gson().fromJson(
+							"{"
+									+ "\"title_sort\": \"asc\""
+							+ "}",
+							JsonObject.class
+					)
+					// tag::elasticsearch-fromJson-jsonObject[]
+					/* ... */;
+			List<Book> hits = searchSession.search( Book.class )
+					.extension( ElasticsearchExtension.get() )
+					.predicate( f -> f.matchAll() )
+					.sort( f -> f.fromJson( jsonObject ) )
+					.fetchHits( 20 );
+			// end::elasticsearch-fromJson-jsonObject[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactly( BOOK1_ID, BOOK4_ID, BOOK2_ID, BOOK3_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::elasticsearch-fromJson-string[]
 			List<Book> hits = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() )
 					.predicate( f -> f.matchAll() )
@@ -325,7 +350,7 @@ public class SortDslIT {
 									+ "\"title_sort\": \"asc\""
 							+ "}" ) )
 					.fetchHits( 20 );
-			// end::elasticsearch-fromJson[]
+			// end::elasticsearch-fromJson-string[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactly( BOOK1_ID, BOOK4_ID, BOOK2_ID, BOOK3_ID );

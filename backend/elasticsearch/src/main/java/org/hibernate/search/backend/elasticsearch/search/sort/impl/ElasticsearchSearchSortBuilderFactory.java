@@ -8,8 +8,12 @@ package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
+import com.google.gson.JsonObject;
+
 public interface ElasticsearchSearchSortBuilderFactory
 		extends SearchSortBuilderFactory<ElasticsearchSearchSortCollector, ElasticsearchSearchSortBuilder> {
+
+	ElasticsearchSearchSortBuilder fromJson(JsonObject jsonObject);
 
 	ElasticsearchSearchSortBuilder fromJson(String jsonString);
 
