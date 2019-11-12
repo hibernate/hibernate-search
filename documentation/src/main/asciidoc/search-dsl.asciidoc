@@ -1566,7 +1566,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/projection/Projec
 [[search-dsl-projection-extensions-elasticsearch-source]]
 ==== Elasticsearch: `source`
 
-.Returning the matched document source as a JSON-formatted String
+.Returning the matched document source as a `JsonObject`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -1583,7 +1583,7 @@ Explanations are rather costly performance-wise:
 only use them for <<search-dsl-query-debugging-scores,debugging>> purposes.
 ====
 
-.Returning the score explanation as a JSON-formatted String
+.Returning the score explanation as a `JsonObject`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----

@@ -35,6 +35,8 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.function.TriFunction;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import com.google.gson.JsonObject;
+
 public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjectionBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -139,11 +141,11 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 		);
 	}
 
-	public SearchProjectionBuilder<String> source() {
+	public SearchProjectionBuilder<JsonObject> source() {
 		return searchProjectionBackendContext.createSourceProjectionBuilder( scopeModel.getHibernateSearchIndexNames() );
 	}
 
-	public SearchProjectionBuilder<String> explanation() {
+	public SearchProjectionBuilder<JsonObject> explanation() {
 		return searchProjectionBackendContext.createExplanationProjectionBuilder( scopeModel.getHibernateSearchIndexNames() );
 	}
 

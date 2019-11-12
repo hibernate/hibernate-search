@@ -13,20 +13,17 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
-class ElasticsearchExplanationProjection implements ElasticsearchSearchProjection<String, String> {
+class ElasticsearchExplanationProjection implements ElasticsearchSearchProjection<JsonObject, JsonObject> {
 
 	private static final JsonAccessor<Boolean> REQUEST_EXPLAIN_ACCESSOR = JsonAccessor.root().property( "explain" ).asBoolean();
 	private static final JsonObjectAccessor HIT_EXPLANATION_ACCESSOR = JsonAccessor.root().property( "_explanation" ).asObject();
 
 	private final Set<String> indexNames;
-	private final Gson gson;
 
-	ElasticsearchExplanationProjection(Set<String> indexNames, Gson gson) {
+	ElasticsearchExplanationProjection(Set<String> indexNames) {
 		this.indexNames = indexNames;
-		this.gson = gson;
 	}
 
 	@Override
@@ -35,14 +32,14 @@ class ElasticsearchExplanationProjection implements ElasticsearchSearchProjectio
 	}
 
 	@Override
-	public String extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
+	public JsonObject extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
 			SearchProjectionExtractContext context) {
 		// We expect the optional to always be non-empty.
-		return gson.toJson( HIT_EXPLANATION_ACCESSOR.get( hit ).get() );
+		return HIT_EXPLANATION_ACCESSOR.get( hit ).get();
 	}
 
 	@Override
-	public String transform(LoadingResult<?> loadingResult, String extractedData,
+	public JsonObject transform(LoadingResult<?> loadingResult, JsonObject extractedData,
 			SearchProjectionTransformContext context) {
 		return extractedData;
 	}

@@ -8,20 +8,12 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.engine.search.projection.spi.SearchProjectionBuilder;
-
-import com.google.gson.Gson;
-
 public class SearchProjectionBackendContext {
 
 	private final DocumentReferenceExtractorHelper documentReferenceExtractorHelper;
-	private final Gson userFacingGson;
 
-	@SuppressWarnings("rawtypes")
-	public SearchProjectionBackendContext(DocumentReferenceExtractorHelper documentReferenceExtractorHelper,
-			Gson userFacingGson) {
+	public SearchProjectionBackendContext(DocumentReferenceExtractorHelper documentReferenceExtractorHelper) {
 		this.documentReferenceExtractorHelper = documentReferenceExtractorHelper;
-		this.userFacingGson = userFacingGson;
 	}
 
 	ElasticsearchDocumentReferenceProjectionBuilder createDocumentReferenceProjectionBuilder(Set<String> indexNames) {
@@ -41,10 +33,10 @@ public class SearchProjectionBackendContext {
 	}
 
 	ElasticsearchSourceProjectionBuilder createSourceProjectionBuilder(Set<String> indexNames) {
-		return new ElasticsearchSourceProjectionBuilder( indexNames, userFacingGson );
+		return new ElasticsearchSourceProjectionBuilder( indexNames );
 	}
 
-	public SearchProjectionBuilder<String> createExplanationProjectionBuilder(Set<String> indexNames) {
-		return new ElasticsearchExplanationProjectionBuilder( indexNames, userFacingGson );
+	ElasticsearchExplanationProjectionBuilder createExplanationProjectionBuilder(Set<String> indexNames) {
+		return new ElasticsearchExplanationProjectionBuilder( indexNames );
 	}
 }

@@ -9,6 +9,8 @@ package org.hibernate.search.backend.elasticsearch.search.projection.dsl;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 
+import com.google.gson.JsonObject;
+
 /**
  * A factory for search projections with some Elasticsearch-specific methods.
  *
@@ -19,20 +21,20 @@ import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 public interface ElasticsearchSearchProjectionFactory<R, E> extends SearchProjectionFactory<R, E> {
 
 	/**
-	 * Project to a string representing the JSON document as stored in Elasticsearch.
+	 * Project to a {@link JsonObject} representing the document as stored in Elasticsearch.
 	 *
 	 * @return The final step of the projection DSL.
 	 */
-	ProjectionFinalStep<String> source();
+	ProjectionFinalStep<JsonObject> source();
 
 	/**
-	 * Project to a string representing a JSON object describing the score computation for the hit.
+	 * Project to a {@link JsonObject} describing the score computation for the hit.
 	 * <p>
 	 * This feature is relatively expensive, do not use unless you return a limited
-	 * amount of objects (using pagination).
+	 * amount of hits (using pagination).
 	 *
 	 * @return The final step of the projection DSL.
 	 */
-	ProjectionFinalStep<String> explanation();
+	ProjectionFinalStep<JsonObject> explanation();
 
 }
