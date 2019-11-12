@@ -47,4 +47,9 @@ public class TckBackendFeatures {
 	public boolean optimizeWillFailIfAppliedToDeletedIndex() {
 		return true;
 	}
+
+	public boolean lenientOnMultiIndexesCompatibilityChecks() {
+		// we decide to allow ALL the model incompatibilities Elasticsearch allows.
+		return false;
+	}
 }
