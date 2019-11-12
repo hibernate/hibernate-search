@@ -43,14 +43,14 @@ abstract class AbstractElasticsearchCompositeProjection<P>
 	}
 
 	@Override
-	public final Object[] extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
+	public final Object[] extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			SearchProjectionExtractContext context) {
 		Object[] extractedData = new Object[children.length];
 
 		for ( int i = 0; i < extractedData.length; i++ ) {
 			ElasticsearchSearchProjection<?, ?> child = children[i];
 			extractedData[i] = child.extract(
-					projectionHitMapper, responseBody, hit, context
+					projectionHitMapper, hit, context
 			);
 		}
 
@@ -79,7 +79,7 @@ abstract class AbstractElasticsearchCompositeProjection<P>
 
 	/**
 	 * @param childResults An object array guaranteed to contain
-	 * the result of calling {@link ElasticsearchSearchProjection#extract(ProjectionHitMapper, JsonObject, JsonObject, SearchProjectionExtractContext)},
+	 * the result of calling {@link ElasticsearchSearchProjection#extract(ProjectionHitMapper, JsonObject, SearchProjectionExtractContext)},
 	 * then {@link ElasticsearchSearchProjection#transform(LoadingResult, Object, SearchProjectionTransformContext)},
 	 * for each child projection.
 	 * Each result has the same index as the child projection it originated from.

@@ -31,7 +31,7 @@ class ElasticsearchDocumentReferenceProjection
 	}
 
 	@Override
-	public DocumentReference extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
+	public DocumentReference extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			SearchProjectionExtractContext context) {
 		return helper.extractDocumentReference( hit );
 	}

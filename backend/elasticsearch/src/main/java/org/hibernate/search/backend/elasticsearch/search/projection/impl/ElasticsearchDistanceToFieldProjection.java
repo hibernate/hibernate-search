@@ -78,7 +78,7 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 	}
 
 	@Override
-	public Double extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
+	public Double extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			SearchProjectionExtractContext context) {
 		Optional<Double> distance;
 		Integer distanceSortIndex = context.getDistanceSortIndex( absoluteFieldPath, center );

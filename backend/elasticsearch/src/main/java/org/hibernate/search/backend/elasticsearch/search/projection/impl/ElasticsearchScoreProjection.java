@@ -31,7 +31,7 @@ class ElasticsearchScoreProjection implements ElasticsearchSearchProjection<Floa
 	}
 
 	@Override
-	public Float extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
+	public Float extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			SearchProjectionExtractContext context) {
 		return hit.get( "_score" ).getAsFloat();
 	}

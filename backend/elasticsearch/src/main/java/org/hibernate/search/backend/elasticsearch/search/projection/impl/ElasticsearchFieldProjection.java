@@ -56,7 +56,7 @@ class ElasticsearchFieldProjection<F, V> implements ElasticsearchSearchProjectio
 	}
 
 	@Override
-	public F extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
+	public F extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			SearchProjectionExtractContext context) {
 		Optional<JsonElement> fieldValue = hitFieldValueAccessor.get( hit );
 		if ( fieldValue.isPresent() ) {

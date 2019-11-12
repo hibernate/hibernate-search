@@ -30,7 +30,7 @@ public class ElasticsearchEntityReferenceProjection<R> implements ElasticsearchS
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public R extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
+	public R extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			SearchProjectionExtractContext context) {
 		return (R) projectionHitMapper.convertReference( helper.extractDocumentReference( hit ) );
 	}

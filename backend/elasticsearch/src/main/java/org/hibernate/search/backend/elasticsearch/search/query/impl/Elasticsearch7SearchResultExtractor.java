@@ -102,7 +102,7 @@ class Elasticsearch7SearchResultExtractor<H> implements ElasticsearchSearchResul
 			JsonObject hitObject = hit.getAsJsonObject();
 
 			extractedData.add( rootProjection.extract(
-					hitMapper, responseBody, hitObject,
+					hitMapper, hitObject,
 					projectionExtractContext
 			) );
 		}

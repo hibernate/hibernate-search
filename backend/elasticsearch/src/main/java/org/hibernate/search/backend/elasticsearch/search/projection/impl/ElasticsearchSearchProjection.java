@@ -20,7 +20,7 @@ public interface ElasticsearchSearchProjection<E, P> extends SearchProjection<P>
 	 * Contribute to the request, making sure that the requirements for this projection are met.
 	 * @param requestBody The request body.
 	 * @param context An execution context that will share state with the context passed to
-	 * {@link #extract(ProjectionHitMapper, JsonObject, JsonObject, SearchProjectionExtractContext)}.
+	 * {@link #extract(ProjectionHitMapper, JsonObject, SearchProjectionExtractContext)}.
 	 */
 	void request(JsonObject requestBody, SearchProjectionRequestContext context);
 
@@ -33,14 +33,12 @@ public interface ElasticsearchSearchProjection<E, P> extends SearchProjection<P>
 	 * so that blocking mapper operations (if any) do not pollute backend threads.
 	 *
 	 * @param projectionHitMapper The projection hit mapper used to transform hits to entities.
-	 * @param responseBody The full body of the response.
 	 * @param hit The part of the response body relevant to the hit to extract.
 	 * @param context An execution context for the extraction.
 	 * @return The element extracted from the hit. Might be a key referring to an object that will be loaded by the
 	 * {@link ProjectionHitMapper}. This returned object will be passed to {@link #transform(LoadingResult, Object, SearchProjectionTransformContext)}.
 	 */
-	E extract(ProjectionHitMapper<?, ?> projectionHitMapper,
-			JsonObject responseBody, JsonObject hit,
+	E extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			SearchProjectionExtractContext context);
 
 	/**
@@ -49,7 +47,7 @@ public interface ElasticsearchSearchProjection<E, P> extends SearchProjection<P>
 	 * @param loadingResult Container containing all the entities that have been loaded by the
 	 * {@link ProjectionHitMapper}.
 	 * @param extractedData The extracted data to transform, coming from the
-	 * {@link #extract(ProjectionHitMapper, JsonObject, JsonObject, SearchProjectionExtractContext)} method.
+	 * {@link #extract(ProjectionHitMapper, JsonObject, SearchProjectionExtractContext)} method.
 	 * @param context An execution context for the transforming.
 	 * @return The final result considered as a hit.
 	 */

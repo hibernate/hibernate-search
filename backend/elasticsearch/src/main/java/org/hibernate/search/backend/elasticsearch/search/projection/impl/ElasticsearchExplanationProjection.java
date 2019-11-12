@@ -32,7 +32,7 @@ class ElasticsearchExplanationProjection implements ElasticsearchSearchProjectio
 	}
 
 	@Override
-	public JsonObject extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
+	public JsonObject extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			SearchProjectionExtractContext context) {
 		// We expect the optional to always be non-empty.
 		return HIT_EXPLANATION_ACCESSOR.get( hit ).get();

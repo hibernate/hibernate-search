@@ -40,7 +40,7 @@ class ElasticsearchSourceProjection implements ElasticsearchSearchProjection<Jso
 	}
 
 	@Override
-	public JsonObject extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
+	public JsonObject extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			SearchProjectionExtractContext context) {
 		Optional<JsonObject> sourceElement = HIT_SOURCE_ACCESSOR.get( hit );
 		if ( sourceElement.isPresent() ) {

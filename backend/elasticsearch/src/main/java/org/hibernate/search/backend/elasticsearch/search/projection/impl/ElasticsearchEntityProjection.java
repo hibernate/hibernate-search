@@ -29,7 +29,7 @@ public class ElasticsearchEntityProjection<E> implements ElasticsearchSearchProj
 	}
 
 	@Override
-	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject responseBody, JsonObject hit,
+	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			SearchProjectionExtractContext context) {
 		return projectionHitMapper.planLoading( helper.extractDocumentReference( hit ) );
 	}
