@@ -1120,11 +1120,19 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 [[search-dsl-predicate-extensions-elasticsearch-from-json]]
 ==== Elasticsearch: `fromJson`
 
-.Matching a native Elasticsearch JSON query
+.Matching a native Elasticsearch JSON query provided as a `JsonObject`
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=elasticsearch-fromJson]
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=elasticsearch-fromJson-jsonObject]
+----
+====
+
+.Matching a native Elasticsearch JSON query provided as a JSON-formatted string
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=elasticsearch-fromJson-string]
 ----
 ====
 

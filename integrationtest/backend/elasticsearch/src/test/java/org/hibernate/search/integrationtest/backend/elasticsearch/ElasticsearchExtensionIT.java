@@ -54,6 +54,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.http.nio.client.HttpAsyncClient;
 import org.assertj.core.api.Assertions;
@@ -89,6 +90,8 @@ public class ElasticsearchExtensionIT {
 	private StubMappingIndexManager indexManager;
 
 	private StubMappingIndexManager otherIndexManager;
+
+	private Gson gson = new Gson();
 
 	@Before
 	public void setup() {
@@ -339,7 +342,77 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void predicate_nativeField_fromJson() {
+	public void predicate_nativeField_fromJson_jsonObject() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.predicate( f -> f.bool()
+						.should( f.extension( ElasticsearchExtension.get() )
+								.fromJson( gson.fromJson( "{'match': {'nativeField_string': 'text 1'}}", JsonObject.class ) )
+						)
+						.should( f.extension( ElasticsearchExtension.get() )
+								.fromJson( gson.fromJson( "{'match': {'nativeField_integer': 2}}", JsonObject.class ) )
+						)
+						.should( f.extension( ElasticsearchExtension.get() )
+								.fromJson( gson.fromJson(
+										"{"
+											+ "'geo_distance': {"
+												+ "'distance': '200km',"
+												+ "'nativeField_geoPoint': {"
+													+ "'lat': 40,"
+													+ "'lon': -70"
+												+ "}"
+											+ "}"
+										+ "}",
+										JsonObject.class
+								)
+						)
+						)
+				)
+				.toQuery();
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
+				.hasTotalHitCount( 3 );
+	}
+
+	@Test
+	public void predicate_nativeField_fromJson_jsonObject_separatePredicate() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchPredicate predicate1 = scope.predicate().extension( ElasticsearchExtension.get() )
+				.fromJson( gson.fromJson( "{'match': {'nativeField_string': 'text 1'}}", JsonObject.class ) ).toPredicate();
+		SearchPredicate predicate2 = scope.predicate().extension( ElasticsearchExtension.get() )
+				.fromJson( gson.fromJson( "{'match': {'nativeField_integer': 2}}", JsonObject.class ) ).toPredicate();
+		SearchPredicate predicate3 = scope.predicate().extension( ElasticsearchExtension.get() )
+				.fromJson( gson.fromJson(
+						"{"
+							+ "'geo_distance': {"
+								+ "'distance': '200km',"
+								+ "'nativeField_geoPoint': {"
+									+ "'lat': 40,"
+									+ "'lon': -70"
+								+ "}"
+							+ "}"
+						+ "}",
+						JsonObject.class
+				) )
+				.toPredicate();
+		SearchPredicate booleanPredicate = scope.predicate().bool()
+				.should( predicate1 )
+				.should( predicate2 )
+				.should( predicate3 )
+				.toPredicate();
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.predicate( booleanPredicate )
+				.toQuery();
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
+				.hasTotalHitCount( 3 );
+	}
+
+	@Test
+	public void predicate_nativeField_fromJson_string() {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -371,7 +444,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
-	public void predicate_nativeField_fromJson_separatePredicate() {
+	public void predicate_nativeField_fromJson_string_separatePredicate() {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchPredicate predicate1 = scope.predicate().extension( ElasticsearchExtension.get() )
