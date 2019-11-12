@@ -11,14 +11,12 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import com.google.gson.JsonObject;
 
 
-class ElasticsearchUserProvidedJsonAggregation extends AbstractElasticsearchAggregation<String> {
+class ElasticsearchUserProvidedJsonAggregation extends AbstractElasticsearchAggregation<JsonObject> {
 
-	private final Gson gson;
 	private final JsonObject requestJson;
 
 	private ElasticsearchUserProvidedJsonAggregation(Builder builder) {
 		super( builder );
-		this.gson = builder.searchContext.getUserFacingGson();
 		this.requestJson = builder.json;
 	}
 
@@ -28,11 +26,11 @@ class ElasticsearchUserProvidedJsonAggregation extends AbstractElasticsearchAggr
 	}
 
 	@Override
-	public String extract(JsonObject aggregationResult, AggregationExtractContext context) {
-		return gson.toJson( aggregationResult );
+	public JsonObject extract(JsonObject aggregationResult, AggregationExtractContext context) {
+		return aggregationResult;
 	}
 
-	static class Builder extends AbstractBuilder<String> {
+	static class Builder extends AbstractBuilder<JsonObject> {
 
 		private final JsonObject json;
 
@@ -42,7 +40,7 @@ class ElasticsearchUserProvidedJsonAggregation extends AbstractElasticsearchAggr
 		}
 
 		@Override
-		public ElasticsearchSearchAggregation<String> build() {
+		public ElasticsearchSearchAggregation<JsonObject> build() {
 			return new ElasticsearchUserProvidedJsonAggregation( this );
 		}
 	}

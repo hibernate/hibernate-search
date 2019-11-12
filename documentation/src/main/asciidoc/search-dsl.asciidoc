@@ -1854,7 +1854,7 @@ include::todo-placeholder.asciidoc[]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=elasticsearch-fromJson-jsonObject]
 ----
-<1> The aggregation result is a JSON-formatted string.
+<1> The aggregation result is a `JsonObject`.
 ====
 
 .Defining a native Elasticsearch JSON aggregation as a JSON-formatted string
@@ -1863,7 +1863,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/Aggre
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=elasticsearch-fromJson-string]
 ----
-<1> The aggregation result is a JSON-formatted string.
+<1> The aggregation result is a `JsonObject`.
 ====
 
 [[search-dsl-type-compatibility]]

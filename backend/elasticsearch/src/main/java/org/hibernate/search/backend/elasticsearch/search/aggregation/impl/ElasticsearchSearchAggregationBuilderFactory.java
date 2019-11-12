@@ -84,11 +84,11 @@ public class ElasticsearchSearchAggregationBuilderFactory
 		);
 	}
 
-	public SearchAggregationBuilder<String> fromJson(JsonObject jsonObject) {
+	public SearchAggregationBuilder<JsonObject> fromJson(JsonObject jsonObject) {
 		return new ElasticsearchUserProvidedJsonAggregation.Builder( searchContext, jsonObject );
 	}
 
-	public SearchAggregationBuilder<String> fromJson(String jsonString) {
+	public SearchAggregationBuilder<JsonObject> fromJson(String jsonString) {
 		return fromJson( searchContext.getUserFacingGson().fromJson( jsonString, JsonObject.class ) );
 	}
 

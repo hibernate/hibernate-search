@@ -28,15 +28,15 @@ public class ElasticsearchSearchAggregationFactoryImpl
 	}
 
 	@Override
-	public AggregationFinalStep<String> fromJson(JsonObject jsonObject) {
-		return new ElasticsearchJsonStringAggregationFinalStep(
+	public AggregationFinalStep<JsonObject> fromJson(JsonObject jsonObject) {
+		return new ElasticsearchJsonAggregationFinalStep(
 				dslContext.getBuilderFactory().fromJson( jsonObject )
 		);
 	}
 
 	@Override
-	public AggregationFinalStep<String> fromJson(String jsonString) {
-		return new ElasticsearchJsonStringAggregationFinalStep(
+	public AggregationFinalStep<JsonObject> fromJson(String jsonString) {
+		return new ElasticsearchJsonAggregationFinalStep(
 				dslContext.getBuilderFactory().fromJson( jsonString )
 		);
 	}

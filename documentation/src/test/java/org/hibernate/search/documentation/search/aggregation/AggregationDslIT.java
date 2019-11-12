@@ -392,13 +392,13 @@ public class AggregationDslIT {
 					)
 					// tag::elasticsearch-fromJson-jsonObject[]
 					/* ... */;
-			AggregationKey<String> countsByPriceHistogramKey = AggregationKey.of( "countsByPriceHistogram" );
+			AggregationKey<JsonObject> countsByPriceHistogramKey = AggregationKey.of( "countsByPriceHistogram" );
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() )
 					.predicate( f -> f.matchAll() )
 					.aggregation( countsByPriceHistogramKey, f -> f.fromJson( jsonObject ) )
 					.fetch( 20 );
-			String countsByPriceHistogram = result.getAggregation( countsByPriceHistogramKey ); // <1>
+			JsonObject countsByPriceHistogram = result.getAggregation( countsByPriceHistogramKey ); // <1>
 			// end::elasticsearch-fromJson-jsonObject[]
 			assertJsonEquals(
 					"{"
@@ -417,13 +417,13 @@ public class AggregationDslIT {
 									+ "}"
 							+ "]"
 					+ "}",
-					countsByPriceHistogram
+					countsByPriceHistogram.toString()
 			);
 		} );
 
 		withinSearchSession( searchSession -> {
 			// tag::elasticsearch-fromJson-string[]
-			AggregationKey<String> countsByPriceHistogramKey = AggregationKey.of( "countsByPriceHistogram" );
+			AggregationKey<JsonObject> countsByPriceHistogramKey = AggregationKey.of( "countsByPriceHistogram" );
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() )
 					.predicate( f -> f.matchAll() )
@@ -434,7 +434,7 @@ public class AggregationDslIT {
 									+ "}"
 							+ "}" ) )
 					.fetch( 20 );
-			String countsByPriceHistogram = result.getAggregation( countsByPriceHistogramKey ); // <1>
+			JsonObject countsByPriceHistogram = result.getAggregation( countsByPriceHistogramKey ); // <1>
 			// end::elasticsearch-fromJson-string[]
 			assertJsonEquals(
 					"{"
@@ -453,7 +453,7 @@ public class AggregationDslIT {
 									+ "}"
 							+ "]"
 					+ "}",
-					countsByPriceHistogram
+					countsByPriceHistogram.toString()
 			);
 		} );
 	}

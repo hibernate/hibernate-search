@@ -10,16 +10,18 @@ import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilder;
 
-final class ElasticsearchJsonStringAggregationFinalStep
-		implements AggregationFinalStep<String> {
-	private final SearchAggregationBuilder<String> builder;
+import com.google.gson.JsonObject;
 
-	ElasticsearchJsonStringAggregationFinalStep(SearchAggregationBuilder<String> builder) {
+final class ElasticsearchJsonAggregationFinalStep
+		implements AggregationFinalStep<JsonObject> {
+	private final SearchAggregationBuilder<JsonObject> builder;
+
+	ElasticsearchJsonAggregationFinalStep(SearchAggregationBuilder<JsonObject> builder) {
 		this.builder = builder;
 	}
 
 	@Override
-	public SearchAggregation<String> toAggregation() {
+	public SearchAggregation<JsonObject> toAggregation() {
 		return builder.build();
 	}
 }

@@ -16,25 +16,25 @@ public interface ElasticsearchSearchAggregationFactory extends SearchAggregation
 	/**
 	 * Create an aggregation from JSON.
 	 * <p>
-	 * The created aggregation will return the result as a JSON-formatted string.
+	 * The created aggregation will return the result as a {@link JsonObject}.
 	 *
 	 * @param jsonObject A {@link JsonObject} representing an Elasticsearch aggregation.
 	 * The JSON object must be a syntactically correct Elasticsearch aggregation.
 	 * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html">the Elasticsearch documentation</a>.
 	 * @return The final step of the aggregation DSL.
 	 */
-	AggregationFinalStep<String> fromJson(JsonObject jsonObject);
+	AggregationFinalStep<JsonObject> fromJson(JsonObject jsonObject);
 
 	/**
 	 * Create an aggregation from JSON.
 	 * <p>
-	 * The created aggregation will return the result as a JSON-formatted string.
+	 * The created aggregation will return the result as a {@link JsonObject}.
 	 *
 	 * @param jsonString A JSON-formatted string representing an Elasticsearch aggregation.
 	 * The JSON object must be a syntactically correct Elasticsearch aggregation.
 	 * See <a href="https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations.html">the Elasticsearch documentation</a>.
 	 * @return The final step of the aggregation DSL.
 	 */
-	AggregationFinalStep<String> fromJson(String jsonString);
+	AggregationFinalStep<JsonObject> fromJson(String jsonString);
 
 }
