@@ -202,11 +202,13 @@ public class ElasticsearchExtensionIT {
 
 		// Matching document
 		Assertions.assertThat( query.explain( FIRST_ID ) )
+				.asString()
 				.contains( "\"description\":" )
 				.contains( "\"details\":" );
 
 		// Non-matching document
 		Assertions.assertThat( query.explain( FIFTH_ID ) )
+				.asString()
 				.contains( "\"description\":" )
 				.contains( "\"details\":" );
 	}
@@ -246,11 +248,13 @@ public class ElasticsearchExtensionIT {
 
 		// Matching document
 		Assertions.assertThat( query.explain( INDEX_NAME, FIRST_ID ) )
+				.asString()
 				.contains( "\"description\":" )
 				.contains( "\"details\":" );
 
 		// Non-matching document
 		Assertions.assertThat( query.explain( INDEX_NAME, FIFTH_ID ) )
+				.asString()
 				.contains( "\"description\":" )
 				.contains( "\"details\":" );
 	}
