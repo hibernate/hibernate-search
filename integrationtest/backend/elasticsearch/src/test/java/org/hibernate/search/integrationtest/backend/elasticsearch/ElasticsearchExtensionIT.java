@@ -860,7 +860,7 @@ public class ElasticsearchExtensionIT {
 	public void aggregation_nativeField_fromJson_jsonObject() {
 		StubMappingScope scope = indexManager.createScope();
 
-		AggregationKey<String> documentCountPerValue = AggregationKey.of( "documentCountPerValue" );
+		AggregationKey<JsonObject> documentCountPerValue = AggregationKey.of( "documentCountPerValue" );
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.extension( ElasticsearchExtension.get() )
@@ -874,12 +874,12 @@ public class ElasticsearchExtensionIT {
 						JsonObject.class
 				) ) )
 				.toQuery();
-		String aggregationResult = query.fetchAll().getAggregation( documentCountPerValue );
+		JsonObject aggregationResult = query.fetchAll().getAggregation( documentCountPerValue );
 		assertJsonEquals(
 				"{"
 						+ "'value': 3,"
 						+ "}",
-				aggregationResult
+				aggregationResult.toString()
 		);
 	}
 
@@ -888,7 +888,7 @@ public class ElasticsearchExtensionIT {
 	public void aggregation_nativeField_fromJson_string() {
 		StubMappingScope scope = indexManager.createScope();
 
-		AggregationKey<String> documentCountPerValue = AggregationKey.of( "documentCountPerValue" );
+		AggregationKey<JsonObject> documentCountPerValue = AggregationKey.of( "documentCountPerValue" );
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.extension( ElasticsearchExtension.get() )
@@ -901,12 +901,12 @@ public class ElasticsearchExtensionIT {
 								+ "}"
 				) )
 				.toQuery();
-		String aggregationResult = query.fetchAll().getAggregation( documentCountPerValue );
+		JsonObject aggregationResult = query.fetchAll().getAggregation( documentCountPerValue );
 		assertJsonEquals(
 				"{"
 						+ "'value': 3,"
 						+ "}",
-				aggregationResult
+				aggregationResult.toString()
 		);
 	}
 
