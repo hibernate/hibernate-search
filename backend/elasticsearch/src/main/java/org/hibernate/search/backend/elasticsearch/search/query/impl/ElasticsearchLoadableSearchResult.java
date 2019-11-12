@@ -88,6 +88,9 @@ public class ElasticsearchLoadableSearchResult<H> {
 		// Make sure that if someone uses this object incorrectly, it will always fail, and will fail early.
 		extractedHits = null;
 
-		return new ElasticsearchSearchResultImpl<>( hitCount, loadedHits, extractedAggregations, took, timedOut );
+		return new ElasticsearchSearchResultImpl<>(
+				extractContext.getResponseBody(),
+				hitCount, loadedHits, extractedAggregations
+		, took, timedOut );
 	}
 }

@@ -14,16 +14,27 @@ import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSear
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
 
+import com.google.gson.JsonObject;
+
 class ElasticsearchSearchResultImpl<H> extends SimpleSearchResult<H>
 		implements ElasticsearchSearchResult<H> {
+
+	private final JsonObject responseBody;
 
 	private final Duration took;
 	private final boolean timedOut;
 
-	ElasticsearchSearchResultImpl(long hitCount, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults, Integer took, Boolean timedOut) {
+	ElasticsearchSearchResultImpl(JsonObject responseBody,
+			long hitCount, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults, Integer took, Boolean timedOut) {
 		super( hitCount, hits, aggregationResults );
+		this.responseBody = responseBody;
 		this.took = Duration.ofMillis( took );
 		this.timedOut = ( timedOut != null ) ? timedOut : false;
+	}
+
+	@Override
+	public JsonObject getResponseBody() {
+		return responseBody;
 	}
 
 	@Override
