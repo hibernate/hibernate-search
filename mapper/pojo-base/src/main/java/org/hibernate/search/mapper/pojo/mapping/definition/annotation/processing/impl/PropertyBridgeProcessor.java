@@ -31,12 +31,12 @@ class PropertyBridgeProcessor extends PropertyAnnotationProcessor<Annotation> {
 	}
 
 	@Override
-	Stream<? extends Annotation> extractAnnotations(PojoPropertyModel<?> propertyModel) {
+	public Stream<? extends Annotation> extractAnnotations(PojoPropertyModel<?> propertyModel) {
 		return propertyModel.getAnnotationsByMetaAnnotationType( PropertyBinding.class );
 	}
 
 	@Override
-	void doProcess(PropertyMappingStep mappingContext,
+	public void process(PropertyMappingStep mappingContext,
 			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 			Annotation annotation) {
 		PropertyBinder<?> binder = createPropertyBinder( annotation );

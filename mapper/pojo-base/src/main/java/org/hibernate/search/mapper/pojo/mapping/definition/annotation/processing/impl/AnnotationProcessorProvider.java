@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processin
 
 import java.util.List;
 
-import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 public class AnnotationProcessorProvider {
@@ -16,8 +15,8 @@ public class AnnotationProcessorProvider {
 	private final List<TypeAnnotationProcessor<?>> typeAnnotationProcessors;
 	private final List<PropertyAnnotationProcessor<?>> propertyAnnotationProcessors;
 
-	public AnnotationProcessorProvider(FailureCollector rootFailureCollector) {
-		AnnotationProcessorHelper helper = new AnnotationProcessorHelper( rootFailureCollector );
+	public AnnotationProcessorProvider() {
+		AnnotationProcessorHelper helper = new AnnotationProcessorHelper();
 
 		this.typeAnnotationProcessors = CollectionHelper.toImmutableList( CollectionHelper.asList(
 				new IndexedProcessor( helper ),

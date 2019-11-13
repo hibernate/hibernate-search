@@ -23,12 +23,12 @@ class IndexedEmbeddedProcessor extends PropertyAnnotationProcessor<IndexedEmbedd
 	}
 
 	@Override
-	Stream<? extends IndexedEmbedded> extractAnnotations(PojoPropertyModel<?> propertyModel) {
+	public Stream<? extends IndexedEmbedded> extractAnnotations(PojoPropertyModel<?> propertyModel) {
 		return propertyModel.getAnnotationsByType( IndexedEmbedded.class );
 	}
 
 	@Override
-	void doProcess(PropertyMappingStep mappingContext,
+	public void process(PropertyMappingStep mappingContext,
 			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 			IndexedEmbedded annotation) {
 		String cleanedUpPrefix = annotation.prefix();

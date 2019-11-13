@@ -28,12 +28,12 @@ class AssociationInverseSideProcessor extends PropertyAnnotationProcessor<Associ
 	}
 
 	@Override
-	Stream<? extends AssociationInverseSide> extractAnnotations(PojoPropertyModel<?> propertyModel) {
+	public Stream<? extends AssociationInverseSide> extractAnnotations(PojoPropertyModel<?> propertyModel) {
 		return propertyModel.getAnnotationsByType( AssociationInverseSide.class );
 	}
 
 	@Override
-	void doProcess(PropertyMappingStep mappingContext,
+	public void process(PropertyMappingStep mappingContext,
 			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 			AssociationInverseSide annotation) {
 		ContainerExtractorPath extractorPath = helper.getExtractorPath( annotation.extraction() );

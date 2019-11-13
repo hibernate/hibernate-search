@@ -6,23 +6,32 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl;
 
+import java.lang.annotation.Annotation;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
+import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.AnnotationProcessorProvider;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.PropertyAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.TypeAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.TypeMappingStepImpl;
+import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
 
 class AnnotationPojoTypeMetadataContributorFactory {
 
+	private final FailureCollector rootFailureCollector;
 	private final AnnotationProcessorProvider annotationProcessorProvider;
 
-	AnnotationPojoTypeMetadataContributorFactory(AnnotationProcessorProvider annotationProcessorProvider) {
-		this.annotationProcessorProvider = annotationProcessorProvider;
+	AnnotationPojoTypeMetadataContributorFactory(FailureCollector rootFailureCollector) {
+		this.rootFailureCollector = rootFailureCollector;
+		this.annotationProcessorProvider = new AnnotationProcessorProvider();
 	}
 
 	public Optional<PojoTypeMetadataContributor> createIfAnnotated(PojoRawTypeModel<?> typeModel) {
@@ -48,7 +57,7 @@ class AnnotationPojoTypeMetadataContributorFactory {
 	private boolean processTypeLevelAnnotations(TypeMappingStepImpl typeMappingContext, PojoRawTypeModel<?> typeModel) {
 		boolean processedAtLeastOneAnnotation = false;
 		for ( TypeAnnotationProcessor<?> processor : annotationProcessorProvider.getTypeAnnotationProcessors() ) {
-			if ( processor.process( typeMappingContext, typeModel ) ) {
+			if ( applyProcessor( processor, typeMappingContext, typeModel ) ) {
 				processedAtLeastOneAnnotation = true;
 			}
 		}
@@ -61,11 +70,59 @@ class AnnotationPojoTypeMetadataContributorFactory {
 		PropertyMappingStep mappingContext = typeMappingContext.property( propertyName );
 		boolean processedAtLeastOneAnnotation = false;
 		for ( PropertyAnnotationProcessor<?> processor : annotationProcessorProvider.getPropertyAnnotationProcessors() ) {
-			if ( processor.process( mappingContext, typeModel, propertyModel ) ) {
+			if ( applyProcessor( processor, mappingContext, typeModel, propertyModel ) ) {
 				processedAtLeastOneAnnotation = true;
 			}
 		}
 		return processedAtLeastOneAnnotation;
+	}
+
+	private <A extends Annotation> boolean applyProcessor(TypeAnnotationProcessor<A> processor,
+			TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel) {
+		List<A> annotationList = processor.extractAnnotations( typeModel ).collect( Collectors.toList() );
+		for ( A annotation : annotationList ) {
+			tryApplyProcessor( processor, mappingContext, typeModel, annotation );
+		}
+		return !annotationList.isEmpty();
+	}
+
+	private <A extends Annotation> void tryApplyProcessor(TypeAnnotationProcessor<A> processor,
+			TypeMappingStep mapping, PojoRawTypeModel<?> typeModel, A annotation) {
+		try {
+			processor.process( mapping, typeModel, annotation );
+		}
+		catch (RuntimeException e) {
+			rootFailureCollector
+					.withContext( PojoEventContexts.fromType( typeModel ) )
+					.withContext( PojoEventContexts.fromAnnotation( annotation ) )
+					.add( e );
+		}
+	}
+
+	private <A extends Annotation> boolean applyProcessor(PropertyAnnotationProcessor<A> processor,
+			PropertyMappingStep mappingContext, PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel) {
+		List<A> annotationList = processor.extractAnnotations( propertyModel ).collect( Collectors.toList() );
+		for ( A annotation : annotationList ) {
+			tryApplyProcessor( processor, mappingContext, typeModel, propertyModel, annotation );
+		}
+		return !annotationList.isEmpty();
+	}
+
+	private <A extends Annotation> void tryApplyProcessor(PropertyAnnotationProcessor<A> processor,
+			PropertyMappingStep mapping, PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
+			A annotation) {
+		try {
+			processor.process( mapping, typeModel, propertyModel, annotation );
+		}
+		catch (RuntimeException e) {
+			rootFailureCollector
+					.withContext( PojoEventContexts.fromType( typeModel ) )
+					.withContext( PojoEventContexts.fromPath(
+							PojoModelPath.ofProperty( propertyModel.getName() )
+					) )
+					.withContext( PojoEventContexts.fromAnnotation( annotation ) )
+					.add( e );
+		}
 	}
 
 }

@@ -33,12 +33,12 @@ class DocumentIdProcessor extends PropertyAnnotationProcessor<DocumentId> {
 	}
 
 	@Override
-	Stream<? extends DocumentId> extractAnnotations(PojoPropertyModel<?> propertyModel) {
+	public Stream<? extends DocumentId> extractAnnotations(PojoPropertyModel<?> propertyModel) {
 		return propertyModel.getAnnotationsByType( DocumentId.class );
 	}
 
 	@Override
-	void doProcess(PropertyMappingStep mappingContext,
+	public void process(PropertyMappingStep mappingContext,
 			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 			DocumentId annotation) {
 		IdentifierBinder binder = createIdentifierBinder( annotation, propertyModel );

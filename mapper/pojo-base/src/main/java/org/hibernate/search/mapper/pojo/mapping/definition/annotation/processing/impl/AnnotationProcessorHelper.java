@@ -11,7 +11,6 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtract;
@@ -27,14 +26,7 @@ class AnnotationProcessorHelper {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final FailureCollector rootFailureCollector;
-
-	AnnotationProcessorHelper(FailureCollector rootFailureCollector) {
-		this.rootFailureCollector = rootFailureCollector;
-	}
-
-	FailureCollector getRootFailureCollector() {
-		return rootFailureCollector;
+	AnnotationProcessorHelper() {
 	}
 
 	Optional<PojoModelPathValueNode> getPojoModelPathValueNode(ObjectPath objectPath) {

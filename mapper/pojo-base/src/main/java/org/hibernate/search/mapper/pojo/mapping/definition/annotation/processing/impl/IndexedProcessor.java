@@ -18,12 +18,12 @@ class IndexedProcessor extends TypeAnnotationProcessor<Indexed> {
 	}
 
 	@Override
-	Stream<? extends Indexed> extractAnnotations(PojoRawTypeModel<?> typeModel) {
+	public Stream<? extends Indexed> extractAnnotations(PojoRawTypeModel<?> typeModel) {
 		return typeModel.getAnnotationsByType( Indexed.class );
 	}
 
 	@Override
-	void doProcess(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel, Indexed annotation) {
+	public void process(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel, Indexed annotation) {
 		String indexName = annotation.index();
 		if ( indexName.isEmpty() ) {
 			indexName = null;
