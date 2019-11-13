@@ -158,6 +158,10 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 		return new ElasticsearchExplanationProjectionBuilder( scopeModel.getHibernateSearchIndexNames() );
 	}
 
+	public SearchProjectionBuilder<JsonObject> jsonHit() {
+		return new ElasticsearchJsonHitProjectionBuilder( scopeModel.getHibernateSearchIndexNames() );
+	}
+
 	@SuppressWarnings("unchecked")
 	public <T> ElasticsearchSearchProjection<?, T> toImplementation(SearchProjection<T> projection) {
 		if ( !( projection instanceof ElasticsearchSearchProjection ) ) {

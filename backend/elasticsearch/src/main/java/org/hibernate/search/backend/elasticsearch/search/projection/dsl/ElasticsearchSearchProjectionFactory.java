@@ -37,4 +37,11 @@ public interface ElasticsearchSearchProjectionFactory<R, E> extends SearchProjec
 	 */
 	ProjectionFinalStep<JsonObject> explanation();
 
+	/**
+	 * Project to a {@link JsonObject} representing the hit as returned by Elasticsearch.
+	 *
+	 * @return The final step of the projection DSL.
+	 */
+	ProjectionFinalStep<JsonObject> jsonHit();
+
 }

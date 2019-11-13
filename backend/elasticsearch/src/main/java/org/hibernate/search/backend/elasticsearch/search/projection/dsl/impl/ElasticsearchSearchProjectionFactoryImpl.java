@@ -36,4 +36,9 @@ public class ElasticsearchSearchProjectionFactoryImpl<R, E>
 	public ProjectionFinalStep<JsonObject> explanation() {
 		return new StaticProjectionFinalStep<>( factory.explanation() );
 	}
+
+	@Override
+	public ProjectionFinalStep<JsonObject> jsonHit() {
+		return new StaticProjectionFinalStep<>( factory.jsonHit() );
+	}
 }
