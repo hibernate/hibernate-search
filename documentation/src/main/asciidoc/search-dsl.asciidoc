@@ -608,6 +608,13 @@ include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.
 ----
 ====
 
+[TIP]
+====
+When data needs to be extracted from each hit,
+it is often more convenient to use the <<search-dsl-projection-extensions-elasticsearch-jsonHit,`jsonHit` projection>>
+than parsing the whole response.
+====
+
 [[search-dsl-predicate]]
 == Predicate DSL
 // Search 5 anchors backward compatibility
@@ -1671,6 +1678,25 @@ only use them for <<search-dsl-query-debugging-scores,debugging>> purposes.
 [source, JAVA, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=elasticsearch-explanation]
+----
+====
+
+[[search-dsl-projection-extensions-elasticsearch-jsonHit]]
+==== Elasticsearch: `jsonHit`
+
+[NOTE]
+====
+This is particularly useful when <<search-dsl-query-elasticsearch-json,customizing the request's JSON>>
+to ask for additional data within each hit.
+====
+
+include::components/elasticsearch-request-response-warning.asciidoc[]
+
+.Returning the Elasticsearch hit as a `JsonObject`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=elasticsearch-jsonHit]
 ----
 ====
 

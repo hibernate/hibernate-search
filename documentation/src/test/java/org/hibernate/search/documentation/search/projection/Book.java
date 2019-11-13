@@ -19,9 +19,11 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 
-@Entity
+@Entity(name = Book.NAME)
 @Indexed
 public class Book {
+
+	public static final String NAME = "Book";
 
 	@Id
 	private Integer id;

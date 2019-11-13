@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.search.projection;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,6 +17,7 @@ import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.Session;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
+import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.ElasticsearchBackendConfiguration;
@@ -47,6 +49,7 @@ import org.junit.runners.Parameterized;
 import com.google.gson.JsonObject;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Explanation;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 
 @RunWith(Parameterized.class)
 public class ProjectionDslIT {
@@ -406,6 +409,29 @@ public class ProjectionDslIT {
 					.fetchHits( 20 );
 			// end::elasticsearch-explanation[]
 			assertThat( hits ).hasSize( 4 );
+		} );
+	}
+
+	@Test
+	public void elasticsearch_jsonHit() {
+		Assume.assumeTrue( backendConfiguration instanceof ElasticsearchBackendConfiguration );
+
+		withinSearchSession( searchSession -> {
+			// tag::elasticsearch-jsonHit[]
+			List<JsonObject> hits = searchSession.search( Book.class )
+					.extension( ElasticsearchExtension.get() )
+					.asProjection( f -> f.jsonHit() )
+					.predicate( f -> f.matchAll() )
+					.fetchHits( 20 );
+			// end::elasticsearch-jsonHit[]
+			assertThat( hits ).hasSize( 4 );
+			assertThat( hits ).allSatisfy( hit -> assertJsonEquals(
+					"{"
+							+ "'_index': '" + ElasticsearchIndexNameNormalizer.normalize( Book.NAME ) + "'"
+							+ "}",
+					hit.toString(),
+					JSONCompareMode.LENIENT
+			) );
 		} );
 	}
 
