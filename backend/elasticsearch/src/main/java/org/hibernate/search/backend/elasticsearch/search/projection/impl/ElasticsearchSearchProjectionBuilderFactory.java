@@ -56,7 +56,10 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 
 	@Override
 	public DocumentReferenceProjectionBuilder documentReference() {
-		return searchProjectionBackendContext.createDocumentReferenceProjectionBuilder( scopeModel.getHibernateSearchIndexNames() );
+		return new ElasticsearchDocumentReferenceProjectionBuilder(
+				scopeModel.getHibernateSearchIndexNames(),
+				searchProjectionBackendContext.getDocumentReferenceExtractorHelper()
+		);
 	}
 
 	@Override
@@ -82,17 +85,23 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 
 	@Override
 	public <E> EntityProjectionBuilder<E> entity() {
-		return searchProjectionBackendContext.createEntityProjectionBuilder( scopeModel.getHibernateSearchIndexNames() );
+		return new ElasticsearchEntityProjectionBuilder<>(
+				scopeModel.getHibernateSearchIndexNames(),
+				searchProjectionBackendContext.getDocumentReferenceExtractorHelper()
+		);
 	}
 
 	@Override
 	public <R> EntityReferenceProjectionBuilder<R> entityReference() {
-		return searchProjectionBackendContext.createReferenceProjectionBuilder( scopeModel.getHibernateSearchIndexNames() );
+		return new ElasticsearchEntityReferenceProjectionBuilder<>(
+				scopeModel.getHibernateSearchIndexNames(),
+				searchProjectionBackendContext.getDocumentReferenceExtractorHelper()
+		);
 	}
 
 	@Override
 	public ScoreProjectionBuilder score() {
-		return searchProjectionBackendContext.createScoreProjectionBuilder( scopeModel.getHibernateSearchIndexNames() );
+		return new ElasticsearchScoreProjectionBuilder( scopeModel.getHibernateSearchIndexNames() );
 	}
 
 	@Override
@@ -142,11 +151,11 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	}
 
 	public SearchProjectionBuilder<JsonObject> source() {
-		return searchProjectionBackendContext.createSourceProjectionBuilder( scopeModel.getHibernateSearchIndexNames() );
+		return new ElasticsearchSourceProjectionBuilder( scopeModel.getHibernateSearchIndexNames() );
 	}
 
 	public SearchProjectionBuilder<JsonObject> explanation() {
-		return searchProjectionBackendContext.createExplanationProjectionBuilder( scopeModel.getHibernateSearchIndexNames() );
+		return new ElasticsearchExplanationProjectionBuilder( scopeModel.getHibernateSearchIndexNames() );
 	}
 
 	@SuppressWarnings("unchecked")

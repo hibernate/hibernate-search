@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import java.util.Set;
-
-public class SearchProjectionBackendContext {
+public final class SearchProjectionBackendContext {
 
 	private final DocumentReferenceExtractorHelper documentReferenceExtractorHelper;
 
@@ -16,27 +14,8 @@ public class SearchProjectionBackendContext {
 		this.documentReferenceExtractorHelper = documentReferenceExtractorHelper;
 	}
 
-	ElasticsearchDocumentReferenceProjectionBuilder createDocumentReferenceProjectionBuilder(Set<String> indexNames) {
-		return new ElasticsearchDocumentReferenceProjectionBuilder( indexNames, documentReferenceExtractorHelper );
+	DocumentReferenceExtractorHelper getDocumentReferenceExtractorHelper() {
+		return documentReferenceExtractorHelper;
 	}
 
-	<E> ElasticsearchEntityProjectionBuilder<E> createEntityProjectionBuilder(Set<String> indexNames) {
-		return new ElasticsearchEntityProjectionBuilder<>( indexNames, documentReferenceExtractorHelper );
-	}
-
-	<R> ElasticsearchEntityReferenceProjectionBuilder<R> createReferenceProjectionBuilder(Set<String> indexNames) {
-		return new ElasticsearchEntityReferenceProjectionBuilder<>( indexNames, documentReferenceExtractorHelper );
-	}
-
-	ElasticsearchScoreProjectionBuilder createScoreProjectionBuilder(Set<String> indexNames) {
-		return new ElasticsearchScoreProjectionBuilder( indexNames );
-	}
-
-	ElasticsearchSourceProjectionBuilder createSourceProjectionBuilder(Set<String> indexNames) {
-		return new ElasticsearchSourceProjectionBuilder( indexNames );
-	}
-
-	ElasticsearchExplanationProjectionBuilder createExplanationProjectionBuilder(Set<String> indexNames) {
-		return new ElasticsearchExplanationProjectionBuilder( indexNames );
-	}
 }
