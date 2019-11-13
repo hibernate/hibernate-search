@@ -7,15 +7,25 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
 import java.lang.annotation.Annotation;
+import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerBinding;
+import org.hibernate.search.mapper.pojo.bridge.mapping.impl.AnnotationInitializingBeanDelegatingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class MarkerProcessor extends PropertyAnnotationProcessor<Annotation> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	MarkerProcessor(AnnotationProcessorHelper helper) {
 		super( helper );
 	}
@@ -28,7 +38,27 @@ class MarkerProcessor extends PropertyAnnotationProcessor<Annotation> {
 	@Override
 	void doProcess(PropertyMappingStep mappingContext,
 			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel, Annotation annotation) {
-		MarkerBinder<?> binder = helper.createMarkerBinder( annotation );
+		MarkerBinder<?> binder = createMarkerBinder( annotation );
 		mappingContext.marker( binder );
+	}
+
+	private <A extends Annotation> MarkerBinder createMarkerBinder(A annotation) {
+		MarkerBinding markerBinding = annotation.annotationType().getAnnotation( MarkerBinding.class );
+		MarkerBinderRef binderReferenceAnnotation = markerBinding.binder();
+		Optional<BeanReference<? extends MarkerBinder>> binderReference = helper.toBeanReference(
+				MarkerBinder.class,
+				MarkerBinderRef.UndefinedBinderImplementationType.class,
+				binderReferenceAnnotation.type(), binderReferenceAnnotation.name()
+		);
+
+		if ( !binderReference.isPresent() ) {
+			throw log.missingBinderReferenceInMarkerMapping(
+					MarkerBinding.class, annotation.annotationType()
+			);
+		}
+
+		MarkerBinder<A> binder = new AnnotationInitializingBeanDelegatingBinder<>( binderReference.get() );
+		binder.initialize( annotation );
+		return binder;
 	}
 }
