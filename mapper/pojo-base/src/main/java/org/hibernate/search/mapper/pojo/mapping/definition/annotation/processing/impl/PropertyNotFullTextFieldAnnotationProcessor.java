@@ -14,7 +14,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Annotation
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStandardFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingNonFullTextFieldOptionsStep;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
 abstract class PropertyNotFullTextFieldAnnotationProcessor<A extends Annotation> extends
 		PropertyStandardFieldAnnotationProcessor<A> {
@@ -24,9 +23,9 @@ abstract class PropertyNotFullTextFieldAnnotationProcessor<A extends Annotation>
 
 	@Override
 	final PropertyMappingStandardFieldOptionsStep<?> initStandardFieldMappingContext(PropertyMappingStep mappingContext,
-			PojoPropertyModel<?> propertyModel, A annotation, String fieldName) {
+			A annotation, String fieldName) {
 		PropertyMappingNonFullTextFieldOptionsStep<?> fieldContext = initSortableFieldMappingContext(
-				mappingContext, propertyModel, annotation, fieldName
+				mappingContext, annotation, fieldName
 		);
 
 		Sortable sortable = getSortable( annotation );
@@ -47,8 +46,9 @@ abstract class PropertyNotFullTextFieldAnnotationProcessor<A extends Annotation>
 		return fieldContext;
 	}
 
-	abstract PropertyMappingNonFullTextFieldOptionsStep<?> initSortableFieldMappingContext(PropertyMappingStep mappingContext,
-			PojoPropertyModel<?> propertyModel, A annotation, String fieldName);
+	abstract PropertyMappingNonFullTextFieldOptionsStep<?> initSortableFieldMappingContext(
+			PropertyMappingStep mappingContext,
+			A annotation, String fieldName);
 
 	abstract Sortable getSortable(A annotation);
 

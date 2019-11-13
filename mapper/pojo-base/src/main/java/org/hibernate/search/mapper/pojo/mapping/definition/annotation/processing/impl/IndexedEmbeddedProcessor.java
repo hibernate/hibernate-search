@@ -15,7 +15,6 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.Container
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 class IndexedEmbeddedProcessor extends PropertyAnnotationProcessor<IndexedEmbedded> {
 	IndexedEmbeddedProcessor(AnnotationProcessorHelper helper) {
@@ -28,9 +27,7 @@ class IndexedEmbeddedProcessor extends PropertyAnnotationProcessor<IndexedEmbedd
 	}
 
 	@Override
-	public void process(PropertyMappingStep mappingContext,
-			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
-			IndexedEmbedded annotation) {
+	public void process(PropertyMappingStep mappingContext, IndexedEmbedded annotation) {
 		String cleanedUpPrefix = annotation.prefix();
 		if ( cleanedUpPrefix.isEmpty() ) {
 			cleanedUpPrefix = null;

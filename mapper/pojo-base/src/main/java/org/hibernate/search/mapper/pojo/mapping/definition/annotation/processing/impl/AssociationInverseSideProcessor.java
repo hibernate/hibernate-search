@@ -16,7 +16,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Associatio
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class AssociationInverseSideProcessor extends PropertyAnnotationProcessor<AssociationInverseSide> {
@@ -34,14 +33,13 @@ class AssociationInverseSideProcessor extends PropertyAnnotationProcessor<Associ
 
 	@Override
 	public void process(PropertyMappingStep mappingContext,
-			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 			AssociationInverseSide annotation) {
 		ContainerExtractorPath extractorPath = helper.getExtractorPath( annotation.extraction() );
 
 		Optional<PojoModelPathValueNode> inversePathOptional =
 				helper.getPojoModelPathValueNode( annotation.inversePath() );
 		if ( !inversePathOptional.isPresent() ) {
-			throw log.missingInversePathInAssociationInverseSideMapping( typeModel, propertyModel.getName() );
+			throw log.missingInversePathInAssociationInverseSideMapping();
 		}
 
 		mappingContext.associationInverseSide( inversePathOptional.get() )

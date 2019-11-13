@@ -13,7 +13,6 @@ import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStandardFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
 abstract class PropertyStandardFieldAnnotationProcessor<A extends Annotation>
 		extends PropertyFieldAnnotationProcessor<A> {
@@ -24,9 +23,9 @@ abstract class PropertyStandardFieldAnnotationProcessor<A extends Annotation>
 
 	@Override
 	PropertyMappingFieldOptionsStep<?> initFieldMappingContext(PropertyMappingStep mappingContext,
-			PojoPropertyModel<?> propertyModel, A annotation, String fieldName) {
+			A annotation, String fieldName) {
 		PropertyMappingStandardFieldOptionsStep<?> fieldContext =
-				initStandardFieldMappingContext( mappingContext, propertyModel, annotation, fieldName );
+				initStandardFieldMappingContext( mappingContext, annotation, fieldName );
 
 		Projectable projectable = getProjectable( annotation );
 		if ( !Projectable.DEFAULT.equals( projectable ) ) {
@@ -41,8 +40,8 @@ abstract class PropertyStandardFieldAnnotationProcessor<A extends Annotation>
 		return fieldContext;
 	}
 
-	abstract PropertyMappingStandardFieldOptionsStep<?> initStandardFieldMappingContext(PropertyMappingStep mappingContext,
-			PojoPropertyModel<?> propertyModel, A annotation, String fieldName);
+	abstract PropertyMappingStandardFieldOptionsStep<?> initStandardFieldMappingContext(
+			PropertyMappingStep mappingContext, A annotation, String fieldName);
 
 	abstract Projectable getProjectable(A annotation);
 

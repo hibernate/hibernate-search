@@ -11,7 +11,6 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 public abstract class PropertyAnnotationProcessor<A extends Annotation> {
 
@@ -23,6 +22,5 @@ public abstract class PropertyAnnotationProcessor<A extends Annotation> {
 
 	public abstract Stream<? extends A> extractAnnotations(PojoPropertyModel<?> propertyModel);
 
-	public abstract void process(PropertyMappingStep mappingContext,
-			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel, A annotation);
+	public abstract void process(PropertyMappingStep mappingContext, A annotation);
 }

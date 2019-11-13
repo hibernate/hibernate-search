@@ -35,7 +35,7 @@ class TypeBridgeProcessor extends TypeAnnotationProcessor<Annotation> {
 	}
 
 	@Override
-	public void process(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel, Annotation annotation) {
+	public void process(TypeMappingStep mappingContext, Annotation annotation) {
 		TypeBinder<?> binder = createTypeBinder( annotation );
 		mappingContext.binder( binder );
 	}

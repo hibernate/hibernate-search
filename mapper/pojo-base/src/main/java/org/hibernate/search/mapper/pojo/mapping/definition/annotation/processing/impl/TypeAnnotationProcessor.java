@@ -22,5 +22,5 @@ public abstract class TypeAnnotationProcessor<A extends Annotation> {
 
 	public abstract Stream<? extends A> extractAnnotations(PojoRawTypeModel<?> typeModel);
 
-	public abstract void process(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel, A annotation);
+	public abstract void process(TypeMappingStep mappingContext, A annotation);
 }

@@ -18,7 +18,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ScaledNumb
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingNonFullTextFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingScaledNumberFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
 class ScaledNumberFieldProcessor extends PropertyNotFullTextFieldAnnotationProcessor<ScaledNumberField> {
 	ScaledNumberFieldProcessor(AnnotationProcessorHelper helper) {
@@ -27,7 +26,7 @@ class ScaledNumberFieldProcessor extends PropertyNotFullTextFieldAnnotationProce
 
 	@Override
 	PropertyMappingNonFullTextFieldOptionsStep<?> initSortableFieldMappingContext(PropertyMappingStep mappingContext,
-			PojoPropertyModel<?> propertyModel, ScaledNumberField annotation, String fieldName) {
+			ScaledNumberField annotation, String fieldName) {
 		PropertyMappingScaledNumberFieldOptionsStep fieldContext = mappingContext.scaledNumberField( fieldName );
 		int decimalScale = annotation.decimalScale();
 		if ( decimalScale != AnnotationDefaultValues.DEFAULT_DECIMAL_SCALE ) {

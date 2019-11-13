@@ -24,7 +24,6 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends PropertyAnnotationProcessor<A> {
@@ -44,21 +43,18 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 	}
 
 	@Override
-	public final void process(PropertyMappingStep mappingContext,
-			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
-			A annotation) {
+	public final void process(PropertyMappingStep mappingContext, A annotation) {
 		String cleanedUpRelativeFieldName = getName( annotation );
 		if ( cleanedUpRelativeFieldName.isEmpty() ) {
 			cleanedUpRelativeFieldName = null;
 		}
 
 		PropertyMappingFieldOptionsStep<?> fieldContext =
-				initFieldMappingContext( mappingContext, propertyModel, annotation, cleanedUpRelativeFieldName );
+				initFieldMappingContext( mappingContext, annotation, cleanedUpRelativeFieldName );
 
 		ValueBinder binder = createValueBinder(
 				getValueBridge( annotation ),
-				getValueBinder( annotation ),
-				propertyModel
+				getValueBinder( annotation )
 		);
 		fieldContext.valueBinder( binder );
 
@@ -68,7 +64,7 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 	}
 
 	abstract PropertyMappingFieldOptionsStep<?> initFieldMappingContext(PropertyMappingStep mappingContext,
-			PojoPropertyModel<?> propertyModel, A annotation, String fieldName);
+			A annotation, String fieldName);
 
 	abstract String getName(A annotation);
 
@@ -79,10 +75,8 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 	abstract ContainerExtraction getExtraction(A annotation);
 
 	@SuppressWarnings("rawtypes") // Raw types are the best we can do here
-	private ValueBinder createValueBinder(
-			ValueBridgeRef bridgeReferenceAnnotation,
-			ValueBinderRef binderReferenceAnnotation,
-			PojoPropertyModel<?> annotationHolder) {
+	private ValueBinder createValueBinder(ValueBridgeRef bridgeReferenceAnnotation,
+			ValueBinderRef binderReferenceAnnotation) {
 		Optional<BeanReference<? extends ValueBridge>> bridgeReference = Optional.empty();
 		if ( bridgeReferenceAnnotation != null ) {
 			bridgeReference = helper.toBeanReference(
@@ -98,7 +92,7 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 		);
 
 		if ( bridgeReference.isPresent() && binderReference.isPresent() ) {
-			throw log.invalidFieldDefiningBothBridgeReferenceAndBinderReference( annotationHolder.getName() );
+			throw log.invalidFieldDefiningBothBridgeReferenceAndBinderReference();
 		}
 		else if ( bridgeReference.isPresent() ) {
 			return new BeanBinder( bridgeReference.get() );
