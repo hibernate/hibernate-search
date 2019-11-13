@@ -314,7 +314,7 @@ public class QueryDslIT {
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
-			// tag::explain-took-timedOut[]
+			// tag::elasticsearch-took-timedOut[]
 			SearchQuery<Book> query = searchSession.search( Book.class )
 					.predicate( f -> f.match()
 							.field( "title" )
@@ -322,11 +322,11 @@ public class QueryDslIT {
 					.toQuery();
 
 			ElasticsearchSearchQuery<Book> elasticsearchQuery = query.extension( ElasticsearchExtension.get() ); // <1>
-			ElasticsearchSearchResult<Book> result = elasticsearchQuery.fetchAll(); // <2>
+			ElasticsearchSearchResult<Book> result = elasticsearchQuery.fetch( 20 ); // <2>
 
 			Duration took = result.getTook(); // <3>
 			Boolean timedOut = result.isTimedOut(); // <4>
-			// end::explain-took-timedOut[]
+			// end::elasticsearch-took-timedOut[]
 
 			assertThat( took ).isNotNull();
 			assertThat( timedOut ).isNotNull();
