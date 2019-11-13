@@ -16,6 +16,7 @@ import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 
@@ -58,52 +59,53 @@ public class ProgrammaticMappingGeoPointBindingIT {
 					) );
 
 					ProgrammaticMappingConfigurationContext mappingDefinition = builder.programmaticMapping();
-					mappingDefinition.type( GeoPointOnTypeEntity.class )
-							.indexed( GeoPointOnTypeEntity.INDEX )
-							.binder( GeoPointBinder.create()
-									.fieldName( "homeLocation" )
-									.markerSet( "home" )
-									.projectable( Projectable.YES )
-									.sortable( Sortable.YES )
-							)
-							.binder( GeoPointBinder.create()
-									.fieldName( "workLocation" )
-									.markerSet( "work" )
-							)
-							.property( "id" )
-									.documentId()
-							.property( "homeLatitude" )
-									.marker( GeoPointBinder.latitude().markerSet( "home" ) )
-							.property( "homeLongitude" )
-									.marker( GeoPointBinder.longitude().markerSet( "home" ) )
-							.property( "workLatitude" )
-									.marker( GeoPointBinder.latitude().markerSet( "work" ) )
-							.property( "workLongitude" )
-									.marker( GeoPointBinder.longitude().markerSet( "work" ) );
 
-					mappingDefinition.type( GeoPointOnCoordinatesPropertyEntity.class )
-							.indexed( GeoPointOnCoordinatesPropertyEntity.INDEX )
-							.property( "id" )
-									.documentId()
-							.property( "coord" )
+					TypeMappingStep geoPointOntTypeEntityMapping = mappingDefinition.type( GeoPointOnTypeEntity.class );
+					geoPointOntTypeEntityMapping.indexed( GeoPointOnTypeEntity.INDEX );
+					geoPointOntTypeEntityMapping.binder( GeoPointBinder.create()
+							.fieldName( "homeLocation" )
+							.markerSet( "home" )
+							.projectable( Projectable.YES )
+							.sortable( Sortable.YES )
+					);
+					geoPointOntTypeEntityMapping.binder( GeoPointBinder.create()
+							.fieldName( "workLocation" )
+							.markerSet( "work" )
+					);
+					geoPointOntTypeEntityMapping.property( "id" ).documentId();
+					geoPointOntTypeEntityMapping.property( "homeLatitude" )
+							.marker( GeoPointBinder.latitude().markerSet( "home" ) );
+					geoPointOntTypeEntityMapping.property( "homeLongitude" )
+							.marker( GeoPointBinder.longitude().markerSet( "home" ) );
+					geoPointOntTypeEntityMapping.property( "workLatitude" )
+							.marker( GeoPointBinder.latitude().markerSet( "work" ) );
+					geoPointOntTypeEntityMapping.property( "workLongitude" )
+							.marker( GeoPointBinder.longitude().markerSet( "work" ) );
+
+					TypeMappingStep geoPointOnCoordinatesPropertyEntityMapping =
+							mappingDefinition.type( GeoPointOnCoordinatesPropertyEntity.class );
+					geoPointOnCoordinatesPropertyEntityMapping.indexed( GeoPointOnCoordinatesPropertyEntity.INDEX );
+					geoPointOnCoordinatesPropertyEntityMapping.property( "id" )
+									.documentId();
+					geoPointOnCoordinatesPropertyEntityMapping.property( "coord" )
 									.genericField()
 									.genericField( "location" ).projectable( Projectable.NO );
 
-					mappingDefinition.type( GeoPointOnCustomCoordinatesPropertyEntity.class )
-							.indexed( GeoPointOnCustomCoordinatesPropertyEntity.INDEX )
-							.property( "id" )
-									.documentId()
-							.property( "coord" )
-									.binder( GeoPointBinder.create() )
-									.binder( GeoPointBinder.create()
-											.fieldName( "location" )
-									);
+					TypeMappingStep geoPointOnCustomCoordinatesPropertyEntityMapping =
+							mappingDefinition.type( GeoPointOnCustomCoordinatesPropertyEntity.class );
+					geoPointOnCustomCoordinatesPropertyEntityMapping.indexed( GeoPointOnCustomCoordinatesPropertyEntity.INDEX );
+					geoPointOnCustomCoordinatesPropertyEntityMapping.property( "id" ).documentId();
+					geoPointOnCustomCoordinatesPropertyEntityMapping.property( "coord" )
+							.binder( GeoPointBinder.create() )
+							.binder( GeoPointBinder.create()
+									.fieldName( "location" )
+							);
 
-					mappingDefinition.type( CustomCoordinates.class )
-							.property( "lat" )
-									.marker( GeoPointBinder.latitude() )
-							.property( "lon" )
-									.marker( GeoPointBinder.longitude() );
+					TypeMappingStep customCoordinatesMapping = mappingDefinition.type( CustomCoordinates.class );
+					customCoordinatesMapping.property( "lat" )
+							.marker( GeoPointBinder.latitude() );
+					customCoordinatesMapping.property( "lon" )
+							.marker( GeoPointBinder.longitude() );
 				} )
 				.setup();
 

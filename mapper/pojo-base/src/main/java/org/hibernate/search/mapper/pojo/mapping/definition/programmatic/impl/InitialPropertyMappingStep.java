@@ -62,11 +62,6 @@ class InitialPropertyMappingStep
 	}
 
 	@Override
-	public PropertyMappingStep property(String propertyName) {
-		return parent.property( propertyName );
-	}
-
-	@Override
 	public PropertyMappingStep binder(PropertyBinder<?> binder) {
 		children.add( new PropertyBridgeMappingContributor( binder ) );
 		return this;

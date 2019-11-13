@@ -38,6 +38,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
@@ -137,10 +138,10 @@ public class AnnotationMappingDiscoveryIT {
 							 * We add some of the annotation mapping programmatically,
 							 * just to check that discovery is disabled for nested types.
 							 */
-							context.programmaticMapping()
-									.type( IndexedEntity.class ).indexed( IndexedEntity.INDEX )
-									.property( "id" ).documentId()
-									.property( "annotationMappedEmbedded" )
+							TypeMappingStep indexedEntityMapping = context.programmaticMapping().type( IndexedEntity.class );
+							indexedEntityMapping.indexed( IndexedEntity.INDEX );
+							indexedEntityMapping.property( "id" ).documentId();
+							indexedEntityMapping.property( "annotationMappedEmbedded" )
 									.indexedEmbedded();
 
 							mapAlwaysPresentProperty( context.programmaticMapping() );

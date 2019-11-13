@@ -28,14 +28,6 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 public interface PropertyMappingStep {
 
 	/**
-	 * Stops mapping the current property and switches to another one on the same parent type.
-	 * @param propertyName The name of another property <strong>on the same type</strong> as the current property
-	 * (not a nested property).
-	 * @return A DSL step where the property mapping can be defined in more details.
-	 */
-	PropertyMappingStep property(String propertyName);
-
-	/**
 	 * Maps the property to the identifier of documents in the index.
 	 * <p>
 	 * This is only taken into account on {@link Indexed} types.

@@ -32,6 +32,7 @@ import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -138,70 +139,70 @@ public class ProgrammaticMappingSmokeIT {
 					) );
 
 					ProgrammaticMappingConfigurationContext mappingDefinition = builder.programmaticMapping();
-					mappingDefinition.type( IndexedEntity.class )
-							.indexed( IndexedEntity.INDEX )
-							.binder(
-									new CustomTypeBridge.Binder()
-									.objectName( "customBridgeOnClass" )
-							)
-							.property( "id" )
-									.documentId()
-							.property( "text" )
-									.genericField( "myTextField" )
-							.property( "embedded" )
-									.indexedEmbedded()
-											.prefix( "embedded.prefix_" )
-											.maxDepth( 1 )
-											.includePaths( "customBridgeOnClass.text", "embedded.prefix_customBridgeOnClass.text" );
+					TypeMappingStep indexedEntityMapping = mappingDefinition.type( IndexedEntity.class );
+					indexedEntityMapping.indexed( IndexedEntity.INDEX );
+					indexedEntityMapping.binder(
+							new CustomTypeBridge.Binder()
+							.objectName( "customBridgeOnClass" )
+					);
+					indexedEntityMapping.property( "id" ).documentId();
+					indexedEntityMapping.property( "text" )
+							.genericField( "myTextField" );
+					indexedEntityMapping.property( "embedded" )
+							.indexedEmbedded()
+									.prefix( "embedded.prefix_" )
+									.maxDepth( 1 )
+									.includePaths( "customBridgeOnClass.text", "embedded.prefix_customBridgeOnClass.text" );
 
 					ProgrammaticMappingConfigurationContext secondMappingDefinition = builder.programmaticMapping();
-					secondMappingDefinition.type( ParentIndexedEntity.class )
-							.property( "localDate" )
-									.genericField( "myLocalDateField" )
-							.property( "embedded" )
-									.associationInverseSide(
-											PojoModelPath.ofValue( "embeddingAsSingle" )
-									)
-									.binder(
-											new CustomPropertyBridge.Binder()
-											.objectName( "customBridgeOnProperty" )
-									);
-					secondMappingDefinition.type( OtherIndexedEntity.class )
-							.indexed( OtherIndexedEntity.INDEX )
-							.property( "id" )
-									.documentId().identifierBridge( DefaultIntegerIdentifierBridge.class )
-							.property( "numeric" )
-									.genericField()
-									.genericField( "numericAsString" ).valueBridge( IntegerAsStringValueBridge.class );
-					secondMappingDefinition.type( YetAnotherIndexedEntity.class )
-							.indexed( YetAnotherIndexedEntity.INDEX )
-							.property( "id" )
-									.documentId()
-							.property( "numeric" )
-									.genericField()
-							.property( "embeddedIterable" )
-									.associationInverseSide(
-											PojoModelPath.ofValue( "embeddingAsIterable" )
-									)
-									.indexedEmbedded().includePaths( "embedded.prefix_myTextField" )
-							.property( "embeddedList" )
-									.associationInverseSide(
-											PojoModelPath.ofValue( "embeddingAsList" )
-									)
-									.indexedEmbedded()
-											.prefix( "embeddedList.otherPrefix_" )
-											.includePaths( "embedded.prefix_customBridgeOnClass.text" )
-							.property( "embeddedArrayList" )
-									.associationInverseSide(
-											PojoModelPath.ofValue( "embeddingAsArrayList" )
-									)
-									.indexedEmbedded().includePaths( "embedded.prefix_customBridgeOnProperty.text" )
-							.property( "embeddedMap" )
-									.associationInverseSide(
-											PojoModelPath.ofValue( "embeddingAsMap" )
-									)
-									.genericField( "embeddedMapKeys" ).extractor( BuiltinContainerExtractors.MAP_KEY )
-									.indexedEmbedded().includePaths( "embedded.prefix_myLocalDateField" );
+
+					TypeMappingStep parentIndexedEntityMapping = secondMappingDefinition.type( ParentIndexedEntity.class );
+					parentIndexedEntityMapping.property( "localDate" )
+							.genericField( "myLocalDateField" );
+					parentIndexedEntityMapping.property( "embedded" )
+							.associationInverseSide(
+									PojoModelPath.ofValue( "embeddingAsSingle" )
+							)
+							.binder(
+									new CustomPropertyBridge.Binder()
+									.objectName( "customBridgeOnProperty" )
+							);
+
+					TypeMappingStep otherIndexedEntityMapping = secondMappingDefinition.type( OtherIndexedEntity.class );
+					otherIndexedEntityMapping.indexed( OtherIndexedEntity.INDEX );
+					otherIndexedEntityMapping.property( "id" )
+							.documentId().identifierBridge( DefaultIntegerIdentifierBridge.class );
+					otherIndexedEntityMapping.property( "numeric" )
+							.genericField()
+							.genericField( "numericAsString" ).valueBridge( IntegerAsStringValueBridge.class );
+
+					TypeMappingStep yetAnotherIndexedEntityMapping = secondMappingDefinition.type( YetAnotherIndexedEntity.class );
+					yetAnotherIndexedEntityMapping.indexed( YetAnotherIndexedEntity.INDEX );
+					yetAnotherIndexedEntityMapping.property( "id" ).documentId();
+					yetAnotherIndexedEntityMapping.property( "numeric" ).genericField();
+					yetAnotherIndexedEntityMapping.property( "embeddedIterable" )
+							.associationInverseSide(
+									PojoModelPath.ofValue( "embeddingAsIterable" )
+							)
+							.indexedEmbedded().includePaths( "embedded.prefix_myTextField" );
+					yetAnotherIndexedEntityMapping.property( "embeddedList" )
+							.associationInverseSide(
+									PojoModelPath.ofValue( "embeddingAsList" )
+							)
+							.indexedEmbedded()
+									.prefix( "embeddedList.otherPrefix_" )
+									.includePaths( "embedded.prefix_customBridgeOnClass.text" );
+					yetAnotherIndexedEntityMapping.property( "embeddedArrayList" )
+							.associationInverseSide(
+									PojoModelPath.ofValue( "embeddingAsArrayList" )
+							)
+							.indexedEmbedded().includePaths( "embedded.prefix_customBridgeOnProperty.text" );
+					yetAnotherIndexedEntityMapping.property( "embeddedMap" )
+							.associationInverseSide(
+									PojoModelPath.ofValue( "embeddingAsMap" )
+							)
+							.genericField( "embeddedMapKeys" ).extractor( BuiltinContainerExtractors.MAP_KEY )
+							.indexedEmbedded().includePaths( "embedded.prefix_myLocalDateField" );
 				} )
 				.setup();
 

@@ -23,6 +23,7 @@ import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
@@ -140,27 +141,31 @@ public class ProgrammaticMappingAccessTypeIT {
 		@Override
 		public void configure(HibernateOrmMappingConfigurationContext context) {
 			ProgrammaticMappingConfigurationContext mapping = context.programmaticMapping();
-			mapping.type( IndexedEntity.class )
-					.indexed( IndexedEntity.INDEX )
-					.property( "id" ).documentId()
-					.property( "fieldWithNonDefaultFieldAccess" ).genericField()
-					.property( "fieldWithDefaultFieldAccess" ).genericField()
-					.property( "fieldWithNonDefaultMethodAccess" ).genericField()
-					.property( "fieldWithDefaultMethodAccess" ).genericField()
-					.property( "embeddedWithDefaultFieldAccess" ).indexedEmbedded()
-					.property( "embeddedWithDefaultMethodAccess" ).indexedEmbedded()
-					.property( "nonManaged" ).indexedEmbedded();
-			mapping.type( IndexedEntityWithoutIdSetter.class )
-					.indexed( IndexedEntityWithoutIdSetter.INDEX )
-					.property( "id" ).documentId();
-			mapping.type( EmbeddableWithDefaultFieldAccess.class )
-					.property( "fieldWithDefaultFieldAccess" ).genericField()
-					.property( "fieldWithNonDefaultMethodAccess" ).genericField();
-			mapping.type( EmbeddableWithDefaultMethodAccess.class )
-					.property( "fieldWithNonDefaultFieldAccess" ).genericField()
-					.property( "fieldWithDefaultMethodAccess" ).genericField();
-			mapping.type( NonManaged.class )
-					.property( "field" ).genericField();
+			TypeMappingStep indexedEntityMapping = mapping.type( IndexedEntity.class );
+			indexedEntityMapping.indexed( IndexedEntity.INDEX );
+			indexedEntityMapping.property( "id" ).documentId();
+			indexedEntityMapping.property( "fieldWithNonDefaultFieldAccess" ).genericField();
+			indexedEntityMapping.property( "fieldWithDefaultFieldAccess" ).genericField();
+			indexedEntityMapping.property( "fieldWithNonDefaultMethodAccess" ).genericField();
+			indexedEntityMapping.property( "fieldWithDefaultMethodAccess" ).genericField();
+			indexedEntityMapping.property( "embeddedWithDefaultFieldAccess" ).indexedEmbedded();
+			indexedEntityMapping.property( "embeddedWithDefaultMethodAccess" ).indexedEmbedded();
+			indexedEntityMapping.property( "nonManaged" ).indexedEmbedded();
+
+			TypeMappingStep indexedEntityWithoutIdSetterMapping = mapping.type( IndexedEntityWithoutIdSetter.class );
+			indexedEntityWithoutIdSetterMapping.indexed( IndexedEntityWithoutIdSetter.INDEX );
+			indexedEntityWithoutIdSetterMapping.property( "id" ).documentId();
+
+			TypeMappingStep embeddableWithDefaultFieldAccessMapping = mapping.type( EmbeddableWithDefaultFieldAccess.class );
+			embeddableWithDefaultFieldAccessMapping.property( "fieldWithDefaultFieldAccess" ).genericField();
+			embeddableWithDefaultFieldAccessMapping.property( "fieldWithNonDefaultMethodAccess" ).genericField();
+
+			TypeMappingStep embeddableWithDefaultMethodAccessMapping = mapping.type( EmbeddableWithDefaultMethodAccess.class );
+			embeddableWithDefaultMethodAccessMapping.property( "fieldWithNonDefaultFieldAccess" ).genericField();
+			embeddableWithDefaultMethodAccessMapping.property( "fieldWithDefaultMethodAccess" ).genericField();
+
+			TypeMappingStep nonManagedMapping = mapping.type( NonManaged.class );
+			nonManagedMapping.property( "field" ).genericField();
 		}
 	}
 

@@ -28,6 +28,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
@@ -584,23 +585,22 @@ public class IndexedEmbeddedBaseIT {
 		SearchMapping mapping = setupHelper.start()
 				.withConfiguration( b -> {
 					b.addEntityType( IndexedEntity.class );
-					b.programmaticMapping().type( IndexedEntity.class )
-							.indexed( INDEX_NAME )
-							.property( "id" )
-									.documentId()
-							.property( "level1" )
-									.indexedEmbedded()
-											.includePaths( "level1IncludedField" );
-					b.programmaticMapping().type( IndexedEmbeddedLevel1.class )
+					TypeMappingStep indexedEntityMapping = b.programmaticMapping().type( IndexedEntity.class );
+					indexedEntityMapping.indexed( INDEX_NAME );
+					indexedEntityMapping.property( "id" ).documentId();
+					indexedEntityMapping.property( "level1" )
+							.indexedEmbedded()
+									.includePaths( "level1IncludedField" );
+					TypeMappingStep indexedEmbeddedLevel1Mapping = b.programmaticMapping().type( IndexedEmbeddedLevel1.class );
+					indexedEmbeddedLevel1Mapping.binder( StartupStubBridge.binder( filteredOutBridgeCounterKeys ) );
+					indexedEmbeddedLevel1Mapping.binder( new GeoPointBridge.Binder().fieldName( "location" ) );
+					indexedEmbeddedLevel1Mapping.property( "latitude" ).marker( new LatitudeMarker.Binder() );
+					indexedEmbeddedLevel1Mapping.property( "longitude" ).marker( new LongitudeMarker.Binder() );
+					indexedEmbeddedLevel1Mapping.property( "level1Property" )
 							.binder( StartupStubBridge.binder( filteredOutBridgeCounterKeys ) )
-							.binder( new GeoPointBridge.Binder().fieldName( "location" ) )
-							.property( "latitude" ).marker( new LatitudeMarker.Binder() )
-							.property( "longitude" ).marker( new LongitudeMarker.Binder() )
-							.property( "level1Property" )
-									.binder( StartupStubBridge.binder( filteredOutBridgeCounterKeys ) )
-									.genericField( "level1IncludedField" )
-									.genericField( "filteredOut" )
-											.valueBinder( StartupStubBridge.binder( String.class, filteredOutBridgeCounterKeys ) );
+							.genericField( "level1IncludedField" )
+							.genericField( "filteredOut" )
+									.valueBinder( StartupStubBridge.binder( String.class, filteredOutBridgeCounterKeys ) );
 				} )
 				.setup();
 		backendMock.verifyExpectationsMet();
