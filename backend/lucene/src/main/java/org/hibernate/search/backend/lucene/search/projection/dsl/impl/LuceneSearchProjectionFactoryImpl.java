@@ -11,6 +11,7 @@ import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchPr
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.spi.DelegatingSearchProjectionFactory;
+import org.hibernate.search.engine.search.projection.dsl.spi.StaticProjectionFinalStep;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Explanation;
@@ -29,11 +30,11 @@ public class LuceneSearchProjectionFactoryImpl<R, E>
 
 	@Override
 	public ProjectionFinalStep<Document> document() {
-		return new LuceneDocumentProjectionFinalStep( factory );
+		return new StaticProjectionFinalStep<>( factory.document() );
 	}
 
 	@Override
 	public ProjectionFinalStep<Explanation> explanation() {
-		return new LuceneExplanationProjectionFinalStep( factory );
+		return new StaticProjectionFinalStep<>( factory.explanation() );
 	}
 }
