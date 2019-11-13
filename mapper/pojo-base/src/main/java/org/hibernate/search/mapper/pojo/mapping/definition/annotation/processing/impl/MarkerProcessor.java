@@ -19,7 +19,6 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class MarkerProcessor extends PropertyAnnotationProcessor<Annotation> {
@@ -36,8 +35,7 @@ class MarkerProcessor extends PropertyAnnotationProcessor<Annotation> {
 	}
 
 	@Override
-	public void process(PropertyMappingStep mappingContext,
-			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel, Annotation annotation) {
+	public void process(PropertyMappingStep mappingContext, Annotation annotation) {
 		MarkerBinder<?> binder = createMarkerBinder( annotation );
 		mappingContext.marker( binder );
 	}

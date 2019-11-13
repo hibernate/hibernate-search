@@ -89,7 +89,7 @@ class AnnotationPojoTypeMetadataContributorFactory {
 	private <A extends Annotation> void tryApplyProcessor(TypeAnnotationProcessor<A> processor,
 			TypeMappingStep mapping, PojoRawTypeModel<?> typeModel, A annotation) {
 		try {
-			processor.process( mapping, typeModel, annotation );
+			processor.process( mapping, annotation );
 		}
 		catch (RuntimeException e) {
 			rootFailureCollector
@@ -112,7 +112,7 @@ class AnnotationPojoTypeMetadataContributorFactory {
 			PropertyMappingStep mapping, PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 			A annotation) {
 		try {
-			processor.process( mapping, typeModel, propertyModel, annotation );
+			processor.process( mapping, annotation );
 		}
 		catch (RuntimeException e) {
 			rootFailureCollector

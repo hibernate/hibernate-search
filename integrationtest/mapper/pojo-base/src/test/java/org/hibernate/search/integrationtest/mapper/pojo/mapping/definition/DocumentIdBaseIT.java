@@ -212,7 +212,7 @@ public class DocumentIdBaseIT {
 						.pathContext( ".id" )
 						.annotationContextAnyParameters( DocumentId.class )
 						.failure(
-								"Annotation @DocumentId on property 'id' defines both identifierBridge and identifierBinder."
+								"@DocumentId defines both identifierBridge and identifierBinder."
 										+ " Only one of those can be defined, not both."
 						)
 						.build()

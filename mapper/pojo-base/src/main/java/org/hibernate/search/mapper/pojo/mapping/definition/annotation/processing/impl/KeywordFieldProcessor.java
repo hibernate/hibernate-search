@@ -18,7 +18,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordFie
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingKeywordFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingNonFullTextFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
 class KeywordFieldProcessor extends PropertyNotFullTextFieldAnnotationProcessor<KeywordField> {
 	KeywordFieldProcessor(AnnotationProcessorHelper helper) {
@@ -27,7 +26,7 @@ class KeywordFieldProcessor extends PropertyNotFullTextFieldAnnotationProcessor<
 
 	@Override
 	PropertyMappingNonFullTextFieldOptionsStep<?> initSortableFieldMappingContext(PropertyMappingStep mappingContext,
-			PojoPropertyModel<?> propertyModel, KeywordField annotation, String fieldName) {
+			KeywordField annotation, String fieldName) {
 		PropertyMappingKeywordFieldOptionsStep fieldContext = mappingContext.keywordField( fieldName );
 
 		String normalizer = annotation.normalizer();

@@ -35,7 +35,7 @@ class RoutingKeyBridgeProcessor extends TypeAnnotationProcessor<Annotation> {
 	}
 
 	@Override
-	public void process(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel, Annotation annotation) {
+	public void process(TypeMappingStep mappingContext, Annotation annotation) {
 		RoutingKeyBinder<?> binder = createRoutingKeyBinder( annotation );
 		mappingContext.routingKeyBinder( binder );
 	}

@@ -16,7 +16,6 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerEx
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingNonFullTextFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
 class GenericFieldProcessor extends PropertyNotFullTextFieldAnnotationProcessor<GenericField> {
 	GenericFieldProcessor(AnnotationProcessorHelper helper) {
@@ -25,7 +24,7 @@ class GenericFieldProcessor extends PropertyNotFullTextFieldAnnotationProcessor<
 
 	@Override
 	PropertyMappingNonFullTextFieldOptionsStep<?> initSortableFieldMappingContext(PropertyMappingStep mappingContext,
-			PojoPropertyModel<?> propertyModel, GenericField annotation, String fieldName) {
+			GenericField annotation, String fieldName) {
 		return mappingContext.genericField( fieldName );
 	}
 

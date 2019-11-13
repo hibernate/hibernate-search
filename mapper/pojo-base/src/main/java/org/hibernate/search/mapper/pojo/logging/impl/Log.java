@@ -105,16 +105,16 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassFormatter.class) Class<? extends Annotation> annotationType);
 
 	@Message(id = ID_OFFSET_2 + 5,
-			value = "Annotation @GenericField on property '%1$s' defines both valueBridge and valueBinder."
+			value = "The field annotation defines both valueBridge and valueBinder."
 					+ " Only one of those can be defined, not both."
 	)
-	SearchException invalidFieldDefiningBothBridgeReferenceAndBinderReference(String property);
+	SearchException invalidFieldDefiningBothBridgeReferenceAndBinderReference();
 
 	@Message(id = ID_OFFSET_2 + 6,
-			value = "Annotation @DocumentId on property '%1$s' defines both identifierBridge and identifierBinder."
+			value = "@DocumentId defines both identifierBridge and identifierBinder."
 					+ " Only one of those can be defined, not both."
 	)
-	SearchException invalidDocumentIdDefiningBothBridgeReferenceAndBinderReference(String property);
+	SearchException invalidDocumentIdDefiningBothBridgeReferenceAndBinderReference();
 
 	@Message(id = ID_OFFSET_2 + 7,
 			value = "Invalid empty target for a scoped operation."
@@ -207,10 +207,8 @@ public interface Log extends BasicLogger {
 			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> entityType);
 
 	@Message(id = ID_OFFSET_2 + 23,
-			value = "Property '%2$s' from type '%1$s' is annotated with @AssociationInverseSide,"
-					+ " but the inverse path is empty.")
-	SearchException missingInversePathInAssociationInverseSideMapping(
-			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel, String propertyName);
+			value = "@AssociationInverseSide.inversePath is empty.")
+	SearchException missingInversePathInAssociationInverseSideMapping();
 
 	@Message(id = ID_OFFSET_2 + 24,
 			value = "Found an infinite embedded recursion involving path '%2$s' on type '%1$s'")
@@ -237,10 +235,8 @@ public interface Log extends BasicLogger {
 	SearchException missingIdentifierMapping(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel);
 
 	@Message(id = ID_OFFSET_2 + 29,
-			value = "Property '%2$s' from type '%1$s' is annotated with @IndexingDependency,"
-					+ " but 'derivedFrom' contains an empty path.")
-	SearchException missingPathInIndexingDependencyDerivedFrom(
-			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel, String propertyName);
+			value = "@IndexingDependency.derivedFrom contains an empty path.")
+	SearchException missingPathInIndexingDependencyDerivedFrom();
 
 	@Message(id = ID_OFFSET_2 + 30,
 			value = "Found a cyclic dependency between derived properties involving path '%2$s' on type '%1$s'."

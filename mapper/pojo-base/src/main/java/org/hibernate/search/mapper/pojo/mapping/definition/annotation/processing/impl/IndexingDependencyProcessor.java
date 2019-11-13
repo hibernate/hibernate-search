@@ -19,7 +19,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Indexing
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class IndexingDependencyProcessor extends PropertyAnnotationProcessor<IndexingDependency> {
@@ -36,9 +35,7 @@ class IndexingDependencyProcessor extends PropertyAnnotationProcessor<IndexingDe
 	}
 
 	@Override
-	public void process(PropertyMappingStep mappingContext,
-			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
-			IndexingDependency annotation) {
+	public void process(PropertyMappingStep mappingContext, IndexingDependency annotation) {
 		ContainerExtractorPath extractorPath = helper.getExtractorPath( annotation.extraction() );
 
 		ReindexOnUpdate reindexOnUpdate = annotation.reindexOnUpdate();
@@ -53,7 +50,7 @@ class IndexingDependencyProcessor extends PropertyAnnotationProcessor<IndexingDe
 			for ( ObjectPath objectPath : annotation.derivedFrom() ) {
 				Optional<PojoModelPathValueNode> pojoModelPathOptional = helper.getPojoModelPathValueNode( objectPath );
 				if ( !pojoModelPathOptional.isPresent() ) {
-					throw log.missingPathInIndexingDependencyDerivedFrom( typeModel, propertyModel.getName() );
+					throw log.missingPathInIndexingDependencyDerivedFrom();
 				}
 				indexingDependencyContext.derivedFrom( pojoModelPathOptional.get() );
 			}

@@ -12,7 +12,6 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerEx
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.NonStandardField;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
 class NonStandardFieldProcessor extends PropertyFieldAnnotationProcessor<NonStandardField> {
 	NonStandardFieldProcessor(AnnotationProcessorHelper helper) {
@@ -21,7 +20,7 @@ class NonStandardFieldProcessor extends PropertyFieldAnnotationProcessor<NonStan
 
 	@Override
 	PropertyMappingFieldOptionsStep<?> initFieldMappingContext(PropertyMappingStep mappingContext,
-			PojoPropertyModel<?> propertyModel, NonStandardField annotation, String fieldName) {
+			NonStandardField annotation, String fieldName) {
 		return mappingContext.nonStandardField( fieldName );
 	}
 

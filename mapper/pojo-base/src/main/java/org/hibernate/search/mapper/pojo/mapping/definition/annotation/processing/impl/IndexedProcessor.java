@@ -23,7 +23,7 @@ class IndexedProcessor extends TypeAnnotationProcessor<Indexed> {
 	}
 
 	@Override
-	public void process(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel, Indexed annotation) {
+	public void process(TypeMappingStep mappingContext, Indexed annotation) {
 		String indexName = annotation.index();
 		if ( indexName.isEmpty() ) {
 			indexName = null;

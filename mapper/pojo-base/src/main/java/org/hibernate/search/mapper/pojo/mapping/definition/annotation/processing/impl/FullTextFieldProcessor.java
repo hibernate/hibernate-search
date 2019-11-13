@@ -17,7 +17,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextFi
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFullTextFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStandardFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
 class FullTextFieldProcessor extends PropertyStandardFieldAnnotationProcessor<FullTextField> {
 	FullTextFieldProcessor(AnnotationProcessorHelper helper) {
@@ -26,7 +25,7 @@ class FullTextFieldProcessor extends PropertyStandardFieldAnnotationProcessor<Fu
 
 	@Override
 	PropertyMappingStandardFieldOptionsStep<?> initStandardFieldMappingContext(PropertyMappingStep mappingContext,
-			PojoPropertyModel<?> propertyModel, FullTextField annotation, String fieldName) {
+			FullTextField annotation, String fieldName) {
 		PropertyMappingFullTextFieldOptionsStep fieldContext = mappingContext.fullTextField( fieldName )
 				.analyzer( annotation.analyzer() );
 

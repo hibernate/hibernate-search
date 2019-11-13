@@ -58,10 +58,7 @@ public class DependencyIT {
 						.pathContext( ".other" )
 						.annotationContextAnyParameters( AssociationInverseSide.class )
 						.failure(
-								"Property 'other'",
-								IndexedEntity.class.getName(),
-								"is annotated with @AssociationInverseSide",
-								"the inverse path is empty"
+								"@AssociationInverseSide.inversePath is empty"
 						)
 						.build()
 				);
@@ -92,10 +89,7 @@ public class DependencyIT {
 						.pathContext( ".derived" )
 						.annotationContextAnyParameters( IndexingDependency.class )
 						.failure(
-								"Property 'derived'",
-								IndexedEntity.class.getName(),
-								"is annotated with @IndexingDependency",
-								"'derivedFrom' contains an empty path"
+								"@IndexingDependency.derivedFrom contains an empty path"
 						)
 						.build()
 				);

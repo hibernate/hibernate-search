@@ -21,7 +21,6 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class DocumentIdProcessor extends PropertyAnnotationProcessor<DocumentId> {
@@ -38,17 +37,14 @@ class DocumentIdProcessor extends PropertyAnnotationProcessor<DocumentId> {
 	}
 
 	@Override
-	public void process(PropertyMappingStep mappingContext,
-			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
-			DocumentId annotation) {
-		IdentifierBinder binder = createIdentifierBinder( annotation, propertyModel );
+	public void process(PropertyMappingStep mappingContext, DocumentId annotation) {
+		IdentifierBinder binder = createIdentifierBinder( annotation );
 
 		mappingContext.documentId().identifierBinder( binder );
 	}
 
 	@SuppressWarnings("rawtypes") // Raw types are the best we can do here
-	private IdentifierBinder createIdentifierBinder(
-			DocumentId annotation, PojoPropertyModel<?> annotationHolder) {
+	private IdentifierBinder createIdentifierBinder(DocumentId annotation) {
 		IdentifierBridgeRef bridgeReferenceAnnotation = annotation.identifierBridge();
 		IdentifierBinderRef binderReferenceAnnotation = annotation.identifierBinder();
 		Optional<BeanReference<? extends IdentifierBridge>> bridgeReference = helper.toBeanReference(
@@ -63,7 +59,7 @@ class DocumentIdProcessor extends PropertyAnnotationProcessor<DocumentId> {
 		);
 
 		if ( bridgeReference.isPresent() && binderReference.isPresent() ) {
-			throw log.invalidDocumentIdDefiningBothBridgeReferenceAndBinderReference( annotationHolder.getName() );
+			throw log.invalidDocumentIdDefiningBothBridgeReferenceAndBinderReference();
 		}
 		else if ( bridgeReference.isPresent() ) {
 			return new BeanBinder( bridgeReference.get() );
