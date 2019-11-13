@@ -19,6 +19,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBi
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -52,12 +53,11 @@ public class ProgrammaticMappingRoutingIT {
 					builder.addEntityType( IndexedEntity.class );
 
 					ProgrammaticMappingConfigurationContext mappingDefinition = builder.programmaticMapping();
-					mappingDefinition.type( IndexedEntity.class )
-							.indexed( IndexedEntity.INDEX )
-							.routingKeyBinder( new MyRoutingKeyBridge.Binder() )
-							.property( "id" )
-									.documentId()
-							.property( "value" ).genericField();
+					TypeMappingStep indexedEntityMapping = mappingDefinition.type( IndexedEntity.class );
+					indexedEntityMapping.indexed( IndexedEntity.INDEX );
+					indexedEntityMapping.routingKeyBinder( new MyRoutingKeyBridge.Binder() );
+					indexedEntityMapping.property( "id" ).documentId();
+					indexedEntityMapping.property( "value" ).genericField();
 				} )
 				.setup();
 

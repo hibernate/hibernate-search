@@ -14,6 +14,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
@@ -43,9 +44,10 @@ public class MappedSuperclassIT {
 		sessionFactory = ormSetupHelper.start()
 				.withProperty( HibernateOrmMapperSettings.MAPPING_CONFIGURER, (HibernateOrmSearchMappingConfigurer) context -> {
 					ProgrammaticMappingConfigurationContext mapping = context.programmaticMapping();
-					mapping.type( IndexedEntity.class ).indexed( INDEX_NAME )
-							.property( "id" ).documentId()
-							.property( "text" ).fullTextField();
+					TypeMappingStep indexedEntityMapping = mapping.type( IndexedEntity.class );
+					indexedEntityMapping.indexed( INDEX_NAME );
+					indexedEntityMapping.property( "id" ).documentId();
+					indexedEntityMapping.property( "text" ).fullTextField();
 				} )
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();

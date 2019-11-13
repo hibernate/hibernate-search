@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.PropertyTypeDescriptor;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.SubTest;
@@ -57,13 +58,14 @@ public class IndexNullAsErrorIT<V, F> {
 		Assume.assumeNotNull( unparsableNullAsValue );
 
 		SubTest.expectException( () ->
-				setupHelper.start().withConfiguration( c -> c
-						.addEntityType( expectations.getTypeWithValueBridge1() )
-						.programmaticMapping()
-						.type( expectations.getTypeWithValueBridge1() ).indexed()
-						.property( FIELD_NAME ).genericField( FIELD_NAME )
-						.property( FIELD_NAME ).genericField( FIELD_INDEXNULLAS_NAME ).indexNullAs( unparsableNullAsValue )
-				).setup()
+				setupHelper.start().withConfiguration( c -> {
+					c.addEntityType( expectations.getTypeWithValueBridge1() );
+					TypeMappingStep typeMapping = c.programmaticMapping().type( expectations.getTypeWithValueBridge1() );
+					typeMapping.indexed();
+					typeMapping.property( FIELD_NAME ).genericField( FIELD_NAME );
+					typeMapping.property( FIELD_NAME )
+							.genericField( FIELD_INDEXNULLAS_NAME ).indexNullAs( unparsableNullAsValue );
+				} ).setup()
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )

@@ -36,11 +36,6 @@ class DelegatingPropertyMappingStep implements PropertyMappingStep {
 	}
 
 	@Override
-	public PropertyMappingStep property(String propertyName) {
-		return delegate.property( propertyName );
-	}
-
-	@Override
 	public PropertyMappingStep binder(PropertyBinder<?> binder) {
 		return delegate.binder( binder );
 	}

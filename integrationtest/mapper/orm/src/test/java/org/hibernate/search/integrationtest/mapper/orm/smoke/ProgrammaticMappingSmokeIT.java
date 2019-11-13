@@ -39,6 +39,7 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigur
 import org.hibernate.search.mapper.pojo.bridge.builtin.impl.DefaultIntegerIdentifierBridge;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
@@ -344,51 +345,50 @@ public class ProgrammaticMappingSmokeIT {
 		@Override
 		public void configure(HibernateOrmMappingConfigurationContext context) {
 			ProgrammaticMappingConfigurationContext mapping = context.programmaticMapping();
-			mapping.type( IndexedEntity.class )
-					.indexed( IndexedEntity.INDEX )
-					.binder(
-							new CustomTypeBridge.Binder()
-							.objectName( "customBridgeOnClass" )
-					)
-					.property( "id" )
-							.documentId()
-					.property( "text" )
-							.genericField( "myTextField" )
-					.property( "embedded" )
-							.indexedEmbedded()
-									.prefix( "embedded.prefix_" )
-									.maxDepth( 1 )
-									.includePaths( "customBridgeOnClass.text", "embedded.prefix_customBridgeOnClass.text" );
+			TypeMappingStep indexedEntityMapping = mapping.type( IndexedEntity.class );
+			indexedEntityMapping.indexed( IndexedEntity.INDEX );
+			indexedEntityMapping.binder(
+					new CustomTypeBridge.Binder()
+					.objectName( "customBridgeOnClass" )
+			);
+			indexedEntityMapping.property( "id" ).documentId();
+			indexedEntityMapping.property( "text" ).genericField( "myTextField" );
+			indexedEntityMapping.property( "embedded" )
+					.indexedEmbedded()
+							.prefix( "embedded.prefix_" )
+							.maxDepth( 1 )
+							.includePaths( "customBridgeOnClass.text", "embedded.prefix_customBridgeOnClass.text" );
 
 			ProgrammaticMappingConfigurationContext secondMapping = context.programmaticMapping();
-			secondMapping.type( ParentIndexedEntity.class )
-					.property( "localDate" )
-							.genericField( "myLocalDateField" )
-					.property( "embedded" )
-							.binder(
-									new CustomPropertyBridge.Binder()
-									.objectName( "customBridgeOnProperty" )
-							);
-			secondMapping.type( OtherIndexedEntity.class )
-					.indexed( OtherIndexedEntity.INDEX )
-					.property( "id" )
-							.documentId().identifierBridge( DefaultIntegerIdentifierBridge.class )
-					.property( "numeric" )
-							.genericField()
-							.genericField( "numericAsString" ).valueBridge( IntegerAsStringValueBridge.class );
-			secondMapping.type( YetAnotherIndexedEntity.class )
-					.indexed( YetAnotherIndexedEntity.INDEX )
-					.property( "id" )
-							.documentId()
-					.property( "numeric" )
-							.genericField()
-					.property( "embeddedList" )
-							.indexedEmbedded()
-									.prefix( "embeddedList.otherPrefix_" )
-									.includePaths( "embedded.prefix_customBridgeOnClass.text" )
-					.property( "embeddedMap" )
-							.genericField( "embeddedMapKeys" ).extractor( BuiltinContainerExtractors.MAP_KEY )
-							.indexedEmbedded().includePaths( "embedded.prefix_myLocalDateField" );
+
+			TypeMappingStep parentIndexedEntityMapping = secondMapping.type( ParentIndexedEntity.class );
+			parentIndexedEntityMapping.property( "localDate" )
+					.genericField( "myLocalDateField" );
+			parentIndexedEntityMapping.property( "embedded" )
+					.binder(
+							new CustomPropertyBridge.Binder()
+							.objectName( "customBridgeOnProperty" )
+					);
+
+			TypeMappingStep otherIndexedEntityMapping = secondMapping.type( OtherIndexedEntity.class );
+			otherIndexedEntityMapping.indexed( OtherIndexedEntity.INDEX );
+			otherIndexedEntityMapping.property( "id" )
+					.documentId().identifierBridge( DefaultIntegerIdentifierBridge.class );
+			otherIndexedEntityMapping.property( "numeric" )
+					.genericField()
+					.genericField( "numericAsString" ).valueBridge( IntegerAsStringValueBridge.class );
+
+			TypeMappingStep yetAnotherIndexedEntityMapping = secondMapping.type( YetAnotherIndexedEntity.class );
+			yetAnotherIndexedEntityMapping.indexed( YetAnotherIndexedEntity.INDEX );
+			yetAnotherIndexedEntityMapping.property( "id" ).documentId();
+			yetAnotherIndexedEntityMapping.property( "numeric" ).genericField();
+			yetAnotherIndexedEntityMapping.property( "embeddedList" )
+					.indexedEmbedded()
+							.prefix( "embeddedList.otherPrefix_" )
+							.includePaths( "embedded.prefix_customBridgeOnClass.text" );
+			yetAnotherIndexedEntityMapping.property( "embeddedMap" )
+					.genericField( "embeddedMapKeys" ).extractor( BuiltinContainerExtractors.MAP_KEY )
+					.indexedEmbedded().includePaths( "embedded.prefix_myLocalDateField" );
 		}
 	}
 
