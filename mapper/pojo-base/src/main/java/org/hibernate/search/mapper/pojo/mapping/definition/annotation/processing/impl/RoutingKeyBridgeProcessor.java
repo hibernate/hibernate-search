@@ -25,22 +25,20 @@ class RoutingKeyBridgeProcessor extends TypeAnnotationProcessor<Annotation> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	RoutingKeyBridgeProcessor(AnnotationProcessorHelper helper) {
-		super( helper );
-	}
-
 	@Override
 	public Stream<? extends Annotation> extractAnnotations(PojoRawTypeModel<?> typeModel) {
 		return typeModel.getAnnotationsByMetaAnnotationType( RoutingKeyBinding.class );
 	}
 
 	@Override
-	public void process(TypeMappingStep mappingContext, Annotation annotation) {
-		RoutingKeyBinder<?> binder = createRoutingKeyBinder( annotation );
+	public void process(TypeMappingStep mappingContext, Annotation annotation,
+			AnnotationProcessorHelper helper) {
+		RoutingKeyBinder<?> binder = createRoutingKeyBinder( annotation, helper );
 		mappingContext.routingKeyBinder( binder );
 	}
 
-	private <A extends Annotation> RoutingKeyBinder createRoutingKeyBinder(A annotation) {
+	private <A extends Annotation> RoutingKeyBinder createRoutingKeyBinder(A annotation,
+			AnnotationProcessorHelper helper) {
 		RoutingKeyBinding bridgeMapping = annotation.annotationType().getAnnotation( RoutingKeyBinding.class );
 		RoutingKeyBinderRef bridgeReferenceAnnotation = bridgeMapping.binder();
 		Optional<BeanReference<? extends RoutingKeyBinder>> binderReference = helper.toBeanReference(

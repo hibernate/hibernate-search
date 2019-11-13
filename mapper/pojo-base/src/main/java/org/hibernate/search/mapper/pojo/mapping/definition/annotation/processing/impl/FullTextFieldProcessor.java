@@ -19,8 +19,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
 class FullTextFieldProcessor extends PropertyStandardFieldAnnotationProcessor<FullTextField> {
-	FullTextFieldProcessor(AnnotationProcessorHelper helper) {
-		super( helper, FullTextField.class );
+	FullTextFieldProcessor() {
+		super( FullTextField.class );
 	}
 
 	@Override

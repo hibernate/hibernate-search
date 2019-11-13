@@ -27,24 +27,21 @@ class DocumentIdProcessor extends PropertyAnnotationProcessor<DocumentId> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	DocumentIdProcessor(AnnotationProcessorHelper helper) {
-		super( helper );
-	}
-
 	@Override
 	public Stream<? extends DocumentId> extractAnnotations(PojoPropertyModel<?> propertyModel) {
 		return propertyModel.getAnnotationsByType( DocumentId.class );
 	}
 
 	@Override
-	public void process(PropertyMappingStep mappingContext, DocumentId annotation) {
-		IdentifierBinder binder = createIdentifierBinder( annotation );
+	public void process(PropertyMappingStep mappingContext, DocumentId annotation,
+			AnnotationProcessorHelper helper) {
+		IdentifierBinder binder = createIdentifierBinder( annotation, helper );
 
 		mappingContext.documentId().identifierBinder( binder );
 	}
 
 	@SuppressWarnings("rawtypes") // Raw types are the best we can do here
-	private IdentifierBinder createIdentifierBinder(DocumentId annotation) {
+	private IdentifierBinder createIdentifierBinder(DocumentId annotation, AnnotationProcessorHelper helper) {
 		IdentifierBridgeRef bridgeReferenceAnnotation = annotation.identifierBridge();
 		IdentifierBinderRef binderReferenceAnnotation = annotation.identifierBinder();
 		Optional<BeanReference<? extends IdentifierBridge>> bridgeReference = helper.toBeanReference(

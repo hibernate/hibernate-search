@@ -13,6 +13,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.AnnotationProcessorHelper;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.AnnotationProcessorProvider;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.PropertyAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.TypeAnnotationProcessor;
@@ -28,6 +29,7 @@ class AnnotationPojoTypeMetadataContributorFactory {
 
 	private final FailureCollector rootFailureCollector;
 	private final AnnotationProcessorProvider annotationProcessorProvider;
+	private final AnnotationProcessorHelper helper = new AnnotationProcessorHelper();
 
 	AnnotationPojoTypeMetadataContributorFactory(FailureCollector rootFailureCollector) {
 		this.rootFailureCollector = rootFailureCollector;
@@ -89,7 +91,7 @@ class AnnotationPojoTypeMetadataContributorFactory {
 	private <A extends Annotation> void tryApplyProcessor(TypeAnnotationProcessor<A> processor,
 			TypeMappingStep mapping, PojoRawTypeModel<?> typeModel, A annotation) {
 		try {
-			processor.process( mapping, annotation );
+			processor.process( mapping, annotation, helper );
 		}
 		catch (RuntimeException e) {
 			rootFailureCollector
@@ -112,7 +114,7 @@ class AnnotationPojoTypeMetadataContributorFactory {
 			PropertyMappingStep mapping, PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 			A annotation) {
 		try {
-			processor.process( mapping, annotation );
+			processor.process( mapping, annotation, helper );
 		}
 		catch (RuntimeException e) {
 			rootFailureCollector

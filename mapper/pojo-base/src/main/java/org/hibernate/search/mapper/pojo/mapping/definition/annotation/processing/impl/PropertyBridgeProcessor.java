@@ -25,22 +25,19 @@ class PropertyBridgeProcessor extends PropertyAnnotationProcessor<Annotation> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	PropertyBridgeProcessor(AnnotationProcessorHelper helper) {
-		super( helper );
-	}
-
 	@Override
 	public Stream<? extends Annotation> extractAnnotations(PojoPropertyModel<?> propertyModel) {
 		return propertyModel.getAnnotationsByMetaAnnotationType( PropertyBinding.class );
 	}
 
 	@Override
-	public void process(PropertyMappingStep mappingContext, Annotation annotation) {
-		PropertyBinder<?> binder = createPropertyBinder( annotation );
+	public void process(PropertyMappingStep mappingContext, Annotation annotation,
+			AnnotationProcessorHelper helper) {
+		PropertyBinder<?> binder = createPropertyBinder( annotation, helper );
 		mappingContext.binder( binder );
 	}
 
-	private <A extends Annotation> PropertyBinder createPropertyBinder(A annotation) {
+	private <A extends Annotation> PropertyBinder createPropertyBinder(A annotation, AnnotationProcessorHelper helper) {
 		PropertyBinding bridgeMapping = annotation.annotationType().getAnnotation( PropertyBinding.class );
 		PropertyBinderRef bridgeReferenceAnnotation = bridgeMapping.binder();
 		Optional<BeanReference<? extends PropertyBinder>> binderReference = helper.toBeanReference(

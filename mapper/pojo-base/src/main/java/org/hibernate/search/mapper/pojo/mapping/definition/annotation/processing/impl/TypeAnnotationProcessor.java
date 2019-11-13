@@ -14,13 +14,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 public abstract class TypeAnnotationProcessor<A extends Annotation> {
 
-	final AnnotationProcessorHelper helper;
-
-	TypeAnnotationProcessor(AnnotationProcessorHelper helper) {
-		this.helper = helper;
-	}
-
 	public abstract Stream<? extends A> extractAnnotations(PojoRawTypeModel<?> typeModel);
 
-	public abstract void process(TypeMappingStep mappingContext, A annotation);
+	public abstract void process(TypeMappingStep mappingContext, A annotation, AnnotationProcessorHelper helper);
 }

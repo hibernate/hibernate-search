@@ -20,8 +20,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
 class ScaledNumberFieldProcessor extends PropertyNotFullTextFieldAnnotationProcessor<ScaledNumberField> {
-	ScaledNumberFieldProcessor(AnnotationProcessorHelper helper) {
-		super( helper, ScaledNumberField.class );
+	ScaledNumberFieldProcessor() {
+		super( ScaledNumberField.class );
 	}
 
 	@Override
