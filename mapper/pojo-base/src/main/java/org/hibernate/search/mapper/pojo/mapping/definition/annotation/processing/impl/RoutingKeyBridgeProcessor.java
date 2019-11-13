@@ -30,12 +30,12 @@ class RoutingKeyBridgeProcessor extends TypeAnnotationProcessor<Annotation> {
 	}
 
 	@Override
-	Stream<? extends Annotation> extractAnnotations(PojoRawTypeModel<?> typeModel) {
+	public Stream<? extends Annotation> extractAnnotations(PojoRawTypeModel<?> typeModel) {
 		return typeModel.getAnnotationsByMetaAnnotationType( RoutingKeyBinding.class );
 	}
 
 	@Override
-	void doProcess(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel, Annotation annotation) {
+	public void process(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel, Annotation annotation) {
 		RoutingKeyBinder<?> binder = createRoutingKeyBinder( annotation );
 		mappingContext.routingKeyBinder( binder );
 	}

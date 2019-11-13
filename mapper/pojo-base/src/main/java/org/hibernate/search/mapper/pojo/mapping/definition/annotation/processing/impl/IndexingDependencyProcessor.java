@@ -31,12 +31,12 @@ class IndexingDependencyProcessor extends PropertyAnnotationProcessor<IndexingDe
 	}
 
 	@Override
-	Stream<? extends IndexingDependency> extractAnnotations(PojoPropertyModel<?> propertyModel) {
+	public Stream<? extends IndexingDependency> extractAnnotations(PojoPropertyModel<?> propertyModel) {
 		return propertyModel.getAnnotationsByType( IndexingDependency.class );
 	}
 
 	@Override
-	void doProcess(PropertyMappingStep mappingContext,
+	public void process(PropertyMappingStep mappingContext,
 			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 			IndexingDependency annotation) {
 		ContainerExtractorPath extractorPath = helper.getExtractorPath( annotation.extraction() );

@@ -39,12 +39,12 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 	}
 
 	@Override
-	final Stream<? extends A> extractAnnotations(PojoPropertyModel<?> propertyModel) {
+	public final Stream<? extends A> extractAnnotations(PojoPropertyModel<?> propertyModel) {
 		return propertyModel.getAnnotationsByType( annotationType );
 	}
 
 	@Override
-	final void doProcess(PropertyMappingStep mappingContext,
+	public final void process(PropertyMappingStep mappingContext,
 			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 			A annotation) {
 		String cleanedUpRelativeFieldName = getName( annotation );

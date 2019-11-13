@@ -30,12 +30,12 @@ class TypeBridgeProcessor extends TypeAnnotationProcessor<Annotation> {
 	}
 
 	@Override
-	Stream<? extends Annotation> extractAnnotations(PojoRawTypeModel<?> typeModel) {
+	public Stream<? extends Annotation> extractAnnotations(PojoRawTypeModel<?> typeModel) {
 		return typeModel.getAnnotationsByMetaAnnotationType( TypeBinding.class );
 	}
 
 	@Override
-	void doProcess(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel, Annotation annotation) {
+	public void process(TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel, Annotation annotation) {
 		TypeBinder<?> binder = createTypeBinder( annotation );
 		mappingContext.binder( binder );
 	}
