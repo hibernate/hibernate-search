@@ -6,15 +6,28 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
+import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBinderRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.impl.BeanDelegatingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class DocumentIdProcessor extends PropertyAnnotationProcessor<DocumentId> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	DocumentIdProcessor(AnnotationProcessorHelper helper) {
 		super( helper );
 	}
@@ -28,9 +41,39 @@ class DocumentIdProcessor extends PropertyAnnotationProcessor<DocumentId> {
 	void doProcess(PropertyMappingStep mappingContext,
 			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 			DocumentId annotation) {
-		IdentifierBinder binder =
-				helper.createIdentifierBinder( annotation, propertyModel );
+		IdentifierBinder binder = createIdentifierBinder( annotation, propertyModel );
 
 		mappingContext.documentId().identifierBinder( binder );
+	}
+
+	@SuppressWarnings("rawtypes") // Raw types are the best we can do here
+	private IdentifierBinder createIdentifierBinder(
+			DocumentId annotation, PojoPropertyModel<?> annotationHolder) {
+		IdentifierBridgeRef bridgeReferenceAnnotation = annotation.identifierBridge();
+		IdentifierBinderRef binderReferenceAnnotation = annotation.identifierBinder();
+		Optional<BeanReference<? extends IdentifierBridge>> bridgeReference = helper.toBeanReference(
+				IdentifierBridge.class,
+				IdentifierBridgeRef.UndefinedBridgeImplementationType.class,
+				bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
+		);
+		Optional<BeanReference<? extends IdentifierBinder>> binderReference = helper.toBeanReference(
+				IdentifierBinder.class,
+				IdentifierBinderRef.UndefinedBinderImplementationType.class,
+				binderReferenceAnnotation.type(), binderReferenceAnnotation.name()
+		);
+
+		if ( bridgeReference.isPresent() && binderReference.isPresent() ) {
+			throw log.invalidDocumentIdDefiningBothBridgeReferenceAndBinderReference( annotationHolder.getName() );
+		}
+		else if ( bridgeReference.isPresent() ) {
+			return new BeanBinder( bridgeReference.get() );
+		}
+		else if ( binderReference.isPresent() ) {
+			return new BeanDelegatingBinder( binderReference.get() );
+		}
+		else {
+			// The bridge will be auto-detected from the property type
+			return null;
+		}
 	}
 }
