@@ -66,6 +66,7 @@ import org.elasticsearch.client.Request;
 import org.elasticsearch.client.Response;
 import org.elasticsearch.client.RestClient;
 import org.json.JSONException;
+import org.skyscreamer.jsonassert.JSONCompareMode;
 
 public class ElasticsearchExtensionIT {
 
@@ -853,6 +854,27 @@ public class ElasticsearchExtensionIT {
 				.asString()
 				.contains( "\"description\":" )
 				.contains( "\"details\":" );
+	}
+
+	@Test
+	public void projection_jsonHit() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<JsonObject> query = scope.query()
+				.asProjection( f -> f.extension( ElasticsearchExtension.get() ).jsonHit() )
+				.predicate( f -> f.id().matching( FIRST_ID ) )
+				.toQuery();
+
+		List<JsonObject> result = query.fetchAll().getHits();
+		Assertions.assertThat( result ).hasSize( 1 );
+		assertJsonEquals(
+				"{"
+						+ "'_id': '" + FIRST_ID + "',"
+						+ "'_index': '" + ElasticsearchIndexNameNormalizer.normalize( INDEX_NAME ) + "'"
+						+ "}",
+				result.get( 0 ).toString(),
+				JSONCompareMode.LENIENT
+		);
 	}
 
 	@Test
