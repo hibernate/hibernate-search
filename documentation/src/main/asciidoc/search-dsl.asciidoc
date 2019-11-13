@@ -541,6 +541,73 @@ include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.
 (ignoring network latency between the application and the Elasticsearch cluster).
 ====
 
+[[search-dsl-query-elasticsearch-json]]
+=== Elasticsearch: leveraging advanced features with JSON manipulation
+
+include::components/experimental-warning.asciidoc[]
+
+Elasticsearch ships with many features.
+It is possible that at some point, one feature you need will not be exposed by the Search DSL.
+
+To work around such limitations, Hibernate Search provides ways to:
+
+* Transform the HTTP request sent to Elasticsearch for search queries.
+* Read the raw JSON of the HTTP response received from Elasticsearch for search queries.
+
+include::components/elasticsearch-request-response-warning.asciidoc[]
+
+Most simple use cases will only need to change the HTTP request slightly, as shown below.
+
+.Transforming the Elasticsearch request manually in a search query
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=elasticsearch-requestTransformer]
+----
+<1> Build the query as usual,
+but using the Elasticsearch extension so that Elasticsearch-specific options are available.
+<2> Add a request transformer to the query.
+Its `transform` method will be called whenever a request is about to be sent to Elasticsearch.
+<3> Inside the `transform` method, alter the HTTP query parameters.
+<4> It is also possible to alter the request's JSON body as shown here,
+or even the request's path (not shown in this example).
+<5> Retrieve the result as usual.
+====
+
+For more complicated use cases, it is possible to access the raw JSON of the HTTP response, as shown below.
+
+.Accessing the Elasticsearch response body manually in a search query
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=elasticsearch-responseBody]
+----
+<1> Build the query as usual,
+but using the Elasticsearch extension so that Elasticsearch-specific options are available.
+<2> Add a request transformer to the query.
+<3> Add content to the request body,
+so that Elasticsearch will return more data in the response.
+Here we're asking Elasticsearch to apply a link:{elasticsearchDocUrl}/search-suggesters.html[suggester].
+<4> Retrieve the result as usual.
+Since we used the Elasticsearch extension when building the query,
+the result will have an Elasticsearch-specific type: `ElasticsearchSearchResult`.
+<5> Get the response body as a `JsonObject`.
+<6> Extract useful information from the response body.
+Here we're extracting the result of the suggester we configured above.
+or even the request's path (not shown in this example).
+====
+
+[NOTE]
+====
+Gson's API for building JSON objects is quite verbose,
+so the example above relies on a small, custom helper method to make the code more readable:
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=elasticsearch-responseBody-helper]
+----
+====
+
 [[search-dsl-predicate]]
 == Predicate DSL
 // Search 5 anchors backward compatibility

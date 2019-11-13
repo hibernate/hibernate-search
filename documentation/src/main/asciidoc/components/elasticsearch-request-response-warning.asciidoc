@@ -1,0 +1,16 @@
+[WARNING]
+====
+Direct changes to the HTTP request may conflict with Hibernate Search features
+and be supported differently by different versions of Elasticsearch.
+
+Similarly, the content of the HTTP response may change
+depending on the version of Elasticsearch,
+depending on which Hibernate Search features are used,
+and even depending on how Hibernate Search features are implemented.
+
+Thus, features relying on direct access to HTTP requests or responses
+cannot be guaranteed to continue to work when upgrading Hibernate Search,
+even for micro upgrades (`x.y.z` to `x.y.(z+1)`).
+
+Use this at your own risk.
+====

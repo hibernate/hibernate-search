@@ -11,7 +11,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.SharedCacheMode;
 
@@ -44,6 +46,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import org.apache.lucene.search.Explanation;
 
@@ -378,6 +381,78 @@ public class QueryDslIT {
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
 		} );
 	}
+
+	@Test
+	public void json_elasticsearch() {
+		Assume.assumeTrue( backendConfiguration instanceof ElasticsearchBackendConfiguration );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::elasticsearch-requestTransformer[]
+			List<Book> hits = searchSession.search( Book.class )
+					.extension( ElasticsearchExtension.get() ) // <1>
+					.predicate( f -> f.match()
+							.field( "title" )
+							.matching( "robot" ) )
+					.requestTransformer( context -> { // <2>
+						Map<String, String> parameters = context.getParametersMap(); // <3>
+						parameters.put( "search_type", "dfs_query_then_fetch" );
+
+						JsonObject body = context.getBody(); // <4>
+						body.addProperty( "min_score", 0.5f );
+					} )
+					.fetchHits( 20 ); // <5>
+			// end::elasticsearch-requestTransformer[]
+
+			assertThat( hits ).extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::elasticsearch-responseBody[]
+			ElasticsearchSearchResult<Book> result = searchSession.search( Book.class )
+					.extension( ElasticsearchExtension.get() ) // <1>
+					.predicate( f -> f.match()
+							.field( "title" )
+							.matching( "robt" ) )
+					.requestTransformer( context -> { // <2>
+						JsonObject body = context.getBody();
+						body.add( "suggest", jsonObject( suggest -> { // <3>
+							suggest.add( "my-suggest", jsonObject( mySuggest -> {
+								mySuggest.addProperty( "text", "robt" );
+								mySuggest.add( "term", jsonObject( term -> {
+									term.addProperty( "field", "title" );
+								} ) );
+							} ) );
+						} ) );
+					} )
+					.fetch( 20 ); // <4>
+
+			JsonObject responseBody = result.getResponseBody(); // <5>
+			JsonArray mySuggestResults = responseBody.getAsJsonObject( "suggest" ) // <6>
+					.getAsJsonArray( "my-suggest" );
+			// end::elasticsearch-responseBody[]
+
+			assertThat( mySuggestResults.size() ).isGreaterThanOrEqualTo( 1 );
+			JsonObject mySuggestResult0 = mySuggestResults.get( 0 ).getAsJsonObject();
+			assertThat( mySuggestResult0.get( "text" ).getAsString() )
+					.isEqualTo( "robt" );
+			JsonObject mySuggestResult0Option0 = mySuggestResult0.getAsJsonArray( "options" ).get( 0 )
+					.getAsJsonObject();
+			assertThat( mySuggestResult0Option0.get( "text" ).getAsString() )
+					.isEqualTo( "robot" );
+
+		} );
+	}
+
+	// tag::elasticsearch-responseBody-helper[]
+	private static JsonObject jsonObject(Consumer<JsonObject> instructions) {
+		JsonObject object = new JsonObject();
+		instructions.accept( object );
+		return object;
+	}
+	// end::elasticsearch-responseBody-helper[]
 
 	private void initData() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
