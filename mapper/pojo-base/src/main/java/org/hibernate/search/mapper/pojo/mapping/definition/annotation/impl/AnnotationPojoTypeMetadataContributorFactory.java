@@ -9,6 +9,9 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation.impl;
 import java.util.Optional;
 
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.AnnotationProcessorProvider;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.PropertyAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.TypeAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.TypeMappingStepImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
