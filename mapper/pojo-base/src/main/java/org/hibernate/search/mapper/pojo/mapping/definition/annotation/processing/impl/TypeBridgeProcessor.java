@@ -25,22 +25,19 @@ class TypeBridgeProcessor extends TypeAnnotationProcessor<Annotation> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	TypeBridgeProcessor(AnnotationProcessorHelper helper) {
-		super( helper );
-	}
-
 	@Override
 	public Stream<? extends Annotation> extractAnnotations(PojoRawTypeModel<?> typeModel) {
 		return typeModel.getAnnotationsByMetaAnnotationType( TypeBinding.class );
 	}
 
 	@Override
-	public void process(TypeMappingStep mappingContext, Annotation annotation) {
-		TypeBinder<?> binder = createTypeBinder( annotation );
+	public void process(TypeMappingStep mappingContext, Annotation annotation,
+			AnnotationProcessorHelper helper) {
+		TypeBinder<?> binder = createTypeBinder( annotation, helper );
 		mappingContext.binder( binder );
 	}
 
-	private <A extends Annotation> TypeBinder createTypeBinder(A annotation) {
+	private <A extends Annotation> TypeBinder createTypeBinder(A annotation, AnnotationProcessorHelper helper) {
 		TypeBinding bridgeMapping = annotation.annotationType().getAnnotation( TypeBinding.class );
 		TypeBinderRef bridgeReferenceAnnotation = bridgeMapping.binder();
 		Optional<BeanReference<? extends TypeBinder>> binderReference = helper.toBeanReference(

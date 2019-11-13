@@ -20,8 +20,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
 class KeywordFieldProcessor extends PropertyNotFullTextFieldAnnotationProcessor<KeywordField> {
-	KeywordFieldProcessor(AnnotationProcessorHelper helper) {
-		super( helper, KeywordField.class );
+	KeywordFieldProcessor() {
+		super( KeywordField.class );
 	}
 
 	@Override

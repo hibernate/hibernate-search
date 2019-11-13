@@ -17,8 +17,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 
 abstract class PropertyNotFullTextFieldAnnotationProcessor<A extends Annotation> extends
 		PropertyStandardFieldAnnotationProcessor<A> {
-	PropertyNotFullTextFieldAnnotationProcessor(AnnotationProcessorHelper helper, Class<A> annotationType) {
-		super( helper, annotationType );
+	PropertyNotFullTextFieldAnnotationProcessor(Class<A> annotationType) {
+		super( annotationType );
 	}
 
 	@Override

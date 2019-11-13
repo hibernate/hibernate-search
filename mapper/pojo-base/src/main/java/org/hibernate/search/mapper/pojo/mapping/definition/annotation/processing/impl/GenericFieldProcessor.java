@@ -18,8 +18,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
 class GenericFieldProcessor extends PropertyNotFullTextFieldAnnotationProcessor<GenericField> {
-	GenericFieldProcessor(AnnotationProcessorHelper helper) {
-		super( helper, GenericField.class );
+	GenericFieldProcessor() {
+		super( GenericField.class );
 	}
 
 	@Override

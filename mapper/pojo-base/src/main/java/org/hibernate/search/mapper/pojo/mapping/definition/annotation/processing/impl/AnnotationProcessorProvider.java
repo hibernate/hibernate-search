@@ -16,26 +16,24 @@ public class AnnotationProcessorProvider {
 	private final List<PropertyAnnotationProcessor<?>> propertyAnnotationProcessors;
 
 	public AnnotationProcessorProvider() {
-		AnnotationProcessorHelper helper = new AnnotationProcessorHelper();
-
 		this.typeAnnotationProcessors = CollectionHelper.toImmutableList( CollectionHelper.asList(
-				new IndexedProcessor( helper ),
-				new RoutingKeyBridgeProcessor( helper ),
-				new TypeBridgeProcessor( helper )
+				new IndexedProcessor(),
+				new RoutingKeyBridgeProcessor(),
+				new TypeBridgeProcessor()
 		) );
 
 		this.propertyAnnotationProcessors = CollectionHelper.toImmutableList( CollectionHelper.asList(
-				new MarkerProcessor( helper ),
-				new AssociationInverseSideProcessor( helper ),
-				new IndexingDependencyProcessor( helper ),
-				new DocumentIdProcessor( helper ),
-				new PropertyBridgeProcessor( helper ),
-				new GenericFieldProcessor( helper ),
-				new FullTextFieldProcessor( helper ),
-				new KeywordFieldProcessor( helper ),
-				new ScaledNumberFieldProcessor( helper ),
-				new NonStandardFieldProcessor( helper ),
-				new IndexedEmbeddedProcessor( helper )
+				new MarkerProcessor(),
+				new AssociationInverseSideProcessor(),
+				new IndexingDependencyProcessor(),
+				new DocumentIdProcessor(),
+				new PropertyBridgeProcessor(),
+				new GenericFieldProcessor(),
+				new FullTextFieldProcessor(),
+				new KeywordFieldProcessor(),
+				new ScaledNumberFieldProcessor(),
+				new NonStandardFieldProcessor(),
+				new IndexedEmbeddedProcessor()
 		) );
 	}
 

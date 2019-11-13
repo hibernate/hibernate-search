@@ -13,9 +13,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMapp
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 class IndexedProcessor extends TypeAnnotationProcessor<Indexed> {
-	IndexedProcessor(AnnotationProcessorHelper helper) {
-		super( helper );
-	}
 
 	@Override
 	public Stream<? extends Indexed> extractAnnotations(PojoRawTypeModel<?> typeModel) {
@@ -23,7 +20,8 @@ class IndexedProcessor extends TypeAnnotationProcessor<Indexed> {
 	}
 
 	@Override
-	public void process(TypeMappingStep mappingContext, Indexed annotation) {
+	public void process(TypeMappingStep mappingContext, Indexed annotation,
+			AnnotationProcessorHelper helper) {
 		String indexName = annotation.index();
 		if ( indexName.isEmpty() ) {
 			indexName = null;

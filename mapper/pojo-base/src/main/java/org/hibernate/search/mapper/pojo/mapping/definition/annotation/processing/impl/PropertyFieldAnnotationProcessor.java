@@ -32,8 +32,7 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 
 	private final Class<A> annotationType;
 
-	PropertyFieldAnnotationProcessor(AnnotationProcessorHelper helper, Class<A> annotationType) {
-		super( helper );
+	PropertyFieldAnnotationProcessor(Class<A> annotationType) {
 		this.annotationType = annotationType;
 	}
 
@@ -43,7 +42,8 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 	}
 
 	@Override
-	public final void process(PropertyMappingStep mappingContext, A annotation) {
+	public final void process(PropertyMappingStep mappingContext, A annotation,
+			AnnotationProcessorHelper helper) {
 		String cleanedUpRelativeFieldName = getName( annotation );
 		if ( cleanedUpRelativeFieldName.isEmpty() ) {
 			cleanedUpRelativeFieldName = null;
@@ -54,7 +54,8 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 
 		ValueBinder binder = createValueBinder(
 				getValueBridge( annotation ),
-				getValueBinder( annotation )
+				getValueBinder( annotation ),
+				helper
 		);
 		fieldContext.valueBinder( binder );
 
@@ -76,7 +77,7 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 
 	@SuppressWarnings("rawtypes") // Raw types are the best we can do here
 	private ValueBinder createValueBinder(ValueBridgeRef bridgeReferenceAnnotation,
-			ValueBinderRef binderReferenceAnnotation) {
+			ValueBinderRef binderReferenceAnnotation, AnnotationProcessorHelper helper) {
 		Optional<BeanReference<? extends ValueBridge>> bridgeReference = Optional.empty();
 		if ( bridgeReferenceAnnotation != null ) {
 			bridgeReference = helper.toBeanReference(

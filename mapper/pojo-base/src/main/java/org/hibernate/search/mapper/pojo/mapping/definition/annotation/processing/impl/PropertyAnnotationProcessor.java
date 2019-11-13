@@ -14,13 +14,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
 public abstract class PropertyAnnotationProcessor<A extends Annotation> {
 
-	final AnnotationProcessorHelper helper;
-
-	PropertyAnnotationProcessor(AnnotationProcessorHelper helper) {
-		this.helper = helper;
-	}
-
 	public abstract Stream<? extends A> extractAnnotations(PojoPropertyModel<?> propertyModel);
 
-	public abstract void process(PropertyMappingStep mappingContext, A annotation);
+	public abstract void process(PropertyMappingStep mappingContext, A annotation, AnnotationProcessorHelper helper);
 }

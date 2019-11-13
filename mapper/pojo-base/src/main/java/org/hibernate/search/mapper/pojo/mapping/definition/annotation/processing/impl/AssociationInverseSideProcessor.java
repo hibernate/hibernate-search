@@ -22,18 +22,14 @@ class AssociationInverseSideProcessor extends PropertyAnnotationProcessor<Associ
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	AssociationInverseSideProcessor(AnnotationProcessorHelper helper) {
-		super( helper );
-	}
-
 	@Override
 	public Stream<? extends AssociationInverseSide> extractAnnotations(PojoPropertyModel<?> propertyModel) {
 		return propertyModel.getAnnotationsByType( AssociationInverseSide.class );
 	}
 
 	@Override
-	public void process(PropertyMappingStep mappingContext,
-			AssociationInverseSide annotation) {
+	public void process(PropertyMappingStep mappingContext, AssociationInverseSide annotation,
+			AnnotationProcessorHelper helper) {
 		ContainerExtractorPath extractorPath = helper.getExtractorPath( annotation.extraction() );
 
 		Optional<PojoModelPathValueNode> inversePathOptional =

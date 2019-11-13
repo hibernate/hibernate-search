@@ -25,22 +25,19 @@ class MarkerProcessor extends PropertyAnnotationProcessor<Annotation> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	MarkerProcessor(AnnotationProcessorHelper helper) {
-		super( helper );
-	}
-
 	@Override
 	public Stream<? extends Annotation> extractAnnotations(PojoPropertyModel<?> propertyModel) {
 		return propertyModel.getAnnotationsByMetaAnnotationType( MarkerBinding.class );
 	}
 
 	@Override
-	public void process(PropertyMappingStep mappingContext, Annotation annotation) {
-		MarkerBinder<?> binder = createMarkerBinder( annotation );
+	public void process(PropertyMappingStep mappingContext, Annotation annotation,
+			AnnotationProcessorHelper helper) {
+		MarkerBinder<?> binder = createMarkerBinder( annotation, helper );
 		mappingContext.marker( binder );
 	}
 
-	private <A extends Annotation> MarkerBinder createMarkerBinder(A annotation) {
+	private <A extends Annotation> MarkerBinder createMarkerBinder(A annotation, AnnotationProcessorHelper helper) {
 		MarkerBinding markerBinding = annotation.annotationType().getAnnotation( MarkerBinding.class );
 		MarkerBinderRef binderReferenceAnnotation = markerBinding.binder();
 		Optional<BeanReference<? extends MarkerBinder>> binderReference = helper.toBeanReference(

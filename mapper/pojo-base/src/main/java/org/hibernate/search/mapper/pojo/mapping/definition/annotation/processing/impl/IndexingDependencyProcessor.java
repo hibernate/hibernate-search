@@ -25,17 +25,14 @@ class IndexingDependencyProcessor extends PropertyAnnotationProcessor<IndexingDe
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	IndexingDependencyProcessor(AnnotationProcessorHelper helper) {
-		super( helper );
-	}
-
 	@Override
 	public Stream<? extends IndexingDependency> extractAnnotations(PojoPropertyModel<?> propertyModel) {
 		return propertyModel.getAnnotationsByType( IndexingDependency.class );
 	}
 
 	@Override
-	public void process(PropertyMappingStep mappingContext, IndexingDependency annotation) {
+	public void process(PropertyMappingStep mappingContext, IndexingDependency annotation,
+			AnnotationProcessorHelper helper) {
 		ContainerExtractorPath extractorPath = helper.getExtractorPath( annotation.extraction() );
 
 		ReindexOnUpdate reindexOnUpdate = annotation.reindexOnUpdate();

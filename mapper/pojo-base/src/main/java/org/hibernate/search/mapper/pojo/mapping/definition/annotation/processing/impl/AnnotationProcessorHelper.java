@@ -22,11 +22,11 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class AnnotationProcessorHelper {
+public class AnnotationProcessorHelper {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	AnnotationProcessorHelper() {
+	public AnnotationProcessorHelper() {
 	}
 
 	Optional<PojoModelPathValueNode> getPojoModelPathValueNode(ObjectPath objectPath) {

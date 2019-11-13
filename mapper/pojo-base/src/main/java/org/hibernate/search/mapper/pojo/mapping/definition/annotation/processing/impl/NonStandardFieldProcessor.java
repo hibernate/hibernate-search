@@ -14,8 +14,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
 class NonStandardFieldProcessor extends PropertyFieldAnnotationProcessor<NonStandardField> {
-	NonStandardFieldProcessor(AnnotationProcessorHelper helper) {
-		super( helper, NonStandardField.class );
+	NonStandardFieldProcessor() {
+		super( NonStandardField.class );
 	}
 
 	@Override
