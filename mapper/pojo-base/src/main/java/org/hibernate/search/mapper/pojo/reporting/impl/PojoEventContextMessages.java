@@ -6,8 +6,12 @@
  */
 package org.hibernate.search.mapper.pojo.reporting.impl;
 
+import java.lang.annotation.Annotation;
+
+import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
+import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;
 
@@ -22,5 +26,8 @@ public interface PojoEventContextMessages {
 
 	@Message(value = "annotation '%1$s'")
 	String annotation(String annotationString);
+
+	@Message(value = "annotation type '@%1$s'")
+	String annotationType(@FormatWith(ClassFormatter.class) Class<? extends Annotation> annotationType);
 
 }

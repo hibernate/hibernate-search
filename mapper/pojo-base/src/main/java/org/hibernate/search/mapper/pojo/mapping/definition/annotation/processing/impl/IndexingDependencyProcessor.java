@@ -21,7 +21,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class IndexingDependencyProcessor implements PropertyMappingAnnotationProcessor<IndexingDependency> {
+public class IndexingDependencyProcessor implements PropertyMappingAnnotationProcessor<IndexingDependency> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

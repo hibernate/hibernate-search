@@ -13,7 +13,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.NonStandar
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
-class NonStandardFieldProcessor extends AbstractFieldAnnotationProcessor<NonStandardField> {
+public class NonStandardFieldProcessor extends AbstractFieldAnnotationProcessor<NonStandardField> {
 
 	@Override
 	PropertyMappingFieldOptionsStep<?> initFieldMappingContext(PropertyMappingStep mappingContext,

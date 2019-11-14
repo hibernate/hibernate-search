@@ -14,6 +14,9 @@ import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.IndexedEmbeddedProcessor;
 
 /**
  * Maps a property to an object field whose fields are the same as those defined in the property type.
@@ -92,6 +95,7 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerEx
 @Documented
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = IndexedEmbeddedProcessor.class))
 public @interface IndexedEmbedded {
 
 	/**

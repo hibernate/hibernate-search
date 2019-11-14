@@ -46,4 +46,13 @@ public final class PojoEventContexts {
 			}
 		} );
 	}
+
+	public static EventContext fromAnnotationType(Class<? extends Annotation> annotationType) {
+		return EventContext.create( new AbstractSimpleEventContextElement<Class<? extends Annotation>>( annotationType ) {
+			@Override
+			public String render(Class<? extends Annotation> annotationType) {
+				return MESSAGES.annotationType( annotationType );
+			}
+		} );
+	}
 }

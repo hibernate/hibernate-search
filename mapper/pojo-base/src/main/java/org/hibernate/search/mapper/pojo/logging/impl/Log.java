@@ -445,4 +445,14 @@ public interface Log extends BasicLogger {
 	SearchException invalidFieldEncodingForNonStandardFieldMapping(IndexFieldTypeOptionsStep<?, ?> step,
 			@FormatWith(ClassFormatter.class) Class<?> expectedContextType);
 
+	@Message(id = ID_OFFSET_2 + 67,
+			value = "Annotation processor '%1$s' expects annotations of incompatible type '%2$s'.")
+	SearchException invalidAnnotationTypeForAnnotationProcessor(Object annotationProcessor,
+			@FormatWith(ClassFormatter.class) Class<?> processorAnnotationType);
+
+	@Message(id = ID_OFFSET_2 + 68,
+			value = "The processor reference in meta-annotation '%1$s' is empty.")
+	SearchException missingProcessorReferenceInMappingAnnotation(
+			@FormatWith(ClassFormatter.class) Class<? extends Annotation> metaAnnotationType);
+
 }
