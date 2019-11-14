@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.showcase.library.bridge;
 
-import java.lang.annotation.Annotation;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -85,7 +84,7 @@ public class AccountBorrowalSummaryBridge implements TypeBridge {
 		borrowalsObject.addValue( totalBorrowalCountReference, borrowals.size() );
 	}
 
-	public static class Binder implements TypeBinder<Annotation> {
+	public static class Binder implements TypeBinder {
 		@Override
 		public void bind(TypeBindingContext context) {
 			context.getDependencies()

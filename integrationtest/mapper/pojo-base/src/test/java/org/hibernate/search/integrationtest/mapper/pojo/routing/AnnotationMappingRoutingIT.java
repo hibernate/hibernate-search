@@ -18,14 +18,17 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.RoutingKeyBinding;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -177,8 +180,15 @@ public class AnnotationMappingRoutingIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.TYPE })
-	@RoutingKeyBinding(binder = @RoutingKeyBinderRef(type = MyRoutingKeyBridge.Binder.class))
+	@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = MyRoutingKeyBinding.Processor.class))
 	public @interface MyRoutingKeyBinding {
+		class Processor implements TypeMappingAnnotationProcessor<MyRoutingKeyBinding> {
+			@Override
+			public void process(TypeMappingStep mapping, MyRoutingKeyBinding annotation,
+					TypeMappingAnnotationProcessorContext context) {
+				mapping.routingKeyBinder( new MyRoutingKeyBridge.Binder() );
+			}
+		}
 	}
 
 	public static final class MyRoutingKeyBridge implements RoutingKeyBridge {
@@ -210,7 +220,7 @@ public class AnnotationMappingRoutingIT {
 			return keyBuilder.toString();
 		}
 
-		public static class Binder implements RoutingKeyBinder<MyRoutingKeyBinding> {
+		public static class Binder implements RoutingKeyBinder {
 			@Override
 			public void bind(RoutingKeyBindingContext context) {
 				PojoElementAccessor<EntityCategory> categoryAccessor =
