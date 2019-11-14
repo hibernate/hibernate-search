@@ -25,18 +25,20 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDe
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.NonStandardField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ScaledNumberField;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessor;
 import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 
 public class AnnotationProcessorProvider {
 
 	private final AnnotationHelper annotationHelper;
 
-	private final Map<Class<? extends Annotation>, TypeAnnotationProcessor<?>> simpleTypeAnnotationProcessors = new HashMap<>();
-	private final Map<Class<? extends Annotation>, PropertyAnnotationProcessor<?>> simplePropertyAnnotationProcessors = new HashMap<>();
-	private final TypeAnnotationProcessor<Annotation> typeBindingAnnotationProcessor = new TypeBridgeProcessor();
-	private final TypeAnnotationProcessor<Annotation> routingKeyBindingAnnotationProcessor = new RoutingKeyBridgeProcessor();
-	private final PropertyAnnotationProcessor<Annotation> propertyBindingAnnotationProcessor = new PropertyBridgeProcessor();
-	private final PropertyAnnotationProcessor<Annotation> markerBindingAnnotationProcessor = new MarkerProcessor();
+	private final Map<Class<? extends Annotation>, TypeMappingAnnotationProcessor<? extends Annotation>> simpleTypeAnnotationProcessors = new HashMap<>();
+	private final Map<Class<? extends Annotation>, PropertyMappingAnnotationProcessor<? extends Annotation>> simplePropertyAnnotationProcessors = new HashMap<>();
+	private final TypeMappingAnnotationProcessor<Annotation> typeBindingAnnotationProcessor = new TypeBridgeProcessor();
+	private final TypeMappingAnnotationProcessor<Annotation> routingKeyBindingAnnotationProcessor = new RoutingKeyBridgeProcessor();
+	private final PropertyMappingAnnotationProcessor<Annotation> propertyBindingAnnotationProcessor = new PropertyBridgeProcessor();
+	private final PropertyMappingAnnotationProcessor<Annotation> markerBindingAnnotationProcessor = new MarkerProcessor();
 
 	public AnnotationProcessorProvider(AnnotationHelper annotationHelper) {
 		this.annotationHelper = annotationHelper;
@@ -55,10 +57,10 @@ public class AnnotationProcessorProvider {
 	}
 
 	@SuppressWarnings("unchecked") // We take care to build the map with matching types
-	public <A extends Annotation> Optional<TypeAnnotationProcessor<? super A>> getTypeMappingAnnotationProcessor(A annotation) {
-		TypeAnnotationProcessor<?> result = simpleTypeAnnotationProcessors.get( annotation.annotationType() );
+	public <A extends Annotation> Optional<TypeMappingAnnotationProcessor<? super A>> getTypeMappingAnnotationProcessor(A annotation) {
+		TypeMappingAnnotationProcessor<? extends Annotation> result = simpleTypeAnnotationProcessors.get( annotation.annotationType() );
 		if ( result != null ) {
-			return Optional.of( (TypeAnnotationProcessor<? super A>) result );
+			return Optional.of( (TypeMappingAnnotationProcessor<? super A>) result );
 		}
 		if ( annotationHelper.isMetaAnnotated( annotation, TypeBinding.class ) ) {
 			return Optional.of( typeBindingAnnotationProcessor );
@@ -70,10 +72,10 @@ public class AnnotationProcessorProvider {
 	}
 
 	@SuppressWarnings("unchecked") // We take care to build the map with matching types
-	public <A extends Annotation> Optional<PropertyAnnotationProcessor<? super A>> getPropertyMappingAnnotationProcessor(A annotation) {
-		PropertyAnnotationProcessor<?> result = simplePropertyAnnotationProcessors.get( annotation.annotationType() );
+	public <A extends Annotation> Optional<PropertyMappingAnnotationProcessor<? super A>> getPropertyMappingAnnotationProcessor(A annotation) {
+		PropertyMappingAnnotationProcessor<? extends Annotation> result = simplePropertyAnnotationProcessors.get( annotation.annotationType() );
 		if ( result != null ) {
-			return Optional.of( (PropertyAnnotationProcessor<? super A>) result );
+			return Optional.of( (PropertyMappingAnnotationProcessor<? super A>) result );
 		}
 		if ( annotationHelper.isMetaAnnotated( annotation, PropertyBinding.class ) ) {
 			return Optional.of( propertyBindingAnnotationProcessor );

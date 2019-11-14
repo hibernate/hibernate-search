@@ -17,11 +17,12 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.impl.AnnotationInitializi
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotationProcessorContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class PropertyBridgeProcessor extends PropertyAnnotationProcessor<Annotation> {
+class PropertyBridgeProcessor implements PropertyMappingAnnotationProcessor<Annotation> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

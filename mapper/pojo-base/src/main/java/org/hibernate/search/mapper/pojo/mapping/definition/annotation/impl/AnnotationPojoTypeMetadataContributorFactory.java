@@ -13,10 +13,10 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.MappingAnnotationProcessorContextImpl;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.AnnotationProcessorProvider;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.PropertyAnnotationProcessor;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.TypeAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.impl.TypeMappingStepImpl;
@@ -90,7 +90,7 @@ class AnnotationPojoTypeMetadataContributorFactory {
 
 	private <A extends Annotation> boolean tryApplyProcessor(TypeMappingStep mapping, PojoRawTypeModel<?> typeModel,
 			A annotation) {
-		Optional<TypeAnnotationProcessor<? super A>> processor =
+		Optional<TypeMappingAnnotationProcessor<? super A>> processor =
 				annotationProcessorProvider.getTypeMappingAnnotationProcessor( annotation );
 		if ( !processor.isPresent() ) {
 			return false;
@@ -112,7 +112,7 @@ class AnnotationPojoTypeMetadataContributorFactory {
 	private <A extends Annotation> boolean tryApplyProcessor(PropertyMappingStep mapping,
 			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 			A annotation) {
-		Optional<PropertyAnnotationProcessor<? super A>> processor =
+		Optional<PropertyMappingAnnotationProcessor<? super A>> processor =
 				annotationProcessorProvider.getPropertyMappingAnnotationProcessor( annotation );
 		if ( !processor.isPresent() ) {
 			return false;
