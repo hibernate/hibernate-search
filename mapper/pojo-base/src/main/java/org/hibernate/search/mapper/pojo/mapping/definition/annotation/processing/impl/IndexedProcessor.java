@@ -7,10 +7,11 @@
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 
-class IndexedProcessor extends TypeAnnotationProcessor<Indexed> {
+class IndexedProcessor implements TypeMappingAnnotationProcessor<Indexed> {
 
 	@Override
 	public void process(TypeMappingStep mappingContext, Indexed annotation,

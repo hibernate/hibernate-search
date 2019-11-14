@@ -19,11 +19,12 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBi
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotationProcessorContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class DocumentIdProcessor extends PropertyAnnotationProcessor<DocumentId> {
+class DocumentIdProcessor implements PropertyMappingAnnotationProcessor<DocumentId> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
