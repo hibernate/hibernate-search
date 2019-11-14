@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.builtin.programmatic;
 
+import java.lang.annotation.Annotation;
+
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -29,7 +31,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
  * @see #longitude()
  */
 public interface GeoPointBinder
-		extends TypeBinder<GeoPointBinding>, PropertyBinder<GeoPointBinding> {
+		extends TypeBinder, PropertyBinder {
 
 	/**
 	 * @param fieldName The name of the {@link GeoPoint} field.
@@ -65,7 +67,8 @@ public interface GeoPointBinder
 	GeoPointBinder markerSet(String markerSet);
 
 	@Override
-	default void initialize(GeoPointBinding annotation) {
+	default void initialize(Annotation annotation) {
+		// TODO HSEARCH-3135 remove this
 	}
 
 	/**

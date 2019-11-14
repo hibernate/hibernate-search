@@ -15,11 +15,12 @@ import java.lang.annotation.Target;
 
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBinding;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBinding;
+import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.processor.impl.GeoPointBindingProcessor;
 import org.hibernate.search.engine.spatial.GeoPoint;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorRef;
 
 /**
  * Defines a {@link GeoPoint} binding from a type or a property
@@ -59,16 +60,12 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
  *
  * @author Nicolas Helleringer
  */
-@PropertyBinding(binder = @PropertyBinderRef(
-		type = org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge.Binder.class
-))
-@TypeBinding(binder = @TypeBinderRef(
-		type = org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.GeoPointBridge.Binder.class
-))
 @Retention(RetentionPolicy.RUNTIME)
 @Target( { ElementType.METHOD, ElementType.FIELD, ElementType.TYPE })
 @Documented
 @Repeatable(GeoPointBinding.List.class)
+@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = GeoPointBindingProcessor.class))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = GeoPointBindingProcessor.class))
 public @interface GeoPointBinding {
 
 	/**
@@ -107,4 +104,6 @@ public @interface GeoPointBinding {
 		GeoPointBinding[] value();
 
 	}
+
+
 }

@@ -12,9 +12,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl.LatitudeMarker;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerBinding;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerBinderRef;
+import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.processor.impl.LatitudeProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
 
 /**
  * Mark the property hosting the latitude of a specific spatial coordinate.
@@ -22,10 +22,10 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerBinderRe
  *
  * @author Nicolas Helleringer
  */
-@MarkerBinding(binder = @MarkerBinderRef(type = LatitudeMarker.Binder.class))
 @Retention( RetentionPolicy.RUNTIME )
 @Target( { ElementType.METHOD, ElementType.FIELD } )
 @Documented
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = LatitudeProcessor.class))
 public @interface Latitude {
 
 	/**
