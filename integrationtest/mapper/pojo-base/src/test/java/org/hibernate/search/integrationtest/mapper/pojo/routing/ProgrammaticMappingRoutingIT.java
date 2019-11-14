@@ -205,7 +205,7 @@ public class ProgrammaticMappingRoutingIT {
 			return keyBuilder.toString();
 		}
 
-		public static class Binder implements RoutingKeyBinder<Annotation> {
+		public static class Binder implements RoutingKeyBinder {
 			@Override
 			public void bind(RoutingKeyBindingContext context) {
 				PojoElementAccessor<EntityCategory> categoryAccessor =

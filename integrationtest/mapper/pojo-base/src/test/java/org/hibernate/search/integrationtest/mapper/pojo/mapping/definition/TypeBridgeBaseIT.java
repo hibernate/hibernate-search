@@ -20,13 +20,16 @@ import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBinding;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
@@ -792,7 +795,7 @@ public class TypeBridgeBaseIT {
 	@Test
 	public void mapping_error_missingBinderReference() {
 		@Indexed
-		@BindingAnnotationWithEmptyTypeBridgeRef
+		@AnnotationWithEmptyProcessorRef
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
@@ -806,12 +809,10 @@ public class TypeBridgeBaseIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( IndexedEntity.class.getName() )
-						.annotationContextAnyParameters( BindingAnnotationWithEmptyTypeBridgeRef.class )
+						.annotationTypeContext( AnnotationWithEmptyProcessorRef.class )
 						.failure(
-								"Annotation type '" + BindingAnnotationWithEmptyTypeBridgeRef.class.getName()
-										+ "' is annotated with '" + TypeBinding.class.getName() + "',"
-										+ " but the binder reference is empty."
+								"The processor reference in meta-annotation '" + TypeMapping.class.getName() + "'"
+										+ " is empty."
 						)
 						.build()
 				);
@@ -819,14 +820,14 @@ public class TypeBridgeBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
-	@TypeBinding(binder = @TypeBinderRef)
-	private @interface BindingAnnotationWithEmptyTypeBridgeRef {
+	@TypeMapping(processor = @TypeMappingAnnotationProcessorRef)
+	private @interface AnnotationWithEmptyProcessorRef {
 	}
 
 	@Test
 	public void mapping_error_invalidAnnotationType() {
 		@Indexed
-		@BindingAnnotationWithBinderWithDifferentAnnotationType
+		@AnnotationWithProcessorWithDifferentAnnotationType
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
@@ -840,11 +841,12 @@ public class TypeBridgeBaseIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( IndexedEntity.class.getName() )
+						.annotationTypeContext( AnnotationWithProcessorWithDifferentAnnotationType.class )
 						.failure(
-								"Binder '" + BinderWithDifferentAnnotationType.TOSTRING
-										+ "' cannot be initialized with annotations of type '"
-										+ BindingAnnotationWithBinderWithDifferentAnnotationType.class.getName() + "'"
+								"Annotation processor '"
+										+ DifferentAnnotationType.Processor.TO_STRING + "'"
+										+ " expects annotations of incompatible type '"
+										+ DifferentAnnotationType.class.getName() + "'."
 						)
 						.build()
 				);
@@ -852,32 +854,26 @@ public class TypeBridgeBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
-	@TypeBinding(binder = @TypeBinderRef(type = BinderWithDifferentAnnotationType.class))
-	private @interface BindingAnnotationWithBinderWithDifferentAnnotationType {
+	@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = DifferentAnnotationType.Processor.class))
+	private @interface AnnotationWithProcessorWithDifferentAnnotationType {
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
 	private @interface DifferentAnnotationType {
-	}
+		class Processor implements TypeMappingAnnotationProcessor<DifferentAnnotationType> {
+			public static final String TO_STRING = "DifferentAnnotationType.Processor";
 
-	public static class BinderWithDifferentAnnotationType
-			implements TypeBinder<DifferentAnnotationType> {
-		private static String TOSTRING = "<BinderWithDifferentAnnotationType toString() result>";
+			@Override
+			public void process(TypeMappingStep mapping, DifferentAnnotationType annotation,
+					TypeMappingAnnotationProcessorContext context) {
+				throw new UnsupportedOperationException( "This should not be called" );
+			}
 
-		@Override
-		public void initialize(DifferentAnnotationType annotation) {
-			throw new UnsupportedOperationException( "This should not be called" );
-		}
-
-		@Override
-		public void bind(TypeBindingContext context) {
-			throw new UnsupportedOperationException( "This should not be called" );
-		}
-
-		@Override
-		public String toString() {
-			return TOSTRING;
+			@Override
+			public String toString() {
+				return TO_STRING;
+			}
 		}
 	}
 
@@ -913,12 +909,18 @@ public class TypeBridgeBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target(ElementType.TYPE)
-	@TypeBinding(binder = @TypeBinderRef(type = IncompatibleTypeRequestingTypeBinder.class))
+	@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = IncompatibleTypeRequestingBinding.Processor.class))
 	private @interface IncompatibleTypeRequestingBinding {
+		class Processor implements TypeMappingAnnotationProcessor<IncompatibleTypeRequestingBinding> {
+			@Override
+			public void process(TypeMappingStep mapping, IncompatibleTypeRequestingBinding annotation,
+					TypeMappingAnnotationProcessorContext context) {
+				mapping.binder( new IncompatibleTypeRequestingTypeBinder() );
+			}
+		}
 	}
 
-	public static class IncompatibleTypeRequestingTypeBinder
-			implements TypeBinder<IncompatibleTypeRequestingBinding> {
+	public static class IncompatibleTypeRequestingTypeBinder implements TypeBinder {
 		@Override
 		public void bind(TypeBindingContext context) {
 			context.getBridgedElement().property( "stringProperty" ).createAccessor( Integer.class );

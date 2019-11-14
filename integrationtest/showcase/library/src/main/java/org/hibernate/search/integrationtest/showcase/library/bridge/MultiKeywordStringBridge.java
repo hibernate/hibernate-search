@@ -11,7 +11,6 @@ import java.util.regex.Pattern;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.integrationtest.showcase.library.bridge.annotation.MultiKeywordStringBinding;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
@@ -46,16 +45,9 @@ public class MultiKeywordStringBridge implements PropertyBridge {
 		}
 	}
 
-	public static class Binder implements
-			PropertyBinder<MultiKeywordStringBinding> {
+	public static class Binder implements PropertyBinder {
 		private String fieldName;
 		private Pattern separatorPattern = Pattern.compile( SEPARATOR_PATTERN_DEFAULT );
-
-		@Override
-		public void initialize(MultiKeywordStringBinding annotation) {
-			fieldName( annotation.fieldName() );
-			separatorPattern( Pattern.compile( annotation.separatorPattern() ) );
-		}
 
 		public Binder fieldName(String fieldName) {
 			this.fieldName = fieldName;

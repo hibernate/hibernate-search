@@ -20,14 +20,17 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBinding;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
@@ -302,9 +305,15 @@ public class AutomaticIndexingOverReindexingIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.TYPE })
-	@TypeBinding(binder = @TypeBinderRef(type = Level3Property1Bridge.Binder.class))
+	@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = Level3Property1Binding.AnnotationProcessor.class))
 	public @interface Level3Property1Binding {
-
+		class AnnotationProcessor implements TypeMappingAnnotationProcessor<Level3Property1Binding> {
+			@Override
+			public void process(TypeMappingStep mapping, Level3Property1Binding annotation,
+					TypeMappingAnnotationProcessorContext context) {
+				mapping.binder( new Level3Property1Bridge.Binder() );
+			}
+		}
 	}
 
 	public static class Level3Property1Bridge implements TypeBridge {
@@ -331,11 +340,12 @@ public class AutomaticIndexingOverReindexingIT {
 			);
 		}
 
-		public static class Binder implements TypeBinder<Level3Property1Binding> {
+		public static class Binder implements TypeBinder {
 			@Override
 			public void bind(TypeBindingContext context) {
 				context.setBridge( new Level3Property1Bridge( context ) );
 			}
 		}
+
 	}
 }

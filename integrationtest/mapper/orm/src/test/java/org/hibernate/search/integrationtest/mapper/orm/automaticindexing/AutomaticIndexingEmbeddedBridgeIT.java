@@ -29,12 +29,15 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBinding;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
@@ -281,8 +284,15 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.TYPE })
-	@TypeBinding(binder = @TypeBinderRef(type = FirstTypeBridge.Binder.class))
+	@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = FirstTypeBinding.Processor.class))
 	public @interface FirstTypeBinding {
+		class Processor implements TypeMappingAnnotationProcessor<Annotation> {
+			@Override
+			public void process(TypeMappingStep mapping, Annotation annotation,
+					TypeMappingAnnotationProcessorContext context) {
+				mapping.binder( new FirstTypeBridge.Binder() );
+			}
+		}
 	}
 
 	public static class FirstTypeBridge implements TypeBridge {
@@ -307,18 +317,26 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 			objectField.addValue( valueFieldReference, valueSourcePropertyAccessor.read( bridgedElement ) );
 		}
 
-		public static class Binder implements TypeBinder<Annotation> {
+		public static class Binder implements TypeBinder {
 			@Override
 			public void bind(TypeBindingContext context) {
 				context.setBridge( new FirstTypeBridge( context ) );
 			}
 		}
+
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.TYPE })
-	@TypeBinding(binder = @TypeBinderRef(type = SecondTypeBridge.Binder.class))
+	@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = SecondTypeBinding.Processor.class))
 	public @interface SecondTypeBinding {
+		class Processor implements TypeMappingAnnotationProcessor<Annotation> {
+			@Override
+			public void process(TypeMappingStep mapping, Annotation annotation,
+					TypeMappingAnnotationProcessorContext context) {
+				mapping.binder( new SecondTypeBridge.Binder() );
+			}
+		}
 	}
 
 	public static class SecondTypeBridge implements TypeBridge {
@@ -349,5 +367,6 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 				context.setBridge( new SecondTypeBridge( context ) );
 			}
 		}
+
 	}
 }

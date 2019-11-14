@@ -20,12 +20,15 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.AutomaticIndexingBridgeAccessorsIT;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBinding;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
@@ -202,8 +205,16 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ ElementType.FIELD, ElementType.METHOD })
-	@PropertyBinding(binder = @PropertyBinderRef(type = BridgeGoingThroughEntityBoundaries.Binder.class))
+	@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = BindingGoingThroughEntityBoundaries.Processor.class))
 	public @interface BindingGoingThroughEntityBoundaries {
+
+		class Processor implements PropertyMappingAnnotationProcessor<BindingGoingThroughEntityBoundaries> {
+			@Override
+			public void process(PropertyMappingStep mapping, BindingGoingThroughEntityBoundaries annotation,
+					PropertyMappingAnnotationProcessorContext context) {
+				mapping.binder( new BridgeGoingThroughEntityBoundaries.Binder() );
+			}
+		}
 	}
 
 	public static class BridgeGoingThroughEntityBoundaries implements PropertyBridge {
@@ -226,7 +237,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 			target.addValue( indexFieldReference, value );
 		}
 
-		public static class Binder implements PropertyBinder<BindingGoingThroughEntityBoundaries> {
+		public static class Binder implements PropertyBinder {
 			@Override
 			public void bind(PropertyBindingContext context) {
 				context.setBridge( new BridgeGoingThroughEntityBoundaries( context ) );

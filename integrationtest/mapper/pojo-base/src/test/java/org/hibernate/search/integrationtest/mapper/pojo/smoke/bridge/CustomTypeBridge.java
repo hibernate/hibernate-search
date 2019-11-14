@@ -63,14 +63,9 @@ public final class CustomTypeBridge implements TypeBridge {
 		// Nothing to do
 	}
 
-	public static final class Binder implements TypeBinder<CustomTypeBinding> {
+	public static final class Binder implements TypeBinder {
 
 		private String objectName;
-
-		@Override
-		public void initialize(CustomTypeBinding annotation) {
-			objectName( annotation.objectName() );
-		}
 
 		public Binder objectName(String value) {
 			this.objectName = value;
@@ -95,4 +90,5 @@ public final class CustomTypeBridge implements TypeBridge {
 			);
 		}
 	}
+
 }

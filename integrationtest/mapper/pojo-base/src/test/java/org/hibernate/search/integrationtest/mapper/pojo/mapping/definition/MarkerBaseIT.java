@@ -15,12 +15,13 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.integrationtest.mapper.pojo.spatial.AnnotationMappingGeoPointBindingIT;
 import org.hibernate.search.integrationtest.mapper.pojo.spatial.ProgrammaticMappingGeoPointBindingIT;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerBinding;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerBinderRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
-import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
@@ -54,7 +55,7 @@ public class MarkerBaseIT {
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
-			@BindingAnnotationWithEmptyMarkerBinderRef
+			@AnnotationWithEmptyProcessorRef
 			public Integer getId() {
 				return id;
 			}
@@ -65,13 +66,10 @@ public class MarkerBaseIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( IndexedEntity.class.getName() )
-						.pathContext( ".id" )
-						.annotationContextAnyParameters( BindingAnnotationWithEmptyMarkerBinderRef.class )
+						.annotationTypeContext( AnnotationWithEmptyProcessorRef.class )
 						.failure(
-								"Annotation type '" + BindingAnnotationWithEmptyMarkerBinderRef.class.getName()
-										+ "' is annotated with '" + MarkerBinding.class.getName() + "',"
-										+ " but the binder reference is empty"
+								"The processor reference in meta-annotation '" + PropertyMapping.class.getName() + "'"
+										+ " is empty."
 						)
 						.build()
 				);
@@ -79,8 +77,8 @@ public class MarkerBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.METHOD})
-	@MarkerBinding(binder = @MarkerBinderRef)
-	private @interface BindingAnnotationWithEmptyMarkerBinderRef {
+	@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef)
+	private @interface AnnotationWithEmptyProcessorRef {
 	}
 
 	@Test
@@ -89,7 +87,7 @@ public class MarkerBaseIT {
 		class IndexedEntity {
 			Integer id;
 			@DocumentId
-			@BindingAnnotationWithBinderWithDifferentAnnotationType
+			@AnnotationWithProcessorWithDifferentAnnotationType
 			public Integer getId() {
 				return id;
 			}
@@ -100,12 +98,12 @@ public class MarkerBaseIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.typeContext( IndexedEntity.class.getName() )
-						.pathContext( ".id" )
+						.annotationTypeContext( AnnotationWithProcessorWithDifferentAnnotationType.class )
 						.failure(
-								"Binder '" + MarkerBinderWithDifferentAnnotationType.TOSTRING
-										+ "' cannot be initialized with annotations of type '"
-										+ BindingAnnotationWithBinderWithDifferentAnnotationType.class.getName() + "'"
+								"Annotation processor '"
+										+ DifferentAnnotationType.Processor.TO_STRING + "'"
+										+ " expects annotations of incompatible type '"
+										+ DifferentAnnotationType.class.getName() + "'."
 						)
 						.build()
 				);
@@ -113,32 +111,26 @@ public class MarkerBaseIT {
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.METHOD})
-	@MarkerBinding(binder = @MarkerBinderRef(type = MarkerBinderWithDifferentAnnotationType.class))
-	private @interface BindingAnnotationWithBinderWithDifferentAnnotationType {
+	@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = DifferentAnnotationType.Processor.class))
+	private @interface AnnotationWithProcessorWithDifferentAnnotationType {
 	}
 
 	@Retention(RetentionPolicy.RUNTIME)
 	@Target({ElementType.FIELD, ElementType.METHOD})
 	private @interface DifferentAnnotationType {
-	}
+		class Processor implements PropertyMappingAnnotationProcessor<DifferentAnnotationType> {
+			public static final String TO_STRING = "DifferentAnnotationType.Processor";
 
-	public static class MarkerBinderWithDifferentAnnotationType
-			implements MarkerBinder<DifferentAnnotationType> {
-		private static String TOSTRING = "<MarkerBinderWithDifferentAnnotationType toString() result>";
+			@Override
+			public void process(PropertyMappingStep mapping, DifferentAnnotationType annotation,
+					PropertyMappingAnnotationProcessorContext context) {
+				throw new UnsupportedOperationException( "This should not be called" );
+			}
 
-		@Override
-		public void initialize(DifferentAnnotationType annotation) {
-			throw new UnsupportedOperationException( "This should not be called" );
-		}
-
-		@Override
-		public void bind(MarkerBindingContext context) {
-			throw new UnsupportedOperationException( "This should not be called" );
-		}
-
-		@Override
-		public String toString() {
-			return TOSTRING;
+			@Override
+			public String toString() {
+				return TO_STRING;
+			}
 		}
 	}
 
