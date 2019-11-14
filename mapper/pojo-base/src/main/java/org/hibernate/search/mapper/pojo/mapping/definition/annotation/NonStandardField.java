@@ -15,6 +15,9 @@ import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.NonStandardFieldProcessor;
 
 /**
  * Maps a property to a non-standard field in the index.
@@ -28,6 +31,7 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerEx
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(NonStandardField.List.class)
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = NonStandardFieldProcessor.class))
 public @interface NonStandardField {
 
 	/**

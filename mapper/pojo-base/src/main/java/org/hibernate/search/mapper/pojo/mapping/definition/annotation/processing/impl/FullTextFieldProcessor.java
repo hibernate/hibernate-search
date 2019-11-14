@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStandardFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
-class FullTextFieldProcessor extends AbstractStandardFieldAnnotationProcessor<FullTextField> {
+public class FullTextFieldProcessor extends AbstractStandardFieldAnnotationProcessor<FullTextField> {
 
 	@Override
 	PropertyMappingStandardFieldOptionsStep<?> initStandardFieldMappingContext(PropertyMappingStep mappingContext,

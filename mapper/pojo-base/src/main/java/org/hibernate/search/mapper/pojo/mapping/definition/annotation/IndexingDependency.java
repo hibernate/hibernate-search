@@ -14,6 +14,9 @@ import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.IndexingDependencyProcessor;
 
 /**
  * Given a property, defines how a dependency of the indexing process to this property
@@ -41,6 +44,7 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerEx
 @Documented
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = IndexingDependencyProcessor.class))
 public @interface IndexingDependency {
 
 	/**

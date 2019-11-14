@@ -11,6 +11,7 @@ import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataDiscoverer;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
@@ -55,10 +56,11 @@ public class AnnotationMappingConfigurationContextImpl implements AnnotationMapp
 	@Override
 	public void configure(MappingBuildContext buildContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> collector) {
+		BeanResolver beanResolver = buildContext.getBeanResolver();
 		FailureCollector failureCollector = buildContext.getFailureCollector();
 		AnnotationHelper annotationHelper = new AnnotationHelper( introspector.getAnnotationValueReadHandleFactory() );
 		AnnotationPojoTypeMetadataContributorFactory contributorFactory =
-				new AnnotationPojoTypeMetadataContributorFactory( failureCollector, annotationHelper );
+				new AnnotationPojoTypeMetadataContributorFactory( beanResolver, failureCollector, annotationHelper );
 
 		/*
 		 * For types that were explicitly requested for annotation scanning and their supertypes,

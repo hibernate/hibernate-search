@@ -31,10 +31,6 @@ public final class AnnotationHelper {
 		this.handleFactory = handleFactory;
 	}
 
-	public boolean isMetaAnnotated(Annotation annotation, Class<? extends Annotation> metaAnnotationType) {
-		return annotation.annotationType().getAnnotationsByType( metaAnnotationType ).length > 0;
-	}
-
 	public Stream<? extends Annotation> expandRepeatableContainingAnnotation(Annotation containingAnnotationCandidate) {
 		Class<? extends Annotation> containingAnnotationCandidateType = containingAnnotationCandidate.annotationType();
 		ValueReadHandle<Annotation[]> containedAnnotationsHandle = containedAnnotationsHandleCache.computeIfAbsent(

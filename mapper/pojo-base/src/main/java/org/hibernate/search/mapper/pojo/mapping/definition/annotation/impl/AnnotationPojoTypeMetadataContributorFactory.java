@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
@@ -33,10 +35,11 @@ class AnnotationPojoTypeMetadataContributorFactory {
 	private final AnnotationProcessorProvider annotationProcessorProvider;
 	private final MappingAnnotationProcessorContextImpl context = new MappingAnnotationProcessorContextImpl();
 
-	AnnotationPojoTypeMetadataContributorFactory(FailureCollector rootFailureCollector, AnnotationHelper annotationHelper) {
+	AnnotationPojoTypeMetadataContributorFactory(BeanResolver beanResolver, FailureCollector rootFailureCollector,
+			AnnotationHelper annotationHelper) {
 		this.rootFailureCollector = rootFailureCollector;
 		this.annotationHelper = annotationHelper;
-		this.annotationProcessorProvider = new AnnotationProcessorProvider( annotationHelper );
+		this.annotationProcessorProvider = new AnnotationProcessorProvider( beanResolver, rootFailureCollector, context );
 	}
 
 	public Optional<PojoTypeMetadataContributor> createIfAnnotated(PojoRawTypeModel<?> typeModel) {
@@ -90,14 +93,15 @@ class AnnotationPojoTypeMetadataContributorFactory {
 
 	private <A extends Annotation> boolean tryApplyProcessor(TypeMappingStep mapping, PojoRawTypeModel<?> typeModel,
 			A annotation) {
-		Optional<TypeMappingAnnotationProcessor<? super A>> processor =
-				annotationProcessorProvider.getTypeMappingAnnotationProcessor( annotation );
-		if ( !processor.isPresent() ) {
+		Optional<BeanHolder<? extends TypeMappingAnnotationProcessor<? super A>>> processorOptional =
+				annotationProcessorProvider.createTypeAnnotationProcessor( annotation );
+		if ( !processorOptional.isPresent() ) {
 			return false;
 		}
 
-		try {
-			processor.get().process( mapping, annotation, context );
+		try ( BeanHolder<? extends TypeMappingAnnotationProcessor<? super A>> processorHolder =
+				processorOptional.get() ) {
+			processorHolder.get().process( mapping, annotation, context );
 		}
 		catch (RuntimeException e) {
 			rootFailureCollector
@@ -112,14 +116,15 @@ class AnnotationPojoTypeMetadataContributorFactory {
 	private <A extends Annotation> boolean tryApplyProcessor(PropertyMappingStep mapping,
 			PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel,
 			A annotation) {
-		Optional<PropertyMappingAnnotationProcessor<? super A>> processor =
-				annotationProcessorProvider.getPropertyMappingAnnotationProcessor( annotation );
-		if ( !processor.isPresent() ) {
+		Optional<BeanHolder<? extends PropertyMappingAnnotationProcessor<? super A>>> processorOptional =
+				annotationProcessorProvider.createPropertyAnnotationProcessor( annotation );
+		if ( !processorOptional.isPresent() ) {
 			return false;
 		}
 
-		try {
-			processor.get().process( mapping, annotation, context );
+		try ( BeanHolder<? extends PropertyMappingAnnotationProcessor<? super A>> processorHolder =
+				processorOptional.get() ) {
+			processorHolder.get().process( mapping, annotation, context );
 		}
 		catch (RuntimeException e) {
 			rootFailureCollector

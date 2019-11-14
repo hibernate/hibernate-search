@@ -127,6 +127,10 @@ public final class FailureReportUtils {
 			return contextPattern( "annotation '@\\Q" + annotationType.getName() + "\\E\\(.*'" );
 		}
 
+		public FailureReportPatternBuilder annotationTypeContext(Class<? extends Annotation> annotationType) {
+			return contextLiteral( "annotation type '@" + annotationType.getName() + "'" );
+		}
+
 		public FailureReportPatternBuilder contextLiteral(String contextLiteral) {
 			return contextPattern( "\\Q" + contextLiteral + "\\E" );
 		}

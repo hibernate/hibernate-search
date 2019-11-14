@@ -21,6 +21,9 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.ValueBridgeRef;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.KeywordFieldProcessor;
 
 /**
  * Maps a property to a keyword field in the index, holding a single token (word) of text.
@@ -43,6 +46,7 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerEx
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(KeywordField.List.class)
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = KeywordFieldProcessor.class))
 public @interface KeywordField {
 
 	/**

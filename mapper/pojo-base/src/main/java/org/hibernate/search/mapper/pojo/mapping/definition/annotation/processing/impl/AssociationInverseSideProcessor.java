@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class AssociationInverseSideProcessor implements PropertyMappingAnnotationProcessor<AssociationInverseSide> {
+public class AssociationInverseSideProcessor implements PropertyMappingAnnotationProcessor<AssociationInverseSide> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

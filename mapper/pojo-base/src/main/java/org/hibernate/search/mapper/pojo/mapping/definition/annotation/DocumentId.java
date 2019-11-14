@@ -14,6 +14,9 @@ import java.lang.annotation.Target;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBridgeRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.DocumentIdProcessor;
 
 /**
  * Maps a property to the identifier of documents in the index.
@@ -23,6 +26,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.IdentifierBrid
 @Documented
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = DocumentIdProcessor.class))
 public @interface DocumentId {
 
 	/**
