@@ -43,7 +43,6 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
-import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 import org.hibernate.search.util.common.impl.ReflectionHelper;
 
 public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstrapIntrospector implements PojoBootstrapIntrospector {
@@ -150,7 +149,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 			Map<Class<?>, HibernateOrmBasicTypeMetadata> typeMetadata,
 			ReflectionManager reflectionManager,
 			ValueReadHandleFactory valueReadHandleFactory) {
-		super( reflectionManager, new AnnotationHelper( valueReadHandleFactory ) );
+		super( reflectionManager );
 		this.typeMetadata = typeMetadata;
 		this.valueReadHandleFactory = valueReadHandleFactory;
 		this.genericContextHelper = new HibernateOrmGenericContextHelper( this );
@@ -175,6 +174,11 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	@Override
 	public <T> PojoGenericTypeModel<T> getGenericTypeModel(Class<T> clazz) {
 		return missingRawTypeDeclaringContext.createGenericTypeModel( clazz );
+	}
+
+	@Override
+	public ValueReadHandleFactory getAnnotationValueReadHandleFactory() {
+		return valueReadHandleFactory;
 	}
 
 	<T> Stream<HibernateOrmRawTypeModel<? super T>> getAscendingSuperTypes(XClass xClass) {

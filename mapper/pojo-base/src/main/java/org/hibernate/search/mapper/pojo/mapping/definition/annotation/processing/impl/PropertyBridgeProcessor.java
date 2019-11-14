@@ -20,16 +20,17 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 
 class PropertyBridgeProcessor extends PropertyAnnotationProcessor<Annotation> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
-	public Stream<? extends Annotation> extractAnnotations(PojoPropertyModel<?> propertyModel) {
-		return propertyModel.getAnnotationsByMetaAnnotationType( PropertyBinding.class );
+	public Stream<? extends Annotation> extractAnnotations(Stream<Annotation> annotations,
+			AnnotationHelper annotationHelper) {
+		return extractByMetaAnnotationType( annotations, annotationHelper, PropertyBinding.class );
 	}
 
 	@Override

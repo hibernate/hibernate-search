@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.model.spi;
 
 import java.lang.annotation.Annotation;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
@@ -39,11 +38,7 @@ public interface PojoRawTypeModel<T> extends PojoTypeModel<T>, MappableTypeModel
 
 	boolean isSubTypeOf(Class<?> other);
 
-	<A extends Annotation> Optional<A> getAnnotationByType(Class<A> annotationType);
-
-	<A extends Annotation> Stream<A> getAnnotationsByType(Class<A> annotationType);
-
-	Stream<? extends Annotation> getAnnotationsByMetaAnnotationType(Class<? extends Annotation> metaAnnotationType);
+	Stream<Annotation> getAnnotations();
 
 	Stream<PojoPropertyModel<?>> getDeclaredProperties();
 

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
+import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -16,16 +17,17 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Associatio
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 
 class AssociationInverseSideProcessor extends PropertyAnnotationProcessor<AssociationInverseSide> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
-	public Stream<? extends AssociationInverseSide> extractAnnotations(PojoPropertyModel<?> propertyModel) {
-		return propertyModel.getAnnotationsByType( AssociationInverseSide.class );
+	public Stream<? extends AssociationInverseSide> extractAnnotations(Stream<Annotation> annotations,
+			AnnotationHelper annotationHelper) {
+		return extractByType( annotations, AssociationInverseSide.class );
 	}
 
 	@Override

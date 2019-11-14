@@ -20,16 +20,17 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 
 class TypeBridgeProcessor extends TypeAnnotationProcessor<Annotation> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	@Override
-	public Stream<? extends Annotation> extractAnnotations(PojoRawTypeModel<?> typeModel) {
-		return typeModel.getAnnotationsByMetaAnnotationType( TypeBinding.class );
+	public Stream<? extends Annotation> extractAnnotations(Stream<Annotation> annotations,
+			AnnotationHelper annotationHelper) {
+		return extractByMetaAnnotationType( annotations, annotationHelper, TypeBinding.class );
 	}
 
 	@Override

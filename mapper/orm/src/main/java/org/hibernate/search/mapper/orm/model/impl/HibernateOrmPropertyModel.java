@@ -62,17 +62,8 @@ class HibernateOrmPropertyModel<T> implements PojoPropertyModel<T> {
 	}
 
 	@Override
-	public <A extends Annotation> Stream<A> getAnnotationsByType(Class<A> annotationType) {
-		return declaredXProperties.stream().flatMap(
-				xProperty -> introspector.getAnnotationsByType( xProperty, annotationType )
-		);
-	}
-
-	@Override
-	public Stream<? extends Annotation> getAnnotationsByMetaAnnotationType(Class<? extends Annotation> metaAnnotationType) {
-		return declaredXProperties.stream().flatMap(
-				xProperty -> introspector.getAnnotationsByMetaAnnotationType( xProperty, metaAnnotationType )
-		);
+	public Stream<Annotation> getAnnotations() {
+		return declaredXProperties.stream().flatMap( introspector::getAnnotations );
 	}
 
 	@Override

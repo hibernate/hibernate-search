@@ -15,9 +15,7 @@ public interface PojoPropertyModel<T> {
 
 	String getName();
 
-	<A extends Annotation> Stream<A> getAnnotationsByType(Class<A> annotationType);
-
-	Stream<? extends Annotation> getAnnotationsByMetaAnnotationType(Class<? extends Annotation> metaAnnotationType);
+	Stream<Annotation> getAnnotations();
 
 	/**
 	 * @return A model of this property's type. Implementations may decide to implement their own,

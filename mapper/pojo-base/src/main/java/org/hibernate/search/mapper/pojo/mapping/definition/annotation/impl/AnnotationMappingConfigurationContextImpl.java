@@ -21,6 +21,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Annotation
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 
 public class AnnotationMappingConfigurationContextImpl implements AnnotationMappingConfigurationContext,
 		PojoMappingConfigurationContributor {
@@ -55,8 +56,9 @@ public class AnnotationMappingConfigurationContextImpl implements AnnotationMapp
 	public void configure(MappingBuildContext buildContext,
 			MappingConfigurationCollector<PojoTypeMetadataContributor> collector) {
 		FailureCollector failureCollector = buildContext.getFailureCollector();
+		AnnotationHelper annotationHelper = new AnnotationHelper( introspector.getAnnotationValueReadHandleFactory() );
 		AnnotationPojoTypeMetadataContributorFactory contributorFactory =
-				new AnnotationPojoTypeMetadataContributorFactory( failureCollector );
+				new AnnotationPojoTypeMetadataContributorFactory( failureCollector, annotationHelper );
 
 		/*
 		 * For types that were explicitly requested for annotation scanning and their supertypes,

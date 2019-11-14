@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.model.spi;
 
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
+
 /**
  * A Pojo introspector used at bootstrap.
  */
@@ -24,5 +26,10 @@ public interface PojoBootstrapIntrospector {
 	 * @return A type model for the given type.
 	 */
 	<T> PojoGenericTypeModel<T> getGenericTypeModel(Class<T> clazz);
+
+	/**
+	 * @return A {@link ValueReadHandleFactory} for reading annotation attributes.
+	 */
+	ValueReadHandleFactory getAnnotationValueReadHandleFactory();
 
 }

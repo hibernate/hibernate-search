@@ -25,8 +25,8 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 
 abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends PropertyAnnotationProcessor<A> {
 
@@ -39,8 +39,9 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 	}
 
 	@Override
-	public final Stream<? extends A> extractAnnotations(PojoPropertyModel<?> propertyModel) {
-		return propertyModel.getAnnotationsByType( annotationType );
+	public final Stream<? extends A> extractAnnotations(Stream<Annotation> annotations,
+			AnnotationHelper annotationHelper) {
+		return extractByType( annotations, annotationType );
 	}
 
 	@Override

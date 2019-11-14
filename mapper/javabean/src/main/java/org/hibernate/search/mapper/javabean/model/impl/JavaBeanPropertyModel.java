@@ -76,13 +76,8 @@ class JavaBeanPropertyModel<T> implements PojoPropertyModel<T> {
 	}
 
 	@Override
-	public <A extends Annotation> Stream<A> getAnnotationsByType(Class<A> annotationType) {
-		return introspector.getAnnotationsByType( property, annotationType );
-	}
-
-	@Override
-	public Stream<? extends Annotation> getAnnotationsByMetaAnnotationType(Class<? extends Annotation> metaAnnotationType) {
-		return introspector.getAnnotationsByMetaAnnotationType( property, metaAnnotationType );
+	public Stream<Annotation> getAnnotations() {
+		return introspector.getAnnotations( property );
 	}
 
 	@Override

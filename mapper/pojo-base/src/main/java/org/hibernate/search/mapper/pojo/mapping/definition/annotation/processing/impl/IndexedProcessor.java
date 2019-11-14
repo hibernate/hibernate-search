@@ -6,18 +6,22 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
+import java.lang.annotation.Annotation;
 import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 
 class IndexedProcessor extends TypeAnnotationProcessor<Indexed> {
 
 	@Override
-	public Stream<? extends Indexed> extractAnnotations(PojoRawTypeModel<?> typeModel) {
-		return typeModel.getAnnotationsByType( Indexed.class );
+	public Stream<? extends Indexed> extractAnnotations(Stream<Annotation> annotations,
+			AnnotationHelper annotationHelper) {
+		return annotations
+				.filter( annotation -> Indexed.class.isAssignableFrom( annotation.annotationType() ) )
+				.map( Indexed.class::cast );
 	}
 
 	@Override

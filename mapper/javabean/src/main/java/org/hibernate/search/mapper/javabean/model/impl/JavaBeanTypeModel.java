@@ -11,7 +11,6 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Modifier;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.stream.Stream;
 
 import org.hibernate.annotations.common.reflection.XClass;
@@ -105,18 +104,8 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	@Override
-	public <A extends Annotation> Optional<A> getAnnotationByType(Class<A> annotationType) {
-		return introspector.getAnnotationByType( xClass, annotationType );
-	}
-
-	@Override
-	public <A extends Annotation> Stream<A> getAnnotationsByType(Class<A> annotationType) {
-		return introspector.getAnnotationsByType( xClass, annotationType );
-	}
-
-	@Override
-	public Stream<? extends Annotation> getAnnotationsByMetaAnnotationType(Class<? extends Annotation> metaAnnotationType) {
-		return introspector.getAnnotationsByMetaAnnotationType( xClass, metaAnnotationType );
+	public Stream<Annotation> getAnnotations() {
+		return introspector.getAnnotations( xClass );
 	}
 
 	@Override
