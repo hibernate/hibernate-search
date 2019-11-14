@@ -27,7 +27,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-abstract class PropertyFieldAnnotationProcessor<A extends Annotation> implements PropertyMappingAnnotationProcessor<A> {
+abstract class AbstractFieldAnnotationProcessor<A extends Annotation> implements PropertyMappingAnnotationProcessor<A> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
