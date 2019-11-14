@@ -11,7 +11,7 @@ import java.lang.annotation.Annotation;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 
-public abstract class TypeAnnotationProcessor<A extends Annotation> extends AnnotationExtractor<A> {
+public abstract class TypeAnnotationProcessor<A extends Annotation> {
 
 	public abstract void process(TypeMappingStep mappingContext, A annotation,
 			TypeMappingAnnotationProcessorContext context);
