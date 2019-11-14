@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingNonFullTextFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
-class GenericFieldProcessor extends PropertyNotFullTextFieldAnnotationProcessor<GenericField> {
+class GenericFieldProcessor extends AbstractNonFullTextFieldAnnotationProcessor<GenericField> {
 
 	@Override
 	PropertyMappingNonFullTextFieldOptionsStep<?> initSortableFieldMappingContext(PropertyMappingStep mappingContext,

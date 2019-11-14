@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingScaledNumberFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
-class ScaledNumberFieldProcessor extends PropertyNotFullTextFieldAnnotationProcessor<ScaledNumberField> {
+class ScaledNumberFieldProcessor extends AbstractNonFullTextFieldAnnotationProcessor<ScaledNumberField> {
 
 	@Override
 	PropertyMappingNonFullTextFieldOptionsStep<?> initSortableFieldMappingContext(PropertyMappingStep mappingContext,
