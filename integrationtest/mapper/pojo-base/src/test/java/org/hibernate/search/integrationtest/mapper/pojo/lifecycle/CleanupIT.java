@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.mapper.pojo.lifecycle;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
-import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.function.Consumer;
@@ -543,14 +542,9 @@ public class CleanupIT {
 		}
 	}
 
-	private static class FailingBinder implements TypeBinder<Annotation>,
-			PropertyBinder<Annotation>, RoutingKeyBinder<Annotation>,
+	private static class FailingBinder implements TypeBinder,
+			PropertyBinder, RoutingKeyBinder,
 			IdentifierBinder, ValueBinder {
-		@Override
-		public void initialize(Annotation annotation) {
-			// Nothing to do
-		}
-
 		@Override
 		public void bind(TypeBindingContext context) {
 			throw new SimulatedFailure();

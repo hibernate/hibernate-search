@@ -65,13 +65,13 @@ public class PojoIndexingProcessorTypeNodeBuilder<T> extends AbstractPojoProcess
 	}
 
 	@Override
-	public void typeBinder(TypeBinder<?> builder) {
+	public void typeBinder(TypeBinder builder) {
 		mappingHelper.getIndexModelBinder().bindType( bindingContext, modelPath, builder )
 			.ifPresent( boundBridges::add );
 	}
 
 	@Override
-	public void routingKeyBinder(RoutingKeyBinder<?> builder) {
+	public void routingKeyBinder(RoutingKeyBinder builder) {
 		if ( identityMappingCollector.isPresent() ) {
 			boundRoutingKeyBridge = identityMappingCollector.get().routingKeyBridge( modelPath, builder );
 		}

@@ -64,13 +64,13 @@ public class TypeMappingStepImpl
 	}
 
 	@Override
-	public TypeMappingStep routingKeyBinder(RoutingKeyBinder<?> binder) {
+	public TypeMappingStep routingKeyBinder(RoutingKeyBinder binder) {
 		children.add( new RoutingKeyBridgeMappingContributor( binder ) );
 		return this;
 	}
 
 	@Override
-	public TypeMappingStep binder(TypeBinder<?> binder) {
+	public TypeMappingStep binder(TypeBinder binder) {
 		children.add( new TypeBridgeMappingContributor( binder ) );
 		return this;
 	}

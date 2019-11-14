@@ -11,9 +11,9 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 
 public interface PojoMappingCollectorTypeNode extends PojoMappingCollector {
 
-	void typeBinder(TypeBinder<?> builder);
+	void typeBinder(TypeBinder builder);
 
-	void routingKeyBinder(RoutingKeyBinder<?> reference);
+	void routingKeyBinder(RoutingKeyBinder reference);
 
 	PojoMappingCollectorPropertyNode property(String propertyName);
 

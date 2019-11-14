@@ -42,7 +42,7 @@ public interface PropertyMappingStep {
 	 * @return {@code this}, for method chaining.
 	 * @see PropertyBinder
 	 */
-	PropertyMappingStep binder(PropertyBinder<?> binder);
+	PropertyMappingStep binder(PropertyBinder binder);
 
 	/**
 	 * @param binder A {@link MarkerBinder} responsible for creating a marker object.
@@ -51,7 +51,7 @@ public interface PropertyMappingStep {
 	 * @see GeoPointBinder#latitude()
 	 * @see GeoPointBinder#longitude()
 	 */
-	PropertyMappingStep marker(MarkerBinder<?> binder);
+	PropertyMappingStep marker(MarkerBinder binder);
 
 	/**
 	 * Maps the property to a field of standard type in the index with the same name as this property.

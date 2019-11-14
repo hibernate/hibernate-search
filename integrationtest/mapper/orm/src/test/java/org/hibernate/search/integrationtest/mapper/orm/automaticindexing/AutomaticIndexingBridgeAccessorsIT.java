@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
-import java.lang.annotation.Annotation;
-
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -31,17 +29,17 @@ import org.hibernate.search.mapper.pojo.model.PojoModelType;
 public class AutomaticIndexingBridgeAccessorsIT extends AbstractAutomaticIndexingBridgeIT {
 
 	@Override
-	protected TypeBinder<?> createContainingEntityTypeBinder() {
+	protected TypeBinder createContainingEntityTypeBinder() {
 		return new ContainingEntityTypeBridge.Binder();
 	}
 
 	@Override
-	protected PropertyBinder<?> createContainingEntitySingleValuedPropertyBinder() {
+	protected PropertyBinder createContainingEntitySingleValuedPropertyBinder() {
 		return new ContainingEntitySingleValuedPropertyBridge.Binder();
 	}
 
 	@Override
-	protected PropertyBinder<?> createContainingEntityMultiValuedPropertyBinder() {
+	protected PropertyBinder createContainingEntityMultiValuedPropertyBinder() {
 		return null; // Not supported with accessors
 	}
 
@@ -84,7 +82,7 @@ public class AutomaticIndexingBridgeAccessorsIT extends AbstractAutomaticIndexin
 			);
 		}
 
-		public static class Binder implements TypeBinder<Annotation> {
+		public static class Binder implements TypeBinder {
 			@Override
 			public void bind(TypeBindingContext context) {
 				context.setBridge( new ContainingEntityTypeBridge( context ) );
@@ -119,7 +117,7 @@ public class AutomaticIndexingBridgeAccessorsIT extends AbstractAutomaticIndexin
 			);
 		}
 
-		public static class Binder implements PropertyBinder<Annotation> {
+		public static class Binder implements PropertyBinder {
 			@Override
 			public void bind(PropertyBindingContext context) {
 				context.setBridge( new ContainingEntitySingleValuedPropertyBridge( context ) );

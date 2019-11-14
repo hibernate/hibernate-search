@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.routing;
 
-import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 

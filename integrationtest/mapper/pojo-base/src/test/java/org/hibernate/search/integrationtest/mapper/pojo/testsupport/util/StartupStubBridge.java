@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.testsupport.util;
 
-import java.lang.annotation.Annotation;
-
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
@@ -134,8 +132,8 @@ public class StartupStubBridge<T>
 		);
 	}
 
-	public static class Binder<T> implements TypeBinder<Annotation>,
-			PropertyBinder<Annotation>, RoutingKeyBinder<Annotation>,
+	public static class Binder<T> implements TypeBinder,
+			PropertyBinder, RoutingKeyBinder,
 			IdentifierBinder, ValueBinder {
 		private final Class<T> bridgeInputType;
 		private final StartupStubBridge.CounterKeys counterKeys;
@@ -143,11 +141,6 @@ public class StartupStubBridge<T>
 		private Binder(Class<T> bridgeInputType, StartupStubBridge.CounterKeys counterKeys) {
 			this.bridgeInputType = bridgeInputType;
 			this.counterKeys = counterKeys;
-		}
-
-		@Override
-		public void initialize(Annotation annotation) {
-			// Nothing to do
 		}
 
 		@Override

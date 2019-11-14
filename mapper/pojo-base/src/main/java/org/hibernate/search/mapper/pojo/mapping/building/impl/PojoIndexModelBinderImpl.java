@@ -100,7 +100,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 	@Override
 	public <T> BoundRoutingKeyBridge<T> bindRoutingKey(IndexedEntityBindingContext indexedEntityBindingContext,
-			BoundPojoModelPathTypeNode<T> modelPath, RoutingKeyBinder<?> binder) {
+			BoundPojoModelPathTypeNode<T> modelPath, RoutingKeyBinder binder) {
 		PojoModelTypeRootElement<T> pojoModelRootElement =
 				new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
 		PojoTypeIndexingDependencyConfigurationContextImpl<T> pojoDependencyContext =
@@ -122,7 +122,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 	@Override
 	public <T> Optional<BoundTypeBridge<T>> bindType(IndexBindingContext indexBindingContext,
-			BoundPojoModelPathTypeNode<T> modelPath, TypeBinder<?> binder) {
+			BoundPojoModelPathTypeNode<T> modelPath, TypeBinder binder) {
 		PojoModelTypeRootElement<T> pojoModelRootElement =
 				new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
 		PojoTypeIndexingDependencyConfigurationContextImpl<T> pojoDependencyContext =
@@ -144,7 +144,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 	@Override
 	public <P> Optional<BoundPropertyBridge<P>> bindProperty(IndexBindingContext indexBindingContext,
-			BoundPojoModelPathPropertyNode<?, P> modelPath, PropertyBinder<?> binder) {
+			BoundPojoModelPathPropertyNode<?, P> modelPath, PropertyBinder binder) {
 		PojoModelPropertyRootElement<P> pojoModelRootElement =
 				new PojoModelPropertyRootElement<>( modelPath, typeAdditionalMetadataProvider );
 		PojoPropertyIndexingDependencyConfigurationContextImpl<P> pojoDependencyContext =

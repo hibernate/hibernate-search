@@ -15,9 +15,9 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.Po
 
 class PropertyBridgeMappingContributor implements PojoPropertyMetadataContributor {
 
-	private final PropertyBinder<?> binder;
+	private final PropertyBinder binder;
 
-	PropertyBridgeMappingContributor(PropertyBinder<?> binder) {
+	PropertyBridgeMappingContributor(PropertyBinder binder) {
 		this.binder = binder;
 	}
 

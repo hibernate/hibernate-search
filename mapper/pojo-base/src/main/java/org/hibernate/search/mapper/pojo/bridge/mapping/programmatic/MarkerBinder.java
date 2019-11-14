@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.mapping.programmatic;
 
-import java.lang.annotation.Annotation;
-
 import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
 
 /**
@@ -15,17 +13,8 @@ import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
  * <p>
  * This binder takes advantage of provided metadata
  * to pick, configure and create a marker object.
- *
- * @param <A> The type of annotations accepted by the {@link #initialize(Annotation)} method.
  */
-public interface MarkerBinder<A extends Annotation> {
-
-	/**
-	 * Initialize the parameters of this binder with the attributes of the given annotation.
-	 * @param annotation An annotation to extract parameters from.
-	 */
-	default void initialize(A annotation) {
-	}
+public interface MarkerBinder {
 
 	/**
 	 * Binds a marker to a POJO property.

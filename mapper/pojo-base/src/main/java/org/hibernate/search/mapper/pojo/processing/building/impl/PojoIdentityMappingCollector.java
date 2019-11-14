@@ -18,5 +18,5 @@ public interface PojoIdentityMappingCollector {
 			IdentifierBinder binder);
 
 	<T> BoundRoutingKeyBridge<T> routingKeyBridge(BoundPojoModelPathTypeNode<T> modelPath,
-			RoutingKeyBinder<?> binder);
+			RoutingKeyBinder binder);
 }

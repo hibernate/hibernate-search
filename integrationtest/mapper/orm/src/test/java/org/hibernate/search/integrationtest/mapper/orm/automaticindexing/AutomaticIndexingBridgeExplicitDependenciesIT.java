@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
-import java.lang.annotation.Annotation;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -33,17 +32,17 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutomaticIndexingBridgeIT {
 
 	@Override
-	protected TypeBinder<?> createContainingEntityTypeBinder() {
+	protected TypeBinder createContainingEntityTypeBinder() {
 		return new ContainingEntityTypeBridge.Binder();
 	}
 
 	@Override
-	protected PropertyBinder<?> createContainingEntitySingleValuedPropertyBinder() {
+	protected PropertyBinder createContainingEntitySingleValuedPropertyBinder() {
 		return new ContainingEntitySingleValuedPropertyBridge.Binder();
 	}
 
 	@Override
-	protected PropertyBinder<?> createContainingEntityMultiValuedPropertyBinder() {
+	protected PropertyBinder createContainingEntityMultiValuedPropertyBinder() {
 		return new ContainingEntityMultiValuedPropertyBridge.Binder();
 	}
 
@@ -91,7 +90,7 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 			);
 		}
 
-		public static class Binder implements TypeBinder<Annotation> {
+		public static class Binder implements TypeBinder {
 			@Override
 			public void bind(TypeBindingContext context) {
 				context.setBridge( new ContainingEntityTypeBridge( context ) );
@@ -129,7 +128,7 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 			);
 		}
 
-		public static class Binder implements PropertyBinder<Annotation> {
+		public static class Binder implements PropertyBinder {
 			@Override
 			public void bind(PropertyBindingContext context) {
 				context.setBridge( new ContainingEntitySingleValuedPropertyBridge( context ) );
@@ -176,7 +175,7 @@ public class AutomaticIndexingBridgeExplicitDependenciesIT extends AbstractAutom
 			);
 		}
 
-		public static class Binder implements PropertyBinder<Annotation> {
+		public static class Binder implements PropertyBinder {
 			@Override
 			public void bind(PropertyBindingContext context) {
 				context.setBridge( new ContainingEntityMultiValuedPropertyBridge( context ) );

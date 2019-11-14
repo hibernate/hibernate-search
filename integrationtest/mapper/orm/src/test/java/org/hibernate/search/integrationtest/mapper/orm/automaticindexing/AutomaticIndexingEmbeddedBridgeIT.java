@@ -361,7 +361,7 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 			objectField.addValue( valueFieldReference, valueSourcePropertyAccessor.read( bridgedElement ) );
 		}
 
-		public static class Binder implements TypeBinder<Annotation> {
+		public static class Binder implements TypeBinder {
 			@Override
 			public void bind(TypeBindingContext context) {
 				context.setBridge( new SecondTypeBridge( context ) );
