@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.builtin.programmatic;
 
-import java.lang.annotation.Annotation;
-
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Latitude;
 import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Longitude;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
@@ -21,7 +19,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder
  * @see GeoPointBinder#latitude()
  * @see GeoPointBinder#longitude()
  */
-public interface LatitudeLongitudeMarkerBinder<A extends Annotation> extends MarkerBinder<A> {
+public interface LatitudeLongitudeMarkerBinder extends MarkerBinder {
 
 	/**
 	 * @param markerSet The name of the "marker set".

@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.pojo.bridge.builtin.spatial.impl;
 
 import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.GeoPointBinder;
 import org.hibernate.search.mapper.pojo.bridge.builtin.programmatic.LatitudeLongitudeMarkerBinder;
-import org.hibernate.search.mapper.pojo.bridge.builtin.annotation.Latitude;
 import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
 
 public class LatitudeMarker {
@@ -26,14 +25,9 @@ public class LatitudeMarker {
 		return markerSet;
 	}
 
-	public static class Binder implements LatitudeLongitudeMarkerBinder<Latitude> {
+	public static class Binder implements LatitudeLongitudeMarkerBinder {
 
 		private String markerSet;
-
-		@Override
-		public void initialize(Latitude annotation) {
-			markerSet( annotation.markerSet() );
-		}
 
 		@Override
 		public Binder markerSet(String markerSet) {
