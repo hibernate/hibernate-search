@@ -17,6 +17,8 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.Ty
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.AnnotationInitializingBeanDelegatingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotationProcessorContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -32,15 +34,15 @@ class TypeBridgeProcessor extends TypeAnnotationProcessor<Annotation> {
 
 	@Override
 	public void process(TypeMappingStep mappingContext, Annotation annotation,
-			AnnotationProcessorHelper helper) {
-		TypeBinder<?> binder = createTypeBinder( annotation, helper );
+			TypeMappingAnnotationProcessorContext context) {
+		TypeBinder<?> binder = createTypeBinder( annotation, context );
 		mappingContext.binder( binder );
 	}
 
-	private <A extends Annotation> TypeBinder createTypeBinder(A annotation, AnnotationProcessorHelper helper) {
+	private <A extends Annotation> TypeBinder createTypeBinder(A annotation, MappingAnnotationProcessorContext context) {
 		TypeBinding bridgeMapping = annotation.annotationType().getAnnotation( TypeBinding.class );
 		TypeBinderRef bridgeReferenceAnnotation = bridgeMapping.binder();
-		Optional<BeanReference<? extends TypeBinder>> binderReference = helper.toBeanReference(
+		Optional<BeanReference<? extends TypeBinder>> binderReference = context.toBeanReference(
 				TypeBinder.class,
 				TypeBinderRef.UndefinedBinderImplementationType.class,
 				bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()

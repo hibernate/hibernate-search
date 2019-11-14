@@ -17,6 +17,8 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.Pr
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.AnnotationInitializingBeanDelegatingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotationProcessorContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -32,15 +34,15 @@ class PropertyBridgeProcessor extends PropertyAnnotationProcessor<Annotation> {
 
 	@Override
 	public void process(PropertyMappingStep mappingContext, Annotation annotation,
-			AnnotationProcessorHelper helper) {
-		PropertyBinder<?> binder = createPropertyBinder( annotation, helper );
+			PropertyMappingAnnotationProcessorContext context) {
+		PropertyBinder<?> binder = createPropertyBinder( annotation, context );
 		mappingContext.binder( binder );
 	}
 
-	private <A extends Annotation> PropertyBinder createPropertyBinder(A annotation, AnnotationProcessorHelper helper) {
+	private <A extends Annotation> PropertyBinder createPropertyBinder(A annotation, MappingAnnotationProcessorContext context) {
 		PropertyBinding bridgeMapping = annotation.annotationType().getAnnotation( PropertyBinding.class );
 		PropertyBinderRef bridgeReferenceAnnotation = bridgeMapping.binder();
-		Optional<BeanReference<? extends PropertyBinder>> binderReference = helper.toBeanReference(
+		Optional<BeanReference<? extends PropertyBinder>> binderReference = context.toBeanReference(
 				PropertyBinder.class,
 				PropertyBinderRef.UndefinedBinderImplementationType.class,
 				bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()

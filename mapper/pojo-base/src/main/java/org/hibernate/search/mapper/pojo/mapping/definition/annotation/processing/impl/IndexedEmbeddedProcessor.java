@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
@@ -25,7 +26,7 @@ class IndexedEmbeddedProcessor extends PropertyAnnotationProcessor<IndexedEmbedd
 
 	@Override
 	public void process(PropertyMappingStep mappingContext, IndexedEmbedded annotation,
-			AnnotationProcessorHelper helper) {
+			PropertyMappingAnnotationProcessorContext context) {
 		String cleanedUpPrefix = annotation.prefix();
 		if ( cleanedUpPrefix.isEmpty() ) {
 			cleanedUpPrefix = null;
@@ -46,7 +47,7 @@ class IndexedEmbeddedProcessor extends PropertyAnnotationProcessor<IndexedEmbedd
 			cleanedUpIncludePaths = Collections.emptySet();
 		}
 
-		ContainerExtractorPath extractorPath = helper.getExtractorPath( annotation.extraction() );
+		ContainerExtractorPath extractorPath = context.toContainerExtractorPath( annotation.extraction() );
 
 		mappingContext.indexedEmbedded()
 				.extractors( extractorPath )

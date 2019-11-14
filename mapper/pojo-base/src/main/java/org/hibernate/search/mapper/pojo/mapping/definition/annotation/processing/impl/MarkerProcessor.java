@@ -17,6 +17,8 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.Ma
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.AnnotationInitializingBeanDelegatingBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotationProcessorContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -32,15 +34,15 @@ class MarkerProcessor extends PropertyAnnotationProcessor<Annotation> {
 
 	@Override
 	public void process(PropertyMappingStep mappingContext, Annotation annotation,
-			AnnotationProcessorHelper helper) {
-		MarkerBinder<?> binder = createMarkerBinder( annotation, helper );
+			PropertyMappingAnnotationProcessorContext context) {
+		MarkerBinder<?> binder = createMarkerBinder( annotation, context );
 		mappingContext.marker( binder );
 	}
 
-	private <A extends Annotation> MarkerBinder createMarkerBinder(A annotation, AnnotationProcessorHelper helper) {
+	private <A extends Annotation> MarkerBinder createMarkerBinder(A annotation, MappingAnnotationProcessorContext context) {
 		MarkerBinding markerBinding = annotation.annotationType().getAnnotation( MarkerBinding.class );
 		MarkerBinderRef binderReferenceAnnotation = markerBinding.binder();
-		Optional<BeanReference<? extends MarkerBinder>> binderReference = helper.toBeanReference(
+		Optional<BeanReference<? extends MarkerBinder>> binderReference = context.toBeanReference(
 				MarkerBinder.class,
 				MarkerBinderRef.UndefinedBinderImplementationType.class,
 				binderReferenceAnnotation.type(), binderReferenceAnnotation.name()

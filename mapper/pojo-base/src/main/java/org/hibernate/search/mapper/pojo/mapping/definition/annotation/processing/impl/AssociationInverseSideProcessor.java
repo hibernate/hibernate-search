@@ -13,6 +13,7 @@ import java.util.stream.Stream;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -29,11 +30,11 @@ class AssociationInverseSideProcessor extends PropertyAnnotationProcessor<Associ
 
 	@Override
 	public void process(PropertyMappingStep mappingContext, AssociationInverseSide annotation,
-			AnnotationProcessorHelper helper) {
-		ContainerExtractorPath extractorPath = helper.getExtractorPath( annotation.extraction() );
+			PropertyMappingAnnotationProcessorContext context) {
+		ContainerExtractorPath extractorPath = context.toContainerExtractorPath( annotation.extraction() );
 
 		Optional<PojoModelPathValueNode> inversePathOptional =
-				helper.getPojoModelPathValueNode( annotation.inversePath() );
+				context.toPojoModelPathValueNode( annotation.inversePath() );
 		if ( !inversePathOptional.isPresent() ) {
 			throw log.missingInversePathInAssociationInverseSideMapping();
 		}

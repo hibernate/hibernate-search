@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processin
 import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
@@ -21,7 +22,7 @@ class IndexedProcessor extends TypeAnnotationProcessor<Indexed> {
 
 	@Override
 	public void process(TypeMappingStep mappingContext, Indexed annotation,
-			AnnotationProcessorHelper helper) {
+			TypeMappingAnnotationProcessorContext context) {
 		String indexName = annotation.index();
 		if ( indexName.isEmpty() ) {
 			indexName = null;

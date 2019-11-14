@@ -11,36 +11,41 @@ import java.util.Arrays;
 import java.util.Optional;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
-import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtract;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
+import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class AnnotationProcessorHelper {
+public class MappingAnnotationProcessorContextImpl
+		implements TypeMappingAnnotationProcessorContext, PropertyMappingAnnotationProcessorContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public AnnotationProcessorHelper() {
+	public MappingAnnotationProcessorContextImpl() {
 	}
 
-	Optional<PojoModelPathValueNode> getPojoModelPathValueNode(ObjectPath objectPath) {
+	@Override
+	public Optional<PojoModelPathValueNode> toPojoModelPathValueNode(ObjectPath objectPath) {
 		PropertyValue[] inversePathElements = objectPath.value();
 		PojoModelPath.Builder inversePathBuilder = PojoModelPath.builder();
 		for ( PropertyValue element : inversePathElements ) {
 			String inversePropertyName = element.propertyName();
-			ContainerExtractorPath inverseExtractorPath = getExtractorPath( element.extraction() );
+			ContainerExtractorPath inverseExtractorPath = toContainerExtractorPath( element.extraction() );
 			inversePathBuilder.property( inversePropertyName ).value( inverseExtractorPath );
 		}
 		return Optional.ofNullable( inversePathBuilder.toValuePathOrNull() );
 	}
 
-	ContainerExtractorPath getExtractorPath(ContainerExtraction extraction) {
+	@Override
+	public ContainerExtractorPath toContainerExtractorPath(ContainerExtraction extraction) {
 		ContainerExtract extract = extraction.extract();
 		String[] extractors = extraction.value();
 		switch ( extract ) {
@@ -63,7 +68,8 @@ public class AnnotationProcessorHelper {
 		}
 	}
 
-	<T> Optional<BeanReference<? extends T>> toBeanReference(Class<T> expectedType, Class<?> undefinedTypeMarker,
+	@Override
+	public <T> Optional<BeanReference<? extends T>> toBeanReference(Class<T> expectedType, Class<?> undefinedTypeMarker,
 			Class<? extends T> type, String name) {
 		String cleanedUpName = name.isEmpty() ? null : name;
 		Class<? extends T> cleanedUpType = undefinedTypeMarker.equals( type ) ? null : type;
