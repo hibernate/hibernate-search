@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processin
 import java.lang.annotation.Annotation;
 import java.util.stream.Stream;
 
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 
@@ -16,5 +17,6 @@ public abstract class PropertyAnnotationProcessor<A extends Annotation> {
 
 	public abstract Stream<? extends A> extractAnnotations(PojoPropertyModel<?> propertyModel);
 
-	public abstract void process(PropertyMappingStep mappingContext, A annotation, AnnotationProcessorHelper helper);
+	public abstract void process(PropertyMappingStep mappingContext, A annotation,
+			PropertyMappingAnnotationProcessorContext context);
 }

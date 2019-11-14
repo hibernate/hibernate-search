@@ -21,6 +21,8 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.annotation.ContainerExtraction;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotationProcessorContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -43,7 +45,7 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 
 	@Override
 	public final void process(PropertyMappingStep mappingContext, A annotation,
-			AnnotationProcessorHelper helper) {
+			PropertyMappingAnnotationProcessorContext context) {
 		String cleanedUpRelativeFieldName = getName( annotation );
 		if ( cleanedUpRelativeFieldName.isEmpty() ) {
 			cleanedUpRelativeFieldName = null;
@@ -55,12 +57,12 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 		ValueBinder binder = createValueBinder(
 				getValueBridge( annotation ),
 				getValueBinder( annotation ),
-				helper
+				context
 		);
 		fieldContext.valueBinder( binder );
 
 		ContainerExtractorPath extractorPath =
-				helper.getExtractorPath( getExtraction( annotation ) );
+				context.toContainerExtractorPath( getExtraction( annotation ) );
 		fieldContext.extractors( extractorPath );
 	}
 
@@ -77,16 +79,16 @@ abstract class PropertyFieldAnnotationProcessor<A extends Annotation> extends Pr
 
 	@SuppressWarnings("rawtypes") // Raw types are the best we can do here
 	private ValueBinder createValueBinder(ValueBridgeRef bridgeReferenceAnnotation,
-			ValueBinderRef binderReferenceAnnotation, AnnotationProcessorHelper helper) {
+			ValueBinderRef binderReferenceAnnotation, MappingAnnotationProcessorContext context) {
 		Optional<BeanReference<? extends ValueBridge>> bridgeReference = Optional.empty();
 		if ( bridgeReferenceAnnotation != null ) {
-			bridgeReference = helper.toBeanReference(
+			bridgeReference = context.toBeanReference(
 					ValueBridge.class,
 					ValueBridgeRef.UndefinedBridgeImplementationType.class,
 					bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
 			);
 		}
-		Optional<BeanReference<? extends ValueBinder>> binderReference = helper.toBeanReference(
+		Optional<BeanReference<? extends ValueBinder>> binderReference = context.toBeanReference(
 				ValueBinder.class,
 				ValueBinderRef.UndefinedBinderImplementationType.class,
 				binderReferenceAnnotation.type(), binderReferenceAnnotation.name()
