@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.pojo.model.hcann.spi;
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Optional;
 import java.util.TreeMap;
 import java.util.function.Function;
 import java.util.stream.Collector;
@@ -20,35 +19,18 @@ import org.hibernate.annotations.common.reflection.XAnnotatedElement;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
-import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 import org.hibernate.search.util.common.impl.StreamHelper;
 
 public abstract class AbstractPojoHCAnnBootstrapIntrospector implements PojoBootstrapIntrospector {
 
 	private final ReflectionManager reflectionManager;
-	private final AnnotationHelper annotationHelper;
 
-	public AbstractPojoHCAnnBootstrapIntrospector(ReflectionManager reflectionManager, AnnotationHelper annotationHelper) {
+	public AbstractPojoHCAnnBootstrapIntrospector(ReflectionManager reflectionManager) {
 		this.reflectionManager = reflectionManager;
-		this.annotationHelper = annotationHelper;
 	}
 
-	public <A extends Annotation> Optional<A> getAnnotationByType(XAnnotatedElement xAnnotated, Class<A> annotationType) {
-		return Optional.ofNullable( xAnnotated.getAnnotation( annotationType ) );
-	}
-
-	public <A extends Annotation> Stream<A> getAnnotationsByType(XAnnotatedElement xAnnotated, Class<A> annotationType) {
-		return Arrays.stream( xAnnotated.getAnnotations() )
-				.flatMap( annotationHelper::expandRepeatableContainingAnnotation )
-				.filter( annotation -> annotationType.isAssignableFrom( annotation.annotationType() ) )
-				.map( annotationType::cast );
-	}
-
-	public Stream<? extends Annotation> getAnnotationsByMetaAnnotationType(
-			XAnnotatedElement xAnnotated, Class<? extends Annotation> metaAnnotationType) {
-		return Arrays.stream( xAnnotated.getAnnotations() )
-				.flatMap( annotationHelper::expandRepeatableContainingAnnotation )
-				.filter( annotation -> annotationHelper.isMetaAnnotated( annotation, metaAnnotationType ) );
+	public Stream<Annotation> getAnnotations(XAnnotatedElement xAnnotated) {
+		return Arrays.stream( xAnnotated.getAnnotations() );
 	}
 
 	public XClass toXClass(Class<?> type) {

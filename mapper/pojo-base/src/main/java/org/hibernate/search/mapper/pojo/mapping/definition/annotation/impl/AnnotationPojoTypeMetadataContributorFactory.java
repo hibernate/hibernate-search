@@ -24,15 +24,18 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.reporting.impl.PojoEventContexts;
+import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 
 class AnnotationPojoTypeMetadataContributorFactory {
 
 	private final FailureCollector rootFailureCollector;
+	private final AnnotationHelper annotationHelper;
 	private final AnnotationProcessorProvider annotationProcessorProvider;
 	private final MappingAnnotationProcessorContextImpl context = new MappingAnnotationProcessorContextImpl();
 
-	AnnotationPojoTypeMetadataContributorFactory(FailureCollector rootFailureCollector) {
+	AnnotationPojoTypeMetadataContributorFactory(FailureCollector rootFailureCollector, AnnotationHelper annotationHelper) {
 		this.rootFailureCollector = rootFailureCollector;
+		this.annotationHelper = annotationHelper;
 		this.annotationProcessorProvider = new AnnotationProcessorProvider();
 	}
 
@@ -81,7 +84,12 @@ class AnnotationPojoTypeMetadataContributorFactory {
 
 	private <A extends Annotation> boolean applyProcessor(TypeAnnotationProcessor<A> processor,
 			TypeMappingStep mappingContext, PojoRawTypeModel<?> typeModel) {
-		List<A> annotationList = processor.extractAnnotations( typeModel ).collect( Collectors.toList() );
+		List<A> annotationList = processor.extractAnnotations(
+				typeModel.getAnnotations()
+						.flatMap( annotationHelper::expandRepeatableContainingAnnotation ),
+				annotationHelper
+		)
+				.collect( Collectors.toList() );
 		for ( A annotation : annotationList ) {
 			tryApplyProcessor( processor, mappingContext, typeModel, annotation );
 		}
@@ -103,7 +111,12 @@ class AnnotationPojoTypeMetadataContributorFactory {
 
 	private <A extends Annotation> boolean applyProcessor(PropertyAnnotationProcessor<A> processor,
 			PropertyMappingStep mappingContext, PojoRawTypeModel<?> typeModel, PojoPropertyModel<?> propertyModel) {
-		List<A> annotationList = processor.extractAnnotations( propertyModel ).collect( Collectors.toList() );
+		List<A> annotationList = processor.extractAnnotations(
+				propertyModel.getAnnotations()
+						.flatMap( annotationHelper::expandRepeatableContainingAnnotation ),
+				annotationHelper
+		)
+				.collect( Collectors.toList() );
 		for ( A annotation : annotationList ) {
 			tryApplyProcessor( processor, mappingContext, typeModel, propertyModel, annotation );
 		}

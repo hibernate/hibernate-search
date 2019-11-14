@@ -29,14 +29,8 @@ final class GenericContextAwarePojoPropertyModel<T> implements PojoPropertyModel
 	}
 
 	@Override
-	public <A extends Annotation> Stream<A> getAnnotationsByType(Class<A> annotationType) {
-		return rawPropertyModel.getAnnotationsByType( annotationType );
-	}
-
-	@Override
-	public Stream<? extends Annotation> getAnnotationsByMetaAnnotationType(
-			Class<? extends Annotation> metaAnnotationType) {
-		return rawPropertyModel.getAnnotationsByMetaAnnotationType( metaAnnotationType );
+	public Stream<Annotation> getAnnotations() {
+		return rawPropertyModel.getAnnotations();
 	}
 
 	@Override
