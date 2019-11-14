@@ -14,7 +14,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 
-public class MultiValuedNamesBinder implements TypeBinder<MultiValuedNamesBinding> {
+public class MultiValuedNamesBinder implements TypeBinder {
 
 	//tag::bind[]
 	@Override

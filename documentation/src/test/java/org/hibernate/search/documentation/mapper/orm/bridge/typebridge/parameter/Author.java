@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 // tag::include[]
 @Entity
 @Indexed
-@FullNameBinding(addSortField = true) // <1>
+@FullNameBinding(sortField = true) // <1>
 public class Author {
 
 	@Id

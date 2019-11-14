@@ -12,13 +12,24 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBinding;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD, ElementType.FIELD })
-@PropertyBinding(binder = @PropertyBinderRef(type = MyDataPropertyBinder.class))
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = MyDataPropertyBinding.Processor.class))
 @Documented
 public @interface MyDataPropertyBinding {
+
+	class Processor implements PropertyMappingAnnotationProcessor<MyDataPropertyBinding> {
+		@Override
+		public void process(PropertyMappingStep mapping, MyDataPropertyBinding annotation,
+				PropertyMappingAnnotationProcessorContext context) {
+			mapping.binder( new MyDataPropertyBinder() );
+		}
+	}
 
 }

@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 
-public class SingleValuedNamesBinder implements TypeBinder<SingleValuedNamesBinding> {
+public class SingleValuedNamesBinder implements TypeBinder {
 
 	//tag::bind[]
 	@Override
