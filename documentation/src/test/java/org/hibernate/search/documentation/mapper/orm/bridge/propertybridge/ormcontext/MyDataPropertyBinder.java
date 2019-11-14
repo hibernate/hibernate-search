@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 
-public class MyDataPropertyBinder implements PropertyBinder<MyDataPropertyBinding> {
+public class MyDataPropertyBinder implements PropertyBinder {
 
 	@Override
 	public void bind(PropertyBindingContext context) {

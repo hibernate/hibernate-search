@@ -20,16 +20,13 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBind
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 
 //tag::include[]
-public class InvoiceLineItemsSummaryBinder implements PropertyBinder<InvoiceLineItemsSummaryBinding> {
+public class InvoiceLineItemsSummaryBinder implements PropertyBinder {
 
-	private String fieldName;
+	private String fieldName = "summary";
 
-	@Override
-	public void initialize(InvoiceLineItemsSummaryBinding annotation) { // <1>
-		this.fieldName = annotation.fieldName(); // <2>
-		if ( this.fieldName.isEmpty() ) {
-			this.fieldName = "summary"; // Default value
-		}
+	public InvoiceLineItemsSummaryBinder fieldName(String fieldName) { // <1>
+		this.fieldName = fieldName;
+		return this;
 	}
 
 	@Override
@@ -39,7 +36,7 @@ public class InvoiceLineItemsSummaryBinder implements PropertyBinder<InvoiceLine
 				.use( "amount" );
 
 		IndexSchemaObjectField summaryField = context.getIndexSchemaElement()
-				.objectField( this.fieldName ); // <3>
+				.objectField( this.fieldName ); // <2>
 
 		IndexFieldType<BigDecimal> amountFieldType = context.getTypeFactory()
 				.asBigDecimal().decimalScale( 2 ).toIndexFieldType();

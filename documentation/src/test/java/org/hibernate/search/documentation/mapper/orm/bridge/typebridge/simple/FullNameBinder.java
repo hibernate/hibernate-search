@@ -14,7 +14,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 
 //tag::binder[]
-public class FullNameBinder implements TypeBinder<FullNameBinding> { // <1>
+public class FullNameBinder implements TypeBinder { // <1>
 
 	@Override
 	public void bind(TypeBindingContext context) { // <2>

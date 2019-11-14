@@ -19,7 +19,7 @@ public class BookRoutingKeyBridge implements RoutingKeyBridge {
 		return ( (Book) bridgedElement ).getGenre().name();
 	}
 
-	public static class Binder implements RoutingKeyBinder<BookRoutingKeyBinding> {
+	public static class Binder implements RoutingKeyBinder {
 		@Override
 		public void bind(RoutingKeyBindingContext context) {
 			context.getDependencies().use( "genre" );

@@ -20,7 +20,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBind
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 
 //tag::binder[]
-public class InvoiceLineItemsSummaryBinder implements PropertyBinder<InvoiceLineItemsSummaryBinding> { // <1>
+public class InvoiceLineItemsSummaryBinder implements PropertyBinder { // <1>
 
 	@Override
 	public void bind(PropertyBindingContext context) { // <2>

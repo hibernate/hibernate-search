@@ -11,11 +11,22 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBinderRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.RoutingKeyBinding;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
-@RoutingKeyBinding(binder = @RoutingKeyBinderRef(type = BookRoutingKeyBridge.Binder.class))
+@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = BookRoutingKeyBinding.Processor.class))
 public @interface BookRoutingKeyBinding {
+
+	class Processor implements TypeMappingAnnotationProcessor<BookRoutingKeyBinding> {
+		@Override
+		public void process(TypeMappingStep mapping, BookRoutingKeyBinding annotation,
+				TypeMappingAnnotationProcessorContext context) {
+			mapping.routingKeyBinder( new BookRoutingKeyBridge.Binder() );
+		}
+	}
 }

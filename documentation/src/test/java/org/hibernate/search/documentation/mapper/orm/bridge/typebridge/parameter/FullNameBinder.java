@@ -15,13 +15,13 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 
 //tag::include[]
-public class FullNameBinder implements TypeBinder<FullNameBinding> {
+public class FullNameBinder implements TypeBinder {
 
-	private boolean addSortField;
+	private boolean sortField;
 
-	@Override
-	public void initialize(FullNameBinding annotation) { // <1>
-		this.addSortField = annotation.addSortField(); // <2>
+	public FullNameBinder sortField(boolean sortField) { // <1>
+		this.sortField = sortField;
+		return this;
 	}
 
 	@Override
@@ -35,7 +35,7 @@ public class FullNameBinder implements TypeBinder<FullNameBinding> {
 				.toReference();
 
 		IndexFieldReference<String> fullNameSortField = null;
-		if ( this.addSortField ) { // <3>
+		if ( this.sortField ) { // <2>
 			fullNameSortField = context.getIndexSchemaElement()
 					.field(
 							"fullName_sort",

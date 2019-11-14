@@ -12,13 +12,23 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBinding;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.TYPE })
-@TypeBinding(binder = @TypeBinderRef(type = MyEntityTypeBinder.class))
 @Documented
+@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = MyEntityTypeBinding.Processor.class))
 public @interface MyEntityTypeBinding {
 
+	class Processor implements TypeMappingAnnotationProcessor<MyEntityTypeBinding> {
+		@Override
+		public void process(TypeMappingStep mapping, MyEntityTypeBinding annotation,
+				TypeMappingAnnotationProcessorContext context) {
+			mapping.binder( new MyEntityTypeBinder() );
+		}
+	}
 }

@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 
-public class MyEntityTypeBinder implements TypeBinder<MyEntityTypeBinding> {
+public class MyEntityTypeBinder implements TypeBinder {
 
 	@Override
 	public void bind(TypeBindingContext context) {

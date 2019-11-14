@@ -12,15 +12,27 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBinding;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
 //tag::include[]
 @Retention(RetentionPolicy.RUNTIME) // <1>
 @Target({ ElementType.METHOD, ElementType.FIELD }) // <2>
-@PropertyBinding(binder = @PropertyBinderRef(type = InvoiceLineItemsSummaryBinder.class)) // <3>
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef( // <3>
+		type = InvoiceLineItemsSummaryBinding.Processor.class
+))
 @Documented // <4>
 public @interface InvoiceLineItemsSummaryBinding {
 
+	class Processor implements PropertyMappingAnnotationProcessor<InvoiceLineItemsSummaryBinding> { // <5>
+		@Override
+		public void process(PropertyMappingStep mapping, InvoiceLineItemsSummaryBinding annotation,
+				PropertyMappingAnnotationProcessorContext context) {
+			mapping.binder( new InvoiceLineItemsSummaryBinder() ); // <6>
+		}
+	}
 }
 //end::include[]
