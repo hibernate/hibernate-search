@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processin
 import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
@@ -21,17 +20,10 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 
 class PropertyBridgeProcessor extends PropertyAnnotationProcessor<Annotation> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	@Override
-	public Stream<? extends Annotation> extractAnnotations(Stream<Annotation> annotations,
-			AnnotationHelper annotationHelper) {
-		return extractByMetaAnnotationType( annotations, annotationHelper, PropertyBinding.class );
-	}
 
 	@Override
 	public void process(PropertyMappingStep mappingContext, Annotation annotation,

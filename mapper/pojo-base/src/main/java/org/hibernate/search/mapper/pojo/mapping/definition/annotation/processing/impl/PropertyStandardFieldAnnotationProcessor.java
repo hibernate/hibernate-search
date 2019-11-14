@@ -17,10 +17,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 abstract class PropertyStandardFieldAnnotationProcessor<A extends Annotation>
 		extends PropertyFieldAnnotationProcessor<A> {
 
-	PropertyStandardFieldAnnotationProcessor(Class<A> annotationType) {
-		super( annotationType );
-	}
-
 	@Override
 	PropertyMappingFieldOptionsStep<?> initFieldMappingContext(PropertyMappingStep mappingContext,
 			A annotation, String fieldName) {

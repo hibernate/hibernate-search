@@ -20,9 +20,6 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
 class KeywordFieldProcessor extends PropertyNotFullTextFieldAnnotationProcessor<KeywordField> {
-	KeywordFieldProcessor() {
-		super( KeywordField.class );
-	}
 
 	@Override
 	PropertyMappingNonFullTextFieldOptionsStep<?> initSortableFieldMappingContext(PropertyMappingStep mappingContext,

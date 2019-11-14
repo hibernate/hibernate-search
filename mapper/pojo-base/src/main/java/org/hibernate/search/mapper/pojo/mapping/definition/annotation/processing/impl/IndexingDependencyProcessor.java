@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl;
 
-import java.lang.annotation.Annotation;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
-import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.ReindexOnUpdate;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
@@ -21,17 +19,10 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Indexing
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.common.reflect.spi.AnnotationHelper;
 
 class IndexingDependencyProcessor extends PropertyAnnotationProcessor<IndexingDependency> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	@Override
-	public Stream<? extends IndexingDependency> extractAnnotations(Stream<Annotation> annotations,
-			AnnotationHelper annotationHelper) {
-		return extractByType( annotations, IndexingDependency.class );
-	}
 
 	@Override
 	public void process(PropertyMappingStep mappingContext, IndexingDependency annotation,

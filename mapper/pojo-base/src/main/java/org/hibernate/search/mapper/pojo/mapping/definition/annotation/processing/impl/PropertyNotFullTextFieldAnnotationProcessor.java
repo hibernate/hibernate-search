@@ -11,15 +11,12 @@ import java.lang.annotation.Annotation;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationDefaultValues;
+import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingNonFullTextFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStandardFieldOptionsStep;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingNonFullTextFieldOptionsStep;
 
 abstract class PropertyNotFullTextFieldAnnotationProcessor<A extends Annotation> extends
 		PropertyStandardFieldAnnotationProcessor<A> {
-	PropertyNotFullTextFieldAnnotationProcessor(Class<A> annotationType) {
-		super( annotationType );
-	}
 
 	@Override
 	final PropertyMappingStandardFieldOptionsStep<?> initStandardFieldMappingContext(PropertyMappingStep mappingContext,
