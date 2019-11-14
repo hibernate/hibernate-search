@@ -13,6 +13,6 @@ public interface PojoAdditionalMetadataCollectorPropertyNode extends PojoAdditio
 
 	PojoAdditionalMetadataCollectorValueNode value(ContainerExtractorPath extractorPath);
 
-	void markerBinder(MarkerBinder<?> definition);
+	void markerBinder(MarkerBinder definition);
 
 }

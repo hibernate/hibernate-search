@@ -59,13 +59,13 @@ public interface PojoIndexModelBinder {
 			BoundPojoModelPathPropertyNode<?, I> modelPath, IdentifierBinder binder);
 
 	<T> BoundRoutingKeyBridge<T> bindRoutingKey(IndexedEntityBindingContext bindingContext,
-			BoundPojoModelPathTypeNode<T> modelPath, RoutingKeyBinder<?> binder);
+			BoundPojoModelPathTypeNode<T> modelPath, RoutingKeyBinder binder);
 
 	<T> Optional<BoundTypeBridge<T>> bindType(IndexBindingContext bindingContext,
-			BoundPojoModelPathTypeNode<T> modelPath, TypeBinder<?> binder);
+			BoundPojoModelPathTypeNode<T> modelPath, TypeBinder binder);
 
 	<P> Optional<BoundPropertyBridge<P>> bindProperty(IndexBindingContext bindingContext,
-			BoundPojoModelPathPropertyNode<?, P> modelPath, PropertyBinder<?> binder);
+			BoundPojoModelPathPropertyNode<?, P> modelPath, PropertyBinder binder);
 
 	<V> Optional<BoundValueBridge<V, ?>> bindValue(IndexBindingContext bindingContext,
 			BoundPojoModelPathValueNode<?, ?, V> modelPath, boolean multiValued,

@@ -80,7 +80,7 @@ public class TypeBridgeBaseIT {
 
 		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
-						.binder( (TypeBinder<?>) context -> {
+						.binder( (TypeBinder) context -> {
 							PojoElementAccessor<String> pojoPropertyAccessor =
 									context.getBridgedElement().property( "stringProperty" )
 											.createAccessor( String.class );
@@ -154,7 +154,7 @@ public class TypeBridgeBaseIT {
 
 		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
-						.binder( (TypeBinder<?>) context -> {
+						.binder( (TypeBinder) context -> {
 							context.getDependencies().use( "stringProperty" );
 							IndexFieldReference<String> indexFieldReference =
 									context.getIndexSchemaElement().field(
@@ -216,7 +216,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.binder( (TypeBinder<?>) context -> {
+								.binder( (TypeBinder) context -> {
 									context.getDependencies().use( "doesNotExist" );
 									context.setBridge( new UnusedTypeBridge() );
 								} )
@@ -270,7 +270,7 @@ public class TypeBridgeBaseIT {
 
 		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( IndexedEntity.class )
-						.binder( (TypeBinder<?>) context -> {
+						.binder( (TypeBinder) context -> {
 							context.getDependencies()
 									.fromOtherEntity( ContainedEntity.class, "parent" )
 									.use( "stringProperty" );
@@ -348,7 +348,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.binder( (TypeBinder<?>) context -> {
+								.binder( (TypeBinder) context -> {
 									context.getDependencies()
 											.fromOtherEntity(
 													ContainedEntity.class,
@@ -396,7 +396,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.binder( (TypeBinder<?>) context -> {
+								.binder( (TypeBinder) context -> {
 									context.getDependencies()
 											.fromOtherEntity(
 													ContainedEntity.class,
@@ -444,7 +444,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( NotEntity.class )
-								.binder( (TypeBinder<?>) context -> {
+								.binder( (TypeBinder) context -> {
 									context.getDependencies()
 											.fromOtherEntity(
 													IndexedEntity.class,
@@ -487,7 +487,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.binder( (TypeBinder<?>) context -> {
+								.binder( (TypeBinder) context -> {
 									context.getDependencies()
 											.fromOtherEntity(
 													NotEntity.class,
@@ -542,7 +542,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.binder( (TypeBinder<?>) context -> {
+								.binder( (TypeBinder) context -> {
 									context.getDependencies()
 											.fromOtherEntity(
 													ContainedEntity.class,
@@ -584,7 +584,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.binder( (TypeBinder<?>) context -> {
+								.binder( (TypeBinder) context -> {
 									// Do not declare any dependency
 									context.setBridge( new UnusedTypeBridge() );
 								} )
@@ -623,7 +623,7 @@ public class TypeBridgeBaseIT {
 		SubTest.expectException(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
-								.binder( (TypeBinder<?>) context -> {
+								.binder( (TypeBinder) context -> {
 									// Declare no dependency, but also a dependency: this is inconsistent.
 									context.getDependencies()
 											.use( "stringProperty" )
@@ -670,7 +670,7 @@ public class TypeBridgeBaseIT {
 
 		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( CustomEnum.class )
-						.binder( (TypeBinder<?>) context -> {
+						.binder( (TypeBinder) context -> {
 							context.getDependencies().useRootOnly();
 							IndexFieldReference<String> indexFieldReference = context.getIndexSchemaElement().field(
 									"someField",
@@ -767,7 +767,7 @@ public class TypeBridgeBaseIT {
 
 		SearchMapping mapping = setupHelper.start().withConfiguration(
 				b -> b.programmaticMapping().type( Contained.class )
-						.binder( (TypeBinder<?>) context -> {
+						.binder( (TypeBinder) context -> {
 							context.getDependencies().useRootOnly();
 							// Single-valued field
 							context.getIndexSchemaElement()

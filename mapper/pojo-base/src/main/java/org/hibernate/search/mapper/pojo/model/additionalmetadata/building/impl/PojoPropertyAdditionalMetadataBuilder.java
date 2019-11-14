@@ -52,7 +52,7 @@ class PojoPropertyAdditionalMetadataBuilder implements PojoAdditionalMetadataCol
 	}
 
 	@Override
-	public final void markerBinder(MarkerBinder<?> builder) {
+	public final void markerBinder(MarkerBinder builder) {
 		doAddMarker( rootBuilder.bindMarker( builder ) );
 	}
 

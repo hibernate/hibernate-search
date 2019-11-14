@@ -16,10 +16,6 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.MarkerBinding;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.PropertyBinding;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.RoutingKeyBinding;
-import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.declaration.TypeBinding;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.MappingAnnotationProcessorContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
@@ -47,10 +43,6 @@ public class AnnotationProcessorProvider {
 			typeAnnotationProcessorReferenceCache = new HashMap<>();
 	private final Map<Class<? extends Annotation>, Optional<BeanReference<? extends PropertyMappingAnnotationProcessor>>>
 			propertyAnnotationProcessorReferenceCache = new HashMap<>();
-	private final TypeMappingAnnotationProcessor<Annotation> typeBindingAnnotationProcessor = new TypeBridgeProcessor();
-	private final TypeMappingAnnotationProcessor<Annotation> routingKeyBindingAnnotationProcessor = new RoutingKeyBridgeProcessor();
-	private final PropertyMappingAnnotationProcessor<Annotation> propertyBindingAnnotationProcessor = new PropertyBridgeProcessor();
-	private final PropertyMappingAnnotationProcessor<Annotation> markerBindingAnnotationProcessor = new MarkerProcessor();
 
 	public AnnotationProcessorProvider(BeanResolver beanResolver, FailureCollector rootFailureCollector,
 			MappingAnnotationProcessorContext context) {
@@ -135,13 +127,6 @@ public class AnnotationProcessorProvider {
 			createTypeAnnotationProcessorReference(Class<? extends Annotation> annotationType) {
 		TypeMapping mapping = annotationType.getAnnotation( TypeMapping.class );
 		if ( mapping == null ) {
-			// TODO HSEARCH-3135 remove this when TypeMapping is used everywhere (tests, documentation)
-			if ( annotationType.getAnnotation( TypeBinding.class ) != null ) {
-				return Optional.of( BeanReference.ofInstance( typeBindingAnnotationProcessor ) );
-			}
-			if ( annotationType.getAnnotation( RoutingKeyBinding.class ) != null ) {
-				return Optional.of( BeanReference.ofInstance( routingKeyBindingAnnotationProcessor ) );
-			}
 			// Not a type mapping annotation: ignore it.
 			return Optional.empty();
 		}
@@ -163,13 +148,6 @@ public class AnnotationProcessorProvider {
 			createPropertyAnnotationProcessorReference(Class<? extends A> annotationType) {
 		PropertyMapping mapping = annotationType.getAnnotation( PropertyMapping.class );
 		if ( mapping == null ) {
-			// TODO HSEARCH-3135 remove this when PropertyMapping is used everywhere (tests, documentation)
-			if ( annotationType.getAnnotation( PropertyBinding.class ) != null ) {
-				return Optional.of( BeanReference.ofInstance( propertyBindingAnnotationProcessor ) );
-			}
-			if ( annotationType.getAnnotation( MarkerBinding.class ) != null ) {
-				return Optional.of( BeanReference.ofInstance( markerBindingAnnotationProcessor ) );
-			}
 			// Not a property mapping annotation: ignore it.
 			return Optional.empty();
 		}

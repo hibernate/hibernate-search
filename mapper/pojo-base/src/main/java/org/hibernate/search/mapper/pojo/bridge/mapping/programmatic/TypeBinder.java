@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.mapping.programmatic;
 
-import java.lang.annotation.Annotation;
-
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
@@ -19,17 +17,9 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
  * This binder takes advantage of provided metadata
  * to pick, configure and create a {@link TypeBridge}.
  *
- * @param <A> The type of annotations accepted by the {@link #initialize(Annotation)} method.
  * @see TypeBridge
  */
-public interface TypeBinder<A extends Annotation> {
-
-	/**
-	 * Initializes the parameters of this binder with the attributes of the given annotation.
-	 * @param annotation An annotation to extract parameters from.
-	 */
-	default void initialize(A annotation) {
-	}
+public interface TypeBinder {
 
 	/**
 	 * Binds a type to index fields.

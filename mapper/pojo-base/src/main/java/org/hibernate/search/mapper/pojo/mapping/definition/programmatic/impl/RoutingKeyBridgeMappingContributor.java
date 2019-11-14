@@ -15,9 +15,9 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.Po
 
 class RoutingKeyBridgeMappingContributor implements PojoTypeMetadataContributor {
 
-	private final RoutingKeyBinder<?> routingKeyBinder;
+	private final RoutingKeyBinder routingKeyBinder;
 
-	RoutingKeyBridgeMappingContributor(RoutingKeyBinder<?> routingKeyBinder) {
+	RoutingKeyBridgeMappingContributor(RoutingKeyBinder routingKeyBinder) {
 		this.routingKeyBinder = routingKeyBinder;
 	}
 

@@ -36,12 +36,12 @@ class DelegatingPropertyMappingStep implements PropertyMappingStep {
 	}
 
 	@Override
-	public PropertyMappingStep binder(PropertyBinder<?> binder) {
+	public PropertyMappingStep binder(PropertyBinder binder) {
 		return delegate.binder( binder );
 	}
 
 	@Override
-	public PropertyMappingStep marker(MarkerBinder<?> binder) {
+	public PropertyMappingStep marker(MarkerBinder binder) {
 		return delegate.marker( binder );
 	}
 

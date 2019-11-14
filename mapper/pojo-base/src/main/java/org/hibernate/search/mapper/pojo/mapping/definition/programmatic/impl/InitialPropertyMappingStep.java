@@ -62,13 +62,13 @@ class InitialPropertyMappingStep
 	}
 
 	@Override
-	public PropertyMappingStep binder(PropertyBinder<?> binder) {
+	public PropertyMappingStep binder(PropertyBinder binder) {
 		children.add( new PropertyBridgeMappingContributor( binder ) );
 		return this;
 	}
 
 	@Override
-	public PropertyMappingStep marker(MarkerBinder<?> binder) {
+	public PropertyMappingStep marker(MarkerBinder binder) {
 		children.add( new MarkerMappingContributor( binder ) );
 		return this;
 	}

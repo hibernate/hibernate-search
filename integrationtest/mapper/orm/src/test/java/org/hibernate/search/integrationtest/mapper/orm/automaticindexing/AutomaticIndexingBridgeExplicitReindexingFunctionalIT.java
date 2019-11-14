@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.lang.annotation.Annotation;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
@@ -274,7 +273,7 @@ public class AutomaticIndexingBridgeExplicitReindexingFunctionalIT {
 			}
 		}
 
-		public static class Binder implements TypeBinder<Annotation> {
+		public static class Binder implements TypeBinder {
 			@Override
 			public void bind(TypeBindingContext context) {
 				context.setBridge( new QueryBasedTypeBridge( context ) );

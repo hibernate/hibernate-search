@@ -626,11 +626,11 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-	protected abstract TypeBinder<?> createContainingEntityTypeBinder();
+	protected abstract TypeBinder createContainingEntityTypeBinder();
 
-	protected abstract PropertyBinder<?> createContainingEntitySingleValuedPropertyBinder();
+	protected abstract PropertyBinder createContainingEntitySingleValuedPropertyBinder();
 
-	protected abstract PropertyBinder<?> createContainingEntityMultiValuedPropertyBinder();
+	protected abstract PropertyBinder createContainingEntityMultiValuedPropertyBinder();
 
 	private SessionFactory setupWithTypeBridge() {
 		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
@@ -691,7 +691,7 @@ public abstract class AbstractAutomaticIndexingBridgeIT {
 	}
 
 	private SessionFactory setupWithMultiValuedPropertyBridge() {
-		PropertyBinder<?> binder = createContainingEntityMultiValuedPropertyBinder();
+		PropertyBinder binder = createContainingEntityMultiValuedPropertyBinder();
 
 		Assume.assumeTrue(
 				"Multi-valued property bridges must be supported",

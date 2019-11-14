@@ -86,7 +86,7 @@ class PojoIdentityMappingCollectorImpl<E> implements PojoIdentityMappingCollecto
 
 	@Override
 	public <T> BoundRoutingKeyBridge<T> routingKeyBridge(BoundPojoModelPathTypeNode<T> modelPath,
-			RoutingKeyBinder<?> binder) {
+			RoutingKeyBinder binder) {
 		BoundRoutingKeyBridge<T> boundRoutingKeyBridge = mappingHelper.getIndexModelBinder()
 				.bindRoutingKey( bindingContext, modelPath, binder );
 		this.routingKeyProvider = new RoutingKeyBridgeRoutingKeyProvider<>( boundRoutingKeyBridge.getBridgeHolder() );

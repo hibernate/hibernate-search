@@ -15,9 +15,9 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.Po
 
 class MarkerMappingContributor implements PojoPropertyMetadataContributor {
 
-	private final MarkerBinder<?> binder;
+	private final MarkerBinder binder;
 
-	MarkerMappingContributor(MarkerBinder<?> binder) {
+	MarkerMappingContributor(MarkerBinder binder) {
 		this.binder = binder;
 	}
 

@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.Container
 
 public interface PojoMappingCollectorPropertyNode extends PojoMappingCollector {
 
-	void propertyBinder(PropertyBinder<?> binder);
+	void propertyBinder(PropertyBinder binder);
 
 	void identifierBinder(IdentifierBinder binder);
 

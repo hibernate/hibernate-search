@@ -15,9 +15,9 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.Po
 
 class TypeBridgeMappingContributor implements PojoTypeMetadataContributor {
 
-	private final TypeBinder<?> binder;
+	private final TypeBinder binder;
 
-	TypeBridgeMappingContributor(TypeBinder<?> binder) {
+	TypeBridgeMappingContributor(TypeBinder binder) {
 		this.binder = binder;
 	}
 

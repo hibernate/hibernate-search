@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.builtin.programmatic;
 
-import java.lang.annotation.Annotation;
-
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -65,11 +63,6 @@ public interface GeoPointBinder
 	 * @return {@code this}, for method chaining.
 	 */
 	GeoPointBinder markerSet(String markerSet);
-
-	@Override
-	default void initialize(Annotation annotation) {
-		// TODO HSEARCH-3135 remove this
-	}
 
 	/**
 	 * @return A {@link GeoPointBinder}.

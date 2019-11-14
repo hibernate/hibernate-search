@@ -30,7 +30,7 @@ public final class MarkerBindingContextImpl extends AbstractBindingContext
 		this.marker = marker;
 	}
 
-	public Object applyBinder(MarkerBinder<?> binder) {
+	public Object applyBinder(MarkerBinder binder) {
 		// This call should set the partial binding
 		binder.bind( this );
 		if ( marker == null ) {
