@@ -57,26 +57,38 @@ public class ElasticsearchScopeModel {
 		return EventContexts.fromIndexNames( hibernateSearchIndexNames );
 	}
 
-	public ToDocumentIdentifierValueConverter<?> getIdDslConverter() {
+	public ElasticsearchScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> getIdDslConverter() {
 		Iterator<ElasticsearchIndexModel> iterator = indexModels.iterator();
-		ElasticsearchIndexModel indexModelForSelectedIdConverter = iterator.next();
-		ToDocumentIdentifierValueConverter<?> selectedIdConverter = indexModelForSelectedIdConverter.getIdDslConverter();
+		ElasticsearchIndexModel indexModelForSelectedIdConverter = null;
+		ToDocumentIdentifierValueConverter<?> selectedIdConverter = null;
+		ElasticsearchScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> scopedIndexFieldComponent =
+				new ElasticsearchScopedIndexRootComponent<>();
 
 		while ( iterator.hasNext() ) {
 			ElasticsearchIndexModel indexModel = iterator.next();
 			ToDocumentIdentifierValueConverter<?> idConverter = indexModel.getIdDslConverter();
+
+			if ( selectedIdConverter == null ) {
+				indexModelForSelectedIdConverter = indexModel;
+				selectedIdConverter = idConverter;
+				scopedIndexFieldComponent.setComponent( selectedIdConverter );
+				continue;
+			}
+
 			if ( !selectedIdConverter.isCompatibleWith( idConverter ) ) {
-				throw log.conflictingIdentifierTypesForPredicate(
-						selectedIdConverter, idConverter,
-						EventContexts.fromIndexNames(
-								indexModelForSelectedIdConverter.getHibernateSearchIndexName(),
-								indexModel.getHibernateSearchIndexName()
-						)
-				);
+				ElasticsearchFailingIdCompatibilityChecker failingCompatibilityChecker =
+						new ElasticsearchFailingIdCompatibilityChecker(
+								selectedIdConverter, idConverter,
+								EventContexts.fromIndexNames(
+										indexModelForSelectedIdConverter.getHibernateSearchIndexName(),
+										indexModel.getHibernateSearchIndexName()
+								)
+						);
+				scopedIndexFieldComponent.setIdConverterCompatibilityChecker( failingCompatibilityChecker );
 			}
 		}
 
-		return selectedIdConverter;
+		return scopedIndexFieldComponent;
 	}
 
 	public <T> ElasticsearchScopedIndexFieldComponent<T> getSchemaNodeComponent(String absoluteFieldPath,
@@ -110,7 +122,7 @@ public class ElasticsearchScopeModel {
 						)
 				);
 			}
-			ElasticsearchFailingCompatibilityChecker<T> failingCompatibilityChecker = new ElasticsearchFailingCompatibilityChecker<>(
+			ElasticsearchFailingFieldCompatibilityChecker<T> failingCompatibilityChecker = new ElasticsearchFailingFieldCompatibilityChecker<>(
 					absoluteFieldPath, scopedIndexFieldComponent.getComponent(), component, EventContexts.fromIndexNames(
 					indexModelForSelectedSchemaNode.getHibernateSearchIndexName(), indexModel.getHibernateSearchIndexName()
 			), componentRetrievalStrategy );

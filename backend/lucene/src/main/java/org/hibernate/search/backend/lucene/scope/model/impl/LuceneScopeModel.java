@@ -54,26 +54,38 @@ public class LuceneScopeModel {
 		return indexManagerContexts;
 	}
 
-	public ToDocumentIdentifierValueConverter<?> getIdDslConverter() {
+	public LuceneScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> getIdDslConverter() {
 		Iterator<LuceneIndexModel> iterator = indexModels.iterator();
-		LuceneIndexModel indexModelForSelectedIdConverter = iterator.next();
-		ToDocumentIdentifierValueConverter<?> selectedIdConverter = indexModelForSelectedIdConverter.getIdDslConverter();
+		LuceneIndexModel indexModelForSelectedIdConverter = null;
+		ToDocumentIdentifierValueConverter<?> selectedIdConverter = null;
+		LuceneScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> scopedIndexFieldComponent =
+				new LuceneScopedIndexRootComponent<>();
 
 		while ( iterator.hasNext() ) {
 			LuceneIndexModel indexModel = iterator.next();
 			ToDocumentIdentifierValueConverter<?> idConverter = indexModel.getIdDslConverter();
+
+			if ( selectedIdConverter == null ) {
+				indexModelForSelectedIdConverter = indexModel;
+				selectedIdConverter = idConverter;
+				scopedIndexFieldComponent.setComponent( selectedIdConverter );
+				continue;
+			}
+
 			if ( !selectedIdConverter.isCompatibleWith( idConverter ) ) {
-				throw log.conflictingIdentifierTypesForPredicate(
-						selectedIdConverter, idConverter,
-						EventContexts.fromIndexNames(
-								indexModelForSelectedIdConverter.getIndexName(),
-								indexModel.getIndexName()
-						)
-				);
+				LuceneFailingIdCompatibilityChecker failingCompatibilityChecker =
+						new LuceneFailingIdCompatibilityChecker(
+								selectedIdConverter, idConverter,
+								EventContexts.fromIndexNames(
+										indexModelForSelectedIdConverter.getIndexName(),
+										indexModel.getIndexName()
+								)
+						);
+				scopedIndexFieldComponent.setIdConverterCompatibilityChecker( failingCompatibilityChecker );
 			}
 		}
 
-		return selectedIdConverter;
+		return scopedIndexFieldComponent;
 	}
 
 	public LuceneObjectPredicateBuilderFactory getObjectPredicateBuilderFactory(String absoluteFieldPath) {
@@ -159,7 +171,7 @@ public class LuceneScopeModel {
 				);
 			}
 
-			LuceneFailingCompatibilityChecker<T> failingCompatibilityChecker = new LuceneFailingCompatibilityChecker<>(
+			LuceneFailingFieldCompatibilityChecker<T> failingCompatibilityChecker = new LuceneFailingFieldCompatibilityChecker<>(
 					absoluteFieldPath, scopedIndexFieldComponent.getComponent(), component, EventContexts.fromIndexNames(
 					indexModelForSelectedSchemaNode.getIndexName(), indexModel.getIndexName()
 			), componentRetrievalStrategy );
