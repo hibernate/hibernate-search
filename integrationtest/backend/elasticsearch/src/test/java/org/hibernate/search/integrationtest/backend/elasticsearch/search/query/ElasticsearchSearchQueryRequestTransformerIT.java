@@ -45,6 +45,7 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 
 	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "indexname";
+	private static final String SECOND_INDEX_NAME = "secondindexname";
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -56,6 +57,7 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 	public ExpectedException thrown = ExpectedException.none();
 
 	private StubMappingIndexManager indexManager;
+	private StubMappingIndexManager secondIndexManager;
 
 	@Before
 	public void setup() {
@@ -68,6 +70,11 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 						ctx -> new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
+				.withIndex(
+						SECOND_INDEX_NAME,
+						ctx -> new IndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.secondIndexManager = indexManager
+				)
 				.setup();
 	}
 
@@ -79,14 +86,15 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 				.predicate( f -> f.matchAll() )
 				.requestTransformer( context -> {
 					assertThat( context.getPath() ).isEqualTo( "/" + INDEX_NAME + "/_search" );
-					context.setPath( "/_search" );
+					context.setPath( "/" + SECOND_INDEX_NAME + "/_search" );
 					// Changes should be visible immediately
-					assertThat( context.getPath() ).isEqualTo( "/_search" );
+					assertThat( context.getPath() ).isEqualTo( "/" + SECOND_INDEX_NAME + "/_search" );
 				} )
 				.toQuery();
 
 		clientSpy.expectNext(
 				ElasticsearchRequest.post()
+						.pathComponent( URLEncodedString.fromString( SECOND_INDEX_NAME ) )
 						.pathComponent( URLEncodedString.fromString( "_search" ) )
 						.body( new Gson().fromJson( "{}", JsonObject.class ) )
 						.build(),
