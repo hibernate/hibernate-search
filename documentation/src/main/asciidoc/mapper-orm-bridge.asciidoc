@@ -47,12 +47,12 @@ the following table may help:
 |<<mapper-orm-bridge-identifierbridge,`IdentifierBridge`>>
 |<<mapper-orm-bridge-routingkeybridge,`RoutingKeyBridge`>>
 
-|Annotation
-|Built-in: <<mapper-orm-directfieldmapping,`@GenericField`, `@FullTextField`, ...>>
-|Custom
-|Custom
-|Built-in: <<mapper-orm-identifiermapping,`@DocumentId`>>
-|Custom
+|Built-in annotation(s)
+|<<mapper-orm-directfieldmapping,`@GenericField`, `@FullTextField`, ...>>
+|None (custom only)
+|None (custom only)
+|<<mapper-orm-identifiermapping,`@DocumentId`>>
+|None (custom only)
 
 |Maps from...
 |One property
