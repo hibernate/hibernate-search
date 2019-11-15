@@ -32,6 +32,15 @@ public interface PropertyMappingDocumentIdOptionsStep extends PropertyMappingSte
 	PropertyMappingDocumentIdOptionsStep identifierBridge(BeanReference<? extends IdentifierBridge<?>> bridgeReference);
 
 	/**
+	 * @param bridgeInstance A bridge instance to use.
+	 * @return {@code this}, for method chaining.
+	 * @see IdentifierBridge
+	 */
+	default PropertyMappingDocumentIdOptionsStep identifierBridge(IdentifierBridge<?> bridgeInstance) {
+		return identifierBridge( BeanReference.ofInstance( bridgeInstance ) );
+	}
+
+	/**
 	 * @param binder A {@link IdentifierBinder} responsible for creating a bridge.
 	 * @return {@code this}, for method chaining.
 	 * @see IdentifierBinder

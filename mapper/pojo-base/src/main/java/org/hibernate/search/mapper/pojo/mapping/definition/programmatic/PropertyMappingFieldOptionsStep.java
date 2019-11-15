@@ -37,6 +37,15 @@ public interface PropertyMappingFieldOptionsStep<S extends PropertyMappingFieldO
 	S valueBridge(BeanReference<? extends ValueBridge<?, ?>> bridgeReference);
 
 	/**
+	 * @param bridgeInstance The bridge instance to use.
+	 * @return {@code this}, for method chaining.
+	 * @see GenericField#valueBridge()
+	 */
+	default S valueBridge(ValueBridge<?, ?> bridgeInstance) {
+		return valueBridge( BeanReference.ofInstance( bridgeInstance ) );
+	}
+
+	/**
 	 * @param binder A {@link ValueBinder} responsible for creating a bridge.
 	 * @return {@code this}, for method chaining.
 	 * @see GenericField#valueBinder()
