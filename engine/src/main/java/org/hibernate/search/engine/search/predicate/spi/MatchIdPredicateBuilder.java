@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
+import org.hibernate.search.engine.search.common.ValueConvert;
+
 public interface MatchIdPredicateBuilder<B> extends SearchPredicateBuilder<B> {
 
-	void value(Object value);
+	void value(Object value, ValueConvert valueConvert);
 
 }
