@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl.impl;
 
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.dsl.MatchIdPredicateMatchingMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchIdPredicateMatchingStep;
 import org.hibernate.search.engine.search.predicate.dsl.MatchIdPredicateOptionsStep;
@@ -26,8 +27,8 @@ class MatchIdPredicateMatchingStepImpl<B>
 	}
 
 	@Override
-	public MatchIdPredicateMatchingStepImpl<B> matching(Object value) {
-		matchIdBuilder.value( value );
+	public MatchIdPredicateMatchingStepImpl<B> matching(Object value, ValueConvert convert) {
+		matchIdBuilder.value( value, convert );
 		return this;
 	}
 

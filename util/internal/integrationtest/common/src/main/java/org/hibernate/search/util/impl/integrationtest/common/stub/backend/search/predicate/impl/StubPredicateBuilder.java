@@ -83,11 +83,6 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 	}
 
 	@Override
-	public void value(Object value) {
-		// No-op
-	}
-
-	@Override
 	public void value(Object value, ValueConvert convert) {
 		// No-op
 	}

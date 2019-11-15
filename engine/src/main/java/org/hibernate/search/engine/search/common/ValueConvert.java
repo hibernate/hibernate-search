@@ -24,6 +24,11 @@ public enum ValueConvert {
 	 * This generally means values passed to the DSL will be expected to have the same type
 	 * as the entity property used to populate the index field.
 	 * <p>
+	 * For identifier values passed to the DSL (for example the parameter of a match predicate),
+	 * the identifier converter defined in the mapping will be used.
+	 * This generally means values passed to the DSL will be expected to have the same type
+	 * as the entity property used to generate document identifiers.
+	 * <p>
 	 * For fields values returned by the backend (for example in projections),
 	 * the {@link IndexFieldTypeConverterStep#projectionConverter(Class, FromDocumentFieldValueConverter) projection converter}
 	 * defined in the mapping will be used.
@@ -41,6 +46,10 @@ public enum ValueConvert {
 	 * For field values passed to the DSL (for example the parameter of a match predicate),
 	 * no converter will be used.
 	 * This generally means values passed to the DSL will be expected to have the same type as the index field.
+	 * <p>
+	 * For identifier values passed to the DSL (for example the parameter of a match predicate),
+	 * no converter will be used.
+	 * This means values passed to the DSL will be expected to be strings that match document identifiers exactly.
 	 * <p>
 	 * For fields values returned by the backend (for example in projections),
 	 * no converter will be used.

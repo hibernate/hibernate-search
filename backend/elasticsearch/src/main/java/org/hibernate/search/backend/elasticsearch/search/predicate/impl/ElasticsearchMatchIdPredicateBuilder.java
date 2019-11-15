@@ -14,6 +14,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
+import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 
 import com.google.gson.JsonArray;
@@ -58,7 +59,8 @@ public class ElasticsearchMatchIdPredicateBuilder extends AbstractElasticsearchS
 	}
 
 	@Override
-	public void value(Object value) {
+	public void value(Object value, ValueConvert valueConvert) {
+		// TODO use valueConvert
 		ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext = searchContext.getToDocumentIdentifierValueConvertContext();
 		values.add( idDslConverter.convertUnknown( value, toDocumentIdentifierValueConvertContext ) );
 	}
