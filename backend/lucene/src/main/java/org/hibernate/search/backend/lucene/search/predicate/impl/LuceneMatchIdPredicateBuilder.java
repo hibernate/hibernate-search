@@ -15,8 +15,11 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.BooleanQuery.Builder;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -25,21 +28,29 @@ import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 public class LuceneMatchIdPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
 		implements MatchIdPredicateBuilder<LuceneSearchPredicateBuilder> {
 
+	private static final StringToDocumentIdentifierValueConverter RAW_CONVERTER =
+			new StringToDocumentIdentifierValueConverter();
+
 	private final List<String> values = new ArrayList<>();
 	private final LuceneSearchContext searchContext;
-	private final ToDocumentIdentifierValueConverter<?> idDslConverter;
+	private final LuceneCompatibilityChecker converterChecker;
+	private final ToDocumentIdentifierValueConverter<?> converter;
 
-	public LuceneMatchIdPredicateBuilder(LuceneSearchContext searchContext,
-			ToDocumentIdentifierValueConverter<?> idDslConverter) {
+	LuceneMatchIdPredicateBuilder(LuceneSearchContext searchContext,
+			LuceneCompatibilityChecker converterChecker,
+			ToDocumentIdentifierValueConverter<?> converter) {
 		this.searchContext = searchContext;
-		this.idDslConverter = idDslConverter;
+		this.converterChecker = converterChecker;
+		this.converter = converter;
 	}
 
 	@Override
 	public void value(Object value, ValueConvert valueConvert) {
-		// TODO use valueConvert
-		ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext = searchContext.getToDocumentIdentifierValueConvertContext();
-		values.add( idDslConverter.convertUnknown( value, toDocumentIdentifierValueConvertContext ) );
+		ToDocumentIdentifierValueConverter<?> dslToDocumentIdConverter =
+				getDslToDocumentIdentifierConverter( valueConvert );
+		ToDocumentIdentifierValueConvertContext toDocumentIdentifierValueConvertContext =
+				searchContext.getToDocumentIdentifierValueConvertContext();
+		values.add( dslToDocumentIdConverter.convertUnknown( value, toDocumentIdentifierValueConvertContext ) );
 	}
 
 	@Override
@@ -53,5 +64,16 @@ public class LuceneMatchIdPredicateBuilder extends AbstractLuceneSearchPredicate
 
 	private TermQuery termQuery( String value ) {
 		return new TermQuery( new Term( LuceneFields.idFieldName(), value ) );
+	}
+
+	private ToDocumentIdentifierValueConverter<?> getDslToDocumentIdentifierConverter(ValueConvert convert) {
+		switch ( convert ) {
+			case NO:
+				return RAW_CONVERTER;
+			case YES:
+			default:
+				converterChecker.failIfNotCompatible();
+				return converter;
+		}
 	}
 }

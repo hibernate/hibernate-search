@@ -13,10 +13,12 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexFieldComponent;
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexRootComponent;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactory;
+import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
@@ -82,7 +84,10 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public MatchIdPredicateBuilder<LuceneSearchPredicateBuilder> id() {
-		return new LuceneMatchIdPredicateBuilder( searchContext, scopeModel.getIdDslConverter() );
+		LuceneScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> component = scopeModel.getIdDslConverter();
+		return new LuceneMatchIdPredicateBuilder(
+				searchContext, component.getIdConverterCompatibilityChecker(), component.getComponent()
+		);
 	}
 
 	@Override

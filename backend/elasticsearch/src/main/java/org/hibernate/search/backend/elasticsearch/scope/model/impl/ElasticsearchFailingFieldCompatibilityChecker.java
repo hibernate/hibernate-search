@@ -4,11 +4,11 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.scope.model.impl;
+package org.hibernate.search.backend.elasticsearch.scope.model.impl;
 
 import org.hibernate.search.util.common.reporting.EventContext;
 
-public class LuceneFailingCompatibilityChecker<T> implements LuceneCompatibilityChecker {
+public class ElasticsearchFailingFieldCompatibilityChecker<T> implements ElasticsearchCompatibilityChecker {
 
 	private final String absoluteFieldPath;
 	private final IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy;
@@ -16,7 +16,7 @@ public class LuceneFailingCompatibilityChecker<T> implements LuceneCompatibility
 	private final T component2;
 	private final EventContext eventContext;
 
-	public LuceneFailingCompatibilityChecker(String absoluteFieldPath, T component1, T component2, EventContext eventContext,
+	public ElasticsearchFailingFieldCompatibilityChecker(String absoluteFieldPath, T component1, T component2, EventContext eventContext,
 			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.component1 = component1;
@@ -31,7 +31,7 @@ public class LuceneFailingCompatibilityChecker<T> implements LuceneCompatibility
 	}
 
 	@Override
-	public LuceneCompatibilityChecker combine(LuceneCompatibilityChecker other) {
+	public ElasticsearchCompatibilityChecker combine(ElasticsearchCompatibilityChecker other) {
 		// failing + any = failing
 		return this;
 	}
