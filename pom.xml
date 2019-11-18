@@ -284,7 +284,7 @@
         <!-- Elasticsearch tests properties -->
 
         <test.elasticsearch.java_home>${java.home}</test.elasticsearch.java_home>
-        <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
+        <test.elasticsearch.host.url></test.elasticsearch.host.url><!-- The default is set in profiles -->
         <test.elasticsearch.host.username></test.elasticsearch.host.username>
         <test.elasticsearch.host.password></test.elasticsearch.host.password>
 
@@ -806,7 +806,7 @@
                 <version>${project.version}</version>
                 <scope>provided</scope>
             </dependency>
-            
+
             <dependency>
                 <groupId>org.hibernate</groupId>
                 <artifactId>hibernate-search-engine</artifactId>
@@ -949,7 +949,7 @@
                 Fix dependency convergence within jackson-databind 2.6 (used by wiremock).
                 Jackson databind 2.6.x has a packaging issue: it depends on jackson-annotations:2.6.0
                 for every version of databind (2.6.1, 2.6.2, ...).
-                We solve this by managing the version of jackson ourselves. 
+                We solve this by managing the version of jackson ourselves.
              -->
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
@@ -981,7 +981,7 @@
                 <artifactId>slf4j-log4j12</artifactId>
                 <version>${version.org.slf4j}</version>
             </dependency>
-            
+
             <dependency>
                 <groupId>log4j</groupId>
                 <artifactId>log4j</artifactId>
@@ -1788,6 +1788,7 @@
                     <artifactId>elasticsearch-maven-plugin</artifactId>
                     <version>${version.elasticsearch.plugin}</version>
                     <configuration>
+                        <skip>${test.elasticsearch.run.skip}</skip>
                         <clusterName>hsearchEsTestCluster</clusterName>
                         <httpPort>9200</httpPort>
                     </configuration>
@@ -1909,7 +1910,7 @@
             </activation>
             <properties>
                 <!-- This is to avoid starting an Elasticsearch node for each module needing integration test -->
-                <test.elasticsearch.host.provided>true</test.elasticsearch.host.provided>
+                <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
                 <!-- And this to avoid unzipping any WildFly server, included modules, configurations and JDBC drivers -->
                 <skipWildFlyPreparation>true</skipWildFlyPreparation>
             </properties>
@@ -1923,7 +1924,7 @@
             </activation>
             <properties>
                 <!-- This is to avoid starting an Elasticsearch node for each module needing integration test -->
-                <test.elasticsearch.host.provided>true</test.elasticsearch.host.provided>
+                <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
                 <!-- And this to avoid unzipping any WildFly server, included modules, configurations and JDBC drivers -->
                 <skipWildFlyPreparation>true</skipWildFlyPreparation>
             </properties>
@@ -2231,13 +2232,40 @@
         <!--
              Different profiles are needed to handle the environment setup (which is handled in Maven,
              on contrary to the various database profiles).
-             
+
              To run tests against a different version of Elasticsearch, use the appropriate profile
              and provide the Elasticsearch version:
-             
+
                  mvn clean test -Pelasticsearch-2.0 -Dtest.elasticsearch.version=2.1.0
           -->
-        
+
+        <!-- Profile enabled when an Elasticsearch instance must be run by Maven -->
+        <profile>
+            <id>elasticsearch-run</id>
+            <activation>
+                <!-- Activate by default, i.e. if test.elasticsearch.host.url has not been defined explicitly -->
+                <property>
+                    <name>!test.elasticsearch.host.url</name>
+                </property>
+            </activation>
+            <properties>
+                <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
+                <test.elasticsearch.run.skip>false</test.elasticsearch.run.skip>
+            </properties>
+        </profile>
+        <!-- Profile enabled when an Elasticsearch instance must NOT be run by Maven -->
+        <profile>
+            <id>elasticsearch-do-not-run</id>
+            <activation>
+                <!-- Activate if test.elasticsearch.host.url has been defined explicitly -->
+                <property>
+                    <name>test.elasticsearch.host.url</name>
+                </property>
+            </activation>
+            <properties>
+                <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
+            </properties>
+        </profile>
         <!-- Elasticsearch [2.0,2.2) test environment -->
         <profile>
             <id>elasticsearch-2.0</id>
@@ -2258,7 +2286,7 @@
                                         <goal>unpack</goal>
                                     </goals>
                                     <configuration>
-                                        <skip>${test.elasticsearch.host.provided}</skip>
+                                        <skip>${test.elasticsearch.run.skip}</skip>
                                         <artifactItems>
                                             <!-- Delete-by-query is a plugin in Elasticsearch 2.x -->
                                             <artifactItem>
@@ -2279,7 +2307,7 @@
                             <artifactId>elasticsearch-maven-plugin</artifactId>
                             <version>${version.elasticsearch.plugin}</version>
                             <configuration>
-                                <skip>${test.elasticsearch.host.provided}</skip>
+                                <skip>${test.elasticsearch.run.skip}</skip>
                                 <tcpPort>9300</tcpPort>
                                 <pluginsPath>${project.build.directory}/_ES_PLUGINS_</pluginsPath>
                                 <outputDirectory>${project.build.directory}/elastisearch0</outputDirectory>
@@ -2324,7 +2352,7 @@
                 </pluginManagement>
             </build>
         </profile>
-        
+
         <!-- Elasticsearch 2.2+ test environment -->
         <profile>
             <id>elasticsearch-2.2</id>
@@ -2345,7 +2373,7 @@
                                         <goal>unpack</goal>
                                     </goals>
                                     <configuration>
-                                        <skip>${test.elasticsearch.host.provided}</skip>
+                                        <skip>${test.elasticsearch.run.skip}</skip>
                                         <artifactItems>
                                             <!-- Delete-by-query is a plugin in Elasticsearch 2.x -->
                                             <artifactItem>
@@ -2375,7 +2403,7 @@
                             <artifactId>elasticsearch-maven-plugin</artifactId>
                             <version>${version.elasticsearch.plugin}</version>
                             <configuration>
-                                <skip>${test.elasticsearch.host.provided}</skip>
+                                <skip>${test.elasticsearch.run.skip}</skip>
                                 <tcpPort>9300</tcpPort>
                                 <pluginsPath>${project.build.directory}/_ES_PLUGINS_</pluginsPath>
                                 <outputDirectory>${project.build.directory}/elastisearch0</outputDirectory>
@@ -2425,7 +2453,7 @@
                             <artifactId>elasticsearch-maven-plugin</artifactId>
                             <version>${version.elasticsearch.plugin}</version>
                             <configuration>
-                                <skip>${test.elasticsearch.host.provided}</skip>
+                                <skip>${test.elasticsearch.run.skip}</skip>
                                 <version>${test.elasticsearch.host.version}</version>
                                 <timeout>90</timeout><!-- Make it work on our slow CI -->
                                 <pathConf>${project.build.directory}/elasticsearch-maven-plugin/5.0/configuration/</pathConf>
@@ -2457,7 +2485,7 @@
                 </pluginManagement>
             </build>
         </profile>
-        
+
         <!-- Elasticsearch 5.2+ test environment (default) -->
         <profile>
             <id>elasticsearch-5.2</id>
@@ -2479,7 +2507,7 @@
                             <artifactId>elasticsearch-maven-plugin</artifactId>
                             <version>${version.elasticsearch.plugin}</version>
                             <configuration>
-                                <skip>${test.elasticsearch.host.provided}</skip>
+                                <skip>${test.elasticsearch.run.skip}</skip>
                                 <version>${test.elasticsearch.host.version}</version>
                                 <timeout>90</timeout><!-- Make it work on our slow CI -->
                                 <pathConf>${project.build.directory}/elasticsearch-maven-plugin/5.0/configuration/</pathConf>
