@@ -6,36 +6,27 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.integrationtest.mapper.pojo.mapping.annotation.processing.CustomPropertyMappingAnnotationBaseIT;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
-import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.extractor.builtin.impl.CollectionElementExtractor;
+import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -49,9 +40,11 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Test common use cases of (custom) property bridges and their annotation mapping.
+ * Test common use cases of (custom) property bridges.
  * <p>
  * Does not test reindexing in depth; this is tested in {@code AutomaticIndexing*} tests in the ORM mapper.
+ * <p>
+ * Does not test custom annotations; this is tested in {@link CustomPropertyMappingAnnotationBaseIT}.
  */
 @SuppressWarnings("unused")
 public class PropertyBridgeBaseIT {
@@ -872,94 +865,8 @@ public class PropertyBridgeBaseIT {
 		backendMock.verifyExpectationsMet();
 	}
 
-
 	@Test
-	public void mapping_error_missingProcessorReference() {
-		@Indexed
-		class IndexedEntity {
-			Integer id;
-			@DocumentId
-			@AnnotationWithEmptyProcessorRef
-			public Integer getId() {
-				return id;
-			}
-		}
-		SubTest.expectException(
-				() -> setupHelper.start().setup( IndexedEntity.class )
-		)
-				.assertThrown()
-				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.annotationTypeContext( AnnotationWithEmptyProcessorRef.class )
-						.failure(
-								"The processor reference in meta-annotation '" + PropertyMapping.class.getName() + "'"
-										+ " is empty."
-						)
-						.build()
-				);
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.FIELD, ElementType.METHOD})
-	@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef())
-	private @interface AnnotationWithEmptyProcessorRef {
-	}
-
-	@Test
-	public void mapping_error_invalidAnnotationType() {
-		@Indexed
-		class IndexedEntity {
-			Integer id;
-			@DocumentId
-			@AnnotationWithProcessorWithDifferentAnnotationType
-			public Integer getId() {
-				return id;
-			}
-		}
-		SubTest.expectException(
-				() -> setupHelper.start().setup( IndexedEntity.class )
-		)
-				.assertThrown()
-				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.annotationTypeContext( AnnotationWithProcessorWithDifferentAnnotationType.class )
-						.failure(
-								"Annotation processor '"
-										+ DifferentAnnotationType.Processor.TO_STRING + "'"
-										+ " expects annotations of incompatible type '"
-										+ DifferentAnnotationType.class.getName() + "'."
-						)
-						.build()
-				);
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.FIELD, ElementType.METHOD})
-	@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = DifferentAnnotationType.Processor.class))
-	private @interface AnnotationWithProcessorWithDifferentAnnotationType {
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.FIELD, ElementType.METHOD})
-	private @interface DifferentAnnotationType {
-		class Processor implements PropertyMappingAnnotationProcessor<DifferentAnnotationType> {
-			public static final String TO_STRING = "DifferentAnnotationType.Processor";
-
-			@Override
-			public void process(PropertyMappingStep mapping, DifferentAnnotationType annotation,
-					PropertyMappingAnnotationProcessorContext context) {
-				throw new UnsupportedOperationException( "This should not be called" );
-			}
-
-			@Override
-			public String toString() {
-				return TO_STRING;
-			}
-		}
-	}
-
-	@Test
-	public void mapping_error_incompatibleRequestedType() {
+	public void incompatibleRequestedType() {
 		@Indexed
 		class IndexedEntity {
 			Integer id;
@@ -968,13 +875,20 @@ public class PropertyBridgeBaseIT {
 			public Integer getId() {
 				return id;
 			}
-			@IncompatibleTypeRequestingBinding
 			public String getStringProperty() {
 				return stringProperty;
 			}
 		}
 		SubTest.expectException(
-				() -> setupHelper.start().setup( IndexedEntity.class )
+				() -> setupHelper.start()
+						.withConfiguration( b -> b.programmaticMapping().type( IndexedEntity.class )
+								.property( "stringProperty" )
+								.binder( (PropertyBinder) context -> {
+									context.getBridgedElement().createAccessor( Integer.class );
+									context.setBridge( new UnusedPropertyBridge() );
+								} )
+						)
+						.setup( IndexedEntity.class )
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -987,27 +901,6 @@ public class PropertyBridgeBaseIT {
 						)
 						.build()
 				);
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ElementType.METHOD, ElementType.FIELD})
-	@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = IncompatibleTypeRequestingBinding.Processor.class))
-	private @interface IncompatibleTypeRequestingBinding {
-		class Processor implements PropertyMappingAnnotationProcessor<IncompatibleTypeRequestingBinding> {
-			@Override
-			public void process(PropertyMappingStep mapping, IncompatibleTypeRequestingBinding annotation,
-					PropertyMappingAnnotationProcessorContext context) {
-				mapping.binder( new IncompatibleTypeRequestingPropertyBinder() );
-			}
-		}
-	}
-
-	public static class IncompatibleTypeRequestingPropertyBinder implements PropertyBinder {
-		@Override
-		public void bind(PropertyBindingContext context) {
-			context.getBridgedElement().createAccessor( Integer.class );
-			context.setBridge( new UnusedPropertyBridge() );
-		}
 	}
 
 	private static class UnusedPropertyBridge implements PropertyBridge {
