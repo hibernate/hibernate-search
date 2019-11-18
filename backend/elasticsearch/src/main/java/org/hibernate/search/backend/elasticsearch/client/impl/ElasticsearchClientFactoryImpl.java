@@ -49,7 +49,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 			.withDependencyAutoClosing( httpClientConfigurerHolders );
 	};
 
-	private static final ConfigurationProperty<List<String>> HOST =
+	private static final ConfigurationProperty<List<String>> HOSTS =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.HOSTS )
 					.asString().multivalued( Pattern.compile( "\\s+" ) )
 					.withDefault( ElasticsearchBackendSettings.Defaults.HOSTS )
@@ -136,7 +136,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 	private RestClient createClient(ConfigurationPropertySource propertySource,
 			ThreadProvider threadProvider) {
-		ServerUris hosts = ServerUris.fromStrings( HOST.get( propertySource ) );
+		ServerUris hosts = ServerUris.fromStrings( HOSTS.get( propertySource ) );
 
 		return RestClient.builder( hosts.asHostsArray() )
 				.setRequestConfigCallback( b -> customizeRequestConfig( b, propertySource ) )
