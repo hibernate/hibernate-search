@@ -15,13 +15,15 @@ import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.OrderBy;
 
-import org.hibernate.search.integrationtest.showcase.library.bridge.annotation.AccountBorrowalSummaryBinding;
+import org.hibernate.search.integrationtest.showcase.library.bridge.AccountBorrowalSummaryBridge;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.TypeBinding;
 
 /**
  * A user account.
  */
 @Entity
-@AccountBorrowalSummaryBinding
+@TypeBinding(binder = @TypeBinderRef(type = AccountBorrowalSummaryBridge.Binder.class))
 public class Account extends AbstractEntity<Integer> {
 
 	@Id

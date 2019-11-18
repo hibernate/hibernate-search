@@ -6,11 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.util.ArrayList;
 import java.util.List;
 import javax.persistence.Basic;
@@ -29,15 +24,12 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMapping;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessor;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorRef;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.TypeBinding;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
@@ -151,8 +143,8 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 	}
 
 	@Entity(name = "containing")
-	@FirstTypeBinding
-	@SecondTypeBinding
+	@TypeBinding(binder = @TypeBinderRef(type = FirstTypeBridge.Binder.class))
+	@TypeBinding(binder = @TypeBinderRef(type = SecondTypeBridge.Binder.class))
 	public static class ContainingEntity {
 
 		@Id
@@ -282,19 +274,6 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 		}
 	}
 
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ ElementType.TYPE })
-	@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = FirstTypeBinding.Processor.class))
-	public @interface FirstTypeBinding {
-		class Processor implements TypeMappingAnnotationProcessor<Annotation> {
-			@Override
-			public void process(TypeMappingStep mapping, Annotation annotation,
-					TypeMappingAnnotationProcessorContext context) {
-				mapping.binder( new FirstTypeBridge.Binder() );
-			}
-		}
-	}
-
 	public static class FirstTypeBridge implements TypeBridge {
 
 		private final PojoElementAccessor<String> valueSourcePropertyAccessor;
@@ -324,19 +303,6 @@ public class AutomaticIndexingEmbeddedBridgeIT {
 			}
 		}
 
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ ElementType.TYPE })
-	@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = SecondTypeBinding.Processor.class))
-	public @interface SecondTypeBinding {
-		class Processor implements TypeMappingAnnotationProcessor<Annotation> {
-			@Override
-			public void process(TypeMappingStep mapping, Annotation annotation,
-					TypeMappingAnnotationProcessorContext context) {
-				mapping.binder( new SecondTypeBridge.Binder() );
-			}
-		}
 	}
 
 	public static class SecondTypeBridge implements TypeBridge {
