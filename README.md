@@ -111,24 +111,24 @@ A list of available versions for `test.elasticsearch.host.version` can be found 
 
 Alternatively, you can prevent the build from launching an Elasticsearch server automatically
 and run Elasticsearch-related tests against your own server using the
-`test.elasticsearch.host.provided` and `test.elasticsearch.host.url` properties:
+`test.elasticsearch.host.url` property:
 
-    > mvn clean install -Dtest.elasticsearch.host.provided=true -Dtest.elasticsearch.host.url=http://localhost:9200
+    > mvn clean install -Dtest.elasticsearch.host.url=http://localhost:9200
 
 If you want to run tests against a different Elasticsearch version  (6.x for instance),
 you will still have to select a profile among those listed above, and specify the version:
 
-    > mvn clean install -Pelasticsearch-6.0 -Dtest.elasticsearch.host.version=6.0.0 -Dtest.elasticsearch.host.provided=true -Dtest.elasticsearch.host.url=http://localhost:9200
+    > mvn clean install -Pelasticsearch-6.0 -Dtest.elasticsearch.host.version=6.0.0 -Dtest.elasticsearch.host.url=http://localhost:9200
 
 You may also use authentication:
 
-    > mvn clean install -Dtest.elasticsearch.host.provided=true -Dtest.elasticsearch.host.url=https://localhost:9200 -Dtest.elasticsearch.host.username=ironman -Dtest.elasticsearch.host.password=j@rV1s
+    > mvn clean install -Dtest.elasticsearch.host.url=https://localhost:9200 -Dtest.elasticsearch.host.username=ironman -Dtest.elasticsearch.host.password=j@rV1s
 
 Also, the elasticsearch integration tests can be executed
 against an Elasticsearch service on AWS.
 You will need to execute something along the lines of:
 
-    > mvn clean install -Dtest.elasticsearch.host.provided=true -Dtest.elasticsearch.host.url=<The full URL of your Elasticsearch endpoint> -Dtest.elasticsearch.host.aws.signing.access_key=<Your access key> -Dtest.elasticsearch.host.aws.signing.secret_key=<Your secret key> -Dtest.elasticsearch.host.aws.signing.region=<Your AWS region ID>
+    > mvn clean install -Dtest.elasticsearch.host.url=<The full URL of your Elasticsearch endpoint> -Dtest.elasticsearch.host.aws.signing.access_key=<Your access key> -Dtest.elasticsearch.host.aws.signing.secret_key=<Your secret key> -Dtest.elasticsearch.host.aws.signing.region=<Your AWS region ID>
 
 When building Hibernate Search with new JDKs, you may want to run Elasticsearch with a different JDK than the one used by Maven.
 This can be done by setting a property

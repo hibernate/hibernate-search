@@ -545,7 +545,6 @@ stage('Non-default environments') {
 									clean install \
 									-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
 									${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
-									-Dtest.elasticsearch.host.provided=true \
 									-Dtest.elasticsearch.host.url=$buildEnv.endpointUrl \
 									-Dtest.elasticsearch.host.aws.signing.enabled=true \
 									-Dtest.elasticsearch.host.aws.signing.access_key=$AWS_ACCESS_KEY_ID \
