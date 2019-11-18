@@ -77,11 +77,11 @@ public class ElasticsearchDateBridge
 	}
 
 	private String convertToString(Date value) {
-		return ElasticsearchDateHelper.dateToString( DateTools.round( value, resolution ) );
+		return value == null ? null : ElasticsearchDateHelper.dateToString( DateTools.round( value, resolution ) );
 	}
 
 	private Date convertFromString(String value) {
-		return ElasticsearchDateHelper.stringToDate( value );
+		return value == null ? null : ElasticsearchDateHelper.stringToDate( value );
 	}
 
 	@Override
