@@ -10,7 +10,9 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyBinding;
 
 @Entity
 @Indexed
@@ -20,7 +22,7 @@ public class MyEntity {
 	@GeneratedValue
 	private Integer id;
 
-	@MyDataPropertyBinding
+	@PropertyBinding(binder = @PropertyBinderRef(type = MyDataPropertyBinder.class))
 	private MyData myData;
 
 	public Integer getId() {

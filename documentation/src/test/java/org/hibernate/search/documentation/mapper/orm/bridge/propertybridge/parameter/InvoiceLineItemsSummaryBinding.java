@@ -19,25 +19,25 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 
 //tag::include[]
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD, ElementType.FIELD })
-@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(
+@Retention(RetentionPolicy.RUNTIME) // <1>
+@Target({ ElementType.METHOD, ElementType.FIELD }) // <2>
+@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef( // <3>
 		type = InvoiceLineItemsSummaryBinding.Processor.class
 ))
-@Documented
+@Documented // <4>
 public @interface InvoiceLineItemsSummaryBinding {
 
-	String fieldName() default ""; // <1>
+	String fieldName() default ""; // <5>
 
-	class Processor implements PropertyMappingAnnotationProcessor<InvoiceLineItemsSummaryBinding> {
+	class Processor implements PropertyMappingAnnotationProcessor<InvoiceLineItemsSummaryBinding> { // <6>
 		@Override
 		public void process(PropertyMappingStep mapping, InvoiceLineItemsSummaryBinding annotation,
 				PropertyMappingAnnotationProcessorContext context) {
-			InvoiceLineItemsSummaryBinder binder = new InvoiceLineItemsSummaryBinder(); // <2>
-			if ( !annotation.fieldName().isEmpty() ) { // <3>
+			InvoiceLineItemsSummaryBinder binder = new InvoiceLineItemsSummaryBinder(); // <7>
+			if ( !annotation.fieldName().isEmpty() ) { // <8>
 				binder.fieldName( annotation.fieldName() );
 			}
-			mapping.binder( binder ); // <4>
+			mapping.binder( binder ); // <9>
 		}
 	}
 }
