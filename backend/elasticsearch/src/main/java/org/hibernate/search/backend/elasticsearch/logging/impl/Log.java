@@ -159,10 +159,10 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ID_OFFSET_2 + 73,
-			value = "Hibernate Search will connect to Elasticsearch server '%1$s' with authentication over plain HTTP (not HTTPS)."
+			value = "Hibernate Search will connect to Elasticsearch with authentication over plain HTTP (not HTTPS)."
 					+ " The password will be sent in clear text over the network."
 	)
-	void usingPasswordOverHttp(String serverUris);
+	void usingPasswordOverHttp();
 
 	@Message(id = ID_OFFSET_2 + 74,
 			value = "Multiple analyzer definitions with the same name: '%1$s'. The analyzer names must be unique.")
@@ -593,4 +593,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_3 + 88, value = "The operation failed due to the failure of the call to the bulk REST API.")
 	SearchException elasticsearchFailedBecauseOfBulkFailure(@Cause Throwable bulkFailure);
+
+	@Message(id = ID_OFFSET_3 + 89, value = "Invalid host/port: '%1$s'."
+			+ " The host/port string must use the format 'host:port', for example 'mycompany.com:9200'"
+			+ " The URI scheme ('http://', 'https://') must not be included.")
+	SearchException invalidHostAndPort(String hostAndPort, @Cause Exception e);
 }

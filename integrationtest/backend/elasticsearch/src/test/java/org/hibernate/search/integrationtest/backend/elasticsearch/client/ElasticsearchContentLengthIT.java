@@ -181,7 +181,7 @@ public class ElasticsearchContentLengthIT {
 
 		// Redirect requests to Wiremock
 		Map<String, Object> configurationOverride = new HashMap<>();
-		configurationOverride.put( ElasticsearchBackendSettings.HOSTS, httpUrlFor( wireMockRule ) );
+		configurationOverride.put( ElasticsearchBackendSettings.HOSTS, hostAndPortFor( wireMockRule ) );
 		ConfigurationPropertySource backendProperties =
 				defaultBackendProperties.withOverride( ConfigurationPropertySource.fromMap( configurationOverride ) );
 
@@ -212,8 +212,8 @@ public class ElasticsearchContentLengthIT {
 		return builder.build();
 	}
 
-	private static String httpUrlFor(WireMockRule rule) {
-		return "http://localhost:" + rule.port();
+	private static String hostAndPortFor(WireMockRule rule) {
+		return "localhost:" + rule.port();
 	}
 
 	private static UrlPathPattern urlPathLike(String path) {

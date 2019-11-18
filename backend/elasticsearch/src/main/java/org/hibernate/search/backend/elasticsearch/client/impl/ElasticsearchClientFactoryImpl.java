@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.client.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
@@ -27,6 +28,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchHttpClientConfigurer;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
@@ -35,11 +37,14 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * @author Gunnar Morling
  */
 public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactory {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static final BeanReference<ElasticsearchClientFactory> REFERENCE = (BeanResolver beanResolver) -> {
 		BeanHolder<List<ElasticsearchHttpClientConfigurer>> httpClientConfigurerHolders =
@@ -53,6 +58,12 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.HOSTS )
 					.asString().multivalued( Pattern.compile( "\\s+" ) )
 					.withDefault( ElasticsearchBackendSettings.Defaults.HOSTS )
+					.build();
+
+	private static final ConfigurationProperty<String> PROTOCOL =
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.PROTOCOL )
+					.asString()
+					.withDefault( ElasticsearchBackendSettings.Defaults.PROTOCOL )
 					.build();
 
 	private static final OptionalConfigurationProperty<String> USERNAME =
@@ -136,7 +147,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 	private RestClient createClient(ConfigurationPropertySource propertySource,
 			ThreadProvider threadProvider) {
-		ServerUris hosts = ServerUris.fromStrings( HOSTS.get( propertySource ) );
+		ServerUris hosts = ServerUris.fromStrings( PROTOCOL.get( propertySource ), HOSTS.get( propertySource ) );
 
 		return RestClient.builder( hosts.asHostsArray() )
 				.setRequestConfigCallback( b -> customizeRequestConfig( b, propertySource ) )
@@ -178,7 +189,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 		builder.setMaxConnTotal( MAX_TOTAL_CONNECTION.get( propertySource ) )
 				.setMaxConnPerRoute( MAX_TOTAL_CONNECTION_PER_ROUTE.get( propertySource ) )
 				.setThreadFactory( threadProvider.createThreadFactory( "Elasticsearch transport thread" ) );
-		if ( !hosts.isAnyRequiringSSL() ) {
+		if ( !hosts.isSslEnabled() ) {
 			// In this case disable the SSL capability as it might have an impact on
 			// bootstrap time, for example consuming entropy for no reason
 			builder.setSSLStrategy( NoopIOSessionStrategy.INSTANCE );
@@ -187,8 +198,8 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 		Optional<String> username = USERNAME.get( propertySource );
 		if ( username.isPresent() ) {
 			Optional<String> password = PASSWORD.get( propertySource );
-			if ( password.isPresent() ) {
-				hosts.warnPasswordsOverHttp();
+			if ( password.isPresent() && !hosts.isSslEnabled() ) {
+				log.usingPasswordOverHttp();
 			}
 
 			BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();

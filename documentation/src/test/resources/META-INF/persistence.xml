@@ -53,7 +53,9 @@
                       value="elasticsearch" /> <!--1-->
             <!--
             <property name="hibernate.search.backends.myBackend.hosts"
-                      value="https://elasticsearch.mycompany.com"/>
+                      value="elasticsearch.mycompany.com"/>
+            <property name="hibernate.search.backends.myBackend.protocol"
+                      value="https"/>
             <property name="hibernate.search.backends.myBackend.username"
                       value="ironman"/>
             <property name="hibernate.search.backends.myBackend.password"
@@ -71,6 +73,8 @@
              -->
             <property name="hibernate.search.backends.myBackend.hosts"
                       value="${test.elasticsearch.connection.hosts}"/>
+            <property name="hibernate.search.backends.myBackend.protocol"
+                      value="${test.elasticsearch.connection.protocol}"/>
             <property name="hibernate.search.backends.myBackend.username"
                       value="${test.elasticsearch.connection.username}"/>
             <property name="hibernate.search.backends.myBackend.password"
@@ -140,6 +144,8 @@
              -->
             <property name="hibernate.search.backends.myBackend.hosts"
                       value="${test.elasticsearch.connection.hosts}"/>
+            <property name="hibernate.search.backends.myBackend.protocol"
+                      value="${test.elasticsearch.connection.protocol}"/>
             <property name="hibernate.search.backends.myBackend.username"
                       value="${test.elasticsearch.connection.username}"/>
             <property name="hibernate.search.backends.myBackend.password"

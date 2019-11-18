@@ -5,7 +5,8 @@ spring.jpa:
       backends:
         elasticsearch1:
           type: elasticsearch
-          hosts: ${ELASTICSEARCH_URL} # From environment variable
+          hosts: ${ELASTICSEARCH_HOSTS} # From environment variable
+          protocol: ${ELASTICSEARCH_PROTOCOL} # From environment variable
           username: ${ELASTICSEARCH_USERNAME} # From environment variable
           password: ${ELASTICSEARCH_PASSWORD} # From environment variable
           aws.signing:

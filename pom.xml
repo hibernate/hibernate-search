@@ -465,6 +465,7 @@
              (which is located in a dependency of the integration tests modules).
          -->
         <test.elasticsearch.connection.hosts></test.elasticsearch.connection.hosts>
+        <test.elasticsearch.connection.protocol></test.elasticsearch.connection.protocol>
         <test.elasticsearch.connection.username></test.elasticsearch.connection.username>
         <test.elasticsearch.connection.password></test.elasticsearch.connection.password>
         <test.elasticsearch.connection.aws.signing.enabled>false</test.elasticsearch.connection.aws.signing.enabled>
@@ -2511,7 +2512,8 @@
                 </property>
             </activation>
             <properties>
-                <test.elasticsearch.connection.hosts>http://localhost:9200</test.elasticsearch.connection.hosts>
+                <test.elasticsearch.connection.hosts>localhost:9200</test.elasticsearch.connection.hosts>
+                <test.elasticsearch.connection.protocol>http</test.elasticsearch.connection.protocol>
                 <test.elasticsearch.run.skip>false</test.elasticsearch.run.skip>
             </properties>
         </profile>

@@ -63,15 +63,25 @@ Hosts::
 +
 [source]
 ----
-hibernate.search.backends.<backend name>.hosts = http://localhost:9200 (default)
+hibernate.search.backends.<backend name>.hosts = localhost:9200 (default)
 ----
 +
 The Elasticsearch host (or hosts) to send indexing requests and search queries to.
-Also defines the scheme (`http` or `https`) and port for each host.
 +
-Expects a String representing an URI such as `http://localhost` or `https://es.mycompany.com:4400`,
-or a String containing multiple such URIs separated by whitespace characters,
-or a `Collection<String>` containing such URIs.
+Expects a String representing a host and port such as `localhost` or `es.mycompany.com:4400`,
+or a String containing multiple such host-and-port strings separated by whitespace characters,
+or a `Collection<String>` containing such host-and-port strings.
+
+Protocol::
++
+[source]
+----
+hibernate.search.backends.<backend name>.protocol = http (default)
+----
++
+The protocol to use when sending indexing requests and search queries to Elasticsearch hosts.
++
+Expects a String: either `http` or `https`.
 
 HTTP authentication::
 +
@@ -85,7 +95,7 @@ The username and password to send when connecting to the Elasticsearch servers.
 +
 [CAUTION]
 ====
-If you use HTTP instead of HTTPS in any of the Elasticsearch host URLs (see above),
+If you use HTTP instead of HTTPS (see above),
 your password will be transmitted in clear text over the network.
 ====
 

@@ -518,8 +518,8 @@ stage('Non-default environments') {
 
 	// Test Elasticsearch integration with multiple versions in an AWS instance
 	environments.content.esAws.enabled.each { EsAwsBuildEnvironment buildEnv ->
-		if (!buildEnv.endpointUrl) {
-			throw new IllegalStateException("Unexpected empty endpoint URL")
+		if (!buildEnv.endpointHostAndPort) {
+			throw new IllegalStateException("Unexpected empty endpoint host")
 		}
 		if (!buildEnv.awsRegion) {
 			throw new IllegalStateException("Unexpected empty AWS region")
@@ -545,7 +545,8 @@ stage('Non-default environments') {
 									clean install \
 									-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
 									${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
-									-Dtest.elasticsearch.connection.hosts=$buildEnv.endpointUrl \
+									-Dtest.elasticsearch.connection.hosts=$buildEnv.endpointHostAndPort \
+									-Dtest.elasticsearch.connection.protocol=$buildEnv.endpointProtocol \
 									-Dtest.elasticsearch.connection.aws.signing.enabled=true \
 									-Dtest.elasticsearch.connection.aws.signing.access_key=$AWS_ACCESS_KEY_ID \
 									-Dtest.elasticsearch.connection.aws.signing.secret_key=$AWS_SECRET_ACCESS_KEY \
@@ -688,6 +689,8 @@ class EsAwsBuildEnvironment extends BuildEnvironment {
 	String version
 	String mavenProfile
 	String endpointUrl = null
+	String endpointHostAndPort = null
+	String endpointProtocol = null
 	String awsRegion = null
 	@Override
 	String getTag() { "elasticsearch-aws-$version" }
@@ -703,6 +706,18 @@ class EsAwsBuildEnvironment extends BuildEnvironment {
 	}
 	String getLockedResourcesLabel() {
 		"es-aws-${nameEmbeddableVersion}"
+	}
+	String setEndpointUrl(String url) {
+		this.endpointUrl = url
+		if ( endpointUrl ) {
+			def matcher = endpointUrl =~ /^(?:(https?):\/\/)?(.*)$/
+			endpointProtocol = matcher[0][1]
+			endpointHostAndPort = matcher[0][2]
+		}
+		else {
+			endpointProtocol = null
+			endpointHostAndPort = null
+		}
 	}
 }
 
