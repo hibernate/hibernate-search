@@ -8,6 +8,7 @@ package org.hibernate.search.test.bridge;
 
 import java.net.URI;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ import org.hibernate.search.cfg.Environment;
 import org.hibernate.search.query.dsl.QueryBuilder;
 import org.hibernate.search.test.SearchTestBase;
 import org.hibernate.search.testsupport.TestConstants;
+import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.junit.SkipOnElasticsearch;
 
 import org.junit.Test;
@@ -40,9 +42,11 @@ import org.apache.lucene.index.Term;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.NumericRangeQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
+import org.assertj.core.api.Assertions;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -357,6 +361,78 @@ public class BridgeTest extends SearchTestBase {
 		bridgeParams.put( "resolution", Resolution.DAY.toString() );
 		bridge.setParameterValues( bridgeParams );
 		assertEquals( "20001215", bridge.objectToString( calendar ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3767")
+	public void testDateBridgeNullProjections() {
+		Cloud nullCloud = new Cloud();
+
+		org.hibernate.Session s = openSession();
+		Transaction tx = s.beginTransaction();
+		s.persist( nullCloud );
+		s.flush();
+		tx.commit();
+
+		tx = s.beginTransaction();
+		FullTextSession session = Search.getFullTextSession( s );
+
+		List<String> projections = new ArrayList<>();
+		projections.add( "myDate" );
+		projections.add( "dateDay" );
+		projections.add( "dateMonth" );
+		projections.add( "dateYear" );
+		projections.add( "dateHour" );
+		projections.add( "dateMinute" );
+		projections.add( "dateSecond" );
+		projections.add( "dateMillisecond" );
+
+		List result = session.createFullTextQuery( new MatchAllDocsQuery() )
+				.setProjection( projections.toArray( new String[0] ) )
+				.list();
+		assertEquals( 1, result.size() );
+
+		// We're mostly checking that the bridge doesn't throw an NPE, but let's check this just in case...
+		Assertions.assertThat( (Object[]) result.get( 0 ) ).containsOnlyNulls();
+
+		tx.commit();
+		s.close();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3767")
+	public void testCalendarBridgeNullProjections() {
+		Cloud nullCloud = new Cloud();
+
+		org.hibernate.Session s = openSession();
+		Transaction tx = s.beginTransaction();
+		s.persist( nullCloud );
+		s.flush();
+		tx.commit();
+
+		tx = s.beginTransaction();
+		FullTextSession session = Search.getFullTextSession( s );
+
+		List<String> projections = new ArrayList<>();
+		projections.add( "myCalendar" );
+		projections.add( "calendarDay" );
+		projections.add( "calendarMonth" );
+		projections.add( "calendarYear" );
+		projections.add( "calendarHour" );
+		projections.add( "calendarMinute" );
+		projections.add( "calendarSecond" );
+		projections.add( "calendarMillisecond" );
+
+		List result = session.createFullTextQuery( new MatchAllDocsQuery() )
+				.setProjection( projections.toArray( new String[0] ) )
+				.list();
+		assertEquals( 1, result.size() );
+
+		// We're mostly checking that the bridge doesn't throw an NPE, but let's check this just in case...
+		Assertions.assertThat( (Object[]) result.get( 0 ) ).containsOnlyNulls();
+
+		tx.commit();
+		s.close();
 	}
 
 	@Test
