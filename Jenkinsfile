@@ -545,11 +545,11 @@ stage('Non-default environments') {
 									clean install \
 									-pl org.hibernate.search:hibernate-search-integrationtest-backend-elasticsearch,org.hibernate.search:hibernate-search-integrationtest-showcase-library \
 									${toElasticsearchVersionArgs(buildEnv.mavenProfile, buildEnv.version)} \
-									-Dtest.elasticsearch.host.url=$buildEnv.endpointUrl \
-									-Dtest.elasticsearch.host.aws.signing.enabled=true \
-									-Dtest.elasticsearch.host.aws.signing.access_key=$AWS_ACCESS_KEY_ID \
-									-Dtest.elasticsearch.host.aws.signing.secret_key=$AWS_SECRET_ACCESS_KEY \
-									-Dtest.elasticsearch.host.aws.signing.region=$buildEnv.awsRegion \
+									-Dtest.elasticsearch.connection.hosts=$buildEnv.endpointUrl \
+									-Dtest.elasticsearch.connection.aws.signing.enabled=true \
+									-Dtest.elasticsearch.connection.aws.signing.access_key=$AWS_ACCESS_KEY_ID \
+									-Dtest.elasticsearch.connection.aws.signing.secret_key=$AWS_SECRET_ACCESS_KEY \
+									-Dtest.elasticsearch.connection.aws.signing.region=$buildEnv.awsRegion \
 								"""
 							}
 						}
@@ -808,7 +808,7 @@ String toElasticsearchVersionArgs(String mavenEsProfile, String version) {
 	if ( version ) {
 		// The default profile is disabled, because a version is passed explicitly
 		// We just need to set the correct profile and pass the version
-		"-P$mavenEsProfile -Dtest.elasticsearch.host.version=$version"
+		"-P$mavenEsProfile -Dtest.elasticsearch.connection.version=$version"
 	}
 	else if ( mavenEsProfile != defaultEsProfile) {
 		// Disable the default profile to avoid conflicting configurations
@@ -829,5 +829,5 @@ String toElasticsearchJdkArg(BuildEnvironment buildEnv) {
 	}
 
 	def elasticsearchJdkToolPath = tool(name: elasticsearchJdkTool, type: 'jdk')
-	return "-Dtest.elasticsearch.java_home=$elasticsearchJdkToolPath"
+	return "-Dtest.elasticsearch.run.java_home=$elasticsearchJdkToolPath"
 }

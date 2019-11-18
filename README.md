@@ -95,9 +95,9 @@ To build the distribution bundle run:
 The Elasticsearch integration tests run against one single version of Elasticsearch at a time,
 launching an Elasticsearch server automatically on port 9200.
 You may redefine the version to use by specifying the right profile and using the
-`test.elasticsearch.host.version` property:
+`test.elasticsearch.connection.version` property:
 
-    > mvn clean install -Pelasticsearch-6.0 -Dtest.elasticsearch.host.version=6.0.0
+    > mvn clean install -Pelasticsearch-6.0 -Dtest.elasticsearch.connection.version=6.0.0
 
 The following profiles are available:
 
@@ -106,35 +106,35 @@ The following profiles are available:
  * `elasticsearch-6.7` for 6.7 and later 6.x
  * `elasticsearch-7.0` for 7.x (the default)
 
-A list of available versions for `test.elasticsearch.host.version` can be found on
+A list of available versions for `test.elasticsearch.connection.version` can be found on
 [Maven Central](https://search.maven.org/search?q=g:org.elasticsearch%20AND%20a:elasticsearch&core=gav).
 
 Alternatively, you can prevent the build from launching an Elasticsearch server automatically
 and run Elasticsearch-related tests against your own server using the
-`test.elasticsearch.host.url` property:
+`test.elasticsearch.connection.hosts` properties:
 
-    > mvn clean install -Dtest.elasticsearch.host.url=http://localhost:9200
+    > mvn clean install -Dtest.elasticsearch.connection.hosts=http://localhost:9200
 
 If you want to run tests against a different Elasticsearch version  (6.x for instance),
 you will still have to select a profile among those listed above, and specify the version:
 
-    > mvn clean install -Pelasticsearch-6.0 -Dtest.elasticsearch.host.version=6.0.0 -Dtest.elasticsearch.host.url=http://localhost:9200
+    > mvn clean install -Pelasticsearch-6.0 -Dtest.elasticsearch.connection.version=6.0.0 -Dtest.elasticsearch.connection.hosts=http://localhost:9200
 
 You may also use authentication:
 
-    > mvn clean install -Dtest.elasticsearch.host.url=https://localhost:9200 -Dtest.elasticsearch.host.username=ironman -Dtest.elasticsearch.host.password=j@rV1s
+    > mvn clean install -Dtest.elasticsearch.connection.hosts=https://localhost:9200 -Dtest.elasticsearch.connection.username=ironman -Dtest.elasticsearch.connection.password=j@rV1s
 
 Also, the elasticsearch integration tests can be executed
 against an Elasticsearch service on AWS.
 You will need to execute something along the lines of:
 
-    > mvn clean install -Dtest.elasticsearch.host.url=<The full URL of your Elasticsearch endpoint> -Dtest.elasticsearch.host.aws.signing.access_key=<Your access key> -Dtest.elasticsearch.host.aws.signing.secret_key=<Your secret key> -Dtest.elasticsearch.host.aws.signing.region=<Your AWS region ID>
+    > mvn clean install -Dtest.elasticsearch.connection.hosts=<The full URL of your Elasticsearch endpoint> -Dtest.elasticsearch.connection.aws.signing.access_key=<Your access key> -Dtest.elasticsearch.connection.aws.signing.secret_key=<Your secret key> -Dtest.elasticsearch.connection.aws.signing.region=<Your AWS region ID>
 
 When building Hibernate Search with new JDKs, you may want to run Elasticsearch with a different JDK than the one used by Maven.
 This can be done by setting a property
 (**this will only work with the profiles for Elasticsearch 5 and above**):
 
-    > mvn clean install -Dtest.elasticsearch.java_home=/path/to/my/jdk
+    > mvn clean install -Dtest.elasticsearch.run.java_home=/path/to/my/jdk
 
 ## JQAssistant
 

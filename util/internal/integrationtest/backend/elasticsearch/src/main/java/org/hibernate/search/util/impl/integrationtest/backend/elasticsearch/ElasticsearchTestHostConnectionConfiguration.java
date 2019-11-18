@@ -32,13 +32,13 @@ public class ElasticsearchTestHostConnectionConfiguration {
 	private final String awsSigningRegion;
 
 	private ElasticsearchTestHostConnectionConfiguration() {
-		this.url = System.getProperty( "test.elasticsearch.host.url" );
-		this.username = System.getProperty( "test.elasticsearch.host.username" );
-		this.password = System.getProperty( "test.elasticsearch.host.password" );
-		this.awsSigningEnabled = Boolean.getBoolean( "test.elasticsearch.host.aws.signing.enabled" );
-		this.awsSigningAccessKey = System.getProperty( "test.elasticsearch.host.aws.signing.access_key" );
-		this.awsSigningSecretKey = System.getProperty( "test.elasticsearch.host.aws.signing.secret_key" );
-		this.awsSigningRegion = System.getProperty( "test.elasticsearch.host.aws.signing.region" );
+		this.url = System.getProperty( "test.elasticsearch.connection.hosts" );
+		this.username = System.getProperty( "test.elasticsearch.connection.username" );
+		this.password = System.getProperty( "test.elasticsearch.connection.password" );
+		this.awsSigningEnabled = Boolean.getBoolean( "test.elasticsearch.connection.aws.signing.enabled" );
+		this.awsSigningAccessKey = System.getProperty( "test.elasticsearch.connection.aws.signing.access_key" );
+		this.awsSigningSecretKey = System.getProperty( "test.elasticsearch.connection.aws.signing.secret_key" );
+		this.awsSigningRegion = System.getProperty( "test.elasticsearch.connection.aws.signing.region" );
 
 		log.infof(
 				"Integration tests will connect to '%s' (AWS signing enabled: '%s')",

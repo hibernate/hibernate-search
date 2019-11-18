@@ -140,13 +140,13 @@
                         <JDBC_USERNAME>${jdbc.user}</JDBC_USERNAME>
                         <JDBC_PASSWORD>${jdbc.pass}</JDBC_PASSWORD>
                         <JDBC_ISOLATION>${jdbc.isolation}</JDBC_ISOLATION>
-                        <ELASTICSEARCH_URL>${test.elasticsearch.host.url}</ELASTICSEARCH_URL>
-                        <ELASTICSEARCH_USERNAME>${test.elasticsearch.host.username}</ELASTICSEARCH_USERNAME>
-                        <ELASTICSEARCH_PASSWORD>${test.elasticsearch.host.password}</ELASTICSEARCH_PASSWORD>
-                        <ELASTICSEARCH_AWS_SIGNING_ENABLED>${test.elasticsearch.host.aws.signing.enabled}</ELASTICSEARCH_AWS_SIGNING_ENABLED>
-                        <ELASTICSEARCH_AWS_SIGNING_ACCESS_KEY>${test.elasticsearch.host.aws.signing.access_key}</ELASTICSEARCH_AWS_SIGNING_ACCESS_KEY>
-                        <ELASTICSEARCH_AWS_SIGNING_SECRET_LEY>${test.elasticsearch.host.aws.signing.secret_key}</ELASTICSEARCH_AWS_SIGNING_SECRET_LEY>
-                        <ELASTICSEARCH_AWS_SIGNING_REGION>${test.elasticsearch.host.aws.signing.region}</ELASTICSEARCH_AWS_SIGNING_REGION>
+                        <ELASTICSEARCH_URL>${test.elasticsearch.connection.hosts}</ELASTICSEARCH_URL>
+                        <ELASTICSEARCH_USERNAME>${test.elasticsearch.connection.username}</ELASTICSEARCH_USERNAME>
+                        <ELASTICSEARCH_PASSWORD>${test.elasticsearch.connection.password}</ELASTICSEARCH_PASSWORD>
+                        <ELASTICSEARCH_AWS_SIGNING_ENABLED>${test.elasticsearch.connection.aws.signing.enabled}</ELASTICSEARCH_AWS_SIGNING_ENABLED>
+                        <ELASTICSEARCH_AWS_SIGNING_ACCESS_KEY>${test.elasticsearch.connection.aws.signing.access_key}</ELASTICSEARCH_AWS_SIGNING_ACCESS_KEY>
+                        <ELASTICSEARCH_AWS_SIGNING_SECRET_LEY>${test.elasticsearch.connection.aws.signing.secret_key}</ELASTICSEARCH_AWS_SIGNING_SECRET_LEY>
+                        <ELASTICSEARCH_AWS_SIGNING_REGION>${test.elasticsearch.connection.aws.signing.region}</ELASTICSEARCH_AWS_SIGNING_REGION>
                         <!--
                              The test settings add a different suffix to this value for each test execution.
                              We can't add this suffix (${random.uuid}) here due to IDEA limitations:

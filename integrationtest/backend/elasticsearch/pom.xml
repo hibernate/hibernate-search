@@ -122,7 +122,7 @@
             <id>aws</id>
             <activation>
                 <property>
-                    <name>test.elasticsearch.host.aws.signing.enabled</name>
+                    <name>test.elasticsearch.connection.aws.signing.enabled</name>
                     <value>true</value>
                 </property>
             </activation>
@@ -131,7 +131,7 @@
                     org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresIndexOpenClose,
                     org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresNoRequestPostProcessing
                 </failsafe.excludedGroups.aws>
-                <test.elasticsearch.host.aws.signing.enabled>true</test.elasticsearch.host.aws.signing.enabled>
+                <test.elasticsearch.connection.aws.signing.enabled>true</test.elasticsearch.connection.aws.signing.enabled>
             </properties>
             <dependencies>
                 <dependency>
