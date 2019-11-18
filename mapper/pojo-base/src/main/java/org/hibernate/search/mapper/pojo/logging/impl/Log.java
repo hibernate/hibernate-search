@@ -91,18 +91,8 @@ public interface Log extends BasicLogger {
 			@FormatWith(PojoTypeModelFormatter.class) PojoTypeModel<?> sourceType);
 
 	@Message(id = ID_OFFSET_2 + 3,
-			value = "Annotation type '%2$s' is annotated with '%1$s',"
-					+ " but the binder reference is empty.")
-	SearchException missingBinderReferenceInBridgeMapping(
-			@FormatWith(ClassFormatter.class) Class<? extends Annotation> metaAnnotationType,
-			@FormatWith(ClassFormatter.class) Class<? extends Annotation> annotationType);
-
-	@Message(id = ID_OFFSET_2 + 4,
-			value = "Annotation type '%2$s' is annotated with '%1$s',"
-					+ " but the binder reference is empty.")
-	SearchException missingBinderReferenceInMarkerMapping(
-			@FormatWith(ClassFormatter.class) Class<? extends Annotation> metaAnnotationType,
-			@FormatWith(ClassFormatter.class) Class<? extends Annotation> annotationType);
+			value = "The binder reference is empty.")
+	SearchException missingBinderReferenceInBinding();
 
 	@Message(id = ID_OFFSET_2 + 5,
 			value = "The field annotation defines both valueBridge and valueBinder."
