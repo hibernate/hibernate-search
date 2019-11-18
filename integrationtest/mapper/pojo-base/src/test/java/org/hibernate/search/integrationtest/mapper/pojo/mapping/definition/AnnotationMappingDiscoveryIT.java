@@ -6,10 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.mapping.definition;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,23 +13,22 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
-import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.binding.MarkerBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.MarkerBinderRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.MarkerBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.MarkerBinding;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyBinding;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
@@ -188,7 +183,7 @@ public class AnnotationMappingDiscoveryIT {
 	public static class NonExplicitlyRegisteredType extends AlwaysPresentPropertyType {
 		private NonExplicitlyRegisteredNonMappedType content;
 
-		@CustomMarkerConsumingPropertyBinding
+		@PropertyBinding(binder = @PropertyBinderRef(type = CustomMarkerConsumingPropertyBridge.Binder.class))
 		public NonExplicitlyRegisteredNonMappedType getContent() {
 			return content;
 		}
@@ -206,7 +201,7 @@ public class AnnotationMappingDiscoveryIT {
 	public static class NonExplicitlyRegisteredNonMappedType {
 		private Integer annotatedProperty;
 
-		@CustomMarkerBinding
+		@MarkerBinding(binder = @MarkerBinderRef(type = CustomMarker.Binder.class))
 		public Integer getAnnotatedProperty() {
 			return annotatedProperty;
 		}
@@ -244,32 +239,6 @@ public class AnnotationMappingDiscoveryIT {
 
 		public void setAlwaysPresent(String alwaysPresent) {
 			this.alwaysPresent = alwaysPresent;
-		}
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ ElementType.METHOD, ElementType.FIELD})
-	@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = CustomMarkerBinding.Processor.class))
-	private @interface CustomMarkerBinding {
-		class Processor implements PropertyMappingAnnotationProcessor<CustomMarkerBinding> {
-			@Override
-			public void process(PropertyMappingStep mapping, CustomMarkerBinding annotation,
-					PropertyMappingAnnotationProcessorContext context) {
-				mapping.marker( new CustomMarker.Binder() );
-			}
-		}
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ ElementType.METHOD, ElementType.FIELD})
-	@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = CustomMarkerConsumingPropertyBinding.Processor.class))
-	private @interface CustomMarkerConsumingPropertyBinding {
-		class Processor implements PropertyMappingAnnotationProcessor<CustomMarkerConsumingPropertyBinding> {
-			@Override
-			public void process(PropertyMappingStep mapping, CustomMarkerConsumingPropertyBinding annotation,
-					PropertyMappingAnnotationProcessorContext context) {
-				mapping.binder( new CustomMarkerConsumingPropertyBridge.Binder() );
-			}
 		}
 	}
 

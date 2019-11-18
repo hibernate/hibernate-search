@@ -6,10 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.automaticindexing;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import javax.persistence.Basic;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -18,19 +14,16 @@ import javax.persistence.OneToOne;
 import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.TypeBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
-import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolverNode;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMapping;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessor;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorRef;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.TypeBinding;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
@@ -182,7 +175,7 @@ public class AutomaticIndexingOverReindexingIT {
 
 	@Entity(name = "level1")
 	@Indexed(index = Level1Entity.INDEX)
-	@Level3Property1Binding
+	@TypeBinding(binder = @TypeBinderRef(type = Level3Property1Bridge.Binder.class))
 	public static class Level1Entity {
 
 		static final String INDEX = "level1";
@@ -300,19 +293,6 @@ public class AutomaticIndexingOverReindexingIT {
 
 		public void setProperty2(String property2) {
 			this.property2 = property2;
-		}
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ ElementType.TYPE })
-	@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = Level3Property1Binding.AnnotationProcessor.class))
-	public @interface Level3Property1Binding {
-		class AnnotationProcessor implements TypeMappingAnnotationProcessor<Level3Property1Binding> {
-			@Override
-			public void process(TypeMappingStep mapping, Level3Property1Binding annotation,
-					TypeMappingAnnotationProcessorContext context) {
-				mapping.binder( new Level3Property1Bridge.Binder() );
-			}
 		}
 	}
 

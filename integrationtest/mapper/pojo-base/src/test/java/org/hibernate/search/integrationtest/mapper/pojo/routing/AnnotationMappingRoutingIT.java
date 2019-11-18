@@ -6,31 +6,24 @@
  */
 package org.hibernate.search.integrationtest.mapper.pojo.routing;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 
-import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
+import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
+import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.RoutingKeyBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.RoutingKeyBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
-import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMapping;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessor;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorRef;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.RoutingKeyBinding;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
-import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
@@ -139,7 +132,7 @@ public class AnnotationMappingRoutingIT {
 	}
 
 	@Indexed(index = IndexedEntity.INDEX)
-	@MyRoutingKeyBinding
+	@RoutingKeyBinding(binder = @RoutingKeyBinderRef(type = MyRoutingKeyBridge.Binder.class))
 	public static final class IndexedEntity {
 
 		public static final String INDEX = "IndexedEntity";
@@ -176,19 +169,6 @@ public class AnnotationMappingRoutingIT {
 			this.value = value;
 		}
 
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ ElementType.TYPE })
-	@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = MyRoutingKeyBinding.Processor.class))
-	public @interface MyRoutingKeyBinding {
-		class Processor implements TypeMappingAnnotationProcessor<MyRoutingKeyBinding> {
-			@Override
-			public void process(TypeMappingStep mapping, MyRoutingKeyBinding annotation,
-					TypeMappingAnnotationProcessorContext context) {
-				mapping.routingKeyBinder( new MyRoutingKeyBridge.Binder() );
-			}
-		}
 	}
 
 	public static final class MyRoutingKeyBridge implements RoutingKeyBridge {

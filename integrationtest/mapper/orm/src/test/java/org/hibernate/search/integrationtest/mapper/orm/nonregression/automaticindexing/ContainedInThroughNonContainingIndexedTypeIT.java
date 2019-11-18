@@ -6,10 +6,6 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.nonregression.automaticindexing;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
@@ -20,15 +16,12 @@ import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.integrationtest.mapper.orm.automaticindexing.AutomaticIndexingBridgeAccessorsIT;
 import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.PropertyBindingContext;
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMapping;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessor;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorContext;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.PropertyMappingAnnotationProcessorRef;
-import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.PropertyMappingStep;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyBinding;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
@@ -125,7 +118,7 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 		@Id
 		private Integer id;
 
-		@BindingGoingThroughEntityBoundaries
+		@PropertyBinding(binder = @PropertyBinderRef(type = BridgeGoingThroughEntityBoundaries.Binder.class))
 		@OneToOne
 		private Contained contained;
 
@@ -200,20 +193,6 @@ public class ContainedInThroughNonContainingIndexedTypeIT {
 
 		public void setIndexedInContaining(int indexedInContaining) {
 			this.indexedInContaining = indexedInContaining;
-		}
-	}
-
-	@Retention(RetentionPolicy.RUNTIME)
-	@Target({ ElementType.FIELD, ElementType.METHOD })
-	@PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = BindingGoingThroughEntityBoundaries.Processor.class))
-	public @interface BindingGoingThroughEntityBoundaries {
-
-		class Processor implements PropertyMappingAnnotationProcessor<BindingGoingThroughEntityBoundaries> {
-			@Override
-			public void process(PropertyMappingStep mapping, BindingGoingThroughEntityBoundaries annotation,
-					PropertyMappingAnnotationProcessorContext context) {
-				mapping.binder( new BridgeGoingThroughEntityBoundaries.Binder() );
-			}
 		}
 	}
 
