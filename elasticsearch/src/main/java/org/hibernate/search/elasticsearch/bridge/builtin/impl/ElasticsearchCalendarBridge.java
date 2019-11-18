@@ -77,11 +77,11 @@ public class ElasticsearchCalendarBridge
 	}
 
 	private String convertToString(Calendar value) {
-		return ElasticsearchDateHelper.calendarToString( ElasticsearchDateHelper.round( value, resolution ) );
+		return value == null ? null : ElasticsearchDateHelper.calendarToString( ElasticsearchDateHelper.round( value, resolution ) );
 	}
 
 	private Calendar convertFromString(String value) {
-		return ElasticsearchDateHelper.stringToCalendar( value );
+		return value == null ? null : ElasticsearchDateHelper.stringToCalendar( value );
 	}
 
 	@Override
