@@ -94,7 +94,7 @@ A value bridge is a pluggable component that implements
 the mapping of a property to an index field.
 It is applied to a property with a <<mapper-orm-directfieldmapping-annotations,`@*Field` annotation>>
 (`@GenericField`, `@FullTextField`, ...)
-or with a custom annotation.
+or with a <<mapper-orm-custom-annotations,custom annotation>>.
 
 A value bridge is relatively straightforward to implement:
 in its simplest form,
@@ -355,6 +355,7 @@ assigning a value bridge directly;
 see <<mapper-orm-bridge-valuebridge-annotation-compatibility>>.
 ====
 
+[[mapper-orm-bridge-valuebridge-parameters]]
 === Passing parameters
 
 The value bridges are usually applied with built-in <<mapper-orm-directfieldmapping-annotations,`@*Field` annotation>>,
@@ -363,7 +364,7 @@ whether the field is sortable, etc.
 
 However, these parameters are not passed to the value bridge or value binder.
 In some cases, it is necessary to pass parameters directly to the value bridge or value binder.
-This is achieved by defining a custom annotation with attributes:
+This is achieved by defining a <<mapper-orm-custom-annotations,custom annotation>> with attributes:
 
 .Passing parameters to a `ValueBridge`
 ====
@@ -481,7 +482,7 @@ A property bridge, like a <<mapper-orm-bridge-valuebridge,value bridge>>,
 is a pluggable component that implements
 the mapping of a property to one or more index fields.
 It is applied to a property with the `@PropertyBinding` annotation
-or with a custom annotation.
+or with a <<mapper-orm-custom-annotations,custom annotation>>.
 
 Compared to the value bridge, the property bridge is more complex to implement,
 but covers a broader range of use cases:
@@ -577,6 +578,7 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/bridge/proper
 <1> Apply the bridge using the `@PropertyBinding` annotation.
 ====
 
+[[mapper-orm-bridge-propertybridge-parameters]]
 === Passing parameters
 // Search 5 anchors backward compatibility
 [[_parameterized_bridge]]
@@ -585,7 +587,7 @@ The property bridges are usually applied with the built-in `@PropertyBinding` an
 which does not accept any parameter other than the property binder.
 
 In some cases, it is necessary to pass parameters directly to the property binder.
-This is achieved by defining a custom annotation with attributes:
+This is achieved by defining a <<mapper-orm-custom-annotations,custom annotation>> with attributes:
 
 // Search 5 anchors backward compatibility
 [[example-passing-bridge-parameters]]
@@ -690,7 +692,7 @@ See the javadoc for more information.
 A type bridge is a pluggable component that implements
 the mapping of a whole type to one or more index fields.
 It is applied to a type with the `@TypeBinding` annotation
-or with a custom annotation.
+or with a <<mapper-orm-custom-annotations,custom annotation>>.
 
 The type bridge is very similar to the property bridge in its core principles and in how it is implemented.
 The only (obvious) difference is that the property bridge is applied to properties (fields or getters),
@@ -772,13 +774,14 @@ But no annotation is necessary on the `firstName` and `lastName` properties:
 these are already handled by the bridge.
 ====
 
+[[mapper-orm-bridge-typebridge-parameters]]
 === Passing parameters
 
 Type bridges are usually applied with the built-in `@TypeBinding` annotation.
 which does not accept any parameter other than the type binder.
 
 In some cases, it is necessary to pass parameters directly to the type binder.
-This is achieved by defining a custom annotation with attributes:
+This is achieved by defining a <<mapper-orm-custom-annotations,custom annotation>> with attributes:
 
 .Passing parameters to a `TypeBinder`
 ====
@@ -815,7 +818,7 @@ Alternatively, we could expose a parameterized constructor.
 Here use the `sortField` parameter to decide whether to add a additional, sortable field,
 but we could pass parameters for any purpose:
 defining the field name,
-defining a normalizer,
+defining a normalizer,custom annotation
 ...
 
 [source, JAVA, indent=0, subs="+callouts"]
@@ -877,7 +880,7 @@ See the javadoc for more information.
 An identifier bridge is a pluggable component that implements
 the mapping of an entity property to a document identifier.
 It is applied to a property with the `@DocumentId` annotation
-or with a custom annotation.
+or with a <<mapper-orm-custom-annotations,custom annotation>>.
 
 Implementing an identifier bridge boils down to implementing two methods:
 
@@ -1006,7 +1009,7 @@ The identifier bridges are usually applied with the built-in <<mapper-orm-identi
 which does not accept any parameter other than the identifier bridge/binder.
 
 In some cases, it is necessary to pass parameters directly to the identifier bridge or identifier binder.
-This is achieved by defining a custom annotation with attributes:
+This is achieved by defining a <<mapper-orm-custom-annotations,custom annotation>> with attributes:
 
 .Passing parameters to an `IdentifierBridge`
 ====

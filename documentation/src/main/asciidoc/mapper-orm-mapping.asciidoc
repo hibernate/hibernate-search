@@ -1408,3 +1408,43 @@ TODO HSEARCH-3680 Detailed description of the programmatic mapping API.
 
 TODO In particular, explain how to use type/property bridges in the programmatic mapping
 ////
+
+[[mapper-orm-custom-annotations]]
+== Custom mapping annotations
+
+By default, Hibernate Search only recognizes built-in mapping annotations
+such as `@Indexed`, `@GenericField` or `@IndexedEmbedded`.
+
+To use custom annotations in a Hibernate Search mapping,
+two steps are required:
+
+. Implementing a processor for that annotation:
+`TypeMappingAnnotationProcessor` for type annotations
+or `PropertyMappingAnnotationProcessor` for method/field annotations.
+. Annotating the custom annotation with either `@TypeMapping` or `@PropertyMapping`,
+passing as an argument the reference to the annotation processor.
+
+Once this is done, Hibernate Search will be able to detect custom annotations in indexed classes.
+Whenever a custom annotation is encountered,
+Hibernate Search will instantiate the annotation processor
+and call its `process` method, passing the following as arguments:
+
+* A `mapping` parameter allowing to define the mapping for the type or property
+using the <<mapper-orm-programmatic-mapping,programmatic mapping API>>.
+* An `annotation` parameter representing the annotation instance.
+* A `context` object with various helpers.
+
+Custom annotations are most frequently used to apply to apply custom, parameterized bridges.
+You can find examples in these sections in particular:
+
+* <<mapper-orm-bridge-valuebridge-parameters,Passing parameters to a value bridge>>
+* <<mapper-orm-bridge-propertybridge-parameters,Passing parameters to a property bridge>>
+* <<mapper-orm-bridge-typebridge-parameters,Passing parameters to a type bridge>>
+
+[TIP]
+====
+It is completely possible to use custom annotations for parameter-less bridges,
+or even for more complex features such as indexed-embedded:
+every feature available in the programmatic API
+can be triggered by a custom annotation.
+====
