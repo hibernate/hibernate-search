@@ -456,7 +456,6 @@
         <!-- Elasticsearch tests properties -->
 
         <test.elasticsearch.java_home>${java.home}</test.elasticsearch.java_home>
-        <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
         <!--
              These properties are transparently passed as system properties to integration tests,
              and retrieved by a test utility:
@@ -465,6 +464,7 @@
              because we will be able to change the configuration without re-compiling the configuration file
              (which is located in a dependency of the integration tests modules).
          -->
+        <test.elasticsearch.host.url></test.elasticsearch.host.url><!-- The default is set in profiles -->
         <test.elasticsearch.host.username></test.elasticsearch.host.username>
         <test.elasticsearch.host.password></test.elasticsearch.host.password>
         <test.elasticsearch.host.aws.signing.enabled>false</test.elasticsearch.host.aws.signing.enabled>
@@ -1692,7 +1692,7 @@
                     <artifactId>elasticsearch-maven-plugin</artifactId>
                     <version>${version.com.github.alexcojocaru.elasticsearch.plugin}</version>
                     <configuration>
-                        <skip>${test.elasticsearch.host.provided}</skip>
+                        <skip>${test.elasticsearch.run.skip}</skip>
                         <clusterName>hsearchEsTestCluster</clusterName>
                         <httpPort>9200</httpPort>
                         <version>${test.elasticsearch.host.version}</version>
@@ -1868,7 +1868,7 @@
             </activation>
             <properties>
                 <!-- This is to avoid starting an Elasticsearch node for each module needing integration test -->
-                <test.elasticsearch.host.provided>true</test.elasticsearch.host.provided>
+                <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
                 <!-- This is to avoid unzipping any WildFly server, included modules, configurations and JDBC drivers -->
                 <skipWildFlyPreparation>true</skipWildFlyPreparation>
             </properties>
@@ -1882,7 +1882,7 @@
             </activation>
             <properties>
                 <!-- This is to avoid starting an Elasticsearch node for each module needing integration test -->
-                <test.elasticsearch.host.provided>true</test.elasticsearch.host.provided>
+                <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
                 <!-- This is to avoid unzipping any WildFly server, included modules, configurations and JDBC drivers -->
                 <skipWildFlyPreparation>true</skipWildFlyPreparation>
             </properties>
@@ -2500,6 +2500,34 @@
 
              To run tests against a different version of Elasticsearch, see README.md.
           -->
+
+        <!-- Profile enabled when an Elasticsearch instance must be run by Maven -->
+        <profile>
+            <id>elasticsearch-run</id>
+            <activation>
+                <!-- Activate by default, i.e. if test.elasticsearch.host.url has not been defined explicitly -->
+                <property>
+                    <name>!test.elasticsearch.host.url</name>
+                </property>
+            </activation>
+            <properties>
+                <test.elasticsearch.host.url>http://localhost:9200</test.elasticsearch.host.url>
+                <test.elasticsearch.run.skip>false</test.elasticsearch.run.skip>
+            </properties>
+        </profile>
+        <!-- Profile enabled when an Elasticsearch instance must NOT be run by Maven -->
+        <profile>
+            <id>elasticsearch-do-not-run</id>
+            <activation>
+                <!-- Activate if test.elasticsearch.host.url has been defined explicitly -->
+                <property>
+                    <name>test.elasticsearch.host.url</name>
+                </property>
+            </activation>
+            <properties>
+                <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
+            </properties>
+        </profile>
 
         <!-- Elasticsearch 5.6+ test environment -->
         <profile>
