@@ -70,19 +70,19 @@
                 take care to also update the name of the commented properties just above.
              -->
             <property name="hibernate.search.backends.myBackend.hosts"
-                      value="${test.elasticsearch.host.url}"/>
+                      value="${test.elasticsearch.connection.hosts}"/>
             <property name="hibernate.search.backends.myBackend.username"
-                      value="${test.elasticsearch.host.username}"/>
+                      value="${test.elasticsearch.connection.username}"/>
             <property name="hibernate.search.backends.myBackend.password"
-                      value="${test.elasticsearch.host.password}"/>
+                      value="${test.elasticsearch.connection.password}"/>
             <property name="hibernate.search.backends.myBackend.aws.signing.enabled"
-                      value="${test.elasticsearch.host.aws.signing.enabled}"/>
+                      value="${test.elasticsearch.connection.aws.signing.enabled}"/>
             <property name="hibernate.search.backends.myBackend.aws.signing.access_key"
-                      value="${test.elasticsearch.host.aws.signing.access_key}"/>
+                      value="${test.elasticsearch.connection.aws.signing.access_key}"/>
             <property name="hibernate.search.backends.myBackend.aws.signing.secret_key"
-                      value="${test.elasticsearch.host.aws.signing.secret_key}"/>
+                      value="${test.elasticsearch.connection.aws.signing.secret_key}"/>
             <property name="hibernate.search.backends.myBackend.aws.signing.region"
-                      value="${test.elasticsearch.host.aws.signing.region}"/>
+                      value="${test.elasticsearch.connection.aws.signing.region}"/>
             <property name="hibernate.search.backends.myBackend.index_defaults.lifecycle.strategy"
                       value="drop-and-create-and-drop"/>
             <!-- Make this test work even if there is only a single node in the cluster -->
@@ -139,19 +139,19 @@
                 take care to also update the name of the commented properties just above.
              -->
             <property name="hibernate.search.backends.myBackend.hosts"
-                      value="${test.elasticsearch.host.url}"/>
+                      value="${test.elasticsearch.connection.hosts}"/>
             <property name="hibernate.search.backends.myBackend.username"
-                      value="${test.elasticsearch.host.username}"/>
+                      value="${test.elasticsearch.connection.username}"/>
             <property name="hibernate.search.backends.myBackend.password"
-                      value="${test.elasticsearch.host.password}"/>
+                      value="${test.elasticsearch.connection.password}"/>
             <property name="hibernate.search.backends.myBackend.aws.signing.enabled"
-                      value="${test.elasticsearch.host.aws.signing.enabled}"/>
+                      value="${test.elasticsearch.connection.aws.signing.enabled}"/>
             <property name="hibernate.search.backends.myBackend.aws.signing.access_key"
-                      value="${test.elasticsearch.host.aws.signing.access_key}"/>
+                      value="${test.elasticsearch.connection.aws.signing.access_key}"/>
             <property name="hibernate.search.backends.myBackend.aws.signing.secret_key"
-                      value="${test.elasticsearch.host.aws.signing.secret_key}"/>
+                      value="${test.elasticsearch.connection.aws.signing.secret_key}"/>
             <property name="hibernate.search.backends.myBackend.aws.signing.region"
-                      value="${test.elasticsearch.host.aws.signing.region}"/>
+                      value="${test.elasticsearch.connection.aws.signing.region}"/>
             <property name="hibernate.search.backends.myBackend.index_defaults.lifecycle.strategy"
                       value="drop-and-create-and-drop"/>
             <!-- Make this test work even if there is only a single node in the cluster -->
