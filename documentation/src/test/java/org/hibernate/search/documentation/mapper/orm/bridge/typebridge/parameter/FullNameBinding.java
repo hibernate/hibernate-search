@@ -19,21 +19,21 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.TypeMappingStep;
 
 //tag::include[]
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.TYPE })
-@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = FullNameBinding.Processor.class))
-@Documented
+@Retention(RetentionPolicy.RUNTIME) // <1>
+@Target({ ElementType.TYPE }) // <2>
+@TypeMapping(processor = @TypeMappingAnnotationProcessorRef(type = FullNameBinding.Processor.class)) // <3>
+@Documented // <4>
 public @interface FullNameBinding {
 
-	boolean sortField() default false; // <1>
+	boolean sortField() default false; // <5>
 
-	class Processor implements TypeMappingAnnotationProcessor<FullNameBinding> {
+	class Processor implements TypeMappingAnnotationProcessor<FullNameBinding> { // <6>
 		@Override
 		public void process(TypeMappingStep mapping, FullNameBinding annotation,
 				TypeMappingAnnotationProcessorContext context) {
-			FullNameBinder binder = new FullNameBinder() // <2>
-					.sortField( annotation.sortField() ); // <3>
-			mapping.binder( binder ); // <4>
+			FullNameBinder binder = new FullNameBinder() // <7>
+					.sortField( annotation.sortField() ); // <8>
+			mapping.binder( binder ); // <9>
 		}
 	}
 }

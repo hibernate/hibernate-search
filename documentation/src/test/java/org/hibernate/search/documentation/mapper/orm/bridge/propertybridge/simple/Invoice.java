@@ -14,7 +14,9 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OrderColumn;
 
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.PropertyBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyBinding;
 
 // tag::include[]
 @Entity
@@ -27,7 +29,7 @@ public class Invoice {
 
 	@ElementCollection
 	@OrderColumn
-	@InvoiceLineItemsSummaryBinding // <1>
+	@PropertyBinding(binder = @PropertyBinderRef(type = InvoiceLineItemsSummaryBinder.class)) // <1>
 	private List<InvoiceLineItem> lineItems = new ArrayList<>();
 
 	// Getters and setters

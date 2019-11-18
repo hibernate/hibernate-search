@@ -11,13 +11,15 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.TypeBinding;
 
 // tag::include[]
 @Entity
 @Indexed
-@FullNameBinding // <1>
+@TypeBinding(binder = @TypeBinderRef(type = FullNameBinder.class)) // <1>
 public class Author {
 
 	@Id

@@ -10,11 +10,13 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
+import org.hibernate.search.mapper.pojo.bridge.mapping.annotation.TypeBinderRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.TypeBinding;
 
 @Entity
 @Indexed
-@MyEntityTypeBinding
+@TypeBinding(binder = @TypeBinderRef(type = MyEntityTypeBinder.class))
 public class MyEntity {
 
 	@Id
