@@ -39,7 +39,7 @@ public class ElasticsearchBootstrapFailureIT {
 						.withBackendProperty(
 								BACKEND_NAME, ElasticsearchBackendSettings.HOSTS,
 								// We just need a closed port, hopefully this one will generally be closed
-								"http://localhost:9199"
+								"localhost:9199"
 						)
 						.withIndex(
 								"EmptyIndexName",

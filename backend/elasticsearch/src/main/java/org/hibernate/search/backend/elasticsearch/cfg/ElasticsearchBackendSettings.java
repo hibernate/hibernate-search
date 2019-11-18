@@ -33,18 +33,26 @@ public final class ElasticsearchBackendSettings {
 	public static final String TYPE_NAME = "elasticsearch";
 
 	/**
-	 * The protocol, host name and HTTP ports of the Elasticsearch servers to connect to.
+	 * The host name and ports of the Elasticsearch servers to connect to.
 	 * <p>
-	 * Expects either a String representing an URI such as {@code http://localhost}
-	 * or {@code https://es.mycompany.com:4400},
-	 * or a String containing multiple such URIs separated by whitespace characters,
-	 * or a {@code Collection<String>} containing such URIs.
+	 * Expects a String representing a host and port such as {@code localhost} or {@code es.mycompany.com:4400},
+	 * or a String containing multiple such host-and-port strings separated by whitespace characters,
+	 * or a {@code Collection<String>} containing such host-and-port strings.
 	 * <p>
 	 * Defaults to {@link Defaults#HOSTS}.
 	 * <p>
 	 * Multiple servers may be specified for load-balancing: requests will be assigned to each host in turns.
 	 */
 	public static final String HOSTS = "hosts";
+
+	/**
+	 * The protocol to use when connecting to the Elasticsearch servers.
+	 * <p>
+	 * Expects a String: either {@code http} or {@code https}.
+	 * <p>
+	 * Defaults to {@link Defaults#PROTOCOL}.
+	 */
+	public static final String PROTOCOL = "protocol";
 
 	/**
 	 * The version of Elasticsearch running on the Elasticsearch cluster.
@@ -196,7 +204,8 @@ public final class ElasticsearchBackendSettings {
 		private Defaults() {
 		}
 
-		public static final List<String> HOSTS = Collections.singletonList( "http://localhost:9200" );
+		public static final List<String> HOSTS = Collections.singletonList( "localhost:9200" );
+		public static final String PROTOCOL = "http";
 		public static final int REQUEST_TIMEOUT = 60000;
 		public static final int READ_TIMEOUT = 60000;
 		public static final int CONNECTION_TIMEOUT = 3000;

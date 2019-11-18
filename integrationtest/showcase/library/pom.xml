@@ -140,7 +140,8 @@
                         <JDBC_USERNAME>${jdbc.user}</JDBC_USERNAME>
                         <JDBC_PASSWORD>${jdbc.pass}</JDBC_PASSWORD>
                         <JDBC_ISOLATION>${jdbc.isolation}</JDBC_ISOLATION>
-                        <ELASTICSEARCH_URL>${test.elasticsearch.connection.hosts}</ELASTICSEARCH_URL>
+                        <ELASTICSEARCH_HOSTS>${test.elasticsearch.connection.hosts}</ELASTICSEARCH_HOSTS>
+                        <ELASTICSEARCH_PROTOCOL>${test.elasticsearch.connection.protocol}</ELASTICSEARCH_PROTOCOL>
                         <ELASTICSEARCH_USERNAME>${test.elasticsearch.connection.username}</ELASTICSEARCH_USERNAME>
                         <ELASTICSEARCH_PASSWORD>${test.elasticsearch.connection.password}</ELASTICSEARCH_PASSWORD>
                         <ELASTICSEARCH_AWS_SIGNING_ENABLED>${test.elasticsearch.connection.aws.signing.enabled}</ELASTICSEARCH_AWS_SIGNING_ENABLED>
