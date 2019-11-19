@@ -116,7 +116,7 @@ or a reference by type as a `java.lang.Class`
 
 |Multi-valued bean reference of type T
 |A `java.util.Collection` containing bean references (see above)
-|Whitespace separated string containing bean references (see above)
+|Comma-separated string containing bean references (see above)
 |===============
 
 [[configuration-property-checking]]

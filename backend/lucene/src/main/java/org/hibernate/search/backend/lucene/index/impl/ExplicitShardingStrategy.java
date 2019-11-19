@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.index.spi.ShardingStrategy;
@@ -28,7 +27,7 @@ public class ExplicitShardingStrategy implements ShardingStrategy {
 
 	private static final OptionalConfigurationProperty<List<String>> SHARD_IDENTIFIERS =
 			ConfigurationProperty.forKey( LuceneIndexSettings.ShardingRadicals.SHARD_IDENTIFIERS )
-					.asString().multivalued( Pattern.compile( "," ) )
+					.asString().multivalued()
 					.build();
 
 	private Set<String> shardIdSet;

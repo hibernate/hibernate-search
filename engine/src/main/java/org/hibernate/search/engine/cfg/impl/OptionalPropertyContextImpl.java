@@ -18,6 +18,8 @@ import org.hibernate.search.engine.cfg.spi.OptionalPropertyContext;
 
 final class OptionalPropertyContextImpl<T> implements OptionalPropertyContext<T> {
 
+	private static final Pattern MULTI_VALUE_SEPARATOR_PATTERN = Pattern.compile( "," );
+
 	private final String key;
 	private final Function<Object, T> converter;
 
@@ -27,10 +29,10 @@ final class OptionalPropertyContextImpl<T> implements OptionalPropertyContext<T>
 	}
 
 	@Override
-	public OptionalPropertyContext<List<T>> multivalued(Pattern separatorPattern) {
+	public OptionalPropertyContext<List<T>> multivalued() {
 		return new OptionalPropertyContextImpl<>(
 				key,
-				v -> ConvertUtils.convertMultiValue( separatorPattern, converter, v )
+				v -> ConvertUtils.convertMultiValue( MULTI_VALUE_SEPARATOR_PATTERN, converter, v )
 		);
 	}
 

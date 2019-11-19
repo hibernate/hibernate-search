@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.SubTest;
@@ -174,7 +173,7 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> extends EasyMockSup
 				testedMethod.apply(
 						ConfigurationProperty.forKey( key )
 				)
-						.multivalued( Pattern.compile( " " ) )
+						.multivalued()
 						.build();
 
 		// String value - one
@@ -193,16 +192,16 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> extends EasyMockSup
 		verifyAll();
 
 		// String value - multiple
-		String spaceSeparatedStringValue = invalidStringValue + " " + invalidStringValue;
+		String commaSeparatedStringValue = invalidStringValue + "," + invalidStringValue;
 		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( spaceSeparatedStringValue ) );
+		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( commaSeparatedStringValue ) );
 		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
 		replayAll();
 		SubTest.expectException( () -> property.get( sourceMock ) )
 				.assertThrown()
 				.hasMessageContaining(
 						"Unable to convert configuration property '" + resolvedKey
-								+ "' with value '" + spaceSeparatedStringValue + "':"
+								+ "' with value '" + commaSeparatedStringValue + "':"
 				)
 				.hasMessageContaining( expectedInvalidValueCommonMessagePrefix )
 				.hasMessageContaining( expectedInvalidStringMessage );

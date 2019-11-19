@@ -9,14 +9,13 @@ package org.hibernate.search.engine.environment.bean.impl;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.EngineSpiSettings;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.engine.environment.bean.spi.BeanCreationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanFactory;
@@ -30,7 +29,7 @@ public final class ConfiguredBeanResolver implements BeanResolver {
 	private static final ConfigurationProperty<List<BeanReference<? extends BeanConfigurer>>> BEAN_CONFIGURERS =
 			ConfigurationProperty.forKey( EngineSpiSettings.Radicals.BEAN_CONFIGURERS )
 					.asBeanReference( BeanConfigurer.class )
-					.multivalued( Pattern.compile( "\\s+" ) )
+					.multivalued()
 					.withDefault( EngineSpiSettings.Defaults.BEAN_CONFIGURERS )
 					.build();
 
