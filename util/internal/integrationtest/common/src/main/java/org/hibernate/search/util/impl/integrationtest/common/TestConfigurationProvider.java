@@ -53,12 +53,16 @@ public final class TestConfigurationProvider implements TestRule {
 	}
 
 	public BeanResolver createBeanResolverForTest() {
+		return createBeanResolverForTest( ConfigurationPropertySource.empty() );
+	}
+
+	public BeanResolver createBeanResolverForTest(ConfigurationPropertySource configurationPropertySource) {
 		AggregatedClassLoader aggregatedClassLoader = AggregatedClassLoader.createDefault();
 		ClassResolver classResolver = DefaultClassResolver.create( aggregatedClassLoader );
 		ServiceResolver serviceResolver = DefaultServiceResolver.create( aggregatedClassLoader );
 		ReflectionBeanProvider beanProvider = ReflectionBeanProvider.create( classResolver );
 		return new ConfiguredBeanResolver(
-				serviceResolver, beanProvider, ConfigurationPropertySource.empty()
+				serviceResolver, beanProvider, configurationPropertySource
 		);
 	}
 

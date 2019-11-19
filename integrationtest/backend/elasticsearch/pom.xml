@@ -129,7 +129,8 @@
             <properties>
                 <failsafe.excludedGroups.aws>
                     org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresIndexOpenClose,
-                    org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresNoRequestPostProcessing
+                    org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresNoRequestPostProcessing,
+                    org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresNoAutomaticAuthenticationHeader
                 </failsafe.excludedGroups.aws>
                 <test.elasticsearch.connection.aws.signing.enabled>true</test.elasticsearch.connection.aws.signing.enabled>
             </properties>
