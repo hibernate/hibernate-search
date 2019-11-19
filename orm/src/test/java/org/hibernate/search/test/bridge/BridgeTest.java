@@ -20,6 +20,7 @@ import java.util.UUID;
 
 import org.hibernate.HibernateException;
 import org.hibernate.Transaction;
+import org.hibernate.dialect.PostgreSQL81Dialect;
 import org.hibernate.search.FullTextQuery;
 import org.hibernate.search.FullTextSession;
 import org.hibernate.search.Search;
@@ -51,6 +52,8 @@ import org.assertj.core.api.Assertions;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+
+import org.hibernate.testing.SkipForDialect;
 
 /**
  * @author Emmanuel Bernard
@@ -365,6 +368,8 @@ public class BridgeTest extends SearchTestBase {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3767")
+	@SkipForDialect(value = PostgreSQL81Dialect.class,
+			comment = "For some reason we try to store the null character in a string and PostgreSQL doesn't like that.")
 	public void testDateBridgeNullProjections() {
 		Cloud nullCloud = new Cloud();
 
@@ -401,6 +406,8 @@ public class BridgeTest extends SearchTestBase {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3767")
+	@SkipForDialect(value = PostgreSQL81Dialect.class,
+			comment = "For some reason we try to store the null character in a string and PostgreSQL doesn't like that.")
 	public void testCalendarBridgeNullProjections() {
 		Cloud nullCloud = new Cloud();
 
