@@ -36,7 +36,7 @@ public final class ElasticsearchBackendSettings {
 	 * The host name and ports of the Elasticsearch servers to connect to.
 	 * <p>
 	 * Expects a String representing a host and port such as {@code localhost} or {@code es.mycompany.com:4400},
-	 * or a String containing multiple such host-and-port strings separated by whitespace characters,
+	 * or a String containing multiple such host-and-port strings separated by commas,
 	 * or a {@code Collection<String>} containing such host-and-port strings.
 	 * <p>
 	 * Defaults to {@link Defaults#HOSTS}.

@@ -13,11 +13,10 @@ import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.regex.Pattern;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.testsupport.util.AbstractBeanResolverPartialMock;
 import org.hibernate.search.util.impl.test.SubTest;
 
@@ -147,7 +146,7 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		String key = "multiValued";
 		OptionalConfigurationProperty<List<BeanReference<? extends StubBean>>> property =
 				ConfigurationProperty.forKey( key ).asBeanReference( StubBean.class )
-						.multivalued( Pattern.compile( " " ) )
+						.multivalued()
 						.build();
 
 		BeanHolder<StubBeanImpl1> expected1 = BeanHolder.of( new StubBeanImpl1() );
@@ -177,7 +176,7 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 
 		// String value - multiple
 		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( "name1 name2" ) );
+		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( "name1,name2" ) );
 		EasyMock.expect( beanResolverMock.resolve( StubBean.class, "name1" ) )
 				.andReturn( expected1AsStubBean );
 		EasyMock.expect( beanResolverMock.resolve( StubBean.class, "name2" ) )
@@ -311,12 +310,12 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		String resolvedKey = "some.prefix." + key;
 		OptionalConfigurationProperty<List<BeanReference<? extends StubBean>>> property =
 				ConfigurationProperty.forKey( key ).asBeanReference( StubBean.class )
-						.multivalued( Pattern.compile( " " ) )
+						.multivalued()
 						.build();
 
 		BeanHolder<StubBean> bean1Mock = createMock( BeanHolder.class );
 
-		String propertyValue = "name1 name2";
+		String propertyValue = "name1,name2";
 		SimulatedFailure simulatedFailure = new SimulatedFailure();
 
 		resetAll();

@@ -8,11 +8,10 @@ package org.hibernate.search.engine.cfg.spi;
 
 import java.util.List;
 import java.util.function.Supplier;
-import java.util.regex.Pattern;
 
 public interface OptionalPropertyContext<T> {
 
-	OptionalPropertyContext<List<T>> multivalued(Pattern separatorPattern);
+	OptionalPropertyContext<List<T>> multivalued();
 
 	DefaultedPropertyContext<T> withDefault(T defaultValue);
 

@@ -15,7 +15,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
-import java.util.regex.Pattern;
 
 import org.hibernate.search.util.impl.test.SubTest;
 
@@ -175,7 +174,7 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> extends EasyMockSuppo
 				testedMethod.apply(
 						ConfigurationProperty.forKey( key )
 				)
-						.multivalued( Pattern.compile( " " ) )
+						.multivalued()
 						.build();
 
 		Optional<List<T>> result;
@@ -191,7 +190,7 @@ public class ConfigurationPropertyValidSimpleValuesTest<T> extends EasyMockSuppo
 
 		// String value - multiple
 		resetAll();
-		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( stringValue + " " + stringValue ) );
+		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( stringValue + "," + stringValue ) );
 		replayAll();
 		result = property.get( sourceMock );
 		verifyAll();

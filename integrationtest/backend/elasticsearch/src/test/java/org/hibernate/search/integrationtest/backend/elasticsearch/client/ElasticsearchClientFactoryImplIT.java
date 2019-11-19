@@ -656,13 +656,13 @@ public class ElasticsearchClientFactoryImplIT {
 	private static String httpHostAndPortFor(WireMockRule ... rules) {
 		return Arrays.stream( rules )
 				.map( rule -> "localhost:" + rule.port() )
-				.collect( Collectors.joining( " " ) );
+				.collect( Collectors.joining( "," ) );
 	}
 
 	private static String httpsHostAndPortFor(WireMockRule ... rules) {
 		return Arrays.stream( rules )
 				.map( rule -> "localhost:" + rule.httpsPort() )
-				.collect( Collectors.joining( " " ) );
+				.collect( Collectors.joining( "," ) );
 	}
 
 	private static List<String> httpsHostsAndPortsFor(List<WireMockRule> rules) {

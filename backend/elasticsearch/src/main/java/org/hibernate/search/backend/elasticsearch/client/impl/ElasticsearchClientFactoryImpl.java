@@ -10,7 +10,22 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
+
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchHttpClientConfigurer;
+import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
+import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -23,21 +38,6 @@ import org.elasticsearch.client.sniff.ElasticsearchNodesSniffer;
 import org.elasticsearch.client.sniff.NodesSniffer;
 import org.elasticsearch.client.sniff.Sniffer;
 import org.elasticsearch.client.sniff.SnifferBuilder;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientImplementor;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchHttpClientConfigurer;
-import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
-import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
-import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * @author Gunnar Morling
@@ -56,7 +56,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 	private static final ConfigurationProperty<List<String>> HOSTS =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.HOSTS )
-					.asString().multivalued( Pattern.compile( "\\s+" ) )
+					.asString().multivalued()
 					.withDefault( ElasticsearchBackendSettings.Defaults.HOSTS )
 					.build();
 

@@ -69,7 +69,7 @@ hibernate.search.backends.<backend name>.hosts = localhost:9200 (default)
 The Elasticsearch host (or hosts) to send indexing requests and search queries to.
 +
 Expects a String representing a host and port such as `localhost` or `es.mycompany.com:4400`,
-or a String containing multiple such host-and-port strings separated by whitespace characters,
+or a String containing multiple such host-and-port strings separated by commas,
 or a `Collection<String>` containing such host-and-port strings.
 
 Protocol::
