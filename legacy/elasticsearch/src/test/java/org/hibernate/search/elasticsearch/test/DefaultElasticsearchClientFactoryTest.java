@@ -36,6 +36,7 @@ import org.hibernate.search.testsupport.BytemanHelper;
 import org.hibernate.search.testsupport.BytemanHelper.BytemanAccessor;
 import org.hibernate.search.testsupport.TestForIssue;
 import org.hibernate.search.testsupport.concurrency.Poller;
+import org.hibernate.search.testsupport.junit.PortedToSearch6;
 import org.hibernate.search.testsupport.setup.BuildContextForTest;
 import org.hibernate.search.testsupport.setup.SearchConfigurationForTest;
 import org.jboss.byteman.contrib.bmunit.BMRule;
@@ -43,6 +44,7 @@ import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 
@@ -59,6 +61,7 @@ import com.google.gson.JsonSyntaxException;
  * @author Yoann Rodiere
  */
 @RunWith(BMUnitRunner.class)
+@Category(PortedToSearch6.class)
 public class DefaultElasticsearchClientFactoryTest {
 
 	private static final Poller POLLER = Poller.milliseconds( 10_000, 500 );
