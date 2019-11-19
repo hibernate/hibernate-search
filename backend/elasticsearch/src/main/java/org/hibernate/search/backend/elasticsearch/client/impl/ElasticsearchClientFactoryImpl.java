@@ -118,12 +118,6 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 					.withDefault( ElasticsearchBackendSettings.Defaults.DISCOVERY_REFRESH_INTERVAL )
 					.build();
 
-	private static final ConfigurationProperty<String> DISCOVERY_SCHEME =
-			ConfigurationProperty.forKey( ElasticsearchBackendSettings.DISCOVERY_SCHEME )
-					.asString()
-					.withDefault( ElasticsearchBackendSettings.Defaults.DISCOVERY_SCHEME )
-					.build();
-
 	private final List<ElasticsearchHttpClientConfigurer> httpClientConfigurers;
 
 	ElasticsearchClientFactoryImpl(List<ElasticsearchHttpClientConfigurer> httpClientConfigurers) {
@@ -135,8 +129,9 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 			ThreadPoolProvider threadPoolProvider, GsonProvider gsonProvider) {
 		int requestTimeoutMs = REQUEST_TIMEOUT.get( propertySource );
 
-		RestClient restClient = createClient( propertySource, threadPoolProvider.getThreadProvider() );
-		Sniffer sniffer = createSniffer( restClient, propertySource );
+		ServerUris hosts = ServerUris.fromStrings( PROTOCOL.get( propertySource ), HOSTS.get( propertySource ) );
+		RestClient restClient = createClient( hosts, propertySource, threadPoolProvider.getThreadProvider() );
+		Sniffer sniffer = createSniffer( hosts, restClient, propertySource );
 
 		return new ElasticsearchClientImpl(
 				restClient, sniffer, threadPoolProvider,
@@ -145,10 +140,9 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 		);
 	}
 
-	private RestClient createClient(ConfigurationPropertySource propertySource,
+	private RestClient createClient(ServerUris hosts,
+			ConfigurationPropertySource propertySource,
 			ThreadProvider threadProvider) {
-		ServerUris hosts = ServerUris.fromStrings( PROTOCOL.get( propertySource ), HOSTS.get( propertySource ) );
-
 		return RestClient.builder( hosts.asHostsArray() )
 				.setRequestConfigCallback( b -> customizeRequestConfig( b, propertySource ) )
 				.setHttpClientConfigCallback(
@@ -157,7 +151,7 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 				.build();
 	}
 
-	private Sniffer createSniffer(RestClient client, ConfigurationPropertySource propertySource) {
+	private Sniffer createSniffer(ServerUris hosts, RestClient client, ConfigurationPropertySource propertySource) {
 		boolean discoveryEnabled = DISCOVERY_ENABLED.get( propertySource );
 		if ( discoveryEnabled ) {
 			SnifferBuilder builder = Sniffer.builder( client )
@@ -165,10 +159,9 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 							DISCOVERY_REFRESH_INTERVAL.get( propertySource )
 							* 1_000 // The configured value is in seconds
 					);
-			String scheme = DISCOVERY_SCHEME.get( propertySource );
 
 			// https discovery support
-			if ( scheme.equals( ElasticsearchNodesSniffer.Scheme.HTTPS.toString() ) ) {
+			if ( hosts.isSslEnabled() ) {
 				NodesSniffer hostsSniffer = new ElasticsearchNodesSniffer(
 						client,
 						ElasticsearchNodesSniffer.DEFAULT_SNIFF_REQUEST_TIMEOUT, // 1sec

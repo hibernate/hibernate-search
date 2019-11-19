@@ -145,15 +145,12 @@ Automatic discovery is controlled by the following properties:
 ----
 hibernate.search.backends.<backend name>.discovery.enabled = false (default)
 hibernate.search.backends.<backend name>.discovery.refresh_interval = 10 (default)
-hibernate.search.backends.<backend name>.discovery.default_scheme = http (default)
 ----
 
 * `discovery.enabled` defines whether the feature is enabled.
 Expects a boolean value.
 * `discovery.refresh_interval` defines the interval between two executions of the automatic discovery.
 Expects a positive integer, in seconds.
-* `discovery.default_scheme` defines the default scheme to use when connecting to automatically discovered nodes.
-Expects a String: either "http" or "https".
 
 [[backend-elasticsearch-configuration-version]]
 === Version

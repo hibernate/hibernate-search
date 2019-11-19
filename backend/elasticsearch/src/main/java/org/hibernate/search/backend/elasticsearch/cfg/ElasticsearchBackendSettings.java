@@ -157,15 +157,6 @@ public final class ElasticsearchBackendSettings {
 	public static final String DISCOVERY_REFRESH_INTERVAL = "discovery.refresh_interval";
 
 	/**
-	 * The default scheme to use when connecting to automatically discovered nodes.
-	 * <p>
-	 * Expects a String: either "http" or "https".
-	 * <p>
-	 * Defaults to {@link Defaults#DISCOVERY_SCHEME}.
-	 */
-	public static final String DISCOVERY_SCHEME = "discovery.default_scheme";
-
-	/**
 	 * Whether JSON included in logs should be pretty-printed (indented, with line breaks).
 	 * <p>
 	 * Expects a Boolean value such as {@code true} or {@code false},
@@ -213,7 +204,6 @@ public final class ElasticsearchBackendSettings {
 		public static final int MAX_CONNECTIONS_PER_ROUTE = 10;
 		public static final boolean DISCOVERY_ENABLED = false;
 		public static final int DISCOVERY_REFRESH_INTERVAL = 10;
-		public static final String DISCOVERY_SCHEME = "http";
 		public static final boolean LOG_JSON_PRETTY_PRINTING = false;
 		public static final MultiTenancyStrategyName MULTI_TENANCY_STRATEGY = MultiTenancyStrategyName.NONE;
 	}
