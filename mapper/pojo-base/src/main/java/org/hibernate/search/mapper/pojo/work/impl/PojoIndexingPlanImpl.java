@@ -220,7 +220,7 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 		throw new AssertionFailure(
 				"Attempt to reindex an entity of type " + clazz + " because a contained entity was modified,"
 				+ " but " + clazz + " is not indexed directly."
-				+ " This is proa"
+				+ " There is a bug in Hibernate Search, please report it."
 		);
 	}
 
