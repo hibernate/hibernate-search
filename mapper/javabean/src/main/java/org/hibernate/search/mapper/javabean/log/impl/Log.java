@@ -32,11 +32,6 @@ public interface Log extends BasicLogger {
 	SearchException cannotFindProperty(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
 			String propertyName);
 
-	@Message(id = ID_OFFSET_1 + 2,
-			value = "Cannot read property '%2$s' on type '%1$s'.")
-	SearchException cannotReadProperty(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
-			String propertyName);
-
 	@Message(id = ID_OFFSET_1 + 3, value = "Exception while retrieving the type model for '%1$s'.")
 	SearchException errorRetrievingTypeModel(@FormatWith(ClassFormatter.class) Class<?> clazz, @Cause Exception cause);
 

@@ -206,14 +206,6 @@ public interface Log extends BasicLogger {
 			@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel,
 			@FormatWith(PojoModelPathFormatter.class) PojoModelPathValueNode path);
 
-	@Message(id = ID_OFFSET_2 + 26,
-			value = "Annotation type '%2$s' is annotated with '%1$s',"
-					+ " but both a bridge reference and a binder reference were provided."
-					+ " Only one can be provided.")
-	SearchException conflictingBridgeReferenceInBridgeMapping(
-			@FormatWith(ClassFormatter.class) Class<? extends Annotation> metaAnnotationType,
-			@FormatWith(ClassFormatter.class) Class<? extends Annotation> annotationType);
-
 	@Message(id = ID_OFFSET_2 + 27,
 			value = "Type '%1$s' is not marked as an entity type, yet it is indexed or targeted"
 			+ " by an association from an indexed type. Please check your configuration.")
@@ -355,11 +347,6 @@ public interface Log extends BasicLogger {
 	)
 	SearchException cannotResolveContainerExtractorName(String extractorName,
 			@FormatWith(ClassFormatter.class) Class<?> builtinExtractorConstantsClass);
-
-	@Message(id = ID_OFFSET_2 + 54,
-			value = "Binder '%1$s' cannot be initialized with annotations of type '%2$s'.")
-	SearchException invalidAnnotationTypeForBinder(Object binder,
-			@FormatWith(ClassFormatter.class) Class<?> annotationType);
 
 	@Message(id = ID_OFFSET_2 + 55,
 			value = "Type '%1$s' is contained in an indexed type but is not itself indexed,"
