@@ -244,7 +244,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		}
 	}
 
-	public String[] getDirtyPropertyNames(PostUpdateEvent event) {
+	private String[] getDirtyPropertyNames(PostUpdateEvent event) {
 		EntityPersister persister = event.getPersister();
 		final int[] dirtyProperties = event.getDirtyProperties();
 		if ( dirtyProperties != null && dirtyProperties.length > 0 ) {
