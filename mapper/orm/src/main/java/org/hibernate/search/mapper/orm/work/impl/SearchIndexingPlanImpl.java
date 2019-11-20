@@ -19,12 +19,12 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void addOrUpdate(Object entity) {
-		context.getCurrentIndexingPlan( true ).addOrUpdate( entity );
+		context.getCurrentIndexingPlan( true ).addOrUpdate( null, entity );
 	}
 
 	@Override
 	public void delete(Object entity) {
-		context.getCurrentIndexingPlan( true ).delete( entity );
+		context.getCurrentIndexingPlan( true ).delete( null, entity );
 	}
 
 	@Override

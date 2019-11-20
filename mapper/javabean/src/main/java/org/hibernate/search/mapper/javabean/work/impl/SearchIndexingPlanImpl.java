@@ -22,7 +22,7 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void add(Object entity) {
-		delegate.add( entity );
+		delegate.add( null, entity );
 	}
 
 	@Override
@@ -32,7 +32,7 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void addOrUpdate(Object entity) {
-		delegate.addOrUpdate( entity );
+		delegate.addOrUpdate( null, entity );
 	}
 
 	@Override
@@ -42,7 +42,7 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void addOrUpdate(Object entity, String... dirtyPaths) {
-		delegate.addOrUpdate( entity, dirtyPaths );
+		delegate.addOrUpdate( null, entity, dirtyPaths );
 	}
 
 	@Override
@@ -52,7 +52,7 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void delete(Object entity) {
-		delegate.delete( entity );
+		delegate.delete( null, entity );
 	}
 
 	@Override

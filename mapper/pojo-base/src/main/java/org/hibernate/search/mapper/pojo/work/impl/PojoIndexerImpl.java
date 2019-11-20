@@ -41,11 +41,6 @@ public class PojoIndexerImpl implements PojoIndexer {
 	}
 
 	@Override
-	public CompletableFuture<?> add(Object entity) {
-		return add( null, entity );
-	}
-
-	@Override
 	public CompletableFuture<?> add(Object providedId, Object entity) {
 		PojoRawTypeIdentifier<?> typeIdentifier = introspector.getTypeIdentifier( entity );
 		PojoTypeIndexer<?, ?, ?> typeExecutor = this.typeExecutors.get( typeIdentifier );

@@ -32,18 +32,9 @@ public interface PojoIndexingPlan {
 	/**
 	 * Add an entity to the index, assuming that the entity is absent from the index.
 	 * <p>
-	 * Shorthand for {@code add(null, entity)}; see {@link #add(Object, Object)}.
-	 *
-	 * @param entity The entity to add to the index.
-	 */
-	void add(Object entity);
-
-	/**
-	 * Add an entity to the index, assuming that the entity is absent from the index.
-	 * <p>
 	 * <strong>Note:</strong> depending on the backend, this may lead to errors or duplicate entries in the index
 	 * if the entity was actually already present in the index before this call.
-	 * When in doubt, you should rather use {@link #addOrUpdate(Object, Object)} or {@link #addOrUpdate(Object)}.
+	 * When in doubt, you should rather use {@link #addOrUpdate(Object, Object)}.
 	 *
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
@@ -51,15 +42,6 @@ public interface PojoIndexingPlan {
 	 * @param entity The entity to add to the index.
 	 */
 	void add(Object providedId, Object entity);
-
-	/**
-	 * Update an entity in the index, or add it if it's absent from the index.
-	 * <p>
-	 * Shorthand for {@code update(null, entity)}; see {@link #addOrUpdate(Object, Object)}.
-	 *
-	 * @param entity The entity to update in the index.
-	 */
-	void addOrUpdate(Object entity);
 
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index.
@@ -75,21 +57,6 @@ public interface PojoIndexingPlan {
 	 * Update an entity in the index, or add it if it's absent from the index,
 	 * but try to avoid reindexing if the given dirty paths
 	 * are known not to impact the indexed form of that entity.
-	 * <p>
-	 * Assumes that the entity may already be present in the index.
-	 * <p>
-	 * Shorthand for {@code update(null, entity, dirtyPaths)}; see {@link #addOrUpdate(Object, Object)}.
-	 *
-	 * @param entity The entity to update in the index.
-	 * @param dirtyPaths The paths to consider dirty, formatted using the dot-notation
-	 * ("directEntityProperty.nestedPropery").
-	 */
-	void addOrUpdate(Object entity, String... dirtyPaths);
-
-	/**
-	 * Update an entity in the index, or add it if it's absent from the index,
-	 * but try to avoid reindexing if the given dirty paths
-	 * are known not to impact the indexed form of that entity.
 	 *
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
@@ -99,15 +66,6 @@ public interface PojoIndexingPlan {
 	 * ("directEntityProperty.nestedPropery").
 	 */
 	void addOrUpdate(Object providedId, Object entity, String... dirtyPaths);
-
-	/**
-	 * Delete an entity from the index.
-	 * <p>
-	 * Shorthand for {@code delete(null, entity)}; see {@link #delete(Object, Object)}.
-	 *
-	 * @param entity The entity to delete from the index.
-	 */
-	void delete(Object entity);
 
 	/**
 	 * Delete an entity from the index.

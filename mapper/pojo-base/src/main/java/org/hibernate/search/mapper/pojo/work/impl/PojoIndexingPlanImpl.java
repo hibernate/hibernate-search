@@ -56,20 +56,10 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 	}
 
 	@Override
-	public void add(Object entity) {
-		add( null, entity );
-	}
-
-	@Override
 	public void add(Object providedId, Object entity) {
 		PojoRawTypeIdentifier<?> typeIdentifier = introspector.getTypeIdentifier( entity );
 		AbstractPojoTypeIndexingPlan delegate = getDelegate( typeIdentifier );
 		delegate.add( providedId, entity );
-	}
-
-	@Override
-	public void addOrUpdate(Object entity) {
-		addOrUpdate( null, entity );
 	}
 
 	@Override
@@ -80,20 +70,10 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 	}
 
 	@Override
-	public void addOrUpdate(Object entity, String... dirtyPaths) {
-		addOrUpdate( null, entity, dirtyPaths );
-	}
-
-	@Override
 	public void addOrUpdate(Object providedId, Object entity, String... dirtyPaths) {
 		PojoRawTypeIdentifier<?> typeIdentifier = introspector.getTypeIdentifier( entity );
 		AbstractPojoTypeIndexingPlan delegate = getDelegate( typeIdentifier );
 		delegate.update( providedId, entity, dirtyPaths );
-	}
-
-	@Override
-	public void delete(Object entity) {
-		delete( null, entity );
 	}
 
 	@Override
