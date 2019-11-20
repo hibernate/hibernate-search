@@ -18,14 +18,14 @@ import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class HibernateOrmByTypeEntityLoader<E, T> implements EntityLoader<EntityReference, T> {
+public class HibernateOrmByTypeEntityLoader<T> implements EntityLoader<EntityReference, T> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Map<Class<? extends E>, HibernateOrmComposableEntityLoader<? extends T>> delegatesByConcreteType;
+	private final Map<String, HibernateOrmComposableEntityLoader<? extends T>> delegatesByEntityName;
 
-	HibernateOrmByTypeEntityLoader(Map<Class<? extends E>, HibernateOrmComposableEntityLoader<? extends T>> delegatesByConcreteType) {
-		this.delegatesByConcreteType = delegatesByConcreteType;
+	HibernateOrmByTypeEntityLoader(Map<String, HibernateOrmComposableEntityLoader<? extends T>> delegatesByEntityName) {
+		this.delegatesByEntityName = delegatesByEntityName;
 	}
 
 	@Override
@@ -37,7 +37,7 @@ public class HibernateOrmByTypeEntityLoader<E, T> implements EntityLoader<Entity
 		// Note that multiple entity types may share the same loader
 		for ( EntityReference reference : references ) {
 			objectsByReference.put( reference, null );
-			HibernateOrmComposableEntityLoader<? extends T> delegate = getDelegate( reference.getType() );
+			HibernateOrmComposableEntityLoader<? extends T> delegate = getDelegate( reference.getName() );
 			referencesByDelegate.computeIfAbsent( delegate, ignored -> new ArrayList<>() )
 					.add( reference );
 		}
@@ -58,10 +58,10 @@ public class HibernateOrmByTypeEntityLoader<E, T> implements EntityLoader<Entity
 		return result;
 	}
 
-	private HibernateOrmComposableEntityLoader<? extends T> getDelegate(Class<?> entityType) {
-		HibernateOrmComposableEntityLoader<? extends T> delegate = delegatesByConcreteType.get( entityType );
+	private HibernateOrmComposableEntityLoader<? extends T> getDelegate(String entityName) {
+		HibernateOrmComposableEntityLoader<? extends T> delegate = delegatesByEntityName.get( entityName );
 		if ( delegate == null ) {
-			throw log.unexpectedSearchHitType( entityType, delegatesByConcreteType.keySet() );
+			throw log.unexpectedSearchHitEntityName( entityName, delegatesByEntityName.keySet() );
 		}
 		return delegate;
 	}

@@ -6,10 +6,11 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
-import javax.persistence.metamodel.IdentifiableType;
+import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
 import org.hibernate.search.mapper.orm.search.loading.impl.EntityLoaderFactory;
 import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmByIdEntityLoader;
@@ -18,27 +19,30 @@ import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionIndexedTy
 import org.hibernate.search.mapper.pojo.bridge.mapping.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<E>
 		implements HibernateOrmSessionIndexedTypeContext<E>, HibernateOrmScopeIndexedTypeContext<E> {
 	private final String indexName;
+	private final EntityTypeDescriptor<E> entityType;
 	private final boolean documentIdIsEntityId;
 	private final EntityLoaderFactory loaderFactory;
 	private final IdentifierMapping identifierMapping;
 
+	@SuppressWarnings("unchecked")
 	private HibernateOrmIndexedTypeContext(Builder<E> builder, SessionFactoryImplementor sessionFactory) {
 		super( builder.javaClass, builder.entityName );
 
 		this.indexName = builder.indexName;
 
-		IdentifiableType<E> indexTypeModel = sessionFactory.getMetamodel().entity( getEntityName() );
+		this.entityType = (EntityTypeDescriptor<E>) getEntityTypeByJpaEntityName( sessionFactory, getEntityName() );
 		SingularAttribute<? super E, ?> documentIdSourceAttribute =
-				indexTypeModel.getSingularAttribute( builder.documentIdSourcePropertyName );
+				entityType.getSingularAttribute( builder.documentIdSourcePropertyName );
 		if ( documentIdSourceAttribute.isId() ) {
 			documentIdIsEntityId = true;
 			loaderFactory = HibernateOrmByIdEntityLoader.factory(
-					sessionFactory, getJavaClass()
+					sessionFactory, entityType
 			);
 		}
 		else {
@@ -46,7 +50,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 			// We need to use a criteria query to load entities from the document IDs
 			documentIdIsEntityId = false;
 			loaderFactory = HibernateOrmCriteriaEntityLoader.factory(
-					getJavaClass(), documentIdSourceAttribute, builder.documentIdSourcePropertyHandle
+					entityType, documentIdSourceAttribute, builder.documentIdSourcePropertyHandle
 			);
 		}
 
@@ -79,7 +83,27 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 		return loaderFactory;
 	}
 
+	@Override
+	public EntityTypeDescriptor<E> getEntityType() {
+		return entityType;
+	}
+
+	private static EntityTypeDescriptor<?> getEntityTypeByJpaEntityName(
+			SessionFactoryImplementor sessionFactory, String jpaEntityName) {
+		// This is ugly, but there is no other way to get the entity type from its JPA entity name...
+		for ( EntityType<?> entity : sessionFactory.getMetamodel().getEntities() ) {
+			if ( jpaEntityName.equals( entity.getName() ) ) {
+				return (EntityTypeDescriptor<?>) entity;
+			}
+		}
+		throw new AssertionFailure(
+				"Could not find the entity type with name '" + jpaEntityName + "'."
+				+ " There is a bug in Hibernate Search, please report it."
+		);
+	}
+
 	static class Builder<E> implements PojoIndexedTypeExtendedMappingCollector {
+
 		private final Class<E> javaClass;
 		private final String entityName;
 		private final String indexName;

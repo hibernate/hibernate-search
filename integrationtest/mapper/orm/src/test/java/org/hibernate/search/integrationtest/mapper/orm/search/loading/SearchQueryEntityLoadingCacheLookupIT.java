@@ -220,7 +220,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 			EntityLoadingCacheLookupStrategy overriddenLookupStrategy) {
 		if ( !primitives.isCacheLookupSupported() ) {
 			logged.expectMessage(
-					"The entity loader for '" + primitives.getIndexedClass().getName()
+					"The entity loader for '" + primitives.getIndexedEntityName()
 					+ "' will ignore the cache lookup strategy"
 			);
 			testLoadingCacheLookupExpectingSkipCacheLookup( overriddenLookupStrategy );
@@ -248,7 +248,7 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 			EntityLoadingCacheLookupStrategy overriddenLookupStrategy) {
 		if ( !primitives.isCacheLookupSupported() ) {
 			logged.expectMessage(
-					"The entity loader for '" + primitives.getIndexedClass().getName()
+					"The entity loader for '" + primitives.getIndexedEntityName()
 					+ "' will ignore the cache lookup strategy"
 			);
 			testLoadingCacheLookupExpectingSkipCacheLookup( overriddenLookupStrategy );

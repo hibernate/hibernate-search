@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
@@ -23,6 +24,7 @@ import org.hibernate.AssertionFailure;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
 import org.hibernate.query.Query;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
@@ -34,20 +36,20 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public static <E> EntityLoaderFactory factory(Class<E> entityType,
+	public static <E> EntityLoaderFactory factory(EntityTypeDescriptor<E> entityType,
 			SingularAttribute<? super E,?> documentIdSourceAttribute,
 			ValueReadHandle<?> documentIdSourceHandle) {
 		return new Factory<>( entityType, documentIdSourceAttribute, documentIdSourceHandle );
 	}
 
-	private final Class<? extends E> entityType;
+	private final EntityTypeDescriptor<? extends E> entityType;
 	private final SingularAttribute<? super E, ?> documentIdSourceAttribute;
 	private final ValueReadHandle<?> documentIdSourceHandle;
 	private final Session session;
 	private final MutableEntityLoadingOptions loadingOptions;
 
 	private HibernateOrmCriteriaEntityLoader(
-			Class<? extends E> entityType,
+			EntityTypeDescriptor<? extends E> entityType,
 			SingularAttribute<? super E, ?> documentIdSourceAttribute,
 			ValueReadHandle<?> documentIdSourceHandle,
 			Session session,
@@ -81,7 +83,7 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 
 	private List<? extends E> loadEntities(Collection<Object> documentIdSourceValues) {
 		CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
-		CriteriaQuery<? extends E> criteriaQuery = criteriaBuilder.createQuery( entityType );
+		CriteriaQuery<? extends E> criteriaQuery = criteriaBuilder.createQuery( entityType.getJavaType() );
 
 		Root<? extends E> root = criteriaQuery.from( entityType );
 		Path<?> documentIdSourcePropertyInRoot = root.get( documentIdSourceAttribute );
@@ -97,11 +99,12 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 
 	private static class Factory<E> implements EntityLoaderFactory {
 
-		private final Class<E> entityType;
+		private final EntityTypeDescriptor<E> entityType;
 		private final SingularAttribute<? super E, ?> documentIdSourceAttribute;
 		private final ValueReadHandle<?> documentIdSourceHandle;
 
-		private Factory(Class<E> entityType, SingularAttribute<? super E, ?> documentIdSourceAttribute,
+		private Factory(EntityTypeDescriptor<E> entityType,
+				SingularAttribute<? super E, ?> documentIdSourceAttribute,
 				ValueReadHandle<?> documentIdSourceHandle) {
 			this.entityType = entityType;
 			this.documentIdSourceAttribute = documentIdSourceAttribute;
@@ -127,29 +130,35 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 		}
 
 		@Override
-		public <E2> HibernateOrmComposableEntityLoader<E2> create(Class<E2> targetEntityType,
+		public <E2> HibernateOrmComposableEntityLoader<E2> create(
+				HibernateOrmLoadingIndexedTypeContext<E2> targetEntityTypeContext,
 				SessionImplementor session,
 				EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
-			return doCreate( targetEntityType, session, cacheLookupStrategy, loadingOptions );
+			return doCreate( targetEntityTypeContext.getEntityType(), session, cacheLookupStrategy, loadingOptions );
 		}
 
 		@Override
-		public <E2> HibernateOrmComposableEntityLoader<? extends E2> create(List<Class<? extends E2>> targetEntityTypes,
+		public <E2> HibernateOrmComposableEntityLoader<? extends E2> create(
+				List<HibernateOrmLoadingIndexedTypeContext<? extends E2>> targetEntityTypeContexts,
 				SessionImplementor session,
 				EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
-			if ( targetEntityTypes.size() != 1 ) {
+			if ( targetEntityTypeContexts.size() != 1 ) {
 				throw new AssertionFailure(
 						"Attempt to use a criteria-based entity loader with multiple target entity types."
 								+ " There is a bug in Hibernate Search, please report it."
-								+ " Expected entity type: " + entityType
-								+ " Targeted entity types: " + targetEntityTypes
+								+ " Expected entity name: " + entityType.getName()
+								+ " Targeted entity names: "
+								+ targetEntityTypeContexts.stream()
+										.map( context -> context.getEntityType().getName() )
+										.collect( Collectors.toList() )
 				);
 			}
 
-			return doCreate( targetEntityTypes.get( 0 ), session, cacheLookupStrategy, loadingOptions );
+			return doCreate( targetEntityTypeContexts.get( 0 ).getEntityType(), session, cacheLookupStrategy, loadingOptions );
 		}
 
-		private <E2> HibernateOrmComposableEntityLoader<E2> doCreate(Class<E2> targetEntityType,
+		private <E2> HibernateOrmComposableEntityLoader<E2> doCreate(
+				EntityTypeDescriptor<E2> targetEntityType,
 				SessionImplementor session,
 				EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 				MutableEntityLoadingOptions loadingOptions) {
@@ -157,8 +166,8 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 				throw new AssertionFailure(
 						"Attempt to use a criteria-based entity loader with an unexpected target entity type."
 								+ " There is a bug in Hibernate Search, please report it."
-								+ " Expected entity type: " + entityType
-								+ " Targeted entity type: " + targetEntityType
+								+ " Expected entity name: " + entityType.getName()
+								+ " Targeted entity name: " + targetEntityType.getName()
 				);
 			}
 
@@ -181,7 +190,9 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 				 * because this setting may still be relevant for other entity types targeted by the same query.
 				 * Let's log something, at least.
 				 */
-				log.skippingPreliminaryCacheLookupsForNonEntityIdEntityLoader( entityType, cacheLookupStrategy );
+				log.skippingPreliminaryCacheLookupsForNonEntityIdEntityLoader(
+						entityType.getName(), cacheLookupStrategy
+				);
 			}
 
 			return result;

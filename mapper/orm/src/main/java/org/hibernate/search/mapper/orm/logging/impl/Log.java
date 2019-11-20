@@ -126,8 +126,8 @@ public interface Log extends BasicLogger {
 	SearchException hibernateSearchNotInitialized();
 
 	@Message(id = ID_OFFSET_2 + 2,
-			value = "Unexpected entity type for a query hit: %1$s. Expected one of %2$s.")
-	SearchException unexpectedSearchHitType(Class<?> entityType, Collection<? extends Class<?>> expectedTypes);
+			value = "Unexpected entity name for a query hit: '%1$s'. Expected one of %2$s.")
+	SearchException unexpectedSearchHitEntityName(String entityName, Collection<String> expectedNames);
 
 	@Message(id = ID_OFFSET_2 + 3,
 			value = "Invalid automatic indexing strategy name: '%1$s'. Valid names are: %2$s.")
@@ -184,8 +184,7 @@ public interface Log extends BasicLogger {
 			value = "The entity loader for '%1$s' will ignore the cache lookup strategy '%2$s',"
 					+ " because document IDs are distinct from entity IDs "
 					+ "and thus cannot be used for persistence context or second level cache lookups.")
-	void skippingPreliminaryCacheLookupsForNonEntityIdEntityLoader(
-			@FormatWith(ClassFormatter.class) Class<?> entityType,
+	void skippingPreliminaryCacheLookupsForNonEntityIdEntityLoader(String entityName,
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy);
 
 	@LogMessage(level = DEBUG)
@@ -193,8 +192,7 @@ public interface Log extends BasicLogger {
 			value = "The entity loader for '%1$s' will ignore the second-level cache "
 					+ " even though it was instructed to use it,"
 					+ " because caching is not enabled for this entity type.")
-	void skippingSecondLevelCacheLookupsForNonCachedEntityTypeEntityLoader(
-			@FormatWith(ClassFormatter.class) Class<?> entityType);
+	void skippingSecondLevelCacheLookupsForNonCachedEntityTypeEntityLoader(String entityName);
 
 	@Message(id = ID_OFFSET_2 + 21, value = "Error trying to access Hibernate ORM session factory." )
 	SearchException hibernateSessionFactoryAccessError(@Cause IllegalStateException cause);

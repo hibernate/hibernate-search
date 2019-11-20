@@ -11,6 +11,7 @@ import java.io.Serializable;
 import org.hibernate.engine.spi.EntityKey;
 import org.hibernate.engine.spi.PersistenceContext;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 
@@ -24,10 +25,10 @@ import org.hibernate.persister.entity.EntityPersister;
 class PersistenceContextLookupStrategy<E>
 		implements EntityLoadingCacheLookupStrategyImplementor<E> {
 
-	static <E> EntityLoadingCacheLookupStrategyImplementor<E> create(Class<E> commonEntitySuperType,
+	static <E> EntityLoadingCacheLookupStrategyImplementor<E> create(EntityTypeDescriptor<E> commonEntitySuperType,
 			SessionImplementor session) {
 		MetamodelImplementor metamodelImplementor = session.getSessionFactory().getMetamodel();
-		EntityPersister persister = metamodelImplementor.entityPersister( commonEntitySuperType );
+		EntityPersister persister = metamodelImplementor.entityPersister( commonEntitySuperType.getTypeName() );
 		return new PersistenceContextLookupStrategy<>(
 				persister, session
 		);
