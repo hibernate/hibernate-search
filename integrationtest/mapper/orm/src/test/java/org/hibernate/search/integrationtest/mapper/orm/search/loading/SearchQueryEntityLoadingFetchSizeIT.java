@@ -47,7 +47,7 @@ public class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryE
 		//  once we execute multiple queries in HibernateOrmSingleTypeCriteriaEntityLoader
 		Assume.assumeTrue(
 				"This test only makes sense if cache lookups are supported",
-				primitives.isCacheLookupSupported()
+				primitives.isFetchSizeSupported()
 		);
 	}
 
