@@ -6,7 +6,7 @@ node ('Performance') {
 	stage ('Build') {
 		sh "mvn clean install" +
 				" -U -am -pl :hibernate-search-performance-orm" +
-				" -DskipTests -Dtest.elasticsearch.host.provided=true"
+				" -DskipTests"
 	}
 	
 	def scenarios

@@ -37,19 +37,19 @@
 
             <property name="hibernate.search.indexing_strategy" value="manual" />
             <property name="hibernate.search.default.indexmanager" value="elasticsearch"/>
-            <property name="hibernate.search.default.elasticsearch.host" value="${test.elasticsearch.host.url}"/>
+            <property name="hibernate.search.default.elasticsearch.host" value="${test.elasticsearch.connection.hosts}"/>
             <property name="hibernate.search.default.elasticsearch.username"
-                      value="${test.elasticsearch.host.username}"/>
+                      value="${test.elasticsearch.connection.username}"/>
             <property name="hibernate.search.default.elasticsearch.password"
-                      value="${test.elasticsearch.host.password}"/>
+                      value="${test.elasticsearch.connection.password}"/>
             <property name="hibernate.search.default.elasticsearch.aws.signing.enabled"
-                      value="${test.elasticsearch.host.aws.signing.enabled}"/>
+                      value="${test.elasticsearch.connection.aws.signing.enabled}"/>
             <property name="hibernate.search.default.elasticsearch.aws.signing.access_key"
-                      value="${test.elasticsearch.host.aws.signing.access_key}"/>
+                      value="${test.elasticsearch.connection.aws.signing.access_key}"/>
             <property name="hibernate.search.default.elasticsearch.aws.signing.secret_key"
-                      value="${test.elasticsearch.host.aws.signing.secret_key}"/>
+                      value="${test.elasticsearch.connection.aws.signing.secret_key}"/>
             <property name="hibernate.search.default.elasticsearch.aws.signing.region"
-                      value="${test.elasticsearch.host.aws.signing.region}"/>
+                      value="${test.elasticsearch.connection.aws.signing.region}"/>
             <property name="hibernate.search.default.elasticsearch.required_index_status" value="yellow"/>
             <property name="hibernate.search.default.elasticsearch.index_schema_management_strategy"
                       value="drop-and-create-and-drop"/>

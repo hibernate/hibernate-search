@@ -814,14 +814,14 @@
         <profile>
             <id>elasticsearch-5.6</id>
             <activation>
-                <!-- Activate by default, i.e. if test.elasticsearch.host.version has not been defined explicitly -->
+                <!-- Activate by default, i.e. if test.elasticsearch.connection.version has not been defined explicitly -->
                 <property>
-                    <name>!test.elasticsearch.host.version</name>
+                    <name>!test.elasticsearch.connection.version</name>
                 </property>
             </activation>
             <properties>
                 <test.elasticsearch.mavenPlugin.version>5.7</test.elasticsearch.mavenPlugin.version>
-                <test.elasticsearch.host.version>5.6.8</test.elasticsearch.host.version>
+                <test.elasticsearch.connection.version>5.6.8</test.elasticsearch.connection.version>
             </properties>
             <build>
                 <pluginManagement>
@@ -831,8 +831,8 @@
                             <artifactId>elasticsearch-maven-plugin</artifactId>
                             <version>${test.elasticsearch.mavenPlugin.version}</version>
                             <configuration>
-                                <skip>${test.elasticsearch.host.provided}</skip>
-                                <version>${test.elasticsearch.host.version}</version>
+                                <skip>${test.elasticsearch.run.skip}</skip>
+                                <version>${test.elasticsearch.connection.version}</version>
                                 <clusterName>hsearchEsTestCluster</clusterName>
                                 <timeout>90</timeout><!-- Make it work on our slow CI -->
                                 <pathConf>${project.build.directory}/elasticsearch-maven-plugin/5.0/configuration/</pathConf>
@@ -867,7 +867,7 @@
             <id>elasticsearch-6.0</id>
             <properties>
                 <test.elasticsearch.mavenPlugin.version>6.8</test.elasticsearch.mavenPlugin.version>
-                <test.elasticsearch.host.version>6.5.0</test.elasticsearch.host.version>
+                <test.elasticsearch.connection.version>6.5.0</test.elasticsearch.connection.version>
             </properties>
             <build>
                 <pluginManagement>
@@ -877,8 +877,8 @@
                             <artifactId>elasticsearch-maven-plugin</artifactId>
                             <version>${test.elasticsearch.mavenPlugin.version}</version>
                             <configuration>
-                                <skip>${test.elasticsearch.host.provided}</skip>
-                                <version>${test.elasticsearch.host.version}</version>
+                                <skip>${test.elasticsearch.run.skip}</skip>
+                                <version>${test.elasticsearch.connection.version}</version>
                                 <timeout>90</timeout><!-- Make it work on our slow CI -->
                                 <pathConf>${project.build.directory}/elasticsearch-maven-plugin/6.0/configuration/</pathConf>
                                 <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/6.0/init/init.script</pathInitScript>

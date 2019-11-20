@@ -218,7 +218,7 @@
             <id>aws</id>
             <activation>
                 <property>
-                    <name>test.elasticsearch.host.aws.signing.enabled</name>
+                    <name>test.elasticsearch.connection.aws.signing.enabled</name>
                     <value>true</value>
                 </property>
             </activation>

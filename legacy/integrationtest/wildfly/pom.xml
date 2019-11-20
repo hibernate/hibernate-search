@@ -481,7 +481,7 @@
                 <test.module-slot.org.hibernate.search>main</test.module-slot.org.hibernate.search>
                 <test.module-slot.org.hibernate>main</test.module-slot.org.hibernate>
                 <!-- WildFly doesn't package Hibernate Search ElasticSearch integration, no need to launch an instance -->
-                <test.elasticsearch.host.provided>true</test.elasticsearch.host.provided>
+                <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
             </properties>
             <build>
                 <plugins>

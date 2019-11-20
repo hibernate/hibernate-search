@@ -175,7 +175,7 @@
                         <jpaVersion>${parsed-version.javax.persistence.majorVersion}.${parsed-version.javax.persistence.minorVersion}</jpaVersion>
                         <luceneVersion>${version.org.apache.lucene}</luceneVersion>
                         <infinispanVersion>${version.org.infinispan}</infinispanVersion>
-                        <testElasticsearchVersion>${test.elasticsearch.host.version}</testElasticsearchVersion>
+                        <testElasticsearchVersion>${test.elasticsearch.connection.version}</testElasticsearchVersion>
                         <tikaModuleVersion>${version.org.apache.tika}</tikaModuleVersion>
                         <elasticsearchClientVersion>${version.org.elasticsearch.client}</elasticsearchClientVersion>
                         <gsonVersion>${version.com.google.code.gson}</gsonVersion>
