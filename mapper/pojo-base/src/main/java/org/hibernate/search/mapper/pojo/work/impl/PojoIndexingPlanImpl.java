@@ -8,7 +8,6 @@ package org.hibernate.search.mapper.pojo.work.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +37,7 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<Class<?>, PojoIndexedTypeIndexingPlan<?, ?, ?>> indexedTypeDelegates = new LinkedHashMap<>();
-	private final Map<Class<?>, PojoContainedTypeIndexingPlan<?>> containedTypeDelegates = new HashMap<>();
+	private final Map<Class<?>, PojoContainedTypeIndexingPlan<?>> containedTypeDelegates = new LinkedHashMap<>();
 
 	private boolean isProcessing = false;
 
