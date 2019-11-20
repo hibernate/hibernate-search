@@ -25,7 +25,9 @@ import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelValueElement;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.AbstractCloser;
 import org.hibernate.search.util.common.impl.Closer;
@@ -38,6 +40,8 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 		implements ValueBindingContext<V> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private final PojoBootstrapIntrospector introspector;
 
 	private final PojoGenericTypeModel<V> valueTypeModel;
 	private final boolean multiValued;
@@ -52,14 +56,16 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 	private PartialBinding<V, ?> partialBinding;
 
 	public ValueBindingContextImpl(BeanResolver beanResolver,
+			PojoBootstrapIntrospector introspector,
 			PojoGenericTypeModel<V> valueTypeModel, boolean multiValued,
 			IndexBindingContext indexBindingContext,
 			IndexFieldTypeDefaultsProvider defaultsProvider,
 			String relativeFieldName, FieldModelContributor contributor) {
 		super( beanResolver );
+		this.introspector = introspector;
 		this.valueTypeModel = valueTypeModel;
 		this.multiValued = multiValued;
-		this.bridgedElement = new PojoModelValueElement<>( valueTypeModel );
+		this.bridgedElement = new PojoModelValueElement<>( introspector, valueTypeModel );
 
 		this.indexFieldTypeFactory = indexBindingContext.createTypeFactory( defaultsProvider );
 		this.listener = new PojoIndexSchemaContributionListener();
@@ -83,8 +89,9 @@ public class ValueBindingContextImpl<V> extends AbstractBindingContext
 	public <V2, F> void setBridge(Class<V2> expectedValueType, BeanHolder<? extends ValueBridge<V2, F>> bridgeHolder,
 			IndexFieldTypeOptionsStep<?, F> fieldTypeOptionsStep) {
 		try {
+			PojoRawTypeModel<V2> expectedValueTypeModel = introspector.getTypeModel( expectedValueType );
 			// TODO HSEARCH-3243 perform more precise checks, we're just comparing raw types here and we might miss some type errors
-			if ( !valueTypeModel.getRawType().isSubTypeOf( expectedValueType ) ) {
+			if ( !valueTypeModel.getRawType().isSubTypeOf( expectedValueTypeModel ) ) {
 				throw log.invalidInputTypeForBridge( bridgeHolder.get(), valueTypeModel );
 			}
 

@@ -104,12 +104,6 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	@Override
-	public boolean isSubTypeOf(Class<?> superClassCandidate) {
-		XClass superClassCandidateXClass = introspector.toXClass( superClassCandidate );
-		return superClassCandidateXClass.isAssignableFrom( xClass );
-	}
-
-	@Override
 	public Stream<HibernateOrmRawTypeModel<? super T>> getAscendingSuperTypes() {
 		return introspector.getAscendingSuperTypes( xClass );
 	}

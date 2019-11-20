@@ -13,7 +13,6 @@ import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoInde
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorValueNode;
 import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
-import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoPropertyAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
@@ -30,10 +29,10 @@ class PojoModelNestedCompositeElement<T, P> extends AbstractPojoModelCompositeEl
 	private final BoundPojoModelPathValueNode<T, P, P> modelPath;
 	private final PojoPropertyAdditionalMetadata propertyAdditionalMetadata;
 
-	PojoModelNestedCompositeElement(AbstractPojoModelCompositeElement<T> parent, BoundPojoModelPathPropertyNode<T, P> modelPath,
-			PojoPropertyAdditionalMetadata propertyAdditionalMetadata,
-			PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider) {
-		super( typeAdditionalMetadataProvider );
+	PojoModelNestedCompositeElement(AbstractPojoModelCompositeElement<T> parent,
+			BoundPojoModelPathPropertyNode<T, P> modelPath,
+			PojoPropertyAdditionalMetadata propertyAdditionalMetadata) {
+		super( parent );
 		this.parent = parent;
 		this.modelPath = modelPath.valueWithoutExtractors();
 		this.propertyAdditionalMetadata = propertyAdditionalMetadata;

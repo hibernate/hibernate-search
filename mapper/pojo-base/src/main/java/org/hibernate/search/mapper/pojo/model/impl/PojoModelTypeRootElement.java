@@ -11,6 +11,7 @@ import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.PojoTypeAdditionalMetadataProvider;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 
 /**
  * @param <T> The type used as a root element.
@@ -20,8 +21,9 @@ public class PojoModelTypeRootElement<T> extends AbstractPojoModelCompositeEleme
 	private final BoundPojoModelPathTypeNode<T> modelPath;
 
 	public PojoModelTypeRootElement(BoundPojoModelPathTypeNode<T> modelPath,
+			PojoBootstrapIntrospector introspector,
 			PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider) {
-		super( typeAdditionalMetadataProvider );
+		super( introspector, typeAdditionalMetadataProvider );
 		this.modelPath = modelPath;
 	}
 

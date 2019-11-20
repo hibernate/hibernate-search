@@ -91,6 +91,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 
 		IdentifierBindingContextImpl<I> bindingContext = new IdentifierBindingContextImpl<>(
 				beanResolver,
+				introspector,
 				indexedEntityBindingContext,
 				identifierTypeModel
 		);
@@ -102,7 +103,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	public <T> BoundRoutingKeyBridge<T> bindRoutingKey(IndexedEntityBindingContext indexedEntityBindingContext,
 			BoundPojoModelPathTypeNode<T> modelPath, RoutingKeyBinder binder) {
 		PojoModelTypeRootElement<T> pojoModelRootElement =
-				new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
+				new PojoModelTypeRootElement<>( modelPath, introspector, typeAdditionalMetadataProvider );
 		PojoTypeIndexingDependencyConfigurationContextImpl<T> pojoDependencyContext =
 				new PojoTypeIndexingDependencyConfigurationContextImpl<>(
 						introspector,
@@ -124,7 +125,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	public <T> Optional<BoundTypeBridge<T>> bindType(IndexBindingContext indexBindingContext,
 			BoundPojoModelPathTypeNode<T> modelPath, TypeBinder binder) {
 		PojoModelTypeRootElement<T> pojoModelRootElement =
-				new PojoModelTypeRootElement<>( modelPath, typeAdditionalMetadataProvider );
+				new PojoModelTypeRootElement<>( modelPath, introspector, typeAdditionalMetadataProvider );
 		PojoTypeIndexingDependencyConfigurationContextImpl<T> pojoDependencyContext =
 				new PojoTypeIndexingDependencyConfigurationContextImpl<>(
 						introspector,
@@ -146,7 +147,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 	public <P> Optional<BoundPropertyBridge<P>> bindProperty(IndexBindingContext indexBindingContext,
 			BoundPojoModelPathPropertyNode<?, P> modelPath, PropertyBinder binder) {
 		PojoModelPropertyRootElement<P> pojoModelRootElement =
-				new PojoModelPropertyRootElement<>( modelPath, typeAdditionalMetadataProvider );
+				new PojoModelPropertyRootElement<>( modelPath, introspector, typeAdditionalMetadataProvider );
 		PojoPropertyIndexingDependencyConfigurationContextImpl<P> pojoDependencyContext =
 				new PojoPropertyIndexingDependencyConfigurationContextImpl<>(
 						introspector,
@@ -180,7 +181,7 @@ public class PojoIndexModelBinderImpl implements PojoIndexModelBinder {
 		}
 
 		ValueBindingContextImpl<V> bindingContext = new ValueBindingContextImpl<>(
-				beanResolver,
+				beanResolver, introspector,
 				valueTypeModel, multiValued,
 				indexBindingContext, defaultsProvider,
 				relativeFieldName, contributor

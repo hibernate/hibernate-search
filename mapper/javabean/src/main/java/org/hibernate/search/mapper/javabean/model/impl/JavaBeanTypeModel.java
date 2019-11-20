@@ -89,11 +89,6 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	@Override
-	public boolean isSubTypeOf(Class<?> superClassCandidate) {
-		return superClassCandidate.isAssignableFrom( clazz );
-	}
-
-	@Override
 	public Stream<JavaBeanTypeModel<? super T>> getAscendingSuperTypes() {
 		return introspector.getAscendingSuperTypes( xClass );
 	}

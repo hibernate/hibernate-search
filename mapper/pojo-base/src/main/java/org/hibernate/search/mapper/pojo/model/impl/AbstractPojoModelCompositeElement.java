@@ -20,6 +20,7 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.P
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoPropertyAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
@@ -32,6 +33,7 @@ public abstract class AbstractPojoModelCompositeElement<V> implements PojoModelC
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final PojoBootstrapIntrospector introspector;
 	private final PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider;
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, PojoModelNestedCompositeElement<V, ?>> properties = new LinkedHashMap<>();
@@ -40,7 +42,14 @@ public abstract class AbstractPojoModelCompositeElement<V> implements PojoModelC
 
 	private PojoElementAccessor<?> accessor;
 
-	AbstractPojoModelCompositeElement(PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider) {
+	AbstractPojoModelCompositeElement(AbstractPojoModelCompositeElement<?> parent) {
+		this.introspector = parent.introspector;
+		this.typeAdditionalMetadataProvider = parent.typeAdditionalMetadataProvider;
+	}
+
+	AbstractPojoModelCompositeElement(PojoBootstrapIntrospector introspector,
+			PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider) {
+		this.introspector = introspector;
 		this.typeAdditionalMetadataProvider = typeAdditionalMetadataProvider;
 	}
 
@@ -63,7 +72,7 @@ public abstract class AbstractPojoModelCompositeElement<V> implements PojoModelC
 
 	@Override
 	public boolean isAssignableTo(Class<?> clazz) {
-		return getTypeModel().getRawType().isSubTypeOf( clazz );
+		return getTypeModel().getRawType().isSubTypeOf( introspector.getTypeModel( clazz ) );
 	}
 
 	@Override
@@ -74,8 +83,7 @@ public abstract class AbstractPojoModelCompositeElement<V> implements PojoModelC
 			return new PojoModelNestedCompositeElement<>(
 					this,
 					modelPathTypeNode.property( name ),
-					additionalMetadata,
-					typeAdditionalMetadataProvider
+					additionalMetadata
 			);
 		} );
 	}

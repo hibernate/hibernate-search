@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.model.impl;
 
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 
 /**
@@ -14,9 +15,12 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
  */
 public class PojoModelValueElement<T> implements PojoModelValue<T> {
 
+	private final PojoBootstrapIntrospector introspector;
 	private final PojoGenericTypeModel<? extends T> typeModel;
 
-	public PojoModelValueElement(PojoGenericTypeModel<? extends T> typeModel) {
+	public PojoModelValueElement(PojoBootstrapIntrospector introspector,
+			PojoGenericTypeModel<? extends T> typeModel) {
+		this.introspector = introspector;
 		this.typeModel = typeModel;
 	}
 
@@ -27,7 +31,7 @@ public class PojoModelValueElement<T> implements PojoModelValue<T> {
 
 	@Override
 	public boolean isAssignableTo(Class<?> clazz) {
-		return typeModel.getRawType().isSubTypeOf( clazz );
+		return typeModel.getRawType().isSubTypeOf( introspector.getTypeModel( clazz ) );
 	}
 
 	@Override

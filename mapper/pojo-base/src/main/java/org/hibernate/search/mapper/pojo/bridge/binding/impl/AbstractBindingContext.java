@@ -13,7 +13,7 @@ abstract class AbstractBindingContext implements BindingContext {
 
 	private final BeanResolver beanResolver;
 
-	public AbstractBindingContext(BeanResolver beanResolver) {
+	AbstractBindingContext(BeanResolver beanResolver) {
 		this.beanResolver = beanResolver;
 	}
 

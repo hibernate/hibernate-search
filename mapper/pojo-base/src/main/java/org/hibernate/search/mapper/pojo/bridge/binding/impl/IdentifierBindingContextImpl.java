@@ -17,7 +17,9 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBi
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelValueElement;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.impl.AbstractCloser;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -27,19 +29,23 @@ public class IdentifierBindingContextImpl<I> extends AbstractBindingContext
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final PojoBootstrapIntrospector introspector;
 	private final IndexedEntityBindingContext indexedEntityBindingContext;
+
 	private final PojoGenericTypeModel<I> identifierTypeModel;
 	private final PojoModelValue<I> bridgedElement;
 
 	private PartialBinding<I> partialBinding;
 
 	public IdentifierBindingContextImpl(BeanResolver beanResolver,
+			PojoBootstrapIntrospector introspector,
 			IndexedEntityBindingContext indexedEntityBindingContext,
 			PojoGenericTypeModel<I> valueTypeModel) {
 		super( beanResolver );
+		this.introspector = introspector;
 		this.indexedEntityBindingContext = indexedEntityBindingContext;
 		this.identifierTypeModel = valueTypeModel;
-		this.bridgedElement = new PojoModelValueElement<>( valueTypeModel );
+		this.bridgedElement = new PojoModelValueElement<>( introspector, valueTypeModel );
 	}
 
 	@Override
@@ -50,10 +56,11 @@ public class IdentifierBindingContextImpl<I> extends AbstractBindingContext
 	@Override
 	public <I2> void setBridge(Class<I2> expectedValueType, BeanHolder<? extends IdentifierBridge<I2>> bridgeHolder) {
 		try {
+			PojoRawTypeModel<I2> expectedValueTypeModel = introspector.getTypeModel( expectedValueType );
 			// TODO HSEARCH-3243 perform more precise checks, we're just comparing raw types here and we might miss some type errors
 			//  Also we're checking that the bridge parameter type is a subtype, but we really should be checking it
 			//  is either the same type or a generic type parameter that can represent the same type.
-			if ( !identifierTypeModel.getRawType().isSubTypeOf( expectedValueType ) ) {
+			if ( !identifierTypeModel.getRawType().isSubTypeOf( expectedValueTypeModel ) ) {
 				throw log.invalidInputTypeForBridge( bridgeHolder.get(), identifierTypeModel );
 			}
 

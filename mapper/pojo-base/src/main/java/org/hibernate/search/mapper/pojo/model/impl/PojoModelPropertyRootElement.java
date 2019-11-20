@@ -16,6 +16,7 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.impl.P
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 
 /**
  * @param <P> The type of the property used as a root element.
@@ -25,8 +26,9 @@ public class PojoModelPropertyRootElement<P> extends AbstractPojoModelCompositeE
 	private final BoundPojoModelPathValueNode<?, P, P> modelPath;
 
 	public PojoModelPropertyRootElement(BoundPojoModelPathPropertyNode<?, P> modelPath,
+			PojoBootstrapIntrospector introspector,
 			PojoTypeAdditionalMetadataProvider typeAdditionalMetadataProvider) {
-		super( typeAdditionalMetadataProvider );
+		super( introspector, typeAdditionalMetadataProvider );
 		this.modelPath = modelPath.valueWithoutExtractors();
 	}
 
