@@ -32,7 +32,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 
 		this.indexName = builder.indexName;
 
-		IdentifiableType<E> indexTypeModel = sessionFactory.getMetamodel().entity( getJavaClass() );
+		IdentifiableType<E> indexTypeModel = sessionFactory.getMetamodel().entity( getEntityName() );
 		SingularAttribute<? super E, ?> documentIdSourceAttribute =
 				indexTypeModel.getSingularAttribute( builder.documentIdSourcePropertyName );
 		if ( documentIdSourceAttribute.isId() ) {

@@ -11,20 +11,24 @@ import org.hibernate.search.mapper.orm.model.impl.HibernateOrmPathFilterFactory;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 final class HibernateOrmEntityTypeMetadataContributor implements PojoTypeMetadataContributor {
 
+	private final PojoRawTypeModel<?> rawTypeModel;
 	private final PersistentClass persistentClass;
 	private final String idPropertyName;
 
-	HibernateOrmEntityTypeMetadataContributor(PersistentClass persistentClass, String idPropertyName) {
+	HibernateOrmEntityTypeMetadataContributor(PojoRawTypeModel<?> rawTypeModel,
+			PersistentClass persistentClass, String idPropertyName) {
+		this.rawTypeModel = rawTypeModel;
 		this.persistentClass = persistentClass;
 		this.idPropertyName = idPropertyName;
 	}
 
 	@Override
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
-		if ( !persistentClass.getMappedClass().equals( collector.getType().getJavaClass() ) ) {
+		if ( !rawTypeModel.equals( collector.getType() ) ) {
 			// Entity metadata is not inherited; only contribute it to the exact type.
 			return;
 		}

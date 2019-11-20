@@ -63,7 +63,7 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 					typeModel,
 					new ErrorCollectingPojoTypeMetadataContributor()
 							.add( new HibernateOrmEntityTypeMetadataContributor(
-									persistentClass, identifierPropertyName
+									typeModel, persistentClass, identifierPropertyName
 							) )
 							.addAll( delegates )
 			);
