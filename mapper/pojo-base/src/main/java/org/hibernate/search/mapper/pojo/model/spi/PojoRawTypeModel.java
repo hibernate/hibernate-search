@@ -28,6 +28,11 @@ import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 public interface PojoRawTypeModel<T> extends PojoTypeModel<T>, MappableTypeModel {
 
 	/**
+	 * @return The identifier for this type.
+	 */
+	PojoRawTypeIdentifier<T> getTypeIdentifier();
+
+	/**
 	 * @return The supertypes of the current type, in ascending order.
 	 */
 	@Override

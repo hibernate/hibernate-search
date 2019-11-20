@@ -29,6 +29,7 @@ import org.hibernate.search.mapper.pojo.model.spi.JavaClassPojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
@@ -36,8 +37,8 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final HibernateOrmBootstrapIntrospector introspector;
+	private final PojoRawTypeIdentifier<T> typeIdentifier;
 	private final XClass xClass;
-	private final Class<T> clazz;
 	private final HibernateOrmBasicTypeMetadata ormTypeMetadata;
 	private final RawTypeDeclaringContext<T> rawTypeDeclaringContext;
 	private final PojoCaster<T> caster;
@@ -49,14 +50,15 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 	private Map<String, XProperty> declaredFieldAccessXPropertiesByName;
 	private Map<String, XProperty> declaredMethodAccessXPropertiesByName;
 
-	HibernateOrmRawTypeModel(HibernateOrmBootstrapIntrospector introspector, Class<T> clazz,
+	HibernateOrmRawTypeModel(HibernateOrmBootstrapIntrospector introspector,
+			PojoRawTypeIdentifier<T> typeIdentifier,
 			HibernateOrmBasicTypeMetadata ormTypeMetadata, RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
 		this.introspector = introspector;
-		this.xClass = introspector.toXClass( clazz );
-		this.clazz = clazz;
+		this.typeIdentifier = typeIdentifier;
+		this.xClass = introspector.toXClass( typeIdentifier.getJavaClass() );
 		this.ormTypeMetadata = ormTypeMetadata;
 		this.rawTypeDeclaringContext = rawTypeDeclaringContext;
-		this.caster = new JavaClassPojoCaster<>( clazz );
+		this.caster = new JavaClassPojoCaster<>( typeIdentifier.getJavaClass() );
 	}
 
 	@Override
@@ -68,23 +70,32 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 			return false;
 		}
 		HibernateOrmRawTypeModel<?> that = (HibernateOrmRawTypeModel<?>) o;
+		/*
+		 * We need to take the introspector into account, so that the engine does not confuse
+		 * type models from different mappers during bootstrap.
+		 */
 		return Objects.equals( introspector, that.introspector ) &&
-				Objects.equals( clazz, that.clazz );
+				Objects.equals( typeIdentifier, that.typeIdentifier );
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash( introspector, clazz );
+		return Objects.hash( introspector, typeIdentifier );
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[" + clazz.getName() + "]";
+		return getClass().getSimpleName() + "[" + typeIdentifier + "]";
+	}
+
+	@Override
+	public PojoRawTypeIdentifier<T> getTypeIdentifier() {
+		return typeIdentifier;
 	}
 
 	@Override
 	public String getName() {
-		return clazz.getName();
+		return typeIdentifier.toString();
 	}
 
 	@Override
@@ -150,7 +161,7 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 
 	@Override
 	public final Class<T> getJavaClass() {
-		return clazz;
+		return typeIdentifier.getJavaClass();
 	}
 
 	RawTypeDeclaringContext<T> getRawTypeDeclaringContext() {

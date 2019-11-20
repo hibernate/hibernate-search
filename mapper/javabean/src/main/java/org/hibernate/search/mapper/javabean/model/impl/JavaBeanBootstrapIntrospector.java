@@ -16,6 +16,7 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnBootstrapIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
@@ -91,9 +92,10 @@ public class JavaBeanBootstrapIntrospector extends AbstractPojoHCAnnBootstrapInt
 	}
 
 	private <T> PojoRawTypeModel<T> createTypeModel(Class<T> clazz) {
+		PojoRawTypeIdentifier<T> typeIdentifier = PojoRawTypeIdentifier.of( clazz );
 		try {
 			return new JavaBeanTypeModel<>(
-					this, clazz,
+					this, typeIdentifier,
 					new RawTypeDeclaringContext<>( genericContextHelper, clazz )
 			);
 		}

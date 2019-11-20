@@ -22,6 +22,7 @@ import org.hibernate.search.mapper.pojo.model.spi.JavaClassPojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
@@ -29,18 +30,19 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final JavaBeanBootstrapIntrospector introspector;
-	private final Class<T> clazz;
+	private final PojoRawTypeIdentifier<T> typeIdentifier;
 	private final RawTypeDeclaringContext<T> rawTypeDeclaringContext;
 	private final PojoCaster<T> caster;
 	private final XClass xClass;
 	private final Map<String, XProperty> declaredProperties;
 
-	JavaBeanTypeModel(JavaBeanBootstrapIntrospector introspector, Class<T> clazz, RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
+	JavaBeanTypeModel(JavaBeanBootstrapIntrospector introspector, PojoRawTypeIdentifier<T> typeIdentifier,
+			RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
 		this.introspector = introspector;
-		this.clazz = clazz;
+		this.typeIdentifier = typeIdentifier;
 		this.rawTypeDeclaringContext = rawTypeDeclaringContext;
-		this.caster = new JavaClassPojoCaster<>( clazz );
-		this.xClass = introspector.toXClass( clazz );
+		this.caster = new JavaClassPojoCaster<>( typeIdentifier.getJavaClass() );
+		this.xClass = introspector.toXClass( typeIdentifier.getJavaClass() );
 		this.declaredProperties = introspector.getDeclaredMethodAccessXPropertiesByName( xClass );
 	}
 
@@ -53,34 +55,43 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 			return false;
 		}
 		JavaBeanTypeModel<?> that = (JavaBeanTypeModel<?>) o;
+		/*
+		 * We need to take the introspector into account, so that the engine does not confuse
+		 * type models from different mappers during bootstrap.
+		 */
 		return Objects.equals( introspector, that.introspector ) &&
-				Objects.equals( clazz, that.clazz );
+				Objects.equals( typeIdentifier, that.typeIdentifier );
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash( introspector, clazz );
+		return Objects.hash( introspector, typeIdentifier );
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[" + clazz.getName() + "]";
+		return getClass().getSimpleName() + "[" + typeIdentifier + "]";
+	}
+
+	@Override
+	public PojoRawTypeIdentifier<T> getTypeIdentifier() {
+		return typeIdentifier;
 	}
 
 	@Override
 	public String getName() {
-		return clazz.getName();
+		return typeIdentifier.toString();
 	}
 
 	@Override
 	public boolean isAbstract() {
-		return Modifier.isAbstract( clazz.getModifiers() );
+		return Modifier.isAbstract( typeIdentifier.getJavaClass().getModifiers() );
 	}
 
 	@Override
 	public boolean isSubTypeOf(MappableTypeModel other) {
 		return other instanceof JavaBeanTypeModel
-				&& ( (JavaBeanTypeModel<?>) other ).clazz.isAssignableFrom( clazz );
+				&& ( (JavaBeanTypeModel<?>) other ).typeIdentifier.getJavaClass().isAssignableFrom( typeIdentifier.getJavaClass() );
 	}
 
 	@Override
@@ -125,7 +136,7 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 
 	@Override
 	public Class<T> getJavaClass() {
-		return clazz;
+		return typeIdentifier.getJavaClass();
 	}
 
 	RawTypeDeclaringContext<T> getRawTypeDeclaringContext() {

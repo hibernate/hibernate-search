@@ -35,6 +35,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmReflectionStrategyName;
 import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnBootstrapIntrospector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
@@ -215,8 +216,9 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	}
 
 	private <T> PojoRawTypeModel<T> createTypeModel(Class<T> type) {
+		PojoRawTypeIdentifier<T> typeIdentifier = PojoRawTypeIdentifier.of( type );
 		return new HibernateOrmRawTypeModel<>(
-				this, type, typeMetadata.get( type ),
+				this, typeIdentifier, typeMetadata.get( type ),
 				new RawTypeDeclaringContext<>( genericContextHelper, type )
 		);
 	}
