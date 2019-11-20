@@ -12,14 +12,17 @@ import java.util.stream.Stream;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
 /**
- * A {@link PojoTypeModel} representing a raw type, fully defined by its {@link Class}.
+ * A {@link PojoTypeModel} representing a raw type,
+ * where generic type parameters are ignored.
  * <p>
  * This excludes in particular parameterized types such as {@code ArrayList<Integer>},
  * because we cannot tell the difference between instances of such types and instances of the same type
  * with different parameters, such as {@code ArrayList<String>}.
  * Thus the mapper would be unable to find which mapping to use when indexing such an instance,
  * and it would be impossible to target the index from the {@link Class} only.
+ * <p>
  *
+ * @see PojoTypeModel
  * @param <T> The pojo type
  */
 public interface PojoRawTypeModel<T> extends PojoTypeModel<T>, MappableTypeModel {

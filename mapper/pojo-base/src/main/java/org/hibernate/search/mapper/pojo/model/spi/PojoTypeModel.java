@@ -6,6 +6,22 @@
  */
 package org.hibernate.search.mapper.pojo.model.spi;
 
+/**
+ * A model representing a POJO type: its structure (properties and their type),
+ * its name, ...
+ * <p>
+ * Most of the time, type models represent a Java class,
+ * either {@link PojoRawTypeModel raw} or {@link PojoGenericTypeModel parameterized}.
+ * However, it is also possible that a given type model
+ * represents a <strong>subset</strong> of all instances of a given Java class,
+ * which all follow a common convention regarding their structure.
+ * <p>
+ * For example, a type model could represent a Map-based type
+ * where properties are defined by the map entries
+ * and where all instances are required to have a value of type {@code Integer} for the key {@code "age"}.
+ *
+ * @param <T> The pojo type
+ */
 public interface PojoTypeModel<T> {
 
 	/**

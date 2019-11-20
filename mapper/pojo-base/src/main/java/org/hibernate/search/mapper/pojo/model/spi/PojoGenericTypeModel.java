@@ -9,7 +9,10 @@ package org.hibernate.search.mapper.pojo.model.spi;
 import java.util.Optional;
 
 /**
- * A {@link PojoTypeModel} offering additional reflection options,
+ * A {@link PojoTypeModel} representing a parameterized type,
+ * where generic type arguments are known.
+ * <p>
+ * This type model offers additional reflection capabilities,
  * such as the ability to retrieve the type argument for a given generic supertype.
  *
  * @see GenericContextAwarePojoGenericTypeModel the default implementation
