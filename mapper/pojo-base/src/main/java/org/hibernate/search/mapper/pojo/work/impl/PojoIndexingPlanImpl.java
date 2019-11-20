@@ -56,37 +56,31 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 	}
 
 	@Override
-	public void add(Object providedId, Object entity) {
-		PojoRawTypeIdentifier<?> typeIdentifier = introspector.getTypeIdentifier( entity );
+	public void add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity) {
 		AbstractPojoTypeIndexingPlan delegate = getDelegate( typeIdentifier );
 		delegate.add( providedId, entity );
 	}
 
 	@Override
-	public void addOrUpdate(Object providedId, Object entity) {
-		PojoRawTypeIdentifier<?> typeIdentifier = introspector.getTypeIdentifier( entity );
+	public void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity) {
 		AbstractPojoTypeIndexingPlan delegate = getDelegate( typeIdentifier );
 		delegate.update( providedId, entity );
 	}
 
 	@Override
-	public void addOrUpdate(Object providedId, Object entity, String... dirtyPaths) {
-		PojoRawTypeIdentifier<?> typeIdentifier = introspector.getTypeIdentifier( entity );
+	public void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity, String... dirtyPaths) {
 		AbstractPojoTypeIndexingPlan delegate = getDelegate( typeIdentifier );
 		delegate.update( providedId, entity, dirtyPaths );
 	}
 
 	@Override
-	public void delete(Object providedId, Object entity) {
-		PojoRawTypeIdentifier<?> typeIdentifier = introspector.getTypeIdentifier( entity );
+	public void delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity) {
 		AbstractPojoTypeIndexingPlan delegate = getDelegate( typeIdentifier );
 		delegate.delete( providedId, entity );
 	}
 
 	@Override
-	public void purge(Class<?> clazz, Object providedId) {
-		// TODO HSEARCH-1401 avoid creating a new instance of that type identifier every single time
-		PojoRawTypeIdentifier<?> typeIdentifier = PojoRawTypeIdentifier.of( clazz );
+	public void purge(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId) {
 		AbstractPojoTypeIndexingPlan delegate = getDelegate( typeIdentifier );
 		delegate.purge( providedId );
 	}

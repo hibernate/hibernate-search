@@ -9,55 +9,60 @@ package org.hibernate.search.mapper.javabean.work.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.impl.Throwables;
 
 public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
+	private final PojoRuntimeIntrospector introspector;
 	private final PojoIndexingPlan delegate;
 
-	public SearchIndexingPlanImpl(PojoIndexingPlan delegate) {
+	public SearchIndexingPlanImpl(PojoRuntimeIntrospector introspector,
+			PojoIndexingPlan delegate) {
+		this.introspector = introspector;
 		this.delegate = delegate;
 	}
 
 	@Override
 	public void add(Object entity) {
-		delegate.add( null, entity );
+		add( null, entity );
 	}
 
 	@Override
 	public void add(Object providedId, Object entity) {
-		delegate.add( providedId, entity );
+		delegate.add( getTypeIdentifier( entity ), providedId, entity );
 	}
 
 	@Override
 	public void addOrUpdate(Object entity) {
-		delegate.addOrUpdate( null, entity );
+		addOrUpdate( null, entity );
 	}
 
 	@Override
 	public void addOrUpdate(Object providedId, Object entity) {
-		delegate.addOrUpdate( providedId, entity );
+		delegate.addOrUpdate( getTypeIdentifier( entity ), providedId, entity );
 	}
 
 	@Override
 	public void addOrUpdate(Object entity, String... dirtyPaths) {
-		delegate.addOrUpdate( null, entity, dirtyPaths );
+		addOrUpdate( null, entity, dirtyPaths );
 	}
 
 	@Override
 	public void addOrUpdate(Object providedId, Object entity, String... dirtyPaths) {
-		delegate.addOrUpdate( providedId, entity, dirtyPaths );
+		delegate.addOrUpdate( getTypeIdentifier( entity ), providedId, entity, dirtyPaths );
 	}
 
 	@Override
 	public void delete(Object entity) {
-		delegate.delete( null, entity );
+		delete( null, entity );
 	}
 
 	@Override
 	public void delete(Object providedId, Object entity) {
-		delegate.delete( providedId, entity );
+		delegate.delete( getTypeIdentifier( entity ), providedId, entity );
 	}
 
 	public CompletableFuture<?> execute() {
@@ -67,5 +72,9 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 			} );
 			return null;
 		} );
+	}
+
+	private <T> PojoRawTypeIdentifier<? extends T> getTypeIdentifier(T entity) {
+		return introspector.getTypeIdentifier( entity );
 	}
 }

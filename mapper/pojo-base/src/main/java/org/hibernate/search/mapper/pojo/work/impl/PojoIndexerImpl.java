@@ -15,7 +15,6 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -26,7 +25,6 @@ public class PojoIndexerImpl implements PojoIndexer {
 
 	private final PojoWorkIndexedTypeContextProvider indexedTypeContextProvider;
 	private final AbstractPojoBackendSessionContext sessionContext;
-	private final PojoRuntimeIntrospector introspector;
 	private final DocumentCommitStrategy commitStrategy;
 
 	private final Map<PojoRawTypeIdentifier<?>, PojoTypeIndexer<?, ?, ?>> typeExecutors = new HashMap<>();
@@ -36,13 +34,11 @@ public class PojoIndexerImpl implements PojoIndexer {
 			DocumentCommitStrategy commitStrategy) {
 		this.indexedTypeContextProvider = indexedTypeContextProvider;
 		this.sessionContext = sessionContext;
-		this.introspector = sessionContext.getRuntimeIntrospector();
 		this.commitStrategy = commitStrategy;
 	}
 
 	@Override
-	public CompletableFuture<?> add(Object providedId, Object entity) {
-		PojoRawTypeIdentifier<?> typeIdentifier = introspector.getTypeIdentifier( entity );
+	public CompletableFuture<?> add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity) {
 		PojoTypeIndexer<?, ?, ?> typeExecutor = this.typeExecutors.get( typeIdentifier );
 		if ( typeExecutor == null ) {
 			typeExecutor = createTypeIndexer( typeIdentifier );

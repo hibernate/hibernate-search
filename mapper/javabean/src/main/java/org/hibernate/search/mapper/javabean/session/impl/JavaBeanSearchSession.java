@@ -74,7 +74,10 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 	@Override
 	public SearchIndexingPlan indexingPlan() {
 		if ( indexingPlan == null ) {
-			indexingPlan = new SearchIndexingPlanImpl( getDelegate().createIndexingPlan( commitStrategy, refreshStrategy ) );
+			indexingPlan = new SearchIndexingPlanImpl(
+					getDelegate().getBackendSessionContext().getRuntimeIntrospector(),
+					getDelegate().createIndexingPlan( commitStrategy, refreshStrategy )
+			);
 		}
 		return indexingPlan;
 	}

@@ -7,11 +7,14 @@
 package org.hibernate.search.mapper.orm.work.impl;
 
 import org.hibernate.search.mapper.orm.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 
 public interface SearchIndexingPlanContext {
 
 	ConfiguredAutomaticIndexingSynchronizationStrategy getConfiguredAutomaticIndexingSynchronizationStrategy();
+
+	PojoRuntimeIntrospector getRuntimeIntrospector();
 
 	PojoIndexingPlan getCurrentIndexingPlan(boolean createIfDoesNotExist);
 

@@ -43,6 +43,7 @@ import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanContext;
 import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
@@ -211,6 +212,11 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 
 	public PojoIndexer createIndexer(DocumentCommitStrategy commitStrategy) {
 		return getDelegate().createIndexer( commitStrategy );
+	}
+
+	@Override
+	public PojoRuntimeIntrospector getRuntimeIntrospector() {
+		return sessionContext.getRuntimeIntrospector();
 	}
 
 	@Override

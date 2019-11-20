@@ -6,7 +6,11 @@
  */
 package org.hibernate.search.mapper.orm.event.impl;
 
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+
 public interface HibernateOrmListenerTypeContext {
+
+	PojoRawTypeIdentifier<?> getTypeIdentifier();
 
 	Object toIndexingPlanProvidedId(Object entityId);
 

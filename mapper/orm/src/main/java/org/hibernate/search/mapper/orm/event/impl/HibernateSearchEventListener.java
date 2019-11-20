@@ -79,7 +79,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 			// TODO Check whether deletes work with hibernate.use_identifier_rollback enabled (see HSEARCH-650)
 			// I think they should, but better safe than sorry
 			getCurrentIndexingPlan( contextProvider, event.getSession() )
-					.delete( providedId, entity );
+					.delete( typeContext.getTypeIdentifier(), providedId, entity );
 		}
 	}
 
@@ -91,7 +91,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		if ( typeContext != null ) {
 			Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
 			getCurrentIndexingPlan( contextProvider, event.getSession() )
-					.add( providedId, entity );
+					.add( typeContext.getTypeIdentifier(), providedId, entity );
 		}
 	}
 
@@ -104,10 +104,10 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 			PojoIndexingPlan plan = getCurrentIndexingPlan( contextProvider, event.getSession() );
 			Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
 			if ( dirtyCheckingEnabled ) {
-				plan.addOrUpdate( providedId, entity, getDirtyPropertyNames( event ) );
+				plan.addOrUpdate( typeContext.getTypeIdentifier(), providedId, entity, getDirtyPropertyNames( event ) );
 			}
 			else {
-				plan.addOrUpdate( providedId, entity );
+				plan.addOrUpdate( typeContext.getTypeIdentifier(), providedId, entity );
 			}
 		}
 	}
@@ -205,15 +205,15 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 
 	private void processCollectionEvent(AbstractCollectionEvent event) {
 		HibernateOrmListenerContextProvider contextProvider = state.getContextProvider();
-		Object entity = event.getAffectedOwnerOrNull();
-		if ( entity == null ) {
+		Object ownerEntity = event.getAffectedOwnerOrNull();
+		if ( ownerEntity == null ) {
 			//Hibernate cannot determine every single time the owner especially in case detached objects are involved
 			// or property-ref is used
 			//Should log really but we don't know if we're interested in this collection for indexing
 			return;
 		}
 
-		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, entity );
+		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, ownerEntity );
 		if ( typeContext != null ) {
 			PojoIndexingPlan plan = getCurrentIndexingPlan( contextProvider, event.getSession() );
 			Object providedId = typeContext.toIndexingPlanProvidedId( event.getAffectedOwnerIdOrNull() );
@@ -231,18 +231,18 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 					 * which can then decide whether to reindex based on whether the collection
 					 * has any impact on indexing.
 					 */
-					plan.addOrUpdate( providedId, entity, collectionRole );
+					plan.addOrUpdate( typeContext.getTypeIdentifier(), providedId, ownerEntity, collectionRole );
 				}
 				else {
 					/*
 					 * We don't know which collection is being changed,
 					 * so we have to default to reindexing, just in case.
 					 */
-					plan.addOrUpdate( providedId, entity );
+					plan.addOrUpdate( typeContext.getTypeIdentifier(), providedId, ownerEntity );
 				}
 			}
 			else {
-				plan.addOrUpdate( providedId, entity );
+				plan.addOrUpdate( typeContext.getTypeIdentifier(), providedId, ownerEntity );
 			}
 		}
 	}

@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.work.spi;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 /**
  * An interface for indexing entities in the context of a session in a POJO mapper.
@@ -34,30 +35,33 @@ public interface PojoIndexingPlan {
 	 * <p>
 	 * <strong>Note:</strong> depending on the backend, this may lead to errors or duplicate entries in the index
 	 * if the entity was actually already present in the index before this call.
-	 * When in doubt, you should rather use {@link #addOrUpdate(Object, Object)}.
+	 * When in doubt, you should rather use {@link #addOrUpdate(PojoRawTypeIdentifier, Object, Object)}.
 	 *
+	 * @param typeIdentifier The identifier of the entity type.
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
 	 * @param entity The entity to add to the index.
 	 */
-	void add(Object providedId, Object entity);
+	void add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity);
 
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index.
 	 *
+	 * @param typeIdentifier The identifier of the entity type.
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
 	 * @param entity The entity to update in the index.
 	 */
-	void addOrUpdate(Object providedId, Object entity);
+	void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity);
 
 	/**
 	 * Update an entity in the index, or add it if it's absent from the index,
 	 * but try to avoid reindexing if the given dirty paths
 	 * are known not to impact the indexed form of that entity.
 	 *
+	 * @param typeIdentifier The identifier of the entity type.
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
@@ -65,19 +69,20 @@ public interface PojoIndexingPlan {
 	 * @param dirtyPaths The paths to consider dirty, formatted using the dot-notation
 	 * ("directEntityProperty.nestedPropery").
 	 */
-	void addOrUpdate(Object providedId, Object entity, String... dirtyPaths);
+	void addOrUpdate(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity, String... dirtyPaths);
 
 	/**
 	 * Delete an entity from the index.
 	 * <p>
 	 * No effect on the index if the entity is not in the index.
 	 *
+	 * @param typeIdentifier The identifier of the entity type.
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 * If {@code null}, Hibernate Search will attempt to extract the ID from the entity.
 	 * @param entity The entity to delete from the index.
 	 */
-	void delete(Object providedId, Object entity);
+	void delete(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity);
 
 	/**
 	 * Purge an entity from the index.
@@ -86,11 +91,11 @@ public interface PojoIndexingPlan {
 	 * <p>
 	 * No effect on the index if the entity is not in the index.
 	 *
-	 * @param clazz The type of the entity.
+	 * @param typeIdentifier The identifier of the entity type.
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
 	 */
-	void purge(Class<?> clazz, Object providedId);
+	void purge(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId);
 
 	/**
 	 * Extract all data from objects passed to the indexing plan so far,

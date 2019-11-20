@@ -236,7 +236,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 
 		CompletableFuture<?> future;
 		try {
-			future = indexer.add( null, entity );
+			future = indexer.add( type.getTypeIdentifier(), null, entity );
 		}
 		catch (RuntimeException e) {
 			future = new CompletableFuture<>();
