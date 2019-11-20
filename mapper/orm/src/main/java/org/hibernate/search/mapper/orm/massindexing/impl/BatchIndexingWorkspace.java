@@ -38,12 +38,12 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 	private final HibernateOrmMassIndexingMappingContext mappingContext;
 	private final DetachedBackendSessionContext sessionContext;
 
+	private final HibernateOrmMassIndexingIndexedTypeContext<E> type;
+	private final SingularAttribute<? super E, I> idAttributeOfType;
+
 	private final ProducerConsumerQueue<List<I>> primaryKeyStream;
 
 	private final int documentBuilderThreads;
-	private final Class<E> indexedType;
-	private final String entityName;
-	private final SingularAttribute<? super E, I> idAttributeOfIndexedType;
 
 	// loading options
 	private final CacheMode cacheMode;
@@ -60,7 +60,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 	BatchIndexingWorkspace(HibernateOrmMassIndexingMappingContext mappingContext,
 			DetachedBackendSessionContext sessionContext,
 			MassIndexingNotifier notifier,
-			Class<E> type, String entityName, SingularAttribute<? super E, I> idAttributeOfIndexedType,
+			HibernateOrmMassIndexingIndexedTypeContext<E> type, SingularAttribute<? super E, I> idAttributeOfType,
 			int objectLoadingThreads, CacheMode cacheMode, int objectLoadingBatchSize,
 			long objectsLimit,
 			int idFetchSize, Integer transactionTimeout) {
@@ -68,9 +68,8 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
 
-		this.indexedType = type;
-		this.entityName = entityName;
-		this.idAttributeOfIndexedType = idAttributeOfIndexedType;
+		this.type = type;
+		this.idAttributeOfType = idAttributeOfType;
 		this.idFetchSize = idFetchSize;
 		this.transactionTimeout = transactionTimeout;
 
@@ -102,7 +101,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 		Futures.unwrappedExceptionGet(
 				CompletableFuture.allOf( indexingFutures.toArray( new CompletableFuture[0] ) )
 		);
-		log.debugf( "Indexing for %s is done", indexedType.getName() );
+		log.debugf( "Indexing for %s is done", type.getEntityType().getName() );
 	}
 
 	@Override
@@ -134,15 +133,17 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 						getNotifier(),
 						primaryKeyStream,
 						objectLoadingBatchSize,
-						indexedType, entityName, idAttributeOfIndexedType,
+						type, idAttributeOfType,
 						objectsLimit,
 						idFetchSize
 				),
 				transactionTimeout, sessionContext.getTenantIdentifier()
 		);
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
-		final ThreadPoolExecutor identifierProducingExecutor = mappingContext.getThreadPoolProvider()
-				.newFixedThreadPool( 1, MassIndexerImpl.THREAD_NAME_PREFIX + entityName + " - ID loading" );
+		final ThreadPoolExecutor identifierProducingExecutor = mappingContext.getThreadPoolProvider().newFixedThreadPool(
+				1,
+				MassIndexerImpl.THREAD_NAME_PREFIX + type.getEntityType().getName() + " - ID loading"
+		);
 		try {
 			identifierProducingFutures.add( Futures.runAsync( primaryKeyOutputter, identifierProducingExecutor ) );
 		}
@@ -155,13 +156,15 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 		final Runnable documentOutputter = new IdentifierConsumerDocumentProducer<>(
 				mappingContext, sessionContext.getTenantIdentifier(),
 				getNotifier(),
+				type, idAttributeOfType,
 				primaryKeyStream,
 				cacheMode,
-				indexedType, entityName, idAttributeOfIndexedType,
 				transactionTimeout
 		);
-		final ThreadPoolExecutor indexingExecutor = mappingContext.getThreadPoolProvider()
-				.newFixedThreadPool( documentBuilderThreads, MassIndexerImpl.THREAD_NAME_PREFIX + entityName + " - Entity loading" );
+		final ThreadPoolExecutor indexingExecutor = mappingContext.getThreadPoolProvider().newFixedThreadPool(
+				documentBuilderThreads,
+				MassIndexerImpl.THREAD_NAME_PREFIX + type.getEntityType().getName() + " - Entity loading"
+		);
 		try {
 			for ( int i = 0; i < documentBuilderThreads; i++ ) {
 				indexingFutures.add( Futures.runAsync( documentOutputter, indexingExecutor ) );

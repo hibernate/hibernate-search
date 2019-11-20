@@ -48,11 +48,11 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 	private final MassIndexingNotifier notifier;
 	private final String tenantId;
 
+	private final HibernateOrmMassIndexingIndexedTypeContext<E> type;
+	private final SingularAttribute<? super E, I> idAttributeOfType;
+
 	private final ProducerConsumerQueue<List<I>> destination;
 	private final int batchSize;
-	private final Class<E> indexedType;
-	private final String entityName;
-	private final SingularAttribute<? super E, I> idAttributeOfIndexedType;
 	private final long objectsLimit;
 	private final int idFetchSize;
 
@@ -62,9 +62,8 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 	 * @param notifier the mass indexing notifier
 	 * @param fromIdentifierListToEntities the target queue where the produced identifiers are sent to
 	 * @param objectLoadingBatchSize affects mostly the next consumer: IdentifierConsumerEntityProducer
-	 * @param indexedType the entity type whose identifiers are to be loaded
-	 * @param entityName the name of the entity whose identifiers are to be loaded
-	 * @param idAttributeOfIndexedType the id attribute to be loaded
+	 * @param type the entity type whose identifiers are to be loaded
+	 * @param idAttributeOfType the id attribute to be loaded
 	 * @param objectsLimit if not zero
 	 * @param idFetchSize the fetch size
 	 */
@@ -72,16 +71,15 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 			MassIndexingNotifier notifier,
 			ProducerConsumerQueue<List<I>> fromIdentifierListToEntities,
 			int objectLoadingBatchSize,
-			Class<E> indexedType, String entityName, SingularAttribute<? super E, I> idAttributeOfIndexedType,
+			HibernateOrmMassIndexingIndexedTypeContext<E> type, SingularAttribute<? super E, I> idAttributeOfType,
 			long objectsLimit, int idFetchSize) {
 		this.sessionFactory = sessionFactory;
 		this.tenantId = tenantId;
 		this.notifier = notifier;
+		this.type = type;
+		this.idAttributeOfType = idAttributeOfType;
 		this.destination = fromIdentifierListToEntities;
 		this.batchSize = objectLoadingBatchSize;
-		this.indexedType = indexedType;
-		this.entityName = entityName;
-		this.idAttributeOfIndexedType = idAttributeOfIndexedType;
 		this.objectsLimit = objectsLimit;
 		this.idFetchSize = idFetchSize;
 		log.trace( "created" );
@@ -94,7 +92,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 			inTransactionWrapper( upperSession );
 		}
 		catch (RuntimeException exception) {
-			notifier.notifyRunnableFailure( exception, log.massIndexerFetchingIds( entityName ) );
+			notifier.notifyRunnableFailure( exception, log.massIndexerFetchingIds( type.getEntityType().getName() ) );
 		}
 		finally {
 			destination.producerStopping();
@@ -160,7 +158,9 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 					// might be produced otherwise if the driver fetches all rows up-front
 					SharedSessionContractImplementor sessionImpl = (SharedSessionContractImplementor) session;
 					if ( !sessionImpl.isTransactionInProgress() ) {
-						throw log.transactionNotActiveWhileProducingIdsForBatchIndexing( indexedType );
+						throw log.transactionNotActiveWhileProducingIdsForBatchIndexing(
+								type.getEntityType().getName()
+						);
 					}
 
 					enqueueList( destinationList );
@@ -179,7 +179,7 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 		CriteriaBuilder criteriaBuilder = sessionFactory.getCriteriaBuilder();
 		CriteriaQuery<Long> criteriaQuery = criteriaBuilder.createQuery( Long.class );
 
-		Root<E> root = criteriaQuery.from( indexedType );
+		Root<E> root = criteriaQuery.from( type.getEntityType() );
 		criteriaQuery.select( criteriaBuilder.count( root ) );
 
 		return session.createQuery( criteriaQuery )
@@ -188,10 +188,10 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 
 	private Query<I> createIdentifiersQuery(StatelessSession session) {
 		CriteriaBuilder criteriaBuilder = sessionFactory.getCriteriaBuilder();
-		CriteriaQuery<I> criteriaQuery = criteriaBuilder.createQuery( idAttributeOfIndexedType.getJavaType() );
+		CriteriaQuery<I> criteriaQuery = criteriaBuilder.createQuery( idAttributeOfType.getJavaType() );
 
-		Root<E> root = criteriaQuery.from( indexedType );
-		Path<I> idPath = root.get( idAttributeOfIndexedType );
+		Root<E> root = criteriaQuery.from( type.getEntityType() );
+		Path<I> idPath = root.get( idAttributeOfType );
 		criteriaQuery.select( idPath );
 
 		return session.createQuery( criteriaQuery )

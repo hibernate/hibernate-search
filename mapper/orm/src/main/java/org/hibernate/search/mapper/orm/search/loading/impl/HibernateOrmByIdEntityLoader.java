@@ -22,6 +22,7 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 
 public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEntityLoader<E> {
@@ -314,7 +315,7 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 			while (
 					// Be sure to ignore mapped superclasses hiding in the middle of the entity hierarchy
 					!Type.PersistenceType.ENTITY.equals( superTypeCandidate.getPersistenceType() )
-					|| !isSuperTypeOf( metamodel, (EntityTypeDescriptor<?>) superTypeCandidate, type2 )
+					|| !HibernateOrmUtils.isSuperTypeOf( metamodel, (EntityTypeDescriptor<?>) superTypeCandidate, type2 )
 			) {
 				superTypeCandidate = superTypeCandidate.getSupertype();
 			}
@@ -325,12 +326,6 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 				);
 			}
 			return (EntityTypeDescriptor<?>) superTypeCandidate;
-		}
-
-		private static boolean isSuperTypeOf(MetamodelImplementor metamodel,
-				EntityTypeDescriptor<?> type1, EntityTypeDescriptor<?> type2) {
-			EntityPersister persister1 = metamodel.entityPersister( type1.getTypeName() );
-			return persister1.isSubclassEntityName( type2.getTypeName() );
 		}
 	}
 }

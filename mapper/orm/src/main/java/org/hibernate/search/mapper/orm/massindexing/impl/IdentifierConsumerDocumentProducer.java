@@ -48,11 +48,11 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 	private final String tenantId;
 	private final MassIndexingNotifier notifier;
 
+	private final HibernateOrmMassIndexingIndexedTypeContext<E> type;
+	private final SingularAttribute<? super E, I> idAttributeOfType;
+
 	private final ProducerConsumerQueue<List<I>> source;
 	private final CacheMode cacheMode;
-	private final Class<E> type;
-	private final String entityName;
-	private final SingularAttribute<? super E, I> idAttributeOfIndexedType;
 	private final Integer transactionTimeout;
 
 	/**
@@ -63,9 +63,9 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 	IdentifierConsumerDocumentProducer(
 			HibernateOrmMassIndexingMappingContext mappingContext, String tenantId,
 			MassIndexingNotifier notifier,
+			HibernateOrmMassIndexingIndexedTypeContext<E> type, SingularAttribute<? super E, I> idAttributeOfType,
 			ProducerConsumerQueue<List<I>> fromIdentifierListToEntities,
 			CacheMode cacheMode,
-			Class<E> indexedType, String entityName, SingularAttribute<? super E, I> idAttributeOfIndexedType,
 			Integer transactionTimeout
 			) {
 		this.mappingContext = mappingContext;
@@ -73,9 +73,8 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		this.notifier = notifier;
 		this.source = fromIdentifierListToEntities;
 		this.cacheMode = cacheMode;
-		this.type = indexedType;
-		this.entityName = entityName;
-		this.idAttributeOfIndexedType = idAttributeOfIndexedType;
+		this.type = type;
+		this.idAttributeOfType = idAttributeOfType;
 		this.transactionTimeout = transactionTimeout;
 		this.transactionManager = mappingContext.getSessionFactory()
 				.getServiceRegistry()
@@ -98,7 +97,10 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			loadAllFromQueue( session );
 		}
 		catch (Exception exception) {
-			notifier.notifyRunnableFailure( exception, log.massIndexingLoadingAndExtractingEntityData( entityName ) );
+			notifier.notifyRunnableFailure(
+					exception,
+					log.massIndexingLoadingAndExtractingEntityData( type.getEntityType().getName() )
+			);
 		}
 		log.trace( "finished" );
 	}
@@ -139,10 +141,10 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			beginTransaction( session );
 
 			CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
-			CriteriaQuery<E> criteriaQuery = criteriaBuilder.createQuery( type );
-			Root<E> root = criteriaQuery.from( type );
+			CriteriaQuery<E> criteriaQuery = criteriaBuilder.createQuery( type.getEntityType().getJavaType() );
+			Root<E> root = criteriaQuery.from( type.getEntityType() );
 			criteriaQuery.select( root );
-			criteriaQuery.where( root.get( idAttributeOfIndexedType ).in( listIds ) );
+			criteriaQuery.where( root.get( idAttributeOfType ).in( listIds ) );
 
 			Query<E> query = session.createQuery( criteriaQuery )
 					.setCacheMode( cacheMode )
@@ -212,7 +214,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 
 			if ( future.isCompletedExceptionally() ) {
 				notifier.notifyEntityIndexingFailure(
-						type, entityName,
+						type,
 						session, entities.get( i ),
 						Futures.getThrowableNow( future )
 				);

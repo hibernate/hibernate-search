@@ -6,11 +6,13 @@
  */
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
+import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
+
 public interface HibernateOrmMassIndexingIndexedTypeContext<E> {
 
 	/**
-	 * @return The entity type as a {@link Class}.
+	 * @return The entity type from the Hibernate ORM metamodel.
 	 */
-	Class<E> getJavaClass();
+	EntityTypeDescriptor<E> getEntityType();
 
 }

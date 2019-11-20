@@ -25,7 +25,6 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
-import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 
 import org.jboss.logging.BasicLogger;
 import org.jboss.logging.annotations.Cause;
@@ -111,8 +110,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_1 + 235, value = "Default automatic indexing synchronization strategy set to '%s'." )
 	void defaultAutomaticIndexingSynchronizationStrategy(Object strategy);
 
-	@Message(id = ID_OFFSET_1 + 276, value = "No transaction is active while indexing entity type '%1$s'; Consider increasing the connection time-out")
-	SearchException transactionNotActiveWhileProducingIdsForBatchIndexing(@FormatWith(ClassFormatter.class) Class<?> entityType);
+	@Message(id = ID_OFFSET_1 + 276, value = "No transaction is active while indexing entity '%1$s'; Consider increasing the connection time-out")
+	SearchException transactionNotActiveWhileProducingIdsForBatchIndexing(String entityName);
 
 	// TODO HSEARCH-3308 migrate relevant messages from Search 5 here
 

@@ -14,7 +14,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
 import org.hibernate.CacheMode;
+import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
+import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
@@ -40,7 +44,7 @@ public class MassIndexerImpl implements MassIndexer {
 	private final HibernateOrmMassIndexingMappingContext mappingContext;
 	private final DetachedBackendSessionContext sessionContext;
 
-	private final Set<Class<?>> rootEntities;
+	private final Set<HibernateOrmMassIndexingIndexedTypeContext<?>> rootEntityTypes;
 	private final PojoScopeWorkspace scopeWorkspace;
 
 	// default settings defined here:
@@ -62,33 +66,36 @@ public class MassIndexerImpl implements MassIndexer {
 			PojoScopeWorkspace scopeWorkspace) {
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
-		this.rootEntities = toRootEntities( targetedIndexedTypes );
+		this.rootEntityTypes = toRootEntityTypes( mappingContext.getSessionFactory(), targetedIndexedTypes );
 		this.scopeWorkspace = scopeWorkspace;
 	}
 
 	/*
-	 * From the set of classes a new set is built containing all indexed
-	 * subclasses, but removing then all subtypes of indexed entities.
+	 * From the set of targeted types a new set is built, removing all subtypes of indexed entities.
 	 */
-	private static Set<Class<?>> toRootEntities(
+	private static Set<HibernateOrmMassIndexingIndexedTypeContext<?>> toRootEntityTypes(
+			SessionFactoryImplementor sessionFactory,
 			Set<? extends HibernateOrmMassIndexingIndexedTypeContext<?>> targetedIndexedTypeContexts) {
-		Set<Class<?>> cleaned = new LinkedHashSet<>();
-		Set<Class<?>> toRemove = new HashSet<>();
+		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
+
+		Set<HibernateOrmMassIndexingIndexedTypeContext<?>> cleaned = new LinkedHashSet<>();
+		Set<HibernateOrmMassIndexingIndexedTypeContext<?>> toRemove = new HashSet<>();
 		//now remove all repeated types to avoid duplicate loading by polymorphic query loading
 		for ( HibernateOrmMassIndexingIndexedTypeContext<?> typeContext : targetedIndexedTypeContexts ) {
-			Class<?> type = typeContext.getJavaClass();
+			EntityTypeDescriptor<?> entityType = typeContext.getEntityType();
 			boolean typeIsOk = true;
-			for ( Class<?> existing : cleaned ) {
-				if ( existing.isAssignableFrom( type ) ) {
+			for ( HibernateOrmMassIndexingIndexedTypeContext<?> existing : cleaned ) {
+				EntityTypeDescriptor<?> existingEntityType = existing.getEntityType();
+				if ( HibernateOrmUtils.isSuperTypeOf( metamodel, existingEntityType, entityType ) ) {
 					typeIsOk = false;
 					break;
 				}
-				if ( type.isAssignableFrom( existing ) ) {
+				if ( HibernateOrmUtils.isSuperTypeOf( metamodel, entityType, existingEntityType ) ) {
 					toRemove.add( existing );
 				}
 			}
 			if ( typeIsOk ) {
-				cleaned.add( type );
+				cleaned.add( typeContext );
 			}
 		}
 		cleaned.removeAll( toRemove );
@@ -101,7 +108,7 @@ public class MassIndexerImpl implements MassIndexer {
 		if ( numberOfThreads < 1 ) {
 			throw new IllegalArgumentException( "numberOfThreads must be at least 1" );
 		}
-		this.typesToIndexInParallel = Math.min( numberOfThreads, rootEntities.size() );
+		this.typesToIndexInParallel = Math.min( numberOfThreads, rootEntityTypes.size() );
 		return this;
 	}
 
@@ -193,7 +200,7 @@ public class MassIndexerImpl implements MassIndexer {
 		return new BatchCoordinator(
 				mappingContext, sessionContext,
 				notifier,
-				rootEntities, scopeWorkspace,
+				rootEntityTypes, scopeWorkspace,
 				typesToIndexInParallel, documentBuilderThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,
 				optimizeAtEnd, purgeAtStart, optimizeAfterPurge,

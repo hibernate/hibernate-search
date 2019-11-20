@@ -61,7 +61,7 @@ class MassIndexingNotifier {
 		monitor.documentsAdded( size );
 	}
 
-	<T> void notifyEntityIndexingFailure(Class<T> entityType, String entityName,
+	<T> void notifyEntityIndexingFailure(HibernateOrmMassIndexingIndexedTypeContext<T> type,
 			Session session, T entity, Throwable throwable) {
 		RecordedEntityIndexingFailure recordedFailure = new RecordedEntityIndexingFailure( throwable );
 		entityIndexingFirstFailure.compareAndSet( null, recordedFailure );
@@ -70,10 +70,10 @@ class MassIndexingNotifier {
 		EntityIndexingFailureContext.Builder contextBuilder = EntityIndexingFailureContext.builder();
 		contextBuilder.throwable( throwable );
 		// Add minimal information here, but information we're sure we can get
-		contextBuilder.failingOperation( log.massIndexerIndexingInstance( entityName ) );
+		contextBuilder.failingOperation( log.massIndexerIndexingInstance( type.getEntityType().getName() ) );
 		// Add more information here, but information that may not be available if the session completely broke down
 		// (we're being extra careful here because we don't want to throw an exception while handling and exception)
-		EntityReference entityReference = extractReferenceOrSuppress( entityType, entityName, session, entity, throwable );
+		EntityReference entityReference = extractReferenceOrSuppress( type, session, entity, throwable );
 		if ( entityReference != null ) {
 			contextBuilder.entityReference( entityReference );
 			recordedFailure.entityReference = entityReference;
@@ -122,10 +122,12 @@ class MassIndexingNotifier {
 		);
 	}
 
-	private <T> EntityReference extractReferenceOrSuppress(Class<T> entityType, String entityName,
+	private <T> EntityReference extractReferenceOrSuppress(HibernateOrmMassIndexingIndexedTypeContext<T> type,
 			Session session, Object entity, Throwable throwable) {
 		try {
-			return new EntityReferenceImpl( entityType, entityName, session.getIdentifier( entity ) );
+			return new EntityReferenceImpl(
+					type.getEntityType().getJavaType(), type.getEntityType().getName(), session.getIdentifier( entity )
+			);
 		}
 		catch (RuntimeException e) {
 			// We failed to extract a reference.

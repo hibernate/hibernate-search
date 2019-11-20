@@ -32,7 +32,8 @@ public class BatchCoordinator extends FailureHandledRunnable {
 
 	private final HibernateOrmMassIndexingMappingContext mappingContext;
 	private final DetachedBackendSessionContext sessionContext;
-	private final Set<Class<?>> rootEntities; //entity types to reindex excluding all subtypes of each-other
+	// Entity types to reindex, guaranteed not to be subtypes of each other.
+	private final Set<HibernateOrmMassIndexingIndexedTypeContext<?>> rootEntityTypes;
 	private final PojoScopeWorkspace scopeWorkspace;
 
 	private final int typesToIndexInParallel;
@@ -50,7 +51,7 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	BatchCoordinator(HibernateOrmMassIndexingMappingContext mappingContext,
 			DetachedBackendSessionContext sessionContext,
 			MassIndexingNotifier notifier,
-			Set<Class<?>> rootEntities, PojoScopeWorkspace scopeWorkspace,
+			Set<HibernateOrmMassIndexingIndexedTypeContext<?>> rootEntityTypes, PojoScopeWorkspace scopeWorkspace,
 			int typesToIndexInParallel, int documentBuilderThreads, CacheMode cacheMode,
 			int objectLoadingBatchSize, long objectsLimit, boolean optimizeAtEnd,
 			boolean purgeAtStart, boolean optimizeAfterPurge,
@@ -58,7 +59,7 @@ public class BatchCoordinator extends FailureHandledRunnable {
 		super( notifier );
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
-		this.rootEntities = rootEntities;
+		this.rootEntityTypes = rootEntityTypes;
 		this.scopeWorkspace = scopeWorkspace;
 
 		this.idFetchSize = idFetchSize;
@@ -129,7 +130,7 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	private void doBatchWork() throws InterruptedException {
 		ExecutorService executor = mappingContext.getThreadPoolProvider()
 				.newFixedThreadPool( typesToIndexInParallel, MassIndexerImpl.THREAD_NAME_PREFIX + "Workspace" );
-		for ( Class<?> type : rootEntities ) {
+		for ( HibernateOrmMassIndexingIndexedTypeContext<?> type : rootEntityTypes ) {
 			indexingFutures.add( Futures.runAsync( createBatchIndexingWorkspace( type ), executor ) );
 		}
 		executor.shutdown();
@@ -140,14 +141,13 @@ public class BatchCoordinator extends FailureHandledRunnable {
 		);
 	}
 
-	private <E> BatchIndexingWorkspace<E, ?> createBatchIndexingWorkspace(Class<E> indexedType) {
-		EntityType<E> indexTypeModel = mappingContext.getSessionFactory().getMetamodel().entity( indexedType );
-		String entityName = indexTypeModel.getName();
-		SingularAttribute<? super E, ?> idAttributeOfIndexedType = indexTypeModel.getId( indexTypeModel.getIdType().getJavaType() );
+	private <E> BatchIndexingWorkspace<E, ?> createBatchIndexingWorkspace(HibernateOrmMassIndexingIndexedTypeContext<E> type) {
+		EntityType<E> indexTypeModel = type.getEntityType();
+		SingularAttribute<? super E, ?> idAttributeOfType = indexTypeModel.getId( indexTypeModel.getIdType().getJavaType() );
 
 		return new BatchIndexingWorkspace<>(
 				mappingContext, sessionContext, getNotifier(),
-				indexedType, entityName, idAttributeOfIndexedType,
+				type, idAttributeOfType,
 				documentBuilderThreads, cacheMode,
 				objectLoadingBatchSize,
 				objectsLimit, idFetchSize, transactionTimeout
