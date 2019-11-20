@@ -27,10 +27,24 @@ public interface MappableTypeModel {
 	 */
 	boolean isAbstract();
 
-	boolean isSubTypeOf(MappableTypeModel other);
+	/**
+	 * @param superTypeCandidate Another type that should be assessed as a supertype.
+	 * @return {@code true} if this type is a subtype of {@code superTypeCandidate},
+	 * i.e. if {@code superTypeCandidate} is mentioned in {@link #getAscendingSuperTypes()}.
+	 * {@code false} otherwise.
+	 */
+	boolean isSubTypeOf(MappableTypeModel superTypeCandidate);
 
+	/**
+	 * @return A stream of all supertypes of this type, from the most specific (this type)
+	 * to the least specific ({@code Object}).
+	 */
 	Stream<? extends MappableTypeModel> getAscendingSuperTypes();
 
+	/**
+	 * @return A stream of all supertypes of this type, from the least specific ({@code Object})
+	 * to the most specific (this type).
+	 */
 	Stream<? extends MappableTypeModel> getDescendingSuperTypes();
 
 	/**
