@@ -12,6 +12,7 @@ import java.util.function.Supplier;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeContainedTypeContext;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
@@ -28,21 +29,21 @@ public class PojoContainedTypeManager<E>
 		implements AutoCloseable, ToStringTreeAppendable,
 		PojoWorkContainedTypeContext<E>, PojoScopeContainedTypeContext<E> {
 
-	private final Class<E> javaClass;
+	private final PojoRawTypeIdentifier<E> typeIdentifier;
 	private final PojoCaster<E> caster;
 	private final PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver;
 
-	public PojoContainedTypeManager(Class<E> javaClass,
+	public PojoContainedTypeManager(PojoRawTypeIdentifier<E> typeIdentifier,
 			PojoCaster<E> caster,
 			PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver) {
-		this.javaClass = javaClass;
+		this.typeIdentifier = typeIdentifier;
 		this.caster = caster;
 		this.reindexingResolver = reindexingResolver;
 	}
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[javaType = " + javaClass + "]";
+		return getClass().getSimpleName() + "[javaType = " + typeIdentifier + "]";
 	}
 
 	@Override
@@ -52,13 +53,13 @@ public class PojoContainedTypeManager<E>
 
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "javaClass", javaClass )
+		builder.attribute( "typeIdentifier", typeIdentifier )
 				.attribute( "reindexingResolver", reindexingResolver );
 	}
 
 	@Override
-	public Class<E> getJavaClass() {
-		return javaClass;
+	public PojoRawTypeIdentifier<E> getTypeIdentifier() {
+		return typeIdentifier;
 	}
 
 	@Override

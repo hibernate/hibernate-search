@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeContainedTypeContextProvider;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkContainedTypeContextProvider;
@@ -26,18 +27,19 @@ public class PojoContainedTypeManagerContainer
 		return new Builder();
 	}
 
-	private final Map<Class<?>, PojoContainedTypeManager<?>> byExactClass;
+	private final Map<PojoRawTypeIdentifier<?>, PojoContainedTypeManager<?>> byExactType;
 	private final Set<PojoContainedTypeManager<?>> all;
 
 	private PojoContainedTypeManagerContainer(Builder builder) {
-		this.byExactClass = new HashMap<>( builder.byExactClass );
-		this.all = Collections.unmodifiableSet( new LinkedHashSet<>( byExactClass.values() ) );
+		this.byExactType = new HashMap<>( builder.byExactClass );
+		this.all = Collections.unmodifiableSet( new LinkedHashSet<>( byExactType.values() ) );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <E> Optional<PojoContainedTypeManager<E>> getByExactClass(Class<E> clazz) {
-		return Optional.ofNullable( (PojoContainedTypeManager<E>) byExactClass.get( clazz ) );
+	public <E> Optional<? extends PojoContainedTypeManager<E>> getByExactType(
+			PojoRawTypeIdentifier<E> typeIdentifier) {
+		return Optional.ofNullable( (PojoContainedTypeManager<E>) byExactType.get( typeIdentifier ) );
 	}
 
 	Set<PojoContainedTypeManager<?>> getAll() {
@@ -47,13 +49,13 @@ public class PojoContainedTypeManagerContainer
 	public static class Builder {
 
 		// Use a LinkedHashMap for deterministic iteration
-		private final Map<Class<?>, PojoContainedTypeManager<?>> byExactClass = new LinkedHashMap<>();
+		private final Map<PojoRawTypeIdentifier<?>, PojoContainedTypeManager<?>> byExactClass = new LinkedHashMap<>();
 
 		private Builder() {
 		}
 
 		public <E> void add(PojoRawTypeModel<E> typeModel, PojoContainedTypeManager<E> typeManager) {
-			byExactClass.put( typeModel.getJavaClass(), typeManager );
+			byExactClass.put( typeModel.getTypeIdentifier(), typeManager );
 		}
 
 		public void closeOnFailure() {

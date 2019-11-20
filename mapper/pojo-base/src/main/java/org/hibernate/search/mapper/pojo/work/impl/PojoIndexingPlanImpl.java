@@ -18,6 +18,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -36,8 +37,8 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 	private final DocumentRefreshStrategy refreshStrategy;
 
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<Class<?>, PojoIndexedTypeIndexingPlan<?, ?, ?>> indexedTypeDelegates = new LinkedHashMap<>();
-	private final Map<Class<?>, PojoContainedTypeIndexingPlan<?>> containedTypeDelegates = new LinkedHashMap<>();
+	private final Map<PojoRawTypeIdentifier<?>, PojoIndexedTypeIndexingPlan<?, ?, ?>> indexedTypeDelegates = new LinkedHashMap<>();
+	private final Map<PojoRawTypeIdentifier<?>, PojoContainedTypeIndexingPlan<?>> containedTypeDelegates = new LinkedHashMap<>();
 
 	private boolean isProcessing = false;
 
@@ -61,8 +62,8 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 
 	@Override
 	public void add(Object providedId, Object entity) {
-		Class<?> clazz = introspector.getClass( entity );
-		AbstractPojoTypeIndexingPlan delegate = getDelegate( clazz );
+		PojoRawTypeIdentifier<?> typeIdentifier = introspector.getTypeIdentifier( entity );
+		AbstractPojoTypeIndexingPlan delegate = getDelegate( typeIdentifier );
 		delegate.add( providedId, entity );
 	}
 
@@ -73,8 +74,8 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 
 	@Override
 	public void addOrUpdate(Object providedId, Object entity) {
-		Class<?> clazz = introspector.getClass( entity );
-		AbstractPojoTypeIndexingPlan delegate = getDelegate( clazz );
+		PojoRawTypeIdentifier<?> typeIdentifier = introspector.getTypeIdentifier( entity );
+		AbstractPojoTypeIndexingPlan delegate = getDelegate( typeIdentifier );
 		delegate.update( providedId, entity );
 	}
 
@@ -85,8 +86,8 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 
 	@Override
 	public void addOrUpdate(Object providedId, Object entity, String... dirtyPaths) {
-		Class<?> clazz = getIntrospector().getClass( entity );
-		AbstractPojoTypeIndexingPlan delegate = getDelegate( clazz );
+		PojoRawTypeIdentifier<?> typeIdentifier = introspector.getTypeIdentifier( entity );
+		AbstractPojoTypeIndexingPlan delegate = getDelegate( typeIdentifier );
 		delegate.update( providedId, entity, dirtyPaths );
 	}
 
@@ -97,14 +98,16 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 
 	@Override
 	public void delete(Object providedId, Object entity) {
-		Class<?> clazz = introspector.getClass( entity );
-		AbstractPojoTypeIndexingPlan delegate = getDelegate( clazz );
+		PojoRawTypeIdentifier<?> typeIdentifier = introspector.getTypeIdentifier( entity );
+		AbstractPojoTypeIndexingPlan delegate = getDelegate( typeIdentifier );
 		delegate.delete( providedId, entity );
 	}
 
 	@Override
 	public void purge(Class<?> clazz, Object providedId) {
-		AbstractPojoTypeIndexingPlan delegate = getDelegate( clazz );
+		// TODO HSEARCH-1401 avoid creating a new instance of that type identifier every single time
+		PojoRawTypeIdentifier<?> typeIdentifier = PojoRawTypeIdentifier.of( clazz );
+		AbstractPojoTypeIndexingPlan delegate = getDelegate( typeIdentifier );
 		delegate.purge( providedId );
 	}
 
@@ -169,65 +172,65 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 		return introspector;
 	}
 
-	private AbstractPojoTypeIndexingPlan getDelegate(Class<?> clazz) {
-		AbstractPojoTypeIndexingPlan delegate = indexedTypeDelegates.get( clazz );
+	private AbstractPojoTypeIndexingPlan getDelegate(PojoRawTypeIdentifier<?> typeIdentifier) {
+		AbstractPojoTypeIndexingPlan delegate = indexedTypeDelegates.get( typeIdentifier );
 		if ( delegate == null ) {
-			delegate = containedTypeDelegates.get( clazz );
+			delegate = containedTypeDelegates.get( typeIdentifier );
 			if ( delegate == null ) {
-				delegate = createDelegate( clazz );
+				delegate = createDelegate( typeIdentifier );
 			}
 		}
 		return delegate;
 	}
 
-	private AbstractPojoTypeIndexingPlan createDelegate(Class<?> clazz) {
+	private AbstractPojoTypeIndexingPlan createDelegate(PojoRawTypeIdentifier<?> typeIdentifier) {
 		Optional<? extends PojoWorkIndexedTypeContext<?, ?, ?>> indexedTypeContextOptional =
-				indexedTypeContextProvider.getByExactClass( clazz );
+				indexedTypeContextProvider.getByExactType( typeIdentifier );
 		if ( indexedTypeContextOptional.isPresent() ) {
 			PojoIndexedTypeIndexingPlan<?, ?, ?> delegate = indexedTypeContextOptional.get()
 					.createIndexingPlan( sessionContext, commitStrategy, refreshStrategy );
-			indexedTypeDelegates.put( clazz, delegate );
+			indexedTypeDelegates.put( typeIdentifier, delegate );
 			return delegate;
 		}
 		else {
 			Optional<? extends PojoWorkContainedTypeContext<?>> containedTypeContextOptional =
-					containedTypeContextProvider.getByExactClass( clazz );
+					containedTypeContextProvider.getByExactType( typeIdentifier );
 			if ( containedTypeContextOptional.isPresent() ) {
 				PojoContainedTypeIndexingPlan<?> delegate = containedTypeContextOptional.get()
 						.createIndexingPlan( sessionContext );
-				containedTypeDelegates.put( clazz, delegate );
+				containedTypeDelegates.put( typeIdentifier, delegate );
 				return delegate;
 			}
 		}
-		throw log.notIndexedTypeNorAsDelegate( clazz );
+		throw log.notIndexedTypeNorAsDelegate( typeIdentifier );
 	}
 
-	private PojoIndexedTypeIndexingPlan<?, ?, ?> getOrCreateIndexedDelegateForContainedUpdate(Class<?> clazz) {
-		PojoIndexedTypeIndexingPlan<?, ?, ?> delegate = indexedTypeDelegates.get( clazz );
+	private PojoIndexedTypeIndexingPlan<?, ?, ?> getOrCreateIndexedDelegateForContainedUpdate(PojoRawTypeIdentifier<?> typeIdentifier) {
+		PojoIndexedTypeIndexingPlan<?, ?, ?> delegate = indexedTypeDelegates.get( typeIdentifier );
 		if ( delegate != null ) {
 			return delegate;
 		}
 
 		Optional<? extends PojoWorkIndexedTypeContext<?, ?, ?>> indexedTypeManagerOptional =
-				indexedTypeContextProvider.getByExactClass( clazz );
+				indexedTypeContextProvider.getByExactType( typeIdentifier );
 		if ( indexedTypeManagerOptional.isPresent() ) {
 			delegate = indexedTypeManagerOptional.get()
 					.createIndexingPlan( sessionContext, commitStrategy, refreshStrategy );
-			indexedTypeDelegates.put( clazz, delegate );
+			indexedTypeDelegates.put( typeIdentifier, delegate );
 			return delegate;
 		}
 
 		throw new AssertionFailure(
-				"Attempt to reindex an entity of type " + clazz + " because a contained entity was modified,"
-				+ " but " + clazz + " is not indexed directly."
+				"Attempt to reindex an entity of type " + typeIdentifier + " because a contained entity was modified,"
+				+ " but " + typeIdentifier + " is not indexed directly."
 				+ " There is a bug in Hibernate Search, please report it."
 		);
 	}
 
 	private void updateBecauseOfContained(Object containingEntity) {
 		// TODO ignore the event when containingEntity has provided IDs
-		Class<?> clazz = getIntrospector().getClass( containingEntity );
-		PojoIndexedTypeIndexingPlan<?, ?, ?> delegate = getOrCreateIndexedDelegateForContainedUpdate( clazz );
+		PojoRawTypeIdentifier<?> typeIdentifier = getIntrospector().getTypeIdentifier( containingEntity );
+		PojoIndexedTypeIndexingPlan<?, ?, ?> delegate = getOrCreateIndexedDelegateForContainedUpdate( typeIdentifier );
 		delegate.updateBecauseOfContained( containingEntity );
 	}
 

@@ -10,6 +10,7 @@ import org.hibernate.Hibernate;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 
 
@@ -27,8 +28,12 @@ public class HibernateOrmRuntimeIntrospector implements PojoRuntimeIntrospector 
 	@Override
 	// The actual class of a proxy of type T is always a Class<? extends T> (unless T is HibernateProxy, but we don't expect that)
 	@SuppressWarnings("unchecked")
-	public <T> Class<? extends T> getClass(T entity) {
-		return Hibernate.getClass( entity );
+	public <T> PojoRawTypeIdentifier<? extends T> getTypeIdentifier(T entity) {
+		if ( entity == null ) {
+			return null;
+		}
+		// TODO HSEARCH-1401 avoid creating a new instance of that type identifier every single time
+		return PojoRawTypeIdentifier.of( (Class<? extends T>) Hibernate.getClass( entity ) );
 	}
 
 	@Override

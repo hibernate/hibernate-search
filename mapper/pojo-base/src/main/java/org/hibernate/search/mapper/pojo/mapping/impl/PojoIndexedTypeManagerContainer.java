@@ -14,8 +14,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContextProvider;
+import org.hibernate.search.mapper.pojo.work.impl.PojoWorkIndexedTypeContext;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkIndexedTypeContextProvider;
 import org.hibernate.search.util.common.impl.Closer;
 
@@ -26,27 +29,29 @@ public class PojoIndexedTypeManagerContainer
 		return new Builder();
 	}
 
-	private final Map<Class<?>, PojoIndexedTypeManager<?, ?, ?>> byExactClass;
-	private final Map<Class<?>, Set<? extends PojoIndexedTypeManager<?, ?, ?>>> bySuperClass;
+	private final Map<PojoRawTypeIdentifier<?>, PojoIndexedTypeManager<?, ?, ?>> byExactType;
+	private final Map<PojoRawTypeIdentifier<?>, Set<? extends PojoIndexedTypeManager<?, ?, ?>>> bySuperType;
 	private final Set<PojoIndexedTypeManager<?, ?, ?>> all;
 
 	private PojoIndexedTypeManagerContainer(Builder builder) {
-		this.byExactClass = new HashMap<>( builder.byExactClass );
-		this.bySuperClass = new HashMap<>( builder.bySuperClass );
-		this.bySuperClass.replaceAll( (k, v) -> Collections.unmodifiableSet( v ) );
-		this.all = Collections.unmodifiableSet( new LinkedHashSet<>( byExactClass.values() ) );
+		this.byExactType = new HashMap<>( builder.byExactType );
+		this.bySuperType = new HashMap<>( builder.bySuperType );
+		this.bySuperType.replaceAll( (k, v) -> Collections.unmodifiableSet( v ) );
+		this.all = Collections.unmodifiableSet( new LinkedHashSet<>( byExactType.values() ) );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <E> Optional<PojoIndexedTypeManager<?, E, ?>> getByExactClass(Class<E> clazz) {
-		return Optional.ofNullable( (PojoIndexedTypeManager<?, E, ?>) byExactClass.get( clazz ) );
+	public <E> Optional<? extends PojoWorkIndexedTypeContext<?, E, ?>> getByExactType(
+			PojoRawTypeIdentifier<E> typeIdentifier) {
+		return Optional.ofNullable( (PojoIndexedTypeManager<?, E, ?>) byExactType.get( typeIdentifier ) );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <E> Optional<Set<PojoIndexedTypeManager<?, ? extends E, ?>>> getAllBySuperClass(Class<E> clazz) {
-		return Optional.ofNullable( (Set<PojoIndexedTypeManager<?, ? extends E, ?>>) bySuperClass.get( clazz ) );
+	public <E> Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E, ?>>> getAllBySuperType(
+			PojoRawTypeIdentifier<E> typeIdentifier) {
+		return Optional.ofNullable( (Set<PojoIndexedTypeManager<?, ? extends E, ?>>) bySuperType.get( typeIdentifier ) );
 	}
 
 	Set<PojoIndexedTypeManager<?, ?, ?>> getAll() {
@@ -56,25 +61,25 @@ public class PojoIndexedTypeManagerContainer
 	public static class Builder {
 
 		// Use a LinkedHashMap for deterministic iteration
-		private final Map<Class<?>, PojoIndexedTypeManager<?, ?, ?>> byExactClass = new LinkedHashMap<>();
-		private final Map<Class<?>, Set<PojoIndexedTypeManager<?, ?, ?>>> bySuperClass = new LinkedHashMap<>();
+		private final Map<PojoRawTypeIdentifier<?>, PojoIndexedTypeManager<?, ?, ?>> byExactType = new LinkedHashMap<>();
+		private final Map<PojoRawTypeIdentifier<?>, Set<PojoIndexedTypeManager<?, ?, ?>>> bySuperType = new LinkedHashMap<>();
 
 		private Builder() {
 		}
 
 		public <E> void add(PojoRawTypeModel<E> typeModel, PojoIndexedTypeManager<?, E, ?> typeManager) {
-			byExactClass.put( typeModel.getJavaClass(), typeManager );
+			byExactType.put( typeModel.getTypeIdentifier(), typeManager );
 			typeModel.getAscendingSuperTypes()
-					.map( PojoRawTypeModel::getJavaClass )
+					.map( PojoRawTypeModel::getTypeIdentifier )
 					.forEach( clazz ->
-							bySuperClass.computeIfAbsent( clazz, ignored -> new LinkedHashSet<>() )
+							bySuperType.computeIfAbsent( clazz, ignored -> new LinkedHashSet<>() )
 									.add( typeManager )
 					);
 		}
 
 		public void closeOnFailure() {
 			try ( Closer<RuntimeException> closer = new Closer<>() ) {
-				closer.pushAll( PojoIndexedTypeManager::close, byExactClass.values() );
+				closer.pushAll( PojoIndexedTypeManager::close, byExactType.values() );
 			}
 		}
 

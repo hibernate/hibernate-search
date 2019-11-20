@@ -357,7 +357,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			delegate.createContainedTypeExtendedMappingCollector( entityType, entityTypeMetadata.getEntityName() );
 
 			PojoContainedTypeManager<T> typeManager = new PojoContainedTypeManager<>(
-					entityType.getJavaClass(), entityType.getCaster(),
+					entityType.getTypeIdentifier(), entityType.getCaster(),
 					reindexingResolverOptional.get()
 			);
 			log.createdPojoContainedTypeManager( typeManager );

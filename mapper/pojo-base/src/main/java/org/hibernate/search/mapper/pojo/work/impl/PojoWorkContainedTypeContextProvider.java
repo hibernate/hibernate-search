@@ -8,8 +8,10 @@ package org.hibernate.search.mapper.pojo.work.impl;
 
 import java.util.Optional;
 
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+
 public interface PojoWorkContainedTypeContextProvider {
 
-	<E> Optional<? extends PojoWorkContainedTypeContext<E>> getByExactClass(Class<E> clazz);
+	<E> Optional<? extends PojoWorkContainedTypeContext<E>> getByExactType(PojoRawTypeIdentifier<E> typeIdentifier);
 
 }

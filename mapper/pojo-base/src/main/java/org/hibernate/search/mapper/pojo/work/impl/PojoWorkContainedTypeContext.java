@@ -10,6 +10,7 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 
@@ -18,7 +19,7 @@ import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendS
  */
 public interface PojoWorkContainedTypeContext<E> {
 
-	Class<E> getJavaClass();
+	PojoRawTypeIdentifier<E> getTypeIdentifier();
 
 	Supplier<E> toEntitySupplier(AbstractPojoBackendSessionContext sessionContext, Object entity);
 

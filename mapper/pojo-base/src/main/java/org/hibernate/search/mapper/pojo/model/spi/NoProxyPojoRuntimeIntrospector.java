@@ -21,8 +21,12 @@ final class NoProxyPojoRuntimeIntrospector implements PojoRuntimeIntrospector {
 
 	@Override
 	@SuppressWarnings("unchecked") // The class of an object of type T is always a Class<? extends T>
-	public <T> Class<? extends T> getClass(T entity) {
-		return entity == null ? null : (Class<? extends T>) entity.getClass();
+	public <T> PojoRawTypeIdentifier<? extends T> getTypeIdentifier(T entity) {
+		if ( entity == null ) {
+			return null;
+		}
+		// TODO HSEARCH-1401 avoid creating a new instance of that type identifier every single time
+		return PojoRawTypeIdentifier.of( (Class<? extends T>) entity.getClass() );
 	}
 
 	@Override

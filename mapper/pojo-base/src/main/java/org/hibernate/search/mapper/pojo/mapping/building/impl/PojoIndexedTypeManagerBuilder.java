@@ -126,7 +126,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 				reindexingResolverBuildingHelper.build( typeModel, pathFilterFactory );
 
 		PojoIndexedTypeManager<?, E, D> typeManager = new PojoIndexedTypeManager<>(
-				typeModel.getJavaClass(), typeModel.getCaster(),
+				typeModel.getTypeIdentifier(), typeModel.getCaster(),
 				identityMappingCollector.identifierMapping,
 				identityMappingCollector.routingKeyProvider,
 				preBuiltIndexingProcessor,

@@ -14,9 +14,9 @@ public interface PojoRuntimeIntrospector {
 	/**
 	 * @param <T> the type of the entity
 	 * @param entity an instance or proxy of T
-	 * @return the class from the instance, or the underlying class as a proxy.
+	 * @return The identifier of the instance's type, or of its delegate object's type if the instance is a proxy.
 	 */
-	<T> Class<? extends T> getClass(T entity);
+	<T> PojoRawTypeIdentifier<? extends T> getTypeIdentifier(T entity);
 
 	/**
 	 * @param value the object to unproxy

@@ -67,6 +67,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBi
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcher;
 import org.hibernate.search.mapper.pojo.model.typepattern.impl.TypePatternMatcherFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -76,8 +77,8 @@ public final class BridgeResolver {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Map<Class<?>, IdentifierBinder> exactRawTypeIdentifierBridgeMappings = new HashMap<>();
-	private final Map<Class<?>, ValueBinder> exactRawTypeValueBridgeMappings = new HashMap<>();
+	private final Map<PojoRawTypeIdentifier<?>, IdentifierBinder> exactRawTypeIdentifierBridgeMappings = new HashMap<>();
+	private final Map<PojoRawTypeIdentifier<?>, ValueBinder> exactRawTypeValueBridgeMappings = new HashMap<>();
 
 	private final List<TypePatternBinderMapping<IdentifierBinder>> typePatternIdentifierBridgeMappings = new ArrayList<>();
 	private final List<TypePatternBinderMapping<ValueBinder>> typePatternValueBridgeMappings = new ArrayList<>();
@@ -160,7 +161,7 @@ public final class BridgeResolver {
 	}
 
 	private <I> void addIdentifierBinderForExactRawType(Class<I> type, IdentifierBinder binder) {
-		exactRawTypeIdentifierBridgeMappings.put( type, binder );
+		exactRawTypeIdentifierBridgeMappings.put( PojoRawTypeIdentifier.of( type ), binder );
 	}
 
 	private <I> void addIdentifierBridgeForExactRawType(Class<I> type, IdentifierBridge<I> bridge) {
@@ -173,7 +174,7 @@ public final class BridgeResolver {
 	}
 
 	private <V> void addValueBinderForExactRawType(Class<V> type, ValueBinder binder) {
-		exactRawTypeValueBridgeMappings.put( type, binder );
+		exactRawTypeValueBridgeMappings.put( PojoRawTypeIdentifier.of( type ), binder );
 	}
 
 	private <V> void addValueBridgeForExactRawType(Class<V> type, ValueBridge<V, ?> bridge) {
@@ -186,9 +187,9 @@ public final class BridgeResolver {
 	}
 
 	private static <B> B getBinderOrNull(PojoGenericTypeModel<?> sourceType,
-			Map<Class<?>, B> exactRawTypeBridgeMappings,
+			Map<PojoRawTypeIdentifier<?>, B> exactRawTypeBridgeMappings,
 			List<TypePatternBinderMapping<B>> typePatternBinderMappings) {
-		Class<?> rawType = sourceType.getRawType().getJavaClass();
+		PojoRawTypeIdentifier<?> rawType = sourceType.getRawType().getTypeIdentifier();
 		B result = exactRawTypeBridgeMappings.get( rawType );
 
 		if ( result == null ) {

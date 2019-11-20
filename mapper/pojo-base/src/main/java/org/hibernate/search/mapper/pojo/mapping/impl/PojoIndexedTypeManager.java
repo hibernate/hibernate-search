@@ -23,6 +23,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.impl.RoutingKeyProvider;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoImplicitReindexingResolver;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.processing.impl.PojoIndexingProcessor;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeIndexedTypeContext;
@@ -46,7 +47,7 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 		implements AutoCloseable, ToStringTreeAppendable,
 		PojoWorkIndexedTypeContext<I, E, D>, PojoScopeIndexedTypeContext<I, E, D> {
 
-	private final Class<E> indexedJavaClass;
+	private final PojoRawTypeIdentifier<E> typeIdentifier;
 	private final PojoCaster<E> caster;
 	private final IdentifierMappingImplementor<I, E> identifierMapping;
 	private final RoutingKeyProvider<E> routingKeyProvider;
@@ -54,13 +55,13 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 	private final MappedIndexManager<D> indexManager;
 	private final PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver;
 
-	public PojoIndexedTypeManager(Class<E> indexedJavaClass,
+	public PojoIndexedTypeManager(PojoRawTypeIdentifier<E> typeIdentifier,
 			PojoCaster<E> caster,
 			IdentifierMappingImplementor<I, E> identifierMapping,
 			RoutingKeyProvider<E> routingKeyProvider,
 			PojoIndexingProcessor<E> processor, MappedIndexManager<D> indexManager,
 			PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver) {
-		this.indexedJavaClass = indexedJavaClass;
+		this.typeIdentifier = typeIdentifier;
 		this.caster = caster;
 		this.identifierMapping = identifierMapping;
 		this.routingKeyProvider = routingKeyProvider;
@@ -71,7 +72,7 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[javaType = " + indexedJavaClass + "]";
+		return getClass().getSimpleName() + "[javaType = " + typeIdentifier + "]";
 	}
 
 	@Override
@@ -86,7 +87,7 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 
 	@Override
 	public void appendTo(ToStringTreeBuilder builder) {
-		builder.attribute( "indexedJavaClass", indexedJavaClass )
+		builder.attribute( "typeIdentifier", typeIdentifier )
 				.attribute( "indexManager", indexManager )
 				.attribute( "identifierMapping", identifierMapping )
 				.attribute( "routingKeyProvider", routingKeyProvider )
@@ -95,8 +96,8 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 	}
 
 	@Override
-	public Class<E> getJavaClass() {
-		return indexedJavaClass;
+	public PojoRawTypeIdentifier<E> getTypeIdentifier() {
+		return typeIdentifier;
 	}
 
 	@Override

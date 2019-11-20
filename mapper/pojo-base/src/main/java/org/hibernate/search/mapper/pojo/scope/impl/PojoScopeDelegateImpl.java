@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.scope.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -23,6 +24,7 @@ import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory
 import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeExtendedContextProvider;
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoBackendMappingContext;
@@ -40,25 +42,31 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 			AbstractPojoBackendMappingContext mappingContext,
 			PojoScopeIndexedTypeContextProvider indexedTypeContextProvider,
 			PojoScopeContainedTypeContextProvider containedTypeContextProvider,
-			Collection<? extends Class<? extends E>> targetedTypes,
+			Collection<? extends Class<? extends E>> targetedClasses,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
+		Collection<PojoRawTypeIdentifier<? extends E>> targetedTypes = new ArrayList<>( targetedClasses.size() );
+		for ( Class<? extends E> targetedClass : targetedClasses ) {
+			// TODO HSEARCH-1401 avoid creating a new instance of each type identifier every single time
+			targetedTypes.add( PojoRawTypeIdentifier.of( targetedClass ) );
+		}
+
 		if ( targetedTypes.isEmpty() ) {
 			throw log.invalidEmptyTargetForScope();
 		}
 
 		Set<PojoScopeIndexedTypeContext<?, ? extends E, ?>> targetedTypeContexts = new LinkedHashSet<>();
-		Set<Class<?>> nonIndexedTypes = new LinkedHashSet<>();
-		Set<Class<?>> nonIndexedButContainedTypes = new LinkedHashSet<>();
-		for ( Class<? extends E> targetedType : targetedTypes ) {
+		Set<PojoRawTypeIdentifier<?>> nonIndexedTypes = new LinkedHashSet<>();
+		Set<PojoRawTypeIdentifier<?>> nonIndexedButContainedTypes = new LinkedHashSet<>();
+		for ( PojoRawTypeIdentifier<? extends E> targetedType : targetedTypes ) {
 			Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E, ?>>> targetedTypeManagersForType =
-					indexedTypeContextProvider.getAllBySuperClass( targetedType );
+					indexedTypeContextProvider.getAllBySuperType( targetedType );
 			if ( targetedTypeManagersForType.isPresent() ) {
 				targetedTypeContexts.addAll( targetedTypeManagersForType.get() );
 			}
 			else {
 				// Remember this to produce a clear error message
 				nonIndexedTypes.add( targetedType );
-				if ( containedTypeContextProvider.getByExactClass( targetedType ).isPresent() ) {
+				if ( containedTypeContextProvider.getByExactType( targetedType ).isPresent() ) {
 					nonIndexedButContainedTypes.add( targetedType );
 				}
 			}
@@ -70,7 +78,9 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 
 		Set<C> targetedTypeExtendedContexts =
 				targetedTypeContexts.stream()
-						.map( PojoScopeIndexedTypeContext::getJavaClass )
+						.map( PojoScopeIndexedTypeContext::getTypeIdentifier )
+						// TODO HSEARCH-1401 remove this map() call and pass the type identifier to the context provider
+						.map( PojoRawTypeIdentifier::getJavaClass )
 						.map( indexedTypeExtendedContextProvider::getByExactClass )
 						.collect( Collectors.toCollection( LinkedHashSet::new ) );
 

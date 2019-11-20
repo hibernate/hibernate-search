@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
@@ -28,7 +29,7 @@ public class PojoIndexerImpl implements PojoIndexer {
 	private final PojoRuntimeIntrospector introspector;
 	private final DocumentCommitStrategy commitStrategy;
 
-	private final Map<Class<?>, PojoTypeIndexer<?, ?, ?>> typeExecutors = new HashMap<>();
+	private final Map<PojoRawTypeIdentifier<?>, PojoTypeIndexer<?, ?, ?>> typeExecutors = new HashMap<>();
 
 	public PojoIndexerImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
 			AbstractPojoBackendSessionContext sessionContext,
@@ -46,21 +47,21 @@ public class PojoIndexerImpl implements PojoIndexer {
 
 	@Override
 	public CompletableFuture<?> add(Object providedId, Object entity) {
-		Class<?> clazz = introspector.getClass( entity );
-		PojoTypeIndexer<?, ?, ?> typeExecutor = this.typeExecutors.get( clazz );
+		PojoRawTypeIdentifier<?> typeIdentifier = introspector.getTypeIdentifier( entity );
+		PojoTypeIndexer<?, ?, ?> typeExecutor = this.typeExecutors.get( typeIdentifier );
 		if ( typeExecutor == null ) {
-			typeExecutor = createTypeIndexer( clazz );
-			typeExecutors.put( clazz, typeExecutor );
+			typeExecutor = createTypeIndexer( typeIdentifier );
+			typeExecutors.put( typeIdentifier, typeExecutor );
 		}
 
 		return typeExecutor.add( providedId, entity );
 	}
 
-	private PojoTypeIndexer<?, ?, ?> createTypeIndexer(Class<?> clazz) {
+	private PojoTypeIndexer<?, ?, ?> createTypeIndexer(PojoRawTypeIdentifier<?> typeIdentifier) {
 		Optional<? extends PojoWorkIndexedTypeContext<?, ?, ?>> typeContext =
-				indexedTypeContextProvider.getByExactClass( clazz );
+				indexedTypeContextProvider.getByExactType( typeIdentifier );
 		if ( !typeContext.isPresent() ) {
-			throw log.notDirectlyIndexedType( clazz );
+			throw log.notDirectlyIndexedType( typeIdentifier );
 		}
 
 		return typeContext.get().createIndexer( sessionContext, commitStrategy );

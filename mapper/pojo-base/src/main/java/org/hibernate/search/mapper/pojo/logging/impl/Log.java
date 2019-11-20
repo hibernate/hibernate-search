@@ -22,6 +22,7 @@ import org.hibernate.search.mapper.pojo.mapping.impl.PojoContainedTypeManager;
 import org.hibernate.search.mapper.pojo.mapping.impl.PojoIndexedTypeManager;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.SearchException;
@@ -254,10 +255,11 @@ public interface Log extends BasicLogger {
 					+ " Note that some of them are indexed-embedded in an indexed entity, but this is not enough to be targeted"
 					+ " (only indexed types can be targeted): %2$s."
 	)
-	SearchException invalidScopeTarget(Collection<Class<?>> nonIndexedTypes, Collection<Class<?>> containedTypes);
+	SearchException invalidScopeTarget(Collection<PojoRawTypeIdentifier<?>> nonIndexedTypes,
+			Collection<PojoRawTypeIdentifier<?>> containedTypes);
 
-	@Message(id = ID_OFFSET_2 + 37, value = "Cannot work on type %1$s, because it is not indexed, neither directly nor as a contained entity in another type.")
-	SearchException notIndexedTypeNorAsDelegate(@FormatWith(ClassFormatter.class) Class<?> targetedType);
+	@Message(id = ID_OFFSET_2 + 37, value = "Cannot work on type '%1$s', because it is not indexed, neither directly nor as a contained entity in another type.")
+	SearchException notIndexedTypeNorAsDelegate(PojoRawTypeIdentifier<?> targetedType);
 
 	@Message(id = ID_OFFSET_2 + 38, value = "The identifier for this entity should always be provided, but the provided identifier was null." )
 	SearchException nullProvidedIdentifier();
@@ -265,8 +267,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 39, value = "Requested incompatible type for '%1$s': '%2$s'")
 	SearchException incompatibleRequestedType(@FormatWith(PojoModelPathFormatter.class) PojoModelPathValueNode accessor, @FormatWith(ClassFormatter.class) Class<?> requestedType);
 
-	@Message(id = ID_OFFSET_2 + 40, value = "Cannot work on type %1$s, because it is not directly indexed.")
-	SearchException notDirectlyIndexedType(@FormatWith(ClassFormatter.class) Class<?> targetedType);
+	@Message(id = ID_OFFSET_2 + 40, value = "Cannot work on type '%1$s', because it is not directly indexed.")
+	SearchException notDirectlyIndexedType(PojoRawTypeIdentifier<?> targetedType);
 
 	@Message(id = ID_OFFSET_2 + 41,
 			value = "A chain of multiple container extractors cannot include the default extractors."
@@ -353,8 +355,7 @@ public interface Log extends BasicLogger {
 					+ " thus entity with identifier '%2$s' cannot be purged."
 					+ " Use delete() and pass the entity instead of just the identifier."
 	)
-	SearchException cannotPurgeNonIndexedContainedType(
-			@FormatWith(ClassFormatter.class) Class<?> typeManager, Object providedId);
+	SearchException cannotPurgeNonIndexedContainedType(PojoRawTypeIdentifier<?> type, Object providedId);
 
 	@Message(id = ID_OFFSET_2 + 56, value = "Could not access to the org.hibernate.annotations.common.reflection.java.JavaXMember#getMember method")
 	SearchException cannotAccessPropertyMember(@Cause Exception cause);

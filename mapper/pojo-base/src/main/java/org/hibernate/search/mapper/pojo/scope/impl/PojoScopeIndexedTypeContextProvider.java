@@ -9,11 +9,12 @@ package org.hibernate.search.mapper.pojo.scope.impl;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkIndexedTypeContextProvider;
 
 public interface PojoScopeIndexedTypeContextProvider extends PojoWorkIndexedTypeContextProvider {
 
-	<E> Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E, ?>>> getAllBySuperClass(
-			Class<E> clazz);
+	<E> Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E, ?>>> getAllBySuperType(
+			PojoRawTypeIdentifier<E> typeIdentifier);
 
 }

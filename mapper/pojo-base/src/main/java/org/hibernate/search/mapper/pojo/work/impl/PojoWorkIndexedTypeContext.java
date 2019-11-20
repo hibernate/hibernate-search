@@ -17,6 +17,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 
@@ -27,7 +28,7 @@ import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendS
  */
 public interface PojoWorkIndexedTypeContext<I, E, D extends DocumentElement> {
 
-	Class<E> getJavaClass();
+	PojoRawTypeIdentifier<E> getTypeIdentifier();
 
 	IdentifierMappingImplementor<I, E> getIdentifierMapping();
 
