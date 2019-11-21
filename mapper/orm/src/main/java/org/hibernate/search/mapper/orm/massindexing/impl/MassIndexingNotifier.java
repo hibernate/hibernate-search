@@ -126,7 +126,7 @@ class MassIndexingNotifier {
 			Session session, Object entity, Throwable throwable) {
 		try {
 			return new EntityReferenceImpl(
-					type.getEntityType().getJavaType(), type.getEntityType().getName(), session.getIdentifier( entity )
+					type.getTypeIdentifier(), type.getEntityType().getName(), session.getIdentifier( entity )
 			);
 		}
 		catch (RuntimeException e) {

@@ -8,12 +8,13 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeContainedTypeContext;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 class HibernateOrmContainedTypeContext<E> extends AbstractHibernateOrmTypeContext<E>
 		implements HibernateOrmScopeContainedTypeContext<E> {
 
 	private HibernateOrmContainedTypeContext(HibernateOrmContainedTypeContext.Builder<E> builder) {
-		super( builder.javaClass, builder.entityName );
+		super( builder.typeIdentifier, builder.entityName );
 	}
 
 	@Override
@@ -24,11 +25,11 @@ class HibernateOrmContainedTypeContext<E> extends AbstractHibernateOrmTypeContex
 	}
 
 	static class Builder<E> implements PojoContainedTypeExtendedMappingCollector {
-		private final Class<E> javaClass;
+		private final PojoRawTypeIdentifier<E> typeIdentifier;
 		private final String entityName;
 
-		Builder(Class<E> javaClass, String entityName) {
-			this.javaClass = javaClass;
+		Builder(PojoRawTypeIdentifier<E> typeIdentifier, String entityName) {
+			this.typeIdentifier = typeIdentifier;
 			this.entityName = entityName;
 		}
 

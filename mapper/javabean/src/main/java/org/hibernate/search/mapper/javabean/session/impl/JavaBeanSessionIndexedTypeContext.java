@@ -7,13 +7,14 @@
 package org.hibernate.search.mapper.javabean.session.impl;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.spi.IdentifierMapping;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 /**
  * @param <E> The entity type mapped to the index.
  */
 public interface JavaBeanSessionIndexedTypeContext<E> {
 
-	Class<E> getJavaClass();
+	PojoRawTypeIdentifier<E> getTypeIdentifier();
 
 	String getEntityName();
 

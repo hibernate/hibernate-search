@@ -35,6 +35,7 @@ import org.hibernate.event.spi.PostUpdateEvent;
 import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -197,7 +198,9 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 
 	private HibernateOrmListenerTypeContext getTypeContext(HibernateOrmListenerContextProvider contextProvider,
 			Object entity) {
-		return contextProvider.getTypeContext( Hibernate.getClass( entity ) );
+		// TODO HSEARCH-1401 avoid creating a new instance of that type identifier every single time
+		PojoRawTypeIdentifier<?> typeIdentifier = PojoRawTypeIdentifier.of( (Class<?>) Hibernate.getClass( entity ) );
+		return contextProvider.getTypeContext( typeIdentifier );
 	}
 
 	private void processCollectionEvent(AbstractCollectionEvent event) {

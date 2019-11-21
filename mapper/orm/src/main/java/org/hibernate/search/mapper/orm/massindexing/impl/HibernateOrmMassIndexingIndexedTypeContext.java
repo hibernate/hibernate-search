@@ -7,8 +7,11 @@
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
 import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public interface HibernateOrmMassIndexingIndexedTypeContext<E> {
+
+	PojoRawTypeIdentifier<E> getTypeIdentifier();
 
 	/**
 	 * @return The entity type from the Hibernate ORM metamodel.

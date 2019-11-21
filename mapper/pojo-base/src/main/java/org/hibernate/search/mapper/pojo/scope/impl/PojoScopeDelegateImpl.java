@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.scope.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -42,14 +41,8 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 			AbstractPojoBackendMappingContext mappingContext,
 			PojoScopeIndexedTypeContextProvider indexedTypeContextProvider,
 			PojoScopeContainedTypeContextProvider containedTypeContextProvider,
-			Collection<? extends Class<? extends E>> targetedClasses,
+			Collection<? extends PojoRawTypeIdentifier<? extends E>> targetedTypes,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider) {
-		Collection<PojoRawTypeIdentifier<? extends E>> targetedTypes = new ArrayList<>( targetedClasses.size() );
-		for ( Class<? extends E> targetedClass : targetedClasses ) {
-			// TODO HSEARCH-1401 avoid creating a new instance of each type identifier every single time
-			targetedTypes.add( PojoRawTypeIdentifier.of( targetedClass ) );
-		}
-
 		if ( targetedTypes.isEmpty() ) {
 			throw log.invalidEmptyTargetForScope();
 		}
@@ -79,9 +72,7 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 		Set<C> targetedTypeExtendedContexts =
 				targetedTypeContexts.stream()
 						.map( PojoScopeIndexedTypeContext::getTypeIdentifier )
-						// TODO HSEARCH-1401 remove this map() call and pass the type identifier to the context provider
-						.map( PojoRawTypeIdentifier::getJavaClass )
-						.map( indexedTypeExtendedContextProvider::getByExactClass )
+						.map( indexedTypeExtendedContextProvider::getByExactType )
 						.collect( Collectors.toCollection( LinkedHashSet::new ) );
 
 		return new PojoScopeDelegateImpl<>(

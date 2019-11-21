@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.scope.impl;
 
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 
 /**
@@ -18,8 +19,8 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 public interface HibernateOrmScopeTypeContext<E> {
 
 	/**
-	 * @return The entity type as a {@link Class}.
+	 * @return The identifier of the entity type.
 	 */
-	Class<E> getJavaClass();
+	PojoRawTypeIdentifier<E> getTypeIdentifier();
 
 }

@@ -28,7 +28,7 @@ public interface PojoMappingDelegate extends AutoCloseable {
 
 	<R, E, E2, C> PojoScopeDelegate<R, E2, C> createPojoScope(
 			AbstractPojoBackendMappingContext mappingContext,
-			Collection<? extends Class<? extends E>> targetedTypes,
+			Collection<? extends PojoRawTypeIdentifier<? extends E>> targetedTypes,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider);
 
 	PojoSearchSessionDelegate createSearchSessionDelegate(AbstractPojoBackendSessionContext backendSessionContext);

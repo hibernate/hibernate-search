@@ -90,7 +90,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 		}
 		Object id = typeContext.getIdentifierMapping()
 				.fromDocumentIdentifier( reference.getId(), getDelegate().getBackendSessionContext() );
-		return new EntityReferenceImpl( typeContext.getJavaClass(), typeContext.getEntityName(), id );
+		return new EntityReferenceImpl( typeContext.getTypeIdentifier(), typeContext.getEntityName(), id );
 	}
 
 	private SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?> search(SearchScopeImpl scope) {

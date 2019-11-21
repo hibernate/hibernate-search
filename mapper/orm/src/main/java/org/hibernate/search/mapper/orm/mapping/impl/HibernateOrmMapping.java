@@ -7,7 +7,9 @@
 package org.hibernate.search.mapper.orm.mapping.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -44,6 +46,7 @@ import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSession;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSessionMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
@@ -216,8 +219,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public <E> AbstractHibernateOrmTypeContext<E> getTypeContext(Class<E> type) {
-		return typeContextContainer.getByExactClass( type );
+	public <E> AbstractHibernateOrmTypeContext<E> getTypeContext(PojoRawTypeIdentifier<E> typeIdentifier) {
+		return typeContextContainer.getByExactType( typeIdentifier );
 	}
 
 	@Override
@@ -226,12 +229,18 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public <T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> types) {
+	public <T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> classes) {
+		List<PojoRawTypeIdentifier<? extends T>> typeIdentifiers = new ArrayList<>( classes.size() );
+		for ( Class<? extends T> clazz : classes ) {
+			// TODO HSEARCH-1401 avoid creating a new instance of the type identifiers every single time
+			typeIdentifiers.add( PojoRawTypeIdentifier.of( clazz ) );
+		}
+
 		PojoScopeDelegate<EntityReference, T, HibernateOrmScopeIndexedTypeContext<? extends T>> scopeDelegate =
 				getDelegate().createPojoScope(
 						backendMappingContext,
-						types,
-						typeContextContainer::getIndexedByExactClass
+						typeIdentifiers,
+						typeContextContainer::getIndexedByExactType
 				);
 		return new SearchScopeImpl<>( this, scopeDelegate );
 	}

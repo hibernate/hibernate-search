@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.mapper.orm.scope.impl;
 
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+
 public interface HibernateOrmScopeTypeContextProvider {
-	<E> HibernateOrmScopeIndexedTypeContext<E> getIndexedByExactClass(Class<E> clazz);
+	<E> HibernateOrmScopeIndexedTypeContext<E> getIndexedByExactType(PojoRawTypeIdentifier<E> typeIdentifier);
 
-	<E> HibernateOrmScopeContainedTypeContext<E> getContainedByExactClass(Class<E> clazz);
+	<E> HibernateOrmScopeContainedTypeContext<E> getContainedByExactType(PojoRawTypeIdentifier<E> typeIdentifier);
 
-	<E> HibernateOrmScopeTypeContext<E> getByExactClass(Class<E> clazz);
+	<E> HibernateOrmScopeTypeContext<E> getByExactType(PojoRawTypeIdentifier<E> typeIdentifier);
 }

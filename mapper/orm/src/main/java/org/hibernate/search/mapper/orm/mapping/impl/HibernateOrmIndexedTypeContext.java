@@ -19,6 +19,7 @@ import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionIndexedTy
 import org.hibernate.search.mapper.pojo.bridge.mapping.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
@@ -32,7 +33,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 
 	@SuppressWarnings("unchecked")
 	private HibernateOrmIndexedTypeContext(Builder<E> builder, SessionFactoryImplementor sessionFactory) {
-		super( builder.javaClass, builder.entityName );
+		super( builder.typeIdentifier, builder.entityName );
 
 		this.indexName = builder.indexName;
 
@@ -104,7 +105,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 
 	static class Builder<E> implements PojoIndexedTypeExtendedMappingCollector {
 
-		private final Class<E> javaClass;
+		private final PojoRawTypeIdentifier<E> typeIdentifier;
 		private final String entityName;
 		private final String indexName;
 
@@ -112,8 +113,8 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 		private ValueReadHandle<?> documentIdSourcePropertyHandle;
 		private IdentifierMapping identifierMapping;
 
-		Builder(Class<E> javaClass, String entityName, String indexName) {
-			this.javaClass = javaClass;
+		Builder(PojoRawTypeIdentifier<E> typeIdentifier, String entityName, String indexName) {
+			this.typeIdentifier = typeIdentifier;
 			this.entityName = entityName;
 			this.indexName = indexName;
 		}

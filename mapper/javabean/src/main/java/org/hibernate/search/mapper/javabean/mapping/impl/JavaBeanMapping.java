@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.mapper.javabean.mapping.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
@@ -19,6 +21,7 @@ import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSearchSession;
 import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSearchSessionMappingContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMapping>
 		implements CloseableSearchMapping, JavaBeanSearchSessionMappingContext {
@@ -58,11 +61,17 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 	}
 
 	@Override
-	public SearchScopeImpl createScope(Collection<? extends Class<?>> types) {
+	public SearchScopeImpl createScope(Collection<? extends Class<?>> classes) {
+		List<PojoRawTypeIdentifier<?>> typeIdentifiers = new ArrayList<>( classes.size() );
+		for ( Class<?> clazz : classes ) {
+			// TODO HSEARCH-1401 avoid creating a new instance of the type identifiers every single time
+			typeIdentifiers.add( PojoRawTypeIdentifier.of( clazz ) );
+		}
+
 		return new SearchScopeImpl(
 				getDelegate().createPojoScope(
 						backendMappingContext,
-						types,
+						typeIdentifiers,
 						// We don't load anything, so we don't need any additional type context
 						ignored -> null
 				)

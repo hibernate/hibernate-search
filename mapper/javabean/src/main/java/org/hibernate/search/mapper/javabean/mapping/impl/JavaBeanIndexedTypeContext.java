@@ -10,23 +10,24 @@ import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSessionIndexedT
 import org.hibernate.search.mapper.pojo.bridge.mapping.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 class JavaBeanIndexedTypeContext<E> implements JavaBeanSessionIndexedTypeContext<E> {
-	private final Class<E> javaClass;
+	private final PojoRawTypeIdentifier<E> typeIdentifier;
 	private final String entityName;
 	private final String indexName;
 	private IdentifierMapping identifierMapping;
 
 	private JavaBeanIndexedTypeContext(Builder<E> builder) {
-		this.javaClass = builder.javaClass;
+		this.typeIdentifier = builder.typeIdentifier;
 		this.entityName = builder.entityName;
 		this.indexName = builder.indexName;
 		this.identifierMapping = builder.identifierMapping;
 	}
 
 	@Override
-	public Class<E> getJavaClass() {
-		return javaClass;
+	public PojoRawTypeIdentifier<E> getTypeIdentifier() {
+		return typeIdentifier;
 	}
 
 	@Override
@@ -44,13 +45,13 @@ class JavaBeanIndexedTypeContext<E> implements JavaBeanSessionIndexedTypeContext
 	}
 
 	static class Builder<E> implements PojoIndexedTypeExtendedMappingCollector {
-		private final Class<E> javaClass;
+		private final PojoRawTypeIdentifier<E> typeIdentifier;
 		private final String entityName;
 		private final String indexName;
 		private IdentifierMapping identifierMapping;
 
-		Builder(Class<E> javaClass, String entityName, String indexName) {
-			this.javaClass = javaClass;
+		Builder(PojoRawTypeIdentifier<E> typeIdentifier, String entityName, String indexName) {
+			this.typeIdentifier = typeIdentifier;
 			this.entityName = entityName;
 			this.indexName = indexName;
 		}

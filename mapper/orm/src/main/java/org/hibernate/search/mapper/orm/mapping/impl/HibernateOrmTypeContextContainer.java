@@ -14,31 +14,32 @@ import java.util.Map;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionIndexedTypeContext;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 class HibernateOrmTypeContextContainer implements HibernateOrmSessionTypeContextProvider {
 
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<Class<?>, HibernateOrmIndexedTypeContext<?>> indexedTypeContexts = new LinkedHashMap<>();
+	private final Map<PojoRawTypeIdentifier<?>, HibernateOrmIndexedTypeContext<?>> indexedTypeContexts = new LinkedHashMap<>();
 	private final Map<String, HibernateOrmIndexedTypeContext<?>> indexedTypeContextsByIndexName = new LinkedHashMap<>();
-	private final Map<Class<?>, HibernateOrmContainedTypeContext<?>> containedTypeContexts = new LinkedHashMap<>();
+	private final Map<PojoRawTypeIdentifier<?>, HibernateOrmContainedTypeContext<?>> containedTypeContexts = new LinkedHashMap<>();
 
 	private HibernateOrmTypeContextContainer(Builder builder, SessionFactoryImplementor sessionFactory) {
 		for ( HibernateOrmIndexedTypeContext.Builder<?> contextBuilder : builder.indexedTypeContextBuilders ) {
 			HibernateOrmIndexedTypeContext<?> indexedTypeContext = contextBuilder.build( sessionFactory );
-			indexedTypeContexts.put( indexedTypeContext.getJavaClass(), indexedTypeContext );
+			indexedTypeContexts.put( indexedTypeContext.getTypeIdentifier(), indexedTypeContext );
 			indexedTypeContextsByIndexName.put( indexedTypeContext.getIndexName(), indexedTypeContext );
 		}
 		for ( HibernateOrmContainedTypeContext.Builder<?> contextBuilder : builder.containedTypeContextBuilders ) {
 			HibernateOrmContainedTypeContext<?> containedTypeContext = contextBuilder.build();
-			containedTypeContexts.put( containedTypeContext.getJavaClass(), containedTypeContext );
+			containedTypeContexts.put( containedTypeContext.getTypeIdentifier(), containedTypeContext );
 		}
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <E> HibernateOrmIndexedTypeContext<E> getIndexedByExactClass(Class<E> clazz) {
-		return (HibernateOrmIndexedTypeContext<E>) indexedTypeContexts.get( clazz );
+	public <E> HibernateOrmIndexedTypeContext<E> getIndexedByExactType(PojoRawTypeIdentifier<E> typeIdentifier) {
+		return (HibernateOrmIndexedTypeContext<E>) indexedTypeContexts.get( typeIdentifier );
 	}
 
 	@Override
@@ -48,18 +49,18 @@ class HibernateOrmTypeContextContainer implements HibernateOrmSessionTypeContext
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <E> HibernateOrmContainedTypeContext<E> getContainedByExactClass(Class<E> clazz) {
-		return (HibernateOrmContainedTypeContext<E>) containedTypeContexts.get( clazz );
+	public <E> HibernateOrmContainedTypeContext<E> getContainedByExactType(PojoRawTypeIdentifier<E> typeIdentifier) {
+		return (HibernateOrmContainedTypeContext<E>) containedTypeContexts.get( typeIdentifier );
 	}
 
 	@Override
-	public <E> AbstractHibernateOrmTypeContext<E> getByExactClass(Class<E> clazz) {
-		AbstractHibernateOrmTypeContext<E> result = getIndexedByExactClass( clazz );
+	public <E> AbstractHibernateOrmTypeContext<E> getByExactType(PojoRawTypeIdentifier<E> typeIdentifier) {
+		AbstractHibernateOrmTypeContext<E> result = getIndexedByExactType( typeIdentifier );
 		if ( result != null ) {
 			return result;
 		}
 
-		result = getContainedByExactClass( clazz );
+		result = getContainedByExactType( typeIdentifier );
 
 		return result;
 	}
@@ -75,14 +76,14 @@ class HibernateOrmTypeContextContainer implements HibernateOrmSessionTypeContext
 		<E> HibernateOrmIndexedTypeContext.Builder<E> addIndexed(PojoRawTypeModel<E> typeModel, String entityName,
 				String indexName) {
 			HibernateOrmIndexedTypeContext.Builder<E> builder =
-					new HibernateOrmIndexedTypeContext.Builder<>( typeModel.getJavaClass(), entityName, indexName );
+					new HibernateOrmIndexedTypeContext.Builder<>( typeModel.getTypeIdentifier(), entityName, indexName );
 			indexedTypeContextBuilders.add( builder );
 			return builder;
 		}
 
 		<E> HibernateOrmContainedTypeContext.Builder<E> addContained(PojoRawTypeModel<E> typeModel, String entityName) {
 			HibernateOrmContainedTypeContext.Builder<E> builder =
-					new HibernateOrmContainedTypeContext.Builder<>( typeModel.getJavaClass(), entityName );
+					new HibernateOrmContainedTypeContext.Builder<>( typeModel.getTypeIdentifier(), entityName );
 			containedTypeContextBuilders.add( builder );
 			return builder;
 		}

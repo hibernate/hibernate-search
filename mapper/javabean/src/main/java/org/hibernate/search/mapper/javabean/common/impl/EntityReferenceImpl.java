@@ -9,28 +9,29 @@ package org.hibernate.search.mapper.javabean.common.impl;
 import java.util.Objects;
 
 import org.hibernate.search.mapper.javabean.common.EntityReference;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public class EntityReferenceImpl implements EntityReference {
 
 	public static EntityReference withDefaultName(Class<?> type, Object id) {
-		return new EntityReferenceImpl( type, type.getSimpleName(), id );
+		return new EntityReferenceImpl( PojoRawTypeIdentifier.of( type ), type.getSimpleName(), id );
 	}
 
-	private final Class<?> type;
+	private final PojoRawTypeIdentifier<?> typeIdentifier;
 
 	private final String name;
 
 	private final Object id;
 
-	public EntityReferenceImpl(Class<?> type, String name, Object id) {
-		this.type = type;
+	public EntityReferenceImpl(PojoRawTypeIdentifier<?> typeIdentifier, String name, Object id) {
+		this.typeIdentifier = typeIdentifier;
 		this.name = name;
 		this.id = id;
 	}
 
 	@Override
 	public Class<?> getType() {
-		return type;
+		return typeIdentifier.getJavaClass();
 	}
 
 	@Override
@@ -54,7 +55,7 @@ public class EntityReferenceImpl implements EntityReference {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash( type, name, id );
+		return Objects.hash( name, id );
 	}
 
 	@Override
