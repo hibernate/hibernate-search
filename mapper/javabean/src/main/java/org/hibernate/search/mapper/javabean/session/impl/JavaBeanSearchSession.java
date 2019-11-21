@@ -141,7 +141,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 			return new JavaBeanBackendSessionContext(
 					mappingContext.getBackendMappingContext(),
 					tenantId,
-					PojoRuntimeIntrospector.noProxy()
+					PojoRuntimeIntrospector.simple()
 			);
 		}
 

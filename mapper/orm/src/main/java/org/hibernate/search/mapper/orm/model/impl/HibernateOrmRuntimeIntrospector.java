@@ -28,7 +28,7 @@ public class HibernateOrmRuntimeIntrospector implements PojoRuntimeIntrospector 
 	@Override
 	// The actual class of a proxy of type T is always a Class<? extends T> (unless T is HibernateProxy, but we don't expect that)
 	@SuppressWarnings("unchecked")
-	public <T> PojoRawTypeIdentifier<? extends T> getTypeIdentifier(T entity) {
+	public <T> PojoRawTypeIdentifier<? extends T> getEntityTypeIdentifier(T entity) {
 		if ( entity == null ) {
 			return null;
 		}

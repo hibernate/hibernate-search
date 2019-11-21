@@ -12,11 +12,15 @@ package org.hibernate.search.mapper.pojo.model.spi;
 public interface PojoRuntimeIntrospector {
 
 	/**
-	 * @param <T> the type of the entity
-	 * @param entity an instance or proxy of T
+	 * Detect the type of a given entity instance.
+	 *
+	 * @param <T> The type of the entity.
+	 * @param entity An instance or proxy of T.
 	 * @return The identifier of the instance's type, or of its delegate object's type if the instance is a proxy.
+	 * May be {@code null} if the entity type is not known from this mapper,
+	 * because it's neither indexed nor contained in an indexed type.
 	 */
-	<T> PojoRawTypeIdentifier<? extends T> getTypeIdentifier(T entity);
+	<T> PojoRawTypeIdentifier<? extends T> getEntityTypeIdentifier(T entity);
 
 	/**
 	 * @param value the object to unproxy
@@ -24,7 +28,11 @@ public interface PojoRuntimeIntrospector {
 	 */
 	Object unproxy(Object value);
 
-	static PojoRuntimeIntrospector noProxy() {
-		return NoProxyPojoRuntimeIntrospector.get();
+	/**
+	 * @return A simple {@link PojoRuntimeIntrospector} that relies on the object's class to return entity types,
+	 * and assumes objects are not proxyfied.
+	 */
+	static PojoRuntimeIntrospector simple() {
+		return SimplePojoRuntimeIntrospector.get();
 	}
 }

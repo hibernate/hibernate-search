@@ -231,7 +231,7 @@ public class FieldDefaultBridgeIT<V, F> {
 						new JavaBeanBackendSessionContext(
 								new JavaBeanBackendMappingContext(),
 								null,
-								PojoRuntimeIntrospector.noProxy()
+								PojoRuntimeIntrospector.simple()
 						)
 				);
 

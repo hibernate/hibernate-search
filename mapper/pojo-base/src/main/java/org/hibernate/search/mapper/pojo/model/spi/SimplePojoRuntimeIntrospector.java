@@ -8,20 +8,20 @@ package org.hibernate.search.mapper.pojo.model.spi;
 
 
 
-final class NoProxyPojoRuntimeIntrospector implements PojoRuntimeIntrospector {
+final class SimplePojoRuntimeIntrospector implements PojoRuntimeIntrospector {
 
-	private static final NoProxyPojoRuntimeIntrospector INSTANCE = new NoProxyPojoRuntimeIntrospector();
+	private static final SimplePojoRuntimeIntrospector INSTANCE = new SimplePojoRuntimeIntrospector();
 
-	public static NoProxyPojoRuntimeIntrospector get() {
+	public static SimplePojoRuntimeIntrospector get() {
 		return INSTANCE;
 	}
 
-	private NoProxyPojoRuntimeIntrospector() {
+	private SimplePojoRuntimeIntrospector() {
 	}
 
 	@Override
 	@SuppressWarnings("unchecked") // The class of an object of type T is always a Class<? extends T>
-	public <T> PojoRawTypeIdentifier<? extends T> getTypeIdentifier(T entity) {
+	public <T> PojoRawTypeIdentifier<? extends T> getEntityTypeIdentifier(T entity) {
 		if ( entity == null ) {
 			return null;
 		}
