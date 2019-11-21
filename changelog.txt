@@ -1,6 +1,24 @@
 Hibernate Search Changelog
 ==========================
 
+5.11.4.Final (21-11-2019)
+-------------------------
+
+** Bug
+    * HSEARCH-3767 Elasticsearch date/time bridges throw NPE on projections
+
+** Improvement
+    * HSEARCH-3730 Upgrade to Hibernate ORM 5.4.6
+
+** Task
+    * HSEARCH-3768 Upgrade to Byteman 4.0.9
+    * HSEARCH-3763 Upgrade to Hibernate ORM 5.4.9.Final
+    * HSEARCH-3754 Upgrade to Hibernate ORM 5.4.8.Final
+    * HSEARCH-3742 Upgrade to Hibernate ORM 5.4.7.Final
+    * HSEARCH-3738 Upgrade to Byteman 4.0.8
+    * HSEARCH-3732 Add a timeout to the Jenkins build configuration
+    * HSEARCH-3716 Mitigate test failures caused by automatic snapshots of AWS-managed Elasticsearch service
+
 5.11.3.Final (18-09-2019)
 -------------------------
 
