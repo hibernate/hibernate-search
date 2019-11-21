@@ -17,9 +17,6 @@ import org.hibernate.mapping.Property;
 import org.hibernate.property.access.spi.Getter;
 
 class HibernateOrmBasicTypeMetadata {
-	private final Class<?> javaClass;
-	private final Map<String, Property> properties;
-	private final Property identifierProperty;
 
 	public static HibernateOrmBasicTypeMetadata create(PersistentClass persistentClass) {
 		Map<String, Property> properties = new HashMap<>();
@@ -43,6 +40,10 @@ class HibernateOrmBasicTypeMetadata {
 			collected.put( property.getName(), property );
 		}
 	}
+
+	private final Class<?> javaClass;
+	private final Map<String, Property> properties;
+	private final Property identifierProperty;
 
 	private HibernateOrmBasicTypeMetadata(Class<?> javaClass, Map<String, Property> properties,
 			Property identifierProperty) {
