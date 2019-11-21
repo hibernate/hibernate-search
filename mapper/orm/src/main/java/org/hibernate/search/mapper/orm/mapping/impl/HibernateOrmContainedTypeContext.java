@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
+import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeContainedTypeContext;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -13,8 +14,9 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 class HibernateOrmContainedTypeContext<E> extends AbstractHibernateOrmTypeContext<E>
 		implements HibernateOrmScopeContainedTypeContext<E> {
 
-	private HibernateOrmContainedTypeContext(HibernateOrmContainedTypeContext.Builder<E> builder) {
-		super( builder.typeIdentifier, builder.entityName );
+	private HibernateOrmContainedTypeContext(HibernateOrmContainedTypeContext.Builder<E> builder,
+			SessionFactoryImplementor sessionFactory) {
+		super( sessionFactory, builder.typeIdentifier, builder.entityName );
 	}
 
 	@Override
@@ -33,8 +35,8 @@ class HibernateOrmContainedTypeContext<E> extends AbstractHibernateOrmTypeContex
 			this.entityName = entityName;
 		}
 
-		HibernateOrmContainedTypeContext<E> build() {
-			return new HibernateOrmContainedTypeContext<>( this );
+		HibernateOrmContainedTypeContext<E> build(SessionFactoryImplementor sessionFactory) {
+			return new HibernateOrmContainedTypeContext<>( this, sessionFactory );
 		}
 	}
 }

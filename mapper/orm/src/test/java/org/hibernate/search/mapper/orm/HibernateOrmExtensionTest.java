@@ -26,6 +26,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValue
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.BridgeSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierBridgeToDocumentIdentifierContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.ValueBridgeToIndexedValueContextImpl;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 
 import org.junit.Test;
 
@@ -36,8 +37,9 @@ public class HibernateOrmExtensionTest extends EasyMockSupport {
 	private final SessionImplementor sessionImplementor = createMock( SessionImplementor.class );
 	private final HibernateOrmMappingContextImpl mappingContext =
 			new HibernateOrmMappingContextImpl( sessionFactoryImplementor );
+	private final PojoRuntimeIntrospector runtimeIntrospector = createMock( PojoRuntimeIntrospector.class );
 	private final HibernateOrmSessionContextImpl sessionContext =
-			new HibernateOrmSessionContextImpl( mappingContext, sessionImplementor );
+			new HibernateOrmSessionContextImpl( mappingContext, sessionImplementor, runtimeIntrospector );
 
 	@Test
 	public void identifierBridge() {

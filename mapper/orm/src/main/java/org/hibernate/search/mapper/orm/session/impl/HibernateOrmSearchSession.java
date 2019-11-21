@@ -31,6 +31,7 @@ import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
+import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRuntimeIntrospector;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
 import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
@@ -363,7 +364,11 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		}
 
 		private HibernateOrmSessionContextImpl buildBackendSessionContext() {
-			return new HibernateOrmSessionContextImpl( mappingContext.getBackendMappingContext(), sessionImplementor );
+			return new HibernateOrmSessionContextImpl(
+					mappingContext.getBackendMappingContext(),
+					sessionImplementor,
+					new HibernateOrmRuntimeIntrospector( typeContextProvider, sessionImplementor )
+			);
 		}
 
 		@Override

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.model.impl;
 
-import org.hibernate.Hibernate;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.proxy.HibernateProxy;
 import org.hibernate.proxy.LazyInitializer;
@@ -19,21 +18,31 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
  */
 public class HibernateOrmRuntimeIntrospector implements PojoRuntimeIntrospector {
 
+	private final HibernateOrmRuntimeIntrospectorTypeContextProvider typeContextProvider;
 	private final SessionImplementor sessionImplementor;
 
-	public HibernateOrmRuntimeIntrospector(SessionImplementor sessionImplementor) {
+	public HibernateOrmRuntimeIntrospector(HibernateOrmRuntimeIntrospectorTypeContextProvider typeContextProvider,
+			SessionImplementor sessionImplementor) {
+		this.typeContextProvider = typeContextProvider;
 		this.sessionImplementor = sessionImplementor;
 	}
 
 	@Override
-	// The actual class of a proxy of type T is always a Class<? extends T> (unless T is HibernateProxy, but we don't expect that)
+	// As long as T is the declared type of an entity or one of its supertypes, this cast is safe
 	@SuppressWarnings("unchecked")
 	public <T> PojoRawTypeIdentifier<? extends T> getEntityTypeIdentifier(T entity) {
 		if ( entity == null ) {
 			return null;
 		}
-		// TODO HSEARCH-1401 avoid creating a new instance of that type identifier every single time
-		return PojoRawTypeIdentifier.of( (Class<? extends T>) Hibernate.getClass( entity ) );
+		String entityName = sessionImplementor.bestGuessEntityName( entity );
+		if ( entityName == null ) {
+			return null;
+		}
+		HibernateOrmRuntimeIntrospectorTypeContext typeContext = typeContextProvider.getByHibernateOrmEntityName( entityName );
+		if ( typeContext == null ) {
+			return null;
+		}
+		return (PojoRawTypeIdentifier<? extends T>) typeContext.getTypeIdentifier();
 	}
 
 	@Override
