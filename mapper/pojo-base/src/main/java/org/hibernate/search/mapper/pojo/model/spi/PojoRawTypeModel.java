@@ -50,9 +50,4 @@ public interface PojoRawTypeModel<T> extends PojoTypeModel<T>, MappableTypeModel
 
 	PojoCaster<T> getCaster();
 
-	/**
-	 * @return The exact Java {@link Class} for this type.
-	 */
-	Class<T> getJavaClass();
-
 }

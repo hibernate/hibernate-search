@@ -134,11 +134,6 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 		return caster;
 	}
 
-	@Override
-	public Class<T> getJavaClass() {
-		return typeIdentifier.getJavaClass();
-	}
-
 	RawTypeDeclaringContext<T> getRawTypeDeclaringContext() {
 		return rawTypeDeclaringContext;
 	}

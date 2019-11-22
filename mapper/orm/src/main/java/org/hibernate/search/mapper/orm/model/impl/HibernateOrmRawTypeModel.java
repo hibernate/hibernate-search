@@ -159,11 +159,6 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 		return caster;
 	}
 
-	@Override
-	public final Class<T> getJavaClass() {
-		return typeIdentifier.getJavaClass();
-	}
-
 	RawTypeDeclaringContext<T> getRawTypeDeclaringContext() {
 		return rawTypeDeclaringContext;
 	}
