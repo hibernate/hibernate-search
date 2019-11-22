@@ -39,7 +39,7 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 	private final HibernateOrmBootstrapIntrospector introspector;
 	private final Map<String, PersistentClass> persistentClasses;
 
-	public HibernateOrmMetatadaContributor(HibernateOrmBootstrapIntrospector introspector,
+	HibernateOrmMetatadaContributor(HibernateOrmBootstrapIntrospector introspector,
 			Map<String, PersistentClass> persistentClasses) {
 		this.introspector = introspector;
 		this.persistentClasses = persistentClasses;
@@ -54,10 +54,10 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 		for ( PersistentClass persistentClass : persistentClasses.values() ) {
 			Class<?> clazz = persistentClass.getMappedClass();
 			PojoRawTypeModel<?> typeModel = introspector.getTypeModel( clazz );
-			collectPropertyDelegates( delegatesCollector, clazz, persistentClass.getPropertyIterator() );
+			collectPropertyDelegates( delegatesCollector, typeModel, persistentClass.getPropertyIterator() );
 
 			String identifierPropertyName = persistentClass.getIdentifierProperty().getName();
-			List<PojoTypeMetadataContributor> delegates = delegatesCollector.buildAndRemove( clazz );
+			List<PojoTypeMetadataContributor> delegates = delegatesCollector.buildAndRemove( typeModel );
 
 			configurationCollector.collectContributor(
 					typeModel,
@@ -69,9 +69,9 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 			);
 		}
 
-		for ( Map.Entry<Class<?>, List<PojoTypeMetadataContributor>> entry :
+		for ( Map.Entry<PojoRawTypeModel<?>, List<PojoTypeMetadataContributor>> entry :
 				delegatesCollector.buildRemaining().entrySet() ) {
-			PojoRawTypeModel<?> typeModel = introspector.getTypeModel( entry.getKey() );
+			PojoRawTypeModel<?> typeModel = entry.getKey();
 			List<PojoTypeMetadataContributor> delegates = entry.getValue();
 			if ( !delegates.isEmpty() ) {
 				configurationCollector.collectContributor(
@@ -85,8 +85,8 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 
 	@SuppressWarnings( "rawtypes" ) // Hibernate ORM gives us raw types, we must make do.
 	private void collectPropertyDelegates(PropertyDelegatesCollector collector,
-			Class<?> javaClass, Iterator propertyIterator) {
-		collector.markAsSeen( javaClass );
+			PojoRawTypeModel<?> typeModel, Iterator propertyIterator) {
+		collector.markAsSeen( typeModel );
 
 		// Sort the properties before processing for deterministic iteration
 		List<Property> properties = new ArrayList<>();
@@ -96,12 +96,12 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 		properties.sort( Comparator.comparing( Property::getName ) );
 
 		for ( Property property : properties ) {
-			collectPropertyMetadataContributors( collector, javaClass, property );
+			collectPropertyMetadataContributors( collector, typeModel, property );
 		}
 	}
 
 	private void collectPropertyMetadataContributors(PropertyDelegatesCollector collector,
-			Class<?> javaClass, Property property) {
+			PojoRawTypeModel<?> typeModel, Property property) {
 		Value value = property.getValue();
 		if ( value instanceof org.hibernate.mapping.Collection ) {
 			org.hibernate.mapping.Collection collectionValue = (org.hibernate.mapping.Collection) value;
@@ -116,7 +116,7 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 			String mappedByPath = collectionValue.getMappedByProperty();
 			if ( referencedEntityName != null && mappedByPath != null && !mappedByPath.isEmpty() ) {
 				collector.collect(
-						javaClass,
+						typeModel,
 						new HibernateOrmAssociationInverseSideMetadataContributor(
 								property.getName(), getExtractorPath( collectionValue ),
 								resolveMappedByPath( referencedEntityName, mappedByPath )
@@ -131,7 +131,7 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 			String mappedByPath = toOneValue.getReferencedPropertyName();
 			if ( mappedByPath != null && !mappedByPath.isEmpty() ) {
 				collector.collect(
-						javaClass,
+						typeModel,
 						new HibernateOrmAssociationInverseSideMetadataContributor(
 								property.getName(), getExtractorPath( toOneValue ),
 								resolveMappedByPath( referencedEntityName, mappedByPath )
@@ -141,13 +141,14 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 		}
 		else if ( value instanceof Component ) {
 			collector.collect(
-					javaClass,
+					typeModel,
 					new HibernateOrmAssociationEmbeddedMetadataContributor(
 							property.getName(), getExtractorPath( value )
 					)
 			);
 			Component componentValue = (Component) value;
 			Class<?> componentClass = componentValue.getComponentClass();
+			PojoRawTypeModel<?> componentTypeModel = introspector.getTypeModel( componentClass );
 			/*
 			 * Different Component instances for the same component class may carry different metadata
 			 * depending on where they appear,
@@ -159,16 +160,17 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 			 * "entity-level" metadata.
 			 * Thus we only use the first Component instance we find, and ignore the others.
 			 */
-			if ( !collector.hasSeen( componentClass ) ) {
-				collectPropertyDelegates( collector, componentClass, componentValue.getPropertyIterator() );
+			if ( !collector.hasSeen( componentTypeModel ) ) {
+				collectPropertyDelegates( collector, componentTypeModel, componentValue.getPropertyIterator() );
 			}
 		}
 		else if ( value instanceof SimpleValue ) {
-			collectScaleContributor( collector, javaClass, property, value );
+			collectScaleContributor( collector, typeModel, property, value );
 		}
 	}
 
-	private void collectScaleContributor(PropertyDelegatesCollector collector, Class<?> javaClass, Property property, Value value) {
+	private void collectScaleContributor(PropertyDelegatesCollector collector, PojoRawTypeModel<?> typeModel,
+			Property property, Value value) {
 		Iterator<Selectable> ci = value.getColumnIterator();
 		while ( ci.hasNext() ) {
 			Selectable selectable = ci.next();
@@ -176,7 +178,7 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 				int scale = ( (Column) selectable ).getScale();
 				HibernateOrmJpaColumnScaleContributor scaleContributor = new HibernateOrmJpaColumnScaleContributor(
 						property.getName(), getExtractorPath( value ), scale );
-				collector.collect( javaClass, scaleContributor );
+				collector.collect( typeModel, scaleContributor );
 			}
 		}
 	}
@@ -246,32 +248,32 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 
 	private static class PropertyDelegatesCollector {
 		// Use a LinkedHashMap for deterministic iteration
-		private final Map<Class<?>, List<PojoTypeMetadataContributor>> result = new LinkedHashMap<>();
+		private final Map<PojoRawTypeModel<?>, List<PojoTypeMetadataContributor>> result = new LinkedHashMap<>();
 
-		public void markAsSeen(Class<?> clazz) {
-			getList( clazz );
+		public void markAsSeen(PojoRawTypeModel<?> typeModel) {
+			getList( typeModel );
 		}
 
-		public boolean hasSeen(Class<?> clazz) {
-			return result.containsKey( clazz );
+		public boolean hasSeen(PojoRawTypeModel<?> typeModel) {
+			return result.containsKey( typeModel );
 		}
 
-		public void collect(Class<?> clazz, PojoTypeMetadataContributor contributor) {
-			getList( clazz ).add( contributor );
+		public void collect(PojoRawTypeModel<?> typeModel, PojoTypeMetadataContributor contributor) {
+			getList( typeModel ).add( contributor );
 		}
 
-		public List<PojoTypeMetadataContributor> buildAndRemove(Class<?> clazz) {
-			List<PojoTypeMetadataContributor> built = getList( clazz );
-			result.remove( clazz );
+		public List<PojoTypeMetadataContributor> buildAndRemove(PojoRawTypeModel<?> typeModel) {
+			List<PojoTypeMetadataContributor> built = getList( typeModel );
+			result.remove( typeModel );
 			return built;
 		}
 
-		public Map<Class<?>, List<PojoTypeMetadataContributor>> buildRemaining() {
+		public Map<PojoRawTypeModel<?>, List<PojoTypeMetadataContributor>> buildRemaining() {
 			return result;
 		}
 
-		private List<PojoTypeMetadataContributor> getList(Class<?> clazz) {
-			return result.computeIfAbsent( clazz, ignored -> new ArrayList<>() );
+		private List<PojoTypeMetadataContributor> getList(PojoRawTypeModel<?> typeModel) {
+			return result.computeIfAbsent( typeModel, ignored -> new ArrayList<>() );
 		}
 	}
 }
