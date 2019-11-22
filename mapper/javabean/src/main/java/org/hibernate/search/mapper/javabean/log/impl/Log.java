@@ -47,4 +47,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_1 + 6, value = "Multiple entity types configured with the same name '%1$s': '%2$s', '%3$s'")
 	SearchException multipleEntityTypesWithSameName(String entityName, Class<?> previousType, Class<?> type);
+
+	@Message(id = ID_OFFSET_1 + 7,
+			value = "The JavaBean mapper does not support named types. The type with name '%1$s' does not exist."
+	)
+	SearchException namedTypesNotSupported(String name);
 }

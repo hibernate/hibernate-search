@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.model.spi;
 
+import java.util.Objects;
+
 import org.hibernate.search.util.common.impl.Contracts;
 
 /**
@@ -19,19 +21,30 @@ import org.hibernate.search.util.common.impl.Contracts;
 public final class PojoRawTypeIdentifier<T> {
 
 	public static <T> PojoRawTypeIdentifier<T> of(Class<T> javaClass) {
-		return new PojoRawTypeIdentifier<>( javaClass );
+		return new PojoRawTypeIdentifier<>( javaClass, null );
+	}
+
+	public static <T> PojoRawTypeIdentifier<T> of(Class<T> javaClass, String label) {
+		return new PojoRawTypeIdentifier<>( javaClass, label );
 	}
 
 	private final Class<T> javaClass;
+	private final String name;
 
-	private PojoRawTypeIdentifier(Class<T> javaClass) {
+	private PojoRawTypeIdentifier(Class<T> javaClass, String name) {
 		Contracts.assertNotNull( javaClass, "javaClass" );
 		this.javaClass = javaClass;
+		this.name = name;
 	}
 
 	@Override
 	public String toString() {
-		return javaClass.getName();
+		if ( name == null ) {
+			return javaClass.getName();
+		}
+		else {
+			return name + " (" + javaClass.getName() + ")";
+		}
 	}
 
 	@Override
@@ -40,12 +53,13 @@ public final class PojoRawTypeIdentifier<T> {
 			return false;
 		}
 		PojoRawTypeIdentifier other = (PojoRawTypeIdentifier) obj;
-		return javaClass.equals( other.javaClass );
+		return javaClass.equals( other.javaClass )
+				&& Objects.equals( name, other.name );
 	}
 
 	@Override
 	public int hashCode() {
-		return javaClass.hashCode();
+		return Objects.hash( javaClass, name );
 	}
 
 	/**
@@ -53,5 +67,9 @@ public final class PojoRawTypeIdentifier<T> {
 	 */
 	public Class<T> getJavaClass() {
 		return javaClass;
+	}
+
+	public boolean isNamed() {
+		return name != null;
 	}
 }

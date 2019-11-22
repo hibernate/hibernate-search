@@ -70,6 +70,11 @@ public class JavaBeanBootstrapIntrospector extends AbstractPojoHCAnnBootstrapInt
 	}
 
 	@Override
+	public PojoRawTypeModel<?> getTypeModel(String name) {
+		throw log.namedTypesNotSupported( name );
+	}
+
+	@Override
 	public <T> PojoGenericTypeModel<T> getGenericTypeModel(Class<T> clazz) {
 		return missingRawTypeDeclaringContext.createGenericTypeModel( clazz );
 	}

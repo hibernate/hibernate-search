@@ -160,6 +160,12 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	}
 
 	@Override
+	public PojoRawTypeModel<?> getTypeModel(String name) {
+		// TODO HSEARCH-1401 handle named types
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
+	@Override
 	@SuppressWarnings("unchecked")
 	public <T> HibernateOrmRawTypeModel<T> getTypeModel(Class<T> clazz) {
 		if ( clazz.isPrimitive() ) {
