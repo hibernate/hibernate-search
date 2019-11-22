@@ -10,22 +10,22 @@ import org.hibernate.search.mapper.javabean.model.impl.JavaBeanSimpleStringSetPo
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 class JavaBeanEntityTypeContributor implements PojoTypeMetadataContributor {
 
-	private final PojoRawTypeModel<?> typeModel;
+	private final PojoRawTypeIdentifier<?> typeIdentifier;
 	private final String entityName;
 
-	JavaBeanEntityTypeContributor(PojoRawTypeModel<?> typeModel, String entityName) {
-		this.typeModel = typeModel;
+	JavaBeanEntityTypeContributor(PojoRawTypeIdentifier<?> typeIdentifier, String entityName) {
+		this.typeIdentifier = typeIdentifier;
 		this.entityName = entityName;
 	}
 
 	@Override
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
 		try {
-			if ( !typeModel.equals( collector.getType() ) ) {
+			if ( !typeIdentifier.equals( collector.getTypeIdentifier() ) ) {
 				// Entity metadata is not inherited; only contribute it to the exact type.
 				return;
 			}

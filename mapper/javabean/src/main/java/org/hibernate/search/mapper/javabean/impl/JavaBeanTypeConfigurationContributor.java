@@ -40,7 +40,7 @@ class JavaBeanTypeConfigurationContributor implements PojoMappingConfigurationCo
 			PojoRawTypeModel<?> typeModel = introspector.getTypeModel( entry.getKey() );
 			configurationCollector.collectContributor(
 					typeModel,
-					new JavaBeanEntityTypeContributor( typeModel, entry.getValue() )
+					new JavaBeanEntityTypeContributor( typeModel.getTypeIdentifier(), entry.getValue() )
 			);
 		}
 	}

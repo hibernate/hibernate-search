@@ -11,26 +11,26 @@ import java.util.Optional;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 
 class IndexedMetadataContributor implements PojoTypeMetadataContributor {
 
-	private final PojoRawTypeModel<?> typeModel;
+	private final PojoRawTypeIdentifier<?> typeIdentifier;
 
 	private final String backendName;
 	private final String indexName;
 
-	IndexedMetadataContributor(PojoRawTypeModel<?> typeModel,
+	IndexedMetadataContributor(PojoRawTypeIdentifier<?> typeIdentifier,
 			String backendName, String indexName) {
-		this.typeModel = typeModel;
+		this.typeIdentifier = typeIdentifier;
 		this.backendName = backendName;
 		this.indexName = indexName;
 	}
 
 	@Override
 	public void contributeAdditionalMetadata(PojoAdditionalMetadataCollectorTypeNode collector) {
-		if ( !typeModel.equals( collector.getType() ) ) {
+		if ( !typeIdentifier.equals( collector.getTypeIdentifier() ) ) {
 			// Index mapping is not inherited; only contribute it to the exact type.
 			return;
 		}

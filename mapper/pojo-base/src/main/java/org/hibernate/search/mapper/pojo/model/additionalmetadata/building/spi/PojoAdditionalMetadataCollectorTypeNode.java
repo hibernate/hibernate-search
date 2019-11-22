@@ -12,14 +12,14 @@ import java.util.Set;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoTypeAdditionalMetadata;
 import org.hibernate.search.mapper.pojo.model.path.spi.PojoPathFilterFactory;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public interface PojoAdditionalMetadataCollectorTypeNode extends PojoAdditionalMetadataCollector {
 
 	/**
-	 * @return The type metadata is being contributed to.
+	 * @return The identifier of the type to which metadata is being contributed.
 	 */
-	PojoRawTypeModel<?> getType();
+	PojoRawTypeIdentifier<?> getTypeIdentifier();
 
 	/**
 	 * Mark this type as an entity type.

@@ -59,7 +59,7 @@ public class TypeMappingStepImpl
 
 	@Override
 	public TypeMappingStep indexed(String backendName, String indexName) {
-		children.add( new IndexedMetadataContributor( typeModel, backendName, indexName ) );
+		children.add( new IndexedMetadataContributor( typeModel.getTypeIdentifier(), backendName, indexName ) );
 		return this;
 	}
 
