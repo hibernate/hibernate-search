@@ -10,13 +10,13 @@ import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContext;
-import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRuntimeIntrospectorTypeContext;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeTypeContext;
+import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 abstract class AbstractHibernateOrmTypeContext<E>
 		implements HibernateOrmScopeTypeContext<E>, HibernateOrmListenerTypeContext,
-				HibernateOrmRuntimeIntrospectorTypeContext {
+				HibernateOrmSessionTypeContext<E> {
 	private final PojoRawTypeIdentifier<E> typeIdentifier;
 	private final EntityTypeDescriptor<E> entityType;
 
@@ -32,6 +32,7 @@ abstract class AbstractHibernateOrmTypeContext<E>
 		return typeIdentifier;
 	}
 
+	@Override
 	public String getEntityName() {
 		return entityType.getName();
 	}

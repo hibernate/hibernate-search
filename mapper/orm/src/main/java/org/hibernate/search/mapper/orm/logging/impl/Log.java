@@ -25,6 +25,7 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
 import org.jboss.logging.BasicLogger;
@@ -229,5 +230,19 @@ public interface Log extends BasicLogger {
 					+ " e.g. 'MyEntity.myEmbedded' or 'MyEntity.myEmbedded.myNestedEmbedded'."
 	)
 	SearchException unknownNamedType(String typeName, Collection<String> availableNamedTypes);
+
+	@Message(id = ID_OFFSET_2 + 28,
+			value = "Unknown entity name: '%1$s'. The Hibernate ORM entity name is expected,"
+					+ " i.e. the name accepted by Session.get(String, Object)."
+	)
+	SearchException invalidHibernateOrmEntityName(String hibernateOrmEntityName);
+
+	@Message(id = ID_OFFSET_2 + 29,
+			value = "Invalid type for '%1$s': expected the entity to extend '%2$s'," +
+					" but entity type '%3$s' does not."
+	)
+	SearchException invalidHibernateOrmEntitySuperType(String hibernateOrmEntityName,
+			@FormatWith(ClassFormatter.class) Class<?> expectedSuperType,
+			@FormatWith(ClassFormatter.class) Class<?> actualJavaType);
 
 }

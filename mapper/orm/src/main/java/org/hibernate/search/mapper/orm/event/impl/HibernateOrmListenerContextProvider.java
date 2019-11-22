@@ -12,7 +12,7 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 
 public interface HibernateOrmListenerContextProvider {
 
-	<E> HibernateOrmListenerTypeContext getTypeContextByHibernateOrmEntityName(String hibernateOrmEntityName);
+	HibernateOrmListenerTypeContextProvider getTypeContextProvider();
 
 	PojoIndexingPlan getCurrentIndexingPlan(SessionImplementor session, boolean createIfDoesNotExist);
 

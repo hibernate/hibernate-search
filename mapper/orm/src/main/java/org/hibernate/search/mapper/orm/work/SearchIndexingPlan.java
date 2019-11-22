@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.work;
 
+import java.io.Serializable;
+
 /**
  * An interface for indexing entities in the context of an ORM Session.
  * <p>
@@ -73,6 +75,28 @@ public interface SearchIndexingPlan {
 	 * ({@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed}).
 	 */
 	void purge(Class<?> entityClass, Object providedId);
+
+	/**
+	 * Delete the entity from the index.
+	 * <p>
+	 * On contrary to {@link #delete(Object)},
+	 * if documents embed this entity
+	 * (through {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded} for example),
+	 * these documents will <strong>not</strong> be re-indexed,
+	 * leaving the indexes in an inconsistent state
+	 * until they are re-indexed manually.
+	 *
+	 * @param hibernateOrmEntityName An entity name.
+	 * This is not the JPA name, but the Hibernate ORM name,
+	 * i.e. the same name accepted by {@link org.hibernate.Session#get(String, Serializable)}.
+	 * Generally the Hibernate ORM name defaults to the fully qualified class name,
+	 * while the JPA name defaults to the unqualified class name.
+	 * @param providedId A value to extract the document ID from.
+	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
+	 * @throws org.hibernate.search.util.common.SearchException If the entity type is not indexed directly
+	 * ({@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed}).
+	 */
+	void purge(String hibernateOrmEntityName, Object providedId);
 
 	/**
 	 * Extract all data from objects passed to the indexing plan so far,

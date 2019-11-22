@@ -197,7 +197,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	private HibernateOrmListenerTypeContext getTypeContext(HibernateOrmListenerContextProvider contextProvider,
 			EntityPersister entityPersister) {
 		String entityName = entityPersister.getEntityName();
-		return contextProvider.getTypeContextByHibernateOrmEntityName( entityName );
+		return contextProvider.getTypeContextProvider().getByHibernateOrmEntityName( entityName );
 	}
 
 	private void processCollectionEvent(AbstractCollectionEvent event) {
@@ -210,8 +210,8 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 			return;
 		}
 
-		HibernateOrmListenerTypeContext typeContext =
-				contextProvider.getTypeContextByHibernateOrmEntityName( event.getAffectedOwnerEntityName() );
+		HibernateOrmListenerTypeContext typeContext = contextProvider.getTypeContextProvider()
+				.getByHibernateOrmEntityName( event.getAffectedOwnerEntityName() );
 		if ( typeContext != null ) {
 			PojoIndexingPlan plan = getCurrentIndexingPlan( contextProvider, event.getSession() );
 			Object providedId = typeContext.toIndexingPlanProvidedId( event.getAffectedOwnerIdOrNull() );

@@ -12,33 +12,42 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 
 public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
-	private final SearchIndexingPlanContext context;
+	private final SearchIndexingPlanTypeContextProvider typeContextProvider;
+	private final SearchIndexingPlanSessionContext sessionContext;
 
-	public SearchIndexingPlanImpl(SearchIndexingPlanContext context) {
-		this.context = context;
+	public SearchIndexingPlanImpl(SearchIndexingPlanTypeContextProvider typeContextProvider,
+			SearchIndexingPlanSessionContext sessionContext) {
+		this.typeContextProvider = typeContextProvider;
+		this.sessionContext = sessionContext;
 	}
 
 	@Override
 	public void addOrUpdate(Object entity) {
-		context.getCurrentIndexingPlan( true )
+		sessionContext.getCurrentIndexingPlan( true )
 				.addOrUpdate( getTypeIdentifier( entity ), null, entity );
 	}
 
 	@Override
 	public void delete(Object entity) {
-		context.getCurrentIndexingPlan( true )
+		sessionContext.getCurrentIndexingPlan( true )
 				.delete( getTypeIdentifier( entity ), null, entity );
 	}
 
 	@Override
 	public void purge(Class<?> entityClass, Object providedId) {
-		context.getCurrentIndexingPlan( true )
+		sessionContext.getCurrentIndexingPlan( true )
 				.purge( getTypeIdentifier( entityClass ), providedId );
 	}
 
 	@Override
+	public void purge(String hibernateOrmEntityName, Object providedId) {
+		sessionContext.getCurrentIndexingPlan( true )
+				.purge( getTypeIdentifier( hibernateOrmEntityName ), providedId );
+	}
+
+	@Override
 	public void process() {
-		PojoIndexingPlan plan = context.getCurrentIndexingPlan( false );
+		PojoIndexingPlan plan = sessionContext.getCurrentIndexingPlan( false );
 		if ( plan == null ) {
 			return;
 		}
@@ -47,23 +56,23 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	@Override
 	public void execute() {
-		PojoIndexingPlan plan = context.getCurrentIndexingPlan( false );
+		PojoIndexingPlan plan = sessionContext.getCurrentIndexingPlan( false );
 		if ( plan == null ) {
 			return;
 		}
-		context.getConfiguredAutomaticIndexingSynchronizationStrategy()
+		sessionContext.getConfiguredAutomaticIndexingSynchronizationStrategy()
 				.executeAndSynchronize( plan );
 	}
 
 	private <T> PojoRawTypeIdentifier<? extends T> getTypeIdentifier(T entity) {
-		return context.getRuntimeIntrospector().getEntityTypeIdentifier( entity );
+		return sessionContext.getRuntimeIntrospector().getEntityTypeIdentifier( entity );
 	}
 
 	private <T> PojoRawTypeIdentifier<T> getTypeIdentifier(Class<T> entityType) {
-		if ( entityType == null ) {
-			return null;
-		}
-		// TODO HSEARCH-1401 avoid creating a new instance of that type identifier every single time
-		return PojoRawTypeIdentifier.of( entityType );
+		return typeContextProvider.getTypeIdentifierByJavaClass( entityType );
+	}
+
+	private PojoRawTypeIdentifier<?> getTypeIdentifier(String hibernateOrmEntityName) {
+		return typeContextProvider.getTypeIdentifierByHibernateOrmEntityName( hibernateOrmEntityName );
 	}
 }

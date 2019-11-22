@@ -21,6 +21,8 @@ public interface HibernateOrmSearchSessionMappingContext {
 
 	<T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> types);
 
+	<T> SearchScopeImpl<T> createScope(Class<T> expectedSuperType, Collection<String> hibernateOrmEntityNames);
+
 	HibernateOrmSearchSession.HibernateOrmSearchSessionBuilder createSessionBuilder(
 			SessionImplementor sessionImplementor);
 }

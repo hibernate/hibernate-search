@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.model.impl;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -23,6 +24,7 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.hibernate.mapping.Value;
 import org.hibernate.property.access.spi.Getter;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 @SuppressWarnings( "unchecked" ) // Hibernate ORM gives us raw types, we must make do.
 public class HibernateOrmBasicTypeMetadataProvider {
@@ -63,16 +65,29 @@ public class HibernateOrmBasicTypeMetadataProvider {
 		metadataProviderBuilder.jpaEntityNameToHibernateOrmEntityName.put( jpaEntityName, hibernateOrmEntityName );
 
 		if ( persistentClass.hasPojoRepresentation() ) {
+			Class<?> javaClass = persistentClass.getMappedClass();
+			PojoRawTypeIdentifier<?> typeIdentifier = createClassTypeIdentifier( javaClass );
+
 			collectClassType(
-					metadataProviderBuilder, persistentClass.getMappedClass(),
+					metadataProviderBuilder, javaClass,
 					persistentClass.getIdentifierProperty(), persistentClass.getPropertyIterator()
+			);
+
+			metadataProviderBuilder.entityTypeIdentifiersByJavaClass.put(
+					javaClass, typeIdentifier
 			);
 		}
 		else {
+			PojoRawTypeIdentifier<Map> typeIdentifier = createDynamicMapTypeIdentifier( hibernateOrmEntityName );
+
 			collectDynamicMapType(
 					metadataProviderBuilder, hibernateOrmEntityName,
 					persistentClass.getSuperclass(),
 					persistentClass.getIdentifierProperty(), persistentClass.getPropertyIterator()
+			);
+
+			metadataProviderBuilder.entityTypeIdentifiersByHibernateOrmEntityName.put(
+					hibernateOrmEntityName, typeIdentifier
 			);
 		}
 	}
@@ -193,12 +208,18 @@ public class HibernateOrmBasicTypeMetadataProvider {
 	private final Map<String, HibernateOrmBasicDynamicMapTypeMetadata> dynamicMapTypeMetadata;
 
 	private final Map<String, String> jpaEntityNameToHibernateOrmEntityName;
+	private final Map<Class<?>, PojoRawTypeIdentifier<?>> entityTypeIdentifiersByJavaClass;
+	private final Map<String, PojoRawTypeIdentifier<?>> entityTypeIdentifiersByHibernateOrmEntityName;
 
 	private HibernateOrmBasicTypeMetadataProvider(Builder builder) {
 		this.persistentClasses = builder.persistentClasses;
 		this.classTypeMetadata = builder.classTypeMetadata;
 		this.dynamicMapTypeMetadata = builder.dynamicMapTypeMetadata;
 		this.jpaEntityNameToHibernateOrmEntityName = builder.jpaEntityNameToHibernateOrmEntityName;
+		this.entityTypeIdentifiersByJavaClass =
+				Collections.unmodifiableMap( builder.entityTypeIdentifiersByJavaClass );
+		this.entityTypeIdentifiersByHibernateOrmEntityName =
+				Collections.unmodifiableMap( builder.entityTypeIdentifiersByHibernateOrmEntityName );
 	}
 
 	public Collection<PersistentClass> getPersistentClasses() {
@@ -207,6 +228,14 @@ public class HibernateOrmBasicTypeMetadataProvider {
 
 	public PersistentClass getPersistentClass(String hibernateOrmEntityName) {
 		return persistentClasses.get( hibernateOrmEntityName );
+	}
+
+	public Map<Class<?>, PojoRawTypeIdentifier<?>> getEntityTypeIdentifiersByJavaClass() {
+		return entityTypeIdentifiersByJavaClass;
+	}
+
+	public Map<String, PojoRawTypeIdentifier<?>> getEntityTypeIdentifiersByHibernateOrmEntityName() {
+		return entityTypeIdentifiersByHibernateOrmEntityName;
 	}
 
 	HibernateOrmBasicClassTypeMetadata getBasicTypeMetadata(Class<?> clazz) {
@@ -233,6 +262,8 @@ public class HibernateOrmBasicTypeMetadataProvider {
 		private final Map<String, HibernateOrmBasicDynamicMapTypeMetadata> dynamicMapTypeMetadata = new LinkedHashMap<>();
 
 		private final Map<String, String> jpaEntityNameToHibernateOrmEntityName = new LinkedHashMap<>();
+		private final Map<Class<?>, PojoRawTypeIdentifier<?>> entityTypeIdentifiersByJavaClass = new LinkedHashMap<>();
+		private final Map<String, PojoRawTypeIdentifier<?>> entityTypeIdentifiersByHibernateOrmEntityName = new LinkedHashMap<>();
 
 		HibernateOrmBasicTypeMetadataProvider build() {
 			return new HibernateOrmBasicTypeMetadataProvider( this );

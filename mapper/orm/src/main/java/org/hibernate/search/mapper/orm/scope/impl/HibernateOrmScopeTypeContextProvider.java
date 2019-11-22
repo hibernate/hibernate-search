@@ -12,6 +12,4 @@ public interface HibernateOrmScopeTypeContextProvider {
 	<E> HibernateOrmScopeIndexedTypeContext<E> getIndexedByExactType(PojoRawTypeIdentifier<E> typeIdentifier);
 
 	<E> HibernateOrmScopeContainedTypeContext<E> getContainedByExactType(PojoRawTypeIdentifier<E> typeIdentifier);
-
-	<E> HibernateOrmScopeTypeContext<E> getByExactType(PojoRawTypeIdentifier<E> typeIdentifier);
 }

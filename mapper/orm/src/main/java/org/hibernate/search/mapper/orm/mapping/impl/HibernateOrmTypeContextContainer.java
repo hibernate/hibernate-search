@@ -6,19 +6,25 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
+import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBasicTypeMetadataProvider;
+import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContextProvider;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionIndexedTypeContext;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class HibernateOrmTypeContextContainer implements HibernateOrmSessionTypeContextProvider {
+class HibernateOrmTypeContextContainer implements HibernateOrmListenerTypeContextProvider, HibernateOrmSessionTypeContextProvider {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<PojoRawTypeIdentifier<?>, HibernateOrmIndexedTypeContext<?>> indexedTypeContexts = new LinkedHashMap<>();
@@ -27,18 +33,29 @@ class HibernateOrmTypeContextContainer implements HibernateOrmSessionTypeContext
 	private final Map<PojoRawTypeIdentifier<?>, HibernateOrmContainedTypeContext<?>> containedTypeContexts = new LinkedHashMap<>();
 	private final Map<String, HibernateOrmContainedTypeContext<?>> containedTypeContextsByHibernateOrmEntityName = new LinkedHashMap<>();
 
+	// This includes non-indexed, non-contained entity types
+	private final Map<Class<?>, PojoRawTypeIdentifier<?>> entityTypeIdentifiersByJavaClass;
+	private final Map<String, PojoRawTypeIdentifier<?>> entityTypeIdentifiersByHibernateOrmEntityName;
+
 	private HibernateOrmTypeContextContainer(Builder builder, SessionFactoryImplementor sessionFactory) {
 		for ( HibernateOrmIndexedTypeContext.Builder<?> contextBuilder : builder.indexedTypeContextBuilders ) {
 			HibernateOrmIndexedTypeContext<?> indexedTypeContext = contextBuilder.build( sessionFactory );
-			indexedTypeContexts.put( indexedTypeContext.getTypeIdentifier(), indexedTypeContext );
+			PojoRawTypeIdentifier<?> typeIdentifier = indexedTypeContext.getTypeIdentifier();
+			indexedTypeContexts.put( typeIdentifier, indexedTypeContext );
 			indexedTypeContextsByHibernateOrmEntityName.put( indexedTypeContext.getEntityType().getTypeName(), indexedTypeContext );
 			indexedTypeContextsByIndexName.put( indexedTypeContext.getIndexName(), indexedTypeContext );
 		}
 		for ( HibernateOrmContainedTypeContext.Builder<?> contextBuilder : builder.containedTypeContextBuilders ) {
 			HibernateOrmContainedTypeContext<?> containedTypeContext = contextBuilder.build( sessionFactory );
-			containedTypeContexts.put( containedTypeContext.getTypeIdentifier(), containedTypeContext );
+			PojoRawTypeIdentifier<?> typeIdentifier = containedTypeContext.getTypeIdentifier();
+			containedTypeContexts.put( typeIdentifier, containedTypeContext );
 			containedTypeContextsByHibernateOrmEntityName.put( containedTypeContext.getEntityType().getTypeName(), containedTypeContext );
 		}
+
+		this.entityTypeIdentifiersByJavaClass =
+				builder.basicTypeMetadataProvider.getEntityTypeIdentifiersByJavaClass();
+		this.entityTypeIdentifiersByHibernateOrmEntityName =
+				builder.basicTypeMetadataProvider.getEntityTypeIdentifiersByHibernateOrmEntityName();
 	}
 
 	@Override
@@ -59,18 +76,6 @@ class HibernateOrmTypeContextContainer implements HibernateOrmSessionTypeContext
 	}
 
 	@Override
-	public <E> AbstractHibernateOrmTypeContext<E> getByExactType(PojoRawTypeIdentifier<E> typeIdentifier) {
-		AbstractHibernateOrmTypeContext<E> result = getIndexedByExactType( typeIdentifier );
-		if ( result != null ) {
-			return result;
-		}
-
-		result = getContainedByExactType( typeIdentifier );
-
-		return result;
-	}
-
-	@Override
 	public AbstractHibernateOrmTypeContext<?> getByHibernateOrmEntityName(String entityName) {
 		AbstractHibernateOrmTypeContext<?> result = indexedTypeContextsByHibernateOrmEntityName.get( entityName );
 		if ( result != null ) {
@@ -79,6 +84,26 @@ class HibernateOrmTypeContextContainer implements HibernateOrmSessionTypeContext
 
 		result = containedTypeContextsByHibernateOrmEntityName.get( entityName );
 
+		return result;
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public <T> PojoRawTypeIdentifier<T> getTypeIdentifierByJavaClass(Class<T> clazz) {
+		PojoRawTypeIdentifier<T> result = (PojoRawTypeIdentifier<T>) entityTypeIdentifiersByJavaClass.get( clazz );
+		if ( result != null ) {
+			return result;
+		}
+		// Non-entity class
+		return PojoRawTypeIdentifier.of( clazz );
+	}
+
+	@Override
+	public PojoRawTypeIdentifier<?> getTypeIdentifierByHibernateOrmEntityName(String entityName) {
+		PojoRawTypeIdentifier<?> result = entityTypeIdentifiersByHibernateOrmEntityName.get( entityName );
+		if ( result == null ) {
+			throw log.invalidHibernateOrmEntityName( entityName );
+		}
 		return result;
 	}
 

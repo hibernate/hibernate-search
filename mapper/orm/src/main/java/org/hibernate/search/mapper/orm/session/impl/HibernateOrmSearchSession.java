@@ -41,7 +41,7 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionContextImpl;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
-import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanContext;
+import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanSessionContext;
 import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanImpl;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -56,7 +56,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * The actual implementation of {@link SearchSession}.
  */
 public class HibernateOrmSearchSession extends AbstractPojoSearchSession
-		implements SearchSession, HibernateOrmScopeSessionContext, SearchIndexingPlanContext,
+		implements SearchSession, HibernateOrmScopeSessionContext, SearchIndexingPlanSessionContext,
 		DocumentReferenceConverter<EntityReference> {
 
 	/**
@@ -154,6 +154,12 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
+	public <T> SearchScope<T> scope(Class<T> expectedSuperType, Collection<String> hibernateOrmEntityNames) {
+		checkOrmSessionIsOpen();
+		return mappingContext.createScope( expectedSuperType, hibernateOrmEntityNames );
+	}
+
+	@Override
 	public EntityManager toEntityManager() {
 		return sessionContext.getSession();
 	}
@@ -166,7 +172,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	@Override
 	public SearchIndexingPlan indexingPlan() {
 		if ( indexingPlan == null ) {
-			indexingPlan = new SearchIndexingPlanImpl( this );
+			indexingPlan = new SearchIndexingPlanImpl( typeContextProvider, this );
 		}
 		return indexingPlan;
 	}

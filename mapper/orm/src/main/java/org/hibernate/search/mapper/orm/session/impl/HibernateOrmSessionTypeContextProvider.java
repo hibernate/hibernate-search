@@ -8,9 +8,11 @@ package org.hibernate.search.mapper.orm.session.impl;
 
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRuntimeIntrospectorTypeContextProvider;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeTypeContextProvider;
+import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanTypeContextProvider;
 
 public interface HibernateOrmSessionTypeContextProvider
-		extends HibernateOrmScopeTypeContextProvider, HibernateOrmRuntimeIntrospectorTypeContextProvider {
+		extends HibernateOrmScopeTypeContextProvider, HibernateOrmRuntimeIntrospectorTypeContextProvider,
+				SearchIndexingPlanTypeContextProvider {
 
 	HibernateOrmSessionIndexedTypeContext getByIndexName(String indexName);
 

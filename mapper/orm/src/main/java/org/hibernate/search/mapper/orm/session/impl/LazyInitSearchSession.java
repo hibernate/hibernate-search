@@ -65,6 +65,11 @@ public class LazyInitSearchSession implements SearchSession {
 	}
 
 	@Override
+	public <T> SearchScope<T> scope(Class<T> expectedSuperType, Collection<String> hibernateOrmEntityNames) {
+		return getDelegate().scope( expectedSuperType, hibernateOrmEntityNames );
+	}
+
+	@Override
 	public EntityManager toEntityManager() {
 		return getDelegate().toEntityManager();
 	}

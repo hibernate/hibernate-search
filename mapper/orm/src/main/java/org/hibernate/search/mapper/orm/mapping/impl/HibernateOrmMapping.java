@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
@@ -23,9 +22,10 @@ import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionCon
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.common.EntityReference;
@@ -51,7 +51,6 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class HibernateOrmMapping extends AbstractPojoMappingImplementor<HibernateOrmMapping>
@@ -141,6 +140,11 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
+	public <T> SearchScope<T> scope(Class<T> expectedSuperType, Collection<String> hibernateOrmEntityNames) {
+		return createScope( expectedSuperType, hibernateOrmEntityNames );
+	}
+
+	@Override
 	public EntityManagerFactory toEntityManagerFactory() {
 		return backendMappingContext.getSessionFactory();
 	}
@@ -219,8 +223,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public AbstractHibernateOrmTypeContext<?> getTypeContextByHibernateOrmEntityName(String hibernateOrmEntityName) {
-		return typeContextContainer.getByHibernateOrmEntityName( hibernateOrmEntityName );
+	public HibernateOrmTypeContextContainer getTypeContextProvider() {
+		return typeContextContainer;
 	}
 
 	@Override
@@ -232,17 +236,18 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	public <T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> classes) {
 		List<PojoRawTypeIdentifier<? extends T>> typeIdentifiers = new ArrayList<>( classes.size() );
 		for ( Class<? extends T> clazz : classes ) {
-			// TODO HSEARCH-1401 avoid creating a new instance of the type identifiers every single time
-			typeIdentifiers.add( PojoRawTypeIdentifier.of( clazz ) );
+			typeIdentifiers.add( typeContextContainer.getTypeIdentifierByJavaClass( clazz ) );
 		}
+		return doCreateScope( typeIdentifiers );
+	}
 
-		PojoScopeDelegate<EntityReference, T, HibernateOrmScopeIndexedTypeContext<? extends T>> scopeDelegate =
-				getDelegate().createPojoScope(
-						backendMappingContext,
-						typeIdentifiers,
-						typeContextContainer::getIndexedByExactType
-				);
-		return new SearchScopeImpl<>( this, scopeDelegate );
+	@Override
+	public <T> SearchScopeImpl<T> createScope(Class<T> expectedSuperType, Collection<String> hibernateOrmEntityNames) {
+		List<PojoRawTypeIdentifier<? extends T>> typeIdentifiers = new ArrayList<>( hibernateOrmEntityNames.size() );
+		for ( String hibernateOrmEntityName : hibernateOrmEntityNames ) {
+			typeIdentifiers.add( getEntityTypeIdentifier( expectedSuperType, hibernateOrmEntityName ) );
+		}
+		return doCreateScope( typeIdentifiers );
 	}
 
 	@Override
@@ -264,5 +269,30 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	private SearchIntegration getSearchIntegration() {
 		return HibernateSearchContextProviderService.get( getSessionFactory() ).getIntegration();
+	}
+
+	private <T> PojoRawTypeIdentifier<? extends T> getEntityTypeIdentifier(Class<T> expectedSuperType,
+			String hibernateOrmEntityName) {
+		PojoRawTypeIdentifier<?> typeIdentifier =
+				typeContextContainer.getTypeIdentifierByHibernateOrmEntityName( hibernateOrmEntityName );
+		Class<?> actualJavaType = typeIdentifier.getJavaClass();
+		if ( !expectedSuperType.isAssignableFrom( actualJavaType ) ) {
+			throw log.invalidHibernateOrmEntitySuperType( hibernateOrmEntityName, expectedSuperType, actualJavaType );
+		}
+		// The cast below is safe because we just checked above that the type extends "expectedSuperType", which extends E
+		@SuppressWarnings("unchecked")
+		PojoRawTypeIdentifier<? extends T> castedTypeIdentifier = (PojoRawTypeIdentifier<? extends T>) typeIdentifier;
+		return castedTypeIdentifier;
+	}
+
+	private <T> SearchScopeImpl<T> doCreateScope(Collection<PojoRawTypeIdentifier<? extends T>> typeIdentifiers) {
+		PojoScopeDelegate<EntityReference, T, HibernateOrmScopeIndexedTypeContext<? extends T>> scopeDelegate =
+				getDelegate().createPojoScope(
+						backendMappingContext,
+						typeIdentifiers,
+						typeContextContainer::getIndexedByExactType
+				);
+
+		return new SearchScopeImpl<T>( this, scopeDelegate );
 	}
 }
