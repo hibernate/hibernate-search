@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search;
 
+import java.util.concurrent.TimeUnit;
+
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.SearchQuery;
@@ -44,6 +46,11 @@ public class StubSearchQueryBuilder<H> implements SearchQueryBuilder<H, StubQuer
 	@Override
 	public void addRoutingKey(String routingKey) {
 		workBuilder.routingKey( routingKey );
+	}
+
+	@Override
+	public void timeout(long timeout, TimeUnit timeUnit) {
+		workBuilder.timeout( timeout, timeUnit );
 	}
 
 	@Override

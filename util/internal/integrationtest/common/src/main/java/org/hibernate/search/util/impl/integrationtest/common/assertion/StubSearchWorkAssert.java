@@ -39,12 +39,22 @@ public class StubSearchWorkAssert {
 		boolean hasAnyMismatch;
 		boolean mismatch = checkForMismatch( builder, "resultType", expected.getResultType(), actual.getResultType() );
 		hasAnyMismatch = mismatch;
+
 		mismatch = checkForMismatch( builder, "routingKeys", expected.getRoutingKeys(), actual.getRoutingKeys() );
 		hasAnyMismatch = hasAnyMismatch || mismatch;
-		mismatch = checkForMismatch( builder, "offset",
-				expected.getOffset(), actual.getOffset()
-		);
+
+		mismatch = checkForMismatch( builder, "timeout", expected.getTimeout(), actual.getTimeout() );
 		hasAnyMismatch = hasAnyMismatch || mismatch;
+
+		if ( expected.getTimeout() != null ) {
+			// check only if there's a timeout, otherwise the attribute does not make any sense
+			mismatch = checkForMismatch( builder, "timeUnit", expected.getTimeUnit(), actual.getTimeUnit() );
+			hasAnyMismatch = hasAnyMismatch || mismatch;
+		}
+
+		mismatch = checkForMismatch( builder, "offset", expected.getOffset(), actual.getOffset() );
+		hasAnyMismatch = hasAnyMismatch || mismatch;
+
 		mismatch = checkForMismatch( builder, "limit", expected.getLimit(), actual.getLimit() );
 		hasAnyMismatch = hasAnyMismatch || mismatch;
 

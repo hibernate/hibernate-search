@@ -12,6 +12,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -96,6 +97,11 @@ public class ElasticsearchSearchQueryBuilder<H>
 	@Override
 	public void addRoutingKey(String routingKey) {
 		this.routingKeys.add( routingKey );
+	}
+
+	@Override
+	public void timeout(long timeout, TimeUnit timeUnit) {
+		// TODO HSEARCH-3352 implement for the backend
 	}
 
 	@Override
