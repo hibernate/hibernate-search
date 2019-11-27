@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
@@ -89,6 +90,11 @@ public class LuceneSearchQueryBuilder<H>
 	@Override
 	public void addRoutingKey(String routingKey) {
 		this.routingKeys.add( routingKey );
+	}
+
+	@Override
+	public void timeout(long timeout, TimeUnit timeUnit) {
+		// TODO HSEARCH-3352 implement for the backend
 	}
 
 	@Override

@@ -8,6 +8,7 @@ package org.hibernate.search.engine.search.query.dsl;
 
 
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
@@ -62,6 +63,16 @@ public interface SearchQueryOptionsStep<
 	 * @return {@code this}, for method chaining.
 	 */
 	S routing(Collection<String> routingKeys);
+
+	/**
+	 * Define a timeout period for a given unit of time.
+	 * Note that this time out is on a best effort basis.
+	 *
+	 * @param timeout time out period
+	 * @param timeUnit time out unit
+	 * @return {@code this} to allow method chaining
+	 */
+	S timeout(long timeout, TimeUnit timeUnit);
 
 	/**
 	 * Add a sort to this query.

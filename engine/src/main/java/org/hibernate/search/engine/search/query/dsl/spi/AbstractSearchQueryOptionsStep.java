@@ -9,6 +9,7 @@ package org.hibernate.search.engine.search.query.dsl.spi;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -80,6 +81,12 @@ public abstract class AbstractSearchQueryOptionsStep<
 	@Override
 	public S routing(Collection<String> routingKeys) {
 		routingKeys.forEach( searchQueryBuilder::addRoutingKey );
+		return thisAsS();
+	}
+
+	@Override
+	public S timeout(long timeout, TimeUnit timeUnit) {
+		searchQueryBuilder.timeout( timeout, timeUnit );
 		return thisAsS();
 	}
 
