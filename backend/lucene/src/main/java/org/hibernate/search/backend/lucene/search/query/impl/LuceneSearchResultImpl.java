@@ -15,7 +15,8 @@ import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
 
 class LuceneSearchResultImpl<H> extends SimpleSearchResult<H>
 		implements LuceneSearchResult<H> {
-	LuceneSearchResultImpl(long hitCount, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults) {
-		super( hitCount, hits, aggregationResults );
+	LuceneSearchResultImpl(long hitCount, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults,
+			Integer took, Boolean timedOut) {
+		super( hitCount, hits, aggregationResults, took, timedOut );
 	}
 }

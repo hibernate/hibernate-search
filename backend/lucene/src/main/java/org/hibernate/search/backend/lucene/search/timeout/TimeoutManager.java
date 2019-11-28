@@ -35,6 +35,8 @@ public interface TimeoutManager {
 
 	Type getType();
 
+	Integer getTookTimeInMilliseconds();
+
 	enum Type {
 		NONE,
 		EXCEPTION,

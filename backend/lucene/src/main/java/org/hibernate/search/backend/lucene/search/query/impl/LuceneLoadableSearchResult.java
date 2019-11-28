@@ -36,16 +36,21 @@ public class LuceneLoadableSearchResult<H> {
 	private final long hitCount;
 	private List<Object> extractedData;
 	private final Map<AggregationKey<?>, ?> extractedAggregations;
+	private Integer took;
+	private Boolean timedOut;
 
 	LuceneLoadableSearchResult(LuceneSearchQueryExtractContext extractContext,
 			LuceneSearchProjection<?, H> rootProjection,
 			long hitCount, List<Object> extractedData,
-			Map<AggregationKey<?>, ?> extractedAggregations) {
+			Map<AggregationKey<?>, ?> extractedAggregations,
+			Integer took, boolean timedOut) {
 		this.extractContext = extractContext;
 		this.rootProjection = rootProjection;
 		this.hitCount = hitCount;
 		this.extractedData = extractedData;
 		this.extractedAggregations = extractedAggregations;
+		this.took = took;
+		this.timedOut = timedOut;
 	}
 
 	LuceneSearchResult<H> loadBlocking() {
@@ -82,6 +87,6 @@ public class LuceneLoadableSearchResult<H> {
 		// Make sure that if someone uses this object incorrectly, it will always fail, and will fail early.
 		extractedData = null;
 
-		return new LuceneSearchResultImpl<>( hitCount, loadedHits, extractedAggregations );
+		return new LuceneSearchResultImpl<>( hitCount, loadedHits, extractedAggregations, took, timedOut );
 	}
 }

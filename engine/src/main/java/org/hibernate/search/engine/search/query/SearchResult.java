@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.query;
 
+import java.time.Duration;
 import java.util.List;
 
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
@@ -33,5 +34,15 @@ public interface SearchResult<H> {
 	 * while building this query, and is thus not mapped to anything.
 	 */
 	<A> A getAggregation(AggregationKey<A> key);
+
+	/**
+	 * @return the time taken to process the request, as a {@link Duration}
+	 */
+	Duration getTook();
+
+	/**
+	 * @return whether or not a timeout occurred processing the request.
+	 */
+	boolean isTimedOut();
 
 }

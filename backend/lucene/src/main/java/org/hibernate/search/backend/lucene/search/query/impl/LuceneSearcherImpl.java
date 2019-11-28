@@ -107,7 +107,9 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 				extractContext, rootProjection,
 				luceneCollectors.getTotalHits(),
 				extractedData,
-				extractedAggregations
+				extractedAggregations,
+				timeoutManager.getTookTimeInMilliseconds(),
+				timeoutManager.isTimedOut()
 		);
 	}
 

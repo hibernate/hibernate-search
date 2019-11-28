@@ -7,6 +7,8 @@
 package org.hibernate.search.backend.lucene.search.timeout.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
@@ -22,6 +24,7 @@ import org.apache.lucene.search.Query;
 public class TimeoutManagerImpl implements TimeoutManager {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	public static final int NANOS_IN_ONE_MILLI = 1000000;
 
 	private final Query query;
 
@@ -41,10 +44,10 @@ public class TimeoutManagerImpl implements TimeoutManager {
 	 */
 	@Override
 	public void start() {
+		this.start = System.nanoTime();
 		if ( timeout == null ) {
 			return;
 		}
-		this.start = System.nanoTime();
 		this.partialResults = false;
 	}
 
@@ -177,6 +180,13 @@ public class TimeoutManagerImpl implements TimeoutManager {
 	@Override
 	public Type getType() {
 		return type;
+	}
+
+	@Override
+	public Integer getTookTimeInMilliseconds() {
+		return BigDecimal.valueOf( System.nanoTime() - start )
+				.divide( BigDecimal.valueOf( NANOS_IN_ONE_MILLI ), RoundingMode.CEILING )
+				.intValue();
 	}
 }
 
