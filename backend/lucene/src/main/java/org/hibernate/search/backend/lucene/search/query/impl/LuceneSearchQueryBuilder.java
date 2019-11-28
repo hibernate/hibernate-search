@@ -191,7 +191,8 @@ public class LuceneSearchQueryBuilder<H>
 				storedFieldVisitor,
 				rootProjection,
 				aggregations == null ? Collections.emptyMap() : aggregations,
-				timeoutManager
+				timeoutManager,
+				searchContext.getTimingSource()
 		);
 
 		return new LuceneSearchQueryImpl<>(
