@@ -31,6 +31,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
+import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManagerImpl;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
@@ -61,6 +62,8 @@ public class LuceneSearchQueryBuilder<H>
 	private Query luceneQuery;
 	private List<SortField> sortFields;
 	private Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations;
+	private Long timeout;
+	private TimeUnit timeUnit;
 
 	public LuceneSearchQueryBuilder(
 			LuceneWorkFactory workFactory,
@@ -94,7 +97,8 @@ public class LuceneSearchQueryBuilder<H>
 
 	@Override
 	public void timeout(long timeout, TimeUnit timeUnit) {
-		// TODO HSEARCH-3352 implement for the backend
+		this.timeout = timeout;
+		this.timeUnit = timeUnit;
 	}
 
 	@Override
@@ -173,11 +177,21 @@ public class LuceneSearchQueryBuilder<H>
 				sessionContext, loadingContext, definitiveLuceneQuery, luceneSort
 		);
 
+		TimeoutManagerImpl timeoutManager = new TimeoutManagerImpl( definitiveLuceneQuery );
+		if ( timeout != null && timeUnit != null ) {
+			// TODO HSEARCH-3352 make timeout property immutable for a timeout manager
+			timeoutManager.setTimeout( timeout, timeUnit );
+			// TODO HSEARCH-3352 make type property immutable as well
+			// TODO HSEARCH-3352 allow to use the other strategy: limitFetchingOnTimeout
+			timeoutManager.raiseExceptionOnTimeout();
+		}
+
 		LuceneSearcherImpl<H> searcher = new LuceneSearcherImpl<>(
 				requestContext,
 				storedFieldVisitor,
 				rootProjection,
-				aggregations == null ? Collections.emptyMap() : aggregations
+				aggregations == null ? Collections.emptyMap() : aggregations,
+				timeoutManager
 		);
 
 		return new LuceneSearchQueryImpl<>(
@@ -186,6 +200,7 @@ public class LuceneSearchQueryBuilder<H>
 				sessionContext,
 				loadingContext,
 				routingKeys,
+				timeoutManager,
 				definitiveLuceneQuery,
 				luceneSort,
 				searcher

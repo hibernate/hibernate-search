@@ -27,6 +27,7 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.ReusableDocume
 import org.hibernate.search.backend.lucene.search.impl.LuceneNestedQueries;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
+import org.hibernate.search.backend.lucene.search.timeout.TimeoutManager;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
@@ -57,15 +58,18 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
 	private final LuceneSearchProjection<?, H> rootProjection;
 	private final Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations;
+	private final TimeoutManager timeoutManager;
 
 	LuceneSearcherImpl(LuceneSearchQueryRequestContext requestContext,
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
 			LuceneSearchProjection<?, H> rootProjection,
-			Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations) {
+			Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations,
+			TimeoutManager timeoutManager) {
 		this.requestContext = requestContext;
 		this.storedFieldVisitor = storedFieldVisitor;
 		this.rootProjection = rootProjection;
 		this.aggregations = aggregations;
+		this.timeoutManager = timeoutManager;
 	}
 
 	@Override
@@ -164,7 +168,8 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 		SearchProjectionExtractContext projectionExtractContext = extractContext.createProjectionExtractContext( nestedDocs );
 
-		for ( ScoreDoc hit : topDocs.scoreDocs ) {
+		for ( int i = 0; i < topDocs.scoreDocs.length; i++ ) {
+			ScoreDoc hit = topDocs.scoreDocs[i];
 			// add root object contribution
 			indexSearcher.doc( hit.doc, storedFieldVisitor );
 			if ( nestedDocs.containsKey( hit.doc ) ) {
@@ -177,6 +182,10 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 			LuceneResult luceneResult = new LuceneResult( document, hit.doc, hit.score );
 
 			extractedData.add( rootProjection.extract( projectionHitMapper, luceneResult, projectionExtractContext ) );
+			//Check for timeout each 16 elements:
+			if ( (i & 0x000F) == 0 ) {
+				timeoutManager.isTimedOut();
+			}
 		}
 
 		return extractedData;

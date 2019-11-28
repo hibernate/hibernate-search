@@ -11,6 +11,7 @@ import static org.jboss.logging.Logger.Level.WARN;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -595,4 +596,14 @@ public interface Log extends BasicLogger {
 			value = "Multiple conflicting models for field '%1$s': '%2$s' vs. '%3$s'.")
 	SearchException conflictingFieldModel(String absoluteFieldPath,
 			LuceneIndexSchemaObjectNode objectNode, LuceneIndexSchemaFieldNode fieldNode, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 107, value = "Query took longer than expected: '%1$s'. Query: '%2$s'.")
+	SearchException timedOut(@FormatWith(DurationFormatter.class) Duration duration, String queryDescription);
+
+	@Message(id = ID_OFFSET_2 + 108, value = "Timeout period exceeded. Query: '%1$s'.")
+	SearchException timeoutPeriodExceeded(String queryDescription);
+
+	@Message(id = ID_OFFSET_2 + 109, value = "Cannot define both 'raise exception' and 'limit fetching' for a timeout event."
+			+ " Please chose one of them.")
+	SearchException raiseExceptionOrLimitFetching();
 }

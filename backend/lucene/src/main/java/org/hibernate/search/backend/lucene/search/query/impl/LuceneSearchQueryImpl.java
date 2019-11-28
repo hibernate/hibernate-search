@@ -14,6 +14,7 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrch
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
+import org.hibernate.search.backend.lucene.search.timeout.TimeoutManager;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.work.impl.LuceneReadWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
@@ -50,12 +51,14 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	private final Query luceneQuery;
 	private final Sort luceneSort;
 	private final LuceneSearcher<LuceneLoadableSearchResult<H>> searcher;
+	private final TimeoutManager timeoutManager;
 
 	LuceneSearchQueryImpl(LuceneReadWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, LuceneSearchContext searchContext,
 			BackendSessionContext sessionContext,
 			LoadingContext<?, ?> loadingContext,
 			Set<String> routingKeys,
+			TimeoutManager timeoutManager,
 			Query luceneQuery, Sort luceneSort,
 			LuceneSearcher<LuceneLoadableSearchResult<H>> searcher) {
 		this.queryOrchestrator = queryOrchestrator;
@@ -64,6 +67,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		this.sessionContext = sessionContext;
 		this.loadingContext = loadingContext;
 		this.routingKeys = routingKeys;
+		this.timeoutManager = timeoutManager;
 		this.luceneQuery = luceneQuery;
 		this.luceneSort = luceneSort;
 		this.searcher = searcher;
@@ -88,8 +92,9 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	@Override
 	public LuceneSearchResult<H> fetch(Integer offset, Integer limit) {
+		timeoutManager.start();
 		LuceneReadWork<LuceneLoadableSearchResult<H>> work = workFactory.search( searcher, offset, limit );
-		return doSubmit( work )
+		LuceneSearchResult<H> result = doSubmit( work )
 				/*
 				 * WARNING: the following call must run in the user thread.
 				 * If we introduce async processing, we will have to add a loadAsync method here,
@@ -98,12 +103,17 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 				 * so we may choose to throw exceptions for those.
 				 */
 				.loadBlocking();
+		timeoutManager.stop();
+		return result;
 	}
 
 	@Override
 	public long fetchTotalHitCount() {
+		timeoutManager.start();
 		LuceneReadWork<Integer> work = workFactory.count( searcher );
-		return doSubmit( work );
+		Integer result = doSubmit( work );
+		timeoutManager.stop();
+		return result;
 	}
 
 	@Override
@@ -141,6 +151,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	}
 
 	private Explanation doExplain(String indexName, String id) {
+		timeoutManager.start();
 		Query explainedDocumentQuery = new BooleanQuery.Builder()
 				.add( new TermQuery( new Term( LuceneFields.indexFieldName(), indexName ) ), BooleanClause.Occur.MUST )
 				.add( new TermQuery( new Term( LuceneFields.idFieldName(), id ) ), BooleanClause.Occur.MUST )
@@ -152,6 +163,8 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		LuceneReadWork<Explanation> work = workFactory.explain(
 				searcher, indexName, id, explainedDocumentQuery
 		);
-		return doSubmit( work );
+		Explanation explanation = doSubmit( work );
+		timeoutManager.stop();
+		return explanation;
 	}
 }
