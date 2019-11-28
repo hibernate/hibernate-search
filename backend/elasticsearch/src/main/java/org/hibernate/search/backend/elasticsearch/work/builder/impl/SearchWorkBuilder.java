@@ -27,4 +27,5 @@ public interface SearchWorkBuilder<R> extends ElasticsearchWorkBuilder<Elasticse
 
 	SearchWorkBuilder<R> requestTransformer(Function<ElasticsearchRequest, ElasticsearchRequest> requestTransformer);
 
+	SearchWorkBuilder<R> exceptionOnTimeout(boolean exceptionOnTimeout);
 }

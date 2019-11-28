@@ -12,21 +12,23 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
-import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
-import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.search.common.TimeoutStrategy;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
+import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -72,7 +74,9 @@ public class ElasticsearchSearchTimeoutIT {
 	}
 
 	@Test
-	public void timeout_largeQuery_smallTimeout() {
+	@Ignore("Most of times it does not work, surprisingly sometimes it works")
+	// See https://discuss.elastic.co/t/query-scoped-timeout-and-allow-partial-search-results/209844
+	public void timeout_largeQuery_smallTimeout_limitFetching() {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -82,13 +86,29 @@ public class ElasticsearchSearchTimeoutIT {
 				.timeout( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
 
-		ElasticsearchSearchResult<DocumentReference> result = query.extension( ElasticsearchExtension.get() ).fetchAll();
+		SearchResult<DocumentReference> result = query.fetchAll();
 
+		assertThat( result.getTotalHitCount() ).isLessThan( ROUNDS * 3 );
 		assertThat( result.getTook() ).isGreaterThan( Duration.ofNanos( 1L ) );
+		assertThat( result.isTimedOut() ).isTrue();
+	}
 
-		// Shouldn't the following assert supposed to be true?
-		// assertThat( result.isTimedOut() ).isTrue();
-		// See https://discuss.elastic.co/t/query-scoped-timeout-and-allow-partial-search-results/209844
+	@Test
+	@Ignore("Most of times it does not work, surprisingly sometimes it works")
+	// See https://discuss.elastic.co/t/query-scoped-timeout-and-allow-partial-search-results/209844
+	public void timeout_largeQuery_smallTimeout_raiseAnExcpetion() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.asEntityReference()
+				.predicate( f -> f.match().field( FIELD_NAME ).matching( BUZZ_WORDS ) )
+				.sort( f -> f.score() )
+				.timeout( 1, TimeUnit.NANOSECONDS, TimeoutStrategy.RAISE_AN_EXCEPTION )
+				.toQuery();
+
+		SubTest.expectException( () -> query.fetchAll() )
+				.assertThrown()
+				.hasMessageContaining( "Time exceeded" );
 	}
 
 	@Test
@@ -98,10 +118,10 @@ public class ElasticsearchSearchTimeoutIT {
 		SearchQuery<DocumentReference> query = scope.query()
 				.asEntityReference()
 				.predicate( f -> f.match().field( EMPTY_FIELD_NAME ).matching( ANY_INTEGER ) )
-				.timeout( 1, TimeUnit.DAYS )
+				.timeout( 1, TimeUnit.DAYS, TimeoutStrategy.RAISE_AN_EXCEPTION )
 				.toQuery();
 
-		ElasticsearchSearchResult<DocumentReference> result = query.extension( ElasticsearchExtension.get() ).fetchAll();
+		SearchResult<DocumentReference> result = query.fetchAll();
 		SearchResultAssert.assertThat( query ).hasNoHits();
 
 		assertThat( result.getTook() ).isLessThan( Duration.ofDays( 1L ) );
