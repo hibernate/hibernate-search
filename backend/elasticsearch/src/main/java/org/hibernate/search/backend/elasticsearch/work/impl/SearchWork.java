@@ -74,6 +74,7 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 		private Integer scrollSize;
 		private String scrollTimeout;
 		private Set<String> routingKeys;
+		private boolean excpetionOnTimeout;
 
 		private Builder(JsonObject payload, ElasticsearchSearchResultExtractor<R> resultExtractor, Boolean trackTotalHits) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
@@ -109,6 +110,12 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 		}
 
 		@Override
+		public SearchWorkBuilder<R> exceptionOnTimeout(boolean exceptionOnTimeout) {
+			this.excpetionOnTimeout = exceptionOnTimeout;
+			return this;
+		}
+
+		@Override
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.post()
@@ -135,6 +142,11 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 
 			if ( trackTotalHits != null ) {
 				builder.param( "track_total_hits", trackTotalHits );
+			}
+
+			if ( excpetionOnTimeout ) {
+				// the default is true
+				builder.param( "allow_partial_search_results", false );
 			}
 
 			return builder.build();

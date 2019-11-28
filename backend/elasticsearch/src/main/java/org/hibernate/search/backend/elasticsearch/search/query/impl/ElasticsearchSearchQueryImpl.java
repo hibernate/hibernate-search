@@ -56,6 +56,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	private final JsonObject payload;
 	private final ElasticsearchSearchRequestTransformer requestTransformer;
 	private final ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor;
+	private final boolean exceptionOnTimeout;
 
 	ElasticsearchSearchQueryImpl(ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchWorkOrchestrator queryOrchestrator,
@@ -65,7 +66,8 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			Set<String> routingKeys,
 			JsonObject payload,
 			ElasticsearchSearchRequestTransformer requestTransformer,
-			ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor) {
+			ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor,
+			boolean exceptionOnTimeout) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.searchContext = searchContext;
@@ -75,6 +77,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		this.payload = payload;
 		this.requestTransformer = requestTransformer;
 		this.searchResultExtractor = searchResultExtractor;
+		this.exceptionOnTimeout = exceptionOnTimeout;
 	}
 
 	@Override
@@ -101,6 +104,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				.indexes( searchContext.getIndexNames() )
 				.paging( defaultedLimit( limit, offset ), offset )
 				.routingKeys( routingKeys )
+				.exceptionOnTimeout( exceptionOnTimeout )
 				.requestTransformer(
 						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
 				)

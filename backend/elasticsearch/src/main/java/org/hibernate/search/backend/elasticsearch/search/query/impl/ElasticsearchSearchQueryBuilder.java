@@ -68,6 +68,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations;
 	private Long timeout;
 	private TimeUnit timeUnit;
+	private boolean exceptionOnTimeout;
 	private ElasticsearchSearchRequestTransformer requestTransformer;
 
 	public ElasticsearchSearchQueryBuilder(
@@ -107,7 +108,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	public void timeout(long timeout, TimeUnit timeUnit, TimeoutStrategy strategy) {
 		this.timeout = timeout;
 		this.timeUnit = timeUnit;
-		// TODO HSEARCH-3352 use strategy
+		this.exceptionOnTimeout = ( TimeoutStrategy.RAISE_AN_EXCEPTION.equals( strategy ) );
 	}
 
 	@Override
@@ -204,7 +205,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 				workFactory, queryOrchestrator,
 				searchContext, sessionContext, loadingContext, routingKeys,
 				payload, requestTransformer,
-				searchResultExtractor
+				searchResultExtractor, exceptionOnTimeout
 		);
 	}
 
