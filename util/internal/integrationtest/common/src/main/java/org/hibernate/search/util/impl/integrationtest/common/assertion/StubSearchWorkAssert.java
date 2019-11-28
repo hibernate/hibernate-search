@@ -46,11 +46,11 @@ public class StubSearchWorkAssert {
 		mismatch = checkForMismatch( builder, "timeout", expected.getTimeout(), actual.getTimeout() );
 		hasAnyMismatch = hasAnyMismatch || mismatch;
 
-		if ( expected.getTimeout() != null ) {
-			// check only if there's a timeout, otherwise the attribute does not make any sense
-			mismatch = checkForMismatch( builder, "timeUnit", expected.getTimeUnit(), actual.getTimeUnit() );
-			hasAnyMismatch = hasAnyMismatch || mismatch;
-		}
+		mismatch = checkForMismatch( builder, "timeUnit", expected.getTimeUnit(), actual.getTimeUnit() );
+		hasAnyMismatch = hasAnyMismatch || mismatch;
+
+		mismatch = checkForMismatch( builder, "strategy", expected.getStrategy(), actual.getStrategy() );
+		hasAnyMismatch = hasAnyMismatch || mismatch;
 
 		mismatch = checkForMismatch( builder, "offset", expected.getOffset(), actual.getOffset() );
 		hasAnyMismatch = hasAnyMismatch || mismatch;

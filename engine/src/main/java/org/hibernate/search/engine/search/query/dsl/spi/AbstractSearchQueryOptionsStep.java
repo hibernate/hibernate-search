@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.search.common.TimeoutStrategy;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
@@ -85,8 +86,8 @@ public abstract class AbstractSearchQueryOptionsStep<
 	}
 
 	@Override
-	public S timeout(long timeout, TimeUnit timeUnit) {
-		searchQueryBuilder.timeout( timeout, timeUnit );
+	public S timeout(long timeout, TimeUnit timeUnit, TimeoutStrategy strategy) {
+		searchQueryBuilder.timeout( timeout, timeUnit, strategy );
 		return thisAsS();
 	}
 

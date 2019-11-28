@@ -8,6 +8,7 @@ package org.hibernate.search.engine.search.query.spi;
 
 import java.util.concurrent.TimeUnit;
 
+import org.hibernate.search.engine.search.common.TimeoutStrategy;
 import org.hibernate.search.engine.search.query.SearchQuery;
 
 /**
@@ -22,7 +23,7 @@ public interface SearchQueryBuilder<H, C> {
 
 	void addRoutingKey(String routingKey);
 
-	void timeout(long timeout, TimeUnit timeUnit);
+	void timeout(long timeout, TimeUnit timeUnit, TimeoutStrategy strategy);
 
 	SearchQuery<H> build();
 

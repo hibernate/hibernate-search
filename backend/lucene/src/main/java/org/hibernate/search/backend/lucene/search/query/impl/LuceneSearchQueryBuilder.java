@@ -36,6 +36,7 @@ import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.Luce
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.common.TimeoutStrategy;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
@@ -96,9 +97,10 @@ public class LuceneSearchQueryBuilder<H>
 	}
 
 	@Override
-	public void timeout(long timeout, TimeUnit timeUnit) {
+	public void timeout(long timeout, TimeUnit timeUnit, TimeoutStrategy strategy) {
 		this.timeout = timeout;
 		this.timeUnit = timeUnit;
+		// TODO HSEARCH-3352 use strategy
 	}
 
 	@Override

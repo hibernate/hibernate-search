@@ -14,6 +14,7 @@ import java.util.function.Function;
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
+import org.hibernate.search.engine.search.common.TimeoutStrategy;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
@@ -67,12 +68,29 @@ public interface SearchQueryOptionsStep<
 	/**
 	 * Define a timeout period for a given unit of time.
 	 * Note that this time out is on a best effort basis.
+	 * <p>
+	 * If the limit is reached, fetching will be limited,
+	 * according to the {@link TimeoutStrategy#LIMIT_FETCHING}.
 	 *
 	 * @param timeout time out period
 	 * @param timeUnit time out unit
 	 * @return {@code this} to allow method chaining
+	 * @see TimeoutStrategy#LIMIT_FETCHING
 	 */
-	S timeout(long timeout, TimeUnit timeUnit);
+	default S timeout(long timeout, TimeUnit timeUnit) {
+		return timeout( timeout, timeUnit, TimeoutStrategy.LIMIT_FETCHING );
+	}
+
+	/**
+	 * Define a timeout period for a given unit of time.
+	 * Note that this time out is on a best effort basis.
+	 *
+	 * @param timeout time out period
+	 * @param timeUnit time out unit
+	 * @param strategy provide a strategy to override the default one
+	 * @return {@code this} to allow method chaining
+	 */
+	S timeout(long timeout, TimeUnit timeUnit, TimeoutStrategy strategy);
 
 	/**
 	 * Add a sort to this query.

@@ -11,6 +11,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import org.hibernate.search.engine.search.common.TimeoutStrategy;
+
 public class StubSearchWork {
 
 	public enum ResultType {
@@ -29,6 +31,7 @@ public class StubSearchWork {
 	private final Integer limit;
 	private final Long timeout;
 	private final TimeUnit timeUnit;
+	private final TimeoutStrategy strategy;
 
 	private StubSearchWork(Builder builder) {
 		this.resultType = builder.resultType;
@@ -37,6 +40,7 @@ public class StubSearchWork {
 		this.limit = builder.limit;
 		this.timeout = builder.timeout;
 		this.timeUnit = builder.timeUnit;
+		this.strategy = builder.strategy;
 	}
 
 	public ResultType getResultType() {
@@ -63,12 +67,17 @@ public class StubSearchWork {
 		return limit;
 	}
 
+	public TimeoutStrategy getStrategy() {
+		return strategy;
+	}
+
 	@Override
 	public String toString() {
 		return "StubSearchWork[" +
 				", routingKeys=" + routingKeys +
 				", timeout=" + timeout +
 				", timeUnit=" + timeUnit +
+				", strategy=" + strategy +
 				", offset=" + offset +
 				", limit=" + limit +
 				']';
@@ -80,6 +89,7 @@ public class StubSearchWork {
 		private final List<String> routingKeys = new ArrayList<>();
 		private Long timeout;
 		private TimeUnit timeUnit;
+		private TimeoutStrategy strategy;
 		private Integer offset;
 		private Integer limit;
 
@@ -92,9 +102,10 @@ public class StubSearchWork {
 			return this;
 		}
 
-		public Builder timeout(long timeout, TimeUnit timeUnit) {
+		public Builder timeout(long timeout, TimeUnit timeUnit, TimeoutStrategy strategy) {
 			this.timeout = timeout;
 			this.timeUnit = timeUnit;
+			this.strategy = strategy;
 			return this;
 		}
 
