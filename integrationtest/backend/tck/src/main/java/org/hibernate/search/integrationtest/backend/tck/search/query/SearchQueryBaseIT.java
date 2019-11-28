@@ -8,6 +8,8 @@ package org.hibernate.search.integrationtest.backend.tck.search.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -75,6 +77,21 @@ public class SearchQueryBaseIT {
 				.toQuery();
 
 		assertThat( query.getQueryString() ).contains( "platypus" );
+	}
+
+	@Test
+	public void tookAndTimedOut() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.predicate( f -> f.matchAll() )
+				.toQuery();
+
+		SearchResult<DocumentReference> result = query.fetchAll();
+
+		assertNotNull( result.getTook() );
+		assertNotNull( result.isTimedOut() );
+		assertFalse( result.isTimedOut() );
 	}
 
 	@Test

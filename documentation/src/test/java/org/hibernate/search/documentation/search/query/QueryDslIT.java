@@ -365,24 +365,21 @@ public class QueryDslIT {
 	}
 
 	@Test
-	public void tookAndTimedOut_elasticsearch() {
-		Assume.assumeTrue( backendConfiguration instanceof ElasticsearchBackendConfiguration );
-
+	public void tookAndTimedOut() {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
-			// tag::elasticsearch-took-timedOut[]
+			// tag::took-timedOut[]
 			SearchQuery<Book> query = searchSession.search( Book.class )
 					.predicate( f -> f.match()
 							.field( "title" )
 							.matching( "robot" ) )
 					.toQuery();
 
-			ElasticsearchSearchQuery<Book> elasticsearchQuery = query.extension( ElasticsearchExtension.get() ); // <1>
-			ElasticsearchSearchResult<Book> result = elasticsearchQuery.fetch( 20 ); // <2>
+			SearchResult<Book> result = query.fetch( 20 ); // <1>
 
-			Duration took = result.getTook(); // <3>
-			Boolean timedOut = result.isTimedOut(); // <4>
-			// end::elasticsearch-took-timedOut[]
+			Duration took = result.getTook(); // <2>
+			Boolean timedOut = result.isTimedOut(); // <3>
+			// end::took-timedOut[]
 
 			assertThat( took ).isNotNull();
 			assertThat( timedOut ).isNotNull();

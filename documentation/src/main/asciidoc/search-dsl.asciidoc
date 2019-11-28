@@ -579,20 +579,19 @@ but also by the name of the index it's located in.
 you can instead use the Elasticsearch extension on the `SearchQuery` to convert it after its creation.
 ====
 
-==== Elasticsearch: `took` and `timed_out`
+==== Query metadata in SearchResult: `took` and `timed_out`
 
 .Returning query execution time and whether a timeout occurred
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=elasticsearch-took-timedOut]
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=took-timedOut]
 ----
-<1> Extract the `ElasticsearchSearchQuery` using the `ElasticsearchExtension`.
-<2> Fetch the results.
-<3> Extract _took_: how much time the query took on the Elasticsearch side
-(ignoring network latency between the application and the Elasticsearch cluster).
-<4> Extract _timedOut_: whether the query timed out on the Elasticsearch side
-(ignoring network latency between the application and the Elasticsearch cluster).
+<1> Fetch the results.
+<2> Extract _took_: how much time the query took
+(in case of Elasticsearch, ignoring network latency between the application and the Elasticsearch cluster).
+<3> Extract _timedOut_: whether the query timed out
+(in case of Elasticsearch, ignoring network latency between the application and the Elasticsearch cluster).
 ====
 
 [[search-dsl-query-elasticsearch-json]]

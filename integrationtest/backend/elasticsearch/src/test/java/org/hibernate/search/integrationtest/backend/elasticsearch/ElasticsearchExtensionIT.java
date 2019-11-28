@@ -8,8 +8,6 @@ package org.hibernate.search.integrationtest.backend.elasticsearch;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.util.List;
@@ -182,22 +180,6 @@ public class ElasticsearchExtensionIT {
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class );
-	}
-
-	@Test
-	public void query_tookAndTimedOut() {
-		StubMappingScope scope = indexManager.createScope();
-
-		SearchQuery<DocumentReference> genericQuery = scope.query()
-				.predicate( f -> f.matchAll() )
-				.toQuery();
-
-		ElasticsearchSearchQuery<DocumentReference> esQuery = genericQuery.extension( ElasticsearchExtension.get() );
-		ElasticsearchSearchResult<DocumentReference> result = esQuery.fetchAll();
-
-		assertNotNull( result.getTook() );
-		assertNotNull( result.isTimedOut() );
-		assertFalse( result.isTimedOut() );
 	}
 
 	@Test
