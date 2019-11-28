@@ -11,20 +11,27 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.backend.lucene.search.timeout.TimeoutManager;
+import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneCounterAdapter;
+import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
+
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.MultiCollector;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.TimeLimitingCollector;
 import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopFieldCollector;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.TotalHitCountCollector;
+import org.apache.lucene.util.Counter;
 
 public class LuceneCollectorsBuilder {
 
 	private final Sort sort;
-
 	private final int maxDocs;
+	private final TimeoutManager timeoutManager;
+	private final TimingSource timingSource;
 
 	private final TotalHitCountCollector totalHitCountCollector;
 
@@ -34,10 +41,11 @@ public class LuceneCollectorsBuilder {
 	private final Map<LuceneCollectorKey<?>, Collector> luceneCollectors = new LinkedHashMap<>();
 	private final List<Collector> luceneCollectorsForNestedDocuments = new ArrayList<>();
 
-	public LuceneCollectorsBuilder(Sort sort, int maxDocs) {
+	public LuceneCollectorsBuilder(Sort sort, int maxDocs, TimeoutManager timeoutManager, TimingSource timingSource) {
 		this.sort = sort;
-
 		this.maxDocs = maxDocs;
+		this.timeoutManager = timeoutManager;
+		this.timingSource = timingSource;
 
 		this.totalHitCountCollector = new TotalHitCountCollector();
 		this.luceneCollectors.put( LuceneCollectorKey.TOTAL_HIT_COUNT, this.totalHitCountCollector );
@@ -110,6 +118,14 @@ public class LuceneCollectorsBuilder {
 		}
 
 		Collector compositeCollector = MultiCollector.wrap( luceneCollectors.values() );
+		if ( TimeoutManager.Type.LIMIT.equals( timeoutManager.getType() ) ) {
+			// Add time-limiting collector
+			final Long timeoutLeft = timeoutManager.getTimeoutLeftInMilliseconds();
+			if ( timeoutLeft != null ) {
+				Counter counter = new LuceneCounterAdapter( timingSource );
+				compositeCollector = new TimeLimitingCollector( compositeCollector, counter, timeoutLeft );
+			}
+		}
 
 		return new LuceneCollectors(
 				topDocsCollector, totalHitCountCollector,

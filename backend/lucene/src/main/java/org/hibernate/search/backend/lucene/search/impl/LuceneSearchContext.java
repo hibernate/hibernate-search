@@ -12,6 +12,8 @@ import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDef
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
+import org.hibernate.search.backend.lucene.search.timeout.impl.DefaultTimingSource;
+import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
@@ -32,6 +34,9 @@ public final class LuceneSearchContext {
 
 	// Targeted indexes
 	private final LuceneScopeModel scopeModel;
+
+	// Global timing source
+	private final TimingSource timingSource = new DefaultTimingSource();
 
 	public LuceneSearchContext(BackendMappingContext mappingContext,
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
@@ -66,5 +71,9 @@ public final class LuceneSearchContext {
 
 	public Query decorateLuceneQuery(Query originalLuceneQuery, String tenantId) {
 		return multiTenancyStrategy.decorateLuceneQuery( originalLuceneQuery, tenantId );
+	}
+
+	public TimingSource getTimingSource() {
+		return timingSource;
 	}
 }

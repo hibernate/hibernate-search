@@ -28,6 +28,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneNestedQueries;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.lucene.search.timeout.TimeoutManager;
+import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
@@ -59,17 +60,19 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	private final LuceneSearchProjection<?, H> rootProjection;
 	private final Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations;
 	private final TimeoutManager timeoutManager;
+	private final TimingSource timingSource;
 
 	LuceneSearcherImpl(LuceneSearchQueryRequestContext requestContext,
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
 			LuceneSearchProjection<?, H> rootProjection,
 			Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations,
-			TimeoutManager timeoutManager) {
+			TimeoutManager timeoutManager, TimingSource timingSource) {
 		this.requestContext = requestContext;
 		this.storedFieldVisitor = storedFieldVisitor;
 		this.rootProjection = rootProjection;
 		this.aggregations = aggregations;
 		this.timeoutManager = timeoutManager;
+		this.timingSource = timingSource;
 	}
 
 	@Override
@@ -133,8 +136,8 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		//  Note that Lucene initializes data structures of this size so setting it to a large value consumes memory.
 		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );
 
-		// TODO HSEARCH-3352 implement timeout handling by wrapping the collector with the timeout limiting one
-		LuceneCollectorsBuilder luceneCollectorsBuilder = new LuceneCollectorsBuilder( requestContext.getLuceneSort(), maxDocs );
+		LuceneCollectorsBuilder luceneCollectorsBuilder =
+				new LuceneCollectorsBuilder( requestContext.getLuceneSort(), maxDocs, timeoutManager, timingSource );
 		rootProjection.contributeCollectors( luceneCollectorsBuilder );
 		for ( LuceneSearchAggregation<?> aggregation : aggregations.values() ) {
 			aggregation.contributeCollectors( luceneCollectorsBuilder );
