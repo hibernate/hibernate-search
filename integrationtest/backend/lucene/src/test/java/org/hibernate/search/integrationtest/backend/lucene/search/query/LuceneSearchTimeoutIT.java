@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.search.query;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.util.concurrent.TimeUnit;
@@ -99,6 +100,9 @@ public class LuceneSearchTimeoutIT {
 
 		SearchResult<DocumentReference> result = query.fetchAll();
 		SearchResultAssert.assertThat( result ).hasNoHits();
+
+		assertThat( result.getTook() ).isNotNull();
+		assertThat( result.isTimedOut() ).isFalse();
 	}
 
 	private void initData() {

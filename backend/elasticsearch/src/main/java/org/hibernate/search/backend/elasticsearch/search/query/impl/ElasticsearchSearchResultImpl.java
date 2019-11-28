@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -21,29 +20,14 @@ class ElasticsearchSearchResultImpl<H> extends SimpleSearchResult<H>
 
 	private final JsonObject responseBody;
 
-	private final Duration took;
-	private final boolean timedOut;
-
 	ElasticsearchSearchResultImpl(JsonObject responseBody,
 			long hitCount, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults, Integer took, Boolean timedOut) {
-		super( hitCount, hits, aggregationResults );
+		super( hitCount, hits, aggregationResults, took, timedOut );
 		this.responseBody = responseBody;
-		this.took = Duration.ofMillis( took );
-		this.timedOut = ( timedOut != null ) ? timedOut : false;
 	}
 
 	@Override
 	public JsonObject getResponseBody() {
 		return responseBody;
-	}
-
-	@Override
-	public Duration getTook() {
-		return took;
-	}
-
-	@Override
-	public boolean isTimedOut() {
-		return timedOut;
 	}
 }

@@ -75,7 +75,8 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 						actualCall.rootProjection,
 						behavior.getRawHits()
 				),
-				Collections.emptyMap()
+				Collections.emptyMap(),
+				0, false
 		);
 	}
 
