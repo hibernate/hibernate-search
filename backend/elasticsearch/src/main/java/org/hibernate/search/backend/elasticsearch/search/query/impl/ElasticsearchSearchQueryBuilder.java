@@ -40,10 +40,11 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 public class ElasticsearchSearchQueryBuilder<H>
 		implements SearchQueryBuilder<H, ElasticsearchSearchQueryElementCollector>,
-				ElasticsearchSearchQueryElementCollector {
+		ElasticsearchSearchQueryElementCollector {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -64,6 +65,8 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private JsonArray jsonSort;
 	private Map<DistanceSortKey, Integer> distanceSorts;
 	private Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations;
+	private Long timeout;
+	private TimeUnit timeUnit;
 	private ElasticsearchSearchRequestTransformer requestTransformer;
 
 	public ElasticsearchSearchQueryBuilder(
@@ -101,7 +104,8 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 	@Override
 	public void timeout(long timeout, TimeUnit timeUnit) {
-		// TODO HSEARCH-3352 implement for the backend
+		this.timeout = timeout;
+		this.timeUnit = timeUnit;
 	}
 
 	@Override
@@ -183,6 +187,10 @@ public class ElasticsearchSearchQueryBuilder<H>
 			payload.add( "aggregations", jsonAggregations );
 		}
 
+		if ( timeout != null && timeUnit != null ) {
+			payload.add( "timeout", getTimeoutString() );
+		}
+
 		ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor =
 				searchResultExtractorFactory.createResultExtractor(
 						requestContext,
@@ -196,5 +204,33 @@ public class ElasticsearchSearchQueryBuilder<H>
 				payload, requestTransformer,
 				searchResultExtractor
 		);
+	}
+
+	private JsonPrimitive getTimeoutString() {
+		StringBuilder builder = new StringBuilder( timeout + "" );
+		switch ( timeUnit ) {
+			case DAYS:
+				builder.append( "d" );
+				break;
+			case HOURS:
+				builder.append( "h" );
+				break;
+			case MINUTES:
+				builder.append( "m" );
+				break;
+			case SECONDS:
+				builder.append( "s" );
+				break;
+			case MILLISECONDS:
+				builder.append( "ms" );
+				break;
+			case MICROSECONDS:
+				builder.append( "micros" );
+				break;
+			case NANOSECONDS:
+				builder.append( "nanos" );
+				break;
+		}
+		return new JsonPrimitive( builder.toString() );
 	}
 }
