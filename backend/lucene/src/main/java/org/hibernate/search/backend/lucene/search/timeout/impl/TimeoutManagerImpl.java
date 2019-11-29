@@ -13,7 +13,7 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.timeout.TimeoutManager;
+import org.hibernate.search.backend.lucene.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Query;
@@ -134,6 +134,7 @@ public class TimeoutManagerImpl implements TimeoutManager {
 		}
 	}
 
+	@Override
 	public void forceTimedOut() {
 		this.timedOut = Boolean.TRUE;
 		if ( type == Type.LIMIT ) {

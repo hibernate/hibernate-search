@@ -27,7 +27,7 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.ReusableDocume
 import org.hibernate.search.backend.lucene.search.impl.LuceneNestedQueries;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
-import org.hibernate.search.backend.lucene.search.timeout.TimeoutManager;
+import org.hibernate.search.backend.lucene.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
@@ -45,6 +45,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MultiCollector;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TimeLimitingCollector;
 import org.apache.lucene.search.TopDocs;
 
 class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult<H>> {
@@ -92,7 +93,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, offset, limit );
 
-		luceneCollectors.collect( indexSearcher, requestContext.getLuceneQuery(), offset, limit );
+		executeQuery( indexSearcher, offset, limit, luceneCollectors );
 
 		LuceneSearchQueryExtractContext extractContext = requestContext.createExtractContext(
 				indexSearcher, luceneCollectors
@@ -147,6 +148,21 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		return luceneCollectorsBuilder.build();
 	}
 
+	private void executeQuery(IndexSearcher indexSearcher, int offset, Integer limit, LuceneCollectors luceneCollectors) throws IOException {
+		boolean timeOutBeforeQuery = timeoutManager.isTimedOut();
+		if ( timeOutBeforeQuery ) {
+			// in case of timeout before the query execution, skipping the query
+			return;
+		}
+
+		try {
+			luceneCollectors.collect( indexSearcher, requestContext.getLuceneQuery(), offset, limit );
+		}
+		catch (TimeLimitingCollector.TimeExceededException e) {
+			timeoutManager.forceTimedOut();
+		}
+	}
+
 	private int getMaxDocs(IndexReader reader, int offset, Integer limit) {
 		if ( limit == null ) {
 			return reader.maxDoc();
@@ -187,8 +203,8 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 			LuceneResult luceneResult = new LuceneResult( document, hit.doc, hit.score );
 
 			extractedData.add( rootProjection.extract( projectionHitMapper, luceneResult, projectionExtractContext ) );
-			//Check for timeout each 16 elements:
-			if ( (i & 0x000F) == 0 ) {
+			// Check for timeout each 16 elements:
+			if ( i % 16 == 0 ) {
 				timeoutManager.isTimedOut();
 			}
 		}
