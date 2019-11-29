@@ -16,6 +16,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.search.common.TimeoutStrategy;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -72,20 +73,35 @@ public class LuceneSearchTimeoutIT {
 	}
 
 	@Test
-	public void timeout_largeQuery_smallTimeout() {
+	public void timeout_largeQuery_smallTimeout_raiseAnException() {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.asEntityReference()
 				.predicate( f -> f.match().field( FIELD_NAME ).matching( BUZZ_WORDS ) )
 				.sort( f -> f.score() )
-				.timeout( 1, TimeUnit.NANOSECONDS )
+				.timeout( 1, TimeUnit.NANOSECONDS, TimeoutStrategy.RAISE_AN_EXCEPTION )
 				.toQuery();
 
 		SubTest.expectException( () -> query.fetchAll() )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Query took longer than expected" );
+	}
+
+	@Test
+	public void timeout_largeQuery_smallTimeout_limitFetching() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.asEntityReference()
+				.predicate( f -> f.match().field( FIELD_NAME ).matching( BUZZ_WORDS ) )
+				.sort( f -> f.score() )
+				.timeout( 1, TimeUnit.NANOSECONDS, TimeoutStrategy.LIMIT_FETCHING )
+				.toQuery();
+
+		SearchResult<DocumentReference> result = query.fetchAll();
+		assertThat( result.getTook() ).isNotNull();
 	}
 
 	@Test
