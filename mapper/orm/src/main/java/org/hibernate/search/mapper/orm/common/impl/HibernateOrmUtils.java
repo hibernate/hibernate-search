@@ -12,8 +12,6 @@ import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
-import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -43,9 +41,7 @@ public final class HibernateOrmUtils {
 		}
 	}
 
-	public static boolean isSuperTypeOf(MetamodelImplementor metamodel,
-			EntityTypeDescriptor<?> type1, EntityTypeDescriptor<?> type2) {
-		EntityPersister persister1 = metamodel.entityPersister( type1.getTypeName() );
-		return persister1.isSubclassEntityName( type2.getTypeName() );
+	public static boolean isSuperTypeOf(EntityPersister type1, EntityPersister type2) {
+		return type1.isSubclassEntityName( type2.getEntityName() );
 	}
 }

@@ -11,16 +11,14 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import javax.persistence.metamodel.IdentifiableType;
-import javax.persistence.metamodel.Type;
 
 import org.hibernate.AssertionFailure;
 import org.hibernate.MultiIdentifierLoadAccess;
 import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
+import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
@@ -28,17 +26,17 @@ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupSt
 public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEntityLoader<E> {
 
 	public static EntityLoaderFactory factory(SessionFactoryImplementor sessionFactory,
-			EntityTypeDescriptor<?> entityType) {
+			EntityPersister entityType) {
 		return new Factory( toRootEntityType( sessionFactory, entityType ) );
 	}
 
 	private final Session session;
-	private final EntityTypeDescriptor<E> targetEntityType;
+	private final EntityPersister targetEntityType;
 	private final EntityLoadingCacheLookupStrategyImplementor<?> cacheLookupStrategyImplementor;
 	private final MutableEntityLoadingOptions loadingOptions;
 
 	private HibernateOrmByIdEntityLoader(
-			EntityTypeDescriptor<E> targetEntityType,
+			EntityPersister targetEntityType,
 			Session session,
 			EntityLoadingCacheLookupStrategyImplementor<E> cacheLookupStrategyImplementor,
 			MutableEntityLoadingOptions loadingOptions) {
@@ -136,7 +134,7 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 	}
 
 	private MultiIdentifierLoadAccess<?> getMultiAccess() {
-		MultiIdentifierLoadAccess<?> multiAccess = session.byMultipleIds( targetEntityType.getTypeName() );
+		MultiIdentifierLoadAccess<?> multiAccess = session.byMultipleIds( targetEntityType.getEntityName() );
 
 		multiAccess.withBatchSize( loadingOptions.getFetchSize() );
 
@@ -171,8 +169,8 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 		return reference.getType().isInstance( loadedEntity );
 	}
 
-	private static EntityTypeDescriptor<?> toRootEntityType(
-			SessionFactoryImplementor sessionFactory, EntityTypeDescriptor<?> entityType) {
+	private static EntityPersister toRootEntityType(
+			SessionFactoryImplementor sessionFactory, EntityPersister entityType) {
 		/*
 		 * We need to rely on Hibernate ORM's SPIs: this is complex stuff.
 		 * For example there may be class hierarchies such as A > B > C
@@ -180,15 +178,15 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 		 * So we need to exclude non-entity types, and for that we need the Hibernate ORM metamodel.
 		 */
 		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
-		String rootEntityName = metamodel.entityPersister( entityType.getTypeName() ).getRootEntityName();
-		return metamodel.entity( rootEntityName );
+		String rootEntityName = metamodel.entityPersister( entityType.getEntityName() ).getRootEntityName();
+		return metamodel.entityPersister( rootEntityName ).getEntityPersister();
 	}
 
 	private static class Factory implements EntityLoaderFactory {
 
-		private final EntityTypeDescriptor<?> rootEntityType;
+		private final EntityPersister rootEntityType;
 
-		private Factory(EntityTypeDescriptor<?> rootEntityType) {
+		private Factory(EntityPersister rootEntityType) {
 			this.rootEntityType = rootEntityType;
 		}
 
@@ -213,46 +211,57 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 				HibernateOrmLoadingIndexedTypeContext<E> targetEntityTypeContext,
 				SessionImplementor session,
 				EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
-			return doCreate( targetEntityTypeContext.getEntityType(), session, cacheLookupStrategy,loadingOptions );
+			/*
+			 * This cast is safe: the loader will only return instances of E.
+			 * See hasExpectedType() and its callers for more information,
+			 * in particular runtime checks handling edge cases.
+			 */
+			@SuppressWarnings("unchecked")
+			HibernateOrmComposableEntityLoader<E> result = (HibernateOrmComposableEntityLoader<E>) doCreate(
+					targetEntityTypeContext.getEntityPersister(), session, cacheLookupStrategy, loadingOptions
+			);
+			return result;
 		}
 
 		@Override
-		public <E2> HibernateOrmComposableEntityLoader<? extends E2> create(
-				List<HibernateOrmLoadingIndexedTypeContext<? extends E2>> targetEntityTypeContexts,
+		public <E> HibernateOrmComposableEntityLoader<? extends E> create(
+				List<HibernateOrmLoadingIndexedTypeContext<? extends E>> targetEntityTypeContexts,
 				SessionImplementor session, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 				MutableEntityLoadingOptions loadingOptions) {
-			EntityTypeDescriptor<?> commonSuperType = toMostSpecificCommonEntitySuperType( session, targetEntityTypeContexts );
+			EntityPersister commonSuperType = toMostSpecificCommonEntitySuperType( session, targetEntityTypeContexts );
 
 			/*
 			 * Theoretically, this cast is unsafe,
-			 * since the loader could return entities of any type extending "commonSuperClass",
-			 * which is either E2 or a common supertype of some child types of E2.
+			 * since the loader could return entities of any type T extending "commonSuperClass",
+			 * which is either E (good: T = E)
+			 * or a common supertype of some child types of E
+			 * (not good: T might be an interface that E doesn't implement but its children do).
 			 *
 			 * However, we perform some runtime checks that make this cast safe.
 			 *
 			 * See hasExpectedType() and its callers for more information.
 			 */
 			@SuppressWarnings("unchecked")
-			HibernateOrmComposableEntityLoader<E2> result = (HibernateOrmComposableEntityLoader<E2>) doCreate(
+			HibernateOrmComposableEntityLoader<E> result = (HibernateOrmComposableEntityLoader<E>) doCreate(
 					commonSuperType, session, cacheLookupStrategy, loadingOptions
 			);
 
 			return result;
 		}
 
-		private <E> HibernateOrmComposableEntityLoader<E> doCreate(EntityTypeDescriptor<E> targetEntityType,
+		private HibernateOrmComposableEntityLoader<?> doCreate(EntityPersister targetEntityType,
 				SessionImplementor session,
 				EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
-			if ( !rootEntityType.getJavaType().isAssignableFrom( targetEntityType.getJavaType() ) ) {
+			if ( !rootEntityType.getMappedClass().isAssignableFrom( targetEntityType.getMappedClass() ) ) {
 				throw new AssertionFailure(
 						"Some types among the targeted entity types are not subclasses of the expected root entity type."
 								+ " There is a bug in Hibernate Search, please report it."
-								+ " Expected root entity name: " + rootEntityType.getName()
-								+ " Targeted entity name: " + targetEntityType.getName()
+								+ " Expected root entity name: " + rootEntityType.getEntityName()
+								+ " Targeted entity name: " + targetEntityType.getEntityName()
 				);
 			}
 
-			EntityLoadingCacheLookupStrategyImplementor<E> cacheLookupStrategyImplementor;
+			EntityLoadingCacheLookupStrategyImplementor<?> cacheLookupStrategyImplementor;
 
 			/*
 			 * Ideally, in order to comply with the cache lookup strategy,
@@ -286,12 +295,12 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 			);
 		}
 
-		private static EntityTypeDescriptor<?> toMostSpecificCommonEntitySuperType(SessionImplementor session,
+		private static EntityPersister toMostSpecificCommonEntitySuperType(SessionImplementor session,
 				Iterable<? extends HibernateOrmLoadingIndexedTypeContext<?>> targetEntityTypeContexts) {
 			MetamodelImplementor metamodel = session.getSessionFactory().getMetamodel();
-			EntityTypeDescriptor<?> result = null;
+			EntityPersister result = null;
 			for ( HibernateOrmLoadingIndexedTypeContext<?> targetTypeContext : targetEntityTypeContexts ) {
-				EntityTypeDescriptor<?> type = targetTypeContext.getEntityType();
+				EntityPersister type = targetTypeContext.getEntityPersister();
 				if ( result == null ) {
 					result = type;
 				}
@@ -302,8 +311,8 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 			return result;
 		}
 
-		private static EntityTypeDescriptor<?> toMostSpecificCommonEntitySuperType(MetamodelImplementor metamodel,
-				EntityTypeDescriptor<?> type1, EntityTypeDescriptor<?> type2) {
+		private static EntityPersister toMostSpecificCommonEntitySuperType(MetamodelImplementor metamodel,
+				EntityPersister type1, EntityPersister type2) {
 			/*
 			 * We need to rely on Hibernate ORM's SPIs: this is complex stuff.
 			 * For example there may be class hierarchies such as A > B > C
@@ -311,21 +320,20 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 			 * So even if we know the two types have a common superclass,
 			 * we need to skip non-entity superclasses, and for that we need the Hibernate ORM metamodel.
 			 */
-			IdentifiableType<?> superTypeCandidate = type1;
-			while (
-					// Be sure to ignore mapped superclasses hiding in the middle of the entity hierarchy
-					!Type.PersistenceType.ENTITY.equals( superTypeCandidate.getPersistenceType() )
-					|| !HibernateOrmUtils.isSuperTypeOf( metamodel, (EntityTypeDescriptor<?>) superTypeCandidate, type2 )
-			) {
-				superTypeCandidate = superTypeCandidate.getSupertype();
+			EntityPersister superTypeCandidate = type1;
+			while ( superTypeCandidate != null && !HibernateOrmUtils.isSuperTypeOf( superTypeCandidate, type2 ) ) {
+				String superSuperTypeEntityName = superTypeCandidate.getEntityMetamodel().getSuperclass();
+				superTypeCandidate = superSuperTypeEntityName == null ? null
+						: metamodel.entityPersister( superSuperTypeEntityName ).getEntityPersister();
 			}
-			if ( !( superTypeCandidate instanceof EntityTypeDescriptor ) ) {
+			if ( superTypeCandidate == null ) {
 				throw new AssertionFailure(
-						"Cannot find a common entity supertype for " + type1 + " and " + type2 + "."
+						"Cannot find a common entity supertype for " + type1.getEntityName()
+								+ " and " + type2.getEntityName() + "."
 								+ " There is a bug in Hibernate Search, please report it."
 				);
 			}
-			return (EntityTypeDescriptor<?>) superTypeCandidate;
+			return superTypeCandidate;
 		}
 	}
 }

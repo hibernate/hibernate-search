@@ -77,7 +77,7 @@ public class EntityLoaderBuilder<E> {
 				HibernateOrmComposableEntityLoader<? extends E> loader =
 						createForMultipleTypes( loaderFactory, types, mutableLoadingOptions );
 				for ( HibernateOrmLoadingIndexedTypeContext<? extends E> type : types ) {
-					delegateByEntityName.put( type.getEntityType().getName(), loader );
+					delegateByEntityName.put( type.getJpaEntityName(), loader );
 				}
 			}
 			return new HibernateOrmByTypeEntityLoader<>( delegateByEntityName );

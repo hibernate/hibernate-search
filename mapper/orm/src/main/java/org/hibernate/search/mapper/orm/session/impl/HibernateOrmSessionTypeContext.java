@@ -14,6 +14,6 @@ import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRuntimeIntrospecto
 public interface HibernateOrmSessionTypeContext<E>
 		extends HibernateOrmRuntimeIntrospectorTypeContext {
 
-	String getEntityName();
+	String getJpaEntityName();
 
 }

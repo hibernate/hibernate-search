@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
 import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
+import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public interface HibernateOrmMassIndexingIndexedTypeContext<E> {
@@ -14,8 +15,22 @@ public interface HibernateOrmMassIndexingIndexedTypeContext<E> {
 	PojoRawTypeIdentifier<E> getTypeIdentifier();
 
 	/**
-	 * @return The entity type from the Hibernate ORM metamodel.
+	 * @return The name of the entity in the JPA metamodel.
 	 */
-	EntityTypeDescriptor<E> getEntityType();
+	String getJpaEntityName();
+
+	/**
+	 * @return The Hibernate ORM entity persister.
+	 */
+	EntityPersister getEntityPersister();
+
+	/**
+	 * @return A representation of the entity type in the Hibernate ORM metamodel.
+	 * @throws org.hibernate.search.util.common.SearchException If there isn't any representation of the entity type
+	 * in the Hibernate ORM metamodel.
+	 * Typically, dynamic-map entities do not have a representation in the Hibernate ORM metamodel
+	 * (which prevents any operation relying on JPA Criteria, in particular).
+	 */
+	EntityTypeDescriptor<E> getEntityTypeDescriptor();
 
 }

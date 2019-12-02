@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 import javax.persistence.metamodel.SingularAttribute;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
 import org.hibernate.search.mapper.orm.search.loading.impl.EntityLoaderFactory;
 import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmByIdEntityLoader;
@@ -28,24 +29,25 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 	private final IdentifierMapping identifierMapping;
 
 	private HibernateOrmIndexedTypeContext(Builder<E> builder, SessionFactoryImplementor sessionFactory) {
-		super( sessionFactory, builder.typeIdentifier, builder.hibernateOrmEntityName );
+		super( sessionFactory, builder.typeIdentifier, builder.jpaEntityName, builder.hibernateOrmEntityName );
 
 		this.indexName = builder.indexName;
 
-		SingularAttribute<? super E, ?> documentIdSourceAttribute =
-				getEntityType().getSingularAttribute( builder.documentIdSourcePropertyName );
-		if ( documentIdSourceAttribute.isId() ) {
+		if ( getEntityPersister().getIdentifierPropertyName().equals( builder.documentIdSourcePropertyName ) ) {
 			documentIdIsEntityId = true;
 			loaderFactory = HibernateOrmByIdEntityLoader.factory(
-					sessionFactory, getEntityType()
+					sessionFactory, getEntityPersister()
 			);
 		}
 		else {
 			// The entity ID is not the property used to generate the document ID
 			// We need to use a criteria query to load entities from the document IDs
 			documentIdIsEntityId = false;
+			EntityTypeDescriptor<E> typeDescriptor = getEntityTypeDescriptor();
+			SingularAttribute<? super E, ?> documentIdSourceAttribute =
+					typeDescriptor.getSingularAttribute( builder.documentIdSourcePropertyName );
 			loaderFactory = HibernateOrmCriteriaEntityLoader.factory(
-					getEntityType(), documentIdSourceAttribute, builder.documentIdSourcePropertyHandle
+					typeDescriptor, documentIdSourceAttribute, builder.documentIdSourcePropertyHandle
 			);
 		}
 

@@ -16,7 +16,7 @@ class HibernateOrmContainedTypeContext<E> extends AbstractHibernateOrmTypeContex
 
 	private HibernateOrmContainedTypeContext(HibernateOrmContainedTypeContext.Builder<E> builder,
 			SessionFactoryImplementor sessionFactory) {
-		super( sessionFactory, builder.typeIdentifier, builder.hibernateOrmEntityName );
+		super( sessionFactory, builder.typeIdentifier, builder.jpaEntityName, builder.hibernateOrmEntityName );
 	}
 
 	@Override

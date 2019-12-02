@@ -14,9 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
 import org.hibernate.CacheMode;
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
-import org.hibernate.metamodel.spi.MetamodelImplementor;
+import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
@@ -66,7 +64,7 @@ public class MassIndexerImpl implements MassIndexer {
 			PojoScopeWorkspace scopeWorkspace) {
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
-		this.rootEntityTypes = toRootEntityTypes( mappingContext.getSessionFactory(), targetedIndexedTypes );
+		this.rootEntityTypes = toRootEntityTypes( targetedIndexedTypes );
 		this.scopeWorkspace = scopeWorkspace;
 	}
 
@@ -74,23 +72,20 @@ public class MassIndexerImpl implements MassIndexer {
 	 * From the set of targeted types a new set is built, removing all subtypes of indexed entities.
 	 */
 	private static Set<HibernateOrmMassIndexingIndexedTypeContext<?>> toRootEntityTypes(
-			SessionFactoryImplementor sessionFactory,
 			Set<? extends HibernateOrmMassIndexingIndexedTypeContext<?>> targetedIndexedTypeContexts) {
-		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
-
 		Set<HibernateOrmMassIndexingIndexedTypeContext<?>> cleaned = new LinkedHashSet<>();
 		Set<HibernateOrmMassIndexingIndexedTypeContext<?>> toRemove = new HashSet<>();
 		//now remove all repeated types to avoid duplicate loading by polymorphic query loading
 		for ( HibernateOrmMassIndexingIndexedTypeContext<?> typeContext : targetedIndexedTypeContexts ) {
-			EntityTypeDescriptor<?> entityType = typeContext.getEntityType();
+			EntityPersister entityPersister = typeContext.getEntityPersister();
 			boolean typeIsOk = true;
 			for ( HibernateOrmMassIndexingIndexedTypeContext<?> existing : cleaned ) {
-				EntityTypeDescriptor<?> existingEntityType = existing.getEntityType();
-				if ( HibernateOrmUtils.isSuperTypeOf( metamodel, existingEntityType, entityType ) ) {
+				EntityPersister existingEntityPersister = existing.getEntityPersister();
+				if ( HibernateOrmUtils.isSuperTypeOf( existingEntityPersister, entityPersister ) ) {
 					typeIsOk = false;
 					break;
 				}
-				if ( HibernateOrmUtils.isSuperTypeOf( metamodel, entityType, existingEntityType ) ) {
+				if ( HibernateOrmUtils.isSuperTypeOf( entityPersister, existingEntityPersister ) ) {
 					toRemove.add( existing );
 				}
 			}

@@ -134,7 +134,7 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 				HibernateOrmLoadingIndexedTypeContext<E2> targetEntityTypeContext,
 				SessionImplementor session,
 				EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
-			return doCreate( targetEntityTypeContext.getEntityType(), session, cacheLookupStrategy, loadingOptions );
+			return doCreate( targetEntityTypeContext, session, cacheLookupStrategy, loadingOptions );
 		}
 
 		@Override
@@ -149,25 +149,25 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 								+ " Expected entity name: " + entityType.getName()
 								+ " Targeted entity names: "
 								+ targetEntityTypeContexts.stream()
-										.map( context -> context.getEntityType().getName() )
+										.map( HibernateOrmLoadingIndexedTypeContext::getJpaEntityName )
 										.collect( Collectors.toList() )
 				);
 			}
 
-			return doCreate( targetEntityTypeContexts.get( 0 ).getEntityType(), session, cacheLookupStrategy, loadingOptions );
+			return doCreate( targetEntityTypeContexts.get( 0 ), session, cacheLookupStrategy, loadingOptions );
 		}
 
 		private <E2> HibernateOrmComposableEntityLoader<E2> doCreate(
-				EntityTypeDescriptor<E2> targetEntityType,
+				HibernateOrmLoadingIndexedTypeContext<? extends E2> targetEntityTypeContext,
 				SessionImplementor session,
 				EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 				MutableEntityLoadingOptions loadingOptions) {
-			if ( !entityType.equals( targetEntityType ) ) {
+			if ( !entityType.getName().equals( targetEntityTypeContext.getJpaEntityName() ) ) {
 				throw new AssertionFailure(
 						"Attempt to use a criteria-based entity loader with an unexpected target entity type."
 								+ " There is a bug in Hibernate Search, please report it."
 								+ " Expected entity name: " + entityType.getName()
-								+ " Targeted entity name: " + targetEntityType.getName()
+								+ " Targeted entity name: " + targetEntityTypeContext.getJpaEntityName()
 				);
 			}
 

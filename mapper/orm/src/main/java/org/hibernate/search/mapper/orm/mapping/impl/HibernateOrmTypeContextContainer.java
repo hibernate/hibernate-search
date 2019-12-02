@@ -42,14 +42,14 @@ class HibernateOrmTypeContextContainer implements HibernateOrmListenerTypeContex
 			HibernateOrmIndexedTypeContext<?> indexedTypeContext = contextBuilder.build( sessionFactory );
 			PojoRawTypeIdentifier<?> typeIdentifier = indexedTypeContext.getTypeIdentifier();
 			indexedTypeContexts.put( typeIdentifier, indexedTypeContext );
-			indexedTypeContextsByHibernateOrmEntityName.put( indexedTypeContext.getEntityType().getTypeName(), indexedTypeContext );
+			indexedTypeContextsByHibernateOrmEntityName.put( indexedTypeContext.getHibernateOrmEntityName(), indexedTypeContext );
 			indexedTypeContextsByIndexName.put( indexedTypeContext.getIndexName(), indexedTypeContext );
 		}
 		for ( HibernateOrmContainedTypeContext.Builder<?> contextBuilder : builder.containedTypeContextBuilders ) {
 			HibernateOrmContainedTypeContext<?> containedTypeContext = contextBuilder.build( sessionFactory );
 			PojoRawTypeIdentifier<?> typeIdentifier = containedTypeContext.getTypeIdentifier();
 			containedTypeContexts.put( typeIdentifier, containedTypeContext );
-			containedTypeContextsByHibernateOrmEntityName.put( containedTypeContext.getEntityType().getTypeName(), containedTypeContext );
+			containedTypeContextsByHibernateOrmEntityName.put( containedTypeContext.getHibernateOrmEntityName(), containedTypeContext );
 		}
 
 		this.entityTypeIdentifiersByJavaClass =

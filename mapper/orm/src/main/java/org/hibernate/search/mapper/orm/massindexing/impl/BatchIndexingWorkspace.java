@@ -101,7 +101,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 		Futures.unwrappedExceptionGet(
 				CompletableFuture.allOf( indexingFutures.toArray( new CompletableFuture[0] ) )
 		);
-		log.debugf( "Indexing for %s is done", type.getEntityType().getName() );
+		log.debugf( "Indexing for %s is done", type.getJpaEntityName() );
 	}
 
 	@Override
@@ -142,7 +142,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 		//execIdentifiersLoader has size 1 and is not configurable: ensures the list is consistent as produced by one transaction
 		final ThreadPoolExecutor identifierProducingExecutor = mappingContext.getThreadPoolProvider().newFixedThreadPool(
 				1,
-				MassIndexerImpl.THREAD_NAME_PREFIX + type.getEntityType().getName() + " - ID loading"
+				MassIndexerImpl.THREAD_NAME_PREFIX + type.getJpaEntityName() + " - ID loading"
 		);
 		try {
 			identifierProducingFutures.add( Futures.runAsync( primaryKeyOutputter, identifierProducingExecutor ) );
@@ -163,7 +163,7 @@ public class BatchIndexingWorkspace<E, I> extends FailureHandledRunnable {
 		);
 		final ThreadPoolExecutor indexingExecutor = mappingContext.getThreadPoolProvider().newFixedThreadPool(
 				documentBuilderThreads,
-				MassIndexerImpl.THREAD_NAME_PREFIX + type.getEntityType().getName() + " - Entity loading"
+				MassIndexerImpl.THREAD_NAME_PREFIX + type.getJpaEntityName() + " - Entity loading"
 		);
 		try {
 			for ( int i = 0; i < documentBuilderThreads; i++ ) {

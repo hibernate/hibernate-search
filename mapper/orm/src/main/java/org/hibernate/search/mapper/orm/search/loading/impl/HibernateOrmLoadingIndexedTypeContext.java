@@ -6,14 +6,19 @@
  */
 package org.hibernate.search.mapper.orm.search.loading.impl;
 
-import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
+import org.hibernate.persister.entity.EntityPersister;
 
 public interface HibernateOrmLoadingIndexedTypeContext<E> {
 
 	/**
-	 * @return The entity type from the Hibernate ORM metamodel.
+	 * @return The name of the entity in the JPA metamodel.
 	 */
-	EntityTypeDescriptor<E> getEntityType();
+	String getJpaEntityName();
+
+	/**
+	 * @return The entity persister, giving access to a representation of the entity type in the Hibernate ORM metamodel.
+	 */
+	EntityPersister getEntityPersister();
 
 	EntityLoaderFactory getLoaderFactory();
 

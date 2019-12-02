@@ -99,7 +99,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		catch (Exception exception) {
 			notifier.notifyRunnableFailure(
 					exception,
-					log.massIndexingLoadingAndExtractingEntityData( type.getEntityType().getName() )
+					log.massIndexingLoadingAndExtractingEntityData( type.getJpaEntityName() )
 			);
 		}
 		log.trace( "finished" );
@@ -141,8 +141,8 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 			beginTransaction( session );
 
 			CriteriaBuilder criteriaBuilder = session.getCriteriaBuilder();
-			CriteriaQuery<E> criteriaQuery = criteriaBuilder.createQuery( type.getEntityType().getJavaType() );
-			Root<E> root = criteriaQuery.from( type.getEntityType() );
+			CriteriaQuery<E> criteriaQuery = criteriaBuilder.createQuery( type.getEntityTypeDescriptor().getJavaType() );
+			Root<E> root = criteriaQuery.from( type.getEntityTypeDescriptor() );
 			criteriaQuery.select( root );
 			criteriaQuery.where( root.get( idAttributeOfType ).in( listIds ) );
 

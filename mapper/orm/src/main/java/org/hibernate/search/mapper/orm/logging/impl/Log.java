@@ -245,4 +245,11 @@ public interface Log extends BasicLogger {
 			@FormatWith(ClassFormatter.class) Class<?> expectedSuperType,
 			@FormatWith(ClassFormatter.class) Class<?> actualJavaType);
 
+	@Message(id = ID_OFFSET_2 + 30,
+			value = "Type '%1$s' doesn't have any representation in the JPA metamodel."
+					+ " As a result, Hibernate Search cannot use the Criteria API to automatically build queries targeting this type."
+					+ " This means in particular that this type cannot:"
+					+ " 1) be mass-indexed or 2) set its document ID to a property that is not its entity ID."
+	)
+	SearchException nonJpaEntityType(PojoRawTypeIdentifier<?> typeIdentifier);
 }

@@ -6,25 +6,36 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
+import java.lang.invoke.MethodHandles;
+
 import org.hibernate.engine.spi.SessionFactoryImplementor;
 import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
 import org.hibernate.metamodel.spi.MetamodelImplementor;
+import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerTypeContext;
+import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeTypeContext;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 abstract class AbstractHibernateOrmTypeContext<E>
 		implements HibernateOrmScopeTypeContext<E>, HibernateOrmListenerTypeContext,
 				HibernateOrmSessionTypeContext<E> {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private final PojoRawTypeIdentifier<E> typeIdentifier;
-	private final EntityTypeDescriptor<E> entityType;
+	private final String jpaEntityName;
+	private final EntityPersister entityPersister;
+	private final EntityTypeDescriptor<E> entityTypeDescriptor;
 
 	AbstractHibernateOrmTypeContext(SessionFactoryImplementor sessionFactory,
-			PojoRawTypeIdentifier<E> typeIdentifier, String hibernateOrmEntityName) {
+			PojoRawTypeIdentifier<E> typeIdentifier, String jpaEntityName, String hibernateOrmEntityName) {
 		this.typeIdentifier = typeIdentifier;
+		this.jpaEntityName = jpaEntityName;
 		MetamodelImplementor metamodel = sessionFactory.getMetamodel();
-		this.entityType = metamodel.entity( hibernateOrmEntityName );
+		this.entityPersister = metamodel.entityPersister( hibernateOrmEntityName );
+		this.entityTypeDescriptor = metamodel.entity( entityPersister.getEntityName() );
 	}
 
 	@Override
@@ -33,11 +44,24 @@ abstract class AbstractHibernateOrmTypeContext<E>
 	}
 
 	@Override
-	public String getEntityName() {
-		return entityType.getName();
+	public String getJpaEntityName() {
+		return jpaEntityName;
 	}
 
-	public EntityTypeDescriptor<E> getEntityType() {
-		return entityType;
+	public String getHibernateOrmEntityName() {
+		return entityPersister.getEntityName();
+	}
+
+	public EntityPersister getEntityPersister() {
+		return entityPersister;
+	}
+
+	public EntityTypeDescriptor<E> getEntityTypeDescriptor() {
+		if ( entityTypeDescriptor == null ) {
+			// TODO HSEARCH-1401 support mass indexing for dynamic-map entity types
+			// TODO HSEARCH-1401 support document id on non-entity-id properties for dynamic-map entity types
+			throw log.nonJpaEntityType( typeIdentifier );
+		}
+		return entityTypeDescriptor;
 	}
 }

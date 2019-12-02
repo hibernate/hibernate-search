@@ -12,8 +12,6 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.ObjectNotFoundException;
 import org.hibernate.cache.spi.access.EntityDataAccess;
 import org.hibernate.engine.spi.SessionImplementor;
-import org.hibernate.metamodel.model.domain.spi.EntityTypeDescriptor;
-import org.hibernate.metamodel.spi.MetamodelImplementor;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -31,42 +29,35 @@ class PersistenceContextThenSecondLevelCacheLookupStrategy<E>
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	static <E> EntityLoadingCacheLookupStrategyImplementor<E> create(EntityTypeDescriptor<E> commonEntitySuperType,
+	static EntityLoadingCacheLookupStrategyImplementor create(EntityPersister commonEntitySuperTypePersister,
 			SessionImplementor session) {
-		EntityLoadingCacheLookupStrategyImplementor<E> persistenceContextLookupStrategy =
-				PersistenceContextLookupStrategy.create( commonEntitySuperType, session );
-		MetamodelImplementor metamodelImplementor = session.getSessionFactory().getMetamodel();
-		// All entities with a common entity supertype share the same persister and cache access, so this is safe
-		EntityPersister persister = metamodelImplementor.entityPersister( commonEntitySuperType.getTypeName() );
-		EntityDataAccess cacheAccess = persister.getCacheAccessStrategy();
+		EntityLoadingCacheLookupStrategyImplementor<?> persistenceContextLookupStrategy =
+				PersistenceContextLookupStrategy.create( commonEntitySuperTypePersister, session );
+		EntityDataAccess cacheAccess = commonEntitySuperTypePersister.getCacheAccessStrategy();
 		if ( cacheAccess == null ) {
 			// No second-level cache
-			log.skippingSecondLevelCacheLookupsForNonCachedEntityTypeEntityLoader( commonEntitySuperType.getName() );
+			log.skippingSecondLevelCacheLookupsForNonCachedEntityTypeEntityLoader( commonEntitySuperTypePersister.getEntityName() );
 			return persistenceContextLookupStrategy;
 		}
 		return new PersistenceContextThenSecondLevelCacheLookupStrategy<>(
 				persistenceContextLookupStrategy,
-				commonEntitySuperType,
-				persister,
+				commonEntitySuperTypePersister,
 				cacheAccess,
 				session
 		);
 	}
 
 	private final EntityLoadingCacheLookupStrategyImplementor<E> persistenceContextLookupStrategy;
-	private final EntityTypeDescriptor<E> commonEntitySuperType;
 	private final EntityPersister persister;
 	private final EntityDataAccess cacheAccess;
 	private final SessionImplementor session;
 
 	private PersistenceContextThenSecondLevelCacheLookupStrategy(
 			EntityLoadingCacheLookupStrategyImplementor<E> persistenceContextLookupStrategy,
-			EntityTypeDescriptor<E> commonEntitySuperType,
 			EntityPersister persister,
 			EntityDataAccess cacheAccess,
 			SessionImplementor session) {
 		this.persistenceContextLookupStrategy = persistenceContextLookupStrategy;
-		this.commonEntitySuperType = commonEntitySuperType;
 		this.persister = persister;
 		this.cacheAccess = cacheAccess;
 		this.session = session;
@@ -103,7 +94,7 @@ class PersistenceContextThenSecondLevelCacheLookupStrategy<E>
 
 		try {
 			// This will load the object from the second level cache
-			return (E) session.get( commonEntitySuperType.getTypeName(), serializableEntityId );
+			return (E) session.get( persister.getEntityName(), serializableEntityId );
 		}
 		catch (ObjectNotFoundException ignored) {
 			// Unlikely but needed: an index might be out of sync, and the cache might be as well
