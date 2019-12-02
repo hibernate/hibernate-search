@@ -138,9 +138,6 @@ public class IdentifierProducer<E, I> implements StatelessSessionAwareRunnable {
 		}
 	}
 
-	// Criteria on a stateless session will be un-deprecated soon.
-	// See https://hibernate.atlassian.net/browse/HHH-13154.
-	@SuppressWarnings("deprecation")
 	private void loadAllIdentifiers(final StatelessSession session) throws InterruptedException {
 		long totalCount = createTotalCountQuery( session ).uniqueResult();
 		if ( objectsLimit != 0 && objectsLimit < totalCount ) {
