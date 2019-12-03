@@ -78,8 +78,11 @@ public abstract class AbstractHibernateOrmBootstrapIntrospectorPerReflectionStra
 			);
 		}
 
+		HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider =
+				HibernateOrmBasicTypeMetadataProvider.create( metadata );
+
 		return HibernateOrmBootstrapIntrospector.create(
-				metadata, reflectionManager,
+				basicTypeMetadataProvider, reflectionManager,
 				ConfigurationPropertySource.fromMap( properties )
 		);
 	}

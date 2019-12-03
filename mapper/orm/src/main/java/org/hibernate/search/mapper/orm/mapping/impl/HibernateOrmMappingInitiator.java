@@ -26,6 +26,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurat
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmMappingConfigurationContext;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
+import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBasicTypeMetadataProvider;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
@@ -50,8 +51,10 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 	public static HibernateOrmMappingInitiator create(Metadata metadata, ReflectionManager reflectionManager,
 			ConfigurationService ormConfigurationService,
 			ConfigurationPropertySource propertySource) {
+		HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider =
+				HibernateOrmBasicTypeMetadataProvider.create( metadata );
 		HibernateOrmBootstrapIntrospector introspector =
-				HibernateOrmBootstrapIntrospector.create( metadata, reflectionManager, propertySource );
+				HibernateOrmBootstrapIntrospector.create( basicTypeMetadataProvider, reflectionManager, propertySource );
 
 		return new HibernateOrmMappingInitiator(
 				metadata, ormConfigurationService, introspector

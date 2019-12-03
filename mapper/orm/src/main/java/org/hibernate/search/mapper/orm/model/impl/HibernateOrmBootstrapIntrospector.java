@@ -12,39 +12,30 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hibernate.AssertionFailure;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.annotations.common.reflection.XClass;
-import org.hibernate.boot.Metadata;
 import org.hibernate.bytecode.enhance.spi.EnhancerConstants;
 import org.hibernate.engine.spi.PersistentAttributeInterceptable;
-import org.hibernate.mapping.Component;
-import org.hibernate.mapping.IndexedCollection;
-import org.hibernate.mapping.PersistentClass;
-import org.hibernate.mapping.Property;
-import org.hibernate.mapping.Value;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmReflectionStrategyName;
 import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
+import org.hibernate.search.util.common.impl.ReflectionHelper;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
-import org.hibernate.search.util.common.impl.ReflectionHelper;
 
 public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstrapIntrospector implements PojoBootstrapIntrospector {
 
@@ -54,20 +45,10 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 					.withDefault( HibernateOrmMapperSpiSettings.Defaults.REFLECTION_STRATEGY )
 					.build();
 
-	public static HibernateOrmBootstrapIntrospector create(Metadata metadata,
+	public static HibernateOrmBootstrapIntrospector create(
+			HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
 			ReflectionManager ormReflectionManager,
 			ConfigurationPropertySource propertySource) {
-		Collection<PersistentClass> persistentClasses = metadata.getEntityBindings()
-				.stream()
-				.filter( PersistentClass::hasPojoRepresentation )
-				.collect( Collectors.toList() );
-		Map<Class<?>, HibernateOrmBasicTypeMetadata> typeMetadata = new HashMap<>();
-		collectPersistentTypes( typeMetadata, persistentClasses );
-		for ( PersistentClass persistentClass : persistentClasses ) {
-			collectEmbeddedTypesRecursively( typeMetadata, persistentClass.getIdentifier() );
-			collectEmbeddedTypesRecursively( typeMetadata, persistentClass.getPropertyIterator() );
-		}
-
 		MethodHandles.Lookup lookup = MethodHandles.publicLookup();
 
 		HibernateOrmReflectionStrategyName reflectionStrategyName = REFLECTION_STRATEGY.get( propertySource );
@@ -84,51 +65,11 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		}
 
 		return new HibernateOrmBootstrapIntrospector(
-				typeMetadata, ormReflectionManager, valueReadHandleFactory
+				basicTypeMetadataProvider, ormReflectionManager, valueReadHandleFactory
 		);
 	}
 
-	private static void collectPersistentTypes(Map<Class<?>, HibernateOrmBasicTypeMetadata> collected, Collection<PersistentClass> persistentClasses) {
-		for ( PersistentClass persistentClass : persistentClasses ) {
-			collected.put( persistentClass.getMappedClass(), HibernateOrmBasicTypeMetadata.create( persistentClass ) );
-		}
-	}
-
-	private static void collectEmbeddedTypesRecursively(Map<Class<?>, HibernateOrmBasicTypeMetadata> collected, Iterator<Property> propertyIterator) {
-		while ( propertyIterator.hasNext() ) {
-			Property property = propertyIterator.next();
-			collectEmbeddedTypesRecursively( collected, property.getValue() );
-		}
-	}
-
-	private static void collectEmbeddedTypesRecursively(Map<Class<?>, HibernateOrmBasicTypeMetadata> collected, Value value) {
-		if ( value instanceof Component ) {
-			Component component = (Component) value;
-			// We don't care about duplicates, we assume they are all the same regarding the information we need
-			collected.computeIfAbsent(
-					component.getComponentClass(),
-					ignored -> HibernateOrmBasicTypeMetadata.create( component )
-			);
-			// Recurse
-			collectEmbeddedTypesRecursively( collected, component.getPropertyIterator() );
-		}
-		else if ( value instanceof org.hibernate.mapping.Collection ) {
-			org.hibernate.mapping.Collection collection = (org.hibernate.mapping.Collection) value;
-			// Recurse
-			collectEmbeddedTypesRecursively( collected, collection.getElement() );
-			if ( collection instanceof IndexedCollection ) {
-				IndexedCollection indexedCollection = (IndexedCollection) collection;
-				/*
-				 * Do not let ORM confuse you: getKey() doesn't return the value of the map key,
-				 * but the value of the foreign key to the targeted entity...
-				 * We need to call getIndex() to retrieve the value of the map key.
-				 */
-				collectEmbeddedTypesRecursively( collected, indexedCollection.getIndex() );
-			}
-		}
-	}
-
-	private final Map<Class<?>, HibernateOrmBasicTypeMetadata> typeMetadata;
+	private final HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider;
 	private final ValueReadHandleFactory valueReadHandleFactory;
 	private final HibernateOrmGenericContextHelper genericContextHelper;
 	private final RawTypeDeclaringContext<?> missingRawTypeDeclaringContext;
@@ -147,11 +88,11 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
 
 	private HibernateOrmBootstrapIntrospector(
-			Map<Class<?>, HibernateOrmBasicTypeMetadata> typeMetadata,
+			HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
 			ReflectionManager reflectionManager,
 			ValueReadHandleFactory valueReadHandleFactory) {
 		super( reflectionManager );
-		this.typeMetadata = typeMetadata;
+		this.basicTypeMetadataProvider = basicTypeMetadataProvider;
 		this.valueReadHandleFactory = valueReadHandleFactory;
 		this.genericContextHelper = new HibernateOrmGenericContextHelper( this );
 		this.missingRawTypeDeclaringContext = new RawTypeDeclaringContext<>(
@@ -224,7 +165,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	private <T> PojoRawTypeModel<T> createTypeModel(Class<T> type) {
 		PojoRawTypeIdentifier<T> typeIdentifier = PojoRawTypeIdentifier.of( type );
 		return new HibernateOrmRawTypeModel<>(
-				this, typeIdentifier, typeMetadata.get( type ),
+				this, typeIdentifier, basicTypeMetadataProvider.getBasicTypeMetadata( type ),
 				new RawTypeDeclaringContext<>( genericContextHelper, type )
 		);
 	}
