@@ -60,6 +60,12 @@ public final class OrmUtils {
 			try {
 				tx.rollback();
 			}
+			catch (AssertionError e) {
+				// An assertion failed while rolling back...
+				// Propagate the assertion failure, but make sure to add some context
+				e.addSuppressed( t );
+				throw e;
+			}
 			catch (RuntimeException e) {
 				t.addSuppressed( e );
 			}
@@ -77,6 +83,12 @@ public final class OrmUtils {
 		catch (Throwable t) {
 			try {
 				tx.rollback();
+			}
+			catch (AssertionError e) {
+				// An assertion failed while rolling back...
+				// Propagate the assertion failure, but make sure to add some context
+				e.addSuppressed( t );
+				throw e;
 			}
 			catch (RuntimeException e) {
 				t.addSuppressed( e );
