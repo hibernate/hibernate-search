@@ -1409,6 +1409,26 @@ TODO HSEARCH-3680 Detailed description of the programmatic mapping API.
 TODO In particular, explain how to use type/property bridges in the programmatic mapping
 ////
 
+[TIP]
+====
+Using the programmatic mapping API,
+it is possible to map a "dynamic-map" entity model,
+i.e. a model based on maps.
+You just need to refer to the types by their name using `context.programmaticMapping().type("thename")`:
+
+* The entity name for dynamic entity types.
+* The "role" for dynamic embedded/component types,
+i.e. the name of the owning entity, followed by a dot ("."),
+followed by the dot-separated path to the component in that entity.
+For example `MyEntity.myEmbedded` or `MyEntity.myEmbedded.myNestedEmbedded`.
+
+However, support for "dynamic-map" entity models is limited. In particular:
+
+* The <<mapper-orm-identifiermapping,document ID>> must be mapped to the entity ID:
+it can't be mapped propery, even if it is unique.
+* <<mapper-orm-indexing-massindexer,Mass indexing>> dynamic-map entities is not supported.
+====
+
 [[mapper-orm-custom-annotations]]
 == Custom mapping annotations
 
