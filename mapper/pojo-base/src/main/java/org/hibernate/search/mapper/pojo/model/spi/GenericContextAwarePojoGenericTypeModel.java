@@ -15,7 +15,7 @@ import org.hibernate.search.util.common.reflect.impl.GenericTypeContext;
 import org.hibernate.search.util.common.reflect.impl.ReflectionUtils;
 
 /**
- * An abstract base for implementations of {@link PojoGenericTypeModel} that take advantage of the context
+ * An implementation of {@link PojoGenericTypeModel} that takes advantage of the context
  * in which a given property appears to derive more precise type information.
  * <p>
  * Instances wrap a {@link PojoRawTypeModel}, and propagate generics information to properties
@@ -44,10 +44,11 @@ import org.hibernate.search.util.common.reflect.impl.ReflectionUtils;
  * This will also be true for more deeply nested references to a type variable,
  * for instance the type of property {@code B.propertyOfA.propertyOfGenericType} will correctly be inferred as D.
  */
-public final class GenericContextAwarePojoGenericTypeModel<T> implements PojoGenericTypeModel<T> {
+public final class GenericContextAwarePojoGenericTypeModel<T>
+		extends AbstractPojoGenericTypeModel<T>
+		implements PojoGenericTypeModel<T> {
 
 	private final Helper helper;
-	private final PojoRawTypeModel<? super T> rawTypeModel;
 	private final GenericTypeContext genericTypeContext;
 
 	private final Map<Object, PojoPropertyModel<?>> genericPropertyCache = new HashMap<>();
@@ -99,16 +100,11 @@ public final class GenericContextAwarePojoGenericTypeModel<T> implements PojoGen
 
 	@SuppressWarnings("unchecked") // Can't do better here, this code is all about reflection
 	private GenericContextAwarePojoGenericTypeModel(Helper helper, GenericTypeContext genericTypeContext) {
-		this.helper = helper;
-		this.rawTypeModel = helper.getRawTypeModel(
+		super( helper.getRawTypeModel(
 				(Class<? super T>) ReflectionUtils.getRawType( genericTypeContext.getResolvedType() )
-		);
+		) );
+		this.helper = helper;
 		this.genericTypeContext = genericTypeContext;
-	}
-
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "[" + getName() + "]";
 	}
 
 	@Override
@@ -117,13 +113,8 @@ public final class GenericContextAwarePojoGenericTypeModel<T> implements PojoGen
 	}
 
 	@Override
-	public PojoRawTypeModel<? super T> getRawType() {
-		return rawTypeModel;
-	}
-
-	@Override
 	public PojoPropertyModel<?> getProperty(String propertyName) {
-		return wrapProperty( rawTypeModel.getProperty( propertyName ) );
+		return wrapProperty( super.getProperty( propertyName ) );
 	}
 
 	@Override

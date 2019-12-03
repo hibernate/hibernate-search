@@ -26,6 +26,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTypeModel<T> {
 
 	private final HibernateOrmBasicClassTypeMetadata ormTypeMetadata;
+	private final RawTypeDeclaringContext<T> rawTypeDeclaringContext;
 
 	private final Map<String, HibernateOrmClassPropertyModel<?>> propertyModelCache = new HashMap<>();
 
@@ -35,8 +36,9 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 	HibernateOrmClassRawTypeModel(HibernateOrmBootstrapIntrospector introspector,
 			PojoRawTypeIdentifier<T> typeIdentifier,
 			HibernateOrmBasicClassTypeMetadata ormTypeMetadata, RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
-		super( introspector, typeIdentifier, rawTypeDeclaringContext );
+		super( introspector, typeIdentifier );
 		this.ormTypeMetadata = ormTypeMetadata;
+		this.rawTypeDeclaringContext = rawTypeDeclaringContext;
 	}
 
 	@Override
@@ -77,6 +79,10 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 	@Override
 	HibernateOrmClassPropertyModel<?> getPropertyOrNull(String propertyName) {
 		return propertyModelCache.computeIfAbsent( propertyName, this::createPropertyModel );
+	}
+
+	RawTypeDeclaringContext<T> getRawTypeDeclaringContext() {
+		return rawTypeDeclaringContext;
 	}
 
 	private Map<String, XProperty> getDeclaredFieldAccessXPropertiesByName() {
@@ -196,5 +202,4 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 				.map( HibernateOrmClassPropertyModel::getMember )
 				.orElse( null );
 	}
-
 }

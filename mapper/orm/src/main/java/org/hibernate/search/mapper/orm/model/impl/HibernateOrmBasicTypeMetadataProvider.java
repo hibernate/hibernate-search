@@ -19,7 +19,6 @@ import java.util.stream.Collectors;
 import org.hibernate.MappingException;
 import org.hibernate.boot.Metadata;
 import org.hibernate.mapping.Component;
-import org.hibernate.mapping.IndexedCollection;
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.hibernate.mapping.Value;
@@ -149,37 +148,64 @@ public class HibernateOrmBasicTypeMetadataProvider {
 	private static void collectDynamicMapProperty(Builder metadataProviderBuilder,
 			Map<String, HibernateOrmBasicDynamicMapPropertyMetadata> collectedProperties,
 			Property property) {
-		Value value = property.getValue();
+		// This also recurses and collects embedded types
+		HibernateOrmGenericTypeModelFactory typeModelFactory =
+				collectValue( metadataProviderBuilder, property.getValue() );
 		collectedProperties.put(
 				property.getName(),
-				new HibernateOrmBasicDynamicMapPropertyMetadata( value )
+				new HibernateOrmBasicDynamicMapPropertyMetadata( typeModelFactory )
 		);
-		// Recurse to collect embedded types
-		// FIXME guess the property type from this "value"
-		collectValue( metadataProviderBuilder, value );
 	}
 
-	private static void collectValue(Builder metadataProviderBuilder, Value value) {
+	private static HibernateOrmGenericTypeModelFactory collectValue(Builder metadataProviderBuilder, Value value) {
 		if ( value instanceof Component ) {
-			collectEmbeddedType( metadataProviderBuilder, (Component) value );
+			return collectEmbedded( metadataProviderBuilder, (Component) value );
+		}
+		else if ( value instanceof org.hibernate.mapping.Array ) {
+			org.hibernate.mapping.Array array = (org.hibernate.mapping.Array) value;
+			return HibernateOrmGenericTypeModelFactory.array(
+					collectValue( metadataProviderBuilder, array.getElement() )
+			);
+		}
+		else if ( value instanceof org.hibernate.mapping.Map ) {
+			org.hibernate.mapping.Map map = (org.hibernate.mapping.Map) value;
+			return HibernateOrmGenericTypeModelFactory.map(
+					map.getCollectionType().getReturnedClass(),
+					/*
+					 * Do not let ORM confuse you: getKey() doesn't return the value of the map key,
+					 * but the value of the foreign key to the targeted entity...
+					 * We need to call getIndex() to retrieve the value of the map key.
+					 */
+					collectValue( metadataProviderBuilder, map.getIndex() ),
+					collectValue( metadataProviderBuilder, map.getElement() )
+			);
 		}
 		else if ( value instanceof org.hibernate.mapping.Collection ) {
 			org.hibernate.mapping.Collection collection = (org.hibernate.mapping.Collection) value;
-			// Recurse
-			collectValue( metadataProviderBuilder, collection.getElement() );
-			if ( collection instanceof IndexedCollection ) {
-				IndexedCollection indexedCollection = (IndexedCollection) collection;
-				/*
-				 * Do not let ORM confuse you: getKey() doesn't return the value of the map key,
-				 * but the value of the foreign key to the targeted entity...
-				 * We need to call getIndex() to retrieve the value of the map key.
-				 */
-				collectValue( metadataProviderBuilder, indexedCollection.getIndex() );
-			}
+			return HibernateOrmGenericTypeModelFactory.collection(
+					collection.getCollectionType().getReturnedClass(),
+					collectValue( metadataProviderBuilder, collection.getElement() )
+			);
+		}
+		else if ( value instanceof org.hibernate.mapping.ToOne ) {
+			org.hibernate.mapping.ToOne toOne = (org.hibernate.mapping.ToOne) value;
+			return HibernateOrmGenericTypeModelFactory.entityReference(
+					toOne.getType().getReturnedClass(), toOne.getReferencedEntityName()
+			);
+		}
+		else if ( value instanceof org.hibernate.mapping.OneToMany ) {
+			org.hibernate.mapping.OneToMany oneToMany = (org.hibernate.mapping.OneToMany) value;
+			return HibernateOrmGenericTypeModelFactory.entityReference(
+					oneToMany.getType().getReturnedClass(), oneToMany.getReferencedEntityName()
+			);
+		}
+		else {
+			// Basic type (mapped to a database column)
+			return HibernateOrmGenericTypeModelFactory.rawType( value.getType().getReturnedClass() );
 		}
 	}
 
-	private static void collectEmbeddedType(Builder metadataProviderBuilder, Component component) {
+	private static HibernateOrmGenericTypeModelFactory<?> collectEmbedded(Builder metadataProviderBuilder, Component component) {
 		if ( component.isDynamic() ) {
 			String name = component.getRoleName();
 			// We don't care about duplicates, we assume they are all the same regarding the information we need
@@ -190,6 +216,7 @@ public class HibernateOrmBasicTypeMetadataProvider {
 						null /* No ID */, component.getPropertyIterator()
 				);
 			}
+			return HibernateOrmGenericTypeModelFactory.dynamicMap( name );
 		}
 		else {
 			Class<?> javaClass = component.getComponentClass();
@@ -200,6 +227,7 @@ public class HibernateOrmBasicTypeMetadataProvider {
 						null /* No ID */, component.getPropertyIterator()
 				);
 			}
+			return HibernateOrmGenericTypeModelFactory.rawType( javaClass );
 		}
 	}
 

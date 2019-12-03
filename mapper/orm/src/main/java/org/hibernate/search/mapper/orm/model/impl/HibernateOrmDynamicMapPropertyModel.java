@@ -53,11 +53,8 @@ class HibernateOrmDynamicMapPropertyModel<T> implements PojoPropertyModel<T> {
 	@SuppressWarnings("unchecked") // We will just trust ORM metadata on this one.
 	public PojoGenericTypeModel<T> getTypeModel() {
 		if ( typeModel == null ) {
-			// TODO HSEARCH-1401 handle generics better, especially for ToMany where we need to "simulate" a map/collection type
-			Class<?> rawType = getRawType();
 			try {
-				typeModel = (PojoGenericTypeModel<T>) holderTypeModel.getRawTypeDeclaringContext()
-						.createGenericTypeModel( rawType );
+				typeModel = ormPropertyMetadata.getTypeModelFactory().create( introspector );
 			}
 			catch (RuntimeException e) {
 				throw log.errorRetrievingPropertyTypeModel( getName(), holderTypeModel, e );
@@ -71,17 +68,15 @@ class HibernateOrmDynamicMapPropertyModel<T> implements PojoPropertyModel<T> {
 	public ValueReadHandle<T> getHandle() {
 		if ( handle == null ) {
 			try {
-				handle = (ValueReadHandle<T>) new HibernateOrmDynamicMapValueReadHandle<>( name, getRawType() );
+				handle = (ValueReadHandle<T>) new HibernateOrmDynamicMapValueReadHandle<>(
+						name, getTypeModel().getRawType().getTypeIdentifier().getJavaClass()
+				);
 			}
 			catch (RuntimeException e) {
 				throw log.errorRetrievingPropertyTypeModel( getName(), holderTypeModel, e );
 			}
 		}
 		return handle;
-	}
-
-	private Class<?> getRawType() {
-		return ormPropertyMetadata.getValue().getType().getReturnedClass();
 	}
 
 }

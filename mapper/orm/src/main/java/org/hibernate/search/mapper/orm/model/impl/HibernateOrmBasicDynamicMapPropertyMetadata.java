@@ -6,17 +6,18 @@
  */
 package org.hibernate.search.mapper.orm.model.impl;
 
-import org.hibernate.mapping.Value;
-
 class HibernateOrmBasicDynamicMapPropertyMetadata {
-	private final Value value;
+	private final HibernateOrmGenericTypeModelFactory typeModelFactory;
 
-	HibernateOrmBasicDynamicMapPropertyMetadata(Value value) {
-		this.value = value;
+	HibernateOrmBasicDynamicMapPropertyMetadata(HibernateOrmGenericTypeModelFactory typeModelFactory) {
+		this.typeModelFactory = typeModelFactory;
 	}
 
-	Value getValue() {
-		return value;
+	/**
+	 * @return A factory of generic type models
+	 */
+	HibernateOrmGenericTypeModelFactory getTypeModelFactory() {
+		return typeModelFactory;
 	}
 
 }

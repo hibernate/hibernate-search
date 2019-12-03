@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 public class HibernateOrmDynamicMapRawTypeModel extends AbstractHibernateOrmRawTypeModel<Map> {
@@ -23,8 +22,8 @@ public class HibernateOrmDynamicMapRawTypeModel extends AbstractHibernateOrmRawT
 
 	HibernateOrmDynamicMapRawTypeModel(HibernateOrmBootstrapIntrospector introspector,
 			PojoRawTypeIdentifier<Map> typeIdentifier,
-			HibernateOrmBasicDynamicMapTypeMetadata ormTypeMetadata, RawTypeDeclaringContext<Map> rawTypeDeclaringContext) {
-		super( introspector, typeIdentifier, rawTypeDeclaringContext );
+			HibernateOrmBasicDynamicMapTypeMetadata ormTypeMetadata) {
+		super( introspector, typeIdentifier );
 		this.ormTypeMetadata = ormTypeMetadata;
 	}
 
@@ -122,5 +121,4 @@ public class HibernateOrmDynamicMapRawTypeModel extends AbstractHibernateOrmRawT
 
 		return ormPropertyMetadata;
 	}
-
 }

@@ -15,7 +15,6 @@ import java.util.stream.Stream;
 import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.JavaClassPojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
@@ -30,18 +29,15 @@ abstract class AbstractHibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T
 	protected final HibernateOrmBootstrapIntrospector introspector;
 	protected final PojoRawTypeIdentifier<T> typeIdentifier;
 	protected final XClass xClass;
-	private final RawTypeDeclaringContext<T> rawTypeDeclaringContext;
 	private final PojoCaster<T> caster;
 
 	private List<PojoPropertyModel<?>> declaredProperties;
 
 	AbstractHibernateOrmRawTypeModel(HibernateOrmBootstrapIntrospector introspector,
-			PojoRawTypeIdentifier<T> typeIdentifier,
-			RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
+			PojoRawTypeIdentifier<T> typeIdentifier) {
 		this.introspector = introspector;
 		this.typeIdentifier = typeIdentifier;
 		this.xClass = introspector.toXClass( typeIdentifier.getJavaClass() );
-		this.rawTypeDeclaringContext = rawTypeDeclaringContext;
 		this.caster = new JavaClassPojoCaster<>( typeIdentifier.getJavaClass() );
 	}
 
@@ -128,9 +124,5 @@ abstract class AbstractHibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T
 	abstract Stream<String> getDeclaredPropertyNames();
 
 	abstract PojoPropertyModel<?> getPropertyOrNull(String propertyName);
-
-	final RawTypeDeclaringContext<T> getRawTypeDeclaringContext() {
-		return rawTypeDeclaringContext;
-	}
 
 }

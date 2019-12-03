@@ -169,8 +169,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		PojoRawTypeIdentifier<Map> typeIdentifier =
 				HibernateOrmBasicTypeMetadataProvider.createDynamicMapTypeIdentifier( name );
 		return new HibernateOrmDynamicMapRawTypeModel(
-				this, typeIdentifier, ormMetadata,
-				new RawTypeDeclaringContext<>( genericContextHelper, typeIdentifier.getJavaClass() )
+				this, typeIdentifier, ormMetadata
 		);
 	}
 
