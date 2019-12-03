@@ -58,8 +58,8 @@ abstract class AbstractHibernateOrmTypeContext<E>
 
 	public EntityTypeDescriptor<E> getEntityTypeDescriptor() {
 		if ( entityTypeDescriptor == null ) {
-			// TODO HSEARCH-1401 support mass indexing for dynamic-map entity types
-			// TODO HSEARCH-1401 support document id on non-entity-id properties for dynamic-map entity types
+			// TODO HSEARCH-3771 Mass indexing for ORM's dynamic-map entity types
+			// TODO HSEARCH-3772 Allow mapping the document id to non-entity-id properties for ORM's dynamic-map entity types
 			throw log.nonJpaEntityType( typeIdentifier );
 		}
 		return entityTypeDescriptor;

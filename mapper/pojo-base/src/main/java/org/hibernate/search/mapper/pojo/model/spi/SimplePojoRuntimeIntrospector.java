@@ -25,7 +25,6 @@ final class SimplePojoRuntimeIntrospector implements PojoRuntimeIntrospector {
 		if ( entity == null ) {
 			return null;
 		}
-		// TODO HSEARCH-1401 avoid creating a new instance of that type identifier every single time
 		return PojoRawTypeIdentifier.of( (Class<? extends T>) entity.getClass() );
 	}
 

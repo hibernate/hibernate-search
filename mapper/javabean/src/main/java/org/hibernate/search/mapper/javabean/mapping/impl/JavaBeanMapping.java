@@ -64,7 +64,6 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 	public SearchScopeImpl createScope(Collection<? extends Class<?>> classes) {
 		List<PojoRawTypeIdentifier<?>> typeIdentifiers = new ArrayList<>( classes.size() );
 		for ( Class<?> clazz : classes ) {
-			// TODO HSEARCH-1401 avoid creating a new instance of the type identifiers every single time
 			typeIdentifiers.add( PojoRawTypeIdentifier.of( clazz ) );
 		}
 
