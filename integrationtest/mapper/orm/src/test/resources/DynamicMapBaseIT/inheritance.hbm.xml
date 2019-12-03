@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~ Hibernate Search, full-text search for your domain model
+ ~
+ ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class entity-name="A">
+        <id name="id" type="integer"/>
+        <discriminator />
+        <property name="propertyOfA" type="string"/>
+        <subclass entity-name="A_B">
+            <property name="propertyOfB" type="integer"/>
+        </subclass>
+        <subclass entity-name="A_C">
+            <property name="propertyOfC" type="LocalDate"/>
+        </subclass>
+    </class>
+</hibernate-mapping>

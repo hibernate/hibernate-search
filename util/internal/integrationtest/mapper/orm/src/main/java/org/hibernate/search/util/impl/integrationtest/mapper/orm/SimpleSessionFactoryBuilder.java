@@ -59,6 +59,14 @@ public final class SimpleSessionFactoryBuilder {
 		return onMetadataSources( sources -> classes.forEach( sources::addAnnotatedClass ) );
 	}
 
+	public SimpleSessionFactoryBuilder addHbmFromClassPath(String firstPath, String ... otherPaths) {
+		return addHbmFromClassPath( CollectionHelper.asList( firstPath, otherPaths ) );
+	}
+
+	public SimpleSessionFactoryBuilder addHbmFromClassPath(Iterable<String> paths) {
+		return onMetadataSources( sources -> paths.forEach( sources::addResource ) );
+	}
+
 	public SimpleSessionFactoryBuilder onBootstraServiceRegistryBuilder(Consumer<BootstrapServiceRegistryBuilder> contributor) {
 		bootstrapServiceRegistryBuilderContributors.add( contributor );
 		return this;
