@@ -153,18 +153,86 @@ public class SearchIndexingPlanBaseIT {
 	}
 
 	@Test
-	public void purgeContained() {
+	public void purgeByEntityClass_invalidClass() {
 		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyName.NONE );
+
+		Class<?> invalidClass = String.class;
 
 		withinTransaction( sessionFactory, session -> {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
 			SubTest.expectException(
-					() -> indexingPlan.purge( ContainedEntity.class, 42 )
+					() -> indexingPlan.purge( invalidClass, 42 )
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
-					.hasMessageContaining( "Type '" + ContainedEntity.class.getName() + "' is contained in an indexed type but is not itself indexed" )
-					.hasMessageContaining( "thus entity with identifier '42' cannot be purged" );
+					.hasMessageContainingAll(
+							"Cannot work on type '" + invalidClass.getName() + "', because it is not indexed,"
+									+ " neither directly nor as a contained entity in another type"
+					);
+		} );
+	}
+
+	@Test
+	public void purgeByEntityClass_invalidClass_contained() {
+		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyName.NONE );
+
+		Class<?> invalidClass = ContainedEntity.class;
+
+		withinTransaction( sessionFactory, session -> {
+			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
+			SubTest.expectException(
+					() -> indexingPlan.purge( invalidClass, 42 )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContainingAll(
+							"Type '" + ContainedEntity.class.getName() + "' is contained in an indexed type but is not itself indexed",
+							"thus entity with identifier '42' cannot be purged"
+					);
+		} );
+	}
+
+	@Test
+	public void purgeByEntityName() {
+		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyName.NONE );
+
+		withinTransaction( sessionFactory, session -> {
+			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
+			indexingPlan.purge( IndexedEntity1.NAME, 42 ); // Does not exist in database, but may exist in the index
+
+			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
+					.delete( "42" )
+					.processedThenExecuted();
+		} );
+		backend1Mock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void purgeByEntityName_invalidName() {
+		SessionFactory sessionFactory = setup( AutomaticIndexingStrategyName.NONE );
+
+		String invalidName = "foo";
+
+		withinTransaction( sessionFactory, session -> {
+			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
+			SubTest.expectException(
+					() -> indexingPlan.purge( invalidName, 42 )
+			)
+					.assertThrown()
+					.isInstanceOf( SearchException.class )
+					.hasMessageContainingAll(
+							"Unknown entity name: '" + invalidName + "'",
+							"Available entity names: ["
+									// Hibernate ORM entity names
+									+ ContainedEntity.class.getName() + ", "
+									+ IndexedEntity1.class.getName() + ", "
+									+ IndexedEntity2.class.getName() + ", "
+									// JPA entity names
+									+ ContainedEntity.NAME + ", "
+									+ IndexedEntity1.NAME + ", "
+									+ IndexedEntity2.NAME
+									+ "]"
+					);
 		} );
 	}
 
@@ -373,9 +441,11 @@ public class SearchIndexingPlanBaseIT {
 		return sessionFactory;
 	}
 
-	@Entity(name = "indexed1")
+	@Entity(name = IndexedEntity1.NAME)
 	@Indexed(backend = BACKEND1_NAME, index = IndexedEntity1.INDEX_NAME)
 	public static class IndexedEntity1 {
+
+		static final String NAME = "indexed1";
 
 		static final String INDEX_NAME = "index1Name";
 
@@ -399,9 +469,11 @@ public class SearchIndexingPlanBaseIT {
 		}
 	}
 
-	@Entity(name = "indexed2")
+	@Entity(name = IndexedEntity2.NAME)
 	@Indexed(backend = BACKEND2_NAME, index = IndexedEntity2.INDEX_NAME)
 	public static class IndexedEntity2 {
+
+		static final String NAME = "indexed2";
 
 		static final String INDEX_NAME = "index2Name";
 
@@ -421,8 +493,10 @@ public class SearchIndexingPlanBaseIT {
 		}
 	}
 
-	@Entity(name = "contained")
+	@Entity(name = ContainedEntity.NAME)
 	public static class ContainedEntity {
+
+		static final String NAME = "contained";
 
 		@Id
 		private Integer id;

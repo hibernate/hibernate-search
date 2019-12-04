@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.search;
 
 import static org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils.reference;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,8 @@ import java.util.Objects;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 
 import org.assertj.core.api.Assertions;
 import org.assertj.core.api.SoftAssertions;
@@ -34,6 +37,7 @@ import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
@@ -43,6 +47,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.StubSearchSort;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -77,13 +82,184 @@ public class SearchQueryBaseIT {
 	@Before
 	public void setup() {
 		backendMock.expectAnySchema( Book.NAME );
+		backendMock.expectAnySchema( Author.NAME );
 
 		sessionFactory = ormSetupHelper.start()
-				.setup( Book.class );
+				.setup( Book.class, Author.class );
 
 		backendMock.verifyExpectationsMet();
 
 		initData();
+	}
+
+	@Test
+	public void target_byClass_singleType() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+
+			SearchQuery<Book> query = searchSession.search( Book.class )
+					.predicate( f -> f.matchAll() )
+					.toQuery();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.NAME ),
+					b -> { },
+					StubSearchWorkBehavior.of(
+							3L,
+							reference( Book.NAME, "1" ),
+							reference( Book.NAME, "2" ),
+							reference( Book.NAME, "3" )
+					)
+			);
+
+			Assertions.assertThat( query.fetchAllHits() ).containsExactly(
+					session.load( Book.class, 1 ),
+					session.load( Book.class, 2 ),
+					session.load( Book.class, 3 )
+			);
+		} );
+	}
+
+	@Test
+	public void target_byClass_multipleTypes() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+
+			SearchQuery<Object> query = searchSession.search( Arrays.asList( Book.class, Author.class ) )
+					.predicate( f -> f.matchAll() )
+					.toQuery();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.NAME, Author.NAME ),
+					b -> { },
+					StubSearchWorkBehavior.of(
+							2L,
+							reference( Book.NAME, "1" ),
+							reference( Author.NAME, "2" )
+					)
+			);
+
+			Assertions.assertThat( query.fetchAllHits() ).containsExactly(
+					session.load( Book.class, 1 ),
+					session.load( Author.class, 2 )
+			);
+		} );
+	}
+
+	@Test
+	public void target_byClass_invalidClass() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+
+			Class<?> invalidClass = String.class;
+
+			SubTest.expectException( () -> searchSession.scope( invalidClass ) )
+					.assertThrown()
+					.hasMessageContainingAll(
+							"Some of the given types cannot be targeted",
+							"These types are not indexed, nor is any of their subtypes: [" + invalidClass.getName() + "]"
+					);
+		} );
+	}
+
+	@Test
+	public void target_byName_singleType() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+
+			SearchQuery<Book> query = searchSession.search( searchSession.scope( Book.class, Book.NAME ) )
+					.predicate( f -> f.matchAll() )
+					.toQuery();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.NAME ),
+					b -> { },
+					StubSearchWorkBehavior.of(
+							3L,
+							reference( Book.NAME, "1" ),
+							reference( Book.NAME, "2" ),
+							reference( Book.NAME, "3" )
+					)
+			);
+
+			Assertions.assertThat( query.fetchAllHits() ).containsExactly(
+					session.load( Book.class, 1 ),
+					session.load( Book.class, 2 ),
+					session.load( Book.class, 3 )
+			);
+		} );
+	}
+
+	@Test
+	public void target_byName_multipleTypes() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+
+			SearchQuery<Object> query = searchSession.search( searchSession.scope(
+							Object.class, Arrays.asList( Book.NAME, Author.NAME )
+					) )
+					.predicate( f -> f.matchAll() )
+					.toQuery();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( Book.NAME, Author.NAME ),
+					b -> { },
+					StubSearchWorkBehavior.of(
+							2L,
+							reference( Book.NAME, "1" ),
+							reference( Author.NAME, "2" )
+					)
+			);
+
+			Assertions.assertThat( query.fetchAllHits() ).containsExactly(
+					session.load( Book.class, 1 ),
+					session.load( Author.class, 2 )
+			);
+		} );
+	}
+
+	@Test
+	public void target_byName_invalidType() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+
+			Class<?> invalidClass = String.class;
+
+			SubTest.expectException( () -> searchSession.scope(
+					invalidClass, Book.NAME
+			) )
+					.assertThrown()
+					.hasMessageContainingAll(
+							"Invalid type for '" + Book.NAME + "'",
+							"expected the entity to extend '" + invalidClass.getName()
+									+ "', but entity type '" + Book.class.getName() + "' does not"
+					);
+		} );
+	}
+
+	@Test
+	public void target_byName_invalidName() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+
+			String invalidName = "foo";
+
+			SubTest.expectException( () -> searchSession.scope(
+					Book.class, invalidName
+			) )
+					.assertThrown()
+					.hasMessageContainingAll(
+							"Unknown entity name: '" + invalidName + "'",
+							"Available entity names: ["
+									// Hibernate ORM entity names
+									+ Author.class.getName() + ", "
+									+ Book.class.getName() + ", "
+									// JPA entity names
+									+ Author.NAME + ", "
+									+ Book.NAME
+									+ "]"
+					);
+		} );
 	}
 
 	@Test
@@ -160,7 +336,7 @@ public class SearchQueryBaseIT {
 							scope.projection().field( "title", String.class ).toProjection(),
 							scope.projection().entityReference().toProjection(),
 							scope.projection().documentReference().toProjection(),
-							scope.projection().field( "author", String.class ).toProjection()
+							scope.projection().field( "author.name", String.class ).toProjection()
 					)
 					.predicate( f -> f.matchAll() )
 					.toQuery();
@@ -226,7 +402,7 @@ public class SearchQueryBaseIT {
 									f.composite(
 											Book_Author::new,
 											f.entity().toProjection(),
-											f.field( "author", String.class ).toProjection()
+											f.field( "author.name", String.class ).toProjection()
 									).toProjection(),
 									f.score().toProjection()
 							)
@@ -274,7 +450,7 @@ public class SearchQueryBaseIT {
 									f.composite(
 											Book_Author::new,
 											f.entity(),
-											f.field( "author", String.class )
+											f.field( "author.name", String.class )
 									),
 									f.score()
 							)
@@ -372,22 +548,59 @@ public class SearchQueryBaseIT {
 
 	private void initData() {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
-			session.persist( new Book( 1, TITLE_4_3_2_1, AUTHOR_4_3_2_1 ) );
-			session.persist( new Book( 2, TITLE_CIDER_HOUSE, AUTHOR_CIDER_HOUSE ) );
-			session.persist( new Book( 3, TITLE_AVENUE_OF_MYSTERIES, AUTHOR_AVENUE_OF_MYSTERIES ) );
+			Author author4321 = new Author( 1, AUTHOR_4_3_2_1 );
+			Author authorCiderHouse = new Author( 2, AUTHOR_CIDER_HOUSE );
+			Author authorAvenueOfMysteries = new Author( 3, AUTHOR_AVENUE_OF_MYSTERIES );
+
+			Book book4321 = new Book( 1, TITLE_4_3_2_1 );
+			book4321.setAuthor( author4321 );
+			author4321.getBooks().add( book4321 );
+
+			Book bookCiderHouse = new Book( 2, TITLE_CIDER_HOUSE );
+			bookCiderHouse.setAuthor( authorCiderHouse );
+			authorCiderHouse.getBooks().add( bookCiderHouse );
+
+			Book bookAvenueOfMysteries = new Book( 3, TITLE_AVENUE_OF_MYSTERIES );
+			bookAvenueOfMysteries.setAuthor( authorAvenueOfMysteries );
+			authorAvenueOfMysteries.getBooks().add( bookAvenueOfMysteries );
+
+			session.persist( author4321 );
+			session.persist( authorCiderHouse );
+			session.persist( authorAvenueOfMysteries );
+			session.persist( book4321 );
+			session.persist( bookCiderHouse );
+			session.persist( bookAvenueOfMysteries );
 
 			backendMock.expectWorks( Book.NAME )
 					.add( "1", b -> b
 							.field( "title", TITLE_4_3_2_1 )
-							.field( "author", AUTHOR_4_3_2_1 )
+							.objectField( "author", b2 -> b2
+									.field( "name", AUTHOR_4_3_2_1 )
+							)
+
 					)
 					.add( "2", b -> b
 							.field( "title", TITLE_CIDER_HOUSE )
-							.field( "author", AUTHOR_CIDER_HOUSE )
+							.objectField( "author", b2 -> b2
+									.field( "name", AUTHOR_CIDER_HOUSE )
+							)
 					)
 					.add( "3", b -> b
 							.field( "title", TITLE_AVENUE_OF_MYSTERIES )
-							.field( "author", AUTHOR_AVENUE_OF_MYSTERIES )
+							.objectField( "author", b2 -> b2
+									.field( "name", AUTHOR_CIDER_HOUSE )
+							)
+					)
+					.processedThenExecuted();
+			backendMock.expectWorks( Author.NAME )
+					.add( "1", b -> b
+							.field( "name", AUTHOR_4_3_2_1 )
+					)
+					.add( "2", b -> b
+							.field( "name", AUTHOR_CIDER_HOUSE )
+					)
+					.add( "3", b -> b
+							.field( "name", AUTHOR_AVENUE_OF_MYSTERIES )
 					)
 					.processedThenExecuted();
 		} );
@@ -407,16 +620,16 @@ public class SearchQueryBaseIT {
 		@GenericField
 		private String title;
 
-		@GenericField
-		private String author;
+		@ManyToOne
+		@IndexedEmbedded
+		private Author author;
 
 		public Book() {
 		}
 
-		public Book(Integer id, String title, String author) {
+		public Book(Integer id, String title) {
 			this.id = id;
 			this.title = title;
-			this.author = author;
 		}
 
 		public Integer getId() {
@@ -427,8 +640,48 @@ public class SearchQueryBaseIT {
 			return title;
 		}
 
-		public String getAuthor() {
+		public Author getAuthor() {
 			return author;
+		}
+
+		public void setAuthor(Author author) {
+			this.author = author;
+		}
+	}
+
+	@Entity(name = Author.NAME)
+	@Indexed(index = Author.NAME)
+	public static class Author {
+
+		public static final String NAME = "Author";
+
+		@Id
+		private Integer id;
+
+		@GenericField
+		private String name;
+
+		@OneToMany(mappedBy = "author")
+		private List<Book> books = new ArrayList<>();
+
+		public Author() {
+		}
+
+		public Author(Integer id, String name) {
+			this.id = id;
+			this.name = name;
+		}
+
+		public Integer getId() {
+			return id;
+		}
+
+		public String getName() {
+			return name;
+		}
+
+		public List<Book> getBooks() {
+			return books;
 		}
 	}
 
