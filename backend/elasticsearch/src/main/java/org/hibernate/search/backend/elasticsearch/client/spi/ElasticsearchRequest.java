@@ -12,6 +12,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.StringJoiner;
+import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
@@ -48,12 +50,16 @@ public final class ElasticsearchRequest {
 	private final String path;
 	private final Map<String, String> parameters;
 	private final List<JsonObject> bodyParts;
+	private final Integer timeoutValue;
+	private final TimeUnit timeoutUnit;
 
 	private ElasticsearchRequest(Builder builder) {
 		this.method = builder.method;
 		this.path = builder.pathBuilder.toString();
 		this.parameters = builder.parameters == null ? Collections.emptyMap() : Collections.unmodifiableMap( builder.parameters );
 		this.bodyParts = builder.bodyParts == null ? Collections.emptyList() : Collections.unmodifiableList( builder.bodyParts );
+		this.timeoutValue = builder.timeoutValue;
+		this.timeoutUnit = builder.timeoutUnit;
 	}
 
 	public String getMethod() {
@@ -72,14 +78,23 @@ public final class ElasticsearchRequest {
 		return bodyParts;
 	}
 
+	public Integer getTimeoutValue() {
+		return timeoutValue;
+	}
+
+	public TimeUnit getTimeoutUnit() {
+		return timeoutUnit;
+	}
+
 	@Override
 	public String toString() {
-		return new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "method=" ).append( method )
-				.append( ", path=" ).append( path )
-				.append( ", parameters=" ).append( parameters )
-				.append( "]" )
+		return new StringJoiner( ", ", ElasticsearchRequest.class.getSimpleName() + "[", "]" )
+				.add( "method='" + method + "'" )
+				.add( "path='" + path + "'" )
+				.add( "parameters=" + parameters )
+				.add( "bodyParts=" + bodyParts )
+				.add( "timeoutValue=" + timeoutValue )
+				.add( "timeoutUnit=" + timeoutUnit )
 				.toString();
 	}
 
@@ -91,6 +106,8 @@ public final class ElasticsearchRequest {
 
 		private Map<String, String> parameters;
 		private List<JsonObject> bodyParts;
+		private Integer timeoutValue;
+		private TimeUnit timeoutUnit;
 
 		private Builder(String method) {
 			super();
@@ -152,6 +169,16 @@ public final class ElasticsearchRequest {
 				bodyParts = new ArrayList<>();
 			}
 			bodyParts.add( object );
+			return this;
+		}
+
+		public Builder timeoutValue(Integer timeoutValue) {
+			this.timeoutValue = timeoutValue;
+			return this;
+		}
+
+		public Builder timeoutUnit(TimeUnit timeoutUnit) {
+			this.timeoutUnit = timeoutUnit;
 			return this;
 		}
 
