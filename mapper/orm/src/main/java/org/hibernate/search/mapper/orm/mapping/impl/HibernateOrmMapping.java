@@ -140,8 +140,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public <T> SearchScope<T> scope(Class<T> expectedSuperType, Collection<String> hibernateOrmEntityNames) {
-		return createScope( expectedSuperType, hibernateOrmEntityNames );
+	public <T> SearchScope<T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
+		return createScope( expectedSuperType, entityNames );
 	}
 
 	@Override
@@ -242,10 +242,10 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public <T> SearchScopeImpl<T> createScope(Class<T> expectedSuperType, Collection<String> hibernateOrmEntityNames) {
-		List<PojoRawTypeIdentifier<? extends T>> typeIdentifiers = new ArrayList<>( hibernateOrmEntityNames.size() );
-		for ( String hibernateOrmEntityName : hibernateOrmEntityNames ) {
-			typeIdentifiers.add( getEntityTypeIdentifier( expectedSuperType, hibernateOrmEntityName ) );
+	public <T> SearchScopeImpl<T> createScope(Class<T> expectedSuperType, Collection<String> entityNames) {
+		List<PojoRawTypeIdentifier<? extends T>> typeIdentifiers = new ArrayList<>( entityNames.size() );
+		for ( String entityName : entityNames ) {
+			typeIdentifiers.add( getEntityTypeIdentifier( expectedSuperType, entityName ) );
 		}
 		return doCreateScope( typeIdentifiers );
 	}
@@ -272,12 +272,12 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	private <T> PojoRawTypeIdentifier<? extends T> getEntityTypeIdentifier(Class<T> expectedSuperType,
-			String hibernateOrmEntityName) {
+			String entityName) {
 		PojoRawTypeIdentifier<?> typeIdentifier =
-				typeContextContainer.getTypeIdentifierByHibernateOrmEntityName( hibernateOrmEntityName );
+				typeContextContainer.getTypeIdentifierByHibernateOrmEntityName( entityName );
 		Class<?> actualJavaType = typeIdentifier.getJavaClass();
 		if ( !expectedSuperType.isAssignableFrom( actualJavaType ) ) {
-			throw log.invalidHibernateOrmEntitySuperType( hibernateOrmEntityName, expectedSuperType, actualJavaType );
+			throw log.invalidHibernateOrmEntitySuperType( entityName, expectedSuperType, actualJavaType );
 		}
 		// The cast below is safe because we just checked above that the type extends "expectedSuperType", which extends E
 		@SuppressWarnings("unchecked")

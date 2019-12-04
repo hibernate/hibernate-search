@@ -154,9 +154,9 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public <T> SearchScope<T> scope(Class<T> expectedSuperType, Collection<String> hibernateOrmEntityNames) {
+	public <T> SearchScope<T> scope(Class<T> expectedSuperType, Collection<String> entityNames) {
 		checkOrmSessionIsOpen();
-		return mappingContext.createScope( expectedSuperType, hibernateOrmEntityNames );
+		return mappingContext.createScope( expectedSuperType, entityNames );
 	}
 
 	@Override

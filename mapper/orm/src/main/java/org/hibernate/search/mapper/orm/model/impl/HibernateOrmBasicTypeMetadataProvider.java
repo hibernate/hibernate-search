@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.orm.model.impl;
 
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -27,14 +26,6 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 @SuppressWarnings( "unchecked" ) // Hibernate ORM gives us raw types, we must make do.
 public class HibernateOrmBasicTypeMetadataProvider {
-
-	static <T> PojoRawTypeIdentifier<T> createClassTypeIdentifier(Class<T> javaClass) {
-		return PojoRawTypeIdentifier.of( javaClass );
-	}
-
-	static PojoRawTypeIdentifier<Map> createDynamicMapTypeIdentifier(String name) {
-		return PojoRawTypeIdentifier.of( Map.class, name );
-	}
 
 	public static HibernateOrmBasicTypeMetadataProvider create(Metadata metadata) {
 		Collection<PersistentClass> persistentClasses = metadata.getEntityBindings()
@@ -67,30 +58,27 @@ public class HibernateOrmBasicTypeMetadataProvider {
 
 		if ( persistentClass.hasPojoRepresentation() ) {
 			Class<?> javaClass = persistentClass.getMappedClass();
-			typeIdentifier = createClassTypeIdentifier( javaClass );
 
 			collectClassType(
 					metadataProviderBuilder, javaClass,
 					persistentClass.getIdentifierProperty(), persistentClass.getPropertyIterator()
 			);
 
-			metadataProviderBuilder.entityTypeIdentifiersByJavaClass.put(
-					javaClass, typeIdentifier
+			metadataProviderBuilder.typeIdentifierResolverBuilder.addClassEntityType(
+					javaClass, hibernateOrmEntityName
 			);
 		}
 		else {
-			typeIdentifier = createDynamicMapTypeIdentifier( hibernateOrmEntityName );
-
 			collectDynamicMapType(
 					metadataProviderBuilder, hibernateOrmEntityName,
 					persistentClass.getSuperclass(),
 					persistentClass.getIdentifierProperty(), persistentClass.getPropertyIterator()
 			);
-		}
 
-		metadataProviderBuilder.entityTypeIdentifiersByHibernateOrmEntityName.put(
-				hibernateOrmEntityName, typeIdentifier
-		);
+			metadataProviderBuilder.typeIdentifierResolverBuilder.addDynamicMapEntityType(
+					hibernateOrmEntityName
+			);
+		}
 	}
 
 	private static void collectClassType(Builder metadataProviderBuilder, Class<?> javaClass,
@@ -238,18 +226,14 @@ public class HibernateOrmBasicTypeMetadataProvider {
 	private final Map<String, HibernateOrmBasicDynamicMapTypeMetadata> dynamicMapTypeMetadata;
 
 	private final Map<String, String> jpaEntityNameToHibernateOrmEntityName;
-	private final Map<Class<?>, PojoRawTypeIdentifier<?>> entityTypeIdentifiersByJavaClass;
-	private final Map<String, PojoRawTypeIdentifier<?>> entityTypeIdentifiersByHibernateOrmEntityName;
+	private final HibernateOrmRawTypeIdentifierResolver typeIdentifierResolver;
 
 	private HibernateOrmBasicTypeMetadataProvider(Builder builder) {
 		this.persistentClasses = builder.persistentClasses;
 		this.classTypeMetadata = builder.classTypeMetadata;
 		this.dynamicMapTypeMetadata = builder.dynamicMapTypeMetadata;
 		this.jpaEntityNameToHibernateOrmEntityName = builder.jpaEntityNameToHibernateOrmEntityName;
-		this.entityTypeIdentifiersByJavaClass =
-				Collections.unmodifiableMap( builder.entityTypeIdentifiersByJavaClass );
-		this.entityTypeIdentifiersByHibernateOrmEntityName =
-				Collections.unmodifiableMap( builder.entityTypeIdentifiersByHibernateOrmEntityName );
+		this.typeIdentifierResolver = builder.typeIdentifierResolverBuilder.build();
 	}
 
 	public Collection<PersistentClass> getPersistentClasses() {
@@ -260,12 +244,8 @@ public class HibernateOrmBasicTypeMetadataProvider {
 		return persistentClasses.get( hibernateOrmEntityName );
 	}
 
-	public Map<Class<?>, PojoRawTypeIdentifier<?>> getEntityTypeIdentifiersByJavaClass() {
-		return entityTypeIdentifiersByJavaClass;
-	}
-
-	public Map<String, PojoRawTypeIdentifier<?>> getEntityTypeIdentifiersByHibernateOrmEntityName() {
-		return entityTypeIdentifiersByHibernateOrmEntityName;
+	public HibernateOrmRawTypeIdentifierResolver getTypeIdentifierResolver() {
+		return typeIdentifierResolver;
 	}
 
 	HibernateOrmBasicClassTypeMetadata getBasicClassTypeMetadata(Class<?> clazz) {
@@ -292,8 +272,8 @@ public class HibernateOrmBasicTypeMetadataProvider {
 		private final Map<String, HibernateOrmBasicDynamicMapTypeMetadata> dynamicMapTypeMetadata = new LinkedHashMap<>();
 
 		private final Map<String, String> jpaEntityNameToHibernateOrmEntityName = new LinkedHashMap<>();
-		private final Map<Class<?>, PojoRawTypeIdentifier<?>> entityTypeIdentifiersByJavaClass = new LinkedHashMap<>();
-		private final Map<String, PojoRawTypeIdentifier<?>> entityTypeIdentifiersByHibernateOrmEntityName = new LinkedHashMap<>();
+		private final HibernateOrmRawTypeIdentifierResolver.Builder typeIdentifierResolverBuilder =
+				new HibernateOrmRawTypeIdentifierResolver.Builder();
 
 		HibernateOrmBasicTypeMetadataProvider build() {
 			return new HibernateOrmBasicTypeMetadataProvider( this );

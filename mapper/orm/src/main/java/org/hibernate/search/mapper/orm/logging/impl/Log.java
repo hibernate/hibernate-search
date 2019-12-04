@@ -221,8 +221,7 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 27,
 			value = "Unknown type: '%1$s'. Available named types: %2$s."
-					+ " For entity types, the correct type name is the Hibernate ORM entity name,"
-					+ " i.e. the name accepted by Session.get(String, Object)."
+					+ " For entity types, the correct type name is the entity name."
 					+ " For component types (embeddeds, ...) in dynamic-map entities,"
 					+ " the correct type name is name of the owner entity"
 					+ " followed by a dot ('.') followed by the dot-separated path to the component,"
@@ -231,10 +230,9 @@ public interface Log extends BasicLogger {
 	SearchException unknownNamedType(String typeName, Collection<String> availableNamedTypes);
 
 	@Message(id = ID_OFFSET_2 + 28,
-			value = "Unknown entity name: '%1$s'. The Hibernate ORM entity name is expected,"
-					+ " i.e. the name accepted by Session.get(String, Object)."
+			value = "Unknown entity name: '%1$s'. Available entity names: %2$s."
 	)
-	SearchException invalidHibernateOrmEntityName(String hibernateOrmEntityName);
+	SearchException invalidEntityName(String entityName, Collection<String> availableEntityNames);
 
 	@Message(id = ID_OFFSET_2 + 29,
 			value = "Invalid type for '%1$s': expected the entity to extend '%2$s'," +

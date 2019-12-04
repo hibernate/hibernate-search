@@ -111,15 +111,15 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 			return dynamicMapTypeModelCache.computeIfAbsent( name, this::createDynamicMapTypeModel );
 		}
 
-		PojoRawTypeIdentifier<?> typeIdentifier =
-				basicTypeMetadataProvider.getEntityTypeIdentifiersByHibernateOrmEntityName().get( name );
+		PojoRawTypeIdentifier<?> typeIdentifier = basicTypeMetadataProvider.getTypeIdentifierResolver()
+				.resolveByHibernateOrmEntityName( name );
 		if ( typeIdentifier != null ) {
 			// Class entity type
 			return getTypeModel( typeIdentifier.getJavaClass() );
 		}
 
 		Set<String> typeNames = new LinkedHashSet<>( basicTypeMetadataProvider.getKnownDynamicMapTypeNames() );
-		typeNames.addAll( basicTypeMetadataProvider.getEntityTypeIdentifiersByHibernateOrmEntityName().keySet() );
+		typeNames.addAll( basicTypeMetadataProvider.getTypeIdentifierResolver().getKnownHibernateOrmEntityNames() );
 		throw log.unknownNamedType( name, typeNames );
 	}
 
@@ -182,7 +182,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	private HibernateOrmDynamicMapRawTypeModel createDynamicMapTypeModel(String name) {
 		HibernateOrmBasicDynamicMapTypeMetadata ormMetadata = basicTypeMetadataProvider.getBasicDynamicMapTypeMetadata( name );
 		PojoRawTypeIdentifier<Map> typeIdentifier =
-				HibernateOrmBasicTypeMetadataProvider.createDynamicMapTypeIdentifier( name );
+				HibernateOrmRawTypeIdentifierResolver.createDynamicMapTypeIdentifier( name );
 		return new HibernateOrmDynamicMapRawTypeModel(
 				this, typeIdentifier, ormMetadata
 		);
@@ -192,7 +192,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		HibernateOrmBasicClassTypeMetadata ormMetadataOrNull =
 				basicTypeMetadataProvider.getBasicClassTypeMetadata( type );
 		PojoRawTypeIdentifier<T> typeIdentifier =
-				HibernateOrmBasicTypeMetadataProvider.createClassTypeIdentifier( type );
+				HibernateOrmRawTypeIdentifierResolver.createClassTypeIdentifier( type );
 		return new HibernateOrmClassRawTypeModel<>(
 				this, typeIdentifier, ormMetadataOrNull,
 				new RawTypeDeclaringContext<>( genericContextHelper, type )

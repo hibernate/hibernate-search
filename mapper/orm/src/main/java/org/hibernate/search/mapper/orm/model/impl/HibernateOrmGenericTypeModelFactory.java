@@ -18,9 +18,9 @@ public interface HibernateOrmGenericTypeModelFactory<T> {
 	PojoGenericTypeModel<T> create(HibernateOrmBootstrapIntrospector introspector);
 
 	@SuppressWarnings("unchecked")
-	static <T> HibernateOrmGenericTypeModelFactory<T> entityReference(Class<T> javaClass, String hibernateOrmEntityName) {
+	static <T> HibernateOrmGenericTypeModelFactory<T> entityReference(Class<T> javaClass, String entityName) {
 		if ( Map.class.equals( javaClass ) ) {
-			return (HibernateOrmGenericTypeModelFactory<T>) dynamicMap( hibernateOrmEntityName );
+			return (HibernateOrmGenericTypeModelFactory<T>) dynamicMap( entityName );
 		}
 		else {
 			return rawType( javaClass );

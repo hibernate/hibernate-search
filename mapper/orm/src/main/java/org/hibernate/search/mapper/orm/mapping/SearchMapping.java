@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.mapper.orm.mapping;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.Collections;
+import javax.persistence.Entity;
 import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.SessionFactory;
@@ -49,33 +49,25 @@ public interface SearchMapping {
 	 * Create a {@link SearchScope} limited to entity types referenced by their name.
 	 *
 	 * @param expectedSuperType A supertype of all entity types to include in the scope.
-	 * @param hibernateOrmEntityName An entity name.
-	 * This is not the JPA name, but the Hibernate ORM name,
-	 * i.e. the same name accepted by {@link org.hibernate.Session#get(String, Serializable)}.
-	 * Generally the Hibernate ORM name defaults to the fully qualified class name,
-	 * while the JPA name defaults to the unqualified class name.
+	 * @param entityName An entity name. See {@link Entity#name()}.
 	 * @param <T> A supertype of all entity types to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	default <T> SearchScope<T> scope(Class<T> expectedSuperType, String hibernateOrmEntityName) {
-		return scope( expectedSuperType, Collections.singleton( hibernateOrmEntityName ) );
+	default <T> SearchScope<T> scope(Class<T> expectedSuperType, String entityName) {
+		return scope( expectedSuperType, Collections.singleton( entityName ) );
 	}
 
 	/**
 	 * Create a {@link SearchScope} limited to entity types referenced by their name.
 	 *
 	 * @param expectedSuperType A supertype of all entity types to include in the scope.
-	 * @param hibernateOrmEntityNames A collection of entity names.
-	 * This is not the JPA name, but the Hibernate ORM name,
-	 * i.e. the same name accepted by {@link org.hibernate.Session#get(String, Serializable)}.
-	 * Generally the Hibernate ORM name defaults to the fully qualified class name,
-	 * while the JPA name defaults to the unqualified class name.
+	 * @param entityNames A collection of entity names. See {@link Entity#name()}.
 	 * @param <T> A supertype of all entity types to include in the scope.
 	 * @return The created scope.
 	 * @see SearchScope
 	 */
-	<T> SearchScope<T> scope(Class<T> expectedSuperType, Collection<String> hibernateOrmEntityNames);
+	<T> SearchScope<T> scope(Class<T> expectedSuperType, Collection<String> entityNames);
 
 	/**
 	 * @return The underlying {@link EntityManagerFactory} used by this {@link SearchMapping}.

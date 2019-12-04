@@ -40,9 +40,9 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	}
 
 	@Override
-	public void purge(String hibernateOrmEntityName, Object providedId) {
+	public void purge(String entityName, Object providedId) {
 		sessionContext.getCurrentIndexingPlan( true )
-				.purge( getTypeIdentifier( hibernateOrmEntityName ), providedId );
+				.purge( getTypeIdentifier( entityName ), providedId );
 	}
 
 	@Override
