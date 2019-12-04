@@ -63,9 +63,11 @@ public class HibernateOrmBasicTypeMetadataProvider {
 		metadataProviderBuilder.persistentClasses.put( hibernateOrmEntityName, persistentClass );
 		metadataProviderBuilder.jpaEntityNameToHibernateOrmEntityName.put( jpaEntityName, hibernateOrmEntityName );
 
+		PojoRawTypeIdentifier<?> typeIdentifier;
+
 		if ( persistentClass.hasPojoRepresentation() ) {
 			Class<?> javaClass = persistentClass.getMappedClass();
-			PojoRawTypeIdentifier<?> typeIdentifier = createClassTypeIdentifier( javaClass );
+			typeIdentifier = createClassTypeIdentifier( javaClass );
 
 			collectClassType(
 					metadataProviderBuilder, javaClass,
@@ -77,18 +79,18 @@ public class HibernateOrmBasicTypeMetadataProvider {
 			);
 		}
 		else {
-			PojoRawTypeIdentifier<Map> typeIdentifier = createDynamicMapTypeIdentifier( hibernateOrmEntityName );
+			typeIdentifier = createDynamicMapTypeIdentifier( hibernateOrmEntityName );
 
 			collectDynamicMapType(
 					metadataProviderBuilder, hibernateOrmEntityName,
 					persistentClass.getSuperclass(),
 					persistentClass.getIdentifierProperty(), persistentClass.getPropertyIterator()
 			);
-
-			metadataProviderBuilder.entityTypeIdentifiersByHibernateOrmEntityName.put(
-					hibernateOrmEntityName, typeIdentifier
-			);
 		}
+
+		metadataProviderBuilder.entityTypeIdentifiersByHibernateOrmEntityName.put(
+				hibernateOrmEntityName, typeIdentifier
+		);
 	}
 
 	private static void collectClassType(Builder metadataProviderBuilder, Class<?> javaClass,
@@ -266,11 +268,11 @@ public class HibernateOrmBasicTypeMetadataProvider {
 		return entityTypeIdentifiersByHibernateOrmEntityName;
 	}
 
-	HibernateOrmBasicClassTypeMetadata getBasicTypeMetadata(Class<?> clazz) {
+	HibernateOrmBasicClassTypeMetadata getBasicClassTypeMetadata(Class<?> clazz) {
 		return classTypeMetadata.get( clazz );
 	}
 
-	HibernateOrmBasicDynamicMapTypeMetadata getBasicTypeMetadata(String name) {
+	HibernateOrmBasicDynamicMapTypeMetadata getBasicDynamicMapTypeMetadata(String name) {
 		return dynamicMapTypeMetadata.get( name );
 	}
 
@@ -280,7 +282,7 @@ public class HibernateOrmBasicTypeMetadataProvider {
 		return jpaEntityNameToHibernateOrmEntityName.get( jpaEntityName );
 	}
 
-	Set<String> getKnownTypeNames() {
+	Set<String> getKnownDynamicMapTypeNames() {
 		return dynamicMapTypeMetadata.keySet();
 	}
 

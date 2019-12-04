@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.Map;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.SyntheticPojoGenericTypeModel;
 
 public interface HibernateOrmGenericTypeModelFactory<T> {
@@ -30,8 +31,12 @@ public interface HibernateOrmGenericTypeModelFactory<T> {
 		return introspector -> introspector.getGenericTypeModel( javaClass );
 	}
 
+	// This cast is safe if the caller made sure that this name really points to a dynamic-map type
+	@SuppressWarnings("unchecked")
 	static HibernateOrmGenericTypeModelFactory<Map> dynamicMap(String name) {
-		return introspector -> SyntheticPojoGenericTypeModel.opaqueType( introspector.getTypeModel( name ) );
+		return introspector -> SyntheticPojoGenericTypeModel.opaqueType(
+				(PojoRawTypeModel<Map>) introspector.getTypeModel( name )
+		);
 	}
 
 	static <T> HibernateOrmGenericTypeModelFactory<T[]> array(HibernateOrmGenericTypeModelFactory<T> elementType) {

@@ -221,10 +221,9 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 27,
 			value = "Unknown type: '%1$s'. Available named types: %2$s."
-					+ " Only dynamic types can be referenced by their name."
-					+ " For dynamic entities, the correct type name is the Hibernate ORM entity name,"
+					+ " For entity types, the correct type name is the Hibernate ORM entity name,"
 					+ " i.e. the name accepted by Session.get(String, Object)."
-					+ " For component types in dynamic entities (embeddeds, ...),"
+					+ " For component types (embeddeds, ...) in dynamic-map entities,"
 					+ " the correct type name is name of the owner entity"
 					+ " followed by a dot ('.') followed by the dot-separated path to the component,"
 					+ " e.g. 'MyEntity.myEmbedded' or 'MyEntity.myEmbedded.myNestedEmbedded'."

@@ -86,7 +86,9 @@ public class HibernateOrmDynamicMapRawTypeModel extends AbstractHibernateOrmRawT
 	private HibernateOrmDynamicMapRawTypeModel getSuperEntityOrNull() {
 		String superEntityName = ormTypeMetadata.getSuperEntityNameOrNull();
 		if ( superEntityName != null ) {
-			return introspector.getTypeModel( superEntityName );
+			// This cast is safe, because if a dynamic-map entity type has an entity supertype,
+			// that entity supertype is also a dynamic-map entity type.
+			return (HibernateOrmDynamicMapRawTypeModel) introspector.getTypeModel( superEntityName );
 		}
 		return null;
 	}
