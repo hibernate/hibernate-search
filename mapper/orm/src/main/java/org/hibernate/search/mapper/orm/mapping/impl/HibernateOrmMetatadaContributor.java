@@ -25,6 +25,7 @@ import org.hibernate.mapping.ToOne;
 import org.hibernate.mapping.Value;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
+import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBasicTypeMetadataProvider;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
@@ -36,13 +37,13 @@ import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 
 public final class HibernateOrmMetatadaContributor implements PojoMappingConfigurationContributor {
+	private final HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider;
 	private final HibernateOrmBootstrapIntrospector introspector;
-	private final Map<String, PersistentClass> persistentClasses;
 
-	HibernateOrmMetatadaContributor(HibernateOrmBootstrapIntrospector introspector,
-			Map<String, PersistentClass> persistentClasses) {
+	HibernateOrmMetatadaContributor(HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
+			HibernateOrmBootstrapIntrospector introspector) {
+		this.basicTypeMetadataProvider = basicTypeMetadataProvider;
 		this.introspector = introspector;
-		this.persistentClasses = persistentClasses;
 	}
 
 	@Override
@@ -51,7 +52,7 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 		PropertyDelegatesCollector delegatesCollector = new PropertyDelegatesCollector();
 
 		// Ensure all entities are declared as such and have their inverse associations declared
-		for ( PersistentClass persistentClass : persistentClasses.values() ) {
+		for ( PersistentClass persistentClass : basicTypeMetadataProvider.getPersistentClasses() ) {
 			Class<?> clazz = persistentClass.getMappedClass();
 			PojoRawTypeModel<?> typeModel = introspector.getTypeModel( clazz );
 			collectPropertyDelegates( delegatesCollector, typeModel, persistentClass.getPropertyIterator() );
@@ -200,7 +201,7 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 
 		String rootPropertyName = tokenizer.nextToken();
 		PojoModelPath.Builder inverseSidePathBuilder = PojoModelPath.builder().property( rootPropertyName );
-		Property property = persistentClasses.get( inverseSideEntity ).getProperty( rootPropertyName );
+		Property property = basicTypeMetadataProvider.getPersistentClass( inverseSideEntity ).getProperty( rootPropertyName );
 
 		do {
 			Value value = property.getValue();

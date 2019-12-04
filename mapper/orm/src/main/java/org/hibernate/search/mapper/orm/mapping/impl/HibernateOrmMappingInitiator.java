@@ -6,10 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
-import java.util.Map;
-import java.util.TreeMap;
-import java.util.function.Function;
-
 import org.hibernate.MultiTenancyStrategy;
 import org.hibernate.annotations.common.reflection.ReflectionManager;
 import org.hibernate.boot.Metadata;
@@ -32,7 +28,6 @@ import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMapperDelegate;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingInitiator;
-import org.hibernate.search.util.common.impl.StreamHelper;
 
 public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<HibernateOrmMappingPartialBuildState>
 		implements HibernateOrmMappingConfigurationContext {
@@ -57,19 +52,19 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 				HibernateOrmBootstrapIntrospector.create( basicTypeMetadataProvider, reflectionManager, propertySource );
 
 		return new HibernateOrmMappingInitiator(
-				metadata, ormConfigurationService, introspector
+				basicTypeMetadataProvider, ormConfigurationService, introspector
 		);
 	}
 
-	private final Metadata metadata;
+	private final HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider;
 	private final HibernateOrmBootstrapIntrospector introspector;
 
-	private HibernateOrmMappingInitiator(Metadata metadata,
+	private HibernateOrmMappingInitiator(HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
 			ConfigurationService ormConfigurationService,
 			HibernateOrmBootstrapIntrospector introspector) {
 		super( introspector );
 
-		this.metadata = metadata;
+		this.basicTypeMetadataProvider = basicTypeMetadataProvider;
 		this.introspector = introspector;
 
 		/*
@@ -92,21 +87,8 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
 		ConfigurationPropertySource propertySource = buildContext.getConfigurationPropertySource();
 
-		Map<String, PersistentClass> persistentClasses = metadata.getEntityBindings().stream()
-				// getMappedClass() can return null, which should be ignored
-				.filter( persistentClass -> persistentClass.getMappedClass() != null )
-				.collect( StreamHelper.toMap(
-						PersistentClass::getEntityName,
-						Function.identity(),
-						/*
-						 * The entity bindings are stored in a HashMap whose order is not well defined.
-						 * Copy them to a sorted map before processing for deterministic iteration.
-						 */
-						TreeMap::new
-				) );
-
 		addConfigurationContributor(
-				new HibernateOrmMetatadaContributor( introspector, persistentClasses )
+				new HibernateOrmMetatadaContributor( basicTypeMetadataProvider, introspector )
 		);
 
 		// Enable annotation mapping if necessary
@@ -115,7 +97,7 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 			setAnnotatedTypeDiscoveryEnabled( true );
 
 			AnnotationMappingConfigurationContext annotationMapping = annotationMapping();
-			for ( PersistentClass persistentClass : persistentClasses.values() ) {
+			for ( PersistentClass persistentClass : basicTypeMetadataProvider.getPersistentClasses() ) {
 				annotationMapping.add( persistentClass.getMappedClass() );
 			}
 		}

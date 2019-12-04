@@ -7,9 +7,11 @@
 package org.hibernate.search.mapper.orm.model.impl;
 
 import java.util.Collection;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import org.hibernate.boot.Metadata;
@@ -26,45 +28,54 @@ public class HibernateOrmBasicTypeMetadataProvider {
 		Collection<PersistentClass> persistentClasses = metadata.getEntityBindings()
 				.stream()
 				.filter( PersistentClass::hasPojoRepresentation )
-				.collect( Collectors.toList() );
-		Map<Class<?>, HibernateOrmBasicTypeMetadata> typeMetadata = new HashMap<>();
-		collectPersistentTypes( typeMetadata, persistentClasses );
+				/*
+				 * The persistent classes from Hibernate ORM are stored in a HashMap whose order is not well defined.
+				 * We use a sorted map here to make iteration deterministic.
+				 */
+				.collect( Collectors.toCollection(
+						() -> new TreeSet<>( Comparator.comparing( PersistentClass::getEntityName ) )
+				) );
+
+		Builder builder = new Builder();
+
 		for ( PersistentClass persistentClass : persistentClasses ) {
-			collectEmbeddedTypesRecursively( typeMetadata, persistentClass.getIdentifier() );
-			collectEmbeddedTypesRecursively( typeMetadata, persistentClass.getPropertyIterator() );
+			collectPersistentClass( builder, persistentClass );
 		}
 
-		return new HibernateOrmBasicTypeMetadataProvider( typeMetadata );
+		return builder.build();
 	}
 
-	private static void collectPersistentTypes(Map<Class<?>, HibernateOrmBasicTypeMetadata> collected, Collection<PersistentClass> persistentClasses) {
-		for ( PersistentClass persistentClass : persistentClasses ) {
-			collected.put( persistentClass.getMappedClass(), HibernateOrmBasicTypeMetadata.create( persistentClass ) );
-		}
+	private static void collectPersistentClass(Builder metadataProviderBuilder, PersistentClass persistentClass) {
+		metadataProviderBuilder.persistentClasses.put( persistentClass.getEntityName(), persistentClass );
+		metadataProviderBuilder.typeMetadata.put(
+				persistentClass.getMappedClass(), HibernateOrmBasicTypeMetadata.create( persistentClass ) );
+		collectEmbeddedTypesRecursively( metadataProviderBuilder, persistentClass.getIdentifier() );
+		collectEmbeddedTypesRecursively( metadataProviderBuilder, persistentClass.getPropertyIterator() );
 	}
 
-	private static void collectEmbeddedTypesRecursively(Map<Class<?>, HibernateOrmBasicTypeMetadata> collected, Iterator<Property> propertyIterator) {
+	private static void collectEmbeddedTypesRecursively(Builder metadataProviderBuilder,
+			Iterator<Property> propertyIterator) {
 		while ( propertyIterator.hasNext() ) {
 			Property property = propertyIterator.next();
-			collectEmbeddedTypesRecursively( collected, property.getValue() );
+			collectEmbeddedTypesRecursively( metadataProviderBuilder, property.getValue() );
 		}
 	}
 
-	private static void collectEmbeddedTypesRecursively(Map<Class<?>, HibernateOrmBasicTypeMetadata> collected, Value value) {
+	private static void collectEmbeddedTypesRecursively(Builder metadataProviderBuilder, Value value) {
 		if ( value instanceof Component ) {
 			Component component = (Component) value;
 			// We don't care about duplicates, we assume they are all the same regarding the information we need
-			collected.computeIfAbsent(
+			metadataProviderBuilder.typeMetadata.computeIfAbsent(
 					component.getComponentClass(),
 					ignored -> HibernateOrmBasicTypeMetadata.create( component )
 			);
 			// Recurse
-			collectEmbeddedTypesRecursively( collected, component.getPropertyIterator() );
+			collectEmbeddedTypesRecursively( metadataProviderBuilder, component.getPropertyIterator() );
 		}
 		else if ( value instanceof org.hibernate.mapping.Collection ) {
 			org.hibernate.mapping.Collection collection = (org.hibernate.mapping.Collection) value;
 			// Recurse
-			collectEmbeddedTypesRecursively( collected, collection.getElement() );
+			collectEmbeddedTypesRecursively( metadataProviderBuilder, collection.getElement() );
 			if ( collection instanceof IndexedCollection ) {
 				IndexedCollection indexedCollection = (IndexedCollection) collection;
 				/*
@@ -72,18 +83,37 @@ public class HibernateOrmBasicTypeMetadataProvider {
 				 * but the value of the foreign key to the targeted entity...
 				 * We need to call getIndex() to retrieve the value of the map key.
 				 */
-				collectEmbeddedTypesRecursively( collected, indexedCollection.getIndex() );
+				collectEmbeddedTypesRecursively( metadataProviderBuilder, indexedCollection.getIndex() );
 			}
 		}
 	}
 
+	private final Map<String, PersistentClass> persistentClasses;
 	private final Map<Class<?>, HibernateOrmBasicTypeMetadata> typeMetadata;
 
-	private HibernateOrmBasicTypeMetadataProvider(Map<Class<?>, HibernateOrmBasicTypeMetadata> typeMetadata) {
-		this.typeMetadata = typeMetadata;
+	private HibernateOrmBasicTypeMetadataProvider(Builder builder) {
+		this.persistentClasses = builder.persistentClasses;
+		this.typeMetadata = builder.typeMetadata;
+	}
+
+	public Collection<PersistentClass> getPersistentClasses() {
+		return persistentClasses.values();
+	}
+
+	public PersistentClass getPersistentClass(String hibernateOrmEntityName) {
+		return persistentClasses.get( hibernateOrmEntityName );
 	}
 
 	HibernateOrmBasicTypeMetadata getBasicTypeMetadata(Class<?> clazz) {
 		return typeMetadata.get( clazz );
+	}
+
+	private static class Builder {
+		private final Map<String, PersistentClass> persistentClasses = new LinkedHashMap<>();
+		private final Map<Class<?>, HibernateOrmBasicTypeMetadata> typeMetadata = new LinkedHashMap<>();
+
+		HibernateOrmBasicTypeMetadataProvider build() {
+			return new HibernateOrmBasicTypeMetadataProvider( this );
+		}
 	}
 }
