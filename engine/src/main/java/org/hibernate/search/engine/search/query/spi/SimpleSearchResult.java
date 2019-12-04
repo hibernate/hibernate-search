@@ -28,11 +28,11 @@ public class SimpleSearchResult<H> implements SearchResult<H> {
 	private final boolean timedOut;
 
 	public SimpleSearchResult(long hitCount, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults,
-			Integer took, Boolean timedOut) {
+			Duration took, Boolean timedOut) {
 		this.hitCount = hitCount;
 		this.hits = hits;
 		this.aggregationResults = aggregationResults;
-		this.took = ( took == null ) ? null : Duration.ofMillis( took );
+		this.took = took;
 		this.timedOut = ( timedOut != null ) && timedOut;
 	}
 
