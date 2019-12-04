@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
 import java.util.Collection;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
@@ -26,6 +27,10 @@ public interface SearchWorkBuilder<R> extends ElasticsearchWorkBuilder<Elasticse
 	SearchWorkBuilder<R> routingKeys(Set<String> routingKeys);
 
 	SearchWorkBuilder<R> requestTransformer(Function<ElasticsearchRequest, ElasticsearchRequest> requestTransformer);
+
+	SearchWorkBuilder<R> timeoutValue(Integer timeoutValue);
+
+	SearchWorkBuilder<R> timeoutUnit(TimeUnit timeoutUnit);
 
 	SearchWorkBuilder<R> exceptionOnTimeout(boolean exceptionOnTimeout);
 }

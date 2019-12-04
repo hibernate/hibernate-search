@@ -57,21 +57,21 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 
 	private final ScheduledExecutorService timeoutExecutorService;
 
-	private final int requestTimeoutValue;
-	private final TimeUnit requestTimeoutUnit;
+	private final int globalTimeoutValue;
+	private final TimeUnit globalTimeoutUnit;
 
 	private final Gson gson;
 	private final JsonLogHelper jsonLogHelper;
 
 	ElasticsearchClientImpl(RestClient restClient, Sniffer sniffer,
 			ThreadPoolProvider threadPoolProvider,
-			int requestTimeoutValue, TimeUnit requestTimeoutUnit,
+			int globalTimeoutValue, TimeUnit globalTimeoutUnit,
 			Gson gson, JsonLogHelper jsonLogHelper) {
 		this.restClient = restClient;
 		this.sniffer = sniffer;
 		this.timeoutExecutorService = threadPoolProvider.newScheduledThreadPool( "Elasticsearch request timeout executor" );
-		this.requestTimeoutValue = requestTimeoutValue;
-		this.requestTimeoutUnit = requestTimeoutUnit;
+		this.globalTimeoutValue = globalTimeoutValue;
+		this.globalTimeoutUnit = globalTimeoutUnit;
 		this.gson = gson;
 		this.jsonLogHelper = jsonLogHelper;
 	}
@@ -133,6 +133,11 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 				}
 				);
 
+		Integer currentTimeoutValue = ( elasticsearchRequest.getTimeoutValue() == null ) ?
+				globalTimeoutValue : elasticsearchRequest.getTimeoutValue();
+		TimeUnit currentTimeoutUnit = ( elasticsearchRequest.getTimeoutUnit() == null ) ?
+				globalTimeoutUnit : elasticsearchRequest.getTimeoutUnit();
+
 		/*
 		 * TODO HSEARCH-3590 maybe the callback should also cancel the request?
 		 *  In any case, the RestClient doesn't return the Future<?> from Apache HTTP client,
@@ -144,7 +149,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 						completableFuture.completeExceptionally( new TimeoutException() );
 					}
 				},
-				requestTimeoutValue, requestTimeoutUnit
+				currentTimeoutValue, currentTimeoutUnit
 				);
 		completableFuture.thenRun( () -> timeout.cancel( false ) );
 

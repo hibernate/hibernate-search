@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
@@ -56,6 +57,8 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	private final JsonObject payload;
 	private final ElasticsearchSearchRequestTransformer requestTransformer;
 	private final ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor;
+	private final Integer timeoutValue;
+	private final TimeUnit timeoutUnit;
 	private final boolean exceptionOnTimeout;
 
 	ElasticsearchSearchQueryImpl(ElasticsearchWorkBuilderFactory workFactory,
@@ -67,7 +70,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			JsonObject payload,
 			ElasticsearchSearchRequestTransformer requestTransformer,
 			ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor,
-			boolean exceptionOnTimeout) {
+			Integer timeoutValue, TimeUnit timeoutUnit, boolean exceptionOnTimeout) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.searchContext = searchContext;
@@ -77,6 +80,8 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		this.payload = payload;
 		this.requestTransformer = requestTransformer;
 		this.searchResultExtractor = searchResultExtractor;
+		this.timeoutValue = timeoutValue;
+		this.timeoutUnit = timeoutUnit;
 		this.exceptionOnTimeout = exceptionOnTimeout;
 	}
 
@@ -104,6 +109,8 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				.indexes( searchContext.getIndexNames() )
 				.paging( defaultedLimit( limit, offset ), offset )
 				.routingKeys( routingKeys )
+				.timeoutValue( timeoutValue )
+				.timeoutUnit( timeoutUnit )
 				.exceptionOnTimeout( exceptionOnTimeout )
 				.requestTransformer(
 						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )

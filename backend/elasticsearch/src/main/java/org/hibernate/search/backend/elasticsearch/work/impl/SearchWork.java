@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
@@ -74,7 +75,9 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 		private Integer scrollSize;
 		private String scrollTimeout;
 		private Set<String> routingKeys;
-		private boolean excpetionOnTimeout;
+		private Integer timeoutValue;
+		private TimeUnit timeoutUnit;
+		private boolean exceptionOnTimeout;
 
 		private Builder(JsonObject payload, ElasticsearchSearchResultExtractor<R> resultExtractor, Boolean trackTotalHits) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
@@ -110,8 +113,20 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 		}
 
 		@Override
+		public SearchWorkBuilder<R> timeoutValue(Integer timeoutValue) {
+			this.timeoutValue = timeoutValue;
+			return this;
+		}
+
+		@Override
+		public SearchWorkBuilder<R> timeoutUnit(TimeUnit timeoutUnit) {
+			this.timeoutUnit = timeoutUnit;
+			return this;
+		}
+
+		@Override
 		public SearchWorkBuilder<R> exceptionOnTimeout(boolean exceptionOnTimeout) {
-			this.excpetionOnTimeout = exceptionOnTimeout;
+			this.exceptionOnTimeout = exceptionOnTimeout;
 			return this;
 		}
 
@@ -144,9 +159,13 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 				builder.param( "track_total_hits", trackTotalHits );
 			}
 
-			if ( excpetionOnTimeout ) {
+			if ( exceptionOnTimeout ) {
 				// the default is true
 				builder.param( "allow_partial_search_results", false );
+
+				// set timeoutValue and timeoutUnit only for hard timeout
+				builder.timeoutValue( timeoutValue );
+				builder.timeoutUnit( timeoutUnit );
 			}
 
 			return builder.build();

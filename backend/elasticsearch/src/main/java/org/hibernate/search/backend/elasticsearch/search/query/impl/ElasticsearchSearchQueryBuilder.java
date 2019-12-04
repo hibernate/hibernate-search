@@ -66,8 +66,8 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private JsonArray jsonSort;
 	private Map<DistanceSortKey, Integer> distanceSorts;
 	private Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations;
-	private Long timeout;
-	private TimeUnit timeUnit;
+	private Integer timeoutValue;
+	private TimeUnit timeoutUnit;
 	private boolean exceptionOnTimeout;
 	private ElasticsearchSearchRequestTransformer requestTransformer;
 
@@ -106,8 +106,9 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 	@Override
 	public void timeout(long timeout, TimeUnit timeUnit, TimeoutStrategy strategy) {
-		this.timeout = timeout;
-		this.timeUnit = timeUnit;
+		// TODO HSEARCH-3774 The timeout implementation can be further improved
+		this.timeoutValue = Math.toIntExact( timeout );
+		this.timeoutUnit = timeUnit;
 		this.exceptionOnTimeout = ( TimeoutStrategy.RAISE_AN_EXCEPTION.equals( strategy ) );
 	}
 
@@ -190,7 +191,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 			payload.add( "aggregations", jsonAggregations );
 		}
 
-		if ( timeout != null && timeUnit != null ) {
+		if ( timeoutValue != null && timeoutUnit != null ) {
 			payload.add( "timeout", getTimeoutString() );
 		}
 
@@ -205,13 +206,14 @@ public class ElasticsearchSearchQueryBuilder<H>
 				workFactory, queryOrchestrator,
 				searchContext, sessionContext, loadingContext, routingKeys,
 				payload, requestTransformer,
-				searchResultExtractor, exceptionOnTimeout
+				searchResultExtractor,
+				timeoutValue, timeoutUnit, exceptionOnTimeout
 		);
 	}
 
 	private JsonPrimitive getTimeoutString() {
-		StringBuilder builder = new StringBuilder( timeout + "" );
-		switch ( timeUnit ) {
+		StringBuilder builder = new StringBuilder( timeoutValue + "" );
+		switch ( timeoutUnit ) {
 			case DAYS:
 				builder.append( "d" );
 				break;
