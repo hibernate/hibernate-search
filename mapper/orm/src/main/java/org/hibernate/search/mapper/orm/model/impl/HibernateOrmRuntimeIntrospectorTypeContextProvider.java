@@ -6,13 +6,14 @@
  */
 package org.hibernate.search.mapper.orm.model.impl;
 
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+
 public interface HibernateOrmRuntimeIntrospectorTypeContextProvider {
 
 	/**
 	 * @param entityName The Hibernate ORM entity name (different from the JPA entity name).
-	 * @return The corresponding type context,
-	 * or {@code null} if the entity is neither indexed nor contained in an indexed type.
+	 * @return The corresponding type identifier.
 	 */
-	HibernateOrmRuntimeIntrospectorTypeContext getByHibernateOrmEntityName(String entityName);
+	PojoRawTypeIdentifier<?> getTypeIdentifierByHibernateOrmEntityName(String entityName);
 
 }

@@ -6,13 +6,14 @@
  */
 package org.hibernate.search.mapper.orm.session.impl;
 
-import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRuntimeIntrospectorTypeContext;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 /**
  * @param <E> The entity type.
  */
-public interface HibernateOrmSessionTypeContext<E>
-		extends HibernateOrmRuntimeIntrospectorTypeContext {
+public interface HibernateOrmSessionTypeContext<E> {
+
+	PojoRawTypeIdentifier<E> getTypeIdentifier();
 
 	String getJpaEntityName();
 
