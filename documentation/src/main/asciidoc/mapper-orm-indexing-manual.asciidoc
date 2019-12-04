@@ -188,6 +188,9 @@ Compared to `delete`, this is mainly useful if the entity has already been delet
 and is not available, even in a detached state, in the session.
 In that case, reindexing associated entities will be the user's responsibility,
 since Hibernate Search cannot know which entities are associated to an entity that no longer exists.
+`purge(String entityName, Object id)`::
+Same as `purge(Class<?> entityType, Object id)`,
+but the entity type is referenced by its name (see `@javax.persistence.Entity#name`).
 `process()` and `execute()`::
 Respectively, process the changes and apply them to indexes.
 +
