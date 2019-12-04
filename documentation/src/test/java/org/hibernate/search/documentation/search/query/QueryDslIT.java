@@ -58,6 +58,11 @@ public class QueryDslIT {
 	private static final int BOOK3_ID = 3;
 	private static final int BOOK4_ID = 4;
 
+	private static final int MANAGER1_ID = 1;
+	private static final int MANAGER2_ID = 2;
+	private static final int ASSOCIATE1_ID = 1;
+	private static final int ASSOCIATE2_ID = 2;
+
 	@Parameterized.Parameters(name = "{0}")
 	public static Object[] backendConfigurations() {
 		return BackendConfigurations.simple().toArray();
@@ -83,7 +88,7 @@ public class QueryDslIT {
 						AutomaticIndexingSynchronizationStrategyName.SEARCHABLE
 				)
 				.withProperty( AvailableSettings.JPA_SHARED_CACHE_MODE, SharedCacheMode.ENABLE_SELECTIVE.name() )
-				.setup( Book.class );
+				.setup( Book.class, Manager.class, Associate.class );
 		initData();
 	}
 
@@ -108,6 +113,53 @@ public class QueryDslIT {
 			assertThat( totalHitCount ).isEqualTo( 2 );
 			assertThat( hits ).extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
+		} );
+	}
+
+	@Test
+	public void targetingMultipleEntityTypes() {
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::targeting-multiple[]
+			SearchResult<Person> result = searchSession.search( Arrays.asList( // <1>
+							Manager.class, Associate.class
+					) )
+					.predicate( f -> f.match() // <2>
+							.field( "name" )
+							.matching( "james" ) )
+					.fetch( 20 ); // <3>
+			// end::targeting-multiple[]
+			List<Person> hits = result.getHits();
+			assertThat( hits )
+					.containsExactlyInAnyOrder(
+							entityManager.getReference( Manager.class, MANAGER1_ID ),
+							entityManager.getReference( Associate.class, ASSOCIATE1_ID )
+					);
+		} );
+	}
+
+	@Test
+	public void targetingByEntityName() {
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::targeting-entityName[]
+			SearchResult<Person> result = searchSession.search( // <1>
+							searchSession.scope( // <2>
+									Person.class,
+									Arrays.asList( "Manager", "Associate" )
+							)
+					)
+					.predicate( f -> f.match() // <3>
+							.field( "name" )
+							.matching( "james" ) )
+					.fetch( 20 ); // <4>
+			// end::targeting-entityName[]
+			List<Person> hits = result.getHits();
+			assertThat( hits )
+					.containsExactlyInAnyOrder(
+							entityManager.getReference( Manager.class, MANAGER1_ID ),
+							entityManager.getReference( Associate.class, ASSOCIATE1_ID )
+					);
 		} );
 	}
 
@@ -476,6 +528,33 @@ public class QueryDslIT {
 			entityManager.persist( book2 );
 			entityManager.persist( book3 );
 			entityManager.persist( book4 );
+		} );
+
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			Manager manager1 = new Manager();
+			manager1.setId( MANAGER1_ID );
+			manager1.setName( "James Green" );
+
+			Manager manager2 = new Manager();
+			manager2.setId( MANAGER2_ID );
+			manager2.setName( "John Doe" );
+
+			Associate associate1 = new Associate();
+			associate1.setId( ASSOCIATE1_ID );
+			associate1.setName( "James Harper" );
+			associate1.setManager( manager1 );
+			manager1.getAssociates().add( associate1 );
+
+			Associate associate2 = new Associate();
+			associate2.setId( ASSOCIATE2_ID );
+			associate2.setName( "John Sutherland" );
+			associate2.setManager( manager2 );
+			manager2.getAssociates().add( associate2 );
+
+			entityManager.persist( manager1 );
+			entityManager.persist( manager2 );
+			entityManager.persist( associate1 );
+			entityManager.persist( associate2 );
 		} );
 	}
 

@@ -62,6 +62,60 @@ or even from both the index and the database.
 * <<search-dsl-aggregation,aggregations>>,
 to group hits and compute aggregated metrics for each group -- hit count by category, for example.
 
+[[search-dsl-query-targeting]]
+=== Advanced entity types targeting
+
+[[search-dsl-query-targeting-multiple]]
+==== Targeting multiple entity types
+
+When multiple entity types have similar indexed fields,
+it is possible to search across these multiple types in a single search query:
+the search result will contain hits from any of the targeted types.
+
+.Targeting multiple entity types in a single search query
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=targeting-multiple]
+----
+<1> Initiate a search query targeting the indexes mapped to the `Manager` and `Associate` entity types.
+Since both entity types implement the `Person` interface,
+search hits will be instances of `Person`.
+<2> Continue building the query as usual.
+There are restrictions regarding the fields that can be used: see the note below.
+<3> Fetch the search result. Hits will all be instances of `Person`.
+====
+
+[NOTE]
+====
+Multi-entity (multi-index) searches will only work well as long
+as the fields referenced in predicates/sorts/etc. are identical in all targeted indexes (same type, same analyzer, ...).
+Fields that are defined in only one of the targeted indexes will also work correctly.
+
+If you want to reference index fields that are even *slightly* different
+in one of the targeted indexes (different type, different analyzer, ...),
+see <<search-dsl-multiple-fields>>.
+====
+
+[[search-dsl-query-targeting-entityName]]
+==== Targeting entity types by name
+
+Though rarely necessary, it is also possible to use entity names instead of classes
+to designate the entity types targeted by the search:
+
+.Targeting entity types by name
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=targeting-entityName]
+----
+<1> Initiate a search query.
+<2> Pass a custom scope encompassing the indexes mapped to the `Manager` and `Associate` entity types,
+expecting those entity types to implement the `Person` interface (Hibernate Search will check that).
+<3> Continue building the query as usual.
+<4> Fetch the search result. Hits will all be instances of `Person`.
+====
+
 [[search-dsl-query-fetching-results]]
 === Fetching results
 // Search 5 anchors backward compatibility
@@ -2109,7 +2163,7 @@ See <<mapper-orm-bridge-valuebridge>>,
 Sometimes a predicate/sort/projection targets *multiple* field, which may have conflicting definitions:
 
 * when multiple field names are passed to the `fields` method in the predicate DSL (each field has its own definition);
-* or when the search query targets multiple indexes (each index has its own definition of each field).
+* or when the search query <<search-dsl-query-targeting-multiple,targets multiple indexes>> (each index has its own definition of each field).
 
 In such cases, the definition of the targeted fields is expected to be compatible.
 For example targeting an `Integer` field and a `java.time.LocalDate` field
