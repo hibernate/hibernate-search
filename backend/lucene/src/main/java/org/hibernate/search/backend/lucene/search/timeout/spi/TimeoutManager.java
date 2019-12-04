@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.timeout.spi;
 
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -37,7 +38,7 @@ public interface TimeoutManager {
 
 	Type getType();
 
-	Integer getTookTimeInMilliseconds();
+	Duration getTookTime();
 
 	enum Type {
 		NONE,

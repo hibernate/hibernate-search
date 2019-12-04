@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
@@ -16,7 +17,7 @@ import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
 class LuceneSearchResultImpl<H> extends SimpleSearchResult<H>
 		implements LuceneSearchResult<H> {
 	LuceneSearchResultImpl(long hitCount, List<H> hits, Map<AggregationKey<?>, ?> aggregationResults,
-			Integer took, Boolean timedOut) {
+			Duration took, Boolean timedOut) {
 		super( hitCount, hits, aggregationResults, took, timedOut );
 	}
 }

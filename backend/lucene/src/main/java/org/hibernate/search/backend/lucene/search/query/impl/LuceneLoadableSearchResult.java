@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 
 import static org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection.transformUnsafe;
 
+import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -36,14 +37,14 @@ public class LuceneLoadableSearchResult<H> {
 	private final long hitCount;
 	private List<Object> extractedData;
 	private final Map<AggregationKey<?>, ?> extractedAggregations;
-	private Integer took;
+	private Duration took;
 	private Boolean timedOut;
 
 	LuceneLoadableSearchResult(LuceneSearchQueryExtractContext extractContext,
 			LuceneSearchProjection<?, H> rootProjection,
 			long hitCount, List<Object> extractedData,
 			Map<AggregationKey<?>, ?> extractedAggregations,
-			Integer took, boolean timedOut) {
+			Duration took, boolean timedOut) {
 		this.extractContext = extractContext;
 		this.rootProjection = rootProjection;
 		this.hitCount = hitCount;

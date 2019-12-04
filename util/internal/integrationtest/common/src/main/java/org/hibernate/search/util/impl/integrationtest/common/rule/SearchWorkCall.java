@@ -8,6 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.rule;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -76,7 +77,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 						behavior.getRawHits()
 				),
 				Collections.emptyMap(),
-				0, false
+				Duration.ZERO, false
 		);
 	}
 
