@@ -28,7 +28,7 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 	private final IdentifierMapping identifierMapping;
 
 	private HibernateOrmIndexedTypeContext(Builder<E> builder, SessionFactoryImplementor sessionFactory) {
-		super( sessionFactory, builder.typeIdentifier, builder.entityName );
+		super( sessionFactory, builder.typeIdentifier, builder.hibernateOrmEntityName );
 
 		this.indexName = builder.indexName;
 
@@ -81,16 +81,19 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 	static class Builder<E> implements PojoIndexedTypeExtendedMappingCollector {
 
 		private final PojoRawTypeIdentifier<E> typeIdentifier;
-		private final String entityName;
+		private final String jpaEntityName;
+		private final String hibernateOrmEntityName;
 		private final String indexName;
 
 		private String documentIdSourcePropertyName;
 		private ValueReadHandle<?> documentIdSourcePropertyHandle;
 		private IdentifierMapping identifierMapping;
 
-		Builder(PojoRawTypeIdentifier<E> typeIdentifier, String entityName, String indexName) {
+		Builder(PojoRawTypeIdentifier<E> typeIdentifier, String jpaEntityName, String hibernateOrmEntityName,
+				String indexName) {
 			this.typeIdentifier = typeIdentifier;
-			this.entityName = entityName;
+			this.jpaEntityName = jpaEntityName;
+			this.hibernateOrmEntityName = hibernateOrmEntityName;
 			this.indexName = indexName;
 		}
 

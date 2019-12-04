@@ -22,6 +22,7 @@ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupSt
 import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
@@ -216,4 +217,17 @@ public interface Log extends BasicLogger {
 	SearchException massIndexingEntityFailures(long finalFailureCount,
 			EntityReference firstFailureEntity, String firstFailureMessage,
 			@Cause Throwable firstFailure);
+
+	@Message(id = ID_OFFSET_2 + 27,
+			value = "Unknown type: '%1$s'. Available named types: %2$s."
+					+ " Only dynamic types can be referenced by their name."
+					+ " For dynamic entities, the correct type name is the Hibernate ORM entity name,"
+					+ " i.e. the name accepted by Session.get(String, Object)."
+					+ " For component types in dynamic entities (embeddeds, ...),"
+					+ " the correct type name is name of the owner entity"
+					+ " followed by a dot ('.') followed by the dot-separated path to the component,"
+					+ " e.g. 'MyEntity.myEmbedded' or 'MyEntity.myEmbedded.myNestedEmbedded'."
+	)
+	SearchException unknownNamedType(String typeName, Collection<String> availableNamedTypes);
+
 }

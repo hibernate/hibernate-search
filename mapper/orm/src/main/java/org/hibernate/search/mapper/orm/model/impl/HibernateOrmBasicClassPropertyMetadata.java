@@ -8,20 +8,20 @@ package org.hibernate.search.mapper.orm.model.impl;
 
 import java.lang.reflect.Member;
 
-class HibernateOrmBasicPropertyMetadata {
+class HibernateOrmBasicClassPropertyMetadata {
 	private final Member member;
 	private final boolean id;
 
-	HibernateOrmBasicPropertyMetadata(Member member, boolean id) {
+	HibernateOrmBasicClassPropertyMetadata(Member member, boolean id) {
 		this.member = member;
 		this.id = id;
 	}
 
-	boolean isId() {
-		return id;
-	}
-
 	Member getMember() {
 		return member;
+	}
+
+	boolean isId() {
+		return id;
 	}
 }

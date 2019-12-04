@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.orm.model.impl;
 
 import java.lang.annotation.Annotation;
-import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Field;
 import java.lang.reflect.Member;
 import java.lang.reflect.Method;
@@ -16,86 +15,28 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.XProperty;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
-import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.hcann.spi.PojoCommonsAnnotationsHelper;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
-import org.hibernate.search.mapper.pojo.model.spi.JavaClassPojoCaster;
-import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
+public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTypeModel<T> {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private final HibernateOrmBasicClassTypeMetadata ormTypeMetadata;
 
-	private final HibernateOrmBootstrapIntrospector introspector;
-	private final PojoRawTypeIdentifier<T> typeIdentifier;
-	private final XClass xClass;
-	private final HibernateOrmBasicTypeMetadata ormTypeMetadata;
-	private final RawTypeDeclaringContext<T> rawTypeDeclaringContext;
-	private final PojoCaster<T> caster;
-
-	private final Map<String, HibernateOrmPropertyModel<?>> propertyModelCache = new HashMap<>();
-
-	private List<PojoPropertyModel<?>> declaredProperties;
+	private final Map<String, HibernateOrmClassPropertyModel<?>> propertyModelCache = new HashMap<>();
 
 	private Map<String, XProperty> declaredFieldAccessXPropertiesByName;
 	private Map<String, XProperty> declaredMethodAccessXPropertiesByName;
 
-	HibernateOrmRawTypeModel(HibernateOrmBootstrapIntrospector introspector,
+	HibernateOrmClassRawTypeModel(HibernateOrmBootstrapIntrospector introspector,
 			PojoRawTypeIdentifier<T> typeIdentifier,
-			HibernateOrmBasicTypeMetadata ormTypeMetadata, RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
-		this.introspector = introspector;
-		this.typeIdentifier = typeIdentifier;
-		this.xClass = introspector.toXClass( typeIdentifier.getJavaClass() );
+			HibernateOrmBasicClassTypeMetadata ormTypeMetadata, RawTypeDeclaringContext<T> rawTypeDeclaringContext) {
+		super( introspector, typeIdentifier, rawTypeDeclaringContext );
 		this.ormTypeMetadata = ormTypeMetadata;
-		this.rawTypeDeclaringContext = rawTypeDeclaringContext;
-		this.caster = new JavaClassPojoCaster<>( typeIdentifier.getJavaClass() );
-	}
-
-	@Override
-	public boolean equals(Object o) {
-		if ( this == o ) {
-			return true;
-		}
-		if ( o == null || getClass() != o.getClass() ) {
-			return false;
-		}
-		HibernateOrmRawTypeModel<?> that = (HibernateOrmRawTypeModel<?>) o;
-		/*
-		 * We need to take the introspector into account, so that the engine does not confuse
-		 * type models from different mappers during bootstrap.
-		 */
-		return Objects.equals( introspector, that.introspector ) &&
-				Objects.equals( typeIdentifier, that.typeIdentifier );
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash( introspector, typeIdentifier );
-	}
-
-	@Override
-	public String toString() {
-		return getClass().getSimpleName() + "[" + typeIdentifier + "]";
-	}
-
-	@Override
-	public PojoRawTypeIdentifier<T> getTypeIdentifier() {
-		return typeIdentifier;
-	}
-
-	@Override
-	public String getName() {
-		return typeIdentifier.toString();
 	}
 
 	@Override
@@ -104,23 +45,18 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	@Override
-	public boolean isSubTypeOf(MappableTypeModel other) {
-		return other instanceof HibernateOrmRawTypeModel
-				&& ( (HibernateOrmRawTypeModel<?>) other ).xClass.isAssignableFrom( xClass );
+	public boolean isSubTypeOf(MappableTypeModel superTypeCandidate) {
+		return superTypeCandidate instanceof HibernateOrmClassRawTypeModel
+				&& ( (HibernateOrmClassRawTypeModel<?>) superTypeCandidate ).xClass.isAssignableFrom( xClass );
 	}
 
 	@Override
-	public PojoRawTypeModel<? super T> getRawType() {
-		return this;
-	}
-
-	@Override
-	public Stream<HibernateOrmRawTypeModel<? super T>> getAscendingSuperTypes() {
+	public Stream<HibernateOrmClassRawTypeModel<? super T>> getAscendingSuperTypes() {
 		return introspector.getAscendingSuperTypes( xClass );
 	}
 
 	@Override
-	public Stream<HibernateOrmRawTypeModel<? super T>> getDescendingSuperTypes() {
+	public Stream<HibernateOrmClassRawTypeModel<? super T>> getDescendingSuperTypes() {
 		return introspector.getDescendingSuperTypes( xClass );
 	}
 
@@ -130,37 +66,17 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	@Override
-	public final PojoPropertyModel<?> getProperty(String propertyName) {
-		PojoPropertyModel<?> propertyModel = getPropertyOrNull( propertyName );
-		if ( propertyModel == null ) {
-			throw log.cannotFindReadableProperty( this, propertyName );
-		}
-		return propertyModel;
+	Stream<String> getDeclaredPropertyNames() {
+		return Stream.concat(
+				getDeclaredFieldAccessXPropertiesByName().keySet().stream(),
+				getDeclaredMethodAccessXPropertiesByName().keySet().stream()
+		)
+				.distinct();
 	}
 
 	@Override
-	public Stream<PojoPropertyModel<?>> getDeclaredProperties() {
-		if ( declaredProperties == null ) {
-			// TODO HSEARCH-3056 remove lambdas if possible
-			declaredProperties = Stream.concat(
-					getDeclaredFieldAccessXPropertiesByName().keySet().stream(),
-					getDeclaredMethodAccessXPropertiesByName().keySet().stream()
-			)
-					.distinct()
-					.map( this::getPropertyOrNull )
-					.filter( Objects::nonNull )
-					.collect( Collectors.toList() );
-		}
-		return declaredProperties.stream();
-	}
-
-	@Override
-	public PojoCaster<T> getCaster() {
-		return caster;
-	}
-
-	RawTypeDeclaringContext<T> getRawTypeDeclaringContext() {
-		return rawTypeDeclaringContext;
+	HibernateOrmClassPropertyModel<?> getPropertyOrNull(String propertyName) {
+		return propertyModelCache.computeIfAbsent( propertyName, this::createPropertyModel );
 	}
 
 	private Map<String, XProperty> getDeclaredFieldAccessXPropertiesByName() {
@@ -179,11 +95,7 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 		return declaredMethodAccessXPropertiesByName;
 	}
 
-	private HibernateOrmPropertyModel<?> getPropertyOrNull(String propertyName) {
-		return propertyModelCache.computeIfAbsent( propertyName, this::createPropertyModel );
-	}
-
-	private HibernateOrmPropertyModel<?> createPropertyModel(String propertyName) {
+	private HibernateOrmClassPropertyModel<?> createPropertyModel(String propertyName) {
 		List<XProperty> declaredXProperties = new ArrayList<>( 2 );
 		// Add the method first on purpose: the first XProperty may be used as a default to create the value accessor handle
 		XProperty methodAccessXProperty = getDeclaredMethodAccessXPropertiesByName().get( propertyName );
@@ -195,13 +107,13 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 			declaredXProperties.add( fieldAccessXProperty );
 		}
 
-		HibernateOrmBasicPropertyMetadata ormPropertyMetadata;
+		HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata;
 		if ( ormTypeMetadata == null ) {
 			// There isn't any Hibernate ORM metadata for this type
 			ormPropertyMetadata = null;
 		}
 		else {
-			ormPropertyMetadata = ormTypeMetadata.getPropertyMetadataOrNull( propertyName );
+			ormPropertyMetadata = ormTypeMetadata.getClassPropertyMetadataOrNull( propertyName );
 		}
 
 		Member member = findPropertyMember(
@@ -212,7 +124,7 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 			return null;
 		}
 
-		return new HibernateOrmPropertyModel<>(
+		return new HibernateOrmClassPropertyModel<>(
 				introspector, this, propertyName,
 				declaredXProperties, ormPropertyMetadata, member
 		);
@@ -220,7 +132,7 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 
 	private Member findPropertyMember(String propertyName,
 			XProperty methodAccessXProperty, XProperty fieldAccessXProperty,
-			HibernateOrmBasicPropertyMetadata propertyMetadataFromHibernateOrmMetamodel) {
+			HibernateOrmBasicClassPropertyMetadata propertyMetadataFromHibernateOrmMetamodel) {
 		if ( propertyMetadataFromHibernateOrmMetamodel != null ) {
 			Member memberFromHibernateOrmMetamodel = propertyMetadataFromHibernateOrmMetamodel.getMember();
 			/*
@@ -281,7 +193,7 @@ public class HibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T> {
 				.map( type -> type.getPropertyOrNull( propertyName ) )
 				.filter( Objects::nonNull )
 				.findFirst()
-				.map( HibernateOrmPropertyModel::getMember )
+				.map( HibernateOrmClassPropertyModel::getMember )
 				.orElse( null );
 	}
 

@@ -54,7 +54,13 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 		// Ensure all entities are declared as such and have their inverse associations declared
 		for ( PersistentClass persistentClass : basicTypeMetadataProvider.getPersistentClasses() ) {
 			Class<?> clazz = persistentClass.getMappedClass();
-			PojoRawTypeModel<?> typeModel = introspector.getTypeModel( clazz );
+			PojoRawTypeModel<?> typeModel;
+			if ( persistentClass.hasPojoRepresentation() ) {
+				typeModel = introspector.getTypeModel( clazz );
+			}
+			else {
+				typeModel = introspector.getTypeModel( persistentClass.getEntityName() );
+			}
 			collectPropertyDelegates( delegatesCollector, typeModel, persistentClass.getPropertyIterator() );
 
 			String identifierPropertyName = persistentClass.getIdentifierProperty().getName();
@@ -148,8 +154,13 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 					)
 			);
 			Component componentValue = (Component) value;
-			Class<?> componentClass = componentValue.getComponentClass();
-			PojoRawTypeModel<?> componentTypeModel = introspector.getTypeModel( componentClass );
+			PojoRawTypeModel<?> componentTypeModel;
+			if ( componentValue.isDynamic() ) {
+				componentTypeModel = introspector.getTypeModel( componentValue.getRoleName() );
+			}
+			else {
+				componentTypeModel = introspector.getTypeModel( componentValue.getComponentClass() );
+			}
 			/*
 			 * Different Component instances for the same component class may carry different metadata
 			 * depending on where they appear,

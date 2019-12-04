@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.engine.spi.SessionFactoryImplementor;
+import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBasicTypeMetadataProvider;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionIndexedTypeContext;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionTypeContextProvider;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -83,23 +84,30 @@ class HibernateOrmTypeContextContainer implements HibernateOrmSessionTypeContext
 
 	static class Builder {
 
+		private final HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider;
 		private final List<HibernateOrmIndexedTypeContext.Builder<?>> indexedTypeContextBuilders = new ArrayList<>();
 		private final List<HibernateOrmContainedTypeContext.Builder<?>> containedTypeContextBuilders = new ArrayList<>();
 
-		Builder() {
+		Builder(HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider) {
+			this.basicTypeMetadataProvider = basicTypeMetadataProvider;
 		}
 
-		<E> HibernateOrmIndexedTypeContext.Builder<E> addIndexed(PojoRawTypeModel<E> typeModel, String entityName,
+		<E> HibernateOrmIndexedTypeContext.Builder<E> addIndexed(PojoRawTypeModel<E> typeModel, String jpaEntityName,
 				String indexName) {
-			HibernateOrmIndexedTypeContext.Builder<E> builder =
-					new HibernateOrmIndexedTypeContext.Builder<>( typeModel.getTypeIdentifier(), entityName, indexName );
+			HibernateOrmIndexedTypeContext.Builder<E> builder = new HibernateOrmIndexedTypeContext.Builder<>(
+					typeModel.getTypeIdentifier(),
+					jpaEntityName, basicTypeMetadataProvider.getHibernateOrmEntityNameByJpaEntityName( jpaEntityName ),
+					indexName
+			);
 			indexedTypeContextBuilders.add( builder );
 			return builder;
 		}
 
-		<E> HibernateOrmContainedTypeContext.Builder<E> addContained(PojoRawTypeModel<E> typeModel, String entityName) {
-			HibernateOrmContainedTypeContext.Builder<E> builder =
-					new HibernateOrmContainedTypeContext.Builder<>( typeModel.getTypeIdentifier(), entityName );
+		<E> HibernateOrmContainedTypeContext.Builder<E> addContained(PojoRawTypeModel<E> typeModel, String jpaEntityName) {
+			HibernateOrmContainedTypeContext.Builder<E> builder = new HibernateOrmContainedTypeContext.Builder<>(
+					typeModel.getTypeIdentifier(),
+					jpaEntityName, basicTypeMetadataProvider.getHibernateOrmEntityNameByJpaEntityName( jpaEntityName )
+			);
 			containedTypeContextBuilders.add( builder );
 			return builder;
 		}

@@ -219,8 +219,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public <E> AbstractHibernateOrmTypeContext<E> getTypeContext(PojoRawTypeIdentifier<E> typeIdentifier) {
-		return typeContextContainer.getByExactType( typeIdentifier );
+	public AbstractHibernateOrmTypeContext<?> getTypeContextByHibernateOrmEntityName(String hibernateOrmEntityName) {
+		return typeContextContainer.getByHibernateOrmEntityName( hibernateOrmEntityName );
 	}
 
 	@Override

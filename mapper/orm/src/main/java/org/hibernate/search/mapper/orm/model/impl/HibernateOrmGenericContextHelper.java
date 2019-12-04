@@ -31,7 +31,7 @@ public class HibernateOrmGenericContextHelper implements GenericContextAwarePojo
 
 	@Override
 	public Type getPropertyGenericType(PojoPropertyModel<?> rawPropertyModel) {
-		HibernateOrmPropertyModel<?> ormPropertyModel = (HibernateOrmPropertyModel<?>) rawPropertyModel;
+		HibernateOrmClassPropertyModel<?> ormPropertyModel = (HibernateOrmClassPropertyModel<?>) rawPropertyModel;
 		return ormPropertyModel.getGetterGenericReturnType();
 	}
 }

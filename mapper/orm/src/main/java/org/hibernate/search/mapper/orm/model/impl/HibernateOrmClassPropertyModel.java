@@ -23,12 +23,12 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class HibernateOrmPropertyModel<T> implements PojoPropertyModel<T> {
+class HibernateOrmClassPropertyModel<T> implements PojoPropertyModel<T> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final HibernateOrmBootstrapIntrospector introspector;
-	private final HibernateOrmRawTypeModel<?> holderTypeModel;
+	private final HibernateOrmClassRawTypeModel<?> holderTypeModel;
 
 	private final String name;
 	/**
@@ -37,16 +37,17 @@ class HibernateOrmPropertyModel<T> implements PojoPropertyModel<T> {
 	 * and not overridden in the holder type.
  	 */
 	private final List<XProperty> declaredXProperties;
-	private final HibernateOrmBasicPropertyMetadata ormPropertyMetadata;
+	private final HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata;
 
 	private final Member member;
 
 	private ValueReadHandle<T> handle;
 	private PojoGenericTypeModel<T> typeModel;
 
-	HibernateOrmPropertyModel(HibernateOrmBootstrapIntrospector introspector, HibernateOrmRawTypeModel<?> holderTypeModel,
+	HibernateOrmClassPropertyModel(HibernateOrmBootstrapIntrospector introspector,
+			HibernateOrmClassRawTypeModel<?> holderTypeModel,
 			String name, List<XProperty> declaredXProperties,
-			HibernateOrmBasicPropertyMetadata ormPropertyMetadata,
+			HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata,
 			Member member) {
 		this.introspector = introspector;
 		this.holderTypeModel = holderTypeModel;

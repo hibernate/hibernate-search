@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
+import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBasicTypeMetadataProvider;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoContainedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
@@ -15,10 +16,10 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 public final class HibernateOrmMapperDelegate
 		implements PojoMapperDelegate<HibernateOrmMappingPartialBuildState> {
 
-	private final HibernateOrmTypeContextContainer.Builder typeContextContainerBuilder =
-			new HibernateOrmTypeContextContainer.Builder();
+	private final HibernateOrmTypeContextContainer.Builder typeContextContainerBuilder;
 
-	HibernateOrmMapperDelegate() {
+	HibernateOrmMapperDelegate(HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider) {
+		typeContextContainerBuilder = new HibernateOrmTypeContextContainer.Builder( basicTypeMetadataProvider );
 	}
 
 	@Override

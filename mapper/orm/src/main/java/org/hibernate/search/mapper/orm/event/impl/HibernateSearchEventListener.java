@@ -9,7 +9,6 @@ package org.hibernate.search.mapper.orm.event.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
 import org.hibernate.collection.spi.PersistentCollection;
 import org.hibernate.engine.spi.SessionImplementor;
@@ -35,7 +34,6 @@ import org.hibernate.event.spi.PostUpdateEvent;
 import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.persister.entity.EntityPersister;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -72,8 +70,8 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	@Override
 	public void onPostDelete(PostDeleteEvent event) {
 		HibernateOrmListenerContextProvider contextProvider = state.getContextProvider();
-		final Object entity = event.getEntity();
-		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, entity );
+		Object entity = event.getEntity();
+		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, event.getPersister() );
 		if ( typeContext != null ) {
 			Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
 			// TODO Check whether deletes work with hibernate.use_identifier_rollback enabled (see HSEARCH-650)
@@ -87,7 +85,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	public void onPostInsert(PostInsertEvent event) {
 		HibernateOrmListenerContextProvider contextProvider = state.getContextProvider();
 		final Object entity = event.getEntity();
-		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, entity );
+		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, event.getPersister() );
 		if ( typeContext != null ) {
 			Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
 			getCurrentIndexingPlan( contextProvider, event.getSession() )
@@ -99,7 +97,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	public void onPostUpdate(PostUpdateEvent event) {
 		HibernateOrmListenerContextProvider contextProvider = state.getContextProvider();
 		final Object entity = event.getEntity();
-		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, entity );
+		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, event.getPersister() );
 		if ( typeContext != null ) {
 			PojoIndexingPlan plan = getCurrentIndexingPlan( contextProvider, event.getSession() );
 			Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
@@ -197,10 +195,9 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	}
 
 	private HibernateOrmListenerTypeContext getTypeContext(HibernateOrmListenerContextProvider contextProvider,
-			Object entity) {
-		// TODO HSEARCH-1401 avoid creating a new instance of that type identifier every single time
-		PojoRawTypeIdentifier<?> typeIdentifier = PojoRawTypeIdentifier.of( (Class<?>) Hibernate.getClass( entity ) );
-		return contextProvider.getTypeContext( typeIdentifier );
+			EntityPersister entityPersister) {
+		String entityName = entityPersister.getEntityName();
+		return contextProvider.getTypeContextByHibernateOrmEntityName( entityName );
 	}
 
 	private void processCollectionEvent(AbstractCollectionEvent event) {
@@ -213,7 +210,8 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 			return;
 		}
 
-		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, ownerEntity );
+		HibernateOrmListenerTypeContext typeContext =
+				contextProvider.getTypeContextByHibernateOrmEntityName( event.getAffectedOwnerEntityName() );
 		if ( typeContext != null ) {
 			PojoIndexingPlan plan = getCurrentIndexingPlan( contextProvider, event.getSession() );
 			Object providedId = typeContext.toIndexingPlanProvidedId( event.getAffectedOwnerIdOrNull() );

@@ -16,7 +16,7 @@ class HibernateOrmContainedTypeContext<E> extends AbstractHibernateOrmTypeContex
 
 	private HibernateOrmContainedTypeContext(HibernateOrmContainedTypeContext.Builder<E> builder,
 			SessionFactoryImplementor sessionFactory) {
-		super( sessionFactory, builder.typeIdentifier, builder.entityName );
+		super( sessionFactory, builder.typeIdentifier, builder.hibernateOrmEntityName );
 	}
 
 	@Override
@@ -28,11 +28,13 @@ class HibernateOrmContainedTypeContext<E> extends AbstractHibernateOrmTypeContex
 
 	static class Builder<E> implements PojoContainedTypeExtendedMappingCollector {
 		private final PojoRawTypeIdentifier<E> typeIdentifier;
-		private final String entityName;
+		private final String jpaEntityName;
+		private final String hibernateOrmEntityName;
 
-		Builder(PojoRawTypeIdentifier<E> typeIdentifier, String entityName) {
+		Builder(PojoRawTypeIdentifier<E> typeIdentifier, String jpaEntityName, String hibernateOrmEntityName) {
 			this.typeIdentifier = typeIdentifier;
-			this.entityName = entityName;
+			this.jpaEntityName = jpaEntityName;
+			this.hibernateOrmEntityName = hibernateOrmEntityName;
 		}
 
 		HibernateOrmContainedTypeContext<E> build(SessionFactoryImplementor sessionFactory) {

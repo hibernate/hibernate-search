@@ -98,7 +98,9 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 
 			AnnotationMappingConfigurationContext annotationMapping = annotationMapping();
 			for ( PersistentClass persistentClass : basicTypeMetadataProvider.getPersistentClasses() ) {
-				annotationMapping.add( persistentClass.getMappedClass() );
+				if ( persistentClass.hasPojoRepresentation() ) {
+					annotationMapping.add( persistentClass.getMappedClass() );
+				}
 			}
 		}
 
@@ -116,6 +118,6 @@ public class HibernateOrmMappingInitiator extends AbstractPojoMappingInitiator<H
 
 	@Override
 	protected PojoMapperDelegate<HibernateOrmMappingPartialBuildState> createMapperDelegate() {
-		return new HibernateOrmMapperDelegate();
+		return new HibernateOrmMapperDelegate( basicTypeMetadataProvider );
 	}
 }

@@ -25,19 +25,20 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmMapperSpiSettings;
 import org.hibernate.search.mapper.orm.cfg.spi.HibernateOrmReflectionStrategyName;
+import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 import org.hibernate.search.util.common.impl.ReflectionHelper;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
 
 public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstrapIntrospector implements PojoBootstrapIntrospector {
+
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private static final ConfigurationProperty<HibernateOrmReflectionStrategyName> REFLECTION_STRATEGY =
 			ConfigurationProperty.forKey( HibernateOrmMapperSpiSettings.Radicals.REFLECTION_STRATEGY )
@@ -74,18 +75,17 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	private final HibernateOrmGenericContextHelper genericContextHelper;
 	private final RawTypeDeclaringContext<?> missingRawTypeDeclaringContext;
 
-	/**
-	 * Note: the main purpose of this cache is not to improve performance,
-	 * but to ensure the unicity of the returned {@link PojoTypeModel}s.
-	 * so as to ensure the unicity of {@link PojoPropertyModel}s,
-	 * which lowers the risk of generating duplicate {@link ValueReadHandle}s.
-	 * <p>
+	/*
+	 * Note: the main purpose of these caches is not to improve performance,
+	 * but to ensure the unicity of the returned PojoTypeModels.
+	 * so as to ensure the unicity of PojoPropertyModels,
+	 * which lowers the risk of generating duplicate ValueReadHandles.
+	 *
 	 * Also, this cache allows to not care at all about implementing equals and hashcode,
 	 * since type models are presumably instantiated only once per type.
-	 *
-	 * See also HibernateOrmRawTypeModel#propertyModelCache
 	 */
-	private final Map<Class<?>, PojoRawTypeModel<?>> typeModelCache = new HashMap<>();
+	private final Map<Class<?>, HibernateOrmClassRawTypeModel<?>> classTypeModelCache = new HashMap<>();
+	private final Map<String, HibernateOrmDynamicMapRawTypeModel> dynamicMapTypeModelCache = new HashMap<>();
 
 	private HibernateOrmBootstrapIntrospector(
 			HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider,
@@ -101,14 +101,13 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 	}
 
 	@Override
-	public PojoRawTypeModel<?> getTypeModel(String name) {
-		// TODO HSEARCH-1401 handle named types
-		throw new UnsupportedOperationException( "Not implemented yet" );
+	public HibernateOrmDynamicMapRawTypeModel getTypeModel(String name) {
+		return dynamicMapTypeModelCache.computeIfAbsent( name, this::createDynamicMapTypeModel );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <T> HibernateOrmRawTypeModel<T> getTypeModel(Class<T> clazz) {
+	public <T> HibernateOrmClassRawTypeModel<T> getTypeModel(Class<T> clazz) {
 		if ( clazz.isPrimitive() ) {
 			/*
 			 * We'll never manipulate the primitive type, as we're using generics everywhere,
@@ -116,7 +115,7 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 			 */
 			clazz = (Class<T>) ReflectionHelper.getPrimitiveWrapperType( clazz );
 		}
-		return (HibernateOrmRawTypeModel<T>) typeModelCache.computeIfAbsent( clazz, this::createTypeModel );
+		return (HibernateOrmClassRawTypeModel<T>) classTypeModelCache.computeIfAbsent( clazz, this::createClassTypeModel );
 	}
 
 	@Override
@@ -129,16 +128,16 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		return valueReadHandleFactory;
 	}
 
-	<T> Stream<HibernateOrmRawTypeModel<? super T>> getAscendingSuperTypes(XClass xClass) {
+	<T> Stream<HibernateOrmClassRawTypeModel<? super T>> getAscendingSuperTypes(XClass xClass) {
 		return getAscendingSuperClasses( xClass ).map( this::getTypeModel );
 	}
 
-	<T> Stream<HibernateOrmRawTypeModel<? super T>> getDescendingSuperTypes(XClass xClass) {
+	<T> Stream<HibernateOrmClassRawTypeModel<? super T>> getDescendingSuperTypes(XClass xClass) {
 		return getDescendingSuperClasses( xClass ).map( this::getTypeModel );
 	}
 
 	ValueReadHandle<?> createValueReadHandle(Member member,
-			HibernateOrmBasicPropertyMetadata ormPropertyMetadata) throws IllegalAccessException {
+			HibernateOrmBasicClassPropertyMetadata ormPropertyMetadata) throws IllegalAccessException {
 		if ( member instanceof Method ) {
 			Method method = (Method) member;
 			setAccessible( method );
@@ -162,10 +161,26 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		}
 	}
 
-	private <T> PojoRawTypeModel<T> createTypeModel(Class<T> type) {
-		PojoRawTypeIdentifier<T> typeIdentifier = PojoRawTypeIdentifier.of( type );
-		return new HibernateOrmRawTypeModel<>(
-				this, typeIdentifier, basicTypeMetadataProvider.getBasicTypeMetadata( type ),
+	private HibernateOrmDynamicMapRawTypeModel createDynamicMapTypeModel(String name) {
+		HibernateOrmBasicDynamicMapTypeMetadata ormMetadata = basicTypeMetadataProvider.getBasicTypeMetadata( name );
+		if ( ormMetadata == null ) {
+			throw log.unknownNamedType( name, basicTypeMetadataProvider.getKnownTypeNames() );
+		}
+		PojoRawTypeIdentifier<Map> typeIdentifier =
+				HibernateOrmBasicTypeMetadataProvider.createDynamicMapTypeIdentifier( name );
+		return new HibernateOrmDynamicMapRawTypeModel(
+				this, typeIdentifier, ormMetadata,
+				new RawTypeDeclaringContext<>( genericContextHelper, typeIdentifier.getJavaClass() )
+		);
+	}
+
+	private <T> HibernateOrmClassRawTypeModel<T> createClassTypeModel(Class<T> type) {
+		HibernateOrmBasicClassTypeMetadata ormMetadataOrNull =
+				basicTypeMetadataProvider.getBasicTypeMetadata( type );
+		PojoRawTypeIdentifier<T> typeIdentifier =
+				HibernateOrmBasicTypeMetadataProvider.createClassTypeIdentifier( type );
+		return new HibernateOrmClassRawTypeModel<>(
+				this, typeIdentifier, ormMetadataOrNull,
 				new RawTypeDeclaringContext<>( genericContextHelper, type )
 		);
 	}
