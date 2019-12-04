@@ -98,6 +98,15 @@ class HibernateOrmTypeContextContainer implements HibernateOrmListenerTypeContex
 		return result;
 	}
 
+	@Override
+	public PojoRawTypeIdentifier<?> getTypeIdentifierByEntityName(String entityName) {
+		PojoRawTypeIdentifier<?> result = typeIdentifierResolver.resolveByJpaOrHibernateOrmEntityName( entityName );
+		if ( result == null ) {
+			throw log.invalidEntityName( entityName, typeIdentifierResolver.getKnownJpaOrHibernateOrmEntityNames() );
+		}
+		return result;
+	}
+
 	static class Builder {
 
 		private final HibernateOrmBasicTypeMetadataProvider basicTypeMetadataProvider;

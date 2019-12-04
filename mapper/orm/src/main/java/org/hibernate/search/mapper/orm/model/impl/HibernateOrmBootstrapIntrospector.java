@@ -112,14 +112,14 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		}
 
 		PojoRawTypeIdentifier<?> typeIdentifier = basicTypeMetadataProvider.getTypeIdentifierResolver()
-				.resolveByHibernateOrmEntityName( name );
+				.resolveByJpaOrHibernateOrmEntityName( name );
 		if ( typeIdentifier != null ) {
 			// Class entity type
 			return getTypeModel( typeIdentifier.getJavaClass() );
 		}
 
 		Set<String> typeNames = new LinkedHashSet<>( basicTypeMetadataProvider.getKnownDynamicMapTypeNames() );
-		typeNames.addAll( basicTypeMetadataProvider.getTypeIdentifierResolver().getKnownHibernateOrmEntityNames() );
+		typeNames.addAll( basicTypeMetadataProvider.getTypeIdentifierResolver().getKnownJpaOrHibernateOrmEntityNames() );
 		throw log.unknownNamedType( name, typeNames );
 	}
 

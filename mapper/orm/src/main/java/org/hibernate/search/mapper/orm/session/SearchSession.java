@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.session;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;

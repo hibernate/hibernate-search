@@ -12,6 +12,6 @@ public interface SearchIndexingPlanTypeContextProvider {
 
 	<T> PojoRawTypeIdentifier<T> getTypeIdentifierByJavaClass(Class<T> javaClass);
 
-	PojoRawTypeIdentifier<?> getTypeIdentifierByHibernateOrmEntityName(String entityName);
+	PojoRawTypeIdentifier<?> getTypeIdentifierByEntityName(String entityName);
 
 }

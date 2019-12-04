@@ -274,10 +274,10 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	private <T> PojoRawTypeIdentifier<? extends T> getEntityTypeIdentifier(Class<T> expectedSuperType,
 			String entityName) {
 		PojoRawTypeIdentifier<?> typeIdentifier =
-				typeContextContainer.getTypeIdentifierByHibernateOrmEntityName( entityName );
+				typeContextContainer.getTypeIdentifierByEntityName( entityName );
 		Class<?> actualJavaType = typeIdentifier.getJavaClass();
 		if ( !expectedSuperType.isAssignableFrom( actualJavaType ) ) {
-			throw log.invalidHibernateOrmEntitySuperType( entityName, expectedSuperType, actualJavaType );
+			throw log.invalidEntitySuperType( entityName, expectedSuperType, actualJavaType );
 		}
 		// The cast below is safe because we just checked above that the type extends "expectedSuperType", which extends E
 		@SuppressWarnings("unchecked")

@@ -238,7 +238,7 @@ public interface Log extends BasicLogger {
 			value = "Invalid type for '%1$s': expected the entity to extend '%2$s'," +
 					" but entity type '%3$s' does not."
 	)
-	SearchException invalidHibernateOrmEntitySuperType(String hibernateOrmEntityName,
+	SearchException invalidEntitySuperType(String entityName,
 			@FormatWith(ClassFormatter.class) Class<?> expectedSuperType,
 			@FormatWith(ClassFormatter.class) Class<?> actualJavaType);
 

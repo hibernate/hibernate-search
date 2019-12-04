@@ -65,7 +65,7 @@ public class HibernateOrmBasicTypeMetadataProvider {
 			);
 
 			metadataProviderBuilder.typeIdentifierResolverBuilder.addClassEntityType(
-					javaClass, hibernateOrmEntityName
+					javaClass, jpaEntityName, hibernateOrmEntityName
 			);
 		}
 		else {
@@ -76,7 +76,7 @@ public class HibernateOrmBasicTypeMetadataProvider {
 			);
 
 			metadataProviderBuilder.typeIdentifierResolverBuilder.addDynamicMapEntityType(
-					hibernateOrmEntityName
+					jpaEntityName, hibernateOrmEntityName
 			);
 		}
 	}
