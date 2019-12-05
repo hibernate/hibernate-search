@@ -19,6 +19,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.mapping.Value;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
+import org.hibernate.search.mapper.pojo.logging.spi.PojoModelPathFormatter;
 import org.hibernate.search.mapper.pojo.logging.spi.PojoTypeModelFormatter;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
@@ -133,9 +134,11 @@ public interface Log extends BasicLogger {
 	SearchException invalidAutomaticIndexingStrategyName(String invalidRepresentation, List<String> validRepresentations);
 
 	@Message(id = ID_OFFSET_2 + 7,
-			value = "Path '%2$s' on entity type '%1$s' cannot be resolved using Hibernate ORM metadata."
-					+ " Please check that this path points to a persisted value.")
-	SearchException unknownPathForDirtyChecking(Class<?> entityType, PojoModelPath path, @Cause Exception e);
+			value = "Path '%1$s' cannot be resolved to a persisted value in Hibernate ORM metadata."
+					+ " If this path points to a transient value, use @IndexingDependency(derivedFrom = ...)"
+					+ " to specify which persisted values it is derived from."
+					+ " See the reference documentation for more information.")
+	SearchException unknownPathForDirtyChecking(@FormatWith(PojoModelPathFormatter.class) PojoModelPath path, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_2 + 8,
 			value = "Path '%2$s' on entity type '%1$s' can be resolved using Hibernate ORM metadata,"
