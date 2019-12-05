@@ -65,7 +65,7 @@ public class LuceneSearchQueryBuilder<H>
 	private Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations;
 	private Long timeout;
 	private TimeUnit timeUnit;
-	private TimeoutStrategy strategy;
+	private boolean exceptionOnTimeout;
 
 	public LuceneSearchQueryBuilder(
 			LuceneWorkFactory workFactory,
@@ -101,7 +101,23 @@ public class LuceneSearchQueryBuilder<H>
 	public void timeout(long timeout, TimeUnit timeUnit, TimeoutStrategy strategy) {
 		this.timeout = timeout;
 		this.timeUnit = timeUnit;
-		this.strategy = strategy;
+		this.exceptionOnTimeout = TimeoutStrategy.RAISE_AN_EXCEPTION.equals( strategy );
+	}
+
+	@Override
+	public void truncateAfter(long timeout, TimeUnit timeUnit) {
+		// This will override any failAfter. Eventually we could allow the user to set both.
+		this.timeout = timeout;
+		this.timeUnit = timeUnit;
+		this.exceptionOnTimeout = false;
+	}
+
+	@Override
+	public void failAfter(long timeout, TimeUnit timeUnit) {
+		// This will override any truncateAfter. Eventually we could allow the user to set both.
+		this.timeout = timeout;
+		this.timeUnit = timeUnit;
+		this.exceptionOnTimeout = true;
 	}
 
 	@Override
@@ -187,7 +203,7 @@ public class LuceneSearchQueryBuilder<H>
 			// TODO HSEARCH-3352 make type property immutable as well
 			// TODO HSEARCH-3352 allow to use the other strategy: limitFetchingOnTimeout
 
-			if ( TimeoutStrategy.RAISE_AN_EXCEPTION.equals( strategy ) ) {
+			if ( exceptionOnTimeout ) {
 				timeoutManager.raiseExceptionOnTimeout();
 			}
 			else {

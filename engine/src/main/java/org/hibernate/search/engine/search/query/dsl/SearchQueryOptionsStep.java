@@ -93,6 +93,28 @@ public interface SearchQueryOptionsStep<
 	S timeout(long timeout, TimeUnit timeUnit, TimeoutStrategy strategy);
 
 	/**
+	 * Define a timeout period for a given unit of time.
+	 * Note that this time out is on a best effort basis.
+	 * If the limit is reached, fetching will be limited.
+	 *
+	 * @param timeout time out value
+	 * @param timeUnit time out unit
+	 * @return {@code this} to allow method chaining
+	 */
+	S truncateAfter(long timeout, TimeUnit timeUnit);
+
+	/**
+	 * Define a timeout period for a given unit of time.
+	 * Note that this time out is on a best effort basis.
+	 * If the limit is reached, an exception will be raised.
+	 *
+	 * @param timeout time out value
+	 * @param timeUnit time out unit
+	 * @return {@code this} to allow method chaining
+	 */
+	S failAfter(long timeout, TimeUnit timeUnit);
+
+	/**
 	 * Add a sort to this query.
 	 * @param sort A {@link SearchSort} object obtained from the search scope.
 	 * @return {@code this}, for method chaining.

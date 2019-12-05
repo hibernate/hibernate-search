@@ -92,6 +92,18 @@ public abstract class AbstractSearchQueryOptionsStep<
 	}
 
 	@Override
+	public S truncateAfter(long timeout, TimeUnit timeUnit) {
+		searchQueryBuilder.truncateAfter( timeout, timeUnit );
+		return thisAsS();
+	}
+
+	@Override
+	public S failAfter(long timeout, TimeUnit timeUnit) {
+		searchQueryBuilder.failAfter( timeout, timeUnit );
+		return thisAsS();
+	}
+
+	@Override
 	public S sort(SearchSort sort) {
 		SearchSortBuilderFactory<? super C, ?> factory = indexScope.getSearchSortBuilderFactory();
 		contribute( factory, sort );

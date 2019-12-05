@@ -49,6 +49,18 @@ public class StubSearchWorkAssert {
 		mismatch = checkForMismatch( builder, "timeUnit", expected.getTimeUnit(), actual.getTimeUnit() );
 		hasAnyMismatch = hasAnyMismatch || mismatch;
 
+		mismatch = checkForMismatch( builder, "truncateAfterTimeout", expected.getTruncateAfterTimeout(), actual.getTruncateAfterTimeout() );
+		hasAnyMismatch = hasAnyMismatch || mismatch;
+
+		mismatch = checkForMismatch( builder, "truncateAfterTimeUnit", expected.getTruncateAfterTimeUnit(), actual.getTruncateAfterTimeUnit() );
+		hasAnyMismatch = hasAnyMismatch || mismatch;
+
+		mismatch = checkForMismatch( builder, "failAfterTimeout", expected.getFailAfterTimeout(), actual.getFailAfterTimeout() );
+		hasAnyMismatch = hasAnyMismatch || mismatch;
+
+		mismatch = checkForMismatch( builder, "failAfterTimeUnit", expected.getFailAfterTimeUnit(), actual.getFailAfterTimeUnit() );
+		hasAnyMismatch = hasAnyMismatch || mismatch;
+
 		mismatch = checkForMismatch( builder, "strategy", expected.getStrategy(), actual.getStrategy() );
 		hasAnyMismatch = hasAnyMismatch || mismatch;
 
