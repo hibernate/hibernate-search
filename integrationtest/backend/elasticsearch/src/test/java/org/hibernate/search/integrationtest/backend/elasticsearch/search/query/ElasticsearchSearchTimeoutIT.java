@@ -17,7 +17,6 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.engine.search.common.TimeoutStrategy;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
@@ -83,7 +82,7 @@ public class ElasticsearchSearchTimeoutIT {
 				.asEntityReference()
 				.predicate( f -> f.match().field( FIELD_NAME ).matching( BUZZ_WORDS ) )
 				.sort( f -> f.score() )
-				.timeout( 1, TimeUnit.NANOSECONDS )
+				.truncateAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
 
 		SearchResult<DocumentReference> result = query.fetchAll();
@@ -103,7 +102,7 @@ public class ElasticsearchSearchTimeoutIT {
 				.asEntityReference()
 				.predicate( f -> f.match().field( FIELD_NAME ).matching( BUZZ_WORDS ) )
 				.sort( f -> f.score() )
-				.timeout( 1, TimeUnit.NANOSECONDS, TimeoutStrategy.RAISE_AN_EXCEPTION )
+				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
 
 		SubTest.expectException( () -> query.fetchAll() )
@@ -118,7 +117,7 @@ public class ElasticsearchSearchTimeoutIT {
 		SearchQuery<DocumentReference> query = scope.query()
 				.asEntityReference()
 				.predicate( f -> f.match().field( EMPTY_FIELD_NAME ).matching( ANY_INTEGER ) )
-				.timeout( 1, TimeUnit.DAYS, TimeoutStrategy.RAISE_AN_EXCEPTION )
+				.failAfter( 1, TimeUnit.DAYS )
 				.toQuery();
 
 		SearchResult<DocumentReference> result = query.fetchAll();

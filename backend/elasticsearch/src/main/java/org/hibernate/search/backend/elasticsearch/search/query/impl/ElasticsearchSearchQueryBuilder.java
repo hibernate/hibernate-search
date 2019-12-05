@@ -29,7 +29,6 @@ import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elas
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
-import org.hibernate.search.engine.search.common.TimeoutStrategy;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
@@ -102,14 +101,6 @@ public class ElasticsearchSearchQueryBuilder<H>
 	@Override
 	public void addRoutingKey(String routingKey) {
 		this.routingKeys.add( routingKey );
-	}
-
-	@Override
-	public void timeout(long timeout, TimeUnit timeUnit, TimeoutStrategy strategy) {
-		// TODO HSEARCH-3774 The timeout implementation can be further improved
-		this.timeoutValue = Math.toIntExact( timeout );
-		this.timeoutUnit = timeUnit;
-		this.exceptionOnTimeout = ( TimeoutStrategy.RAISE_AN_EXCEPTION.equals( strategy ) );
 	}
 
 	@Override

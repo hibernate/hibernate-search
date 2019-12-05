@@ -43,12 +43,6 @@ public class StubSearchWorkAssert {
 		mismatch = checkForMismatch( builder, "routingKeys", expected.getRoutingKeys(), actual.getRoutingKeys() );
 		hasAnyMismatch = hasAnyMismatch || mismatch;
 
-		mismatch = checkForMismatch( builder, "timeout", expected.getTimeout(), actual.getTimeout() );
-		hasAnyMismatch = hasAnyMismatch || mismatch;
-
-		mismatch = checkForMismatch( builder, "timeUnit", expected.getTimeUnit(), actual.getTimeUnit() );
-		hasAnyMismatch = hasAnyMismatch || mismatch;
-
 		mismatch = checkForMismatch( builder, "truncateAfterTimeout", expected.getTruncateAfterTimeout(), actual.getTruncateAfterTimeout() );
 		hasAnyMismatch = hasAnyMismatch || mismatch;
 
@@ -59,9 +53,6 @@ public class StubSearchWorkAssert {
 		hasAnyMismatch = hasAnyMismatch || mismatch;
 
 		mismatch = checkForMismatch( builder, "failAfterTimeUnit", expected.getFailAfterTimeUnit(), actual.getFailAfterTimeUnit() );
-		hasAnyMismatch = hasAnyMismatch || mismatch;
-
-		mismatch = checkForMismatch( builder, "strategy", expected.getStrategy(), actual.getStrategy() );
 		hasAnyMismatch = hasAnyMismatch || mismatch;
 
 		mismatch = checkForMismatch( builder, "offset", expected.getOffset(), actual.getOffset() );
