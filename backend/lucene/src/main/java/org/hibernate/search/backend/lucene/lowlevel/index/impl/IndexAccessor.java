@@ -76,7 +76,7 @@ public class IndexAccessor implements AutoCloseable {
 	public DirectoryReader openNRTIndexReader(boolean applyDeletes) throws IOException {
 		final IndexWriter indexWriter = indexWriterDelegator.getIndexWriterOrNull();
 		if ( indexWriter != null ) {
-			// TODO HSEARCH-3117 should parameter writeAllDeletes take the same value as applyDeletes?
+			// TODO HSEARCH-3775 should parameter writeAllDeletes take the same value as applyDeletes?
 			return DirectoryReader.open( indexWriter, applyDeletes, applyDeletes );
 		}
 		else {

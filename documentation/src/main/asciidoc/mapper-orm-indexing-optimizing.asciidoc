@@ -6,7 +6,7 @@
 include::todo-placeholder.asciidoc[]
 
 ////
-TODO HSEARCH-3117 restore this documentation (maybe in the Lucene section)
+TODO HSEARCH-3776 restore this documentation (maybe in the Lucene section)
      and link to it when we restore the configuration properties
 
 Other parameters which affect indexing time and memory consumption are:

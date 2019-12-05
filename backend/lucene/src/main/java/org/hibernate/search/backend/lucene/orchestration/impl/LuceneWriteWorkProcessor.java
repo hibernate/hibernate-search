@@ -82,7 +82,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 	public void beforeWorkSet(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		workSetForcesCommit = DocumentCommitStrategy.FORCE.equals( commitStrategy )
 				// We need to commit in order to make the changes visible
-				// TODO HSEARCH-3117 this may not be true with the NRT implementation from Search 5
+				// TODO HSEARCH-3775 this may not be true with the NRT implementation from Search 5
 				|| DocumentRefreshStrategy.FORCE.equals( refreshStrategy );
 		workSetUncommittedWorks.clear();
 		workSetHasFailure = false;
@@ -145,7 +145,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 
 	private void commit() {
 		try {
-			// TODO HSEARCH-3117 restore the commit policy feature to allow scheduled commits?
+			// TODO HSEARCH-3775 restore the commit policy feature to allow scheduled commits?
 			indexWriterDelegator.commit();
 		}
 		catch (RuntimeException | IOException e) {

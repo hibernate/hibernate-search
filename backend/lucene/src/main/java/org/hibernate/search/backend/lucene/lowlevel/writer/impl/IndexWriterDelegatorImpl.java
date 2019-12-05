@@ -46,7 +46,7 @@ public class IndexWriterDelegatorImpl implements Closeable, IndexWriterDelegator
 	private final ThreadProvider threadProvider;
 	private final FailureHandler failureHandler;
 
-	/* TODO HSEARCH-3117 re-allow to configure index writers
+	/* TODO HSEARCH-3776 re-allow configuring index writers
 	private final Similarity similarity;
 	private final LuceneIndexingParameters luceneParameters;
 	private final ParameterSet indexParameters;
@@ -73,7 +73,7 @@ public class IndexWriterDelegatorImpl implements Closeable, IndexWriterDelegator
 		this.analyzer = analyzer;
 		this.threadProvider = threadProvider;
 		this.failureHandler = failureHandler;
-		/* TODO HSEARCH-3117 re-allow to configure index writers
+		/* TODO HSEARCH-3776 re-allow configuring index writers
 		this.luceneParameters = indexManager.getIndexingParameters();
 		this.indexParameters = luceneParameters.getIndexParameters();
 		this.similarity = indexManager.getSimilarity();
@@ -214,12 +214,12 @@ public class IndexWriterDelegatorImpl implements Closeable, IndexWriterDelegator
 
 	private IndexWriterConfig createWriterConfig() {
 		IndexWriterConfig writerConfig = new IndexWriterConfig( analyzer );
-		/* TODO HSEARCH-3117 re-allow to configure index writers
+		/* TODO HSEARCH-3776 re-allow configuring index writers
 		luceneParameters.applyToWriter( writerConfig );
 		if ( similarity != null ) {
 			writerConfig.setSimilarity( similarity );
 		}
-		LogByteSizeMergePolicy newMergePolicy = indexParameters.getNewMergePolicy(); //TODO HSEARCH-3117 make it possible to configure a different policy?
+		LogByteSizeMergePolicy newMergePolicy = indexParameters.getNewMergePolicy(); //TODO HSEARCH-3776 make it possible to configure a different policy?
 		writerConfig.setMergePolicy( newMergePolicy );
 		 */
 		MergeScheduler mergeScheduler = new HibernateSearchConcurrentMergeScheduler(
