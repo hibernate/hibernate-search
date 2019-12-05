@@ -10,7 +10,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.Collections;
 import java.util.concurrent.TimeUnit;
 
-import org.hibernate.search.engine.search.common.TimeoutStrategy;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
@@ -54,12 +53,12 @@ public class SearchTimeoutIT {
 					.asEntityReference()
 					.predicate( f -> f.matchAll() )
 						// define a timeout
-						.timeout( 5L, TimeUnit.SECONDS )
+						.truncateAfter( 5L, TimeUnit.SECONDS )
 					.toQuery();
 
 			backendMock.expectSearchReferences( Collections.singletonList( INDEX_NAME ),
 					// timeout is supposed to be set on the backend
-					b -> b.timeout( 5L, TimeUnit.SECONDS, TimeoutStrategy.LIMIT_FETCHING ),
+					b -> b.truncateAfter( 5L, TimeUnit.SECONDS ),
 					StubSearchWorkBehavior.of( 0L, Collections.emptyList() )
 			);
 

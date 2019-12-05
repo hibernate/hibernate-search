@@ -36,7 +36,6 @@ import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.Luce
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
-import org.hibernate.search.engine.search.common.TimeoutStrategy;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
@@ -95,13 +94,6 @@ public class LuceneSearchQueryBuilder<H>
 	@Override
 	public void addRoutingKey(String routingKey) {
 		this.routingKeys.add( routingKey );
-	}
-
-	@Override
-	public void timeout(long timeout, TimeUnit timeUnit, TimeoutStrategy strategy) {
-		this.timeout = timeout;
-		this.timeUnit = timeUnit;
-		this.exceptionOnTimeout = TimeoutStrategy.RAISE_AN_EXCEPTION.equals( strategy );
 	}
 
 	@Override
@@ -198,11 +190,7 @@ public class LuceneSearchQueryBuilder<H>
 
 		TimeoutManagerImpl timeoutManager = new TimeoutManagerImpl( definitiveLuceneQuery );
 		if ( timeout != null && timeUnit != null ) {
-			// TODO HSEARCH-3352 make timeout property immutable for a timeout manager
 			timeoutManager.setTimeout( timeout, timeUnit );
-			// TODO HSEARCH-3352 make type property immutable as well
-			// TODO HSEARCH-3352 allow to use the other strategy: limitFetchingOnTimeout
-
 			if ( exceptionOnTimeout ) {
 				timeoutManager.raiseExceptionOnTimeout();
 			}
