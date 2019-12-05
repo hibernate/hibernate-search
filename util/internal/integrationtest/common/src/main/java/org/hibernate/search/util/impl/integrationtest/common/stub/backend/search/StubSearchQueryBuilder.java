@@ -55,6 +55,16 @@ public class StubSearchQueryBuilder<H> implements SearchQueryBuilder<H, StubQuer
 	}
 
 	@Override
+	public void truncateAfter(long timeout, TimeUnit timeUnit) {
+		workBuilder.truncateAfter( timeout, timeUnit );
+	}
+
+	@Override
+	public void failAfter(long timeout, TimeUnit timeUnit) {
+		workBuilder.failAfter( timeout, timeUnit );
+	}
+
+	@Override
 	public SearchQuery<H> build() {
 		return new StubSearchQuery<>(
 				backend, scopeModel.getIndexNames(), workBuilder, projectionContext,

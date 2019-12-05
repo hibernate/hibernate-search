@@ -113,6 +113,22 @@ public class ElasticsearchSearchQueryBuilder<H>
 	}
 
 	@Override
+	public void truncateAfter(long timeout, TimeUnit timeUnit) {
+		// This will override any failAfter. Eventually we could allow the user to set both.
+		this.timeoutValue = Math.toIntExact( timeout );
+		this.timeoutUnit = timeUnit;
+		this.exceptionOnTimeout = false;
+	}
+
+	@Override
+	public void failAfter(long timeout, TimeUnit timeUnit) {
+		// This will override any truncateAfter. Eventually we could allow the user to set both.
+		this.timeoutValue = Math.toIntExact( timeout );
+		this.timeoutUnit = timeUnit;
+		this.exceptionOnTimeout = true;
+	}
+
+	@Override
 	public ElasticsearchSearchPredicateContext getRootPredicateContext() {
 		return rootPredicateContext;
 	}

@@ -25,6 +25,10 @@ public interface SearchQueryBuilder<H, C> {
 
 	void timeout(long timeout, TimeUnit timeUnit, TimeoutStrategy strategy);
 
+	void truncateAfter(long timeout, TimeUnit timeUnit);
+
+	void failAfter(long timeout, TimeUnit timeUnit);
+
 	SearchQuery<H> build();
 
 }

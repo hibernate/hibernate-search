@@ -32,6 +32,10 @@ public class StubSearchWork {
 	private final Long timeout;
 	private final TimeUnit timeUnit;
 	private final TimeoutStrategy strategy;
+	private final Long truncateAfterTimeout;
+	private final TimeUnit truncateAfterTimeUnit;
+	private final Long failAfterTimeout;
+	private final TimeUnit failAfterTimeUnit;
 
 	private StubSearchWork(Builder builder) {
 		this.resultType = builder.resultType;
@@ -41,6 +45,10 @@ public class StubSearchWork {
 		this.timeout = builder.timeout;
 		this.timeUnit = builder.timeUnit;
 		this.strategy = builder.strategy;
+		this.truncateAfterTimeout = builder.truncateAfterTimeout;
+		this.truncateAfterTimeUnit = builder.truncateAfterTimeUnit;
+		this.failAfterTimeout = builder.failAfterTimeout;
+		this.failAfterTimeUnit = builder.failAfterTimeUnit;
 	}
 
 	public ResultType getResultType() {
@@ -57,6 +65,22 @@ public class StubSearchWork {
 
 	public TimeUnit getTimeUnit() {
 		return timeUnit;
+	}
+
+	public Long getTruncateAfterTimeout() {
+		return truncateAfterTimeout;
+	}
+
+	public TimeUnit getTruncateAfterTimeUnit() {
+		return truncateAfterTimeUnit;
+	}
+
+	public Long getFailAfterTimeout() {
+		return failAfterTimeout;
+	}
+
+	public TimeUnit getFailAfterTimeUnit() {
+		return failAfterTimeUnit;
 	}
 
 	public Integer getOffset() {
@@ -90,6 +114,10 @@ public class StubSearchWork {
 		private Long timeout;
 		private TimeUnit timeUnit;
 		private TimeoutStrategy strategy;
+		private Long truncateAfterTimeout;
+		private TimeUnit truncateAfterTimeUnit;
+		private Long failAfterTimeout;
+		private TimeUnit failAfterTimeUnit;
 		private Integer offset;
 		private Integer limit;
 
@@ -106,6 +134,18 @@ public class StubSearchWork {
 			this.timeout = timeout;
 			this.timeUnit = timeUnit;
 			this.strategy = strategy;
+			return this;
+		}
+
+		public Builder truncateAfter(long timeout, TimeUnit timeUnit) {
+			this.truncateAfterTimeout = timeout;
+			this.truncateAfterTimeUnit = timeUnit;
+			return this;
+		}
+
+		public Builder failAfter(long timeout, TimeUnit timeUnit) {
+			this.failAfterTimeout = timeout;
+			this.failAfterTimeUnit = timeUnit;
 			return this;
 		}
 
