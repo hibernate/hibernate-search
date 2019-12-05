@@ -604,7 +604,7 @@ public class ElasticsearchClientFactoryImplIT {
 				new ElasticsearchTckBackendHelper().createDefaultBackendSetupStrategy()
 						.createBackendConfigurationPropertySource( testConfigurationProvider );
 		ThreadPoolProvider threadPoolProvider = new ThreadPoolProviderImpl(
-				new DefaultThreadProvider( ElasticsearchContentLengthIT.class.getName() + ": " )
+				new DefaultThreadProvider( ElasticsearchClientFactoryImplIT.class.getName() + ": " )
 		);
 
 		Map<String, Object> configurationOverride = new HashMap<>();
