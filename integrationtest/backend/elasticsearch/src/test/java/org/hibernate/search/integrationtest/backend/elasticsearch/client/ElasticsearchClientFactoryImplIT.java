@@ -332,7 +332,8 @@ public class ElasticsearchClientFactoryImplIT {
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.HOSTS, httpHostAndPortFor( wireMockRule1, wireMockRule2 ) );
-					properties.accept( ElasticsearchBackendSettings.READ_TIMEOUT, "1000" /* 1s */ );
+					// Use a timeout much higher than 1s, because wiremock can be really slow...
+					properties.accept( ElasticsearchBackendSettings.READ_TIMEOUT, "5000" /* 5s */ );
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );
