@@ -171,7 +171,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 			 * We were able to resolve the path, but didn't find any Value that could possibly
 			 * be reported as dirty by Hibernate ORM.
 			 */
-			throw log.unreportedPathForDirtyChecking( persistentClass.getMappedClass(), path, value );
+			throw log.unreportedPathForDirtyChecking( path, value );
 		}
 		// Else everything is good, the string representation was successfully added to the set.
 	}
