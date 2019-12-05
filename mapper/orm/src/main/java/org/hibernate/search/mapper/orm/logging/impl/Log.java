@@ -141,10 +141,10 @@ public interface Log extends BasicLogger {
 	SearchException unknownPathForDirtyChecking(@FormatWith(PojoModelPathFormatter.class) PojoModelPath path, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_2 + 8,
-			value = "Path '%2$s' on entity type '%1$s' can be resolved using Hibernate ORM metadata,"
-					+ " but points to value '%3$s' that will never be reported as dirty by Hibernate ORM."
-					+ " Please check that this path points to a persisted value, and in particular not an embedded property.")
-	SearchException unreportedPathForDirtyChecking(Class<?> entityType, PojoModelPath path, Value value);
+			value = "Path '%1$s' can be resolved using Hibernate ORM metadata,"
+					+ " but points to value '%2$s' that will never be reported as dirty by Hibernate ORM."
+					+ " Check that you didn't declare an invalid indexing dependency.")
+	SearchException unreportedPathForDirtyChecking(@FormatWith(PojoModelPathFormatter.class) PojoModelPath path, Value value);
 
 	@SuppressWarnings("rawtypes")
 	@Message(id = ID_OFFSET_2 + 9,
