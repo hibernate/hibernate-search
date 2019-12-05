@@ -47,9 +47,10 @@ public class TransientPropertyIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( EntityWithoutDerivedFrom.class.getName() )
 						.failure(
-								"Path 'PojoModelPathPropertyNode[.APlusB]' on entity type '" + EntityWithoutDerivedFrom.class + "'"
-										+ " cannot be resolved using Hibernate ORM metadata.",
-								"Please check that this path points to a persisted value."
+								"Path '.APlusB' cannot be resolved to a persisted value in Hibernate ORM metadata.",
+								"If this path points to a transient value, use @IndexingDependency(derivedFrom = ...)"
+										+ " to specify which persisted values it is derived from.",
+								"See the reference documentation for more information"
 						)
 						.build()
 				);

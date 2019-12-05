@@ -196,7 +196,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 			else {
 				Value parentValue = parentValueOptional.get();
 				if ( !( parentValue instanceof Component ) ) {
-					throw log.unknownPathForDirtyChecking( persistentClass.getMappedClass(), propertyNode, null );
+					throw log.unknownPathForDirtyChecking( propertyNode, null );
 				}
 				property = resolveProperty( (Component) parentValue, propertyNode );
 			}
@@ -250,7 +250,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 				 * We only allow an empty extractor path for a collection at the very end of the path,
 				 * meaning "reindex whenever that collection changes, we don't really care about the values".
 				 */
-				throw log.unknownPathForDirtyChecking( persistentClass.getMappedClass(), propertyNode, null );
+				throw log.unknownPathForDirtyChecking( propertyNode, null );
 			}
 
 			List<String> extractorNames = extractorPath.getExplicitExtractorNames();
@@ -265,7 +265,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 					containedValue = resolveContainedValue( collectionValue, extractorName );
 				}
 				catch (SearchException e) {
-					throw log.unknownPathForDirtyChecking( persistentClass.getMappedClass(), path, e );
+					throw log.unknownPathForDirtyChecking( path, e );
 				}
 			}
 			while ( extractorNameIterator.hasNext() && containedValue instanceof org.hibernate.mapping.Collection );
@@ -289,7 +289,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 			}
 		}
 
-		throw log.unknownPathForDirtyChecking( persistentClass.getMappedClass(), path, null );
+		throw log.unknownPathForDirtyChecking( path, null );
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -323,7 +323,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 			return persistentClass.getProperty( propertyNode.getPropertyName() );
 		}
 		catch (MappingException e) {
-			throw log.unknownPathForDirtyChecking( persistentClass.getMappedClass(), propertyNode, e );
+			throw log.unknownPathForDirtyChecking( propertyNode, e );
 		}
 	}
 
@@ -332,7 +332,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 			return parentValue.getProperty( propertyNode.getPropertyName() );
 		}
 		catch (MappingException e) {
-			throw log.unknownPathForDirtyChecking( persistentClass.getMappedClass(), propertyNode, e );
+			throw log.unknownPathForDirtyChecking( propertyNode, e );
 		}
 	}
 }
