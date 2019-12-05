@@ -42,7 +42,7 @@ abstract class AbstractHibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T
 	}
 
 	@Override
-	public boolean equals(Object o) {
+	public final boolean equals(Object o) {
 		if ( this == o ) {
 			return true;
 		}
@@ -59,7 +59,7 @@ abstract class AbstractHibernateOrmRawTypeModel<T> implements PojoRawTypeModel<T
 	}
 
 	@Override
-	public int hashCode() {
+	public final int hashCode() {
 		return Objects.hash( introspector, typeIdentifier );
 	}
 

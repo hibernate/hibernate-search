@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
  * @param <E> The entity type mapped to the index.
  */
 public interface HibernateOrmScopeIndexedTypeContext<E>
-		extends HibernateOrmScopeTypeContext<E>, HibernateOrmLoadingIndexedTypeContext<E>,
+		extends HibernateOrmScopeTypeContext<E>, HibernateOrmLoadingIndexedTypeContext,
 		HibernateOrmMassIndexingIndexedTypeContext<E> {
 
 }

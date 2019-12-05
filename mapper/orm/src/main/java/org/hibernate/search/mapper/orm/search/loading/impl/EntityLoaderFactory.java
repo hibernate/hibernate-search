@@ -26,12 +26,12 @@ public interface EntityLoaderFactory {
 	 */
 	int hashCode();
 
-	<E> HibernateOrmComposableEntityLoader<E> create(HibernateOrmLoadingIndexedTypeContext<E> targetEntityTypeContext,
+	<E> HibernateOrmComposableEntityLoader<E> create(HibernateOrmLoadingIndexedTypeContext targetEntityTypeContext,
 			SessionImplementor session, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions);
 
 	<E> HibernateOrmComposableEntityLoader<? extends E> create(
-			List<HibernateOrmLoadingIndexedTypeContext<? extends E>> targetEntityTypeContexts,
+			List<HibernateOrmLoadingIndexedTypeContext> targetEntityTypeContexts,
 			SessionImplementor session, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			MutableEntityLoadingOptions loadingOptions);
 

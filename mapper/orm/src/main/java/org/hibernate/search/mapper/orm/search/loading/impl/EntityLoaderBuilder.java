@@ -20,13 +20,13 @@ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupSt
 public class EntityLoaderBuilder<E> {
 
 	private final SessionImplementor session;
-	private final Set<? extends HibernateOrmLoadingIndexedTypeContext<? extends E>> concreteIndexedTypes;
+	private final Set<? extends HibernateOrmLoadingIndexedTypeContext> concreteIndexedTypes;
 
 	private EntityLoadingCacheLookupStrategy cacheLookupStrategy;
 
 	public EntityLoaderBuilder(HibernateOrmLoadingMappingContext mappingContext,
 			HibernateOrmLoadingSessionContext sessionContext,
-			Set<? extends HibernateOrmLoadingIndexedTypeContext<? extends E>> concreteIndexedTypes) {
+			Set<? extends HibernateOrmLoadingIndexedTypeContext> concreteIndexedTypes) {
 		this.session = sessionContext.getSession();
 		this.concreteIndexedTypes = concreteIndexedTypes;
 		this.cacheLookupStrategy = mappingContext.getCacheLookupStrategy();
@@ -38,7 +38,7 @@ public class EntityLoaderBuilder<E> {
 
 	public EntityLoader<EntityReference, ? extends E> build(MutableEntityLoadingOptions mutableLoadingOptions) {
 		if ( concreteIndexedTypes.size() == 1 ) {
-			HibernateOrmLoadingIndexedTypeContext<? extends E> typeContext = concreteIndexedTypes.iterator().next();
+			HibernateOrmLoadingIndexedTypeContext typeContext = concreteIndexedTypes.iterator().next();
 			return createForSingleType( typeContext, mutableLoadingOptions );
 		}
 
@@ -48,9 +48,9 @@ public class EntityLoaderBuilder<E> {
 		 * this will allow to run one query to load entities of all these types,
 		 * instead of one query per type.
 		 */
-		Map<EntityLoaderFactory, List<HibernateOrmLoadingIndexedTypeContext<? extends E>>> typesByEntityLoaderFactory =
+		Map<EntityLoaderFactory, List<HibernateOrmLoadingIndexedTypeContext>> typesByEntityLoaderFactory =
 				new HashMap<>( concreteIndexedTypes.size() );
-		for ( HibernateOrmLoadingIndexedTypeContext<? extends E> typeContext : concreteIndexedTypes ) {
+		for ( HibernateOrmLoadingIndexedTypeContext typeContext : concreteIndexedTypes ) {
 			EntityLoaderFactory loaderFactoryForType = typeContext.getLoaderFactory();
 			typesByEntityLoaderFactory.computeIfAbsent( loaderFactoryForType, ignored -> new ArrayList<>() )
 					.add( typeContext );
@@ -61,22 +61,22 @@ public class EntityLoaderBuilder<E> {
 		 */
 		if ( typesByEntityLoaderFactory.size() == 1 ) {
 			// Optimization: we only need one loader, so skip the "by type" wrapper.
-			Map.Entry<EntityLoaderFactory, List<HibernateOrmLoadingIndexedTypeContext<? extends E>>> entry =
+			Map.Entry<EntityLoaderFactory, List<HibernateOrmLoadingIndexedTypeContext>> entry =
 					typesByEntityLoaderFactory.entrySet().iterator().next();
 			EntityLoaderFactory loaderFactory = entry.getKey();
-			List<HibernateOrmLoadingIndexedTypeContext<? extends E>> types = entry.getValue();
+			List<HibernateOrmLoadingIndexedTypeContext> types = entry.getValue();
 			return createForMultipleTypes( loaderFactory, types, mutableLoadingOptions );
 		}
 		else {
 			Map<String, HibernateOrmComposableEntityLoader<? extends E>> delegateByEntityName =
 					new HashMap<>( concreteIndexedTypes.size() );
-			for ( Map.Entry<EntityLoaderFactory, List<HibernateOrmLoadingIndexedTypeContext<? extends E>>> entry :
+			for ( Map.Entry<EntityLoaderFactory, List<HibernateOrmLoadingIndexedTypeContext>> entry :
 					typesByEntityLoaderFactory.entrySet() ) {
 				EntityLoaderFactory loaderFactory = entry.getKey();
-				List<HibernateOrmLoadingIndexedTypeContext<? extends E>> types = entry.getValue();
+				List<HibernateOrmLoadingIndexedTypeContext> types = entry.getValue();
 				HibernateOrmComposableEntityLoader<? extends E> loader =
 						createForMultipleTypes( loaderFactory, types, mutableLoadingOptions );
-				for ( HibernateOrmLoadingIndexedTypeContext<? extends E> type : types ) {
+				for ( HibernateOrmLoadingIndexedTypeContext type : types ) {
 					delegateByEntityName.put( type.getJpaEntityName(), loader );
 				}
 			}
@@ -85,7 +85,7 @@ public class EntityLoaderBuilder<E> {
 	}
 
 	private HibernateOrmComposableEntityLoader<? extends E> createForSingleType(
-			HibernateOrmLoadingIndexedTypeContext<? extends E> typeContext,
+			HibernateOrmLoadingIndexedTypeContext typeContext,
 			MutableEntityLoadingOptions mutableLoadingOptions) {
 		return typeContext.getLoaderFactory().create(
 				typeContext,
@@ -97,7 +97,7 @@ public class EntityLoaderBuilder<E> {
 
 	private HibernateOrmComposableEntityLoader<? extends E> createForMultipleTypes(
 			EntityLoaderFactory loaderFactory,
-			List<HibernateOrmLoadingIndexedTypeContext<? extends E>> types,
+			List<HibernateOrmLoadingIndexedTypeContext> types,
 			MutableEntityLoadingOptions mutableLoadingOptions) {
 		return loaderFactory.create(
 				types,

@@ -22,7 +22,6 @@ import org.hibernate.mapping.PersistentClass;
 import org.hibernate.mapping.Property;
 import org.hibernate.mapping.Value;
 import org.hibernate.property.access.spi.Getter;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 
 @SuppressWarnings( "unchecked" ) // Hibernate ORM gives us raw types, we must make do.
 public class HibernateOrmBasicTypeMetadataProvider {
@@ -53,8 +52,6 @@ public class HibernateOrmBasicTypeMetadataProvider {
 
 		metadataProviderBuilder.persistentClasses.put( hibernateOrmEntityName, persistentClass );
 		metadataProviderBuilder.jpaEntityNameToHibernateOrmEntityName.put( jpaEntityName, hibernateOrmEntityName );
-
-		PojoRawTypeIdentifier<?> typeIdentifier;
 
 		if ( persistentClass.hasPojoRepresentation() ) {
 			Class<?> javaClass = persistentClass.getMappedClass();

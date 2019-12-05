@@ -131,7 +131,7 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 
 		@Override
 		public <E2> HibernateOrmComposableEntityLoader<E2> create(
-				HibernateOrmLoadingIndexedTypeContext<E2> targetEntityTypeContext,
+				HibernateOrmLoadingIndexedTypeContext targetEntityTypeContext,
 				SessionImplementor session,
 				EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
 			return doCreate( targetEntityTypeContext, session, cacheLookupStrategy, loadingOptions );
@@ -139,7 +139,7 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 
 		@Override
 		public <E2> HibernateOrmComposableEntityLoader<? extends E2> create(
-				List<HibernateOrmLoadingIndexedTypeContext<? extends E2>> targetEntityTypeContexts,
+				List<HibernateOrmLoadingIndexedTypeContext> targetEntityTypeContexts,
 				SessionImplementor session,
 				EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
 			if ( targetEntityTypeContexts.size() != 1 ) {
@@ -158,7 +158,7 @@ public class HibernateOrmCriteriaEntityLoader<E> implements HibernateOrmComposab
 		}
 
 		private <E2> HibernateOrmComposableEntityLoader<E2> doCreate(
-				HibernateOrmLoadingIndexedTypeContext<? extends E2> targetEntityTypeContext,
+				HibernateOrmLoadingIndexedTypeContext targetEntityTypeContext,
 				SessionImplementor session,
 				EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 				MutableEntityLoadingOptions loadingOptions) {

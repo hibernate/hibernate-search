@@ -208,7 +208,7 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 
 		@Override
 		public <E> HibernateOrmComposableEntityLoader<E> create(
-				HibernateOrmLoadingIndexedTypeContext<E> targetEntityTypeContext,
+				HibernateOrmLoadingIndexedTypeContext targetEntityTypeContext,
 				SessionImplementor session,
 				EntityLoadingCacheLookupStrategy cacheLookupStrategy, MutableEntityLoadingOptions loadingOptions) {
 			/*
@@ -225,7 +225,7 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 
 		@Override
 		public <E> HibernateOrmComposableEntityLoader<? extends E> create(
-				List<HibernateOrmLoadingIndexedTypeContext<? extends E>> targetEntityTypeContexts,
+				List<HibernateOrmLoadingIndexedTypeContext> targetEntityTypeContexts,
 				SessionImplementor session, EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 				MutableEntityLoadingOptions loadingOptions) {
 			EntityPersister commonSuperType = toMostSpecificCommonEntitySuperType( session, targetEntityTypeContexts );
@@ -296,10 +296,10 @@ public class HibernateOrmByIdEntityLoader<E> implements HibernateOrmComposableEn
 		}
 
 		private static EntityPersister toMostSpecificCommonEntitySuperType(SessionImplementor session,
-				Iterable<? extends HibernateOrmLoadingIndexedTypeContext<?>> targetEntityTypeContexts) {
+				Iterable<? extends HibernateOrmLoadingIndexedTypeContext> targetEntityTypeContexts) {
 			MetamodelImplementor metamodel = session.getSessionFactory().getMetamodel();
 			EntityPersister result = null;
-			for ( HibernateOrmLoadingIndexedTypeContext<?> targetTypeContext : targetEntityTypeContexts ) {
+			for ( HibernateOrmLoadingIndexedTypeContext targetTypeContext : targetEntityTypeContexts ) {
 				EntityPersister type = targetTypeContext.getEntityPersister();
 				if ( result == null ) {
 					result = type;
