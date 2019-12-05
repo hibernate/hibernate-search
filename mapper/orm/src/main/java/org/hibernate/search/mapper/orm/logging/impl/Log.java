@@ -146,7 +146,6 @@ public interface Log extends BasicLogger {
 					+ " Check that you didn't declare an invalid indexing dependency.")
 	SearchException unreportedPathForDirtyChecking(@FormatWith(PojoModelPathFormatter.class) PojoModelPath path, Value value);
 
-	@SuppressWarnings("rawtypes")
 	@Message(id = ID_OFFSET_2 + 9,
 			value = "Container value extractor with name '%2$s' cannot be applied to"
 					+ " Hibernate ORM metadata node of type '%1$s'.")
