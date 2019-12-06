@@ -13,13 +13,16 @@ import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.D
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchFields;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 
@@ -33,11 +36,13 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 
 	private static final JsonAccessor<String> TENANT_ID_ACCESSOR = JsonAccessor.root().property( ElasticsearchFields.tenantIdFieldName() ).asString();
 
-	private static final JsonAccessor<String> STORED_FIELDS_ACCESSOR = JsonAccessor.root().property( "stored_fields" ).asString();
+	private static final JsonArrayAccessor DOCVALUE_FIELDS_ACCESSOR = JsonAccessor.root().property( "docvalue_fields" ).asArray();
 
 	private static final JsonAccessor<String> HIT_ID_ACCESSOR = JsonAccessor.root().property( "fields" ).asObject()
 			.property( ElasticsearchFields.idFieldName() ).asArray()
 			.element( 0 ).asString();
+
+	private static final JsonElement ID_FIELD_NAME_JSON = new JsonPrimitive( ElasticsearchFields.idFieldName() );
 
 	@Override
 	public boolean isMultiTenancySupported() {
@@ -47,15 +52,17 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 	@Override
 	public void contributeToMapping(RootTypeMapping rootTypeMapping) {
 		PropertyMapping idPropertyMapping = new PropertyMapping();
-		idPropertyMapping.setIndex( true );
-		idPropertyMapping.setStore( Boolean.TRUE );
 		idPropertyMapping.setType( DataTypes.KEYWORD );
+		idPropertyMapping.setIndex( true );
+		idPropertyMapping.setStore( false );
+		idPropertyMapping.setDocValues( true );
 		rootTypeMapping.addProperty( ElasticsearchFields.idFieldName(), idPropertyMapping );
 
 		PropertyMapping tenantIdPropertyMapping = new PropertyMapping();
-		tenantIdPropertyMapping.setIndex( true );
-		tenantIdPropertyMapping.setStore( Boolean.TRUE );
 		tenantIdPropertyMapping.setType( DataTypes.KEYWORD );
+		tenantIdPropertyMapping.setIndex( true );
+		tenantIdPropertyMapping.setStore( false );
+		tenantIdPropertyMapping.setDocValues( true );
 		rootTypeMapping.addProperty( ElasticsearchFields.tenantIdFieldName(), tenantIdPropertyMapping );
 	}
 
@@ -88,7 +95,7 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 
 	@Override
 	public void contributeToSearchRequest(JsonObject requestBody) {
-		STORED_FIELDS_ACCESSOR.add( requestBody, ElasticsearchFields.idFieldName() );
+		DOCVALUE_FIELDS_ACCESSOR.addElementIfAbsent( requestBody, ID_FIELD_NAME_JSON );
 	}
 
 	@Override
