@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.multitenancy.impl;
 
+import java.util.Optional;
+
+import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -41,13 +44,10 @@ public interface MultiTenancyStrategy {
 	String toElasticsearchId(String tenantId, String id);
 
 	/**
-	 * Contributes additional information to the indexed document.
-	 *
-	 * @param document The indexed document.
-	 * @param tenantId The tenant id.
-	 * @param id The object id.
+	 * @return A metadata contributor for the required additional properties (tenant ID, ...),
+	 * or an empty optional.
 	 */
-	void contributeToIndexedDocument(JsonObject document, String tenantId, String id);
+	Optional<DocumentMetadataContributor> getDocumentMetadataContributor();
 
 	/**
 	 * Decorate the query with the tenant constraint.

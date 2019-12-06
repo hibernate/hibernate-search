@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
+import java.util.List;
+
+import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
@@ -23,17 +26,20 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 	private final String elasticsearchIndexName;
 	private final ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder;
 	private final ElasticsearchIndexSettingsBuilder settingsBuilder;
+	private final List<DocumentMetadataContributor> documentMetadataContributors;
 
 	public ElasticsearchIndexManagerBuilder(IndexManagerBackendContext backendContext,
 			String hibernateSearchIndexName, String elasticsearchIndexName,
 			ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder,
-			ElasticsearchIndexSettingsBuilder settingsBuilder) {
+			ElasticsearchIndexSettingsBuilder settingsBuilder,
+			List<DocumentMetadataContributor> documentMetadataContributors) {
 		this.backendContext = backendContext;
 
 		this.hibernateSearchIndexName = hibernateSearchIndexName;
 		this.elasticsearchIndexName = elasticsearchIndexName;
 		this.schemaRootNodeBuilder = schemaRootNodeBuilder;
 		this.settingsBuilder = settingsBuilder;
+		this.documentMetadataContributors = documentMetadataContributors;
 	}
 
 	@Override
@@ -56,7 +62,8 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 		return new ElasticsearchIndexManagerImpl(
 				backendContext,
 				hibernateSearchIndexName, encodedElasticsearchIndexName,
-				model
+				model,
+				documentMetadataContributors
 		);
 	}
 

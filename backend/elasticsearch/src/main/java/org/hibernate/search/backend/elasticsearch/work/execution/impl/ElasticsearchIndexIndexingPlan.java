@@ -12,7 +12,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
-import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentElasticsearchWork;
@@ -30,7 +29,6 @@ import com.google.gson.JsonObject;
 public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan<ElasticsearchDocumentObjectBuilder> {
 
 	private final ElasticsearchWorkBuilderFactory builderFactory;
-	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final ElasticsearchWorkOrchestrator orchestrator;
 	private final WorkExecutionIndexManagerContext indexManagerContext;
 	private final DocumentRefreshStrategy refreshStrategy;
@@ -39,13 +37,11 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan<Elastic
 	private final List<SingleDocumentElasticsearchWork<?>> works = new ArrayList<>();
 
 	public ElasticsearchIndexIndexingPlan(ElasticsearchWorkBuilderFactory builderFactory,
-			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestrator orchestrator,
 			WorkExecutionIndexManagerContext indexManagerContext,
 			DocumentRefreshStrategy refreshStrategy,
 			BackendSessionContext sessionContext) {
 		this.builderFactory = builderFactory;
-		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
 		this.indexManagerContext = indexManagerContext;
 		this.refreshStrategy = refreshStrategy;
@@ -66,7 +62,7 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan<Elastic
 
 	@Override
 	public void delete(DocumentReferenceProvider referenceProvider) {
-		String elasticsearchId = multiTenancyStrategy.toElasticsearchId( tenantId, referenceProvider.getIdentifier() );
+		String elasticsearchId = indexManagerContext.toElasticsearchId( tenantId, referenceProvider.getIdentifier() );
 		String routingKey = referenceProvider.getRoutingKey();
 
 		collect(
@@ -108,12 +104,10 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan<Elastic
 	private void index(DocumentReferenceProvider referenceProvider,
 			DocumentContributor<ElasticsearchDocumentObjectBuilder> documentContributor) {
 		String id = referenceProvider.getIdentifier();
-		String elasticsearchId = multiTenancyStrategy.toElasticsearchId( tenantId, id );
+		String elasticsearchId = indexManagerContext.toElasticsearchId( tenantId, id );
 		String routingKey = referenceProvider.getRoutingKey();
 
-		ElasticsearchDocumentObjectBuilder builder = new ElasticsearchDocumentObjectBuilder();
-		documentContributor.contribute( builder );
-		JsonObject document = builder.build( multiTenancyStrategy, tenantId, id );
+		JsonObject document = indexManagerContext.createDocument( tenantId, id, documentContributor );
 
 		collect(
 				builderFactory.index(

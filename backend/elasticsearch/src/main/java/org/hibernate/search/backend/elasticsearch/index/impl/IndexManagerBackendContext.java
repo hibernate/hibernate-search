@@ -51,8 +51,8 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	private final ElasticsearchWorkOrchestratorProvider orchestratorProvider;
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 
-	private final SearchProjectionBackendContext searchProjectionBackendContext;
 	private final DocumentReferenceExtractorHelper documentReferenceExtractorHelper;
+	private final SearchProjectionBackendContext searchProjectionBackendContext;
 
 	public IndexManagerBackendContext(EventContext eventContext, ElasticsearchLink link, Gson userFacingGson,
 			Function<String, String> indexNameConverter,
@@ -87,7 +87,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		return new ElasticsearchIndexIndexingPlan(
-				link.getWorkBuilderFactory(), multiTenancyStrategy, orchestrator,
+				link.getWorkBuilderFactory(), orchestrator,
 				indexManagerContext,
 				refreshStrategy,
 				sessionContext
@@ -101,7 +101,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 			BackendSessionContext sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
-		return new ElasticsearchIndexIndexer( link.getWorkBuilderFactory(), multiTenancyStrategy, orchestrator,
+		return new ElasticsearchIndexIndexer( link.getWorkBuilderFactory(), orchestrator,
 				indexManagerContext, sessionContext );
 	}
 
@@ -178,5 +178,9 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		return orchestratorProvider.createParallelOrchestrator(
 				"Elasticsearch parallel work orchestrator for index " + indexName
 		);
+	}
+
+	String toElasticsearchId(String tenantId, String id) {
+		return multiTenancyStrategy.toElasticsearchId( tenantId, id );
 	}
 }

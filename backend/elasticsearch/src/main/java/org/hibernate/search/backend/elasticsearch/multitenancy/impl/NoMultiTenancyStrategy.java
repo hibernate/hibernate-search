@@ -7,9 +7,11 @@
 package org.hibernate.search.backend.elasticsearch.multitenancy.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
+import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -38,8 +40,9 @@ public class NoMultiTenancyStrategy implements MultiTenancyStrategy {
 	}
 
 	@Override
-	public void contributeToIndexedDocument(JsonObject document, String tenantId, String id) {
+	public Optional<DocumentMetadataContributor> getDocumentMetadataContributor() {
 		// No need to add anything to documents, Elasticsearch metadata is enough
+		return Optional.empty();
 	}
 
 	@Override
