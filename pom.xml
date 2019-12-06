@@ -286,7 +286,7 @@
         <version.coveralls.plugin>4.3.0</version.coveralls.plugin>
         <version.org.jboss.bridger.plugin>1.5.Final</version.org.jboss.bridger.plugin>
         <version.com.buschmais.jqassistant.plugin>1.5.0</version.com.buschmais.jqassistant.plugin>
-        <version.com.github.alexcojocaru.elasticsearch.plugin>6.14</version.com.github.alexcojocaru.elasticsearch.plugin>
+        <version.com.github.alexcojocaru.elasticsearch.plugin>6.15</version.com.github.alexcojocaru.elasticsearch.plugin>
         <version.moditect.plugin>1.0.0.Beta2</version.moditect.plugin>
 
         <!--
