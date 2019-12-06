@@ -33,4 +33,12 @@ public class JsonArrayAccessorImpl extends AbstractTypingJsonAccessor<JsonArray>
 	public UnknownTypeJsonAccessor element(int index) {
 		return new ArrayElementJsonAccessor( this, index );
 	}
+
+	@Override
+	public void addElementIfAbsent(JsonObject root, JsonElement newValue) throws UnexpectedJsonElementTypeException {
+		JsonArray array = getOrCreate( root );
+		if ( !array.contains( newValue ) ) {
+			array.add( newValue );
+		}
+	}
 }

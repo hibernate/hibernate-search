@@ -19,7 +19,6 @@ import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentF
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -48,11 +47,8 @@ class ElasticsearchFieldProjection<F, V> implements ElasticsearchSearchProjectio
 
 	@Override
 	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
-		JsonArray source = REQUEST_SOURCE_ACCESSOR.getOrCreate( requestBody, JsonArray::new );
 		JsonPrimitive fieldPathJson = new JsonPrimitive( absoluteFieldPath );
-		if ( !source.contains( fieldPathJson ) ) {
-			source.add( fieldPathJson );
-		}
+		REQUEST_SOURCE_ACCESSOR.addElementIfAbsent( requestBody, fieldPathJson );
 	}
 
 	@Override

@@ -15,7 +15,6 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
@@ -33,10 +32,7 @@ class ElasticsearchSourceProjection implements ElasticsearchSearchProjection<Jso
 
 	@Override
 	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
-		JsonArray source = REQUEST_SOURCE_ACCESSOR.getOrCreate( requestBody, JsonArray::new );
-		if ( !source.contains( WILDCARD_ALL ) ) {
-			source.add( WILDCARD_ALL );
-		}
+		REQUEST_SOURCE_ACCESSOR.addElementIfAbsent( requestBody, WILDCARD_ALL );
 	}
 
 	@Override
