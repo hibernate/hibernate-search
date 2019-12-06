@@ -12,7 +12,6 @@ import java.util.Objects;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -89,16 +88,14 @@ public class ElasticsearchDocumentObjectBuilder implements DocumentElement {
 		elasticsearchFieldReference.addTo( content, null );
 	}
 
+	public JsonObject build() {
+		return content;
+	}
+
 	private void checkTreeConsistency(ElasticsearchIndexSchemaObjectNode expectedParentNode) {
 		if ( !Objects.equals( expectedParentNode, schemaNode ) ) {
 			throw log.invalidFieldForDocumentElement( expectedParentNode.getAbsolutePath(), schemaNode.getAbsolutePath() );
 		}
-	}
-
-	public JsonObject build(MultiTenancyStrategy multiTenancyStrategy, String tenantId, String id) {
-		multiTenancyStrategy.contributeToIndexedDocument( content, tenantId, id );
-
-		return content;
 	}
 
 }

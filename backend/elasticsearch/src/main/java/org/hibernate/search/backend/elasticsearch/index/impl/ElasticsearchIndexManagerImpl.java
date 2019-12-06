@@ -8,8 +8,10 @@ package org.hibernate.search.backend.elasticsearch.index.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
@@ -27,6 +29,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
@@ -43,6 +46,7 @@ import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import com.google.gson.JsonObject;
 
 
 class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<ElasticsearchDocumentObjectBuilder>,
@@ -73,6 +77,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	private final String hibernateSearchIndexName;
 	private final URLEncodedString elasticsearchIndexName;
 	private final ElasticsearchIndexModel model;
+	private final List<DocumentMetadataContributor> documentMetadataContributors;
 
 	private final ElasticsearchWorkOrchestratorImplementor serialOrchestrator;
 	private final ElasticsearchWorkOrchestratorImplementor parallelOrchestrator;
@@ -83,11 +88,13 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 
 	ElasticsearchIndexManagerImpl(IndexManagerBackendContext backendContext,
 			String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName,
-			ElasticsearchIndexModel model) {
+			ElasticsearchIndexModel model,
+			List<DocumentMetadataContributor> documentMetadataContributors) {
 		this.backendContext = backendContext;
 		this.hibernateSearchIndexName = hibernateSearchIndexName;
 		this.elasticsearchIndexName = elasticsearchIndexName;
 		this.model = model;
+		this.documentMetadataContributors = documentMetadataContributors;
 		this.parallelOrchestrator = backendContext.createParallelOrchestrator( elasticsearchIndexName.original );
 		this.serialOrchestrator = backendContext.createSerialOrchestrator( elasticsearchIndexName.original );
 		this.administrationClient = backendContext.createAdministrationClient(
@@ -154,6 +161,25 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	@Override
 	public URLEncodedString getElasticsearchIndexName() {
 		return elasticsearchIndexName;
+	}
+
+	@Override
+	public String toElasticsearchId(String tenantId, String id) {
+		return backendContext.toElasticsearchId( tenantId, id );
+	}
+
+	@Override
+	public JsonObject createDocument(String tenantId, String id,
+			DocumentContributor<ElasticsearchDocumentObjectBuilder> documentContributor) {
+		ElasticsearchDocumentObjectBuilder builder = new ElasticsearchDocumentObjectBuilder();
+		documentContributor.contribute( builder );
+		JsonObject document = builder.build();
+
+		for ( DocumentMetadataContributor contributor : documentMetadataContributors ) {
+			contributor.contribute( document, tenantId, id );
+		}
+
+		return document;
 	}
 
 	public ElasticsearchIndexModel getModel() {

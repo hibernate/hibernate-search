@@ -8,11 +8,14 @@ package org.hibernate.search.backend.elasticsearch.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorImplementor;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorProvider;
@@ -190,10 +193,15 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		ElasticsearchIndexSettingsBuilder settingsBuilder =
 				new ElasticsearchIndexSettingsBuilder( analysisDefinitionRegistry );
 
+		List<DocumentMetadataContributor> documentMetadataContributors = new ArrayList<>();
+		multiTenancyStrategy.getDocumentMetadataContributor()
+				.ifPresent( documentMetadataContributors::add );
+
 		return new ElasticsearchIndexManagerBuilder(
 				indexManagerBackendContext,
 				hibernateSearchIndexName, elasticsearchIndexName,
-				indexSchemaRootNodeBuilder, settingsBuilder
+				indexSchemaRootNodeBuilder, settingsBuilder,
+				documentMetadataContributors
 		);
 	}
 }

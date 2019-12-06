@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.multitenancy.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.DataTypes;
@@ -15,6 +16,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.R
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
+import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchFields;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -32,10 +34,6 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 
 	private static final String ESCAPED_UNDERSCORE = "__";
 
-	private static final JsonAccessor<String> ID_ACCESSOR = JsonAccessor.root().property( ElasticsearchFields.idFieldName() ).asString();
-
-	private static final JsonAccessor<String> TENANT_ID_ACCESSOR = JsonAccessor.root().property( ElasticsearchFields.tenantIdFieldName() ).asString();
-
 	private static final JsonArrayAccessor DOCVALUE_FIELDS_ACCESSOR = JsonAccessor.root().property( "docvalue_fields" ).asArray();
 
 	private static final JsonAccessor<String> HIT_ID_ACCESSOR = JsonAccessor.root().property( "fields" ).asObject()
@@ -43,6 +41,9 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 			.element( 0 ).asString();
 
 	private static final JsonElement ID_FIELD_NAME_JSON = new JsonPrimitive( ElasticsearchFields.idFieldName() );
+
+	private final DiscriminatorMultiTenancyDocumentMetadataContributor documentMetadataContributor =
+			new DiscriminatorMultiTenancyDocumentMetadataContributor();
 
 	@Override
 	public boolean isMultiTenancySupported() {
@@ -72,9 +73,8 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 	}
 
 	@Override
-	public void contributeToIndexedDocument(JsonObject document, String tenantId, String id) {
-		ID_ACCESSOR.set( document, id );
-		TENANT_ID_ACCESSOR.set( document, tenantId );
+	public Optional<DocumentMetadataContributor> getDocumentMetadataContributor() {
+		return Optional.of( documentMetadataContributor );
 	}
 
 	@Override
@@ -107,6 +107,19 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 	public void checkTenantId(String tenantId, EventContext backendContext) {
 		if ( tenantId == null ) {
 			throw log.multiTenancyEnabledButNoTenantIdProvided( backendContext );
+		}
+	}
+
+	private static class DiscriminatorMultiTenancyDocumentMetadataContributor implements DocumentMetadataContributor {
+		private static final JsonAccessor<String> TENANT_ID_ACCESSOR =
+				JsonAccessor.root().property( ElasticsearchFields.tenantIdFieldName() ).asString();
+		private static final JsonAccessor<String> ID_ACCESSOR =
+				JsonAccessor.root().property( ElasticsearchFields.idFieldName() ).asString();
+
+		@Override
+		public void contribute(JsonObject document, String tenantId, String id) {
+			TENANT_ID_ACCESSOR.set( document, tenantId );
+			ID_ACCESSOR.set( document, id );
 		}
 	}
 }

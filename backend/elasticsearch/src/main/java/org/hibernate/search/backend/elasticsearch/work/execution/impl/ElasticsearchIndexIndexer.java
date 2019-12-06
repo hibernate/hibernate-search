@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.work.execution.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
-import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
@@ -24,31 +23,28 @@ import com.google.gson.JsonObject;
 public class ElasticsearchIndexIndexer implements IndexIndexer<ElasticsearchDocumentObjectBuilder> {
 
 	private final ElasticsearchWorkBuilderFactory factory;
-	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final ElasticsearchWorkOrchestrator orchestrator;
 	private final WorkExecutionIndexManagerContext indexManagerContext;
 	private final String tenantId;
 
-	public ElasticsearchIndexIndexer(ElasticsearchWorkBuilderFactory factory, MultiTenancyStrategy multiTenancyStrategy,
+	public ElasticsearchIndexIndexer(ElasticsearchWorkBuilderFactory factory,
 			ElasticsearchWorkOrchestrator orchestrator,
 			WorkExecutionIndexManagerContext indexManagerContext,
 			BackendSessionContext sessionContext) {
 		this.factory = factory;
-		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.orchestrator = orchestrator;
 		this.indexManagerContext = indexManagerContext;
 		this.tenantId = sessionContext.getTenantIdentifier();
 	}
 
 	@Override
-	public CompletableFuture<?> add(DocumentReferenceProvider referenceProvider, DocumentContributor<ElasticsearchDocumentObjectBuilder> documentContributor) {
+	public CompletableFuture<?> add(DocumentReferenceProvider referenceProvider,
+			DocumentContributor<ElasticsearchDocumentObjectBuilder> documentContributor) {
 		String id = referenceProvider.getIdentifier();
-		String elasticsearchId = multiTenancyStrategy.toElasticsearchId( tenantId, id );
+		String elasticsearchId = indexManagerContext.toElasticsearchId( tenantId, id );
 		String routingKey = referenceProvider.getRoutingKey();
 
-		ElasticsearchDocumentObjectBuilder builder = new ElasticsearchDocumentObjectBuilder();
-		documentContributor.contribute( builder );
-		JsonObject document = builder.build( multiTenancyStrategy, tenantId, id );
+		JsonObject document = indexManagerContext.createDocument( tenantId, id, documentContributor );
 
 		ElasticsearchWork<Void> work = factory.index(
 				indexManagerContext.getHibernateSearchIndexName(),
