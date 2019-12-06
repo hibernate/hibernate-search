@@ -19,7 +19,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.entity.ContentType;
@@ -146,7 +145,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 		ScheduledFuture<?> timeout = timeoutExecutorService.schedule(
 				() -> {
 					if ( !completableFuture.isDone() ) {
-						completableFuture.completeExceptionally( new TimeoutException() );
+						completableFuture.completeExceptionally( log.timedOut( elasticsearchRequest ) );
 					}
 				},
 				currentTimeoutValue, currentTimeoutUnit

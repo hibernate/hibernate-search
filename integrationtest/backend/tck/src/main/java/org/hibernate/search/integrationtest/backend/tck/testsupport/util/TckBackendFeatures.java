@@ -52,4 +52,8 @@ public class TckBackendFeatures {
 		// we decide to allow ALL the model incompatibilities Elasticsearch allows.
 		return false;
 	}
+
+	public boolean fastTimeoutResolution() {
+		return true;
+	}
 }

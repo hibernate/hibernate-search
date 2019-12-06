@@ -24,7 +24,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletionException;
-import java.util.concurrent.TimeoutException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -240,7 +239,8 @@ public class ElasticsearchClientFactoryImplIT {
 
 		thrown.expect(
 				isException( CompletionException.class )
-						.causedBy( TimeoutException.class )
+						.causedBy( SearchException.class )
+						.withMessage( "Query took longer than expected" )
 				.build()
 		);
 

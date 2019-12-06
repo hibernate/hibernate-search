@@ -15,9 +15,10 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRespon
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.Throwables;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * @author Gunnar Morling
@@ -63,6 +64,13 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 		return Futures.create( () -> beforeExecute( executionContext, request ) )
 				.thenCompose( ignored -> executionContext.getClient().submit( request ) )
 				.exceptionally( Futures.handler( throwable -> {
+					// if we already have a SearchExececption, throw that,
+					// since it will be more specific
+					if ( throwable instanceof SearchException ) {
+						throw (SearchException) throwable;
+					}
+
+					// otherwise, throw a more generic request failed exception
 					throw log.elasticsearchRequestFailed(
 							request, null,
 							throwable.getMessage(),

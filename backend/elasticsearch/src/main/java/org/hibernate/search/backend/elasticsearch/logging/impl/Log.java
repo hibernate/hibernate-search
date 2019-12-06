@@ -598,4 +598,7 @@ public interface Log extends BasicLogger {
 			+ " The host/port string must use the format 'host:port', for example 'mycompany.com:9200'"
 			+ " The URI scheme ('http://', 'https://') must not be included.")
 	SearchException invalidHostAndPort(String hostAndPort, @Cause Exception e);
+
+	@Message(id = ID_OFFSET_3 + 90, value = "Query took longer than expected. Request: '%1$s'.")
+	SearchException timedOut(ElasticsearchRequest request);
 }
