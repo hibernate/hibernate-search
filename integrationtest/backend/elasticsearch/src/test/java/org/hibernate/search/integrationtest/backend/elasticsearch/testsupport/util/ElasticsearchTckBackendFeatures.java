@@ -55,4 +55,10 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	public boolean lenientOnMultiIndexesCompatibilityChecks() {
 		return true;
 	}
+
+	@Override
+	public boolean fastTimeoutResolution() {
+		// TODO HSEARCH-3785 Elasticsearch timeout resolution is not very fast
+		return false;
+	}
 }

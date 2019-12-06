@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.search.query;
+package org.hibernate.search.integrationtest.backend.tck.search.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
@@ -20,18 +20,20 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.util.impl.test.SubTest;
 
+import org.junit.Assume;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ElasticsearchSearchTimeoutIT {
+public class SearchTimeoutIT {
 
 	private static final String BACKEND_NAME = "backendName";
 	private static final String INDEX_NAME = "indexName";
@@ -73,9 +75,29 @@ public class ElasticsearchSearchTimeoutIT {
 	}
 
 	@Test
-	@Ignore("Most of times it does not work, surprisingly sometimes it works")
-	// See https://discuss.elastic.co/t/query-scoped-timeout-and-allow-partial-search-results/209844
+	public void timeout_largeQuery_smallTimeout_raiseAnException() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.asEntityReference()
+				.predicate( f -> f.match().field( FIELD_NAME ).matching( BUZZ_WORDS ) )
+				.sort( f -> f.score() )
+				.failAfter( 1, TimeUnit.NANOSECONDS )
+				.toQuery();
+
+		SubTest.expectException( () -> query.fetchAll() )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Query took longer than expected" );
+	}
+
+	@Test
 	public void timeout_largeQuery_smallTimeout_limitFetching() {
+		Assume.assumeTrue(
+				"backend should have a fast timeout resolution in order to run this test correctly",
+				TckConfiguration.get().getBackendFeatures().fastTimeoutResolution()
+		);
+
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -93,24 +115,6 @@ public class ElasticsearchSearchTimeoutIT {
 	}
 
 	@Test
-	@Ignore("Most of times it does not work, surprisingly sometimes it works")
-	// See https://discuss.elastic.co/t/query-scoped-timeout-and-allow-partial-search-results/209844
-	public void timeout_largeQuery_smallTimeout_raiseAnExcpetion() {
-		StubMappingScope scope = indexManager.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
-				.asEntityReference()
-				.predicate( f -> f.match().field( FIELD_NAME ).matching( BUZZ_WORDS ) )
-				.sort( f -> f.score() )
-				.failAfter( 1, TimeUnit.NANOSECONDS )
-				.toQuery();
-
-		SubTest.expectException( () -> query.fetchAll() )
-				.assertThrown()
-				.hasMessageContaining( "Time exceeded" );
-	}
-
-	@Test
 	public void timeout_smallQuery_largeTimeout() {
 		StubMappingScope scope = indexManager.createScope();
 
@@ -121,7 +125,7 @@ public class ElasticsearchSearchTimeoutIT {
 				.toQuery();
 
 		SearchResult<DocumentReference> result = query.fetchAll();
-		SearchResultAssert.assertThat( query ).hasNoHits();
+		SearchResultAssert.assertThat( result ).hasNoHits();
 
 		assertThat( result.getTook() ).isLessThan( Duration.ofDays( 1L ) );
 		assertThat( result.isTimedOut() ).isFalse();
