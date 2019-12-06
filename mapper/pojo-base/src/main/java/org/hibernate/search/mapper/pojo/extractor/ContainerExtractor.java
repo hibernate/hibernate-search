@@ -25,6 +25,9 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.Container
  * @param <V> The type of values extracted by this extractor.
  * @see ContainerExtractorPath
  * @see BuiltinContainerExtractors
+ *
+ * @hsearch.experimental This type is under active development.
+ *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
  */
 public interface ContainerExtractor<C, V> {
 

@@ -27,6 +27,9 @@ public interface HibernateOrmMappingConfigurationContext {
 	/**
 	 * Start the definition of container extractors available for use in mappings.
 	 * @return A context to define container extractors.
+	 *
+	 * @hsearch.experimental This feature is under active development.
+	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
 	ContainerExtractorConfigurationContext containerExtractors();
 
