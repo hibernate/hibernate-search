@@ -26,7 +26,7 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 
 	private static final JsonObjectAccessor SCRIPT_FIELDS_ACCESSOR = JsonAccessor.root().property( "script_fields" ).asObject();
 	private static final JsonObjectAccessor FIELDS_ACCESSOR = JsonAccessor.root().property( "fields" ).asObject();
-	private static final JsonArrayAccessor SCORE_ACCESSOR = JsonAccessor.root().property( "sort" ).asArray();
+	private static final JsonArrayAccessor SORT_ACCESSOR = JsonAccessor.root().property( "sort" ).asArray();
 
 	private static final Pattern NON_DIGITS_PATTERN = Pattern.compile( "\\D" );
 
@@ -88,19 +88,19 @@ class ElasticsearchDistanceToFieldProjection implements ElasticsearchSearchProje
 			distance = extractDistance( hit );
 		}
 		else {
-			// we extract the value from the score element
-			Optional<JsonElement> scoreDistanceElement = SCORE_ACCESSOR.element( distanceSortIndex ).get( hit );
+			// we extract the value from the sort key
+			Optional<JsonElement> sortKeyDistanceElement = SORT_ACCESSOR.element( distanceSortIndex ).get( hit );
 
-			if ( !scoreDistanceElement.isPresent() ) {
+			if ( !sortKeyDistanceElement.isPresent() ) {
 				distance = Optional.empty();
 			}
-			else if ( !scoreDistanceElement.get().getAsJsonPrimitive().isNumber() ) {
+			else if ( !sortKeyDistanceElement.get().getAsJsonPrimitive().isNumber() ) {
 				// Elasticsearch will return "Infinity" if the distance has not been computed.
 				// Usually, it's because the indexed object doesn't have a location defined for this field.
 				distance = Optional.empty();
 			}
 			else {
-				distance = Optional.of( scoreDistanceElement.get().getAsJsonPrimitive().getAsDouble() );
+				distance = Optional.of( sortKeyDistanceElement.get().getAsJsonPrimitive().getAsDouble() );
 			}
 		}
 
