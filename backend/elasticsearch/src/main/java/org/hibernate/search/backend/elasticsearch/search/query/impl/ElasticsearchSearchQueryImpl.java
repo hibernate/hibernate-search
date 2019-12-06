@@ -32,6 +32,7 @@ import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 
@@ -185,7 +186,13 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 				searchContext.toElasticsearchId( sessionContext.getTenantIdentifier(), id )
 		);
 
-		ElasticsearchWork<ExplainResult> work = workFactory.explain( encodedIndexName, elasticsearchId, payload )
+		JsonObject queryOnlyPayload = new JsonObject();
+		JsonElement query = payload.get( "query" );
+		if ( query != null ) {
+			queryOnlyPayload.add( "query", query );
+		}
+
+		ElasticsearchWork<ExplainResult> work = workFactory.explain( encodedIndexName, elasticsearchId, queryOnlyPayload )
 				.routingKeys( routingKeys )
 				.requestTransformer(
 						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
