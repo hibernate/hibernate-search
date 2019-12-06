@@ -53,7 +53,7 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 	public void contributeToMapping(RootTypeMapping rootTypeMapping) {
 		PropertyMapping idPropertyMapping = new PropertyMapping();
 		idPropertyMapping.setType( DataTypes.KEYWORD );
-		idPropertyMapping.setIndex( true );
+		idPropertyMapping.setIndex( false );
 		idPropertyMapping.setStore( false );
 		idPropertyMapping.setDocValues( true );
 		rootTypeMapping.addProperty( ElasticsearchFields.idFieldName(), idPropertyMapping );
