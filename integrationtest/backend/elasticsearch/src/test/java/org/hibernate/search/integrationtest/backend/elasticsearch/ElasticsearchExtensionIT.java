@@ -31,6 +31,7 @@ import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -48,6 +49,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMap
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
 import org.hibernate.search.util.impl.test.SubTest;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -216,6 +218,29 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
+				.predicate( f -> f.id().matching( FIRST_ID ) )
+				.toQuery();
+
+		// Matching document
+		Assertions.assertThat( query.explain( FIRST_ID ) )
+				.asString()
+				.contains( "\"description\":" )
+				.contains( "\"details\":" );
+
+		// Non-matching document
+		Assertions.assertThat( query.explain( FIFTH_ID ) )
+				.asString()
+				.contains( "\"description\":" )
+				.contains( "\"details\":" );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3783")
+	public void query_explain_projection() {
+		StubMappingScope scope = indexManager.createScope();
+
+		ElasticsearchSearchQuery<String> query = scope.query().extension( ElasticsearchExtension.get() )
+				.asProjection( f -> f.field( "string", String.class ) )
 				.predicate( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
@@ -793,6 +818,7 @@ public class ElasticsearchExtensionIT {
 		Assertions.assertThat( result ).hasSize( 1 );
 		assertJsonEquals(
 				"{"
+						+ "'string': 'text 5',"
 						+ "'nativeField_string': 'text 2',"
 						+ "'nativeField_integer': 1,"
 						+ "'nativeField_geoPoint': {'lat': 45.12, 'lon': -75.34},"
@@ -828,6 +854,7 @@ public class ElasticsearchExtensionIT {
 		Assertions.assertThat( result ).hasSize( 1 );
 		assertJsonEquals(
 				"{"
+						+ "'string': 'text 5',"
 						+ "'nativeField_string': 'text 2',"
 						+ "'nativeField_integer': 1,"
 						+ "'nativeField_geoPoint': {'lat': 45.12, 'lon': -75.34},"
@@ -1013,6 +1040,8 @@ public class ElasticsearchExtensionIT {
 	private void initData() {
 		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( SECOND_ID ), document -> {
+			document.addValue( indexMapping.string, "text 2" );
+
 			document.addValue( indexMapping.nativeField_integer, new JsonPrimitive( 2 ) );
 			document.addValue( indexMapping.nativeField_integer_converted, new JsonPrimitive( 2 ) );
 			document.addValue( indexMapping.nativeField_unsupportedType, new JsonPrimitive( "42" ) );
@@ -1026,6 +1055,8 @@ public class ElasticsearchExtensionIT {
 			document.addValue( indexMapping.nativeField_aggregation, new JsonPrimitive( "value-for-doc-1-and-2" ) );
 		} );
 		plan.add( referenceProvider( FIRST_ID ), document -> {
+			document.addValue( indexMapping.string, "text 1" );
+
 			document.addValue( indexMapping.nativeField_string, new JsonPrimitive( "text 1" ) );
 
 			document.addValue( indexMapping.nativeField_sort1, new JsonPrimitive( "a" ) );
@@ -1037,6 +1068,8 @@ public class ElasticsearchExtensionIT {
 			document.addValue( indexMapping.nativeField_aggregation, new JsonPrimitive( "value-for-doc-1-and-2" ) );
 		} );
 		plan.add( referenceProvider( THIRD_ID ), document -> {
+			document.addValue( indexMapping.string, "text 3" );
+
 			document.addValue( indexMapping.nativeField_geoPoint, gson.fromJson( "{'lat': 40.12, 'lon': -71.34}", JsonObject.class ) );
 
 			document.addValue( indexMapping.nativeField_sort1, new JsonPrimitive( "z" ) );
@@ -1048,6 +1081,8 @@ public class ElasticsearchExtensionIT {
 			document.addValue( indexMapping.nativeField_aggregation, new JsonPrimitive( "value-for-doc-3" ) );
 		} );
 		plan.add( referenceProvider( FOURTH_ID ), document -> {
+			document.addValue( indexMapping.string, "text 4" );
+
 			document.addValue( indexMapping.nativeField_dateWithColons, new JsonPrimitive( "2018:01:12" ) );
 
 			document.addValue( indexMapping.nativeField_sort1, new JsonPrimitive( "z" ) );
@@ -1057,6 +1092,8 @@ public class ElasticsearchExtensionIT {
 			document.addValue( indexMapping.nativeField_sort5, new JsonPrimitive( "a" ) );
 		} );
 		plan.add( referenceProvider( FIFTH_ID ), document -> {
+			document.addValue( indexMapping.string, "text 5" );
+
 			// This document should not match any query
 			document.addValue( indexMapping.nativeField_string, new JsonPrimitive( "text 2" ) );
 			document.addValue( indexMapping.nativeField_integer, new JsonPrimitive( 1 ) );
@@ -1082,6 +1119,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	private static class IndexMapping {
+		final IndexFieldReference<String> string;
 		final IndexFieldReference<JsonElement> nativeField_integer;
 		final IndexFieldReference<JsonElement> nativeField_integer_converted;
 		final IndexFieldReference<JsonElement> nativeField_string;
@@ -1098,6 +1136,7 @@ public class ElasticsearchExtensionIT {
 		final IndexFieldReference<JsonElement> nativeField_aggregation;
 
 		IndexMapping(IndexSchemaElement root) {
+			string = root.field( "string", f -> f.asString().projectable( Projectable.YES ) ).toReference();
 			nativeField_integer = root.field(
 					"nativeField_integer",
 					f -> f.extension( ElasticsearchExtension.get() )
