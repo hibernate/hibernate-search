@@ -36,7 +36,9 @@ public class LuceneEntityProjection<E> implements LuceneSearchProjection<Object,
 	@Override
 	public Object extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExtractContext context) {
-		return mapper.planLoading( DocumentReferenceExtractorHelper.extractDocumentReference( documentResult ) );
+		return mapper.planLoading(
+				DocumentReferenceExtractorHelper.extractDocumentReference( context, documentResult )
+		);
 	}
 
 	@SuppressWarnings("unchecked")

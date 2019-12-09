@@ -15,8 +15,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
 
-import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
-
 import org.apache.lucene.document.Document;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.BytesRef;
@@ -104,9 +102,7 @@ public class DocumentAssert {
 
 	public void andOnlyInternalFields() {
 		Set<String> allowedPaths = new HashSet<>( allCheckedPaths );
-		allowedPaths.add( LuceneFields.idFieldName() );
-		allowedPaths.add( LuceneFields.indexFieldName() );
-		allowedPaths.add( LuceneFields.rootIdFieldName() );
+		// There is no stored internal field at the moment, we use docvalues instead.
 		asFields().are( new Condition<>(
 				field -> allowedPaths.contains( field.name() ),
 				"exclusively fields with path " + allCheckedPaths

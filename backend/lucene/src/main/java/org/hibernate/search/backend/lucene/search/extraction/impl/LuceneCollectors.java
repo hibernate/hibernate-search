@@ -17,10 +17,8 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneNestedQueries;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneChildrenCollector;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
-import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import org.apache.lucene.document.Document;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.FieldDoc;
@@ -36,9 +34,6 @@ import org.apache.lucene.search.TotalHitCountCollector;
 public class LuceneCollectors {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private static final Set<String> ID_FIELD_SET = Collections.singleton( LuceneFields.idFieldName() );
-
 
 	private final boolean requireFieldDocRescoring;
 	private final Integer scoreSortFieldIndexForRescoring;
@@ -149,28 +144,20 @@ public class LuceneCollectors {
 		}
 	}
 
-	private void collectNestedDocs(IndexSearcher indexSearcher, Query parentsQuery)
-			throws IOException {
+	private void collectNestedDocs(IndexSearcher indexSearcher, Query parentsQuery) {
 		// if the projection does not need any nested object skip their fetching
 		if ( topDocs == null || nestedDocumentPaths.isEmpty() ) {
 			return;
 		}
 
-		// TODO HSEARCH-3657 this could be avoided
-		Map<String, Integer> parentIds = new HashMap<>();
-		for ( ScoreDoc hit : topDocs.scoreDocs ) {
-			Document doc = indexSearcher.doc( hit.doc, ID_FIELD_SET );
-			String parentId = doc.getField( LuceneFields.idFieldName() ).stringValue();
-			if ( parentId == null ) {
-				continue;
-			}
-			parentIds.put( parentId, hit.doc );
-		}
+		HibernateSearchDocumentIdToLuceneDocIdMapCollector searchDocumentIdToLuceneDocId =
+				(HibernateSearchDocumentIdToLuceneDocIdMapCollector)
+						collectors.get( HibernateSearchDocumentIdToLuceneDocIdMapCollector.FACTORY );
 
 		Map<String, Set<Integer>> stringSetMap = applyCollectorsToNestedDocs( indexSearcher, parentsQuery );
 		this.nestedDocIds = new HashMap<>();
 		for ( Map.Entry<String, Set<Integer>> entry : stringSetMap.entrySet() ) {
-			this.nestedDocIds.put( parentIds.get( entry.getKey() ), entry.getValue() );
+			nestedDocIds.put( searchDocumentIdToLuceneDocId.getLuceneDocId( entry.getKey() ), entry.getValue() );
 		}
 	}
 

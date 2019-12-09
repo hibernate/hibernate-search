@@ -49,6 +49,9 @@ public class LuceneCollectorsBuilder {
 
 		this.totalHitCountCollector = new TotalHitCountCollector();
 		this.luceneCollectors.put( LuceneCollectorKey.TOTAL_HIT_COUNT, this.totalHitCountCollector );
+
+		// TODO HSEARCH-3657 Only add this when really necessary
+		addCollector( HibernateSearchDocumentIdToLuceneDocIdMapCollector.FACTORY );
 	}
 
 	public void requireScore() {
