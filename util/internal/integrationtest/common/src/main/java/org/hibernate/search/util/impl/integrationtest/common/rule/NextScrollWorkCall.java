@@ -7,6 +7,7 @@
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.common.rule.SearchWorkCall.getLoadingTimeout;
 
 import java.time.Duration;
 import java.util.Objects;
@@ -63,12 +64,12 @@ public class NextScrollWorkCall<T> extends Call<NextScrollWorkCall<?>> {
 		// work is expected to be filled only on from the actualCall
 		assertThat( work ).isNull();
 
-		// TODO HSEARCH-3787 Use actualCall.work#failAfterTimeout and actualCall.work#failAfterTimeUnit
 		return () -> new SimpleSearchScrollResult<>( behavior.hasHits(), SearchWorkCall.getResults(
 				actualCall.projectionContext,
 				actualCall.loadingContext.createProjectionHitMapper(),
 				actualCall.rootProjection,
-				behavior.getRawHits()
+				behavior.getRawHits(),
+				getLoadingTimeout( actualCall.work )
 		), Duration.ZERO, false );
 	}
 
