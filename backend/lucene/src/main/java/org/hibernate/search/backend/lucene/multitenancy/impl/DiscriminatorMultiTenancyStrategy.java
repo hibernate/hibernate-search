@@ -32,7 +32,7 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 
 	@Override
 	public void contributeToIndexedDocument(Document document, String tenantId) {
-		document.add( LuceneFields.searchableRetrievableMetadataField( LuceneFields.tenantIdFieldName(), tenantId ) );
+		document.add( LuceneFields.searchableMetadataField( LuceneFields.tenantIdFieldName(), tenantId ) );
 	}
 
 	@Override

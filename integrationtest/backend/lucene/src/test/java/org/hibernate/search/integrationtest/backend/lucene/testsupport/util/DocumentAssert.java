@@ -120,10 +120,7 @@ public class DocumentAssert {
 		Set<String> allowedPaths = new HashSet<>( allCheckedPaths );
 		allowedPaths.add( LuceneFields.idFieldName() );
 		allowedPaths.add( LuceneFields.indexFieldName() );
-		allowedPaths.add( LuceneFields.typeFieldName() );
-		allowedPaths.add( LuceneFields.tenantIdFieldName() );
 		allowedPaths.add( LuceneFields.rootIdFieldName() );
-		allowedPaths.add( LuceneFields.rootIndexFieldName() );
 		asFields().are( new Condition<>(
 				field -> allowedPaths.contains( field.name() ),
 				"exclusively fields with path " + allCheckedPaths
