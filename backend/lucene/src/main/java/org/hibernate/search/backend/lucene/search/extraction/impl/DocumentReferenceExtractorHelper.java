@@ -6,8 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneDocumentReference;
-import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 
 public final class DocumentReferenceExtractorHelper {
@@ -17,17 +16,15 @@ public final class DocumentReferenceExtractorHelper {
 
 	public static void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
 		luceneCollectorBuilder.requireTopDocsCollector();
+		luceneCollectorBuilder.addCollector( DocumentReferenceCollector.FACTORY );
 	}
 
 	public static void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder) {
-		builder.add( LuceneFields.indexFieldName() );
-		builder.add( LuceneFields.idFieldName() );
+		// No-op
 	}
 
-	public static DocumentReference extractDocumentReference(LuceneResult documentResult) {
-		return new LuceneDocumentReference(
-				documentResult.getStringValue( LuceneFields.indexFieldName() ),
-				documentResult.getStringValue( LuceneFields.idFieldName() )
-		);
+	public static DocumentReference extractDocumentReference(SearchProjectionExtractContext context,
+			LuceneResult documentResult) {
+		return context.getCollector( DocumentReferenceCollector.FACTORY ).get( documentResult.getDocId() );
 	}
 }

@@ -37,7 +37,9 @@ public class LuceneReferenceProjection<R> implements LuceneSearchProjection<R, R
 	@Override
 	public R extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExtractContext context) {
-		return (R) mapper.convertReference( DocumentReferenceExtractorHelper.extractDocumentReference( documentResult ) );
+		return (R) mapper.convertReference(
+				DocumentReferenceExtractorHelper.extractDocumentReference( context, documentResult )
+		);
 	}
 
 	@Override

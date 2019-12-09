@@ -8,13 +8,16 @@ package org.hibernate.search.backend.lucene.util.impl;
 
 import org.apache.lucene.document.Field;
 import org.apache.lucene.document.FieldType;
+import org.apache.lucene.index.DocValuesType;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexableField;
+import org.apache.lucene.util.BytesRef;
 
 public class LuceneFields {
 
 	private static final FieldType METADATA_FIELD_TYPE_WITH_INDEX;
-	private static final FieldType METADATA_FIELD_TYPE_WITH_INDEX_WITH_STORAGE;
+	private static final FieldType METADATA_FIELD_TYPE_WITH_DOCVALUES;
+	private static final FieldType METADATA_FIELD_TYPE_WITH_INDEX_WITH_DOCVALUES;
 	static {
 		METADATA_FIELD_TYPE_WITH_INDEX = new FieldType();
 		METADATA_FIELD_TYPE_WITH_INDEX.setTokenized( false );
@@ -22,12 +25,19 @@ public class LuceneFields {
 		METADATA_FIELD_TYPE_WITH_INDEX.setIndexOptions( IndexOptions.DOCS );
 		METADATA_FIELD_TYPE_WITH_INDEX.freeze();
 
-		METADATA_FIELD_TYPE_WITH_INDEX_WITH_STORAGE = new FieldType();
-		METADATA_FIELD_TYPE_WITH_INDEX_WITH_STORAGE.setTokenized( false );
-		METADATA_FIELD_TYPE_WITH_INDEX_WITH_STORAGE.setOmitNorms( true );
-		METADATA_FIELD_TYPE_WITH_INDEX_WITH_STORAGE.setIndexOptions( IndexOptions.DOCS );
-		METADATA_FIELD_TYPE_WITH_INDEX_WITH_STORAGE.setStored( true );
-		METADATA_FIELD_TYPE_WITH_INDEX_WITH_STORAGE.freeze();
+		METADATA_FIELD_TYPE_WITH_DOCVALUES = new FieldType( METADATA_FIELD_TYPE_WITH_INDEX );
+		METADATA_FIELD_TYPE_WITH_DOCVALUES.setTokenized( false );
+		METADATA_FIELD_TYPE_WITH_DOCVALUES.setOmitNorms( true );
+		METADATA_FIELD_TYPE_WITH_DOCVALUES.setIndexOptions( IndexOptions.NONE );
+		METADATA_FIELD_TYPE_WITH_DOCVALUES.setDocValuesType( DocValuesType.BINARY );
+		METADATA_FIELD_TYPE_WITH_DOCVALUES.freeze();
+
+		METADATA_FIELD_TYPE_WITH_INDEX_WITH_DOCVALUES = new FieldType();
+		METADATA_FIELD_TYPE_WITH_INDEX_WITH_DOCVALUES.setTokenized( false );
+		METADATA_FIELD_TYPE_WITH_INDEX_WITH_DOCVALUES.setOmitNorms( true );
+		METADATA_FIELD_TYPE_WITH_INDEX_WITH_DOCVALUES.setIndexOptions( IndexOptions.DOCS );
+		METADATA_FIELD_TYPE_WITH_INDEX_WITH_DOCVALUES.setDocValuesType( DocValuesType.BINARY );
+		METADATA_FIELD_TYPE_WITH_INDEX_WITH_DOCVALUES.freeze();
 	}
 
 	private static final String INTERNAL_FIELD_PREFIX = "__HSEARCH_";
@@ -78,7 +88,11 @@ public class LuceneFields {
 	}
 
 	public static IndexableField searchableRetrievableMetadataField(String name, String value) {
-		return new Field( name, value, METADATA_FIELD_TYPE_WITH_INDEX_WITH_STORAGE );
+		return new Field( name, new BytesRef( value ), METADATA_FIELD_TYPE_WITH_INDEX_WITH_DOCVALUES );
+	}
+
+	public static IndexableField retrievableMetadataField(String name, String value) {
+		return new Field( name, new BytesRef( value ), METADATA_FIELD_TYPE_WITH_DOCVALUES );
 	}
 
 	public static String idFieldName() {
