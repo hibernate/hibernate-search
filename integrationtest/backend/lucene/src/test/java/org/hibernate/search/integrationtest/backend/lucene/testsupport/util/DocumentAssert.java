@@ -10,7 +10,6 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -34,34 +33,21 @@ public class DocumentAssert {
 	 * <p>
 	 * The consumer should generally be passed to {@link ListAssert#satisfies(java.util.function.Consumer)}.
 	 *
-	 * @param id The ID of the document that should be contained within the list.
 	 * @param assertions An assertion that should pass on the document with the given id.
 	 * @return A consumer to be passed to {@link ListAssert#satisfies(java.util.function.Consumer)}.
 	 */
-	public static Consumer<List<? extends Document>> containsDocument(String id, Consumer<DocumentAssert> assertions) {
-		return allDocuments -> {
-			Optional<? extends Document> found = allDocuments.stream()
-					.filter( doc -> id.equals( doc.get( LuceneFields.idFieldName() ) ) )
-					.findFirst();
-			Assertions.assertThat( found )
-					.as( "Document with ID '" + id + "'" )
-					.isNotEmpty();
-			assertions.accept( new DocumentAssert( found.get() ).as( id ) );
-		};
+	public static Consumer<List<? extends Document>> containsDocument(Consumer<DocumentAssert> assertions) {
+		return allDocuments -> Assertions.assertThat( allDocuments ).anySatisfy(
+			document -> assertions.accept( new DocumentAssert( document ) )
+		);
 	}
 
 	private final Document actual;
-	private String name;
 
 	private Set<String> allCheckedPaths = new HashSet<>();
 
 	public DocumentAssert(Document actual) {
 		this.actual = actual;
-	}
-
-	public DocumentAssert as(String name) {
-		this.name = name;
-		return this;
 	}
 
 	private ListAssert<IndexableField> asFields() {
@@ -86,8 +72,8 @@ public class DocumentAssert {
 
 	@SafeVarargs
 	private final <T> DocumentAssert hasField(String type, String absoluteFieldPath, T ... values) {
-		String fieldDescription = "field of document '" + name + "' at path '" + absoluteFieldPath + "'"
-				+ " with type '" + type + "' and values '" + Arrays.toString( values ) + "'";
+		String fieldDescription = "field at path '" + absoluteFieldPath + "'"
+				+ " with expected type '" + type + "' and expected values '" + Arrays.toString( values ) + "'";
 		Predicate<IndexableField> predicate = field -> absoluteFieldPath.equals( field.name() );
 		asFields()
 				.areAtLeastOne( new Condition<>( predicate, fieldDescription ) )

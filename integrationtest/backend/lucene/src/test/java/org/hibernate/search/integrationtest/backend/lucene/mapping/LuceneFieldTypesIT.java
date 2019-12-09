@@ -70,7 +70,6 @@ public class LuceneFieldTypesIT {
 		Assertions.assertThat( result )
 				.hasSize( 2 )
 				.satisfies( containsDocument(
-						"ID:1",
 						doc -> doc.hasField( "string", "keyword" )
 								.hasField( "text", TEXT_1 )
 								.hasField( "integer", 739 )
@@ -79,7 +78,6 @@ public class LuceneFieldTypesIT {
 								.andOnlyInternalFields()
 				) )
 				.satisfies( containsDocument(
-						"ID:2",
 						doc -> doc.hasField( "string", "anotherKeyword" )
 								.hasField( "text", TEXT_2 )
 								.hasField( "integer", 123 )
