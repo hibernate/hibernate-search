@@ -14,9 +14,7 @@ import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.document.Field;
-import org.apache.lucene.document.Field.Store;
 import org.apache.lucene.document.FieldType;
-import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.DocValuesType;
 import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.util.BytesRef;
@@ -26,20 +24,20 @@ class LuceneNestedObjectDocumentBuilder extends AbstractLuceneNonFlattenedDocume
 
 	/**
 	 * Indexed, not tokenized, omits norms, indexes
-	 * DOCS_ONLY, stored
+	 * DOCS_ONLY, doc values.
 	 */
-	private static final FieldType TYPE_STORED_BINARY = new FieldType();
+	private static final FieldType TYPE_DOCVALUES_BINARY = new FieldType();
 
 	static {
-		TYPE_STORED_BINARY.setOmitNorms( true );
-		TYPE_STORED_BINARY.setIndexOptions( IndexOptions.DOCS );
-		TYPE_STORED_BINARY.setStored( true );
-		TYPE_STORED_BINARY.setTokenized( false );
+		TYPE_DOCVALUES_BINARY.setOmitNorms( true );
+		TYPE_DOCVALUES_BINARY.setIndexOptions( IndexOptions.NONE );
+		TYPE_DOCVALUES_BINARY.setStored( false );
+		TYPE_DOCVALUES_BINARY.setTokenized( false );
 
 		// Using a binary type to allow doc values extraction. See LuceneChildrenCollector.FieldLeafCollector.
-		TYPE_STORED_BINARY.setDocValuesType( DocValuesType.BINARY );
+		TYPE_DOCVALUES_BINARY.setDocValuesType( DocValuesType.BINARY );
 
-		TYPE_STORED_BINARY.freeze();
+		TYPE_DOCVALUES_BINARY.freeze();
 	}
 
 	LuceneNestedObjectDocumentBuilder(LuceneIndexSchemaObjectNode schemaNode) {
@@ -49,11 +47,11 @@ class LuceneNestedObjectDocumentBuilder extends AbstractLuceneNonFlattenedDocume
 	@Override
 	void contribute(String rootIndexName, MultiTenancyStrategy multiTenancyStrategy, String tenantId, String rootId,
 			List<Document> nestedDocuments) {
-		document.add( LuceneFields.searchableRetrievableMetadataField( LuceneFields.typeFieldName(), LuceneFields.TYPE_CHILD_DOCUMENT ) );
-		document.add( LuceneFields.searchableRetrievableMetadataField( LuceneFields.rootIndexFieldName(), rootIndexName ) );
+		document.add( LuceneFields.searchableMetadataField( LuceneFields.typeFieldName(), LuceneFields.TYPE_CHILD_DOCUMENT ) );
+		document.add( LuceneFields.searchableMetadataField( LuceneFields.rootIndexFieldName(), rootIndexName ) );
 		// TODO HSEARCH-3657 use LuceneFields.* to create the field
-		document.add( new Field( LuceneFields.rootIdFieldName(), new BytesRef( rootId ), TYPE_STORED_BINARY ) );
-		document.add( LuceneFields.searchableRetrievableMetadataField( LuceneFields.nestedDocumentPathFieldName(), schemaNode.getAbsolutePath() ) );
+		document.add( new Field( LuceneFields.rootIdFieldName(), new BytesRef( rootId ), TYPE_DOCVALUES_BINARY ) );
+		document.add( LuceneFields.searchableMetadataField( LuceneFields.nestedDocumentPathFieldName(), schemaNode.getAbsolutePath() ) );
 
 		// all the ancestors of a subdocument must be added after it
 		super.contribute( rootIndexName, multiTenancyStrategy, tenantId, rootId, nestedDocuments );
