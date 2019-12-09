@@ -567,7 +567,6 @@ public class LuceneExtensionIT {
 		Assertions.assertThat( result )
 				.hasSize( 5 )
 				.satisfies( containsDocument(
-						FIRST_ID,
 						doc -> doc.hasField( "string", "text 1" )
 								.hasField( "nativeField", "37" )
 								.hasField( "nativeField_converted", "37" )
@@ -575,7 +574,6 @@ public class LuceneExtensionIT {
 								.andOnlyInternalFields()
 				) )
 				.satisfies( containsDocument(
-						SECOND_ID,
 						doc -> doc.hasField( "integer", 2 )
 								.hasField( "nativeField", "78" )
 								.hasField( "nativeField_converted", "78" )
@@ -583,7 +581,6 @@ public class LuceneExtensionIT {
 								.andOnlyInternalFields()
 				) )
 				.satisfies( containsDocument(
-						THIRD_ID,
 						doc -> doc.hasField( "nativeField", "13" )
 								.hasField( "nativeField_converted", "13" )
 								.hasField( "nativeField_unsupportedProjection", "13" )
@@ -593,14 +590,12 @@ public class LuceneExtensionIT {
 								.andOnlyInternalFields()
 				) )
 				.satisfies( containsDocument(
-						FOURTH_ID,
 						doc -> doc.hasField( "nativeField", "89" )
 								.hasField( "nativeField_converted", "89" )
 								.hasField( "nativeField_unsupportedProjection", "89" )
 								.andOnlyInternalFields()
 				) )
 				.satisfies( containsDocument(
-						FIFTH_ID,
 						doc -> doc.hasField( "string", "text 2" )
 								.hasField( "integer", 1 )
 								// Geo points are stored as two internal fields
@@ -634,7 +629,6 @@ public class LuceneExtensionIT {
 		Assertions.assertThat( result )
 				.hasSize( 1 )
 				.satisfies( containsDocument(
-						FIRST_ID,
 						doc -> doc.hasField( "string", "text 1" )
 								.hasField( "nativeField", "37" )
 								.hasField( "nativeField_converted", "37" )
