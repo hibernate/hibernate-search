@@ -23,7 +23,6 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrch
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkProcessor;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
@@ -151,15 +150,11 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 			LuceneSearchProjection<?, H> rootProjection) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
-		LuceneDocumentStoredFieldVisitorBuilder storedFieldFilterBuilder = new LuceneDocumentStoredFieldVisitorBuilder();
-		rootProjection.contributeFields( storedFieldFilterBuilder );
-
 		return new LuceneSearchQueryBuilder<>(
 				workFactory,
 				readOrchestrator,
 				searchContext,
 				sessionContext,
-				storedFieldFilterBuilder.build(),
 				loadingContextBuilder,
 				rootProjection
 		);

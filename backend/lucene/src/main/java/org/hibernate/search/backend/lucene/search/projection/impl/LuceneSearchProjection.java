@@ -8,22 +8,22 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorProvider;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
-import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
+import org.hibernate.search.engine.search.projection.SearchProjection;
 
-public interface LuceneSearchProjection<E, P> extends SearchProjection<P>, LuceneCollectorProvider {
+public interface LuceneSearchProjection<E, P> extends SearchProjection<P> {
 
 	/**
-	 * Contributes to the list of fields extracted from the Lucene document. Some fields might require the extraction of
-	 * other fields e.g. if the stored fields have different names.
+	 * Request the collection of per-document data that will be used in
+	 * {@link #extract(ProjectionHitMapper, LuceneResult, SearchProjectionExtractContext)},
+	 * making sure that the requirements for this projection are met.
 	 *
-	 * @param builder The builder allowing to set expectations regarding collected fields.
+	 * @param context A context that will share its state with the context passed to
+	 * {@link #extract(ProjectionHitMapper, LuceneResult, SearchProjectionExtractContext)} .
 	 */
-	void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder);
+	void request(SearchProjectionRequestContext context);
 
 	/**
 	 * Perform hit extraction.

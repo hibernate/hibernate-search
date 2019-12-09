@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
 import java.nio.charset.StandardCharsets;
-import java.util.HashSet;
 import java.util.Set;
 
 import org.apache.lucene.document.Document;
@@ -36,7 +35,6 @@ public final class ReusableDocumentStoredFieldVisitor extends StoredFieldVisitor
 
 	private final FieldAcceptor rootAcceptor;
 	private final int totalFields;
-	private final Set<String> nestedDocumentPaths;
 
 	//The Lucene Document which will be returned. Lazily initialized.
 	private Document doc = null;
@@ -52,13 +50,12 @@ public final class ReusableDocumentStoredFieldVisitor extends StoredFieldVisitor
 		this.rootAcceptor = null;
 		this.totalFields = 0; // Shouldn't be used
 		this.missingFields = totalFields;
-		this.nestedDocumentPaths = new HashSet<>();
 	}
 
 	/**
 	 * Create a visitor that collects only some specified fields.
 	 */
-	public ReusableDocumentStoredFieldVisitor(Set<String> fieldsToLoad, Set<String> nestedDocumentPaths) {
+	public ReusableDocumentStoredFieldVisitor(Set<String> fieldsToLoad) {
 		FieldAcceptor previous = NOT_ACCEPT;
 		for ( String fieldName : fieldsToLoad ) {
 			previous = new ChainedFieldAcceptor( previous, fieldName );
@@ -66,7 +63,6 @@ public final class ReusableDocumentStoredFieldVisitor extends StoredFieldVisitor
 		this.rootAcceptor = previous;
 		this.totalFields = fieldsToLoad.size();
 		this.missingFields = totalFields;
-		this.nestedDocumentPaths = nestedDocumentPaths;
 	}
 
 	@Override
@@ -145,10 +141,6 @@ public final class ReusableDocumentStoredFieldVisitor extends StoredFieldVisitor
 			this.doc = localDoc;
 		}
 		return localDoc;
-	}
-
-	public Set<String> getNestedDocumentPaths() {
-		return nestedDocumentPaths;
 	}
 
 	/* The structure below shapes a chain of accepted field names:

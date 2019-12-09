@@ -9,8 +9,6 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 import java.util.Arrays;
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -36,16 +34,9 @@ abstract class AbstractLuceneCompositeProjection<P>
 	}
 
 	@Override
-	public final void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
+	public void request(SearchProjectionRequestContext context) {
 		for ( LuceneSearchProjection<?, ?> child : children ) {
-			child.contributeCollectors( luceneCollectorBuilder );
-		}
-	}
-
-	@Override
-	public final void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder) {
-		for ( LuceneSearchProjection<?, ?> child : children ) {
-			child.contributeFields( builder );
+			child.request( context );
 		}
 	}
 

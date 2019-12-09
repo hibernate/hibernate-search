@@ -16,8 +16,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
+import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorFactory;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
@@ -54,8 +54,8 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 	}
 
 	@Override
-	public final void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
-		luceneCollectorBuilder.addCollector( LuceneCollectorFactory.FACETS );
+	public void request(AggregationRequestContext context) {
+		context.requireCollector( LuceneCollectorFactory.FACETS );
 	}
 
 	@Override

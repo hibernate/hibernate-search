@@ -13,7 +13,7 @@ import org.apache.lucene.search.TotalHitCountCollector;
 /**
  * Tagging interface for collector keys.
  * @param <C> The type of collector.
- * @see LuceneCollectorsBuilder#addCollector(LuceneCollectorFactory)
+ * @see ExtractionRequirements.Builder#requireCollector(LuceneCollectorFactory)
  * @see LuceneCollectors#getCollectors()
  */
 public interface LuceneCollectorKey<C extends Collector> {

@@ -9,9 +9,7 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.DocumentReferenceExtractorHelper;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
@@ -24,13 +22,8 @@ public class LuceneReferenceProjection<R> implements LuceneSearchProjection<R, R
 	}
 
 	@Override
-	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
-		DocumentReferenceExtractorHelper.contributeCollectors( luceneCollectorBuilder );
-	}
-
-	@Override
-	public void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder) {
-		DocumentReferenceExtractorHelper.contributeFields( builder );
+	public void request(SearchProjectionRequestContext context) {
+		DocumentReferenceExtractorHelper.request( context );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -38,7 +31,7 @@ public class LuceneReferenceProjection<R> implements LuceneSearchProjection<R, R
 	public R extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExtractContext context) {
 		return (R) mapper.convertReference(
-				DocumentReferenceExtractorHelper.extractDocumentReference( context, documentResult )
+				DocumentReferenceExtractorHelper.extract( context, documentResult )
 		);
 	}
 

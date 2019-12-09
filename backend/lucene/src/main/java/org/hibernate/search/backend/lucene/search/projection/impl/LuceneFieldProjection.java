@@ -8,12 +8,10 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
-import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
+import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
@@ -37,14 +35,10 @@ class LuceneFieldProjection<F, V> implements LuceneSearchProjection<F, V> {
 	}
 
 	@Override
-	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
-		luceneCollectorBuilder.requireTopDocsCollector();
-	}
-
-	@Override
-	public void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder) {
-		codec.contributeStoredFields( absoluteFieldPath, builder::add );
-		builder.addNestedDocumentPath( nestedDocumentPath );
+	public void request(SearchProjectionRequestContext context) {
+		context.requireTopDocsCollector();
+		codec.contributeStoredFields( absoluteFieldPath, context::requireStoredField );
+		context.requireNestedDocumentExtraction( nestedDocumentPath );
 	}
 
 	@Override
