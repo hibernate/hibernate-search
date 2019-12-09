@@ -12,8 +12,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.document.StringField;
 import org.apache.lucene.facet.FacetsConfig;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
@@ -44,9 +42,9 @@ public class LuceneRootDocumentBuilder extends AbstractLuceneNonFlattenedDocumen
 	}
 
 	private List<Document> assembleDocuments(String indexName, MultiTenancyStrategy multiTenancyStrategy, String tenantId, String id) {
-		document.add( new StringField( LuceneFields.typeFieldName(), LuceneFields.TYPE_MAIN_DOCUMENT, Store.YES ) );
-		document.add( new StringField( LuceneFields.indexFieldName(), indexName, Store.YES ) );
-		document.add( new StringField( LuceneFields.idFieldName(), id, Store.YES ) );
+		document.add( LuceneFields.searchableRetrievableMetadataField( LuceneFields.typeFieldName(), LuceneFields.TYPE_MAIN_DOCUMENT ) );
+		document.add( LuceneFields.searchableRetrievableMetadataField( LuceneFields.indexFieldName(), indexName ) );
+		document.add( LuceneFields.searchableRetrievableMetadataField( LuceneFields.idFieldName(), id ) );
 
 		// all the ancestors of a subdocument must be added after it
 		List<Document> documents = new ArrayList<>();

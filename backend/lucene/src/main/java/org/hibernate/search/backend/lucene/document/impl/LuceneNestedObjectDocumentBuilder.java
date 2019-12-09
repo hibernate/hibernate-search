@@ -49,10 +49,11 @@ class LuceneNestedObjectDocumentBuilder extends AbstractLuceneNonFlattenedDocume
 	@Override
 	void contribute(String rootIndexName, MultiTenancyStrategy multiTenancyStrategy, String tenantId, String rootId,
 			List<Document> nestedDocuments) {
-		document.add( new StringField( LuceneFields.typeFieldName(), LuceneFields.TYPE_CHILD_DOCUMENT, Store.YES ) );
-		document.add( new StringField( LuceneFields.rootIndexFieldName(), rootIndexName, Store.YES ) );
+		document.add( LuceneFields.searchableRetrievableMetadataField( LuceneFields.typeFieldName(), LuceneFields.TYPE_CHILD_DOCUMENT ) );
+		document.add( LuceneFields.searchableRetrievableMetadataField( LuceneFields.rootIndexFieldName(), rootIndexName ) );
+		// TODO HSEARCH-3657 use LuceneFields.* to create the field
 		document.add( new Field( LuceneFields.rootIdFieldName(), new BytesRef( rootId ), TYPE_STORED_BINARY ) );
-		document.add( new StringField( LuceneFields.nestedDocumentPathFieldName(), schemaNode.getAbsolutePath(), Store.YES ) );
+		document.add( LuceneFields.searchableRetrievableMetadataField( LuceneFields.nestedDocumentPathFieldName(), schemaNode.getAbsolutePath() ) );
 
 		// all the ancestors of a subdocument must be added after it
 		super.contribute( rootIndexName, multiTenancyStrategy, tenantId, rootId, nestedDocuments );

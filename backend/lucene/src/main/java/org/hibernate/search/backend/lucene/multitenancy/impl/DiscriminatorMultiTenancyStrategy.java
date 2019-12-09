@@ -19,8 +19,6 @@ import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field.Store;
-import org.apache.lucene.document.StringField;
 import org.apache.lucene.search.Query;
 
 public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
@@ -34,7 +32,7 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 
 	@Override
 	public void contributeToIndexedDocument(Document document, String tenantId) {
-		document.add( new StringField( LuceneFields.tenantIdFieldName(), tenantId, Store.YES ) );
+		document.add( LuceneFields.searchableRetrievableMetadataField( LuceneFields.tenantIdFieldName(), tenantId ) );
 	}
 
 	@Override
