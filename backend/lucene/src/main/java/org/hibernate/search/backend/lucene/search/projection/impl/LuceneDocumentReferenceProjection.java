@@ -10,8 +10,6 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.DocumentReferenceExtractorHelper;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -25,19 +23,14 @@ class LuceneDocumentReferenceProjection implements LuceneSearchProjection<Docume
 	}
 
 	@Override
-	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
-		DocumentReferenceExtractorHelper.contributeCollectors( luceneCollectorBuilder );
-	}
-
-	@Override
-	public void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder) {
-		DocumentReferenceExtractorHelper.contributeFields( builder );
+	public void request(SearchProjectionRequestContext context) {
+		DocumentReferenceExtractorHelper.request( context );
 	}
 
 	@Override
 	public DocumentReference extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExtractContext context) {
-		return DocumentReferenceExtractorHelper.extractDocumentReference( context, documentResult );
+		return DocumentReferenceExtractorHelper.extract( context, documentResult );
 	}
 
 	@Override

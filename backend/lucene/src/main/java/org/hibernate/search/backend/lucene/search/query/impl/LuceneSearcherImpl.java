@@ -17,8 +17,8 @@ import java.util.Set;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
+import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequirements;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectors;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ReusableDocumentStoredFieldVisitor;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
@@ -45,21 +45,21 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 	private final LuceneSearchQueryRequestContext requestContext;
 
-	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
 	private final LuceneSearchProjection<?, H> rootProjection;
 	private final Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations;
+	private final ExtractionRequirements extractionRequirements;
 
 	private TimeoutManager timeoutManager;
 
 	LuceneSearcherImpl(LuceneSearchQueryRequestContext requestContext,
-			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
 			LuceneSearchProjection<?, H> rootProjection,
 			Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations,
+			ExtractionRequirements extractionRequirements,
 			TimeoutManager timeoutManager) {
 		this.requestContext = requestContext;
-		this.storedFieldVisitor = storedFieldVisitor;
 		this.rootProjection = rootProjection;
 		this.aggregations = aggregations;
+		this.extractionRequirements = extractionRequirements;
 		this.timeoutManager = timeoutManager;
 	}
 
@@ -138,16 +138,8 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		//  Note that Lucene initializes data structures of this size so setting it to a large value consumes memory.
 		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );
 
-		LuceneCollectorsBuilder luceneCollectorsBuilder = new LuceneCollectorsBuilder(
-				requestContext.getLuceneSort(), storedFieldVisitor.getNestedDocumentPaths(),
-				maxDocs,
-				timeoutManager
-		);
-		rootProjection.contributeCollectors( luceneCollectorsBuilder );
-		for ( LuceneSearchAggregation<?> aggregation : aggregations.values() ) {
-			aggregation.contributeCollectors( luceneCollectorsBuilder );
-		}
-		return luceneCollectorsBuilder.build();
+		// TODO HSEARCH-3352 implement timeout handling by wrapping the collector with the timeout limiting one
+		return extractionRequirements.createCollectors( requestContext.getLuceneSort(), maxDocs, timeoutManager );
 	}
 
 	private int getMaxDocs(IndexReader reader, int offset, Integer limit) {
@@ -163,6 +155,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	}
 
 	private List<Object> extractHits(LuceneSearchQueryExtractContext extractContext) throws IOException {
+		ReusableDocumentStoredFieldVisitor storedFieldVisitor = extractionRequirements.getStoredFieldVisitor();
 		ProjectionHitMapper<?, ?> projectionHitMapper = extractContext.getProjectionHitMapper();
 		IndexSearcher indexSearcher = extractContext.getIndexSearcher();
 

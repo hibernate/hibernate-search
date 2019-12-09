@@ -11,9 +11,7 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.DistanceCollector;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorFactory;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.engine.spatial.DistanceUnit;
@@ -40,7 +38,7 @@ class LuceneDistanceToFieldProjection
 
 	/**
 	 * Necessary in order to share a single collector if there are multiple similar projections.
-	 * See {@link #createCollector(int)}, {@link #contributeCollectors(LuceneCollectorsBuilder)}.
+	 * See {@link #createCollector(int)}, {@link #request(SearchProjectionRequestContext)}.
 	 */
 	@Override
 	public boolean equals(Object obj) {
@@ -60,14 +58,10 @@ class LuceneDistanceToFieldProjection
 	}
 
 	@Override
-	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
-		luceneCollectorBuilder.addCollector( this );
-	}
-
-	@Override
-	public void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder) {
-		builder.add( absoluteFieldPath );
-		builder.addNestedDocumentPath( nestedDocumentPath );
+	public void request(SearchProjectionRequestContext context) {
+		context.requireCollector( this );
+		context.requireStoredField( absoluteFieldPath );
+		context.requireNestedDocumentExtraction( nestedDocumentPath );
 	}
 
 	@Override

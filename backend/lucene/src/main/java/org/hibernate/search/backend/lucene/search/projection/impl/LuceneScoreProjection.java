@@ -9,8 +9,6 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorsBuilder;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneDocumentStoredFieldVisitorBuilder;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
@@ -23,13 +21,8 @@ class LuceneScoreProjection implements LuceneSearchProjection<Float, Float> {
 	}
 
 	@Override
-	public void contributeCollectors(LuceneCollectorsBuilder luceneCollectorBuilder) {
-		luceneCollectorBuilder.requireScore();
-	}
-
-	@Override
-	public void contributeFields(LuceneDocumentStoredFieldVisitorBuilder builder) {
-		// Nothing to contribute
+	public void request(SearchProjectionRequestContext context) {
+		context.requireScore();
 	}
 
 	@Override

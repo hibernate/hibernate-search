@@ -6,6 +6,20 @@
  */
 package org.hibernate.search.backend.lucene.search.aggregation.impl;
 
-public interface AggregationRequestContext {
+import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequirements;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorFactory;
 
+import org.apache.lucene.search.Collector;
+
+public final class AggregationRequestContext {
+
+	private final ExtractionRequirements.Builder extractionRequirementsBuilder;
+
+	public AggregationRequestContext(ExtractionRequirements.Builder extractionRequirementsBuilder) {
+		this.extractionRequirementsBuilder = extractionRequirementsBuilder;
+	}
+
+	public <C extends Collector> void requireCollector(LuceneCollectorFactory<C> collectorFactory) {
+		extractionRequirementsBuilder.requireCollector( collectorFactory );
+	}
 }

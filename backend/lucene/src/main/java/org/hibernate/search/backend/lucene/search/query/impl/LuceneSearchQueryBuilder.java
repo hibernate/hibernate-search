@@ -9,27 +9,23 @@ package org.hibernate.search.backend.lucene.search.query.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.lucene.search.BooleanClause.Occur;
-import org.apache.lucene.search.BooleanQuery;
-import org.apache.lucene.search.Query;
-import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
-
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
+import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
-import org.hibernate.search.backend.lucene.search.extraction.impl.ReusableDocumentStoredFieldVisitor;
+import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequirements;
 import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
+import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionRequestContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
@@ -40,6 +36,12 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+
+import org.apache.lucene.search.BooleanClause.Occur;
+import org.apache.lucene.search.BooleanQuery;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
 
 public class LuceneSearchQueryBuilder<H>
 		implements SearchQueryBuilder<H, LuceneSearchQueryElementCollector>, LuceneSearchQueryElementCollector {
@@ -53,7 +55,6 @@ public class LuceneSearchQueryBuilder<H>
 	private final BackendSessionContext sessionContext;
 	private final Set<String> routingKeys;
 
-	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
 	private final LoadingContextBuilder<?, ?> loadingContextBuilder;
 	private final LuceneSearchProjection<?, H> rootProjection;
 
@@ -71,7 +72,6 @@ public class LuceneSearchQueryBuilder<H>
 			LuceneReadWorkOrchestrator queryOrchestrator,
 			LuceneSearchContext searchContext,
 			BackendSessionContext sessionContext,
-			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
 			LoadingContextBuilder<?, ?> loadingContextBuilder,
 			LuceneSearchProjection<?, H> rootProjection) {
 		this.workFactory = workFactory;
@@ -81,7 +81,6 @@ public class LuceneSearchQueryBuilder<H>
 		this.sessionContext = sessionContext;
 		this.routingKeys = new HashSet<>();
 
-		this.storedFieldVisitor = storedFieldVisitor;
 		this.loadingContextBuilder = loadingContextBuilder;
 		this.rootProjection = rootProjection;
 	}
@@ -188,13 +187,26 @@ public class LuceneSearchQueryBuilder<H>
 				sessionContext, loadingContext, definitiveLuceneQuery, luceneSort
 		);
 
+		ExtractionRequirements.Builder extractionRequirementsBuilder = new ExtractionRequirements.Builder();
+		SearchProjectionRequestContext projectionRequestContext =
+				new SearchProjectionRequestContext( extractionRequirementsBuilder );
+		rootProjection.request( new SearchProjectionRequestContext( extractionRequirementsBuilder ) );
+		if ( aggregations != null ) {
+			AggregationRequestContext aggregationRequestContext =
+					new AggregationRequestContext( extractionRequirementsBuilder );
+			for ( LuceneSearchAggregation<?> aggregation : aggregations.values() ) {
+				aggregation.request( aggregationRequestContext );
+			}
+		}
+		ExtractionRequirements extractionRequirements = extractionRequirementsBuilder.build();
+
 		TimeoutManager timeoutManager = searchContext.createTimeoutManager( definitiveLuceneQuery, timeout, timeUnit, exceptionOnTimeout );
 
 		LuceneSearcherImpl<H> searcher = new LuceneSearcherImpl<>(
 				requestContext,
-				storedFieldVisitor,
 				rootProjection,
 				aggregations == null ? Collections.emptyMap() : aggregations,
+				extractionRequirements,
 				timeoutManager
 		);
 
