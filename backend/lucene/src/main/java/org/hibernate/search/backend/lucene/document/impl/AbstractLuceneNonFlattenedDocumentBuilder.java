@@ -18,8 +18,6 @@ import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.document.Document;
-import org.apache.lucene.document.Field;
-import org.apache.lucene.document.StringField;
 import org.apache.lucene.index.IndexableField;
 
 
@@ -61,7 +59,7 @@ abstract class AbstractLuceneNonFlattenedDocumentBuilder extends AbstractLuceneD
 			EncounteredFieldStatus status = entry.getValue();
 			if ( EncounteredFieldStatus.ENCOUNTERED_AND_NAME_INDEXED.equals( status ) ) {
 				String fieldName = entry.getKey();
-				document.add( new StringField( LuceneFields.fieldNamesFieldName(), fieldName, Field.Store.NO ) );
+				document.add( LuceneFields.searchableMetadataField( LuceneFields.fieldNamesFieldName(), fieldName ) );
 			}
 		}
 

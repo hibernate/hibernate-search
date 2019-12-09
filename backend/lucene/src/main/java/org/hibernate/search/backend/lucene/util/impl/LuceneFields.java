@@ -6,7 +6,29 @@
  */
 package org.hibernate.search.backend.lucene.util.impl;
 
+import org.apache.lucene.document.Field;
+import org.apache.lucene.document.FieldType;
+import org.apache.lucene.index.IndexOptions;
+import org.apache.lucene.index.IndexableField;
+
 public class LuceneFields {
+
+	private static final FieldType METADATA_FIELD_TYPE_WITH_INDEX;
+	private static final FieldType METADATA_FIELD_TYPE_WITH_INDEX_WITH_STORAGE;
+	static {
+		METADATA_FIELD_TYPE_WITH_INDEX = new FieldType();
+		METADATA_FIELD_TYPE_WITH_INDEX.setTokenized( false );
+		METADATA_FIELD_TYPE_WITH_INDEX.setOmitNorms( true );
+		METADATA_FIELD_TYPE_WITH_INDEX.setIndexOptions( IndexOptions.DOCS );
+		METADATA_FIELD_TYPE_WITH_INDEX.freeze();
+
+		METADATA_FIELD_TYPE_WITH_INDEX_WITH_STORAGE = new FieldType();
+		METADATA_FIELD_TYPE_WITH_INDEX_WITH_STORAGE.setTokenized( false );
+		METADATA_FIELD_TYPE_WITH_INDEX_WITH_STORAGE.setOmitNorms( true );
+		METADATA_FIELD_TYPE_WITH_INDEX_WITH_STORAGE.setIndexOptions( IndexOptions.DOCS );
+		METADATA_FIELD_TYPE_WITH_INDEX_WITH_STORAGE.setStored( true );
+		METADATA_FIELD_TYPE_WITH_INDEX_WITH_STORAGE.freeze();
+	}
 
 	private static final String INTERNAL_FIELD_PREFIX = "__HSEARCH_";
 
@@ -49,6 +71,14 @@ public class LuceneFields {
 		sb.append( '_' );
 		sb.append( suffix );
 		return sb.toString();
+	}
+
+	public static IndexableField searchableMetadataField(String name, String value) {
+		return new Field( name, value, METADATA_FIELD_TYPE_WITH_INDEX );
+	}
+
+	public static IndexableField searchableRetrievableMetadataField(String name, String value) {
+		return new Field( name, value, METADATA_FIELD_TYPE_WITH_INDEX_WITH_STORAGE );
 	}
 
 	public static String idFieldName() {
