@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchResult;
@@ -72,7 +73,8 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 						actualCall.projectionContext,
 						actualCall.loadingContext.createProjectionHitMapper(),
 						actualCall.rootProjection,
-						behavior.getRawHits()
+						behavior.getRawHits(),
+						getLoadingTimeout( work )
 				),
 				Collections.emptyMap(),
 				Duration.ZERO, false
@@ -87,7 +89,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 	static <H> List<H> getResults(StubSearchProjectionContext actualProjectionContext,
 			ProjectionHitMapper<?, ?> actualProjectionHitMapper,
 			StubSearchProjection<H> actualRootProjection,
-			List<?> rawHits) {
+			List<?> rawHits, Integer loadingTimeout) {
 		List<Object> extractedElements = new ArrayList<>( rawHits.size() );
 
 		for ( Object rawHit : rawHits ) {
@@ -97,8 +99,7 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 			);
 		}
 
-		// TODO HSEARCH-3352 pass timeout
-		LoadingResult<?, ?> loadingResult = actualProjectionHitMapper.loadBlocking( null );
+		LoadingResult<?, ?> loadingResult = actualProjectionHitMapper.loadBlocking( loadingTimeout );
 
 		List<H> hits = new ArrayList<>( rawHits.size() );
 
@@ -120,6 +121,18 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 	@Override
 	public String toString() {
 		return "search work execution on indexes '" + indexNames + "'; work = " + work;
+	}
+
+	static Integer getLoadingTimeout(StubSearchWork work) {
+		Long timeout = work.getFailAfterTimeout();
+		TimeUnit timeUnit = work.getFailAfterTimeUnit();
+		if ( timeout == null || timeUnit == null ) {
+			return null;
+		}
+
+		long nanos = timeUnit.toNanos( timeout );
+		int millis = Math.toIntExact( nanos / 1000000 );
+		return ( nanos % 1000000 == 0 ) ? millis : millis + 1;
 	}
 
 }
