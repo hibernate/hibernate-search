@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneChildrenCollector;
@@ -39,7 +40,7 @@ public final class ExtractionRequirements {
 
 	private final Set<String> requiredNestedDocumentExtractionPaths;
 
-	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
+	private final Optional<ReusableDocumentStoredFieldVisitor> storedFieldVisitor;
 
 	private ExtractionRequirements(Builder builder) {
 		requireTopDocs = builder.requireTopDocs;
@@ -134,7 +135,7 @@ public final class ExtractionRequirements {
 		);
 	}
 
-	public ReusableDocumentStoredFieldVisitor getStoredFieldVisitor() {
+	public Optional<ReusableDocumentStoredFieldVisitor> getStoredFieldVisitor() {
 		return storedFieldVisitor;
 	}
 
@@ -201,12 +202,15 @@ public final class ExtractionRequirements {
 			return new ExtractionRequirements( this );
 		}
 
-		public ReusableDocumentStoredFieldVisitor createStoredFieldVisitor() {
+		public Optional<ReusableDocumentStoredFieldVisitor> createStoredFieldVisitor() {
 			if ( requireAllStoredFields ) {
-				return new ReusableDocumentStoredFieldVisitor();
+				return Optional.of( new ReusableDocumentStoredFieldVisitor() );
+			}
+			else if ( !requiredStoredFields.isEmpty() ) {
+				return Optional.of( new ReusableDocumentStoredFieldVisitor( requiredStoredFields ) );
 			}
 			else {
-				return new ReusableDocumentStoredFieldVisitor( requiredStoredFields );
+				return Optional.empty();
 			}
 		}
 	}

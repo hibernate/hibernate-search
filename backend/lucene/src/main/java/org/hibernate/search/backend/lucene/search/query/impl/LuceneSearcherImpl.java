@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
@@ -155,7 +156,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	}
 
 	private List<Object> extractHits(LuceneSearchQueryExtractContext extractContext) throws IOException {
-		ReusableDocumentStoredFieldVisitor storedFieldVisitor = extractionRequirements.getStoredFieldVisitor();
+		Optional<ReusableDocumentStoredFieldVisitor> storedFieldVisitorOptional = extractionRequirements.getStoredFieldVisitor();
 		ProjectionHitMapper<?, ?> projectionHitMapper = extractContext.getProjectionHitMapper();
 		IndexSearcher indexSearcher = extractContext.getIndexSearcher();
 
@@ -178,17 +179,21 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 			}
 
 			ScoreDoc hit = topDocs.scoreDocs[i];
-			// add root document contribution
-			indexSearcher.doc( hit.doc, storedFieldVisitor );
-			// add nested documents contribution
-			Set<Integer> nestedDocIdsForDocument = projectionExtractContext.getNestedDocIds( hit.doc );
-			if ( nestedDocIdsForDocument != null ) {
-				for ( Integer child : nestedDocIdsForDocument ) {
-					indexSearcher.doc( child, storedFieldVisitor );
+			Document document = null;
+			if ( storedFieldVisitorOptional.isPresent() ) {
+				ReusableDocumentStoredFieldVisitor storedFieldVisitor = storedFieldVisitorOptional.get();
+				// add root document contribution
+				indexSearcher.doc( hit.doc, storedFieldVisitor );
+				// add nested documents contribution
+				Set<Integer> nestedDocIdsForDocument = projectionExtractContext.getNestedDocIds( hit.doc );
+				if ( nestedDocIdsForDocument != null ) {
+					for ( Integer child : nestedDocIdsForDocument ) {
+						indexSearcher.doc( child, storedFieldVisitor );
+					}
 				}
+				document = storedFieldVisitor.getDocumentAndReset();
 			}
 
-			Document document = storedFieldVisitor.getDocumentAndReset();
 			LuceneResult luceneResult = new LuceneResult( document, hit.doc, hit.score );
 
 			extractedData.add( rootProjection.extract( projectionHitMapper, luceneResult, projectionExtractContext ) );
