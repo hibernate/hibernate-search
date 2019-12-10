@@ -37,6 +37,7 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
@@ -168,14 +169,17 @@ public class LuceneSearchQueryBuilder<H>
 		luceneQueryBuilder.add( luceneQuery, Occur.MUST );
 		luceneQueryBuilder.add( LuceneQueries.mainDocumentQuery(), Occur.FILTER );
 
+		Query filter = searchContext.getFilterOrNull( sessionContext.getTenantIdentifier() );
+		if ( filter != null ) {
+			luceneQueryBuilder.add( filter, BooleanClause.Occur.FILTER );
+		}
+
+		Query definitiveLuceneQuery = luceneQueryBuilder.build();
+
 		Sort luceneSort = null;
 		if ( sortFields != null && !sortFields.isEmpty() ) {
 			luceneSort = new Sort( sortFields.toArray( new SortField[0] ) );
 		}
-
-		Query definitiveLuceneQuery = searchContext.decorateLuceneQuery(
-				luceneQueryBuilder.build(), sessionContext.getTenantIdentifier()
-		);
 
 		if ( nestedFieldSorts != null ) {
 			for ( LuceneFieldComparatorSource nestedField : nestedFieldSorts ) {

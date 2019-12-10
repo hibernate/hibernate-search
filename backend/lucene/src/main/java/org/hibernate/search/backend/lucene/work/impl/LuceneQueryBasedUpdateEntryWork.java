@@ -22,7 +22,7 @@ public class LuceneQueryBasedUpdateEntryWork extends AbstractLuceneUpdateEntryWo
 	@Override
 	protected long doUpdateEntry(IndexWriterDelegator indexWriterDelegator, String tenantId, String id,
 			LuceneIndexEntry indexEntry) throws IOException {
-		indexWriterDelegator.deleteDocuments( LuceneQueries.discriminatorMultiTenancyDeleteDocumentQuery( tenantId, id ) );
+		indexWriterDelegator.deleteDocuments( LuceneQueries.singleDocumentQuery( tenantId, id ) );
 		return indexWriterDelegator.addDocuments( indexEntry );
 	}
 }

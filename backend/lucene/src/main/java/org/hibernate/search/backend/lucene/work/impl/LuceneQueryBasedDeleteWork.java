@@ -12,16 +12,16 @@ import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDeleg
 import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 
 
-public class LuceneQueryBasedDeleteAllEntriesWork extends AbstractLuceneDeleteAllEntriesWork {
+public class LuceneQueryBasedDeleteWork extends AbstractLuceneDeleteAllEntriesWork {
 
-	public LuceneQueryBasedDeleteAllEntriesWork(String tenantId) {
+	public LuceneQueryBasedDeleteWork(String tenantId) {
 		super( tenantId );
 	}
 
 	@Override
 	protected long doDeleteDocuments(IndexWriterDelegator indexWriterDelegator, String tenantId) throws IOException {
 		return indexWriterDelegator.deleteDocuments(
-				LuceneQueries.discriminatorMultiTenancyDeleteAllDocumentsQuery( tenantId )
+				LuceneQueries.tenantIdQuery( tenantId )
 		);
 	}
 }

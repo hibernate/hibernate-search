@@ -33,8 +33,8 @@ public class NoMultiTenancyStrategy implements MultiTenancyStrategy {
 	}
 
 	@Override
-	public Query decorateLuceneQuery(Query originalLuceneQuery, String tenantId) {
-		return originalLuceneQuery;
+	public Query getFilterOrNull(String tenantId) {
+		return null;
 	}
 
 	@Override

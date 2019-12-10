@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
-import org.hibernate.search.backend.lucene.work.impl.LuceneQueryBasedDeleteAllEntriesWork;
+import org.hibernate.search.backend.lucene.work.impl.LuceneQueryBasedDeleteWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryBasedDeleteEntryWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryBasedUpdateEntryWork;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -36,8 +36,8 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 	}
 
 	@Override
-	public Query decorateLuceneQuery(Query originalLuceneQuery, String tenantId) {
-		return LuceneQueries.wrapWithDiscriminatorTenantIdQuery( originalLuceneQuery, tenantId );
+	public Query getFilterOrNull(String tenantId) {
+		return LuceneQueries.tenantIdQuery( tenantId );
 	}
 
 	@Override
@@ -52,8 +52,8 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 	}
 
 	@Override
-	public LuceneQueryBasedDeleteAllEntriesWork createDeleteAllEntriesLuceneWork(String tenantId) {
-		return new LuceneQueryBasedDeleteAllEntriesWork( tenantId );
+	public LuceneQueryBasedDeleteWork createDeleteAllEntriesLuceneWork(String tenantId) {
+		return new LuceneQueryBasedDeleteWork( tenantId );
 	}
 
 	@Override
