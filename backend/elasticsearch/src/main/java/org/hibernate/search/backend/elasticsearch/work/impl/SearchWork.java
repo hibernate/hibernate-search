@@ -159,6 +159,10 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 				builder.param( "track_total_hits", trackTotalHits );
 			}
 
+			if ( timeoutValue != null && timeoutUnit != null ) {
+				builder.param( "timeout", getTimeoutString() );
+			}
+
 			if ( exceptionOnTimeout ) {
 				// the default is true
 				builder.param( "allow_partial_search_results", false );
@@ -174,6 +178,34 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 		@Override
 		public SearchWork<R> build() {
 			return new SearchWork<>( this );
+		}
+
+		private String getTimeoutString() {
+			StringBuilder builder = new StringBuilder( timeoutValue + "" );
+			switch ( timeoutUnit ) {
+				case DAYS:
+					builder.append( "d" );
+					break;
+				case HOURS:
+					builder.append( "h" );
+					break;
+				case MINUTES:
+					builder.append( "m" );
+					break;
+				case SECONDS:
+					builder.append( "s" );
+					break;
+				case MILLISECONDS:
+					builder.append( "ms" );
+					break;
+				case MICROSECONDS:
+					builder.append( "micros" );
+					break;
+				case NANOSECONDS:
+					builder.append( "nanos" );
+					break;
+			}
+			return builder.toString();
 		}
 	}
 }
