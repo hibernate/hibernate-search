@@ -72,8 +72,8 @@ public final class LuceneSearchContext {
 		return scopeModel.getIndexManagerContexts();
 	}
 
-	public Query decorateLuceneQuery(Query originalLuceneQuery, String tenantId) {
-		return multiTenancyStrategy.decorateLuceneQuery( originalLuceneQuery, tenantId );
+	public Query getFilterOrNull(String tenantId) {
+		return multiTenancyStrategy.getFilterOrNull( tenantId );
 	}
 
 	public TimeoutManager createTimeoutManager(Query definitiveLuceneQuery,

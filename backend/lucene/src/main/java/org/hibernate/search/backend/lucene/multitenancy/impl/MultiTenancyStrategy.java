@@ -38,11 +38,10 @@ public interface MultiTenancyStrategy {
 	/**
 	 * Decorate the query with the tenant constraint.
 	 *
-	 * @param originalLuceneQuery The original Lucene query.
 	 * @param tenantId The tenant id.
 	 * @return The decorated query.
 	 */
-	Query decorateLuceneQuery(Query originalLuceneQuery, String tenantId);
+	Query getFilterOrNull(String tenantId);
 
 	/**
 	 * Check that the tenant id value is consistent with the strategy.

@@ -154,16 +154,16 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	private Explanation doExplain(String indexName, String id) {
 		timeoutManager.start();
-		Query explainedDocumentQuery = new BooleanQuery.Builder()
+		BooleanQuery.Builder explainedDocumentQueryBuilder = new BooleanQuery.Builder()
 				.add( new TermQuery( new Term( LuceneFields.indexFieldName(), indexName ) ), BooleanClause.Occur.MUST )
-				.add( new TermQuery( new Term( LuceneFields.idFieldName(), id ) ), BooleanClause.Occur.MUST )
-				.build();
-		explainedDocumentQuery = searchContext.decorateLuceneQuery(
-				explainedDocumentQuery, sessionContext.getTenantIdentifier()
-		);
+				.add( new TermQuery( new Term( LuceneFields.idFieldName(), id ) ), BooleanClause.Occur.MUST );
+		Query filter = searchContext.getFilterOrNull( sessionContext.getTenantIdentifier() );
+		if ( filter != null ) {
+			explainedDocumentQueryBuilder.add( filter, BooleanClause.Occur.FILTER );
+		}
 
 		LuceneReadWork<Explanation> work = workFactory.explain(
-				searcher, indexName, id, explainedDocumentQuery
+				searcher, indexName, id, explainedDocumentQueryBuilder.build()
 		);
 		Explanation explanation = doSubmit( work );
 		timeoutManager.stop();

@@ -21,7 +21,7 @@ public class LuceneQueryBasedDeleteEntryWork extends AbstractLuceneDeleteEntryWo
 	@Override
 	protected long doDeleteDocuments(IndexWriterDelegator indexWriterDelegator, String tenantId, String id) throws IOException {
 		return indexWriterDelegator.deleteDocuments(
-				LuceneQueries.discriminatorMultiTenancyDeleteDocumentQuery( tenantId, id )
+				LuceneQueries.singleDocumentQuery( tenantId, id )
 		);
 	}
 }
