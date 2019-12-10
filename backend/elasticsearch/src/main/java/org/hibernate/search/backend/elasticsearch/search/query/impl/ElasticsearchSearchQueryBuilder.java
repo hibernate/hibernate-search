@@ -40,7 +40,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import com.google.gson.JsonPrimitive;
 
 public class ElasticsearchSearchQueryBuilder<H>
 		implements SearchQueryBuilder<H, ElasticsearchSearchQueryElementCollector>,
@@ -198,10 +197,6 @@ public class ElasticsearchSearchQueryBuilder<H>
 			payload.add( "aggregations", jsonAggregations );
 		}
 
-		if ( timeoutValue != null && timeoutUnit != null ) {
-			payload.add( "timeout", getTimeoutString() );
-		}
-
 		ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor =
 				searchResultExtractorFactory.createResultExtractor(
 						requestContext,
@@ -216,33 +211,5 @@ public class ElasticsearchSearchQueryBuilder<H>
 				searchResultExtractor,
 				timeoutValue, timeoutUnit, exceptionOnTimeout
 		);
-	}
-
-	private JsonPrimitive getTimeoutString() {
-		StringBuilder builder = new StringBuilder( timeoutValue + "" );
-		switch ( timeoutUnit ) {
-			case DAYS:
-				builder.append( "d" );
-				break;
-			case HOURS:
-				builder.append( "h" );
-				break;
-			case MINUTES:
-				builder.append( "m" );
-				break;
-			case SECONDS:
-				builder.append( "s" );
-				break;
-			case MILLISECONDS:
-				builder.append( "ms" );
-				break;
-			case MICROSECONDS:
-				builder.append( "micros" );
-				break;
-			case NANOSECONDS:
-				builder.append( "nanos" );
-				break;
-		}
-		return new JsonPrimitive( builder.toString() );
 	}
 }
