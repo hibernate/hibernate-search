@@ -13,6 +13,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
 import javax.persistence.Parameter;
@@ -31,6 +32,7 @@ import org.hibernate.query.internal.ParameterMetadataImpl;
 import org.hibernate.query.spi.QueryParameterBindings;
 import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.query.spi.SearchQueryImplementor;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.type.Type;
@@ -153,7 +155,6 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 
 	@Override
 	protected List<R> doList() {
-		// TODO HSEARCH-3352 handle timeouts
 		// TODO HSEARCH-3093 apply the result transformer?
 		return delegate.fetchHits( firstResult, maxResults );
 	}
@@ -188,8 +189,11 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 
 	@Override
 	public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value) {
-		// TODO HSEARCH-3352 hints (javax.persistence.query.timeout hint in particular)
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		if ( "javax.persistence.query.timeout".equals( hintName ) && value instanceof Integer &&
+				delegate instanceof SearchQueryImplementor ) {
+			( (SearchQueryImplementor) delegate ).failAfter( (Integer) value, TimeUnit.MILLISECONDS );
+		}
+		return this;
 	}
 
 	@Override
@@ -346,12 +350,10 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 
 	@Override
 	public HibernateOrmSearchQueryAdapter<R> setTimeout(int timeout) {
-		throw timeoutNotImplementedYet();
-	}
-
-	private UnsupportedOperationException timeoutNotImplementedYet() {
-		// TODO HSEARCH-3352 add support for timeouts
-		return new UnsupportedOperationException( "Not implemented yet" );
+		if ( delegate instanceof SearchQueryImplementor ) {
+			( (SearchQueryImplementor) delegate ).failAfter( timeout, TimeUnit.SECONDS );
+		}
+		return this;
 	}
 
 	@Deprecated

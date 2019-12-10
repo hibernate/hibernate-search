@@ -7,6 +7,7 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search;
 
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
@@ -62,5 +63,10 @@ final class StubSearchQuery<H> extends AbstractSearchQuery<H, SearchResult<H>>
 	@Override
 	public long fetchTotalHitCount() {
 		return backend.getBehavior().executeCountWork( indexNames );
+	}
+
+	@Override
+	public void failAfter(long timeout, TimeUnit timeUnit) {
+
 	}
 }

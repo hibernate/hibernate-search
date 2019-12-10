@@ -6,8 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.search.query.impl;
 
+import static org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder.createTimeoutManager;
+
 import java.lang.invoke.MethodHandles;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
@@ -167,5 +170,12 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		Explanation explanation = doSubmit( work );
 		timeoutManager.stop();
 		return explanation;
+	}
+
+	@Override
+	public void failAfter(long timeout, TimeUnit timeUnit) {
+		// replace the timeout manager on already created query instance
+		timeoutManager = createTimeoutManager( luceneQuery, timeout, timeUnit, true );
+		searcher.setTimeoutManager( timeoutManager );
 	}
 }
