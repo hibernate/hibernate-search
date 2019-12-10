@@ -21,7 +21,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @param <H> The type of query hits.
  * @param <R> The result type (extending {@link SearchResult}).
  */
-public abstract class AbstractSearchQuery<H, R extends SearchResult<H>> implements SearchQuery<H> {
+public abstract class AbstractSearchQuery<H, R extends SearchResult<H>> implements SearchQueryImplementor<H> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
