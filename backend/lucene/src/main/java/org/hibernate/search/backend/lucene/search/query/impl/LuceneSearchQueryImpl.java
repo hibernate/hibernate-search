@@ -51,7 +51,8 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	private final Query luceneQuery;
 	private final Sort luceneSort;
 	private final LuceneSearcher<LuceneLoadableSearchResult<H>> searcher;
-	private final TimeoutManager timeoutManager;
+
+	private TimeoutManager timeoutManager;
 
 	LuceneSearchQueryImpl(LuceneReadWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, LuceneSearchContext searchContext,

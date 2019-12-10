@@ -60,8 +60,9 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
 	private final LuceneSearchProjection<?, H> rootProjection;
 	private final Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations;
-	private final TimeoutManager timeoutManager;
 	private final TimingSource timingSource;
+
+	private TimeoutManager timeoutManager;
 
 	LuceneSearcherImpl(LuceneSearchQueryRequestContext requestContext,
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
@@ -131,6 +132,11 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	@Override
 	public Query getLuceneQueryForExceptions() {
 		return requestContext.getLuceneQuery();
+	}
+
+	@Override
+	public void setTimeoutManager(TimeoutManager timeoutManager) {
+		this.timeoutManager = timeoutManager;
 	}
 
 	private LuceneCollectors buildCollectors(IndexSearcher indexSearcher, int offset, Integer limit) {
