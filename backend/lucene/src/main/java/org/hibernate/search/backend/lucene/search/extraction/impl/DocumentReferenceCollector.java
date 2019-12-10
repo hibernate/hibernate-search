@@ -20,7 +20,7 @@ import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.SimpleCollector;
 
-final class DocumentReferenceCollector extends SimpleCollector {
+public final class DocumentReferenceCollector extends SimpleCollector {
 
 	public static final LuceneCollectorFactory<DocumentReferenceCollector> FACTORY =
 			maxDocs -> new DocumentReferenceCollector();

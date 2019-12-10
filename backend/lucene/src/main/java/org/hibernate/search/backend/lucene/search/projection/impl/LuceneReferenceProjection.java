@@ -8,8 +8,9 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.search.extraction.impl.DocumentReferenceExtractorHelper;
+import org.hibernate.search.backend.lucene.search.extraction.impl.DocumentReferenceCollector;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
@@ -23,16 +24,16 @@ public class LuceneReferenceProjection<R> implements LuceneSearchProjection<R, R
 
 	@Override
 	public void request(SearchProjectionRequestContext context) {
-		DocumentReferenceExtractorHelper.request( context );
+		context.requireCollector( DocumentReferenceCollector.FACTORY );
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public R extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExtractContext context) {
-		return (R) mapper.convertReference(
-				DocumentReferenceExtractorHelper.extract( context, documentResult )
-		);
+		DocumentReference documentReference =
+				context.getCollector( DocumentReferenceCollector.FACTORY ).get( documentResult.getDocId() );
+		return (R) mapper.convertReference( documentReference );
 	}
 
 	@Override
