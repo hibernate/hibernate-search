@@ -57,9 +57,10 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	private final JsonObject payload;
 	private final ElasticsearchSearchRequestTransformer requestTransformer;
 	private final ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor;
-	private final Integer timeoutValue;
-	private final TimeUnit timeoutUnit;
-	private final boolean exceptionOnTimeout;
+
+	private Integer timeoutValue;
+	private TimeUnit timeoutUnit;
+	private boolean exceptionOnTimeout;
 
 	ElasticsearchSearchQueryImpl(ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchWorkOrchestrator queryOrchestrator,
@@ -212,5 +213,12 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 		ExplainResult explainResult = Futures.unwrappedExceptionJoin( queryOrchestrator.submit( work ) );
 		return explainResult.getJsonObject();
+	}
+
+	@Override
+	public void failAfter(long timeout, TimeUnit timeUnit) {
+		timeoutValue = Math.toIntExact( timeout );
+		timeoutUnit = timeUnit;
+		exceptionOnTimeout = true;
 	}
 }

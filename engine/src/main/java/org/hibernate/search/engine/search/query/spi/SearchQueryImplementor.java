@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.query.spi;
 
+import java.util.concurrent.TimeUnit;
+
 import org.hibernate.search.engine.search.query.SearchQuery;
 
 /**
@@ -18,4 +20,5 @@ import org.hibernate.search.engine.search.query.SearchQuery;
  */
 public interface SearchQueryImplementor<H> extends SearchQuery<H> {
 
+	void failAfter(long timeout, TimeUnit timeUnit);
 }
