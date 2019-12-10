@@ -46,8 +46,6 @@ public class LuceneFields {
 
 	private static final String ID_FIELD_NAME = internalFieldName( "id" );
 
-	private static final String INDEX_FIELD_NAME = internalFieldName( "index" );
-
 	private static final String TENANT_ID_FIELD_NAME = internalFieldName( "tenantId" );
 
 	private static final String TYPE_FIELD_NAME = internalFieldName( "type" );
@@ -97,10 +95,6 @@ public class LuceneFields {
 
 	public static String idFieldName() {
 		return ID_FIELD_NAME;
-	}
-
-	public static String indexFieldName() {
-		return INDEX_FIELD_NAME;
 	}
 
 	public static String tenantIdFieldName() {
