@@ -39,7 +39,7 @@ public class LuceneQueries {
 	}
 
 	public static Query discriminatorMultiTenancyDeleteAllDocumentsQuery(String tenantId) {
-		return new BooleanQuery.Builder().add( new TermQuery( new Term( LuceneFields.tenantIdFieldName(), tenantId ) ), Occur.FILTER ).build();
+		return new TermQuery( new Term( LuceneFields.tenantIdFieldName(), tenantId ) );
 	}
 
 	public static Query wrapWithDiscriminatorTenantIdQuery(Query originalLuceneQuery, String tenantId) {
