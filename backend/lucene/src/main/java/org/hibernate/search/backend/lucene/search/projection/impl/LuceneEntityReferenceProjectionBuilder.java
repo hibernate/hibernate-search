@@ -22,6 +22,6 @@ public class LuceneEntityReferenceProjectionBuilder<R> implements EntityReferenc
 
 	@Override
 	public SearchProjection<R> build() {
-		return new LuceneReferenceProjection<>( indexNames );
+		return new LuceneEntityReferenceProjection<>( indexNames );
 	}
 }

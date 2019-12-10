@@ -14,11 +14,11 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 
-public class LuceneReferenceProjection<R> implements LuceneSearchProjection<R, R> {
+public class LuceneEntityReferenceProjection<R> implements LuceneSearchProjection<R, R> {
 
 	private final Set<String> indexNames;
 
-	public LuceneReferenceProjection(Set<String> indexNames) {
+	public LuceneEntityReferenceProjection(Set<String> indexNames) {
 		this.indexNames = indexNames;
 	}
 
