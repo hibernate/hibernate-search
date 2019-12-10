@@ -93,6 +93,7 @@ public class LuceneExtensionIT {
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
+	private IndexMapping otherIndexMapping;
 	private StubMappingIndexManager otherIndexManager;
 
 	@Before
@@ -105,7 +106,7 @@ public class LuceneExtensionIT {
 				)
 				.withIndex(
 						OTHER_INDEX_NAME,
-						ctx -> new IndexMapping( ctx.getSchemaElement() ),
+						ctx -> this.otherIndexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.otherIndexManager = indexManager
 				)
 				.setup();
@@ -705,6 +706,26 @@ public class LuceneExtensionIT {
 	}
 
 	private void initData() {
+		indexDataSet( indexMapping, indexManager );
+
+		// Use the same IDs and dataset for otherIndexMapping to trigger
+		// a failure in explain() tests if index selection doesn't work correctly.
+		indexDataSet( otherIndexMapping, otherIndexManager );
+
+		// Check that all documents are searchable
+		assertThat( indexManager.createScope().query().predicate( f -> f.matchAll() ).toQuery() )
+				.hasDocRefHitsAnyOrder(
+						INDEX_NAME,
+						FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
+				);
+		assertThat( otherIndexManager.createScope().query().predicate( f -> f.matchAll() ).toQuery() )
+				.hasDocRefHitsAnyOrder(
+						OTHER_INDEX_NAME,
+						FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
+				);
+	}
+
+	private static void indexDataSet(IndexMapping indexMapping, StubMappingIndexManager indexManager) {
 		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( FIRST_ID ), document -> {
 			document.addValue( indexMapping.string, "text 1" );
@@ -758,18 +779,7 @@ public class LuceneExtensionIT {
 			document.addValue( indexMapping.sort2, "zz" );
 			document.addValue( indexMapping.sort3, "zz" );
 		} );
-
 		plan.execute().join();
-
-		// Check that all documents are searchable
-		StubMappingScope scope = indexManager.createScope();
-		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
-				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder(
-				INDEX_NAME,
-				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
-		);
 	}
 
 	private static class IndexMapping {
