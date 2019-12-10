@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.search.projection.impl.LuceneComposit
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneEntityProjection;
-import org.hibernate.search.backend.lucene.search.projection.impl.LuceneReferenceProjection;
+import org.hibernate.search.backend.lucene.search.projection.impl.LuceneEntityReferenceProjection;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
@@ -48,7 +48,7 @@ public class LuceneSearchQueryBuilderFactory
 	@Override
 	public <R> LuceneSearchQueryBuilder<R> asReference(
 			BackendSessionContext sessionContext, LoadingContextBuilder<R, ?> loadingContextBuilder) {
-		return createSearchQueryBuilder( sessionContext, loadingContextBuilder, new LuceneReferenceProjection( searchContext.getIndexNames() ) );
+		return createSearchQueryBuilder( sessionContext, loadingContextBuilder, new LuceneEntityReferenceProjection( searchContext.getIndexNames() ) );
 	}
 
 	@Override
