@@ -53,7 +53,7 @@ public class DistanceCollector implements Collector {
 		}
 
 		// try to find the field on nested docs
-		Set<Integer> nestedDocs = context.getNestedDocs( docId );
+		Set<Integer> nestedDocs = context.getNestedDocIds( docId );
 		if ( nestedDocs == null ) {
 			return null;
 		}

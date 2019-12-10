@@ -10,6 +10,6 @@ import java.util.Set;
 
 public interface LuceneCollectorExtractContext {
 
-	Set<Integer> getNestedDocs(int docId);
+	Set<Integer> getNestedDocIds(int docId);
 
 }

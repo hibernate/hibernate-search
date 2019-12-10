@@ -27,15 +27,15 @@ public class SearchProjectionExtractContext implements LuceneCollectorExtractCon
 
 	private final IndexSearcher indexSearcher;
 	private final Query luceneQuery;
-	private final Map<Integer, Set<Integer>> nestedDocs;
+	private final Map<Integer, Set<Integer>> topDocIdsToNestedDocIds;
 	private final Map<LuceneCollectorKey<?>, Collector> collectors;
 
 	public SearchProjectionExtractContext(IndexSearcher indexSearcher, Query luceneQuery,
-			Map<Integer, Set<Integer>> nestedDocs,
+			Map<Integer, Set<Integer>> topDocIdsToNestedDocIds,
 			Map<LuceneCollectorKey<?>, Collector> collectors) {
 		this.indexSearcher = indexSearcher;
 		this.luceneQuery = luceneQuery;
-		this.nestedDocs = nestedDocs;
+		this.topDocIdsToNestedDocIds = topDocIdsToNestedDocIds;
 		this.collectors = collectors;
 	}
 
@@ -49,8 +49,8 @@ public class SearchProjectionExtractContext implements LuceneCollectorExtractCon
 	}
 
 	@Override
-	public Set<Integer> getNestedDocs(int docId) {
-		return nestedDocs.get( docId );
+	public Set<Integer> getNestedDocIds(int docId) {
+		return topDocIdsToNestedDocIds.get( docId );
 	}
 
 	@SuppressWarnings("unchecked")
