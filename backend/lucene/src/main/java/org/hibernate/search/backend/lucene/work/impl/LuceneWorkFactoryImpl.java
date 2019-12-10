@@ -64,10 +64,10 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 
 	@Override
 	public LuceneReadWork<Explanation> explain(LuceneSearcher<?> searcher,
-			String explainedDocumentIndexName, String explainedDocumentId, Query explainedDocumentQuery) {
+			String explainedDocumentIndexName, String explainedDocumentId, Query explainedDocumentFilter) {
 		return new LuceneExplainWork(
 				searcher,
-				explainedDocumentIndexName, explainedDocumentId, explainedDocumentQuery
+				explainedDocumentIndexName, explainedDocumentId, explainedDocumentFilter
 		);
 	}
 }

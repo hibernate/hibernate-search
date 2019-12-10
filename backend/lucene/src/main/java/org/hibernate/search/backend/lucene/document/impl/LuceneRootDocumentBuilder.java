@@ -43,7 +43,6 @@ public class LuceneRootDocumentBuilder extends AbstractLuceneNonFlattenedDocumen
 
 	private List<Document> assembleDocuments(String indexName, MultiTenancyStrategy multiTenancyStrategy, String tenantId, String id) {
 		document.add( LuceneFields.searchableMetadataField( LuceneFields.typeFieldName(), LuceneFields.TYPE_MAIN_DOCUMENT ) );
-		document.add( LuceneFields.searchableMetadataField( LuceneFields.indexFieldName(), indexName ) );
 		document.add( LuceneFields.searchableRetrievableMetadataField( LuceneFields.idFieldName(), id ) );
 
 		// all the ancestors of a subdocument must be added after it

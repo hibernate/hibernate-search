@@ -16,7 +16,6 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
-import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.work.impl.LuceneReadWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
@@ -28,14 +27,9 @@ import org.hibernate.search.engine.search.query.SearchQueryExtension;
 import org.hibernate.search.util.common.impl.Contracts;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import org.apache.lucene.index.Term;
-import org.apache.lucene.search.BooleanClause;
-import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.TermQuery;
-
 
 
 public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearchResult<H>>
@@ -154,16 +148,9 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	private Explanation doExplain(String indexName, String id) {
 		timeoutManager.start();
-		BooleanQuery.Builder explainedDocumentQueryBuilder = new BooleanQuery.Builder()
-				.add( new TermQuery( new Term( LuceneFields.indexFieldName(), indexName ) ), BooleanClause.Occur.MUST )
-				.add( new TermQuery( new Term( LuceneFields.idFieldName(), id ) ), BooleanClause.Occur.MUST );
 		Query filter = searchContext.getFilterOrNull( sessionContext.getTenantIdentifier() );
-		if ( filter != null ) {
-			explainedDocumentQueryBuilder.add( filter, BooleanClause.Occur.FILTER );
-		}
-
 		LuceneReadWork<Explanation> work = workFactory.explain(
-				searcher, indexName, id, explainedDocumentQueryBuilder.build()
+				searcher, indexName, id, filter
 		);
 		Explanation explanation = doSubmit( work );
 		timeoutManager.stop();
