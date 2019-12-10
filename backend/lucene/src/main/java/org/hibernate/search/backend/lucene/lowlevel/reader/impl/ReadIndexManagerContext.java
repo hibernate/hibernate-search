@@ -7,10 +7,7 @@
 package org.hibernate.search.backend.lucene.lowlevel.reader.impl;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Set;
-
-import org.hibernate.search.backend.lucene.lowlevel.reader.spi.IndexReaderHolder;
 
 /**
  * An interface with knowledge of the index manager internals,
@@ -18,6 +15,6 @@ import org.hibernate.search.backend.lucene.lowlevel.reader.spi.IndexReaderHolder
  */
 public interface ReadIndexManagerContext {
 
-	void openIndexReaders(Set<String> routingKeys, Collection<IndexReaderHolder> readerCollector) throws IOException;
+	void openIndexReaders(Set<String> routingKeys, DirectoryReaderCollector readerCollector) throws IOException;
 
 }

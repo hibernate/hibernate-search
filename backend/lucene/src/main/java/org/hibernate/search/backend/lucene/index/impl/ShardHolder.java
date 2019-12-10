@@ -18,8 +18,8 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.index.spi.ShardingStrategy;
+import org.hibernate.search.backend.lucene.lowlevel.reader.impl.DirectoryReaderCollector;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
-import org.hibernate.search.backend.lucene.lowlevel.reader.spi.IndexReaderHolder;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.execution.impl.WorkExecutionIndexManagerContext;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
@@ -109,11 +109,11 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 	}
 
 	@Override
-	public void openIndexReaders(Set<String> routingKeys, Collection<IndexReaderHolder> readerCollector)
-			throws IOException {
+	public void openIndexReaders(Set<String> routingKeys, DirectoryReaderCollector readerCollector) throws IOException {
+		String indexName = getIndexName();
 		Collection<Shard> enabledShards = toShards( routingKeys );
 		for ( Shard shard : enabledShards ) {
-			readerCollector.add( shard.openReader() );
+			readerCollector.collect( indexName, shard.openReader() );
 		}
 	}
 

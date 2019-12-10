@@ -10,6 +10,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.DistanceCollector;
+import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorExecutionContext;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorFactory;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
@@ -38,7 +39,7 @@ class LuceneDistanceToFieldProjection
 
 	/**
 	 * Necessary in order to share a single collector if there are multiple similar projections.
-	 * See {@link #createCollector(int)}, {@link #request(SearchProjectionRequestContext)}.
+	 * See {@link #createCollector(LuceneCollectorExecutionContext)}, {@link #request(SearchProjectionRequestContext)}.
 	 */
 	@Override
 	public boolean equals(Object obj) {
@@ -95,8 +96,8 @@ class LuceneDistanceToFieldProjection
 	}
 
 	@Override
-	public DistanceCollector createCollector(int maxDocs) {
-		return new DistanceCollector( absoluteFieldPath, center, maxDocs );
+	public DistanceCollector createCollector(LuceneCollectorExecutionContext context) {
+		return new DistanceCollector( absoluteFieldPath, center, context.getMaxDocs() );
 	}
 
 	@Override

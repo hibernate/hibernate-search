@@ -8,14 +8,13 @@ package org.hibernate.search.backend.lucene.index.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
-import org.hibernate.search.backend.lucene.lowlevel.reader.spi.IndexReaderHolder;
+import org.hibernate.search.backend.lucene.lowlevel.reader.impl.DirectoryReaderCollector;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeIndexManagerContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
@@ -135,8 +134,7 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public void openIndexReaders(Set<String> routingKeys, Collection<IndexReaderHolder> readerCollector)
-			throws IOException {
+	public void openIndexReaders(Set<String> routingKeys, DirectoryReaderCollector readerCollector) throws IOException {
 		shardHolder.openIndexReaders( routingKeys, readerCollector );
 	}
 

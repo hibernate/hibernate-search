@@ -9,21 +9,24 @@ package org.hibernate.search.backend.lucene.lowlevel.reader.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.MultiReader;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.lowlevel.reader.spi.IndexReaderHolder;
+import org.hibernate.search.backend.lucene.lowlevel.reader.spi.DirectoryReaderHolder;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
- * A {@link MultiReader} keeping references to {@link IndexReaderHolder}s to eventually close them.
+ * A {@link MultiReader} keeping references to {@link DirectoryReaderHolder}s to eventually close them.
  * <p>
  * Ported from Search 5: {@code org.hibernate.search.reader.impl.ManagedMultiReader},
  * {@code org.hibernate.search.reader.impl.MultiReaderFactory}.
@@ -41,16 +44,16 @@ public class HolderMultiReader extends MultiReader {
 			return null;
 		}
 		else {
-			List<IndexReaderHolder> indexReaderHolders = new ArrayList<>();
+			Builder builder = new Builder();
 			try {
 				for ( ReadIndexManagerContext indexManagerContext : indexManagerContexts ) {
-					indexManagerContext.openIndexReaders( routingKeys, indexReaderHolders );
+					indexManagerContext.openIndexReaders( routingKeys, builder );
 				}
-				return new HolderMultiReader( indexReaderHolders );
+				return builder.build();
 			}
 			catch (IOException | RuntimeException e) {
 				new SuppressingCloser( e )
-						.pushAll( indexReaderHolders );
+						.pushAll( builder.directoryReaderHolders );
 				throw log.failureOnMultiReaderRefresh(
 						EventContexts.fromIndexNames( indexNames ), e
 				);
@@ -58,18 +61,24 @@ public class HolderMultiReader extends MultiReader {
 		}
 	}
 
-	private final List<IndexReaderHolder> indexReaderHolders;
+	private final List<DirectoryReaderHolder> directoryReaderHolders;
+	private final IndexReaderMetadataResolver metadataResolver;
 
-	HolderMultiReader(List<IndexReaderHolder> indexReaderHolders) throws IOException {
+	HolderMultiReader(List<DirectoryReaderHolder> directoryReaderHolders, IndexReaderMetadataResolver metadataResolver) throws IOException {
 		// If this flag isn't set to true, the MultiReader will increase the usage counter!
-		super( toReaderArray( indexReaderHolders ), true );
-		this.indexReaderHolders = indexReaderHolders;
+		super( toReaderArray( directoryReaderHolders ), true );
+		this.directoryReaderHolders = directoryReaderHolders;
+		this.metadataResolver = metadataResolver;
 	}
 
 	@Override
 	public String toString() {
 		return HolderMultiReader.class.getSimpleName() + " [subReaders=" + getSequentialSubReaders()
-				+ ", indexReaderHolders=" + indexReaderHolders + "]";
+				+ ", indexReaderHolders=" + directoryReaderHolders + "]";
+	}
+
+	public IndexReaderMetadataResolver getMetadataResolver() {
+		return metadataResolver;
 	}
 
 	@Override
@@ -85,18 +94,38 @@ public class HolderMultiReader extends MultiReader {
 			log.debugf( "Closing MultiReader: %s", this );
 		}
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.pushAll( IndexReaderHolder::close, indexReaderHolders );
+			closer.pushAll( DirectoryReaderHolder::close, directoryReaderHolders );
 		}
 		if ( debugEnabled ) {
 			log.trace( "MultiReader closed." );
 		}
 	}
 
-	private static IndexReader[] toReaderArray(List<IndexReaderHolder> indexReaderHolders) {
-		IndexReader[] indexReaders = new IndexReader[indexReaderHolders.size()];
-		for ( int i = 0; i < indexReaderHolders.size(); i++ ) {
-			indexReaders[i] = indexReaderHolders.get( i ).get();
+	private static IndexReader[] toReaderArray(List<DirectoryReaderHolder> directoryReaderHolders) {
+		IndexReader[] indexReaders = new IndexReader[directoryReaderHolders.size()];
+		for ( int i = 0; i < directoryReaderHolders.size(); i++ ) {
+			indexReaders[i] = directoryReaderHolders.get( i ).get();
 		}
 		return indexReaders;
+	}
+
+	public static class Builder implements DirectoryReaderCollector {
+		private final List<DirectoryReaderHolder> directoryReaderHolders = new ArrayList<>();
+		private final Map<DirectoryReader, String> indexNameByDirectoryReader = new HashMap<>();
+
+		private Builder() {
+		}
+
+		@Override
+		public void collect(String indexName, DirectoryReaderHolder directoryReaderHolder) {
+			directoryReaderHolders.add( directoryReaderHolder );
+			DirectoryReader reader = directoryReaderHolder.get();
+			indexNameByDirectoryReader.put( reader, indexName );
+		}
+
+		HolderMultiReader build() throws IOException {
+			IndexReaderMetadataResolver metadataResolver = new IndexReaderMetadataResolver( indexNameByDirectoryReader );
+			return new HolderMultiReader( directoryReaderHolders, metadataResolver );
+		}
 	}
 }

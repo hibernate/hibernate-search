@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.search.impl.LuceneDocumentReference;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -22,24 +23,25 @@ import org.apache.lucene.search.SimpleCollector;
 
 public final class DocumentReferenceCollector extends SimpleCollector {
 
-	public static final LuceneCollectorFactory<DocumentReferenceCollector> FACTORY =
-			maxDocs -> new DocumentReferenceCollector();
+	public static final LuceneCollectorFactory<DocumentReferenceCollector> FACTORY = DocumentReferenceCollector::new;
 
-	private BinaryDocValues currentLeafIndexDocValues;
+	private final IndexReaderMetadataResolver metadataResolver;
+
+	private String currentLeafIndexName;
 	private BinaryDocValues currentLeafIdDocValues;
 	private int currentLeafDocBase;
 
 	private Map<Integer, DocumentReference> collected = new HashMap<>();
 
-	private DocumentReferenceCollector() {
+	private DocumentReferenceCollector(LuceneCollectorExecutionContext executionContext) {
+		this.metadataResolver = executionContext.getMetadataResolver();
 	}
 
 	@Override
 	public void collect(int doc) throws IOException {
-		currentLeafIndexDocValues.advance( doc );
 		currentLeafIdDocValues.advance( doc );
 		collected.put( currentLeafDocBase + doc, new LuceneDocumentReference(
-				currentLeafIndexDocValues.binaryValue().utf8ToString(),
+				currentLeafIndexName,
 				currentLeafIdDocValues.binaryValue().utf8ToString()
 		) );
 	}
@@ -55,7 +57,7 @@ public final class DocumentReferenceCollector extends SimpleCollector {
 
 	@Override
 	protected void doSetNextReader(LeafReaderContext context) throws IOException {
-		this.currentLeafIndexDocValues = DocValues.getBinary( context.reader(), LuceneFields.indexFieldName() );
+		this.currentLeafIndexName = metadataResolver.resolveIndexName( context );
 		this.currentLeafIdDocValues = DocValues.getBinary( context.reader(), LuceneFields.idFieldName() );
 		this.currentLeafDocBase = context.docBase;
 	}

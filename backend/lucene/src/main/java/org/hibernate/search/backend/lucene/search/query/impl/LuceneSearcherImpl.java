@@ -16,6 +16,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequirements;
@@ -75,11 +76,12 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	}
 
 	@Override
-	public LuceneLoadableSearchResult<H> search(IndexSearcher indexSearcher, int offset, Integer limit)
-			throws IOException {
+	public LuceneLoadableSearchResult<H> search(IndexSearcher indexSearcher,
+			IndexReaderMetadataResolver metadataResolver,
+			int offset, Integer limit) throws IOException {
 		queryLog.executingLuceneQuery( requestContext.getLuceneQuery() );
 
-		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, offset, limit );
+		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, metadataResolver, offset, limit );
 
 		luceneCollectors.collect(
 				indexSearcher, requestContext.getLuceneQuery(), offset, limit
@@ -133,14 +135,15 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		this.timeoutManager = timeoutManager;
 	}
 
-	private LuceneCollectors buildCollectors(IndexSearcher indexSearcher, int offset, Integer limit) {
+	private LuceneCollectors buildCollectors(IndexSearcher indexSearcher, IndexReaderMetadataResolver metadataResolver,
+			int offset, Integer limit) {
 		// TODO HSEARCH-3323 this is very naive for now, we will probably need to implement some scrolling in the collector
 		//  as it is done in Search 5.
 		//  Note that Lucene initializes data structures of this size so setting it to a large value consumes memory.
 		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );
 
 		// TODO HSEARCH-3352 implement timeout handling by wrapping the collector with the timeout limiting one
-		return extractionRequirements.createCollectors( requestContext.getLuceneSort(), maxDocs, timeoutManager );
+		return extractionRequirements.createCollectors( requestContext.getLuceneSort(), metadataResolver, maxDocs, timeoutManager );
 	}
 
 	private int getMaxDocs(IndexReader reader, int offset, Integer limit) {

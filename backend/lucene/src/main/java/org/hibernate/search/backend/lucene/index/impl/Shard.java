@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
-import org.hibernate.search.backend.lucene.lowlevel.reader.spi.IndexReaderHolder;
+import org.hibernate.search.backend.lucene.lowlevel.reader.spi.DirectoryReaderHolder;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
@@ -65,8 +65,8 @@ public final class Shard {
 		}
 	}
 
-	IndexReaderHolder openReader() throws IOException {
-		return IndexReaderHolder.of( indexAccessor.openDirectoryIndexReader() );
+	DirectoryReaderHolder openReader() throws IOException {
+		return DirectoryReaderHolder.of( indexAccessor.openDirectoryIndexReader() );
 	}
 
 	LuceneWriteWorkOrchestrator getWriteOrchestrator() {

@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.work.impl;
 
 import java.io.IOException;
 
+import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 
 import org.apache.lucene.search.Explanation;
@@ -16,7 +17,8 @@ import org.apache.lucene.search.Query;
 
 public interface LuceneSearcher<R> {
 
-	R search(IndexSearcher indexSearcher, int offset, Integer limit) throws IOException;
+	R search(IndexSearcher indexSearcher, IndexReaderMetadataResolver metadataResolver,
+			int offset, Integer limit) throws IOException;
 
 	int count(IndexSearcher indexSearcher) throws IOException;
 

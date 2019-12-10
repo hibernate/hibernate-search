@@ -8,22 +8,22 @@ package org.hibernate.search.backend.lucene.lowlevel.reader.spi;
 
 import java.io.IOException;
 
-import org.apache.lucene.index.IndexReader;
+import org.apache.lucene.index.DirectoryReader;
 
-final class SimpleIndexReaderHolder implements IndexReaderHolder {
-	private final IndexReader indexReader;
+final class SimpleDirectoryReaderHolder implements DirectoryReaderHolder {
+	private final DirectoryReader directoryReader;
 
-	SimpleIndexReaderHolder(IndexReader indexReader) {
-		this.indexReader = indexReader;
+	SimpleDirectoryReaderHolder(DirectoryReader directoryReader) {
+		this.directoryReader = directoryReader;
 	}
 
 	@Override
-	public IndexReader get() {
-		return indexReader;
+	public DirectoryReader get() {
+		return directoryReader;
 	}
 
 	@Override
 	public void close() throws IOException {
-		indexReader.close();
+		directoryReader.close();
 	}
 }
