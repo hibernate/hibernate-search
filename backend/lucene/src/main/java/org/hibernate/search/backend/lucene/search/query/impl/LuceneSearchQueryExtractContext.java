@@ -57,7 +57,7 @@ class LuceneSearchQueryExtractContext {
 	SearchProjectionExtractContext createProjectionExtractContext() {
 		return new SearchProjectionExtractContext(
 				indexSearcher, luceneQuery,
-				luceneCollectors.getNestedDocIds(),
+				luceneCollectors.getTopDocIdsToNestedDocIds(),
 				luceneCollectors.getCollectors()
 		);
 	}

@@ -185,9 +185,10 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 			}
 
 			ScoreDoc hit = topDocs.scoreDocs[i];
-			// add root object contribution
+			// add root document contribution
 			indexSearcher.doc( hit.doc, storedFieldVisitor );
-			Set<Integer> nestedDocIdsForDocument = projectionExtractContext.getNestedDocs( hit.doc );
+			// add nested documents contribution
+			Set<Integer> nestedDocIdsForDocument = projectionExtractContext.getNestedDocIds( hit.doc );
 			if ( nestedDocIdsForDocument != null ) {
 				for ( Integer child : nestedDocIdsForDocument ) {
 					indexSearcher.doc( child, storedFieldVisitor );

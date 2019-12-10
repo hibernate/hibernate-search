@@ -50,7 +50,7 @@ public class LuceneCollectors {
 	private final TimeoutManager timeoutManager;
 
 	private TopDocs topDocs = null;
-	private Map<Integer, Set<Integer>> nestedDocIds = Collections.emptyMap();
+	private Map<Integer, Set<Integer>> topDocIdsToNestedDocIds = Collections.emptyMap();
 
 	LuceneCollectors(boolean requireFieldDocRescoring, Integer scoreSortFieldIndexForRescoring,
 			Set<String> nestedDocumentPaths,
@@ -116,8 +116,8 @@ public class LuceneCollectors {
 		return topDocs;
 	}
 
-	public Map<Integer, Set<Integer>> getNestedDocIds() {
-		return nestedDocIds;
+	public Map<Integer, Set<Integer>> getTopDocIdsToNestedDocIds() {
+		return topDocIdsToNestedDocIds;
 	}
 
 	private void extractTopDocs(int offset, Integer limit) {
@@ -155,9 +155,9 @@ public class LuceneCollectors {
 						collectors.get( HibernateSearchDocumentIdToLuceneDocIdMapCollector.FACTORY );
 
 		Map<String, Set<Integer>> stringSetMap = applyCollectorsToNestedDocs( indexSearcher, parentsQuery );
-		this.nestedDocIds = new HashMap<>();
+		this.topDocIdsToNestedDocIds = new HashMap<>();
 		for ( Map.Entry<String, Set<Integer>> entry : stringSetMap.entrySet() ) {
-			nestedDocIds.put( searchDocumentIdToLuceneDocId.getLuceneDocId( entry.getKey() ), entry.getValue() );
+			topDocIdsToNestedDocIds.put( searchDocumentIdToLuceneDocId.getLuceneDocId( entry.getKey() ), entry.getValue() );
 		}
 	}
 
