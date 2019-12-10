@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Explanation;
@@ -55,9 +56,15 @@ class LuceneExplainWork implements LuceneReadWork<Explanation> {
 	 * it's more or less an address in an array (?).
 	 */
 	private int getLuceneDocId(IndexSearcher indexSearcher) throws IOException {
-		TopDocs topDocs = indexSearcher.search( explainedDocumentQuery, 1 );
-		if ( topDocs.scoreDocs.length != 1 ) {
+		TopDocs topDocs = indexSearcher.search( explainedDocumentQuery, 2 );
+		if ( topDocs.scoreDocs.length < 1 ) {
 			throw log.explainUnkownDocument( indexName, documentId );
+		}
+		if ( topDocs.scoreDocs.length > 1 ) {
+			throw new AssertionFailure(
+					"Multiple documents match query " + explainedDocumentQuery + "." +
+							" There is a bug in Hibernate Search, please report it."
+			);
 		}
 		return topDocs.scoreDocs[0].doc;
 	}
