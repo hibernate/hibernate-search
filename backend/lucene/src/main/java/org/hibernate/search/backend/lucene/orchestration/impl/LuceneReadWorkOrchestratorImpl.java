@@ -13,6 +13,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HolderMultiReader;
+import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
 import org.hibernate.search.backend.lucene.work.impl.LuceneReadWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneReadWorkExecutionContext;
@@ -107,6 +108,11 @@ public class LuceneReadWorkOrchestratorImpl
 		@Override
 		public IndexReader getIndexReader() {
 			return indexReader;
+		}
+
+		@Override
+		public IndexReaderMetadataResolver getIndexReaderMetadataResolver() {
+			return indexReader.getMetadataResolver();
 		}
 
 		@Override

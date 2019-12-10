@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneChildrenCollector;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 
@@ -50,7 +51,7 @@ public final class ExtractionRequirements {
 		storedFieldVisitor = builder.createStoredFieldVisitor();
 	}
 
-	public LuceneCollectors createCollectors(Sort sort, int maxDocs, TimeoutManager timeoutManager) {
+	public LuceneCollectors createCollectors(Sort sort, IndexReaderMetadataResolver metadataResolver, int maxDocs, TimeoutManager timeoutManager) {
 		TopDocsCollector<?> topDocsCollector = null;
 		Integer scoreSortFieldIndexForRescoring = null;
 		boolean requireFieldDocRescoring = false;
@@ -100,8 +101,11 @@ public final class ExtractionRequirements {
 		TotalHitCountCollector totalHitCountCollector = new TotalHitCountCollector();
 		luceneCollectors.put( LuceneCollectorKey.TOTAL_HIT_COUNT, totalHitCountCollector );
 
+		LuceneCollectorExecutionContext executionContext =
+				new LuceneCollectorExecutionContext( metadataResolver, maxDocs );
+
 		for ( LuceneCollectorFactory<?> collectorFactory : requiredCollectorFactories ) {
-			Collector collector = collectorFactory.createCollector( maxDocs );
+			Collector collector = collectorFactory.createCollector( executionContext );
 			luceneCollectors.put( collectorFactory, collector );
 			if ( collectorFactory.applyToNestedDocuments() ) {
 				luceneCollectorsForNestedDocuments.add( collector );

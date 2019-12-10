@@ -38,7 +38,7 @@ public class LuceneSearchWork<R> implements LuceneReadWork<R> {
 			IndexSearcher indexSearcher = new IndexSearcher( context.getIndexReader() );
 
 			return searcher.search(
-					indexSearcher, offset, limit
+					indexSearcher, context.getIndexReaderMetadataResolver(), offset, limit
 			);
 		}
 		catch (IOException e) {

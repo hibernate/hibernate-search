@@ -9,12 +9,13 @@ package org.hibernate.search.backend.lucene.lowlevel.reader.spi;
 import java.io.Closeable;
 import java.io.IOException;
 
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexReader;
 
-public interface IndexReaderHolder extends Closeable {
+public interface DirectoryReaderHolder extends Closeable {
 
 	/**
-	 * Release any resource currently held by the {@link IndexReaderHolder},
+	 * Release any resource currently held by the {@link DirectoryReaderHolder},
 	 * including (but not limiting to) the reader itself.
 	 * <p>
 	 * After this method has been called, the result of calling any other method on the same instance is undefined.
@@ -26,17 +27,17 @@ public interface IndexReaderHolder extends Closeable {
 	void close() throws IOException;
 
 	/**
-	 * @return The reader held by this {@link IndexReaderHolder}.
+	 * @return The reader held by this {@link DirectoryReaderHolder}.
 	 */
-	IndexReader get();
+	DirectoryReader get();
 
 	/**
 	 * @param indexReader The {@link IndexReader} to hold.
-	 * @return An {@link IndexReaderHolder} that returns the given directory when {@link #get()} is called
+	 * @return An {@link DirectoryReaderHolder} that returns the given directory when {@link #get()} is called
 	 * and simply closes the directory when {@link #close()} is called.
 	 */
-	static IndexReaderHolder of(IndexReader indexReader) {
-		return new SimpleIndexReaderHolder( indexReader );
+	static DirectoryReaderHolder of(DirectoryReader indexReader) {
+		return new SimpleDirectoryReaderHolder( indexReader );
 	}
 
 }

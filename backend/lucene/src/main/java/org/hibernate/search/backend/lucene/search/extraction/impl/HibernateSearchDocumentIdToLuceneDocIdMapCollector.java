@@ -21,7 +21,7 @@ import org.apache.lucene.search.SimpleCollector;
 public final class HibernateSearchDocumentIdToLuceneDocIdMapCollector extends SimpleCollector {
 
 	public static final LuceneCollectorFactory<HibernateSearchDocumentIdToLuceneDocIdMapCollector> FACTORY =
-			maxDocs -> new HibernateSearchDocumentIdToLuceneDocIdMapCollector();
+			context -> new HibernateSearchDocumentIdToLuceneDocIdMapCollector();
 
 	private BinaryDocValues currentLeafIdDocValues;
 	private int currentLeafDocBase;

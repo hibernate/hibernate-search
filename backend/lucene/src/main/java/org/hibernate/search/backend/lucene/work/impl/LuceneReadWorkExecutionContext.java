@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
+import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.index.IndexReader;
@@ -14,6 +15,8 @@ import org.apache.lucene.index.IndexReader;
 public interface LuceneReadWorkExecutionContext {
 
 	IndexReader getIndexReader();
+
+	IndexReaderMetadataResolver getIndexReaderMetadataResolver();
 
 	EventContext getEventContext();
 

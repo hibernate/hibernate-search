@@ -11,12 +11,12 @@ import org.apache.lucene.search.Collector;
 
 public interface LuceneCollectorFactory<C extends Collector> extends LuceneCollectorKey<C> {
 
-	C createCollector(int maxDocs);
+	C createCollector(LuceneCollectorExecutionContext context);
 
 	default boolean applyToNestedDocuments() {
 		return false;
 	}
 
-	LuceneCollectorFactory<FacetsCollector> FACETS = maxDocs -> new FacetsCollector();
+	LuceneCollectorFactory<FacetsCollector> FACETS = context -> new FacetsCollector();
 
 }
