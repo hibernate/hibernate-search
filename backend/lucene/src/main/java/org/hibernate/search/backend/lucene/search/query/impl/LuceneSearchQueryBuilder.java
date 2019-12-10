@@ -188,16 +188,7 @@ public class LuceneSearchQueryBuilder<H>
 				sessionContext, loadingContext, definitiveLuceneQuery, luceneSort
 		);
 
-		TimeoutManagerImpl timeoutManager = new TimeoutManagerImpl( definitiveLuceneQuery );
-		if ( timeout != null && timeUnit != null ) {
-			timeoutManager.setTimeout( timeout, timeUnit );
-			if ( exceptionOnTimeout ) {
-				timeoutManager.raiseExceptionOnTimeout();
-			}
-			else {
-				timeoutManager.limitFetchingOnTimeout();
-			}
-		}
+		TimeoutManagerImpl timeoutManager = createTimeoutManager( definitiveLuceneQuery, timeout, timeUnit, exceptionOnTimeout );
 
 		LuceneSearcherImpl<H> searcher = new LuceneSearcherImpl<>(
 				requestContext,
@@ -219,5 +210,19 @@ public class LuceneSearchQueryBuilder<H>
 				luceneSort,
 				searcher
 		);
+	}
+
+	protected static TimeoutManagerImpl createTimeoutManager(Query definitiveLuceneQuery, Long timeout, TimeUnit timeUnit, boolean exceptionOnTimeout) {
+		TimeoutManagerImpl timeoutManager = new TimeoutManagerImpl( definitiveLuceneQuery );
+		if ( timeout != null && timeUnit != null ) {
+			timeoutManager.setTimeout( timeout, timeUnit );
+			if ( exceptionOnTimeout ) {
+				timeoutManager.raiseExceptionOnTimeout();
+			}
+			else {
+				timeoutManager.limitFetchingOnTimeout();
+			}
+		}
+		return timeoutManager;
 	}
 }

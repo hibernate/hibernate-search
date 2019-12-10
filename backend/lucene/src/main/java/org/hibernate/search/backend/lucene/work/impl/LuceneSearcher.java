@@ -8,6 +8,8 @@ package org.hibernate.search.backend.lucene.work.impl;
 
 import java.io.IOException;
 
+import org.hibernate.search.backend.lucene.search.timeout.spi.TimeoutManager;
+
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -22,4 +24,5 @@ public interface LuceneSearcher<R> {
 
 	Query getLuceneQueryForExceptions();
 
+	void setTimeoutManager(TimeoutManager timeoutManager);
 }
