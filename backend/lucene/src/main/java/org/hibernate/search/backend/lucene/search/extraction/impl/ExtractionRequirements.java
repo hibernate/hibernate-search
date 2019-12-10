@@ -162,11 +162,6 @@ public final class ExtractionRequirements {
 		private boolean requireAllStoredFields = false;
 		private final Set<String> requiredStoredFields = new HashSet<>();
 
-		public Builder() {
-			// TODO HSEARCH-3657 Only add this when really necessary
-			requireCollector( HibernateSearchDocumentIdToLuceneDocIdMapCollector.FACTORY );
-		}
-
 		public void requireScore() {
 			this.requireTopDocs = true;
 			this.requireScore = true;
@@ -183,6 +178,7 @@ public final class ExtractionRequirements {
 
 		public void requireNestedDocumentExtraction(String nestedDocumentPath) {
 			if ( nestedDocumentPath != null ) {
+				requireCollector( HibernateSearchDocumentIdToLuceneDocIdMapCollector.FACTORY );
 				this.requiredNestedDocumentExtractionPaths.add( nestedDocumentPath );
 			}
 		}
