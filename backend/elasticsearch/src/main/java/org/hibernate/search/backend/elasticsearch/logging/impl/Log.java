@@ -605,4 +605,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 91, value = "Invalid name for the type-name mapping strategy: '%1$s'."
 			+ " Valid names are: %2$s.")
 	SearchException invalidTypeNameMappingStrategyName(String invalidRepresentation, List<String> validRepresentations);
+
+	@Message(id = ID_OFFSET_3 + 92,
+			value = "Missing field '%1$s' for one of the search hits."
+					+ " The document was probably indexed with a different configuration: full reindexing is necessary.")
+	SearchException missingTypeFieldInDocument(String fieldName);
 }

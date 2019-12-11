@@ -98,7 +98,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 				eventContext, link,
 				userFacingGson,
 				new DocumentReferenceExtractionHelper(
-						typeNameMapping.getMappedTypeNameExtractionHelper(),
+						typeNameMapping.getTypeNameExtractionHelper(),
 						multiTenancyStrategy.getIdProjectionExtractionHelper()
 				),
 				multiTenancyStrategy,
@@ -193,6 +193,9 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 						mappedTypeName
 				);
 
+		typeNameMapping.getIndexSchemaRootContributor()
+				.ifPresent( indexSchemaRootNodeBuilder::addSchemaRootContributor );
+
 		multiTenancyStrategy.getIndexSchemaRootContributor()
 				.ifPresent( indexSchemaRootNodeBuilder::addSchemaRootContributor );
 
@@ -200,6 +203,8 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 				new ElasticsearchIndexSettingsBuilder( analysisDefinitionRegistry );
 
 		List<DocumentMetadataContributor> documentMetadataContributors = new ArrayList<>();
+		typeNameMapping.getDocumentMetadataContributor( mappedTypeName )
+				.ifPresent( documentMetadataContributors::add );
 		multiTenancyStrategy.getDocumentMetadataContributor()
 				.ifPresent( documentMetadataContributors::add );
 
