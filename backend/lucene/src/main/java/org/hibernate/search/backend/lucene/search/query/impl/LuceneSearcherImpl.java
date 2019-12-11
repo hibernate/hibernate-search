@@ -27,6 +27,7 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.ReusableDocume
 import org.hibernate.search.backend.lucene.search.impl.LuceneNestedQueries;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
+import org.hibernate.search.backend.lucene.search.query.timout.impl.TimeoutCountCollectorManager;
 import org.hibernate.search.backend.lucene.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
@@ -119,8 +120,13 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	public int count(IndexSearcher indexSearcher) throws IOException {
 		queryLog.executingLuceneQuery( requestContext.getLuceneQuery() );
 
-		// TODO HSEARCH-3352 implement timeout handling... somehow?
-		//  We may have to use search() instead of count() with a TotalHitCountCollector wrapped with the timeout limiting one
+		// Handling the hard timeout.
+		// Soft timeout has no sense in case of count,
+		// since there is no possible to have partial result.
+		if ( TimeoutManager.Type.EXCEPTION.equals( timeoutManager.getType() ) ) {
+			return indexSearcher.search( requestContext.getLuceneQuery(), new TimeoutCountCollectorManager( timeoutManager ) );
+		}
+
 		return indexSearcher.count( requestContext.getLuceneQuery() );
 	}
 
