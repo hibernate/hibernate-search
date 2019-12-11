@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.multitenancy.impl;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
-import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
+import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexSchemaRootContributor;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -28,11 +28,10 @@ public interface MultiTenancyStrategy {
 	boolean isMultiTenancySupported();
 
 	/**
-	 * Contributes the additional properties to the Elasticsearch schema.
-	 *
-	 * @param rootTypeMapping The root type mapping.
+	 * @return A schema contributor for the required additional properties (tenant ID, ...),
+	 * or an empty optional.
 	 */
-	void contributeToMapping(RootTypeMapping rootTypeMapping);
+	Optional<IndexSchemaRootContributor> getIndexSchemaRootContributor();
 
 	/**
 	 * Converts the object id to an Elasticsearch id: in the case of discriminator-based multi-tenancy, the id of the
