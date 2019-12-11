@@ -14,6 +14,7 @@ import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysis
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl.ElasticsearchAnalysisConfigurationContextImpl;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
+import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.IndexNameTypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.multitenancy.MultiTenancyStrategyName;
@@ -76,6 +77,12 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 	private static final OptionalConfigurationProperty<BeanReference<? extends ElasticsearchAnalysisConfigurer>> ANALYSIS_CONFIGURER =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.ANALYSIS_CONFIGURER )
 					.asBeanReference( ElasticsearchAnalysisConfigurer.class )
+					.build();
+
+	private static final ConfigurationProperty<TypeNameMappingStrategyName> MAPPING_TYPE_STRATEGY =
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.MAPPING_TYPE_NAME_STRATEGY )
+					.as( TypeNameMappingStrategyName.class, TypeNameMappingStrategyName::of )
+					.withDefault( ElasticsearchBackendSettings.Defaults.MAPPING_TYPE_NAME_STRATEGY )
 					.build();
 
 	@Override
@@ -160,9 +167,18 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		}
 	}
 
-	private TypeNameMapping createTypeNameMapping(String name, ConfigurationPropertySource propertySource) {
-		// TODO HSEARCH-3765 introduce alternatives and make them configurable
-		return new IndexNameTypeNameMapping();
+	private TypeNameMapping createTypeNameMapping(String backendName, ConfigurationPropertySource propertySource) {
+		TypeNameMappingStrategyName strategyName = MAPPING_TYPE_STRATEGY.get( propertySource );
+
+		switch ( strategyName ) {
+			case INDEX_NAME:
+				return new IndexNameTypeNameMapping();
+			default:
+				throw new AssertionFailure( String.format(
+						Locale.ROOT, "Unsupported type mapping strategy '%2$s' for backend '%1$s'",
+						backendName, strategyName
+				) );
+		}
 	}
 
 	private ElasticsearchAnalysisDefinitionRegistry getAnalysisDefinitionRegistry(
