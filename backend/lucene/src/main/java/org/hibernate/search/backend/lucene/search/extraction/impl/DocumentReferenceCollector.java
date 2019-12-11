@@ -27,7 +27,7 @@ public final class DocumentReferenceCollector extends SimpleCollector {
 
 	private final IndexReaderMetadataResolver metadataResolver;
 
-	private String currentLeafIndexName;
+	private String currentLeafMappedTypeName;
 	private BinaryDocValues currentLeafIdDocValues;
 	private int currentLeafDocBase;
 
@@ -41,7 +41,7 @@ public final class DocumentReferenceCollector extends SimpleCollector {
 	public void collect(int doc) throws IOException {
 		currentLeafIdDocValues.advance( doc );
 		collected.put( currentLeafDocBase + doc, new LuceneDocumentReference(
-				currentLeafIndexName,
+				currentLeafMappedTypeName,
 				currentLeafIdDocValues.binaryValue().utf8ToString()
 		) );
 	}
@@ -57,7 +57,7 @@ public final class DocumentReferenceCollector extends SimpleCollector {
 
 	@Override
 	protected void doSetNextReader(LeafReaderContext context) throws IOException {
-		this.currentLeafIndexName = metadataResolver.resolveIndexName( context );
+		this.currentLeafMappedTypeName = metadataResolver.resolveMappedTypeName( context );
 		this.currentLeafIdDocValues = DocValues.getBinary( context.reader(), LuceneFields.idFieldName() );
 		this.currentLeafDocBase = context.docBase;
 	}

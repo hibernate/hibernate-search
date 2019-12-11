@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.QueryTimeoutException;
-import javax.persistence.Table;
 
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -54,7 +53,7 @@ public class ToHibernateOrmIT {
 
 	@Before
 	public void setup() {
-		backendMock.expectAnySchema( IndexedEntity.INDEX );
+		backendMock.expectAnySchema( IndexedEntity.NAME );
 		sessionFactory = ormSetupHelper.start()
 				.setup( IndexedEntity.class );
 		backendMock.verifyExpectationsMet();
@@ -70,7 +69,7 @@ public class ToHibernateOrmIT {
 			session.persist( entity1 );
 			session.persist( entity2 );
 
-			backendMock.expectWorks( IndexedEntity.INDEX )
+			backendMock.expectWorks( IndexedEntity.NAME )
 					.add( "1", b -> b
 							.field( "text", entity1.getText() )
 					)
@@ -133,12 +132,12 @@ public class ToHibernateOrmIT {
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME ),
 					b -> { },
 					StubSearchWorkBehavior.of(
 							6L,
-							reference( IndexedEntity.INDEX, "1" ),
-							reference( IndexedEntity.INDEX, "2" )
+							reference( IndexedEntity.NAME, "1" ),
+							reference( IndexedEntity.NAME, "2" )
 					)
 			);
 			List<IndexedEntity> result = query.list();
@@ -158,11 +157,11 @@ public class ToHibernateOrmIT {
 			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME ),
 					b -> { },
 					StubSearchWorkBehavior.of(
 							1L,
-							reference( IndexedEntity.INDEX, "1" )
+							reference( IndexedEntity.NAME, "1" )
 					)
 			);
 			IndexedEntity result = query.uniqueResult();
@@ -171,7 +170,7 @@ public class ToHibernateOrmIT {
 					.isEqualTo( session.getReference( IndexedEntity.class, 1 ) );
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME ),
 					b -> { },
 					StubSearchWorkBehavior.empty()
 			);
@@ -180,12 +179,12 @@ public class ToHibernateOrmIT {
 			assertThat( result ).isNull();
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME ),
 					b -> { },
 					StubSearchWorkBehavior.of(
 							2L,
-							reference( IndexedEntity.INDEX, "1" ),
-							reference( IndexedEntity.INDEX, "2" )
+							reference( IndexedEntity.NAME, "1" ),
+							reference( IndexedEntity.NAME, "2" )
 					)
 			);
 			SubTest.expectException( () -> {
@@ -196,12 +195,12 @@ public class ToHibernateOrmIT {
 			backendMock.verifyExpectationsMet();
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME ),
 					b -> { },
 					StubSearchWorkBehavior.of(
 							2L,
-							reference( IndexedEntity.INDEX, "1" ),
-							reference( IndexedEntity.INDEX, "1" )
+							reference( IndexedEntity.NAME, "1" ),
+							reference( IndexedEntity.NAME, "1" )
 					)
 			);
 			result = query.uniqueResult();
@@ -227,7 +226,7 @@ public class ToHibernateOrmIT {
 			assertThat( query.getMaxResults() ).isEqualTo( 2 );
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME ),
 					b -> b
 							.offset( 3 )
 							.limit( 2 ),
@@ -252,7 +251,7 @@ public class ToHibernateOrmIT {
 			SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME ),
 					b -> b.failAfter( 2, TimeUnit.SECONDS ),
 					StubSearchWorkBehavior.failing( () -> timeoutException )
 			);
@@ -276,7 +275,7 @@ public class ToHibernateOrmIT {
 			SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME ),
 					b -> b.failAfter( 200, TimeUnit.MILLISECONDS ),
 					StubSearchWorkBehavior.failing( () -> timeoutException )
 			);
@@ -300,7 +299,7 @@ public class ToHibernateOrmIT {
 			SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME ),
 					b -> b.failAfter( 4, TimeUnit.SECONDS ),
 					StubSearchWorkBehavior.failing( () -> timeoutException )
 			);
@@ -324,7 +323,7 @@ public class ToHibernateOrmIT {
 			SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME ),
 					b -> b.failAfter( 3, TimeUnit.SECONDS ),
 					StubSearchWorkBehavior.failing( () -> timeoutException )
 			);
@@ -353,7 +352,7 @@ public class ToHibernateOrmIT {
 			SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME ),
 					b -> b.failAfter( 4, TimeUnit.SECONDS ),
 					StubSearchWorkBehavior.failing( () -> timeoutException )
 			);
@@ -382,7 +381,7 @@ public class ToHibernateOrmIT {
 			SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME ),
 					b -> b.failAfter( 3, TimeUnit.SECONDS ),
 					StubSearchWorkBehavior.failing( () -> timeoutException )
 			);
@@ -437,7 +436,7 @@ public class ToHibernateOrmIT {
 		session.close();
 
 		backendMock.expectSearchObjects(
-				Arrays.asList( IndexedEntity.INDEX ),
+				Arrays.asList( IndexedEntity.NAME ),
 				b -> { },
 				// The call will fail, this doesn't matter
 				StubSearchWorkBehavior.empty()
@@ -458,12 +457,11 @@ public class ToHibernateOrmIT {
 				.toQuery();
 	}
 
-	@Entity
-	@Table(name = "indexed")
-	@Indexed(index = IndexedEntity.INDEX)
+	@Entity(name = IndexedEntity.NAME)
+	@Indexed(index = IndexedEntity.NAME)
 	public static class IndexedEntity {
 
-		public static final String INDEX = "IndexedEntity";
+		public static final String NAME = "indexed";
 
 		@Id
 		private Integer id;

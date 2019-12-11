@@ -22,13 +22,13 @@ public final class DocumentReferenceExtractionHelper implements ProjectionExtrac
 
 	private static final JsonAccessor<String> HIT_INDEX_NAME_ACCESSOR = JsonAccessor.root().property( "_index" ).asString();
 
-	private final Function<String, String> indexNameConverter;
+	private final Function<String, String> mappedTypeNameResolver;
 	private final ProjectionExtractionHelper<String> idHelper;
 
 	public DocumentReferenceExtractionHelper(
-			Function<String, String> indexNameConverter,
+			Function<String, String> mappedTypeNameResolver,
 			ProjectionExtractionHelper<String> idHelper) {
-		this.indexNameConverter = indexNameConverter;
+		this.mappedTypeNameResolver = mappedTypeNameResolver;
 		this.idHelper = idHelper;
 	}
 
@@ -39,10 +39,10 @@ public final class DocumentReferenceExtractionHelper implements ProjectionExtrac
 
 	@Override
 	public DocumentReference extract(JsonObject hit) {
-		String indexName = HIT_INDEX_NAME_ACCESSOR.get( hit )
-				.map( indexNameConverter )
+		String mappedTypeName = HIT_INDEX_NAME_ACCESSOR.get( hit )
+				.map( mappedTypeNameResolver )
 				.orElseThrow( log::elasticsearchResponseMissingData );
 		String id = idHelper.extract( hit );
-		return new ElasticsearchDocumentReference( indexName, id );
+		return new ElasticsearchDocumentReference( mappedTypeName, id );
 	}
 }

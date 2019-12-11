@@ -15,13 +15,11 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 class JavaBeanIndexedTypeContext<E> implements JavaBeanSessionIndexedTypeContext<E> {
 	private final PojoRawTypeIdentifier<E> typeIdentifier;
 	private final String entityName;
-	private final String indexName;
 	private IdentifierMapping identifierMapping;
 
 	private JavaBeanIndexedTypeContext(Builder<E> builder) {
 		this.typeIdentifier = builder.typeIdentifier;
 		this.entityName = builder.entityName;
-		this.indexName = builder.indexName;
 		this.identifierMapping = builder.identifierMapping;
 	}
 
@@ -35,10 +33,6 @@ class JavaBeanIndexedTypeContext<E> implements JavaBeanSessionIndexedTypeContext
 		return entityName;
 	}
 
-	String getIndexName() {
-		return indexName;
-	}
-
 	@Override
 	public IdentifierMapping getIdentifierMapping() {
 		return identifierMapping;
@@ -47,13 +41,11 @@ class JavaBeanIndexedTypeContext<E> implements JavaBeanSessionIndexedTypeContext
 	static class Builder<E> implements PojoIndexedTypeExtendedMappingCollector {
 		private final PojoRawTypeIdentifier<E> typeIdentifier;
 		private final String entityName;
-		private final String indexName;
 		private IdentifierMapping identifierMapping;
 
-		Builder(PojoRawTypeIdentifier<E> typeIdentifier, String entityName, String indexName) {
+		Builder(PojoRawTypeIdentifier<E> typeIdentifier, String entityName) {
 			this.typeIdentifier = typeIdentifier;
 			this.entityName = entityName;
-			this.indexName = indexName;
 		}
 
 		@Override

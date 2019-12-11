@@ -87,7 +87,7 @@ public class FieldDefaultBridgeIT<V, F> {
 		Capture<StubIndexSchemaNode> schemaCapture1 = Capture.newInstance();
 		Capture<StubIndexSchemaNode> schemaCapture2 = Capture.newInstance();
 		backendMock.expectSchema(
-				DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_INDEX_NAME, b -> {
+				DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME, b -> {
 					b.field( FIELD_NAME, expectations.getIndexFieldJavaType() );
 
 					if ( typeDescriptor.isNullable() ) {
@@ -96,7 +96,7 @@ public class FieldDefaultBridgeIT<V, F> {
 				}, schemaCapture1
 		);
 		backendMock.expectSchema(
-				DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_INDEX_NAME, b -> {
+				DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME, b -> {
 					b.field( FIELD_NAME, expectations.getIndexFieldJavaType() );
 
 					if ( typeDescriptor.isNullable() ) {
@@ -105,7 +105,9 @@ public class FieldDefaultBridgeIT<V, F> {
 				}, schemaCapture2
 		);
 		mapping = setupHelper.start()
-				.setup( expectations.getTypeWithValueBridge1(), expectations.getTypeWithValueBridge2() );
+				.withAnnotatedEntityType( expectations.getTypeWithValueBridge1(), DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME )
+				.withAnnotatedEntityType( expectations.getTypeWithValueBridge2(), DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME )
+				.setup();
 		backendMock.verifyExpectationsMet();
 		index1FieldSchemaNode = schemaCapture1.getValue().getChildren().get( FIELD_NAME ).get( 0 );
 		index2FieldSchemaNode = schemaCapture1.getValue().getChildren().get( FIELD_NAME ).get( 0 );
@@ -122,7 +124,7 @@ public class FieldDefaultBridgeIT<V, F> {
 			}
 
 			BackendMock.DocumentWorkCallListContext expectationSetter = backendMock.expectWorks(
-					DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_INDEX_NAME
+					DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME
 			);
 			id = 0;
 			for ( F expectedFieldValue : getDocumentFieldValues() ) {
@@ -151,7 +153,7 @@ public class FieldDefaultBridgeIT<V, F> {
 
 			backendMock.expectSearchProjection(
 					Collections
-							.singletonList( DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_INDEX_NAME ),
+							.singletonList( DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME ),
 					b -> {
 					},
 					StubSearchWorkBehavior.of(

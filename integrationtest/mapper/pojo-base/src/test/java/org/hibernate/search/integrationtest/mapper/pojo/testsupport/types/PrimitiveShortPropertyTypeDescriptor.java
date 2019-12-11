@@ -111,7 +111,7 @@ public class PrimitiveShortPropertyTypeDescriptor extends PropertyTypeDescriptor
 		} );
 	}
 
-	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_INDEX_NAME)
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
 	public static class TypeWithIdentifierBridge1 {
 		short id;
 		@DocumentId
@@ -120,7 +120,7 @@ public class PrimitiveShortPropertyTypeDescriptor extends PropertyTypeDescriptor
 		}
 	}
 
-	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_INDEX_NAME)
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
 	public static class TypeWithIdentifierBridge2 {
 		short id;
 		@DocumentId
@@ -129,7 +129,7 @@ public class PrimitiveShortPropertyTypeDescriptor extends PropertyTypeDescriptor
 		}
 	}
 
-	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_INDEX_NAME)
+	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
 		int id;
 		short myProperty;
@@ -143,7 +143,7 @@ public class PrimitiveShortPropertyTypeDescriptor extends PropertyTypeDescriptor
 		}
 	}
 
-	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_INDEX_NAME)
+	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
 		int id;
 		short myProperty;

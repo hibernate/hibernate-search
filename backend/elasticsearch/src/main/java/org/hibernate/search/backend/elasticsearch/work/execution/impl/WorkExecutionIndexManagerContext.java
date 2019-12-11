@@ -25,7 +25,7 @@ import com.google.gson.JsonObject;
  */
 public interface WorkExecutionIndexManagerContext {
 
-	String getHibernateSearchIndexName();
+	String getMappedTypeName();
 
 	URLEncodedString getElasticsearchIndexName();
 

@@ -17,6 +17,10 @@ public class EntityReferenceImpl implements EntityReference {
 		return new EntityReferenceImpl( PojoRawTypeIdentifier.of( type ), type.getSimpleName(), id );
 	}
 
+	public static EntityReference withName(Class<?> type, String name, Object id) {
+		return new EntityReferenceImpl( PojoRawTypeIdentifier.of( type ), name, id );
+	}
+
 	private final PojoRawTypeIdentifier<?> typeIdentifier;
 
 	private final String name;

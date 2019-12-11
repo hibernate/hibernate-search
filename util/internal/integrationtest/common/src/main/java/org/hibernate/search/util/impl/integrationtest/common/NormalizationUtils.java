@@ -79,7 +79,7 @@ public final class NormalizationUtils {
 	}
 
 	public static DocumentReference normalize(DocumentReference original) {
-		return original == null ? null : reference( original.getIndexName(), original.getId() );
+		return original == null ? null : reference( original.getTypeName(), original.getId() );
 	}
 
 	public static BigDecimal normalize(BigDecimal original) {
@@ -117,17 +117,17 @@ public final class NormalizationUtils {
 	 * with each other.
 	 */
 	private static class NormalizedDocumentReference implements DocumentReference {
-		private final String indexName;
+		private final String typeName;
 		private final String id;
 
-		private NormalizedDocumentReference(String indexName, String id) {
-			this.indexName = indexName;
+		private NormalizedDocumentReference(String typeName, String id) {
+			this.typeName = typeName;
 			this.id = id;
 		}
 
 		@Override
-		public String getIndexName() {
-			return indexName;
+		public String getTypeName() {
+			return typeName;
 		}
 
 		@Override
@@ -141,18 +141,18 @@ public final class NormalizationUtils {
 				return false;
 			}
 			NormalizedDocumentReference other = (NormalizedDocumentReference) obj;
-			return Objects.equals( indexName, other.indexName )
+			return Objects.equals( typeName, other.typeName )
 					&& Objects.equals( id, other.id );
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hash( indexName, id );
+			return Objects.hash( typeName, id );
 		}
 
 		@Override
 		public String toString() {
-			return "DocRef:" + indexName + "/" + id;
+			return "DocRef:" + typeName + "/" + id;
 		}
 	}
 

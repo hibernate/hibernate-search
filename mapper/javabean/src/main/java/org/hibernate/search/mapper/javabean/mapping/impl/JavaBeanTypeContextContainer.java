@@ -18,18 +18,18 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 class JavaBeanTypeContextContainer implements JavaBeanSearchSessionTypeContextProvider {
 
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<String, JavaBeanIndexedTypeContext<?>> indexedTypeContextsByIndexName = new LinkedHashMap<>();
+	private final Map<String, JavaBeanIndexedTypeContext<?>> indexedTypeContextsByEntityName = new LinkedHashMap<>();
 
 	private JavaBeanTypeContextContainer(Builder builder) {
 		for ( JavaBeanIndexedTypeContext.Builder<?> contextBuilder : builder.indexedTypeContextBuilders ) {
 			JavaBeanIndexedTypeContext<?> indexedTypeContext = contextBuilder.build();
-			indexedTypeContextsByIndexName.put( indexedTypeContext.getIndexName(), indexedTypeContext );
+			indexedTypeContextsByEntityName.put( indexedTypeContext.getEntityName(), indexedTypeContext );
 		}
 	}
 
 	@Override
-	public JavaBeanSessionIndexedTypeContext getByIndexName(String indexName) {
-		return indexedTypeContextsByIndexName.get( indexName );
+	public JavaBeanSessionIndexedTypeContext<?> getIndexedByEntityName(String indexName) {
+		return indexedTypeContextsByEntityName.get( indexName );
 	}
 
 	static class Builder {
@@ -39,10 +39,9 @@ class JavaBeanTypeContextContainer implements JavaBeanSearchSessionTypeContextPr
 		Builder() {
 		}
 
-		<E> JavaBeanIndexedTypeContext.Builder<E> addIndexed(PojoRawTypeModel<E> typeModel, String entityName,
-				String indexName) {
+		<E> JavaBeanIndexedTypeContext.Builder<E> addIndexed(PojoRawTypeModel<E> typeModel, String entityName) {
 			JavaBeanIndexedTypeContext.Builder<E> builder =
-					new JavaBeanIndexedTypeContext.Builder<>( typeModel.getTypeIdentifier(), entityName, indexName );
+					new JavaBeanIndexedTypeContext.Builder<>( typeModel.getTypeIdentifier(), entityName );
 			indexedTypeContextBuilders.add( builder );
 			return builder;
 		}

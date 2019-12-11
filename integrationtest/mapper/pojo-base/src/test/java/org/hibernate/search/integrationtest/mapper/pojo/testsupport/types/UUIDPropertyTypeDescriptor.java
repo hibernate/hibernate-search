@@ -108,7 +108,7 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 		} );
 	}
 
-	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_INDEX_NAME)
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
 	public static class TypeWithIdentifierBridge1 {
 		UUID id;
 
@@ -118,7 +118,7 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 		}
 	}
 
-	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_INDEX_NAME)
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
 	public static class TypeWithIdentifierBridge2 {
 		UUID id;
 
@@ -128,7 +128,7 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 		}
 	}
 
-	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_INDEX_NAME)
+	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		UUID myProperty;
@@ -150,7 +150,7 @@ public class UUIDPropertyTypeDescriptor extends PropertyTypeDescriptor<UUID> {
 		}
 	}
 
-	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_INDEX_NAME)
+	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		UUID myProperty;

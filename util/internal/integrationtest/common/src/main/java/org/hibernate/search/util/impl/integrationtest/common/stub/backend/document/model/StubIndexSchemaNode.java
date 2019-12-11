@@ -113,11 +113,6 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 			return this;
 		}
 
-		public Builder mappedTypeName(String mappedTypeName) {
-			attribute( "mappedTypeName", mappedTypeName );
-			return this;
-		}
-
 		public Builder idDslConverter(ToDocumentIdentifierValueConverter<?> idDslConverter) {
 			this.idDslConverter = idDslConverter;
 			return this;

@@ -16,14 +16,14 @@ import org.apache.lucene.index.LeafReaderContext;
 
 public final class IndexReaderMetadataResolver {
 
-	private final Map<DirectoryReader, String> indexNameByDirectoryReader;
+	private final Map<DirectoryReader, String> mappedTypeNameByDirectoryReader;
 
-	IndexReaderMetadataResolver(Map<DirectoryReader, String> indexNameByDirectoryReader) {
-		this.indexNameByDirectoryReader = indexNameByDirectoryReader;
+	IndexReaderMetadataResolver(Map<DirectoryReader, String> mappedTypeNameByDirectoryReader) {
+		this.mappedTypeNameByDirectoryReader = mappedTypeNameByDirectoryReader;
 	}
 
-	public String resolveIndexName(LeafReaderContext context) {
-		return indexNameByDirectoryReader.get( getDirectoryReader( context ) );
+	public String resolveMappedTypeName(LeafReaderContext context) {
+		return mappedTypeNameByDirectoryReader.get( getDirectoryReader( context ) );
 	}
 
 	private DirectoryReader getDirectoryReader(LeafReaderContext context) {

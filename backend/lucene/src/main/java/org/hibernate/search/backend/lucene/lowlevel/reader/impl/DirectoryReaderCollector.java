@@ -10,6 +10,6 @@ import org.hibernate.search.backend.lucene.lowlevel.reader.spi.DirectoryReaderHo
 
 public interface DirectoryReaderCollector {
 
-	void collect(String indexName, DirectoryReaderHolder directoryReaderHolder);
+	void collect(String mappedTypeName, DirectoryReaderHolder directoryReaderHolder);
 
 }

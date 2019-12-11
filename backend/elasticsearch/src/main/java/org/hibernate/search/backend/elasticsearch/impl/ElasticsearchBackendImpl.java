@@ -64,6 +64,8 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 	private final Map<String, String> hibernateSearchIndexNamesByElasticsearchIndexNames = new ConcurrentHashMap<>();
 
+	private final Map<String, String> mappedTypeNamesByElasticsearchIndexNames = new ConcurrentHashMap<>();
+
 	private final EventContext eventContext;
 	private final IndexManagerBackendContext indexManagerBackendContext;
 
@@ -95,7 +97,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 				eventContext, link,
 				userFacingGson,
 				( String elasticsearchIndexName ) -> {
-					String result = hibernateSearchIndexNamesByElasticsearchIndexNames.get( elasticsearchIndexName );
+					String result = mappedTypeNamesByElasticsearchIndexNames.get( elasticsearchIndexName );
 					if ( result == null ) {
 						throw log.elasticsearchResponseUnknownIndexName( elasticsearchIndexName, eventContext );
 					}
@@ -182,6 +184,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 					eventContext
 			);
 		}
+		mappedTypeNamesByElasticsearchIndexNames.put( elasticsearchIndexName, mappedTypeName );
 
 		EventContext indexEventContext = EventContexts.fromIndexName( hibernateSearchIndexName );
 

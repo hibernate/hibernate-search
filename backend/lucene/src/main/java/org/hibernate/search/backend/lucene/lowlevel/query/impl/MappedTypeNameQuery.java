@@ -18,18 +18,18 @@ import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.Weight;
 
-public final class IndexNameQuery extends Query {
+public final class MappedTypeNameQuery extends Query {
 	private final IndexReaderMetadataResolver metadataResolver;
-	private final String indexName;
+	private final String mappedTypeName;
 
-	public IndexNameQuery(IndexReaderMetadataResolver metadataResolver, String indexName) {
+	public MappedTypeNameQuery(IndexReaderMetadataResolver metadataResolver, String mappedTypeName) {
 		this.metadataResolver = metadataResolver;
-		this.indexName = indexName;
+		this.mappedTypeName = mappedTypeName;
 	}
 
 	@Override
 	public String toString(String field) {
-		return getClass().getName() + "{" + indexName + "}";
+		return getClass().getName() + "{" + mappedTypeName + "}";
 	}
 
 	@Override
@@ -40,13 +40,13 @@ public final class IndexNameQuery extends Query {
 		if ( obj == null || getClass() != obj.getClass() ) {
 			return false;
 		}
-		IndexNameQuery other = (IndexNameQuery) obj;
-		return indexName.equals( other.indexName );
+		MappedTypeNameQuery other = (MappedTypeNameQuery) obj;
+		return mappedTypeName.equals( other.mappedTypeName );
 	}
 
 	@Override
 	public int hashCode() {
-		return indexName.hashCode();
+		return mappedTypeName.hashCode();
 	}
 
 	@Override
@@ -54,9 +54,9 @@ public final class IndexNameQuery extends Query {
 		return new ConstantScoreWeight( this, 1.0f ) {
 			@Override
 			public Scorer scorer(LeafReaderContext context) {
-				String leafIndexName = metadataResolver.resolveIndexName( context );
+				String leafMappedTypeName = metadataResolver.resolveMappedTypeName( context );
 				DocIdSetIterator matchingDocs;
-				if ( indexName.equals( leafIndexName ) ) {
+				if ( mappedTypeName.equals( leafMappedTypeName ) ) {
 					matchingDocs = DocIdSetIterator.all( context.reader().maxDoc() );
 				}
 				else {

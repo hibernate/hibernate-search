@@ -29,8 +29,6 @@ import org.junit.Test;
 
 public class ProvidedIdIT {
 
-	private static final String INDEX_NAME = "IndexName";
-
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
@@ -39,13 +37,16 @@ public class ProvidedIdIT {
 
 	@Test
 	public void indexAndSearch() {
-		@Indexed(index = INDEX_NAME)
+		final String entityAndIndexName = "indexed";
+		@Indexed
 		class IndexedEntity {
 		}
 
 		// Schema
-		backendMock.expectSchema( INDEX_NAME, b -> { } );
-		SearchMapping mapping = withBaseConfiguration().setup( IndexedEntity.class );
+		backendMock.expectSchema( entityAndIndexName, b -> { } );
+		SearchMapping mapping = withBaseConfiguration()
+				.withAnnotatedEntityType( IndexedEntity.class, entityAndIndexName )
+				.setup();
 		backendMock.verifyExpectationsMet();
 
 		// Indexing
@@ -54,7 +55,7 @@ public class ProvidedIdIT {
 
 			session.indexingPlan().add( "42", entity1 );
 
-			backendMock.expectWorks( INDEX_NAME )
+			backendMock.expectWorks( entityAndIndexName )
 					.add( "42", b -> { } )
 					.processedThenExecuted();
 		}
@@ -63,11 +64,11 @@ public class ProvidedIdIT {
 		// Searching
 		try ( SearchSession session = mapping.createSession() ) {
 			backendMock.expectSearchReferences(
-					Collections.singletonList( INDEX_NAME ),
+					Collections.singletonList( entityAndIndexName ),
 					b -> { },
 					StubSearchWorkBehavior.of(
 							1L,
-							StubBackendUtils.reference( INDEX_NAME, "42" )
+							StubBackendUtils.reference( entityAndIndexName, "42" )
 					)
 			);
 
@@ -77,19 +78,22 @@ public class ProvidedIdIT {
 					.toQuery();
 
 			assertThat( query.fetchAll().getHits() )
-					.containsExactly( EntityReferenceImpl.withDefaultName( IndexedEntity.class, "42" ) );
+					.containsExactly( EntityReferenceImpl.withName( IndexedEntity.class, entityAndIndexName, "42" ) );
 		}
 		backendMock.verifyExpectationsMet();
 	}
 
 	@Test
 	public void error_nullProvidedId() {
-		@Indexed(index = INDEX_NAME)
+		final String entityAndIndexName = "indexed";
+		@Indexed
 		class IndexedEntity {
 		}
 
-		backendMock.expectAnySchema( INDEX_NAME );
-		SearchMapping mapping = withBaseConfiguration().setup( IndexedEntity.class );
+		backendMock.expectAnySchema( entityAndIndexName );
+		SearchMapping mapping = withBaseConfiguration()
+				.withAnnotatedEntityType( IndexedEntity.class, entityAndIndexName )
+				.setup();
 		backendMock.verifyExpectationsMet();
 
 		try ( SearchSession session = mapping.createSession() ) {

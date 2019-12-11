@@ -88,7 +88,7 @@ public class MonthDayPropertyTypeDescriptor extends PropertyTypeDescriptor<Month
 		} );
 	}
 
-	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_INDEX_NAME)
+	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		MonthDay myProperty;
@@ -110,7 +110,7 @@ public class MonthDayPropertyTypeDescriptor extends PropertyTypeDescriptor<Month
 		}
 	}
 
-	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_INDEX_NAME)
+	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		MonthDay myProperty;

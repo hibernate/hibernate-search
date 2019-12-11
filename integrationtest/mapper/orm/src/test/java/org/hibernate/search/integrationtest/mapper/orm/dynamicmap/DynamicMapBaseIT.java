@@ -117,7 +117,7 @@ public class DynamicMapBaseIT {
 					b -> { },
 					StubSearchWorkBehavior.of(
 							1L,
-							reference( INDEX1_NAME, "1" )
+							reference( entityTypeName, "1" )
 					)
 			);
 
@@ -281,8 +281,8 @@ public class DynamicMapBaseIT {
 					b -> { },
 					StubSearchWorkBehavior.of(
 							2L,
-							reference( INDEX1_NAME, "1" ),
-							reference( INDEX2_NAME, "2" )
+							reference( entityA_BTypeName, "1" ),
+							reference( entityA_CTypeName, "2" )
 					)
 			);
 

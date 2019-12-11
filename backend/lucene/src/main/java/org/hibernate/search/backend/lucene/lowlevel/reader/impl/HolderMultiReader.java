@@ -111,20 +111,21 @@ public class HolderMultiReader extends MultiReader {
 
 	public static class Builder implements DirectoryReaderCollector {
 		private final List<DirectoryReaderHolder> directoryReaderHolders = new ArrayList<>();
-		private final Map<DirectoryReader, String> indexNameByDirectoryReader = new HashMap<>();
+		private final Map<DirectoryReader, String> mappedTypeNameByDirectoryReader = new HashMap<>();
 
 		private Builder() {
 		}
 
 		@Override
-		public void collect(String indexName, DirectoryReaderHolder directoryReaderHolder) {
+		public void collect(String mappedTypeName, DirectoryReaderHolder directoryReaderHolder) {
 			directoryReaderHolders.add( directoryReaderHolder );
 			DirectoryReader reader = directoryReaderHolder.get();
-			indexNameByDirectoryReader.put( reader, indexName );
+			mappedTypeNameByDirectoryReader.put( reader, mappedTypeName );
 		}
 
 		HolderMultiReader build() throws IOException {
-			IndexReaderMetadataResolver metadataResolver = new IndexReaderMetadataResolver( indexNameByDirectoryReader );
+			IndexReaderMetadataResolver metadataResolver =
+					new IndexReaderMetadataResolver( mappedTypeNameByDirectoryReader );
 			return new HolderMultiReader( directoryReaderHolders, metadataResolver );
 		}
 	}
