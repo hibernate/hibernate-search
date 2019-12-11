@@ -420,10 +420,70 @@ include::todo-placeholder.asciidoc[]
 // Search 5 anchors backward compatibility
 [[_limiting_the_time_of_a_query]]
 
-include::todo-placeholder.asciidoc[]
+You can limit the time a query takes in Hibernate Search in two ways:
 
-// TODO [[_raise_an_exception_on_time_limit]] https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_raise_an_exception_on_time_limit
-// TODO [[_limit_the_number_of_results_when_the_time_limit_is_reached]] https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_limit_the_number_of_results_when_the_time_limit_is_reached
+* Raise an exception when the limit is reached
+* Limit to the number of results retrieved when the time limit is raised
+
+==== Raise an exception on time limit
+
+You can decide to stop a query if when it takes more than a predefined amount of time. Note that
+this is a best effort basis but if Hibernate Search still has significant work to do and if we are
+beyond the time limit, a `org.hibernate.search.util.common.SearchException` will be raised.
+
+.Defining a timeout in query execution
+====
+[source, JAVA]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=failAfter]
+----
+<1> Set `failAfter` timeout on terminal query DSL
+<2> Fetch the results
+<3> Optionally extract _took_: how much time the query took
+<4> Optionally extract _timedOut_: whether the query timed out
+====
+
+[NOTE]
+====
+`explain()` does not honor the timeout: this method is used for debug purposes and in particular to find out why a query is slow
+====
+
+[IMPORTANT]
+====
+Remember, this is a best effort approach and does not guarantee to stop exactly on the specified timeout.
+====
+
+==== Limit the number of results when the time limit is reached
+
+Alternatively, you can return the number of results which have already been fetched by the time the
+limit is reached. Note that only the Lucene part of the query is influenced by this limit. It is
+possible that, if you retrieve managed object, it takes longer to fetch these objects.
+
+To define this soft limit, use the following approach
+
+.Defining a time limit in query execution
+====
+[source, JAVA]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=truncateAfter]
+----
+<1> Set `truncateAfter` timeout on terminal query DSL
+<2> Fetch the results
+<3> Optionally extract _took_: how much time the query took
+<4> Optionally extract _timedOut_: whether the query timed out
+====
+
+[WARNING]
+====
+This approach at the moment is not compatible with the `failAfter` approach.
+If you try to set both `failAfter` and `truncateAfter`, the last set will override the previous one.
+====
+[NOTE]
+====
+`explain()` and `fetchTotalHitCount()` do not honor the timeout.
+The former is used for debug purposes and in particular to find out why a query is slow.
+For the latter it doesn't have any sense returning a *partial* result.
+====
 
 [[search-dsl-query-object]]
 === Obtaining a query object

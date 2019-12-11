@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.SharedCacheMode;
@@ -380,6 +381,52 @@ public class QueryDslIT {
 			Duration took = result.getTook(); // <2>
 			Boolean timedOut = result.isTimedOut(); // <3>
 			// end::took-timedOut[]
+
+			assertThat( took ).isNotNull();
+			assertThat( timedOut ).isNotNull();
+		} );
+	}
+
+	@Test
+	public void truncateAfter() {
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::truncateAfter[]
+			SearchQuery<Book> query = searchSession.search( Book.class )
+					.predicate( f -> f.match()
+							.field( "title" )
+							.matching( "robot" ) )
+					.truncateAfter( 500, TimeUnit.MILLISECONDS ) // <1>
+					.toQuery();
+
+			SearchResult<Book> result = query.fetch( 20 ); // <2>
+
+			Duration took = result.getTook(); // <3>
+			Boolean timedOut = result.isTimedOut(); // <4>
+			// end::truncateAfter[]
+
+			assertThat( took ).isNotNull();
+			assertThat( timedOut ).isNotNull();
+		} );
+	}
+
+	@Test
+	public void failAfter() {
+		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
+			SearchSession searchSession = Search.session( entityManager );
+			// tag::failAfter[]
+			SearchQuery<Book> query = searchSession.search( Book.class )
+					.predicate( f -> f.match()
+							.field( "title" )
+							.matching( "robot" ) )
+					.failAfter( 500, TimeUnit.MILLISECONDS ) // <1>
+					.toQuery();
+
+			SearchResult<Book> result = query.fetch( 20 ); // <2>
+
+			Duration took = result.getTook(); // <3>
+			Boolean timedOut = result.isTimedOut(); // <4>
+			// end::failAfter[]
 
 			assertThat( took ).isNotNull();
 			assertThat( timedOut ).isNotNull();
