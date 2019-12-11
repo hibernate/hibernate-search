@@ -14,6 +14,8 @@ import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysis
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl.ElasticsearchAnalysisConfigurationContextImpl;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
+import org.hibernate.search.backend.elasticsearch.mapping.impl.IndexNameTypeNameMapping;
+import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.multitenancy.MultiTenancyStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
@@ -130,6 +132,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					userFacingGson,
 					analysisDefinitionRegistry,
 					getMultiTenancyStrategy( name, propertySource ),
+					createTypeNameMapping( name, propertySource ),
 					buildContext.getFailureHandler()
 			);
 		}
@@ -155,6 +158,11 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 						backendName, multiTenancyStrategyName
 				) );
 		}
+	}
+
+	private TypeNameMapping createTypeNameMapping(String name, ConfigurationPropertySource propertySource) {
+		// TODO HSEARCH-3765 introduce alternatives and make them configurable
+		return new IndexNameTypeNameMapping();
 	}
 
 	private ElasticsearchAnalysisDefinitionRegistry getAnalysisDefinitionRegistry(
