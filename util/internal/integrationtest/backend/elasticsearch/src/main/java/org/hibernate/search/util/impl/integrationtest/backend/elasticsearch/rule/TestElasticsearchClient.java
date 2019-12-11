@@ -107,6 +107,11 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 			return this;
 		}
 
+		public IndexClient addAlias(String alias) {
+			TestElasticsearchClient.this.addAlias( indexName, alias );
+			return this;
+		}
+
 		public IndexClient registerForCleanup() {
 			TestElasticsearchClient.this.registerIndexForCleanup( indexName );
 			return this;
@@ -134,7 +139,12 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		}
 
 		public TypeClient putMapping(String mappingJson) {
-			TestElasticsearchClient.this.putMapping( indexClient.indexName, mappingJson );
+			JsonObject mappingJsonObject = toJsonElement( mappingJson ).getAsJsonObject();
+			return putMapping( mappingJsonObject );
+		}
+
+		public TypeClient putMapping(JsonObject mapping) {
+			TestElasticsearchClient.this.putMapping( indexClient.indexName, mapping );
 			return this;
 		}
 
@@ -337,6 +347,14 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 				.build() );
 	}
 
+	private void addAlias(URLEncodedString indexName, String alias) {
+		performRequest( ElasticsearchRequest.put()
+				.pathComponent( indexName )
+				.pathComponent( URLEncodedString.fromString( "_alias" ) )
+				.pathComponent( URLEncodedString.fromString( alias ) )
+				.build() );
+	}
+
 	private void registerIndexForCleanup(URLEncodedString indexName) {
 		createdIndicesNames.add( indexName );
 	}
@@ -357,9 +375,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 				.build() );
 	}
 
-	private void putMapping(URLEncodedString indexName, String mappingJson) {
-		JsonObject mappingJsonObject = toJsonElement( mappingJson ).getAsJsonObject();
-
+	private void putMapping(URLEncodedString indexName, JsonObject mappingJsonObject) {
 		ElasticsearchRequest.Builder builder = ElasticsearchRequest.put()
 				.pathComponent( indexName ).pathComponent( Paths._MAPPING );
 		dialect.getTypeNameForMappingApi().ifPresent( builder::pathComponent );
