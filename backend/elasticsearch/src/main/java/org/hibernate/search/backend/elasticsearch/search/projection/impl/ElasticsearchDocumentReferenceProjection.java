@@ -18,22 +18,22 @@ class ElasticsearchDocumentReferenceProjection
 		implements ElasticsearchSearchProjection<DocumentReference, DocumentReference> {
 
 	private final Set<String> indexNames;
-	private final DocumentReferenceExtractorHelper helper;
+	private final DocumentReferenceExtractionHelper helper;
 
-	ElasticsearchDocumentReferenceProjection(Set<String> indexNames, DocumentReferenceExtractorHelper helper) {
+	ElasticsearchDocumentReferenceProjection(Set<String> indexNames, DocumentReferenceExtractionHelper helper) {
 		this.indexNames = indexNames;
 		this.helper = helper;
 	}
 
 	@Override
 	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
-		helper.requestDocumentReference( requestBody );
+		helper.request( requestBody );
 	}
 
 	@Override
 	public DocumentReference extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			SearchProjectionExtractContext context) {
-		return helper.extractDocumentReference( hit );
+		return helper.extract( hit );
 	}
 
 	@Override

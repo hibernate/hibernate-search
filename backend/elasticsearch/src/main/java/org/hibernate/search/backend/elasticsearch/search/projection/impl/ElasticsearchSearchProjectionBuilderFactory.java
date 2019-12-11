@@ -58,7 +58,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	public DocumentReferenceProjectionBuilder documentReference() {
 		return new ElasticsearchDocumentReferenceProjectionBuilder(
 				scopeModel.getHibernateSearchIndexNames(),
-				searchProjectionBackendContext.getDocumentReferenceExtractorHelper()
+				searchProjectionBackendContext.getDocumentReferenceExtractionHelper()
 		);
 	}
 
@@ -87,7 +87,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	public <E> EntityProjectionBuilder<E> entity() {
 		return new ElasticsearchEntityProjectionBuilder<>(
 				scopeModel.getHibernateSearchIndexNames(),
-				searchProjectionBackendContext.getDocumentReferenceExtractorHelper()
+				searchProjectionBackendContext.getDocumentReferenceExtractionHelper()
 		);
 	}
 
@@ -95,7 +95,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	public <R> EntityReferenceProjectionBuilder<R> entityReference() {
 		return new ElasticsearchEntityReferenceProjectionBuilder<>(
 				scopeModel.getHibernateSearchIndexNames(),
-				searchProjectionBackendContext.getDocumentReferenceExtractorHelper()
+				searchProjectionBackendContext.getDocumentReferenceExtractionHelper()
 		);
 	}
 

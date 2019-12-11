@@ -8,14 +8,14 @@ package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
 public final class SearchProjectionBackendContext {
 
-	private final DocumentReferenceExtractorHelper documentReferenceExtractorHelper;
+	private final DocumentReferenceExtractionHelper documentReferenceExtractionHelper;
 
-	public SearchProjectionBackendContext(DocumentReferenceExtractorHelper documentReferenceExtractorHelper) {
-		this.documentReferenceExtractorHelper = documentReferenceExtractorHelper;
+	public SearchProjectionBackendContext(DocumentReferenceExtractionHelper documentReferenceExtractionHelper) {
+		this.documentReferenceExtractionHelper = documentReferenceExtractionHelper;
 	}
 
-	DocumentReferenceExtractorHelper getDocumentReferenceExtractorHelper() {
-		return documentReferenceExtractorHelper;
+	DocumentReferenceExtractionHelper getDocumentReferenceExtractionHelper() {
+		return documentReferenceExtractionHelper;
 	}
 
 }

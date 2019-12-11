@@ -16,7 +16,7 @@ class ElasticsearchEntityReferenceProjectionBuilder<R> implements EntityReferenc
 
 	private final ElasticsearchEntityReferenceProjection<R> projection;
 
-	ElasticsearchEntityReferenceProjectionBuilder(Set<String> indexNames, DocumentReferenceExtractorHelper helper) {
+	ElasticsearchEntityReferenceProjectionBuilder(Set<String> indexNames, DocumentReferenceExtractionHelper helper) {
 		this.projection = new ElasticsearchEntityReferenceProjection<>( indexNames, helper );
 	}
 
