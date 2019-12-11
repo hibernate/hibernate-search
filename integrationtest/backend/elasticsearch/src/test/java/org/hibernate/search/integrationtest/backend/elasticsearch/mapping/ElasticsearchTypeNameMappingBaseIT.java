@@ -6,19 +6,30 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.mapping;
 
+import static org.hibernate.search.integrationtest.backend.elasticsearch.mapping.ElasticsearchTypeNameMappingTestUtils.mappingWithDiscriminatorProperty;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.mapping.ElasticsearchTypeNameMappingTestUtils.mappingWithoutAnyProperty;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
+import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
+import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import com.google.gson.JsonObject;
 
 /**
  * Test the base functionality of type name mapping strategies.
@@ -32,33 +43,48 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	private static final String TYPE2_NAME = "type2_name";
 	private static final String INDEX2_NAME = "index2_name";
 
+	private static final String INDEX_NAME_SUFFIX_WHEN_ALIASES = "_actual";
+
 	private static final String ID_1 = "id_1";
 	private static final String ID_2 = "id_2";
+
+	private enum AliasSupport {
+		YES,
+		NO
+	}
 
 	@Parameterized.Parameters(name = "{0}")
 	public static Object[][] configurations() {
 		return new Object[][] {
-				{ null },
-				{ "index-name" },
-				{ "discriminator"  }
+				{ null, mappingWithoutAnyProperty(), AliasSupport.NO },
+				{ "index-name", mappingWithoutAnyProperty(), AliasSupport.NO },
+				{ "discriminator", mappingWithDiscriminatorProperty( "__HSEARCH_type" ), AliasSupport.YES }
 		};
 	}
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
+	@Rule
+	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
+
 	private final String strategyName;
+	private final JsonObject expectedMappingContent;
+	private final AliasSupport aliasSupport;
 
 	private StubMappingIndexManager index1Manager;
 	private StubMappingIndexManager index2Manager;
 
-	public ElasticsearchTypeNameMappingBaseIT(String strategyName) {
+	public ElasticsearchTypeNameMappingBaseIT(String strategyName, JsonObject expectedMappingContent,
+			AliasSupport aliasSupport) {
 		this.strategyName = strategyName;
+		this.expectedMappingContent = expectedMappingContent;
+		this.aliasSupport = aliasSupport;
 	}
 
 	@Test
 	public void singleIndexScope() {
-		setup();
+		setup( IndexLifecycleStrategyName.DROP_AND_CREATE_AND_DROP );
 		SearchResultAssert.assertThat(
 				index1Manager.createScope().query().predicate( f -> f.matchAll() ).toQuery()
 		)
@@ -70,7 +96,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 
 	@Test
 	public void multiIndexScope() {
-		setup();
+		setup( IndexLifecycleStrategyName.DROP_AND_CREATE_AND_DROP );
 		SearchResultAssert.assertThat(
 				index1Manager.createScope( index2Manager ).query().predicate( f -> f.matchAll() ).toQuery()
 		)
@@ -82,8 +108,70 @@ public class ElasticsearchTypeNameMappingBaseIT {
 				);
 	}
 
-	private void setup() {
+	@Test
+	public void alias_singleIndexScope() {
+		createIndexAndAliases();
+		setup( IndexLifecycleStrategyName.NONE );
+
+		SearchQuery<DocumentReference> query = index1Manager.createScope().query()
+				.predicate( f -> f.matchAll() )
+				.toQuery();
+
+		if ( AliasSupport.YES.equals( aliasSupport ) ) {
+			SearchResultAssert.assertThat( query )
+					.hasDocRefHitsAnyOrder( c -> c
+							.doc( TYPE1_NAME, ID_1 )
+							.doc( TYPE1_NAME, ID_2 )
+					);
+		}
+		else {
+			SubTest.expectException( () -> query.fetch( 20 ) )
+					.assertThrown()
+					.isInstanceOf( SearchException.class );
+		}
+	}
+
+	@Test
+	public void alias_multiIndexScope() {
+		createIndexAndAliases();
+		setup( IndexLifecycleStrategyName.NONE );
+
+		SearchQuery<DocumentReference> query = index1Manager.createScope( index2Manager ).query()
+				.predicate( f -> f.matchAll() )
+				.toQuery();
+
+		if ( AliasSupport.YES.equals( aliasSupport ) ) {
+			SearchResultAssert.assertThat( query )
+					.hasDocRefHitsAnyOrder( c -> c
+							.doc( TYPE1_NAME, ID_1 )
+							.doc( TYPE1_NAME, ID_2 )
+							.doc( TYPE2_NAME, ID_1 )
+							.doc( TYPE2_NAME, ID_2 )
+					);
+		}
+		else {
+			SubTest.expectException( () -> query.fetch( 20 ) )
+					.assertThrown()
+					.isInstanceOf( SearchException.class );
+		}
+	}
+
+	private void createIndexAndAliases() {
+		String index1ActualName = INDEX1_NAME + INDEX_NAME_SUFFIX_WHEN_ALIASES;
+		elasticsearchClient.index( index1ActualName ).deleteAndCreate();
+		elasticsearchClient.index( index1ActualName ).type().putMapping( expectedMappingContent );
+		elasticsearchClient.index( index1ActualName ).addAlias( INDEX1_NAME );
+		String index2ActualName = INDEX2_NAME + INDEX_NAME_SUFFIX_WHEN_ALIASES;
+		elasticsearchClient.index( index2ActualName ).deleteAndCreate();
+		elasticsearchClient.index( index2ActualName ).type().putMapping( expectedMappingContent );
+		elasticsearchClient.index( index2ActualName ).addAlias( INDEX2_NAME );
+	}
+
+	private void setup(IndexLifecycleStrategyName lifecycleStrategy) {
 		setupHelper.start( BACKEND_NAME )
+				.withIndexDefaultsProperty(
+						BACKEND_NAME, ElasticsearchIndexSettings.LIFECYCLE_STRATEGY, lifecycleStrategy
+				)
 				.withBackendProperty(
 						BACKEND_NAME, ElasticsearchBackendSettings.MAPPING_TYPE_NAME_STRATEGY, strategyName
 				)
