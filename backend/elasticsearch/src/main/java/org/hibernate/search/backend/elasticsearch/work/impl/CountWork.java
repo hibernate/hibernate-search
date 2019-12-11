@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
@@ -39,6 +40,9 @@ public class CountWork extends AbstractSimpleElasticsearchWork<Long> {
 		private final List<URLEncodedString> indexNames = new ArrayList<>();
 		private JsonObject query;
 		private Set<String> routingKeys;
+		private Integer timeoutValue;
+		private TimeUnit timeoutUnit;
+		private boolean exceptionOnTimeout;
 
 		public Builder(Collection<URLEncodedString> indexNames) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
@@ -58,6 +62,24 @@ public class CountWork extends AbstractSimpleElasticsearchWork<Long> {
 		}
 
 		@Override
+		public CountWorkBuilder timeoutValue(Integer timeoutValue) {
+			this.timeoutValue = timeoutValue;
+			return this;
+		}
+
+		@Override
+		public CountWorkBuilder timeoutUnit(TimeUnit timeoutUnit) {
+			this.timeoutUnit = timeoutUnit;
+			return this;
+		}
+
+		@Override
+		public CountWorkBuilder exceptionOnTimeout(boolean exceptionOnTimeout) {
+			this.exceptionOnTimeout = exceptionOnTimeout;
+			return this;
+		}
+
+		@Override
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.get()
@@ -71,6 +93,19 @@ public class CountWork extends AbstractSimpleElasticsearchWork<Long> {
 
 			if ( !routingKeys.isEmpty() ) {
 				builder.multiValuedParam( "routing", routingKeys );
+			}
+
+			if ( timeoutValue != null && timeoutUnit != null ) {
+				builder.param( "timeout", AbstractSimpleElasticsearchWork.AbstractBuilder.getTimeoutString( timeoutValue, timeoutUnit ) );
+			}
+
+			if ( exceptionOnTimeout ) {
+				// the default is true
+				builder.param( "allow_partial_search_results", false );
+
+				// set timeoutValue and timeoutUnit only for hard timeout
+				builder.timeoutValue( timeoutValue );
+				builder.timeoutUnit( timeoutUnit );
 			}
 
 			return builder.build();

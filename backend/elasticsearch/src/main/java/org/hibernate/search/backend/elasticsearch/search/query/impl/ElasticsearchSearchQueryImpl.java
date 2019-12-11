@@ -140,6 +140,9 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		ElasticsearchWork<Long> work = workFactory.count( searchContext.getIndexNames() )
 				.query( filteredPayload )
 				.routingKeys( routingKeys )
+				.timeoutValue( timeoutValue )
+				.timeoutUnit( timeoutUnit )
+				.exceptionOnTimeout( exceptionOnTimeout )
 				.requestTransformer(
 						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )
 				)

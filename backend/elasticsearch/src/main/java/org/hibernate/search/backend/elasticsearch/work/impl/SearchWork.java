@@ -160,7 +160,7 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 			}
 
 			if ( timeoutValue != null && timeoutUnit != null ) {
-				builder.param( "timeout", getTimeoutString() );
+				builder.param( "timeout", AbstractSimpleElasticsearchWork.AbstractBuilder.getTimeoutString( timeoutValue, timeoutUnit ) );
 			}
 
 			if ( exceptionOnTimeout ) {
@@ -178,34 +178,6 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 		@Override
 		public SearchWork<R> build() {
 			return new SearchWork<>( this );
-		}
-
-		private String getTimeoutString() {
-			StringBuilder builder = new StringBuilder( timeoutValue + "" );
-			switch ( timeoutUnit ) {
-				case DAYS:
-					builder.append( "d" );
-					break;
-				case HOURS:
-					builder.append( "h" );
-					break;
-				case MINUTES:
-					builder.append( "m" );
-					break;
-				case SECONDS:
-					builder.append( "s" );
-					break;
-				case MILLISECONDS:
-					builder.append( "ms" );
-					break;
-				case MICROSECONDS:
-					builder.append( "micros" );
-					break;
-				case NANOSECONDS:
-					builder.append( "nanos" );
-					break;
-			}
-			return builder.toString();
 		}
 	}
 }

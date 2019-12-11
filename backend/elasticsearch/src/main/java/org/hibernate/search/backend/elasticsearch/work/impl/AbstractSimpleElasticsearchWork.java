@@ -6,8 +6,17 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
+import static java.util.concurrent.TimeUnit.DAYS;
+import static java.util.concurrent.TimeUnit.HOURS;
+import static java.util.concurrent.TimeUnit.MICROSECONDS;
+import static java.util.concurrent.TimeUnit.MILLISECONDS;
+import static java.util.concurrent.TimeUnit.MINUTES;
+import static java.util.concurrent.TimeUnit.NANOSECONDS;
+import static java.util.concurrent.TimeUnit.SECONDS;
+
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
@@ -152,6 +161,34 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 			return (B) this;
 		}
 
+		protected static String getTimeoutString(Integer timeoutValue, TimeUnit timeoutUnit) {
+			StringBuilder builder = new StringBuilder( timeoutValue.toString() );
+			switch ( timeoutUnit ) {
+				case DAYS:
+					builder.append( "d" );
+					break;
+				case HOURS:
+					builder.append( "h" );
+					break;
+				case MINUTES:
+					builder.append( "m" );
+					break;
+				case SECONDS:
+					builder.append( "s" );
+					break;
+				case MILLISECONDS:
+					builder.append( "ms" );
+					break;
+				case MICROSECONDS:
+					builder.append( "micros" );
+					break;
+				case NANOSECONDS:
+					builder.append( "nanos" );
+					break;
+			}
+			return builder.toString();
+		}
+
 		private ElasticsearchRequest buildRequestAndTransformIfNecessary() {
 			ElasticsearchRequest request = buildRequest();
 			if ( requestTransformer != null ) {
@@ -163,5 +200,6 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 		protected abstract ElasticsearchRequest buildRequest();
 
 		public abstract ElasticsearchWork<?> build();
+
 	}
 }
