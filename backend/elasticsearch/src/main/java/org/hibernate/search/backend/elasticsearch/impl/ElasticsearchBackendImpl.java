@@ -16,9 +16,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
+import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorImplementor;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorProvider;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.DocumentReferenceExtractionHelper;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
@@ -52,19 +54,16 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	private final ElasticsearchLinkImpl link;
 
 	private final String name;
+
 	private final ElasticsearchWorkOrchestratorProvider orchestratorProvider;
-
 	private final ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider;
-
 	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
-
 	private final MultiTenancyStrategy multiTenancyStrategy;
+	private final TypeNameMapping typeNameMapping;
 
 	private final ElasticsearchWorkOrchestratorImplementor queryOrchestrator;
 
 	private final Map<String, String> hibernateSearchIndexNamesByElasticsearchIndexNames = new ConcurrentHashMap<>();
-
-	private final Map<String, String> mappedTypeNamesByElasticsearchIndexNames = new ConcurrentHashMap<>();
 
 	private final EventContext eventContext;
 	private final IndexManagerBackendContext indexManagerBackendContext;
@@ -76,6 +75,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 			Gson userFacingGson,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy,
+			TypeNameMapping typeNameMapping,
 			FailureHandler failureHandler) {
 		this.link = link;
 		this.name = name;
@@ -88,21 +88,19 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		);
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.queryOrchestrator = orchestratorProvider.createParallelOrchestrator( "Elasticsearch query orchestrator for backend " + name );
-
 		this.typeFactoryProvider = typeFactoryProvider;
+		this.typeNameMapping = typeNameMapping;
+
+		this.queryOrchestrator = orchestratorProvider.createParallelOrchestrator( "Elasticsearch query orchestrator for backend " + name );
 
 		this.eventContext = EventContexts.fromBackendName( name );
 		this.indexManagerBackendContext = new IndexManagerBackendContext(
 				eventContext, link,
 				userFacingGson,
-				( String elasticsearchIndexName ) -> {
-					String result = mappedTypeNamesByElasticsearchIndexNames.get( elasticsearchIndexName );
-					if ( result == null ) {
-						throw log.elasticsearchResponseUnknownIndexName( elasticsearchIndexName, eventContext );
-					}
-					return result;
-				},
+				new DocumentReferenceExtractionHelper(
+						typeNameMapping.getMappedTypeNameExtractionHelper(),
+						multiTenancyStrategy.getIdProjectionExtractionHelper()
+				),
 				multiTenancyStrategy,
 				orchestratorProvider,
 				queryOrchestrator
@@ -184,7 +182,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 					eventContext
 			);
 		}
-		mappedTypeNamesByElasticsearchIndexNames.put( elasticsearchIndexName, mappedTypeName );
+		typeNameMapping.register( elasticsearchIndexName, mappedTypeName );
 
 		EventContext indexEventContext = EventContexts.fromIndexName( hibernateSearchIndexName );
 

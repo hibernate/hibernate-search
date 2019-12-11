@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
-import java.util.function.Function;
-
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorImplementor;
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
@@ -55,7 +53,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	private final SearchProjectionBackendContext searchProjectionBackendContext;
 
 	public IndexManagerBackendContext(EventContext eventContext, ElasticsearchLink link, Gson userFacingGson,
-			Function<String, String> mappedTypeNameResolver,
+			DocumentReferenceExtractionHelper documentReferenceExtractionHelper,
 			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestratorProvider orchestratorProvider,
 			ElasticsearchWorkOrchestrator queryOrchestrator) {
@@ -66,8 +64,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		this.orchestratorProvider = orchestratorProvider;
 		this.queryOrchestrator = queryOrchestrator;
 
-		this.documentReferenceExtractionHelper =
-				new DocumentReferenceExtractionHelper( mappedTypeNameResolver, multiTenancyStrategy.getIdProjectionExtractionHelper() );
+		this.documentReferenceExtractionHelper = documentReferenceExtractionHelper;
 		this.searchProjectionBackendContext = new SearchProjectionBackendContext(
 				documentReferenceExtractionHelper
 		);
