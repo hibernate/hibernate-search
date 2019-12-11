@@ -92,6 +92,23 @@ public class SearchTimeoutIT {
 	}
 
 	@Test
+	public void timeout_largeCount_smallTimeout_raiseAnException() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.asEntityReference()
+				.predicate( f -> f.match().field( FIELD_NAME ).matching( BUZZ_WORDS ) )
+				.sort( f -> f.score() )
+				.failAfter( 1, TimeUnit.NANOSECONDS )
+				.toQuery();
+
+		SubTest.expectException( () -> query.fetchTotalHitCount() )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Query took longer than expected" );
+	}
+
+	@Test
 	public void timeout_largeQuery_smallTimeout_limitFetching() {
 		Assume.assumeTrue(
 				"backend should have a fast timeout resolution in order to run this test correctly",
