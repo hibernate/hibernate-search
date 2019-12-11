@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
+import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
 import org.hibernate.search.backend.elasticsearch.multitenancy.MultiTenancyStrategyName;
 
 /**
@@ -176,6 +177,16 @@ public final class ElasticsearchBackendSettings {
 	public static final String MULTI_TENANCY_STRATEGY = "multi_tenancy.strategy";
 
 	/**
+	 * The strategy for mapping documents to their type name,
+	 * i.e. to determine the type name of a document in search hits.
+	 * <p>
+	 * Expects a {@link TypeNameMappingStrategyName} value, or a String representation of such value.
+	 * <p>
+	 * Defaults to {@link Defaults#MAPPING_TYPE_NAME_STRATEGY}.
+	 */
+	public static final String MAPPING_TYPE_NAME_STRATEGY = "mapping.type_name.strategy";
+
+	/**
 	 * The analysis configurer to use.
 	 * <p>
 	 * Expects a reference to a bean of type {@link ElasticsearchAnalysisConfigurer}.
@@ -206,5 +217,6 @@ public final class ElasticsearchBackendSettings {
 		public static final int DISCOVERY_REFRESH_INTERVAL = 10;
 		public static final boolean LOG_JSON_PRETTY_PRINTING = false;
 		public static final MultiTenancyStrategyName MULTI_TENANCY_STRATEGY = MultiTenancyStrategyName.NONE;
+		public static final TypeNameMappingStrategyName MAPPING_TYPE_NAME_STRATEGY = TypeNameMappingStrategyName.INDEX_NAME;
 	}
 }
