@@ -19,7 +19,7 @@ public class ElasticsearchFields {
 	private ElasticsearchFields() {
 	}
 
-	private static String internalFieldName(String fieldName) {
+	public static String internalFieldName(String fieldName) {
 		StringBuilder sb = new StringBuilder( INTERNAL_FIELD_PREFIX.length() + fieldName.length() );
 		sb.append( INTERNAL_FIELD_PREFIX );
 		sb.append( fieldName );

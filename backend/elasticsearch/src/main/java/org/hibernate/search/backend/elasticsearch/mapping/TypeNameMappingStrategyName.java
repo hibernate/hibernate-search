@@ -18,7 +18,12 @@ public enum TypeNameMappingStrategyName {
 	 * Rely on the "_index" meta-field.
 	 * Does not work with index aliases.
 	 */
-	INDEX_NAME("index-name");
+	INDEX_NAME("index-name"),
+	/**
+	 * Rely on a discriminator field added to each document to resolve the type name.
+	 * Works correctly with index aliases.
+	 */
+	DISCRIMINATOR("discriminator");
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

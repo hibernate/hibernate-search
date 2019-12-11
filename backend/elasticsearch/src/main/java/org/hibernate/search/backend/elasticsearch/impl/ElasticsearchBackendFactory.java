@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl.Elasti
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
+import org.hibernate.search.backend.elasticsearch.mapping.impl.DiscriminatorTypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.IndexNameTypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.multitenancy.MultiTenancyStrategyName;
@@ -173,6 +174,8 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		switch ( strategyName ) {
 			case INDEX_NAME:
 				return new IndexNameTypeNameMapping();
+			case DISCRIMINATOR:
+				return new DiscriminatorTypeNameMapping();
 			default:
 				throw new AssertionFailure( String.format(
 						Locale.ROOT, "Unsupported type mapping strategy '%2$s' for backend '%1$s'",

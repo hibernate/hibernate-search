@@ -8,8 +8,11 @@ package org.hibernate.search.backend.elasticsearch.mapping.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
+import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexSchemaRootContributor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
@@ -28,13 +31,25 @@ public class IndexNameTypeNameMapping implements TypeNameMapping {
 			new TypeNameFromIndexNameExtractionHelper();
 
 	@Override
+	public Optional<IndexSchemaRootContributor> getIndexSchemaRootContributor() {
+		// No need to add anything to documents, Elasticsearch metadata is enough
+		return Optional.empty();
+	}
+
+	@Override
+	public Optional<DocumentMetadataContributor> getDocumentMetadataContributor(String mappedTypeName) {
+		// No need to add anything to documents, Elasticsearch metadata is enough
+		return Optional.empty();
+	}
+
+	@Override
 	public void register(String elasticsearchIndexName, String mappedTypeName) {
 		mappedTypeNameExtractionHelper.mappedTypeNamesByElasticsearchIndexNames
 				.put( elasticsearchIndexName, mappedTypeName );
 	}
 
 	@Override
-	public ProjectionExtractionHelper<String> getMappedTypeNameExtractionHelper() {
+	public ProjectionExtractionHelper<String> getTypeNameExtractionHelper() {
 		return mappedTypeNameExtractionHelper;
 	}
 
