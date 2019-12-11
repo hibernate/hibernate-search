@@ -16,23 +16,23 @@ import com.google.gson.JsonObject;
 public class ElasticsearchEntityReferenceProjection<R> implements ElasticsearchSearchProjection<R, R> {
 
 	private final Set<String> indexNames;
-	private final DocumentReferenceExtractorHelper helper;
+	private final DocumentReferenceExtractionHelper helper;
 
-	public ElasticsearchEntityReferenceProjection(Set<String> indexNames, DocumentReferenceExtractorHelper helper) {
+	public ElasticsearchEntityReferenceProjection(Set<String> indexNames, DocumentReferenceExtractionHelper helper) {
 		this.indexNames = indexNames;
 		this.helper = helper;
 	}
 
 	@Override
 	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
-		helper.requestDocumentReference( requestBody );
+		helper.request( requestBody );
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public R extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			SearchProjectionExtractContext context) {
-		return (R) projectionHitMapper.convertReference( helper.extractDocumentReference( hit ) );
+		return (R) projectionHitMapper.convertReference( helper.extract( hit ) );
 	}
 
 	@Override

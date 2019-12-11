@@ -43,7 +43,7 @@ public class ElasticsearchSearchQueryBuilderFactory
 			BackendSessionContext sessionContext, LoadingContextBuilder<?, E> loadingContextBuilder) {
 		return createSearchQueryBuilder(
 				sessionContext, loadingContextBuilder,
-				new ElasticsearchEntityProjection<>( searchContext.getHibernateSearchIndexNames(), searchBackendContext.getDocumentReferenceExtractorHelper() )
+				new ElasticsearchEntityProjection<>( searchContext.getHibernateSearchIndexNames(), searchBackendContext.getDocumentReferenceExtractionHelper() )
 		);
 	}
 
@@ -52,7 +52,7 @@ public class ElasticsearchSearchQueryBuilderFactory
 			BackendSessionContext sessionContext, LoadingContextBuilder<R, ?> loadingContextBuilder) {
 		return createSearchQueryBuilder(
 				sessionContext, loadingContextBuilder,
-				new ElasticsearchEntityReferenceProjection<>( searchContext.getHibernateSearchIndexNames(), searchBackendContext.getDocumentReferenceExtractorHelper() )
+				new ElasticsearchEntityReferenceProjection<>( searchContext.getHibernateSearchIndexNames(), searchBackendContext.getDocumentReferenceExtractionHelper() )
 		);
 	}
 

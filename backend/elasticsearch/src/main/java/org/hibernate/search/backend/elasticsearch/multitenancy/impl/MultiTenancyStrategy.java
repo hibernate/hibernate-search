@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.JsonObject;
@@ -59,19 +60,9 @@ public interface MultiTenancyStrategy {
 	JsonObject decorateJsonQuery(JsonObject originalJsonQuery, String tenantId);
 
 	/**
-	 * Contributes additional elements to the Elasticsearch search request.
-	 *
-	 * @param requestBody The body of the request.
+	 * @return A helper for projections that need to extract the document id from search hits.
 	 */
-	void contributeToSearchRequest(JsonObject requestBody);
-
-	/**
-	 * Extracts the tenant-scoped document id from an Elasticsearch hit.
-	 *
-	 * @param hit The Elasticsearch hit.
-	 * @return The tenant scoped document id.
-	 */
-	String extractTenantScopedDocumentId(JsonObject hit);
+	ProjectionExtractionHelper<String> getIdProjectionExtractionHelper();
 
 	/**
 	 * Check that the tenant id value is consistent with the strategy.

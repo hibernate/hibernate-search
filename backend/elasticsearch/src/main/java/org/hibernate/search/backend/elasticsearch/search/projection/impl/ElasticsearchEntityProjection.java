@@ -16,22 +16,22 @@ import com.google.gson.JsonObject;
 public class ElasticsearchEntityProjection<E> implements ElasticsearchSearchProjection<Object, E> {
 
 	private final Set<String> indexNames;
-	private final DocumentReferenceExtractorHelper helper;
+	private final DocumentReferenceExtractionHelper helper;
 
-	public ElasticsearchEntityProjection(Set<String> indexNames, DocumentReferenceExtractorHelper helper) {
+	public ElasticsearchEntityProjection(Set<String> indexNames, DocumentReferenceExtractionHelper helper) {
 		this.indexNames = indexNames;
 		this.helper = helper;
 	}
 
 	@Override
 	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
-		helper.requestDocumentReference( requestBody );
+		helper.request( requestBody );
 	}
 
 	@Override
 	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			SearchProjectionExtractContext context) {
-		return projectionHitMapper.planLoading( helper.extractDocumentReference( hit ) );
+		return projectionHitMapper.planLoading( helper.extract( hit ) );
 	}
 
 	@SuppressWarnings("unchecked")

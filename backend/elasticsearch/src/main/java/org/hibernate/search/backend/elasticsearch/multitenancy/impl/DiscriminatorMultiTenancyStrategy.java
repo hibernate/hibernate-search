@@ -18,6 +18,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
 import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchFields;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -34,16 +35,11 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 
 	private static final String ESCAPED_UNDERSCORE = "__";
 
-	private static final JsonArrayAccessor DOCVALUE_FIELDS_ACCESSOR = JsonAccessor.root().property( "docvalue_fields" ).asArray();
-
-	private static final JsonAccessor<String> HIT_ID_ACCESSOR = JsonAccessor.root().property( "fields" ).asObject()
-			.property( ElasticsearchFields.idFieldName() ).asArray()
-			.element( 0 ).asString();
-
-	private static final JsonElement ID_FIELD_NAME_JSON = new JsonPrimitive( ElasticsearchFields.idFieldName() );
-
 	private final DiscriminatorMultiTenancyDocumentMetadataContributor documentMetadataContributor =
 			new DiscriminatorMultiTenancyDocumentMetadataContributor();
+
+	private final DiscriminatorMultiTenancyIdProjectionExtractionHelper idProjectionExtractionHelper =
+			new DiscriminatorMultiTenancyIdProjectionExtractionHelper();
 
 	@Override
 	public boolean isMultiTenancySupported() {
@@ -94,13 +90,8 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 	}
 
 	@Override
-	public void contributeToSearchRequest(JsonObject requestBody) {
-		DOCVALUE_FIELDS_ACCESSOR.addElementIfAbsent( requestBody, ID_FIELD_NAME_JSON );
-	}
-
-	@Override
-	public String extractTenantScopedDocumentId(JsonObject hit) {
-		return HIT_ID_ACCESSOR.get( hit ).orElseThrow( log::elasticsearchResponseMissingData );
+	public DiscriminatorMultiTenancyIdProjectionExtractionHelper getIdProjectionExtractionHelper() {
+		return idProjectionExtractionHelper;
 	}
 
 	@Override
@@ -120,6 +111,29 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 		public void contribute(JsonObject document, String tenantId, String id) {
 			TENANT_ID_ACCESSOR.set( document, tenantId );
 			ID_ACCESSOR.set( document, id );
+		}
+	}
+
+	private static final class DiscriminatorMultiTenancyIdProjectionExtractionHelper implements ProjectionExtractionHelper<String> {
+		private static final JsonArrayAccessor DOCVALUE_FIELDS_ACCESSOR =
+				JsonAccessor.root().property( "docvalue_fields" ).asArray();
+
+		private static final JsonAccessor<String> HIT_ID_ACCESSOR =
+				JsonAccessor.root().property( "fields" ).asObject()
+						.property( ElasticsearchFields.idFieldName() ).asArray()
+						.element( 0 ).asString();
+
+		private static final JsonElement ID_FIELD_NAME_JSON =
+				new JsonPrimitive( ElasticsearchFields.idFieldName() );
+
+		@Override
+		public void request(JsonObject requestBody) {
+			DOCVALUE_FIELDS_ACCESSOR.addElementIfAbsent( requestBody, ID_FIELD_NAME_JSON );
+		}
+
+		@Override
+		public String extract(JsonObject hit) {
+			return HIT_ID_ACCESSOR.get( hit ).orElseThrow( log::elasticsearchResponseMissingData );
 		}
 	}
 }

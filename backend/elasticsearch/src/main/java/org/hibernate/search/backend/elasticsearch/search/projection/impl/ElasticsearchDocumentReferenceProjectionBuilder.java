@@ -17,7 +17,7 @@ class ElasticsearchDocumentReferenceProjectionBuilder implements DocumentReferen
 
 	private final ElasticsearchDocumentReferenceProjection projection;
 
-	ElasticsearchDocumentReferenceProjectionBuilder(Set<String> indexNames, DocumentReferenceExtractorHelper helper) {
+	ElasticsearchDocumentReferenceProjectionBuilder(Set<String> indexNames, DocumentReferenceExtractionHelper helper) {
 		this.projection = new ElasticsearchDocumentReferenceProjection( indexNames, helper );
 	}
 

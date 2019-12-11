@@ -13,6 +13,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.R
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -22,7 +23,8 @@ public class NoMultiTenancyStrategy implements MultiTenancyStrategy {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final JsonAccessor<String> HIT_ID_ACCESSOR = JsonAccessor.root().property( "_id" ).asString();
+	private final NoMultiTenancyIdProjectionExtractionHelper idProjectionExtractionHelper =
+			new NoMultiTenancyIdProjectionExtractionHelper();
 
 	@Override
 	public boolean isMultiTenancySupported() {
@@ -51,19 +53,29 @@ public class NoMultiTenancyStrategy implements MultiTenancyStrategy {
 	}
 
 	@Override
-	public void contributeToSearchRequest(JsonObject requestBody) {
-		// No need to request any additional information, Elasticsearch metadata is enough
-	}
-
-	@Override
-	public String extractTenantScopedDocumentId(JsonObject hit) {
-		return HIT_ID_ACCESSOR.get( hit ).orElseThrow( log::elasticsearchResponseMissingData );
+	public NoMultiTenancyIdProjectionExtractionHelper getIdProjectionExtractionHelper() {
+		return idProjectionExtractionHelper;
 	}
 
 	@Override
 	public void checkTenantId(String tenantId, EventContext backendContext) {
 		if ( tenantId != null ) {
 			throw log.tenantIdProvidedButMultiTenancyDisabled( tenantId, backendContext );
+		}
+	}
+
+	private static final class NoMultiTenancyIdProjectionExtractionHelper implements ProjectionExtractionHelper<String> {
+		private static final JsonAccessor<String> HIT_ID_ACCESSOR =
+				JsonAccessor.root().property( "_id" ).asString();
+
+		@Override
+		public void request(JsonObject requestBody) {
+			// No need to request any additional information, Elasticsearch metadata is enough
+		}
+
+		@Override
+		public String extract(JsonObject hit) {
+			return HIT_ID_ACCESSOR.get( hit ).orElseThrow( log::elasticsearchResponseMissingData );
 		}
 	}
 }
