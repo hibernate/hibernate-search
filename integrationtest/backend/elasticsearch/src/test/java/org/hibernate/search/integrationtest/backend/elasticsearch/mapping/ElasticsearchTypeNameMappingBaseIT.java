@@ -56,7 +56,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	@Parameterized.Parameters(name = "{0}")
 	public static Object[][] configurations() {
 		return new Object[][] {
-				{ null, mappingWithoutAnyProperty(), AliasSupport.NO },
+				{ null, mappingWithDiscriminatorProperty( "__HSEARCH_type" ), AliasSupport.YES },
 				{ "index-name", mappingWithoutAnyProperty(), AliasSupport.NO },
 				{ "discriminator", mappingWithDiscriminatorProperty( "__HSEARCH_type" ), AliasSupport.YES }
 		};
