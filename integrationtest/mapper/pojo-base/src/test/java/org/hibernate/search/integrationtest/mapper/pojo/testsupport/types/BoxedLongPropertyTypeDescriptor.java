@@ -109,7 +109,7 @@ public class BoxedLongPropertyTypeDescriptor extends PropertyTypeDescriptor<Long
 		} );
 	}
 
-	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_INDEX_NAME)
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
 	public static class TypeWithIdentifierBridge1 {
 		Long id;
 		@DocumentId
@@ -118,7 +118,7 @@ public class BoxedLongPropertyTypeDescriptor extends PropertyTypeDescriptor<Long
 		}
 	}
 
-	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_INDEX_NAME)
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
 	public static class TypeWithIdentifierBridge2 {
 		Long id;
 		@DocumentId
@@ -127,7 +127,7 @@ public class BoxedLongPropertyTypeDescriptor extends PropertyTypeDescriptor<Long
 		}
 	}
 
-	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_INDEX_NAME)
+	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		Long myProperty;
@@ -149,7 +149,7 @@ public class BoxedLongPropertyTypeDescriptor extends PropertyTypeDescriptor<Long
 		}
 	}
 
-	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_INDEX_NAME)
+	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		Long myProperty;

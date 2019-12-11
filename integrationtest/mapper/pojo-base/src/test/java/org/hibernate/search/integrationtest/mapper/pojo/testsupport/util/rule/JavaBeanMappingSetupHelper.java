@@ -74,6 +74,13 @@ public final class JavaBeanMappingSetupHelper
 			return thisAsC();
 		}
 
+		public SetupContext withAnnotatedEntityType(Class<?> annotatedEntityType, String entityName) {
+			return withConfiguration( builder -> {
+				builder.addEntityType( annotatedEntityType, entityName );
+				builder.annotationMapping().add( annotatedEntityType );
+			} );
+		}
+
 		public SetupContext withAnnotatedEntityTypes(Class<?> ... annotatedEntityTypes) {
 			return withAnnotatedEntityTypes( CollectionHelper.asLinkedHashSet( annotatedEntityTypes ) );
 		}

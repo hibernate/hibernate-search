@@ -206,10 +206,10 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	@Override
 	public EntityReference fromDocumentReference(DocumentReference reference) {
 		HibernateOrmSessionIndexedTypeContext<?> typeContext =
-				typeContextProvider.getByIndexName( reference.getIndexName() );
+				typeContextProvider.getIndexedByJpaEntityName( reference.getTypeName() );
 		if ( typeContext == null ) {
 			throw new AssertionFailure(
-					"Document reference " + reference + " refers to an unknown index"
+					"Document reference " + reference + " refers to an unknown type"
 			);
 		}
 		Object id = typeContext.getIdentifierMapping()

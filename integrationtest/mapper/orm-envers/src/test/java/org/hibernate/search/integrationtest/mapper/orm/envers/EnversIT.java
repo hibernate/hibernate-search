@@ -55,7 +55,7 @@ public class EnversIT {
 
 	@Before
 	public void setup() {
-		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
+		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.field( "text", String.class )
 				.objectField( "contained", b2 -> b2
 						.field( "text", String.class )
@@ -86,7 +86,7 @@ public class EnversIT {
 			session.persist( indexed );
 			session.persist( contained );
 
-			backendMock.expectWorks( IndexedEntity.INDEX )
+			backendMock.expectWorks( IndexedEntity.NAME )
 					.add( "1", b -> b
 							.field( "text", "initial" )
 							.objectField( "contained", b2 -> b2
@@ -107,7 +107,7 @@ public class EnversIT {
 			IndexedEntity indexed = session.getReference( IndexedEntity.class, 1 );
 			indexed.setText( "updated" );
 
-			backendMock.expectWorks( IndexedEntity.INDEX )
+			backendMock.expectWorks( IndexedEntity.NAME )
 					.update( "1", b -> b
 							.field( "text", "updated" )
 							.objectField( "contained", b2 -> b2
@@ -128,7 +128,7 @@ public class EnversIT {
 			ContainedEntity contained = session.getReference( ContainedEntity.class, 1 );
 			contained.setText( "updated" );
 
-			backendMock.expectWorks( IndexedEntity.INDEX )
+			backendMock.expectWorks( IndexedEntity.NAME )
 					.update( "1", b -> b
 							.field( "text", "updated" )
 							.objectField( "contained", b2 -> b2
@@ -149,7 +149,7 @@ public class EnversIT {
 			IndexedEntity indexed = session.getReference( IndexedEntity.class, 1 );
 			session.delete( indexed );
 
-			backendMock.expectWorks( IndexedEntity.INDEX )
+			backendMock.expectWorks( IndexedEntity.NAME )
 					.delete( "1" )
 					.processedThenExecuted();
 		} );
@@ -185,11 +185,11 @@ public class EnversIT {
 			String expectedIndexedEntityText, String expectedContainedEntityText) {
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME ),
 					b -> b.limit( 2 ), // fetchSingleHit() (see below) sets the limit to 2 to check if there really is a single hit
 					StubSearchWorkBehavior.of(
 							1L,
-							reference( IndexedEntity.INDEX, id )
+							reference( IndexedEntity.NAME, id )
 					)
 			);
 			Optional<IndexedEntity> loadedEntity = Search.session( session ).search( IndexedEntity.class )
@@ -231,12 +231,12 @@ public class EnversIT {
 				.addProjection( AuditEntity.revisionNumber().max() ).getSingleResult();
 	}
 
-	@Entity(name = "indexed")
-	@Indexed(index = IndexedEntity.INDEX)
+	@Entity(name = IndexedEntity.NAME)
+	@Indexed(index = IndexedEntity.NAME)
 	@Audited(withModifiedFlag = true)
 	public static final class IndexedEntity {
 
-		static final String INDEX = "IndexedEntity";
+		static final String NAME = "indexed";
 
 		@Id
 		private Integer id;

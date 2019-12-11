@@ -31,7 +31,6 @@ public class StubIndexSchemaRootNodeBuilder extends AbstractStubIndexSchemaObjec
 		super( builder );
 		this.backendBehavior = backendBehavior;
 		this.indexName = indexName;
-		builder.mappedTypeName( mappedTypeName );
 	}
 
 	@Override

@@ -110,7 +110,7 @@ public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 		} );
 	}
 
-	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_INDEX_NAME)
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME)
 	public static class TypeWithIdentifierBridge1 {
 		BigInteger id;
 
@@ -120,7 +120,7 @@ public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 		}
 
 	}
-	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_INDEX_NAME)
+	@Indexed(index = DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME)
 	public static class TypeWithIdentifierBridge2 {
 		BigInteger id;
 
@@ -130,7 +130,7 @@ public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 		}
 
 	}
-	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_INDEX_NAME)
+	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
 		Integer id;
 		BigInteger myProperty;
@@ -151,7 +151,7 @@ public class BigIntegerPropertyTypeDescriptor extends PropertyTypeDescriptor<Big
 			return indexNullAsProperty;
 		}
 	}
-	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_INDEX_NAME)
+	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
 		Integer id;
 		BigInteger myProperty;

@@ -12,11 +12,10 @@ package org.hibernate.search.engine.backend.common;
 public interface DocumentReference {
 
 	/**
-	 * @return The name of the index hosting the referenced document.
-	 * The name is returned as it is configured in Hibernate Search,
-	 * i.e. it is <strong>not</strong> normalized (lowercased, ...) as some backends may do under the hood.
+	 * @return The name of the type of the referenced document.
+	 * The type name is mapper-specific. For example, in the Hibernate ORM mapper, it will be the JPA entity name.
 	 */
-	String getIndexName();
+	String getTypeName();
 
 	/**
 	 * @return The identifier of the referenced document.

@@ -19,7 +19,6 @@ import javax.persistence.Id;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
 import javax.persistence.QueryTimeoutException;
-import javax.persistence.Table;
 import javax.persistence.TypedQuery;
 
 import org.hibernate.cfg.AvailableSettings;
@@ -57,7 +56,7 @@ public class ToJpaIT {
 
 	@Before
 	public void setup() {
-		backendMock.expectAnySchema( IndexedEntity.INDEX );
+		backendMock.expectAnySchema( IndexedEntity.NAME );
 		entityManagerFactory = ormSetupHelper.start()
 				.withProperty( AvailableSettings.JPA_QUERY_COMPLIANCE, true )
 				.setup( IndexedEntity.class );
@@ -74,7 +73,7 @@ public class ToJpaIT {
 			entityManager.persist( entity1 );
 			entityManager.persist( entity2 );
 
-			backendMock.expectWorks( IndexedEntity.INDEX )
+			backendMock.expectWorks( IndexedEntity.NAME )
 					.add( "1", b -> b
 							.field( "text", entity1.getText() )
 					)
@@ -137,12 +136,12 @@ public class ToJpaIT {
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME ),
 					b -> { },
 					StubSearchWorkBehavior.of(
 							6L,
-							reference( IndexedEntity.INDEX, "1" ),
-							reference( IndexedEntity.INDEX, "2" )
+							reference( IndexedEntity.NAME, "1" ),
+							reference( IndexedEntity.NAME, "2" )
 					)
 			);
 			List<IndexedEntity> result = query.getResultList();
@@ -162,11 +161,11 @@ public class ToJpaIT {
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery( createSimpleQuery( searchSession ) );
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME ),
 					b -> { },
 					StubSearchWorkBehavior.of(
 							1L,
-							reference( IndexedEntity.INDEX, "1" )
+							reference( IndexedEntity.NAME, "1" )
 					)
 			);
 			IndexedEntity result = query.getSingleResult();
@@ -175,7 +174,7 @@ public class ToJpaIT {
 					.isEqualTo( entityManager.getReference( IndexedEntity.class, 1 ) );
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME ),
 					b -> { },
 					StubSearchWorkBehavior.empty()
 			);
@@ -187,12 +186,12 @@ public class ToJpaIT {
 			backendMock.verifyExpectationsMet();
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME ),
 					b -> { },
 					StubSearchWorkBehavior.of(
 							2L,
-							reference( IndexedEntity.INDEX, "1" ),
-							reference( IndexedEntity.INDEX, "2" )
+							reference( IndexedEntity.NAME, "1" ),
+							reference( IndexedEntity.NAME, "2" )
 					)
 			);
 			SubTest.expectException( () -> {
@@ -203,12 +202,12 @@ public class ToJpaIT {
 			backendMock.verifyExpectationsMet();
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME ),
 					b -> { },
 					StubSearchWorkBehavior.of(
 							2L,
-							reference( IndexedEntity.INDEX, "1" ),
-							reference( IndexedEntity.INDEX, "1" )
+							reference( IndexedEntity.NAME, "1" ),
+							reference( IndexedEntity.NAME, "1" )
 					)
 			);
 			result = query.getSingleResult();
@@ -234,7 +233,7 @@ public class ToJpaIT {
 			assertThat( query.getMaxResults() ).isEqualTo( 2 );
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME ),
 					b -> b
 							.offset( 3 )
 							.limit( 2 ),
@@ -259,7 +258,7 @@ public class ToJpaIT {
 			SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME ),
 					b -> b.failAfter( 2, TimeUnit.SECONDS ),
 					StubSearchWorkBehavior.failing( () -> timeoutException )
 			);
@@ -283,7 +282,7 @@ public class ToJpaIT {
 			SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME ),
 					b -> b.failAfter( 200, TimeUnit.MILLISECONDS ),
 					StubSearchWorkBehavior.failing( () -> timeoutException )
 			);
@@ -312,7 +311,7 @@ public class ToJpaIT {
 			SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME ),
 					b -> b.failAfter( 200, TimeUnit.MILLISECONDS ),
 					StubSearchWorkBehavior.failing( () -> timeoutException )
 			);
@@ -365,12 +364,11 @@ public class ToJpaIT {
 				.toQuery();
 	}
 
-	@Entity
-	@Table(name = "indexed")
-	@Indexed(index = IndexedEntity.INDEX)
+	@Entity(name = IndexedEntity.NAME)
+	@Indexed(index = IndexedEntity.NAME)
 	public static class IndexedEntity {
 
-		public static final String INDEX = "IndexedEntity";
+		public static final String NAME = "indexed";
 
 		@Id
 		private Integer id;

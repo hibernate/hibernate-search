@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.lowlevel.query.impl.IndexNameQuery;
+import org.hibernate.search.backend.lucene.lowlevel.query.impl.MappedTypeNameQuery;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -80,7 +80,7 @@ class LuceneExplainWork implements LuceneReadWork<Explanation> {
 	private Query createExplainedDocumentQuery(LuceneReadWorkExecutionContext context) {
 		BooleanQuery.Builder builder = new BooleanQuery.Builder()
 				.add( new TermQuery( new Term( LuceneFields.idFieldName(), explainedDocumentId ) ), BooleanClause.Occur.FILTER )
-				.add( new IndexNameQuery( context.getIndexReaderMetadataResolver(), explainedDocumentIndexName ), BooleanClause.Occur.FILTER );
+				.add( new MappedTypeNameQuery( context.getIndexReaderMetadataResolver(), explainedDocumentIndexName ), BooleanClause.Occur.FILTER );
 		if ( explainedDocumentFilter != null ) {
 			builder.add( explainedDocumentFilter, BooleanClause.Occur.FILTER );
 		}

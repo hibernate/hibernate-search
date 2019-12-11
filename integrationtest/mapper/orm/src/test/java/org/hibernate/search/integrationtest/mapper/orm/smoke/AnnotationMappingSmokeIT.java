@@ -23,7 +23,6 @@ import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.OneToMany;
-import javax.persistence.Table;
 
 import org.assertj.core.api.Assertions;
 import org.hibernate.SessionFactory;
@@ -67,11 +66,11 @@ public class AnnotationMappingSmokeIT {
 
 	@Before
 	public void setup() {
-		backendMock.expectSchema( OtherIndexedEntity.INDEX, b -> b
+		backendMock.expectSchema( OtherIndexedEntity.NAME, b -> b
 				.field( "numeric", Integer.class )
 				.field( "numericAsString", String.class )
 		);
-		backendMock.expectSchema( YetAnotherIndexedEntity.INDEX, b -> b
+		backendMock.expectSchema( YetAnotherIndexedEntity.NAME, b -> b
 				.objectField( "customBridgeOnProperty", b2 -> b2
 						.field( "date", LocalDate.class )
 						.field( "text", String.class )
@@ -94,7 +93,7 @@ public class AnnotationMappingSmokeIT {
 						)
 				)
 		);
-		backendMock.expectSchema( IndexedEntity.INDEX, b -> b
+		backendMock.expectSchema( IndexedEntity.NAME, b -> b
 				.objectField( "customBridgeOnClass", b2 -> b2
 						.field( "date", LocalDate.class )
 						.field( "text", String.class )
@@ -185,7 +184,7 @@ public class AnnotationMappingSmokeIT {
 			session.persist( entity5 );
 			session.persist( entity6 );
 
-			backendMock.expectWorks( IndexedEntity.INDEX )
+			backendMock.expectWorks( IndexedEntity.NAME )
 					.add( "2", b -> b
 							.field( "myLocalDateField", entity2.getLocalDate() )
 							.field( "myTextField", entity2.getText() )
@@ -253,13 +252,13 @@ public class AnnotationMappingSmokeIT {
 							)
 					)
 					.processedThenExecuted();
-			backendMock.expectWorks( OtherIndexedEntity.INDEX )
+			backendMock.expectWorks( OtherIndexedEntity.NAME )
 					.add( "4", b -> b
 							.field( "numeric", entity4.getNumeric() )
 							.field( "numericAsString", String.valueOf( entity4.getNumeric() ) )
 					)
 					.processedThenExecuted();
-			backendMock.expectWorks( YetAnotherIndexedEntity.INDEX )
+			backendMock.expectWorks( YetAnotherIndexedEntity.NAME )
 					.add( "5", b -> b
 							.field( "myLocalDateField", entity5.getLocalDate() )
 							.field( "numeric", entity5.getNumeric() )
@@ -315,14 +314,14 @@ public class AnnotationMappingSmokeIT {
 					.toQuery();
 
 			backendMock.expectSearchObjects(
-					Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ),
+					Arrays.asList( IndexedEntity.NAME, YetAnotherIndexedEntity.NAME ),
 					b -> b
 							.offset( 3 )
 							.limit( 2 ),
 					StubSearchWorkBehavior.of(
 							6L,
-							reference( IndexedEntity.INDEX, "0" ),
-							reference( YetAnotherIndexedEntity.INDEX, "1" )
+							reference( IndexedEntity.NAME, "0" ),
+							reference( YetAnotherIndexedEntity.NAME, "1" )
 					)
 			);
 
@@ -334,7 +333,7 @@ public class AnnotationMappingSmokeIT {
 							session.getReference( YetAnotherIndexedEntity.class, 1 )
 					);
 
-			backendMock.expectCount( Arrays.asList( IndexedEntity.INDEX, YetAnotherIndexedEntity.INDEX ), 6L );
+			backendMock.expectCount( Arrays.asList( IndexedEntity.NAME, YetAnotherIndexedEntity.NAME ), 6L );
 
 			long resultSize = query.fetchTotalHitCount();
 			backendMock.verifyExpectationsMet();
@@ -369,13 +368,12 @@ public class AnnotationMappingSmokeIT {
 		}
 	}
 
-	@Entity
-	@Table(name = "indexed")
-	@Indexed(index = IndexedEntity.INDEX)
+	@Entity(name = IndexedEntity.NAME)
+	@Indexed(index = IndexedEntity.NAME)
 	@CustomTypeBinding(objectName = "customBridgeOnClass")
 	public static class IndexedEntity extends ParentIndexedEntity {
 
-		public static final String INDEX = "IndexedEntity";
+		public static final String NAME = "indexed";
 
 		@Id
 		private Integer id;
@@ -435,12 +433,11 @@ public class AnnotationMappingSmokeIT {
 		}
 	}
 
-	@Entity
-	@Table(name = "other")
-	@Indexed(index = OtherIndexedEntity.INDEX)
+	@Entity(name = OtherIndexedEntity.NAME)
+	@Indexed(index = OtherIndexedEntity.NAME)
 	public static class OtherIndexedEntity {
 
-		public static final String INDEX = "OtherIndexedEntity";
+		public static final String NAME = "other";
 
 		@Id
 		private Integer id;
@@ -469,12 +466,11 @@ public class AnnotationMappingSmokeIT {
 
 	}
 
-	@Entity
-	@Table(name = "yetanother")
-	@Indexed(index = YetAnotherIndexedEntity.INDEX)
+	@Entity(name = YetAnotherIndexedEntity.NAME)
+	@Indexed(index = YetAnotherIndexedEntity.NAME)
 	public static class YetAnotherIndexedEntity extends ParentIndexedEntity {
 
-		public static final String INDEX = "YetAnotherIndexedEntity";
+		public static final String NAME = "yetanother";
 
 		@Id
 		private Integer id;

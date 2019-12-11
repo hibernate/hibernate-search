@@ -23,15 +23,12 @@ import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 
 class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<E>
 		implements HibernateOrmSessionIndexedTypeContext<E>, HibernateOrmScopeIndexedTypeContext<E> {
-	private final String indexName;
 	private final boolean documentIdIsEntityId;
 	private final EntityLoaderFactory loaderFactory;
 	private final IdentifierMapping identifierMapping;
 
 	private HibernateOrmIndexedTypeContext(Builder<E> builder, SessionFactoryImplementor sessionFactory) {
 		super( sessionFactory, builder.typeIdentifier, builder.jpaEntityName, builder.hibernateOrmEntityName );
-
-		this.indexName = builder.indexName;
 
 		if ( getEntityPersister().getIdentifierPropertyName().equals( builder.documentIdSourcePropertyName ) ) {
 			documentIdIsEntityId = true;
@@ -52,10 +49,6 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 		}
 
 		this.identifierMapping = builder.identifierMapping;
-	}
-
-	public String getIndexName() {
-		return indexName;
 	}
 
 	@Override
@@ -85,18 +78,15 @@ class HibernateOrmIndexedTypeContext<E> extends AbstractHibernateOrmTypeContext<
 		private final PojoRawTypeIdentifier<E> typeIdentifier;
 		private final String jpaEntityName;
 		private final String hibernateOrmEntityName;
-		private final String indexName;
 
 		private String documentIdSourcePropertyName;
 		private ValueReadHandle<?> documentIdSourcePropertyHandle;
 		private IdentifierMapping identifierMapping;
 
-		Builder(PojoRawTypeIdentifier<E> typeIdentifier, String jpaEntityName, String hibernateOrmEntityName,
-				String indexName) {
+		Builder(PojoRawTypeIdentifier<E> typeIdentifier, String jpaEntityName, String hibernateOrmEntityName) {
 			this.typeIdentifier = typeIdentifier;
 			this.jpaEntityName = jpaEntityName;
 			this.hibernateOrmEntityName = hibernateOrmEntityName;
-			this.indexName = indexName;
 		}
 
 		@Override

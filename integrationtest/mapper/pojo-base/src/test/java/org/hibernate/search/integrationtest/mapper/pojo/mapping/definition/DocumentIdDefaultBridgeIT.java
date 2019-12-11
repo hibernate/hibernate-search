@@ -77,17 +77,19 @@ public class DocumentIdDefaultBridgeIT<I> {
 		Capture<StubIndexSchemaNode> schemaCapture1 = Capture.newInstance();
 		Capture<StubIndexSchemaNode> schemaCapture2 = Capture.newInstance();
 		backendMock.expectSchema(
-				DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_INDEX_NAME,
+				DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME,
 				b -> { },
 				schemaCapture1
 		);
 		backendMock.expectSchema(
-				DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_INDEX_NAME,
+				DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME,
 				b -> { },
 				schemaCapture2
 		);
 		mapping = setupHelper.start()
-				.setup( expectations.getTypeWithIdentifierBridge1(), expectations.getTypeWithIdentifierBridge2() );
+				.withAnnotatedEntityType( expectations.getTypeWithIdentifierBridge1(), DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME )
+				.withAnnotatedEntityType( expectations.getTypeWithIdentifierBridge2(), DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME )
+				.setup();
 		backendMock.verifyExpectationsMet();
 		index1RootSchemaNode = schemaCapture1.getValue();
 		index2RootSchemaNode = schemaCapture2.getValue();
@@ -102,7 +104,7 @@ public class DocumentIdDefaultBridgeIT<I> {
 			}
 
 			BackendMock.DocumentWorkCallListContext expectationSetter = backendMock.expectWorks(
-					DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_INDEX_NAME
+					DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME
 			);
 			for ( String expectedDocumentIdentifierValue : expectations.getDocumentIdentifierValues() ) {
 				expectationSetter.add(
@@ -123,13 +125,13 @@ public class DocumentIdDefaultBridgeIT<I> {
 				I entityIdentifierValue = entityIdentifierIterator.next();
 				backendMock.expectSearchReferences(
 						Collections.singletonList(
-								DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_INDEX_NAME ),
+								DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME ),
 						b -> {
 						},
 						StubSearchWorkBehavior.of(
 								1L,
 								StubBackendUtils.reference(
-										DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_INDEX_NAME,
+										DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME,
 										documentIdentifierValue
 								)
 						)
@@ -141,8 +143,9 @@ public class DocumentIdDefaultBridgeIT<I> {
 						.toQuery();
 
 				assertThat( query.fetchAll().getHits() )
-						.containsExactly( EntityReferenceImpl.withDefaultName(
+						.containsExactly( EntityReferenceImpl.withName(
 								expectations.getTypeWithIdentifierBridge1(),
+								DefaultIdentifierBridgeExpectations.TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME,
 								entityIdentifierValue
 						) );
 			}

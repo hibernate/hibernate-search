@@ -154,8 +154,8 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	}
 
 	@Override
-	public String getHibernateSearchIndexName() {
-		return hibernateSearchIndexName;
+	public String getMappedTypeName() {
+		return model.getMappedTypeName();
 	}
 
 	@Override

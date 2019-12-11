@@ -266,7 +266,9 @@ public class SearchSetupHelper implements TestRule {
 			this.rawIndexName = rawIndexName;
 			this.mappingContributor = mappingContributor;
 			this.listener = listener;
-			this.typeName = rawIndexName + "_Type";
+			// Use the index name for the type name by default.
+			// Tests are easier to write if we can just have one constant for the index name.
+			this.typeName = rawIndexName;
 			this.backendName = null;
 		}
 

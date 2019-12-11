@@ -81,7 +81,7 @@ public class PrimitiveCharacterPropertyTypeDescriptor extends PropertyTypeDescri
 		} );
 	}
 
-	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_INDEX_NAME)
+	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_1_NAME)
 	public static class TypeWithValueBridge1 {
 		int id;
 		char myProperty;
@@ -95,7 +95,7 @@ public class PrimitiveCharacterPropertyTypeDescriptor extends PropertyTypeDescri
 		}
 	}
 
-	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_INDEX_NAME)
+	@Indexed(index = DefaultValueBridgeExpectations.TYPE_WITH_VALUE_BRIDGE_2_NAME)
 	public static class TypeWithValueBridge2 {
 		int id;
 		char myProperty;

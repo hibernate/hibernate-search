@@ -9,8 +9,8 @@ package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expec
 import java.util.List;
 
 public interface DefaultIdentifierBridgeExpectations<I> {
-	String TYPE_WITH_IDENTIFIER_BRIDGE_1_INDEX_NAME = "TypeWithIdentifierBridge1IndexName";
-	String TYPE_WITH_IDENTIFIER_BRIDGE_2_INDEX_NAME = "TypeWithIdentifierBridge2IndexName";
+	String TYPE_WITH_IDENTIFIER_BRIDGE_1_NAME = "TypeWithIdentifierBridge1Name";
+	String TYPE_WITH_IDENTIFIER_BRIDGE_2_NAME = "TypeWithIdentifierBridge2Name";
 
 	List<I> getEntityIdentifierValues();
 

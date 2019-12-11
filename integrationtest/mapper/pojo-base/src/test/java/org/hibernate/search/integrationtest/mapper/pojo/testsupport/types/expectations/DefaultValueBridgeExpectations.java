@@ -9,8 +9,8 @@ package org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expec
 import java.util.List;
 
 public interface DefaultValueBridgeExpectations<V, F> {
-	String TYPE_WITH_VALUE_BRIDGE_1_INDEX_NAME = "TypeWithValueBridge1IndexName";
-	String TYPE_WITH_VALUE_BRIDGE_2_INDEX_NAME = "TypeWithValueBridge2IndexName";
+	String TYPE_WITH_VALUE_BRIDGE_1_NAME = "TypeWithValueBridge1Name";
+	String TYPE_WITH_VALUE_BRIDGE_2_NAME = "TypeWithValueBridge2Name";
 	String TYPE_WITH_VALUE_BRIDGE_FIELD_NAME = "myProperty";
 	String TYPE_WITH_VALUE_BRIDGE_FIELD_INDEXNULLAS_NAME = "indexNullAsProperty";
 

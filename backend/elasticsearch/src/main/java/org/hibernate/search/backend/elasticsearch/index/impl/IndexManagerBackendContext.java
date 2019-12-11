@@ -55,7 +55,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	private final SearchProjectionBackendContext searchProjectionBackendContext;
 
 	public IndexManagerBackendContext(EventContext eventContext, ElasticsearchLink link, Gson userFacingGson,
-			Function<String, String> indexNameConverter,
+			Function<String, String> mappedTypeNameResolver,
 			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestratorProvider orchestratorProvider,
 			ElasticsearchWorkOrchestrator queryOrchestrator) {
@@ -67,7 +67,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		this.queryOrchestrator = queryOrchestrator;
 
 		this.documentReferenceExtractionHelper =
-				new DocumentReferenceExtractionHelper( indexNameConverter, multiTenancyStrategy.getIdProjectionExtractionHelper() );
+				new DocumentReferenceExtractionHelper( mappedTypeNameResolver, multiTenancyStrategy.getIdProjectionExtractionHelper() );
 		this.searchProjectionBackendContext = new SearchProjectionBackendContext(
 				documentReferenceExtractionHelper
 		);

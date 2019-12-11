@@ -110,10 +110,10 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 
 	@Override
 	public void openIndexReaders(Set<String> routingKeys, DirectoryReaderCollector readerCollector) throws IOException {
-		String indexName = getIndexName();
+		String mappedTypeName = model.getMappedTypeName();
 		Collection<Shard> enabledShards = toShards( routingKeys );
 		for ( Shard shard : enabledShards ) {
-			readerCollector.collect( indexName, shard.openReader() );
+			readerCollector.collect( mappedTypeName, shard.openReader() );
 		}
 	}
 
