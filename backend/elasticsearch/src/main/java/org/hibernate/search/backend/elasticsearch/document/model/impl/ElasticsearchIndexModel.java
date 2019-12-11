@@ -21,6 +21,7 @@ public class ElasticsearchIndexModel {
 
 	private final String hibernateSearchIndexName;
 	private final URLEncodedString elasticsearchIndexName;
+	private final String mappedTypeName;
 	private final RootTypeMapping mapping;
 	private final IndexSettings settings;
 
@@ -30,12 +31,14 @@ public class ElasticsearchIndexModel {
 
 	public ElasticsearchIndexModel(String hibernateSearchIndexName,
 			URLEncodedString elasticsearchIndexName,
+			String mappedTypeName,
 			ElasticsearchIndexSettingsBuilder settingsBuilder,
 			RootTypeMapping mapping, ToDocumentIdentifierValueConverter<?> idDslConverter,
 			Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes,
 			Map<String, ElasticsearchIndexSchemaFieldNode<?>> fieldNodes) {
 		this.hibernateSearchIndexName = hibernateSearchIndexName;
 		this.elasticsearchIndexName = elasticsearchIndexName;
+		this.mappedTypeName = mappedTypeName;
 		this.settings = settingsBuilder.build();
 		this.idDslConverter = idDslConverter;
 		this.objectNodes = objectNodes;
@@ -49,6 +52,10 @@ public class ElasticsearchIndexModel {
 
 	public URLEncodedString getElasticsearchIndexName() {
 		return elasticsearchIndexName;
+	}
+
+	public String getMappedTypeName() {
+		return mappedTypeName;
 	}
 
 	public EventContext getEventContext() {

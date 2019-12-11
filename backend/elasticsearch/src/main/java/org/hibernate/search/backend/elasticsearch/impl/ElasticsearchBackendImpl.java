@@ -165,7 +165,9 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 	@Override
 	public IndexManagerBuilder<ElasticsearchDocumentObjectBuilder> createIndexManagerBuilder(
-			String hibernateSearchIndexName, boolean multiTenancyEnabled, BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
+			String hibernateSearchIndexName,
+			String mappedTypeName, boolean multiTenancyEnabled, BackendBuildContext buildContext,
+			ConfigurationPropertySource propertySource) {
 		if ( multiTenancyEnabled && !multiTenancyStrategy.isMultiTenancySupported() ) {
 			throw log.multiTenancyRequiredButNotSupportedByBackend( hibernateSearchIndexName, eventContext );
 		}
@@ -186,7 +188,8 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		ElasticsearchIndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder =
 				new ElasticsearchIndexSchemaRootNodeBuilder(
 						typeFactoryProvider,
-						indexEventContext
+						indexEventContext,
+						mappedTypeName
 				);
 
 		multiTenancyStrategy.getIndexSchemaRootContributor()

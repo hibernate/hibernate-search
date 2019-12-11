@@ -133,13 +133,14 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 
 	@Override
 	public IndexManagerBuilder<LuceneRootDocumentBuilder> createIndexManagerBuilder(
-			String indexName, boolean multiTenancyEnabled, BackendBuildContext context, ConfigurationPropertySource propertySource) {
+			String indexName, String mappedTypeName,
+			boolean multiTenancyEnabled, BackendBuildContext context, ConfigurationPropertySource propertySource) {
 		if ( multiTenancyEnabled && !multiTenancyStrategy.isMultiTenancySupported() ) {
 			throw log.multiTenancyRequiredButNotSupportedByBackend( indexName, eventContext );
 		}
 
 		LuceneIndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder = new LuceneIndexSchemaRootNodeBuilder(
-				EventContexts.fromIndexName( indexName ), analysisDefinitionRegistry
+				EventContexts.fromIndexName( indexName ), mappedTypeName, analysisDefinitionRegistry
 		);
 
 		/*

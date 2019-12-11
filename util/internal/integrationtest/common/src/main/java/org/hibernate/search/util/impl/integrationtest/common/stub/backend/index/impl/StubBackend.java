@@ -62,8 +62,9 @@ public class StubBackend implements BackendImplementor<StubDocumentElement>, Bac
 	}
 
 	@Override
-	public IndexManagerBuilder<StubDocumentElement> createIndexManagerBuilder(String indexName, boolean isMultiTenancyEnabled, BackendBuildContext context,
+	public IndexManagerBuilder<StubDocumentElement> createIndexManagerBuilder(String indexName,
+			String mappedTypeName, boolean isMultiTenancyEnabled, BackendBuildContext context,
 			ConfigurationPropertySource propertySource) {
-		return new StubIndexManagerBuilder( this, indexName );
+		return new StubIndexManagerBuilder( this, indexName, mappedTypeName );
 	}
 }

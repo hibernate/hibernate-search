@@ -32,13 +32,15 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 		implements IndexSchemaRootNodeBuilder, IndexSchemaBuildContext {
 
 	private final EventContext indexEventContext;
+	private final String mappedTypeName;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
 	private ToDocumentIdentifierValueConverter<?> idDslConverter;
 
 	public LuceneIndexSchemaRootNodeBuilder(EventContext indexEventContext,
-			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry) {
+			String mappedTypeName, LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry) {
 		this.indexEventContext = indexEventContext;
+		this.mappedTypeName = mappedTypeName;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 	}
 
@@ -100,6 +102,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 
 		return new LuceneIndexModel(
 				indexName,
+				mappedTypeName,
 				idDslConverter == null ? new StringToDocumentIdentifierValueConverter() : idDslConverter,
 				objectNodesBuilder,
 				fieldNodesBuilder,

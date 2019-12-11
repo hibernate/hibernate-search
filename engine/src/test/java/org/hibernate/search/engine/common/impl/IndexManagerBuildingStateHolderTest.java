@@ -78,6 +78,7 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		resetAll();
 		EasyMock.expect( backendMock.createIndexManagerBuilder(
 				EasyMock.eq( "myIndex" ),
+				EasyMock.eq( "myType" ),
 				EasyMock.eq( false ),
 				EasyMock.anyObject(),
 				EasyMock.capture( indexPropertySourceCapture )
@@ -86,7 +87,9 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 		EasyMock.expect( indexManagerBuilderMock.getSchemaRootNodeBuilder() )
 				.andStubReturn( indexSchemaRootNodeBuilderMock );
 		replayAll();
-		holder.getIndexManagerBuildingState( Optional.of( "myBackend" ), "myIndex", false );
+		holder.getIndexManagerBuildingState(
+				Optional.of( "myBackend" ), "myIndex", "myType", false
+		);
 		verifyAll();
 
 		// Check that configuration property sources behave as expected

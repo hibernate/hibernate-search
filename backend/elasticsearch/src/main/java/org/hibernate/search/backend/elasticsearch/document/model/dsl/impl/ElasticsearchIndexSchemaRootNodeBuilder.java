@@ -36,13 +36,17 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 	private final EventContext indexEventContext;
 	private final List<IndexSchemaRootContributor> schemaRootContributors = new ArrayList<>();
 
+	private final String mappedTypeName;
+
 	private RoutingType routing = null;
 	private ToDocumentIdentifierValueConverter<?> idDslConverter;
 
 	public ElasticsearchIndexSchemaRootNodeBuilder(ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
-			EventContext indexEventContext) {
+			EventContext indexEventContext,
+			String mappedTypeName) {
 		this.typeFactoryProvider = typeFactoryProvider;
 		this.indexEventContext = indexEventContext;
+		this.mappedTypeName = mappedTypeName;
 	}
 
 	@Override
@@ -105,6 +109,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 		return new ElasticsearchIndexModel(
 				hibernateSearchIndexName,
 				elasticsearchIndexName,
+				mappedTypeName,
 				settingsBuilder,
 				mapping,
 				idDslConverter == null ? new StringToDocumentIdentifierValueConverter() : idDslConverter,
