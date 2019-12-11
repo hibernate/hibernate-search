@@ -217,6 +217,6 @@ public final class ElasticsearchBackendSettings {
 		public static final int DISCOVERY_REFRESH_INTERVAL = 10;
 		public static final boolean LOG_JSON_PRETTY_PRINTING = false;
 		public static final MultiTenancyStrategyName MULTI_TENANCY_STRATEGY = MultiTenancyStrategyName.NONE;
-		public static final TypeNameMappingStrategyName MAPPING_TYPE_NAME_STRATEGY = TypeNameMappingStrategyName.INDEX_NAME;
+		public static final TypeNameMappingStrategyName MAPPING_TYPE_NAME_STRATEGY = TypeNameMappingStrategyName.DISCRIMINATOR;
 	}
 }

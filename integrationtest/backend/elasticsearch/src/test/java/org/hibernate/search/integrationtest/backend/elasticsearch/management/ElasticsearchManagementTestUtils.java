@@ -6,19 +6,20 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.management;
 
+import static org.hibernate.search.integrationtest.backend.elasticsearch.mapping.ElasticsearchTypeNameMappingTestUtils.discriminatorMappingComplete;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.mapping.ElasticsearchTypeNameMappingTestUtils.discriminatorMappingOmitDefaults;
+
 class ElasticsearchManagementTestUtils {
 
 	private ElasticsearchManagementTestUtils() {
 	}
 
 	static String simpleMappingForInitialization(String properties) {
-		// TODO HSEARCH-3765 add type metadata
-		return simpleMapping( "", properties );
+		return simpleMapping( "'__HSEARCH_type': " + discriminatorMappingComplete(), properties );
 	}
 
 	static String simpleMappingForExpectations(String properties) {
-		// TODO HSEARCH-3765 add type metadata
-		return simpleMapping( "", properties );
+		return simpleMapping( "'__HSEARCH_type': " + discriminatorMappingOmitDefaults(), properties );
 	}
 
 	private static String simpleMapping(String metadataMapping, String otherProperties) {
@@ -37,8 +38,7 @@ class ElasticsearchManagementTestUtils {
 	}
 
 	static String defaultMetadataMappingForInitialization() {
-		// TODO HSEARCH-3765 add type metadata
-		return "";
+		return "'__HSEARCH_type': " + discriminatorMappingComplete().toString();
 	}
 
 	static String defaultMetadataMappingAndCommaForInitialization() {

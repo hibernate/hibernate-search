@@ -41,7 +41,7 @@ public class ElasticsearchTypeNameMappingSchemaIT {
 	@Parameterized.Parameters(name = "{0}")
 	public static Object[][] configurations() {
 		return new Object[][] {
-				{ null, mappingWithoutAnyProperty() },
+				{ null, mappingWithDiscriminatorProperty( "__HSEARCH_type" ) },
 				{ "index-name", mappingWithoutAnyProperty() },
 				{ "discriminator", mappingWithDiscriminatorProperty( "__HSEARCH_type" ) }
 		};
