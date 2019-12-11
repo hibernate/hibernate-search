@@ -210,6 +210,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				indexedTypeMetadata.getBackendName(),
 				indexedTypeMetadata.getIndexName()
 						.orElse( entityName ),
+				entityName,
 				multiTenancyEnabled
 		);
 		PojoIndexedTypeManagerBuilder<?, ?> builder = createIndexedTypeManagerBuilder(

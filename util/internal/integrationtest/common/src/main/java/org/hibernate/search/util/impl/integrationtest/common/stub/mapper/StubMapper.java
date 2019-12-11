@@ -104,6 +104,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 					this,
 					Optional.ofNullable( backendName ),
 					indexName,
+					type.getName(),
 					multiTenancyEnabled
 			);
 			indexManagerBuilders.put( (StubTypeModel) type, indexManagerBuilder );

@@ -21,6 +21,8 @@ public class LuceneIndexModel implements AutoCloseable {
 
 	private final String indexName;
 
+	private final String mappedTypeName;
+
 	private final ToDocumentIdentifierValueConverter<?> idDslConverter;
 
 	private final Map<String, LuceneIndexSchemaObjectNode> objectNodes;
@@ -32,12 +34,14 @@ public class LuceneIndexModel implements AutoCloseable {
 	private final FacetsConfig facetsConfig;
 
 	public LuceneIndexModel(String indexName,
+			String mappedTypeName,
 			ToDocumentIdentifierValueConverter<?> idDslConverter,
 			Map<String, LuceneIndexSchemaObjectNode> objectNodesBuilder,
 			Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodesBuilder,
 			ScopedAnalyzer scopedAnalyzer,
 			FacetsConfig facetsConfig) {
 		this.indexName = indexName;
+		this.mappedTypeName = mappedTypeName;
 		this.idDslConverter = idDslConverter;
 		this.fieldNodes = CollectionHelper.toImmutableMap( fieldNodesBuilder );
 		this.objectNodes = CollectionHelper.toImmutableMap( objectNodesBuilder );
@@ -52,6 +56,10 @@ public class LuceneIndexModel implements AutoCloseable {
 
 	public String getIndexName() {
 		return indexName;
+	}
+
+	public String getMappedTypeName() {
+		return mappedTypeName;
 	}
 
 	public EventContext getEventContext() {

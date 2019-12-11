@@ -85,9 +85,9 @@ class IndexManagerBuildingStateHolder {
 	}
 
 	IndexManagerBuildingState<?> getIndexManagerBuildingState(Optional<String> backendName, String indexName,
-			boolean multiTenancyEnabled) {
+			String mappedTypeName, boolean multiTenancyEnabled) {
 		return getBackend( backendName.orElseGet( this::getDefaultBackendName ) )
-				.getIndexManagerBuildingState( indexName, multiTenancyEnabled );
+				.getIndexManagerBuildingState( indexName, mappedTypeName, multiTenancyEnabled );
 	}
 
 	private BackendInitialBuildState<?> getBackend(String backendName) {
@@ -175,14 +175,14 @@ class IndexManagerBuildingStateHolder {
 		}
 
 		IndexManagerInitialBuildState<?> getIndexManagerBuildingState(
-				String indexName, boolean multiTenancyEnabled) {
+				String indexName, String mappedTypeName, boolean multiTenancyEnabled) {
 			IndexManagerInitialBuildState<?> state = indexManagerBuildStateByName.get( indexName );
 			if ( state == null ) {
 				ConfigurationPropertySource indexPropertySource =
 						EngineConfigurationUtils.getIndex( backendPropertySource, defaultIndexPropertySource, indexName );
 
 				IndexManagerBuilder<D> builder = backend.createIndexManagerBuilder(
-						indexName, multiTenancyEnabled, backendBuildContext, indexPropertySource
+						indexName, mappedTypeName, multiTenancyEnabled, backendBuildContext, indexPropertySource
 				);
 				IndexSchemaRootNodeBuilder schemaRootNodeBuilder = builder.getSchemaRootNodeBuilder();
 

@@ -52,6 +52,10 @@ public interface BackendImplementor<D extends DocumentElement> {
 	 * @param indexName The name of the index from the point of view of Hibernate Search.
 	 * A slightly different name may be used by the backend internally,
 	 * but {@code indexName} is the one that will appear everywhere the index is mentioned to the user.
+	 * @param mappedTypeName The name of the type mapped to this index.
+	 * This is the type name that will be assigned to search query hits for this index,
+	 * allowing the mapper to resolve the type of each hit in multi-index searches.
+	 * Each index is mapped to one and only one type.
 	 * @param multiTenancyEnabled {@code true} if multi-tenancy is enabled for this index, {@code false} otherwise.
 	 * @param context The build context
 	 * @param propertySource A configuration property source, appropriately masked so that the backend
@@ -61,7 +65,8 @@ public interface BackendImplementor<D extends DocumentElement> {
 	 * are reserved for use by the engine.
 	 * @return A builder for index managers targeting this backend.
 	 */
-	IndexManagerBuilder<D> createIndexManagerBuilder(String indexName, boolean multiTenancyEnabled, BackendBuildContext context,
+	IndexManagerBuilder<D> createIndexManagerBuilder(String indexName,
+			String mappedTypeName, boolean multiTenancyEnabled, BackendBuildContext context,
 			ConfigurationPropertySource propertySource);
 
 }
