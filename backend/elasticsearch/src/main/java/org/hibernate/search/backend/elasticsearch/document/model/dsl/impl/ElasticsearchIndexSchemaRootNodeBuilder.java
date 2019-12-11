@@ -6,7 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
@@ -17,7 +19,6 @@ import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.D
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RoutingType;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
-import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactory;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -33,16 +34,15 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 
 	private final ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider;
 	private final EventContext indexEventContext;
-	private final MultiTenancyStrategy multiTenancyStrategy;
+	private final List<IndexSchemaRootContributor> schemaRootContributors = new ArrayList<>();
 
 	private RoutingType routing = null;
 	private ToDocumentIdentifierValueConverter<?> idDslConverter;
 
 	public ElasticsearchIndexSchemaRootNodeBuilder(ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
-			EventContext indexEventContext, MultiTenancyStrategy multiTenancyStrategy) {
+			EventContext indexEventContext) {
 		this.typeFactoryProvider = typeFactoryProvider;
 		this.indexEventContext = indexEventContext;
-		this.multiTenancyStrategy = multiTenancyStrategy;
 	}
 
 	@Override
@@ -66,6 +66,10 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 		this.idDslConverter = idDslConverter;
 	}
 
+	public void addSchemaRootContributor(IndexSchemaRootContributor schemaRootContributor) {
+		schemaRootContributors.add( schemaRootContributor );
+	}
+
 	public ElasticsearchIndexModel build(String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName,
 			ElasticsearchIndexSettingsBuilder settingsBuilder) {
 		RootTypeMapping mapping = new RootTypeMapping();
@@ -73,7 +77,9 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 			mapping.setRouting( routing );
 		}
 
-		multiTenancyStrategy.contributeToMapping( mapping );
+		for ( IndexSchemaRootContributor schemaRootContributor : schemaRootContributors ) {
+			schemaRootContributor.contribute( mapping );
+		}
 
 		// TODO HSEARCH-3273 allow to configure this, both at index level (configuration properties) and at field level (ElasticsearchExtension)
 		mapping.setDynamic( DynamicType.STRICT );

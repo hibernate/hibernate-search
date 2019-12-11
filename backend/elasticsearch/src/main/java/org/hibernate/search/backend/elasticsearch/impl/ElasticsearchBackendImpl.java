@@ -186,9 +186,11 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		ElasticsearchIndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder =
 				new ElasticsearchIndexSchemaRootNodeBuilder(
 						typeFactoryProvider,
-						indexEventContext,
-						multiTenancyStrategy
+						indexEventContext
 				);
+
+		multiTenancyStrategy.getIndexSchemaRootContributor()
+				.ifPresent( indexSchemaRootNodeBuilder::addSchemaRootContributor );
 
 		ElasticsearchIndexSettingsBuilder settingsBuilder =
 				new ElasticsearchIndexSettingsBuilder( analysisDefinitionRegistry );

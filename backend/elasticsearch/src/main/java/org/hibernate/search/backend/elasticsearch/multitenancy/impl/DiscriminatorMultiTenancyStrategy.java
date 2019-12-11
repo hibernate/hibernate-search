@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexSchemaRootContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
@@ -38,6 +39,9 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 	private final DiscriminatorMultiTenancyDocumentMetadataContributor documentMetadataContributor =
 			new DiscriminatorMultiTenancyDocumentMetadataContributor();
 
+	private final DiscriminatorMultiTenancyIndexSchemaRootContributor schemaRootContributor =
+			new DiscriminatorMultiTenancyIndexSchemaRootContributor();
+
 	private final DiscriminatorMultiTenancyIdProjectionExtractionHelper idProjectionExtractionHelper =
 			new DiscriminatorMultiTenancyIdProjectionExtractionHelper();
 
@@ -47,20 +51,8 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 	}
 
 	@Override
-	public void contributeToMapping(RootTypeMapping rootTypeMapping) {
-		PropertyMapping idPropertyMapping = new PropertyMapping();
-		idPropertyMapping.setType( DataTypes.KEYWORD );
-		idPropertyMapping.setIndex( false );
-		idPropertyMapping.setStore( false );
-		idPropertyMapping.setDocValues( true );
-		rootTypeMapping.addProperty( ElasticsearchFields.idFieldName(), idPropertyMapping );
-
-		PropertyMapping tenantIdPropertyMapping = new PropertyMapping();
-		tenantIdPropertyMapping.setType( DataTypes.KEYWORD );
-		tenantIdPropertyMapping.setIndex( true );
-		tenantIdPropertyMapping.setStore( false );
-		tenantIdPropertyMapping.setDocValues( true );
-		rootTypeMapping.addProperty( ElasticsearchFields.tenantIdFieldName(), tenantIdPropertyMapping );
+	public Optional<IndexSchemaRootContributor> getIndexSchemaRootContributor() {
+		return Optional.of( schemaRootContributor );
 	}
 
 	@Override
@@ -98,6 +90,25 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 	public void checkTenantId(String tenantId, EventContext backendContext) {
 		if ( tenantId == null ) {
 			throw log.multiTenancyEnabledButNoTenantIdProvided( backendContext );
+		}
+	}
+
+	private static class DiscriminatorMultiTenancyIndexSchemaRootContributor implements IndexSchemaRootContributor {
+		@Override
+		public void contribute(RootTypeMapping rootTypeMapping) {
+			PropertyMapping idPropertyMapping = new PropertyMapping();
+			idPropertyMapping.setType( DataTypes.KEYWORD );
+			idPropertyMapping.setIndex( false );
+			idPropertyMapping.setStore( false );
+			idPropertyMapping.setDocValues( true );
+			rootTypeMapping.addProperty( ElasticsearchFields.idFieldName(), idPropertyMapping );
+
+			PropertyMapping tenantIdPropertyMapping = new PropertyMapping();
+			tenantIdPropertyMapping.setType( DataTypes.KEYWORD );
+			tenantIdPropertyMapping.setIndex( true );
+			tenantIdPropertyMapping.setStore( false );
+			tenantIdPropertyMapping.setDocValues( true );
+			rootTypeMapping.addProperty( ElasticsearchFields.tenantIdFieldName(), tenantIdPropertyMapping );
 		}
 	}
 
