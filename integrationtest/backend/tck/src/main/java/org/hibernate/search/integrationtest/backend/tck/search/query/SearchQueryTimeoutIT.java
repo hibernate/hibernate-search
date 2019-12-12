@@ -121,7 +121,7 @@ public class SearchQueryTimeoutIT {
 		SearchResult<DocumentReference> result = query.fetchAll();
 
 		assertThat( result.getTotalHitCount() ).isLessThan( ROUNDS * 3 );
-		assertThat( result.getTook() ).isGreaterThan( Duration.ofNanos( 1L ) );
+		assertThat( result.getTook() ).isNotNull(); // May be 0 due to low resolution
 		assertThat( result.isTimedOut() ).isTrue();
 	}
 

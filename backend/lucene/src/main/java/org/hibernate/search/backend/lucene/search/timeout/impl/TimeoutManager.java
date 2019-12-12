@@ -42,13 +42,14 @@ public final class TimeoutManager {
 	public TimeoutManager(TimingSource timingSource, Query query) {
 		this.timingSource = timingSource;
 		this.query = query;
+		timingSource.ensureInitialized();
 	}
 
 	/**
 	 * we start counting from this method call (if needed)
 	 */
 	public void start() {
-		this.start = System.nanoTime();
+		this.start = timingSource.getMonotonicTimeEstimate();
 	}
 
 	/**
@@ -61,22 +62,15 @@ public final class TimeoutManager {
 			return null;
 		}
 		else {
-			final long elapsedTimeNanos = getElapsedTimeInNanoseconds();
-			long timeLeftNanos = timeout - elapsedTimeNanos;
-			long timeLeftMillis;
-			if ( timeLeftNanos % 1_000_000 == 0 ) {
-				timeLeftMillis = timeLeftNanos / 1_000_000;
-			}
-			else {
-				timeLeftMillis = ( timeLeftNanos / 1_000_000 ) + 1;
-			}
-			if ( timeLeftMillis <= 0 ) {
+			final long elapsedTime = getElapsedTimeInMilliseconds();
+			long timeLeft = timeout - elapsedTime;
+			if ( timeLeft <= 0 ) {
 				forceTimedOut();
 				// Timed out: don't return a negative number.
 				return 0L;
 			}
 			else {
-				return timeLeftMillis;
+				return timeLeft;
 			}
 		}
 	}
@@ -109,7 +103,7 @@ public final class TimeoutManager {
 	}
 
 	public void setTimeout(long timeout, TimeUnit timeUnit) {
-		this.timeout = timeUnit.toNanos( timeout );
+		this.timeout = timeUnit.toMillis( timeout );
 		//timeout of 0 means no more timeout
 		if ( timeout == 0 ) {
 			stop();
@@ -146,11 +140,11 @@ public final class TimeoutManager {
 	}
 
 	public Duration getTookTime() {
-		return Duration.ofNanos( getElapsedTimeInNanoseconds() );
+		return Duration.ofMillis( getElapsedTimeInMilliseconds() );
 	}
 
-	private long getElapsedTimeInNanoseconds() {
-		return System.nanoTime() - start;
+	private long getElapsedTimeInMilliseconds() {
+		return timingSource.getMonotonicTimeEstimate() - start;
 	}
 }
 
