@@ -34,6 +34,7 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
+import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
@@ -598,7 +599,7 @@ public interface Log extends BasicLogger {
 			LuceneIndexSchemaObjectNode objectNode, LuceneIndexSchemaFieldNode fieldNode, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 107, value = "Query took longer than expected: '%1$s'. Query: '%2$s'.")
-	SearchException timedOut(@FormatWith(DurationFormatter.class) Duration duration, String queryDescription);
+	SearchTimeoutException timedOut(@FormatWith(DurationFormatter.class) Duration duration, String queryDescription);
 
 	@Message(id = ID_OFFSET_2 + 109, value = "Cannot define both 'raise exception' and 'limit fetching' for a timeout event."
 			+ " Please chose one of them.")

@@ -31,6 +31,7 @@ import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.SearchException;
@@ -600,5 +601,5 @@ public interface Log extends BasicLogger {
 	SearchException invalidHostAndPort(String hostAndPort, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_3 + 90, value = "Query took longer than expected. Request: '%1$s'.")
-	SearchException timedOut(ElasticsearchRequest request);
+	SearchTimeoutException timedOut(ElasticsearchRequest request);
 }

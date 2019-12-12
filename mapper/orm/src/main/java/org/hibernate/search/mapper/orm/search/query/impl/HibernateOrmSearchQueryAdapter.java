@@ -17,6 +17,7 @@ import java.util.concurrent.TimeUnit;
 import javax.persistence.FlushModeType;
 import javax.persistence.LockModeType;
 import javax.persistence.Parameter;
+import javax.persistence.QueryTimeoutException;
 import javax.persistence.TemporalType;
 
 import org.hibernate.HibernateException;
@@ -35,6 +36,7 @@ import org.hibernate.query.spi.ScrollableResultsImplementor;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.spi.SearchQueryImplementor;
 import org.hibernate.search.mapper.orm.search.loading.impl.MutableEntityLoadingOptions;
+import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.transform.ResultTransformer;
 import org.hibernate.type.Type;
 
@@ -88,6 +90,9 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 		 */
 		try {
 			return doList();
+		}
+		catch (SearchTimeoutException e) {
+			throw new QueryTimeoutException( e );
 		}
 		catch (QueryException he) {
 			throw new IllegalStateException( he );

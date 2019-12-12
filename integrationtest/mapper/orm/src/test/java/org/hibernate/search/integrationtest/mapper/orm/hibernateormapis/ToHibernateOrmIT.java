@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.QueryTimeoutException;
 import javax.persistence.Table;
 
 import org.hibernate.Session;
@@ -26,6 +27,7 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
@@ -247,7 +249,7 @@ public class ToHibernateOrmIT {
 							.toQuery()
 			);
 
-			SearchException timeoutException = new SearchException( "Timed out" );
+			SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX ),
@@ -258,7 +260,8 @@ public class ToHibernateOrmIT {
 			// Just check that the exception is propagated
 			SubTest.expectException( () -> query.list() )
 					.assertThrown()
-					.isSameAs( timeoutException );
+					.isInstanceOf( QueryTimeoutException.class )
+					.hasCause( timeoutException );
 		} );
 	}
 
@@ -270,7 +273,7 @@ public class ToHibernateOrmIT {
 
 			query.setHint( "javax.persistence.query.timeout", 200 );
 
-			SearchException timeoutException = new SearchException( "Timed out" );
+			SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX ),
@@ -281,7 +284,8 @@ public class ToHibernateOrmIT {
 			// Just check that the exception is propagated
 			SubTest.expectException( () -> query.list() )
 					.assertThrown()
-					.isSameAs( timeoutException );
+					.isInstanceOf( QueryTimeoutException.class )
+					.hasCause( timeoutException );
 		} );
 	}
 
@@ -293,7 +297,7 @@ public class ToHibernateOrmIT {
 
 			query.setHint( "org.hibernate.timeout", 4 );
 
-			SearchException timeoutException = new SearchException( "Timed out" );
+			SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX ),
@@ -304,7 +308,8 @@ public class ToHibernateOrmIT {
 			// Just check that the exception is propagated
 			SubTest.expectException( () -> query.list() )
 					.assertThrown()
-					.isSameAs( timeoutException );
+					.isInstanceOf( QueryTimeoutException.class )
+					.hasCause( timeoutException );
 		} );
 	}
 
@@ -316,7 +321,7 @@ public class ToHibernateOrmIT {
 
 			query.setTimeout( 3 );
 
-			SearchException timeoutException = new SearchException( "Timed out" );
+			SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX ),
@@ -327,7 +332,8 @@ public class ToHibernateOrmIT {
 			// Just check that the exception is propagated
 			SubTest.expectException( () -> query.list() )
 					.assertThrown()
-					.isSameAs( timeoutException );
+					.isInstanceOf( QueryTimeoutException.class )
+					.hasCause( timeoutException );
 		} );
 	}
 
@@ -344,7 +350,7 @@ public class ToHibernateOrmIT {
 
 			query.setHint( "org.hibernate.timeout", 4 );
 
-			SearchException timeoutException = new SearchException( "Timed out" );
+			SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX ),
@@ -355,7 +361,8 @@ public class ToHibernateOrmIT {
 			// Just check that the exception is propagated
 			SubTest.expectException( () -> query.list() )
 					.assertThrown()
-					.isSameAs( timeoutException );
+					.isInstanceOf( QueryTimeoutException.class )
+					.hasCause( timeoutException );
 		} );
 	}
 
@@ -372,7 +379,7 @@ public class ToHibernateOrmIT {
 
 			query.setTimeout( 3 );
 
-			SearchException timeoutException = new SearchException( "Timed out" );
+			SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX ),
@@ -383,7 +390,8 @@ public class ToHibernateOrmIT {
 			// Just check that the exception is propagated
 			SubTest.expectException( () -> query.list() )
 					.assertThrown()
-					.isSameAs( timeoutException );
+					.isInstanceOf( QueryTimeoutException.class )
+					.hasCause( timeoutException );
 		} );
 	}
 
