@@ -67,6 +67,6 @@ final class StubSearchQuery<H> extends AbstractSearchQuery<H, SearchResult<H>>
 
 	@Override
 	public void failAfter(long timeout, TimeUnit timeUnit) {
-
+		workBuilder.failAfter( timeout, timeUnit );
 	}
 }
