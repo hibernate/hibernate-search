@@ -11,9 +11,11 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Query;
+import org.apache.lucene.util.Counter;
 
 /**
  * @author Emmanuel Bernard
@@ -25,9 +27,10 @@ public final class TimeoutManager {
 	public enum Type {
 		NONE,
 		EXCEPTION,
-		LIMIT
+		LIMIT;
 	}
 
+	private final TimingSource timingSource;
 	private final Query query;
 
 	// timeout in nanoseconds
@@ -36,7 +39,8 @@ public final class TimeoutManager {
 	boolean timedOut = false;
 	private Type type;
 
-	public TimeoutManager(Query query) {
+	public TimeoutManager(TimingSource timingSource, Query query) {
+		this.timingSource = timingSource;
 		this.query = query;
 	}
 
@@ -75,6 +79,10 @@ public final class TimeoutManager {
 				return timeLeftMillis;
 			}
 		}
+	}
+
+	public Counter createCounter() {
+		return new LuceneCounterAdapter( timingSource );
 	}
 
 	/**

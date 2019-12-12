@@ -25,7 +25,6 @@ import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchPr
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.lucene.search.extraction.impl.TimeoutCountCollectorManager;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
-import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -49,7 +48,6 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
 	private final LuceneSearchProjection<?, H> rootProjection;
 	private final Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations;
-	private final TimingSource timingSource;
 
 	private TimeoutManager timeoutManager;
 
@@ -57,13 +55,12 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
 			LuceneSearchProjection<?, H> rootProjection,
 			Map<AggregationKey<?>, LuceneSearchAggregation<?>> aggregations,
-			TimeoutManager timeoutManager, TimingSource timingSource) {
+			TimeoutManager timeoutManager) {
 		this.requestContext = requestContext;
 		this.storedFieldVisitor = storedFieldVisitor;
 		this.rootProjection = rootProjection;
 		this.aggregations = aggregations;
 		this.timeoutManager = timeoutManager;
-		this.timingSource = timingSource;
 	}
 
 	@Override
@@ -144,7 +141,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		LuceneCollectorsBuilder luceneCollectorsBuilder = new LuceneCollectorsBuilder(
 				requestContext.getLuceneSort(), storedFieldVisitor.getNestedDocumentPaths(),
 				maxDocs,
-				timeoutManager, timingSource
+				timeoutManager
 		);
 		rootProjection.contributeCollectors( luceneCollectorsBuilder );
 		for ( LuceneSearchAggregation<?> aggregation : aggregations.values() ) {
