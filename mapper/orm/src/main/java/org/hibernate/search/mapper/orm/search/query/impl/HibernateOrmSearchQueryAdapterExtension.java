@@ -12,6 +12,7 @@ import java.util.Optional;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchQueryExtension;
+import org.hibernate.search.engine.search.query.spi.SearchQueryImplementor;
 import org.hibernate.search.mapper.orm.search.loading.context.impl.HibernateOrmLoadingContext;
 
 final class HibernateOrmSearchQueryAdapterExtension<H> implements
@@ -28,7 +29,8 @@ final class HibernateOrmSearchQueryAdapterExtension<H> implements
 		if ( loadingContext instanceof HibernateOrmLoadingContext ) {
 			HibernateOrmLoadingContext<?> castedLoadingContext = (HibernateOrmLoadingContext<?>) loadingContext;
 			return Optional.of( new HibernateOrmSearchQueryAdapter<>(
-					original,
+					// All SearchQuery implementations should implement SearchQueryImplementor
+					(SearchQueryImplementor<H>) original,
 					castedLoadingContext.getSessionImplementor(),
 					castedLoadingContext.getLoadingOptions()
 			) );

@@ -43,13 +43,13 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 		return query.extension( HibernateOrmSearchQueryAdapterExtension.get() );
 	}
 
-	private final SearchQuery<R> delegate;
+	private final SearchQueryImplementor<R> delegate;
 	private final MutableEntityLoadingOptions loadingOptions;
 
 	private Integer firstResult;
 	private Integer maxResults;
 
-	HibernateOrmSearchQueryAdapter(SearchQuery<R> delegate, SessionImplementor sessionImplementor,
+	HibernateOrmSearchQueryAdapter(SearchQueryImplementor<R> delegate, SessionImplementor sessionImplementor,
 			MutableEntityLoadingOptions loadingOptions) {
 		super( sessionImplementor, new ParameterMetadataImpl( null, null ) );
 		this.delegate = delegate;
@@ -189,9 +189,8 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 
 	@Override
 	public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value) {
-		if ( "javax.persistence.query.timeout".equals( hintName ) && value instanceof Long &&
-				delegate instanceof SearchQueryImplementor ) {
-			( (SearchQueryImplementor) delegate ).failAfter( (Long) value, TimeUnit.MILLISECONDS );
+		if ( "javax.persistence.query.timeout".equals( hintName ) && value instanceof Long ) {
+			delegate.failAfter( (Long) value, TimeUnit.MILLISECONDS );
 		}
 		return this;
 	}
@@ -350,9 +349,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 
 	@Override
 	public HibernateOrmSearchQueryAdapter<R> setTimeout(int timeout) {
-		if ( delegate instanceof SearchQueryImplementor ) {
-			( (SearchQueryImplementor) delegate ).failAfter( timeout, TimeUnit.SECONDS );
-		}
+		delegate.failAfter( timeout, TimeUnit.SECONDS );
 		return this;
 	}
 
