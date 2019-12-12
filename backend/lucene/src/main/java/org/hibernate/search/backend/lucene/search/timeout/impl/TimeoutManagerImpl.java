@@ -30,7 +30,6 @@ public class TimeoutManagerImpl implements TimeoutManager {
 	private long start;
 	boolean timedOut = false;
 	private Type type;
-	private boolean partialResults;
 
 	public TimeoutManagerImpl(Query query) {
 		this.query = query;
@@ -42,20 +41,11 @@ public class TimeoutManagerImpl implements TimeoutManager {
 	@Override
 	public void start() {
 		this.start = System.nanoTime();
-		if ( timeout == null ) {
-			return;
-		}
-		this.partialResults = false;
 	}
 
 	@Override
 	public Long getTimeoutLeftInMilliseconds() {
 		return getTimeoutLeft( 1000000 );
-	}
-
-	@Override
-	public Long getTimeoutLeftInSeconds() {
-		return getTimeoutLeft( 1000000000 );
 	}
 
 	private Long getTimeoutLeft(long factor) {
@@ -118,7 +108,6 @@ public class TimeoutManagerImpl implements TimeoutManager {
 	public void stop() {
 		this.timeout = null;
 		this.type = Type.NONE;
-		//don't reset, we need it for the query API even when the manager is stopped.
 	}
 
 	@Override
@@ -133,10 +122,6 @@ public class TimeoutManagerImpl implements TimeoutManager {
 	@Override
 	public void forceTimedOut() {
 		this.timedOut = Boolean.TRUE;
-		if ( type == Type.LIMIT ) {
-			//we stop where we are return what we have
-			this.partialResults = true;
-		}
 	}
 
 	@Override
@@ -153,25 +138,6 @@ public class TimeoutManagerImpl implements TimeoutManager {
 			throw log.raiseExceptionOrLimitFetching();
 		}
 		this.type = Type.LIMIT;
-	}
-
-	@Override
-	public void reactOnQueryTimeoutExceptionWhileExtracting(RuntimeException e) {
-		if ( type == Type.LIMIT ) {
-			//we stop where we are return what we have
-			this.partialResults = true;
-		}
-		else {
-			if ( e == null ) {
-				e = log.timeoutPeriodExceeded( query.toString() );
-			}
-			throw e;
-		}
-	}
-
-	@Override
-	public boolean hasPartialResults() {
-		return partialResults;
 	}
 
 	@Override
