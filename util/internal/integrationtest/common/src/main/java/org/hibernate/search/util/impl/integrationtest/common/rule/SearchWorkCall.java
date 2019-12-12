@@ -66,10 +66,8 @@ class SearchWorkCall<T> extends Call<SearchWorkCall<?>> {
 				.as( "Search work on indexes " + indexNames + " did not match: " )
 				.matches( work );
 
-		long totalHitCount = behavior.getTotalHitCount();
-
 		return () -> new SimpleSearchResult<>(
-				totalHitCount,
+				behavior.getTotalHitCount(),
 				getResults(
 						actualCall.projectionContext,
 						actualCall.loadingContext.getProjectionHitMapper(),

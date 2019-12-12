@@ -18,8 +18,10 @@ import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.DocumentId;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
+import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -47,7 +49,7 @@ public class SearchTimeoutIT {
 	}
 
 	@Test
-	public void timeoutOption() {
+	public void truncateAfter() {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchQuery<EntityReference> query = session.search( IndexedEntity.class )
 					.asEntityReference()
@@ -63,6 +65,31 @@ public class SearchTimeoutIT {
 			);
 
 			Assertions.assertThat( query.fetchAll().getHits() ).isEmpty();
+		}
+	}
+
+	@Test
+	public void failAfter() {
+		try ( SearchSession session = mapping.createSession() ) {
+			SearchQuery<EntityReference> query = session.search( IndexedEntity.class )
+					.asEntityReference()
+					.predicate( f -> f.matchAll() )
+					// define a timeout
+					.failAfter( 5L, TimeUnit.SECONDS )
+					.toQuery();
+
+			SearchException timeoutException = new SearchException( "Timed out" );
+
+			backendMock.expectSearchReferences( Collections.singletonList( INDEX_NAME ),
+					// timeout is supposed to be set on the backend
+					b -> b.failAfter( 5L, TimeUnit.SECONDS ),
+					StubSearchWorkBehavior.failing( () -> timeoutException )
+			);
+
+			// Just check that the exception is propagated
+			SubTest.expectException( () -> query.fetchAll() )
+					.assertThrown()
+					.isSameAs( timeoutException );
 		}
 	}
 

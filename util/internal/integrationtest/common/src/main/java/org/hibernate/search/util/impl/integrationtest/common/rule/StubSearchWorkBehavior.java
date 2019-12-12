@@ -8,6 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.rule;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Supplier;
 
 public interface StubSearchWorkBehavior<H> {
 
@@ -37,6 +38,24 @@ public interface StubSearchWorkBehavior<H> {
 			@Override
 			public List<H> getRawHits() {
 				return rawHits;
+			}
+		};
+	}
+
+	static <H> StubSearchWorkBehavior<H> failing(Supplier<RuntimeException> exceptionSupplier) {
+		return new StubSearchWorkBehavior<H>() {
+			@Override
+			public long getTotalHitCount() {
+				return fail();
+			}
+
+			@Override
+			public List<H> getRawHits() {
+				return fail();
+			}
+
+			private <T> T fail() {
+				throw exceptionSupplier.get();
 			}
 		};
 	}
