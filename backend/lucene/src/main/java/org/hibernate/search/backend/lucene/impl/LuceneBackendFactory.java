@@ -23,6 +23,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.DiscriminatorMultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.NoMultiTenancyStrategy;
+import org.hibernate.search.backend.lucene.search.timeout.impl.DefaultTimingSource;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactoryImpl;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
@@ -85,6 +86,7 @@ public class LuceneBackendFactory implements BackendFactory {
 				new LuceneWorkFactoryImpl( multiTenancyStrategy ),
 				analysisDefinitionRegistry,
 				multiTenancyStrategy,
+				new DefaultTimingSource(),
 				buildContext.getFailureHandler()
 		);
 	}

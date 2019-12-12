@@ -13,7 +13,6 @@ import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDef
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
-import org.hibernate.search.backend.lucene.search.timeout.impl.DefaultTimingSource;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
@@ -34,20 +33,22 @@ public final class LuceneSearchContext {
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
+	// Global timing source
+	private final TimingSource timingSource;
+
 	// Targeted indexes
 	private final LuceneScopeModel scopeModel;
-
-	// Global timing source
-	private final TimingSource timingSource = new DefaultTimingSource();
 
 	public LuceneSearchContext(BackendMappingContext mappingContext,
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy,
+			TimingSource timingSource,
 			LuceneScopeModel scopeModel) {
 		this.toDocumentIdentifierValueConvertContext = new ToDocumentIdentifierValueConvertContextImpl( mappingContext );
 		this.toDocumentFieldValueConvertContext = new ToDocumentFieldValueConvertContextImpl( mappingContext );
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.multiTenancyStrategy = multiTenancyStrategy;
+		this.timingSource = timingSource;
 		this.scopeModel = scopeModel;
 	}
 
