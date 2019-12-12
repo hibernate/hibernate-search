@@ -189,9 +189,18 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	}
 
 	@Override
+	@SuppressWarnings("deprecation")
 	public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value) {
-		if ( QueryHints.SPEC_HINT_TIMEOUT.equals( hintName ) ) {
-			delegate.failAfter( hintValueToLong( value ), TimeUnit.MILLISECONDS );
+		switch ( hintName ) {
+			case QueryHints.SPEC_HINT_TIMEOUT:
+				delegate.failAfter( hintValueToLong( value ), TimeUnit.MILLISECONDS );
+				break;
+			case QueryHints.HINT_TIMEOUT:
+				setTimeout( hintValueToInteger( value ) );
+				break;
+			default:
+				handleUnrecognizedHint( hintName, value );
+				break;
 		}
 		return this;
 	}
@@ -384,6 +393,15 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 		}
 		else {
 			return Long.parseLong( String.valueOf( value ) );
+		}
+	}
+
+	private static int hintValueToInteger(Object value) {
+		if ( value instanceof Number ) {
+			return ( (Number) value ).intValue();
+		}
+		else {
+			return Integer.parseInt( String.valueOf( value ) );
 		}
 	}
 }
