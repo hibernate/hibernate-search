@@ -14,8 +14,6 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneChildrenCollector;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
-import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneCounterAdapter;
-import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
 
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.MultiCollector;
@@ -26,7 +24,6 @@ import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopFieldCollector;
 import org.apache.lucene.search.TopScoreDocCollector;
 import org.apache.lucene.search.TotalHitCountCollector;
-import org.apache.lucene.util.Counter;
 
 public class LuceneCollectorsBuilder {
 
@@ -34,7 +31,6 @@ public class LuceneCollectorsBuilder {
 	private final Set<String> nestedDocumentPaths;
 	private final int maxDocs;
 	private final TimeoutManager timeoutManager;
-	private final TimingSource timingSource;
 
 	private final TotalHitCountCollector totalHitCountCollector;
 
@@ -45,12 +41,11 @@ public class LuceneCollectorsBuilder {
 	private final List<Collector> luceneCollectorsForNestedDocuments = new ArrayList<>();
 
 	public LuceneCollectorsBuilder(Sort sort, Set<String> nestedDocumentPaths,
-			int maxDocs, TimeoutManager timeoutManager, TimingSource timingSource) {
+			int maxDocs, TimeoutManager timeoutManager) {
 		this.sort = sort;
 		this.nestedDocumentPaths = nestedDocumentPaths;
 		this.maxDocs = maxDocs;
 		this.timeoutManager = timeoutManager;
-		this.timingSource = timingSource;
 
 		this.totalHitCountCollector = new TotalHitCountCollector();
 		this.luceneCollectors.put( LuceneCollectorKey.TOTAL_HIT_COUNT, this.totalHitCountCollector );
@@ -151,8 +146,7 @@ public class LuceneCollectorsBuilder {
 	private Collector wrapTimeLimitingCollectorIfNecessary(Collector collector) {
 		final Long timeoutLeft = timeoutManager.checkTimeLeftInMilliseconds();
 		if ( timeoutLeft != null ) {
-			Counter counter = new LuceneCounterAdapter( timingSource );
-			TimeLimitingCollector wrapped = new TimeLimitingCollector( collector, counter, timeoutLeft );
+			TimeLimitingCollector wrapped = new TimeLimitingCollector( collector, timeoutManager.createCounter(), timeoutLeft );
 			// The timeout starts from now, not from when the collector is first used.
 			// This is important because some collectors are applied during a second search.
 			wrapped.setBaseline();
