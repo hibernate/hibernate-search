@@ -33,7 +33,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class SearchTimeoutIT {
+public class SearchQueryTimeoutIT {
 
 	private static final String BACKEND_NAME = "backendName";
 	private static final String INDEX_NAME = "indexName";
