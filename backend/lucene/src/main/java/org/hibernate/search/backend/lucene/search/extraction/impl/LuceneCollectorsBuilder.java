@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.search.timeout.spi.TimeoutManager;
+import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneCounterAdapter;
 import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
 

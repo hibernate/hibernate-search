@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.work.impl;
 
 import java.io.IOException;
 
-import org.hibernate.search.backend.lucene.search.timeout.spi.TimeoutManager;
+import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;

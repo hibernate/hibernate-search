@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.query.timout.impl;
 
-import org.hibernate.search.backend.lucene.search.timeout.spi.TimeoutManager;
+import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 
 import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.SimpleCollector;

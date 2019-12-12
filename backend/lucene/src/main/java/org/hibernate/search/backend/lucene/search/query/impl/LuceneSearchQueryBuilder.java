@@ -31,7 +31,8 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
-import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManagerImpl;
+import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
+import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
@@ -188,7 +189,7 @@ public class LuceneSearchQueryBuilder<H>
 				sessionContext, loadingContext, definitiveLuceneQuery, luceneSort
 		);
 
-		TimeoutManagerImpl timeoutManager = createTimeoutManager( definitiveLuceneQuery, timeout, timeUnit, exceptionOnTimeout );
+		TimeoutManager timeoutManager = createTimeoutManager( definitiveLuceneQuery, timeout, timeUnit, exceptionOnTimeout );
 
 		LuceneSearcherImpl<H> searcher = new LuceneSearcherImpl<>(
 				requestContext,
@@ -212,8 +213,9 @@ public class LuceneSearchQueryBuilder<H>
 		);
 	}
 
-	protected static TimeoutManagerImpl createTimeoutManager(Query definitiveLuceneQuery, Long timeout, TimeUnit timeUnit, boolean exceptionOnTimeout) {
-		TimeoutManagerImpl timeoutManager = new TimeoutManagerImpl( definitiveLuceneQuery );
+	protected static TimeoutManager createTimeoutManager(Query definitiveLuceneQuery,
+			Long timeout, TimeUnit timeUnit, boolean exceptionOnTimeout) {
+		TimeoutManager timeoutManager = new TimeoutManager( definitiveLuceneQuery );
 		if ( timeout != null && timeUnit != null ) {
 			timeoutManager.setTimeout( timeout, timeUnit );
 			if ( exceptionOnTimeout ) {
