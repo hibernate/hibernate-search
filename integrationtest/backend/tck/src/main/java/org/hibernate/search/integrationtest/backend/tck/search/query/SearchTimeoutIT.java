@@ -22,7 +22,7 @@ import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
@@ -87,7 +87,7 @@ public class SearchTimeoutIT {
 
 		SubTest.expectException( () -> query.fetchAll() )
 				.assertThrown()
-				.isInstanceOf( SearchException.class )
+				.isInstanceOf( SearchTimeoutException.class )
 				.hasMessageContaining( "Query took longer than expected" );
 	}
 
@@ -104,7 +104,7 @@ public class SearchTimeoutIT {
 
 		SubTest.expectException( () -> query.fetchTotalHitCount() )
 				.assertThrown()
-				.isInstanceOf( SearchException.class )
+				.isInstanceOf( SearchTimeoutException.class )
 				.hasMessageContaining( "Query took longer than expected" );
 	}
 

@@ -18,6 +18,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Id;
 import javax.persistence.NoResultException;
 import javax.persistence.NonUniqueResultException;
+import javax.persistence.QueryTimeoutException;
 import javax.persistence.Table;
 import javax.persistence.TypedQuery;
 
@@ -29,6 +30,7 @@ import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
@@ -254,7 +256,7 @@ public class ToJpaIT {
 							.toQuery()
 			);
 
-			SearchException timeoutException = new SearchException( "Timed out" );
+			SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX ),
@@ -265,7 +267,8 @@ public class ToJpaIT {
 			// Just check that the exception is propagated
 			SubTest.expectException( () -> query.getResultList() )
 					.assertThrown()
-					.isSameAs( timeoutException );
+					.isInstanceOf( QueryTimeoutException.class )
+					.hasCause( timeoutException );
 		} );
 	}
 
@@ -277,7 +280,7 @@ public class ToJpaIT {
 
 			query.setHint( "javax.persistence.query.timeout", 200 );
 
-			SearchException timeoutException = new SearchException( "Timed out" );
+			SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX ),
@@ -288,7 +291,8 @@ public class ToJpaIT {
 			// Just check that the exception is propagated
 			SubTest.expectException( () -> query.getResultList() )
 					.assertThrown()
-					.isSameAs( timeoutException );
+					.isInstanceOf( QueryTimeoutException.class )
+					.hasCause( timeoutException );
 		} );
 	}
 
@@ -305,7 +309,7 @@ public class ToJpaIT {
 
 			query.setHint( "javax.persistence.query.timeout", 200 );
 
-			SearchException timeoutException = new SearchException( "Timed out" );
+			SearchTimeoutException timeoutException = new SearchTimeoutException( "Timed out" );
 
 			backendMock.expectSearchObjects(
 					Arrays.asList( IndexedEntity.INDEX ),
@@ -316,7 +320,8 @@ public class ToJpaIT {
 			// Just check that the exception is propagated
 			SubTest.expectException( () -> query.getResultList() )
 					.assertThrown()
-					.isSameAs( timeoutException );
+					.isInstanceOf( QueryTimeoutException.class )
+					.hasCause( timeoutException );
 		} );
 	}
 
