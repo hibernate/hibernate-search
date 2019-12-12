@@ -77,7 +77,7 @@ public interface SearchQueryOptionsStep<
 	S truncateAfter(long timeout, TimeUnit timeUnit);
 
 	/**
-	 * Stop the query and throw an exception after a given timeout.
+	 * Stop the query and throw a {@link org.hibernate.search.util.common.SearchTimeoutException} after a given timeout.
 	 * <p>
 	 * The timeout is handled on a best effort basis:
 	 * Hibernate Search will *try* to stop the query as soon as possible after the timeout.
