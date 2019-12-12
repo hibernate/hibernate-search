@@ -35,6 +35,7 @@ import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchr
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
@@ -392,17 +393,15 @@ public class QueryDslIT {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::truncateAfter[]
-			SearchQuery<Book> query = searchSession.search( Book.class )
+			SearchResult<Book> result = searchSession.search( Book.class ) // <1>
 					.predicate( f -> f.match()
 							.field( "title" )
 							.matching( "robot" ) )
-					.truncateAfter( 500, TimeUnit.MILLISECONDS ) // <1>
-					.toQuery();
+					.truncateAfter( 500, TimeUnit.MILLISECONDS ) // <2>
+					.fetch( 20 ); // <3>
 
-			SearchResult<Book> result = query.fetch( 20 ); // <2>
-
-			Duration took = result.getTook(); // <3>
-			Boolean timedOut = result.isTimedOut(); // <4>
+			Duration took = result.getTook(); // <4>
+			Boolean timedOut = result.isTimedOut(); // <5>
 			// end::truncateAfter[]
 
 			assertThat( took ).isNotNull();
@@ -415,21 +414,18 @@ public class QueryDslIT {
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::failAfter[]
-			SearchQuery<Book> query = searchSession.search( Book.class )
-					.predicate( f -> f.match()
-							.field( "title" )
-							.matching( "robot" ) )
-					.failAfter( 500, TimeUnit.MILLISECONDS ) // <1>
-					.toQuery();
-
-			SearchResult<Book> result = query.fetch( 20 ); // <2>
-
-			Duration took = result.getTook(); // <3>
-			Boolean timedOut = result.isTimedOut(); // <4>
+			try {
+				SearchResult<Book> result = searchSession.search( Book.class ) // <1>
+						.predicate( f -> f.match()
+								.field( "title" )
+								.matching( "robot" ) )
+						.failAfter( 500, TimeUnit.MILLISECONDS ) // <2>
+						.fetch( 20 ); // <3>
+			}
+			catch (SearchTimeoutException e) { // <4>
+				// ...
+			}
 			// end::failAfter[]
-
-			assertThat( took ).isNotNull();
-			assertThat( timedOut ).isNotNull();
 		} );
 	}
 

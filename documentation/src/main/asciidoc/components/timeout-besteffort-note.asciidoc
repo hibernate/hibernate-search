@@ -1,0 +1,9 @@
+[NOTE]
+====
+Timeouts are handled on a best-effort basis.
+
+Depending on the resolution of the internal clock
+and on how often Hibernate Search is able to check that clock,
+it is possible that a query execution exceeds the timeout.
+Hibernate Search will try to minimize this excess execution time.
+====
