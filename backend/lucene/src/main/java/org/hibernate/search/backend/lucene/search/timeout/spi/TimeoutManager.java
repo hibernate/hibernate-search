@@ -18,8 +18,6 @@ public interface TimeoutManager {
 
 	Long getTimeoutLeftInMilliseconds();
 
-	Long getTimeoutLeftInSeconds();
-
 	boolean isTimedOut();
 
 	void stop();
@@ -31,10 +29,6 @@ public interface TimeoutManager {
 	void raiseExceptionOnTimeout();
 
 	void limitFetchingOnTimeout();
-
-	void reactOnQueryTimeoutExceptionWhileExtracting(RuntimeException e);
-
-	boolean hasPartialResults();
 
 	Type getType();
 

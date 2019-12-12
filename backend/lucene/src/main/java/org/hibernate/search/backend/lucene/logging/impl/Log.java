@@ -600,9 +600,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 107, value = "Query took longer than expected: '%1$s'. Query: '%2$s'.")
 	SearchException timedOut(@FormatWith(DurationFormatter.class) Duration duration, String queryDescription);
 
-	@Message(id = ID_OFFSET_2 + 108, value = "Timeout period exceeded. Query: '%1$s'.")
-	SearchException timeoutPeriodExceeded(String queryDescription);
-
 	@Message(id = ID_OFFSET_2 + 109, value = "Cannot define both 'raise exception' and 'limit fetching' for a timeout event."
 			+ " Please chose one of them.")
 	SearchException raiseExceptionOrLimitFetching();
