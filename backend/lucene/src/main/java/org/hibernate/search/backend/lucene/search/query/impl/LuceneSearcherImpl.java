@@ -179,6 +179,14 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		SearchProjectionExtractContext projectionExtractContext = extractContext.createProjectionExtractContext();
 
 		for ( int i = 0; i < topDocs.scoreDocs.length; i++ ) {
+			// Check for timeout every 16 elements.
+			// Do this *before* the element, so that we don't fail after the last element.
+			if ( i % 16 == 0 ) {
+				if ( timeoutManager.checkTimedOut() ) {
+					break;
+				}
+			}
+
 			ScoreDoc hit = topDocs.scoreDocs[i];
 			// add root object contribution
 			indexSearcher.doc( hit.doc, storedFieldVisitor );
@@ -193,10 +201,6 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 			LuceneResult luceneResult = new LuceneResult( document, hit.doc, hit.score );
 
 			extractedData.add( rootProjection.extract( projectionHitMapper, luceneResult, projectionExtractContext ) );
-			// Check for timeout each 16 elements:
-			if ( i % 16 == 0 ) {
-				timeoutManager.isTimedOut();
-			}
 		}
 
 		return extractedData;

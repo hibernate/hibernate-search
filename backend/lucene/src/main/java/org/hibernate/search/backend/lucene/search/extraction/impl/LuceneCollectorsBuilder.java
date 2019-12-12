@@ -149,7 +149,7 @@ public class LuceneCollectorsBuilder {
 	}
 
 	private Collector wrapTimeLimitingCollectorIfNecessary(Collector collector) {
-		final Long timeoutLeft = timeoutManager.getTimeoutLeftInMilliseconds();
+		final Long timeoutLeft = timeoutManager.checkTimeLeftInMilliseconds();
 		if ( timeoutLeft != null ) {
 			Counter counter = new LuceneCounterAdapter( timingSource );
 			TimeLimitingCollector wrapped = new TimeLimitingCollector( collector, counter, timeoutLeft );

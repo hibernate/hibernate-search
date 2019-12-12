@@ -47,63 +47,52 @@ public final class TimeoutManager {
 		this.start = System.nanoTime();
 	}
 
-	public Long getTimeoutLeftInMilliseconds() {
-		return getTimeoutLeft( 1000000 );
-	}
-
-	private Long getTimeoutLeft(long factor) {
+	/**
+	 * @return {@code true} if the timeout was reached, {@code false} otherwise.
+	 * @throws org.hibernate.search.util.common.SearchTimeoutException If the timeout was reached and
+	 * a hard timeout was requested.
+	 */
+	public Long checkTimeLeftInMilliseconds() {
 		if ( timeout == null ) {
 			return null;
 		}
 		else {
-			final long currentTime = System.nanoTime();
-			if ( isTimedOut( currentTime ) ) {
-				//0 means no limit so we return the lowest possible value
-				return 0L;
-			}
-			long left = timeout - ( currentTime - start );
-			long result;
-			if ( left % factor == 0 ) {
-				result = left / factor;
+			final long elapsedTimeNanos = getElapsedTimeInNanoseconds();
+			long timeLeftNanos = timeout - elapsedTimeNanos;
+			long timeLeftMillis;
+			if ( timeLeftNanos % 1_000_000 == 0 ) {
+				timeLeftMillis = timeLeftNanos / 1_000_000;
 			}
 			else {
-				result = ( left / factor ) + 1;
+				timeLeftMillis = ( timeLeftNanos / 1_000_000 ) + 1;
 			}
-			if ( result <= 0 ) {
-				//0 means no limit so we return the lowest possible value
+			if ( timeLeftMillis <= 0 ) {
+				forceTimedOut();
+				// Timed out: don't return a negative number.
 				return 0L;
 			}
 			else {
-				return result;
+				return timeLeftMillis;
 			}
 		}
 	}
 
+	/**
+	 * @return {@code true} if the timeout was reached in a previous call to {@link #checkTimedOut()},
+	 * {@code false} otherwise.
+	 */
 	public boolean isTimedOut() {
-		if ( timeout == null ) {
-			return false;
-		}
-		if ( timedOut ) {
-			return true;
-		}
-		return isTimedOut( System.nanoTime() );
+		return timedOut;
 	}
 
-	private boolean isTimedOut(long currentTime) {
-		if ( timeout == null ) {
-			return false;
-		}
-		if ( timedOut ) {
-			return true;
-		}
-		else {
-			final long elapsedTime = currentTime - start;
-			timedOut = elapsedTime > timeout;
-			if ( this.type != Type.LIMIT && timedOut ) {
-				throw log.timedOut( Duration.ofNanos( elapsedTime ), query.toString() );
-			}
-			return timedOut;
-		}
+	/**
+	 * @return {@code true} if the timeout was reached, {@code false} otherwise.
+	 * @throws org.hibernate.search.util.common.SearchTimeoutException If the timeout was reached and
+	 * a hard timeout was requested.
+	 */
+	public boolean checkTimedOut() {
+		Long timeLeft = checkTimeLeftInMilliseconds();
+		return timeLeft != null && timeLeft <= 0;
 	}
 
 	public void stop() {
@@ -121,6 +110,13 @@ public final class TimeoutManager {
 
 	public void forceTimedOut() {
 		this.timedOut = Boolean.TRUE;
+		onTimedOut();
+	}
+
+	private void onTimedOut() {
+		if ( this.type == Type.EXCEPTION ) {
+			throw log.timedOut( getTookTime(), query.toString() );
+		}
 	}
 
 	public void raiseExceptionOnTimeout() {
@@ -142,8 +138,11 @@ public final class TimeoutManager {
 	}
 
 	public Duration getTookTime() {
-		long deltaNanos = System.nanoTime() - start;
-		return Duration.ofNanos( deltaNanos );
+		return Duration.ofNanos( getElapsedTimeInNanoseconds() );
+	}
+
+	private long getElapsedTimeInNanoseconds() {
+		return System.nanoTime() - start;
 	}
 }
 
