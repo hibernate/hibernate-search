@@ -26,6 +26,7 @@ import org.hibernate.QueryException;
 import org.hibernate.ScrollMode;
 import org.hibernate.TypeMismatchException;
 import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.jpa.QueryHints;
 import org.hibernate.query.QueryParameter;
 import org.hibernate.query.internal.AbstractProducedQuery;
 import org.hibernate.query.internal.ParameterMetadataImpl;
@@ -189,7 +190,7 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 
 	@Override
 	public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value) {
-		if ( "javax.persistence.query.timeout".equals( hintName ) ) {
+		if ( QueryHints.SPEC_HINT_TIMEOUT.equals( hintName ) ) {
 			delegate.failAfter( hintValueToLong( value ), TimeUnit.MILLISECONDS );
 		}
 		return this;
