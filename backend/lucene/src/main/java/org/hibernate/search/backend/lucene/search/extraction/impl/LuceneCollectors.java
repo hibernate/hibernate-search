@@ -87,20 +87,22 @@ public class LuceneCollectors {
 		}
 		catch (TimeLimitingCollector.TimeExceededException e) {
 			timeoutManager.forceTimedOut();
-			return;
 		}
-
 		if ( topDocsCollector == null ) {
 			return;
 		}
 
 		extractTopDocs( offset, limit );
-
 		if ( requireFieldDocRescoring ) {
 			handleRescoring( indexSearcher, luceneQuery );
 		}
 
-		collectNestedDocs( indexSearcher, luceneQuery );
+		try {
+			collectNestedDocs( indexSearcher, luceneQuery );
+		}
+		catch (TimeLimitingCollector.TimeExceededException e) {
+			timeoutManager.forceTimedOut();
+		}
 	}
 
 	public Map<LuceneCollectorKey<?>, Collector> getCollectors() {
