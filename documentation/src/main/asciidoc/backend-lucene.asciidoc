@@ -315,11 +315,24 @@ You can find a full reference of available properties in the Hibernate Search ja
 * link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneBackendSettings.html[org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings].
 * link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneIndexSettings.html[org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings].
 
+[[backend-lucene-schema]]
+== Schema
+
+Lucene does not really have a concept of centralized schema to specify the data type and capabilities of each field,
+but Hibernate Search maintains such a schema in memory,
+in order to remember which predicates/projections/sorts can be applied to each field.
+
+For the most part, the schema is inferred from
+<<mapper-orm-mapping,the mapping configured through Hibernate Search's mapping APIs>>,
+which are generic and independent from Elasticsearch.
+
+Aspects that are specific to the Lucene backend are explained in this section.
+
 [[backend-lucene-field-types]]
-== Field types
+=== Field types
 
 [[backend-lucene-field-types-available]]
-=== Available field types
+==== Available field types
 
 [NOTE]
 ====
@@ -378,7 +391,7 @@ Date/time types do not support the whole range of years that can be represented 
 ====
 
 [[backend-lucene-field-types-extension]]
-=== Index field type DSL extensions
+==== Index field type DSL extensions
 
 Not all Lucene field types have built-in support in Hibernate Search.
 Unsupported field types can still be used, however,
@@ -423,6 +436,21 @@ must be mapped using the `@NonStandardField` annotation:
 other annotations such as `@GenericField` will fail.
 <2> Instruct Hibernate Search to use our custom value binder.
 ====
+
+[[backend-lucene-multi-tenancy]]
+=== Multi-tenancy
+
+Multi-tenancy is supported and handled transparently,
+according to the tenant ID defined in the current session:
+
+* documents will be indexed with the appropriate values, allowing later filtering;
+* queries will filter results appropriately.
+
+However, multi-tenancy must be enabled explicitly.
+To do so, set the `hibernate.search.backends.<backend name>.multi_tenancy.strategy` property:
+
+* to `none` for single-tenancy;
+* to `discriminator` for discriminator-based multi-tenancy: adds a "tenant ID" field to every document.
 
 [[backend-lucene-analysis]]
 == Analysis
@@ -481,18 +509,3 @@ link:http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters[Solr Wiki]
 (you don't need Solr to use these analyzers,
 it's just that there is no documentation page for Lucene proper).
 ====
-
-[[backend-lucene-multi-tenancy]]
-== Multi-tenancy
-
-Multi-tenancy is supported and handled transparently,
-according to the tenant ID defined in the current session:
-
-* documents will be indexed with the appropriate values, allowing later filtering;
-* queries will filter results appropriately.
-
-However, multi-tenancy must be enabled explicitly.
-To do so, set the `hibernate.search.backends.<backend name>.multi_tenancy.strategy` property:
-
-* to `none` for single-tenancy;
-* to `discriminator` for discriminator-based multi-tenancy: adds a "tenant ID" field to every document.

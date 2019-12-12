@@ -265,6 +265,255 @@ Elasticsearch disables sharding by default.
 To enable it,
 link:{elasticsearchDocUrl}/index-modules.html#_static_index_settings[set the property `index.number_of_shards` in your cluster].
 
+[[backend-elasticsearch-schema]]
+== Schema ("mapping")
+
+What Elasticsearch calls the link:{elasticsearchDocUrl}/mapping.html["mapping"]
+is the schema assigned to each index,
+specifying the data type and capabilities of each "property" (called an "index field" in Hibernate Search).
+
+For the most part, the Elasticsearch mapping is inferred from
+<<mapper-orm-mapping,the mapping configured through Hibernate Search's mapping APIs>>,
+which are generic and independent from Elasticsearch.
+
+Aspects that are specific to the Elasticsearch backend are explained in this section.
+
+[TIP]
+====
+Hibernate Search can be configured to push the mapping to Elasticsearch when creating the indexes
+through the <<backend-elasticsearch-index-lifecycle,index lifecycle strategy>>.
+====
+
+[[backend-elasticsearch-field-types]]
+=== Field types
+
+[[backend-elasticsearch-field-types-available]]
+==== Available field types
+
+[NOTE]
+====
+Some types are not supported directly by the Elasticsearch backend,
+but will work anyway because they are "bridged" by the mapper.
+For example a `java.util.Date` in your entity model is "bridged" to `java.time.Instant`,
+which is supported by the Elasticsearch backend.
+See <<mapper-orm-directfieldmapping-supported-types>> for more information.
+====
+
+[NOTE]
+====
+Field types that are not in this list can still be used with a little bit more work:
+
+* If a property in the entity model has an unsupported type,
+but can be converted to a supported type, you will need a bridge.
+See <<mapper-orm-bridge>>.
+* If you need an index field with a specific type that is not supported by Hibernate Search,
+you will need a bridge that defines a native field type.
+See <<backend-elasticsearch-field-types-extension>>.
+====
+
+[cols="l,1",options="header"]
+.Field types supported by the Elasticsearch backend
+|====
+|Field type|link:{elasticsearchDocUrl}/mapping-types.html[Data type] in Elasticsearch
+|java.lang.String|`text` if an analyzer is defined, `keyword` otherwise
+|java.lang.Byte|`byte`
+|java.lang.Short|`short`
+|java.lang.Integer|`integer`
+|java.lang.Long|`long`
+|java.lang.Double|`double`
+|java.lang.Float|`float`
+|java.lang.Boolean|`boolean`
+|java.math.BigDecimal|`scaled_float`
+with a `scaling_factor` equal to 10^(`decimalScale`)
+|java.math.BigInteger|`scaled_float`
+with a `scaling_factor` equal to 10^(`decimalScale`)
+|java.time.Instant|`date` with format
+`uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSZZZZZ` (ES7 and above)
+or `yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS'Z'` (ES6 and below)
+|java.time.LocalDate|`date` with format
+`uuuu-MM-dd` (ES7 and above)
+or `yyyy-MM-dd\|\|yyyyyyyyy-MM-dd` (ES6 and below)
+|java.time.LocalTime|`date` with format
+`HH:mm:ss.SSSSSSSSS` (ES7 and above)
+or `HH:mm:ss.SSS\|\|HH:mm:ss.SSSSSSSSS` (ES6 and below)
+|java.time.LocalDateTime|`date` with format
+`uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSS` (ES7 and above)
+or `yyyy-MM-dd'T'HH:mm:ss.SSS\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS` (ES6 and below)
+|java.time.ZonedDateTime|`date` with format
+`uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSZZZZZ'['VV']'` (ES7 and above)
+or `yyyy-MM-dd'T'HH:mm:ss.SSSZZ'['ZZZ']'\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ'['ZZZ']'\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ'['ZZ']'` (ES6 and below)
+|java.time.OffsetDateTime|`date` with format
+`uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSZZZZZ` (ES7 and above)
+or `yyyy-MM-dd'T'HH:mm:ss.SSSZZ\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ` (ES6 and below)
+|java.time.OffsetTime|`date` with format
+`HH:mm:ss.SSSSSSSSSZZZZZ` (ES7 and above)
+or `HH:mm:ss.SSSZZ\|\|HH:mm:ss.SSSSSSSSSZZ` (ES6 and below)
+|java.time.Year|`date` with format
+`uuuu` (ES7 and above)
+or `yyyy\|\|yyyyyyyyy` (ES6 and below)
+|java.time.YearMonth|`date` with format
+`uuuu-MM` (ES7 and above)
+or `yyyy-MM\|\|yyyyyyyyy-MM` (ES6 and below)
+|java.time.MonthDay|`date` with format `uuuu-MM-dd` (ES7 and above)
+or `yyyy-MM-dd` (ES6 and below).
+**The year is always set to 0**.
+|org.hibernate.search.engine.spatial.GeoPoint|`geo_point`
+|====
+
+[NOTE]
+====
+The Elasticsearch `date` type does not support the whole range of years that can be modeled in `java.time` types:
+
+* `java.time` supports years ranging from `-999.999.999` to `999.999.999`.
+* Elasticsearch supports years ranging from `-292.275.054` to `292.278.993`.
+====
+
+[[backend-elasticsearch-field-types-extension]]
+==== Index field type DSL extension
+
+Not all Elasticsearch field types have built-in support in Hibernate Search.
+Unsupported field types can still be used, however,
+by taking advantage of the "native" field type.
+Using this field type, the Elasticsearch "mapping" can be defined as JSON directly,
+giving access to everything Elasticsearch can offer.
+
+Below is an example of how to use the Elasticearch "native" type.
+
+.Using the Elasticearch "native" type
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/type/asnative/IpAddressValueBinder.java[tags=include]
+----
+<1> Define a <<mapper-orm-bridge,custom binder>> and its bridge.
+The "native" type can only be used from a binder,
+it cannot be used directly with annotation mapping.
+Here we're defining a <<mapper-orm-bridge-valuebridge,value binder>>,
+but a <<mapper-orm-bridge-typebridge,type binder>>,
+or a <<mapper-orm-bridge-propertybridge,property binder>>
+would work as well.
+<2> Get the context's type factory.
+<3> Apply the Elasticsearch extension to the type factory.
+<4> Call `asNative` to start defining a native type.
+<5> Pass the Elasticsearch mapping as JSON.
+<6> Values of native fields are represented as a `JsonElement` in Hibernate Search.
+`JsonElement` is a type from the link:{gsonUrl}[Gson] library.
+Do not forget to format them correctly before you pass them to the backend.
+Here we are creating a `JsonPrimitive` (a subtype of `JsonElement`) from a `String`
+because we just need a JSON string,
+but it's completely possible to handle more complex objects,
+or even to convert directly from POJOs to JSON using Gson.
+<7> For nicer projections, you can also implement this method to convert
+from `JsonElement` to the mapped type (here, `String`).
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/type/asnative/CompanyServer.java[tags=include,!getters-setters]
+----
+<1> Map the property to an index field.
+Note that value bridges using a non-standard type (such as Elasticsearch's "native" type)
+must be mapped using the `@NonStandardField` annotation:
+other annotations such as `@GenericField` will fail.
+<2> Instruct Hibernate Search to use our custom value binder.
+====
+
+[[backend-elasticsearch-multi-tenancy]]
+=== Multi-tenancy
+
+Multi-tenancy is supported and handled transparently,
+according to the tenant ID defined in the current session:
+
+* documents will be indexed with the appropriate values, allowing later filtering;
+* queries will filter results appropriately.
+
+However, multi-tenancy must be enabled explicitly.
+To do so, set the `hibernate.search.backends.<backend name>.multi_tenancy.strategy` property:
+
+* to `none` (the default) for single-tenancy;
+* to `discriminator` for discriminator-based multi-tenancy: adds a "tenant ID" field to every document.
+
+[[backend-elasticsearch-analysis]]
+== Analysis
+// Search 5 anchors backward compatibility
+[[elasticsearch-mapping-analyzer]]
+
+<<concepts-analysis,Analysis>> is the text processing performed by analyzers,
+both when indexing (document processing)
+and when searching (query processing).
+
+All built-in Elasticsearch analyzers can be used transparently,
+without any configuration in Hibernate Search:
+just use their name wherever Hibernate Search expects an analyzer name.
+However, in order to define custom analyzers,
+analysis must be configured explicitly.
+
+[CAUTION]
+====
+Elasticsearch analysis configuration is not applied immediately on startup:
+it needs to be pushed to the Elasticsearch cluster.
+Hibernate Search will only push the configuration to the cluster if specific conditions are met,
+and only if instructed to do so
+through the <<backend-elasticsearch-index-lifecycle,lifecycle configuration>>.
+====
+
+To configure analysis in an Elasticsearch backend, you will need to:
+
+* Define a class that implements the `org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer` interface.
+* Configure the backend to use that implementation by setting the configuration property
+`hibernate.search.backends.<backend name>.analysis.configurer`
+to a <<configuration-property-types,bean reference>> pointing to the implementation.
+
+Hibernate Search will call the `configure` method of this implementation on startup,
+and the configurer will be able to take advantage of a DSL to define analyzers:
+
+.Implementing and using an analysis configurer with the Elasticsearch backend
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/analysis/MyElasticsearchAnalysisConfigurer.java[tags=include]
+----
+<1> Define a custom analyzer named "english", because it will be used to analyze English text such as book titles.
+<2> Set the tokenizer to a standard tokenizer.
+<3> Set the char filters. Char filters are applied in the order they are given, before the tokenizer.
+<4> Set the token filters. Token filters are applied in the order they are given, after the tokenizer.
+<5> Note that, for Elasticsearch, any parameterized char filter, tokenizer or token filter
+must be defined separately and assigned a name.
+<6> Set the value of a parameter for the char filter/tokenizer/token filter being defined.
+<7> Normalizers are defined in a similar way, the only difference being that they cannot use a tokenizer.
+<8> Multiple analyzers/normalizers can be defined in the same configurer.
+
+[source, XML, indent=0, subs="+callouts"]
+----
+include::{resourcesdir}/analysis/elasticsearch-simple.properties[]
+----
+<1> Assign the configurer to the backend `myBackend` using a Hibernate Search configuration property.
+====
+
+It is also possible to assign a name to a parameterized built-in analyzer:
+
+.Naming a parameterized built-in analyzer in the Elasticsearch backend
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/analysis/AdvancedElasticsearchAnalysisConfigurer.java[tags=type]
+----
+<1> Define an analyzer with the given name and type.
+<2> Set the value of a parameter for the analyzer being defined.
+====
+
+[TIP]
+====
+To know which character filters, tokenizers and token filters are available,
+refer to the documentation:
+
+* If you want to use a built-in analyzer and not create your own:
+{elasticsearchDocUrl}/analysis-analyzers.html[analyzers];
+* If you want to define your own analyzer:
+{elasticsearchDocUrl}/analysis-charfilters.html[character filters],
+{elasticsearchDocUrl}/analysis-tokenizers.html[tokenizers],
+{elasticsearchDocUrl}/analysis-tokenfilters.html[token filters].
+====
+
 [[backend-elasticsearch-index-lifecycle]]
 == Index lifecycle
 // Search 5 anchors backward compatibility
@@ -351,233 +600,3 @@ those clients should be synchronized in such a way that while Hibernate Search i
 
 For these reasons, migrating your mapping on a live cluster should be carefully planned as part of the deployment process.
 ====
-
-[[backend-elasticsearch-field-types]]
-== Field types
-
-[[backend-elasticsearch-field-types-available]]
-=== Available field types
-
-[NOTE]
-====
-Some types are not supported directly by the Elasticsearch backend,
-but will work anyway because they are "bridged" by the mapper.
-For example a `java.util.Date` in your entity model is "bridged" to `java.time.Instant`,
-which is supported by the Elasticsearch backend.
-See <<mapper-orm-directfieldmapping-supported-types>> for more information.
-====
-
-[NOTE]
-====
-Field types that are not in this list can still be used with a little bit more work:
-
-* If a property in the entity model has an unsupported type,
-but can be converted to a supported type, you will need a bridge.
-See <<mapper-orm-bridge>>.
-* If you need an index field with a specific type that is not supported by Hibernate Search,
-you will need a bridge that defines a native field type.
-See <<backend-elasticsearch-field-types-extension>>.
-====
-
-[cols="l,1",options="header"]
-.Field types supported by the Elasticsearch backend
-|====
-|Field type|link:{elasticsearchDocUrl}/mapping-types.html[Data type] in Elasticsearch
-|java.lang.String|`text` if an analyzer is defined, `keyword` otherwise
-|java.lang.Byte|`byte`
-|java.lang.Short|`short`
-|java.lang.Integer|`integer`
-|java.lang.Long|`long`
-|java.lang.Double|`double`
-|java.lang.Float|`float`
-|java.lang.Boolean|`boolean`
-|java.math.BigDecimal|`scaled_float`
-with a `scaling_factor` equal to 10^(`decimalScale`)
-|java.math.BigInteger|`scaled_float`
-with a `scaling_factor` equal to 10^(`decimalScale`)
-|java.time.Instant|`date` with format
-`uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSZZZZZ` (ES7 and above)
-or `yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS'Z'` (ES6 and below)
-|java.time.LocalDate|`date` with format
-`uuuu-MM-dd` (ES7 and above)
-or `yyyy-MM-dd\|\|yyyyyyyyy-MM-dd` (ES6 and below)
-|java.time.LocalTime|`date` with format
-`HH:mm:ss.SSSSSSSSS` (ES7 and above)
-or `HH:mm:ss.SSS\|\|HH:mm:ss.SSSSSSSSS` (ES6 and below)
-|java.time.LocalDateTime|`date` with format
-`uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSS` (ES7 and above)
-or `yyyy-MM-dd'T'HH:mm:ss.SSS\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSS` (ES6 and below)
-|java.time.ZonedDateTime|`date` with format
-`uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSZZZZZ'['VV']'` (ES7 and above)
-or `yyyy-MM-dd'T'HH:mm:ss.SSSZZ'['ZZZ']'\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ'['ZZZ']'\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ'['ZZ']'` (ES6 and below)
-|java.time.OffsetDateTime|`date` with format
-`uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSZZZZZ` (ES7 and above)
-or `yyyy-MM-dd'T'HH:mm:ss.SSSZZ\|\|yyyyyyyyy-MM-dd'T'HH:mm:ss.SSSSSSSSSZZ` (ES6 and below)
-|java.time.OffsetTime|`date` with format
-`HH:mm:ss.SSSSSSSSSZZZZZ` (ES7 and above)
-or `HH:mm:ss.SSSZZ\|\|HH:mm:ss.SSSSSSSSSZZ` (ES6 and below)
-|java.time.Year|`date` with format
-`uuuu` (ES7 and above)
-or `yyyy\|\|yyyyyyyyy` (ES6 and below)
-|java.time.YearMonth|`date` with format
-`uuuu-MM` (ES7 and above)
-or `yyyy-MM\|\|yyyyyyyyy-MM` (ES6 and below)
-|java.time.MonthDay|`date` with format `uuuu-MM-dd` (ES7 and above)
-or `yyyy-MM-dd` (ES6 and below).
-**The year is always set to 0**.
-|org.hibernate.search.engine.spatial.GeoPoint|`geo_point`
-|====
-
-[NOTE]
-====
-The Elasticsearch `date` type does not support the whole range of years that can be modeled in `java.time` types:
-
-* `java.time` supports years ranging from `-999.999.999` to `999.999.999`.
-* Elasticsearch supports years ranging from `-292.275.054` to `292.278.993`.
-====
-
-[[backend-elasticsearch-field-types-extension]]
-=== Index field type DSL extension
-
-Not all Elasticsearch field types have built-in support in Hibernate Search.
-Unsupported field types can still be used, however,
-by taking advantage of the "native" field type.
-Using this field type, the Elasticsearch "mapping" can be defined as JSON directly,
-giving access to everything Elasticsearch can offer.
-
-Below is an example of how to use the Elasticearch "native" type.
-
-.Using the Elasticearch "native" type
-====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/type/asnative/IpAddressValueBinder.java[tags=include]
-----
-<1> Define a <<mapper-orm-bridge,custom binder>> and its bridge.
-The "native" type can only be used from a binder,
-it cannot be used directly with annotation mapping.
-Here we're defining a <<mapper-orm-bridge-valuebridge,value binder>>,
-but a <<mapper-orm-bridge-typebridge,type binder>>,
-or a <<mapper-orm-bridge-propertybridge,property binder>>
-would work as well.
-<2> Get the context's type factory.
-<3> Apply the Elasticsearch extension to the type factory.
-<4> Call `asNative` to start defining a native type.
-<5> Pass the Elasticsearch mapping as JSON.
-<6> Values of native fields are represented as a `JsonElement` in Hibernate Search.
-`JsonElement` is a type from the link:{gsonUrl}[Gson] library.
-Do not forget to format them correctly before you pass them to the backend.
-Here we are creating a `JsonPrimitive` (a subtype of `JsonElement`) from a `String`
-because we just need a JSON string,
-but it's completely possible to handle more complex objects,
-or even to convert directly from POJOs to JSON using Gson.
-<7> For nicer projections, you can also implement this method to convert
-from `JsonElement` to the mapped type (here, `String`).
-
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/type/asnative/CompanyServer.java[tags=include,!getters-setters]
-----
-<1> Map the property to an index field.
-Note that value bridges using a non-standard type (such as Elasticsearch's "native" type)
-must be mapped using the `@NonStandardField` annotation:
-other annotations such as `@GenericField` will fail.
-<2> Instruct Hibernate Search to use our custom value binder.
-====
-
-[[backend-elasticsearch-analysis]]
-== Analysis
-// Search 5 anchors backward compatibility
-[[elasticsearch-mapping-analyzer]]
-
-<<concepts-analysis,Analysis>> is the text processing performed by analyzers,
-both when indexing (document processing)
-and when searching (query processing).
-
-All built-in Elasticsearch analyzers can be used transparently,
-without any configuration in Hibernate Search:
-just use their name wherever Hibernate Search expects an analyzer name.
-However, in order to define custom analyzers,
-analysis must be configured explicitly.
-
-[CAUTION]
-====
-Elasticsearch analysis configuration is not applied immediately on startup:
-it needs to be pushed to the Elasticsearch cluster.
-Hibernate Search will only push the configuration to the cluster if specific conditions are met,
-and only if instructed to do so
-through the <<backend-elasticsearch-index-lifecycle,lifecycle configuration>>.
-====
-
-To configure analysis in an Elasticsearch backend, you will need to:
-
-* Define a class that implements the `org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer` interface.
-* Configure the backend to use that implementation by setting the configuration property
-`hibernate.search.backends.<backend name>.analysis.configurer`
-to a <<configuration-property-types,bean reference>> pointing to the implementation.
-
-Hibernate Search will call the `configure` method of this implementation on startup,
-and the configurer will be able to take advantage of a DSL to define analyzers:
-
-.Implementing and using an analysis configurer with the Elasticsearch backend
-====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/analysis/MyElasticsearchAnalysisConfigurer.java[tags=include]
-----
-<1> Define a custom analyzer named "english", because it will be used to analyze English text such as book titles.
-<2> Set the tokenizer to a standard tokenizer.
-<3> Set the char filters. Char filters are applied in the order they are given, before the tokenizer.
-<4> Set the token filters. Token filters are applied in the order they are given, after the tokenizer.
-<5> Note that, for Elasticsearch, any parameterized char filter, tokenizer or token filter
-must be defined separately and assigned a name.
-<6> Set the value of a parameter for the char filter/tokenizer/token filter being defined.
-<7> Normalizers are defined in a similar way, the only difference being that they cannot use a tokenizer.
-<8> Multiple analyzers/normalizers can be defined in the same configurer.
-
-[source, XML, indent=0, subs="+callouts"]
-----
-include::{resourcesdir}/analysis/elasticsearch-simple.properties[]
-----
-<1> Assign the configurer to the backend `myBackend` using a Hibernate Search configuration property.
-====
-
-It is also possible to assign a name to a parameterized built-in analyzer:
-
-.Naming a parameterized built-in analyzer in the Elasticsearch backend
-====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/analysis/AdvancedElasticsearchAnalysisConfigurer.java[tags=type]
-----
-<1> Define an analyzer with the given name and type.
-<2> Set the value of a parameter for the analyzer being defined.
-====
-
-[TIP]
-====
-To know which character filters, tokenizers and token filters are available,
-refer to the documentation:
-
-* If you want to use a built-in analyzer and not create your own:
-{elasticsearchDocUrl}/analysis-analyzers.html[analyzers];
-* If you want to define your own analyzer:
-{elasticsearchDocUrl}/analysis-charfilters.html[character filters],
-{elasticsearchDocUrl}/analysis-tokenizers.html[tokenizers],
-{elasticsearchDocUrl}/analysis-tokenfilters.html[token filters].
-====
-
-[[backend-elasticsearch-multi-tenancy]]
-== Multi-tenancy
-
-Multi-tenancy is supported and handled transparently,
-according to the tenant ID defined in the current session:
-
-* documents will be indexed with the appropriate values, allowing later filtering;
-* queries will filter results appropriately.
-
-However, multi-tenancy must be enabled explicitly.
-To do so, set the `hibernate.search.backends.<backend name>.multi_tenancy.strategy` property:
-
-* to `none` (the default) for single-tenancy;
-* to `discriminator` for discriminator-based multi-tenancy: adds a "tenant ID" field to every document.
