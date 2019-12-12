@@ -172,12 +172,8 @@ public final class ElasticsearchRequest {
 			return this;
 		}
 
-		public Builder timeoutValue(Integer timeoutValue) {
+		public Builder timeout(Integer timeoutValue, TimeUnit timeoutUnit) {
 			this.timeoutValue = timeoutValue;
-			return this;
-		}
-
-		public Builder timeoutUnit(TimeUnit timeoutUnit) {
 			this.timeoutUnit = timeoutUnit;
 			return this;
 		}

@@ -62,19 +62,9 @@ public class CountWork extends AbstractSimpleElasticsearchWork<Long> {
 		}
 
 		@Override
-		public CountWorkBuilder timeoutValue(Integer timeoutValue) {
+		public CountWorkBuilder timeout(Integer timeoutValue, TimeUnit timeoutUnit, boolean exceptionOnTimeout) {
 			this.timeoutValue = timeoutValue;
-			return this;
-		}
-
-		@Override
-		public CountWorkBuilder timeoutUnit(TimeUnit timeoutUnit) {
 			this.timeoutUnit = timeoutUnit;
-			return this;
-		}
-
-		@Override
-		public CountWorkBuilder exceptionOnTimeout(boolean exceptionOnTimeout) {
 			this.exceptionOnTimeout = exceptionOnTimeout;
 			return this;
 		}
@@ -96,7 +86,7 @@ public class CountWork extends AbstractSimpleElasticsearchWork<Long> {
 			}
 
 			if ( timeoutValue != null && timeoutUnit != null ) {
-				builder.param( "timeout", AbstractSimpleElasticsearchWork.AbstractBuilder.getTimeoutString( timeoutValue, timeoutUnit ) );
+				builder.param( "timeout", getTimeoutString( timeoutValue, timeoutUnit ) );
 			}
 
 			if ( exceptionOnTimeout ) {
@@ -104,8 +94,7 @@ public class CountWork extends AbstractSimpleElasticsearchWork<Long> {
 				builder.param( "allow_partial_search_results", false );
 
 				// set timeoutValue and timeoutUnit only for hard timeout
-				builder.timeoutValue( timeoutValue );
-				builder.timeoutUnit( timeoutUnit );
+				builder.timeout( timeoutValue, timeoutUnit );
 			}
 
 			return builder.build();
