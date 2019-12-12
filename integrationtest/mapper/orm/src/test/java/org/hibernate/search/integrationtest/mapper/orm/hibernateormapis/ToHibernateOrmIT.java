@@ -11,6 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.backend
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.Table;
@@ -232,6 +233,157 @@ public class ToHibernateOrmIT {
 			);
 			query.list();
 			backendMock.verifyExpectationsMet();
+		} );
+	}
+
+	@Test
+	public void timeout_dsl() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery(
+					searchSession.search( IndexedEntity.class )
+							.predicate( f -> f.matchAll() )
+							.failAfter( 2, TimeUnit.SECONDS )
+							.toQuery()
+			);
+
+			SearchException timeoutException = new SearchException( "Timed out" );
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( IndexedEntity.INDEX ),
+					b -> b.failAfter( 2, TimeUnit.SECONDS ),
+					StubSearchWorkBehavior.failing( () -> timeoutException )
+			);
+
+			// Just check that the exception is propagated
+			SubTest.expectException( () -> query.list() )
+					.assertThrown()
+					.isSameAs( timeoutException );
+		} );
+	}
+
+	@Test
+	public void timeout_jpaHint() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
+
+			query.setHint( "javax.persistence.query.timeout", 200 );
+
+			SearchException timeoutException = new SearchException( "Timed out" );
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( IndexedEntity.INDEX ),
+					b -> b.failAfter( 200, TimeUnit.MILLISECONDS ),
+					StubSearchWorkBehavior.failing( () -> timeoutException )
+			);
+
+			// Just check that the exception is propagated
+			SubTest.expectException( () -> query.list() )
+					.assertThrown()
+					.isSameAs( timeoutException );
+		} );
+	}
+
+	@Test
+	public void timeout_ormHint() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
+
+			query.setHint( "org.hibernate.timeout", 4 );
+
+			SearchException timeoutException = new SearchException( "Timed out" );
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( IndexedEntity.INDEX ),
+					b -> b.failAfter( 4, TimeUnit.SECONDS ),
+					StubSearchWorkBehavior.failing( () -> timeoutException )
+			);
+
+			// Just check that the exception is propagated
+			SubTest.expectException( () -> query.list() )
+					.assertThrown()
+					.isSameAs( timeoutException );
+		} );
+	}
+
+	@Test
+	public void timeout_setter() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery( createSimpleQuery( searchSession ) );
+
+			query.setTimeout( 3 );
+
+			SearchException timeoutException = new SearchException( "Timed out" );
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( IndexedEntity.INDEX ),
+					b -> b.failAfter( 3, TimeUnit.SECONDS ),
+					StubSearchWorkBehavior.failing( () -> timeoutException )
+			);
+
+			// Just check that the exception is propagated
+			SubTest.expectException( () -> query.list() )
+					.assertThrown()
+					.isSameAs( timeoutException );
+		} );
+	}
+
+	@Test
+	public void timeout_override_ormHint() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery(
+					searchSession.search( IndexedEntity.class )
+							.predicate( f -> f.matchAll() )
+							.failAfter( 2, TimeUnit.SECONDS )
+							.toQuery()
+			);
+
+			query.setHint( "org.hibernate.timeout", 4 );
+
+			SearchException timeoutException = new SearchException( "Timed out" );
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( IndexedEntity.INDEX ),
+					b -> b.failAfter( 4, TimeUnit.SECONDS ),
+					StubSearchWorkBehavior.failing( () -> timeoutException )
+			);
+
+			// Just check that the exception is propagated
+			SubTest.expectException( () -> query.list() )
+					.assertThrown()
+					.isSameAs( timeoutException );
+		} );
+	}
+
+	@Test
+	public void timeout_override_setter() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			Query<IndexedEntity> query = Search.toOrmQuery(
+					searchSession.search( IndexedEntity.class )
+							.predicate( f -> f.matchAll() )
+							.failAfter( 2, TimeUnit.SECONDS )
+							.toQuery()
+			);
+
+			query.setTimeout( 3 );
+
+			SearchException timeoutException = new SearchException( "Timed out" );
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( IndexedEntity.INDEX ),
+					b -> b.failAfter( 3, TimeUnit.SECONDS ),
+					StubSearchWorkBehavior.failing( () -> timeoutException )
+			);
+
+			// Just check that the exception is propagated
+			SubTest.expectException( () -> query.list() )
+					.assertThrown()
+					.isSameAs( timeoutException );
 		} );
 	}
 
