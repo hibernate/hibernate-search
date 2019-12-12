@@ -79,9 +79,7 @@ public class SearchQueryTimeoutIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asEntityReference()
 				.predicate( f -> f.match().field( FIELD_NAME ).matching( BUZZ_WORDS ) )
-				.sort( f -> f.score() )
 				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
 
@@ -96,9 +94,7 @@ public class SearchQueryTimeoutIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asEntityReference()
 				.predicate( f -> f.match().field( FIELD_NAME ).matching( BUZZ_WORDS ) )
-				.sort( f -> f.score() )
 				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
 
@@ -118,9 +114,7 @@ public class SearchQueryTimeoutIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asEntityReference()
 				.predicate( f -> f.match().field( FIELD_NAME ).matching( BUZZ_WORDS ) )
-				.sort( f -> f.score() )
 				.truncateAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
 
@@ -136,7 +130,6 @@ public class SearchQueryTimeoutIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asEntityReference()
 				.predicate( f -> f.match().field( EMPTY_FIELD_NAME ).matching( ANY_INTEGER ) )
 				.failAfter( 1, TimeUnit.DAYS )
 				.toQuery();
