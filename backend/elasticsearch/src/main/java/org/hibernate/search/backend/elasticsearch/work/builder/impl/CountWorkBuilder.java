@@ -23,6 +23,6 @@ public interface CountWorkBuilder extends ElasticsearchWorkBuilder<Elasticsearch
 
 	CountWorkBuilder requestTransformer(Function<ElasticsearchRequest, ElasticsearchRequest> requestTransformer);
 
-	CountWorkBuilder timeout(Integer timeoutValue, TimeUnit timeoutUnit, boolean exceptionOnTimeout);
+	CountWorkBuilder timeout(Long timeoutValue, TimeUnit timeoutUnit, boolean exceptionOnTimeout);
 
 }

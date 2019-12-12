@@ -75,7 +75,7 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 		private Integer scrollSize;
 		private String scrollTimeout;
 		private Set<String> routingKeys;
-		private Integer timeoutValue;
+		private Long timeoutValue;
 		private TimeUnit timeoutUnit;
 		private boolean exceptionOnTimeout;
 
@@ -113,7 +113,7 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 		}
 
 		@Override
-		public SearchWorkBuilder<R> timeout(Integer timeoutValue, TimeUnit timeoutUnit, boolean exceptionOnTimeout) {
+		public SearchWorkBuilder<R> timeout(Long timeoutValue, TimeUnit timeoutUnit, boolean exceptionOnTimeout) {
 			this.timeoutValue = timeoutValue;
 			this.timeoutUnit = timeoutUnit;
 			this.exceptionOnTimeout = exceptionOnTimeout;

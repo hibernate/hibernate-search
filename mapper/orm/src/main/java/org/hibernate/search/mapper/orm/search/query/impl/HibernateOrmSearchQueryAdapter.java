@@ -189,9 +189,9 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 
 	@Override
 	public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value) {
-		if ( "javax.persistence.query.timeout".equals( hintName ) && value instanceof Integer &&
+		if ( "javax.persistence.query.timeout".equals( hintName ) && value instanceof Long &&
 				delegate instanceof SearchQueryImplementor ) {
-			( (SearchQueryImplementor) delegate ).failAfter( (Integer) value, TimeUnit.MILLISECONDS );
+			( (SearchQueryImplementor) delegate ).failAfter( (Long) value, TimeUnit.MILLISECONDS );
 		}
 		return this;
 	}

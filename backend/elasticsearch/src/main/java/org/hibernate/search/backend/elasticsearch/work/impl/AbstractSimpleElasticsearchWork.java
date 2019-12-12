@@ -161,7 +161,7 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 			return (B) this;
 		}
 
-		protected static String getTimeoutString(Integer timeoutValue, TimeUnit timeoutUnit) {
+		protected static String getTimeoutString(Long timeoutValue, TimeUnit timeoutUnit) {
 			StringBuilder builder = new StringBuilder( timeoutValue.toString() );
 			switch ( timeoutUnit ) {
 				case DAYS:

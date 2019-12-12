@@ -58,7 +58,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	private final ElasticsearchSearchRequestTransformer requestTransformer;
 	private final ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor;
 
-	private Integer timeoutValue;
+	private Long timeoutValue;
 	private TimeUnit timeoutUnit;
 	private boolean exceptionOnTimeout;
 
@@ -71,7 +71,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			JsonObject payload,
 			ElasticsearchSearchRequestTransformer requestTransformer,
 			ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor,
-			Integer timeoutValue, TimeUnit timeoutUnit, boolean exceptionOnTimeout) {
+			Long timeoutValue, TimeUnit timeoutUnit, boolean exceptionOnTimeout) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;
 		this.searchContext = searchContext;
@@ -216,7 +216,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 
 	@Override
 	public void failAfter(long timeout, TimeUnit timeUnit) {
-		timeoutValue = Math.toIntExact( timeout );
+		timeoutValue = timeout;
 		timeoutUnit = timeUnit;
 		exceptionOnTimeout = true;
 	}

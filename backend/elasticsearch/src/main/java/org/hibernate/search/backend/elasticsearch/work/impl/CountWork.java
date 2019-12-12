@@ -40,7 +40,7 @@ public class CountWork extends AbstractSimpleElasticsearchWork<Long> {
 		private final List<URLEncodedString> indexNames = new ArrayList<>();
 		private JsonObject query;
 		private Set<String> routingKeys;
-		private Integer timeoutValue;
+		private Long timeoutValue;
 		private TimeUnit timeoutUnit;
 		private boolean exceptionOnTimeout;
 
@@ -62,7 +62,7 @@ public class CountWork extends AbstractSimpleElasticsearchWork<Long> {
 		}
 
 		@Override
-		public CountWorkBuilder timeout(Integer timeoutValue, TimeUnit timeoutUnit, boolean exceptionOnTimeout) {
+		public CountWorkBuilder timeout(Long timeoutValue, TimeUnit timeoutUnit, boolean exceptionOnTimeout) {
 			this.timeoutValue = timeoutValue;
 			this.timeoutUnit = timeoutUnit;
 			this.exceptionOnTimeout = exceptionOnTimeout;
