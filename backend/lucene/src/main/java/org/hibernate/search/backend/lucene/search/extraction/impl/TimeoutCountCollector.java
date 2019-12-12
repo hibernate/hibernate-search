@@ -35,7 +35,8 @@ public class TimeoutCountCollector extends SimpleCollector {
 	public void collect(int doc) {
 		// Check for timeout each 256 elements:
 		if ( totalHits % 256 == 0 ) {
-			timeoutManager.isTimedOut();
+			// Fail if hard timeout, ignore if soft timeout
+			timeoutManager.checkTimedOut();
 		}
 		totalHits++;
 	}

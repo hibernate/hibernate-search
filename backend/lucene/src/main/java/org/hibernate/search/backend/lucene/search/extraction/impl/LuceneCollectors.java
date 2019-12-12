@@ -77,7 +77,7 @@ public class LuceneCollectors {
 	}
 
 	public void collect(IndexSearcher indexSearcher, Query luceneQuery, int offset, Integer limit) throws IOException {
-		if ( timeoutManager.isTimedOut() ) {
+		if ( timeoutManager.checkTimedOut() ) {
 			// in case of timeout before the query execution, skip the query
 			return;
 		}
@@ -95,6 +95,10 @@ public class LuceneCollectors {
 		extractTopDocs( offset, limit );
 		if ( requireFieldDocRescoring ) {
 			handleRescoring( indexSearcher, luceneQuery );
+		}
+
+		if ( timeoutManager.isTimedOut() ) {
+			return; // Skip nested docs
 		}
 
 		try {
