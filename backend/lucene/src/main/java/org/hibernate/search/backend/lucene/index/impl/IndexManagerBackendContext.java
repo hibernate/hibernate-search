@@ -28,6 +28,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.backend.lucene.search.query.impl.SearchBackendContext;
+import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
 import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexIndexer;
 import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexIndexingPlan;
 import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexWorkspace;
@@ -59,6 +60,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	private final DirectoryProvider directoryProvider;
 	private final LuceneWorkFactory workFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
+	private final TimingSource timingSource;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 	private final ThreadPoolProvider threadPoolProvider;
 	private final FailureHandler failureHandler;
@@ -68,6 +70,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 			DirectoryProvider directoryProvider,
 			LuceneWorkFactory workFactory,
 			MultiTenancyStrategy multiTenancyStrategy,
+			TimingSource timingSource,
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			ThreadPoolProvider threadPoolProvider,
 			FailureHandler failureHandler,
@@ -75,6 +78,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		this.eventContext = eventContext;
 		this.directoryProvider = directoryProvider;
 		this.multiTenancyStrategy = multiTenancyStrategy;
+		this.timingSource = timingSource;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.workFactory = workFactory;
 		this.threadPoolProvider = threadPoolProvider;
@@ -133,7 +137,9 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	public LuceneSearchContext createSearchContext(BackendMappingContext mappingContext,
 			LuceneScopeModel scopeModel) {
 		return new LuceneSearchContext(
-				mappingContext, analysisDefinitionRegistry, multiTenancyStrategy, scopeModel
+				mappingContext, analysisDefinitionRegistry, multiTenancyStrategy,
+				timingSource,
+				scopeModel
 		);
 	}
 

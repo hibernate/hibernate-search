@@ -13,6 +13,7 @@ import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDef
 import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestratorImplementor;
+import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.backend.lucene.LuceneBackend;
@@ -48,6 +49,7 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 
 	private final LuceneReadWorkOrchestratorImplementor readOrchestrator;
 	private final MultiTenancyStrategy multiTenancyStrategy;
+	private final TimingSource timingSource;
 
 	private final EventContext eventContext;
 	private final IndexManagerBackendContext indexManagerBackendContext;
@@ -58,6 +60,7 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 			LuceneWorkFactory workFactory,
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy,
+			TimingSource timingSource,
 			FailureHandler failureHandler) {
 		this.name = name;
 		this.directoryProviderHolder = directoryProviderHolder;
@@ -68,12 +71,13 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 				"Lucene read work orchestrator for backend " + name
 		);
 		this.multiTenancyStrategy = multiTenancyStrategy;
+		this.timingSource = timingSource;
 
 		this.eventContext = EventContexts.fromBackendName( name );
 		this.indexManagerBackendContext = new IndexManagerBackendContext(
 				eventContext, directoryProviderHolder.get(),
 				workFactory, multiTenancyStrategy,
-				analysisDefinitionRegistry,
+				timingSource, analysisDefinitionRegistry,
 				threadPoolProvider,
 				failureHandler,
 				readOrchestrator
@@ -107,6 +111,7 @@ public class LuceneBackendImpl implements BackendImplementor<LuceneRootDocumentB
 			closer.push( LuceneReadWorkOrchestratorImplementor::stop, readOrchestrator );
 			closer.push( holder -> holder.get().close(), directoryProviderHolder );
 			closer.push( BeanHolder::close, directoryProviderHolder );
+			closer.push( TimingSource::stop, timingSource );
 		}
 	}
 
