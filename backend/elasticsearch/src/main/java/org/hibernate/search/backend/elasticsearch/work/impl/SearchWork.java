@@ -113,19 +113,9 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 		}
 
 		@Override
-		public SearchWorkBuilder<R> timeoutValue(Integer timeoutValue) {
+		public SearchWorkBuilder<R> timeout(Integer timeoutValue, TimeUnit timeoutUnit, boolean exceptionOnTimeout) {
 			this.timeoutValue = timeoutValue;
-			return this;
-		}
-
-		@Override
-		public SearchWorkBuilder<R> timeoutUnit(TimeUnit timeoutUnit) {
 			this.timeoutUnit = timeoutUnit;
-			return this;
-		}
-
-		@Override
-		public SearchWorkBuilder<R> exceptionOnTimeout(boolean exceptionOnTimeout) {
 			this.exceptionOnTimeout = exceptionOnTimeout;
 			return this;
 		}
@@ -160,7 +150,7 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 			}
 
 			if ( timeoutValue != null && timeoutUnit != null ) {
-				builder.param( "timeout", AbstractSimpleElasticsearchWork.AbstractBuilder.getTimeoutString( timeoutValue, timeoutUnit ) );
+				builder.param( "timeout", getTimeoutString( timeoutValue, timeoutUnit ) );
 			}
 
 			if ( exceptionOnTimeout ) {
@@ -168,8 +158,7 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 				builder.param( "allow_partial_search_results", false );
 
 				// set timeoutValue and timeoutUnit only for hard timeout
-				builder.timeoutValue( timeoutValue );
-				builder.timeoutUnit( timeoutUnit );
+				builder.timeout( timeoutValue, timeoutUnit );
 			}
 
 			return builder.build();
