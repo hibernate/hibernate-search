@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.management;
 
+import static org.hibernate.search.integrationtest.backend.elasticsearch.management.ElasticsearchManagementTestUtils.defaultMetadataMappingAndCommaForInitialization;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.management.ElasticsearchManagementTestUtils.simpleMappingForInitialization;
+
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -49,6 +52,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
 				"{"
 					+ "'properties': {"
+							+ defaultMetadataMappingAndCommaForInitialization()
 							+ "'myField': {"
 									+ "'type': 'integer',"
 									+ "'index': true"
@@ -81,6 +85,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				"{"
 					+ "'dynamic': false,"
 					+ "'properties': {"
+							+ defaultMetadataMappingAndCommaForInitialization()
 							+ "'myField': {"
 									+ "'type': 'integer',"
 									+ "'index': true"
@@ -130,6 +135,8 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.indexFieldContext( "__HSEARCH_type" )
+						.failure( "Missing property mapping" )
 						.indexFieldContext( "myField" )
 						.failure( "Missing property mapping" )
 						.build() );
@@ -160,6 +167,8 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.indexFieldContext( "__HSEARCH_type" )
+						.failure( "Missing property mapping" )
 						.indexFieldContext( "myField" )
 						.failure( "Missing property mapping" )
 						.build() );
@@ -169,15 +178,12 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_type_invalid() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'keyword',"
-									+ "'index': true"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'keyword',"
+							+ "'index': true"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		SubTest.expectException( () ->
@@ -202,14 +208,11 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_index_missing() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'integer'"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'integer'"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		// the expected value true is the default
@@ -226,15 +229,12 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_index_invalid() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'integer',"
-									+ "'index': false"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'integer',"
+							+ "'index': false"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		SubTest.expectException( () ->
@@ -259,15 +259,12 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_index_false_scalar() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'integer',"
-									+ "'index': false"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'integer',"
+							+ "'index': false"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		validateSchemaConfig()
@@ -284,16 +281,13 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_index_false_text() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'text',"
-									+ "'analyzer': 'keyword',"
-									+ "'index': false"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'text',"
+							+ "'analyzer': 'keyword',"
+							+ "'index': false"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		validateSchemaConfig()
@@ -312,14 +306,11 @@ public class ElasticsearchSchemaAttributeValidationIT {
 
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'date'"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'date'"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		SubTest.expectException( () ->
@@ -350,15 +341,12 @@ public class ElasticsearchSchemaAttributeValidationIT {
 
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'date',"
-									+ "'format': '" + allFormats + "'"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'date',"
+							+ "'format': '" + allFormats + "'"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		validateSchemaConfig()
@@ -382,15 +370,12 @@ public class ElasticsearchSchemaAttributeValidationIT {
 
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'date',"
-									+ "'format': '" + firstFormat + "'"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'date',"
+							+ "'format': '" + firstFormat + "'"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		SubTest.expectException( () ->
@@ -420,15 +405,12 @@ public class ElasticsearchSchemaAttributeValidationIT {
 
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'date',"
-									+ "'format': '" + allFormats + "||yyyy" + "'"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'date',"
+							+ "'format': '" + allFormats + "||yyyy" + "'"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		SubTest.expectException( () ->
@@ -456,15 +438,12 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_format_wrong() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'date',"
-									+ "'format': 'epoch_millis||strict_date_time'"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'date',"
+							+ "'format': 'epoch_millis||strict_date_time'"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		SubTest.expectException( () ->
@@ -493,15 +472,12 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_analyzer_missing() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'text',"
-									+ "'index': true"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'text',"
+							+ "'index': true"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		SubTest.expectException( () ->
@@ -526,16 +502,13 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_analyzer_valid() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'text',"
-									+ "'index': true,"
-									+ "'analyzer': 'keyword'"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'text',"
+							+ "'index': true,"
+							+ "'analyzer': 'keyword'"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		validateSchemaConfig()
@@ -551,16 +524,13 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_analyzer_invalid() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'text',"
-									+ "'index': true,"
-									+ "'analyzer': 'keyword'"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'text',"
+							+ "'index': true,"
+							+ "'analyzer': 'keyword'"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		SubTest.expectException( () ->
@@ -585,16 +555,13 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_searchAnalyzer_missing() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'text',"
-									+ "'index': true,"
-									+ "'analyzer': 'keyword'"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'text',"
+							+ "'index': true,"
+							+ "'analyzer': 'keyword'"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		SubTest.expectException( () ->
@@ -620,17 +587,14 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_searchAnalyzer_valid() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'text',"
-									+ "'index': true,"
-									+ "'analyzer': 'keyword',"
-									+ "'search_analyzer': 'english'"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'text',"
+							+ "'index': true,"
+							+ "'analyzer': 'keyword',"
+							+ "'search_analyzer': 'english'"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		validateSchemaConfig()
@@ -647,17 +611,14 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_searchAnalyzer_invalid() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'text',"
-									+ "'index': true,"
-									+ "'analyzer': 'keyword',"
-									+ "'search_analyzer': 'english'"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'text',"
+							+ "'index': true,"
+							+ "'analyzer': 'keyword',"
+							+ "'search_analyzer': 'english'"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		SubTest.expectException( () ->
@@ -682,15 +643,12 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void property_norms_valid() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'text',"
-									+ "'norms': false"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'text',"
+							+ "'norms': false"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		validateSchemaConfig()
@@ -706,15 +664,12 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void property_norms_invalid() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'text',"
-									+ "'norms': false"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'text',"
+							+ "'norms': false"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		SubTest.expectException( () ->
@@ -740,14 +695,11 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void property_norms_missing_textField() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'text'"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'text'"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		validateSchemaConfig()
@@ -763,14 +715,11 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void property_norms_missing_keywordField() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'keyword'"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'keyword'"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		validateSchemaConfig()
@@ -786,16 +735,13 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void property_termVector_valid() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'text',"
-									+ "'analyzer': 'english',"
-									+ "'term_vector': 'with_positions_offsets'"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'text',"
+							+ "'analyzer': 'english',"
+							+ "'term_vector': 'with_positions_offsets'"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		validateSchemaConfig()
@@ -811,15 +757,12 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void property_termVector_missing() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'text',"
-									+ "'analyzer': 'english'"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'text',"
+							+ "'analyzer': 'english'"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		validateSchemaConfig()
@@ -835,16 +778,13 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void property_termVector_invalid() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'text',"
-									+ "'analyzer': 'english',"
-									+ "'term_vector': 'with_offsets'"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'text',"
+							+ "'analyzer': 'english',"
+							+ "'term_vector': 'with_offsets'"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		SubTest.expectException( () -> validateSchemaConfig()
@@ -868,15 +808,12 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_store_true() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'keyword',"
-									+ "'store': true"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'keyword',"
+							+ "'store': true"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		validateSchemaConfig()
@@ -892,14 +829,11 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_store_default() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'keyword'"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'keyword'"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		validateSchemaConfig()
@@ -915,15 +849,12 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_store_invalid() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'keyword',"
-									+ "'store': false"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'keyword',"
+							+ "'store': false"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		SubTest.expectException( () -> validateSchemaConfig()
@@ -947,15 +878,12 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_nullValue_valid() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'integer',"
-									+ "'null_value': 739"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'integer',"
+							+ "'null_value': 739"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		validateSchemaConfig()
@@ -971,14 +899,11 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_nullValue_missing() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'integer'"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'integer'"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		SubTest.expectException( () -> validateSchemaConfig()
@@ -1002,15 +927,12 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_nullValue_invalid() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'integer',"
-									+ "'null_value': 777"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'integer',"
+							+ "'null_value': 777"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		SubTest.expectException( () -> validateSchemaConfig()
@@ -1034,15 +956,12 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_docValues_valid() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'integer',"
-									+ "'doc_values': true"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'integer',"
+							+ "'doc_values': true"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		validateSchemaConfig()
@@ -1058,14 +977,11 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_docValues_default() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'integer'"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'integer'"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		validateSchemaConfig()
@@ -1081,15 +997,12 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_docValues_invalid() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'integer',"
-									+ "'doc_values': false"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'integer',"
+							+ "'doc_values': false"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		SubTest.expectException( () -> validateSchemaConfig()
@@ -1113,15 +1026,12 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_docValues_false() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'integer',"
-									+ "'doc_values': false"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'integer',"
+							+ "'doc_values': false"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		validateSchemaConfig()
@@ -1138,15 +1048,12 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_docValues_skip() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'keyword',"
-									+ "'doc_values': true"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'keyword',"
+							+ "'doc_values': true"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		validateSchemaConfig()
@@ -1163,15 +1070,12 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_scaling_factor_valid() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'scaled_float',"
-									+ "'scaling_factor': 100"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'scaled_float',"
+							+ "'scaling_factor': 100"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		validateSchemaConfig()
@@ -1187,15 +1091,12 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_scaling_factor_invalid() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'scaled_float',"
-									+ "'scaling_factor': 2"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'scaled_float',"
+							+ "'scaling_factor': 2"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		SubTest.expectException( () -> validateSchemaConfig()
@@ -1219,15 +1120,12 @@ public class ElasticsearchSchemaAttributeValidationIT {
 	public void attribute_normalizer_missing() {
 		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'keyword',"
-									+ "'index': true"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'keyword',"
+							+ "'index': true"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		SubTest.expectException( () ->
@@ -1291,16 +1189,13 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				+ "}"
 		);
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'keyword',"
-									+ "'index': true,"
-									+ "'normalizer': 'custom-normalizer'"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'keyword',"
+							+ "'index': true,"
+							+ "'normalizer': 'custom-normalizer'"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		validateSchemaWithAnalyzerConfig()
@@ -1338,16 +1233,13 @@ public class ElasticsearchSchemaAttributeValidationIT {
 					+ "}"
 		);
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'keyword',"
-									+ "'index': true,"
-									+ "'normalizer': 'custom-normalizer'"
-							+ "}"
+				simpleMappingForInitialization(
+					"'myField': {"
+							+ "'type': 'keyword',"
+							+ "'index': true,"
+							+ "'normalizer': 'custom-normalizer'"
 					+ "}"
-				+ "}"
+				)
 		);
 
 		SubTest.expectException( () ->

@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.mapping;
 
 import com.google.gson.JsonObject;
 
-class ElasticsearchTypeNameMappingTestUtils {
+public class ElasticsearchTypeNameMappingTestUtils {
 
 	private ElasticsearchTypeNameMappingTestUtils() {
 	}
@@ -26,12 +26,12 @@ class ElasticsearchTypeNameMappingTestUtils {
 		JsonObject properties = new JsonObject();
 		result.add( "properties", properties );
 
-		properties.add( propertyName, discriminatorMapping() );
+		properties.add( propertyName, discriminatorMappingComplete() );
 
 		return result;
 	}
 
-	private static JsonObject discriminatorMapping() {
+	public static JsonObject discriminatorMappingComplete() {
 		JsonObject discriminatorMapping = new JsonObject();
 		discriminatorMapping.addProperty( "type", "keyword" );
 		discriminatorMapping.addProperty( "index", false );
@@ -40,4 +40,11 @@ class ElasticsearchTypeNameMappingTestUtils {
 		return discriminatorMapping;
 	}
 
+	public static JsonObject discriminatorMappingOmitDefaults() {
+		JsonObject discriminatorMapping = new JsonObject();
+		discriminatorMapping.addProperty( "type", "keyword" );
+		discriminatorMapping.addProperty( "index", false );
+		// "store" and "doc_values" have default values: omit them.
+		return discriminatorMapping;
+	}
 }

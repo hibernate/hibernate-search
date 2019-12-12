@@ -808,7 +808,8 @@ public class ElasticsearchExtensionIT {
 						+ "'nativeField_unsupportedType': 'foobar',"
 						+ "'nativeField_sort5': 'z'"
 						+ "}",
-				result.get( 0 ).toString()
+				result.get( 0 ).toString(),
+				JSONCompareMode.LENIENT
 		);
 	}
 
@@ -844,7 +845,8 @@ public class ElasticsearchExtensionIT {
 						+ "'nativeField_unsupportedType': 'foobar',"
 						+ "'nativeField_sort5': 'z'"
 						+ "}",
-				result.get( 0 ).toString()
+				result.get( 0 ).toString(),
+				JSONCompareMode.LENIENT
 		);
 	}
 
