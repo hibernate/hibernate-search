@@ -189,8 +189,8 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 
 	@Override
 	public HibernateOrmSearchQueryAdapter<R> setHint(String hintName, Object value) {
-		if ( "javax.persistence.query.timeout".equals( hintName ) && value instanceof Long ) {
-			delegate.failAfter( (Long) value, TimeUnit.MILLISECONDS );
+		if ( "javax.persistence.query.timeout".equals( hintName ) ) {
+			delegate.failAfter( hintValueToLong( value ), TimeUnit.MILLISECONDS );
 		}
 		return this;
 	}
@@ -375,5 +375,14 @@ public final class HibernateOrmSearchQueryAdapter<R> extends AbstractProducedQue
 	@Override
 	public HibernateOrmSearchQueryAdapter<R> setEntity(String name, Object val) {
 		throw new UnsupportedOperationException( "setEntity(String,Object) is not implemented in Hibernate Search queries" );
+	}
+
+	private static long hintValueToLong(Object value) {
+		if ( value instanceof Number ) {
+			return ( (Number) value ).longValue();
+		}
+		else {
+			return Long.parseLong( String.valueOf( value ) );
+		}
 	}
 }
