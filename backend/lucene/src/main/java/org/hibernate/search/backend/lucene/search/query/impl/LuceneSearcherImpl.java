@@ -110,7 +110,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		// Handling the hard timeout.
 		// Soft timeout has no sense in case of count,
 		// since there is no possible to have partial result.
-		if ( TimeoutManager.Type.EXCEPTION.equals( timeoutManager.getType() ) ) {
+		if ( timeoutManager.hasHardTimeout() ) {
 			return indexSearcher.search( requestContext.getLuceneQuery(), new TimeoutCountCollectorManager( timeoutManager ) );
 		}
 

@@ -24,7 +24,19 @@ public final class TimeoutManager {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public enum Type {
+	public static TimeoutManager noTimeout(TimingSource timingSource, Query query) {
+		return new TimeoutManager( timingSource, query, null, Type.NONE );
+	}
+
+	public static TimeoutManager softTimeout(TimingSource timingSource, Query query, long timeout, TimeUnit timeUnit) {
+		return new TimeoutManager( timingSource, query, timeUnit.toMillis( timeout ), Type.LIMIT );
+	}
+
+	public static TimeoutManager hardTimeout(TimingSource timingSource, Query query, long timeout, TimeUnit timeUnit) {
+		return new TimeoutManager( timingSource, query, timeUnit.toMillis( timeout ), Type.EXCEPTION );
+	}
+
+	private enum Type {
 		NONE,
 		EXCEPTION,
 		LIMIT;
@@ -32,16 +44,18 @@ public final class TimeoutManager {
 
 	private final TimingSource timingSource;
 	private final Query query;
+	private final Long timeout;
+	private final Type type;
 
-	// timeout in nanoseconds
-	private Long timeout;
-	private long start;
+	private Long start;
 	boolean timedOut = false;
-	private Type type;
 
-	public TimeoutManager(TimingSource timingSource, Query query) {
+	private TimeoutManager(TimingSource timingSource, Query query, Long timeout, Type type) {
 		this.timingSource = timingSource;
 		this.query = query;
+		this.timeout = timeout;
+		this.type = type;
+
 		timingSource.ensureInitialized();
 	}
 
@@ -50,6 +64,10 @@ public final class TimeoutManager {
 	 */
 	public void start() {
 		this.start = timingSource.getMonotonicTimeEstimate();
+	}
+
+	public void stop() {
+		this.start = null;
 	}
 
 	/**
@@ -97,46 +115,19 @@ public final class TimeoutManager {
 		return timeLeft != null && timeLeft <= 0;
 	}
 
-	public void stop() {
-		this.timeout = null;
-		this.type = Type.NONE;
-	}
-
-	public void setTimeout(long timeout, TimeUnit timeUnit) {
-		this.timeout = timeUnit.toMillis( timeout );
-		//timeout of 0 means no more timeout
-		if ( timeout == 0 ) {
-			stop();
-		}
-	}
-
 	public void forceTimedOut() {
 		this.timedOut = Boolean.TRUE;
 		onTimedOut();
 	}
 
 	private void onTimedOut() {
-		if ( this.type == Type.EXCEPTION ) {
+		if ( hasHardTimeout() ) {
 			throw log.timedOut( getTookTime(), query.toString() );
 		}
 	}
 
-	public void raiseExceptionOnTimeout() {
-		if ( this.type == Type.LIMIT ) {
-			throw log.raiseExceptionOrLimitFetching();
-		}
-		this.type = Type.EXCEPTION;
-	}
-
-	public void limitFetchingOnTimeout() {
-		if ( this.type == Type.EXCEPTION ) {
-			throw log.raiseExceptionOrLimitFetching();
-		}
-		this.type = Type.LIMIT;
-	}
-
-	public Type getType() {
-		return type;
+	public boolean hasHardTimeout() {
+		return this.type == Type.EXCEPTION;
 	}
 
 	public Duration getTookTime() {

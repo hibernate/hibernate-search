@@ -78,17 +78,15 @@ public final class LuceneSearchContext {
 
 	public TimeoutManager createTimeoutManager(Query definitiveLuceneQuery,
 			Long timeout, TimeUnit timeUnit, boolean exceptionOnTimeout) {
-		TimeoutManager timeoutManager = new TimeoutManager( timingSource, definitiveLuceneQuery );
 		if ( timeout != null && timeUnit != null ) {
-			timeoutManager.setTimeout( timeout, timeUnit );
 			if ( exceptionOnTimeout ) {
-				timeoutManager.raiseExceptionOnTimeout();
+				return TimeoutManager.hardTimeout( timingSource, definitiveLuceneQuery, timeout, timeUnit );
 			}
 			else {
-				timeoutManager.limitFetchingOnTimeout();
+				return TimeoutManager.softTimeout( timingSource, definitiveLuceneQuery, timeout, timeUnit );
 			}
 		}
-		return timeoutManager;
+		return TimeoutManager.noTimeout( timingSource, definitiveLuceneQuery );
 	}
 
 }
