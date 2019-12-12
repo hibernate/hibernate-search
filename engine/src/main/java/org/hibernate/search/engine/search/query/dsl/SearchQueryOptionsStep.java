@@ -65,24 +65,27 @@ public interface SearchQueryOptionsStep<
 	S routing(Collection<String> routingKeys);
 
 	/**
-	 * Define a timeout period for a given unit of time.
-	 * Note that this time out is on a best effort basis.
-	 * If the limit is reached, fetching will be limited.
+	 * Stop the query and return truncated results after a given timeout.
+	 * <p>
+	 * The timeout is handled on a best effort basis:
+	 * Hibernate Search will *try* to stop the query as soon as possible after the timeout.
 	 *
-	 * @param timeout time out value
-	 * @param timeUnit time out unit
-	 * @return {@code this} to allow method chaining
+	 * @param timeout Timeout value.
+	 * @param timeUnit Timeout unit.
+	 * @return {@code this}, for method chaining.
 	 */
 	S truncateAfter(long timeout, TimeUnit timeUnit);
 
 	/**
-	 * Define a timeout period for a given unit of time.
-	 * Note that this time out is on a best effort basis.
-	 * If the limit is reached, an exception will be raised.
+	 * Stop the query and throw an exception after a given timeout.
+	 * <p>
+	 * The timeout is handled on a best effort basis:
+	 * Hibernate Search will *try* to stop the query as soon as possible after the timeout.
+	 * However, this method is more likely to trigger an early stop than {@link #truncateAfter(long, TimeUnit)}.
 	 *
-	 * @param timeout time out value
-	 * @param timeUnit time out unit
-	 * @return {@code this} to allow method chaining
+	 * @param timeout Timeout value.
+	 * @param timeUnit Timeout unit.
+	 * @return {@code this}, for method chaining.
 	 */
 	S failAfter(long timeout, TimeUnit timeUnit);
 
