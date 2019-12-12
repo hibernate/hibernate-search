@@ -10,7 +10,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -19,13 +24,13 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Assume;
@@ -37,7 +42,12 @@ public class SearchQueryTimeoutIT {
 
 	private static final String BACKEND_NAME = "backendName";
 	private static final String INDEX_NAME = "indexName";
-	private static final String FIELD_NAME = "fieldName";
+	private static final int FIELD_COUNT = 20;
+	private static final List<String> FIELD_NAMES = Collections.unmodifiableList(
+			IntStream.range( 0 , FIELD_COUNT )
+					.mapToObj( i -> "field_" + i )
+					.collect( Collectors.toList() )
+	);
 	private static final String EMPTY_FIELD_NAME = "emptyFieldName";
 
 	// Taken from our current documentation (https://docs.jboss.org/hibernate/search/6.0/reference/en-US/html_single/):
@@ -75,11 +85,8 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void timeout_largeQuery_smallTimeout_raiseAnException() {
-		StubMappingScope scope = indexManager.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.match().field( FIELD_NAME ).matching( BUZZ_WORDS ) )
+	public void timeout_slowQuery_smallTimeout_raiseAnException() {
+		SearchQuery<DocumentReference> query = startSlowQuery()
 				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
 
@@ -90,11 +97,8 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void timeout_largeCount_smallTimeout_raiseAnException() {
-		StubMappingScope scope = indexManager.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.match().field( FIELD_NAME ).matching( BUZZ_WORDS ) )
+	public void timeout_slowCount_smallTimeout_raiseAnException() {
+		SearchQuery<DocumentReference> query = startSlowQuery()
 				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
 
@@ -105,20 +109,15 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void timeout_largeQuery_smallTimeout_limitFetching() {
+	public void timeout_slowQuery_smallTimeout_limitFetching() {
 		Assume.assumeTrue(
 				"backend should have a fast timeout resolution in order to run this test correctly",
 				TckConfiguration.get().getBackendFeatures().fastTimeoutResolution()
 		);
 
-		StubMappingScope scope = indexManager.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.match().field( FIELD_NAME ).matching( BUZZ_WORDS ) )
+		SearchResult<DocumentReference> result = startSlowQuery()
 				.truncateAfter( 1, TimeUnit.NANOSECONDS )
-				.toQuery();
-
-		SearchResult<DocumentReference> result = query.fetchAll();
+				.fetchAll();
 
 		assertThat( result.getTotalHitCount() ).isLessThan( ROUNDS * 3 );
 		assertThat( result.getTook() ).isNotNull(); // May be 0 due to low resolution
@@ -126,19 +125,29 @@ public class SearchQueryTimeoutIT {
 	}
 
 	@Test
-	public void timeout_smallQuery_largeTimeout() {
-		StubMappingScope scope = indexManager.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.match().field( EMPTY_FIELD_NAME ).matching( ANY_INTEGER ) )
+	public void timeout_fastQuery_largeTimeout() {
+		SearchResult<DocumentReference> result = startFastQuery()
 				.failAfter( 1, TimeUnit.DAYS )
-				.toQuery();
+				.fetchAll();
 
-		SearchResult<DocumentReference> result = query.fetchAll();
 		SearchResultAssert.assertThat( result ).hasNoHits();
 
 		assertThat( result.getTook() ).isLessThan( Duration.ofDays( 1L ) );
 		assertThat( result.isTimedOut() ).isFalse();
+	}
+
+	private SearchQueryOptionsStep<?, DocumentReference, ?, ?> startSlowQuery() {
+		return indexManager.createScope().query()
+				.predicate( f -> f.bool( b -> {
+					for ( String fieldName : FIELD_NAMES ) {
+						b.must( f.match().field( fieldName ).matching( BUZZ_WORDS ) );
+					}
+				} ) );
+	}
+
+	private SearchQueryOptionsStep<?, DocumentReference, ?, ?> startFastQuery() {
+		return indexManager.createScope().query()
+				.predicate( f -> f.match().field( EMPTY_FIELD_NAME ).matching( ANY_INTEGER ) );
 	}
 
 	private void initData() {
@@ -146,19 +155,47 @@ public class SearchQueryTimeoutIT {
 		// Use a batch approach for a real application
 		// Here the huge bulk is used to provoke a timeout
 		for ( int i = 0; i < ROUNDS; i++ ) {
-			plan.add( referenceProvider( i + "a" ), document -> document.addValue( indexMapping.field, TEXT_1 ) );
-			plan.add( referenceProvider( i + "b" ), document -> document.addValue( indexMapping.field, TEXT_2 ) );
-			plan.add( referenceProvider( i + "c" ), document -> document.addValue( indexMapping.field, TEXT_3 ) );
+			plan.add(
+					referenceProvider( i + "a" ),
+					document -> {
+						for ( IndexFieldReference<String> field : indexMapping.fields ) {
+							document.addValue( field, TEXT_1 );
+						}
+					}
+			);
+			plan.add(
+					referenceProvider( i + "b" ),
+					document -> {
+						for ( IndexFieldReference<String> field : indexMapping.fields ) {
+							document.addValue( field, TEXT_2 );
+						}
+					}
+			);
+			plan.add(
+					referenceProvider( i + "c" ),
+					document -> {
+						for ( IndexFieldReference<String> field : indexMapping.fields ) {
+							document.addValue( field, TEXT_3 );
+						}
+					}
+			);
 		}
 		plan.execute().join();
 	}
 
 	private static class IndexMapping {
-		private final IndexFieldReference<String> field;
+		private final List<IndexFieldReference<String>> fields = new ArrayList<>();
 
 		IndexMapping(IndexSchemaElement root) {
-			field = root.field( FIELD_NAME, f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ) )
-					.toReference();
+			for ( String fieldName : FIELD_NAMES ) {
+				fields.add(
+						root.field(
+								fieldName,
+								f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
+						)
+								.toReference()
+				);
+			}
 			root.field( EMPTY_FIELD_NAME, f -> f.asInteger() ).toReference();
 		}
 	}
