@@ -122,15 +122,9 @@ public class LuceneCollectorsBuilder {
 			luceneCollectors.put( LuceneCollectorKey.TOP_DOCS, topDocsCollector );
 		}
 
-		Collector compositeCollector = MultiCollector.wrap( luceneCollectors.values() );
-		if ( TimeoutManager.Type.LIMIT.equals( timeoutManager.getType() ) ) {
-			// Add time-limiting collector
-			final Long timeoutLeft = timeoutManager.getTimeoutLeftInMilliseconds();
-			if ( timeoutLeft != null ) {
-				Counter counter = new LuceneCounterAdapter( timingSource );
-				compositeCollector = new TimeLimitingCollector( compositeCollector, counter, timeoutLeft );
-			}
-		}
+		Collector compositeCollector = wrapTimeLimitingCollectorIfNecessary(
+				MultiCollector.wrap( luceneCollectors.values() )
+		);
 
 		LuceneChildrenCollector childrenCollector = null;
 		if ( !nestedDocumentPaths.isEmpty() ) {
@@ -139,7 +133,9 @@ public class LuceneCollectorsBuilder {
 		}
 		Collector compositeCollectorForNestedDocuments = null;
 		if ( !luceneCollectorsForNestedDocuments.isEmpty() ) {
-			compositeCollectorForNestedDocuments = MultiCollector.wrap( luceneCollectorsForNestedDocuments );
+			compositeCollectorForNestedDocuments = wrapTimeLimitingCollectorIfNecessary(
+					MultiCollector.wrap( luceneCollectorsForNestedDocuments )
+			);
 		}
 
 		return new LuceneCollectors(
@@ -150,5 +146,20 @@ public class LuceneCollectorsBuilder {
 				luceneCollectors,
 				timeoutManager
 		);
+	}
+
+	private Collector wrapTimeLimitingCollectorIfNecessary(Collector collector) {
+		if ( TimeoutManager.Type.LIMIT.equals( timeoutManager.getType() ) ) {
+			final Long timeoutLeft = timeoutManager.getTimeoutLeftInMilliseconds();
+			if ( timeoutLeft != null ) {
+				Counter counter = new LuceneCounterAdapter( timingSource );
+				TimeLimitingCollector wrapped = new TimeLimitingCollector( collector, counter, timeoutLeft );
+				// The timeout starts from now, not from when the collector is first used.
+				// This is important because some collectors are applied during a second search.
+				wrapped.setBaseline();
+				return wrapped;
+			}
+		}
+		return collector;
 	}
 }
