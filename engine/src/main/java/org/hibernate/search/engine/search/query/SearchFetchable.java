@@ -8,8 +8,10 @@ package org.hibernate.search.engine.search.query;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.SearchTimeoutException;
 
 /**
  * A component allowing to fetch search results.
@@ -25,6 +27,9 @@ public interface SearchFetchable<H> {
 	 * @param limit The maximum number of hits to be included in the {@link SearchResult}. {@code null} means no limit.
 	 * @return The {@link SearchResult}.
 	 * @throws SearchException If something goes wrong while executing the query.
+	 * @throws SearchTimeoutException If a
+	 * {@link org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep#failAfter(long, TimeUnit) failure timeout was set}
+	 * and was reached while executing the query.
 	 * @throws RuntimeException If something goes wrong while loading entities. The exact type depends on the mapper,
 	 * e.g. HibernateException/PersistenceException for the Hibernate ORM mapper.
 	 */
@@ -38,6 +43,9 @@ public interface SearchFetchable<H> {
 	 * @param limit The maximum number of hits to be included in the {@link SearchResult}. {@code null} means no limit.
 	 * @return The {@link SearchResult}.
 	 * @throws SearchException If something goes wrong while executing the query.
+	 * @throws SearchTimeoutException If a
+	 * {@link org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep#failAfter(long, TimeUnit) failure timeout was set}
+	 * and was reached while executing the query.
 	 * @throws RuntimeException If something goes wrong while loading entities. The exact type depends on the mapper,
 	 * e.g. HibernateException/PersistenceException for the Hibernate ORM mapper.
 	 */
@@ -50,6 +58,9 @@ public interface SearchFetchable<H> {
 	 * @param limit The maximum number of hits to be returned by this method. {@code null} means no limit.
 	 * @return The query hits.
 	 * @throws SearchException If something goes wrong while executing the query.
+	 * @throws SearchTimeoutException If a
+	 * {@link org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep#failAfter(long, TimeUnit) failure timeout was set}
+	 * and was reached while executing the query.
 	 * @throws RuntimeException If something goes wrong while loading entities. The exact type depends on the mapper,
 	 * e.g. HibernateException/PersistenceException for the Hibernate ORM mapper.
 	 */
@@ -63,6 +74,9 @@ public interface SearchFetchable<H> {
 	 * @param limit The maximum number of hits to be returned by this method. {@code null} means no limit.
 	 * @return The query hits.
 	 * @throws SearchException If something goes wrong while executing the query.
+	 * @throws SearchTimeoutException If a
+	 * {@link org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep#failAfter(long, TimeUnit) failure timeout was set}
+	 * and was reached while executing the query.
 	 * @throws RuntimeException If something goes wrong while loading entities. The exact type depends on the mapper,
 	 * e.g. HibernateException/PersistenceException for the Hibernate ORM mapper.
 	 */
@@ -74,6 +88,9 @@ public interface SearchFetchable<H> {
 	 * @return The single, optional query hit.
 	 * @throws SearchException If something goes wrong while executing the query,
 	 * or the number of hits is more than one.
+	 * @throws SearchTimeoutException If a
+	 * {@link org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep#failAfter(long, TimeUnit) failure timeout was set}
+	 * and was reached while executing the query.
 	 * @throws RuntimeException If something goes wrong while loading entities. The exact type depends on the mapper,
 	 * e.g. HibernateException/PersistenceException for the Hibernate ORM mapper.
 	 */
@@ -84,6 +101,9 @@ public interface SearchFetchable<H> {
 	 *
 	 * @return The total number of matching entities, ignoring pagination settings.
 	 * @throws SearchException If something goes wrong while executing the query.
+	 * @throws SearchTimeoutException If a
+	 * {@link org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep#failAfter(long, TimeUnit) failure timeout was set}
+	 * and was reached while executing the query.
 	 */
 	long fetchTotalHitCount();
 
@@ -95,6 +115,9 @@ public interface SearchFetchable<H> {
 	 *
 	 * @return The {@link SearchResult}.
 	 * @throws SearchException If something goes wrong while executing the query.
+	 * @throws SearchTimeoutException If a
+	 * {@link org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep#failAfter(long, TimeUnit) failure timeout was set}
+	 * and was reached while executing the query.
 	 * @throws RuntimeException If something goes wrong while loading entities. The exact type depends on the mapper,
 	 * e.g. HibernateException/PersistenceException for the Hibernate ORM mapper.
 	 */
@@ -109,6 +132,9 @@ public interface SearchFetchable<H> {
 	 *
 	 * @return The query hits.
 	 * @throws SearchException If something goes wrong while executing the query.
+	 * @throws SearchTimeoutException If a
+	 * {@link org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep#failAfter(long, TimeUnit) failure timeout was set}
+	 * and was reached while executing the query.
 	 * @throws RuntimeException If something goes wrong while loading entities. The exact type depends on the mapper,
 	 * e.g. HibernateException/PersistenceException for the Hibernate ORM mapper.
 	 */
