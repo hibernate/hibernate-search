@@ -17,7 +17,7 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrch
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
-import org.hibernate.search.backend.lucene.search.timeout.spi.TimeoutManager;
+import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.work.impl.LuceneReadWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;

@@ -28,7 +28,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneNestedQueries;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.lucene.search.query.timout.impl.TimeoutCountCollectorManager;
-import org.hibernate.search.backend.lucene.search.timeout.spi.TimeoutManager;
+import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
 import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;

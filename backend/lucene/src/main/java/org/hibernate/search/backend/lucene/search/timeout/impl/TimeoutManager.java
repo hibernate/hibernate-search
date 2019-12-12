@@ -11,7 +11,6 @@ import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.timeout.spi.TimeoutManager;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Query;
@@ -19,9 +18,15 @@ import org.apache.lucene.search.Query;
 /**
  * @author Emmanuel Bernard
  */
-public class TimeoutManagerImpl implements TimeoutManager {
+public final class TimeoutManager {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	public enum Type {
+		NONE,
+		EXCEPTION,
+		LIMIT
+	}
 
 	private final Query query;
 
@@ -31,19 +36,17 @@ public class TimeoutManagerImpl implements TimeoutManager {
 	boolean timedOut = false;
 	private Type type;
 
-	public TimeoutManagerImpl(Query query) {
+	public TimeoutManager(Query query) {
 		this.query = query;
 	}
 
 	/**
 	 * we start counting from this method call (if needed)
 	 */
-	@Override
 	public void start() {
 		this.start = System.nanoTime();
 	}
 
-	@Override
 	public Long getTimeoutLeftInMilliseconds() {
 		return getTimeoutLeft( 1000000 );
 	}
@@ -76,7 +79,6 @@ public class TimeoutManagerImpl implements TimeoutManager {
 		}
 	}
 
-	@Override
 	public boolean isTimedOut() {
 		if ( timeout == null ) {
 			return false;
@@ -104,13 +106,11 @@ public class TimeoutManagerImpl implements TimeoutManager {
 		}
 	}
 
-	@Override
 	public void stop() {
 		this.timeout = null;
 		this.type = Type.NONE;
 	}
 
-	@Override
 	public void setTimeout(long timeout, TimeUnit timeUnit) {
 		this.timeout = timeUnit.toNanos( timeout );
 		//timeout of 0 means no more timeout
@@ -119,12 +119,10 @@ public class TimeoutManagerImpl implements TimeoutManager {
 		}
 	}
 
-	@Override
 	public void forceTimedOut() {
 		this.timedOut = Boolean.TRUE;
 	}
 
-	@Override
 	public void raiseExceptionOnTimeout() {
 		if ( this.type == Type.LIMIT ) {
 			throw log.raiseExceptionOrLimitFetching();
@@ -132,7 +130,6 @@ public class TimeoutManagerImpl implements TimeoutManager {
 		this.type = Type.EXCEPTION;
 	}
 
-	@Override
 	public void limitFetchingOnTimeout() {
 		if ( this.type == Type.EXCEPTION ) {
 			throw log.raiseExceptionOrLimitFetching();
@@ -140,12 +137,10 @@ public class TimeoutManagerImpl implements TimeoutManager {
 		this.type = Type.LIMIT;
 	}
 
-	@Override
 	public Type getType() {
 		return type;
 	}
 
-	@Override
 	public Duration getTookTime() {
 		long deltaNanos = System.nanoTime() - start;
 		return Duration.ofNanos( deltaNanos );
