@@ -132,7 +132,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 				}
 				);
 
-		Integer currentTimeoutValue = ( elasticsearchRequest.getTimeoutValue() == null ) ?
+		long currentTimeoutValue = ( elasticsearchRequest.getTimeoutValue() == null ) ?
 				globalTimeoutValue : elasticsearchRequest.getTimeoutValue();
 		TimeUnit currentTimeoutUnit = ( elasticsearchRequest.getTimeoutUnit() == null ) ?
 				globalTimeoutUnit : elasticsearchRequest.getTimeoutUnit();

@@ -64,7 +64,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private JsonArray jsonSort;
 	private Map<DistanceSortKey, Integer> distanceSorts;
 	private Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations;
-	private Integer timeoutValue;
+	private Long timeoutValue;
 	private TimeUnit timeoutUnit;
 	private boolean exceptionOnTimeout;
 	private ElasticsearchSearchRequestTransformer requestTransformer;
@@ -105,7 +105,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	@Override
 	public void truncateAfter(long timeout, TimeUnit timeUnit) {
 		// This will override any failAfter. Eventually we could allow the user to set both.
-		this.timeoutValue = Math.toIntExact( timeout );
+		this.timeoutValue = timeout;
 		this.timeoutUnit = timeUnit;
 		this.exceptionOnTimeout = false;
 	}
@@ -113,7 +113,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	@Override
 	public void failAfter(long timeout, TimeUnit timeUnit) {
 		// This will override any truncateAfter. Eventually we could allow the user to set both.
-		this.timeoutValue = Math.toIntExact( timeout );
+		this.timeoutValue = timeout;
 		this.timeoutUnit = timeUnit;
 		this.exceptionOnTimeout = true;
 	}

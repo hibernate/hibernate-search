@@ -50,7 +50,7 @@ public final class ElasticsearchRequest {
 	private final String path;
 	private final Map<String, String> parameters;
 	private final List<JsonObject> bodyParts;
-	private final Integer timeoutValue;
+	private final Long timeoutValue;
 	private final TimeUnit timeoutUnit;
 
 	private ElasticsearchRequest(Builder builder) {
@@ -78,7 +78,7 @@ public final class ElasticsearchRequest {
 		return bodyParts;
 	}
 
-	public Integer getTimeoutValue() {
+	public Long getTimeoutValue() {
 		return timeoutValue;
 	}
 
@@ -106,7 +106,7 @@ public final class ElasticsearchRequest {
 
 		private Map<String, String> parameters;
 		private List<JsonObject> bodyParts;
-		private Integer timeoutValue;
+		private Long timeoutValue;
 		private TimeUnit timeoutUnit;
 
 		private Builder(String method) {
@@ -172,7 +172,7 @@ public final class ElasticsearchRequest {
 			return this;
 		}
 
-		public Builder timeout(Integer timeoutValue, TimeUnit timeoutUnit) {
+		public Builder timeout(Long timeoutValue, TimeUnit timeoutUnit) {
 			this.timeoutValue = timeoutValue;
 			this.timeoutUnit = timeoutUnit;
 			return this;
