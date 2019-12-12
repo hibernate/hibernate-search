@@ -10,7 +10,9 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import org.hibernate.search.backend.lucene.search.query.impl.LuceneChildrenCollector;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 import org.hibernate.search.backend.lucene.search.timeout.impl.LuceneCounterAdapter;
 import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
@@ -29,6 +31,7 @@ import org.apache.lucene.util.Counter;
 public class LuceneCollectorsBuilder {
 
 	private final Sort sort;
+	private final Set<String> nestedDocumentPaths;
 	private final int maxDocs;
 	private final TimeoutManager timeoutManager;
 	private final TimingSource timingSource;
@@ -41,8 +44,10 @@ public class LuceneCollectorsBuilder {
 	private final Map<LuceneCollectorKey<?>, Collector> luceneCollectors = new LinkedHashMap<>();
 	private final List<Collector> luceneCollectorsForNestedDocuments = new ArrayList<>();
 
-	public LuceneCollectorsBuilder(Sort sort, int maxDocs, TimeoutManager timeoutManager, TimingSource timingSource) {
+	public LuceneCollectorsBuilder(Sort sort, Set<String> nestedDocumentPaths,
+			int maxDocs, TimeoutManager timeoutManager, TimingSource timingSource) {
 		this.sort = sort;
+		this.nestedDocumentPaths = nestedDocumentPaths;
 		this.maxDocs = maxDocs;
 		this.timeoutManager = timeoutManager;
 		this.timingSource = timingSource;
@@ -127,11 +132,23 @@ public class LuceneCollectorsBuilder {
 			}
 		}
 
+		LuceneChildrenCollector childrenCollector = null;
+		if ( !nestedDocumentPaths.isEmpty() ) {
+			childrenCollector = new LuceneChildrenCollector();
+			luceneCollectorsForNestedDocuments.add( childrenCollector );
+		}
+		Collector compositeCollectorForNestedDocuments = null;
+		if ( !luceneCollectorsForNestedDocuments.isEmpty() ) {
+			compositeCollectorForNestedDocuments = MultiCollector.wrap( luceneCollectorsForNestedDocuments );
+		}
+
 		return new LuceneCollectors(
-				topDocsCollector, totalHitCountCollector,
-				compositeCollector, luceneCollectorsForNestedDocuments,
+				requireFieldDocRescoring, scoreSortFieldIndexForRescoring,
+				nestedDocumentPaths,
+				topDocsCollector, totalHitCountCollector, childrenCollector,
+				compositeCollector, compositeCollectorForNestedDocuments,
 				luceneCollectors,
-				requireFieldDocRescoring, scoreSortFieldIndexForRescoring
+				timeoutManager
 		);
 	}
 }

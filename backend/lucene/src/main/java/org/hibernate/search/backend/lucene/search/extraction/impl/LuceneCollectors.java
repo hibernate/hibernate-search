@@ -7,14 +7,27 @@
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
 import java.io.IOException;
-import java.util.Collection;
+import java.lang.invoke.MethodHandles;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
+import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.impl.LuceneNestedQueries;
+import org.hibernate.search.backend.lucene.search.query.impl.LuceneChildrenCollector;
+import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
+import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+
+import org.apache.lucene.document.Document;
+import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.FieldDoc;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.TimeLimitingCollector;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopFieldCollector;
@@ -22,43 +35,88 @@ import org.apache.lucene.search.TotalHitCountCollector;
 
 public class LuceneCollectors {
 
-	private final TopDocsCollector<?> topDocsCollector;
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final TotalHitCountCollector totalHitCountCollector;
+	private static final Set<String> ID_FIELD_SET = Collections.singleton( LuceneFields.idFieldName() );
 
-	private final Collector compositeCollector;
-	private final Collection<Collector> collectorsForNestedDocuments;
-
-	private final Map<LuceneCollectorKey<?>, Collector> collectors;
 
 	private final boolean requireFieldDocRescoring;
 	private final Integer scoreSortFieldIndexForRescoring;
+	private final Set<String> nestedDocumentPaths;
+
+	private final TopDocsCollector<?> topDocsCollector;
+	private final TotalHitCountCollector totalHitCountCollector;
+	private final LuceneChildrenCollector childrenCollector;
+
+	private final Collector compositeCollector;
+	private final Collector compositeCollectorForNestedDocuments;
+	private final Map<LuceneCollectorKey<?>, Collector> collectors;
+
+	private final TimeoutManager timeoutManager;
 
 	private TopDocs topDocs = null;
+	private Map<Integer, Set<Integer>> nestedDocIds = Collections.emptyMap();
 
-	LuceneCollectors(TopDocsCollector<?> topDocsCollector, TotalHitCountCollector totalHitCountCollector,
-			Collector compositeCollector, Collection<Collector> collectorsForNestedDocuments,
+	LuceneCollectors(boolean requireFieldDocRescoring, Integer scoreSortFieldIndexForRescoring,
+			Set<String> nestedDocumentPaths,
+			TopDocsCollector<?> topDocsCollector,
+			TotalHitCountCollector totalHitCountCollector, LuceneChildrenCollector childrenCollector,
+			Collector compositeCollector, Collector compositeCollectorForNestedDocuments,
 			Map<LuceneCollectorKey<?>, Collector> collectors,
-			boolean requireFieldDocRescoring, Integer scoreSortFieldIndexForRescoring) {
-		this.topDocsCollector = topDocsCollector;
-		this.totalHitCountCollector = totalHitCountCollector;
-		this.compositeCollector = compositeCollector;
-		this.collectorsForNestedDocuments = collectorsForNestedDocuments;
-		this.collectors = collectors;
+			TimeoutManager timeoutManager) {
 		this.requireFieldDocRescoring = requireFieldDocRescoring;
 		this.scoreSortFieldIndexForRescoring = scoreSortFieldIndexForRescoring;
+		this.nestedDocumentPaths = nestedDocumentPaths;
+		this.topDocsCollector = topDocsCollector;
+		this.totalHitCountCollector = totalHitCountCollector;
+		this.childrenCollector = childrenCollector;
+		this.compositeCollector = compositeCollector;
+		this.compositeCollectorForNestedDocuments = compositeCollectorForNestedDocuments;
+		this.collectors = collectors;
+		this.timeoutManager = timeoutManager;
 	}
 
 	public void collect(IndexSearcher indexSearcher, Query luceneQuery, int offset, Integer limit) throws IOException {
-		indexSearcher.search( luceneQuery, compositeCollector );
+		if ( timeoutManager.isTimedOut() ) {
+			// in case of timeout before the query execution, skip the query
+			return;
+		}
+
+		try {
+			indexSearcher.search( luceneQuery, compositeCollector );
+		}
+		catch (TimeLimitingCollector.TimeExceededException e) {
+			timeoutManager.forceTimedOut();
+			return;
+		}
 
 		if ( topDocsCollector == null ) {
 			return;
 		}
+
 		extractTopDocs( offset, limit );
+
 		if ( requireFieldDocRescoring ) {
 			handleRescoring( indexSearcher, luceneQuery );
 		}
+
+		collectNestedDocs( indexSearcher, luceneQuery );
+	}
+
+	public Map<LuceneCollectorKey<?>, Collector> getCollectors() {
+		return collectors;
+	}
+
+	public long getTotalHits() {
+		return totalHitCountCollector.getTotalHits();
+	}
+
+	public TopDocs getTopDocs() {
+		return topDocs;
+	}
+
+	public Map<Integer, Set<Integer>> getNestedDocIds() {
+		return nestedDocIds;
 	}
 
 	private void extractTopDocs(int offset, Integer limit) {
@@ -85,19 +143,40 @@ public class LuceneCollectors {
 		}
 	}
 
-	public Collection<Collector> getCollectorsForNestedDocuments() {
-		return collectorsForNestedDocuments;
+	private void collectNestedDocs(IndexSearcher indexSearcher, Query parentsQuery)
+			throws IOException {
+		// if the projection does not need any nested object skip their fetching
+		if ( topDocs == null || nestedDocumentPaths.isEmpty() ) {
+			return;
+		}
+
+		// TODO HSEARCH-3657 this could be avoided
+		Map<String, Integer> parentIds = new HashMap<>();
+		for ( ScoreDoc hit : topDocs.scoreDocs ) {
+			Document doc = indexSearcher.doc( hit.doc, ID_FIELD_SET );
+			String parentId = doc.getField( LuceneFields.idFieldName() ).stringValue();
+			if ( parentId == null ) {
+				continue;
+			}
+			parentIds.put( parentId, hit.doc );
+		}
+
+		Map<String, Set<Integer>> stringSetMap = applyCollectorsToNestedDocs( indexSearcher, parentsQuery );
+		this.nestedDocIds = new HashMap<>();
+		for ( Map.Entry<String, Set<Integer>> entry : stringSetMap.entrySet() ) {
+			this.nestedDocIds.put( parentIds.get( entry.getKey() ), entry.getValue() );
+		}
 	}
 
-	public Map<LuceneCollectorKey<?>, Collector> getCollectors() {
-		return collectors;
-	}
+	private Map<String, Set<Integer>> applyCollectorsToNestedDocs(IndexSearcher indexSearcher, Query parentsQuery) {
+		BooleanQuery booleanQuery = LuceneNestedQueries.findChildQuery( nestedDocumentPaths, parentsQuery );
 
-	public long getTotalHits() {
-		return totalHitCountCollector.getTotalHits();
-	}
-
-	public TopDocs getTopDocs() {
-		return topDocs;
+		try {
+			indexSearcher.search( booleanQuery, compositeCollectorForNestedDocuments );
+			return childrenCollector.getChildren();
+		}
+		catch (IOException e) {
+			throw log.errorFetchingNestedDocuments( booleanQuery, e );
+		}
 	}
 }

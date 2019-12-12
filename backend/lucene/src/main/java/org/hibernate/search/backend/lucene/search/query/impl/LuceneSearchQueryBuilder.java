@@ -32,7 +32,6 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementC
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
-import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
 import org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl.LuceneFieldComparatorSource;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
