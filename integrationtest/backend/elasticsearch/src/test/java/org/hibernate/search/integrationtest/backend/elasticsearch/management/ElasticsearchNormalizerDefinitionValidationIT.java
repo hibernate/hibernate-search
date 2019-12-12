@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.management;
 
+import static org.hibernate.search.integrationtest.backend.elasticsearch.management.ElasticsearchManagementTestUtils.simpleMappingForInitialization;
+
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
@@ -134,11 +136,7 @@ public class ElasticsearchNormalizerDefinitionValidationIT {
 
 	protected void putMapping() {
 		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
-				"{"
-						+ "'dynamic': 'strict',"
-						+ "'properties': {"
-						+ "}"
-						+ "}"
+				simpleMappingForInitialization( "" )
 		);
 	}
 

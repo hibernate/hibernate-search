@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.management;
 
+import static org.hibernate.search.integrationtest.backend.elasticsearch.management.ElasticsearchManagementTestUtils.defaultMetadataMappingAndCommaForInitialization;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.management.ElasticsearchManagementTestUtils.simpleMappingForExpectations;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.management.ElasticsearchManagementTestUtils.simpleMappingForInitialization;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
@@ -50,62 +53,53 @@ public class ElasticsearchSchemaMigrationIT {
 		elasticSearchClient.index( INDEX1_NAME )
 				.deleteAndCreate()
 				.type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'date',"
-									+ "'index': true,"
-									+ "'doc_values': false,"
-									+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
-									+ "'ignore_malformed': true" // Ignored during migration
-							+ "},"
-							+ "'NOTmyField': {" // Ignored during migration
-									+ "'type': 'date',"
-									+ "'index': true"
-							+ "}"
-					+ "}"
-				+ "}"
+						simpleMappingForInitialization(
+								"'myField': {"
+										+ "'type': 'date',"
+										+ "'index': true,"
+										+ "'doc_values': false,"
+										+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
+										+ "'ignore_malformed': true" // Ignored during migration
+								+ "},"
+								+ "'NOTmyField': {" // Ignored during migration
+										+ "'type': 'date',"
+										+ "'index': true"
+								+ "}"
+						)
 				);
 		elasticSearchClient.index( INDEX2_NAME )
 				.deleteAndCreate()
 				.type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'boolean',"
-									+ "'doc_values': false,"
-									+ "'index': true"
-							+ "},"
-							+ "'NOTmyField': {" // Ignored during migration
-									+ "'type': 'boolean',"
-									+ "'index': true"
-							+ "}"
-					+ "}"
-				+ "}"
+						simpleMappingForInitialization(
+								"'myField': {"
+										+ "'type': 'boolean',"
+										+ "'doc_values': false,"
+										+ "'index': true"
+								+ "},"
+								+ "'NOTmyField': {" // Ignored during migration
+										+ "'type': 'boolean',"
+										+ "'index': true"
+								+ "}"
+						)
 				);
 		elasticSearchClient.index( INDEX3_NAME ).deleteAndCreate(
 				"index.analysis", generateAnalysisSettings()
 				);
 		elasticSearchClient.index( INDEX3_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'defaultAnalyzer': {"
-									+ "'type': 'text'"
-							+ "},"
-							+ "'nonDefaultAnalyzer': {"
-									+ "'type': 'text',"
-									+ "'analyzer': 'customAnalyzer'"
-							+ "},"
-							+ "'normalizer': {"
-									+ "'type': 'keyword',"
-									+ "'doc_values': false,"
-									+ "'normalizer': 'customNormalizer'"
-							+ "}"
-					+ "}"
-				+ "}"
+						simpleMappingForInitialization(
+								"'defaultAnalyzer': {"
+										+ "'type': 'text'"
+								+ "},"
+								+ "'nonDefaultAnalyzer': {"
+										+ "'type': 'text',"
+										+ "'analyzer': 'customAnalyzer'"
+								+ "},"
+								+ "'normalizer': {"
+										+ "'type': 'keyword',"
+										+ "'doc_values': false,"
+										+ "'normalizer': 'customNormalizer'"
+								+ "}"
+						)
 				);
 
 		withManagementStrategyConfiguration()
@@ -149,57 +143,48 @@ public class ElasticsearchSchemaMigrationIT {
 				.setup();
 
 		assertJsonEquals(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'date',"
-									+ "'doc_values': false,"
-									+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
-									+ "'ignore_malformed': true" // Assert it was not removed
-							+ "},"
-							+ "'NOTmyField': {" // Assert it was not removed
-									+ "'type': 'date'"
-							+ "}"
-					+ "}"
-				+ "}",
+				simpleMappingForExpectations(
+						"'myField': {"
+								+ "'type': 'date',"
+								+ "'doc_values': false,"
+								+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
+								+ "'ignore_malformed': true" // Assert it was not removed
+						+ "},"
+						+ "'NOTmyField': {" // Assert it was not removed
+								+ "'type': 'date'"
+						+ "}"
+				),
 				elasticSearchClient.index( INDEX1_NAME ).type().getMapping()
-				);
+		);
 		assertJsonEquals(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'boolean',"
-									+ "'doc_values': false"
-							+ "},"
-							+ "'NOTmyField': {" // Assert it was not removed
-									+ "'type': 'boolean'"
-							+ "}"
-					+ "}"
-				+ "}",
+				simpleMappingForExpectations(
+						"'myField': {"
+								+ "'type': 'boolean',"
+								+ "'doc_values': false"
+						+ "},"
+						+ "'NOTmyField': {" // Assert it was not removed
+								+ "'type': 'boolean'"
+						+ "}"
+				),
 				elasticSearchClient.index( INDEX2_NAME ).type().getMapping()
-				);
+		);
 		assertJsonEquals(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'defaultAnalyzer': {"
-									+ "'type': 'text'"
-							+ "},"
-							+ "'nonDefaultAnalyzer': {"
-									+ "'type': 'text',"
-									+ "'analyzer': 'customAnalyzer'"
-							+ "},"
-							+ "'normalizer': {"
-									+ "'type': 'keyword',"
-									+ "'doc_values': false,"
-									+ "'normalizer': 'customNormalizer'"
-							+ "}"
-					+ "}"
-				+ "}",
+				simpleMappingForExpectations(
+						"'defaultAnalyzer': {"
+								+ "'type': 'text'"
+						+ "},"
+						+ "'nonDefaultAnalyzer': {"
+								+ "'type': 'text',"
+								+ "'analyzer': 'customAnalyzer'"
+						+ "},"
+						+ "'normalizer': {"
+								+ "'type': 'keyword',"
+								+ "'doc_values': false,"
+								+ "'normalizer': 'customNormalizer'"
+						+ "}"
+				),
 				elasticSearchClient.index( INDEX3_NAME ).type().getMapping()
-				);
+		);
 	}
 
 	@Test
@@ -218,17 +203,14 @@ public class ElasticsearchSchemaMigrationIT {
 				.setup();
 
 		assertJsonEquals(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
+				simpleMappingForExpectations(
+						"'myField': {"
 									+ "'type': 'boolean',"
 									+ "'doc_values': false"
 							+ "}"
-					+ "}"
-				+ "}",
+				),
 				elasticSearchClient.index( INDEX1_NAME ).type().getMapping()
-				);
+		);
 	}
 
 	@Test
@@ -236,19 +218,21 @@ public class ElasticsearchSchemaMigrationIT {
 		elasticSearchClient.index( INDEX1_NAME )
 				.deleteAndCreate()
 				.type().putMapping(
-				"{"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'boolean',"
-									+ "'doc_values': false,"
-									+ "'index': true"
-							+ "},"
-							+ "'NOTmyField': {"
-									+ "'type': 'boolean',"
-									+ "'index': true"
-							+ "}"
-					+ "}"
-				+ "}"
+						"{"
+								// "dynamic" missing
+								+ "'properties': {"
+										+ defaultMetadataMappingAndCommaForInitialization()
+										+ "'myField': {"
+												+ "'type': 'boolean',"
+												+ "'doc_values': false,"
+												+ "'index': true"
+										+ "},"
+										+ "'NOTmyField': {"
+												+ "'type': 'boolean',"
+												+ "'index': true"
+										+ "}"
+								+ "}"
+						+ "}"
 				);
 
 		withManagementStrategyConfiguration()
@@ -263,20 +247,17 @@ public class ElasticsearchSchemaMigrationIT {
 				.setup();
 
 		assertJsonEquals(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'boolean',"
-									+ "'doc_values': false"
-							+ "},"
-							+ "'NOTmyField': {" // Assert it was not removed
-									+ "'type': 'boolean'"
-							+ "}"
-					+ "}"
-				+ "}",
+				simpleMappingForExpectations(
+						"'myField': {"
+								+ "'type': 'boolean',"
+								+ "'doc_values': false"
+						+ "},"
+						+ "'NOTmyField': {" // Assert it was not removed
+								+ "'type': 'boolean'"
+						+ "}"
+				),
 				elasticSearchClient.index( INDEX1_NAME ).type().getMapping()
-				);
+		);
 	}
 
 	@Test
@@ -284,15 +265,12 @@ public class ElasticsearchSchemaMigrationIT {
 		elasticSearchClient.index( INDEX1_NAME )
 				.deleteAndCreate()
 				.type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'NOTmyField': {"
-									+ "'type': 'date',"
-									+ "'index': true"
-							+ "}"
-					+ "}"
-				+ "}"
+						simpleMappingForInitialization(
+								"'NOTmyField': {"
+										+ "'type': 'date',"
+										+ "'index': true"
+								+ "}"
+						)
 				);
 
 		withManagementStrategyConfiguration()
@@ -307,21 +285,18 @@ public class ElasticsearchSchemaMigrationIT {
 				.setup();
 
 		assertJsonEquals(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'date',"
-									+ "'doc_values': false,"
-									+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "'"
-							+ "},"
-							+ "'NOTmyField': {" // Assert it was not removed
-									+ "'type': 'date'"
-							+ "}"
-					+ "}"
-				+ "}",
+				simpleMappingForExpectations(
+						"'myField': {"
+								+ "'type': 'date',"
+								+ "'doc_values': false,"
+								+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "'"
+						+ "},"
+						+ "'NOTmyField': {" // Assert it was not removed
+								+ "'type': 'date'"
+						+ "}"
+				),
 				elasticSearchClient.index( INDEX1_NAME ).type().getMapping()
-				);
+		);
 	}
 
 	@Test
@@ -329,16 +304,13 @@ public class ElasticsearchSchemaMigrationIT {
 		elasticSearchClient.index( INDEX1_NAME )
 				.deleteAndCreate()
 				.type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
+						simpleMappingForInitialization(
+							"'myField': {"
 									+ "'type': 'date',"
 									+ "'index': false," // Invalid
 									+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "'"
 							+ "}"
-					+ "}"
-				+ "}"
+						)
 				);
 
 		setupExpectingFailure(
@@ -371,16 +343,13 @@ public class ElasticsearchSchemaMigrationIT {
 				"index.analysis", generateAnalysisSettings()
 				);
 		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'analyzer': {"
-									+ "'type': 'text',"
-									+ "'analyzer': 'standard'" // Invalid
-							+ "}"
+				simpleMappingForInitialization(
+					"'analyzer': {"
+							+ "'type': 'text',"
+							+ "'analyzer': 'standard'" // Invalid
 					+ "}"
-				+ "}"
-				);
+				)
+		);
 
 		setupExpectingFailure(
 				() -> withManagementStrategyConfiguration()
@@ -415,16 +384,13 @@ public class ElasticsearchSchemaMigrationIT {
 				"index.analysis", generateAnalysisSettings()
 				);
 		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'normalizer': {"
-									+ "'type': 'keyword',"
-									+ "'normalizer': 'customNormalizer2'" // Invalid
-							+ "}"
-					+ "}"
-				+ "}"
-				);
+				simpleMappingForInitialization(
+						"'normalizer': {"
+								+ "'type': 'keyword',"
+								+ "'normalizer': 'customNormalizer2'" // Invalid
+						+ "}"
+				)
+		);
 
 		setupExpectingFailure(
 				() -> withManagementStrategyConfiguration()

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.management;
 
+import static org.hibernate.search.integrationtest.backend.elasticsearch.management.ElasticsearchManagementTestUtils.simpleMappingForExpectations;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.util.EnumSet;
@@ -73,18 +74,15 @@ public class ElasticsearchSchemaCreationIT {
 		} );
 
 		assertJsonEquals(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'date',"
-									+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
-									+ "'doc_values': false"
-							+ "}"
-					+ "}"
-				+ "}",
+				simpleMappingForExpectations(
+						"'myField': {"
+								+ "'type': 'date',"
+								+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
+								+ "'doc_values': false"
+						+ "}"
+				),
 				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
-				);
+		);
 	}
 
 	@Test
@@ -101,17 +99,14 @@ public class ElasticsearchSchemaCreationIT {
 		} );
 
 		assertJsonEquals(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'boolean',"
-									+ "'doc_values': false"
-							+ "}"
-					+ "}"
-				+ "}",
+				simpleMappingForExpectations(
+						"'myField': {"
+								+ "'type': 'boolean',"
+								+ "'doc_values': false"
+						+ "}"
+				),
 				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
-				);
+		);
 	}
 
 	@Test
@@ -128,17 +123,14 @@ public class ElasticsearchSchemaCreationIT {
 		} );
 
 		assertJsonEquals(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'keyword',"
-									+ "'doc_values': false"
-							+ "}"
-					+ "}"
-				+ "}",
+				simpleMappingForExpectations(
+						"'myField': {"
+								+ "'type': 'keyword',"
+								+ "'doc_values': false"
+						+ "}"
+				),
 				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
-				);
+		);
 	}
 
 	@Test
@@ -155,17 +147,14 @@ public class ElasticsearchSchemaCreationIT {
 		} );
 
 		assertJsonEquals(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'text',"
-									+ "'analyzer': 'standard'"
-							+ "}"
-					+ "}"
-				+ "}",
+				simpleMappingForExpectations(
+						"'myField': {"
+								+ "'type': 'text',"
+								+ "'analyzer': 'standard'"
+						+ "}"
+				),
 				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
-				);
+		);
 	}
 
 	@Test
@@ -182,18 +171,15 @@ public class ElasticsearchSchemaCreationIT {
 		} );
 
 		assertJsonEquals(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'text',"
-									+ "'analyzer': 'standard',"
-									+ "'norms': false"
-							+ "}"
-					+ "}"
-				+ "}",
+				simpleMappingForExpectations(
+						"'myField': {"
+								+ "'type': 'text',"
+								+ "'analyzer': 'standard',"
+								+ "'norms': false"
+						+ "}"
+				),
 				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
-				);
+		);
 	}
 
 	private void setup(Consumer<IndexBindingContext> mappingContributor) {

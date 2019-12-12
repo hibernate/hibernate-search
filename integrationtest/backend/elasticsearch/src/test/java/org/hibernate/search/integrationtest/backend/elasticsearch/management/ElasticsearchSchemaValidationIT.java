@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.management;
 
+import static org.hibernate.search.integrationtest.backend.elasticsearch.management.ElasticsearchManagementTestUtils.defaultMetadataMappingAndCommaForInitialization;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.management.ElasticsearchManagementTestUtils.simpleMappingForInitialization;
+
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
@@ -48,81 +51,69 @@ public class ElasticsearchSchemaValidationIT {
 	public void success_simple() throws Exception {
 		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'date',"
-									+ "'index': true,"
-									+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
-									+ "'ignore_malformed': true" // Ignored during validation
-							+ "},"
-							+ "'NOTmyField': {" // Ignored during validation
-									+ "'type': 'date',"
-									+ "'index': true"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
+				simpleMappingForInitialization(
+						"'myField': {"
+								+ "'type': 'date',"
+								+ "'index': true,"
+								+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
+								+ "'ignore_malformed': true" // Ignored during validation
+						+ "},"
+						+ "'NOTmyField': {" // Ignored during validation
+								+ "'type': 'date',"
+								+ "'index': true"
+						+ "}"
+				)
+		);
 		elasticSearchClient.index( INDEX2_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX2_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'boolean',"
-									+ "'index': true"
-							+ "},"
-							+ "'NOTmyField': {" // Ignored during validation
-									+ "'type': 'boolean',"
-									+ "'index': true"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
+				simpleMappingForInitialization(
+						"'myField': {"
+								+ "'type': 'boolean',"
+								+ "'index': true"
+						+ "},"
+						+ "'NOTmyField': {" // Ignored during validation
+								+ "'type': 'boolean',"
+								+ "'index': true"
+						+ "}"
+				)
+		);
 		elasticSearchClient.index( INDEX3_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX3_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'text',"
-									+ "'index': true,"
-									+ "'analyzer': 'default'"
-							+ "},"
-							+ "'NOTmyField': {" // Ignored during validation
-									+ "'type': 'text',"
-									+ "'index': true"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
+				simpleMappingForInitialization(
+						"'myField': {"
+								+ "'type': 'text',"
+								+ "'index': true,"
+								+ "'analyzer': 'default'"
+						+ "},"
+						+ "'NOTmyField': {" // Ignored during validation
+								+ "'type': 'text',"
+								+ "'index': true"
+						+ "}"
+				)
+		);
 
 		/*
 		 TODO uncomment and adapt this once we restore support for faceting; see HSEARCH-3271
 
 		elasticSearchClient.index( INDEX4_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX4_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'date',"
-									+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
-									+ "'ignore_malformed': true," // Ignored during validation
-									+ "'fields': {"
-											+ "'myField" + FACET_FIELD_SUFFIX + "': {"
-													+ "'type': 'date'"
-											+ "}"
-									+ "}"
-							+ "},"
-							+ "'NOTmyField': {" // Ignored during validation
-									+ "'type': 'date',"
-									+ "'index': 'false'"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
+				simpleMappingForInitialization(
+						"'myField': {"
+								+ "'type': 'date',"
+								+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
+								+ "'ignore_malformed': true," // Ignored during validation
+								+ "'fields': {"
+										+ "'myField" + FACET_FIELD_SUFFIX + "': {"
+												+ "'type': 'date'"
+										+ "}"
+								+ "}"
+						+ "},"
+						+ "'NOTmyField': {" // Ignored during validation
+								+ "'type': 'date',"
+								+ "'index': 'false'"
+						+ "}"
+				)
+		);
 		 */
 
 		validateSchemaConfig()
@@ -181,15 +172,12 @@ public class ElasticsearchSchemaValidationIT {
 	public void attribute_field_notPresent() {
 		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'notMyField': {"
+				simpleMappingForInitialization(
+					"'notMyField': {"
 									+ "'type': 'integer',"
 									+ "'index': true"
 							+ "}"
-					+ "}"
-				+ "}"
+				)
 		);
 
 		setupExpectingFailure(
@@ -218,22 +206,19 @@ public class ElasticsearchSchemaValidationIT {
 	public void property_attribute_leniency() throws Exception {
 		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'long',"
-									+ "'index': true,"
-									+ "'store': true"
-							+ "},"
-							+ "'myTextField': {"
-									+ "'type': 'text',"
-									+ "'index': true,"
-									+ "'norms': true"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
+				simpleMappingForInitialization(
+						"'myField': {"
+								+ "'type': 'long',"
+								+ "'index': true,"
+								+ "'store': true"
+						+ "},"
+						+ "'myTextField': {"
+								+ "'type': 'text',"
+								+ "'index': true,"
+								+ "'norms': true"
+						+ "}"
+				)
+		);
 
 		validateSchemaConfig()
 				.withIndex(
@@ -256,23 +241,20 @@ public class ElasticsearchSchemaValidationIT {
 	public void nestedProperty_attribute_invalid() throws Exception {
 		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-						+ "'myObjectField': {"
-							+ "'type': 'object',"
-							+ "'dynamic': 'strict',"
-							+ "'properties': {"
-								+ "'myField': {"
-									+ "'type': 'date',"
-									+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
-									+ "'index': false"
+				simpleMappingForInitialization(
+						"'myObjectField': {"
+								+ "'type': 'object',"
+								+ "'dynamic': 'strict',"
+								+ "'properties': {"
+										+ "'myField': {"
+												+ "'type': 'date',"
+												+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
+												+ "'index': false"
+										+ "}"
 								+ "}"
-							+ "}"
 						+ "}"
-					+ "}"
-				+ "}"
-				);
+				)
+		);
 
 		setupExpectingFailure(
 				() -> validateSchemaConfig()
@@ -302,14 +284,15 @@ public class ElasticsearchSchemaValidationIT {
 		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
 				"{"
-					+ "'dynamic': false,"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'integer'"
-							+ "}"
-					+ "}"
+						+ "'dynamic': false,"
+						+ "'properties': {"
+								+ defaultMetadataMappingAndCommaForInitialization()
+								+ "'myField': {"
+										+ "'type': 'integer'"
+								+ "}"
+						+ "}"
 				+ "}"
-				);
+		);
 
 		setupExpectingFailure(
 				() -> setupSimpleIndexWithKeywordField( INDEX1_NAME ),
@@ -332,25 +315,27 @@ public class ElasticsearchSchemaValidationIT {
 		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
 				"{"
-					+ "'dynamic': false,"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'keyword'"
-							+ "}"
-					+ "}"
+						+ "'dynamic': false,"
+						+ "'properties': {"
+								+ defaultMetadataMappingAndCommaForInitialization()
+								+ "'myField': {"
+										+ "'type': 'keyword'"
+								+ "}"
+						+ "}"
 				+ "}"
-				);
+		);
 		elasticSearchClient.index( INDEX2_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX2_NAME ).type().putMapping(
 				"{"
-					+ "'dynamic': false,"
-					+ "'properties': {"
-							+ "'myField': {"
-									+ "'type': 'integer'"
-							+ "}"
-					+ "}"
+						+ "'dynamic': false,"
+						+ "'properties': {"
+								+ defaultMetadataMappingAndCommaForInitialization()
+								+ "'myField': {"
+										+ "'type': 'integer'"
+								+ "}"
+						+ "}"
 				+ "}"
-				);
+		);
 
 		setupExpectingFailure(
 				() -> validateSchemaConfig()
@@ -396,19 +381,16 @@ public class ElasticsearchSchemaValidationIT {
 
 		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'id': {"
-									+ "'type': 'keyword',"
-									+ "'store': true"
-							+ "},"
-							+ "'myField': {"
-									+ "'type': 'date'"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
+				simpleMappingForInitialization(
+						"'id': {"
+								+ "'type': 'keyword',"
+								+ "'store': true"
+						+ "},"
+						+ "'myField': {"
+								+ "'type': 'date'"
+						+ "}"
+				)
+		);
 
 		setupExpectingFailure(
 				() -> validateSchemaConfig()
@@ -431,24 +413,21 @@ public class ElasticsearchSchemaValidationIT {
 
 		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'id': {"
-									+ "'type': 'keyword',"
-									+ "'store': true"
-							+ "},"
-							+ "'myField': {"
-									+ "'type': 'date',"
-									+ "'fields': {"
-											+ "'NOTmyField" + FACET_FIELD_SUFFIX + "': {"
-													+ "'type': 'date'"
-											+ "}"
-									+ "}"
-							+ "}"
-					+ "}"
-				+ "}"
-				);
+				simpleMappingForInitialization(
+						"'id': {"
+								+ "'type': 'keyword',"
+								+ "'store': true"
+						+ "},"
+						+ "'myField': {"
+								+ "'type': 'date',"
+								+ "'fields': {"
+										+ "'NOTmyField" + FACET_FIELD_SUFFIX + "': {"
+												+ "'type': 'date'"
+										+ "}"
+								+ "}"
+						+ "}"
+				)
+		);
 
 		setupExpectingFailure(
 				() -> validateSchemaConfig()
@@ -471,26 +450,23 @@ public class ElasticsearchSchemaValidationIT {
 
 		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
 		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
-				"{"
-					+ "'dynamic': 'strict',"
-					+ "'properties': {"
-							+ "'id': {"
-									+ "'type': 'keyword',"
-									+ "'index': 'true',"
-									+ "'store': true"
-							+ "},"
-							+ "'myField': {"
-									+ "'type': 'date',"
-									+ "'index': 'false',"
-									+ "'fields': {"
-											+ "'myField" + FACET_FIELD_SUFFIX + "': {"
-													+ "'type': 'date',"
-													+ "'index': 'false'"
-											+ "}"
-									+ "}"
-							+ "}"
-					+ "}"
-				+ "}"
+				simpleMappingForInitialization(
+						"'id': {"
+								+ "'type': 'keyword',"
+								+ "'index': 'true',"
+								+ "'store': true"
+						+ "},"
+						+ "'myField': {"
+								+ "'type': 'date',"
+								+ "'index': 'false',"
+								+ "'fields': {"
+										+ "'myField" + FACET_FIELD_SUFFIX + "': {"
+												+ "'type': 'date',"
+												+ "'index': 'false'"
+										+ "}"
+								+ "}"
+						+ "}"
+				)
 				);
 
 		setupExpectingFailure(
