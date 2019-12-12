@@ -214,6 +214,12 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		Map<AggregationKey<?>, Object> extractedMap = new LinkedHashMap<>();
 
 		for ( Map.Entry<AggregationKey<?>, LuceneSearchAggregation<?>> entry : aggregations.entrySet() ) {
+			// Check for timeout before every element.
+			// Do this *before* the element, so that we don't fail after the last element.
+			if ( timeoutManager.checkTimedOut() ) {
+				break;
+			}
+
 			AggregationKey<?> key = entry.getKey();
 			LuceneSearchAggregation<?> aggregation = entry.getValue();
 
