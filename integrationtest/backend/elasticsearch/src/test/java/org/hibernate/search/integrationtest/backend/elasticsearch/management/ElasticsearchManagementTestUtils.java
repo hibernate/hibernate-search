@@ -15,11 +15,11 @@ class ElasticsearchManagementTestUtils {
 	}
 
 	static String simpleMappingForInitialization(String properties) {
-		return simpleMapping( "'__HSEARCH_type': " + discriminatorMappingComplete(), properties );
+		return simpleMapping( "'_entity_type': " + discriminatorMappingComplete(), properties );
 	}
 
 	static String simpleMappingForExpectations(String properties) {
-		return simpleMapping( "'__HSEARCH_type': " + discriminatorMappingOmitDefaults(), properties );
+		return simpleMapping( "'_entity_type': " + discriminatorMappingOmitDefaults(), properties );
 	}
 
 	private static String simpleMapping(String metadataMapping, String otherProperties) {
@@ -38,7 +38,7 @@ class ElasticsearchManagementTestUtils {
 	}
 
 	static String defaultMetadataMappingForInitialization() {
-		return "'__HSEARCH_type': " + discriminatorMappingComplete().toString();
+		return "'_entity_type': " + discriminatorMappingComplete().toString();
 	}
 
 	static String defaultMetadataMappingAndCommaForInitialization() {

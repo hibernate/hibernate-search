@@ -440,7 +440,7 @@ See the following subsections for details about available strategies.
 
 With the `discriminator` strategy, a discriminator field is used to retrieve the type name directly from each document.
 
-When indexing, the `__HSEARCH_type` field is populated transparently with type name for each document.
+When indexing, the `_entity_type` field is populated transparently with type name for each document.
 
 When searching, the docvalues for the type field is transparently requested to Elasticsearch
 and extracted from the response.
@@ -505,8 +505,8 @@ The Elasticsearch ID of each document is set to the concatenation of the tenant 
 
 When indexing, two fields are populated transparently for each document:
 
-* `__HSEARCH_tenantId`: the "discriminator" field holding the tenant ID.
-* `__HSEARCH_id`: a field holding the the original (tenant-scoped) document ID.
+* `_tenant_id`: the "discriminator" field holding the tenant ID.
+* `_tenant_doc_id`: a field holding the the original (tenant-scoped) document ID.
 
 When searching, a filter targeting the tenant ID field is added transparently to the search query
 to only return search hits for the current tenant.
