@@ -76,10 +76,7 @@ public class ElasticsearchTypeNameMappingSchemaIT {
 		);
 
 		clientSpy.expectNext(
-				ElasticsearchRequest.put()
-						.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
-						.body( indexCreationPayload() )
-						.build(),
+				indexCreationRequest(),
 				ElasticsearchRequestAssertionMode.STRICT
 		);
 
@@ -106,6 +103,17 @@ public class ElasticsearchTypeNameMappingSchemaIT {
 				)
 				.setup();
 		clientSpy.verifyExpectationsMet();
+	}
+
+	private ElasticsearchRequest indexCreationRequest() {
+		ElasticsearchRequest.Builder schemaRequestBuilder = ElasticsearchRequest.put()
+				.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
+				.body( indexCreationPayload() );
+		Boolean includeTypeName = ElasticsearchTestDialect.get().getIncludeTypeNameParameterForMappingApi();
+		if ( includeTypeName != null ) {
+			schemaRequestBuilder.param( "include_type_name", includeTypeName );
+		}
+		return schemaRequestBuilder.build();
 	}
 
 	private JsonObject indexCreationPayload() {
