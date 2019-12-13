@@ -111,18 +111,17 @@ public class ElasticsearchTypeNameMappingSchemaIT {
 	private JsonObject indexCreationPayload() {
 		JsonObject payload = new JsonObject();
 
-		JsonObject mappings = new JsonObject();
-
-		JsonObject mapping = ElasticsearchTestDialect.get().getTypeNameForMappingApi()
+		JsonObject mappings = ElasticsearchTestDialect.get().getTypeNameForMappingApi()
 				// ES6 and below: the mapping has its own object node, child of "mappings"
 				.map( name -> {
 					JsonObject doc = new JsonObject();
-					mappings.add( name.original, expectedMappingContent );
+					doc.add( name.original, expectedMappingContent );
 					return doc;
 				} )
 				// ES7 and below: the mapping is the "mappings" node
 				.orElse( expectedMappingContent );
-		payload.add( "mappings", mapping );
+
+		payload.add( "mappings", mappings );
 
 		payload.add( "settings", new JsonObject() );
 
