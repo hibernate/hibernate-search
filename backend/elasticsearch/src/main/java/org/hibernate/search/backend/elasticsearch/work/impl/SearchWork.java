@@ -161,14 +161,13 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 
 			if ( timeoutValue != null && timeoutUnit != null ) {
 				builder.param( "timeout", getTimeoutString( timeoutValue, timeoutUnit ) );
+
+				if ( allowPartialSearchResultsSupported ) {
+					builder.param( "allow_partial_search_results", !exceptionOnTimeout );
+				}
 			}
 
 			if ( exceptionOnTimeout ) {
-				if ( allowPartialSearchResultsSupported ) {
-					// the default is true
-					builder.param( "allow_partial_search_results", false );
-				}
-
 				// set timeoutValue and timeoutUnit only for hard timeout
 				builder.timeout( timeoutValue, timeoutUnit );
 			}
