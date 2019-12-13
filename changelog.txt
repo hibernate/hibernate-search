@@ -1,6 +1,57 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.Beta3 (13-12-2019)
+-------------------------
+
+** Bug
+    * HSEARCH-3783 query.explain() with the Elasticsearch backend fails when using projections or multi-tenancy
+    * HSEARCH-3755 Configuration property checking displays the wrong name for the property controlling its behavior
+    * HSEARCH-1799 FullTextQueryImpl raises java.sql.QueryTimeoutException
+
+** Improvement
+    * HSEARCH-3788 Use a simpler prefix for metadata fields in Elasticsearch
+    * HSEARCH-3784 Avoid storing the index name in the index for each document
+    * HSEARCH-3766 Provide simple annotations for applying binders to types/properties
+    * HSEARCH-3764 Allow disabling conversion in the ID predicate
+    * HSEARCH-3761 Use GSON rather than strings to pass JSON objects around in Elasticsearch APIs
+    * HSEARCH-3758 Upgrade to Lucene 8.3.0
+    * HSEARCH-3757 Configure the protocol used to contact Elasticsearch separately
+    * HSEARCH-3756 Use commas instead of blanks as separators for multi-valued properties
+    * HSEARCH-3712 Simplify the definition of DSL converters and projection converters
+    * HSEARCH-3657 Switch to docvalues instead of stored fields for Hibernate Search metadata in Lucene/ES documents
+    * HSEARCH-3634 Clarify the error message when a @Transient property is missing a @IndexingDependency annotation
+    * HSEARCH-3456 Expose meta-information about the query execution (execution time, timeout, ...)
+    * HSEARCH-2389 Support "exists" predicate for @IndexedEmbedded
+
+** New Feature
+    * HSEARCH-3765 Add minimal support for Index Aliases
+    * HSEARCH-3662 Define aggregations from JSON with Elasticsearch
+    * HSEARCH-3496 Customization of Elasticsearch search requests
+    * HSEARCH-3135 Allow the definition of domain specific annotations for ValueBridges
+    * HSEARCH-2399 Implement timeouts for the Elasticsearch backend
+    * HSEARCH-1401 Allow integrators to declare entities whose structure is defined programmatically ("free-form")
+
+** Sub-task
+    * HSEARCH-3711 Document index field type DSL extension
+
+** Task
+    * HSEARCH-3782 Upgrade to Elasticsearch 7.5.0
+    * HSEARCH-3781 Upgrade to Hibernate ORM 5.4.10.Final
+    * HSEARCH-3780 Fix random failures in ElasticsearchClientFactoryImplIT
+    * HSEARCH-3770 Upgrade to elasticsearch-maven-plugin 6.15
+    * HSEARCH-3763 Upgrade to Hibernate ORM 5.4.9.Final
+    * HSEARCH-3754 Upgrade to Hibernate ORM 5.4.8.Final
+    * HSEARCH-3753 Mark the ContainerExtractor API as experimental
+    * HSEARCH-3750 Use auto-expanding entries in the documentation TOC
+    * HSEARCH-3748 Remove the bridge-based programmatic mapping APIs for TypeBridge, PropertyBridge and RoutingKeyBridge
+    * HSEARCH-3737 Test against AWS-hosted ES 7.1
+    * HSEARCH-3732 Add a timeout to the Jenkins build configuration
+    * HSEARCH-3717 Allow the use of native field types in ValueBridge
+    * HSEARCH-3716 Mitigate test failures caused by automatic snapshots of AWS-managed Elasticsearch service
+    * HSEARCH-3693 Search 6 groundwork Restore missing log messages from Search 5 in Search 6
+    * HSEARCH-3352 Search 6 groundwork - Restore support for search query timeouts
+
 6.0.0.Beta2 (25-10-2019)
 -------------------------
 
