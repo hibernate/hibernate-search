@@ -188,7 +188,8 @@ public class ElasticsearchClientFactoryImplIT {
 				) );
 
 		thrown.expect(
-				isException( CompletionException.class )
+				isException( AssertionFailure.class )
+						.causedBy( CompletionException.class )
 						.causedBy( SearchException.class )
 								.withMessage( "HSEARCH400089" )
 						.causedBy( JsonSyntaxException.class )
@@ -211,7 +212,8 @@ public class ElasticsearchClientFactoryImplIT {
 				) );
 
 		thrown.expect(
-				isException( CompletionException.class )
+				isException( AssertionFailure.class )
+						.causedBy( CompletionException.class )
 						.causedBy( IOException.class )
 				.build()
 		);
@@ -238,7 +240,8 @@ public class ElasticsearchClientFactoryImplIT {
 				) );
 
 		thrown.expect(
-				isException( CompletionException.class )
+				isException( AssertionFailure.class )
+						.causedBy( CompletionException.class )
 						.causedBy( SearchException.class )
 						.withMessage( "Query took longer than expected" )
 				.build()
@@ -642,7 +645,7 @@ public class ElasticsearchClientFactoryImplIT {
 			return client.submit( buildRequest( ElasticsearchRequest.post(), path, payload ) ).join();
 		}
 		catch (RuntimeException e) {
-			throw new SearchException( "Unexpected exception during POST: " + e.getMessage(), e );
+			throw new AssertionFailure( "Unexpected exception during POST: " + e.getMessage(), e );
 		}
 	}
 
