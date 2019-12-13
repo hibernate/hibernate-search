@@ -638,7 +638,12 @@ public class ElasticsearchClientFactoryImplIT {
 	}
 
 	private ElasticsearchResponse doPost(ElasticsearchClient client, String path, String payload) {
-		return client.submit( buildRequest( ElasticsearchRequest.post(), path, payload ) ).join();
+		try {
+			return client.submit( buildRequest( ElasticsearchRequest.post(), path, payload ) ).join();
+		}
+		catch (RuntimeException e) {
+			throw new SearchException( "Unexpected exception during POST: " + e.getMessage(), e );
+		}
 	}
 
 	private ElasticsearchRequest buildRequest(ElasticsearchRequest.Builder builder, String path, String payload) {
