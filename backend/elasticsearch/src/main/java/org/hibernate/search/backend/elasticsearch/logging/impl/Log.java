@@ -349,8 +349,7 @@ public interface Log extends BasicLogger {
 			value = "Duplicate index names when normalized to conform to Elasticsearch rules:"
 					+ " '%1$s' and '%2$s' both become '%3$s'")
 	SearchException duplicateNormalizedIndexNames(String firstHibernateSearchIndexName,
-			String secondHibernateSearchIndexName, String elasticsearchIndexName,
-			@Param EventContext context);
+			String secondHibernateSearchIndexName, String elasticsearchIndexName);
 
 	@Message(id = ID_OFFSET_3 + 31,
 			value = "Unknown index name encountered in Elasticsearch response: '%1$s'")
