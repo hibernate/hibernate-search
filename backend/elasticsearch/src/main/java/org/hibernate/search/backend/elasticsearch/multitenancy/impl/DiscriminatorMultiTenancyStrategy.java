@@ -32,6 +32,10 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private static final String ID_FIELD_NAME = ElasticsearchFields.internalFieldName( "id" );
+
+	private static final String TENANT_ID_FIELD_NAME = ElasticsearchFields.internalFieldName( "tenantId" );
+
 	private static final Pattern UNDERSCORE_PATTERN = Pattern.compile( "_" );
 
 	private static final String ESCAPED_UNDERSCORE = "__";
@@ -71,7 +75,7 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 		JsonObjectAccessor boolQuery = JsonAccessor.root().property( "bool" ).asObject();
 		boolQuery.property( "filter" ).asObject()
 				.property( "term" ).asObject()
-				.property( ElasticsearchFields.tenantIdFieldName() ).asString()
+				.property( TENANT_ID_FIELD_NAME ).asString()
 				.set( jsonQuery, tenantId );
 
 		if ( originalJsonQuery != null ) {
@@ -101,22 +105,22 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 			idPropertyMapping.setIndex( false );
 			idPropertyMapping.setStore( false );
 			idPropertyMapping.setDocValues( true );
-			rootTypeMapping.addProperty( ElasticsearchFields.idFieldName(), idPropertyMapping );
+			rootTypeMapping.addProperty( ID_FIELD_NAME, idPropertyMapping );
 
 			PropertyMapping tenantIdPropertyMapping = new PropertyMapping();
 			tenantIdPropertyMapping.setType( DataTypes.KEYWORD );
 			tenantIdPropertyMapping.setIndex( true );
 			tenantIdPropertyMapping.setStore( false );
 			tenantIdPropertyMapping.setDocValues( true );
-			rootTypeMapping.addProperty( ElasticsearchFields.tenantIdFieldName(), tenantIdPropertyMapping );
+			rootTypeMapping.addProperty( TENANT_ID_FIELD_NAME, tenantIdPropertyMapping );
 		}
 	}
 
 	private static class DiscriminatorMultiTenancyDocumentMetadataContributor implements DocumentMetadataContributor {
 		private static final JsonAccessor<String> TENANT_ID_ACCESSOR =
-				JsonAccessor.root().property( ElasticsearchFields.tenantIdFieldName() ).asString();
+				JsonAccessor.root().property( TENANT_ID_FIELD_NAME ).asString();
 		private static final JsonAccessor<String> ID_ACCESSOR =
-				JsonAccessor.root().property( ElasticsearchFields.idFieldName() ).asString();
+				JsonAccessor.root().property( ID_FIELD_NAME ).asString();
 
 		@Override
 		public void contribute(JsonObject document, String tenantId, String id) {
@@ -131,11 +135,11 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 
 		private static final JsonAccessor<String> HIT_ID_ACCESSOR =
 				JsonAccessor.root().property( "fields" ).asObject()
-						.property( ElasticsearchFields.idFieldName() ).asArray()
+						.property( ID_FIELD_NAME ).asArray()
 						.element( 0 ).asString();
 
 		private static final JsonElement ID_FIELD_NAME_JSON =
-				new JsonPrimitive( ElasticsearchFields.idFieldName() );
+				new JsonPrimitive( ID_FIELD_NAME );
 
 		@Override
 		public void request(JsonObject requestBody) {

@@ -12,10 +12,6 @@ public class ElasticsearchFields {
 
 	private static final char PATH_SEPARATOR = '.';
 
-	private static final String ID_FIELD_NAME = internalFieldName( "id" );
-
-	private static final String TENANT_ID_FIELD_NAME = internalFieldName( "tenantId" );
-
 	private ElasticsearchFields() {
 	}
 
@@ -24,14 +20,6 @@ public class ElasticsearchFields {
 		sb.append( INTERNAL_FIELD_PREFIX );
 		sb.append( fieldName );
 		return sb.toString();
-	}
-
-	public static String idFieldName() {
-		return ID_FIELD_NAME;
-	}
-
-	public static String tenantIdFieldName() {
-		return TENANT_ID_FIELD_NAME;
 	}
 
 	public static String compose(String absolutePath, String relativeFieldName) {
