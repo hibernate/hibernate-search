@@ -10,9 +10,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
@@ -63,10 +61,10 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 	private final ElasticsearchWorkOrchestratorImplementor queryOrchestrator;
 
-	private final Map<String, String> hibernateSearchIndexNamesByElasticsearchIndexNames = new ConcurrentHashMap<>();
-
 	private final EventContext eventContext;
+
 	private final IndexManagerBackendContext indexManagerBackendContext;
+	private final IndexNamesRegistry indexNamesRegistry;
 
 	ElasticsearchBackendImpl(String name,
 			ElasticsearchLinkImpl link,
@@ -105,6 +103,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 				orchestratorProvider,
 				queryOrchestrator
 		);
+		this.indexNamesRegistry = new IndexNamesRegistry();
 	}
 
 	@Override
@@ -172,19 +171,15 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 			throw log.multiTenancyRequiredButNotSupportedByBackend( hibernateSearchIndexName, eventContext );
 		}
 
-		String elasticsearchIndexName = ElasticsearchIndexNameNormalizer.normalize( hibernateSearchIndexName );
-		String existingHibernateSearchIndexName = hibernateSearchIndexNamesByElasticsearchIndexNames.putIfAbsent(
-				elasticsearchIndexName, hibernateSearchIndexName
-		);
-		if ( existingHibernateSearchIndexName != null ) {
-			throw log.duplicateNormalizedIndexNames(
-					existingHibernateSearchIndexName, hibernateSearchIndexName, elasticsearchIndexName,
-					eventContext
-			);
-		}
-		typeNameMapping.register( elasticsearchIndexName, mappedTypeName );
-
 		EventContext indexEventContext = EventContexts.fromIndexName( hibernateSearchIndexName );
+
+		String elasticsearchIndexName = ElasticsearchIndexNameNormalizer.normalize( hibernateSearchIndexName );
+
+		// This will check that names are unique.
+		indexNamesRegistry.register( elasticsearchIndexName, hibernateSearchIndexName );
+
+		// This will allow the type mapping to resolve the type name from the index name.
+		typeNameMapping.register( elasticsearchIndexName, mappedTypeName );
 
 		ElasticsearchIndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder =
 				new ElasticsearchIndexSchemaRootNodeBuilder(
@@ -210,7 +205,8 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 		return new ElasticsearchIndexManagerBuilder(
 				indexManagerBackendContext,
-				hibernateSearchIndexName, elasticsearchIndexName,
+				hibernateSearchIndexName,
+				elasticsearchIndexName,
 				indexSchemaRootNodeBuilder, settingsBuilder,
 				documentMetadataContributors
 		);
