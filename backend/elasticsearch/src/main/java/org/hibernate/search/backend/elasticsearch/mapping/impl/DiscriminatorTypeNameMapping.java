@@ -32,7 +32,7 @@ import com.google.gson.JsonPrimitive;
 public class DiscriminatorTypeNameMapping implements TypeNameMapping {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final String MAPPED_TYPE_FIELD_NAME = ElasticsearchFields.internalFieldName( "type" );
+	private static final String MAPPED_TYPE_FIELD_NAME = ElasticsearchFields.internalFieldName( "entity_type" );
 
 	private final TypeNameDiscriminatorSchemaRootContributor schemaRootContributor =
 			new TypeNameDiscriminatorSchemaRootContributor();

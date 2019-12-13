@@ -32,9 +32,9 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final String ID_FIELD_NAME = ElasticsearchFields.internalFieldName( "id" );
+	private static final String ID_FIELD_NAME = ElasticsearchFields.internalFieldName( "tenant_doc_id" );
 
-	private static final String TENANT_ID_FIELD_NAME = ElasticsearchFields.internalFieldName( "tenantId" );
+	private static final String TENANT_ID_FIELD_NAME = ElasticsearchFields.internalFieldName( "tenant_id" );
 
 	private static final Pattern UNDERSCORE_PATTERN = Pattern.compile( "_" );
 

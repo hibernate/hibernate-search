@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.util.impl;
 
 public class ElasticsearchFields {
 
-	private static final String INTERNAL_FIELD_PREFIX = "__HSEARCH_";
+	private static final String INTERNAL_FIELD_PREFIX = "_";
 
 	private static final char PATH_SEPARATOR = '.';
 
