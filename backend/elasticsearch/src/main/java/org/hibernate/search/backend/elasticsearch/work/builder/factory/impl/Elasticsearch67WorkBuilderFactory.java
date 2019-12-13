@@ -31,7 +31,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.SearchWork;
 import com.google.gson.JsonObject;
 
 /**
- * A work builder factory for ES6.
+ * A work builder factory for ES6.3 to ES6.7.
  * <p>
  * Compared to ES7:
  * <ul>
@@ -64,7 +64,7 @@ public class Elasticsearch67WorkBuilderFactory extends Elasticsearch7WorkBuilder
 	@Override
 	public <T> SearchWorkBuilder<T> search(JsonObject payload,
 			ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
-		return SearchWork.Builder.forElasticsearch6AndBelow( payload, searchResultExtractor );
+		return SearchWork.Builder.forElasticsearch63to68( payload, searchResultExtractor );
 	}
 
 	@Override

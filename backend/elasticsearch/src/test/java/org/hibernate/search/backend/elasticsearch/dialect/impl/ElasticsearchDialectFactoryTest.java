@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch56ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch60ProtocolDialect;
+import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch63ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch67ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch70ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.ElasticsearchProtocolDialect;
@@ -102,8 +103,8 @@ public class ElasticsearchDialectFactoryTest {
 				Elasticsearch6ModelDialect.class, Elasticsearch60ProtocolDialect.class
 		);
 		testSuccess(
-				"6", "6.6.0",
-				Elasticsearch6ModelDialect.class, Elasticsearch60ProtocolDialect.class
+				"6", "6.3.0",
+				Elasticsearch6ModelDialect.class, Elasticsearch63ProtocolDialect.class
 		);
 		testSuccess(
 				"6", "6.7.0",
@@ -129,11 +130,29 @@ public class ElasticsearchDialectFactoryTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3352")
+	public void es63() {
+		testSuccess(
+				"6.3", "6.3.0",
+				Elasticsearch6ModelDialect.class, Elasticsearch63ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3352")
+	public void es630() {
+		testSuccess(
+				"6.3.0", "6.3.0",
+				Elasticsearch6ModelDialect.class, Elasticsearch63ProtocolDialect.class
+		);
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3563")
 	public void es66() {
 		testSuccess(
 				"6.6", "6.6.0",
-				Elasticsearch6ModelDialect.class, Elasticsearch60ProtocolDialect.class
+				Elasticsearch6ModelDialect.class, Elasticsearch63ProtocolDialect.class
 		);
 	}
 
@@ -141,7 +160,7 @@ public class ElasticsearchDialectFactoryTest {
 	public void es660() {
 		testSuccess(
 				"6.6.0", "6.6.0",
-				Elasticsearch6ModelDialect.class, Elasticsearch60ProtocolDialect.class
+				Elasticsearch6ModelDialect.class, Elasticsearch63ProtocolDialect.class
 		);
 	}
 
