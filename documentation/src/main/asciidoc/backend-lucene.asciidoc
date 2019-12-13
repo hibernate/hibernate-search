@@ -446,11 +446,34 @@ according to the tenant ID defined in the current session:
 * documents will be indexed with the appropriate values, allowing later filtering;
 * queries will filter results appropriately.
 
-However, multi-tenancy must be enabled explicitly.
-To do so, set the `hibernate.search.backends.<backend name>.multi_tenancy.strategy` property:
+However, a strategy must be selected in order to enable multi-tenancy.
 
-* to `none` for single-tenancy;
-* to `discriminator` for discriminator-based multi-tenancy: adds a "tenant ID" field to every document.
+The multi-tenancy strategy is set a the backend level:
+
+[source]
+----
+hibernate.search.backends.<backend name>.multi_tenancy.strategy = none (default)
+----
+
+See the following subsections for details about available strategies.
+
+[[backend-lucene-multi-tenancy-none]]
+==== `none`: single-tenancy
+
+The `none` strategy (the default) disables multi-tenancy completely.
+
+Attempting to set a tenant ID will lead to a failure when indexing.
+
+[[backend-lucene-multi-tenancy-discriminator]]
+==== `discriminator`: type name mapping using the index name
+
+With the `discriminator` strategy,
+all documents from all tenants are stored in the same index.
+
+When indexing, a discriminator field holding the tenant ID is populated transparently for each document.
+
+When searching, a filter targeting the tenant ID field is added transparently to the search query
+to only return search hits for the current tenant.
 
 [[backend-lucene-analysis]]
 == Analysis
