@@ -50,7 +50,7 @@ public class SubTest {
 				subTest.test();
 				return; // Test succeeded
 			}
-			catch (AssertionError|Exception e) {
+			catch (AssertionError | Exception e) {
 				if ( failure == null ) {
 					failure = e;
 				}
