@@ -417,6 +417,58 @@ other annotations such as `@GenericField` will fail.
 <2> Instruct Hibernate Search to use our custom value binder.
 ====
 
+[[backend-elasticsearch-type-name]]
+=== Type name mapping
+
+When Hibernate Search performs a search query targeting multiple entity types, and thus multiple indexes,
+it needs to determine the type of each search hit in order to map it back to an entity.
+
+There are multiple strategies to handle this "type name resolution",
+and each has pros and cons.
+
+The strategy is set a the backend level:
+
+[source]
+----
+hibernate.search.backends.<backend-name>.mapping.type_name.strategy = discriminator (default)
+----
+
+See the following subsections for details about available strategies.
+
+[[backend-elasticsearch-type-name-discriminator]]
+==== `discriminator`: type name mapping using a discriminator field
+
+With the `discriminator` strategy, a discriminator field is used to retrieve the type name directly from each document.
+
+When indexing, the `__HSEARCH_type` field is populated transparently with type name for each document.
+
+When searching, the docvalues for the type field is transparently requested to Elasticsearch
+and extracted from the response.
+
+Pros:
+
+* Works in every situation, even when using link:{elasticsearchDocUrl}/indices-add-alias.html[index aliases].
+
+Cons:
+
+* Small storage overhead: a few bytes of storage per document.
+* Requires reindexing if an entity name changes, even if the index name doesn't change.
+
+[[backend-elasticsearch-type-name-index-name]]
+==== `index-name`: type name mapping using the index name
+
+With the `index-name` strategy, the `_index` meta-field returned for each search hit
+is used to resolve the index name, and from that the type name.
+
+Pros:
+
+* No storage overhead.
+
+Cons:
+
+* Will not work correctly when using link:{elasticsearchDocUrl}/indices-add-alias.html[index aliases],
+because in that case the `_index` meta-field contains the actual index name, not the alias.
+
 [[backend-elasticsearch-multi-tenancy]]
 === Multi-tenancy
 
