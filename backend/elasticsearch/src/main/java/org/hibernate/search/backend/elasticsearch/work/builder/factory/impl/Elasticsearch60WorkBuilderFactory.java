@@ -6,51 +6,31 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.builder.factory.impl;
 
-import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
-import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.CreateIndexWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexMetadataWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexExistsWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexMappingWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.impl.CreateIndexWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.GetIndexMetadataWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.IndexExistsWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.PutIndexTypeMappingWork;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
+import org.hibernate.search.backend.elasticsearch.work.impl.SearchWork;
+
+import com.google.gson.JsonObject;
 
 /**
- * A work builder factory for ES6.0 to ES6.6.
+ * A work builder factory for ES6.0 to ES6.3.
  * <p>
- * Compared to ES6.7:
+ * Compared to ES6.3:
  * <ul>
- *     <li>We do NOT set an "include_type_name=true" parameter in index creation and mapping APIs</li>
+ *     <li>We do NOT set the "allow_partial_search_results" query parameter in search APIs</li>
  * </ul>
  */
-@SuppressWarnings("deprecation") // We use Paths.DOC on purpose
-public class Elasticsearch60WorkBuilderFactory extends Elasticsearch67WorkBuilderFactory {
+public class Elasticsearch60WorkBuilderFactory extends Elasticsearch63WorkBuilderFactory {
 
 	public Elasticsearch60WorkBuilderFactory(GsonProvider gsonProvider) {
 		super( gsonProvider );
 	}
 
 	@Override
-	public CreateIndexWorkBuilder createIndex(URLEncodedString indexName) {
-		return CreateIndexWork.Builder.forElasticsearch66AndBelow( gsonProvider, indexName, Paths.DOC );
+	public <T> SearchWorkBuilder<T> search(JsonObject payload,
+			ElasticsearchSearchResultExtractor<T> searchResultExtractor) {
+		return SearchWork.Builder.forElasticsearch62AndBelow( payload, searchResultExtractor );
 	}
 
-	@Override
-	public IndexExistsWorkBuilder indexExists(URLEncodedString indexName) {
-		return IndexExistsWork.Builder.forElasticsearch66AndBelow( indexName );
-	}
-
-	@Override
-	public GetIndexMetadataWorkBuilder getIndexMetadata(URLEncodedString indexName) {
-		return GetIndexMetadataWork.Builder.forElasticsearch66AndBelow( indexName, Paths.DOC );
-	}
-
-	@Override
-	public PutIndexMappingWorkBuilder putIndexTypeMapping(URLEncodedString indexName, RootTypeMapping mapping) {
-		return PutIndexTypeMappingWork.Builder.forElasticsearch66AndBelow( gsonProvider, indexName, Paths.DOC, mapping );
-	}
 }

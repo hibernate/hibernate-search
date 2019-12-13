@@ -55,19 +55,27 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 			extends AbstractBuilder<Builder<R>>
 			implements SearchWorkBuilder<R> {
 
-		public static <T> Builder<T> forElasticsearch6AndBelow(JsonObject payload, ElasticsearchSearchResultExtractor<T> resultExtractor) {
+		public static <T> Builder<T> forElasticsearch62AndBelow(JsonObject payload, ElasticsearchSearchResultExtractor<T> resultExtractor) {
 			// No "track_total_hits": this parameter does not exist in ES6 and below, and total hits are always tracked
-			return new Builder<>( payload, resultExtractor, null );
+			// No "allow_partial_search_results": this parameter does not exist in ES6 and below, and total hits are always tracked
+			// See https://github.com/elastic/elasticsearch/pull/27906
+			return new Builder<>( payload, resultExtractor, null, false );
+		}
+
+		public static <T> Builder<T> forElasticsearch63to68(JsonObject payload, ElasticsearchSearchResultExtractor<T> resultExtractor) {
+			// No "track_total_hits": this parameter does not exist in ES6 and below, and total hits are always tracked
+			return new Builder<>( payload, resultExtractor, null, false );
 		}
 
 		public static <T> Builder<T> forElasticsearch7AndAbove(JsonObject payload, ElasticsearchSearchResultExtractor<T> resultExtractor) {
 			// TODO HSEARCH-3517 disable track_total_hits when possible
-			return new Builder<>( payload, resultExtractor, true );
+			return new Builder<>( payload, resultExtractor, true, false );
 		}
 
 		private final JsonObject payload;
 		private final ElasticsearchSearchResultExtractor<R> resultExtractor;
 		private final Boolean trackTotalHits;
+		private final boolean allowPartialSearchResultsSupported;
 		private final Set<URLEncodedString> indexes = new HashSet<>();
 
 		private Integer from;
@@ -79,11 +87,13 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 		private TimeUnit timeoutUnit;
 		private boolean exceptionOnTimeout;
 
-		private Builder(JsonObject payload, ElasticsearchSearchResultExtractor<R> resultExtractor, Boolean trackTotalHits) {
+		private Builder(JsonObject payload, ElasticsearchSearchResultExtractor<R> resultExtractor, Boolean trackTotalHits,
+				boolean allowPartialSearchResultsSupported) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.payload = payload;
 			this.resultExtractor = resultExtractor;
 			this.trackTotalHits = trackTotalHits;
+			this.allowPartialSearchResultsSupported = allowPartialSearchResultsSupported;
 		}
 
 		@Override
@@ -154,8 +164,10 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 			}
 
 			if ( exceptionOnTimeout ) {
-				// the default is true
-				builder.param( "allow_partial_search_results", false );
+				if ( allowPartialSearchResultsSupported ) {
+					// the default is true
+					builder.param( "allow_partial_search_results", false );
+				}
 
 				// set timeoutValue and timeoutUnit only for hard timeout
 				builder.timeout( timeoutValue, timeoutUnit );
