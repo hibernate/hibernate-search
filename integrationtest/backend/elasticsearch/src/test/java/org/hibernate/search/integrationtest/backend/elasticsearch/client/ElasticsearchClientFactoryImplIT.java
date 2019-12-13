@@ -54,6 +54,7 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
+import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
@@ -323,20 +324,34 @@ public class ElasticsearchClientFactoryImplIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2469")
-	public void multipleHosts_failover_timeout() throws Exception {
+	public void multipleHosts_failover_timeout() {
+		SubTest.expectSuccessAfterRetry(
+				// This test is flaky, for some reason once in a while wiremock takes a very long time to answer
+				// even though no delay was configured.
+				// The exact reason is unknown though, so just try multiple times...
+				this::try_multipleHosts_failover_timeout
+		);
+	}
+
+	private void try_multipleHosts_failover_timeout() throws Exception {
+		wireMockRule1.resetRequests();
+		wireMockRule2.resetRequests();
+		wireMockRule1.resetMappings();
+		wireMockRule2.resetMappings();
+
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
 				.willReturn( elasticsearchResponse().withStatus( 200 ) ) );
 		wireMockRule2.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
-				.willReturn( elasticsearchResponse().withStatus( 200 ).withFixedDelay( 10_000 /* 10s => will time out */ ) ) );
+				.willReturn( elasticsearchResponse().withStatus( 200 ).withFixedDelay( 5_000 /* 5s => will time out */ ) ) );
 
 		try ( ElasticsearchClientImplementor client = createClient(
 				properties -> {
 					properties.accept( ElasticsearchBackendSettings.HOSTS, httpHostAndPortFor( wireMockRule1, wireMockRule2 ) );
 					// Use a timeout much higher than 1s, because wiremock can be really slow...
-					properties.accept( ElasticsearchBackendSettings.READ_TIMEOUT, "5000" /* 5s */ );
+					properties.accept( ElasticsearchBackendSettings.READ_TIMEOUT, "1000" /* 1s */ );
 				}
 		) ) {
 			ElasticsearchResponse result = doPost( client, "/myIndex/myType", payload );

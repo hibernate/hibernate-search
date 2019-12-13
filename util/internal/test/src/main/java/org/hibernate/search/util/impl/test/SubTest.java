@@ -16,6 +16,7 @@ import org.jboss.logging.BasicLogger;
 import org.jboss.logging.Logger;
 
 import org.assertj.core.api.AbstractThrowableAssert;
+import org.assertj.core.api.Assertions;
 import org.assertj.core.api.ThrowableAssert;
 
 /**
@@ -41,6 +42,28 @@ import org.assertj.core.api.ThrowableAssert;
 public class SubTest {
 
 	private static final BasicLogger log = Logger.getLogger( SubTest.class.getName() );
+
+	public static void expectSuccessAfterRetry(FlakySubTest subTest) {
+		Throwable failure = null;
+		for ( int i = 0; i < 3; i++ ) {
+			try {
+				subTest.test();
+				return; // Test succeeded
+			}
+			catch (AssertionError|Exception e) {
+				if ( failure == null ) {
+					failure = e;
+				}
+				else {
+					failure.addSuppressed( e );
+				}
+			}
+		}
+		Assertions.fail(
+				"Test failed after 3 attempts",
+				failure
+		);
+	}
 
 	public static <T> void expectSuccess(T parameter, ParameterizedSubTest<T> subTest) {
 		subTest.test( parameter );
@@ -123,6 +146,11 @@ public class SubTest {
 			return new ThrowableAssert( thrown )
 					.as( description );
 		}
+	}
+
+	@FunctionalInterface
+	public interface FlakySubTest {
+		void test() throws Exception;
 	}
 
 	@FunctionalInterface
