@@ -160,16 +160,29 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 			}
 
 			if ( timeoutValue != null && timeoutUnit != null ) {
+				// Server-side timeout: the search will truncate results or fail on timeout.
 				builder.param( "timeout", getTimeoutString( timeoutValue, timeoutUnit ) );
-
 				if ( allowPartialSearchResultsSupported ) {
-					builder.param( "allow_partial_search_results", !exceptionOnTimeout );
+					if ( exceptionOnTimeout ) {
+						// Ask the server to fail on timeout.
+						// Functionally, this does not matter, because we also have a client-side timeout.
+						// The server-side timeout is just an optimization so that Elasticsearch doesn't continue
+						// to work on a search we cancelled on the client side.
+						builder.param( "allow_partial_search_results", false );
+					}
+					else {
+						// Ask the server to truncate results on timeout.
+						// This is normally the default behavior, but can be overridden with server-side settings,
+						// so we set it just to be safe.
+						builder.param( "allow_partial_search_results", true );
+					}
 				}
-			}
 
-			if ( exceptionOnTimeout ) {
-				// set timeoutValue and timeoutUnit only for hard timeout
-				builder.timeout( timeoutValue, timeoutUnit );
+				// Client-side timeout: the search will fail on timeout.
+				// This is necessary to address network problems: the server-side timeout would not detect that.
+				if ( exceptionOnTimeout ) {
+					builder.timeout( timeoutValue, timeoutUnit );
+				}
 			}
 
 			return builder.build();
