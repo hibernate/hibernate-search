@@ -95,8 +95,8 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 		this.elasticsearchIndexName = elasticsearchIndexName;
 		this.model = model;
 		this.documentMetadataContributors = documentMetadataContributors;
-		this.parallelOrchestrator = backendContext.createParallelOrchestrator( elasticsearchIndexName.original );
-		this.serialOrchestrator = backendContext.createSerialOrchestrator( elasticsearchIndexName.original );
+		this.parallelOrchestrator = backendContext.createParallelOrchestrator( hibernateSearchIndexName );
+		this.serialOrchestrator = backendContext.createSerialOrchestrator( hibernateSearchIndexName );
 		this.administrationClient = backendContext.createAdministrationClient(
 				elasticsearchIndexName, model
 		);
