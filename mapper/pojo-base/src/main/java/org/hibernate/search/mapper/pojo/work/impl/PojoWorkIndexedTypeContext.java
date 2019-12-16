@@ -10,16 +10,16 @@ import java.util.Set;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
-import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierMappingImplementor;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 /**
  * @param <I> The identifier type for the mapped entity type.
@@ -32,24 +32,23 @@ public interface PojoWorkIndexedTypeContext<I, E, D extends DocumentElement> {
 
 	IdentifierMappingImplementor<I, E> getIdentifierMapping();
 
-	Supplier<E> toEntitySupplier(AbstractPojoBackendSessionContext sessionContext, Object entity);
+	Supplier<E> toEntitySupplier(PojoWorkSessionContext sessionContext, Object entity);
 
-	DocumentReferenceProvider toDocumentReferenceProvider(AbstractPojoBackendSessionContext sessionContext,
+	DocumentReferenceProvider toDocumentReferenceProvider(PojoWorkSessionContext sessionContext,
 			I identifier, Supplier<E> entitySupplier);
 
 	PojoDocumentContributor<D, E> toDocumentContributor(Supplier<E> entitySupplier,
-			AbstractPojoBackendSessionContext sessionContext);
+			PojoWorkSessionContext sessionContext);
 
 	boolean requiresSelfReindexing(Set<String> dirtyPaths);
 
 	void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoRuntimeIntrospector runtimeIntrospector,
 			Supplier<E> entitySupplier, Set<String> dirtyPaths);
 
-	PojoIndexedTypeIndexingPlan<I, E, D> createIndexingPlan(AbstractPojoBackendSessionContext sessionContext,
+	PojoIndexedTypeIndexingPlan<I, E, D> createIndexingPlan(PojoWorkSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
-	PojoTypeIndexer<I, E, D> createIndexer(
-			AbstractPojoBackendSessionContext sessionContext,
+	PojoTypeIndexer<I, E, D> createIndexer(PojoWorkSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy);
 
 	IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext);

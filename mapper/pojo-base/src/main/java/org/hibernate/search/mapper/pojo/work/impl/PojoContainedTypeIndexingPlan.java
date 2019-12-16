@@ -15,7 +15,7 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -31,7 +31,7 @@ public class PojoContainedTypeIndexingPlan<E> extends AbstractPojoTypeIndexingPl
 	private final Map<Object, ContainedEntityIndexingPlan> indexingPlansPerId = new LinkedHashMap<>();
 
 	public PojoContainedTypeIndexingPlan(PojoWorkContainedTypeContext<E> typeContext,
-			AbstractPojoBackendSessionContext sessionContext) {
+			PojoWorkSessionContext sessionContext) {
 		super( sessionContext );
 		this.typeContext = typeContext;
 	}
@@ -138,7 +138,7 @@ public class PojoContainedTypeIndexingPlan<E> extends AbstractPojoTypeIndexingPl
 			if ( shouldResolveToReindex ) {
 				shouldResolveToReindex = false; // Avoid infinite looping
 				typeContext.resolveEntitiesToReindex(
-						containingEntityCollector, sessionContext.getRuntimeIntrospector(), entitySupplier,
+						containingEntityCollector, sessionContext, entitySupplier,
 						considerAllDirty ? null : dirtyPaths
 				);
 			}

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.pojo.session.context.spi;
 
-import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
@@ -15,10 +14,10 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedVal
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.SessionBasedBridgeOperationContext;
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoBackendMappingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.mapper.pojo.processing.spi.PojoIndexingProcessorSessionContext;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 public abstract class AbstractPojoBackendSessionContext
-		implements BackendSessionContext, PojoIndexingProcessorSessionContext {
+		implements PojoWorkSessionContext {
 
 	private final SessionBasedBridgeOperationContext sessionBasedBridgeOperationContext;
 

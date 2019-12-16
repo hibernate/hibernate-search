@@ -6,15 +6,14 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.context.spi;
 
-import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierBridgeToDocumentIdentifierContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.ValueBridgeToIndexedValueContextImpl;
-import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkMappingContext;
 
 public abstract class AbstractPojoBackendMappingContext
-		implements BackendMappingContext, BridgeMappingContext {
+		implements PojoWorkMappingContext {
 
 	private final IdentifierBridgeToDocumentIdentifierContext toDocumentIdentifierContext;
 	private final ValueBridgeToIndexedValueContext toIndexedValueContext;

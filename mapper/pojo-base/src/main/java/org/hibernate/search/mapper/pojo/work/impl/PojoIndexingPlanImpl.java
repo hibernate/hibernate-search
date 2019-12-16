@@ -19,9 +19,9 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -31,7 +31,7 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 
 	private final PojoWorkIndexedTypeContextProvider indexedTypeContextProvider;
 	private final PojoWorkContainedTypeContextProvider containedTypeContextProvider;
-	private final AbstractPojoBackendSessionContext sessionContext;
+	private final PojoWorkSessionContext sessionContext;
 	private final PojoRuntimeIntrospector introspector;
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
@@ -44,7 +44,7 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 
 	public PojoIndexingPlanImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
 			PojoWorkContainedTypeContextProvider containedTypeContextProvider,
-			AbstractPojoBackendSessionContext sessionContext,
+			PojoWorkSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy,
 			DocumentRefreshStrategy refreshStrategy) {
 		this.indexedTypeContextProvider = indexedTypeContextProvider;
