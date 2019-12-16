@@ -14,11 +14,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 /**
  * @param <I> The identifier type for the mapped entity type.
@@ -34,7 +34,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, D extends DocumentElement> extend
 	private final Map<I, IndexedEntityIndexingPlan> indexingPlansPerId = new LinkedHashMap<>();
 
 	public PojoIndexedTypeIndexingPlan(PojoWorkIndexedTypeContext<I, E, D> typeContext,
-			AbstractPojoBackendSessionContext sessionContext,
+			PojoWorkSessionContext sessionContext,
 			IndexIndexingPlan<D> delegate) {
 		super( sessionContext );
 		this.typeContext = typeContext;

@@ -11,8 +11,7 @@ import java.util.function.Supplier;
 
 import org.hibernate.search.mapper.pojo.automaticindexing.impl.PojoReindexingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 /**
  * @param <E> The contained entity type.
@@ -21,11 +20,11 @@ public interface PojoWorkContainedTypeContext<E> {
 
 	PojoRawTypeIdentifier<E> getTypeIdentifier();
 
-	Supplier<E> toEntitySupplier(AbstractPojoBackendSessionContext sessionContext, Object entity);
+	Supplier<E> toEntitySupplier(PojoWorkSessionContext sessionContext, Object entity);
 
-	void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoRuntimeIntrospector runtimeIntrospector,
+	void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoWorkSessionContext sessionContext,
 			Supplier<E> entitySupplier, Set<String> dirtyPaths);
 
-	PojoContainedTypeIndexingPlan<E> createIndexingPlan(AbstractPojoBackendSessionContext sessionContext);
+	PojoContainedTypeIndexingPlan<E> createIndexingPlan(PojoWorkSessionContext sessionContext);
 
 }

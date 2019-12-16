@@ -15,10 +15,10 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoCaster;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeContainedTypeContext;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.mapper.pojo.work.impl.CachingCastingEntitySupplier;
 import org.hibernate.search.mapper.pojo.work.impl.PojoContainedTypeIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.impl.PojoWorkContainedTypeContext;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 import org.hibernate.search.util.common.impl.ToStringTreeAppendable;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 
@@ -63,21 +63,22 @@ public class PojoContainedTypeManager<E>
 	}
 
 	@Override
-	public Supplier<E> toEntitySupplier(AbstractPojoBackendSessionContext sessionContext, Object entity) {
+	public Supplier<E> toEntitySupplier(PojoWorkSessionContext sessionContext, Object entity) {
 		PojoRuntimeIntrospector introspector = sessionContext.getRuntimeIntrospector();
 		return new CachingCastingEntitySupplier<>( caster, introspector, entity );
 	}
 
 	@Override
-	public void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoRuntimeIntrospector runtimeIntrospector,
+	public void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoWorkSessionContext sessionContext,
 			Supplier<E> entitySupplier, Set<String> dirtyPaths) {
+		PojoRuntimeIntrospector introspector = sessionContext.getRuntimeIntrospector();
 		reindexingResolver.resolveEntitiesToReindex(
-				collector, runtimeIntrospector, entitySupplier.get(), dirtyPaths
+				collector, introspector, entitySupplier.get(), dirtyPaths
 		);
 	}
 
 	@Override
-	public PojoContainedTypeIndexingPlan<E> createIndexingPlan(AbstractPojoBackendSessionContext sessionContext) {
+	public PojoContainedTypeIndexingPlan<E> createIndexingPlan(PojoWorkSessionContext sessionContext) {
 		return new PojoContainedTypeIndexingPlan<>(
 				this, sessionContext
 		);

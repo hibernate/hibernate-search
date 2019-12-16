@@ -15,8 +15,8 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class PojoIndexerImpl implements PojoIndexer {
@@ -24,13 +24,13 @@ public class PojoIndexerImpl implements PojoIndexer {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoWorkIndexedTypeContextProvider indexedTypeContextProvider;
-	private final AbstractPojoBackendSessionContext sessionContext;
+	private final PojoWorkSessionContext sessionContext;
 	private final DocumentCommitStrategy commitStrategy;
 
 	private final Map<PojoRawTypeIdentifier<?>, PojoTypeIndexer<?, ?, ?>> typeExecutors = new HashMap<>();
 
 	public PojoIndexerImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
-			AbstractPojoBackendSessionContext sessionContext,
+			PojoWorkSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy) {
 		this.indexedTypeContextProvider = indexedTypeContextProvider;
 		this.sessionContext = sessionContext;

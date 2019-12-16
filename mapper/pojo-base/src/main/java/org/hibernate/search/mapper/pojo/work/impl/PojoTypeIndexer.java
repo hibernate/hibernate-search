@@ -12,16 +12,16 @@ import java.util.function.Supplier;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 public class PojoTypeIndexer<I, E, D extends DocumentElement> {
 
-	private final AbstractPojoBackendSessionContext sessionContext;
+	private final PojoWorkSessionContext sessionContext;
 	private final PojoWorkIndexedTypeContext<I, E, D> typeContext;
 	private final IndexIndexer<D> delegate;
 
 	public PojoTypeIndexer(PojoWorkIndexedTypeContext<I, E, D> typeContext,
-			AbstractPojoBackendSessionContext sessionContext,
+			PojoWorkSessionContext sessionContext,
 			IndexIndexer<D> delegate) {
 		this.sessionContext = sessionContext;
 		this.typeContext = typeContext;
