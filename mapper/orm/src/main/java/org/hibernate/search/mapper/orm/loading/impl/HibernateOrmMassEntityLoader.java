@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.mapper.orm.loading.impl;
 
-import java.io.Serializable;
 import java.util.List;
 
 import org.hibernate.FlushMode;
@@ -56,12 +55,11 @@ public final class HibernateOrmMassEntityLoader<E, I> implements PojoMassEntityL
 		transactionHelper.commit( session );
 	}
 
-	@SuppressWarnings("unchecked") // We can assume identifiers are serializable
 	private List<E> multiLoad(List<I> identifiers) {
 		return typeQueryLoader.createMultiIdentifierLoadAccess( session )
 				.with( options.cacheMode() )
 				.with( LockOptions.NONE )
-				.multiLoad( (List<Serializable>) identifiers );
+				.multiLoad( identifiers );
 	}
 
 	private List<E> queryByIds(List<I> identifiers) {
