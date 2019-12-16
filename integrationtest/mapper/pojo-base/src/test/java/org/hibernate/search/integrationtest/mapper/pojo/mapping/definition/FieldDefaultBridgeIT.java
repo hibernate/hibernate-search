@@ -28,10 +28,7 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.Proper
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.types.expectations.DefaultValueBridgeExpectations;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
-import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanBackendMappingContext;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
-import org.hibernate.search.mapper.javabean.session.context.impl.JavaBeanBackendSessionContext;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
@@ -179,7 +176,7 @@ public class FieldDefaultBridgeIT<V, F> {
 		DslConverter<?, ?> incompatibleDslConverter =
 				new DslConverter<>( typeDescriptor.getJavaType(), new IncompatibleToDocumentFieldValueConverter<>() );
 		ToDocumentFieldValueConvertContext toDocumentConvertContext =
-				new ToDocumentFieldValueConvertContextImpl( new JavaBeanBackendMappingContext() );
+				new ToDocumentFieldValueConvertContextImpl( BridgeTestUtils.toBackendMappingContext( mapping ) );
 
 		// isCompatibleWith must return true when appropriate
 		assertThat( dslConverter.isCompatibleWith( dslConverter ) ).isTrue();
@@ -228,14 +225,6 @@ public class FieldDefaultBridgeIT<V, F> {
 				index2FieldSchemaNode.getConverter().getProjectionConverter();
 		ProjectionConverter<?, ?> incompatibleIndexToProjectionConverter =
 				new ProjectionConverter<>( typeDescriptor.getJavaType(), new IncompatibleFromDocumentFieldValueConverter<>() );
-		FromDocumentFieldValueConvertContext fromDocumentConvertContext =
-				new FromDocumentFieldValueConvertContextImpl(
-						new JavaBeanBackendSessionContext(
-								new JavaBeanBackendMappingContext(),
-								null,
-								PojoRuntimeIntrospector.simple()
-						)
-				);
 
 		// isCompatibleWith must return true when appropriate
 		assertThat( indexToProjectionConverter.isCompatibleWith( indexToProjectionConverter ) ).isTrue();
@@ -249,17 +238,24 @@ public class FieldDefaultBridgeIT<V, F> {
 		assertThat( indexToProjectionConverter.isConvertedTypeAssignableTo( IncompatibleType.class ) ).isFalse();
 
 		// convert must behave appropriately on valid input
-		assertThat(
-				indexToProjectionConverter.convert( null, fromDocumentConvertContext )
-		)
-				.isNull();
-		Iterator<V> projectionValuesIterator = getProjectionValues().iterator();
-		for ( F fieldValue : getDocumentFieldValues() ) {
-			V projectionValue = projectionValuesIterator.next();
+		try ( SearchSession searchSession = mapping.createSession() ) {
+			FromDocumentFieldValueConvertContext fromDocumentConvertContext =
+					new FromDocumentFieldValueConvertContextImpl(
+							BridgeTestUtils.toBackendSessionContext( searchSession )
+					);
+			new FromDocumentFieldValueConvertContextImpl( null );
 			assertThat(
-					indexToProjectionConverter.convert( fieldValue, fromDocumentConvertContext )
+					indexToProjectionConverter.convert( null, fromDocumentConvertContext )
 			)
-					.isEqualTo( projectionValue );
+					.isNull();
+			Iterator<V> projectionValuesIterator = getProjectionValues().iterator();
+			for ( F fieldValue : getDocumentFieldValues() ) {
+				V projectionValue = projectionValuesIterator.next();
+				assertThat(
+						indexToProjectionConverter.convert( fieldValue, fromDocumentConvertContext )
+				)
+						.isEqualTo( projectionValue );
+			}
 		}
 	}
 

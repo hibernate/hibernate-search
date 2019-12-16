@@ -8,16 +8,19 @@ package org.hibernate.search.mapper.pojo.session.spi;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkMappingContext;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
-public interface PojoSearchSessionDelegate {
+/**
+ * Mapping-scoped information and operations for use in POJO search sessions.
+ */
+public interface PojoSearchSessionMappingContext extends PojoWorkMappingContext {
 
-	AbstractPojoBackendSessionContext getBackendSessionContext();
+	PojoIndexingPlan createIndexingPlan(PojoWorkSessionContext context,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
-	PojoIndexingPlan createIndexingPlan(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
-
-	PojoIndexer createIndexer(DocumentCommitStrategy commitStrategy);
+	PojoIndexer createIndexer(PojoWorkSessionContext context, DocumentCommitStrategy commitStrategy);
 
 }

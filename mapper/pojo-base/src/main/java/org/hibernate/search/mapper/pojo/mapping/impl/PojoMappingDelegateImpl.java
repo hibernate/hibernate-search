@@ -8,17 +8,21 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.Collection;
 
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.scope.impl.PojoScopeDelegateImpl;
-import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeMappingContext;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeMappingContext;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeExtendedContextProvider;
-import org.hibernate.search.mapper.pojo.session.impl.PojoSearchSessionDelegateImpl;
-import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionDelegate;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
+import org.hibernate.search.mapper.pojo.work.impl.PojoIndexerImpl;
+import org.hibernate.search.mapper.pojo.work.impl.PojoIndexingPlanImpl;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 import org.hibernate.search.util.common.impl.Closer;
 
 
@@ -72,11 +76,19 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
-	public PojoSearchSessionDelegate createSearchSessionDelegate(
-			AbstractPojoBackendSessionContext backendSessionContext) {
-		return new PojoSearchSessionDelegateImpl(
+	public PojoIndexingPlan createIndexingPlan(PojoWorkSessionContext context, DocumentCommitStrategy commitStrategy,
+			DocumentRefreshStrategy refreshStrategy) {
+		return new PojoIndexingPlanImpl(
 				indexedTypeManagers, containedTypeManagers,
-				backendSessionContext
+				context, commitStrategy, refreshStrategy
+		);
+	}
+
+	@Override
+	public PojoIndexer createIndexer(PojoWorkSessionContext context, DocumentCommitStrategy commitStrategy) {
+		return new PojoIndexerImpl(
+				indexedTypeManagers,
+				context, commitStrategy
 		);
 	}
 }

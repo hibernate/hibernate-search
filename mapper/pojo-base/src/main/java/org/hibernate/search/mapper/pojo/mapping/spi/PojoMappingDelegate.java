@@ -8,14 +8,17 @@ package org.hibernate.search.mapper.pojo.mapping.spi;
 
 import java.util.Collection;
 
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
-import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeMappingContext;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeMappingContext;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeExtendedContextProvider;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
-import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionDelegate;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 public interface PojoMappingDelegate extends AutoCloseable {
 
@@ -31,6 +34,9 @@ public interface PojoMappingDelegate extends AutoCloseable {
 			Collection<? extends PojoRawTypeIdentifier<? extends E>> targetedTypes,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider);
 
-	PojoSearchSessionDelegate createSearchSessionDelegate(AbstractPojoBackendSessionContext backendSessionContext);
+	PojoIndexingPlan createIndexingPlan(PojoWorkSessionContext context,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
+
+	PojoIndexer createIndexer(PojoWorkSessionContext context, DocumentCommitStrategy commitStrategy);
 
 }
