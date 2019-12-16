@@ -14,6 +14,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBind
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.IdentifierBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.PojoIdentifierBridgeToDocumentIdentifierValueConverter;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
 import org.hibernate.search.mapper.pojo.model.impl.PojoModelValueElement;

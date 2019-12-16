@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.orm.search.loading.impl.EntityLoaderFactory;
 import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmByIdEntityLoader;
 import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmCriteriaEntityLoader;
 import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSessionIndexedTypeContext;
-import org.hibernate.search.mapper.pojo.bridge.mapping.spi.IdentifierMapping;
+import org.hibernate.search.mapper.pojo.bridge.runtime.spi.IdentifierMapping;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoIndexedTypeExtendedMappingCollector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;

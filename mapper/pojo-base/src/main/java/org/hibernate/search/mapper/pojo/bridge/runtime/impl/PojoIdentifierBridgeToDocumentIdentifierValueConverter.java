@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.bridge.binding.impl;
+package org.hibernate.search.mapper.pojo.bridge.runtime.impl;
 
 import java.util.Optional;
 
@@ -16,12 +16,12 @@ import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoBackendMappingContext;
 
-final class PojoIdentifierBridgeToDocumentIdentifierValueConverter<I> implements ToDocumentIdentifierValueConverter<I> {
+public final class PojoIdentifierBridgeToDocumentIdentifierValueConverter<I> implements ToDocumentIdentifierValueConverter<I> {
 
 	private final IdentifierBridge<I> bridge;
 	private final Class<I> expectedValueType;
 
-	PojoIdentifierBridgeToDocumentIdentifierValueConverter(IdentifierBridge<I> bridge, Class<I> expectedValueType) {
+	public PojoIdentifierBridgeToDocumentIdentifierValueConverter(IdentifierBridge<I> bridge, Class<I> expectedValueType) {
 		this.bridge = bridge;
 		this.expectedValueType = expectedValueType;
 	}

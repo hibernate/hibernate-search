@@ -21,6 +21,8 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexFieldTypeDef
 import org.hibernate.search.mapper.pojo.bridge.ValueBridge;
 import org.hibernate.search.mapper.pojo.bridge.binding.ValueBindingContext;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.PojoValueBridgeFromDocumentFieldValueConverter;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.PojoValueBridgeToDocumentFieldValueConverter;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.bridge.binding.spi.FieldModelContributor;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
