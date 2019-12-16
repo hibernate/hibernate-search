@@ -6,33 +6,67 @@
  */
 package org.hibernate.search.mapper.pojo.session.spi;
 
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.SessionBasedBridgeOperationContext;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
+import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
+import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 
-public abstract class AbstractPojoSearchSession {
+public abstract class AbstractPojoSearchSession implements PojoWorkSessionContext {
 
-	private final PojoSearchSessionDelegate delegate;
+	private final PojoSearchSessionMappingContext mappingContext;
 
-	protected AbstractPojoSearchSession(AbstractBuilder<? extends AbstractPojoSearchSession> builder,
-			AbstractPojoBackendSessionContext backendSessionContext) {
-		this.delegate = builder.mappingDelegate.createSearchSessionDelegate( backendSessionContext );
+	private final SessionBasedBridgeOperationContext sessionBasedBridgeOperationContext;
+
+	protected AbstractPojoSearchSession(PojoSearchSessionMappingContext mappingContext) {
+		this.mappingContext = mappingContext;
+		this.sessionBasedBridgeOperationContext = new SessionBasedBridgeOperationContext( this );
 	}
 
-	protected final PojoSearchSessionDelegate getDelegate() {
-		return delegate;
+	@Override
+	public PojoSearchSessionMappingContext getMappingContext() {
+		return mappingContext;
 	}
 
-	protected abstract static class AbstractBuilder<T extends AbstractPojoSearchSession> {
+	@Override
+	public final IdentifierBridgeFromDocumentIdentifierContext getIdentifierBridgeFromDocumentIdentifierContext() {
+		return sessionBasedBridgeOperationContext;
+	}
 
-		private final PojoMappingDelegate mappingDelegate;
+	@Override
+	public final RoutingKeyBridgeToRoutingKeyContext getRoutingKeyBridgeToRoutingKeyContext() {
+		return sessionBasedBridgeOperationContext;
+	}
 
-		public AbstractBuilder(PojoMappingDelegate mappingDelegate) {
-			this.mappingDelegate = mappingDelegate;
-		}
+	@Override
+	public final TypeBridgeWriteContext getTypeBridgeWriteContext() {
+		return sessionBasedBridgeOperationContext;
+	}
 
-		public abstract T build();
+	@Override
+	public final PropertyBridgeWriteContext getPropertyBridgeWriteContext() {
+		return sessionBasedBridgeOperationContext;
+	}
 
+	@Override
+	public final ValueBridgeFromIndexedValueContext getValueBridgeFromIndexedValueContext() {
+		return sessionBasedBridgeOperationContext;
+	}
+
+	protected PojoIndexingPlan createIndexingPlan(DocumentCommitStrategy commitStrategy,
+			DocumentRefreshStrategy refreshStrategy) {
+		return mappingContext.createIndexingPlan( this, commitStrategy, refreshStrategy );
+	}
+
+	protected PojoIndexer createIndexer(DocumentCommitStrategy commitStrategy) {
+		return mappingContext.createIndexer( this, commitStrategy );
 	}
 
 }

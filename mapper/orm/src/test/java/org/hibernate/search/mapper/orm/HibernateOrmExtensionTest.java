@@ -8,14 +8,14 @@ package org.hibernate.search.mapper.orm;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.hibernate.engine.spi.SessionFactoryImplementor;
-import org.hibernate.engine.spi.SessionImplementor;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.FromDocumentFieldValueConvertContextImpl;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentFieldValueConvertContextImpl;
-import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
-import org.hibernate.search.mapper.orm.session.context.impl.HibernateOrmSessionContextImpl;
+import org.hibernate.search.mapper.orm.mapping.context.HibernateOrmMappingContext;
+import org.hibernate.search.mapper.orm.session.context.HibernateOrmSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
@@ -23,23 +23,19 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRouting
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
-import org.hibernate.search.mapper.pojo.bridge.runtime.impl.SessionBasedBridgeOperationContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierBridgeToDocumentIdentifierContextImpl;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.SessionBasedBridgeOperationContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.ValueBridgeToIndexedValueContextImpl;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
+import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 
 import org.junit.Test;
 
 import org.easymock.EasyMockSupport;
 
 public class HibernateOrmExtensionTest extends EasyMockSupport {
-	private final SessionFactoryImplementor sessionFactoryImplementor = createMock( SessionFactoryImplementor.class );
-	private final SessionImplementor sessionImplementor = createMock( SessionImplementor.class );
-	private final HibernateOrmMappingContextImpl mappingContext =
-			new HibernateOrmMappingContextImpl( sessionFactoryImplementor );
-	private final PojoRuntimeIntrospector runtimeIntrospector = createMock( PojoRuntimeIntrospector.class );
-	private final HibernateOrmSessionContextImpl sessionContext =
-			new HibernateOrmSessionContextImpl( mappingContext, sessionImplementor, runtimeIntrospector );
+	private final HibernateOrmMappingContextMock mappingContext = createMock( HibernateOrmMappingContextMock.class );
+	private final HibernateOrmSessionContextMock sessionContext = createMock( HibernateOrmSessionContextMock.class );
 
 	@Test
 	public void identifierBridge() {
@@ -115,5 +111,17 @@ public class HibernateOrmExtensionTest extends EasyMockSupport {
 		replayAll();
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
 		verifyAll();
+	}
+
+	private interface HibernateOrmMappingContextMock
+			extends HibernateOrmMappingContext, BridgeMappingContext, BackendMappingContext {
+	}
+
+	private interface HibernateOrmSessionContextMock
+			extends HibernateOrmSessionContext, BridgeSessionContext, BackendSessionContext {
+
+		@Override
+		HibernateOrmMappingContextMock getMappingContext();
+
 	}
 }

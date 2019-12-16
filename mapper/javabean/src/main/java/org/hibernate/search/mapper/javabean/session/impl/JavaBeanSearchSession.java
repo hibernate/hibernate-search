@@ -19,13 +19,10 @@ import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
-import org.hibernate.search.mapper.javabean.session.context.impl.JavaBeanBackendSessionContext;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.javabean.work.impl.SearchIndexingPlanImpl;
 import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
-import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
@@ -36,14 +33,17 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 	private final JavaBeanSearchSessionMappingContext mappingContext;
 	private final JavaBeanSearchSessionTypeContextProvider typeContextProvider;
 
+	private final String tenantId;
+
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 	private SearchIndexingPlanImpl indexingPlan;
 
-	private JavaBeanSearchSession(JavaBeanSearchSessionBuilder builder) {
-		super( builder, builder.buildSessionContext() );
+	private JavaBeanSearchSession(Builder builder) {
+		super( builder.mappingContext );
 		this.mappingContext = builder.mappingContext;
 		this.typeContextProvider = builder.typeContextProvider;
+		this.tenantId = builder.tenantId;
 		this.commitStrategy = builder.commitStrategy;
 		this.refreshStrategy = builder.refreshStrategy;
 	}
@@ -54,6 +54,16 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 			CompletableFuture<?> future = indexingPlan.execute();
 			Futures.unwrappedExceptionJoin( future );
 		}
+	}
+
+	@Override
+	public String getTenantIdentifier() {
+		return tenantId;
+	}
+
+	@Override
+	public PojoRuntimeIntrospector getRuntimeIntrospector() {
+		return PojoRuntimeIntrospector.simple();
 	}
 
 	@Override
@@ -75,8 +85,8 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 	public SearchIndexingPlan indexingPlan() {
 		if ( indexingPlan == null ) {
 			indexingPlan = new SearchIndexingPlanImpl(
-					getDelegate().getBackendSessionContext().getRuntimeIntrospector(),
-					getDelegate().createIndexingPlan( commitStrategy, refreshStrategy )
+					getRuntimeIntrospector(),
+					createIndexingPlan( commitStrategy, refreshStrategy )
 			);
 		}
 		return indexingPlan;
@@ -92,18 +102,15 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 			);
 		}
 		Object id = typeContext.getIdentifierMapping()
-				.fromDocumentIdentifier( reference.getId(), getDelegate().getBackendSessionContext() );
+				.fromDocumentIdentifier( reference.getId(), this );
 		return new EntityReferenceImpl( typeContext.getTypeIdentifier(), typeContext.getEntityName(), id );
 	}
 
 	private SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?> search(SearchScopeImpl scope) {
-		return ( (SearchScopeImpl) scope ).search(
-				getDelegate().getBackendSessionContext(),
-				this
-		);
+		return ( (SearchScopeImpl) scope ).search( this, this );
 	}
 
-	public static class JavaBeanSearchSessionBuilder extends AbstractBuilder<JavaBeanSearchSession>
+	public static class Builder
 			implements SearchSessionBuilder {
 		private final JavaBeanSearchSessionMappingContext mappingContext;
 		private final JavaBeanSearchSessionTypeContextProvider typeContextProvider;
@@ -111,16 +118,14 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 		private DocumentCommitStrategy commitStrategy = DocumentCommitStrategy.FORCE;
 		private DocumentRefreshStrategy refreshStrategy = DocumentRefreshStrategy.NONE;
 
-		public JavaBeanSearchSessionBuilder(PojoMappingDelegate mappingDelegate,
-				JavaBeanSearchSessionMappingContext mappingContext,
+		public Builder(JavaBeanSearchSessionMappingContext mappingContext,
 				JavaBeanSearchSessionTypeContextProvider typeContextProvider) {
-			super( mappingDelegate );
 			this.mappingContext = mappingContext;
 			this.typeContextProvider = typeContextProvider;
 		}
 
 		@Override
-		public JavaBeanSearchSessionBuilder tenantId(String tenantId) {
+		public Builder tenantId(String tenantId) {
 			this.tenantId = tenantId;
 			return this;
 		}
@@ -135,14 +140,6 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 		public SearchSessionBuilder refreshStrategy(DocumentRefreshStrategy refreshStrategy) {
 			this.refreshStrategy = refreshStrategy;
 			return this;
-		}
-
-		protected AbstractPojoBackendSessionContext buildSessionContext() {
-			return new JavaBeanBackendSessionContext(
-					mappingContext.getBackendMappingContext(),
-					tenantId,
-					PojoRuntimeIntrospector.simple()
-			);
 		}
 
 		@Override

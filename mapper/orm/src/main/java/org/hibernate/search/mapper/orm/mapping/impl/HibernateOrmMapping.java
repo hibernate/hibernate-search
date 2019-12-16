@@ -33,7 +33,7 @@ import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
 import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerContextProvider;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
-import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
+import org.hibernate.search.mapper.orm.mapping.context.HibernateOrmMappingContext;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeMappingContext;
@@ -54,7 +54,7 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class HibernateOrmMapping extends AbstractPojoMappingImplementor<HibernateOrmMapping>
-		implements SearchMapping,
+		implements SearchMapping, HibernateOrmMappingContext,
 				HibernateOrmListenerContextProvider,
 				HibernateOrmScopeMappingContext, HibernateOrmSearchSessionMappingContext {
 
@@ -114,7 +114,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		);
 	}
 
-	private final HibernateOrmMappingContextImpl backendMappingContext;
+	private final SessionFactoryImplementor sessionFactory;
 	private final HibernateOrmTypeContextContainer typeContextContainer;
 	private final AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 	private final EntityLoadingCacheLookupStrategy cacheLookupStrategy;
@@ -128,7 +128,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 			int fetchSize) {
 		super( mappingDelegate );
 		this.typeContextContainer = typeContextContainer;
-		this.backendMappingContext = new HibernateOrmMappingContextImpl( sessionFactory );
+		this.sessionFactory = sessionFactory;
 		this.synchronizationStrategy = synchronizationStrategy;
 		this.cacheLookupStrategy = cacheLookupStrategy;
 		this.fetchSize = fetchSize;
@@ -146,12 +146,12 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	@Override
 	public EntityManagerFactory toEntityManagerFactory() {
-		return backendMappingContext.getSessionFactory();
+		return sessionFactory;
 	}
 
 	@Override
 	public SessionFactory toOrmSessionFactory() {
-		return backendMappingContext.getSessionFactory();
+		return sessionFactory;
 	}
 
 	@Override
@@ -170,8 +170,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public PojoIndexer createIndexer(SessionImplementor sessionImplementor,
-			DocumentCommitStrategy commitStrategy) {
+	public PojoIndexer createIndexer(SessionImplementor sessionImplementor, DocumentCommitStrategy commitStrategy) {
 		return HibernateOrmSearchSession.get( this, sessionImplementor ).createIndexer( commitStrategy );
 	}
 
@@ -187,7 +186,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	@Override
 	public SessionFactoryImplementor getSessionFactory() {
-		return backendMappingContext.getSessionFactory();
+		return sessionFactory;
 	}
 
 	@Override
@@ -207,7 +206,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	@Override
 	public DetachedBackendSessionContext getDetachedBackendSessionContext(String tenantId) {
-		return DetachedBackendSessionContext.of( backendMappingContext, tenantId );
+		return DetachedBackendSessionContext.of( this, tenantId );
 	}
 
 	@Override
@@ -225,11 +224,6 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	@Override
 	public HibernateOrmTypeContextContainer getTypeContextProvider() {
 		return typeContextContainer;
-	}
-
-	@Override
-	public HibernateOrmMappingContextImpl getBackendMappingContext() {
-		return backendMappingContext;
 	}
 
 	@Override
@@ -251,17 +245,16 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public HibernateOrmSearchSession.HibernateOrmSearchSessionBuilder createSessionBuilder(
+	public HibernateOrmSearchSession.Builder createSessionBuilder(
 			SessionImplementor sessionImplementor) {
-		SessionFactory expectedSessionFactory = backendMappingContext.getSessionFactory();
 		SessionFactory givenSessionFactory = sessionImplementor.getSessionFactory();
 
-		if ( !givenSessionFactory.equals( expectedSessionFactory ) ) {
-			throw log.usingDifferentSessionFactories( expectedSessionFactory, givenSessionFactory );
+		if ( !givenSessionFactory.equals( sessionFactory ) ) {
+			throw log.usingDifferentSessionFactories( sessionFactory, givenSessionFactory );
 		}
 
-		return new HibernateOrmSearchSession.HibernateOrmSearchSessionBuilder(
-				getDelegate(), this, typeContextContainer,
+		return new HibernateOrmSearchSession.Builder(
+				this, typeContextContainer,
 				sessionImplementor,
 				synchronizationStrategy
 		);
@@ -288,7 +281,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	private <T> SearchScopeImpl<T> doCreateScope(Collection<PojoRawTypeIdentifier<? extends T>> typeIdentifiers) {
 		PojoScopeDelegate<EntityReference, T, HibernateOrmScopeIndexedTypeContext<? extends T>> scopeDelegate =
 				getDelegate().createPojoScope(
-						backendMappingContext,
+						this,
 						typeIdentifiers,
 						typeContextContainer::getIndexedByExactType
 				);

@@ -15,7 +15,6 @@ import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.scope.impl.SearchScopeImpl;
 import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
-import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanBackendMappingContext;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSearchSession;
 import org.hibernate.search.mapper.javabean.session.impl.JavaBeanSearchSessionMappingContext;
@@ -26,12 +25,10 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMapping>
 		implements CloseableSearchMapping, JavaBeanSearchSessionMappingContext {
 
-	private final JavaBeanBackendMappingContext backendMappingContext;
 	private final JavaBeanTypeContextContainer typeContextContainer;
 
 	JavaBeanMapping(PojoMappingDelegate mappingDelegate, JavaBeanTypeContextContainer typeContextContainer) {
 		super( mappingDelegate );
-		this.backendMappingContext = new JavaBeanBackendMappingContext();
 		this.typeContextContainer = typeContextContainer;
 	}
 
@@ -56,11 +53,6 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 	}
 
 	@Override
-	public JavaBeanBackendMappingContext getBackendMappingContext() {
-		return backendMappingContext;
-	}
-
-	@Override
 	public SearchScopeImpl createScope(Collection<? extends Class<?>> classes) {
 		List<PojoRawTypeIdentifier<?>> typeIdentifiers = new ArrayList<>( classes.size() );
 		for ( Class<?> clazz : classes ) {
@@ -69,7 +61,7 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 
 		return new SearchScopeImpl(
 				getDelegate().createPojoScope(
-						backendMappingContext,
+						this,
 						typeIdentifiers,
 						// We don't load anything, so we don't need any additional type context
 						ignored -> null
@@ -78,8 +70,8 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 	}
 
 	private SearchSessionBuilder createSearchManagerBuilder() {
-		return new JavaBeanSearchSession.JavaBeanSearchSessionBuilder(
-				getDelegate(), this, typeContextContainer
+		return new JavaBeanSearchSession.Builder(
+				this, typeContextContainer
 		);
 	}
 }

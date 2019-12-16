@@ -8,12 +8,10 @@ package org.hibernate.search.mapper.javabean.session.impl;
 
 import java.util.Collection;
 
-import org.hibernate.search.mapper.javabean.mapping.context.impl.JavaBeanBackendMappingContext;
 import org.hibernate.search.mapper.javabean.scope.impl.SearchScopeImpl;
+import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionMappingContext;
 
-public interface JavaBeanSearchSessionMappingContext {
-
-	JavaBeanBackendMappingContext getBackendMappingContext();
+public interface JavaBeanSearchSessionMappingContext extends PojoSearchSessionMappingContext {
 
 	SearchScopeImpl createScope(Collection<? extends Class<?>> types);
 

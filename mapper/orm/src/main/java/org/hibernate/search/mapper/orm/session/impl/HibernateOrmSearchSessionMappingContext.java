@@ -10,19 +10,17 @@ import java.util.Collection;
 
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.mapper.orm.mapping.context.impl.HibernateOrmMappingContextImpl;
 import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
+import org.hibernate.search.mapper.pojo.session.spi.PojoSearchSessionMappingContext;
 
-public interface HibernateOrmSearchSessionMappingContext {
+public interface HibernateOrmSearchSessionMappingContext extends PojoSearchSessionMappingContext {
 
 	FailureHandler getFailureHandler();
-
-	HibernateOrmMappingContextImpl getBackendMappingContext();
 
 	<T> SearchScopeImpl<T> createScope(Collection<? extends Class<? extends T>> types);
 
 	<T> SearchScopeImpl<T> createScope(Class<T> expectedSuperType, Collection<String> entityNames);
 
-	HibernateOrmSearchSession.HibernateOrmSearchSessionBuilder createSessionBuilder(
+	HibernateOrmSearchSession.Builder createSessionBuilder(
 			SessionImplementor sessionImplementor);
 }
