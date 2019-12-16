@@ -25,8 +25,8 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeMappingContext;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeExtendedContextProvider;
-import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoBackendMappingContext;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.pojo.work.impl.PojoScopeWorkspaceImpl;
@@ -38,7 +38,7 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static <R, E, E2, C> PojoScopeDelegate<R, E2, C> create(
-			AbstractPojoBackendMappingContext mappingContext,
+			PojoScopeMappingContext mappingContext,
 			PojoScopeIndexedTypeContextProvider indexedTypeContextProvider,
 			PojoScopeContainedTypeContextProvider containedTypeContextProvider,
 			Collection<? extends PojoRawTypeIdentifier<? extends E>> targetedTypes,
@@ -81,12 +81,12 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 		);
 	}
 
-	private final AbstractPojoBackendMappingContext mappingContext;
+	private final PojoScopeMappingContext mappingContext;
 	private final Set<? extends PojoScopeIndexedTypeContext<?, ? extends E, ?>> targetedTypeContexts;
 	private final Set<C> targetedTypeExtendedContexts;
 	private MappedIndexScope<R, E2> delegate;
 
-	private PojoScopeDelegateImpl(AbstractPojoBackendMappingContext mappingContext,
+	private PojoScopeDelegateImpl(PojoScopeMappingContext mappingContext,
 			Set<? extends PojoScopeIndexedTypeContext<?, ? extends E, ?>> targetedTypeContexts,
 			Set<C> targetedTypeExtendedContexts) {
 		this.mappingContext = mappingContext;

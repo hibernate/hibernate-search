@@ -10,10 +10,10 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumen
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierBridgeToDocumentIdentifierContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.ValueBridgeToIndexedValueContextImpl;
-import org.hibernate.search.mapper.pojo.work.spi.PojoWorkMappingContext;
+import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeMappingContext;
 
 public abstract class AbstractPojoBackendMappingContext
-		implements PojoWorkMappingContext {
+		implements PojoScopeMappingContext {
 
 	private final IdentifierBridgeToDocumentIdentifierContext toDocumentIdentifierContext;
 	private final ValueBridgeToIndexedValueContext toIndexedValueContext;
