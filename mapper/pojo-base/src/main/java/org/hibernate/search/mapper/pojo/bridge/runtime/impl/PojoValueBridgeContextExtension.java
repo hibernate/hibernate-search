@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.pojo.bridge.binding.impl;
+package org.hibernate.search.mapper.pojo.bridge.runtime.impl;
 
 import java.util.Optional;
 
@@ -19,10 +19,13 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValue
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoBackendMappingContext;
 import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 
-class PojoValueBridgeContextExtension
+public final class PojoValueBridgeContextExtension
 		implements ToDocumentFieldValueConvertContextExtension<ValueBridgeToIndexedValueContext>,
 		FromDocumentFieldValueConvertContextExtension<ValueBridgeFromIndexedValueContext> {
 	public static final PojoValueBridgeContextExtension INSTANCE = new PojoValueBridgeContextExtension();
+
+	private PojoValueBridgeContextExtension() {
+	}
 
 	@Override
 	public Optional<ValueBridgeToIndexedValueContext> extendOptional(ToDocumentFieldValueConvertContext original,
