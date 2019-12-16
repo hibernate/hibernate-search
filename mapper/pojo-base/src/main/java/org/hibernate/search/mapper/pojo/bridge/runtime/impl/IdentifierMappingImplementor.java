@@ -8,8 +8,8 @@ package org.hibernate.search.mapper.pojo.bridge.runtime.impl;
 
 import java.util.function.Supplier;
 
+import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.spi.IdentifierMapping;
-import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoBackendMappingContext;
 
 /**
  * @param <I> The identifier type for the mapped entity type.
@@ -25,6 +25,6 @@ public interface IdentifierMappingImplementor<I, E> extends IdentifierMapping, A
 
 	I getIdentifier(Object providedId, Supplier<? extends E> entitySupplier);
 
-	String toDocumentIdentifier(I identifier, AbstractPojoBackendMappingContext context);
+	String toDocumentIdentifier(I identifier, BridgeMappingContext context);
 
 }

@@ -6,10 +6,8 @@
  */
 package org.hibernate.search.mapper.pojo.bridge.runtime.spi;
 
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
-
 public interface IdentifierMapping {
 
-	Object fromDocumentIdentifier(String documentId, AbstractPojoBackendSessionContext sessionContext);
+	Object fromDocumentIdentifier(String documentId, BridgeSessionContext sessionContext);
 
 }

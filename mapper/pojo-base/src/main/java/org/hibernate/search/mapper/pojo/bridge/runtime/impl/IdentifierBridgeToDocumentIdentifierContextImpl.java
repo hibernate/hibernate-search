@@ -7,15 +7,15 @@
 package org.hibernate.search.mapper.pojo.bridge.runtime.impl;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
-import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContextExtension;
+import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
 
 public class IdentifierBridgeToDocumentIdentifierContextImpl implements IdentifierBridgeToDocumentIdentifierContext {
 
-	private final BackendMappingContext mappingContext;
+	private final BridgeMappingContext mappingContext;
 
-	public IdentifierBridgeToDocumentIdentifierContextImpl(BackendMappingContext mappingContext) {
+	public IdentifierBridgeToDocumentIdentifierContextImpl(BridgeMappingContext mappingContext) {
 		this.mappingContext = mappingContext;
 	}
 

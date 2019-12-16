@@ -11,8 +11,10 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumen
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierBridgeToDocumentIdentifierContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.ValueBridgeToIndexedValueContextImpl;
+import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
 
-public abstract class AbstractPojoBackendMappingContext implements BackendMappingContext {
+public abstract class AbstractPojoBackendMappingContext
+		implements BackendMappingContext, BridgeMappingContext {
 
 	private final IdentifierBridgeToDocumentIdentifierContext toDocumentIdentifierContext;
 	private final ValueBridgeToIndexedValueContext toIndexedValueContext;
@@ -22,11 +24,13 @@ public abstract class AbstractPojoBackendMappingContext implements BackendMappin
 		this.toIndexedValueContext = new ValueBridgeToIndexedValueContextImpl( this );
 	}
 
+	@Override
 	public final IdentifierBridgeToDocumentIdentifierContext getIdentifierBridgeToDocumentIdentifierContext() {
 		return toDocumentIdentifierContext;
 	}
 
-	public ValueBridgeToIndexedValueContext getToIndexedValueContext() {
+	@Override
+	public ValueBridgeToIndexedValueContext getValueBridgeToIndexedValueContext() {
 		return toIndexedValueContext;
 	}
 }
