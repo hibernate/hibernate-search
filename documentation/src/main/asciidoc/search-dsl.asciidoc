@@ -713,7 +713,6 @@ the result will have an Elasticsearch-specific type: `ElasticsearchSearchResult`
 <5> Get the response body as a `JsonObject`.
 <6> Extract useful information from the response body.
 Here we're extracting the result of the suggester we configured above.
-or even the request's path (not shown in this example).
 ====
 
 [NOTE]
