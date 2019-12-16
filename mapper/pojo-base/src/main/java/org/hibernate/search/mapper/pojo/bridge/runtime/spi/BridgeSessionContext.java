@@ -22,6 +22,8 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedVal
  */
 public interface BridgeSessionContext {
 
+	BridgeMappingContext getMappingContext();
+
 	String getTenantIdentifier();
 
 	IdentifierBridgeFromDocumentIdentifierContext getIdentifierBridgeFromDocumentIdentifierContext();
