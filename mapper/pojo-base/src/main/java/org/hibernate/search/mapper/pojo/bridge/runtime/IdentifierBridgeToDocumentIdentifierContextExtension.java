@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.bridge.runtime;
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
 
 /**
  * An extension to {@link IdentifierBridgeToDocumentIdentifierContext}, allowing to access non-standard context
@@ -32,11 +32,11 @@ public interface IdentifierBridgeToDocumentIdentifierContextExtension<T> {
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
 	 * @param original The original, non-extended {@link IdentifierBridgeToDocumentIdentifierContext}.
-	 * @param mappingContext A {@link BackendMappingContext}.
+	 * @param mappingContext A {@link BridgeMappingContext}.
 	 * @return An optional containing the extended context ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
 	Optional<T> extendOptional(IdentifierBridgeToDocumentIdentifierContext original,
-			BackendMappingContext mappingContext);
+			BridgeMappingContext mappingContext);
 
 }

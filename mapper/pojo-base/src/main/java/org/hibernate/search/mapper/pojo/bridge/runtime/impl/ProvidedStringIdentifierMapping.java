@@ -9,10 +9,10 @@ package org.hibernate.search.mapper.pojo.bridge.runtime.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.function.Supplier;
 
+import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoBackendMappingContext;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
 
 
 public class ProvidedStringIdentifierMapping implements IdentifierMappingImplementor<String, Object> {
@@ -40,12 +40,12 @@ public class ProvidedStringIdentifierMapping implements IdentifierMappingImpleme
 	}
 
 	@Override
-	public String toDocumentIdentifier(String identifier, AbstractPojoBackendMappingContext context) {
+	public String toDocumentIdentifier(String identifier, BridgeMappingContext context) {
 		return identifier;
 	}
 
 	@Override
-	public String fromDocumentIdentifier(String documentId, AbstractPojoBackendSessionContext sessionContext) {
+	public String fromDocumentIdentifier(String documentId, BridgeSessionContext sessionContext) {
 		return documentId;
 	}
 

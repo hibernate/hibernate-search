@@ -7,15 +7,15 @@
 package org.hibernate.search.mapper.pojo.bridge.runtime.impl;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
-import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContextExtension;
+import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
 
 public class ValueBridgeToIndexedValueContextImpl implements ValueBridgeToIndexedValueContext {
 
-	private final BackendMappingContext mappingContext;
+	private final BridgeMappingContext mappingContext;
 
-	public ValueBridgeToIndexedValueContextImpl(BackendMappingContext mappingContext) {
+	public ValueBridgeToIndexedValueContextImpl(BridgeMappingContext mappingContext) {
 		this.mappingContext = mappingContext;
 	}
 

@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.bridge.runtime.impl;
 
 import java.util.function.Supplier;
 
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 
 /**
  * @param <E> The entity type mapped to an index.
@@ -20,7 +20,7 @@ public interface RoutingKeyProvider<E> extends AutoCloseable {
 	}
 
 	String toRoutingKey(Object identifier, Supplier<E> entitySupplier,
-			AbstractPojoBackendSessionContext context);
+			BridgeSessionContext context);
 
 	static <E> RoutingKeyProvider<E> alwaysNull() {
 		return (tenantIdentifier, entity, context) -> null;

@@ -23,7 +23,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRouting
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
-import org.hibernate.search.mapper.pojo.bridge.runtime.impl.BridgeSessionContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.SessionBasedBridgeOperationContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierBridgeToDocumentIdentifierContextImpl;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.ValueBridgeToIndexedValueContextImpl;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
@@ -50,7 +50,7 @@ public class HibernateOrmExtensionTest extends EasyMockSupport {
 		assertThat( toDocumentContext.extension( HibernateOrmExtension.get() ) ).isSameAs( mappingContext );
 		verifyAll();
 
-		IdentifierBridgeFromDocumentIdentifierContext fromDocumentContext = new BridgeSessionContext( sessionContext );
+		IdentifierBridgeFromDocumentIdentifierContext fromDocumentContext = new SessionBasedBridgeOperationContext( sessionContext );
 		resetAll();
 		replayAll();
 		assertThat( fromDocumentContext.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
@@ -59,7 +59,7 @@ public class HibernateOrmExtensionTest extends EasyMockSupport {
 
 	@Test
 	public void routingKeyBridge() {
-		RoutingKeyBridgeToRoutingKeyContext context = new BridgeSessionContext( sessionContext );
+		RoutingKeyBridgeToRoutingKeyContext context = new SessionBasedBridgeOperationContext( sessionContext );
 		resetAll();
 		replayAll();
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
@@ -68,7 +68,7 @@ public class HibernateOrmExtensionTest extends EasyMockSupport {
 
 	@Test
 	public void typeBridge() {
-		TypeBridgeWriteContext context = new BridgeSessionContext( sessionContext );
+		TypeBridgeWriteContext context = new SessionBasedBridgeOperationContext( sessionContext );
 		resetAll();
 		replayAll();
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
@@ -77,7 +77,7 @@ public class HibernateOrmExtensionTest extends EasyMockSupport {
 
 	@Test
 	public void propertyBridge() {
-		PropertyBridgeWriteContext context = new BridgeSessionContext( sessionContext );
+		PropertyBridgeWriteContext context = new SessionBasedBridgeOperationContext( sessionContext );
 		resetAll();
 		replayAll();
 		assertThat( context.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );
@@ -92,7 +92,7 @@ public class HibernateOrmExtensionTest extends EasyMockSupport {
 		assertThat( toIndexedValueContext.extension( HibernateOrmExtension.get() ) ).isSameAs( mappingContext );
 		verifyAll();
 
-		ValueBridgeFromIndexedValueContext fromIndexedValueContext = new BridgeSessionContext( sessionContext );
+		ValueBridgeFromIndexedValueContext fromIndexedValueContext = new SessionBasedBridgeOperationContext( sessionContext );
 		resetAll();
 		replayAll();
 		assertThat( fromIndexedValueContext.extension( HibernateOrmExtension.get() ) ).isSameAs( sessionContext );

@@ -16,8 +16,8 @@ import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
-import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoBackendMappingContext;
-import org.hibernate.search.mapper.pojo.session.context.spi.AbstractPojoBackendSessionContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 
 public final class PojoValueBridgeContextExtension
 		implements ToDocumentFieldValueConvertContextExtension<ValueBridgeToIndexedValueContext>,
@@ -30,9 +30,9 @@ public final class PojoValueBridgeContextExtension
 	@Override
 	public Optional<ValueBridgeToIndexedValueContext> extendOptional(ToDocumentFieldValueConvertContext original,
 		BackendMappingContext mappingContext) {
-		if ( mappingContext instanceof AbstractPojoBackendMappingContext ) {
-			AbstractPojoBackendMappingContext pojoMappingContext = (AbstractPojoBackendMappingContext) mappingContext;
-			return Optional.of( pojoMappingContext.getToIndexedValueContext() );
+		if ( mappingContext instanceof BridgeMappingContext ) {
+			BridgeMappingContext pojoMappingContext = (BridgeMappingContext) mappingContext;
+			return Optional.of( pojoMappingContext.getValueBridgeToIndexedValueContext() );
 		}
 		else {
 			return Optional.empty();
@@ -42,8 +42,8 @@ public final class PojoValueBridgeContextExtension
 	@Override
 	public Optional<ValueBridgeFromIndexedValueContext> extendOptional(FromDocumentFieldValueConvertContext original,
 			BackendSessionContext sessionContext) {
-		if ( sessionContext instanceof AbstractPojoBackendSessionContext ) {
-			AbstractPojoBackendSessionContext pojoSessionContext = (AbstractPojoBackendSessionContext) sessionContext;
+		if ( sessionContext instanceof BridgeSessionContext ) {
+			BridgeSessionContext pojoSessionContext = (BridgeSessionContext) sessionContext;
 			return Optional.of( pojoSessionContext.getValueBridgeFromIndexedValueContext() );
 		}
 		else {

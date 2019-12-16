@@ -14,7 +14,7 @@ import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumen
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
-import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoBackendMappingContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeMappingContext;
 
 public final class PojoIdentifierBridgeToDocumentIdentifierValueConverter<I> implements ToDocumentIdentifierValueConverter<I> {
 
@@ -61,8 +61,8 @@ public final class PojoIdentifierBridgeToDocumentIdentifierValueConverter<I> imp
 		public Optional<IdentifierBridgeToDocumentIdentifierContext> extendOptional(
 				ToDocumentIdentifierValueConvertContext original,
 				BackendMappingContext mappingContext) {
-			if ( mappingContext instanceof AbstractPojoBackendMappingContext ) {
-				AbstractPojoBackendMappingContext pojoMappingContext = (AbstractPojoBackendMappingContext) mappingContext;
+			if ( mappingContext instanceof BridgeMappingContext ) {
+				BridgeMappingContext pojoMappingContext = (BridgeMappingContext) mappingContext;
 				return Optional.of( pojoMappingContext.getIdentifierBridgeToDocumentIdentifierContext() );
 			}
 			else {

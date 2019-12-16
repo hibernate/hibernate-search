@@ -12,16 +12,18 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContex
 import org.hibernate.search.mapper.pojo.bridge.runtime.RoutingKeyBridgeToRoutingKeyContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
-import org.hibernate.search.mapper.pojo.bridge.runtime.impl.BridgeSessionContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.impl.SessionBasedBridgeOperationContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 import org.hibernate.search.mapper.pojo.mapping.context.spi.AbstractPojoBackendMappingContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 
-public abstract class AbstractPojoBackendSessionContext implements BackendSessionContext {
+public abstract class AbstractPojoBackendSessionContext
+		implements BackendSessionContext, BridgeSessionContext {
 
-	private final BridgeSessionContext bridgeSessionContext;
+	private final SessionBasedBridgeOperationContext sessionBasedBridgeOperationContext;
 
 	public AbstractPojoBackendSessionContext() {
-		this.bridgeSessionContext = new BridgeSessionContext( this );
+		this.sessionBasedBridgeOperationContext = new SessionBasedBridgeOperationContext( this );
 	}
 
 	@Override
@@ -29,23 +31,28 @@ public abstract class AbstractPojoBackendSessionContext implements BackendSessio
 
 	public abstract PojoRuntimeIntrospector getRuntimeIntrospector();
 
+	@Override
 	public final IdentifierBridgeFromDocumentIdentifierContext getIdentifierBridgeFromDocumentIdentifierContext() {
-		return bridgeSessionContext;
+		return sessionBasedBridgeOperationContext;
 	}
 
+	@Override
 	public final RoutingKeyBridgeToRoutingKeyContext getRoutingKeyBridgeToRoutingKeyContext() {
-		return bridgeSessionContext;
+		return sessionBasedBridgeOperationContext;
 	}
 
+	@Override
 	public final TypeBridgeWriteContext getTypeBridgeWriteContext() {
-		return bridgeSessionContext;
+		return sessionBasedBridgeOperationContext;
 	}
 
+	@Override
 	public final PropertyBridgeWriteContext getPropertyBridgeWriteContext() {
-		return bridgeSessionContext;
+		return sessionBasedBridgeOperationContext;
 	}
 
+	@Override
 	public final ValueBridgeFromIndexedValueContext getValueBridgeFromIndexedValueContext() {
-		return bridgeSessionContext;
+		return sessionBasedBridgeOperationContext;
 	}
 }

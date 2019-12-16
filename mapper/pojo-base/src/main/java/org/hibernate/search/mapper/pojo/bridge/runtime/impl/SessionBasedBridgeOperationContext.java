@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.bridge.runtime.impl;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
-import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContextExtension;
 import org.hibernate.search.mapper.pojo.bridge.runtime.PropertyBridgeWriteContext;
@@ -18,6 +17,7 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.TypeBridgeWriteContextExtension;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContextExtension;
+import org.hibernate.search.mapper.pojo.bridge.runtime.spi.BridgeSessionContext;
 
 /**
  * A single implementation for all the bridge context interfaces that rely on the session context.
@@ -26,16 +26,16 @@ import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedVal
  * since the only feature provided by each interface is an access to the extension.
  * This might change in the future, though, which is why the interfaces themselves are split.
  */
-public final class BridgeSessionContext
+public final class SessionBasedBridgeOperationContext
 		implements IdentifierBridgeFromDocumentIdentifierContext,
 				RoutingKeyBridgeToRoutingKeyContext,
 				TypeBridgeWriteContext,
 				PropertyBridgeWriteContext,
 				ValueBridgeFromIndexedValueContext {
 
-	private final BackendSessionContext sessionContext;
+	private final BridgeSessionContext sessionContext;
 
-	public BridgeSessionContext(BackendSessionContext sessionContext) {
+	public SessionBasedBridgeOperationContext(BridgeSessionContext sessionContext) {
 		this.sessionContext = sessionContext;
 	}
 
