@@ -1,0 +1,27 @@
+[[mapper-orm-bridge-routingkeybridge]]
+= Routing key bridges
+
+== Basics
+
+include::todo-placeholder.asciidoc[]
+//TODO HSEARCH-3709 basic example with annotation, binder, bridge, mapping
+
+== Passing parameters
+
+include::todo-placeholder.asciidoc[]
+//TODO HSEARCH-3709 parameterized example
+
+== Accessing the ORM session from the bridge
+
+include::todo-placeholder.asciidoc[]
+// TODO HSEARCH-3709 HibernateOrmExtension.get()? Make sure to warn that not all operations are valid.
+
+== Injecting beans into the binder
+
+include::todo-placeholder.asciidoc[]
+// TODO HSEARCH-3709 say it's supported, give some basic information and link to <<configuration-bean-injection>>
+
+== Experimental features
+
+include::todo-placeholder.asciidoc[]
+// TODO HSEARCH-3709 experimental support for reflection with getBridgedElement (advanced use, no example)

@@ -1,0 +1,5 @@
+[[mapper-orm-bridge-bridgedelement-dependencies]]
+= Declaring dependencies to bridged elements
+
+include::todo-placeholder.asciidoc[]
+// TODO HSEARCH-3710

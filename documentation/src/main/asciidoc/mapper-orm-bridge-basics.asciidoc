@@ -1,0 +1,80 @@
+[[mapper-orm-bridge-basics]]
+= Basics
+// Search 5 anchors backward compatibility
+[[section-custom-bridges]]
+
+In Hibernate Search, bridges are the components responsible for converting pieces of data
+from the entity model to the document model.
+
+For example, when `@GenericField` is applied to a property of a custom enum type,
+a built-in bridge will be used to convert this enum to a string when indexing,
+and to convert the string back to an enum when projecting.
+
+Similarly, when a entity identifier of type `Long` is mapped to a document identifier,
+a built-in bridge will be used to convert the `Long` to a `String`
+(since all document identifiers are strings)
+when indexing,
+and back from a `String` to a `Long` when loading search results.
+
+Bridges are not limited to one-to-one mapping:
+for example, the <<mapper-orm-geopoint-geopointbinding,`@GeoPointBinding`>> annotation,
+which maps two properties annotated with `@Latitude` and `@Longitude`
+to a single field, is backed by another built-in bridge.
+
+While built-in bridges are provided for a wide range of standard types,
+they may not be enough for complex models.
+This is why bridges are really interesting:
+it is possible to implement custom bridges and to refer to them in the Hibernate Search mapping.
+Using custom bridges, custom types can be mapped,
+even complex types that require user code to execute at indexing time.
+
+There are multiple types of bridges,
+detailed in the next sections.
+If you need to implement a custom bridge, but don't quite know which type of bridge you need,
+the following table may help:
+
+[cols="h,1,1,1,1,1",options="header"]
+.Comparison of available bridge types
+|===
+|Bridge type
+|<<mapper-orm-bridge-valuebridge,`ValueBridge`>>
+|<<mapper-orm-bridge-propertybridge,`PropertyBridge`>>
+|<<mapper-orm-bridge-typebridge,`TypeBridge`>>
+|<<mapper-orm-bridge-identifierbridge,`IdentifierBridge`>>
+|<<mapper-orm-bridge-routingkeybridge,`RoutingKeyBridge`>>
+
+|Built-in annotation(s)
+|<<mapper-orm-directfieldmapping,`@GenericField`, `@FullTextField`, ...>>
+|`@PropertyBinding`
+|`@TypeBinding`
+|<<mapper-orm-identifiermapping,`@DocumentId`>>
+|`@RoutingKeyBinding`
+
+|Maps from...
+|One property
+|One property
+|One property or more
+|One property (usually the entity identifier)
+|One property or more
+
+|Maps to...
+|One index field
+|One index field or more
+|One index field or more
+|Document identifier
+|<<concepts-sharding-routing,Routing key>>
+
+|Supports <<mapper-orm-containerextractor,container extractors>>
+|Yes
+|No
+|No
+|No
+|No
+
+|Supports mutable types
+|[red]*No*
+|Yes
+|Yes
+|[red]*No*
+|Yes
+|===
