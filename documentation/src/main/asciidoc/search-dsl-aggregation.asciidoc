@@ -1,0 +1,257 @@
+[[search-dsl-aggregation]]
+= Aggregation DSL
+// Search 5 anchors backward compatibility
+[[query-faceting]]
+
+// TODO add more than just examples in the sub-sections
+
+[[search-dsl-aggregation-concepts]]
+== Basics
+
+Sometimes, you don't just need to list query hits directly:
+you also need to group and aggregate the hits.
+
+// Search 5 anchors backward compatibility
+[[example-amazon-facets]]
+For example, almost any e-commerce website you can visit will have some sort of "faceting",
+which is a simple form of aggregation.
+In the "book search" webpage of an online bookshop, beside the list of matching books,
+you will find "facets", i.e. a count of matching documents in various categories.
+These categories can be taken directly from the indexed data, e.g. the genre of the book (science-fiction, crime fiction, ...),
+but also derived from the indexed data slightly, e.g. a price range ("less than $5", "less than $10", ...).
+
+Aggregations allow just that (and, depending on the backend, much more):
+they allow the query to return "aggregated" hits.
+
+// Search 5 anchors backward compatibility
+[[section-creating-faceting-request]][[section-applying-faceting-request]]
+Aggregations can be configured when building the search query:
+
+// Search 5 anchors backward compatibility
+[[example-applying-faceting]]
+.Defining an aggregation in a search query
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=entryPoint-lambdas]
+----
+<1> Define a key that will uniquely identify the aggregation. Make sure to give it the correct type (see <6>).
+<2> Start building the query as usual.
+<3> Define a predicate: the aggregation will only take into account documents matching this predicate.
+<4> Request an aggregation on the `genre` field,
+with a separate count for each genre: science-fiction, crime fiction, ...
+If the field does not exist or cannot be aggregated, an exception will be thrown.
+<5> Fetch the results.
+<6> Retrieve the aggregation from the results as a `Map`,
+with the genre as key and the hit count as value of type `Long`.
+====
+
+Or alternatively, if you don't want to use lambdas:
+
+.Defining an aggregation in a search query -- object-based syntax
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=entryPoint-objects]
+----
+====
+
+// Search 5 anchors backward compatibility
+[[example-faceting-entity]]
+[NOTE]
+====
+There are a few constraints regarding aggregations.
+In particular, in order for a field to be "aggregable", it must be <<mapper-orm-directfieldmapping-aggregable,marked as such in the mapping>>,
+so that it is correctly stored in the index.
+====
+
+// Search 5 anchors backward compatibility
+[[example-restricting-query-results]]
+[TIP]
+====
+Faceting generally involves a concept of "drill-down",
+i.e. the ability to select a facet and restrict the hits
+to only those that match that facet.
+
+Hibernate Search 5 used to offer a dedicated API to enable this "drill-down",
+but in Hibernate Search 6 you should simply create a new query
+with the appropriate <<search-dsl-predicate,predicate>>.
+====
+
+The aggregation DSL offers more aggregation types, and multiple options for each type of aggregation.
+To learn more about the `terms` aggregation, and all the other types of aggregations,
+refer to the following sections.
+
+[[search-dsl-aggregation-terms]]
+== `terms`: group by the value of a field
+// Search 5 anchors backward compatibility
+[[discrete-faceting-request]]
+
+// TODO introduction, mention default order, default minDocCount, default maxTermCount
+
+.Counting hits grouped by the value of a field
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=terms]
+----
+<1> Define the path and type of the field whose values should be considered.
+====
+
+.Counting hits grouped by the value of a field, without converting field values
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=terms-noConverter]
+----
+====
+
+.Setting the maximum number of returned entries in a `terms` aggregation
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=terms-max-term-count]
+----
+====
+
+.Including values from unmatched documents in a `terms` aggregation
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=terms-min-doc-count-zero]
+----
+====
+
+.Excluding the rarest terms from a `terms` aggregation
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=terms-min-doc-count-high]
+----
+====
+
+[WARNING]
+====
+With the Lucene backend, due to limitations of the current implementation,
+using any order other than the default one (by descending count)
+may lead to incorrect results.
+See https://hibernate.atlassian.net/browse/HSEARCH-3666[HSEARCH-3666] for more information.
+====
+
+// Search 5 anchors backward compatibility
+[[section-sorting-faceting-request]]
+.Ordering entries by ascending value in a `terms` aggregation
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=terms-order-term-ascending]
+----
+====
+
+.Ordering entries by descending value in a `terms` aggregation
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=terms-order-term-descending]
+----
+====
+
+.Ordering entries by ascending count in a `terms` aggregation
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=terms-order-count-ascending]
+----
+====
+
+[WARNING]
+====
+When ordering entries by ascending count in a `terms` aggregation,
+link:{elasticsearchDocUrl}/search-aggregations-bucket-terms-aggregation.html#search-aggregations-bucket-terms-aggregation-order[hit counts are approximate].
+====
+
+[[search-dsl-aggregation-range]]
+== `range`: grouped by ranges of values for a field
+// Search 5 anchors backward compatibility
+[[range-faceting-request]]
+
+// TODO introduction, mention default order
+
+[NOTE]
+====
+Range aggregations are not available on String-based fields.
+====
+
+.Counting hits grouped by range of values for a field
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=range]
+----
+<1> Define the path and type of the field whose values should be considered.
+<2> Define the ranges to group hits into.
+The range can be passed directly as the lower bound (included) and upper bound (excluded).
+Other syntaxes exist to define different bound inclusion (see other examples below).
+<3> `null` means "to infinity".
+====
+
+.Counting hits grouped by range of values for a field -- passing `Range` objects
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=range-objects]
+----
+<1> With `Range.of(Object, Object)`, the lower bound is included and the upper bound is excluded.
+<2> `Range.of(Object, RangeBoundInclusion, Object, RangeBoundInclusion)` is more verbose, but allows setting the bound inclusion explicitly.
+<3> `Range` also offers multiple static methods to create ranges for a variety of use cases ("at least", "greater than", "at most", ...).
+====
+
+[WARNING]
+====
+With the Elasticsearch backend, due to a limitation of Elasticsearch itself,
+all ranges must have their lower bound included (or `null`)
+and their upper bound excluded (or `null`).
+Otherwise, an exception will be thrown.
+
+If you need to exclude the lower bound, or to include the upper bound,
+replace that bound with the immediate next value instead.
+For example with integers, `.range( 0, 100 )` means "0 (included) to 100 (excluded)".
+Call `.range( 0, 101 )` to mean "0 (included) to 100 (included)",
+or `.range( 1, 100 )` to mean "0 (excluded) to 100 (excluded)".
+====
+
+.Counting hits grouped by range of values for a field, without converting field values
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=range-noConverter]
+----
+====
+
+[[search-dsl-aggregation-extensions]]
+== Backend-specific extensions
+
+include::todo-placeholder.asciidoc[]
+
+// TODO introduction to extensions or links to that introduction
+
+[[search-dsl-aggregation-extensions-elasticsearch-from-json]]
+=== Elasticsearch: `fromJson`
+
+.Defining a native Elasticsearch JSON aggregation as a `JsonObject`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=elasticsearch-fromJson-jsonObject]
+----
+<1> The aggregation result is a `JsonObject`.
+====
+
+.Defining a native Elasticsearch JSON aggregation as a JSON-formatted string
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/aggregation/AggregationDslIT.java[tags=elasticsearch-fromJson-string]
+----
+<1> The aggregation result is a `JsonObject`.
+====

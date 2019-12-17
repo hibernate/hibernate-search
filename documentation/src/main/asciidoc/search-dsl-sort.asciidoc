@@ -1,0 +1,210 @@
+[[search-dsl-sort]]
+= Sort DSL
+// Search 5 anchors backward compatibility
+[[query-sorting]]
+
+// TODO add more than just examples in the sub-sections
+
+[[search-dsl-sort-concepts]]
+== Basics
+
+By default, query results are sorted by relevance.
+Other sorts, including the sort by field value, can be configured when building the search query:
+
+.Using custom sorts
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=entryPoint-lambdas]
+----
+<1> Start building the query as usual.
+<2> Mention that the results of the query are expected to be sorted on field "pageCount" in descending order,
+then (for those with the same page count) on field "title_sort" in ascending order.
+If the field does not exist or cannot be sorted on, an exception will be thrown.
+<3> Fetch the results, which will be sorted according to instructions.
+====
+
+Or alternatively, if you don't want to use lambdas:
+
+.Using custom sorts -- object-based syntax
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=entryPoint-objects]
+----
+====
+
+[NOTE]
+====
+There are a few constraints regarding sorts by field.
+In particular, in order for a field to be "sortable", it must be <<mapper-orm-directfieldmapping-sortable,marked as such in the mapping>>,
+so that the correct data structures are available in the index.
+====
+
+The sort DSL offers more sort types, and multiple options for each type of sort.
+To learn more about the field sort, and all the other types of sort,
+refer to the following sections.
+
+[[search-dsl-sort-common]]
+== Options common to multiple sort types
+
+include::todo-placeholder.asciidoc[]
+
+// TODO asc(), desc(), order(SortOrder), ...
+
+[[search-dsl-sort-score]]
+== `score`: sort by matching score (relevance)
+
+.Sorting by relevance
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=score]
+----
+====
+
+[[search-dsl-sort-index-order]]
+== `indexOrder`: sort according to the order of documents on storage
+
+.Sorting according to the order of documents on storage
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=indexOrder]
+----
+====
+
+[[search-dsl-sort-field]]
+== `field`: sort by field values
+
+.Sorting by field values
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=field]
+----
+====
+
+// Search 5 anchors backward compatibility
+[[_handling_missing_values]]
+
+.Sorting by field values, with missing values in first position
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=field-missing-first]
+----
+====
+
+.Sorting by field values, with missing values in last position
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=field-missing-last]
+----
+====
+
+.Sorting by field values, with missing values replaced by a given value
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=field-missing-use]
+----
+====
+
+[[search-dsl-sort-distance]]
+== `distance`: sort by distance to a point
+
+.Sorting by distance to a point
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=distance]
+----
+====
+
+// TODO alternative syntaxes?
+
+[[search-dsl-sort-composite]]
+== `composite`: combine sorts
+
+.Sorting by multiple composed sorts using `composite()`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=composite]
+----
+====
+
+.Sorting by multiple composed sorts using `then()`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=then]
+----
+====
+
+.Easily composing sorts dynamically with the lambda syntax
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=composite_dynamicParameters]
+----
+<1> Get a custom object holding the search parameters provided by the user through a web form, for example.
+<2> Call `.composite(Consumer)`.
+The consumer, implemented by a lambda expression, will receive a builder as an argument
+and will add sorts to that builder as necessary.
+<3> Inside the lambda, the code is free to do whatever is necessary before adding sorts.
+In this case, we iterate over user-selected sorts and add sorts accordingly.
+<4> The hits will be sorted according to sorts added by the lambda expression.
+====
+
+[[search-dsl-sort-extensions]]
+== Backend-specific extensions
+
+include::todo-placeholder.asciidoc[]
+
+// TODO introduction to extensions or links to that introduction
+
+[[search-dsl-sort-extensions-lucene-from-lucene-sort]]
+=== Lucene: `fromLuceneSort`
+
+.Sorting by a native `org.apache.lucene.search.Sort`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=lucene-fromLuceneSort]
+----
+====
+
+[[search-dsl-sort-extensions-lucene-from-lucene-sort-field]]
+=== Lucene: `fromLuceneSortField`
+// Search 5 anchors backward compatibility
+[[_using_native_sorts_within_the_sort_dsl]]
+
+.Sorting by a native `org.apache.lucene.search.SortField`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=lucene-fromLuceneSortField]
+----
+====
+
+[[search-dsl-sort-extensions-elasticsearch-from-json]]
+=== Elasticsearch: `fromJson`
+
+.Sorting by a native Elasticsearch JSON sort provided as a `JsonObject`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=elasticsearch-fromJson-jsonObject]
+----
+====
+
+.Sorting by a native Elasticsearch JSON sort provided as a JSON-formatted string
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=elasticsearch-fromJson-string]
+----
+====

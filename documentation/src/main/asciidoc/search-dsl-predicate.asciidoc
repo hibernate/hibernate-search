@@ -1,0 +1,594 @@
+[[search-dsl-predicate]]
+= Predicate DSL
+// Search 5 anchors backward compatibility
+[[query-predicate]]
+
+// TODO add more than just examples in the sub-sections
+
+[[search-dsl-predicate-concepts]]
+== Basics
+
+The main component of a search query is the _predicate_,
+i.e. the condition that every document must satisfy in order to be included in search results.
+
+The predicate is configured when building the search query:
+
+.Defining the predicate of a search query
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=entryPoint-lambdas]
+----
+<1> Start building the query.
+<2> Mention that the results of the query are expected to have a `title` field matching the value `robot`.
+If the field does not exist or cannot be searched on, an exception will be thrown.
+<3> Fetch the results, which will match the given predicate.
+====
+
+Or alternatively, if you don't want to use lambdas:
+
+.Defining the predicate of a search query -- object-based syntax
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=entryPoint-objects]
+----
+====
+
+The predicate DSL offers more predicate types, and multiple options for each type of predicate.
+To learn more about the `match` predicate, and all the other types of predicate,
+refer to the following sections.
+
+[[search-dsl-predicate-common]]
+== Options common to multiple predicate types
+// Search 5 anchors backward compatibility
+[[_query_options]]
+
+include::todo-placeholder.asciidoc[]
+
+// TODO boost, constantScore, ...
+
+[[search-dsl-predicate-match-all]]
+== `matchAll`: match all documents
+
+.Matching all documents
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=matchAll]
+----
+====
+
+.Matching all documents except those matching a given predicate
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=matchAll-except]
+----
+====
+
+[[search-dsl-predicate-id]]
+== `id`: match a document identifier
+
+.Matching a document with a given identifier
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=id]
+----
+====
+
+.Matching all documents with an identifier among a given collection
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=id-matchingAny]
+----
+====
+
+[[search-dsl-predicate-match]]
+== `match`: match a value
+// Search 5 anchors backward compatibility
+[[_keyword_queries]]
+
+.Matching a value
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match]
+----
+====
+
+.Matching multiple terms
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match-multipleTerms]
+----
+<1> For full-text fields, the value passed to `matching` may be a string containing multiple terms.
+The string will be analyzed and each term identified.
+<2> All returned hits will match *at least one* term of the given string.
+Hits matching multiple terms will have a higher score.
+====
+
+// TODO HSEARCH-917 add an option to match all terms instead of any term, then document it here
+
+.Matching a value in any of multiple fields
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match-orField]
+----
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match-fields]
+----
+====
+
+.Matching a text value approximately
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match-fuzzy]
+----
+====
+
+// TODO fuzzy parameters: edit distance, prefix length, ...
+
+.Matching a value, analyzing it with a different analyzer
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match-analyzer]
+----
+====
+
+.Matching a value without analyzing it
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=match-skipAnalysis]
+----
+====
+
+// TODO per-field boosts?
+
+[[search-dsl-predicate-range]]
+== `range`: match a range of values
+// Search 5 anchors backward compatibility
+[[_range_queries]]
+
+.Matching a range of values
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-between]
+----
+====
+
+.Matching values equal to or greater than a given value
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-atLeast]
+----
+====
+
+.Matching values strictly greater than a given value
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-greaterThan]
+----
+====
+
+.Matching values equal to or less than a given value
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-atMost]
+----
+====
+
+.Matching values strictly less than a given value
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-lessThan]
+----
+====
+
+.Matching a range of values with explicit bound inclusion/exclusion
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=range-between-advanced]
+----
+====
+
+// TODO multiple fields?
+
+// TODO per-field boosts?
+
+[[search-dsl-predicate-phrase]]
+== `phrase`: match a sequence of words
+// Search 5 anchors backward compatibility
+[[_phrase_queries]]
+
+.Matching a sequence of words
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=phrase]
+----
+====
+
+.Matching a sequence of words approximately
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=phrase-slop]
+----
+====
+
+// TODO analyzer?
+
+// TODO skipAnalysis?
+
+// TODO multiple fields?
+
+// TODO per-field boosts?
+
+[[search-dsl-predicate-exists]]
+== `exists`: match fields with non-null values
+
+[NOTE]
+====
+This predicate currently only works with non-object fields.
+
+See https://hibernate.atlassian.net/browse/HSEARCH-2389[HSEARCH-2389].
+====
+
+.Matching fields with non-null values
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=exists]
+----
+====
+
+[TIP]
+====
+There isn't any built-in predicate to match fields with exclusively null values,
+but you can easily create one yourself
+using an `exists` predicate in a `mustNot` clause in a <<search-dsl-predicate-boolean,boolean predicate>>.
+====
+
+[[search-dsl-predicate-wildcard]]
+== `wildcard`: match a simple pattern
+// Search 5 anchors backward compatibility
+[[_wildcard_queries]]
+
+.Matching a simple pattern
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=wildcard]
+----
+====
+
+[IMPORTANT]
+====
+If a normalizer has been defined on the field, the patterns used in wildcard predicates
+will be normalized.
+
+If an analyzer has been defined on the field:
+
+* when using the Elasticsearch backend, the patterns won't be analyzed nor normalized,
+and will be expected to match a *single* indexed token, not a sequence of tokens.
+* when using the Lucene backend the patterns will be normalized, but not tokenized:
+the pattern will still be expected to match a *single* indexed token, not a sequence of tokens.
+
+For example, a pattern such as `Cat*` could match `cat`
+when targeting a field having a normalizer that applies a lowercase filter when indexing.
+
+A pattern such as `john gr*` will not match anything
+when targeting a field that tokenizes on spaces.
+`gr*` may match, since it doesn't include any space.
+
+When the goal is to match user-provided query strings,
+the <<search-dsl-predicate-simple-query-string,simple query string predicate>> should be preferred.
+====
+
+[[search-dsl-predicate-boolean]]
+== `bool`: combine predicates (or/and/...)
+// Search 5 anchors backward compatibility
+[[_combining_queries]]
+
+.Matching a document that matches any of multiple given predicates (~`OR` operator)
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=bool-or]
+----
+<1> The hits *should* have a `title` field matching the text `robot`,
+*or* they should match any other clause in the same boolean predicate.
+<2> The hits *should* have a `description` field matching the text `investigation`,
+*or* they should match any other clause in the same boolean predicate.
+<3> All returned hits will match *at least one* of the clauses above:
+they will have a `title` field matching the text `robot`
+*or* they will have a `description` field matching the text `investigation`.
+====
+
+.Matching a document that matches all of multiple given predicates (~`AND` operator)
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=bool-and]
+----
+<1> The hits *must* have a `title` field matching the text `robot`,
+independently from other clauses in the same boolean predicate.
+<2> The hits *must* have a `description` field matching the text `crime`,
+independently from other clauses in the same boolean predicate.
+<3> All returned hits will match *all* of the clauses above:
+they will have a `title` field matching the text `robot`
+*and* they will have a `description` field matching the text `crime`.
+====
+
+.Matching a document that does *not* match a given predicate
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=bool-mustNot]
+----
+<1> The hits *must* have a `title` field matching the text `robot`,
+independently from other clauses in the same boolean predicate.
+<2> The hits *must not* have a `description` field matching the text `investigation`,
+independently from other clauses in the same boolean predicate.
+<3> All returned hits will match *all* of the clauses above:
+they will have a `title` field matching the text `robot`
+*and* they will not have a `description` field matching the text `investigation`.
+
+[NOTE]
+======
+While it is possible to execute a boolean predicate with only "negative" clauses (`mustNot`),
+performance may be disappointing because the full power of indexes cannot be leveraged in that case.
+======
+====
+
+.Matching a document that matches a given predicate without affecting the score
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=bool-filter]
+----
+<1> Create a top-level boolean predicate, with two `should` clauses.
+<2> In the first `should` clause, create a nested boolean predicate.
+<3> Use a `filter` clause to require documents to have the `science-fiction` genre,
+without taking this predicate into account when scoring.
+<4> Use a `must` clause to require documents with the `science-fiction` genre
+to have a `title` field matching `crime`,
+and take this predicate into account when scoring.
+<5> In the second `should` clause, create a nested boolean predicate.
+<6> Use a `filter` clause to require documents to have the `crime fiction` genre,
+without taking this predicate into account when scoring.
+<7> Use a `must` clause to require documents with the `crime fiction` genre
+to have a `description` field matching `robot`,
+and take this predicate into account when scoring.
+<8> The score of hits will ignore the `filter` clauses,
+leading to fairer sorts if there are much more "crime fiction" documents than "science-fiction" documents.
+====
+
+.Using optional `should` clauses to boost the score of some documents
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=bool-mustAndShould]
+----
+<1> The hits *must* have a `title` field matching the text `robot`,
+independently from other clauses in the same boolean predicate.
+<2> The hits *should* have a `description` field matching the text `crime`,
+but they may not, because matching the `must` clause above is enough.
+However, matching this `should` clause will improve the score of the document.
+<3> The hits *should* have a `description` field matching the text `investigation`,
+but they may not, because matching the `must` clause above is enough.
+However, matching this `should` clause will improve the score of the document.
+<4> All returned hits will match the `must` clause, and optionally the `should` clauses:
+they will have a `title` field matching the text `robot`,
+and the ones whose description matches either `crime` or `investigation` will have a better score.
+====
+
+.Fine-tuning `should` clauses matching requirements with `minimumShouldMatch`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=bool-minimumShouldMatchNumber]
+----
+<1> At least two "should" clauses must match for this boolean predicate to match.
+<2> The hits *should* have a `description` field matching the text `robot`.
+<3> The hits *should* have a `description` field matching the text `investigate`.
+<4> The hits *should* have a `description` field matching the text `crime`.
+<5> All returned hits will match at least two of the `should` clauses:
+their description will match either `robot` and `investigate`,
+`robot` and `crime`, `investigate` and `crime`, or all three of these terms.
+====
+
+.Easily adding clauses dynamically with the lambda syntax
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=bool-dynamicParameters]
+----
+<1> Get a custom object holding the search parameters provided by the user through a web form, for example.
+<2> Call `.bool(Consumer)`.
+The consumer, implemented by a lambda expression, will receive a builder as an argument
+and will add clauses to that builder as necessary.
+<3> By default, a boolean predicate will match nothing if there is no clause.
+To match every document when there is no clause, add a `must` clause that matches everything.
+<4> Inside the lambda, the code is free to check conditions before adding clauses.
+In this case, we only add clauses if the relevant parameter was filled in by the user.
+<5> The hits will match the clauses added by the lambda expression.
+====
+
+[[search-dsl-predicate-simple-query-string]]
+== `simpleQueryString`: match a user-provided query
+// Search 5 anchors backward compatibility
+[[_simple_query_string_queries]]
+
+.Matching a simple query string: AND/OR operators
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-boolean]
+----
+====
+
+.Matching a simple query string: NOT operator
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-not]
+----
+====
+
+.Matching a simple query string: AND as default operator
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-defaultOperator-and]
+----
+====
+
+.Matching a simple query string: prefix
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-prefix]
+----
+====
+
+.Matching a simple query string: fuzzy
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-fuzzy]
+----
+====
+
+.Matching a simple query string: phrase
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-phrase]
+----
+====
+
+.Matching a simple query string: phrase with slop
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=simpleQueryString-phrase-slop]
+----
+====
+
+// TODO multiple fields?
+
+// TODO per-field boosts?
+
+[[search-dsl-predicate-nested]]
+== `nested`: match nested documents
+
+.Matching a simple pattern
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=nested]
+----
+<1> Create a nested predicate on the `authors` object field.
+<2> The author must have a first name matching `isaac`.
+<3> The author must have a last name matching `asimov`.
+<4> All returned hits will be books for which at least one author
+has a first name matching `isaac` and a last name matching `asimov`.
+Books that happen to have multiple authors,
+one of which has a first name matching `isaac`
+and *another* of which has a last name matching `asimov`,
+will *not* match.
+====
+
+[[search-dsl-predicate-spatial-within]]
+== `within`: match points within a circle, box, polygon
+// Search 5 anchors backward compatibility
+[[spatial-queries]]
+
+.Matching points within a circle
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=within-circle]
+----
+====
+
+// TODO alternative syntaxes?
+
+.Matching points within a box
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=within-box]
+----
+====
+
+// TODO alternative syntaxes?
+
+.Matching points within a polygon
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=within-polygon]
+----
+====
+
+// TODO alternative syntaxes?
+
+[[search-dsl-predicate-more-like-this]]
+== More like this
+[[search-query-querydsl-mlt]]
+
+include::todo-placeholder.asciidoc[]
+
+[[search-dsl-predicate-extensions]]
+== Backend-specific extensions
+
+include::todo-placeholder.asciidoc[]
+
+// TODO introduction to extensions or links to that introduction
+
+[[search-dsl-predicate-extensions-lucene-from-lucene-query]]
+=== Lucene: `fromLuceneQuery`
+
+.Matching a native `org.apache.lucene.search.Query`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=lucene-fromLuceneQuery]
+----
+====
+
+[[search-dsl-predicate-extensions-elasticsearch-from-json]]
+=== Elasticsearch: `fromJson`
+
+.Matching a native Elasticsearch JSON query provided as a `JsonObject`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=elasticsearch-fromJson-jsonObject]
+----
+====
+
+.Matching a native Elasticsearch JSON query provided as a JSON-formatted string
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=elasticsearch-fromJson-string]
+----
+====

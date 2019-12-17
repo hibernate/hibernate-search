@@ -1,0 +1,278 @@
+[[search-dsl-projection]]
+= Projection DSL
+// Search 5 anchors backward compatibility
+[[projections]]
+
+// TODO add more than just examples in the sub-sections
+
+[[search-dsl-projection-concepts]]
+== Basics
+
+For some use cases, you only need the query to return a small subset of the data contained in your domain object.
+In these cases, returning managed entities and extracting data from these entities may be overkill:
+extracting the data from the index itself would avoid the database round-trip.
+
+Projections do just that: they allow the query to return something more precise than just "the matching entities".
+Projections can be configured when building the search query:
+
+.Using projections to extract data from the index
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=entryPoint-lambdas]
+----
+<1> Start building the query as usual.
+<2> Mention that the expected result of the query is a projection on field "title", of type String.
+If that type is not appropriate or if the field does not exist, an exception will be thrown.
+<3> Fetch the results, which will have the expected type.
+====
+
+Or alternatively, if you don't want to use lambdas:
+
+.Using projections to extract data from the index -- object-based syntax
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=entryPoint-objects]
+----
+====
+
+[NOTE]
+====
+There are a few constraints regarding field projections.
+In particular, in order for a field to be "projectable", it must be <<mapper-orm-directfieldmapping-projectable,marked as such in the mapping>>,
+so that it is correctly stored in the index.
+====
+
+While field projections are certainly the most common,
+they are not the only type of projection.
+Other projections allow to
+<<search-dsl-projection-composite,compose custom beans containing extracted data>>,
+get references to the <<search-dsl-projection-documentReference,extracted documents>>
+or the <<search-dsl-projection-reference,corresponding entities>>,
+or get information related to the search query itself
+(<<search-dsl-projection-score,score>>, ...).
+
+To learn more about the field projection, and all the other types of projection,
+refer to the following sections.
+
+[[search-dsl-projection-common]]
+== Options common to multiple projection types
+
+include::todo-placeholder.asciidoc[]
+
+// TODO common options, if there are any?
+
+[[search-dsl-projection-documentReference]]
+== `documentReference`: return references to matched documents
+
+.Returning references to matched documents
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=documentReference]
+----
+====
+
+[[search-dsl-projection-reference]]
+== `entityReference`: return references to matched entities
+
+.Returning references to matched entities
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=reference]
+----
+====
+
+[[search-dsl-projection-entity]]
+== `entity`: return matched entities loaded from the database
+
+.Returning matched entities loaded from the database
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=entity]
+----
+====
+
+[[search-dsl-projection-field]]
+== `field`: return field values from matched documents
+
+.Returning field values from matched documents
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=field]
+----
+====
+
+.Returning field values from matched documents, without specifying the field type
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=field-noType]
+----
+====
+
+.Returning field values from matched documents, without converting the field value
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=field-noProjectionConverter]
+----
+====
+
+[[search-dsl-projection-score]]
+== `score`: return the score of matched documents
+
+.Returning the score of matched documents
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=score]
+----
+====
+
+[[search-dsl-projection-distance]]
+== `distance`: return the distance to a point
+
+.Returning the distance to a point
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=distance]
+----
+====
+
+.Returning the distance to a point with a given distance unit
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=distance-unit]
+----
+====
+
+[[search-dsl-projection-composite]]
+== `composite`: combine projections
+
+.Returning custom objects created from multiple projected values
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=composite-customObject]
+----
+<1> Call `.composite(...)`.
+<2> Use the constructor of a custom object, `MyPair`, as the combining function.
+The combining function can be a `Function`, a `BiFunction`,
+or a `org.hibernate.search.util.common.function.TriFunction`.
+It will combine values returned by other projections and create an object returned by the composite projection.
+Depending on the type of function,
+either one, two, or three additional arguments are expected.
+<3> Define the first projection to combine as a projection on the `title` field,
+meaning the constructor of `MyPair` will be called for each matched document
+with the value of the `title` field as its first argument.
+<4> Define the second projection to combine as a projection on the `genre` field,
+meaning the constructor of `MyPair` will be called for each matched document
+with the value of the `genre` field as its second argument.
+<5> The hits will be the result of calling the combining function for each matched document,
+in this case `MyPair` instances.
+====
+
+.Returning a `List` of projected values
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=composite-list]
+----
+<1> Call `.composite(...)`.
+<2> Define the first projection to combine as a projection on the `title` field,
+meaning the hits will be `List` instances with the value of the `title` field of the matched document at index `0`.
+<3> Define the second projection to combine as a projection on the `genre` field,
+meaning the hits will be `List` instances with the value of the `genre` field of the matched document at index `1`.
+<4> The hits will be `List` instances holding the result of the given projections, in order for each matched document.
+====
+
+[[search-dsl-projection-extensions]]
+== Backend-specific extensions
+
+include::todo-placeholder.asciidoc[]
+
+// TODO introduction to extensions or links to that introduction
+
+[[search-dsl-projection-extensions-lucene-document]]
+=== Lucene: `document`
+
+.Returning the matched document as a native `org.apache.lucene.document.Document`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=lucene-document]
+----
+====
+
+// TODO explain limitations: not the original documents, fields reconstructed from what we find, not all fields presents, ...
+
+[[search-dsl-projection-extensions-lucene-explanation]]
+=== Lucene: `explanation`
+
+[WARNING]
+====
+Explanations are rather costly performance-wise:
+only use them for <<search-dsl-query-debugging-scores,debugging>> purposes.
+====
+
+.Returning the score explanation as a native `org.apache.lucene.search.Explanation`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=lucene-explanation]
+----
+====
+
+[[search-dsl-projection-extensions-elasticsearch-source]]
+=== Elasticsearch: `source`
+
+.Returning the matched document source as a `JsonObject`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=elasticsearch-source]
+----
+====
+
+[[search-dsl-projection-extensions-elasticsearch-explanation]]
+=== Elasticsearch: `explanation`
+
+[WARNING]
+====
+Explanations are rather costly performance-wise:
+only use them for <<search-dsl-query-debugging-scores,debugging>> purposes.
+====
+
+.Returning the score explanation as a `JsonObject`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=elasticsearch-explanation]
+----
+====
+
+[[search-dsl-projection-extensions-elasticsearch-jsonHit]]
+=== Elasticsearch: `jsonHit`
+
+[NOTE]
+====
+This is particularly useful when <<search-dsl-query-elasticsearch-json,customizing the request's JSON>>
+to ask for additional data within each hit.
+====
+
+include::components/elasticsearch-request-response-warning.asciidoc[]
+
+.Returning the Elasticsearch hit as a `JsonObject`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/projection/ProjectionDslIT.java[tags=elasticsearch-jsonHit]
+----
+====

@@ -1,0 +1,722 @@
+[[search-dsl-query]]
+= Query DSL
+// Search 5 anchors backward compatibility
+[[search-query]]
+
+[[search-dsl-query-generality]]
+== Basics
+// Search 5 anchors backward compatibility
+[[_building_a_hibernate_search_query]]
+
+Preparing and executing a query requires just a few lines:
+
+.Executing a search query
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=entryPoint]
+----
+<1> Get a Hibernate Search session, called `SearchSession`, from the `EntityManager`.
+<2> Initiate a search query on the index mapped to the `Book` entity.
+<3> Define that only documents matching the given predicate should be returned.
+The predicate is created using a factory `f` passed as an argument to the lambda expression.
+See <<search-dsl-predicate>> for more information about predicates.
+<4> Build the query and fetch the results, limiting to the top 20 hits.
+<5> Retrieve the total number of matching entities.
+<6> Retrieve matching entities.
+====
+
+By default, the hits of a search query will be entities managed by Hibernate ORM,
+bound to the entity manager used to create the search session.
+This provides all the benefits of Hibernate ORM,
+in particular the ability to navigate the entity graph to retrieve associated entities if necessary.
+
+The query DSL offers many features, detailed in the following sections.
+Some commonly used features include:
+
+* <<search-dsl-predicate,predicates>>,
+the main component of a search query,
+i.e. the condition that every document must satisfy in order to be included in search results.
+* <<search-dsl-query-fetching-results,fetching the results differently>>:
+getting the hits directly as a list,
+using pagination, scrolling, etc.
+* <<search-dsl-sort,sorts>>,
+to order the hits in various ways:
+by score, by the value of a field, by distance to a point, etc.
+* <<search-dsl-projection,projections>>,
+to retrieve hits that are not just managed entities:
+data can be extracted from the index (field values),
+or even from both the index and the database.
+* <<search-dsl-aggregation,aggregations>>,
+to group hits and compute aggregated metrics for each group -- hit count by category, for example.
+
+[[search-dsl-query-targeting]]
+== Advanced entity types targeting
+
+[[search-dsl-query-targeting-multiple]]
+=== Targeting multiple entity types
+
+When multiple entity types have similar indexed fields,
+it is possible to search across these multiple types in a single search query:
+the search result will contain hits from any of the targeted types.
+
+.Targeting multiple entity types in a single search query
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=targeting-multiple]
+----
+<1> Initiate a search query targeting the indexes mapped to the `Manager` and `Associate` entity types.
+Since both entity types implement the `Person` interface,
+search hits will be instances of `Person`.
+<2> Continue building the query as usual.
+There are restrictions regarding the fields that can be used: see the note below.
+<3> Fetch the search result. Hits will all be instances of `Person`.
+====
+
+[NOTE]
+====
+Multi-entity (multi-index) searches will only work well as long
+as the fields referenced in predicates/sorts/etc. are identical in all targeted indexes (same type, same analyzer, ...).
+Fields that are defined in only one of the targeted indexes will also work correctly.
+
+If you want to reference index fields that are even *slightly* different
+in one of the targeted indexes (different type, different analyzer, ...),
+see <<search-dsl-multiple-fields>>.
+====
+
+[[search-dsl-query-targeting-entityName]]
+=== Targeting entity types by name
+
+Though rarely necessary, it is also possible to use entity names instead of classes
+to designate the entity types targeted by the search:
+
+.Targeting entity types by name
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=targeting-entityName]
+----
+<1> Initiate a search query.
+<2> Pass a custom scope encompassing the indexes mapped to the `Manager` and `Associate` entity types,
+expecting those entity types to implement the `Person` interface (Hibernate Search will check that).
+<3> Continue building the query as usual.
+<4> Fetch the search result. Hits will all be instances of `Person`.
+====
+
+[[search-dsl-query-fetching-results]]
+== Fetching results
+// Search 5 anchors backward compatibility
+[[_retrieving_the_results]]
+
+[[search-dsl-query-fetching-results-basics]]
+=== Basics
+// Search 5 anchors backward compatibility
+[[_result_size]]
+
+In Hibernate Search, the default search result is a little bit more complicated than just "a list of hits".
+This is why the default methods return a composite `SearchResult` object offering getters
+to retrieve the part of the result you want,
+as shown in the example below.
+
+.Getting information from a `SearchResult`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-searchResult]
+----
+<1> Start building the query as usual.
+<2> Fetch the results, limiting to the top 20 hits.
+<3> Retrieve the total hit count, i.e. the total number of matching entities/documents,
+which could be 10,000 even if you only retrieved the top 20 hits.
+This is useful to give end users and idea of how many more hits they query produced.
+<4> Retrieve the top hits, in this case the top 20 matching entities/documents.
+<5> Other kinds of results and information can be retrieved from `SearchResult`.
+They are explained in dedicated sections, such as <<search-dsl-aggregation>>.
+====
+
+It is possible to retrieve the total hit count alone,
+for cases where only the number of hits is of interest,
+not the hits themselves:
+
+.Getting the total hit count directly
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-totalHitCount]
+----
+====
+
+The top hits can also be obtained directly,
+without going through a `SearchResult`,
+which can be handy if only the top hits are useful, and not the total hit count:
+
+.Getting the top hits directly
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-hits]
+----
+====
+
+If only zero to one hit is expected, it is possible to retrieve it as an `Optional`.
+An exception will be thrown if more than one hits are returned.
+
+.Getting the only hit directly
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-singleHit]
+----
+====
+
+[[search-dsl-query-fetching-results-all]]
+=== Fetching all hits
+
+[WARNING]
+====
+Fetching all hits is rarely a good idea:
+if the query matches many entities/documents,
+this may lead to loading millions of entities in memory,
+which will likely crash the JVM,
+or at the very least slow it down to a crawl.
+
+If you know your query will always have less than N hits,
+consider setting the limit to N to avoid memory issues.
+
+If there is no bound to the number of hits you expect,
+you should consider <<search-dsl-query-fetching-results-pagination>>
+or <<search-dsl-query-fetching-results-scrolling>>
+to retrieve data in batches.
+
+If you still want to fetch all hits in one call,
+be aware that the Elasticsearch backend will only ever return 10,000 hits at a time,
+due to internal safety mechanisms in the Elasticsearch cluster.
+====
+
+.Getting all hits in a `SearchResult`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-all-searchResult]
+----
+====
+
+.Getting all hits directly
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-all-hits]
+----
+====
+
+[[search-dsl-query-fetching-results-pagination]]
+=== Pagination
+// Search 5 anchors backward compatibility
+[[_pagination]]
+
+Pagination is the concept of splitting hits in successive "pages",
+all pages containing a fixed number of elements (except potentially the last one).
+When displaying results on a web page,
+the user will be able to go to an arbitrary page and see the corresponding results,
+for example "results 151 to 170 of 14,265".
+
+Pagination is achieved in Hibernate Search by passing an offset and a limit to the `fetch` or `fetchHits` method:
+
+* The offset defines the number of documents that should be skipped because they were displayed in previous pages.
+It is a *number of documents*, not a number of pages,
+so you will usually want to compute it from the page number and page size this way:
+`offset = zero-based-page-number * page-size`.
+* The limit defines the maximum number of hits to return, i.e. the page size.
+
+.Pagination retrieving a `SearchResult`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-pagination-searchResult]
+----
+<1> Set the offset to `40` and the limit to `20`.
+====
+
+.Pagination retrieving hits directly
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetching-pagination-hits]
+----
+<1> Set the offset to `40` and the limit to `20`.
+====
+
+[[search-dsl-query-fetching-results-scrolling]]
+=== Scrolling
+// Search 5 anchors backward compatibility
+[[_performance_considerations]]
+
+include::todo-placeholder.asciidoc[]
+
+// TODO https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_performance_considerations
+
+[[search-dsl-query-routing]]
+== Routing
+
+include::components/sharding-intro-note.asciidoc[]
+
+This feature is useful when sharding is enabled,
+and when each entity is mapped in such a way that
+<<mapper-orm-bridge-routingkeybridge,it is assigned a routing key>>.
+
+If a search query already uses predicates to filter documents in such a way that
+all matching documents will have a routing key in a known subset of all possible routing keys,
+it is possible to specify these routing keys to Hibernate Search
+so that only the relevant shards are queried,
+potentially improving performance.
+
+[WARNING]
+====
+The main purpose of this feature is to *improve performance*.
+It should not be relied on for document filtering purposes.
+
+While setting a routing key will remove some irrelevant documents from the hits,
+it may not remove _all_ of them: the routing key will resolve into a single shard,
+but that shard may be contain documents with multiple different routing keys,
+depending on the sharding strategy.
+
+Thus, even when specifying a routing key that supposedly has the same value
+as a field in the document (e.g. a `genre` field),
+it is necessary to also add a predicate to explicitly filter out documents
+that may not have the same routing key.
+====
+
+Specifying routing keys is done by calling the `.routing(String)` or .`routing(Collection<String>)` methods
+when building the query:
+
+.Routing a query to a subset of all shards
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/routing/HibernateOrmRoutingIT.java[tags=routing-single]
+----
+<1> Start building the query.
+<2> Define that only documents matching the given `genre` should be returned.
+<3> In this case, the entity is mapped in such a way that the `genre` is also used as a routing key.
+We know all documents will have the given `genre` value,
+so we can specify the routing key to limit the query to relevant shards.
+<4> Build the query and fetch the results.
+====
+
+[[search-dsl-query-entity-loading-options]]
+== Entity loading options
+
+Hibernate Search executes database queries to load entities
+that are returned as part of the hits of a search query.
+
+This section presents all available options related to entity loading in search queries.
+
+[[search-dsl-query-cache-lookup-strategy]]
+=== Cache lookup strategy
+// Search 5 anchors backward compatibility
+[[_customizing_object_initialization_strategies]]
+
+By default, Hibernate Search will load entities from the database directly,
+without looking at any cache.
+This is a good strategy when the size of caches (Hibernate ORM session or second level cache)
+is much lower than the total number of indexed entities.
+
+If a significant portion of your entities are present in the second level cache,
+you can force Hibernate Search to retrieve entities from the persistence context (the session)
+and/or the second level cache if possible.
+Hibernate Search will still need to execute a database query to retrieve entities missing from the cache,
+but the query will likely have to fetch fewer entities,
+leading to better performance and lower stress on your database.
+
+This is done through the cache lookup strategy,
+which can be configured by setting the configuration property `hibernate.search.query.loading.cache_lookup.strategy`:
+
+* `skip` (the default) will not perform any cache lookup.
+* `persistence-context` will only look into the persistence context,
+i.e. will check if the entities are already loaded in the session.
+Useful if most search hits are expected to already be loaded in session,
+which is generally unlikely.
+* `persistence-context-then-second-level-cache` will first look into the persistence context,
+then into the second level cache, if enabled in Hibernate ORM for the searched entity.
+Useful if most search hits are expected to be cached,
+which may be likely if you have a small number of entities and a large cache.
+
+[NOTE]
+====
+Before a second-level cache can be used for a given entity type,
+some configuration is required in Hibernate ORM.
+
+See link:{hibernateDocUrl}#caching[the caching section of the Hibernate ORM documentation]
+for more information.
+====
+
+It is also possible to override the configured strategy on a per-query basis, as shown below.
+
+.Overriding the cache lookup strategy in a single search query
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=cacheLookupStrategy-persistenceContextThenSecondLevelCache]
+----
+<1> Start building the query.
+<2> Mention that the persistence context and second level cache should be checked
+before entities are loaded from the database.
+<3> Fetch the results.
+The more entities found in the persistence context or second level cache,
+the less entities will be loaded from the database.
+====
+
+[[search-dsl-query-fetch-size]]
+=== Fetch size
+
+By default, Hibernate Search will use a fetch size of `100`,
+meaning that for a single `fetch*()` call on a single query,
+it will run a first query to load the first 100 entities,
+then if there are more hits it will run a second query to load the next 100,
+etc.
+
+The fetch size can be configured by setting the configuration property `hibernate.search.query.loading.fetch_size`.
+This property expects a strictly positive <<configuration-property-types,Integer value>>.
+
+It is also possible to override the configured fetch size on a per-query basis, as shown below.
+
+.Overriding the fetch size in a single search query
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetchSize]
+----
+<1> Start building the query.
+<2> Set the fetch size to an arbitrary value (must be `1` or more).
+<3> Fetch the results, limiting to the top 200 hits.
+One query will be executed to load the hits if there are less hits than the given fetch size;
+two queries if there are more hits than the fetch size but less than twice the fetch size,
+etc.
+====
+
+=== Entity graph
+// Search 5 anchors backward compatibility
+[[_fetching_strategy]]
+
+include::todo-placeholder.asciidoc[]
+
+// TODO HSEARCH-3628 https://docs.jboss.org/hibernate/search/5.11/reference/en-US/html_single/#_fetching_strategy
+
+[[search-dsl-query-timeout]]
+== Timeout
+// Search 5 anchors backward compatibility
+[[_limiting_the_time_of_a_query]]
+
+You can limit the time it takes for a search query to execute in two ways:
+
+* Aborting (throwing an exception) when the time limit is reached with `failAfter()`.
+* Truncating the results when the time limit is reached with `truncateAfter()`.
+
+[WARNING]
+====
+Currently, the two approaches are incompatible:
+trying to set both `failAfter` and `truncateAfter` will result in unspecified behavior.
+====
+
+=== `failAfter()`: Aborting the query after a given amount of time
+// Search 5 anchors backward compatibility
+[[_raise_an_exception_on_time_limit]]
+
+By calling `failAfter(...)` when building the query,
+it is possible to set a time limit for the query execution.
+Once the time limit is reached,
+Hibernate Search will stop the query execution and throw a `SearchTimeoutException`.
+
+include::components/timeout-besteffort-note.asciidoc[]
+
+.Triggering a failure on timeout
+====
+[source, JAVA]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=failAfter]
+----
+<1> Build the query as usual.
+<2> Call `failAfter` to set the timeout.
+<3> Fetch the results.
+<4> Catch the exception if necessary.
+====
+
+[NOTE]
+====
+`explain()` does not honor this timeout:
+this method is used for debugging purposes and in particular to find out why a query is slow.
+====
+
+=== `truncateAfter()`: Truncating the results after a given amount of time
+// Search 5 anchors backward compatibility
+[[_limit_the_number_of_results_when_the_time_limit_is_reached]]
+
+By calling `truncateAfter(...)` when building the query,
+it is possible to set a time limit for the collection of search results.
+Once the time limit is reached,
+Hibernate Search will stop collecting hits and return an incomplete result.
+
+include::components/timeout-besteffort-note.asciidoc[]
+
+.Truncating the results on timeout
+====
+[source, JAVA]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=truncateAfter]
+----
+<1> Build the query as usual.
+<2> Call `truncateAfter` to set the timeout.
+<3> Fetch the results.
+<4> Optionally extract _took_: how much time the query took to execute.
+<5> Optionally extract _timedOut_: whether the query timed out.
+====
+
+[NOTE]
+====
+`explain()` and `fetchTotalHitCount()` do not honor this timeout.
+The former is used for debugging purposes and in particular to find out why a query is slow.
+For the latter it does not make sense to return a _partial_ result.
+====
+
+[[search-dsl-query-object]]
+== Obtaining a query object
+
+The example presented in most of this documentation fetch the query results
+directly at the end of the query definition DSL,
+not showing any "query" object that can be manipulated.
+This is because the query object generally only makes code more verbose
+without bringing anything worthwhile.
+
+However, in some cases a query object can be useful.
+To get a query object, just call `toQuery()` at the end of the query definition:
+
+.Getting a `SearchQuery` object
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=searchQuery]
+----
+<1> Build the query as usual.
+<2> Retrieve a `SearchQuery` object.
+<3> Fetch the results.
+====
+
+This query object supports all <<search-dsl-query-fetching-results,`fetch*` methods supported by the query DSL>>.
+The main advantage over calling these methods directly at the end of a query definition
+is mostly related to debugging (see <<search-dsl-query-debugging>>),
+but the query object can also be useful if you need an adapter to another API.
+
+Hibernate Search provides an adapter to JPA and Hibernate ORM's native APIs,
+i.e. a way to turn a `SearchQuery` into a `javax.persistence.TypedQuery` (JPA)
+or a `org.hibernate.query.Query` (native ORM API):
+
+.Getting a `SearchQuery` object
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=searchQuery-toORM]
+----
+<1> Build the query as usual.
+<2> Retrieve a `SearchQuery` object.
+<3> Turn the `SearchQuery` object into a JPA query.
+<4> Turn the `SearchQuery` object into a Hibernate ORM query.
+====
+
+// Search 5 anchors backward compatibility
+[[_resulttransformer]]
+[WARNING]
+====
+The resulting query *does not support all operations*,
+so is recommended to only convert search queries when absolutely required,
+for example when integrating with code that only works with Hibernate ORM queries.
+
+The following operations are expected to work correctly in most cases,
+even though they may behave slightly differently from what is expected from a JPA `TypedQuery`
+or Hibernate ORM `Query` in some cases
+(including, but not limited to, the type of thrown exceptions):
+
+* Hit retrieval methods (`list`, `getResultList`, `uniqueResult`, ... ).
+* `setFirstResult`/`setMaxResults` and getters.
+* `setFetchSize`
+* `unwrap`
+
+The following operations are known not to work correctly,
+with no plan to fix them at the moment:
+
+* Hints (`setHint`, ...).
+* Parameter-related methods (`setParameter`, ...).
+* Result transformer (`setResultTransformer`, ...);
+use <<search-dsl-projection-composite,composite projections>> instead.
+* Lock-related methods (`setLockOptions`, ...).
+* And more (this list is not exhaustive).
+====
+
+[[search-dsl-query-debugging]]
+== Debugging a query
+
+[[search-dsl-query-debugging-matches]]
+=== Explaining matches
+
+When some documents unexpectedly match or don't match,
+you will need information about the exact query being executed,
+and about the index content.
+
+To gain insight about what ends up being executed exactly,
+one option is to <<search-dsl-query-object,create a `SearchQuery` object>>
+using `toQuery()` at the end of the query definition,
+then call `toString()` to get a String representation of that query.
+
+Another option is to take advantage of logs:
+all executed search queries are logged to the log category `org.hibernate.search.query`
+at the `DEBUG` level.
+
+You may also need to inspect the content of the index.
+This is rather obvious with Elasticsearch: run simpler queries using either Hibernate Search or the REST APIs directly.
+For the Lucene backend,
+https://medium.com/@mocobeta/luke-become-an-apache-lucene-module-as-of-lucene-8-1-7d139c998b2[use the Luke tool]
+distributed as part of the https://lucene.apache.org/core/downloads.html[Lucene binary packages].
+
+[[search-dsl-query-debugging-scores]]
+=== Explaining scores
+// Search 5 anchors backward compatibility
+[[_understanding_results]]
+
+When the score of some documents is higher or lower than expected,
+the best way to gain insight is to <<search-dsl-query-object,create a `SearchQuery` object>>
+using `toQuery()` at the end of the query definition,
+and then use the backend-specific `explain` methods;
+the result of these methods will explain how the score of a specific document was computed.
+See below for examples.
+
+To retrieve an explanation for all matches in one call,
+`explanation` projections are available:
+see <<search-dsl-projection-extensions-lucene-explanation,here for Lucene>>
+and <<search-dsl-projection-extensions-elasticsearch-explanation,here for Elasticsearch>>.
+
+[WARNING]
+====
+Regardless of the API used, explanations are rather costly performance-wise:
+only use them for debugging purposes.
+====
+
+.Retrieving score explanation -- Lucene
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=explain-lucene]
+----
+<1> Build the query as usual,
+but using the Lucene extension so that the retrieved query exposes Lucene-specific operations.
+<2> Retrieve a `SearchQuery` object.
+<3> Retrieve the explanation of the score of the document with ID `1`.
+The explanation is of type `Explanation`, but you can convert it to a readable string using `toString()`.
+<4> For multi-index queries, it is necessary to refer to the document not only by its ID,
+but also by the name of the index it's located in.
+<5> If you cannot change the code building the query to use the Lucene extension,
+you can instead use the Lucene extension on the `SearchQuery` to convert it after its creation.
+====
+
+.Retrieving score explanation -- Elasticsearch
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=explain-elasticsearch]
+----
+<1> Build the query as usual,
+but using the Elasticsearch extension so that the retrieved query exposes Elasticsearch-specific operations.
+<2> Retrieve a `SearchQuery` object.
+<3> Retrieve the explanation of the score of the document with ID `1`.
+<4> For multi-index queries, it is necessary to refer to the document not only by its ID,
+but also by the name of the index it's located in.
+<5> If you cannot change the code building the query to use the Elasticsearch extension,
+you can instead use the Elasticsearch extension on the `SearchQuery` to convert it after its creation.
+====
+
+=== Query metadata in SearchResult: `took` and `timed_out`
+
+.Returning query execution time and whether a timeout occurred
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=took-timedOut]
+----
+<1> Fetch the results.
+<2> Extract _took_: how much time the query took
+(in case of Elasticsearch, ignoring network latency between the application and the Elasticsearch cluster).
+<3> Extract _timedOut_: whether the query timed out
+(in case of Elasticsearch, ignoring network latency between the application and the Elasticsearch cluster).
+====
+
+[[search-dsl-query-elasticsearch-json]]
+== Elasticsearch: leveraging advanced features with JSON manipulation
+
+include::components/experimental-warning.asciidoc[]
+
+Elasticsearch ships with many features.
+It is possible that at some point, one feature you need will not be exposed by the Search DSL.
+
+To work around such limitations, Hibernate Search provides ways to:
+
+* Transform the HTTP request sent to Elasticsearch for search queries.
+* Read the raw JSON of the HTTP response received from Elasticsearch for search queries.
+
+include::components/elasticsearch-request-response-warning.asciidoc[]
+
+Most simple use cases will only need to change the HTTP request slightly, as shown below.
+
+.Transforming the Elasticsearch request manually in a search query
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=elasticsearch-requestTransformer]
+----
+<1> Build the query as usual,
+but using the Elasticsearch extension so that Elasticsearch-specific options are available.
+<2> Add a request transformer to the query.
+Its `transform` method will be called whenever a request is about to be sent to Elasticsearch.
+<3> Inside the `transform` method, alter the HTTP query parameters.
+<4> It is also possible to alter the request's JSON body as shown here,
+or even the request's path (not shown in this example).
+<5> Retrieve the result as usual.
+====
+
+For more complicated use cases, it is possible to access the raw JSON of the HTTP response, as shown below.
+
+.Accessing the Elasticsearch response body manually in a search query
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=elasticsearch-responseBody]
+----
+<1> Build the query as usual,
+but using the Elasticsearch extension so that Elasticsearch-specific options are available.
+<2> Add a request transformer to the query.
+<3> Add content to the request body,
+so that Elasticsearch will return more data in the response.
+Here we're asking Elasticsearch to apply a link:{elasticsearchDocUrl}/search-suggesters.html[suggester].
+<4> Retrieve the result as usual.
+Since we used the Elasticsearch extension when building the query,
+the result will have an Elasticsearch-specific type: `ElasticsearchSearchResult`.
+<5> Get the response body as a `JsonObject`.
+<6> Extract useful information from the response body.
+Here we're extracting the result of the suggester we configured above.
+====
+
+[NOTE]
+====
+Gson's API for building JSON objects is quite verbose,
+so the example above relies on a small, custom helper method to make the code more readable:
+
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=elasticsearch-responseBody-helper]
+----
+====
+
+[TIP]
+====
+When data needs to be extracted from each hit,
+it is often more convenient to use the <<search-dsl-projection-extensions-elasticsearch-jsonHit,`jsonHit` projection>>
+than parsing the whole response.
+====

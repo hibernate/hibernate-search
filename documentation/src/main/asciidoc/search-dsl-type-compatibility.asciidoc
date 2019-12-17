@@ -1,0 +1,239 @@
+[[search-dsl-type-compatibility]]
+= Field types and compatibility
+
+[[search-dsl-argument-type]]
+== Type of arguments passed to the DSL
+
+Some predicates, such as the `match` predicate or the `range` predicate,
+require a parameter of type `Object` at some point (`matching(Object)`, `atLeast(Object)`, ...).
+Similarly, it is possible to pass an argument of type `Object` in the sort DSL
+when defining the behavior for missing values (`missing().use(Object)`).
+
+These methods do not actually accept *any* object,
+and will throw an exception when passed an argument with the wrong type.
+
+Generally the expected type of this argument should be rather obvious:
+for example if you created a field by mapping an `Integer` property,
+then an `Integer` value will be expected when building a predicate;
+if you mapped a `java.time.LocalDate`, then a `java.time.LocalDate` will be expected,
+etc.
+
+Things get a little more complex if you start defining and using custom bridges.
+You will then have properties of type `A` mapped to an index field of type `B`.
+What should you pass to the DSL?
+To answer that question, we need to understand DSL converters.
+
+DSL converters are a feature of Hibernate Search that allows the DSL to accept
+arguments that match the type of the indexed property,
+instead of the type of the underlying index field.
+
+Each custom bridge has the possibility to define a DSL converter for the index fields it populates.
+When it does, every time that field is mentioned in the predicate DSL,
+Hibernate Search will use that DSL converter to convert the value passed to the DSL to a value that the backend understands.
+
+For example, let's imagine an `AuthenticationEvent` entity with an `outcome` property of type `AuthenticationOutcome`.
+This `AuthenticationOutcome` type is an enum.
+We index the `AuthenticationEvent` entity and its `outcome` property in order to allow users to find events by their outcome.
+
+The default bridge for enums puts the result of `Enum.name()` into a `String` field.
+However, this default bridge also defines a DSL converter under the hood.
+As a result, any call to the DSL will be expected to pass an `AuthenticationOutcome` instance:
+
+.Transparent conversion of DSL parameters
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/converter/DslConverterIT.java[tags=dsl-converter-enabled]
+----
+====
+
+This is handy, and especially appropriate if users are asked to select an outcome in a list of choices.
+But what if we want users to type in some words instead, i.e. what if we want full-text search on the `outcome` field?
+Then we will not have an `AuthenticationOutcome` instance to pass to the DSL, only a `String`...
+
+In that case, we will first need to assign some text to each enum.
+This can be achieved by defining a custom <<mapper-orm-bridge-valuebridge,`ValueBridge<AuthenticationOutcome, String>`>>
+and applying it to the `outcome` property so as to index a textual description of the outcome,
+instead of the default `Enum#name()`.
+
+Then, we will need to tell Hibernate Search that the value passed to the DSL should not be passed to the DSL converter,
+but should be assumed to match the type of the index field directly (in this case, `String`).
+To that end, one can simply use the variant of the `matching` method that accepts a `ValueConvert` parameter,
+and pass `ValueConvert.NO`:
+
+.Disabling the DSL converter
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/converter/DslConverterIT.java[tags=dsl-converter-disabled]
+----
+====
+
+All methods that apply DSL converters offer a variant that accepts a `ValueConvert` parameter:
+`matching`, `between`, `atLeast`, `atMost`, `greaterThan`, `lessThan`, `range`, ...
+
+[NOTE]
+====
+A DSL converter is always automatically generated for value bridges.
+However, more complex bridges will require explicit configuration.
+
+See <<mapper-orm-bridge-typebridge>> or <<mapper-orm-bridge-propertybridge>> for more information.
+====
+
+[[search-dsl-projected-value-type]]
+== Type of projected values
+
+Generally the type of values returned by projections argument should be rather obvious:
+for example if you created a field by mapping an `Integer` property,
+then an `Integer` value will be returned when projecting;
+if you mapped a `java.time.LocalDate`, then a `java.time.LocalDate` will be returned,
+etc.
+
+Things get a little more complex if you start defining and using custom bridges.
+You will then have properties of type `A` mapped to an index field of type `B`.
+What will be returned by projections?
+To answer that question, we need to understand projection converters.
+
+Projection converters are a feature of Hibernate Search that allows the projections to return
+values that match the type of the indexed property,
+instead of the type of the underlying index field.
+
+Each custom bridge has the possibility to define a projection converter for the index fields it populates.
+When it does, every time that field is projected on,
+Hibernate Search will use that projection converter to convert the projected value returned by the index.
+
+For example, let's imagine an `Order` entity with a `status` property of type `OrderStatus`.
+This `OrderStatus` type is an enum.
+We index the `Order` entity and its `status` property.
+
+The default bridge for enums puts the result of `Enum.name()` into a `String` field.
+However, this default bridge also defines a projection converter.
+As a result, any projection on the `status` field will return an `OrderStatus` instance:
+
+.Transparent conversion of projections
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/converter/ProjectionConverterIT.java[tags=projection-converter-enabled]
+----
+====
+
+This is probably what you want in general.
+But in some cases, you may want to disable this conversion and return the index value instead
+(i.e. the value of `Enum.name()`).
+
+In that case, we will need to tell Hibernate Search that the value returned by the backend should not be passed to the projection converter.
+To that end, one can simply use the variant of the `field` method that accepts a `ValueConvert` parameter,
+and pass `ValueConvert.NO`:
+
+.Disabling the projection converter
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/converter/ProjectionConverterIT.java[tags=projection-converter-disabled]
+----
+====
+
+[NOTE]
+====
+Projection converters must be configured explicitly in custom bridges.
+
+See <<mapper-orm-bridge-valuebridge>>,
+<<mapper-orm-bridge-propertybridge>> or <<mapper-orm-bridge-typebridge>> for more information.
+====
+
+[[search-dsl-multiple-fields]]
+== Targeting multiple fields
+
+Sometimes a predicate/sort/projection targets *multiple* field, which may have conflicting definitions:
+
+* when multiple field names are passed to the `fields` method in the predicate DSL (each field has its own definition);
+* or when the search query <<search-dsl-query-targeting-multiple,targets multiple indexes>> (each index has its own definition of each field).
+
+In such cases, the definition of the targeted fields is expected to be compatible.
+For example targeting an `Integer` field and a `java.time.LocalDate` field
+in the same `match` predicate will not work,
+because you won't be able to pass a non-null argument to the `matching(Object)` method
+that is both an `Integer` and a `java.time.LocalDate`.
+
+If you are looking for a simple rule of thumb, here it is:
+if the indexed properties do not have the same type, or are mapped differently,
+the corresponding fields are probably not going to be compatible.
+
+However, if you're interested in the details, Hibernate Search is a bit more flexible than that.
+
+There are three different constraints when it comes to field compatibility:
+
+1. The fields must be "encoded" in a compatible way.
+This means the backend must use the same representation for the two fields,
+for example they are both `Integer`,
+or they are both `BigDecimal` with the same decimal scale,
+or they are both `LocalDate` with the same date format, etc.
+2. The fields must have a compatible DSL converter (for predicates and sorts) or projection converter (for projections).
+3. For full-text predicates, the fields must have a compatible analyzer.
+
+The following sections describe all the possible incompatibilities, and how to solve them.
+
+=== Incompatible codec
+
+In a search query targeting multiple indexes,
+if a field is encoded differently in each index,
+you cannot apply predicates, sorts or projections on that field.
+
+NOTE: Encoding is not only about the field type, such as `LocalDate` or `BigDecimal`.
+Some codecs are parameterized and two codecs with different parameters will often be considered incompatible.
+Examples of parameters include the format for temporal types
+or the <<mapper-orm-directfieldmapping-annotations-scalednumberfield, decimal scale>>
+for `BigDecimal` and `BigInteger`.
+
+In that case, your only option is to change your mapping to avoid the conflict:
+
+1. rename the field in one index
+2. OR change the field type in one index
+3. OR if the problem is simply different codec parameters (date format, decimal scale, ...),
+align the value of these parameters in one index with the other index.
+
+If you choose to rename the field in one index,
+you will still be able to apply a similar predicate
+to the two fields in a single query:
+you will have to create one predicate per field
+and combine them with a <<search-dsl-predicate-boolean,boolean junction>>.
+
+=== Incompatible DSL converters
+
+Incompatible DSL converters are only a problem when you need to pass an argument to the DSL in certain methods:
+`matching(Object)`/`between(Object)`/`atLeast(Object)`/`greaterThan(Object)`/etc. in the predicate DSL,
+`missing().use(Object) in the sort DSL,
+`range(Object, Object)` in the aggregation DSL,
+...
+
+If two fields encoded in a compatible way (for example both as `String`),
+but that have different DSL converters
+(for example the first one converts from `String` to `String`, but the second one converts from `Integer` to `String`),
+you can still use these methods, but you will need to disable the DSL converter
+as explained in <<search-dsl-argument-type>>:
+you will just pass the "index" value to the DSL (using the same example, a `String`).
+
+=== Incompatible projection converters
+
+If, in a search query targeting multiple indexes,
+a field is encoded in a compatible way in every indexes (for example both as `String`),
+but that has a different projection converters
+(for example the first one converts from `String` to `String`, but the second one converts from `String` to `Integer`),
+you can still project on this field, but you will need to disable the projection converter
+as explained in <<search-dsl-projected-value-type>>:
+the projection will return the "index", unconverted value (using the same example, a `String`).
+
+=== Incompatible analyzer
+
+Incompatible analyzers are only a problem with full-text predicates:
+match predicate on a text field, phrase predicate, simple query string predicate, ...
+
+If two fields encoded in a compatible way (for example both as `String`),
+but that have different analyzers,
+you can still use these predicates, but you will need to explicitly configure the predicate to either
+set the search analyzer to an analyzer of your choosing with `.analyzer(analyzerName)`,
+or skip analysis completely with `.skipAnalysis()`.
+
+See <<search-dsl-predicate>> for more information about how to create predicates
+and about the available options.
