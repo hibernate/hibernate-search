@@ -66,6 +66,16 @@ public class BootstrapLogsIT {
 				.setup( IndexedEntity.class, ContainedEntity.class );
 	}
 
+	@Test
+	public void versionLogEvent() {
+		logged.expectMessage( "HSEARCH000034", "Hibernate Search {" ).once();
+
+		backendMock.expectAnySchema( IndexedEntity.NAME );
+
+		ormSetupHelper.start()
+				.setup( IndexedEntity.class, ContainedEntity.class );
+	}
+
 	private static Matcher<? extends LoggingEvent> suspiciousLogEventMatcher() {
 		return new TypeSafeMatcher<LoggingEvent>() {
 			private final Level level = Level.WARN;

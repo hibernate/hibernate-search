@@ -42,7 +42,9 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = MessageConstants.ORM_ID_RANGE_MIN, max = MessageConstants.ORM_ID_RANGE_MAX),
 		// Exceptions for legacy messages from Search 5
 		@ValidIdRange(min = 27, max = 28),
-		@ValidIdRange(min = 30, max = 31),
+		@ValidIdRange(min = 30, max = 30),
+		@ValidIdRange(min = 31, max = 31),
+		@ValidIdRange(min = 34, max = 34),
 		@ValidIdRange(min = 36, max = 36),
 		@ValidIdRange(min = 62, max = 62),
 		@ValidIdRange(min = 65, max = 65),
@@ -77,6 +79,10 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = INFO)
 	@Message(id = ID_OFFSET_1 + 31, value = "Indexing speed: %1$f documents/second; progress: %2$.2f%%")
 	void indexingSpeed(float estimateSpeed, float estimatePercentileComplete);
+
+	@LogMessage(level = INFO)
+	@Message(id = ID_OFFSET_1 + 34, value = "Hibernate Search {%1$s}")
+	void version(String versionString);
 
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET_1 + 36, value = "Cannot guess the Transaction Status: not starting a JTA transaction")

@@ -7,7 +7,6 @@
 package org.hibernate.search.engine.logging.impl;
 
 import static org.jboss.logging.Logger.Level.DEBUG;
-import static org.jboss.logging.Logger.Level.INFO;
 
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
@@ -51,10 +50,6 @@ public interface Log extends BasicLogger {
 	// DO NOT ADD ANY NEW MESSAGES HERE
 	// -----------------------------------
 	int ID_OFFSET_1 = MessageConstants.ENGINE_ID_RANGE_MIN;
-
-	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET_1 + 34, value = "Hibernate Search {%1$s}")
-	void version(String versionString);
 
 	@LogMessage(level = DEBUG)
 	@Message(id = ID_OFFSET_1 + 230, value = "Starting executor '%1$s'" )

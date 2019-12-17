@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.engine.Version;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
@@ -126,8 +125,6 @@ public final class SearchMappingBuilder {
 	}
 
 	public CloseableSearchMapping build() {
-		Version.logVersion();
-
 		SearchIntegrationPartialBuildState integrationPartialBuildState = integrationBuilder.prepareBuild();
 		SearchIntegration integration = null;
 		SearchMapping mapping;
