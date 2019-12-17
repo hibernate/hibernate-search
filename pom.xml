@@ -2536,7 +2536,7 @@
         <profile>
             <id>elasticsearch-5.6</id>
             <properties>
-                <test.elasticsearch.connection.version>5.6.8</test.elasticsearch.connection.version>
+                <test.elasticsearch.connection.version>5.6.16</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch5TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
