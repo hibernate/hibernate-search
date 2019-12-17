@@ -13,7 +13,7 @@ package org.hibernate.search.engine;
 public final class Version {
 
 	private Version() {
-		//now allowed
+		//not allowed
 	}
 
 	public static String getVersionString() {
