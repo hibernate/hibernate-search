@@ -15,9 +15,6 @@ package org.hibernate.search.engine.reporting;
  * but it can be replaced with a custom implementations through
  * {@link org.hibernate.search.engine.cfg.EngineSettings#BACKGROUND_FAILURE_HANDLER a configuration property}.
  * <p>
- * Handlers should <strong>never</strong> throw any exception:
- * doing so will lead to undetermined behavior in Hibernate Search background threads.
- * <p>
  * Handlers can be called from multiple threads simultaneously: implementations must be thread-safe.
  *
  * @author Amin Mohammed-Coleman
@@ -31,8 +28,7 @@ public interface FailureHandler {
 	 * then return as quickly as possible.
 	 * Heavy error processing (sending emails, ...), if any, should be done asynchronously.
 	 * <p>
-	 * This method should <strong>never</strong> throw any exception:
-	 * doing so will lead to undetermined behavior in Hibernate Search background threads.
+	 * Any error or exception thrown by this method will be caught by Hibernate Search and logged.
 	 *
 	 * @param context Contextual information about the failure (throwable, operation, ...)
 	 */
@@ -45,8 +41,7 @@ public interface FailureHandler {
 	 * then return as quickly as possible.
 	 * Heavy error processing (sending emails, ...), if any, should be done asynchronously.
 	 * <p>
-	 * This method should <strong>never</strong> throw any exception:
-	 * doing so will lead to undetermined behavior in Hibernate Search background threads.
+	 * Any error or exception thrown by this method will be caught by Hibernate Search and logged.
 	 *
 	 * @param context Contextual information about the failure (throwable, operation, ...)
 	 */
@@ -59,8 +54,7 @@ public interface FailureHandler {
 	 * then return as quickly as possible.
 	 * Heavy error processing (sending emails, ...), if any, should be done asynchronously.
 	 * <p>
-	 * This method should <strong>never</strong> throw any exception:
-	 * doing so will lead to undetermined behavior in Hibernate Search background threads.
+	 * Any error or exception thrown by this method will be caught by Hibernate Search and logged.
 	 *
 	 * @param context Contextual information about the failure (throwable, operation, ...)
 	 */
