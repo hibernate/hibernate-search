@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.mapper.orm.massindexing;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubFailureHandler;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
@@ -21,6 +22,11 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 	@Override
 	protected String getBackgroundFailureHandlerReference() {
 		return StubFailureHandler.class.getName();
+	}
+
+	@Override
+	protected MassIndexingFailureHandler getMassIndexingFailureHandler() {
+		return null;
 	}
 
 	@Override

@@ -25,6 +25,7 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
+import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
@@ -278,6 +279,8 @@ public abstract class AbstractMassIndexingFailureIT {
 
 	protected abstract String getBackgroundFailureHandlerReference();
 
+	protected abstract MassIndexingFailureHandler getMassIndexingFailureHandler();
+
 	protected void assertBeforeSetup() {
 	}
 
@@ -399,6 +402,11 @@ public abstract class AbstractMassIndexingFailureIT {
 			OrmUtils.withinSession( sessionFactory, session -> {
 				SearchSession searchSession = Search.session( session );
 				MassIndexer indexer = indexerProducer.apply( searchSession );
+
+				MassIndexingFailureHandler massIndexingFailureHandler = getMassIndexingFailureHandler();
+				if ( massIndexingFailureHandler != null ) {
+					indexer.failureHandler( massIndexingFailureHandler );
+				}
 
 				for ( Runnable expectationSetter : expectationSetters ) {
 					expectationSetter.run();
