@@ -29,6 +29,7 @@ import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
 import org.jboss.logging.BasicLogger;
+import org.jboss.logging.Logger;
 import org.jboss.logging.annotations.Cause;
 import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.LogMessage;
@@ -255,4 +256,10 @@ public interface Log extends BasicLogger {
 					+ " 1) be mass-indexed or 2) set its document ID to a property that is not its entity ID."
 	)
 	SearchException nonJpaEntityType(PojoRawTypeIdentifier<?> typeIdentifier);
+
+	@LogMessage(level = Logger.Level.ERROR)
+	@Message(id = ID_OFFSET_2 + 31,
+			value = "The mass indexing failure handler threw an exception while handling a previous failure."
+					+ " The failure may not have been reported.")
+	void failureInMassIndexingFailureHandler(@Cause Throwable t);
 }
