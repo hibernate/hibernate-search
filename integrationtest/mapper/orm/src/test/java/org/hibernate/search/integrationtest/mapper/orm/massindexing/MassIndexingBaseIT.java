@@ -92,7 +92,52 @@ public class MassIndexingBaseIT {
 					)
 					.processedThenExecuted();
 
-			// purgeAtStart, optimizeAfterPurge and purgeAtStart flags are active by default,
+			// purgeAtStart and optimizeAfterPurge are enabled by default,
+			// so we expect 1 purge, 1 optimize and 1 flush calls in this order:
+			backendMock.expectIndexScopeWorks( Book.INDEX, session.getTenantIdentifier() )
+					.purge()
+					.optimize()
+					.flush();
+
+			try {
+				indexer.startAndWait();
+			}
+			catch (InterruptedException e) {
+				fail( "Unexpected InterruptedException: " + e.getMessage() );
+			}
+
+		} );
+
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void optimizeOnFinish() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			MassIndexer indexer = searchSession.massIndexer().optimizeOnFinish( true );
+
+			// add operations on indexes can follow any random order,
+			// since they are executed by different threads
+			backendMock.expectWorksAnyOrder(
+					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+			)
+					.add( "1", b -> b
+							.field( "title", TITLE_1 )
+							.field( "author", AUTHOR_1 )
+					)
+					.add( "2", b -> b
+							.field( "title", TITLE_2 )
+							.field( "author", AUTHOR_2 )
+					)
+					.add( "3", b -> b
+							.field( "title", TITLE_3 )
+							.field( "author", AUTHOR_3 )
+					)
+					.processedThenExecuted();
+
+			// purgeAtStart and optimizeAfterPurge are enabled by default,
+			// and optimizeOnFinish is enabled explicitly,
 			// so we expect 1 purge, 2 optimize and 1 flush calls in this order:
 			backendMock.expectIndexScopeWorks( Book.INDEX, session.getTenantIdentifier() )
 					.purge()
@@ -136,11 +181,10 @@ public class MassIndexingBaseIT {
 				)
 				.processedThenExecuted();
 
-		// purgeAtStart, optimizeAfterPurge and purgeAtStart flags are active by default,
-		// so we expect 1 purge, 2 optimize and 1 flush calls in this order:
+		// purgeAtStart and optimizeAfterPurge are enabled by default,
+		// so we expect 1 purge, 1 optimize and 1 flush calls in this order:
 		backendMock.expectIndexScopeWorks( Book.INDEX )
 				.purge()
-				.optimize()
 				.optimize()
 				.flush();
 

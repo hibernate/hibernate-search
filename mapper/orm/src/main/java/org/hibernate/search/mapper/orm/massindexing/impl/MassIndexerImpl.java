@@ -51,7 +51,7 @@ public class MassIndexerImpl implements MassIndexer {
 	private int objectLoadingBatchSize = 10;
 	private long objectsLimit = 0; //means no limit at all
 	private CacheMode cacheMode = CacheMode.IGNORE;
-	private boolean optimizeAtEnd = true;
+	private boolean optimizeAtEnd = false;
 	private boolean purgeAtStart = true;
 	private boolean optimizeAfterPurge = true;
 	private MassIndexingMonitor monitor;
