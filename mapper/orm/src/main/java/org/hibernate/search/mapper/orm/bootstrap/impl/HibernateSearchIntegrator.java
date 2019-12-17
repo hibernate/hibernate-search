@@ -62,7 +62,7 @@ public class HibernateSearchIntegrator implements Integrator {
 
 	@Override
 	public void integrate(Metadata metadata, SessionFactoryImplementor sessionFactory, SessionFactoryServiceRegistry serviceRegistry) {
-		Version.logVersion();
+		log.version( Version.getVersionString() );
 
 		ConfigurationPropertyChecker propertyChecker = ConfigurationPropertyChecker.create();
 		ConfigurationPropertySource propertySource = HibernateOrmIntegrationBooterImpl.getPropertySource(

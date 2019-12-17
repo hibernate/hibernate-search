@@ -6,11 +6,6 @@
  */
 package org.hibernate.search.engine;
 
-import java.lang.invoke.MethodHandles;
-
-import org.hibernate.search.engine.logging.impl.Log;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-
 /**
  * @author Emmanuel Bernard
  * @author Hardy Ferentschik
@@ -25,10 +20,4 @@ public final class Version {
 		return Version.class.getPackage().getImplementationVersion();
 	}
 
-	/**
-	 * Logs the Hibernate Search version (using {@link #getVersionString()}) to the logging system.
-	 */
-	public static void logVersion() {
-		LoggerFactory.make( Log.class, MethodHandles.lookup() ).version( getVersionString() );
-	}
 }
