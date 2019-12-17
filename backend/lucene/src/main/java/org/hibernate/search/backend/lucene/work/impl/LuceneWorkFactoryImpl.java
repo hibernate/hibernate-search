@@ -48,8 +48,8 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	}
 
 	@Override
-	public LuceneWriteWork<?> optimize() {
-		return new LuceneOptimizeWork();
+	public LuceneWriteWork<?> forceMerge() {
+		return new LuceneForceMergeWork();
 	}
 
 	@Override

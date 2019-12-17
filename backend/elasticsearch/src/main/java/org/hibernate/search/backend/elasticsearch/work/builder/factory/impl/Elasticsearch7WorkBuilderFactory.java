@@ -28,7 +28,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexMeta
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexExistsWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.OpenIndexWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.OptimizeWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.ForceMergeWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexMappingWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexSettingsWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.RefreshWorkBuilder;
@@ -51,7 +51,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.GetIndexMetadataWork
 import org.hibernate.search.backend.elasticsearch.work.impl.IndexExistsWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.IndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.OpenIndexWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.OptimizeWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.ForceMergeWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.PutIndexSettingsWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.PutIndexTypeMappingWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.RefreshWork;
@@ -99,8 +99,8 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 	}
 
 	@Override
-	public OptimizeWorkBuilder optimize() {
-		return new OptimizeWork.Builder();
+	public ForceMergeWorkBuilder forceMerge() {
+		return new ForceMergeWork.Builder();
 	}
 
 	@Override

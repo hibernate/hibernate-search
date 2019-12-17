@@ -20,13 +20,13 @@ public class SearchWorkspaceImpl implements SearchWorkspace {
 	}
 
 	@Override
-	public void optimize() {
-		Futures.unwrappedExceptionJoin( optimizeAsync() );
+	public void forceMerge() {
+		Futures.unwrappedExceptionJoin( forceMergeAsync() );
 	}
 
 	@Override
-	public CompletableFuture<?> optimizeAsync() {
-		return delegate.optimize();
+	public CompletableFuture<?> forceMergeAsync() {
+		return delegate.forceMerge();
 	}
 
 	@Override

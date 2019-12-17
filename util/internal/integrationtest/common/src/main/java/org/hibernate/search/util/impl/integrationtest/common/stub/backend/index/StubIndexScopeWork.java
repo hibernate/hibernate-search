@@ -9,7 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index
 public final class StubIndexScopeWork {
 
 	public enum Type {
-		OPTIMIZE, PURGE, FLUSH
+		FORCE_MERGE, PURGE, FLUSH
 	}
 
 	public static Builder builder(Type type) {

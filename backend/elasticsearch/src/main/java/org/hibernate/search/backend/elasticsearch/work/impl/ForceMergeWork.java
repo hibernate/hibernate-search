@@ -13,17 +13,16 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.OptimizeWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.ForceMergeWorkBuilder;
 
 /**
- * An optimize work for ES5, using the ForceMerge API.
+ * A force-merge work for ES5+.
  * <p>
- * The ForceMerge API replaces the removed Optimize API in ES5.
- *
+ * The ForceMerge API replaced the removed Optimize API in ES5.
  */
-public class OptimizeWork extends AbstractSimpleElasticsearchWork<Void> {
+public class ForceMergeWork extends AbstractSimpleElasticsearchWork<Void> {
 
-	protected OptimizeWork(Builder builder) {
+	protected ForceMergeWork(Builder builder) {
 		super( builder );
 	}
 
@@ -34,7 +33,7 @@ public class OptimizeWork extends AbstractSimpleElasticsearchWork<Void> {
 
 	public static class Builder
 			extends AbstractBuilder<Builder>
-			implements OptimizeWorkBuilder {
+			implements ForceMergeWorkBuilder {
 		private final List<URLEncodedString> indexNames = new ArrayList<>();
 
 		public Builder() {
@@ -62,8 +61,8 @@ public class OptimizeWork extends AbstractSimpleElasticsearchWork<Void> {
 		}
 
 		@Override
-		public OptimizeWork build() {
-			return new OptimizeWork( this );
+		public ForceMergeWork build() {
+			return new ForceMergeWork( this );
 		}
 	}
 }

@@ -148,15 +148,14 @@ takes place before indexing.
 Only set this to `false` if you know the index is already empty;
 otherwise, you will end up with duplicates in the index.
 
-|`optimizeAfterPurge(boolean)`
+|`forceMergeAfterPurge(boolean)`
 |`true`
-|Whether the mass indexer should be optimized at the beginning of the job. This operation
-takes place after the purge operation and before indexing.
+|Force merging of each index into a single segment after the initial index purge, just before indexing.
+This setting has no effect if {@code purgeAllOnStart} is set to false.
 
-|`optimizeOnFinish(boolean)`
+|`forceMergeOnFinish(boolean)`
 |`false`
-|Whether the mass indexer should be optimized at the end of the job. This operation takes
-place after indexing.
+|Force merging of each index into a single segment after indexing.
 
 |`cacheMode(CacheMode)`
 |`CacheMode.IGNORE`

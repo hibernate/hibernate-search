@@ -24,7 +24,7 @@ public interface LuceneWorkFactory {
 
 	LuceneWriteWork<?> flush();
 
-	LuceneWriteWork<?> optimize();
+	LuceneWriteWork<?> forceMerge();
 
 	<R> LuceneReadWork<R> search(LuceneSearcher<R> searcher, Integer offset, Integer limit);
 
