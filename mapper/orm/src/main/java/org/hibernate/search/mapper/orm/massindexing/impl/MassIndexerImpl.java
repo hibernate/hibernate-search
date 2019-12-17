@@ -54,9 +54,11 @@ public class MassIndexerImpl implements MassIndexer {
 	private boolean mergeSegmentsOnFinish = false;
 	private boolean purgeAtStart = true;
 	private boolean mergeSegmentsAfterPurge = true;
-	private MassIndexingMonitor monitor;
 	private int idFetchSize = 100; //reasonable default as we only load IDs
 	private Integer idLoadingTransactionTimeout;
+
+	private MassIndexingFailureHandler failureHandler;
+	private MassIndexingMonitor monitor;
 
 	public MassIndexerImpl(HibernateOrmMassIndexingMappingContext mappingContext,
 			Set<? extends HibernateOrmMassIndexingIndexedTypeContext<?>> targetedIndexedTypes,
@@ -189,7 +191,7 @@ public class MassIndexerImpl implements MassIndexer {
 
 	protected BatchCoordinator createCoordinator() {
 		MassIndexingNotifier notifier = new MassIndexingNotifier(
-				mappingContext.getFailureHandler(),
+				getOrCreateFailureHandler(),
 				getOrCreateMonitor()
 		);
 		return new BatchCoordinator(
@@ -219,7 +221,17 @@ public class MassIndexerImpl implements MassIndexer {
 
 	@Override
 	public MassIndexer failureHandler(MassIndexingFailureHandler failureHandler) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		this.failureHandler = failureHandler;
+		return this;
+	}
+
+	private MassIndexingFailureHandler getOrCreateFailureHandler() {
+		MassIndexingFailureHandler result = failureHandler;
+		if ( result == null ) {
+			result = new DelegatingMassIndexingFailureHandler( mappingContext.getFailureHandler() );
+		}
+		result = new FailSafeMassIndexingFailureHandlerWrapper( result );
+		return result;
 	}
 
 	private MassIndexingMonitor getOrCreateMonitor() {

@@ -11,12 +11,12 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.atomic.LongAdder;
 
 import org.hibernate.Session;
-import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
-import org.hibernate.search.engine.reporting.FailureContext;
-import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
+import org.hibernate.search.mapper.orm.massindexing.MassIndexingEntityFailureContext;
+import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureContext;
+import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingMonitor;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -25,15 +25,14 @@ class MassIndexingNotifier {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final FailureHandler failureHandler;
+	private final MassIndexingFailureHandler failureHandler;
 	private final MassIndexingMonitor monitor;
 
 	private final AtomicReference<RecordedEntityIndexingFailure> entityIndexingFirstFailure =
 			new AtomicReference<>( null );
 	private final LongAdder entityIndexingFailureCount = new LongAdder();
 
-	MassIndexingNotifier(FailureHandler failureHandler,
-			MassIndexingMonitor monitor) {
+	MassIndexingNotifier(MassIndexingFailureHandler failureHandler, MassIndexingMonitor monitor) {
 		this.failureHandler = failureHandler;
 		this.monitor = monitor;
 	}
@@ -43,7 +42,7 @@ class MassIndexingNotifier {
 	}
 
 	void notifyRunnableFailure(Exception exception, String operation) {
-		FailureContext.Builder contextBuilder = FailureContext.builder();
+		MassIndexingFailureContext.Builder contextBuilder = MassIndexingFailureContext.builder();
 		contextBuilder.throwable( exception );
 		contextBuilder.failingOperation( operation );
 		failureHandler.handle( contextBuilder.build() );
@@ -67,7 +66,7 @@ class MassIndexingNotifier {
 		entityIndexingFirstFailure.compareAndSet( null, recordedFailure );
 		entityIndexingFailureCount.increment();
 
-		EntityIndexingFailureContext.Builder contextBuilder = EntityIndexingFailureContext.builder();
+		MassIndexingEntityFailureContext.Builder contextBuilder = MassIndexingEntityFailureContext.builder();
 		contextBuilder.throwable( throwable );
 		// Add minimal information here, but information we're sure we can get
 		contextBuilder.failingOperation( log.massIndexerIndexingInstance( type.getJpaEntityName() ) );
@@ -104,7 +103,7 @@ class MassIndexingNotifier {
 			throwable.addSuppressed( entityIndexingException );
 		}
 
-		FailureContext.Builder contextBuilder = FailureContext.builder();
+		MassIndexingFailureContext.Builder contextBuilder = MassIndexingFailureContext.builder();
 		contextBuilder.throwable( throwable );
 		contextBuilder.failingOperation( log.massIndexerOperation() );
 		failureHandler.handle( contextBuilder.build() );
