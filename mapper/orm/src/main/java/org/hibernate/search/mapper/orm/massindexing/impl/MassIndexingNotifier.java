@@ -17,7 +17,7 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
+import org.hibernate.search.mapper.orm.massindexing.MassIndexingMonitor;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
