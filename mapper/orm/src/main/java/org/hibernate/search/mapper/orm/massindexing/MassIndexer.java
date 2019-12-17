@@ -54,7 +54,7 @@ public interface MassIndexer {
 	MassIndexer cacheMode(CacheMode cacheMode);
 
 	/**
-	 * If index optimization has to be started at the end of the indexing process. Defaults to {@code true}.
+	 * If index optimization has to be started at the end of the indexing process. Defaults to {@code false}.
 	 * @param optimize {@code true} to enable the index optimization at the end of the indexing process
 	 * @return {@code this} for method chaining
 	 */

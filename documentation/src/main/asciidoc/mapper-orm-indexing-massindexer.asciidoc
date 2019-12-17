@@ -154,7 +154,7 @@ otherwise, you will end up with duplicates in the index.
 takes place after the purge operation and before indexing.
 
 |`optimizeOnFinish(boolean)`
-|`true`
+|`false`
 |Whether the mass indexer should be optimized at the end of the job. This operation takes
 place after indexing.
 
