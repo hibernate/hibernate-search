@@ -277,14 +277,35 @@ Only to be used by experts fully aware of the implications.
 Asynchronous version of `flush()` returning a `CompletableFuture`.
 `forceMerge()`::
 Merge all segments of the indexes targeted by this workspace into a single one.
-+
-Note this operation may affect performance positively as well as negatively.
-As a rule of thumb, if indexes are read-only for extended periods of time,
-then calling `forceMerge()` may improve performance.
-If indexes are written to, then calling `forceMerge()`
-is likely to degrade read/write performance overall.
+This operation does not always improve performance: see <<mapper-orm-indexing-force-merge>>.
 `forceMergeAsync()`::
 Asynchronous version of `forceMerge()` returning a `CompletableFuture`.
+This operation does not always improve performance: see <<mapper-orm-indexing-force-merge>>.
+
+[NOTE]
+[[mapper-orm-indexing-force-merge]]
+.Force-merge and performance
+====
+The force-merge operation may affect performance positively as well as negatively.
+
+Force-merge will regroup all index data into a single, huge segment.
+This may speed up search at first, but as documents are deleted,
+this huge segment will begin to fill with "holes" which have to be handled as special cases
+during search, degrading performance.
+
+Elasticsearch/Lucene do address this by rebuilding the segment at some point,
+but only once a certain ratio of deleted documents is reached.
+If all documents are in a single, huge segment, this ratio is less likely to be reached,
+and the index performance will continue to degrade for a long time.
+
+There are, however, two situations in which force-merge may help:
+
+1. No deletions or document updates are expected for an extended period of time.
+2. Most, or all documents have just been removed from the index,
+leading to segments consisting mostly of deleted documents.
+In that case, it makes sense to regroup the few remaining documents into a single segment,
+though Elasticsearch/Lucene will probably do it automatically.
+====
 
 Below is an example using a `SearchWorkspace` to purge several indexes.
 
