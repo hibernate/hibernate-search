@@ -156,6 +156,7 @@ This setting has no effect if {@code purgeAllOnStart} is set to false.
 |`forceMergeOnFinish(boolean)`
 |`false`
 |Force merging of each index into a single segment after indexing.
+This operation does not always improve performance: see <<mapper-orm-indexing-force-merge>>.
 
 |`cacheMode(CacheMode)`
 |`CacheMode.IGNORE`
