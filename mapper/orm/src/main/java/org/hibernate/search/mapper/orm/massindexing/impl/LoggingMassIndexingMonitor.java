@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.massindexing.monitor.impl;
+package org.hibernate.search.mapper.orm.massindexing.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.TimeUnit;
@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAdder;
 
 import org.hibernate.search.mapper.orm.logging.impl.Log;
-import org.hibernate.search.mapper.orm.massindexing.monitor.MassIndexingMonitor;
+import org.hibernate.search.mapper.orm.massindexing.MassIndexingMonitor;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -21,7 +21,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *
  * @author Sanne Grinovero
  */
-public class SimpleIndexingProgressMonitor implements MassIndexingMonitor {
+public class LoggingMassIndexingMonitor implements MassIndexingMonitor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private final AtomicLong documentsDoneCounter = new AtomicLong();
@@ -32,7 +32,7 @@ public class SimpleIndexingProgressMonitor implements MassIndexingMonitor {
 	/**
 	 * Logs progress of indexing job every 50 documents written.
 	 */
-	public SimpleIndexingProgressMonitor() {
+	public LoggingMassIndexingMonitor() {
 		this( 50 );
 	}
 
@@ -42,7 +42,7 @@ public class SimpleIndexingProgressMonitor implements MassIndexingMonitor {
 	 *
 	 * @param logAfterNumberOfDocuments log each time the specified number of documents has been added
 	 */
-	public SimpleIndexingProgressMonitor(int logAfterNumberOfDocuments) {
+	public LoggingMassIndexingMonitor(int logAfterNumberOfDocuments) {
 		this.logAfterNumberOfDocuments = logAfterNumberOfDocuments;
 	}
 
