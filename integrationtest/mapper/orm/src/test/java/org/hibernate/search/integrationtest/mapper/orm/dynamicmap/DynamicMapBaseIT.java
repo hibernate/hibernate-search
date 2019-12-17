@@ -155,7 +155,7 @@ public class DynamicMapBaseIT {
 
 			backendMock.expectIndexScopeWorks( INDEX1_NAME )
 					.purge()
-					.optimize();
+					.forceMerge();
 
 			SubTest.expectException( () -> {
 				try {

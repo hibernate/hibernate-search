@@ -40,9 +40,9 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	private final int documentBuilderThreads;
 	private final CacheMode cacheMode;
 	private final int objectLoadingBatchSize;
-	private final boolean optimizeAtEnd;
+	private final boolean forceMergeOnFinish;
 	private final boolean purgeAtStart;
-	private final boolean optimizeAfterPurge;
+	private final boolean forceMergeAfterPurge;
 	private final long objectsLimit;
 	private final int idFetchSize;
 	private final Integer transactionTimeout;
@@ -53,8 +53,8 @@ public class BatchCoordinator extends FailureHandledRunnable {
 			MassIndexingNotifier notifier,
 			Set<HibernateOrmMassIndexingIndexedTypeContext<?>> rootEntityTypes, PojoScopeWorkspace scopeWorkspace,
 			int typesToIndexInParallel, int documentBuilderThreads, CacheMode cacheMode,
-			int objectLoadingBatchSize, long objectsLimit, boolean optimizeAtEnd,
-			boolean purgeAtStart, boolean optimizeAfterPurge,
+			int objectLoadingBatchSize, long objectsLimit, boolean forceMergeOnFinish,
+			boolean purgeAtStart, boolean forceMergeAfterPurge,
 			int idFetchSize, Integer transactionTimeout) {
 		super( notifier );
 		this.mappingContext = mappingContext;
@@ -68,9 +68,9 @@ public class BatchCoordinator extends FailureHandledRunnable {
 		this.documentBuilderThreads = documentBuilderThreads;
 		this.cacheMode = cacheMode;
 		this.objectLoadingBatchSize = objectLoadingBatchSize;
-		this.optimizeAtEnd = optimizeAtEnd;
+		this.forceMergeOnFinish = forceMergeOnFinish;
 		this.purgeAtStart = purgeAtStart;
-		this.optimizeAfterPurge = optimizeAfterPurge;
+		this.forceMergeAfterPurge = forceMergeAfterPurge;
 		this.objectsLimit = objectsLimit;
 	}
 
@@ -80,9 +80,9 @@ public class BatchCoordinator extends FailureHandledRunnable {
 			throw new AssertionFailure( "BatchCoordinator instance not expected to be reused" );
 		}
 
-		beforeBatch(); // purgeAll and pre-optimize activities
+		beforeBatch(); // purgeAll and forceMerge if enabled
 		doBatchWork();
-		afterBatch();
+		afterBatch(); // forceMerge if enabled and flush
 	}
 
 	@Override
@@ -158,8 +158,8 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	 * Operations to do after all subthreads finished their work on index
 	 */
 	private void afterBatch() throws InterruptedException {
-		if ( this.optimizeAtEnd ) {
-			Futures.unwrappedExceptionGet( scopeWorkspace.optimize() );
+		if ( this.forceMergeOnFinish ) {
+			Futures.unwrappedExceptionGet( scopeWorkspace.forceMerge() );
 		}
 		Futures.unwrappedExceptionGet( scopeWorkspace.flush() );
 	}
@@ -177,8 +177,8 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	private void beforeBatch() throws InterruptedException {
 		if ( this.purgeAtStart ) {
 			Futures.unwrappedExceptionGet( scopeWorkspace.purge() );
-			if ( this.optimizeAfterPurge ) {
-				Futures.unwrappedExceptionGet( scopeWorkspace.optimize() );
+			if ( this.forceMergeAfterPurge ) {
+				Futures.unwrappedExceptionGet( scopeWorkspace.forceMerge() );
 			}
 		}
 	}

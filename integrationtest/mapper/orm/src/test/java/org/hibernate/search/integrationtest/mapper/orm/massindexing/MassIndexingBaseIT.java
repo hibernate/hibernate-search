@@ -92,11 +92,11 @@ public class MassIndexingBaseIT {
 					)
 					.processedThenExecuted();
 
-			// purgeAtStart and optimizeAfterPurge are enabled by default,
-			// so we expect 1 purge, 1 optimize and 1 flush calls in this order:
+			// purgeAtStart and forceMergeAfterPurge are enabled by default,
+			// so we expect 1 purge, 1 forceMerge and 1 flush calls in this order:
 			backendMock.expectIndexScopeWorks( Book.INDEX, session.getTenantIdentifier() )
 					.purge()
-					.optimize()
+					.forceMerge()
 					.flush();
 
 			try {
@@ -112,10 +112,10 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void optimizeOnFinish() {
+	public void forceMergeOnFinish() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
-			MassIndexer indexer = searchSession.massIndexer().optimizeOnFinish( true );
+			MassIndexer indexer = searchSession.massIndexer().forceMergeOnFinish( true );
 
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
@@ -136,13 +136,13 @@ public class MassIndexingBaseIT {
 					)
 					.processedThenExecuted();
 
-			// purgeAtStart and optimizeAfterPurge are enabled by default,
+			// purgeAtStart and forceMergeAfterPurge are enabled by default,
 			// and optimizeOnFinish is enabled explicitly,
 			// so we expect 1 purge, 2 optimize and 1 flush calls in this order:
 			backendMock.expectIndexScopeWorks( Book.INDEX, session.getTenantIdentifier() )
 					.purge()
-					.optimize()
-					.optimize()
+					.forceMerge()
+					.forceMerge()
 					.flush();
 
 			try {
@@ -181,11 +181,11 @@ public class MassIndexingBaseIT {
 				)
 				.processedThenExecuted();
 
-		// purgeAtStart and optimizeAfterPurge are enabled by default,
-		// so we expect 1 purge, 1 optimize and 1 flush calls in this order:
+		// purgeAtStart and forceMergeAfterPurge are enabled by default,
+		// so we expect 1 purge, 1 forceMerge and 1 flush calls in this order:
 		backendMock.expectIndexScopeWorks( Book.INDEX )
 				.purge()
-				.optimize()
+				.forceMerge()
 				.flush();
 
 		try {

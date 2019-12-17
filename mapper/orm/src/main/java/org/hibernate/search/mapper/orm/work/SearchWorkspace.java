@@ -67,18 +67,18 @@ public interface SearchWorkspace {
 	 * <p>
 	 * Note this operation may affect performance positively as well as negatively.
 	 * As a rule of thumb, if indexes are read-only for extended periods of time,
-	 * then calling {@link #optimize()} may improve performance.
-	 * If indexes are written to, then calling {@link #optimize()}
+	 * then calling {@link #forceMerge()} may improve performance.
+	 * If indexes are written to, then calling {@link #forceMerge()}
 	 * is likely to degrade read/write performance overall.
 	 */
-	void optimize();
+	void forceMerge();
 
 	/**
-	 * Asynchronous version of {@link #optimize()}, returning as soon as the operation is queued.
+	 * Asynchronous version of {@link #forceMerge()}, returning as soon as the operation is queued.
 	 *
 	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
-	 * @see #optimize()
+	 * @see #forceMerge()
 	 */
-	CompletableFuture<?> optimizeAsync();
+	CompletableFuture<?> forceMergeAsync();
 
 }

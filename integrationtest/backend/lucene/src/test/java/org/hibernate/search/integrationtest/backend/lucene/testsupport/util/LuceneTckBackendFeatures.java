@@ -35,11 +35,11 @@ class LuceneTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
-	public boolean optimizeWillFailIfAppliedToDeletedIndex() {
+	public boolean forceMergeWillFailIfAppliedToDeletedIndex() {
 		/*
-		 * Lucene has optimizations in place to not apply optimize() when there is only one segment.
+		 * Lucene has optimizations in place to not apply forceMerge() when there is only one segment.
 		 * Thus, even if we ruthlessly delete the index from the filesystem,
-		 * executing optimize() will work most of the time,
+		 * executing forceMerge() will work most of the time,
 		 * because most of the time we will only have one segment.
 		 */
 		return false;

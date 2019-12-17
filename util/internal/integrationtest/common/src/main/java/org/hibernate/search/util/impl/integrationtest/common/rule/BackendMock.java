@@ -322,12 +322,12 @@ public class BackendMock implements TestRule {
 			this.expectationConsumer = expectationConsumer;
 		}
 
-		public IndexScopeWorkCallListContext optimize() {
-			return indexScopeWork( StubIndexScopeWork.Type.OPTIMIZE );
+		public IndexScopeWorkCallListContext forceMerge() {
+			return indexScopeWork( StubIndexScopeWork.Type.FORCE_MERGE );
 		}
 
-		public IndexScopeWorkCallListContext optimize(CompletableFuture<?> future) {
-			return indexScopeWork( StubIndexScopeWork.Type.OPTIMIZE, future );
+		public IndexScopeWorkCallListContext forceMerge(CompletableFuture<?> future) {
+			return indexScopeWork( StubIndexScopeWork.Type.FORCE_MERGE, future );
 		}
 
 		public IndexScopeWorkCallListContext purge() {

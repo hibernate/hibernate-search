@@ -275,16 +275,16 @@ This is generally not useful as Hibernate Search commits changes automatically.
 Only to be used by experts fully aware of the implications.
 `flushAsync()`::
 Asynchronous version of `flush()` returning a `CompletableFuture`.
-`optimize()`::
+`forceMerge()`::
 Merge all segments of the indexes targeted by this workspace into a single one.
 +
 Note this operation may affect performance positively as well as negatively.
 As a rule of thumb, if indexes are read-only for extended periods of time,
-then calling `optimize()` may improve performance.
-If indexes are written to, then calling `optimize()`
+then calling `forceMerge()` may improve performance.
+If indexes are written to, then calling `forceMerge()`
 is likely to degrade read/write performance overall.
-`optimizeAsync()`::
-Asynchronous version of `optimize()` returning a `CompletableFuture`.
+`forceMergeAsync()`::
+Asynchronous version of `forceMerge()` returning a `CompletableFuture`.
 
 Below is an example using a `SearchWorkspace` to purge several indexes.
 

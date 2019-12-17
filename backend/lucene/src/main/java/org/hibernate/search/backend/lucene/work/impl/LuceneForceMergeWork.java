@@ -14,12 +14,12 @@ import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDeleg
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
-public class LuceneOptimizeWork extends AbstractLuceneWriteWork<Void> {
+public class LuceneForceMergeWork extends AbstractLuceneWriteWork<Void> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	LuceneOptimizeWork() {
-		super( "optimizeIndex" );
+	LuceneForceMergeWork() {
+		super( "forceMergeIndex" );
 	}
 
 	@Override
@@ -30,7 +30,7 @@ public class LuceneOptimizeWork extends AbstractLuceneWriteWork<Void> {
 			return null;
 		}
 		catch (IOException e) {
-			throw log.unableToOptimizeIndex( context.getEventContext(), e );
+			throw log.unableToForceMerge( context.getEventContext(), e );
 		}
 	}
 

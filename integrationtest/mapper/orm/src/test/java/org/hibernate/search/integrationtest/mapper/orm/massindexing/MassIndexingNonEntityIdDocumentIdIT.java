@@ -91,11 +91,11 @@ public class MassIndexingNonEntityIdDocumentIdIT {
 					)
 					.processedThenExecuted();
 
-			// purgeAtStart and optimizeAfterPurge are enabled by default,
-			// so we expect 1 purge, 1 optimize and 1 flush calls in this order:
+			// purgeAtStart and forceMergeAfterPurge are enabled by default,
+			// so we expect 1 purge, 1 forceMerge and 1 flush calls in this order:
 			backendMock.expectIndexScopeWorks( Book.INDEX, session.getTenantIdentifier() )
 					.purge()
-					.optimize()
+					.forceMerge()
 					.flush();
 
 			try {

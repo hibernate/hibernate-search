@@ -10,8 +10,8 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 
 
-public interface OptimizeWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<Void>> {
+public interface ForceMergeWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<Void>> {
 
-	OptimizeWorkBuilder index(URLEncodedString indexName);
+	ForceMergeWorkBuilder index(URLEncodedString indexName);
 
 }
