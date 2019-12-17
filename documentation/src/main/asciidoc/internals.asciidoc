@@ -153,8 +153,8 @@ The mapper should create an indexing plan whenever it needs to add, update or de
 including the tenant identifier when using multi-tenancy, in particular.
 Thus the mapper should instantiate a new indexing plan whenever this context changes.
 
-NOTE: For now index-scoped operations such as flush, optimize, etc. are unavailable from indexing plans.
-HSEARCH-3305 will introduce APIs and SPIs for these.
+NOTE: Index-scoped operations such as flush, optimize, etc. are unavailable from indexing plans.
+They are accessed through a separate class, `IndexWorkspace`.
 
 === Searching
 
