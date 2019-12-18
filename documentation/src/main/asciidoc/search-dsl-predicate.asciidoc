@@ -240,16 +240,11 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 // TODO per-field boosts?
 
 [[search-dsl-predicate-exists]]
-== `exists`: match fields with non-null values
+== `exists`: match fields with content
 
-[NOTE]
-====
-This predicate currently only works with non-object fields.
+The `exists` predicate, applied to a field, will match all documents for which this field has a non-null value.
 
-See https://hibernate.atlassian.net/browse/HSEARCH-2389[HSEARCH-2389].
-====
-
-.Matching fields with non-null values
+.Matching fields with content
 ====
 [source, JAVA, indent=0, subs="+callouts"]
 ----
@@ -262,6 +257,37 @@ include::{sourcedir}/org/hibernate/search/documentation/search/predicate/Predica
 There isn't any built-in predicate to match fields with exclusively null values,
 but you can easily create one yourself
 using an `exists` predicate in a `mustNot` clause in a <<search-dsl-predicate-boolean,boolean predicate>>.
+====
+
+The `exists` predicate can also be applied to an object field.
+In that case, it will match all documents for which at least one sub-field of the object field has a non-null value.
+
+.Matching object fields with content
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=exists-object]
+----
+====
+
+[IMPORTANT]
+====
+Object fields need to have at least one sub-field with content in order to be considered as "existing".
+
+Let's consider the example above, and let's assume the `placeOfBirth` object field only has one sub-field: `placeOfBirth.country`:
+
+* an author whose `placeOfBirth` is null will not match.
+* an author whose `placeOfBirth` is not null and has the `country` filled in will match.
+* an author whose `placeOfBirth` is not null but does not have the `country` filled in **will not match**.
+
+Because of this, it is preferable to use the `exists` predicate
+on object fields that are known to have at least one sub-field that is never null: an identifier, a name, ...
+====
+
+[IMPORTANT]
+====
+For object fields with <<mapper-orm-indexedembedded-storage-nested,`NESTED` storage>>,
+the `exists` predicate needs to be wrapped in a <<search-dsl-predicate-nested,`nested` predicate>>.
 ====
 
 [[search-dsl-predicate-wildcard]]
