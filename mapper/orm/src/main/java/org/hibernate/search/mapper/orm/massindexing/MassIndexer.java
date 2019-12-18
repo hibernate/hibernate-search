@@ -54,21 +54,21 @@ public interface MassIndexer {
 	MassIndexer cacheMode(CacheMode cacheMode);
 
 	/**
-	 * Force merging of each index into a single segment after indexing. Defaults to {@code false}.
+	 * Merge each index into a single segment after indexing. Defaults to {@code false}.
 	 * @param enable {@code true} to enable this operation, {@code false} to disable it.
 	 * @return {@code this} for method chaining
 	 */
-	MassIndexer forceMergeOnFinish(boolean enable);
+	MassIndexer mergeSegmentsOnFinish(boolean enable);
 
 	/**
-	 * Force merging of each index into a single segment after the initial index purge, just before indexing.
+	 * Merge each index into a single segment after the initial index purge, just before indexing.
 	 * Defaults to {@code true}.
 	 * <p>
 	 * This setting has no effect if {@code purgeAllOnStart} is set to false.
 	 * @param enable {@code true} to enable this operation, {@code false} to disable it.
 	 * @return {@code this} for method chaining
 	 */
-	MassIndexer forceMergeAfterPurge(boolean enable);
+	MassIndexer mergeSegmentsAfterPurge(boolean enable);
 
 	/**
 	 * If all entities should be removed from the index before starting

@@ -148,15 +148,15 @@ takes place before indexing.
 Only set this to `false` if you know the index is already empty;
 otherwise, you will end up with duplicates in the index.
 
-|`forceMergeAfterPurge(boolean)`
+|`mergeSegmentsAfterPurge(boolean)`
 |`true`
 |Force merging of each index into a single segment after the initial index purge, just before indexing.
 This setting has no effect if {@code purgeAllOnStart} is set to false.
 
-|`forceMergeOnFinish(boolean)`
+|`mergeSegmentsOnFinish(boolean)`
 |`false`
 |Force merging of each index into a single segment after indexing.
-This operation does not always improve performance: see <<mapper-orm-indexing-force-merge>>.
+This operation does not always improve performance: see <<mapper-orm-indexing-merge-segments>>.
 
 |`cacheMode(CacheMode)`
 |`CacheMode.IGNORE`

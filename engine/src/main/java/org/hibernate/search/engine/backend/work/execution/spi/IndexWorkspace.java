@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
  */
 public interface IndexWorkspace {
 
-	CompletableFuture<?> forceMerge();
+	CompletableFuture<?> mergeSegments();
 
 	CompletableFuture<?> purge();
 

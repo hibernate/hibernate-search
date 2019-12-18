@@ -32,8 +32,8 @@ public class LuceneIndexWorkspace implements IndexWorkspace {
 	}
 
 	@Override
-	public CompletableFuture<?> forceMerge() {
-		return doSubmit( factory.forceMerge() );
+	public CompletableFuture<?> mergeSegments() {
+		return doSubmit( factory.mergeSegments() );
 	}
 
 	@Override

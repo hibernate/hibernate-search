@@ -28,7 +28,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexMeta
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexExistsWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.OpenIndexWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.ForceMergeWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.MergeSegmentsWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexMappingWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexSettingsWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.RefreshWorkBuilder;
@@ -99,7 +99,7 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 	}
 
 	@Override
-	public ForceMergeWorkBuilder forceMerge() {
+	public MergeSegmentsWorkBuilder mergeSegments() {
 		return new ForceMergeWork.Builder();
 	}
 

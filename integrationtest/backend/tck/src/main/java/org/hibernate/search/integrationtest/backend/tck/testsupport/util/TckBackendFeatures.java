@@ -44,7 +44,7 @@ public class TckBackendFeatures {
 		return true;
 	}
 
-	public boolean forceMergeWillFailIfAppliedToDeletedIndex() {
+	public boolean mergeSegmentsWillFailIfAppliedToDeletedIndex() {
 		return true;
 	}
 

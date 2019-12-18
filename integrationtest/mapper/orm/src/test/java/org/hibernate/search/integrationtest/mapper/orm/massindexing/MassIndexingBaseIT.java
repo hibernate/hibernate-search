@@ -92,11 +92,11 @@ public class MassIndexingBaseIT {
 					)
 					.processedThenExecuted();
 
-			// purgeAtStart and forceMergeAfterPurge are enabled by default,
-			// so we expect 1 purge, 1 forceMerge and 1 flush calls in this order:
+			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
+			// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
 			backendMock.expectIndexScopeWorks( Book.INDEX, session.getTenantIdentifier() )
 					.purge()
-					.forceMerge()
+					.mergeSegments()
 					.flush();
 
 			try {
@@ -112,10 +112,10 @@ public class MassIndexingBaseIT {
 	}
 
 	@Test
-	public void forceMergeOnFinish() {
+	public void mergeSegmentsOnFinish() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
-			MassIndexer indexer = searchSession.massIndexer().forceMergeOnFinish( true );
+			MassIndexer indexer = searchSession.massIndexer().mergeSegmentsOnFinish( true );
 
 			// add operations on indexes can follow any random order,
 			// since they are executed by different threads
@@ -136,13 +136,13 @@ public class MassIndexingBaseIT {
 					)
 					.processedThenExecuted();
 
-			// purgeAtStart and forceMergeAfterPurge are enabled by default,
+			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// and optimizeOnFinish is enabled explicitly,
 			// so we expect 1 purge, 2 optimize and 1 flush calls in this order:
 			backendMock.expectIndexScopeWorks( Book.INDEX, session.getTenantIdentifier() )
 					.purge()
-					.forceMerge()
-					.forceMerge()
+					.mergeSegments()
+					.mergeSegments()
 					.flush();
 
 			try {
@@ -181,11 +181,11 @@ public class MassIndexingBaseIT {
 				)
 				.processedThenExecuted();
 
-		// purgeAtStart and forceMergeAfterPurge are enabled by default,
-		// so we expect 1 purge, 1 forceMerge and 1 flush calls in this order:
+		// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
+		// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
 		backendMock.expectIndexScopeWorks( Book.INDEX )
 				.purge()
-				.forceMerge()
+				.mergeSegments()
 				.flush();
 
 		try {

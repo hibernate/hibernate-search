@@ -51,9 +51,9 @@ public class MassIndexerImpl implements MassIndexer {
 	private int objectLoadingBatchSize = 10;
 	private long objectsLimit = 0; //means no limit at all
 	private CacheMode cacheMode = CacheMode.IGNORE;
-	private boolean forceMergeOnFinish = false;
+	private boolean mergeSegmentsOnFinish = false;
 	private boolean purgeAtStart = true;
-	private boolean forceMergeAfterPurge = true;
+	private boolean mergeSegmentsAfterPurge = true;
 	private MassIndexingMonitor monitor;
 	private int idFetchSize = 100; //reasonable default as we only load IDs
 	private Integer idLoadingTransactionTimeout;
@@ -135,14 +135,14 @@ public class MassIndexerImpl implements MassIndexer {
 	}
 
 	@Override
-	public MassIndexer forceMergeOnFinish(boolean enable) {
-		this.forceMergeOnFinish = enable;
+	public MassIndexer mergeSegmentsOnFinish(boolean enable) {
+		this.mergeSegmentsOnFinish = enable;
 		return this;
 	}
 
 	@Override
-	public MassIndexer forceMergeAfterPurge(boolean enable) {
-		this.forceMergeAfterPurge = enable;
+	public MassIndexer mergeSegmentsAfterPurge(boolean enable) {
+		this.mergeSegmentsAfterPurge = enable;
 		return this;
 	}
 
@@ -198,7 +198,7 @@ public class MassIndexerImpl implements MassIndexer {
 				rootEntityTypes, scopeWorkspace,
 				typesToIndexInParallel, documentBuilderThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,
-				forceMergeOnFinish, purgeAtStart, forceMergeAfterPurge,
+				mergeSegmentsOnFinish, purgeAtStart, mergeSegmentsAfterPurge,
 				idFetchSize, idLoadingTransactionTimeout
 		);
 	}

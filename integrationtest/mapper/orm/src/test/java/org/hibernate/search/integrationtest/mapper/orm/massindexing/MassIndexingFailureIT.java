@@ -98,7 +98,7 @@ public class MassIndexingFailureIT {
 						)
 						.hasCauseInstanceOf( SimulatedFailure.class ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FORCE_MERGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.FAIL ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.SUCCEED )
 		);
@@ -129,7 +129,7 @@ public class MassIndexingFailureIT {
 								"Indexing failure"
 						),
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FORCE_MERGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.FAIL ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.SUCCEED )
 		);
@@ -273,13 +273,13 @@ public class MassIndexingFailureIT {
 	}
 
 	@Test
-	public void forceMergeBefore_defaultHandler() {
+	public void mergeSegmentsBefore_defaultHandler() {
 		SessionFactory sessionFactory = setup( null );
 
 		logged.expectEvent(
 				Level.ERROR,
 				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
-						.withMessage( "FORCE_MERGE failure" )
+						.withMessage( "MERGE_SEGMENTS failure" )
 						.build(),
 				"MassIndexer operation"
 		)
@@ -289,14 +289,14 @@ public class MassIndexingFailureIT {
 				sessionFactory,
 				ThreadExpectation.NOT_CREATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
-						.hasMessageContaining( "FORCE_MERGE failure" ),
+						.hasMessageContaining( "MERGE_SEGMENTS failure" ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FORCE_MERGE, ExecutionExpectation.FAIL )
+				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.FAIL )
 		);
 	}
 
 	@Test
-	public void forceMergeBefore_customHandler() {
+	public void mergeSegmentsBefore_customHandler() {
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
@@ -311,9 +311,9 @@ public class MassIndexingFailureIT {
 				sessionFactory,
 				ThreadExpectation.NOT_CREATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
-						.hasMessageContaining( "FORCE_MERGE failure" ),
+						.hasMessageContaining( "MERGE_SEGMENTS failure" ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FORCE_MERGE, ExecutionExpectation.FAIL )
+				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.FAIL )
 		);
 
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
@@ -322,13 +322,13 @@ public class MassIndexingFailureIT {
 	}
 
 	@Test
-	public void forceMergeAfter_defaultHandler() {
+	public void mergeSegmentsAfter_defaultHandler() {
 		SessionFactory sessionFactory = setup( null );
 
 		logged.expectEvent(
 				Level.ERROR,
 				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
-						.withMessage( "FORCE_MERGE failure" )
+						.withMessage( "MERGE_SEGMENTS failure" )
 						.build(),
 				"MassIndexer operation"
 		)
@@ -336,19 +336,19 @@ public class MassIndexingFailureIT {
 
 		doMassIndexingWithFailure(
 				sessionFactory,
-				searchSession -> searchSession.massIndexer().forceMergeOnFinish( true ),
+				searchSession -> searchSession.massIndexer().mergeSegmentsOnFinish( true ),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
-						.hasMessageContaining( "FORCE_MERGE failure" ),
+						.hasMessageContaining( "MERGE_SEGMENTS failure" ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FORCE_MERGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FORCE_MERGE, ExecutionExpectation.FAIL )
+				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.FAIL )
 		);
 	}
 
 	@Test
-	public void forceMergeAfter_customHandler() {
+	public void mergeSegmentsAfter_customHandler() {
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
@@ -361,14 +361,14 @@ public class MassIndexingFailureIT {
 
 		doMassIndexingWithFailure(
 				sessionFactory,
-				searchSession -> searchSession.massIndexer().forceMergeOnFinish( true ),
+				searchSession -> searchSession.massIndexer().mergeSegmentsOnFinish( true ),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
-						.hasMessageContaining( "FORCE_MERGE failure" ),
+						.hasMessageContaining( "MERGE_SEGMENTS failure" ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FORCE_MERGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FORCE_MERGE, ExecutionExpectation.FAIL )
+				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.FAIL )
 		);
 
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
@@ -395,7 +395,7 @@ public class MassIndexingFailureIT {
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
 						.hasMessageContaining( "FLUSH failure" ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FORCE_MERGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.FAIL )
 		);
@@ -419,7 +419,7 @@ public class MassIndexingFailureIT {
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
 						.hasMessageContaining( "FLUSH failure" ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FORCE_MERGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.FAIL )
 		);
@@ -471,7 +471,7 @@ public class MassIndexingFailureIT {
 								.hasCauseInstanceOf( SimulatedFailure.class )
 						),
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FORCE_MERGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.FAIL ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.FAIL )
 		);
@@ -509,7 +509,7 @@ public class MassIndexingFailureIT {
 								.hasCauseInstanceOf( SimulatedFailure.class )
 						),
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FORCE_MERGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.FAIL ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.FAIL )
 		);
@@ -565,7 +565,7 @@ public class MassIndexingFailureIT {
 						.hasMessageContaining( "Exception while invoking" ),
 				ExecutionExpectation.FAIL, ExecutionExpectation.SKIP,
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FORCE_MERGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SKIP ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.SUCCEED )
 		);
@@ -588,7 +588,7 @@ public class MassIndexingFailureIT {
 						.hasMessageContaining( "Exception while invoking" ),
 				ExecutionExpectation.SUCCEED, ExecutionExpectation.FAIL,
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FORCE_MERGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SKIP ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.SUCCEED )
 		);

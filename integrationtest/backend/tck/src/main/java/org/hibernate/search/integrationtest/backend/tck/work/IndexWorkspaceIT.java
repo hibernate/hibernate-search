@@ -31,7 +31,7 @@ import org.assertj.core.api.Assertions;
 
 /**
  * Verify that the work executor operations:
- * {@link IndexWorkspace#forceMerge()}, {@link IndexWorkspace#purge()}, {@link IndexWorkspace#flush()}
+ * {@link IndexWorkspace#mergeSegments()}, {@link IndexWorkspace#purge()}, {@link IndexWorkspace#flush()}
  * work properly, in every backends.
  */
 public class IndexWorkspaceIT {
@@ -59,7 +59,7 @@ public class IndexWorkspaceIT {
 	private StubMappingIndexManager indexManager;
 
 	@Test
-	public void runForceMergePurgeAndFlushInSequence() {
+	public void runMergeSegmentsPurgeAndFlushInSequence() {
 		setupHelper.start()
 				.withIndex(
 						INDEX_NAME,
@@ -75,7 +75,7 @@ public class IndexWorkspaceIT {
 		workspace.flush().join();
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, noTenantSessionContext );
 
-		workspace.forceMerge().join();
+		workspace.mergeSegments().join();
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, noTenantSessionContext );
 
 		// purge without providing a tenant
@@ -86,7 +86,7 @@ public class IndexWorkspaceIT {
 	}
 
 	@Test
-	public void runForceMergePurgeAndFlushWithMultiTenancy() {
+	public void runMergeSegmentsPurgeAndFlushWithMultiTenancy() {
 		multiTenancySetupHelper.start()
 				.withIndex(
 						INDEX_NAME,
@@ -106,7 +106,7 @@ public class IndexWorkspaceIT {
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant1SessionContext );
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant2SessionContext );
 
-		workspace.forceMerge().join();
+		workspace.mergeSegments().join();
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant1SessionContext );
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant2SessionContext );
 

@@ -28,8 +28,8 @@ public class PojoScopeWorkspaceImpl implements PojoScopeWorkspace {
 	}
 
 	@Override
-	public CompletableFuture<?> forceMerge() {
-		return doOperationOnTypes( IndexWorkspace::forceMerge );
+	public CompletableFuture<?> mergeSegments() {
+		return doOperationOnTypes( IndexWorkspace::mergeSegments );
 	}
 
 	@Override

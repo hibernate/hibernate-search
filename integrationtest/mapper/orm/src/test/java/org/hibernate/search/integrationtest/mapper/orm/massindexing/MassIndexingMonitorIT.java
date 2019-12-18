@@ -87,11 +87,11 @@ public class MassIndexingMonitorIT {
 					)
 					.processedThenExecuted( indexingFuture );
 
-			// purgeAtStart and forceMergeAfterPurge are enabled by default,
-			// so we expect 1 purge, 1 forceMerge and 1 flush calls in this order:
+			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
+			// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
 			backendMock.expectIndexScopeWorks( Book.INDEX, session.getTenantIdentifier() )
 					.purge()
-					.forceMerge()
+					.mergeSegments()
 					.flush();
 
 			try {

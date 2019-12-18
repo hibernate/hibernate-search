@@ -130,7 +130,7 @@ public class MassIndexingInterruptionIT {
 
 		backendMock.expectIndexScopeWorks( Book.INDEX )
 				.purge()
-				.forceMerge();
+				.mergeSegments();
 
 		backendMock.expectWorksAnyOrder(
 				Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
@@ -144,7 +144,7 @@ public class MassIndexingInterruptionIT {
 
 		backendMock.expectIndexScopeWorks( Book.INDEX )
 				.flush()
-				.forceMerge();
+				.mergeSegments();
 
 		return indexer;
 	}

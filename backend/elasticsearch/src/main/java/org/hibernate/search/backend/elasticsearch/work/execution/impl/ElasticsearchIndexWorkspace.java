@@ -37,8 +37,8 @@ public class ElasticsearchIndexWorkspace implements IndexWorkspace {
 	}
 
 	@Override
-	public CompletableFuture<?> forceMerge() {
-		return orchestrator.submit( builderFactory.forceMerge().index( indexName ).build() );
+	public CompletableFuture<?> mergeSegments() {
+		return orchestrator.submit( builderFactory.mergeSegments().index( indexName ).build() );
 	}
 
 	@Override

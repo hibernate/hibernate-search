@@ -153,7 +153,7 @@ public class IndexWriterDelegatorImpl implements Closeable, IndexWriterDelegator
 	}
 
 	@Override
-	public void forceMerge() throws IOException {
+	public void mergeSegments() throws IOException {
 		getOrCreateIndexWriter().forceMerge( 1 );
 	}
 
