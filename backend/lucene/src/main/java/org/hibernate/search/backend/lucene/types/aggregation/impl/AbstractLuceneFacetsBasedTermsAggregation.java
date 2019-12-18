@@ -17,7 +17,7 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorFactory;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneCollectorFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;

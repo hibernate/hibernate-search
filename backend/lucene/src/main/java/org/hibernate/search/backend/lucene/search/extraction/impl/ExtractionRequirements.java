@@ -15,8 +15,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.HibernateSearchDocumentIdToLuceneDocIdMapCollector;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneCollectorExecutionContext;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneCollectorFactory;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneCollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
-import org.hibernate.search.backend.lucene.search.query.impl.LuceneChildrenCollector;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneChildrenCollector;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 
 import org.apache.lucene.search.Collector;

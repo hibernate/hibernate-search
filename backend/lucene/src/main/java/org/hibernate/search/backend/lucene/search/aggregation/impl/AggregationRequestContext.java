@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.search.aggregation.impl;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequirements;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorFactory;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneCollectorFactory;
 
 import org.apache.lucene.search.Collector;
 

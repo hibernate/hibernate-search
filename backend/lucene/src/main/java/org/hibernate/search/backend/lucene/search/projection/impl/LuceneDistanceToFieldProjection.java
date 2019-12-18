@@ -9,9 +9,9 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 import java.util.Objects;
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.search.extraction.impl.DistanceCollector;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorExecutionContext;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorFactory;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.DistanceCollector;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneCollectorExecutionContext;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneCollectorFactory;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
