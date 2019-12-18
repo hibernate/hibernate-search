@@ -43,10 +43,6 @@ public interface LuceneFieldCodec<F> {
 		collector.accept( absoluteFieldPath );
 	}
 
-	default void contributeNestedDocumentPath(String nestedDocumentPath, Consumer<String> collector) {
-		collector.accept( nestedDocumentPath );
-	}
-
 	/**
 	 * Extract the value from the Lucene document, typically used in projections.
 	 *

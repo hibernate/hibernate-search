@@ -91,11 +91,6 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 	}
 
 	@Override
-	public void contributeNestedDocumentPath(String nestedDocumentPath, Consumer<String> collector) {
-		collector.accept( nestedDocumentPath );
-	}
-
-	@Override
 	public Query createExistsQuery(String absoluteFieldPath) {
 		if ( sortable ) {
 			return new DocValuesFieldExistsQuery( absoluteFieldPath );
