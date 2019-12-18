@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorExtractContext;
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorKey;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneCollectorExtractContext;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneCollectorKey;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Collector;

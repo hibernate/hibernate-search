@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.search.aggregation.impl;
 
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectorKey;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneCollectorKey;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 
 import org.apache.lucene.index.IndexReader;
