@@ -543,24 +543,24 @@ or <<backend-elasticsearch-field-types,Elasticsearch field types>> depending on 
 |java.time.MonthDay|-|-|`MonthDay.parse(String)`
 |java.util.UUID|`toString()` as a `java.lang.String`|-|`UUID.fromString(String)`
 |java.util.Calendar
- |A `java.time.ZonedDateTime` representing the same date/time and timezone; see <<mapper-orm-legacy-date-time-apis>>.
- |-
+ |A `java.time.ZonedDateTime` representing the same date/time and timezone.
+ |See <<mapper-orm-legacy-date-time-apis>>.
  |`ZonedDateTime.parse(String)`
 |java.util.Date
- |`Instant.ofEpochMilli(long)` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>>.
- |-
+ |`Instant.ofEpochMilli(long)` as a `java.time.Instant`.
+ |See <<mapper-orm-legacy-date-time-apis>>.
  |`Instant.parse(String)`
 |java.sql.Timestamp
- |`Instant.ofEpochMilli(long)` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>>.
- |-
+ |`Instant.ofEpochMilli(long)` as a `java.time.Instant`.
+ |See <<mapper-orm-legacy-date-time-apis>>.
  |`Instant.parse(String)`
 |java.sql.Date
- |`Instant.ofEpochMilli(long)` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>>.
- |-
+ |`Instant.ofEpochMilli(long)` as a `java.time.Instant`.
+ |See <<mapper-orm-legacy-date-time-apis>>.
  |`Instant.parse(String)`
 |java.sql.Time
- |`Instant.ofEpochMilli(long)` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>>.
- |-
+ |`Instant.ofEpochMilli(long)` as a `java.time.Instant`.
+ |See <<mapper-orm-legacy-date-time-apis>>.
  |`Instant.parse(String)`
 |org.hibernate.search.engine.spatial.GeoPoint and subtypes|-|-|Latitude as double and longitude as double, separated by a comma. Ex: `41.8919, 12.51133`.
 |===
@@ -582,7 +582,7 @@ and <<backend-elasticsearch-field-types-date-time,here for Elasticsearch>>.
 ====
 
 [[mapper-orm-legacy-date-time-apis]]
-=== Support for legacy java.util date/time APIs
+=== Support for legacy `java.util` date/time APIs
 
 Using legacy date/time types such as `java.util.Calendar`, `java.util.Date`, `java.sql.Timestamp`, `java.sql.Date`, `java.sql.Time`
 is not recommended,
