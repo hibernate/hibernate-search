@@ -355,39 +355,50 @@ you will need a bridge that defines a native field type.
 See <<backend-lucene-field-types-extension>>.
 ====
 
-[cols="l",options="header"]
+[cols="l,1",options="header"]
 .Field types supported by the Lucene backend
 |====
-|Field type
-|java.lang.String
-|java.lang.Byte
-|java.lang.Short
-|java.lang.Integer
-|java.lang.Long
-|java.lang.Double
-|java.lang.Float
-|java.lang.Boolean
-|java.math.BigDecimal
-|java.math.BigInteger
-|java.time.Instant
-|java.time.LocalDate
-|java.time.LocalTime
-|java.time.LocalDateTime
-|java.time.ZonedDateTime
-|java.time.OffsetDateTime
-|java.time.OffsetTime
-|java.time.Year
-|java.time.YearMonth
-|java.time.MonthDay
-|org.hibernate.search.engine.spatial.GeoPoint
+|Field type|Limitations
+|java.lang.String|-
+|java.lang.Byte|-
+|java.lang.Short|-
+|java.lang.Integer|-
+|java.lang.Long|-
+|java.lang.Double|-
+|java.lang.Float|-
+|java.lang.Boolean|-
+|java.math.BigDecimal|-
+|java.math.BigInteger|-
+|java.time.Instant|<<backend-lucene-field-types-date-time>>
+|java.time.LocalDate|<<backend-lucene-field-types-date-time>>
+|java.time.LocalTime|<<backend-lucene-field-types-date-time>>
+|java.time.LocalDateTime|<<backend-lucene-field-types-date-time>>
+|java.time.ZonedDateTime|<<backend-lucene-field-types-date-time>>
+|java.time.OffsetDateTime|<<backend-lucene-field-types-date-time>>
+|java.time.OffsetTime|<<backend-lucene-field-types-date-time>>
+|java.time.Year|<<backend-lucene-field-types-date-time>>
+|java.time.YearMonth|<<backend-lucene-field-types-date-time>>
+|java.time.MonthDay|-
+|org.hibernate.search.engine.spatial.GeoPoint|-
 |====
 
+[[backend-lucene-field-types-date-time,Lower range/resolution]]
 [NOTE]
+.Range and resolution of date/time fields
 ====
 Date/time types do not support the whole range of years that can be represented in `java.time` types:
 
 * `java.time` can represent years ranging from `-999.999.999` to `999.999.999`.
 * The Lucene backend supports dates ranging from year `-292.275.054` to year `292.278.993`.
+
+Values that are out of range will trigger indexing failures.
+
+Resolution for time types is also lower:
+
+* `java.time` supports nanosecond-resolution.
+* The Lucene backend supports millisecond-resolution.
+
+Precision beyond the millisecond will be lost when indexing.
 ====
 
 [[backend-lucene-field-types-extension]]
