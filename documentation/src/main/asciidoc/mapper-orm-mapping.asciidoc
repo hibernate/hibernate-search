@@ -6,11 +6,11 @@
 [[mapper-orm-mapping-configuration]]
 == Configuration
 
-=== Enabling the integration
+=== Enabling/disabling Hibernate Search
 // Search 5 anchors backward compatibility
 [[search-configuration-event]]
 
-The Hibernate ORM integration is enabled by default as soon as it is present in the classpath.
+The Hibernate Search integration into Hibernate ORM is enabled by default as soon as it is present in the classpath.
 If for some reason you need to disable it,
 set the `hibernate.search.enabled` <<configuration-property-types,boolean property>> to `false`.
 
