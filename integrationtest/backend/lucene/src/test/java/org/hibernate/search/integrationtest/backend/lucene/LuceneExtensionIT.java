@@ -38,7 +38,7 @@ import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryPre
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryHitTypeStep;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
-import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;

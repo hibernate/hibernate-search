@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
 
 import org.apache.lucene.document.Document;
 

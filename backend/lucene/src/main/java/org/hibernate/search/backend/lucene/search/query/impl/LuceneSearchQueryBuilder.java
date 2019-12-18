@@ -21,7 +21,7 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrch
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequirements;
-import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
+import org.hibernate.search.backend.lucene.lowlevel.query.impl.LuceneQueries;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;

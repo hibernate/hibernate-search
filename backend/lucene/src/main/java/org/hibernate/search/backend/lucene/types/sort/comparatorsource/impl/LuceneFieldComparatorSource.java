@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl;
 
-import org.hibernate.search.backend.lucene.types.lowlevel.impl.NestedDocsProvider;
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 
 import org.apache.lucene.search.FieldComparatorSource;
 import org.apache.lucene.search.Query;

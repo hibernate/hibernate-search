@@ -15,7 +15,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.facet.FacetsConfig;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;

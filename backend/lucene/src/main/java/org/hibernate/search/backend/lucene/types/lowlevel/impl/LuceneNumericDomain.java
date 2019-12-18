@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.types.lowlevel.impl;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.util.common.data.Range;
 
 import org.apache.lucene.facet.Facets;

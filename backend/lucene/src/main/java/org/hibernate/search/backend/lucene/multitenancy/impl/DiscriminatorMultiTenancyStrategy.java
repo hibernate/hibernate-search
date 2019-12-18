@@ -10,8 +10,8 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
-import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.lowlevel.query.impl.LuceneQueries;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryBasedDeleteWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryBasedDeleteEntryWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryBasedUpdateEntryWork;

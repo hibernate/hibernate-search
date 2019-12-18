@@ -11,7 +11,7 @@ import java.io.IOException;
 import org.apache.lucene.index.Term;
 
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
-import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
 
 
 public class LuceneTermBasedDeleteEntryWork extends AbstractLuceneDeleteEntryWork {

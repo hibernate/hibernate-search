@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
 import java.util.Objects;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
-import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;

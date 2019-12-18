@@ -12,7 +12,7 @@ import java.util.Map;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.DelegatingAnalyzerWrapper;
 
-import org.hibernate.search.backend.lucene.util.impl.AnalyzerConstants;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 

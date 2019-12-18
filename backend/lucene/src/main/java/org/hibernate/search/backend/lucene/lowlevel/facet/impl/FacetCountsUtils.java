@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.types.lowlevel.impl;
+package org.hibernate.search.backend.lucene.lowlevel.facet.impl;
 
 import java.util.Collection;
 
@@ -14,12 +14,12 @@ import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.apache.lucene.facet.range.DoubleRange;
 import org.apache.lucene.facet.range.LongRange;
 
-class FacetCountsUtils {
+public class FacetCountsUtils {
 
 	private FacetCountsUtils() {
 	}
 
-	static LongRange[] createLongRanges(Collection<? extends Range<? extends Number>> ranges) {
+	public static LongRange[] createLongRanges(Collection<? extends Range<? extends Number>> ranges) {
 		LongRange[] longRanges = new LongRange[ranges.size()];
 		int i = 0;
 		for ( Range<? extends Number> range : ranges ) {
@@ -41,7 +41,7 @@ class FacetCountsUtils {
 		return longRanges;
 	}
 
-	static DoubleRange[] createDoubleRanges(Collection<? extends Range<? extends Number>> ranges) {
+	public static DoubleRange[] createDoubleRanges(Collection<? extends Range<? extends Number>> ranges) {
 		DoubleRange[] doubleRanges = new DoubleRange[ranges.size()];
 		int i = 0;
 		for ( Range<? extends Number> range : ranges ) {

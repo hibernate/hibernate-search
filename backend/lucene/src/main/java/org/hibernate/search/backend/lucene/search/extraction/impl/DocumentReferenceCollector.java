@@ -12,7 +12,7 @@ import java.util.Map;
 
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.search.impl.LuceneDocumentReference;
-import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 
 import org.apache.lucene.index.BinaryDocValues;

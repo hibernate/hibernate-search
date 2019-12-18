@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.impl.LuceneNestedQueries;
+import org.hibernate.search.backend.lucene.lowlevel.query.impl.LuceneQueries;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneChildrenCollector;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -162,7 +162,7 @@ public class LuceneCollectors {
 	}
 
 	private Map<String, Set<Integer>> applyCollectorsToNestedDocs(IndexSearcher indexSearcher, Query parentsQuery) {
-		BooleanQuery booleanQuery = LuceneNestedQueries.findChildQuery( nestedDocumentPaths, parentsQuery );
+		BooleanQuery booleanQuery = LuceneQueries.findChildQuery( nestedDocumentPaths, parentsQuery );
 
 		try {
 			indexSearcher.search( booleanQuery, compositeCollectorForNestedDocuments );
