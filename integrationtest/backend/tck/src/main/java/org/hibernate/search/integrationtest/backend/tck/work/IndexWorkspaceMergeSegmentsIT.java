@@ -12,15 +12,15 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 
-public class IndexWorkspaceForceMergeIT extends AbstractIndexWorkspaceSimpleOperationIT {
+public class IndexWorkspaceMergeSegmentsIT extends AbstractIndexWorkspaceSimpleOperationIT {
 	@Override
 	protected boolean operationWillFailIfAppliedToDeletedIndex() {
-		return TckConfiguration.get().getBackendFeatures().forceMergeWillFailIfAppliedToDeletedIndex();
+		return TckConfiguration.get().getBackendFeatures().mergeSegmentsWillFailIfAppliedToDeletedIndex();
 	}
 
 	@Override
 	protected CompletableFuture<?> executeAsync(IndexWorkspace workspace) {
-		return workspace.forceMerge();
+		return workspace.mergeSegments();
 	}
 
 	@Override

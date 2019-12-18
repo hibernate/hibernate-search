@@ -14,23 +14,23 @@ import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDeleg
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
-public class LuceneForceMergeWork extends AbstractLuceneWriteWork<Void> {
+public class LuceneMergeSegmentsWork extends AbstractLuceneWriteWork<Void> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	LuceneForceMergeWork() {
-		super( "forceMergeIndex" );
+	LuceneMergeSegmentsWork() {
+		super( "mergeSegmentsIndexSegments" );
 	}
 
 	@Override
 	public Void execute(LuceneWriteWorkExecutionContext context) {
 		try {
 			IndexWriterDelegator indexWriterDelegator = context.getIndexWriterDelegator();
-			indexWriterDelegator.forceMerge();
+			indexWriterDelegator.mergeSegments();
 			return null;
 		}
 		catch (IOException e) {
-			throw log.unableToForceMerge( context.getEventContext(), e );
+			throw log.unableToMergeSegments( context.getEventContext(), e );
 		}
 	}
 

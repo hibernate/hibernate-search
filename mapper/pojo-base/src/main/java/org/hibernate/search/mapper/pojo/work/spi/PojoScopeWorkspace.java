@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 public interface PojoScopeWorkspace {
 
-	CompletableFuture<?> forceMerge();
+	CompletableFuture<?> mergeSegments();
 
 	CompletableFuture<?> purge();
 

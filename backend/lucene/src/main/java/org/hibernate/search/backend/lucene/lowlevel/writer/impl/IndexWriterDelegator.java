@@ -43,7 +43,7 @@ public interface IndexWriterDelegator {
 
 	void flush() throws IOException;
 
-	void forceMerge() throws IOException;
+	void mergeSegments() throws IOException;
 
 	/**
 	 * Forces release of Directory lock. Should be used only to cleanup as error recovery.

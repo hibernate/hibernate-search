@@ -68,17 +68,17 @@ public interface SearchWorkspace {
 	 * Note this operation may affect performance positively as well as negatively.
 	 * See the reference documentation for more information.
 	 */
-	void forceMerge();
+	void mergeSegments();
 
 	/**
-	 * Asynchronous version of {@link #forceMerge()}, returning as soon as the operation is queued.
+	 * Asynchronous version of {@link #mergeSegments()}, returning as soon as the operation is queued.
 	 * <p>
 	 * Note this operation may affect performance positively as well as negatively.
 	 * See the reference documentation for more information.
 	 *
 	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
-	 * @see #forceMerge()
+	 * @see #mergeSegments()
 	 */
-	CompletableFuture<?> forceMergeAsync();
+	CompletableFuture<?> mergeSegmentsAsync();
 
 }

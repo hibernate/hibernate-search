@@ -28,8 +28,8 @@ class StubIndexWorkspace implements IndexWorkspace {
 	}
 
 	@Override
-	public CompletableFuture<?> forceMerge() {
-		StubIndexScopeWork work = StubIndexScopeWork.builder( StubIndexScopeWork.Type.FORCE_MERGE ).build();
+	public CompletableFuture<?> mergeSegments() {
+		StubIndexScopeWork work = StubIndexScopeWork.builder( StubIndexScopeWork.Type.MERGE_SEGMENTS ).build();
 		return behavior.executeIndexScopeWork( Collections.singleton( indexName ), work );
 	}
 

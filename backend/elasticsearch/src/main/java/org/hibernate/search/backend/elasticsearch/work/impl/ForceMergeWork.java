@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.ForceMergeWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.MergeSegmentsWorkBuilder;
 
 /**
  * A force-merge work for ES5+.
@@ -33,7 +33,7 @@ public class ForceMergeWork extends AbstractSimpleElasticsearchWork<Void> {
 
 	public static class Builder
 			extends AbstractBuilder<Builder>
-			implements ForceMergeWorkBuilder {
+			implements MergeSegmentsWorkBuilder {
 		private final List<URLEncodedString> indexNames = new ArrayList<>();
 
 		public Builder() {
