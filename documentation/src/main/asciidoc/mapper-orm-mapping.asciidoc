@@ -479,46 +479,107 @@ see <<backend-lucene-field-types,Lucene field types>>
 or <<backend-elasticsearch-field-types,Elasticsearch field types>> depending on your backend.
 ====
 
-[cols="l,1,1",options="header"]
+[cols="l,1,1,1",options="header"]
 .Property types with built-in value bridges
 |===
-|Property type|Value of index field (if different)| Parsing method for 'indexNullAs'
-|All enum types|`name()` as a `java.lang.String`| `Enum.valueOf(String)`
-|java.lang.String|- | -
-|java.lang.Character, char|A single-character `java.lang.String`| Accepts any single-character `java.lang.String`
-|java.lang.Byte, byte|-| `Byte.parseByte(String)`
-|java.lang.Short, short|-| `Short.parseShort(String)`
-|java.lang.Integer, int|-| `Integer.parseInt(String)`
-|java.lang.Long, long|-| `Long.parseLong(String)`
-|java.lang.Double, double|-| `Double.parseDouble(String)`
-|java.lang.Float, float|-| `Float.parseFloat(String)`
-|java.lang.Boolean, boolean|-| Accepts the strings `true` or `false`, ignoring case
-|java.math.BigDecimal|-| `new BigDecimal(String)`
-|java.math.BigInteger|-| `new BigInteger(String)`
-|java.net.URI|`toString()` as a `java.lang.String` | `new URI(String)`
-|java.net.URL|`toExternalForm()` as a `java.lang.String`| `new URL(String)`
-|java.time.Instant|- | `Instant.parse(String)`
-|java.time.LocalDate|- | `LocalDate.parse(String)`
-|java.time.LocalTime|- | `LocalTime.parse(String)`
-|java.time.LocalDateTime|- | `LocalDateTime.parse(String)`
-|java.time.OffsetDateTime|- | `OffsetDateTime.parse(String)`
-|java.time.OffsetTime|- | `OffsetTime.parse(String)`
-|java.time.ZonedDateTime|- | `ZonedDateTime.parse(String)`
-|java.time.ZoneId|`getId()` as a `java.lang.String` | `ZoneId.of(String)`
-|java.time.ZoneOffset|`getTotalSeconds()` as a `java.lang.Integer` | `ZoneOffset.of(String)`
-|java.time.Period|A formatted `java.lang.String`: `<years on 11 characters><months on 11 characters><days on 11 characters>` |`Period.parse(String)`
-|java.time.Duration|`toNanos()` as a `java.lang.Long` | `Duration.parse(String)`
-|java.time.Year|- | `Year.parse(String)`
-|java.time.YearMonth|- | `YearMonth.parse(String)`
-|java.time.MonthDay|- | `MonthDay.parse(String)`
-|java.util.UUID|`toString()` as a `java.lang.String` | `UUID.fromString(String)`
-|java.util.Calendar|A `java.time.ZonedDateTime` representing the same date/time and timezone; see <<mapper-orm-legacy-date-time-apis>> | `ZonedDateTime.parse(String)`
-|java.util.Date|`Instant.ofEpochMilli(long)` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
-|java.sql.Timestamp|`Instant.ofEpochMilli(long)` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
-|java.sql.Date|`Instant.ofEpochMilli(long)` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
-|java.sql.Time|`Instant.ofEpochMilli(long)` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>> | `Instant.parse(String)`
-|org.hibernate.search.engine.spatial.GeoPoint and subtypes|-| Latitude as double and longitude as double, separated by a comma. Ex: `41.8919, 12.51133`.
+|Property type|Value of index field (if different)|Limitations|Parsing method for 'indexNullAs'
+|All enum types|`name()` as a `java.lang.String`|-|`Enum.valueOf(String)`
+|java.lang.String|-|-|-
+|java.lang.Character, char|A single-character `java.lang.String`|-|Accepts any single-character `java.lang.String`
+|java.lang.Byte, byte|-|-|`Byte.parseByte(String)`
+|java.lang.Short, short|-|-|`Short.parseShort(String)`
+|java.lang.Integer, int|-|-|`Integer.parseInt(String)`
+|java.lang.Long, long|-|-|`Long.parseLong(String)`
+|java.lang.Double, double|-|-|`Double.parseDouble(String)`
+|java.lang.Float, float|-|-|`Float.parseFloat(String)`
+|java.lang.Boolean, boolean|-|-|Accepts the strings `true` or `false`, ignoring case
+|java.math.BigDecimal|-|-|`new BigDecimal(String)`
+|java.math.BigInteger|-|-|`new BigInteger(String)`
+|java.net.URI|`toString()` as a `java.lang.String`|-|`new URI(String)`
+|java.net.URL|`toExternalForm()` as a `java.lang.String`|-|`new URL(String)`
+|java.time.Instant
+ |-
+ |<<mapper-orm-directfieldmapping-supported-types-date-time>>
+ |`Instant.parse(String)`
+|java.time.LocalDate
+ |-
+ |<<mapper-orm-directfieldmapping-supported-types-date-time>>
+ |`LocalDate.parse(String)`.
+|java.time.LocalTime
+ |-
+ |<<mapper-orm-directfieldmapping-supported-types-date-time>>
+ |`LocalTime.parse(String)`
+|java.time.LocalDateTime
+ |-
+ |<<mapper-orm-directfieldmapping-supported-types-date-time>>
+ |`LocalDateTime.parse(String)`
+|java.time.OffsetDateTime
+ |-
+ |<<mapper-orm-directfieldmapping-supported-types-date-time>>
+ |`OffsetDateTime.parse(String)`
+|java.time.OffsetTime
+ |-
+ |<<mapper-orm-directfieldmapping-supported-types-date-time>>
+ |`OffsetTime.parse(String)`
+|java.time.ZonedDateTime
+ |-
+ |<<mapper-orm-directfieldmapping-supported-types-date-time>>
+ |`ZonedDateTime.parse(String)`
+|java.time.ZoneId|`getId()` as a `java.lang.String`|-|`ZoneId.of(String)`
+|java.time.ZoneOffset|`getTotalSeconds()` as a `java.lang.Integer`|-|`ZoneOffset.of(String)`
+|java.time.Period|A formatted `java.lang.String`: `<years on 11 characters><months on 11 characters><days on 11 characters>`|-|`Period.parse(String)`
+|java.time.Duration
+ |`toNanos()` as a `java.lang.Long`
+ |<<mapper-orm-directfieldmapping-supported-types-date-time>>
+ |`Duration.parse(String)`
+|java.time.Year
+ |-
+ |<<mapper-orm-directfieldmapping-supported-types-date-time>>
+ |`Year.parse(String)`
+|java.time.YearMonth
+ |-
+ |<<mapper-orm-directfieldmapping-supported-types-date-time>>
+ |`YearMonth.parse(String)`
+|java.time.MonthDay|-|-|`MonthDay.parse(String)`
+|java.util.UUID|`toString()` as a `java.lang.String`|-|`UUID.fromString(String)`
+|java.util.Calendar
+ |A `java.time.ZonedDateTime` representing the same date/time and timezone; see <<mapper-orm-legacy-date-time-apis>>.
+ |-
+ |`ZonedDateTime.parse(String)`
+|java.util.Date
+ |`Instant.ofEpochMilli(long)` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>>.
+ |-
+ |`Instant.parse(String)`
+|java.sql.Timestamp
+ |`Instant.ofEpochMilli(long)` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>>.
+ |-
+ |`Instant.parse(String)`
+|java.sql.Date
+ |`Instant.ofEpochMilli(long)` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>>.
+ |-
+ |`Instant.parse(String)`
+|java.sql.Time
+ |`Instant.ofEpochMilli(long)` as a `java.time.Instant`; see <<mapper-orm-legacy-date-time-apis>>.
+ |-
+ |`Instant.parse(String)`
+|org.hibernate.search.engine.spatial.GeoPoint and subtypes|-|-|Latitude as double and longitude as double, separated by a comma. Ex: `41.8919, 12.51133`.
 |===
+
+[[mapper-orm-directfieldmapping-supported-types-date-time,Possibly lower range/resolution]]
+[NOTE]
+.Range and resolution of date/time fields
+====
+With a few exceptions, most date and time values are passed as-is to the backend;
+e.g. a `LocalDateTime` property would be passed as a `LocalDateTime` to the backend.
+
+Internally, however, the Lucene and Elasticsearch backend use a different representation of date/time types.
+As a result, date and time fields stored in the index may have a smaller range and resolution
+than the corresponding Java type.
+
+The documentation of each backend provides more information:
+see <<backend-lucene-field-types-date-time,here for Lucene>>
+and <<backend-elasticsearch-field-types-date-time,here for Elasticsearch>>.
+====
 
 [[mapper-orm-legacy-date-time-apis]]
 === Support for legacy java.util date/time APIs
