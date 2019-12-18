@@ -4,12 +4,12 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.types.lowlevel.impl;
+package org.hibernate.search.backend.lucene.lowlevel.join.impl;
 
 import java.io.IOException;
 import java.util.Collections;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneNestedQueries;
+import org.hibernate.search.backend.lucene.lowlevel.query.impl.LuceneQueries;
 
 import org.apache.lucene.index.IndexReaderContext;
 import org.apache.lucene.index.LeafReaderContext;
@@ -38,7 +38,7 @@ public class NestedDocsProvider {
 
 	public NestedDocsProvider(String nestedDocumentPath, Query originalParentQuery) {
 		this.parentFiler = new QueryBitSetProducer( originalParentQuery );
-		this.childQuery = LuceneNestedQueries.findChildQuery( Collections.singleton( nestedDocumentPath ), originalParentQuery );
+		this.childQuery = LuceneQueries.findChildQuery( Collections.singleton( nestedDocumentPath ), originalParentQuery );
 	}
 
 	public BitSet parentDocs(LeafReaderContext context) throws IOException {

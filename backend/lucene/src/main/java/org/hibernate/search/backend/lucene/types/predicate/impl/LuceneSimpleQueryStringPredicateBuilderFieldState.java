@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
-import org.hibernate.search.backend.lucene.util.impl.FieldContextSimpleQueryParser;
+import org.hibernate.search.backend.lucene.lowlevel.query.impl.FieldContextSimpleQueryParser;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 
 import org.apache.lucene.analysis.Analyzer;

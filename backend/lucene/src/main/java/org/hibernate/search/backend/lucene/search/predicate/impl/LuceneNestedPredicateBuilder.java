@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
+import org.hibernate.search.backend.lucene.lowlevel.query.impl.LuceneQueries;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 
 import org.apache.lucene.search.BooleanClause.Occur;

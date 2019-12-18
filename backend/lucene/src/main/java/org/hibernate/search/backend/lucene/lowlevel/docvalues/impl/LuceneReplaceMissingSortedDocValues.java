@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl;
+package org.hibernate.search.backend.lucene.lowlevel.docvalues.impl;
 
 import java.io.IOException;
 
@@ -19,7 +19,7 @@ import org.apache.lucene.util.BytesRef;
  * of <a href="https://github.com/elastic/elasticsearch">Elasticsearch project</a>.
  *
  */
-class LuceneReplaceMissingSortedDocValues extends SortedDocValues {
+public class LuceneReplaceMissingSortedDocValues extends SortedDocValues {
 	final SortedDocValues originalValues;
 	final BytesRef missingValue;
 	final int missingValuePosition;
@@ -27,7 +27,7 @@ class LuceneReplaceMissingSortedDocValues extends SortedDocValues {
 
 	boolean hasValue = false;
 
-	LuceneReplaceMissingSortedDocValues(SortedDocValues originalValues, BytesRef missingValue) throws IOException {
+	public LuceneReplaceMissingSortedDocValues(SortedDocValues originalValues, BytesRef missingValue) throws IOException {
 		this.originalValues = originalValues;
 		this.missingValue = missingValue;
 

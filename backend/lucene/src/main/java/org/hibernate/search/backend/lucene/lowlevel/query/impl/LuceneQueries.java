@@ -4,14 +4,19 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.search.impl;
+package org.hibernate.search.backend.lucene.lowlevel.query.impl;
+
+import java.util.Set;
+
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
-import org.hibernate.search.backend.lucene.util.impl.LuceneFields;
+import org.apache.lucene.search.join.QueryBitSetProducer;
+import org.apache.lucene.search.join.ToChildBlockJoinQuery;
 
 public class LuceneQueries {
 
@@ -43,5 +48,25 @@ public class LuceneQueries {
 
 	public static Query tenantIdQuery(String tenantId) {
 		return new TermQuery( new Term( LuceneFields.tenantIdFieldName(), tenantId ) );
+	}
+
+	public static BooleanQuery findChildQuery(Set<String> nestedDocumentPaths, Query originalParentQuery) {
+		QueryBitSetProducer parentsFilter = new QueryBitSetProducer( mainDocumentQuery() );
+		ToChildBlockJoinQuery parentQuery = new ToChildBlockJoinQuery( originalParentQuery, parentsFilter );
+
+		return new BooleanQuery.Builder()
+				.add( parentQuery, Occur.MUST )
+				.add( createNestedDocumentPathSubQuery( nestedDocumentPaths ), Occur.FILTER )
+				.add( childDocumentQuery(), Occur.FILTER )
+				.build();
+	}
+
+	private static BooleanQuery createNestedDocumentPathSubQuery(Set<String> nestedDocumentPaths) {
+		BooleanQuery.Builder builder = new BooleanQuery.Builder();
+		for ( String nestedDocumentPath : nestedDocumentPaths ) {
+			builder.add( nestedDocumentPathQuery( nestedDocumentPath ), Occur.SHOULD );
+		}
+		builder.setMinimumNumberShouldMatch( 1 );
+		return builder.build();
 	}
 }

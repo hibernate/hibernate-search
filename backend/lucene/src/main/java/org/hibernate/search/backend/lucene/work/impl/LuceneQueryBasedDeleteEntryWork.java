@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.work.impl;
 import java.io.IOException;
 
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
-import org.hibernate.search.backend.lucene.search.impl.LuceneQueries;
+import org.hibernate.search.backend.lucene.lowlevel.query.impl.LuceneQueries;
 
 
 public class LuceneQueryBasedDeleteEntryWork extends AbstractLuceneDeleteEntryWork {

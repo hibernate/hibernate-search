@@ -9,6 +9,10 @@ package org.hibernate.search.backend.lucene.types.lowlevel.impl;
 import java.io.IOException;
 import java.util.Collection;
 
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.SortedNumericDoubleValues;
+import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
+import org.hibernate.search.backend.lucene.lowlevel.sort.impl.OnTheFlyNestedSorter;
 import org.hibernate.search.util.common.data.Range;
 
 import org.apache.lucene.document.DoubleDocValuesField;
