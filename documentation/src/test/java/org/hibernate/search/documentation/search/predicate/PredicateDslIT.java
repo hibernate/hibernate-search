@@ -618,6 +618,17 @@ public class PredicateDslIT {
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK2_ID );
 		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::exists-object[]
+			List<Author> hits = searchSession.search( Author.class )
+					.predicate( f -> f.exists().field( "placeOfBirth" ) )
+					.fetchHits( 20 );
+			// end::exists-object[]
+			assertThat( hits )
+					.extracting( Author::getId )
+					.containsExactlyInAnyOrder( ASIMOV_ID, MARTINEZ_ID );
+		} );
 	}
 
 	@Test
@@ -661,7 +672,7 @@ public class PredicateDslIT {
 			// tag::within-circle[]
 			GeoPoint center = GeoPoint.of( 53.970000, 32.150000 );
 			List<Author> hits = searchSession.search( Author.class )
-					.predicate( f -> f.spatial().within().field( "placeOfBirth" )
+					.predicate( f -> f.spatial().within().field( "placeOfBirth.coordinates" )
 							.circle( center, 50, DistanceUnit.KILOMETERS ) )
 					.fetchHits( 20 );
 			// end::within-circle[]
@@ -677,7 +688,7 @@ public class PredicateDslIT {
 					53.95, 32.17
 			);
 			List<Author> hits = searchSession.search( Author.class )
-					.predicate( f -> f.spatial().within().field( "placeOfBirth" )
+					.predicate( f -> f.spatial().within().field( "placeOfBirth.coordinates" )
 							.boundingBox( box ) )
 					.fetchHits( 20 );
 			// end::within-box[]
@@ -697,7 +708,7 @@ public class PredicateDslIT {
 					GeoPoint.of( 53.976177, 32.138627 )
 			);
 			List<Author> hits = searchSession.search( Author.class )
-					.predicate( f -> f.spatial().within().field( "placeOfBirth" )
+					.predicate( f -> f.spatial().within().field( "placeOfBirth.coordinates" )
 							.polygon( polygon ) )
 					.fetchHits( 20 );
 			// end::within-polygon[]
@@ -803,13 +814,23 @@ public class PredicateDslIT {
 			isaacAsimov.setId( ASIMOV_ID );
 			isaacAsimov.setFirstName( "Isaac" );
 			isaacAsimov.setLastName( "Asimov" );
-			isaacAsimov.setPlaceOfBirth( EmbeddableGeoPoint.of( 53.976177, 32.158627 ) );
+
+			Address address1 = new Address();
+			address1.setCountry( "Russia" );
+			address1.setCity( "Petrovichi" );
+			address1.setCoordinates( EmbeddableGeoPoint.of( 53.976177, 32.158627 ) );
+			isaacAsimov.setPlaceOfBirth( address1 );
 
 			Author aLeeMartinez = new Author();
 			aLeeMartinez.setId( MARTINEZ_ID );
 			aLeeMartinez.setFirstName( "A. Lee" );
 			aLeeMartinez.setLastName( "Martinez" );
-			aLeeMartinez.setPlaceOfBirth( EmbeddableGeoPoint.of( 31.814315, -106.475524 ) );
+
+			Address address2 = new Address();
+			address2.setCountry( "United States of America" );
+			address2.setCity( "El Paso" );
+			address2.setCoordinates( EmbeddableGeoPoint.of( 31.814315, -106.475524 ) );
+			aLeeMartinez.setPlaceOfBirth( address2 );
 
 			Book book1 = new Book();
 			book1.setId( BOOK1_ID );

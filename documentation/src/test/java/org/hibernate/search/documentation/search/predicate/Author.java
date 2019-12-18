@@ -14,8 +14,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 
 @Entity
 @Indexed
@@ -31,8 +31,8 @@ public class Author {
 	private String lastName;
 
 	@Embedded
-	@GenericField
-	private EmbeddableGeoPoint placeOfBirth;
+	@IndexedEmbedded
+	private Address placeOfBirth;
 
 	@ManyToMany(mappedBy = "authors")
 	private List<Book> books = new ArrayList<>();
@@ -64,11 +64,11 @@ public class Author {
 		this.lastName = lastName;
 	}
 
-	public EmbeddableGeoPoint getPlaceOfBirth() {
+	public Address getPlaceOfBirth() {
 		return placeOfBirth;
 	}
 
-	public void setPlaceOfBirth(EmbeddableGeoPoint placeOfBirth) {
+	public void setPlaceOfBirth(Address placeOfBirth) {
 		this.placeOfBirth = placeOfBirth;
 	}
 
