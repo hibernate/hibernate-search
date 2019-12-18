@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.lowlevel.join.impl;
 import java.io.IOException;
 import java.util.Collections;
 
-import org.hibernate.search.backend.lucene.lowlevel.query.impl.LuceneQueries;
+import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 
 import org.apache.lucene.index.IndexReaderContext;
 import org.apache.lucene.index.LeafReaderContext;
@@ -38,7 +38,7 @@ public class NestedDocsProvider {
 
 	public NestedDocsProvider(String nestedDocumentPath, Query originalParentQuery) {
 		this.parentFiler = new QueryBitSetProducer( originalParentQuery );
-		this.childQuery = LuceneQueries.findChildQuery( Collections.singleton( nestedDocumentPath ), originalParentQuery );
+		this.childQuery = Queries.findChildQuery( Collections.singleton( nestedDocumentPath ), originalParentQuery );
 	}
 
 	public BitSet parentDocs(LeafReaderContext context) throws IOException {

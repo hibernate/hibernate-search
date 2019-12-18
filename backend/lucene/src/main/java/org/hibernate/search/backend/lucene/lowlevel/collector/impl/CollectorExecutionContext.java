@@ -8,13 +8,13 @@ package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 
-public final class LuceneCollectorExecutionContext {
+public final class CollectorExecutionContext {
 
 	private final IndexReaderMetadataResolver metadataResolver;
 
 	private final int maxDocs;
 
-	public LuceneCollectorExecutionContext(IndexReaderMetadataResolver metadataResolver, int maxDocs) {
+	public CollectorExecutionContext(IndexReaderMetadataResolver metadataResolver, int maxDocs) {
 		this.metadataResolver = metadataResolver;
 		this.maxDocs = maxDocs;
 	}

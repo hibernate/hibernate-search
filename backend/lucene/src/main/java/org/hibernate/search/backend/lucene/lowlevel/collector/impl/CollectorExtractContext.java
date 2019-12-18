@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 
 import java.util.Set;
 
-public interface LuceneCollectorExtractContext {
+public interface CollectorExtractContext {
 
 	Set<Integer> getNestedDocIds(int docId);
 

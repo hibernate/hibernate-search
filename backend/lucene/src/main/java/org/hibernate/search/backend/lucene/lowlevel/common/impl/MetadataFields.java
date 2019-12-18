@@ -13,7 +13,7 @@ import org.apache.lucene.index.IndexOptions;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.util.BytesRef;
 
-public class LuceneFields {
+public class MetadataFields {
 
 	private static final FieldType METADATA_FIELD_TYPE_WITH_INDEX;
 	private static final FieldType METADATA_FIELD_TYPE_WITH_DOCVALUES;
@@ -62,7 +62,7 @@ public class LuceneFields {
 
 	private static final String NESTED_DOCUMENT_PATH = internalFieldName( "nested_document_path" );
 
-	private LuceneFields() {
+	private MetadataFields() {
 	}
 
 	public static String internalFieldName(String fieldName) {

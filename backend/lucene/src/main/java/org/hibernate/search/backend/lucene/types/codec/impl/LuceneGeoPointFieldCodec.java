@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import static org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields.internalFieldName;
+import static org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields.internalFieldName;
 
 import java.util.function.Consumer;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
-import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 import org.apache.lucene.document.Document;
@@ -101,7 +101,7 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 			return new DocValuesFieldExistsQuery( absoluteFieldPath );
 		}
 		else {
-			return new TermQuery( new Term( LuceneFields.fieldNamesFieldName(), absoluteFieldPath ) );
+			return new TermQuery( new Term( MetadataFields.fieldNamesFieldName(), absoluteFieldPath ) );
 		}
 	}
 

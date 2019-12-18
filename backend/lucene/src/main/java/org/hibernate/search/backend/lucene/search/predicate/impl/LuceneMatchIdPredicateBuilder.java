@@ -18,7 +18,7 @@ import org.apache.lucene.search.TermQuery;
 
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
@@ -63,7 +63,7 @@ public class LuceneMatchIdPredicateBuilder extends AbstractLuceneSearchPredicate
 	}
 
 	private TermQuery termQuery( String value ) {
-		return new TermQuery( new Term( LuceneFields.idFieldName(), value ) );
+		return new TermQuery( new Term( MetadataFields.idFieldName(), value ) );
 	}
 
 	private ToDocumentIdentifierValueConverter<?> getDslToDocumentIdentifierConverter(ValueConvert convert) {

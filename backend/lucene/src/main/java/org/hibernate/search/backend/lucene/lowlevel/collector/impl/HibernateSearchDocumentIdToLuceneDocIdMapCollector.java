@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 
 import org.apache.lucene.index.BinaryDocValues;
 import org.apache.lucene.index.DocValues;
@@ -20,7 +20,7 @@ import org.apache.lucene.search.SimpleCollector;
 
 public final class HibernateSearchDocumentIdToLuceneDocIdMapCollector extends SimpleCollector {
 
-	public static final LuceneCollectorFactory<HibernateSearchDocumentIdToLuceneDocIdMapCollector> FACTORY =
+	public static final CollectorFactory<HibernateSearchDocumentIdToLuceneDocIdMapCollector> FACTORY =
 			context -> new HibernateSearchDocumentIdToLuceneDocIdMapCollector();
 
 	private BinaryDocValues currentLeafIdDocValues;
@@ -48,7 +48,7 @@ public final class HibernateSearchDocumentIdToLuceneDocIdMapCollector extends Si
 
 	@Override
 	protected void doSetNextReader(LeafReaderContext context) throws IOException {
-		this.currentLeafIdDocValues = DocValues.getBinary( context.reader(), LuceneFields.idFieldName() );
+		this.currentLeafIdDocValues = DocValues.getBinary( context.reader(), MetadataFields.idFieldName() );
 		this.currentLeafDocBase = context.docBase;
 	}
 }

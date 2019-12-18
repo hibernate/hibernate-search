@@ -9,14 +9,14 @@ package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.search.Collector;
 
-public interface LuceneCollectorFactory<C extends Collector> extends LuceneCollectorKey<C> {
+public interface CollectorFactory<C extends Collector> extends CollectorKey<C> {
 
-	C createCollector(LuceneCollectorExecutionContext context);
+	C createCollector(CollectorExecutionContext context);
 
 	default boolean applyToNestedDocuments() {
 		return false;
 	}
 
-	LuceneCollectorFactory<FacetsCollector> FACETS = context -> new FacetsCollector();
+	CollectorFactory<FacetsCollector> FACETS = context -> new FacetsCollector();
 
 }

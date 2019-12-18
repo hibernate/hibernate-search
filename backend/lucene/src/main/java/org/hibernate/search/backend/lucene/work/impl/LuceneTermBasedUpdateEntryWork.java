@@ -11,7 +11,7 @@ import java.io.IOException;
 import org.apache.lucene.index.Term;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
-import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 
 
 public class LuceneTermBasedUpdateEntryWork extends AbstractLuceneUpdateEntryWork {
@@ -23,6 +23,6 @@ public class LuceneTermBasedUpdateEntryWork extends AbstractLuceneUpdateEntryWor
 	@Override
 	protected long doUpdateEntry(IndexWriterDelegator indexWriterDelegator, String tenantId, String id,
 			LuceneIndexEntry indexEntry) throws IOException {
-		return indexWriterDelegator.updateDocuments( new Term( LuceneFields.idFieldName(), id ), indexEntry );
+		return indexWriterDelegator.updateDocuments( new Term( MetadataFields.idFieldName(), id ), indexEntry );
 	}
 }

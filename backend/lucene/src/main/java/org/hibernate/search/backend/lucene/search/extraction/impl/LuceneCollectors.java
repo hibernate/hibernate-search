@@ -15,9 +15,9 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.HibernateSearchDocumentIdToLuceneDocIdMapCollector;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneCollectorKey;
-import org.hibernate.search.backend.lucene.lowlevel.query.impl.LuceneQueries;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneChildrenCollector;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
+import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.ChildrenCollector;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -43,11 +43,11 @@ public class LuceneCollectors {
 
 	private final TopDocsCollector<?> topDocsCollector;
 	private final TotalHitCountCollector totalHitCountCollector;
-	private final LuceneChildrenCollector childrenCollector;
+	private final ChildrenCollector childrenCollector;
 
 	private final Collector compositeCollector;
 	private final Collector compositeCollectorForNestedDocuments;
-	private final Map<LuceneCollectorKey<?>, Collector> collectors;
+	private final Map<CollectorKey<?>, Collector> collectors;
 
 	private final TimeoutManager timeoutManager;
 
@@ -57,9 +57,9 @@ public class LuceneCollectors {
 	LuceneCollectors(boolean requireFieldDocRescoring, Integer scoreSortFieldIndexForRescoring,
 			Set<String> nestedDocumentPaths,
 			TopDocsCollector<?> topDocsCollector,
-			TotalHitCountCollector totalHitCountCollector, LuceneChildrenCollector childrenCollector,
+			TotalHitCountCollector totalHitCountCollector, ChildrenCollector childrenCollector,
 			Collector compositeCollector, Collector compositeCollectorForNestedDocuments,
-			Map<LuceneCollectorKey<?>, Collector> collectors,
+			Map<CollectorKey<?>, Collector> collectors,
 			TimeoutManager timeoutManager) {
 		this.requireFieldDocRescoring = requireFieldDocRescoring;
 		this.scoreSortFieldIndexForRescoring = scoreSortFieldIndexForRescoring;
@@ -106,7 +106,7 @@ public class LuceneCollectors {
 		}
 	}
 
-	public Map<LuceneCollectorKey<?>, Collector> getCollectors() {
+	public Map<CollectorKey<?>, Collector> getCollectors() {
 		return collectors;
 	}
 
@@ -164,7 +164,7 @@ public class LuceneCollectors {
 	}
 
 	private Map<String, Set<Integer>> applyCollectorsToNestedDocs(IndexSearcher indexSearcher, Query parentsQuery) {
-		BooleanQuery booleanQuery = LuceneQueries.findChildQuery( nestedDocumentPaths, parentsQuery );
+		BooleanQuery booleanQuery = Queries.findChildQuery( nestedDocumentPaths, parentsQuery );
 
 		try {
 			indexSearcher.search( booleanQuery, compositeCollectorForNestedDocuments );

@@ -14,7 +14,7 @@ import java.util.Map;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.document.Document;
@@ -59,7 +59,7 @@ abstract class AbstractLuceneNonFlattenedDocumentBuilder extends AbstractLuceneD
 			EncounteredFieldStatus status = entry.getValue();
 			if ( EncounteredFieldStatus.ENCOUNTERED_AND_NAME_INDEXED.equals( status ) ) {
 				String fieldName = entry.getKey();
-				document.add( LuceneFields.searchableMetadataField( LuceneFields.fieldNamesFieldName(), fieldName ) );
+				document.add( MetadataFields.searchableMetadataField( MetadataFields.fieldNamesFieldName(), fieldName ) );
 			}
 		}
 

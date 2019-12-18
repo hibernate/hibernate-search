@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl;
 import java.io.IOException;
 
 import org.hibernate.search.backend.lucene.lowlevel.sort.impl.OnTheFlyNestedSorter;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LuceneReplaceMissingSortedDocValues;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.ReplaceMissingSortedDocValues;
 import org.hibernate.search.backend.lucene.types.sort.impl.SortMissingValue;
 
 import org.apache.lucene.index.LeafReaderContext;
@@ -49,7 +49,7 @@ public class LuceneTextFieldComparatorSource extends LuceneFieldComparatorSource
 					return sortedDocValues;
 				}
 
-				return new LuceneReplaceMissingSortedDocValues( sortedDocValues, (BytesRef) missingValue );
+				return new ReplaceMissingSortedDocValues( sortedDocValues, (BytesRef) missingValue );
 			}
 		};
 	}

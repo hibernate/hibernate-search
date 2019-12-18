@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import org.hibernate.search.backend.lucene.lowlevel.query.impl.LuceneQueries;
+import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 
 import org.apache.lucene.search.BooleanClause.Occur;
@@ -39,16 +39,16 @@ class LuceneNestedPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
 		LuceneSearchPredicateContext childContext = new LuceneSearchPredicateContext( absoluteFieldPath );
 
 		BooleanQuery.Builder childQueryBuilder = new BooleanQuery.Builder();
-		childQueryBuilder.add( LuceneQueries.childDocumentQuery(), Occur.FILTER );
-		childQueryBuilder.add( LuceneQueries.nestedDocumentPathQuery( absoluteFieldPath ), Occur.FILTER );
+		childQueryBuilder.add( Queries.childDocumentQuery(), Occur.FILTER );
+		childQueryBuilder.add( Queries.nestedDocumentPathQuery( absoluteFieldPath ), Occur.FILTER );
 		childQueryBuilder.add( nestedBuilder.build( childContext ), Occur.MUST );
 
 		Query parentQuery;
 		if ( context.getNestedPath() == null ) {
-			parentQuery = LuceneQueries.mainDocumentQuery();
+			parentQuery = Queries.mainDocumentQuery();
 		}
 		else {
-			parentQuery = LuceneQueries.nestedDocumentPathQuery( context.getNestedPath() );
+			parentQuery = Queries.nestedDocumentPathQuery( context.getNestedPath() );
 		}
 
 		// TODO HSEARCH-3090 at some point we should have a parameter for the score mode

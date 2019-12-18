@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.search.aggregation.impl;
 
 import java.util.Map;
 
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneCollectorKey;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
 
 import org.apache.lucene.index.IndexReader;
@@ -18,11 +18,11 @@ public class AggregationExtractContext {
 
 	private final IndexReader indexReader;
 	private final FromDocumentFieldValueConvertContext convertContext;
-	private final Map<LuceneCollectorKey<?>, Collector> collectors;
+	private final Map<CollectorKey<?>, Collector> collectors;
 
 	public AggregationExtractContext(IndexReader indexReader,
 			FromDocumentFieldValueConvertContext convertContext,
-			Map<LuceneCollectorKey<?>, Collector> collectors) {
+			Map<CollectorKey<?>, Collector> collectors) {
 		this.indexReader = indexReader;
 		this.convertContext = convertContext;
 		this.collectors = collectors;
@@ -37,7 +37,7 @@ public class AggregationExtractContext {
 	}
 
 	@SuppressWarnings("unchecked")
-	public <C extends Collector> C getCollector(LuceneCollectorKey<C> key) {
+	public <C extends Collector> C getCollector(CollectorKey<C> key) {
 		return (C) collectors.get( key );
 	}
 

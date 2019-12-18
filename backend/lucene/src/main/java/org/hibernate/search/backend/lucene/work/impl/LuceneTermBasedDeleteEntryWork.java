@@ -11,7 +11,7 @@ import java.io.IOException;
 import org.apache.lucene.index.Term;
 
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
-import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 
 
 public class LuceneTermBasedDeleteEntryWork extends AbstractLuceneDeleteEntryWork {
@@ -23,6 +23,6 @@ public class LuceneTermBasedDeleteEntryWork extends AbstractLuceneDeleteEntryWor
 	@Override
 	protected long doDeleteDocuments(IndexWriterDelegator indexWriterDelegator, String tenantId, String id)
 			throws IOException {
-		return indexWriterDelegator.deleteDocuments( new Term( LuceneFields.idFieldName(), id ) );
+		return indexWriterDelegator.deleteDocuments( new Term( MetadataFields.idFieldName(), id ) );
 	}
 }

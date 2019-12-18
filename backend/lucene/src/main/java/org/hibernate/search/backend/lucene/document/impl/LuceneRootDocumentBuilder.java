@@ -15,7 +15,7 @@ import org.apache.lucene.document.Document;
 import org.apache.lucene.facet.FacetsConfig;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -42,8 +42,8 @@ public class LuceneRootDocumentBuilder extends AbstractLuceneNonFlattenedDocumen
 	}
 
 	private List<Document> assembleDocuments(String indexName, MultiTenancyStrategy multiTenancyStrategy, String tenantId, String id) {
-		document.add( LuceneFields.searchableMetadataField( LuceneFields.typeFieldName(), LuceneFields.TYPE_MAIN_DOCUMENT ) );
-		document.add( LuceneFields.searchableRetrievableMetadataField( LuceneFields.idFieldName(), id ) );
+		document.add( MetadataFields.searchableMetadataField( MetadataFields.typeFieldName(), MetadataFields.TYPE_MAIN_DOCUMENT ) );
+		document.add( MetadataFields.searchableRetrievableMetadataField( MetadataFields.idFieldName(), id ) );
 
 		// all the ancestors of a subdocument must be added after it
 		List<Document> documents = new ArrayList<>();

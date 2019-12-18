@@ -38,7 +38,7 @@ import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryPre
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryHitTypeStep;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
-import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -193,12 +193,12 @@ public class LuceneExtensionIT {
 		// Matching document
 		Assertions.assertThat( query.explain( FIRST_ID ) )
 				.extracting( Object::toString ).asString()
-				.contains( LuceneFields.idFieldName() );
+				.contains( MetadataFields.idFieldName() );
 
 		// Non-matching document
 		Assertions.assertThat( query.explain( FIFTH_ID ) )
 				.extracting( Object::toString ).asString()
-				.contains( LuceneFields.idFieldName() );
+				.contains( MetadataFields.idFieldName() );
 	}
 
 	@Test
@@ -231,12 +231,12 @@ public class LuceneExtensionIT {
 		// Matching document
 		Assertions.assertThat( query.explain( INDEX_NAME, FIRST_ID ) )
 				.extracting( Object::toString ).asString()
-				.contains( LuceneFields.idFieldName() );
+				.contains( MetadataFields.idFieldName() );
 
 		// Non-matching document
 		Assertions.assertThat( query.explain( INDEX_NAME, FIFTH_ID ) )
 				.extracting( Object::toString ).asString()
-				.contains( LuceneFields.idFieldName() );
+				.contains( MetadataFields.idFieldName() );
 	}
 
 	@Test
@@ -652,7 +652,7 @@ public class LuceneExtensionIT {
 		Assertions.assertThat( result.get( 0 ) )
 				.isInstanceOf( Explanation.class )
 				.extracting( Object::toString ).asString()
-				.contains( LuceneFields.idFieldName() );
+				.contains( MetadataFields.idFieldName() );
 	}
 
 	@Test

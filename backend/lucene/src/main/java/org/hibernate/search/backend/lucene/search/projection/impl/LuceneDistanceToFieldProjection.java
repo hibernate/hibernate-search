@@ -10,8 +10,8 @@ import java.util.Objects;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.DistanceCollector;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneCollectorExecutionContext;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneCollectorFactory;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExecutionContext;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
 import org.hibernate.search.engine.search.loading.spi.LoadingResult;
 import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
@@ -19,7 +19,7 @@ import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 class LuceneDistanceToFieldProjection
-		implements LuceneSearchProjection<Double, Double>, LuceneCollectorFactory<DistanceCollector> {
+		implements LuceneSearchProjection<Double, Double>, CollectorFactory<DistanceCollector> {
 
 	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
@@ -39,7 +39,7 @@ class LuceneDistanceToFieldProjection
 
 	/**
 	 * Necessary in order to share a single collector if there are multiple similar projections.
-	 * See {@link #createCollector(LuceneCollectorExecutionContext)}, {@link #request(SearchProjectionRequestContext)}.
+	 * See {@link #createCollector(CollectorExecutionContext)}, {@link #request(SearchProjectionRequestContext)}.
 	 */
 	@Override
 	public boolean equals(Object obj) {
@@ -96,7 +96,7 @@ class LuceneDistanceToFieldProjection
 	}
 
 	@Override
-	public DistanceCollector createCollector(LuceneCollectorExecutionContext context) {
+	public DistanceCollector createCollector(CollectorExecutionContext context) {
 		return new DistanceCollector( absoluteFieldPath, center, context.getMaxDocs() );
 	}
 
