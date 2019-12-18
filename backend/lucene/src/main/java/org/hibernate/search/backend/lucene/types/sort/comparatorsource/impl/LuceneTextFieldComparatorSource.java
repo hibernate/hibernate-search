@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl;
 
 import java.io.IOException;
 
-import org.hibernate.search.backend.lucene.lowlevel.sort.impl.OnTheFlyNestedSorter;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DocValuesJoin;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.ReplaceMissingSortedDocValues;
 import org.hibernate.search.backend.lucene.types.sort.impl.SortMissingValue;
 
@@ -41,7 +41,7 @@ public class LuceneTextFieldComparatorSource extends LuceneFieldComparatorSource
 					BitSet parentDocs = nestedDocsProvider.parentDocs( context );
 					DocIdSetIterator childDocs = nestedDocsProvider.childDocs( context );
 					if ( parentDocs != null && childDocs != null ) {
-						sortedDocValues = OnTheFlyNestedSorter.sort( sortedDocValues, parentDocs, childDocs );
+						sortedDocValues = DocValuesJoin.joinAsSingleValued( sortedDocValues, parentDocs, childDocs );
 					}
 				}
 

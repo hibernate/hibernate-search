@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene.lowlevel.sort.impl;
+package org.hibernate.search.backend.lucene.lowlevel.docvalues.impl;
 
 import java.io.IOException;
 
@@ -18,17 +18,17 @@ import org.apache.lucene.util.BitSet;
 import org.apache.lucene.util.BytesRef;
 
 /**
- * Allows to sort on nested document field values.
+ * Utils around docvalues and nested documents.
  * <p>
  * Copied and adapted from {@code org.elasticsearch.search.MultiValueMode} class
  * of <a href="https://github.com/elastic/elasticsearch">Elasticsearch project</a>.
  */
-public class OnTheFlyNestedSorter {
+public class DocValuesJoin {
 
-	private OnTheFlyNestedSorter() {
+	private DocValuesJoin() {
 	}
 
-	public static SortedDocValues sort(SortedDocValues selectedValues, BitSet parentDocs, DocIdSetIterator childDocs) {
+	public static SortedDocValues joinAsSingleValued(SortedDocValues selectedValues, BitSet parentDocs, DocIdSetIterator childDocs) {
 		Contracts.assertNotNull( parentDocs, "parent docs" );
 		Contracts.assertNotNull( childDocs, "child docs" );
 
@@ -96,7 +96,7 @@ public class OnTheFlyNestedSorter {
 		};
 	}
 
-	public static NumericDocValues sort(SortedNumericDocValues values, long missingValue, BitSet parentDocs, DocIdSetIterator childDocs) {
+	public static NumericDocValues joinAsSingleValued(SortedNumericDocValues values, long missingValue, BitSet parentDocs, DocIdSetIterator childDocs) {
 
 		return new NumericDocValues() {
 
@@ -154,7 +154,7 @@ public class OnTheFlyNestedSorter {
 		};
 	}
 
-	public static NumericDoubleValues sort(SortedNumericDoubleValues values, double missingValue, BitSet parentDocs, DocIdSetIterator childDocs) {
+	public static NumericDoubleValues joinAsSingleValued(SortedNumericDoubleValues values, double missingValue, BitSet parentDocs, DocIdSetIterator childDocs) {
 
 		return new NumericDoubleValues() {
 
