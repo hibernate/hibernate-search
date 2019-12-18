@@ -12,7 +12,6 @@ import static org.assertj.core.api.Fail.fail;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 
@@ -26,7 +25,6 @@ import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrate
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler;
-import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
@@ -76,7 +74,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		);
 
 		doMassIndexingWithFailure(
-				sessionFactory,
+				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
 						.hasMessageContainingAll(
@@ -113,8 +111,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		);
 
 		doMassIndexingWithFailure(
-				sessionFactory,
-				searchSession -> searchSession.massIndexer(),
+				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
 						.hasMessageContainingAll(
@@ -154,8 +151,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		);
 
 		doMassIndexingWithFailure(
-				sessionFactory,
-				searchSession -> searchSession.massIndexer(),
+				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
 						.hasMessageContainingAll(
@@ -190,7 +186,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		expectMassIndexerOperationFailureHandling( exceptionMessage, failingOperationAsString );
 
 		doMassIndexingWithFailure(
-				sessionFactory,
+				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
 				ThreadExpectation.NOT_CREATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
 						.hasMessageContaining( exceptionMessage ),
@@ -210,7 +206,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		expectMassIndexerOperationFailureHandling( exceptionMessage, failingOperationAsString );
 
 		doMassIndexingWithFailure(
-				sessionFactory,
+				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
 				ThreadExpectation.NOT_CREATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
 						.hasMessageContaining( exceptionMessage ),
@@ -231,8 +227,8 @@ public abstract class AbstractMassIndexingFailureIT {
 		expectMassIndexerOperationFailureHandling( exceptionMessage, failingOperationAsString );
 
 		doMassIndexingWithFailure(
-				sessionFactory,
-				searchSession -> searchSession.massIndexer().mergeSegmentsOnFinish( true ),
+				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer()
+						.mergeSegmentsOnFinish( true ),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
 						.hasMessageContaining( exceptionMessage ),
@@ -255,7 +251,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		expectMassIndexerOperationFailureHandling( exceptionMessage, failingOperationAsString );
 
 		doMassIndexingWithFailure(
-				sessionFactory,
+				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
 						.hasMessageContaining( exceptionMessage ),
@@ -286,7 +282,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		);
 
 		doMassIndexingWithFailure(
-				sessionFactory,
+				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
 						.hasMessageContaining( failingMassIndexerOperationExceptionMessage )
@@ -353,27 +349,12 @@ public abstract class AbstractMassIndexingFailureIT {
 			String failingEntityIndexingExceptionMessage, String failingEntityIndexingOperationAsString,
 			String failingMassIndexerOperationExceptionMessage, String failingMassIndexerOperationAsString);
 
-	private void doMassIndexingWithFailure(SessionFactory sessionFactory,
+	private void doMassIndexingWithFailure(MassIndexer massIndexer,
 			ThreadExpectation threadExpectation,
 			Consumer<Throwable> thrownExpectation,
 			Runnable ... expectationSetters) {
 		doMassIndexingWithFailure(
-				sessionFactory,
-				searchSession -> searchSession.massIndexer(),
-				threadExpectation,
-				thrownExpectation,
-				expectationSetters
-		);
-	}
-
-	private void doMassIndexingWithFailure(SessionFactory sessionFactory,
-			Function<SearchSession, MassIndexer> indexerProducer,
-			ThreadExpectation threadExpectation,
-			Consumer<Throwable> thrownExpectation,
-			Runnable ... expectationSetters) {
-		doMassIndexingWithFailure(
-				sessionFactory,
-				indexerProducer,
+				massIndexer,
 				threadExpectation,
 				thrownExpectation,
 				ExecutionExpectation.SUCCEED, ExecutionExpectation.SUCCEED,
@@ -381,8 +362,7 @@ public abstract class AbstractMassIndexingFailureIT {
 		);
 	}
 
-	private void doMassIndexingWithFailure(SessionFactory sessionFactory,
-			Function<SearchSession, MassIndexer> indexerProducer,
+	private void doMassIndexingWithFailure(MassIndexer massIndexer,
 			ThreadExpectation threadExpectation,
 			Consumer<Throwable> thrownExpectation,
 			ExecutionExpectation book2GetIdExpectation, ExecutionExpectation book2GetTitleExpectation,
@@ -391,37 +371,32 @@ public abstract class AbstractMassIndexingFailureIT {
 		Book.failOnBook2GetTitle.set( ExecutionExpectation.FAIL.equals( book2GetTitleExpectation ) );
 		AssertionError assertionError = null;
 		try {
-			OrmUtils.withinSession( sessionFactory, session -> {
-				SearchSession searchSession = Search.session( session );
-				MassIndexer indexer = indexerProducer.apply( searchSession );
+			MassIndexingFailureHandler massIndexingFailureHandler = getMassIndexingFailureHandler();
+			if ( massIndexingFailureHandler != null ) {
+				massIndexer.failureHandler( massIndexingFailureHandler );
+			}
 
-				MassIndexingFailureHandler massIndexingFailureHandler = getMassIndexingFailureHandler();
-				if ( massIndexingFailureHandler != null ) {
-					indexer.failureHandler( massIndexingFailureHandler );
-				}
+			for ( Runnable expectationSetter : expectationSetters ) {
+				expectationSetter.run();
+			}
 
-				for ( Runnable expectationSetter : expectationSetters ) {
-					expectationSetter.run();
+			// TODO HSEARCH-3728 simplify this when even indexing exceptions are propagated
+			Runnable runnable = () -> {
+				try {
+					massIndexer.startAndWait();
 				}
-
-				// TODO HSEARCH-3728 simplify this when even indexing exceptions are propagated
-				Runnable runnable = () -> {
-					try {
-						indexer.startAndWait();
-					}
-					catch (InterruptedException e) {
-						fail( "Unexpected InterruptedException: " + e.getMessage() );
-					}
-				};
-				if ( thrownExpectation == null ) {
-					runnable.run();
+				catch (InterruptedException e) {
+					fail( "Unexpected InterruptedException: " + e.getMessage() );
 				}
-				else {
-					SubTest.expectException( runnable )
-							.assertThrown()
-							.satisfies( thrownExpectation );
-				}
-			} );
+			};
+			if ( thrownExpectation == null ) {
+				runnable.run();
+			}
+			else {
+				SubTest.expectException( runnable )
+						.assertThrown()
+						.satisfies( thrownExpectation );
+			}
 			backendMock.verifyExpectationsMet();
 		}
 		catch (AssertionError e) {
