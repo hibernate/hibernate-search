@@ -10,8 +10,8 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.lowlevel.query.impl.LuceneQueries;
-import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryBasedDeleteWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryBasedDeleteEntryWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryBasedUpdateEntryWork;
@@ -32,12 +32,12 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 
 	@Override
 	public void contributeToIndexedDocument(Document document, String tenantId) {
-		document.add( LuceneFields.searchableMetadataField( LuceneFields.tenantIdFieldName(), tenantId ) );
+		document.add( MetadataFields.searchableMetadataField( MetadataFields.tenantIdFieldName(), tenantId ) );
 	}
 
 	@Override
 	public Query getFilterOrNull(String tenantId) {
-		return LuceneQueries.tenantIdQuery( tenantId );
+		return Queries.tenantIdQuery( tenantId );
 	}
 
 	@Override

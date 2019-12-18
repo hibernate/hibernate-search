@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.work.impl;
 import java.io.IOException;
 
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
-import org.hibernate.search.backend.lucene.lowlevel.query.impl.LuceneQueries;
+import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 
 
 public class LuceneQueryBasedDeleteWork extends AbstractLuceneDeleteAllEntriesWork {
@@ -21,7 +21,7 @@ public class LuceneQueryBasedDeleteWork extends AbstractLuceneDeleteAllEntriesWo
 	@Override
 	protected long doDeleteDocuments(IndexWriterDelegator indexWriterDelegator, String tenantId) throws IOException {
 		return indexWriterDelegator.deleteDocuments(
-				LuceneQueries.tenantIdQuery( tenantId )
+				Queries.tenantIdQuery( tenantId )
 		);
 	}
 }

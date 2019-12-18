@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
 import java.util.Objects;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
-import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.document.Document;
@@ -106,7 +106,7 @@ public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String
 			return new DocValuesFieldExistsQuery( absoluteFieldPath );
 		}
 		else {
-			return new TermQuery( new Term( LuceneFields.fieldNamesFieldName(), absoluteFieldPath ) );
+			return new TermQuery( new Term( MetadataFields.fieldNamesFieldName(), absoluteFieldPath ) );
 		}
 	}
 

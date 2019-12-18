@@ -46,7 +46,7 @@ public class DistanceCollector implements Collector {
 		this.distances = new SpatialResultsCollector( hitsCount );
 	}
 
-	public Double getDistance(final int docId, LuceneCollectorExtractContext context) {
+	public Double getDistance(final int docId, CollectorExtractContext context) {
 		Double result = distances.get( docId, center );
 		if ( result != null ) {
 			return result;

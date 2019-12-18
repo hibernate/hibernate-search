@@ -12,7 +12,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 
 import org.apache.lucene.index.BinaryDocValues;
 import org.apache.lucene.index.DocValues;
@@ -23,7 +23,7 @@ import org.apache.lucene.search.LeafCollector;
 import org.apache.lucene.search.Scorable;
 import org.apache.lucene.search.ScoreMode;
 
-public class LuceneChildrenCollector implements Collector {
+public class ChildrenCollector implements Collector {
 
 	private final Map<String, Set<Integer>> children = new HashMap<>();
 
@@ -48,7 +48,7 @@ public class LuceneChildrenCollector implements Collector {
 
 		public FieldLeafCollector(LeafReaderContext context) throws IOException {
 			reader = context.reader();
-			docValues = DocValues.getBinary( reader, LuceneFields.rootIdFieldName() );
+			docValues = DocValues.getBinary( reader, MetadataFields.rootIdFieldName() );
 		}
 
 		@Override

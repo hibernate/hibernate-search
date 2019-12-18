@@ -17,15 +17,15 @@ import org.apache.lucene.search.TotalHitCountCollector;
  *
  * @param <C> The type of collector.
  */
-public interface LuceneCollectorKey<C extends Collector> {
+public interface CollectorKey<C extends Collector> {
 
-	static <C extends Collector> LuceneCollectorKey<C> create() {
-		return new LuceneCollectorKey<C>() {
+	static <C extends Collector> CollectorKey<C> create() {
+		return new CollectorKey<C>() {
 		};
 	}
 
-	LuceneCollectorKey<TotalHitCountCollector> TOTAL_HIT_COUNT = create();
+	CollectorKey<TotalHitCountCollector> TOTAL_HIT_COUNT = create();
 
-	LuceneCollectorKey<TopDocsCollector> TOP_DOCS = create();
+	CollectorKey<TopDocsCollector> TOP_DOCS = create();
 
 }

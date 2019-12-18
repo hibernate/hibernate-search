@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.search.projection.impl;
 
 import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequirements;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneCollectorFactory;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
 
 import org.apache.lucene.search.Collector;
 
@@ -39,7 +39,7 @@ public final class SearchProjectionRequestContext {
 		extractionRequirementsBuilder.requireTopDocsCollector();
 	}
 
-	public <C extends Collector> void requireCollector(LuceneCollectorFactory<C> collectorFactory) {
+	public <C extends Collector> void requireCollector(CollectorFactory<C> collectorFactory) {
 		extractionRequirementsBuilder.requireCollector( collectorFactory );
 	}
 }

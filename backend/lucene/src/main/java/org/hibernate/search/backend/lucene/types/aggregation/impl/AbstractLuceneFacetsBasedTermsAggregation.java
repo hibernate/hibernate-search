@@ -17,7 +17,7 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneCollectorFactory;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentFieldValueConvertContext;
@@ -55,7 +55,7 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 
 	@Override
 	public void request(AggregationRequestContext context) {
-		context.requireCollector( LuceneCollectorFactory.FACETS );
+		context.requireCollector( CollectorFactory.FACETS );
 	}
 
 	@Override
@@ -122,7 +122,7 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 	abstract F termToFieldValue(T key);
 
 	private List<Bucket<T>> getTopBuckets(AggregationExtractContext context) throws IOException {
-		FacetsCollector facetsCollector = context.getCollector( LuceneCollectorFactory.FACETS );
+		FacetsCollector facetsCollector = context.getCollector( CollectorFactory.FACETS );
 
 		/*
 		 * TODO HSEARCH-3666 What if the sort order is by term value?

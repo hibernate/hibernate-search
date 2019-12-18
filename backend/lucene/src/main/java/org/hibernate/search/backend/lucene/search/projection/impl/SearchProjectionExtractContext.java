@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneCollectorExtractContext;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneCollectorKey;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExtractContext;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Collector;
@@ -21,18 +21,18 @@ import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 
-public class SearchProjectionExtractContext implements LuceneCollectorExtractContext {
+public class SearchProjectionExtractContext implements CollectorExtractContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final IndexSearcher indexSearcher;
 	private final Query luceneQuery;
 	private final Map<Integer, Set<Integer>> topDocIdsToNestedDocIds;
-	private final Map<LuceneCollectorKey<?>, Collector> collectors;
+	private final Map<CollectorKey<?>, Collector> collectors;
 
 	public SearchProjectionExtractContext(IndexSearcher indexSearcher, Query luceneQuery,
 			Map<Integer, Set<Integer>> topDocIdsToNestedDocIds,
-			Map<LuceneCollectorKey<?>, Collector> collectors) {
+			Map<CollectorKey<?>, Collector> collectors) {
 		this.indexSearcher = indexSearcher;
 		this.luceneQuery = luceneQuery;
 		this.topDocIdsToNestedDocIds = topDocIdsToNestedDocIds;
@@ -54,7 +54,7 @@ public class SearchProjectionExtractContext implements LuceneCollectorExtractCon
 	}
 
 	@SuppressWarnings("unchecked")
-	public <C extends Collector> C getCollector(LuceneCollectorKey<C> key) {
+	public <C extends Collector> C getCollector(CollectorKey<C> key) {
 		return (C) collectors.get( key );
 	}
 

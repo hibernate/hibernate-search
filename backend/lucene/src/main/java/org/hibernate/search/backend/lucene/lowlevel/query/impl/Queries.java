@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.lowlevel.query.impl;
 
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 
 import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause.Occur;
@@ -18,13 +18,13 @@ import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.join.QueryBitSetProducer;
 import org.apache.lucene.search.join.ToChildBlockJoinQuery;
 
-public class LuceneQueries {
+public class Queries {
 
-	private static final Query MAIN_DOCUMENT_QUERY = new TermQuery( new Term( LuceneFields.typeFieldName(), LuceneFields.TYPE_MAIN_DOCUMENT ) );
+	private static final Query MAIN_DOCUMENT_QUERY = new TermQuery( new Term( MetadataFields.typeFieldName(), MetadataFields.TYPE_MAIN_DOCUMENT ) );
 
-	private static final Query CHILD_DOCUMENT_QUERY = new TermQuery( new Term( LuceneFields.typeFieldName(), LuceneFields.TYPE_CHILD_DOCUMENT ) );
+	private static final Query CHILD_DOCUMENT_QUERY = new TermQuery( new Term( MetadataFields.typeFieldName(), MetadataFields.TYPE_CHILD_DOCUMENT ) );
 
-	private LuceneQueries() {
+	private Queries() {
 	}
 
 	public static Query mainDocumentQuery() {
@@ -36,18 +36,18 @@ public class LuceneQueries {
 	}
 
 	public static Query nestedDocumentPathQuery(String absoluteFieldPath) {
-		return new TermQuery( new Term( LuceneFields.nestedDocumentPathFieldName(), absoluteFieldPath ) );
+		return new TermQuery( new Term( MetadataFields.nestedDocumentPathFieldName(), absoluteFieldPath ) );
 	}
 
 	public static Query singleDocumentQuery(String tenantId, String id) {
 		BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder();
-		queryBuilder.add( new TermQuery( new Term( LuceneFields.idFieldName(), id ) ), Occur.MUST );
+		queryBuilder.add( new TermQuery( new Term( MetadataFields.idFieldName(), id ) ), Occur.MUST );
 		queryBuilder.add( tenantIdQuery( tenantId ), Occur.FILTER );
 		return queryBuilder.build();
 	}
 
 	public static Query tenantIdQuery(String tenantId) {
-		return new TermQuery( new Term( LuceneFields.tenantIdFieldName(), tenantId ) );
+		return new TermQuery( new Term( MetadataFields.tenantIdFieldName(), tenantId ) );
 	}
 
 	public static BooleanQuery findChildQuery(Set<String> nestedDocumentPaths, Query originalParentQuery) {

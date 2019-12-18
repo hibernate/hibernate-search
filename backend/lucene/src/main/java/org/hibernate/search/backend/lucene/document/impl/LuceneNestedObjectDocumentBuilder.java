@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 
 import org.apache.lucene.document.Document;
 
@@ -24,10 +24,10 @@ class LuceneNestedObjectDocumentBuilder extends AbstractLuceneNonFlattenedDocume
 	@Override
 	void contribute(String rootIndexName, MultiTenancyStrategy multiTenancyStrategy, String tenantId, String rootId,
 			List<Document> nestedDocuments) {
-		document.add( LuceneFields.searchableMetadataField( LuceneFields.typeFieldName(), LuceneFields.TYPE_CHILD_DOCUMENT ) );
-		document.add( LuceneFields.searchableMetadataField( LuceneFields.rootIndexFieldName(), rootIndexName ) );
-		document.add( LuceneFields.retrievableMetadataField( LuceneFields.rootIdFieldName(), rootId ) );
-		document.add( LuceneFields.searchableMetadataField( LuceneFields.nestedDocumentPathFieldName(), schemaNode.getAbsolutePath() ) );
+		document.add( MetadataFields.searchableMetadataField( MetadataFields.typeFieldName(), MetadataFields.TYPE_CHILD_DOCUMENT ) );
+		document.add( MetadataFields.searchableMetadataField( MetadataFields.rootIndexFieldName(), rootIndexName ) );
+		document.add( MetadataFields.retrievableMetadataField( MetadataFields.rootIdFieldName(), rootId ) );
+		document.add( MetadataFields.searchableMetadataField( MetadataFields.nestedDocumentPathFieldName(), schemaNode.getAbsolutePath() ) );
 
 		// all the ancestors of a subdocument must be added after it
 		super.contribute( rootIndexName, multiTenancyStrategy, tenantId, rootId, nestedDocuments );

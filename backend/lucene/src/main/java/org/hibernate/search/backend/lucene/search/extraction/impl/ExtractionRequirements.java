@@ -16,11 +16,11 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.HibernateSearchDocumentIdToLuceneDocIdMapCollector;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneCollectorExecutionContext;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneCollectorFactory;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneCollectorKey;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExecutionContext;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.LuceneChildrenCollector;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.ChildrenCollector;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 
 import org.apache.lucene.search.Collector;
@@ -41,7 +41,7 @@ public final class ExtractionRequirements {
 
 	private final boolean requireTopDocs;
 	private final boolean requireScore;
-	private final Set<LuceneCollectorFactory<?>> requiredCollectorFactories;
+	private final Set<CollectorFactory<?>> requiredCollectorFactories;
 
 	private final Set<String> requiredNestedDocumentExtractionPaths;
 
@@ -60,7 +60,7 @@ public final class ExtractionRequirements {
 		Integer scoreSortFieldIndexForRescoring = null;
 		boolean requireFieldDocRescoring = false;
 
-		Map<LuceneCollectorKey<?>, Collector> luceneCollectors = new LinkedHashMap<>();
+		Map<CollectorKey<?>, Collector> luceneCollectors = new LinkedHashMap<>();
 		List<Collector> luceneCollectorsForNestedDocuments = new ArrayList<>();
 
 		if ( requireTopDocs && maxDocs > 0 ) {
@@ -99,16 +99,16 @@ public final class ExtractionRequirements {
 						Integer.MAX_VALUE
 				);
 			}
-			luceneCollectors.put( LuceneCollectorKey.TOP_DOCS, topDocsCollector );
+			luceneCollectors.put( CollectorKey.TOP_DOCS, topDocsCollector );
 		}
 
 		TotalHitCountCollector totalHitCountCollector = new TotalHitCountCollector();
-		luceneCollectors.put( LuceneCollectorKey.TOTAL_HIT_COUNT, totalHitCountCollector );
+		luceneCollectors.put( CollectorKey.TOTAL_HIT_COUNT, totalHitCountCollector );
 
-		LuceneCollectorExecutionContext executionContext =
-				new LuceneCollectorExecutionContext( metadataResolver, maxDocs );
+		CollectorExecutionContext executionContext =
+				new CollectorExecutionContext( metadataResolver, maxDocs );
 
-		for ( LuceneCollectorFactory<?> collectorFactory : requiredCollectorFactories ) {
+		for ( CollectorFactory<?> collectorFactory : requiredCollectorFactories ) {
 			Collector collector = collectorFactory.createCollector( executionContext );
 			luceneCollectors.put( collectorFactory, collector );
 			if ( collectorFactory.applyToNestedDocuments() ) {
@@ -116,9 +116,9 @@ public final class ExtractionRequirements {
 			}
 		}
 
-		LuceneChildrenCollector childrenCollector = null;
+		ChildrenCollector childrenCollector = null;
 		if ( !requiredNestedDocumentExtractionPaths.isEmpty() ) {
-			childrenCollector = new LuceneChildrenCollector();
+			childrenCollector = new ChildrenCollector();
 			luceneCollectorsForNestedDocuments.add( childrenCollector );
 		}
 
@@ -163,7 +163,7 @@ public final class ExtractionRequirements {
 
 		private boolean requireTopDocs;
 		private boolean requireScore;
-		private final Set<LuceneCollectorFactory<?>> requiredCollectorFactories = new LinkedHashSet<>();
+		private final Set<CollectorFactory<?>> requiredCollectorFactories = new LinkedHashSet<>();
 
 		private final Set<String> requiredNestedDocumentExtractionPaths = new HashSet<>();
 
@@ -179,7 +179,7 @@ public final class ExtractionRequirements {
 			this.requireTopDocs = true;
 		}
 
-		public <C extends Collector> void requireCollector(LuceneCollectorFactory<C> collectorFactory) {
+		public <C extends Collector> void requireCollector(CollectorFactory<C> collectorFactory) {
 			this.requireTopDocs = true; // We can't collect anything if we don't know from which documents it should be collected
 			requiredCollectorFactories.add( collectorFactory );
 		}

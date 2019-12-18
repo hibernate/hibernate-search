@@ -12,7 +12,7 @@ import java.util.Map;
 
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.search.impl.LuceneDocumentReference;
-import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 
 import org.apache.lucene.index.BinaryDocValues;
@@ -23,7 +23,7 @@ import org.apache.lucene.search.SimpleCollector;
 
 public final class DocumentReferenceCollector extends SimpleCollector {
 
-	public static final LuceneCollectorFactory<DocumentReferenceCollector> FACTORY = DocumentReferenceCollector::new;
+	public static final CollectorFactory<DocumentReferenceCollector> FACTORY = DocumentReferenceCollector::new;
 
 	private final IndexReaderMetadataResolver metadataResolver;
 
@@ -33,7 +33,7 @@ public final class DocumentReferenceCollector extends SimpleCollector {
 
 	private Map<Integer, DocumentReference> collected = new HashMap<>();
 
-	private DocumentReferenceCollector(LuceneCollectorExecutionContext executionContext) {
+	private DocumentReferenceCollector(CollectorExecutionContext executionContext) {
 		this.metadataResolver = executionContext.getMetadataResolver();
 	}
 
@@ -58,7 +58,7 @@ public final class DocumentReferenceCollector extends SimpleCollector {
 	@Override
 	protected void doSetNextReader(LeafReaderContext context) throws IOException {
 		this.currentLeafMappedTypeName = metadataResolver.resolveMappedTypeName( context );
-		this.currentLeafIdDocValues = DocValues.getBinary( context.reader(), LuceneFields.idFieldName() );
+		this.currentLeafIdDocValues = DocValues.getBinary( context.reader(), MetadataFields.idFieldName() );
 		this.currentLeafDocBase = context.docBase;
 	}
 }

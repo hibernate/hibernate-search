@@ -10,7 +10,7 @@ import java.io.IOException;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
-import org.hibernate.search.backend.lucene.lowlevel.query.impl.LuceneQueries;
+import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 
 
 public class LuceneQueryBasedUpdateEntryWork extends AbstractLuceneUpdateEntryWork {
@@ -22,7 +22,7 @@ public class LuceneQueryBasedUpdateEntryWork extends AbstractLuceneUpdateEntryWo
 	@Override
 	protected long doUpdateEntry(IndexWriterDelegator indexWriterDelegator, String tenantId, String id,
 			LuceneIndexEntry indexEntry) throws IOException {
-		indexWriterDelegator.deleteDocuments( LuceneQueries.singleDocumentQuery( tenantId, id ) );
+		indexWriterDelegator.deleteDocuments( Queries.singleDocumentQuery( tenantId, id ) );
 		return indexWriterDelegator.addDocuments( indexEntry );
 	}
 }

@@ -10,7 +10,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.backend.lucene.lowlevel.common.impl.LuceneFields;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 
 
@@ -44,7 +44,7 @@ public class LuceneIndexSchemaObjectNode {
 		this.storage = storage;
 		this.multiValued = multiValued;
 		this.childrenAbsolutePaths = childrenAbsolutePaths.stream()
-				.map( relativeFieldName -> LuceneFields.compose( absolutePath, relativeFieldName ) )
+				.map( relativeFieldName -> MetadataFields.compose( absolutePath, relativeFieldName ) )
 				.collect( Collectors.toList() );
 	}
 
@@ -57,7 +57,7 @@ public class LuceneIndexSchemaObjectNode {
 	}
 
 	public String getAbsolutePath(String relativeFieldName) {
-		return LuceneFields.compose( absolutePath, relativeFieldName );
+		return MetadataFields.compose( absolutePath, relativeFieldName );
 	}
 
 	public String getNestedDocumentPath() {
