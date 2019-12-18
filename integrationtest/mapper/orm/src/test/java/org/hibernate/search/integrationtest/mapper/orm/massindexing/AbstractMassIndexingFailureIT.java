@@ -112,7 +112,26 @@ public abstract class AbstractMassIndexingFailureIT {
 				exceptionMessage, failingOperationAsString
 		);
 
-		doMassIndexingWithBook2GetIdFailure( sessionFactory );
+		doMassIndexingWithFailure(
+				sessionFactory,
+				searchSession -> searchSession.massIndexer(),
+				ThreadExpectation.CREATED_AND_TERMINATED,
+				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
+						.hasMessageContainingAll(
+								"1 entities could not be indexed",
+								"See the logs for details.",
+								"First failure on entity 'Book#2': ",
+								"Exception while invoking"
+						)
+						.extracting( Throwable::getCause ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
+						.isInstanceOf( SearchException.class )
+						.hasMessageContaining( "Exception while invoking" ),
+				ExecutionExpectation.FAIL, ExecutionExpectation.SKIP,
+				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
+				expectIndexingWorks( ExecutionExpectation.SKIP ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.SUCCEED )
+		);
 
 		assertEntityGetterFailureHandling(
 				entityName, entityReferenceAsString,
@@ -134,7 +153,26 @@ public abstract class AbstractMassIndexingFailureIT {
 				exceptionMessage, failingOperationAsString
 		);
 
-		doMassIndexingWithBook2GetTitleFailure( sessionFactory );
+		doMassIndexingWithFailure(
+				sessionFactory,
+				searchSession -> searchSession.massIndexer(),
+				ThreadExpectation.CREATED_AND_TERMINATED,
+				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
+						.hasMessageContainingAll(
+								"1 entities could not be indexed",
+								"See the logs for details.",
+								"First failure on entity 'Book#2': ",
+								"Exception while invoking"
+						)
+						.extracting( Throwable::getCause ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
+						.isInstanceOf( SearchException.class )
+						.hasMessageContaining( "Exception while invoking" ),
+				ExecutionExpectation.SUCCEED, ExecutionExpectation.FAIL,
+				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
+				expectIndexingWorks( ExecutionExpectation.SKIP ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.SUCCEED )
+		);
 
 		assertEntityGetterFailureHandling(
 				entityName, entityReferenceAsString,
@@ -340,52 +378,6 @@ public abstract class AbstractMassIndexingFailureIT {
 				thrownExpectation,
 				ExecutionExpectation.SUCCEED, ExecutionExpectation.SUCCEED,
 				expectationSetters
-		);
-	}
-
-	private void doMassIndexingWithBook2GetIdFailure(SessionFactory sessionFactory) {
-		doMassIndexingWithFailure(
-				sessionFactory,
-				searchSession -> searchSession.massIndexer(),
-				ThreadExpectation.CREATED_AND_TERMINATED,
-				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
-						.hasMessageContainingAll(
-								"1 entities could not be indexed",
-								"See the logs for details.",
-								"First failure on entity 'Book#2': ",
-								"Exception while invoking"
-						)
-						.extracting( Throwable::getCause ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
-						.isInstanceOf( SearchException.class )
-						.hasMessageContaining( "Exception while invoking" ),
-				ExecutionExpectation.FAIL, ExecutionExpectation.SKIP,
-				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
-				expectIndexingWorks( ExecutionExpectation.SKIP ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.SUCCEED )
-		);
-	}
-
-	private void doMassIndexingWithBook2GetTitleFailure(SessionFactory sessionFactory) {
-		doMassIndexingWithFailure(
-				sessionFactory,
-				searchSession -> searchSession.massIndexer(),
-				ThreadExpectation.CREATED_AND_TERMINATED,
-				throwable -> assertThat( throwable ).isInstanceOf( SearchException.class )
-						.hasMessageContainingAll(
-								"1 entities could not be indexed",
-								"See the logs for details.",
-								"First failure on entity 'Book#2': ",
-								"Exception while invoking"
-						)
-						.extracting( Throwable::getCause ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
-						.isInstanceOf( SearchException.class )
-						.hasMessageContaining( "Exception while invoking" ),
-				ExecutionExpectation.SUCCEED, ExecutionExpectation.FAIL,
-				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
-				expectIndexingWorks( ExecutionExpectation.SKIP ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.SUCCEED )
 		);
 	}
 
