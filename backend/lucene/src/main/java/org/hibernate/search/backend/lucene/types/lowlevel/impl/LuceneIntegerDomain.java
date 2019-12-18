@@ -11,7 +11,7 @@ import java.util.Collection;
 
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
-import org.hibernate.search.backend.lucene.lowlevel.sort.impl.OnTheFlyNestedSorter;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DocValuesJoin;
 import org.hibernate.search.util.common.data.Range;
 
 import org.apache.lucene.document.IntPoint;
@@ -20,7 +20,6 @@ import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.facet.LongValueFacetCounts;
 import org.apache.lucene.facet.range.LongRangeFacetCounts;
-import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
@@ -122,11 +121,11 @@ public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
 				return numericDocValues;
 			}
 
-			SortedNumericDocValues sortedNumericDocValues = DocValues.singleton( numericDocValues );
+			SortedNumericDocValues sortedNumericDocValues = org.apache.lucene.index.DocValues.singleton( numericDocValues );
 			BitSet parentDocs = nestedDocsProvider.parentDocs( context );
 			DocIdSetIterator childDocs = nestedDocsProvider.childDocs( context );
 			if ( parentDocs != null && childDocs != null ) {
-				numericDocValues = OnTheFlyNestedSorter.sort( sortedNumericDocValues, missingValue, parentDocs, childDocs );
+				numericDocValues = DocValuesJoin.joinAsSingleValued( sortedNumericDocValues, missingValue, parentDocs, childDocs );
 			}
 
 			return numericDocValues;

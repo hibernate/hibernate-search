@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl;
 import java.io.IOException;
 
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.GeoPointDistanceDocValues;
-import org.hibernate.search.backend.lucene.lowlevel.sort.impl.OnTheFlyNestedSorter;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DocValuesJoin;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.SortedNumericDoubleValues;
 
 import org.apache.lucene.index.LeafReaderContext;
@@ -51,7 +51,7 @@ public class LuceneGeoPointDistanceComparatorSource extends LuceneFieldComparato
 				}
 
 				SortedNumericDoubleValues sortedNumericDoubleValues = SortedNumericDoubleValues.createDistance( geoPointDistanceDocValues );
-				return OnTheFlyNestedSorter.sort( sortedNumericDoubleValues, Double.POSITIVE_INFINITY, parentDocs, childDocs ).getRawDoubleValues();
+				return DocValuesJoin.joinAsSingleValued( sortedNumericDoubleValues, Double.POSITIVE_INFINITY, parentDocs, childDocs ).getRawDoubleValues();
 			}
 		};
 	}

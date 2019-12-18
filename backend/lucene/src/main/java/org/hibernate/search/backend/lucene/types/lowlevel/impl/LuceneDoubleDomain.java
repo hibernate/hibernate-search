@@ -12,7 +12,7 @@ import java.util.Collection;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.SortedNumericDoubleValues;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
-import org.hibernate.search.backend.lucene.lowlevel.sort.impl.OnTheFlyNestedSorter;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DocValuesJoin;
 import org.hibernate.search.util.common.data.Range;
 
 import org.apache.lucene.document.DoubleDocValuesField;
@@ -130,7 +130,7 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 			BitSet parentDocs = nestedDocsProvider.parentDocs( context );
 			DocIdSetIterator childDocs = nestedDocsProvider.childDocs( context );
 			if ( parentDocs != null && childDocs != null ) {
-				numericDocValues = OnTheFlyNestedSorter.sort( sortedNumericDoubleValues, missingValue, parentDocs, childDocs ).getRawDoubleValues();
+				numericDocValues = DocValuesJoin.joinAsSingleValued( sortedNumericDoubleValues, missingValue, parentDocs, childDocs ).getRawDoubleValues();
 			}
 			return numericDocValues;
 		}
