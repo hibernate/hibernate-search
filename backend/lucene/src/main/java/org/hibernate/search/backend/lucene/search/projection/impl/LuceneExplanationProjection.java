@@ -25,7 +25,6 @@ class LuceneExplanationProjection implements LuceneSearchProjection<Explanation,
 	@Override
 	public void request(SearchProjectionRequestContext context) {
 		context.requireTopDocsCollector();
-		context.requireAllStoredFields();
 	}
 
 	@Override
