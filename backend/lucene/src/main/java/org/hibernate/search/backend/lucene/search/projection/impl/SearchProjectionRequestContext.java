@@ -35,10 +35,6 @@ public final class SearchProjectionRequestContext {
 		extractionRequirementsBuilder.requireScore();
 	}
 
-	public void requireTopDocsCollector() {
-		extractionRequirementsBuilder.requireTopDocsCollector();
-	}
-
 	public <C extends Collector> void requireCollector(CollectorFactory<C> collectorFactory) {
 		extractionRequirementsBuilder.requireCollector( collectorFactory );
 	}

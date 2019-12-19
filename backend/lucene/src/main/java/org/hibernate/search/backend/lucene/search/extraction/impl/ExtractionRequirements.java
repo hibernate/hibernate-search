@@ -41,7 +41,6 @@ import org.apache.lucene.search.TotalHitCountCollector;
  */
 public final class ExtractionRequirements {
 
-	private final boolean requireTopDocs;
 	private final boolean requireScore;
 	private final Set<CollectorFactory<?>> requiredCollectorFactories;
 
@@ -50,7 +49,6 @@ public final class ExtractionRequirements {
 	private final Optional<ReusableDocumentStoredFieldVisitor> storedFieldVisitor;
 
 	private ExtractionRequirements(Builder builder) {
-		requireTopDocs = builder.requireTopDocs;
 		requireScore = builder.requireScore;
 		requiredCollectorFactories = builder.requiredCollectorFactories;
 		requiredNestedDocumentExtractionPaths = builder.requiredNestedDocumentExtractionPaths;
@@ -65,7 +63,7 @@ public final class ExtractionRequirements {
 
 		Map<CollectorKey<?>, Collector> luceneCollectors = new LinkedHashMap<>();
 
-		if ( requireTopDocs && maxDocs > 0 ) {
+		if ( maxDocs > 0 ) {
 			if ( sort == null ) {
 				topDocsCollector = TopScoreDocCollector.create(
 						maxDocs,
@@ -171,7 +169,6 @@ public final class ExtractionRequirements {
 
 	public static class Builder {
 
-		private boolean requireTopDocs;
 		private boolean requireScore;
 		private final Set<CollectorFactory<?>> requiredCollectorFactories = new LinkedHashSet<>();
 
@@ -181,16 +178,10 @@ public final class ExtractionRequirements {
 		private final Set<String> requiredStoredFields = new HashSet<>();
 
 		public void requireScore() {
-			this.requireTopDocs = true;
 			this.requireScore = true;
 		}
 
-		public void requireTopDocsCollector() {
-			this.requireTopDocs = true;
-		}
-
 		public <C extends Collector> void requireCollector(CollectorFactory<C> collectorFactory) {
-			this.requireTopDocs = true; // We can't collect anything if we don't know from which documents it should be collected
 			requiredCollectorFactories.add( collectorFactory );
 		}
 

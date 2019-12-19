@@ -24,7 +24,6 @@ class LuceneDocumentProjection implements LuceneSearchProjection<Document, Docum
 
 	@Override
 	public void request(SearchProjectionRequestContext context) {
-		context.requireTopDocsCollector();
 		context.requireAllStoredFields();
 	}
 
