@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 import java.util.Objects;
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.DistanceCollector;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.GeoPointDistanceCollector;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExecutionContext;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
@@ -19,7 +19,7 @@ import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 class LuceneDistanceToFieldProjection
-		implements LuceneSearchProjection<Double, Double>, CollectorFactory<DistanceCollector> {
+		implements LuceneSearchProjection<Double, Double>, CollectorFactory<GeoPointDistanceCollector> {
 
 	private final Set<String> indexNames;
 	private final String absoluteFieldPath;
@@ -68,7 +68,7 @@ class LuceneDistanceToFieldProjection
 	@Override
 	public Double extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExtractContext context) {
-		DistanceCollector distanceCollector = context.getCollector( this );
+		GeoPointDistanceCollector distanceCollector = context.getCollector( this );
 		return unit.fromMeters( distanceCollector.getDistance(
 				documentResult.getDocId(), context
 		) );
@@ -96,8 +96,8 @@ class LuceneDistanceToFieldProjection
 	}
 
 	@Override
-	public DistanceCollector createCollector(CollectorExecutionContext context) {
-		return new DistanceCollector( absoluteFieldPath, center, context.getMaxDocs() );
+	public GeoPointDistanceCollector createCollector(CollectorExecutionContext context) {
+		return new GeoPointDistanceCollector( absoluteFieldPath, center, context.getMaxDocs() );
 	}
 
 	@Override

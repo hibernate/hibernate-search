@@ -32,7 +32,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @author Sanne Grinovero
  * @author Nicolas Helleringer
  */
-public class DistanceCollector implements Collector {
+public class GeoPointDistanceCollector implements Collector {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -40,7 +40,7 @@ public class DistanceCollector implements Collector {
 	private final GeoPoint center;
 	private final SpatialResultsCollector distances;
 
-	public DistanceCollector(String absoluteFieldPath, GeoPoint center, int hitsCount) {
+	public GeoPointDistanceCollector(String absoluteFieldPath, GeoPoint center, int hitsCount) {
 		this.center = center;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.distances = new SpatialResultsCollector( hitsCount );
