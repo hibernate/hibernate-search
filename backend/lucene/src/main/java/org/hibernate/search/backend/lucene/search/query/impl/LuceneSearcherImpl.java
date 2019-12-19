@@ -96,7 +96,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 		return new LuceneLoadableSearchResult<>(
 				extractContext, rootProjection,
-				luceneCollectors.getTotalHits(),
+				luceneCollectors.getTotalHitCount(),
 				extractedData,
 				extractedAggregations,
 				timeoutManager.getTookTime(),
