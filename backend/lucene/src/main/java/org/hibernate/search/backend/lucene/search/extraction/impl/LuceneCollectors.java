@@ -13,16 +13,24 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.ChildrenCollector;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
+import org.hibernate.search.backend.lucene.lowlevel.query.impl.ExplicitDocIdsQuery;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 
+import org.apache.lucene.index.LeafReaderContext;
+import org.apache.lucene.search.BulkScorer;
+import org.apache.lucene.search.CollectionTerminatedException;
+import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.FieldDoc;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.LeafCollector;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
+import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.TimeLimitingCollector;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopFieldCollector;
+import org.apache.lucene.search.Weight;
 
 public class LuceneCollectors {
 
@@ -32,7 +40,8 @@ public class LuceneCollectors {
 	private final boolean requireFieldDocRescoring;
 	private final Integer scoreSortFieldIndexForRescoring;
 
-	private final CollectorSet collectors;
+	private final CollectorSet allMatchingDocsCollectors;
+	private final CollectorSet topDocsCollectors;
 
 	private final TimeoutManager timeoutManager;
 
@@ -42,13 +51,14 @@ public class LuceneCollectors {
 
 	LuceneCollectors(IndexSearcher indexSearcher, Query luceneQuery,
 			boolean requireFieldDocRescoring, Integer scoreSortFieldIndexForRescoring,
-			CollectorSet collectors,
+			CollectorSet allMatchingDocsCollectors, CollectorSet topDocsCollectors,
 			TimeoutManager timeoutManager) {
 		this.indexSearcher = indexSearcher;
 		this.luceneQuery = luceneQuery;
 		this.requireFieldDocRescoring = requireFieldDocRescoring;
 		this.scoreSortFieldIndexForRescoring = scoreSortFieldIndexForRescoring;
-		this.collectors = collectors;
+		this.allMatchingDocsCollectors = allMatchingDocsCollectors;
+		this.topDocsCollectors = topDocsCollectors;
 		this.timeoutManager = timeoutManager;
 	}
 
@@ -58,16 +68,17 @@ public class LuceneCollectors {
 			return;
 		}
 
+		// Phase 1: collect top docs and aggregations
 		try {
-			indexSearcher.search( luceneQuery, collectors.getComposed() );
+			indexSearcher.search( luceneQuery, allMatchingDocsCollectors.getComposed() );
 		}
 		catch (TimeLimitingCollector.TimeExceededException e) {
 			timeoutManager.forceTimedOut();
 		}
 
-		this.totalHitCount = collectors.get( CollectorKey.TOTAL_HIT_COUNT ).getTotalHits();
+		this.totalHitCount = allMatchingDocsCollectors.get( CollectorKey.TOTAL_HIT_COUNT ).getTotalHits();
 
-		TopDocsCollector<?> topDocsCollector = collectors.get( CollectorKey.TOP_DOCS );
+		TopDocsCollector<?> topDocsCollector = allMatchingDocsCollectors.get( CollectorKey.TOP_DOCS );
 		if ( topDocsCollector == null ) {
 			return;
 		}
@@ -77,14 +88,29 @@ public class LuceneCollectors {
 			handleRescoring( indexSearcher, luceneQuery );
 		}
 
-		ChildrenCollector childrenCollector = collectors.get( CollectorKey.CHILDREN );
+		// Phase 2: apply collectors to top docs
+		if ( topDocsCollectors == null ) {
+			return;
+		}
+		try {
+			applyCollectorsToTopDocs();
+		}
+		catch (TimeLimitingCollector.TimeExceededException e) {
+			timeoutManager.forceTimedOut();
+		}
+
+		ChildrenCollector childrenCollector = topDocsCollectors.get( CollectorKey.CHILDREN );
 		if ( childrenCollector != null ) {
 			this.topDocIdsToNestedDocIds = childrenCollector.getChildren();
 		}
 	}
 
-	public CollectorSet getCollectors() {
-		return collectors;
+	public CollectorSet getAllMatchingDocsCollectors() {
+		return allMatchingDocsCollectors;
+	}
+
+	public CollectorSet getTopDocsCollectors() {
+		return topDocsCollectors;
 	}
 
 	public long getTotalHitCount() {
@@ -120,6 +146,35 @@ public class LuceneCollectors {
 			// Failing that, we need to re-score the top documents after the query was executed.
 			// This feels wrong, but apparently that's the recommended practice...
 			TopFieldCollector.populateScores( topDocs.scoreDocs, indexSearcher, luceneQuery );
+		}
+	}
+
+	private void applyCollectorsToTopDocs() throws IOException {
+		ExplicitDocIdsQuery topDocsQuery = new ExplicitDocIdsQuery( topDocs.scoreDocs );
+		Weight weight = indexSearcher.createWeight( topDocsQuery, ScoreMode.COMPLETE_NO_SCORES, 1.0f );
+
+		Collector collector = topDocsCollectors.getComposed();
+
+		for ( LeafReaderContext ctx : indexSearcher.getTopReaderContext().leaves() ) {
+			final LeafCollector leafCollector;
+			try {
+				leafCollector = collector.getLeafCollector( ctx );
+			}
+			catch (CollectionTerminatedException e) {
+				// there is no doc of interest in this reader context
+				// continue with the following leaf
+				continue;
+			}
+			BulkScorer scorer = weight.bulkScorer( ctx );
+			if ( scorer != null ) {
+				try {
+					scorer.score( leafCollector, ctx.reader().getLiveDocs() );
+				}
+				catch (CollectionTerminatedException e) {
+					// collection was terminated prematurely
+					// continue with the following leaf
+				}
+			}
 		}
 	}
 }

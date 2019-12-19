@@ -20,6 +20,6 @@ public final class AggregationRequestContext {
 	}
 
 	public <C extends Collector> void requireCollector(CollectorFactory<C> collectorFactory) {
-		extractionRequirementsBuilder.requireCollector( collectorFactory );
+		extractionRequirementsBuilder.requireCollectorForAllMatchingDocs( collectorFactory );
 	}
 }
