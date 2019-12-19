@@ -14,9 +14,7 @@ import org.hibernate.search.backend.lucene.types.sort.impl.SortMissingValue;
 
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.SortedDocValues;
-import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.FieldComparator;
-import org.apache.lucene.util.BitSet;
 import org.apache.lucene.util.BytesRef;
 
 public class LuceneTextFieldComparatorSource extends LuceneFieldComparatorSource {
@@ -35,15 +33,7 @@ public class LuceneTextFieldComparatorSource extends LuceneFieldComparatorSource
 		return new FieldComparator.TermOrdValComparator( numHits, fieldname, sortMissingLast ) {
 			@Override
 			protected SortedDocValues getSortedDocValues(LeafReaderContext context, String field) throws IOException {
-				SortedDocValues sortedDocValues = super.getSortedDocValues( context, field );
-
-				if ( nestedDocsProvider != null ) {
-					BitSet parentDocs = nestedDocsProvider.parentDocs( context );
-					DocIdSetIterator childDocs = nestedDocsProvider.childDocs( context );
-					if ( parentDocs != null && childDocs != null ) {
-						sortedDocValues = DocValuesJoin.joinAsSingleValued( sortedDocValues, parentDocs, childDocs );
-					}
-				}
+				SortedDocValues sortedDocValues = DocValuesJoin.getJoinedAsSingleValuedSorted( context, field, nestedDocsProvider );
 
 				if ( missingValue == null || missingFirst() || missingLast() ) {
 					return sortedDocValues;

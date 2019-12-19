@@ -9,10 +9,9 @@ package org.hibernate.search.backend.lucene.types.lowlevel.impl;
 import java.io.IOException;
 import java.util.Collection;
 
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.SortedNumericDoubleValues;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DocValuesJoin;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DocValuesJoin;
 import org.hibernate.search.util.common.data.Range;
 
 import org.apache.lucene.document.DoubleDocValuesField;
@@ -24,11 +23,9 @@ import org.apache.lucene.facet.range.DoubleRangeFacetCounts;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
-import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.LongValuesSource;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.util.BitSet;
 
 public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	private static final LuceneNumericDomain<Double> INSTANCE = new LuceneDoubleDomain();
@@ -121,18 +118,7 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 
 		@Override
 		protected NumericDocValues getNumericDocValues(LeafReaderContext context, String field) throws IOException {
-			NumericDocValues numericDocValues = super.getNumericDocValues( context, field );
-			if ( nestedDocsProvider == null ) {
-				return numericDocValues;
-			}
-
-			SortedNumericDoubleValues sortedNumericDoubleValues = SortedNumericDoubleValues.createDouble( numericDocValues );
-			BitSet parentDocs = nestedDocsProvider.parentDocs( context );
-			DocIdSetIterator childDocs = nestedDocsProvider.childDocs( context );
-			if ( parentDocs != null && childDocs != null ) {
-				numericDocValues = DocValuesJoin.joinAsSingleValued( sortedNumericDoubleValues, missingValue, parentDocs, childDocs ).getRawDoubleValues();
-			}
-			return numericDocValues;
+			return DocValuesJoin.getJoinedAsSingleValuedNumericDouble( context, field, nestedDocsProvider, missingValue );
 		}
 	}
 }
