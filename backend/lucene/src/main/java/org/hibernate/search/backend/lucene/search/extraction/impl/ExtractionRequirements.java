@@ -63,7 +63,7 @@ public final class ExtractionRequirements {
 		Integer scoreSortFieldIndexForRescoring = null;
 		boolean requireFieldDocRescoring = false;
 
-		Map<CollectorKey<?>, Collector> luceneCollectors = new LinkedHashMap<>();
+		Map<CollectorKey<?>, Collector> collectorMap = new LinkedHashMap<>();
 
 		if ( maxDocs > 0 ) {
 			if ( sort == null ) {
@@ -101,14 +101,13 @@ public final class ExtractionRequirements {
 						Integer.MAX_VALUE
 				);
 			}
-			luceneCollectors.put( CollectorKey.TOP_DOCS, topDocsCollector );
+			collectorMap.put( CollectorKey.TOP_DOCS, topDocsCollector );
 		}
 
 		TotalHitCountCollector totalHitCountCollector = new TotalHitCountCollector();
-		luceneCollectors.put( CollectorKey.TOTAL_HIT_COUNT, totalHitCountCollector );
+		collectorMap.put( CollectorKey.TOTAL_HIT_COUNT, totalHitCountCollector );
 
 		Map<String, NestedDocsProvider> nestedDocsProviders;
-		ChildrenCollector childrenCollector = null;
 		if ( requiredNestedDocumentExtractionPaths.isEmpty() ) {
 			nestedDocsProviders = Collections.emptyMap();
 		}
@@ -123,8 +122,8 @@ public final class ExtractionRequirements {
 
 			NestedDocsProvider nestedDocsProvider =
 					new NestedDocsProvider( requiredNestedDocumentExtractionPaths, luceneQuery );
-			childrenCollector = new ChildrenCollector( indexSearcher, nestedDocsProvider );
-			luceneCollectors.put( CollectorKey.CHILDREN, childrenCollector );
+			ChildrenCollector childrenCollector = new ChildrenCollector( indexSearcher, nestedDocsProvider );
+			collectorMap.put( CollectorKey.CHILDREN, childrenCollector );
 		}
 
 		CollectorExecutionContext executionContext =
@@ -132,20 +131,23 @@ public final class ExtractionRequirements {
 
 		for ( CollectorFactory<?> collectorFactory : requiredCollectorFactories ) {
 			Collector collector = collectorFactory.createCollector( executionContext );
-			luceneCollectors.put( collectorFactory, collector );
+			collectorMap.put( collectorFactory, collector );
 		}
 
 		Collector compositeCollector = wrapTimeLimitingCollectorIfNecessary(
-				MultiCollector.wrap( luceneCollectors.values() ), timeoutManager
+				MultiCollector.wrap( collectorMap.values() ), timeoutManager
+		);
+
+		CollectorSet collectors = new CollectorSet(
+				compositeCollector,
+				collectorMap
 		);
 
 		return new LuceneCollectors(
 				indexSearcher,
 				luceneQuery,
 				requireFieldDocRescoring, scoreSortFieldIndexForRescoring,
-				topDocsCollector, totalHitCountCollector, childrenCollector,
-				compositeCollector,
-				luceneCollectors,
+				collectors,
 				timeoutManager
 		);
 	}

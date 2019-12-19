@@ -15,7 +15,6 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.ChildrenColle
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 
-import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.FieldDoc;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
@@ -24,7 +23,6 @@ import org.apache.lucene.search.TimeLimitingCollector;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopFieldCollector;
-import org.apache.lucene.search.TotalHitCountCollector;
 
 public class LuceneCollectors {
 
@@ -34,33 +32,22 @@ public class LuceneCollectors {
 	private final boolean requireFieldDocRescoring;
 	private final Integer scoreSortFieldIndexForRescoring;
 
-	private final TopDocsCollector<?> topDocsCollector;
-	private final TotalHitCountCollector totalHitCountCollector;
-	private final ChildrenCollector childrenCollector;
-
-	private final Collector compositeCollector;
-	private final Map<CollectorKey<?>, Collector> collectors;
+	private final CollectorSet collectors;
 
 	private final TimeoutManager timeoutManager;
 
+	private long totalHitCount = 0;
 	private TopDocs topDocs = null;
 	private Map<Integer, Set<Integer>> topDocIdsToNestedDocIds = Collections.emptyMap();
 
 	LuceneCollectors(IndexSearcher indexSearcher, Query luceneQuery,
 			boolean requireFieldDocRescoring, Integer scoreSortFieldIndexForRescoring,
-			TopDocsCollector<?> topDocsCollector,
-			TotalHitCountCollector totalHitCountCollector, ChildrenCollector childrenCollector,
-			Collector compositeCollector,
-			Map<CollectorKey<?>, Collector> collectors,
+			CollectorSet collectors,
 			TimeoutManager timeoutManager) {
 		this.indexSearcher = indexSearcher;
 		this.luceneQuery = luceneQuery;
 		this.requireFieldDocRescoring = requireFieldDocRescoring;
 		this.scoreSortFieldIndexForRescoring = scoreSortFieldIndexForRescoring;
-		this.topDocsCollector = topDocsCollector;
-		this.totalHitCountCollector = totalHitCountCollector;
-		this.childrenCollector = childrenCollector;
-		this.compositeCollector = compositeCollector;
 		this.collectors = collectors;
 		this.timeoutManager = timeoutManager;
 	}
@@ -72,31 +59,36 @@ public class LuceneCollectors {
 		}
 
 		try {
-			indexSearcher.search( luceneQuery, compositeCollector );
+			indexSearcher.search( luceneQuery, collectors.getComposed() );
 		}
 		catch (TimeLimitingCollector.TimeExceededException e) {
 			timeoutManager.forceTimedOut();
 		}
+
+		this.totalHitCount = collectors.get( CollectorKey.TOTAL_HIT_COUNT ).getTotalHits();
+
+		TopDocsCollector<?> topDocsCollector = collectors.get( CollectorKey.TOP_DOCS );
 		if ( topDocsCollector == null ) {
 			return;
 		}
 
-		extractTopDocs( offset, limit );
+		extractTopDocs( topDocsCollector, offset, limit );
 		if ( requireFieldDocRescoring ) {
 			handleRescoring( indexSearcher, luceneQuery );
 		}
 
+		ChildrenCollector childrenCollector = collectors.get( CollectorKey.CHILDREN );
 		if ( childrenCollector != null ) {
 			this.topDocIdsToNestedDocIds = childrenCollector.getChildren();
 		}
 	}
 
-	public Map<CollectorKey<?>, Collector> getCollectors() {
+	public CollectorSet getCollectors() {
 		return collectors;
 	}
 
-	public long getTotalHits() {
-		return totalHitCountCollector.getTotalHits();
+	public long getTotalHitCount() {
+		return totalHitCount;
 	}
 
 	public TopDocs getTopDocs() {
@@ -107,7 +99,7 @@ public class LuceneCollectors {
 		return topDocIdsToNestedDocIds;
 	}
 
-	private void extractTopDocs(int offset, Integer limit) {
+	private void extractTopDocs(TopDocsCollector<?> topDocsCollector, int offset, Integer limit) {
 		if ( limit == null ) {
 			topDocs = topDocsCollector.topDocs( offset );
 		}

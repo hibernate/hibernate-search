@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
+import org.hibernate.search.backend.lucene.search.extraction.impl.CollectorSet;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Collector;
@@ -27,11 +28,11 @@ public class SearchProjectionExtractContext {
 	private final IndexSearcher indexSearcher;
 	private final Query luceneQuery;
 	private final Map<Integer, Set<Integer>> topDocIdsToNestedDocIds;
-	private final Map<CollectorKey<?>, Collector> collectors;
+	private final CollectorSet collectors;
 
 	public SearchProjectionExtractContext(IndexSearcher indexSearcher, Query luceneQuery,
 			Map<Integer, Set<Integer>> topDocIdsToNestedDocIds,
-			Map<CollectorKey<?>, Collector> collectors) {
+			CollectorSet collectors) {
 		this.indexSearcher = indexSearcher;
 		this.luceneQuery = luceneQuery;
 		this.topDocIdsToNestedDocIds = topDocIdsToNestedDocIds;
@@ -51,9 +52,8 @@ public class SearchProjectionExtractContext {
 		return topDocIdsToNestedDocIds.get( docId );
 	}
 
-	@SuppressWarnings("unchecked")
 	public <C extends Collector> C getCollector(CollectorKey<C> key) {
-		return (C) collectors.get( key );
+		return collectors.get( key );
 	}
 
 }
