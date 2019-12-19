@@ -53,7 +53,7 @@ public class SearchProjectionExtractContext {
 	}
 
 	public <C extends Collector> C getCollector(CollectorKey<C> key) {
-		return collectors.get( key );
+		return collectors == null ? null : collectors.get( key );
 	}
 
 }

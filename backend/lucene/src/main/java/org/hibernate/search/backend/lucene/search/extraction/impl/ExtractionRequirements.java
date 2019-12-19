@@ -43,7 +43,8 @@ import org.apache.lucene.search.TotalHitCountCollector;
 public final class ExtractionRequirements {
 
 	private final boolean requireScore;
-	private final Set<CollectorFactory<?>> requiredCollectorFactories;
+	private final Set<CollectorFactory<?>> requiredCollectorForAllMatchingDocsFactories;
+	private final Set<CollectorFactory<?>> requiredCollectorForTopDocsFactories;
 
 	private final Set<String> requiredNestedDocumentExtractionPaths;
 
@@ -51,7 +52,8 @@ public final class ExtractionRequirements {
 
 	private ExtractionRequirements(Builder builder) {
 		requireScore = builder.requireScore;
-		requiredCollectorFactories = builder.requiredCollectorFactories;
+		requiredCollectorForAllMatchingDocsFactories = builder.requiredCollectorForAllMatchingDocsFactories;
+		requiredCollectorForTopDocsFactories = builder.requiredCollectorForTopDocsFactories;
 		requiredNestedDocumentExtractionPaths = builder.requiredNestedDocumentExtractionPaths;
 		storedFieldVisitor = builder.createStoredFieldVisitor();
 	}
@@ -63,7 +65,8 @@ public final class ExtractionRequirements {
 		Integer scoreSortFieldIndexForRescoring = null;
 		boolean requireFieldDocRescoring = false;
 
-		Map<CollectorKey<?>, Collector> collectorMap = new LinkedHashMap<>();
+		Map<CollectorKey<?>, Collector> collectorForAllMatchingDocsMap = new LinkedHashMap<>();
+		Map<CollectorKey<?>, Collector> collectorForTopDocsMap = new LinkedHashMap<>();
 
 		if ( maxDocs > 0 ) {
 			if ( sort == null ) {
@@ -101,11 +104,11 @@ public final class ExtractionRequirements {
 						Integer.MAX_VALUE
 				);
 			}
-			collectorMap.put( CollectorKey.TOP_DOCS, topDocsCollector );
+			collectorForAllMatchingDocsMap.put( CollectorKey.TOP_DOCS, topDocsCollector );
 		}
 
 		TotalHitCountCollector totalHitCountCollector = new TotalHitCountCollector();
-		collectorMap.put( CollectorKey.TOTAL_HIT_COUNT, totalHitCountCollector );
+		collectorForAllMatchingDocsMap.put( CollectorKey.TOTAL_HIT_COUNT, totalHitCountCollector );
 
 		Map<String, NestedDocsProvider> nestedDocsProviders;
 		if ( requiredNestedDocumentExtractionPaths.isEmpty() ) {
@@ -123,31 +126,42 @@ public final class ExtractionRequirements {
 			NestedDocsProvider nestedDocsProvider =
 					new NestedDocsProvider( requiredNestedDocumentExtractionPaths, luceneQuery );
 			ChildrenCollector childrenCollector = new ChildrenCollector( indexSearcher, nestedDocsProvider );
-			collectorMap.put( CollectorKey.CHILDREN, childrenCollector );
+			collectorForTopDocsMap.put( CollectorKey.CHILDREN, childrenCollector );
 		}
 
 		CollectorExecutionContext executionContext =
 				new CollectorExecutionContext( metadataResolver, nestedDocsProviders, maxDocs );
 
-		for ( CollectorFactory<?> collectorFactory : requiredCollectorFactories ) {
+		for ( CollectorFactory<?> collectorFactory : requiredCollectorForAllMatchingDocsFactories ) {
 			Collector collector = collectorFactory.createCollector( executionContext );
-			collectorMap.put( collectorFactory, collector );
+			collectorForAllMatchingDocsMap.put( collectorFactory, collector );
 		}
-
-		Collector compositeCollector = wrapTimeLimitingCollectorIfNecessary(
-				MultiCollector.wrap( collectorMap.values() ), timeoutManager
+		CollectorSet collectorsForAllMatchingDocs = new CollectorSet(
+				wrapTimeLimitingCollectorIfNecessary(
+						MultiCollector.wrap( collectorForAllMatchingDocsMap.values() ), timeoutManager
+				),
+				collectorForAllMatchingDocsMap
 		);
 
-		CollectorSet collectors = new CollectorSet(
-				compositeCollector,
-				collectorMap
-		);
+		for ( CollectorFactory<?> collectorFactory : requiredCollectorForTopDocsFactories ) {
+			Collector collector = collectorFactory.createCollector( executionContext );
+			collectorForTopDocsMap.put( collectorFactory, collector );
+		}
+		CollectorSet collectorsForTopDocs = null;
+		if ( !collectorForTopDocsMap.isEmpty() ) {
+			collectorsForTopDocs = new CollectorSet(
+					wrapTimeLimitingCollectorIfNecessary(
+							MultiCollector.wrap( collectorForTopDocsMap.values() ), timeoutManager
+					),
+					collectorForTopDocsMap
+			);
+		}
 
 		return new LuceneCollectors(
 				indexSearcher,
 				luceneQuery,
 				requireFieldDocRescoring, scoreSortFieldIndexForRescoring,
-				collectors,
+				collectorsForAllMatchingDocs, collectorsForTopDocs,
 				timeoutManager
 		);
 	}
@@ -171,7 +185,8 @@ public final class ExtractionRequirements {
 	public static class Builder {
 
 		private boolean requireScore;
-		private final Set<CollectorFactory<?>> requiredCollectorFactories = new LinkedHashSet<>();
+		private final Set<CollectorFactory<?>> requiredCollectorForAllMatchingDocsFactories = new LinkedHashSet<>();
+		private final Set<CollectorFactory<?>> requiredCollectorForTopDocsFactories = new LinkedHashSet<>();
 
 		private final Set<String> requiredNestedDocumentExtractionPaths = new HashSet<>();
 
@@ -182,8 +197,12 @@ public final class ExtractionRequirements {
 			this.requireScore = true;
 		}
 
-		public <C extends Collector> void requireCollector(CollectorFactory<C> collectorFactory) {
-			requiredCollectorFactories.add( collectorFactory );
+		public <C extends Collector> void requireCollectorForAllMatchingDocs(CollectorFactory<C> collectorFactory) {
+			requiredCollectorForAllMatchingDocsFactories.add( collectorFactory );
+		}
+
+		public <C extends Collector> void requireCollectorForTopDocs(CollectorFactory<C> collectorFactory) {
+			requiredCollectorForTopDocsFactories.add( collectorFactory );
 		}
 
 		public void requireNestedDocumentExtraction(String nestedDocumentPath) {

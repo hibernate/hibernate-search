@@ -36,6 +36,6 @@ public final class SearchProjectionRequestContext {
 	}
 
 	public <C extends Collector> void requireCollector(CollectorFactory<C> collectorFactory) {
-		extractionRequirementsBuilder.requireCollector( collectorFactory );
+		extractionRequirementsBuilder.requireCollectorForTopDocs( collectorFactory );
 	}
 }

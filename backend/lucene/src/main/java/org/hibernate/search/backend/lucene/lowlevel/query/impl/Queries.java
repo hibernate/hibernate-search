@@ -52,6 +52,11 @@ public class Queries {
 
 	public static BooleanQuery findChildQuery(Set<String> nestedDocumentPaths, Query originalParentQuery) {
 		QueryBitSetProducer parentsFilter = new QueryBitSetProducer( mainDocumentQuery() );
+		return findChildQuery( nestedDocumentPaths, originalParentQuery, parentsFilter );
+	}
+
+	public static BooleanQuery findChildQuery(Set<String> nestedDocumentPaths, Query originalParentQuery,
+			QueryBitSetProducer parentsFilter) {
 		ToChildBlockJoinQuery parentQuery = new ToChildBlockJoinQuery( originalParentQuery, parentsFilter );
 
 		return new BooleanQuery.Builder()
