@@ -36,7 +36,6 @@ class LuceneFieldProjection<F, V> implements LuceneSearchProjection<F, V> {
 
 	@Override
 	public void request(SearchProjectionRequestContext context) {
-		context.requireTopDocsCollector();
 		codec.contributeStoredFields( absoluteFieldPath, context::requireStoredField );
 		context.requireNestedDocumentExtraction( nestedDocumentPath );
 	}
