@@ -142,7 +142,6 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		//  Note that Lucene initializes data structures of this size so setting it to a large value consumes memory.
 		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );
 
-		// TODO HSEARCH-3352 implement timeout handling by wrapping the collector with the timeout limiting one
 		return extractionRequirements.createCollectors( requestContext.getLuceneSort(), metadataResolver, maxDocs, timeoutManager );
 	}
 
