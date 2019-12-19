@@ -7,21 +7,14 @@
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
 import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.HibernateSearchDocumentIdToLuceneDocIdMapCollector;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
-import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.ChildrenCollector;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.FieldDoc;
 import org.apache.lucene.search.IndexSearcher;
@@ -35,20 +28,17 @@ import org.apache.lucene.search.TotalHitCountCollector;
 
 public class LuceneCollectors {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
+	private final IndexSearcher indexSearcher;
 	private final Query luceneQuery;
 
 	private final boolean requireFieldDocRescoring;
 	private final Integer scoreSortFieldIndexForRescoring;
-	private final Set<String> nestedDocumentPaths;
 
 	private final TopDocsCollector<?> topDocsCollector;
 	private final TotalHitCountCollector totalHitCountCollector;
 	private final ChildrenCollector childrenCollector;
 
 	private final Collector compositeCollector;
-	private final Collector collectorForNestedDocuments;
 	private final Map<CollectorKey<?>, Collector> collectors;
 
 	private final TimeoutManager timeoutManager;
@@ -56,28 +46,26 @@ public class LuceneCollectors {
 	private TopDocs topDocs = null;
 	private Map<Integer, Set<Integer>> topDocIdsToNestedDocIds = Collections.emptyMap();
 
-	LuceneCollectors(Query luceneQuery,
+	LuceneCollectors(IndexSearcher indexSearcher, Query luceneQuery,
 			boolean requireFieldDocRescoring, Integer scoreSortFieldIndexForRescoring,
-			Set<String> nestedDocumentPaths,
 			TopDocsCollector<?> topDocsCollector,
 			TotalHitCountCollector totalHitCountCollector, ChildrenCollector childrenCollector,
-			Collector compositeCollector, Collector collectorForNestedDocuments,
+			Collector compositeCollector,
 			Map<CollectorKey<?>, Collector> collectors,
 			TimeoutManager timeoutManager) {
+		this.indexSearcher = indexSearcher;
 		this.luceneQuery = luceneQuery;
 		this.requireFieldDocRescoring = requireFieldDocRescoring;
 		this.scoreSortFieldIndexForRescoring = scoreSortFieldIndexForRescoring;
-		this.nestedDocumentPaths = nestedDocumentPaths;
 		this.topDocsCollector = topDocsCollector;
 		this.totalHitCountCollector = totalHitCountCollector;
 		this.childrenCollector = childrenCollector;
 		this.compositeCollector = compositeCollector;
-		this.collectorForNestedDocuments = collectorForNestedDocuments;
 		this.collectors = collectors;
 		this.timeoutManager = timeoutManager;
 	}
 
-	public void collect(IndexSearcher indexSearcher, int offset, Integer limit) throws IOException {
+	public void collect(int offset, Integer limit) throws IOException {
 		if ( timeoutManager.checkTimedOut() ) {
 			// in case of timeout before the query execution, skip the query
 			return;
@@ -98,15 +86,8 @@ public class LuceneCollectors {
 			handleRescoring( indexSearcher, luceneQuery );
 		}
 
-		if ( timeoutManager.isTimedOut() ) {
-			return; // Skip nested docs
-		}
-
-		try {
-			collectNestedDocs( indexSearcher, luceneQuery );
-		}
-		catch (TimeLimitingCollector.TimeExceededException e) {
-			timeoutManager.forceTimedOut();
+		if ( childrenCollector != null ) {
+			this.topDocIdsToNestedDocIds = childrenCollector.getChildren();
 		}
 	}
 
@@ -147,35 +128,6 @@ public class LuceneCollectors {
 			// Failing that, we need to re-score the top documents after the query was executed.
 			// This feels wrong, but apparently that's the recommended practice...
 			TopFieldCollector.populateScores( topDocs.scoreDocs, indexSearcher, luceneQuery );
-		}
-	}
-
-	private void collectNestedDocs(IndexSearcher indexSearcher, Query parentsQuery) {
-		// if the projection does not need any nested object skip their fetching
-		if ( topDocs == null || nestedDocumentPaths.isEmpty() ) {
-			return;
-		}
-
-		HibernateSearchDocumentIdToLuceneDocIdMapCollector searchDocumentIdToLuceneDocId =
-				(HibernateSearchDocumentIdToLuceneDocIdMapCollector)
-						collectors.get( HibernateSearchDocumentIdToLuceneDocIdMapCollector.FACTORY );
-
-		Map<String, Set<Integer>> stringSetMap = applyCollectorsToNestedDocs( indexSearcher, parentsQuery );
-		this.topDocIdsToNestedDocIds = new HashMap<>();
-		for ( Map.Entry<String, Set<Integer>> entry : stringSetMap.entrySet() ) {
-			topDocIdsToNestedDocIds.put( searchDocumentIdToLuceneDocId.getLuceneDocId( entry.getKey() ), entry.getValue() );
-		}
-	}
-
-	private Map<String, Set<Integer>> applyCollectorsToNestedDocs(IndexSearcher indexSearcher, Query parentsQuery) {
-		BooleanQuery booleanQuery = Queries.findChildQuery( nestedDocumentPaths, parentsQuery );
-
-		try {
-			indexSearcher.search( booleanQuery, collectorForNestedDocuments );
-			return childrenCollector.getChildren();
-		}
-		catch (IOException e) {
-			throw log.errorFetchingNestedDocuments( booleanQuery, e );
 		}
 	}
 }

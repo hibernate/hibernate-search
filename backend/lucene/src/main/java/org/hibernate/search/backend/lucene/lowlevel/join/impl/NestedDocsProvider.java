@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.lowlevel.join.impl;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Set;
 
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 
@@ -37,8 +38,12 @@ public class NestedDocsProvider {
 	private final Query childQuery;
 
 	public NestedDocsProvider(String nestedDocumentPath, Query originalParentQuery) {
+		this( Collections.singleton( nestedDocumentPath ), originalParentQuery );
+	}
+
+	public NestedDocsProvider(Set<String> nestedDocumentPaths, Query originalParentQuery) {
 		this.parentFiler = new QueryBitSetProducer( originalParentQuery );
-		this.childQuery = Queries.findChildQuery( Collections.singleton( nestedDocumentPath ), originalParentQuery );
+		this.childQuery = Queries.findChildQuery( nestedDocumentPaths, originalParentQuery );
 	}
 
 	public BitSet parentDocs(LeafReaderContext context) throws IOException {
@@ -51,7 +56,15 @@ public class NestedDocsProvider {
 		// Maybe we can cache on shard-base. See Elasticsearch code.
 		IndexSearcher indexSearcher = new IndexSearcher( topLevelCtx );
 
-		Weight weight = indexSearcher.createWeight( indexSearcher.rewrite( childQuery ), ScoreMode.COMPLETE_NO_SCORES, 1f );
+		Weight weight = childDocsWeight( indexSearcher );
+		return childDocs( weight, context );
+	}
+
+	public Weight childDocsWeight(IndexSearcher indexSearcher) throws IOException {
+		return indexSearcher.createWeight( indexSearcher.rewrite( childQuery ), ScoreMode.COMPLETE_NO_SCORES, 1f );
+	}
+
+	public DocIdSetIterator childDocs(Weight weight, LeafReaderContext context) throws IOException {
 		Scorer s = weight.scorer( context );
 		return s == null ? null : s.iterator();
 	}
