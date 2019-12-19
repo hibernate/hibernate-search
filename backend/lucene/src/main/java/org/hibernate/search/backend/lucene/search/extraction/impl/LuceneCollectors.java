@@ -37,6 +37,8 @@ public class LuceneCollectors {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private final Query luceneQuery;
+
 	private final boolean requireFieldDocRescoring;
 	private final Integer scoreSortFieldIndexForRescoring;
 	private final Set<String> nestedDocumentPaths;
@@ -46,7 +48,7 @@ public class LuceneCollectors {
 	private final ChildrenCollector childrenCollector;
 
 	private final Collector compositeCollector;
-	private final Collector compositeCollectorForNestedDocuments;
+	private final Collector collectorForNestedDocuments;
 	private final Map<CollectorKey<?>, Collector> collectors;
 
 	private final TimeoutManager timeoutManager;
@@ -54,13 +56,15 @@ public class LuceneCollectors {
 	private TopDocs topDocs = null;
 	private Map<Integer, Set<Integer>> topDocIdsToNestedDocIds = Collections.emptyMap();
 
-	LuceneCollectors(boolean requireFieldDocRescoring, Integer scoreSortFieldIndexForRescoring,
+	LuceneCollectors(Query luceneQuery,
+			boolean requireFieldDocRescoring, Integer scoreSortFieldIndexForRescoring,
 			Set<String> nestedDocumentPaths,
 			TopDocsCollector<?> topDocsCollector,
 			TotalHitCountCollector totalHitCountCollector, ChildrenCollector childrenCollector,
-			Collector compositeCollector, Collector compositeCollectorForNestedDocuments,
+			Collector compositeCollector, Collector collectorForNestedDocuments,
 			Map<CollectorKey<?>, Collector> collectors,
 			TimeoutManager timeoutManager) {
+		this.luceneQuery = luceneQuery;
 		this.requireFieldDocRescoring = requireFieldDocRescoring;
 		this.scoreSortFieldIndexForRescoring = scoreSortFieldIndexForRescoring;
 		this.nestedDocumentPaths = nestedDocumentPaths;
@@ -68,12 +72,12 @@ public class LuceneCollectors {
 		this.totalHitCountCollector = totalHitCountCollector;
 		this.childrenCollector = childrenCollector;
 		this.compositeCollector = compositeCollector;
-		this.compositeCollectorForNestedDocuments = compositeCollectorForNestedDocuments;
+		this.collectorForNestedDocuments = collectorForNestedDocuments;
 		this.collectors = collectors;
 		this.timeoutManager = timeoutManager;
 	}
 
-	public void collect(IndexSearcher indexSearcher, Query luceneQuery, int offset, Integer limit) throws IOException {
+	public void collect(IndexSearcher indexSearcher, int offset, Integer limit) throws IOException {
 		if ( timeoutManager.checkTimedOut() ) {
 			// in case of timeout before the query execution, skip the query
 			return;
@@ -167,7 +171,7 @@ public class LuceneCollectors {
 		BooleanQuery booleanQuery = Queries.findChildQuery( nestedDocumentPaths, parentsQuery );
 
 		try {
-			indexSearcher.search( booleanQuery, compositeCollectorForNestedDocuments );
+			indexSearcher.search( booleanQuery, collectorForNestedDocuments );
 			return childrenCollector.getChildren();
 		}
 		catch (IOException e) {

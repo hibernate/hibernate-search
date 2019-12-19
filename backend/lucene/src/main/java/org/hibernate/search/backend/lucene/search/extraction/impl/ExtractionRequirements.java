@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
-import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -19,12 +19,14 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.HibernateSear
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExecutionContext;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.ChildrenCollector;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.MultiCollector;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.TimeLimitingCollector;
@@ -55,13 +57,13 @@ public final class ExtractionRequirements {
 		storedFieldVisitor = builder.createStoredFieldVisitor();
 	}
 
-	public LuceneCollectors createCollectors(Sort sort, IndexReaderMetadataResolver metadataResolver, int maxDocs, TimeoutManager timeoutManager) {
+	public LuceneCollectors createCollectors(Query luceneQuery, Sort sort,
+			IndexReaderMetadataResolver metadataResolver, int maxDocs, TimeoutManager timeoutManager) {
 		TopDocsCollector<?> topDocsCollector = null;
 		Integer scoreSortFieldIndexForRescoring = null;
 		boolean requireFieldDocRescoring = false;
 
 		Map<CollectorKey<?>, Collector> luceneCollectors = new LinkedHashMap<>();
-		List<Collector> luceneCollectorsForNestedDocuments = new ArrayList<>();
 
 		if ( requireTopDocs && maxDocs > 0 ) {
 			if ( sort == null ) {
@@ -105,39 +107,47 @@ public final class ExtractionRequirements {
 		TotalHitCountCollector totalHitCountCollector = new TotalHitCountCollector();
 		luceneCollectors.put( CollectorKey.TOTAL_HIT_COUNT, totalHitCountCollector );
 
+		Map<String, NestedDocsProvider> nestedDocsProviders;
+		if ( requiredNestedDocumentExtractionPaths.isEmpty() ) {
+			nestedDocsProviders = Collections.emptyMap();
+		}
+		else {
+			nestedDocsProviders = new HashMap<>();
+			for ( String nestedDocumentPath : requiredNestedDocumentExtractionPaths ) {
+				nestedDocsProviders.put(
+						nestedDocumentPath,
+						new NestedDocsProvider( nestedDocumentPath, luceneQuery )
+				);
+			}
+		}
+
 		CollectorExecutionContext executionContext =
-				new CollectorExecutionContext( metadataResolver, maxDocs );
+				new CollectorExecutionContext( metadataResolver, nestedDocsProviders, maxDocs );
 
 		for ( CollectorFactory<?> collectorFactory : requiredCollectorFactories ) {
 			Collector collector = collectorFactory.createCollector( executionContext );
 			luceneCollectors.put( collectorFactory, collector );
-			if ( collectorFactory.applyToNestedDocuments() ) {
-				luceneCollectorsForNestedDocuments.add( collector );
-			}
-		}
-
-		ChildrenCollector childrenCollector = null;
-		if ( !requiredNestedDocumentExtractionPaths.isEmpty() ) {
-			childrenCollector = new ChildrenCollector();
-			luceneCollectorsForNestedDocuments.add( childrenCollector );
 		}
 
 		Collector compositeCollector = wrapTimeLimitingCollectorIfNecessary(
 				MultiCollector.wrap( luceneCollectors.values() ), timeoutManager
 		);
 
-		Collector compositeCollectorForNestedDocuments = null;
-		if ( !luceneCollectorsForNestedDocuments.isEmpty() ) {
-			compositeCollectorForNestedDocuments = wrapTimeLimitingCollectorIfNecessary(
-					MultiCollector.wrap( luceneCollectorsForNestedDocuments ), timeoutManager
+		ChildrenCollector childrenCollector = null;
+		Collector collectorForNestedDocuments = null;
+		if ( !requiredNestedDocumentExtractionPaths.isEmpty() ) {
+			childrenCollector = new ChildrenCollector();
+			collectorForNestedDocuments = wrapTimeLimitingCollectorIfNecessary(
+					childrenCollector, timeoutManager
 			);
 		}
 
 		return new LuceneCollectors(
+				luceneQuery,
 				requireFieldDocRescoring, scoreSortFieldIndexForRescoring,
 				requiredNestedDocumentExtractionPaths,
 				topDocsCollector, totalHitCountCollector, childrenCollector,
-				compositeCollector, compositeCollectorForNestedDocuments,
+				compositeCollector, collectorForNestedDocuments,
 				luceneCollectors,
 				timeoutManager
 		);

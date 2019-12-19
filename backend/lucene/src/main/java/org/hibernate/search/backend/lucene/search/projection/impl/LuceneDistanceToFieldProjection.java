@@ -70,7 +70,7 @@ class LuceneDistanceToFieldProjection
 			SearchProjectionExtractContext context) {
 		GeoPointDistanceCollector distanceCollector = context.getCollector( this );
 		return unit.fromMeters( distanceCollector.getDistance(
-				documentResult.getDocId(), context
+				documentResult.getDocId()
 		) );
 	}
 
@@ -97,11 +97,10 @@ class LuceneDistanceToFieldProjection
 
 	@Override
 	public GeoPointDistanceCollector createCollector(CollectorExecutionContext context) {
-		return new GeoPointDistanceCollector( absoluteFieldPath, center, context.getMaxDocs() );
+		return new GeoPointDistanceCollector(
+				absoluteFieldPath, context.getNestedDocsProvider( nestedDocumentPath ),
+				center, context.getMaxDocs()
+		);
 	}
 
-	@Override
-	public boolean applyToNestedDocuments() {
-		return true;
-	}
 }

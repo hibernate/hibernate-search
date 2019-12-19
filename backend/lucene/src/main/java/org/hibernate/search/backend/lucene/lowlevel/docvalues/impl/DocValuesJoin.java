@@ -200,7 +200,8 @@ public class DocValuesJoin {
 		};
 	}
 
-	private static NumericDocValues joinAsSingleValued(SortedNumericDocValues values, long missingValue, BitSet parentDocs, DocIdSetIterator childDocs) {
+	private static NumericDocValues joinAsSingleValued(SortedNumericDocValues values, long missingValue,
+			BitSet parentDocs, DocIdSetIterator childDocs) {
 		return new NumericDocValues() {
 
 			int lastSeenParentDoc = -1;

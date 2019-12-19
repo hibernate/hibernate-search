@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExtractContext;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -21,7 +20,7 @@ import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 
-public class SearchProjectionExtractContext implements CollectorExtractContext {
+public class SearchProjectionExtractContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -48,7 +47,6 @@ public class SearchProjectionExtractContext implements CollectorExtractContext {
 		}
 	}
 
-	@Override
 	public Set<Integer> getNestedDocIds(int docId) {
 		return topDocIdsToNestedDocIds.get( docId );
 	}

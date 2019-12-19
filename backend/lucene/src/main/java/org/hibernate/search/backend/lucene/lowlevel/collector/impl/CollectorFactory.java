@@ -13,10 +13,6 @@ public interface CollectorFactory<C extends Collector> extends CollectorKey<C> {
 
 	C createCollector(CollectorExecutionContext context);
 
-	default boolean applyToNestedDocuments() {
-		return false;
-	}
-
 	CollectorFactory<FacetsCollector> FACETS = context -> new FacetsCollector();
 
 }

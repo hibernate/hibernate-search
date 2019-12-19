@@ -9,20 +9,17 @@ package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
-import java.util.Set;
 
-import org.apache.lucene.geo.GeoEncodingUtils;
-import org.apache.lucene.index.DocValues;
-import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.SortedNumericDocValues;
 import org.apache.lucene.search.Collector;
+import org.apache.lucene.search.DoubleValues;
 import org.apache.lucene.search.LeafCollector;
 import org.apache.lucene.search.Scorable;
 import org.apache.lucene.search.ScoreMode;
-import org.apache.lucene.util.SloppyMath;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DocValuesJoin;
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -36,40 +33,29 @@ public class GeoPointDistanceCollector implements Collector {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
+	private static final double MISSING_VALUE_MARKER = Double.NEGATIVE_INFINITY;
+
 	private final String absoluteFieldPath;
+	private final NestedDocsProvider nestedDocsProvider;
 	private final GeoPoint center;
+
 	private final SpatialResultsCollector distances;
 
-	public GeoPointDistanceCollector(String absoluteFieldPath, GeoPoint center, int hitsCount) {
-		this.center = center;
+	public GeoPointDistanceCollector(String absoluteFieldPath, NestedDocsProvider nestedDocsProvider,
+			GeoPoint center, int hitsCount) {
 		this.absoluteFieldPath = absoluteFieldPath;
+		this.nestedDocsProvider = nestedDocsProvider;
+		this.center = center;
 		this.distances = new SpatialResultsCollector( hitsCount );
 	}
 
-	public Double getDistance(final int docId, CollectorExtractContext context) {
-		Double result = distances.get( docId, center );
-		if ( result != null ) {
-			return result;
-		}
-
-		// try to find the field on nested docs
-		Set<Integer> nestedDocs = context.getNestedDocIds( docId );
-		if ( nestedDocs == null ) {
-			return null;
-		}
-		for ( Integer nestedDocId : nestedDocs ) {
-			result = distances.get( nestedDocId, center );
-			if ( result != null ) {
-				return result;
-			}
-		}
-
-		return null;
+	public Double getDistance(final int docId) {
+		return distances.get( docId );
 	}
 
 	@Override
 	public LeafCollector getLeafCollector(LeafReaderContext context) throws IOException {
-		return new DistanceLeafCollector( context );
+		return new DistanceLeafCollector( context.docBase, createDistanceDocValues( context ) );
 	}
 
 	@Override
@@ -77,46 +63,25 @@ public class GeoPointDistanceCollector implements Collector {
 		return ScoreMode.COMPLETE_NO_SCORES;
 	}
 
+	private DoubleValues createDistanceDocValues(LeafReaderContext context) throws IOException {
+		return DocValuesJoin.getJoinedAsSingleValuedDistance(
+				context, absoluteFieldPath, nestedDocsProvider,
+				center.getLatitude(), center.getLongitude(),
+				MISSING_VALUE_MARKER
+		);
+	}
+
 	/**
 	 * We'll store matching hits in HitEntry instances so to allow retrieving results
 	 * in a second phase after the Collector has run.
-	 * Also take the opportunity to lazily calculate the actual distance: only store
-	 * latitude and longitude coordinates.
 	 */
-	private abstract static class HitEntry {
+	private static class HitEntry {
 		private final int documentId;
+		private final Double distance;
 
-		private HitEntry(int documentId) {
+		private HitEntry(int documentId, Double distance) {
 			this.documentId = documentId;
-		}
-
-		public abstract Double getDistance(GeoPoint center);
-	}
-
-	private static final class CompleteHitEntry extends HitEntry {
-		private final double latitude;
-		private final double longitude;
-
-		private CompleteHitEntry(int documentId, double latitude, double longitude) {
-			super( documentId );
-			this.latitude = latitude;
-			this.longitude = longitude;
-		}
-
-		@Override
-		public Double getDistance(final GeoPoint center) {
-			return SloppyMath.haversinMeters( center.getLatitude(), center.getLongitude(), latitude, longitude );
-		}
-	}
-
-	private static final class IncompleteHitEntry extends HitEntry {
-		private IncompleteHitEntry(int documentId) {
-			super( documentId );
-		}
-
-		@Override
-		public Double getDistance(final GeoPoint center) {
-			return null;
+			this.distance = distance;
 		}
 	}
 
@@ -139,7 +104,7 @@ public class GeoPointDistanceCollector implements Collector {
 			orderedEntries = new ArrayList<>( size );
 		}
 
-		public Double get(int index, GeoPoint center) {
+		public Double get(int index) {
 			//Optimize for an iteration having a monotonic index:
 			int startingPoint = currentIterator;
 			for ( ; currentIterator < orderedEntries.size(); currentIterator++ ) {
@@ -148,7 +113,7 @@ public class GeoPointDistanceCollector implements Collector {
 					break;
 				}
 				if ( currentEntry.documentId == index ) {
-					return currentEntry.getDistance( center );
+					return currentEntry.distance;
 				}
 			}
 
@@ -159,31 +124,26 @@ public class GeoPointDistanceCollector implements Collector {
 					break;
 				}
 				if ( currentEntry.documentId == index ) {
-					return currentEntry.getDistance( center );
+					return currentEntry.distance;
 				}
 			}
 
 			throw log.documentIdNotCollected( index );
 		}
 
-		void put(int documentId, double latitude, double longitude) {
-			orderedEntries.add( new CompleteHitEntry( documentId, latitude, longitude ) );
-		}
-
-		void putIncomplete(int documentId) {
-			orderedEntries.add( new IncompleteHitEntry( documentId ) );
+		void put(int documentId, Double distance) {
+			orderedEntries.add( new HitEntry( documentId, distance ) );
 		}
 	}
 
 	private class DistanceLeafCollector implements LeafCollector {
 
 		private final int docBase;
-		private final SortedNumericDocValues geoPointValues;
+		private final DoubleValues distanceDocValues;
 
-		DistanceLeafCollector(LeafReaderContext context) throws IOException {
-			final LeafReader atomicReader = context.reader();
-			this.geoPointValues = DocValues.getSortedNumeric( atomicReader, absoluteFieldPath );
-			this.docBase = context.docBase;
+		DistanceLeafCollector(int docBase, DoubleValues distanceDocValues) {
+			this.docBase = docBase;
+			this.distanceDocValues = distanceDocValues;
 		}
 
 		@Override
@@ -192,17 +152,14 @@ public class GeoPointDistanceCollector implements Collector {
 		}
 
 		@Override
-		public void collect(int doc) throws IOException {
-			final int absolute = docBase + doc;
-			if ( geoPointValues.advanceExact( doc ) ) {
-				long encodedValue = geoPointValues.nextValue();
-				double latitude = GeoEncodingUtils.decodeLatitude( (int) ( encodedValue >> 32 ) );
-				double longitude = GeoEncodingUtils.decodeLongitude( (int) encodedValue );
-				distances.put( absolute, latitude, longitude );
+		public void collect(int docId) throws IOException {
+			final int absoluteDocId = docBase + docId;
+			Double distance = null;
+			if ( distanceDocValues.advanceExact( docId ) ) {
+				double distanceFromDocValues = distanceDocValues.doubleValue();
+				distance = distanceFromDocValues == MISSING_VALUE_MARKER ? null : distanceFromDocValues;
 			}
-			else {
-				distances.putIncomplete( absolute );
-			}
+			distances.put( absoluteDocId, distance );
 		}
 	}
 }
