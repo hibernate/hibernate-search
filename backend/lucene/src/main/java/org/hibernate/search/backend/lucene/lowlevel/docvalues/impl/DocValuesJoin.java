@@ -8,8 +8,11 @@ package org.hibernate.search.backend.lucene.lowlevel.docvalues.impl;
 
 import java.io.IOException;
 
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.util.common.impl.Contracts;
 
+import org.apache.lucene.index.DocValues;
+import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.index.SortedDocValues;
 import org.apache.lucene.index.SortedNumericDocValues;
@@ -28,7 +31,108 @@ public class DocValuesJoin {
 	private DocValuesJoin() {
 	}
 
-	public static SortedDocValues joinAsSingleValued(SortedDocValues selectedValues, BitSet parentDocs, DocIdSetIterator childDocs) {
+	public static SortedDocValues getJoinedAsSingleValuedSorted(LeafReaderContext context, String field,
+			NestedDocsProvider nestedDocsProvider) throws IOException {
+		SortedDocValues sortedDocValues = DocValues.getSorted( context.reader(), field );
+		if ( nestedDocsProvider == null ) {
+			// No join requested
+			return sortedDocValues;
+		}
+
+		BitSet parentDocs = nestedDocsProvider.parentDocs( context );
+		DocIdSetIterator childDocs = nestedDocsProvider.childDocs( context );
+		if ( parentDocs == null || childDocs == null ) {
+			// No join possible
+			return sortedDocValues;
+		}
+
+		return joinAsSingleValued( sortedDocValues, parentDocs, childDocs );
+	}
+
+	public static NumericDocValues getJoinedAsSingleValuedNumeric(LeafReaderContext context, String field,
+			NestedDocsProvider nestedDocsProvider, long missingValue) throws IOException {
+		NumericDocValues numericDocValues = DocValues.getNumeric( context.reader(), field );
+		if ( nestedDocsProvider == null ) {
+			// No join requested
+			return numericDocValues;
+		}
+
+		SortedNumericDocValues sortedNumericDocValues = DocValues.singleton( numericDocValues );
+		BitSet parentDocs = nestedDocsProvider.parentDocs( context );
+		DocIdSetIterator childDocs = nestedDocsProvider.childDocs( context );
+		if ( parentDocs == null || childDocs == null ) {
+			// No join possible
+			return numericDocValues;
+		}
+
+		return joinAsSingleValued( sortedNumericDocValues, missingValue, parentDocs, childDocs );
+	}
+
+	public static NumericDocValues getJoinedAsSingleValuedNumericDouble(LeafReaderContext context, String field,
+			NestedDocsProvider nestedDocsProvider, double missingValue) throws IOException {
+		NumericDocValues numericDocValues = DocValues.getNumeric( context.reader(), field );
+		if ( nestedDocsProvider == null ) {
+			// No join requested
+			return numericDocValues;
+		}
+
+		SortedNumericDoubleValues sortedNumericDoubleValues =
+				SortedNumericDoubleValues.createDouble( numericDocValues );
+		BitSet parentDocs = nestedDocsProvider.parentDocs( context );
+		DocIdSetIterator childDocs = nestedDocsProvider.childDocs( context );
+		if ( parentDocs == null || childDocs == null ) {
+			// No join possible
+			return numericDocValues;
+		}
+
+		return joinAsSingleValued( sortedNumericDoubleValues, missingValue, parentDocs, childDocs )
+				.getRawDoubleValues();
+	}
+
+	public static NumericDocValues getJoinedAsSingleValuedNumericFloat(LeafReaderContext context, String field,
+			NestedDocsProvider nestedDocsProvider, float missingValue) throws IOException {
+		NumericDocValues numericDocValues = DocValues.getNumeric( context.reader(), field );
+		if ( nestedDocsProvider == null ) {
+			// No join requested
+			return numericDocValues;
+		}
+
+		SortedNumericDoubleValues sortedNumericDoubleValues = SortedNumericDoubleValues.createFloat( numericDocValues );
+		BitSet parentDocs = nestedDocsProvider.parentDocs( context );
+		DocIdSetIterator childDocs = nestedDocsProvider.childDocs( context );
+		if ( parentDocs == null || childDocs == null ) {
+			// No join possible
+			return numericDocValues;
+		}
+
+		return joinAsSingleValued( sortedNumericDoubleValues, missingValue, parentDocs, childDocs )
+				.getRawFloatValues();
+	}
+
+	public static NumericDoubleValues getJoinedAsSingleValuedDistance(LeafReaderContext context, String field,
+			NestedDocsProvider nestedDocsProvider, double centerLatitude, double centerLongitude,
+			double missingValue) throws IOException {
+		SortedNumericDocValues sortedNumericDocValues = context.reader().getSortedNumericDocValues( field );
+		GeoPointDistanceDocValues geoPointDistanceDocValues =
+				new GeoPointDistanceDocValues( sortedNumericDocValues, centerLatitude, centerLongitude );
+		if ( nestedDocsProvider == null ) {
+			// No join requested
+			return geoPointDistanceDocValues;
+		}
+
+		BitSet parentDocs = nestedDocsProvider.parentDocs( context );
+		DocIdSetIterator childDocs = nestedDocsProvider.childDocs( context );
+		if ( parentDocs == null || childDocs == null ) {
+			// No join possible
+			return geoPointDistanceDocValues;
+		}
+
+		SortedNumericDoubleValues sortedNumericDoubleValues =
+				SortedNumericDoubleValues.createDistance( geoPointDistanceDocValues );
+		return joinAsSingleValued( sortedNumericDoubleValues, missingValue, parentDocs, childDocs );
+	}
+
+	private static SortedDocValues joinAsSingleValued(SortedDocValues selectedValues, BitSet parentDocs, DocIdSetIterator childDocs) {
 		Contracts.assertNotNull( parentDocs, "parent docs" );
 		Contracts.assertNotNull( childDocs, "child docs" );
 
@@ -96,8 +200,7 @@ public class DocValuesJoin {
 		};
 	}
 
-	public static NumericDocValues joinAsSingleValued(SortedNumericDocValues values, long missingValue, BitSet parentDocs, DocIdSetIterator childDocs) {
-
+	private static NumericDocValues joinAsSingleValued(SortedNumericDocValues values, long missingValue, BitSet parentDocs, DocIdSetIterator childDocs) {
 		return new NumericDocValues() {
 
 			int lastSeenParentDoc = -1;
@@ -154,8 +257,7 @@ public class DocValuesJoin {
 		};
 	}
 
-	public static NumericDoubleValues joinAsSingleValued(SortedNumericDoubleValues values, double missingValue, BitSet parentDocs, DocIdSetIterator childDocs) {
-
+	private static NumericDoubleValues joinAsSingleValued(SortedNumericDoubleValues values, double missingValue, BitSet parentDocs, DocIdSetIterator childDocs) {
 		return new NumericDoubleValues() {
 
 			int lastSeenParentDoc = 0;
@@ -191,7 +293,7 @@ public class DocValuesJoin {
 	// This method has been taken from MultiValueMode.MIN.
 	// We could have take the one from MultiValueMode.MAX.
 	// Since for single value sorting they are equivalent.
-	protected static int pick(SortedDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc, int maxChildren) throws IOException {
+	private static int pick(SortedDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc, int maxChildren) throws IOException {
 		int ord = Integer.MAX_VALUE;
 		boolean hasValue = false;
 		int count = 0;
@@ -212,7 +314,7 @@ public class DocValuesJoin {
 	// This method has been taken from MultiValueMode.MIN.
 	// We could have take the other ones.
 	// Since for single value sorting they are all equivalent.
-	protected static long pick(SortedNumericDocValues values, long missingValue, DocIdSetIterator docItr, int startDoc, int endDoc,
+	private static long pick(SortedNumericDocValues values, long missingValue, DocIdSetIterator docItr, int startDoc, int endDoc,
 			int maxChildren) throws IOException {
 		boolean hasValue = false;
 		long minValue = Long.MAX_VALUE;
@@ -232,7 +334,7 @@ public class DocValuesJoin {
 	// This method has been taken from MultiValueMode.MIN.
 	// We could have take the other ones.
 	// Since for single value sorting they are all equivalent.
-	protected static double pick(SortedNumericDoubleValues values, double missingValue, DocIdSetIterator docItr, int startDoc, int endDoc,
+	private static double pick(SortedNumericDoubleValues values, double missingValue, DocIdSetIterator docItr, int startDoc, int endDoc,
 			int maxChildren) throws IOException {
 		boolean hasValue = false;
 		double minValue = Double.POSITIVE_INFINITY;

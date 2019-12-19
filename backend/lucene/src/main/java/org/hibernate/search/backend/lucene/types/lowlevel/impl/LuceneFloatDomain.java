@@ -9,10 +9,9 @@ package org.hibernate.search.backend.lucene.types.lowlevel.impl;
 import java.io.IOException;
 import java.util.Collection;
 
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.SortedNumericDoubleValues;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DocValuesJoin;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DocValuesJoin;
 import org.hibernate.search.util.common.data.Range;
 
 import org.apache.lucene.document.FloatDocValuesField;
@@ -24,12 +23,10 @@ import org.apache.lucene.facet.range.DoubleRangeFacetCounts;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
-import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.DoubleValuesSource;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.LongValuesSource;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.util.BitSet;
 
 public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	private static final LuceneNumericDomain<Float> INSTANCE = new LuceneFloatDomain();
@@ -122,19 +119,7 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 
 		@Override
 		protected NumericDocValues getNumericDocValues(LeafReaderContext context, String field) throws IOException {
-			NumericDocValues numericDocValues = super.getNumericDocValues( context, field );
-			if ( nestedDocsProvider == null ) {
-				return numericDocValues;
-			}
-
-			SortedNumericDoubleValues sortedNumericDoubleValues = SortedNumericDoubleValues.createFloat( numericDocValues );
-			BitSet parentDocs = nestedDocsProvider.parentDocs( context );
-			DocIdSetIterator childDocs = nestedDocsProvider.childDocs( context );
-			if ( parentDocs != null && childDocs != null ) {
-				numericDocValues = DocValuesJoin.joinAsSingleValued( sortedNumericDoubleValues, missingValue, parentDocs, childDocs ).getRawFloatValues();
-			}
-
-			return numericDocValues;
+			return DocValuesJoin.getJoinedAsSingleValuedNumericFloat( context, field, nestedDocsProvider, missingValue );
 		}
 	}
 }
