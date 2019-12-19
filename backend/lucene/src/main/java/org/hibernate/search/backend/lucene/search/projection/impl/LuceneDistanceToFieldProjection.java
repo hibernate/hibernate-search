@@ -61,7 +61,6 @@ class LuceneDistanceToFieldProjection
 	@Override
 	public void request(SearchProjectionRequestContext context) {
 		context.requireCollector( this );
-		context.requireStoredField( absoluteFieldPath );
 		context.requireNestedDocumentExtraction( nestedDocumentPath );
 	}
 
