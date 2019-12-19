@@ -83,9 +83,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 
 		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, metadataResolver, offset, limit );
 
-		luceneCollectors.collect(
-				indexSearcher, offset, limit
-		);
+		luceneCollectors.collect( offset, limit );
 
 		LuceneSearchQueryExtractContext extractContext = requestContext.createExtractContext(
 				indexSearcher, luceneCollectors
@@ -136,14 +134,14 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 	}
 
 	private LuceneCollectors buildCollectors(IndexSearcher indexSearcher, IndexReaderMetadataResolver metadataResolver,
-			int offset, Integer limit) {
+			int offset, Integer limit) throws IOException {
 		// TODO HSEARCH-3323 this is very naive for now, we will probably need to implement some scrolling in the collector
 		//  as it is done in Search 5.
 		//  Note that Lucene initializes data structures of this size so setting it to a large value consumes memory.
 		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );
 
 		return extractionRequirements.createCollectors(
-				requestContext.getLuceneQuery(), requestContext.getLuceneSort(),
+				indexSearcher, requestContext.getLuceneQuery(), requestContext.getLuceneSort(),
 				metadataResolver, maxDocs, timeoutManager
 		);
 	}

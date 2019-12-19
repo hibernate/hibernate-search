@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -15,7 +16,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.HibernateSearchDocumentIdToLuceneDocIdMapCollector;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExecutionContext;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
@@ -25,6 +25,7 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.ChildrenColle
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 
 import org.apache.lucene.search.Collector;
+import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.MultiCollector;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
@@ -55,8 +56,9 @@ public final class ExtractionRequirements {
 		storedFieldVisitor = builder.createStoredFieldVisitor();
 	}
 
-	public LuceneCollectors createCollectors(Query luceneQuery, Sort sort,
-			IndexReaderMetadataResolver metadataResolver, int maxDocs, TimeoutManager timeoutManager) {
+	public LuceneCollectors createCollectors(IndexSearcher indexSearcher, Query luceneQuery, Sort sort,
+			IndexReaderMetadataResolver metadataResolver, int maxDocs, TimeoutManager timeoutManager)
+			throws IOException {
 		TopDocsCollector<?> topDocsCollector = null;
 		Integer scoreSortFieldIndexForRescoring = null;
 		boolean requireFieldDocRescoring = false;
@@ -106,6 +108,7 @@ public final class ExtractionRequirements {
 		luceneCollectors.put( CollectorKey.TOTAL_HIT_COUNT, totalHitCountCollector );
 
 		Map<String, NestedDocsProvider> nestedDocsProviders;
+		ChildrenCollector childrenCollector = null;
 		if ( requiredNestedDocumentExtractionPaths.isEmpty() ) {
 			nestedDocsProviders = Collections.emptyMap();
 		}
@@ -117,6 +120,11 @@ public final class ExtractionRequirements {
 						new NestedDocsProvider( nestedDocumentPath, luceneQuery )
 				);
 			}
+
+			NestedDocsProvider nestedDocsProvider =
+					new NestedDocsProvider( requiredNestedDocumentExtractionPaths, luceneQuery );
+			childrenCollector = new ChildrenCollector( indexSearcher, nestedDocsProvider );
+			luceneCollectors.put( CollectorKey.CHILDREN, childrenCollector );
 		}
 
 		CollectorExecutionContext executionContext =
@@ -131,21 +139,12 @@ public final class ExtractionRequirements {
 				MultiCollector.wrap( luceneCollectors.values() ), timeoutManager
 		);
 
-		ChildrenCollector childrenCollector = null;
-		Collector collectorForNestedDocuments = null;
-		if ( !requiredNestedDocumentExtractionPaths.isEmpty() ) {
-			childrenCollector = new ChildrenCollector();
-			collectorForNestedDocuments = wrapTimeLimitingCollectorIfNecessary(
-					childrenCollector, timeoutManager
-			);
-		}
-
 		return new LuceneCollectors(
+				indexSearcher,
 				luceneQuery,
 				requireFieldDocRescoring, scoreSortFieldIndexForRescoring,
-				requiredNestedDocumentExtractionPaths,
 				topDocsCollector, totalHitCountCollector, childrenCollector,
-				compositeCollector, collectorForNestedDocuments,
+				compositeCollector,
 				luceneCollectors,
 				timeoutManager
 		);
@@ -187,7 +186,6 @@ public final class ExtractionRequirements {
 
 		public void requireNestedDocumentExtraction(String nestedDocumentPath) {
 			if ( nestedDocumentPath != null ) {
-				requireCollector( HibernateSearchDocumentIdToLuceneDocIdMapCollector.FACTORY );
 				this.requiredNestedDocumentExtractionPaths.add( nestedDocumentPath );
 			}
 		}

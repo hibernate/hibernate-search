@@ -28,4 +28,6 @@ public interface CollectorKey<C extends Collector> {
 
 	CollectorKey<TopDocsCollector> TOP_DOCS = create();
 
+	CollectorKey<ChildrenCollector> CHILDREN = create();
+
 }
