@@ -13,7 +13,6 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExecutionContext;
@@ -21,7 +20,7 @@ import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFact
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.ChildrenCollector;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.StoredFieldsCollector;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 
 import org.apache.lucene.search.Collector;
@@ -48,14 +47,14 @@ public final class ExtractionRequirements {
 
 	private final Set<String> requiredNestedDocumentExtractionPaths;
 
-	private final Optional<ReusableDocumentStoredFieldVisitor> storedFieldVisitor;
+	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
 
 	private ExtractionRequirements(Builder builder) {
 		requireScore = builder.requireScore;
 		requiredCollectorForAllMatchingDocsFactories = builder.requiredCollectorForAllMatchingDocsFactories;
 		requiredCollectorForTopDocsFactories = builder.requiredCollectorForTopDocsFactories;
 		requiredNestedDocumentExtractionPaths = builder.requiredNestedDocumentExtractionPaths;
-		storedFieldVisitor = builder.createStoredFieldVisitor();
+		storedFieldVisitor = builder.createStoredFieldVisitorOrNull();
 	}
 
 	public LuceneCollectors createCollectors(IndexSearcher indexSearcher, Query luceneQuery, Sort sort,
@@ -111,8 +110,10 @@ public final class ExtractionRequirements {
 		collectorForAllMatchingDocsMap.put( CollectorKey.TOTAL_HIT_COUNT, totalHitCountCollector );
 
 		Map<String, NestedDocsProvider> nestedDocsProviders;
+		NestedDocsProvider allNestedDocsProvider;
 		if ( requiredNestedDocumentExtractionPaths.isEmpty() ) {
 			nestedDocsProviders = Collections.emptyMap();
+			allNestedDocsProvider = null;
 		}
 		else {
 			nestedDocsProviders = new HashMap<>();
@@ -123,10 +124,14 @@ public final class ExtractionRequirements {
 				);
 			}
 
-			NestedDocsProvider nestedDocsProvider =
+			allNestedDocsProvider =
 					new NestedDocsProvider( requiredNestedDocumentExtractionPaths, luceneQuery );
-			ChildrenCollector childrenCollector = new ChildrenCollector( indexSearcher, nestedDocsProvider );
-			collectorForTopDocsMap.put( CollectorKey.CHILDREN, childrenCollector );
+		}
+
+		if ( storedFieldVisitor != null ) {
+			StoredFieldsCollector storedFieldsCollector =
+					new StoredFieldsCollector( indexSearcher, allNestedDocsProvider, storedFieldVisitor );
+			collectorForTopDocsMap.put( CollectorKey.STORED_FIELDS, storedFieldsCollector );
 		}
 
 		CollectorExecutionContext executionContext =
@@ -164,10 +169,6 @@ public final class ExtractionRequirements {
 				collectorsForAllMatchingDocs, collectorsForTopDocs,
 				timeoutManager
 		);
-	}
-
-	public Optional<ReusableDocumentStoredFieldVisitor> getStoredFieldVisitor() {
-		return storedFieldVisitor;
 	}
 
 	private Collector wrapTimeLimitingCollectorIfNecessary(Collector collector, TimeoutManager timeoutManager) {
@@ -226,15 +227,15 @@ public final class ExtractionRequirements {
 			return new ExtractionRequirements( this );
 		}
 
-		public Optional<ReusableDocumentStoredFieldVisitor> createStoredFieldVisitor() {
+		public ReusableDocumentStoredFieldVisitor createStoredFieldVisitorOrNull() {
 			if ( requireAllStoredFields ) {
-				return Optional.of( new ReusableDocumentStoredFieldVisitor() );
+				return new ReusableDocumentStoredFieldVisitor();
 			}
 			else if ( !requiredStoredFields.isEmpty() ) {
-				return Optional.of( new ReusableDocumentStoredFieldVisitor( requiredStoredFields ) );
+				return new ReusableDocumentStoredFieldVisitor( requiredStoredFields );
 			}
 			else {
-				return Optional.empty();
+				return null;
 			}
 		}
 	}

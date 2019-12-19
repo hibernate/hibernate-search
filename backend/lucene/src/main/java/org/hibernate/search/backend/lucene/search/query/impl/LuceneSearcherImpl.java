@@ -12,20 +12,19 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.StoredFieldsCollector;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TimeoutCountCollectorManager;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequirements;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneCollectors;
 import org.hibernate.search.backend.lucene.search.extraction.impl.LuceneResult;
-import org.hibernate.search.backend.lucene.search.extraction.impl.ReusableDocumentStoredFieldVisitor;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
 import org.hibernate.search.backend.lucene.search.projection.impl.SearchProjectionExtractContext;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TimeoutCountCollectorManager;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
@@ -158,10 +157,8 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		}
 	}
 
-	private List<Object> extractHits(LuceneSearchQueryExtractContext extractContext) throws IOException {
-		Optional<ReusableDocumentStoredFieldVisitor> storedFieldVisitorOptional = extractionRequirements.getStoredFieldVisitor();
+	private List<Object> extractHits(LuceneSearchQueryExtractContext extractContext) {
 		ProjectionHitMapper<?, ?> projectionHitMapper = extractContext.getProjectionHitMapper();
-		IndexSearcher indexSearcher = extractContext.getIndexSearcher();
 
 		TopDocs topDocs = extractContext.getTopDocs();
 		if ( topDocs == null ) {
@@ -171,6 +168,9 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		List<Object> extractedData = new ArrayList<>( topDocs.scoreDocs.length );
 
 		SearchProjectionExtractContext projectionExtractContext = extractContext.createProjectionExtractContext();
+
+		StoredFieldsCollector storedFieldsCollector =
+				projectionExtractContext.getCollector( CollectorKey.STORED_FIELDS );
 
 		for ( int i = 0; i < topDocs.scoreDocs.length; i++ ) {
 			// Check for timeout every 16 elements.
@@ -182,20 +182,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 			}
 
 			ScoreDoc hit = topDocs.scoreDocs[i];
-			Document document = null;
-			if ( storedFieldVisitorOptional.isPresent() ) {
-				ReusableDocumentStoredFieldVisitor storedFieldVisitor = storedFieldVisitorOptional.get();
-				// add root document contribution
-				indexSearcher.doc( hit.doc, storedFieldVisitor );
-				// add nested documents contribution
-				Set<Integer> nestedDocIdsForDocument = projectionExtractContext.getNestedDocIds( hit.doc );
-				if ( nestedDocIdsForDocument != null ) {
-					for ( Integer child : nestedDocIdsForDocument ) {
-						indexSearcher.doc( child, storedFieldVisitor );
-					}
-				}
-				document = storedFieldVisitor.getDocumentAndReset();
-			}
+			Document document = storedFieldsCollector == null ? null : storedFieldsCollector.getDocument( hit.doc );
 
 			LuceneResult luceneResult = new LuceneResult( document, hit.doc, hit.score );
 
