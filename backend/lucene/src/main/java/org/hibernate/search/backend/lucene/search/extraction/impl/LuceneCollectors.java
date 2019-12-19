@@ -7,11 +7,7 @@
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
 
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.ChildrenCollector;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.ExplicitDocIdsQuery;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
@@ -47,7 +43,6 @@ public class LuceneCollectors {
 
 	private long totalHitCount = 0;
 	private TopDocs topDocs = null;
-	private Map<Integer, Set<Integer>> topDocIdsToNestedDocIds = Collections.emptyMap();
 
 	LuceneCollectors(IndexSearcher indexSearcher, Query luceneQuery,
 			boolean requireFieldDocRescoring, Integer scoreSortFieldIndexForRescoring,
@@ -98,11 +93,6 @@ public class LuceneCollectors {
 		catch (TimeLimitingCollector.TimeExceededException e) {
 			timeoutManager.forceTimedOut();
 		}
-
-		ChildrenCollector childrenCollector = topDocsCollectors.get( CollectorKey.CHILDREN );
-		if ( childrenCollector != null ) {
-			this.topDocIdsToNestedDocIds = childrenCollector.getChildren();
-		}
 	}
 
 	public CollectorSet getAllMatchingDocsCollectors() {
@@ -119,10 +109,6 @@ public class LuceneCollectors {
 
 	public TopDocs getTopDocs() {
 		return topDocs;
-	}
-
-	public Map<Integer, Set<Integer>> getTopDocIdsToNestedDocIds() {
-		return topDocIdsToNestedDocIds;
 	}
 
 	private void extractTopDocs(TopDocsCollector<?> topDocsCollector, int offset, Integer limit) {

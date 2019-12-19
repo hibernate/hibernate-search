@@ -8,13 +8,14 @@ package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
+import org.hibernate.search.backend.lucene.search.extraction.impl.ReusableDocumentStoredFieldVisitor;
 import org.hibernate.search.util.common.AssertionFailure;
 
+import org.apache.lucene.document.Document;
+import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.IndexSearcher;
@@ -22,36 +23,55 @@ import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.SimpleCollector;
 import org.apache.lucene.search.Weight;
 
-public class ChildrenCollector extends SimpleCollector {
+/**
+ * Collects stored fields as Document instances.
+ * <p>
+ * <strong>WARNING:</strong> this relies on reader.document() to load the value of stored field
+ * for <strong>each single matching document</strong>,
+ * Use with care.
+ */
+public class StoredFieldsCollector extends SimpleCollector {
 
 	private final NestedDocsProvider nestedDocsProvider;
 	private final Weight childrenWeight;
+	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
 
 	private int currentLeafDocBase;
 	private int currentLeafLastSeenParentDoc;
 	private DocIdSetIterator currentLeafChildDocs;
+	private LeafReader currentLeafReader;
 
-	private final Map<Integer, Set<Integer>> children = new HashMap<>();
+	private final Map<Integer, Document> documents = new HashMap<>();
 
-	public ChildrenCollector(IndexSearcher indexSearcher, NestedDocsProvider nestedDocsProvider) throws IOException {
-		this.childrenWeight = nestedDocsProvider.childDocsWeight( indexSearcher );
+	public StoredFieldsCollector(IndexSearcher indexSearcher, NestedDocsProvider nestedDocsProvider,
+			ReusableDocumentStoredFieldVisitor storedFieldVisitor) throws IOException {
+		this.childrenWeight = nestedDocsProvider == null ? null : nestedDocsProvider.childDocsWeight( indexSearcher );
 		this.nestedDocsProvider = nestedDocsProvider;
+		this.storedFieldVisitor = storedFieldVisitor;
 	}
 
 	@Override
 	public String toString() {
 		final StringBuilder sb = new StringBuilder( "ChildrenCollector{" );
-		sb.append( "children=" ).append( children );
+		sb.append( "documents=" ).append( documents );
 		sb.append( '}' );
 		return sb.toString();
 	}
 
 	@Override
 	public void collect(int parentDoc) throws IOException {
-		if ( currentLeafChildDocs == null ) {
-			return; // No children in this leaf
+		// add nested documents contribution
+		if ( currentLeafChildDocs != null ) {
+			collectChildDocs( parentDoc );
 		}
 
+		// add root document contribution
+		currentLeafReader.document( parentDoc, storedFieldVisitor );
+
+		documents.put( currentLeafDocBase + parentDoc, storedFieldVisitor.getDocumentAndReset() );
+	}
+
+	private void collectChildDocs(int parentDoc) throws IOException {
 		if ( parentDoc < currentLeafLastSeenParentDoc ) {
 			throw new AssertionFailure( "Collector.collect called in unexpected order" );
 		}
@@ -70,11 +90,8 @@ public class ChildrenCollector extends SimpleCollector {
 			return;
 		}
 
-		Set<Integer> childrenOfThisDoc = new HashSet<>();
-		children.put( parentDoc, childrenOfThisDoc );
-
 		for ( int childDoc = firstChildDoc; childDoc < parentDoc; childDoc = currentLeafChildDocs.nextDoc() ) {
-			childrenOfThisDoc.add( currentLeafDocBase + childDoc );
+			currentLeafReader.document( childDoc, storedFieldVisitor );
 		}
 	}
 
@@ -83,15 +100,16 @@ public class ChildrenCollector extends SimpleCollector {
 		return ScoreMode.COMPLETE_NO_SCORES;
 	}
 
-	public Map<Integer, Set<Integer>> getChildren() {
-		return children;
+	public Document getDocument(int docId) {
+		return documents.get( docId );
 	}
 
 	@Override
 	protected void doSetNextReader(LeafReaderContext context) throws IOException {
 		this.currentLeafDocBase = context.docBase;
 		this.currentLeafLastSeenParentDoc = -1;
+		this.currentLeafReader = context.reader();
 
-		this.currentLeafChildDocs = nestedDocsProvider.childDocs( childrenWeight, context );
+		this.currentLeafChildDocs = nestedDocsProvider == null ? null : nestedDocsProvider.childDocs( childrenWeight, context );
 	}
 }
