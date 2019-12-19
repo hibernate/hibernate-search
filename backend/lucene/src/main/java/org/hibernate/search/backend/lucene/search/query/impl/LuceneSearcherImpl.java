@@ -84,7 +84,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		LuceneCollectors luceneCollectors = buildCollectors( indexSearcher, metadataResolver, offset, limit );
 
 		luceneCollectors.collect(
-				indexSearcher, requestContext.getLuceneQuery(), offset, limit
+				indexSearcher, offset, limit
 		);
 
 		LuceneSearchQueryExtractContext extractContext = requestContext.createExtractContext(
@@ -142,7 +142,10 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		//  Note that Lucene initializes data structures of this size so setting it to a large value consumes memory.
 		int maxDocs = getMaxDocs( indexSearcher.getIndexReader(), offset, limit );
 
-		return extractionRequirements.createCollectors( requestContext.getLuceneSort(), metadataResolver, maxDocs, timeoutManager );
+		return extractionRequirements.createCollectors(
+				requestContext.getLuceneQuery(), requestContext.getLuceneSort(),
+				metadataResolver, maxDocs, timeoutManager
+		);
 	}
 
 	private int getMaxDocs(IndexReader reader, int offset, Integer limit) {
