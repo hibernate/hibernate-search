@@ -139,7 +139,7 @@ public final class ExtractionRequirements {
 
 		for ( CollectorFactory<?> collectorFactory : requiredCollectorForAllMatchingDocsFactories ) {
 			Collector collector = collectorFactory.createCollector( executionContext );
-			collectorForAllMatchingDocsMap.put( collectorFactory, collector );
+			collectorForAllMatchingDocsMap.put( collectorFactory.getCollectorKey(), collector );
 		}
 		CollectorSet collectorsForAllMatchingDocs = new CollectorSet(
 				wrapTimeLimitingCollectorIfNecessary(
@@ -150,7 +150,7 @@ public final class ExtractionRequirements {
 
 		for ( CollectorFactory<?> collectorFactory : requiredCollectorForTopDocsFactories ) {
 			Collector collector = collectorFactory.createCollector( executionContext );
-			collectorForTopDocsMap.put( collectorFactory, collector );
+			collectorForTopDocsMap.put( collectorFactory.getCollectorKey(), collector );
 		}
 		CollectorSet collectorsForTopDocs = null;
 		if ( !collectorForTopDocsMap.isEmpty() ) {

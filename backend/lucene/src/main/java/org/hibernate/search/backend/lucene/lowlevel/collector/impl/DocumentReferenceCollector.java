@@ -23,7 +23,19 @@ import org.apache.lucene.search.SimpleCollector;
 
 public final class DocumentReferenceCollector extends SimpleCollector {
 
-	public static final CollectorFactory<DocumentReferenceCollector> FACTORY = DocumentReferenceCollector::new;
+	public static final CollectorKey<DocumentReferenceCollector> KEY = CollectorKey.create();
+
+	public static final CollectorFactory<DocumentReferenceCollector> FACTORY = new CollectorFactory<DocumentReferenceCollector>() {
+		@Override
+		public DocumentReferenceCollector createCollector(CollectorExecutionContext context) {
+			return new DocumentReferenceCollector( context );
+		}
+
+		@Override
+		public CollectorKey<DocumentReferenceCollector> getCollectorKey() {
+			return KEY;
+		}
+	};
 
 	private final IndexReaderMetadataResolver metadataResolver;
 

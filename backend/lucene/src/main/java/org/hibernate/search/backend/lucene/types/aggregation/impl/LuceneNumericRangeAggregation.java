@@ -15,9 +15,9 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.FacetsCollectorFactory;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
@@ -59,14 +59,14 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 
 	@Override
 	public void request(AggregationRequestContext context) {
-		context.requireCollector( CollectorFactory.FACETS );
+		context.requireCollector( FacetsCollectorFactory.INSTANCE );
 	}
 
 	@Override
 	public Map<Range<K>, Long> extract(AggregationExtractContext context) throws IOException {
 		LuceneNumericDomain<E> numericDomain = codec.getDomain();
 
-		FacetsCollector facetsCollector = context.getCollector( CollectorFactory.FACETS );
+		FacetsCollector facetsCollector = context.getCollector( FacetsCollectorFactory.KEY );
 
 		Facets facetsCount = numericDomain.createRangeFacetCounts(
 				absoluteFieldPath, facetsCollector, encodedRangesInOrder

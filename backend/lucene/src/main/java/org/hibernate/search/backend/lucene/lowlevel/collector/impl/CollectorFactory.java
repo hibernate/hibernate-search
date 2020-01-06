@@ -6,13 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 
-import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.search.Collector;
 
-public interface CollectorFactory<C extends Collector> extends CollectorKey<C> {
+public interface CollectorFactory<C extends Collector> {
 
 	C createCollector(CollectorExecutionContext context);
 
-	CollectorFactory<FacetsCollector> FACETS = context -> new FacetsCollector();
+	CollectorKey<C> getCollectorKey();
 
 }
