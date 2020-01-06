@@ -102,19 +102,13 @@ public final class ExtractionRequirements {
 		collectorsForAllMatchingDocsBuilder.addAll( requiredCollectorForAllMatchingDocsFactories );
 		CollectorSet collectorsForAllMatchingDocs = collectorsForAllMatchingDocsBuilder.build();
 
-		CollectorSet collectorsForTopDocs = null;
-		if ( !requiredCollectorForTopDocsFactories.isEmpty() ) {
-			CollectorSet.Builder collectorForTopDocsBuilder =
-					new CollectorSet.Builder( executionContext, timeoutManager );
-			collectorForTopDocsBuilder.addAll( requiredCollectorForTopDocsFactories );
-			collectorsForTopDocs = collectorForTopDocsBuilder.build();
-		}
-
 		return new LuceneCollectors(
+				metadataResolver,
 				indexSearcher,
 				luceneQuery,
 				requireFieldDocRescoring, scoreSortFieldIndexForRescoring,
-				collectorsForAllMatchingDocs, collectorsForTopDocs,
+				collectorsForAllMatchingDocs,
+				requiredCollectorForTopDocsFactories,
 				timeoutManager
 		);
 	}
