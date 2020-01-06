@@ -23,12 +23,8 @@ public final class SearchProjectionRequestContext {
 		extractionRequirementsBuilder.requireAllStoredFields();
 	}
 
-	public void requireStoredField(String absoluteFieldPath) {
-		extractionRequirementsBuilder.requireStoredField( absoluteFieldPath );
-	}
-
-	public void requireNestedDocumentExtraction(String nestedDocumentPath) {
-		extractionRequirementsBuilder.requireNestedDocumentExtraction( nestedDocumentPath );
+	public void requireStoredField(String absoluteFieldPath, String nestedDocumentPath) {
+		extractionRequirementsBuilder.requireStoredField( absoluteFieldPath, nestedDocumentPath );
 	}
 
 	public void requireScore() {

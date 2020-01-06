@@ -6,24 +6,24 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 
-import java.util.Map;
-
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
+
+import org.apache.lucene.search.Query;
 
 public final class CollectorExecutionContext {
 
 	private final IndexReaderMetadataResolver metadataResolver;
 
-	private final Map<String, NestedDocsProvider> nestedDocsProviders;
+	private final Query luceneQuery;
 
 	private final int maxDocs;
 
 	public CollectorExecutionContext(IndexReaderMetadataResolver metadataResolver,
-			Map<String, NestedDocsProvider> nestedDocsProviders,
+			Query luceneQuery,
 			int maxDocs) {
 		this.metadataResolver = metadataResolver;
-		this.nestedDocsProviders = nestedDocsProviders;
+		this.luceneQuery = luceneQuery;
 		this.maxDocs = maxDocs;
 	}
 
@@ -31,8 +31,8 @@ public final class CollectorExecutionContext {
 		return metadataResolver;
 	}
 
-	public NestedDocsProvider getNestedDocsProvider(String nestedDocumentPath) {
-		return nestedDocsProviders.get( nestedDocumentPath );
+	public NestedDocsProvider createNestedDocsProvider(String nestedDocumentPath) {
+		return new NestedDocsProvider( nestedDocumentPath, luceneQuery );
 	}
 
 	public int getMaxDocs() {

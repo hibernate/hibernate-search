@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
 
 import static org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields.internalFieldName;
 
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
@@ -85,9 +85,10 @@ public final class LuceneGeoPointFieldCodec implements LuceneFieldCodec<GeoPoint
 	}
 
 	@Override
-	public void contributeStoredFields(String absoluteFieldPath, Consumer<String> collector) {
-		collector.accept( getLatitudeAbsoluteFieldPath( absoluteFieldPath ) );
-		collector.accept( getLongitudeAbsoluteFieldPath( absoluteFieldPath ) );
+	public void contributeStoredFields(String absoluteFieldPath, String nestedDocumentPath,
+			BiConsumer<String, String> collector) {
+		collector.accept( getLatitudeAbsoluteFieldPath( absoluteFieldPath ), nestedDocumentPath );
+		collector.accept( getLongitudeAbsoluteFieldPath( absoluteFieldPath ), nestedDocumentPath );
 	}
 
 	@Override
