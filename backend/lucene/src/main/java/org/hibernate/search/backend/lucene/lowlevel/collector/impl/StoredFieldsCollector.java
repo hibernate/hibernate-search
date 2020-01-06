@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ReusableDocumentStoredFieldVisitor;
@@ -32,6 +33,32 @@ import org.apache.lucene.search.Weight;
  */
 public class StoredFieldsCollector extends SimpleCollector {
 
+	public static final CollectorKey<StoredFieldsCollector> KEY = CollectorKey.create();
+
+	public static CollectorFactory<StoredFieldsCollector> factory(
+			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
+			Set<String> requiredNestedDocumentPathsForStoredFields) {
+		return new CollectorFactory<StoredFieldsCollector>() {
+			@Override
+			public StoredFieldsCollector createCollector(CollectorExecutionContext context) throws IOException {
+				NestedDocsProvider nestedDocsProvider;
+				if ( requiredNestedDocumentPathsForStoredFields.isEmpty() ) {
+					nestedDocsProvider = null;
+				}
+				else {
+					nestedDocsProvider = context.createNestedDocsProvider( requiredNestedDocumentPathsForStoredFields );
+				}
+
+				return new StoredFieldsCollector( nestedDocsProvider, storedFieldVisitor, context.getIndexSearcher() );
+			}
+
+			@Override
+			public CollectorKey<StoredFieldsCollector> getCollectorKey() {
+				return KEY;
+			}
+		};
+	}
+
 	private final NestedDocsProvider nestedDocsProvider;
 	private final Weight childrenWeight;
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
@@ -43,8 +70,9 @@ public class StoredFieldsCollector extends SimpleCollector {
 
 	private final Map<Integer, Document> documents = new HashMap<>();
 
-	public StoredFieldsCollector(IndexSearcher indexSearcher, NestedDocsProvider nestedDocsProvider,
-			ReusableDocumentStoredFieldVisitor storedFieldVisitor) throws IOException {
+	public StoredFieldsCollector(NestedDocsProvider nestedDocsProvider,
+			ReusableDocumentStoredFieldVisitor storedFieldVisitor,
+			IndexSearcher indexSearcher) throws IOException {
 		this.childrenWeight = nestedDocsProvider == null ? null : nestedDocsProvider.childDocsWeight( indexSearcher );
 		this.nestedDocsProvider = nestedDocsProvider;
 		this.storedFieldVisitor = storedFieldVisitor;

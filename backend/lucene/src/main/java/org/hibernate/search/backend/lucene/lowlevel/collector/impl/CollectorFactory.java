@@ -6,11 +6,13 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 
+import java.io.IOException;
+
 import org.apache.lucene.search.Collector;
 
 public interface CollectorFactory<C extends Collector> {
 
-	C createCollector(CollectorExecutionContext context);
+	C createCollector(CollectorExecutionContext context) throws IOException;
 
 	CollectorKey<C> getCollectorKey();
 
