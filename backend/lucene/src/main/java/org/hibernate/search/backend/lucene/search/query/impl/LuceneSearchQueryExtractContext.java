@@ -53,7 +53,7 @@ class LuceneSearchQueryExtractContext {
 	SearchProjectionExtractContext createProjectionExtractContext() {
 		return new SearchProjectionExtractContext(
 				indexSearcher, luceneQuery,
-				luceneCollectors.getTopDocsCollectors()
+				luceneCollectors.getCollectorsForTopDocs()
 		);
 	}
 
@@ -65,7 +65,7 @@ class LuceneSearchQueryExtractContext {
 		return new AggregationExtractContext(
 				indexSearcher.getIndexReader(),
 				convertContext,
-				luceneCollectors.getAllMatchingDocsCollectors()
+				luceneCollectors.getCollectorsForAllMatchingDocs()
 		);
 	}
 }
