@@ -42,10 +42,6 @@ class LuceneSearchQueryExtractContext {
 		this.luceneCollectors = luceneCollectors;
 	}
 
-	IndexSearcher getIndexSearcher() {
-		return indexSearcher;
-	}
-
 	ProjectionHitMapper<?, ?> getProjectionHitMapper() {
 		return projectionHitMapper;
 	}
