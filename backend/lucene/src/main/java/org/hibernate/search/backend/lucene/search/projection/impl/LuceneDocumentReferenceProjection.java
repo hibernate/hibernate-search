@@ -30,7 +30,7 @@ class LuceneDocumentReferenceProjection implements LuceneSearchProjection<Docume
 	@Override
 	public DocumentReference extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExtractContext context) {
-		return context.getCollector( DocumentReferenceCollector.FACTORY ).get( documentResult.getDocId() );
+		return context.getCollector( DocumentReferenceCollector.KEY ).get( documentResult.getDocId() );
 	}
 
 	@Override

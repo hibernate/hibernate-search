@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.projection.impl;
 import java.util.Objects;
 import java.util.Set;
 
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.GeoPointDistanceCollector;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExecutionContext;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
@@ -29,33 +30,15 @@ class LuceneDistanceToFieldProjection
 
 	private final DistanceUnit unit;
 
+	private final DistanceCollectorKey collectorKey;
+
 	LuceneDistanceToFieldProjection(Set<String> indexNames, String absoluteFieldPath, String nestedDocumentPath, GeoPoint center, DistanceUnit unit) {
 		this.indexNames = indexNames;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.nestedDocumentPath = nestedDocumentPath;
 		this.center = center;
 		this.unit = unit;
-	}
-
-	/**
-	 * Necessary in order to share a single collector if there are multiple similar projections.
-	 * See {@link #createCollector(CollectorExecutionContext)}, {@link #request(SearchProjectionRequestContext)}.
-	 */
-	@Override
-	public boolean equals(Object obj) {
-		if ( obj == this ) {
-			return true;
-		}
-		if ( obj == null || !obj.getClass().equals( getClass() ) ) {
-			return false;
-		}
-		LuceneDistanceToFieldProjection other = (LuceneDistanceToFieldProjection) obj;
-		return absoluteFieldPath.equals( other.absoluteFieldPath ) && center.equals( other.center );
-	}
-
-	@Override
-	public int hashCode() {
-		return Objects.hash( absoluteFieldPath, center );
+		this.collectorKey = new DistanceCollectorKey( absoluteFieldPath, center );
 	}
 
 	@Override
@@ -67,7 +50,7 @@ class LuceneDistanceToFieldProjection
 	@Override
 	public Double extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExtractContext context) {
-		GeoPointDistanceCollector distanceCollector = context.getCollector( this );
+		GeoPointDistanceCollector distanceCollector = context.getCollector( collectorKey );
 		return unit.fromMeters( distanceCollector.getDistance(
 				documentResult.getDocId()
 		) );
@@ -100,6 +83,43 @@ class LuceneDistanceToFieldProjection
 				absoluteFieldPath, context.getNestedDocsProvider( nestedDocumentPath ),
 				center, context.getMaxDocs()
 		);
+	}
+
+	@Override
+	public CollectorKey<GeoPointDistanceCollector> getCollectorKey() {
+		return collectorKey;
+	}
+
+	/**
+	 * Necessary in order to share a single collector if there are multiple similar projections.
+	 * See {@link #createCollector(CollectorExecutionContext)}, {@link #request(SearchProjectionRequestContext)}.
+	 */
+	private static final class DistanceCollectorKey implements CollectorKey<GeoPointDistanceCollector> {
+
+		private final String absoluteFieldPath;
+		private final GeoPoint center;
+
+		private DistanceCollectorKey(String absoluteFieldPath, GeoPoint center) {
+			this.absoluteFieldPath = absoluteFieldPath;
+			this.center = center;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( obj == this ) {
+				return true;
+			}
+			if ( obj == null || !obj.getClass().equals( getClass() ) ) {
+				return false;
+			}
+			DistanceCollectorKey other = (DistanceCollectorKey) obj;
+			return absoluteFieldPath.equals( other.absoluteFieldPath ) && center.equals( other.center );
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash( absoluteFieldPath, center );
+		}
 	}
 
 }

@@ -32,7 +32,7 @@ public class LuceneEntityReferenceProjection<R> implements LuceneSearchProjectio
 	public R extract(ProjectionHitMapper<?, ?> mapper, LuceneResult documentResult,
 			SearchProjectionExtractContext context) {
 		DocumentReference documentReference =
-				context.getCollector( DocumentReferenceCollector.FACTORY ).get( documentResult.getDocId() );
+				context.getCollector( DocumentReferenceCollector.KEY ).get( documentResult.getDocId() );
 		return (R) mapper.convertReference( documentReference );
 	}
 
