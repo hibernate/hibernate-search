@@ -8,9 +8,7 @@ package org.hibernate.search.backend.lucene.search.extraction.impl;
 
 import java.io.IOException;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
-import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExecutionContext;
@@ -22,11 +20,9 @@ import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.MultiCollector;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
-import org.apache.lucene.search.TimeLimitingCollector;
 import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopFieldCollector;
 import org.apache.lucene.search.TopScoreDocCollector;
@@ -51,12 +47,15 @@ public final class ExtractionRequirements {
 	public LuceneCollectors createCollectors(IndexSearcher indexSearcher, Query luceneQuery, Sort sort,
 			IndexReaderMetadataResolver metadataResolver, int maxDocs, TimeoutManager timeoutManager)
 			throws IOException {
-		TopDocsCollector<?> topDocsCollector = null;
+		TopDocsCollector<?> topDocsCollector;
 		Integer scoreSortFieldIndexForRescoring = null;
 		boolean requireFieldDocRescoring = false;
 
-		Map<CollectorKey<?>, Collector> collectorForAllMatchingDocsMap = new LinkedHashMap<>();
-		Map<CollectorKey<?>, Collector> collectorForTopDocsMap = new LinkedHashMap<>();
+		CollectorExecutionContext executionContext =
+				new CollectorExecutionContext( metadataResolver, indexSearcher, luceneQuery, maxDocs );
+
+		CollectorSet.Builder collectorsForAllMatchingDocsBuilder =
+				new CollectorSet.Builder( executionContext, timeoutManager );
 
 		if ( maxDocs > 0 ) {
 			if ( sort == null ) {
@@ -94,38 +93,21 @@ public final class ExtractionRequirements {
 						Integer.MAX_VALUE
 				);
 			}
-			collectorForAllMatchingDocsMap.put( CollectorKey.TOP_DOCS, topDocsCollector );
+			collectorsForAllMatchingDocsBuilder.add( CollectorKey.TOP_DOCS, topDocsCollector );
 		}
 
 		TotalHitCountCollector totalHitCountCollector = new TotalHitCountCollector();
-		collectorForAllMatchingDocsMap.put( CollectorKey.TOTAL_HIT_COUNT, totalHitCountCollector );
+		collectorsForAllMatchingDocsBuilder.add( CollectorKey.TOTAL_HIT_COUNT, totalHitCountCollector );
 
-		CollectorExecutionContext executionContext =
-				new CollectorExecutionContext( metadataResolver, indexSearcher, luceneQuery, maxDocs );
+		collectorsForAllMatchingDocsBuilder.addAll( requiredCollectorForAllMatchingDocsFactories );
+		CollectorSet collectorsForAllMatchingDocs = collectorsForAllMatchingDocsBuilder.build();
 
-		for ( CollectorFactory<?> collectorFactory : requiredCollectorForAllMatchingDocsFactories ) {
-			Collector collector = collectorFactory.createCollector( executionContext );
-			collectorForAllMatchingDocsMap.put( collectorFactory.getCollectorKey(), collector );
-		}
-		CollectorSet collectorsForAllMatchingDocs = new CollectorSet(
-				wrapTimeLimitingCollectorIfNecessary(
-						MultiCollector.wrap( collectorForAllMatchingDocsMap.values() ), timeoutManager
-				),
-				collectorForAllMatchingDocsMap
-		);
-
-		for ( CollectorFactory<?> collectorFactory : requiredCollectorForTopDocsFactories ) {
-			Collector collector = collectorFactory.createCollector( executionContext );
-			collectorForTopDocsMap.put( collectorFactory.getCollectorKey(), collector );
-		}
 		CollectorSet collectorsForTopDocs = null;
-		if ( !collectorForTopDocsMap.isEmpty() ) {
-			collectorsForTopDocs = new CollectorSet(
-					wrapTimeLimitingCollectorIfNecessary(
-							MultiCollector.wrap( collectorForTopDocsMap.values() ), timeoutManager
-					),
-					collectorForTopDocsMap
-			);
+		if ( !requiredCollectorForTopDocsFactories.isEmpty() ) {
+			CollectorSet.Builder collectorForTopDocsBuilder =
+					new CollectorSet.Builder( executionContext, timeoutManager );
+			collectorForTopDocsBuilder.addAll( requiredCollectorForTopDocsFactories );
+			collectorsForTopDocs = collectorForTopDocsBuilder.build();
 		}
 
 		return new LuceneCollectors(
@@ -135,18 +117,6 @@ public final class ExtractionRequirements {
 				collectorsForAllMatchingDocs, collectorsForTopDocs,
 				timeoutManager
 		);
-	}
-
-	private Collector wrapTimeLimitingCollectorIfNecessary(Collector collector, TimeoutManager timeoutManager) {
-		final Long timeoutLeft = timeoutManager.checkTimeLeftInMilliseconds();
-		if ( timeoutLeft != null ) {
-			TimeLimitingCollector wrapped = new TimeLimitingCollector( collector, timeoutManager.createCounter(), timeoutLeft );
-			// The timeout starts from now, not from when the collector is first used.
-			// This is important because some collectors are applied during a second search.
-			wrapped.setBaseline();
-			return wrapped;
-		}
-		return collector;
 	}
 
 	public static class Builder {

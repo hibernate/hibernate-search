@@ -70,6 +70,10 @@ public final class TimeoutManager {
 		this.start = null;
 	}
 
+	public long getTimeoutBaseline() {
+		return start;
+	}
+
 	/**
 	 * @return {@code true} if the timeout was reached, {@code false} otherwise.
 	 * @throws org.hibernate.search.util.common.SearchTimeoutException If the timeout was reached and
