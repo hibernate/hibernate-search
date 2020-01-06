@@ -16,21 +16,15 @@ import org.hibernate.search.backend.lucene.lowlevel.query.impl.ExplicitDocIdsQue
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 
-import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.search.BulkScorer;
-import org.apache.lucene.search.CollectionTerminatedException;
 import org.apache.lucene.search.Collector;
 import org.apache.lucene.search.FieldDoc;
 import org.apache.lucene.search.IndexSearcher;
-import org.apache.lucene.search.LeafCollector;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreDoc;
-import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.TimeLimitingCollector;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopFieldCollector;
-import org.apache.lucene.search.Weight;
 
 public class LuceneCollectors {
 
@@ -146,7 +140,6 @@ public class LuceneCollectors {
 
 	private void applyCollectorsToTopDocs() throws IOException {
 		ExplicitDocIdsQuery topDocsQuery = new ExplicitDocIdsQuery( topDocs.scoreDocs );
-		Weight weight = indexSearcher.createWeight( topDocsQuery, ScoreMode.COMPLETE_NO_SCORES, 1.0f );
 
 		CollectorExecutionContext executionContext = new CollectorExecutionContext(
 				metadataResolver, indexSearcher,
@@ -163,26 +156,7 @@ public class LuceneCollectors {
 
 		Collector collector = this.collectorsForTopDocs.getComposed();
 
-		for ( LeafReaderContext ctx : indexSearcher.getTopReaderContext().leaves() ) {
-			final LeafCollector leafCollector;
-			try {
-				leafCollector = collector.getLeafCollector( ctx );
-			}
-			catch (CollectionTerminatedException e) {
-				// there is no doc of interest in this reader context
-				// continue with the following leaf
-				continue;
-			}
-			BulkScorer scorer = weight.bulkScorer( ctx );
-			if ( scorer != null ) {
-				try {
-					scorer.score( leafCollector, ctx.reader().getLiveDocs() );
-				}
-				catch (CollectionTerminatedException e) {
-					// collection was terminated prematurely
-					// continue with the following leaf
-				}
-			}
-		}
+		// This will collect data
+		indexSearcher.search( topDocsQuery, collector );
 	}
 }
