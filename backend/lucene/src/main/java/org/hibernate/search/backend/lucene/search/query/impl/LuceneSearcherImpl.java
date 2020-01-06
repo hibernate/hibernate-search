@@ -170,7 +170,7 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		SearchProjectionExtractContext projectionExtractContext = extractContext.createProjectionExtractContext();
 
 		StoredFieldsCollector storedFieldsCollector =
-				projectionExtractContext.getCollector( CollectorKey.STORED_FIELDS );
+				projectionExtractContext.getCollector( StoredFieldsCollector.KEY );
 
 		for ( int i = 0; i < topDocs.scoreDocs.length; i++ ) {
 			// Check for timeout every 16 elements.

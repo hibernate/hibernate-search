@@ -16,7 +16,6 @@ import java.util.Set;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExecutionContext;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
-import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.StoredFieldsCollector;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
@@ -43,15 +42,10 @@ public final class ExtractionRequirements {
 	private final Set<CollectorFactory<?>> requiredCollectorForAllMatchingDocsFactories;
 	private final Set<CollectorFactory<?>> requiredCollectorForTopDocsFactories;
 
-	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
-	private final Set<String> requiredNestedDocumentPathsForStoredFields;
-
 	private ExtractionRequirements(Builder builder) {
 		requireScore = builder.requireScore;
 		requiredCollectorForAllMatchingDocsFactories = builder.requiredCollectorForAllMatchingDocsFactories;
 		requiredCollectorForTopDocsFactories = builder.requiredCollectorForTopDocsFactories;
-		storedFieldVisitor = builder.createStoredFieldVisitorOrNull();
-		requiredNestedDocumentPathsForStoredFields = builder.requiredNestedDocumentPathsForStoredFields;
 	}
 
 	public LuceneCollectors createCollectors(IndexSearcher indexSearcher, Query luceneQuery, Sort sort,
@@ -106,23 +100,8 @@ public final class ExtractionRequirements {
 		TotalHitCountCollector totalHitCountCollector = new TotalHitCountCollector();
 		collectorForAllMatchingDocsMap.put( CollectorKey.TOTAL_HIT_COUNT, totalHitCountCollector );
 
-		if ( storedFieldVisitor != null ) {
-			NestedDocsProvider nestedDocsProvider;
-			if ( requiredNestedDocumentPathsForStoredFields.isEmpty() ) {
-				nestedDocsProvider = null;
-			}
-			else {
-				nestedDocsProvider =
-						new NestedDocsProvider( requiredNestedDocumentPathsForStoredFields, luceneQuery );
-			}
-
-			StoredFieldsCollector storedFieldsCollector =
-					new StoredFieldsCollector( indexSearcher, nestedDocsProvider, storedFieldVisitor );
-			collectorForTopDocsMap.put( CollectorKey.STORED_FIELDS, storedFieldsCollector );
-		}
-
 		CollectorExecutionContext executionContext =
-				new CollectorExecutionContext( metadataResolver, luceneQuery, maxDocs );
+				new CollectorExecutionContext( metadataResolver, indexSearcher, luceneQuery, maxDocs );
 
 		for ( CollectorFactory<?> collectorFactory : requiredCollectorForAllMatchingDocsFactories ) {
 			Collector collector = collectorFactory.createCollector( executionContext );
@@ -207,19 +186,26 @@ public final class ExtractionRequirements {
 		}
 
 		public ExtractionRequirements build() {
+			CollectorFactory<StoredFieldsCollector> storedFieldCollectorFactory = createStoredFieldCollectorFactoryOrNull();
+			if ( storedFieldCollectorFactory != null ) {
+				requiredCollectorForTopDocsFactories.add( storedFieldCollectorFactory );
+			}
 			return new ExtractionRequirements( this );
 		}
 
-		public ReusableDocumentStoredFieldVisitor createStoredFieldVisitorOrNull() {
+		private CollectorFactory<StoredFieldsCollector> createStoredFieldCollectorFactoryOrNull() {
+			ReusableDocumentStoredFieldVisitor storedFieldVisitor;
 			if ( requireAllStoredFields ) {
-				return new ReusableDocumentStoredFieldVisitor();
+				storedFieldVisitor = new ReusableDocumentStoredFieldVisitor();
 			}
 			else if ( !requiredStoredFields.isEmpty() ) {
-				return new ReusableDocumentStoredFieldVisitor( requiredStoredFields );
+				storedFieldVisitor = new ReusableDocumentStoredFieldVisitor( requiredStoredFields );
 			}
 			else {
 				return null;
 			}
+
+			return StoredFieldsCollector.factory( storedFieldVisitor, requiredNestedDocumentPathsForStoredFields );
 		}
 	}
 }
