@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.StoredFieldsCollector;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.TimeoutCountCollectorManager;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;

@@ -6,18 +6,26 @@
  */
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
+import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExecutionContext;
+import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
+import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
 
 import org.apache.lucene.search.Collector;
+import org.apache.lucene.search.MultiCollector;
+import org.apache.lucene.search.TimeLimitingCollector;
 
 public class CollectorSet {
 
 	private final Collector composed;
 	private final Map<CollectorKey<?>, Collector> components;
 
-	public CollectorSet(Collector composed, Map<CollectorKey<?>, Collector> components) {
+	private CollectorSet(Collector composed, Map<CollectorKey<?>, Collector> components) {
 		this.composed = composed;
 		this.components = components;
 	}
@@ -29,6 +37,51 @@ public class CollectorSet {
 	@SuppressWarnings("unchecked")
 	public <C extends Collector> C get(CollectorKey<C> key) {
 		return (C) components.get( key );
+	}
+
+	public static class Builder {
+
+		private final CollectorExecutionContext executionContext;
+		private final TimeoutManager timeoutManager;
+
+		private final Map<CollectorKey<?>, Collector> components = new LinkedHashMap<>();
+
+		public Builder(CollectorExecutionContext executionContext, TimeoutManager timeoutManager) {
+			this.executionContext = executionContext;
+			this.timeoutManager = timeoutManager;
+		}
+
+		public <C extends Collector> void add(CollectorKey<C> key, C collector) {
+			components.put( key, collector );
+		}
+
+		public void addAll(Set<CollectorFactory<?>> collectorFactories) throws IOException {
+			for ( CollectorFactory<?> collectorFactory : collectorFactories ) {
+				Collector collector = collectorFactory.createCollector( executionContext );
+				components.put( collectorFactory.getCollectorKey(), collector );
+			}
+		}
+
+		public CollectorSet build() {
+			Collector composed = wrapTimeLimitingCollectorIfNecessary(
+					MultiCollector.wrap( components.values() ),
+					timeoutManager
+			);
+
+			return new CollectorSet( composed, components );
+		}
+
+		private Collector wrapTimeLimitingCollectorIfNecessary(Collector collector, TimeoutManager timeoutManager) {
+			final Long timeoutLeft = timeoutManager.checkTimeLeftInMilliseconds();
+			if ( timeoutLeft != null ) {
+				TimeLimitingCollector wrapped = new TimeLimitingCollector( collector, timeoutManager.createCounter(), timeoutLeft );
+				// The timeout starts from the given baseline, not from when the collector is first used.
+				// This is important because some collectors are applied during a second search.
+				wrapped.setBaseline( timeoutManager.getTimeoutBaseline() );
+				return wrapped;
+			}
+			return collector;
+		}
 	}
 
 }
