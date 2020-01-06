@@ -7,8 +7,6 @@
 package org.hibernate.search.backend.lucene.search.extraction.impl;
 
 import java.io.IOException;
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -45,16 +43,15 @@ public final class ExtractionRequirements {
 	private final Set<CollectorFactory<?>> requiredCollectorForAllMatchingDocsFactories;
 	private final Set<CollectorFactory<?>> requiredCollectorForTopDocsFactories;
 
-	private final Set<String> requiredNestedDocumentExtractionPaths;
-
 	private final ReusableDocumentStoredFieldVisitor storedFieldVisitor;
+	private final Set<String> requiredNestedDocumentPathsForStoredFields;
 
 	private ExtractionRequirements(Builder builder) {
 		requireScore = builder.requireScore;
 		requiredCollectorForAllMatchingDocsFactories = builder.requiredCollectorForAllMatchingDocsFactories;
 		requiredCollectorForTopDocsFactories = builder.requiredCollectorForTopDocsFactories;
-		requiredNestedDocumentExtractionPaths = builder.requiredNestedDocumentExtractionPaths;
 		storedFieldVisitor = builder.createStoredFieldVisitorOrNull();
+		requiredNestedDocumentPathsForStoredFields = builder.requiredNestedDocumentPathsForStoredFields;
 	}
 
 	public LuceneCollectors createCollectors(IndexSearcher indexSearcher, Query luceneQuery, Sort sort,
@@ -109,33 +106,23 @@ public final class ExtractionRequirements {
 		TotalHitCountCollector totalHitCountCollector = new TotalHitCountCollector();
 		collectorForAllMatchingDocsMap.put( CollectorKey.TOTAL_HIT_COUNT, totalHitCountCollector );
 
-		Map<String, NestedDocsProvider> nestedDocsProviders;
-		NestedDocsProvider allNestedDocsProvider;
-		if ( requiredNestedDocumentExtractionPaths.isEmpty() ) {
-			nestedDocsProviders = Collections.emptyMap();
-			allNestedDocsProvider = null;
-		}
-		else {
-			nestedDocsProviders = new HashMap<>();
-			for ( String nestedDocumentPath : requiredNestedDocumentExtractionPaths ) {
-				nestedDocsProviders.put(
-						nestedDocumentPath,
-						new NestedDocsProvider( nestedDocumentPath, luceneQuery )
-				);
+		if ( storedFieldVisitor != null ) {
+			NestedDocsProvider nestedDocsProvider;
+			if ( requiredNestedDocumentPathsForStoredFields.isEmpty() ) {
+				nestedDocsProvider = null;
+			}
+			else {
+				nestedDocsProvider =
+						new NestedDocsProvider( requiredNestedDocumentPathsForStoredFields, luceneQuery );
 			}
 
-			allNestedDocsProvider =
-					new NestedDocsProvider( requiredNestedDocumentExtractionPaths, luceneQuery );
-		}
-
-		if ( storedFieldVisitor != null ) {
 			StoredFieldsCollector storedFieldsCollector =
-					new StoredFieldsCollector( indexSearcher, allNestedDocsProvider, storedFieldVisitor );
+					new StoredFieldsCollector( indexSearcher, nestedDocsProvider, storedFieldVisitor );
 			collectorForTopDocsMap.put( CollectorKey.STORED_FIELDS, storedFieldsCollector );
 		}
 
 		CollectorExecutionContext executionContext =
-				new CollectorExecutionContext( metadataResolver, nestedDocsProviders, maxDocs );
+				new CollectorExecutionContext( metadataResolver, luceneQuery, maxDocs );
 
 		for ( CollectorFactory<?> collectorFactory : requiredCollectorForAllMatchingDocsFactories ) {
 			Collector collector = collectorFactory.createCollector( executionContext );
@@ -189,10 +176,9 @@ public final class ExtractionRequirements {
 		private final Set<CollectorFactory<?>> requiredCollectorForAllMatchingDocsFactories = new LinkedHashSet<>();
 		private final Set<CollectorFactory<?>> requiredCollectorForTopDocsFactories = new LinkedHashSet<>();
 
-		private final Set<String> requiredNestedDocumentExtractionPaths = new HashSet<>();
-
 		private boolean requireAllStoredFields = false;
 		private final Set<String> requiredStoredFields = new HashSet<>();
+		private final Set<String> requiredNestedDocumentPathsForStoredFields = new HashSet<>();
 
 		public void requireScore() {
 			this.requireScore = true;
@@ -206,20 +192,17 @@ public final class ExtractionRequirements {
 			requiredCollectorForTopDocsFactories.add( collectorFactory );
 		}
 
-		public void requireNestedDocumentExtraction(String nestedDocumentPath) {
-			if ( nestedDocumentPath != null ) {
-				this.requiredNestedDocumentExtractionPaths.add( nestedDocumentPath );
-			}
-		}
-
 		public void requireAllStoredFields() {
 			requireAllStoredFields = true;
 			requiredStoredFields.clear();
 		}
 
-		public void requireStoredField(String absoluteFieldPath) {
+		public void requireStoredField(String absoluteFieldPath, String nestedDocumentPath) {
 			if ( !requireAllStoredFields ) {
 				requiredStoredFields.add( absoluteFieldPath );
+			}
+			if ( nestedDocumentPath != null ) {
+				requiredNestedDocumentPathsForStoredFields.add( nestedDocumentPath );
 			}
 		}
 

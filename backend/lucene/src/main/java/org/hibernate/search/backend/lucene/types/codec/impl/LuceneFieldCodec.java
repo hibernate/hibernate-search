@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.codec.impl;
 
-import java.util.function.Consumer;
+import java.util.function.BiConsumer;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
 
@@ -38,9 +38,11 @@ public interface LuceneFieldCodec<F> {
 	 *
 	 * @param absoluteFieldPath The path of the field whose value is assumed to be stored.
 	 * @param collector A collector of absolute field paths to be extracted from the document.
+	 * First argument is the absolute field path,
+	 * second argument is the path of the nested document containing that field (or null if not relevant).
 	 */
-	default void contributeStoredFields(String absoluteFieldPath, Consumer<String> collector) {
-		collector.accept( absoluteFieldPath );
+	default void contributeStoredFields(String absoluteFieldPath, String nestedDocumentPath, BiConsumer<String, String> collector) {
+		collector.accept( absoluteFieldPath, nestedDocumentPath );
 	}
 
 	/**

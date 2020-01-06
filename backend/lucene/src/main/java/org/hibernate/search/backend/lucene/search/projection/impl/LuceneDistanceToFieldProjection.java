@@ -44,7 +44,6 @@ class LuceneDistanceToFieldProjection
 	@Override
 	public void request(SearchProjectionRequestContext context) {
 		context.requireCollector( this );
-		context.requireNestedDocumentExtraction( nestedDocumentPath );
 	}
 
 	@Override
@@ -80,7 +79,8 @@ class LuceneDistanceToFieldProjection
 	@Override
 	public GeoPointDistanceCollector createCollector(CollectorExecutionContext context) {
 		return new GeoPointDistanceCollector(
-				absoluteFieldPath, context.getNestedDocsProvider( nestedDocumentPath ),
+				absoluteFieldPath,
+				nestedDocumentPath == null ? null : context.createNestedDocsProvider( nestedDocumentPath ),
 				center, context.getMaxDocs()
 		);
 	}
