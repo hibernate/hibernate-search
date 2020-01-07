@@ -181,7 +181,9 @@ stage('Configure') {
 					new JdkBuildEnvironment(version: '8', tool: 'OpenJDK 8 Latest', status: BuildEnvironmentStatus.USED_IN_DEFAULT_BUILD),
 					new JdkBuildEnvironment(version: '11', tool: 'OpenJDK 11 Latest', status: BuildEnvironmentStatus.SUPPORTED),
 					new JdkBuildEnvironment(version: '13', tool: 'OpenJDK 13 Latest', status: BuildEnvironmentStatus.SUPPORTED),
-					new JdkBuildEnvironment(version: '14', tool: 'OpenJDK 14 Latest', status: BuildEnvironmentStatus.SUPPORTED)
+					new JdkBuildEnvironment(version: '14', tool: 'OpenJDK 14 Latest', status: BuildEnvironmentStatus.SUPPORTED),
+					// Experimental because Hibernate ORM bytecode enhancement doesn't work yet
+					new JdkBuildEnvironment(version: '15', tool: 'OpenJDK 15 Latest', status: BuildEnvironmentStatus.EXPERIMENTAL)
 			],
 			compiler: [
 					new CompilerBuildEnvironment(name: 'eclipse', mavenProfile: 'compiler-eclipse', status: BuildEnvironmentStatus.SUPPORTED),
