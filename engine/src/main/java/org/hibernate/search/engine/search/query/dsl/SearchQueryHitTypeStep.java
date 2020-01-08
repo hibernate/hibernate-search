@@ -92,7 +92,7 @@ public interface SearchQueryHitTypeStep<
 	 *
 	 * @param projections A list of previously-created {@link SearchProjection} objects.
 	 * @return The next step.
-	 * @see SearchProjectionFactory#composite(BiFunction, SearchProjection, SearchProjection)
+	 * @see SearchProjectionFactory#composite(SearchProjection[]) 
 	 * @see SearchQueryPredicateStep
 	 */
 	SearchQueryPredicateStep<?, List<?>, ?> asProjections(SearchProjection<?>... projections);
