@@ -496,7 +496,7 @@ public class RangeAggregationSpecificsIT<F> {
 		);
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?> matchAllQuery() {
+	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllQuery() {
 		return indexManager.createScope().query().predicate( f -> f.matchAll() );
 	}
 

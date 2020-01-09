@@ -20,7 +20,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
  * @param <PDF> The type of factory used to create predicates in {@link #predicate(Function)}.
  */
 public interface SearchQueryPredicateStep<
-				N extends SearchQueryOptionsStep<?, H, ?, ?>,
+				N extends SearchQueryOptionsStep<?, H, ?, ?, ?>,
 				H,
 				PDF extends SearchPredicateFactory
 		> {

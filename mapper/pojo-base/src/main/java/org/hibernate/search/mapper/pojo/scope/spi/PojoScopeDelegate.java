@@ -32,7 +32,7 @@ public interface PojoScopeDelegate<R, E, C> {
 
 	Set<C> getIncludedIndexedTypes();
 
-	SearchQueryHitTypeStep<?, R, E, SearchProjectionFactory<R, E>, ?> search(
+	<LOS> SearchQueryHitTypeStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
 			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder);
 

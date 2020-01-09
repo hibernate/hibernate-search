@@ -203,10 +203,10 @@ public class SearchQueryBaseIT {
 		}
 	}
 
-	private static class SupportedQueryDslExtension<R, E> implements
-			SearchQueryDslExtension<MyExtendedDslContext<R>, R, E> {
+	private static class SupportedQueryDslExtension<R, E, LOS> implements
+			SearchQueryDslExtension<MyExtendedDslContext<R>, R, E, LOS> {
 		@Override
-		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryHitTypeStep<?, R, E, ?, ?> original,
+		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryHitTypeStep<?, R, E, LOS, ?, ?> original,
 				IndexScope<?> indexScope, BackendSessionContext sessionContext,
 				LoadingContextBuilder<R, E> loadingContextBuilder) {
 			Assertions.assertThat( original ).isNotNull();
@@ -217,10 +217,10 @@ public class SearchQueryBaseIT {
 		}
 	}
 
-	private static class UnSupportedQueryDslExtension<R, E> implements
-			SearchQueryDslExtension<MyExtendedDslContext<R>, R, E> {
+	private static class UnSupportedQueryDslExtension<R, E, LOS> implements
+			SearchQueryDslExtension<MyExtendedDslContext<R>, R, E, LOS> {
 		@Override
-		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryHitTypeStep<?, R, E, ?, ?> original,
+		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryHitTypeStep<?, R, E, LOS, ?, ?> original,
 				IndexScope<?> indexScope, BackendSessionContext sessionContext,
 				LoadingContextBuilder<R, E> loadingContextBuilder) {
 			Assertions.assertThat( original ).isNotNull();

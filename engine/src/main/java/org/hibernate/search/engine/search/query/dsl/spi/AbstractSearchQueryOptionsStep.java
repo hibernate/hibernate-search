@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -38,14 +39,15 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 
 public abstract class AbstractSearchQueryOptionsStep<
-				S extends SearchQueryOptionsStep<S, H, SF, AF>,
+				S extends SearchQueryOptionsStep<S, H, LOS, SF, AF>,
 				H,
+				LOS,
 				PDF extends SearchPredicateFactory,
 				SF extends SearchSortFactory,
 				AF extends SearchAggregationFactory,
 				C
 		>
-		implements SearchQueryPredicateStep<S, H, PDF>, SearchQueryOptionsStep<S, H, SF, AF> {
+		implements SearchQueryPredicateStep<S, H, PDF>, SearchQueryOptionsStep<S, H, LOS, SF, AF> {
 
 	private final IndexScope<C> indexScope;
 	private final SearchQueryBuilder<H, C> searchQueryBuilder;
@@ -94,6 +96,12 @@ public abstract class AbstractSearchQueryOptionsStep<
 	public S failAfter(long timeout, TimeUnit timeUnit) {
 		searchQueryBuilder.failAfter( timeout, timeUnit );
 		return thisAsS();
+	}
+
+	@Override
+	public S loading(Consumer<? super LOS> loadingOptionsContributor) {
+		// TODO HSEARCH-3629 Implement this
+		throw new UnsupportedOperationException( "Not supported yet" );
 	}
 
 	@Override

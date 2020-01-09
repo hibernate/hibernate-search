@@ -18,17 +18,18 @@ import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
 public abstract class AbstractSearchQueryHitTypeStep<
-				N extends SearchQueryOptionsStep<?, E, ?, ?>,
+				N extends SearchQueryOptionsStep<?, E, LOS, ?, ?>,
 				R,
 				E,
+				LOS,
 				PJF extends SearchProjectionFactory<R, E>,
 				PDF extends SearchPredicateFactory,
 				C
 		>
-		implements SearchQueryHitTypeStep<N, R, E, PJF, PDF> {
+		implements SearchQueryHitTypeStep<N, R, E, LOS, PJF, PDF> {
 
 	@Override
-	public <T> T extension(SearchQueryDslExtension<T, R, E> extension) {
+	public <T> T extension(SearchQueryDslExtension<T, R, E, LOS> extension) {
 		return DslExtensionState.returnIfSupported(
 				extension,
 				extension.extendOptional(

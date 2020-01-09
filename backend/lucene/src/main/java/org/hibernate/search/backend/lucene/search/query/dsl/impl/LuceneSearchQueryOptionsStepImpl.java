@@ -22,17 +22,18 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractExtendedSearchQueryOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 
-class LuceneSearchQueryOptionsStepImpl<H>
+class LuceneSearchQueryOptionsStepImpl<H, LOS>
 		extends AbstractExtendedSearchQueryOptionsStep<
-						LuceneSearchQueryOptionsStep<H>,
+						LuceneSearchQueryOptionsStep<H, LOS>,
 						H,
 						LuceneSearchResult<H>,
+						LOS,
 						LuceneSearchPredicateFactory,
 						LuceneSearchSortFactory,
 						LuceneSearchAggregationFactory,
 						LuceneSearchQueryElementCollector
 				>
-		implements LuceneSearchQueryPredicateStep<H>, LuceneSearchQueryOptionsStep<H> {
+		implements LuceneSearchQueryPredicateStep<H, LOS>, LuceneSearchQueryOptionsStep<H, LOS> {
 
 	private final LuceneSearchQueryBuilder<H> searchQueryBuilder;
 
@@ -48,7 +49,7 @@ class LuceneSearchQueryOptionsStepImpl<H>
 	}
 
 	@Override
-	protected LuceneSearchQueryOptionsStepImpl<H> thisAsS() {
+	protected LuceneSearchQueryOptionsStepImpl<H, LOS> thisAsS() {
 		return this;
 	}
 

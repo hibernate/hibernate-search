@@ -52,6 +52,7 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubLoadingOptionsStep;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.backend.lucene.LuceneExtension;
@@ -120,9 +121,9 @@ public class LuceneExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		// Put intermediary contexts into variables to check they have the right type
-		LuceneSearchQueryHitTypeStep<DocumentReference, DocumentReference> context1 =
+		LuceneSearchQueryHitTypeStep<DocumentReference, DocumentReference, StubLoadingOptionsStep> context1 =
 				scope.query().extension( LuceneExtension.get() );
-		LuceneSearchQueryPredicateStep<DocumentReference> context2 = context1.asProjection(
+		LuceneSearchQueryPredicateStep<DocumentReference, StubLoadingOptionsStep> context2 = context1.asProjection(
 				f -> f.composite(
 						// We don't care about the document, it's just to test that the factory context allows Lucene-specific projection
 						(docRef, document) -> docRef,
@@ -130,10 +131,10 @@ public class LuceneExtensionIT {
 				)
 		);
 		// Note we can use Lucene-specific predicates immediately
-		LuceneSearchQueryOptionsStep<DocumentReference> context3 =
+		LuceneSearchQueryOptionsStep<DocumentReference, StubLoadingOptionsStep> context3 =
 				context2.predicate( f -> f.fromLuceneQuery( new MatchAllDocsQuery() ) );
 		// Note we can use Lucene-specific sorts immediately
-		LuceneSearchQueryOptionsStep<DocumentReference> context4 =
+		LuceneSearchQueryOptionsStep<DocumentReference, StubLoadingOptionsStep> context4 =
 				context3.sort( f -> f.fromLuceneSortField( new SortField( "sort1", Type.STRING ) ) );
 
 		// Put the query and result into variables to check they have the right type
@@ -145,16 +146,16 @@ public class LuceneExtensionIT {
 				.hasTotalHitCount( 5 );
 
 		// Also check (at compile time) the context type for other asXXX() methods, since we need to override each method explicitly
-		LuceneSearchQueryPredicateStep<DocumentReference> asReferenceContext =
+		LuceneSearchQueryPredicateStep<DocumentReference, StubLoadingOptionsStep> asReferenceContext =
 				scope.query().extension( LuceneExtension.get() ).asEntityReference();
-		LuceneSearchQueryPredicateStep<DocumentReference> asEntityContext =
+		LuceneSearchQueryPredicateStep<DocumentReference, StubLoadingOptionsStep> asEntityContext =
 				scope.query().extension( LuceneExtension.get() ).asEntity();
 		SearchProjection<DocumentReference> projection = scope.projection().documentReference().toProjection();
-		LuceneSearchQueryPredicateStep<DocumentReference> asProjectionContext =
+		LuceneSearchQueryPredicateStep<DocumentReference, StubLoadingOptionsStep> asProjectionContext =
 				scope.query().extension( LuceneExtension.get() ).asProjection( projection );
-		LuceneSearchQueryPredicateStep<List<?>> asProjectionsContext =
+		LuceneSearchQueryPredicateStep<List<?>, ?> asProjectionsContext =
 				scope.query().extension( LuceneExtension.get() ).asProjections( projection, projection );
-		LuceneSearchQueryOptionsStep<DocumentReference> defaultResultContext =
+		LuceneSearchQueryOptionsStep<DocumentReference, StubLoadingOptionsStep> defaultResultContext =
 				scope.query().extension( LuceneExtension.get() )
 						.predicate( f -> f.fromLuceneQuery( new MatchAllDocsQuery() ) );
 	}

@@ -26,16 +26,17 @@ import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractSearchQueryHitTypeStep;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
-public class LuceneSearchQueryHitTypeStepImpl<R, E>
+public class LuceneSearchQueryHitTypeStepImpl<R, E, LOS>
 		extends AbstractSearchQueryHitTypeStep<
-						LuceneSearchQueryOptionsStep<E>,
+						LuceneSearchQueryOptionsStep<E, LOS>,
 						R,
 						E,
+						LOS,
 						LuceneSearchProjectionFactory<R, E>,
 						LuceneSearchPredicateFactory,
 						LuceneSearchQueryElementCollector
 				>
-		implements LuceneSearchQueryHitTypeStep<R, E> {
+		implements LuceneSearchQueryHitTypeStep<R, E, LOS> {
 
 	private final LuceneIndexScope indexScope;
 	private final BackendSessionContext sessionContext;
@@ -50,21 +51,21 @@ public class LuceneSearchQueryHitTypeStepImpl<R, E>
 	}
 
 	@Override
-	public LuceneSearchQueryPredicateStep<E> asEntity() {
+	public LuceneSearchQueryPredicateStep<E, LOS> asEntity() {
 		LuceneSearchQueryBuilder<E> builder = indexScope.getSearchQueryBuilderFactory()
 				.asEntity( sessionContext, loadingContextBuilder );
 		return createSearchQueryContext( builder );
 	}
 
 	@Override
-	public LuceneSearchQueryPredicateStep<R> asEntityReference() {
+	public LuceneSearchQueryPredicateStep<R, LOS> asEntityReference() {
 		LuceneSearchQueryBuilder<R> builder = indexScope.getSearchQueryBuilderFactory()
 				.asReference( sessionContext, loadingContextBuilder );
 		return createSearchQueryContext( builder );
 	}
 
 	@Override
-	public <P> LuceneSearchQueryPredicateStep<P> asProjection(
+	public <P> LuceneSearchQueryPredicateStep<P, LOS> asProjection(
 			Function<? super LuceneSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
 		LuceneSearchProjectionFactory<R, E> factoryContext =
 				createDefaultProjectionFactory().extension( LuceneExtension.get() );
@@ -73,26 +74,26 @@ public class LuceneSearchQueryHitTypeStepImpl<R, E>
 	}
 
 	@Override
-	public <P> LuceneSearchQueryPredicateStep<P> asProjection(SearchProjection<P> projection) {
+	public <P> LuceneSearchQueryPredicateStep<P, LOS> asProjection(SearchProjection<P> projection) {
 		LuceneSearchQueryBuilder<P> builder = indexScope.getSearchQueryBuilderFactory()
 				.asProjection( sessionContext, loadingContextBuilder, projection );
 		return createSearchQueryContext( builder );
 	}
 
 	@Override
-	public LuceneSearchQueryPredicateStep<List<?>> asProjections(SearchProjection<?>... projections) {
+	public LuceneSearchQueryPredicateStep<List<?>, LOS> asProjections(SearchProjection<?>... projections) {
 		LuceneSearchQueryBuilder<List<?>> builder = indexScope.getSearchQueryBuilderFactory()
 				.asProjections( sessionContext, loadingContextBuilder, projections );
 		return createSearchQueryContext( builder );
 	}
 
 	@Override
-	public LuceneSearchQueryOptionsStep<E> predicate(SearchPredicate predicate) {
+	public LuceneSearchQueryOptionsStep<E, LOS> predicate(SearchPredicate predicate) {
 		return asEntity().predicate( predicate );
 	}
 
 	@Override
-	public LuceneSearchQueryOptionsStep<E> predicate(
+	public LuceneSearchQueryOptionsStep<E, LOS> predicate(
 			Function<? super LuceneSearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
 		return asEntity().predicate( predicateContributor );
 	}
@@ -112,7 +113,7 @@ public class LuceneSearchQueryHitTypeStepImpl<R, E>
 		return loadingContextBuilder;
 	}
 
-	private <H> LuceneSearchQueryPredicateStep<H> createSearchQueryContext(LuceneSearchQueryBuilder<H> builder) {
+	private <H> LuceneSearchQueryPredicateStep<H, LOS> createSearchQueryContext(LuceneSearchQueryBuilder<H> builder) {
 		return new LuceneSearchQueryOptionsStepImpl<>( indexScope, builder );
 	}
 }

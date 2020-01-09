@@ -20,18 +20,19 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryPredicateStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
 
-public abstract class AbstractDelegatingSearchQueryHitTypeStep<R, E>
+public abstract class AbstractDelegatingSearchQueryHitTypeStep<R, E, LOS>
 		implements SearchQueryHitTypeStep<
-						SearchQueryOptionsStep<?, E, ?, ?>,
+						SearchQueryOptionsStep<?, E, LOS,?, ?>,
 						R,
 						E,
+						LOS,
 						SearchProjectionFactory<R, E>,
 						SearchPredicateFactory
 				> {
 
-	private final SearchQueryHitTypeStep<?, R, E, ?, ?> delegate;
+	private final SearchQueryHitTypeStep<?, R, E, LOS, ?, ?> delegate;
 
-	public AbstractDelegatingSearchQueryHitTypeStep(SearchQueryHitTypeStep<?, R, E, ?, ?> delegate) {
+	public AbstractDelegatingSearchQueryHitTypeStep(SearchQueryHitTypeStep<?, R, E, LOS, ?, ?> delegate) {
 		this.delegate = delegate;
 	}
 
@@ -63,18 +64,18 @@ public abstract class AbstractDelegatingSearchQueryHitTypeStep<R, E>
 	}
 
 	@Override
-	public SearchQueryOptionsStep<?, E, ?, ?> predicate(
+	public SearchQueryOptionsStep<?, E, LOS, ?, ?> predicate(
 			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
 		return delegate.predicate( predicateContributor );
 	}
 
 	@Override
-	public SearchQueryOptionsStep<?, E, ?, ?> predicate(SearchPredicate predicate) {
+	public SearchQueryOptionsStep<?, E, LOS, ?, ?> predicate(SearchPredicate predicate) {
 		return delegate.predicate( predicate );
 	}
 
 	@Override
-	public <T> T extension(SearchQueryDslExtension<T, R, E> extension) {
+	public <T> T extension(SearchQueryDslExtension<T, R, E, LOS> extension) {
 		return delegate.extension( extension );
 	}
 }

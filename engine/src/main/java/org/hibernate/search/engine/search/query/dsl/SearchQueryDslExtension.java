@@ -26,11 +26,12 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
  * {@link SearchQueryHitTypeStep}.
  * @param <R> The reference type.
  * @param <E> The entity type.
+ * @param <LOS> The type of the initial step of the loading options definition DSL.
  *
  * @see SearchQueryHitTypeStep#extension(SearchQueryDslExtension)
  * @see AbstractSearchQueryOptionsStep
  */
-public interface SearchQueryDslExtension<T, R, E> {
+public interface SearchQueryDslExtension<T, R, E, LOS> {
 
 	/**
 	 * Attempt to extend a given DSL step, returning an empty {@link Optional} in case of failure.
@@ -44,7 +45,7 @@ public interface SearchQueryDslExtension<T, R, E> {
 	 * @return An optional containing the extended search query DSL step ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(SearchQueryHitTypeStep<?, R, E, ?, ?> original,
+	Optional<T> extendOptional(SearchQueryHitTypeStep<?, R, E, LOS, ?, ?> original,
 			IndexScope<?> indexScope,
 			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder);
