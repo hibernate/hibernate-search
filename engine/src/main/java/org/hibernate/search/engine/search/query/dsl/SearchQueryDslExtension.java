@@ -25,10 +25,7 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
  * @param <T> The type of extended steps in the search query definition DSL. Should generally extend
  * {@link SearchQueryHitTypeStep}.
  * @param <R> The reference type.
- * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
- * {@code .extension( ElasticsearchExtension.get() }.
  * @param <E> The entity type.
- * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  *
  * @see SearchQueryHitTypeStep#extension(SearchQueryDslExtension)
  * @see AbstractSearchQueryOptionsStep
