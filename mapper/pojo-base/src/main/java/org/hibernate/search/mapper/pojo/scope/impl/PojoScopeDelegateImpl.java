@@ -100,7 +100,7 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 	}
 
 	@Override
-	public SearchQueryHitTypeStep<?, R, E2, SearchProjectionFactory<R, E2>, ?> search(
+	public <LOS> SearchQueryHitTypeStep<?, R, E2, LOS, SearchProjectionFactory<R, E2>, ?> search(
 			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E2> loadingContextBuilder) {
 		return getIndexScope().search( sessionContext, loadingContextBuilder );

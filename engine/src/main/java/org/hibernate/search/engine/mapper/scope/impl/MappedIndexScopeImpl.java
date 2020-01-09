@@ -6,11 +6,13 @@
  */
 package org.hibernate.search.engine.mapper.scope.impl;
 
-import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
+import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.DefaultSearchAggregationFactory;
 import org.hibernate.search.engine.search.aggregation.dsl.impl.SearchAggregationDslContextImpl;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.impl.DefaultSearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
@@ -20,8 +22,6 @@ import org.hibernate.search.engine.search.query.dsl.impl.DefaultSearchQueryHitTy
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.impl.DefaultSearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.impl.SearchSortDslContextImpl;
-import org.hibernate.search.engine.backend.scope.spi.IndexScope;
-import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
 class MappedIndexScopeImpl<C, R, E> implements MappedIndexScope<R, E> {
 
@@ -41,7 +41,7 @@ class MappedIndexScopeImpl<C, R, E> implements MappedIndexScope<R, E> {
 	}
 
 	@Override
-	public SearchQueryHitTypeStep<?, R, E, SearchProjectionFactory<R, E>, ?> search(
+	public <LOS> SearchQueryHitTypeStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
 			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder) {
 		return new DefaultSearchQueryHitTypeStep<>( delegate, sessionContext, loadingContextBuilder );

@@ -136,7 +136,7 @@ public class SearchQueryTimeoutIT {
 		assertThat( result.isTimedOut() ).isFalse();
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?> startSlowQuery() {
+	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> startSlowQuery() {
 		return indexManager.createScope().query()
 				.predicate( f -> f.bool( b -> {
 					for ( String fieldName : FIELD_NAMES ) {
@@ -145,7 +145,7 @@ public class SearchQueryTimeoutIT {
 				} ) );
 	}
 
-	private SearchQueryOptionsStep<?, DocumentReference, ?, ?> startFastQuery() {
+	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> startFastQuery() {
 		return indexManager.createScope().query()
 				.predicate( f -> f.match().field( EMPTY_FIELD_NAME ).matching( ANY_INTEGER ) );
 	}

@@ -43,6 +43,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubLoadingOptionsStep;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
 import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
@@ -120,9 +121,9 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		// Put intermediary contexts into variables to check they have the right type
-		ElasticsearchSearchQueryHitTypeStep<DocumentReference, DocumentReference> context1 =
+		ElasticsearchSearchQueryHitTypeStep<DocumentReference, DocumentReference, StubLoadingOptionsStep> context1 =
 				scope.query().extension( ElasticsearchExtension.get() );
-		ElasticsearchSearchQueryPredicateStep<DocumentReference> context2 = context1.asProjection(
+		ElasticsearchSearchQueryPredicateStep<DocumentReference, StubLoadingOptionsStep> context2 = context1.asProjection(
 				f -> f.composite(
 						// We don't care about the source, it's just to test that the factory context allows ES-specific projection
 						(docRef, source) -> docRef,
@@ -130,10 +131,10 @@ public class ElasticsearchExtensionIT {
 				)
 		);
 		// Note we can use Elasticsearch-specific predicates immediately
-		ElasticsearchSearchQueryOptionsStep<DocumentReference> context3 =
+		ElasticsearchSearchQueryOptionsStep<DocumentReference, StubLoadingOptionsStep> context3 =
 				context2.predicate( f -> f.fromJson( "{'match_all': {}}" ) );
 		// Note we can use Elasticsearch-specific sorts immediately
-		ElasticsearchSearchQueryOptionsStep<DocumentReference> context4 =
+		ElasticsearchSearchQueryOptionsStep<DocumentReference, StubLoadingOptionsStep> context4 =
 				context3.sort( f -> f.fromJson( "{'nativeField_sort1': 'asc'}" ) );
 
 		// Put the query and result into variables to check they have the right type
@@ -145,16 +146,16 @@ public class ElasticsearchExtensionIT {
 				.hasTotalHitCount( 6 );
 
 		// Also check (at compile time) the context type for other asXXX() methods, since we need to override each method explicitly
-		ElasticsearchSearchQueryPredicateStep<DocumentReference> asReferenceContext =
+		ElasticsearchSearchQueryPredicateStep<DocumentReference, StubLoadingOptionsStep> asReferenceContext =
 				scope.query().extension( ElasticsearchExtension.get() ).asEntityReference();
-		ElasticsearchSearchQueryPredicateStep<DocumentReference> asEntityContext =
+		ElasticsearchSearchQueryPredicateStep<DocumentReference, StubLoadingOptionsStep> asEntityContext =
 				scope.query().extension( ElasticsearchExtension.get() ).asEntity();
 		SearchProjection<DocumentReference> projection = scope.projection().documentReference().toProjection();
-		ElasticsearchSearchQueryPredicateStep<DocumentReference> asProjectionContext =
+		ElasticsearchSearchQueryPredicateStep<DocumentReference, StubLoadingOptionsStep> asProjectionContext =
 				scope.query().extension( ElasticsearchExtension.get() ).asProjection( projection );
-		ElasticsearchSearchQueryPredicateStep<List<?>> asProjectionsContext =
+		ElasticsearchSearchQueryPredicateStep<List<?>, StubLoadingOptionsStep> asProjectionsContext =
 				scope.query().extension( ElasticsearchExtension.get() ).asProjections( projection, projection );
-		ElasticsearchSearchQueryOptionsStep<DocumentReference> defaultResultContext =
+		ElasticsearchSearchQueryOptionsStep<DocumentReference, StubLoadingOptionsStep> defaultResultContext =
 				scope.query().extension( ElasticsearchExtension.get() )
 						.predicate( f -> f.fromJson( "{'match_all': {}}" ) );
 	}

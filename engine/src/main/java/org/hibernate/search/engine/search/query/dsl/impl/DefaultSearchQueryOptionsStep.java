@@ -6,26 +6,27 @@
  */
 package org.hibernate.search.engine.search.query.dsl.impl;
 
+import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryPredicateStep;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractSearchQueryOptionsStep;
-import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
-import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 
-final class DefaultSearchQueryOptionsStep<H, C>
+final class DefaultSearchQueryOptionsStep<H, LOS, C>
 		extends AbstractSearchQueryOptionsStep<
-						DefaultSearchQueryOptionsStep<H, C>,
+						DefaultSearchQueryOptionsStep<H, LOS,C>,
 						H,
+						LOS,
 						SearchPredicateFactory,
 						SearchSortFactory,
 						SearchAggregationFactory,
 						C
 				>
-		implements SearchQueryPredicateStep<DefaultSearchQueryOptionsStep<H, C>, H, SearchPredicateFactory>,
-				SearchQueryOptionsStep<DefaultSearchQueryOptionsStep<H, C>, H, SearchSortFactory, SearchAggregationFactory> {
+		implements SearchQueryPredicateStep<DefaultSearchQueryOptionsStep<H, LOS,C>, H, SearchPredicateFactory>,
+				SearchQueryOptionsStep<DefaultSearchQueryOptionsStep<H, LOS, C>, H, LOS, SearchSortFactory, SearchAggregationFactory> {
 
 	DefaultSearchQueryOptionsStep(IndexScope<C> indexScope, SearchQueryBuilder<H, C> searchQueryBuilder) {
 		super( indexScope, searchQueryBuilder );
@@ -51,7 +52,7 @@ final class DefaultSearchQueryOptionsStep<H, C>
 	}
 
 	@Override
-	protected DefaultSearchQueryOptionsStep<H, C> thisAsS() {
+	protected DefaultSearchQueryOptionsStep<H, LOS, C> thisAsS() {
 		return this;
 	}
 }

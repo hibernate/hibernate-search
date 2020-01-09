@@ -8,6 +8,7 @@ package org.hibernate.search.engine.search.query.dsl;
 
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -31,13 +32,15 @@ import org.hibernate.search.util.common.SearchException;
  * @param <E> The type of entities, i.e. the type of hits returned by
  * {@link #asEntity() entity queries},
  * or the type of objects returned for {@link SearchProjectionFactory#entity() entity projections}.
+ * @param <LOS> The type of the initial step of the loading options definition DSL accessible through {@link SearchQueryOptionsStep#loading(Consumer)}.
  * @param <PJF> The type of factory used to create projections in {@link #asProjection(Function)}.
  * @param <PDF> The type of factory used to create predicates in {@link #predicate(Function)}.
  */
 public interface SearchQueryHitTypeStep<
-				N extends SearchQueryOptionsStep<?, E, ?, ?>,
+				N extends SearchQueryOptionsStep<?, E, LOS, ?, ?>,
 				R,
 				E,
+				LOS,
 				PJF extends SearchProjectionFactory<R, E>,
 				PDF extends SearchPredicateFactory
 		>
@@ -92,7 +95,7 @@ public interface SearchQueryHitTypeStep<
 	 *
 	 * @param projections A list of previously-created {@link SearchProjection} objects.
 	 * @return The next step.
-	 * @see SearchProjectionFactory#composite(SearchProjection[]) 
+	 * @see SearchProjectionFactory#composite(SearchProjection[])
 	 * @see SearchQueryPredicateStep
 	 */
 	SearchQueryPredicateStep<?, List<?>, ?> asProjections(SearchProjection<?>... projections);
@@ -106,6 +109,6 @@ public interface SearchQueryHitTypeStep<
 	 * @return The extended DSL step.
 	 * @throws SearchException If the extension cannot be applied (wrong underlying backend, ...).
 	 */
-	<T> T extension(SearchQueryDslExtension<T, R, E> extension);
+	<T> T extension(SearchQueryDslExtension<T, R, E, LOS> extension);
 
 }

@@ -14,12 +14,12 @@ import org.hibernate.search.mapper.orm.search.loading.context.impl.HibernateOrmL
 import org.hibernate.search.mapper.orm.common.EntityReference;
 
 public class HibernateOrmSearchQueryHitTypeStepImpl<E>
-		extends AbstractDelegatingSearchQueryHitTypeStep<EntityReference, E>
+		extends AbstractDelegatingSearchQueryHitTypeStep<EntityReference, E, Void>
 		implements HibernateOrmSearchQueryHitTypeStep<E> {
 	private final HibernateOrmLoadingContext.Builder<E> loadingContextBuilder;
 
 	public HibernateOrmSearchQueryHitTypeStepImpl(
-			SearchQueryHitTypeStep<?, EntityReference, E, ?, ?> delegate,
+			SearchQueryHitTypeStep<?, EntityReference, E, Void, ?, ?> delegate,
 			HibernateOrmLoadingContext.Builder<E> loadingContextBuilder) {
 		super( delegate );
 		this.loadingContextBuilder = loadingContextBuilder;

@@ -68,11 +68,14 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @param <E> entity type for projections.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( LuceneExtension.get() }.
+ * @param <LOS> The type of the initial step of the loading options definition DSL.
+ * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
+ * {@code .extension( LuceneExtension.get() }.
  *
  * @see #get()
  */
-public final class LuceneExtension<H, R, E>
-		implements SearchQueryDslExtension<LuceneSearchQueryHitTypeStep<R, E>, R, E>,
+public final class LuceneExtension<H, R, E, LOS>
+		implements SearchQueryDslExtension<LuceneSearchQueryHitTypeStep<R, E, LOS>, R, E, LOS>,
 		SearchQueryExtension<LuceneSearchQuery<H>, H>,
 		SearchPredicateFactoryExtension<LuceneSearchPredicateFactory>,
 		SearchSortFactoryExtension<LuceneSearchSortFactory>,
@@ -82,7 +85,7 @@ public final class LuceneExtension<H, R, E>
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final LuceneExtension<Object, Object, Object> INSTANCE = new LuceneExtension<>();
+	private static final LuceneExtension<Object, Object, Object, Object> INSTANCE = new LuceneExtension<>();
 
 	/**
 	 * Get the extension with generic parameters automatically set as appropriate for the context in which it's used.
@@ -96,11 +99,14 @@ public final class LuceneExtension<H, R, E>
 	 * @param <E> entity type for projections.
 	 * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
 	 * {@code .extension( LuceneExtension.get() }.
+	 * @param <LOS> The type of the initial step of the loading options definition DSL.
+	 * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
+	 * {@code .extension( LuceneExtension.get() }.
 	 * @return The extension.
 	 */
 	@SuppressWarnings("unchecked") // The instance works for any H, R and E
-	public static <H, R, E> LuceneExtension<H, R, E> get() {
-		return (LuceneExtension<H, R, E>) INSTANCE;
+	public static <H, R, E, LOS> LuceneExtension<H, R, E, LOS> get() {
+		return (LuceneExtension<H, R, E, LOS>) INSTANCE;
 	}
 
 	private LuceneExtension() {
@@ -111,8 +117,8 @@ public final class LuceneExtension<H, R, E>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<LuceneSearchQueryHitTypeStep<R, E>> extendOptional(
-			SearchQueryHitTypeStep<?, R, E, ?, ?> original,
+	public Optional<LuceneSearchQueryHitTypeStep<R, E, LOS>> extendOptional(
+			SearchQueryHitTypeStep<?, R, E, LOS, ?, ?> original,
 			IndexScope<?> indexScope,
 			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder) {

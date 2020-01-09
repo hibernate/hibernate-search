@@ -19,32 +19,35 @@ import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSear
 import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractExtendedSearchQueryOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 
-class ElasticsearchSearchQueryOptionsStepImpl<H>
+class ElasticsearchSearchQueryOptionsStepImpl<H, LOS>
 		extends AbstractExtendedSearchQueryOptionsStep<
-						ElasticsearchSearchQueryOptionsStep<H>,
+						ElasticsearchSearchQueryOptionsStep<H, LOS>,
 						H,
 						ElasticsearchSearchResult<H>,
+						LOS,
 						ElasticsearchSearchPredicateFactory,
 						ElasticsearchSearchSortFactory,
 						ElasticsearchSearchAggregationFactory,
 						ElasticsearchSearchQueryElementCollector
 				>
-		implements ElasticsearchSearchQueryPredicateStep<H>, ElasticsearchSearchQueryOptionsStep<H> {
+		implements ElasticsearchSearchQueryPredicateStep<H, LOS>, ElasticsearchSearchQueryOptionsStep<H, LOS> {
 
 	private final ElasticsearchSearchQueryBuilder<H> searchQueryBuilder;
 
 	ElasticsearchSearchQueryOptionsStepImpl(ElasticsearchIndexScope indexSearchScope,
-			ElasticsearchSearchQueryBuilder<H> searchQueryBuilder) {
+			ElasticsearchSearchQueryBuilder<H> searchQueryBuilder,
+			LoadingContextBuilder<?, ?> loadingContextBuilder) {
 		super( indexSearchScope, searchQueryBuilder );
 		this.searchQueryBuilder = searchQueryBuilder;
 	}
 
 	@Override
-	public ElasticsearchSearchQueryOptionsStep<H> requestTransformer(ElasticsearchSearchRequestTransformer transformer) {
+	public ElasticsearchSearchQueryOptionsStep<H, LOS> requestTransformer(ElasticsearchSearchRequestTransformer transformer) {
 		searchQueryBuilder.requestTransformer( transformer );
 		return thisAsS();
 	}
@@ -55,7 +58,7 @@ class ElasticsearchSearchQueryOptionsStepImpl<H>
 	}
 
 	@Override
-	protected ElasticsearchSearchQueryOptionsStepImpl<H> thisAsS() {
+	protected ElasticsearchSearchQueryOptionsStepImpl<H, LOS> thisAsS() {
 		return this;
 	}
 

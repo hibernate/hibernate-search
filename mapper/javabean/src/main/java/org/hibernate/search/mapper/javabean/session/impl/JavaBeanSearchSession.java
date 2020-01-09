@@ -67,12 +67,12 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?> search(Collection<? extends Class<?>> types) {
+	public SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?, ?> search(Collection<? extends Class<?>> types) {
 		return search( scope( types ) );
 	}
 
 	@Override
-	public SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?> search(SearchScope scope) {
+	public SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?, ?> search(SearchScope scope) {
 		return search( (SearchScopeImpl) scope );
 	}
 
@@ -106,7 +106,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 		return new EntityReferenceImpl( typeContext.getTypeIdentifier(), typeContext.getEntityName(), id );
 	}
 
-	private SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?> search(SearchScopeImpl scope) {
+	private SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?, ?> search(SearchScopeImpl scope) {
 		return ( (SearchScopeImpl) scope ).search( this, this );
 	}
 

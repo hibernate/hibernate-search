@@ -68,11 +68,14 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @param <E> The entity type for projections.
  * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
  * {@code .extension( ElasticsearchExtension.get() }.
+ * @param <LOS> The type of the initial step of the loading options definition DSL.
+ * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
+ * {@code .extension( ElasticsearchExtension.get() }.
  *
  * @see #get()
  */
-public final class ElasticsearchExtension<H, R, E>
-		implements SearchQueryDslExtension<ElasticsearchSearchQueryHitTypeStep<R, E>, R, E>,
+public final class ElasticsearchExtension<H, R, E, LOS>
+		implements SearchQueryDslExtension<ElasticsearchSearchQueryHitTypeStep<R, E, LOS>, R, E, LOS>,
 		SearchQueryExtension<ElasticsearchSearchQuery<H>, H>,
 		SearchPredicateFactoryExtension<ElasticsearchSearchPredicateFactory>,
 		SearchSortFactoryExtension<ElasticsearchSearchSortFactory>,
@@ -82,7 +85,7 @@ public final class ElasticsearchExtension<H, R, E>
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ElasticsearchExtension<Object, Object, Object> INSTANCE = new ElasticsearchExtension<>();
+	private static final ElasticsearchExtension<Object, Object, Object, Object> INSTANCE = new ElasticsearchExtension<>();
 
 	/**
 	 * Get the extension with generic parameters automatically set as appropriate for the context in which it's used.
@@ -96,11 +99,14 @@ public final class ElasticsearchExtension<H, R, E>
 	 * @param <E> The entity type for projections.
 	 * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
 	 * {@code .extension( ElasticsearchExtension.get() }.
+	 * @param <LOS> The type of the initial step of the loading options definition DSL.
+	 * Users should not have to care about this, as the parameter will automatically take the appropriate value when calling
+	 * {@code .extension( ElasticsearchExtension.get() }.
 	 * @return The extension.
 	 */
-	@SuppressWarnings("unchecked") // The instance works for any H, R and E
-	public static <H, R, E> ElasticsearchExtension<H, R, E> get() {
-		return (ElasticsearchExtension<H, R, E>) INSTANCE;
+	@SuppressWarnings("unchecked") // The instance works for any H, R, E and LOS
+	public static <H, R, E, LOS> ElasticsearchExtension<H, R, E, LOS> get() {
+		return (ElasticsearchExtension<H, R, E, LOS>) INSTANCE;
 	}
 
 	private ElasticsearchExtension() {
@@ -111,8 +117,8 @@ public final class ElasticsearchExtension<H, R, E>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<ElasticsearchSearchQueryHitTypeStep<R, E>> extendOptional(
-			SearchQueryHitTypeStep<?, R, E, ?, ?> original,
+	public Optional<ElasticsearchSearchQueryHitTypeStep<R, E, LOS>> extendOptional(
+			SearchQueryHitTypeStep<?, R, E, LOS, ?, ?> original,
 			IndexScope<?> indexScope,
 			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E> loadingContextBuilder) {

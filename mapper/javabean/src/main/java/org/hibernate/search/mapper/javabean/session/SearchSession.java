@@ -32,7 +32,7 @@ public interface SearchSession extends AutoCloseable {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQueryHitTypeStep
 	 */
-	default SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?> search(Class<?> type) {
+	default SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?, ?> search(Class<?> type) {
 		return search( Collections.singleton( type ) );
 	}
 
@@ -45,7 +45,7 @@ public interface SearchSession extends AutoCloseable {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQueryHitTypeStep
 	 */
-	SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?> search(Collection<? extends Class<?>> types);
+	SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?, ?> search(Collection<? extends Class<?>> types);
 
 	/**
 	 * Initiate the building of a search query.
@@ -56,7 +56,7 @@ public interface SearchSession extends AutoCloseable {
 	 * @return The initial step of a DSL where the search query can be defined.
 	 * @see SearchQueryHitTypeStep
 	 */
-	SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?> search(SearchScope scope);
+	SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?, ?> search(SearchScope scope);
 
 	/**
 	 * Create a {@link SearchScope} limited to the given type.

@@ -46,7 +46,7 @@ public class SearchScopeImpl implements SearchScope {
 		return delegate.aggregation();
 	}
 
-	public SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?> search(BackendSessionContext sessionContext,
+	public SearchQueryHitTypeStep<?, EntityReference, Void, ?, ?, ?> search(BackendSessionContext sessionContext,
 			DocumentReferenceConverter<EntityReference> documentReferenceConverter) {
 		return delegate.search( sessionContext, new JavaBeanLoadingContext.Builder( documentReferenceConverter ) );
 	}

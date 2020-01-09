@@ -13,10 +13,11 @@ import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSear
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 
-public interface ElasticsearchSearchQueryOptionsStep<H>
+public interface ElasticsearchSearchQueryOptionsStep<H, LOS>
 		extends SearchQueryOptionsStep<
-						ElasticsearchSearchQueryOptionsStep<H>,
+						ElasticsearchSearchQueryOptionsStep<H, LOS>,
 						H,
+						LOS,
 						ElasticsearchSearchSortFactory,
 						ElasticsearchSearchAggregationFactory
 				>,
@@ -37,7 +38,7 @@ public interface ElasticsearchSearchQueryOptionsStep<H>
 	 * @param transformer The search request transformer.
 	 * @return {@code this}, for method chaining.
 	 */
-	ElasticsearchSearchQueryOptionsStep<H> requestTransformer(ElasticsearchSearchRequestTransformer transformer);
+	ElasticsearchSearchQueryOptionsStep<H, LOS> requestTransformer(ElasticsearchSearchRequestTransformer transformer);
 
 	@Override
 	ElasticsearchSearchQuery<H> toQuery();

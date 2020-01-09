@@ -9,6 +9,7 @@ package org.hibernate.search.engine.search.query.dsl;
 
 import java.util.Collection;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
@@ -28,12 +29,14 @@ import org.hibernate.search.engine.search.query.SearchResult;
  * @param <S> The "self" type (the actual exposed type of this step).
  * May be a subtype of SearchQueryOptionsStep with more exposed methods.
  * @param <H> The type of hits for the created query.
+ * @param <LOS> The type of the initial step of the loading options definition DSL accessible through {@link #loading(Consumer)}.
  * @param <SF> The type of factory used to create sorts in {@link #sort(Function)}.
  * @param <AF> The type of factory used to create aggregations in {@link #aggregation(AggregationKey, Function)}.
  */
 public interface SearchQueryOptionsStep<
-				S extends SearchQueryOptionsStep<?, H, SF, AF>,
+				S extends SearchQueryOptionsStep<?, H, LOS, SF, AF>,
 				H,
+				LOS,
 				SF extends SearchSortFactory,
 				AF extends SearchAggregationFactory
 		>
@@ -88,6 +91,14 @@ public interface SearchQueryOptionsStep<
 	 * @return {@code this}, for method chaining.
 	 */
 	S failAfter(long timeout, TimeUnit timeUnit);
+
+	/**
+	 * Configure entity loading for this query.
+	 * @param loadingOptionsContributor A consumer that will alter the loading options passed in parameter.
+	 * Should generally be a lambda expression.
+	 * @return {@code this}, for method chaining.
+	 */
+	S loading(Consumer<? super LOS> loadingOptionsContributor);
 
 	/**
 	 * Add a sort to this query.

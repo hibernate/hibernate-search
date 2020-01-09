@@ -15,30 +15,31 @@ import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
 
-public interface ElasticsearchSearchQueryHitTypeStep<R, E>
+public interface ElasticsearchSearchQueryHitTypeStep<R, E, LOS>
 		extends SearchQueryHitTypeStep<
-				ElasticsearchSearchQueryOptionsStep<E>,
+				ElasticsearchSearchQueryOptionsStep<E, LOS>,
 				R,
 				E,
+				LOS,
 				ElasticsearchSearchProjectionFactory<R, E>,
 				ElasticsearchSearchPredicateFactory
 		>,
-		ElasticsearchSearchQueryPredicateStep<E> {
+		ElasticsearchSearchQueryPredicateStep<E, LOS> {
 
 	@Override
-	ElasticsearchSearchQueryPredicateStep<E> asEntity();
+	ElasticsearchSearchQueryPredicateStep<E, LOS> asEntity();
 
 	@Override
-	ElasticsearchSearchQueryPredicateStep<R> asEntityReference();
+	ElasticsearchSearchQueryPredicateStep<R, LOS> asEntityReference();
 
 	@Override
-	<P> ElasticsearchSearchQueryPredicateStep<P> asProjection(
+	<P> ElasticsearchSearchQueryPredicateStep<P, LOS> asProjection(
 			Function<? super ElasticsearchSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor);
 
 	@Override
-	<P> ElasticsearchSearchQueryPredicateStep<P> asProjection(SearchProjection<P> projection);
+	<P> ElasticsearchSearchQueryPredicateStep<P, LOS> asProjection(SearchProjection<P> projection);
 
 	@Override
-	ElasticsearchSearchQueryPredicateStep<List<?>> asProjections(SearchProjection<?>... projections);
+	ElasticsearchSearchQueryPredicateStep<List<?>, LOS> asProjections(SearchProjection<?>... projections);
 
 }
