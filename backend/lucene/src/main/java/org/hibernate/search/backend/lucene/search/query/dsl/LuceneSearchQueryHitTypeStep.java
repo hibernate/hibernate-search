@@ -17,13 +17,13 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
 
 public interface LuceneSearchQueryHitTypeStep<R, E>
 		extends SearchQueryHitTypeStep<
-		LuceneSearchQueryOptionsStep<E>,
-				R,
-				E,
-				LuceneSearchProjectionFactory<R, E>,
-				LuceneSearchPredicateFactory
-		>,
-		LuceneSearchQueryPredicateStep<E> {
+						LuceneSearchQueryOptionsStep<E>,
+						R,
+						E,
+						LuceneSearchProjectionFactory<R, E>,
+						LuceneSearchPredicateFactory
+				>,
+				LuceneSearchQueryPredicateStep<E> {
 
 	@Override
 	LuceneSearchQueryPredicateStep<E> asEntity();

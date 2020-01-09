@@ -25,7 +25,7 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 
 class ElasticsearchSearchQueryOptionsStepImpl<H>
 		extends AbstractExtendedSearchQueryOptionsStep<
-		ElasticsearchSearchQueryOptionsStep<H>,
+						ElasticsearchSearchQueryOptionsStep<H>,
 						H,
 						ElasticsearchSearchResult<H>,
 						ElasticsearchSearchPredicateFactory,

@@ -22,12 +22,12 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
 
 public abstract class AbstractDelegatingSearchQueryHitTypeStep<R, E>
 		implements SearchQueryHitTypeStep<
-		SearchQueryOptionsStep<?, E, ?, ?>,
-								R,
-								E,
-								SearchProjectionFactory<R, E>,
-								SearchPredicateFactory
-						> {
+						SearchQueryOptionsStep<?, E, ?, ?>,
+						R,
+						E,
+						SearchProjectionFactory<R, E>,
+						SearchPredicateFactory
+				> {
 
 	private final SearchQueryHitTypeStep<?, R, E, ?, ?> delegate;
 

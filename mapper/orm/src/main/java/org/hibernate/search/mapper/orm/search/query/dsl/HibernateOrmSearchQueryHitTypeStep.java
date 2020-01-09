@@ -22,12 +22,12 @@ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupSt
  */
 public interface HibernateOrmSearchQueryHitTypeStep<E>
 		extends SearchQueryHitTypeStep<
-				SearchQueryOptionsStep<?, E, ?, ?>,
-				EntityReference,
-				E,
-				SearchProjectionFactory<EntityReference, E>,
-				SearchPredicateFactory
-		> {
+						SearchQueryOptionsStep<?, E, ?, ?>,
+						EntityReference,
+						E,
+						SearchProjectionFactory<EntityReference, E>,
+						SearchPredicateFactory
+				> {
 
 	/**
 	 * Set the JDBC fetch size for this query.
