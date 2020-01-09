@@ -17,15 +17,15 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 final class DefaultSearchQueryOptionsStep<H, C>
 		extends AbstractSearchQueryOptionsStep<
-								DefaultSearchQueryOptionsStep<H, C>,
-								H,
-								SearchPredicateFactory,
-								SearchSortFactory,
-								SearchAggregationFactory,
-								C
-						>
+						DefaultSearchQueryOptionsStep<H, C>,
+						H,
+						SearchPredicateFactory,
+						SearchSortFactory,
+						SearchAggregationFactory,
+						C
+				>
 		implements SearchQueryPredicateStep<DefaultSearchQueryOptionsStep<H, C>, H, SearchPredicateFactory>,
-		SearchQueryOptionsStep<DefaultSearchQueryOptionsStep<H, C>, H, SearchSortFactory, SearchAggregationFactory> {
+				SearchQueryOptionsStep<DefaultSearchQueryOptionsStep<H, C>, H, SearchSortFactory, SearchAggregationFactory> {
 
 	DefaultSearchQueryOptionsStep(IndexScope<C> indexScope, SearchQueryBuilder<H, C> searchQueryBuilder) {
 		super( indexScope, searchQueryBuilder );

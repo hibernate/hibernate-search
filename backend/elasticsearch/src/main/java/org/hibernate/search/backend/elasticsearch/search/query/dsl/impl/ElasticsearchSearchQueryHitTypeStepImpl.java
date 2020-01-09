@@ -28,10 +28,10 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
 
 public class ElasticsearchSearchQueryHitTypeStepImpl<R, E>
 		extends AbstractSearchQueryHitTypeStep<
-		ElasticsearchSearchQueryOptionsStep<E>,
+						ElasticsearchSearchQueryOptionsStep<E>,
 						R,
 						E,
-				ElasticsearchSearchProjectionFactory<R, E>,
+						ElasticsearchSearchProjectionFactory<R, E>,
 						ElasticsearchSearchPredicateFactory,
 						ElasticsearchSearchQueryElementCollector
 				>

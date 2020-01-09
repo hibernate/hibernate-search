@@ -25,13 +25,13 @@ import org.hibernate.search.engine.search.query.spi.SearchQueryBuilder;
 
 public final class DefaultSearchQueryHitTypeStep<R, E, C>
 		extends AbstractSearchQueryHitTypeStep<
-		SearchQueryOptionsStep<?, E, ?, ?>,
-								R,
-								E,
-								SearchProjectionFactory<R, E>,
-								SearchPredicateFactory,
-								C
-						> {
+						SearchQueryOptionsStep<?, E, ?, ?>,
+						R,
+						E,
+						SearchProjectionFactory<R, E>,
+						SearchPredicateFactory,
+						C
+				> {
 
 	private final IndexScope<C> indexScope;
 	private final BackendSessionContext sessionContext;

@@ -28,10 +28,10 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
 
 public class LuceneSearchQueryHitTypeStepImpl<R, E>
 		extends AbstractSearchQueryHitTypeStep<
-		LuceneSearchQueryOptionsStep<E>,
+						LuceneSearchQueryOptionsStep<E>,
 						R,
 						E,
-				LuceneSearchProjectionFactory<R, E>,
+						LuceneSearchProjectionFactory<R, E>,
 						LuceneSearchPredicateFactory,
 						LuceneSearchQueryElementCollector
 				>
