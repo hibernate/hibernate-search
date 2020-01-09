@@ -13,6 +13,7 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
+import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 
 /**
  * The initial step in a query definition, where the type of query hits can be set,
@@ -22,10 +23,10 @@ import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupSt
  */
 public interface HibernateOrmSearchQueryHitTypeStep<E>
 		extends SearchQueryHitTypeStep<
-						SearchQueryOptionsStep<?, E, Void, ?, ?>,
+						SearchQueryOptionsStep<?, E, SearchLoadingOptionsStep, ?, ?>,
 						EntityReference,
 						E,
-						Void,
+						SearchLoadingOptionsStep,
 						SearchProjectionFactory<EntityReference, E>,
 						SearchPredicateFactory
 				> {

@@ -8,32 +8,32 @@ package org.hibernate.search.mapper.orm.search.query.dsl.impl;
 
 import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractDelegatingSearchQueryHitTypeStep;
-import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQueryHitTypeStep;
-import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
-import org.hibernate.search.mapper.orm.search.loading.context.impl.HibernateOrmLoadingContext;
 import org.hibernate.search.mapper.orm.common.EntityReference;
+import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
+import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
+import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQueryHitTypeStep;
 
 public class HibernateOrmSearchQueryHitTypeStepImpl<E>
-		extends AbstractDelegatingSearchQueryHitTypeStep<EntityReference, E, Void>
+		extends AbstractDelegatingSearchQueryHitTypeStep<EntityReference, E, SearchLoadingOptionsStep>
 		implements HibernateOrmSearchQueryHitTypeStep<E> {
-	private final HibernateOrmLoadingContext.Builder<E> loadingContextBuilder;
+	private final SearchLoadingOptionsStep loadingOptions;
 
 	public HibernateOrmSearchQueryHitTypeStepImpl(
-			SearchQueryHitTypeStep<?, EntityReference, E, Void, ?, ?> delegate,
-			HibernateOrmLoadingContext.Builder<E> loadingContextBuilder) {
+			SearchQueryHitTypeStep<?, EntityReference, E, SearchLoadingOptionsStep, ?, ?> delegate,
+			SearchLoadingOptionsStep loadingOptions) {
 		super( delegate );
-		this.loadingContextBuilder = loadingContextBuilder;
+		this.loadingOptions = loadingOptions;
 	}
 
 	@Override
 	public HibernateOrmSearchQueryHitTypeStep<E> fetchSize(int fetchSize) {
-		loadingContextBuilder.fetchSize( fetchSize );
+		loadingOptions.fetchSize( fetchSize );
 		return this;
 	}
 
 	@Override
 	public HibernateOrmSearchQueryHitTypeStep<E> cacheLookupStrategy(EntityLoadingCacheLookupStrategy strategy) {
-		loadingContextBuilder.cacheLookupStrategy( strategy );
+		loadingOptions.cacheLookupStrategy( strategy );
 		return this;
 	}
 }

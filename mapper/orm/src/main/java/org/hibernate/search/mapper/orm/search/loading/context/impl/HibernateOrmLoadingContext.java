@@ -17,6 +17,7 @@ import org.hibernate.search.engine.search.loading.spi.ProjectionHitMapper;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
+import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.search.loading.impl.EntityLoaderBuilder;
 import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmLoadingMappingContext;
 import org.hibernate.search.mapper.orm.search.loading.impl.HibernateOrmLoadingSessionContext;
@@ -62,7 +63,8 @@ public final class HibernateOrmLoadingContext<E> implements LoadingContext<Entit
 		return loadingOptions;
 	}
 
-	public static final class Builder<E> implements LoadingContextBuilder<EntityReference, E, Void> {
+	public static final class Builder<E>
+			implements LoadingContextBuilder<EntityReference, E, SearchLoadingOptionsStep>, SearchLoadingOptionsStep {
 		private final HibernateOrmLoadingSessionContext sessionContext;
 		private final EntityLoaderBuilder<E> entityLoaderBuilder;
 		private final MutableEntityLoadingOptions loadingOptions;
@@ -76,17 +78,20 @@ public final class HibernateOrmLoadingContext<E> implements LoadingContext<Entit
 		}
 
 		@Override
-		public Void toAPI() {
-			// TODO HSEARCH-3629 expose options through the object returned here
-			return null;
+		public SearchLoadingOptionsStep toAPI() {
+			return this;
 		}
 
-		public void fetchSize(int fetchSize) {
+		@Override
+		public SearchLoadingOptionsStep fetchSize(int fetchSize) {
 			loadingOptions.setFetchSize( fetchSize );
+			return this;
 		}
 
-		public void cacheLookupStrategy(EntityLoadingCacheLookupStrategy strategy) {
+		@Override
+		public SearchLoadingOptionsStep cacheLookupStrategy(EntityLoadingCacheLookupStrategy strategy) {
 			entityLoaderBuilder.cacheLookupStrategy( strategy );
+			return this;
 		}
 
 		@Override
