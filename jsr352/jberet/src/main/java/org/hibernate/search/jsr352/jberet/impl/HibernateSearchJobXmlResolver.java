@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.exception.SearchException;
 import org.hibernate.search.jsr352.massindexing.MassIndexingJob;
 
 import org.jberet.spi.JobXmlResolver;
@@ -47,7 +46,7 @@ public final class HibernateSearchJobXmlResolver extends AbstractJobXmlResolver 
 			return classLoader.getResourceAsStream( path );
 		}
 		else {
-			throw new SearchException( "Not a Hibernate Search JSR-352 job: " + jobXml );
+			return null;
 		}
 	}
 }
