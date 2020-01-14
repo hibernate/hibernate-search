@@ -40,11 +40,11 @@ public class LuceneSearchQueryHitTypeStepImpl<R, E, LOS>
 
 	private final LuceneIndexScope indexScope;
 	private final BackendSessionContext sessionContext;
-	private final LoadingContextBuilder<R, E> loadingContextBuilder;
+	private final LoadingContextBuilder<R, E, LOS> loadingContextBuilder;
 
 	public LuceneSearchQueryHitTypeStepImpl(LuceneIndexScope indexScope,
 			BackendSessionContext sessionContext,
-			LoadingContextBuilder<R, E> loadingContextBuilder) {
+			LoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 		this.indexScope = indexScope;
 		this.sessionContext = sessionContext;
 		this.loadingContextBuilder = loadingContextBuilder;
@@ -109,12 +109,12 @@ public class LuceneSearchQueryHitTypeStepImpl<R, E, LOS>
 	}
 
 	@Override
-	protected LoadingContextBuilder<R, E> getLoadingContextBuilder() {
+	protected LoadingContextBuilder<R, E, LOS> getLoadingContextBuilder() {
 		return loadingContextBuilder;
 	}
 
 	private <H> LuceneSearchQueryPredicateStep<H, LOS> createSearchQueryContext(LuceneSearchQueryBuilder<H> builder) {
-		return new LuceneSearchQueryOptionsStepImpl<>( indexScope, builder );
+		return new LuceneSearchQueryOptionsStepImpl<>( indexScope, builder, loadingContextBuilder );
 	}
 }
 

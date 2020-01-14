@@ -34,7 +34,7 @@ public interface PojoScopeDelegate<R, E, C> {
 
 	<LOS> SearchQueryHitTypeStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
 			BackendSessionContext sessionContext,
-			LoadingContextBuilder<R, E> loadingContextBuilder);
+			LoadingContextBuilder<R, E, LOS> loadingContextBuilder);
 
 	SearchPredicateFactory predicate();
 

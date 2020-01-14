@@ -43,7 +43,7 @@ class MappedIndexScopeImpl<C, R, E> implements MappedIndexScope<R, E> {
 	@Override
 	public <LOS> SearchQueryHitTypeStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
 			BackendSessionContext sessionContext,
-			LoadingContextBuilder<R, E> loadingContextBuilder) {
+			LoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 		return new DefaultSearchQueryHitTypeStep<>( delegate, sessionContext, loadingContextBuilder );
 	}
 

@@ -35,11 +35,11 @@ public final class DefaultSearchQueryHitTypeStep<R, E, LOS, C>
 
 	private final IndexScope<C> indexScope;
 	private final BackendSessionContext sessionContext;
-	private final LoadingContextBuilder<R, E> loadingContextBuilder;
+	private final LoadingContextBuilder<R, E, LOS> loadingContextBuilder;
 
 	public DefaultSearchQueryHitTypeStep(IndexScope<C> indexScope,
 			BackendSessionContext sessionContext,
-			LoadingContextBuilder<R, E> loadingContextBuilder) {
+			LoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 		this.indexScope = indexScope;
 		this.sessionContext = sessionContext;
 		this.loadingContextBuilder = loadingContextBuilder;
@@ -49,14 +49,14 @@ public final class DefaultSearchQueryHitTypeStep<R, E, LOS, C>
 	public DefaultSearchQueryOptionsStep<E, LOS, C> asEntity() {
 		SearchQueryBuilder<E, C> builder = indexScope.getSearchQueryBuilderFactory()
 				.asEntity( sessionContext, loadingContextBuilder );
-		return new DefaultSearchQueryOptionsStep<E, LOS, C>( indexScope, builder );
+		return new DefaultSearchQueryOptionsStep<E, LOS, C>( indexScope, builder, loadingContextBuilder );
 	}
 
 	@Override
 	public DefaultSearchQueryOptionsStep<R, LOS, C> asEntityReference() {
 		SearchQueryBuilder<R, C> builder = indexScope.getSearchQueryBuilderFactory()
 				.asReference( sessionContext, loadingContextBuilder );
-		return new DefaultSearchQueryOptionsStep<>( indexScope, builder );
+		return new DefaultSearchQueryOptionsStep<>( indexScope, builder, loadingContextBuilder );
 	}
 
 	@Override
@@ -71,14 +71,14 @@ public final class DefaultSearchQueryHitTypeStep<R, E, LOS, C>
 	public <P> DefaultSearchQueryOptionsStep<P, LOS, C> asProjection(SearchProjection<P> projection) {
 		SearchQueryBuilder<P, C> builder = indexScope.getSearchQueryBuilderFactory()
 				.asProjection( sessionContext, loadingContextBuilder, projection );
-		return new DefaultSearchQueryOptionsStep<>( indexScope, builder );
+		return new DefaultSearchQueryOptionsStep<>( indexScope, builder, loadingContextBuilder );
 	}
 
 	@Override
 	public DefaultSearchQueryOptionsStep<List<?>, LOS, C> asProjections(SearchProjection<?>... projections) {
 		SearchQueryBuilder<List<?>, C> builder = indexScope.getSearchQueryBuilderFactory()
 				.asProjections( sessionContext, loadingContextBuilder, projections );
-		return new DefaultSearchQueryOptionsStep<>( indexScope, builder );
+		return new DefaultSearchQueryOptionsStep<>( indexScope, builder, loadingContextBuilder );
 	}
 
 	@Override
@@ -103,7 +103,7 @@ public final class DefaultSearchQueryHitTypeStep<R, E, LOS, C>
 	}
 
 	@Override
-	protected LoadingContextBuilder<R, E> getLoadingContextBuilder() {
+	protected LoadingContextBuilder<R, E, LOS> getLoadingContextBuilder() {
 		return loadingContextBuilder;
 	}
 }

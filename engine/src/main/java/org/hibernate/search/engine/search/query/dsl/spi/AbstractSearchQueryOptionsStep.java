@@ -13,6 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
@@ -51,11 +52,14 @@ public abstract class AbstractSearchQueryOptionsStep<
 
 	private final IndexScope<C> indexScope;
 	private final SearchQueryBuilder<H, C> searchQueryBuilder;
+	private final LoadingContextBuilder<?, ?, LOS> loadingContextBuilder;
 
 	public AbstractSearchQueryOptionsStep(IndexScope<C> indexScope,
-			SearchQueryBuilder<H, C> searchQueryBuilder) {
+			SearchQueryBuilder<H, C> searchQueryBuilder,
+			LoadingContextBuilder<?, ?, LOS> loadingContextBuilder) {
 		this.indexScope = indexScope;
 		this.searchQueryBuilder = searchQueryBuilder;
+		this.loadingContextBuilder = loadingContextBuilder;
 	}
 
 	@Override
@@ -100,8 +104,8 @@ public abstract class AbstractSearchQueryOptionsStep<
 
 	@Override
 	public S loading(Consumer<? super LOS> loadingOptionsContributor) {
-		// TODO HSEARCH-3629 Implement this
-		throw new UnsupportedOperationException( "Not supported yet" );
+		loadingOptionsContributor.accept( loadingContextBuilder.toAPI() );
+		return thisAsS();
 	}
 
 	@Override

@@ -23,15 +23,15 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
 public interface SearchQueryBuilderFactory<C> {
 
 	<E> SearchQueryBuilder<E, C> asEntity(BackendSessionContext sessionContext,
-			LoadingContextBuilder<?, E> loadingContextBuilder);
+			LoadingContextBuilder<?, E, ?> loadingContextBuilder);
 
 	<R> SearchQueryBuilder<R, C> asReference(BackendSessionContext sessionContext,
-			LoadingContextBuilder<R, ?> loadingContextBuilder);
+			LoadingContextBuilder<R, ?, ?> loadingContextBuilder);
 
 	<P> SearchQueryBuilder<P, C> asProjection(BackendSessionContext sessionContext,
-			LoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<P> projection);
+			LoadingContextBuilder<?, ?, ?> loadingContextBuilder, SearchProjection<P> projection);
 
 	SearchQueryBuilder<List<?>, C> asProjections(BackendSessionContext sessionContext,
-			LoadingContextBuilder<?, ?> loadingContextBuilder, SearchProjection<?>... projections);
+			LoadingContextBuilder<?, ?, ?> loadingContextBuilder, SearchProjection<?>... projections);
 
 }

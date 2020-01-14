@@ -56,7 +56,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private final BackendSessionContext sessionContext;
 
 	private final ElasticsearchSearchPredicateContext rootPredicateContext;
-	private final LoadingContextBuilder<?, ?> loadingContextBuilder;
+	private final LoadingContextBuilder<?, ?, ?> loadingContextBuilder;
 	private final ElasticsearchSearchProjection<?, H> rootProjection;
 
 	private final Set<String> routingKeys;
@@ -76,7 +76,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchSearchContext searchContext,
 			BackendSessionContext sessionContext,
-			LoadingContextBuilder<?, ?> loadingContextBuilder,
+			LoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			ElasticsearchSearchProjection<?, H> rootProjection) {
 		this.workFactory = workFactory;
 		this.searchResultExtractorFactory = searchResultExtractorFactory;

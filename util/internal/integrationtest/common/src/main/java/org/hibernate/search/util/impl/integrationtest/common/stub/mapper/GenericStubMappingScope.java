@@ -34,7 +34,17 @@ public class GenericStubMappingScope<R, E> {
 
 	public SearchQueryHitTypeStep<?, R, E, StubLoadingOptionsStep, ?, ?> query(StubBackendSessionContext sessionContext,
 			LoadingContext<R, E> loadingContext) {
-		LoadingContextBuilder<R, E> loadingContextBuilder = () -> loadingContext;
+		LoadingContextBuilder<R, E, StubLoadingOptionsStep> loadingContextBuilder = new LoadingContextBuilder<R, E, StubLoadingOptionsStep>() {
+			@Override
+			public StubLoadingOptionsStep toAPI() {
+				return new StubLoadingOptionsStep();
+			}
+
+			@Override
+			public LoadingContext<R, E> build() {
+				return loadingContext;
+			}
+		};
 		return delegate.search( sessionContext, loadingContextBuilder );
 	}
 

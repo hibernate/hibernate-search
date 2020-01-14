@@ -23,13 +23,13 @@ public class StubSearchQueryBuilder<H> implements SearchQueryBuilder<H, StubQuer
 	private final StubScopeModel scopeModel;
 	private final StubSearchWork.Builder workBuilder;
 	private final StubSearchProjectionContext projectionContext;
-	private final LoadingContextBuilder<?, ?> loadingContextBuilder;
+	private final LoadingContextBuilder<?, ?, ?> loadingContextBuilder;
 	private final StubSearchProjection<H> rootProjection;
 
 	public StubSearchQueryBuilder(StubBackend backend, StubScopeModel scopeModel,
 			StubSearchWork.ResultType resultType,
 			BackendSessionContext sessionContext,
-			LoadingContextBuilder<?, ?> loadingContextBuilder, StubSearchProjection<H> rootProjection) {
+			LoadingContextBuilder<?, ?, ?> loadingContextBuilder, StubSearchProjection<H> rootProjection) {
 		this.backend = backend;
 		this.scopeModel = scopeModel;
 		this.workBuilder = StubSearchWork.builder( resultType );

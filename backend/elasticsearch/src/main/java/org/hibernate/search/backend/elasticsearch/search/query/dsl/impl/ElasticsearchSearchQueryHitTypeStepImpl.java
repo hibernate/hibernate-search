@@ -40,11 +40,11 @@ public class ElasticsearchSearchQueryHitTypeStepImpl<R, E, LOS>
 
 	private final ElasticsearchIndexScope indexScope;
 	private final BackendSessionContext sessionContext;
-	private final LoadingContextBuilder<R, E> loadingContextBuilder;
+	private final LoadingContextBuilder<R, E, LOS> loadingContextBuilder;
 
 	public ElasticsearchSearchQueryHitTypeStepImpl(ElasticsearchIndexScope indexScope,
 			BackendSessionContext sessionContext,
-			LoadingContextBuilder<R, E> loadingContextBuilder) {
+			LoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 		this.indexScope = indexScope;
 		this.sessionContext = sessionContext;
 		this.loadingContextBuilder = loadingContextBuilder;
@@ -109,7 +109,7 @@ public class ElasticsearchSearchQueryHitTypeStepImpl<R, E, LOS>
 	}
 
 	@Override
-	protected LoadingContextBuilder<R, E> getLoadingContextBuilder() {
+	protected LoadingContextBuilder<R, E, LOS> getLoadingContextBuilder() {
 		return loadingContextBuilder;
 	}
 
