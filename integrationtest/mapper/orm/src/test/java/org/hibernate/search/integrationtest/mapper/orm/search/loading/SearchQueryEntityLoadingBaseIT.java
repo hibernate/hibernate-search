@@ -56,7 +56,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 
 		testLoadingThatManyEntities(
 				session -> { }, // No particular session setup
-				loadingOptions -> loadingOptions, // No particular loading option
+				o -> { }, // No particular loading option
 				entityCount,
 				// Only one entity type means only one statement should be executed, even if there are multiple hits
 				c -> c.assertStatementExecutionCount().isEqualTo( 1 )
@@ -76,7 +76,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 
 		testLoading(
 				session -> { }, // No particular session setup
-				loadingOptions -> loadingOptions, // No particular loading option
+				o -> { }, // No particular loading option
 				c -> c
 						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 0 ) )
 						.doc( primitives.getIndexName(), primitives.getDocumentIdForEntityId( 1 ) )
@@ -116,7 +116,7 @@ public class SearchQueryEntityLoadingBaseIT<T> extends AbstractSearchQueryEntity
 					 */
 					proxyReference.set( proxy );
 				},
-				loadingOptions -> loadingOptions, // No particular loading option
+				o -> { }, // No particular loading option
 				entityCount,
 				// Only one entity type means only one statement should be executed, even if there are multiple hits
 				c -> c.assertStatementExecutionCount().isEqualTo( 1 )

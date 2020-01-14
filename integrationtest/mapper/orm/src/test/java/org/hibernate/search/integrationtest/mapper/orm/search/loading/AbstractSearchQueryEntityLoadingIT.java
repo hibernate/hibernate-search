@@ -12,7 +12,6 @@ import static org.hibernate.search.util.impl.integrationtest.common.stub.backend
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.hibernate.Hibernate;
@@ -21,7 +20,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQueryHitTypeStep;
+import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
@@ -44,7 +43,7 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 			Consumer<Session> sessionSetup,
 			List<? extends Class<? extends T>> targetClasses,
 			List<String> targetIndexes,
-			Function<HibernateOrmSearchQueryHitTypeStep<T>, HibernateOrmSearchQueryHitTypeStep<T>> loadingOptionsContributor,
+			Consumer<SearchLoadingOptionsStep> loadingOptionsContributor,
 			Consumer<DocumentReferenceCollector> hitDocumentReferencesContributor,
 			Consumer<EntityCollector<T>> expectedLoadedEntitiesContributor,
 			Consumer<OrmSoftAssertions> assertionsContributor) {
@@ -55,8 +54,9 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 
 			SearchSession searchSession = Search.session( session );
 
-			SearchQuery<T> query = loadingOptionsContributor.apply( searchSession.search( targetClasses ) )
+			SearchQuery<T> query = searchSession.search( targetClasses )
 					.predicate( f -> f.matchAll() )
+					.loading( loadingOptionsContributor )
 					.toQuery();
 
 			DocumentReferenceCollector documentReferenceCollector = new DocumentReferenceCollector();
