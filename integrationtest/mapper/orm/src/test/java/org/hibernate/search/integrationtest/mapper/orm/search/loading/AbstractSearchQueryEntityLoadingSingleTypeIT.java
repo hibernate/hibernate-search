@@ -10,13 +10,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import org.hibernate.Session;
-import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQueryHitTypeStep;
-import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSoftAssertions;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.EntityIdDocumentIdIndexedEntity;
 import org.hibernate.search.integrationtest.mapper.orm.search.loading.model.singletype.NonEntityIdDocumentIdIndexedEntity;
+import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
+import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSoftAssertions;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 
 public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends AbstractSearchQueryEntityLoadingIT {
@@ -45,7 +44,7 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 
 	protected final void testLoadingThatManyEntities(
 			Consumer<Session> sessionSetup,
-			Function<HibernateOrmSearchQueryHitTypeStep<T>, HibernateOrmSearchQueryHitTypeStep<T>> loadingOptionsContributor,
+			Consumer<SearchLoadingOptionsStep> loadingOptionsContributor,
 			int entityCount,
 			Consumer<OrmSoftAssertions> assertionsContributor) {
 		testLoading(
@@ -69,7 +68,7 @@ public abstract class AbstractSearchQueryEntityLoadingSingleTypeIT<T> extends Ab
 
 	protected final void testLoading(
 			Consumer<Session> sessionSetup,
-			Function<HibernateOrmSearchQueryHitTypeStep<T>, HibernateOrmSearchQueryHitTypeStep<T>> loadingOptionsContributor,
+			Consumer<SearchLoadingOptionsStep> loadingOptionsContributor,
 			Consumer<DocumentReferenceCollector> hitDocumentReferencesContributor,
 			Consumer<EntityCollector<T>> expectedLoadedEntitiesContributor,
 			Consumer<OrmSoftAssertions> assertionsContributor) {

@@ -148,12 +148,9 @@ public class SearchQueryEntityLoadingFetchSizeIT<T> extends AbstractSearchQueryE
 
 		testLoadingThatManyEntities(
 				session -> { }, // No particular session setup
-				loadingOptions -> {
+				o -> {
 					if ( overriddenFetchSize != null ) {
-						return loadingOptions.fetchSize( overriddenFetchSize );
-					}
-					else {
-						return loadingOptions;
+						o.fetchSize( overriddenFetchSize );
 					}
 				},
 				entityCount,

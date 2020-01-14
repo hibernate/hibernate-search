@@ -303,12 +303,9 @@ public class SearchQueryEntityLoadingCacheLookupIT<T> extends AbstractSearchQuer
 							.as( "Test setup sanity check" )
 							.hasSize( entitiesToLoadInSession.size() );
 				},
-				loadingOptions -> {
+				f -> {
 					if ( overriddenLookupStrategy != null ) {
-						return loadingOptions.cacheLookupStrategy( overriddenLookupStrategy );
-					}
-					else {
-						return loadingOptions;
+						f.cacheLookupStrategy( overriddenLookupStrategy );
 					}
 				},
 				entityCount,
