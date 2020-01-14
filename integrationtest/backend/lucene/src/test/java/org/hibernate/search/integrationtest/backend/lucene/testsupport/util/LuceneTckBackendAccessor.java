@@ -42,7 +42,7 @@ class LuceneTckBackendAccessor implements TckBackendAccessor {
 			Files.list( indexPath ).forEach( path -> nukeOrLogRecursively( path, indexName ) );
 			// We don't want to delete the index directory itself, because HSearch will just re-create it.
 			// Try to remove all permissions, which will prevent HSearch from creating new content.
-			makeInaccessible( indexPath );
+			nukeOrLog( indexPath, indexName, false, null );
 		}
 		catch (RuntimeException | IOException e) {
 			throw new IllegalStateException(
@@ -58,19 +58,19 @@ class LuceneTckBackendAccessor implements TckBackendAccessor {
 			Files.walkFileTree( path, new SimpleFileVisitor<Path>() {
 				@Override
 				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) {
-					nukeOrLog( file, indexName, null );
+					nukeOrLog( file, indexName, true, null );
 					return FileVisitResult.CONTINUE;
 				}
 
 				@Override
 				public FileVisitResult visitFileFailed(Path file, IOException exception) {
-					nukeOrLog( file, indexName, exception );
+					nukeOrLog( file, indexName, true, exception );
 					return FileVisitResult.CONTINUE;
 				}
 
 				@Override
 				public FileVisitResult postVisitDirectory(Path dir, IOException exception) {
-					nukeOrLog( dir, indexName, exception );
+					nukeOrLog( dir, indexName, true, exception );
 					return FileVisitResult.CONTINUE;
 				}
 			} );
@@ -80,15 +80,17 @@ class LuceneTckBackendAccessor implements TckBackendAccessor {
 		}
 	}
 
-	private void nukeOrLog(Path path, String indexName, IOException previousException) {
+	private void nukeOrLog(Path path, String indexName, boolean allowDelete, IOException previousException) {
 		IOException exception = previousException;
-		try {
-			// Try to delete it...
-			delete( path );
-			return; // Success, don't worry about the rest
-		}
-		catch (IOException e) {
-			exception = Throwables.combine( exception, e );
+		if ( allowDelete ) {
+			try {
+				// Try to delete it...
+				delete( path );
+				return; // Success, don't worry about the rest
+			}
+			catch (IOException e) {
+				exception = Throwables.combine( exception, e );
+			}
 		}
 
 		// If we can't delete it, try to make it inaccessible.
