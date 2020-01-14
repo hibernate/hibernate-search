@@ -39,19 +39,19 @@ public class LuceneSearchQueryBuilderFactory
 
 	@Override
 	public <E> LuceneSearchQueryBuilder<E> asEntity(
-			BackendSessionContext sessionContext, LoadingContextBuilder<?, E> loadingContextBuilder) {
+			BackendSessionContext sessionContext, LoadingContextBuilder<?, E, ?> loadingContextBuilder) {
 		return asProjection( sessionContext, loadingContextBuilder, searchProjectionFactory.<E>entity().build() );
 	}
 
 	@Override
 	public <R> LuceneSearchQueryBuilder<R> asReference(
-			BackendSessionContext sessionContext, LoadingContextBuilder<R, ?> loadingContextBuilder) {
+			BackendSessionContext sessionContext, LoadingContextBuilder<R, ?, ?> loadingContextBuilder) {
 		return asProjection( sessionContext, loadingContextBuilder, searchProjectionFactory.<R>entityReference().build() );
 	}
 
 	@Override
 	public <P> LuceneSearchQueryBuilder<P> asProjection(
-			BackendSessionContext sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
+			BackendSessionContext sessionContext, LoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			SearchProjection<P> projection) {
 		return createSearchQueryBuilder( sessionContext, loadingContextBuilder,
 				searchProjectionFactory.toImplementation( projection ) );
@@ -59,7 +59,7 @@ public class LuceneSearchQueryBuilderFactory
 
 	@Override
 	public LuceneSearchQueryBuilder<List<?>> asProjections(
-			BackendSessionContext sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
+			BackendSessionContext sessionContext, LoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			SearchProjection<?>... projections) {
 		return createSearchQueryBuilder( sessionContext, loadingContextBuilder, createRootProjection( projections ) );
 	}
@@ -75,7 +75,7 @@ public class LuceneSearchQueryBuilderFactory
 	}
 
 	private <H> LuceneSearchQueryBuilder<H> createSearchQueryBuilder(
-			BackendSessionContext sessionContext, LoadingContextBuilder<?, ?> loadingContextBuilder,
+			BackendSessionContext sessionContext, LoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			LuceneSearchProjection<?, H> rootProjection) {
 		return searchBackendContext.createSearchQueryBuilder(
 				searchContext, sessionContext, loadingContextBuilder, rootProjection

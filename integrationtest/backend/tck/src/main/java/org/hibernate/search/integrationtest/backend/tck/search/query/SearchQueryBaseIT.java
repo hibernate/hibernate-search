@@ -208,7 +208,7 @@ public class SearchQueryBaseIT {
 		@Override
 		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryHitTypeStep<?, R, E, LOS, ?, ?> original,
 				IndexScope<?> indexScope, BackendSessionContext sessionContext,
-				LoadingContextBuilder<R, E> loadingContextBuilder) {
+				LoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( indexScope ).isNotNull();
 			Assertions.assertThat( sessionContext ).isNotNull();
@@ -222,7 +222,7 @@ public class SearchQueryBaseIT {
 		@Override
 		public Optional<MyExtendedDslContext<R>> extendOptional(SearchQueryHitTypeStep<?, R, E, LOS, ?, ?> original,
 				IndexScope<?> indexScope, BackendSessionContext sessionContext,
-				LoadingContextBuilder<R, E> loadingContextBuilder) {
+				LoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( indexScope ).isNotNull();
 			Assertions.assertThat( sessionContext ).isNotNull();

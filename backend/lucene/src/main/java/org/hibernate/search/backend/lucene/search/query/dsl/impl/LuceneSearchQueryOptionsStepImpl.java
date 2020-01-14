@@ -18,6 +18,7 @@ import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScope;
 import org.hibernate.search.backend.lucene.search.query.impl.LuceneSearchQueryBuilder;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.dsl.spi.AbstractExtendedSearchQueryOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
@@ -38,8 +39,9 @@ class LuceneSearchQueryOptionsStepImpl<H, LOS>
 	private final LuceneSearchQueryBuilder<H> searchQueryBuilder;
 
 	LuceneSearchQueryOptionsStepImpl(LuceneIndexScope indexSearchScope,
-			LuceneSearchQueryBuilder<H> searchQueryBuilder) {
-		super( indexSearchScope, searchQueryBuilder );
+			LuceneSearchQueryBuilder<H> searchQueryBuilder,
+			LoadingContextBuilder<?, ?, LOS> loadingContextBuilder) {
+		super( indexSearchScope, searchQueryBuilder, loadingContextBuilder );
 		this.searchQueryBuilder = searchQueryBuilder;
 	}
 

@@ -62,7 +62,7 @@ public final class HibernateOrmLoadingContext<E> implements LoadingContext<Entit
 		return loadingOptions;
 	}
 
-	public static final class Builder<E> implements LoadingContextBuilder<EntityReference, E> {
+	public static final class Builder<E> implements LoadingContextBuilder<EntityReference, E, Void> {
 		private final HibernateOrmLoadingSessionContext sessionContext;
 		private final EntityLoaderBuilder<E> entityLoaderBuilder;
 		private final MutableEntityLoadingOptions loadingOptions;
@@ -73,6 +73,12 @@ public final class HibernateOrmLoadingContext<E> implements LoadingContext<Entit
 			this.sessionContext = sessionContext;
 			this.entityLoaderBuilder = new EntityLoaderBuilder<>( mappingContext, sessionContext, indexedTypeContexts );
 			this.loadingOptions = new MutableEntityLoadingOptions( mappingContext );
+		}
+
+		@Override
+		public Void toAPI() {
+			// TODO HSEARCH-3629 expose options through the object returned here
+			return null;
 		}
 
 		public void fetchSize(int fetchSize) {

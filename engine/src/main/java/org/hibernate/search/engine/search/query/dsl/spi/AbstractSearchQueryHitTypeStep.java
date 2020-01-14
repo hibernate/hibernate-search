@@ -46,5 +46,5 @@ public abstract class AbstractSearchQueryHitTypeStep<
 
 	protected abstract BackendSessionContext getSessionContext();
 
-	protected abstract LoadingContextBuilder<R, E> getLoadingContextBuilder();
+	protected abstract LoadingContextBuilder<R, E, LOS> getLoadingContextBuilder();
 }

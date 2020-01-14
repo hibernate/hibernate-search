@@ -48,6 +48,6 @@ public interface SearchQueryDslExtension<T, R, E, LOS> {
 	Optional<T> extendOptional(SearchQueryHitTypeStep<?, R, E, LOS, ?, ?> original,
 			IndexScope<?> indexScope,
 			BackendSessionContext sessionContext,
-			LoadingContextBuilder<R, E> loadingContextBuilder);
+			LoadingContextBuilder<R, E, LOS> loadingContextBuilder);
 
 }

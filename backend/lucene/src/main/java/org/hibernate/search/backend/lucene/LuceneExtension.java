@@ -121,7 +121,7 @@ public final class LuceneExtension<H, R, E, LOS>
 			SearchQueryHitTypeStep<?, R, E, LOS, ?, ?> original,
 			IndexScope<?> indexScope,
 			BackendSessionContext sessionContext,
-			LoadingContextBuilder<R, E> loadingContextBuilder) {
+			LoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 		if ( indexScope instanceof LuceneIndexScope ) {
 			return Optional.of( new LuceneSearchQueryHitTypeStepImpl<>(
 					(LuceneIndexScope) indexScope, sessionContext, loadingContextBuilder

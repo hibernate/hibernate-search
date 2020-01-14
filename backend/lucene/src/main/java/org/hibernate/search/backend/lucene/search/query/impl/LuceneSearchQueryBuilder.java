@@ -56,7 +56,7 @@ public class LuceneSearchQueryBuilder<H>
 	private final BackendSessionContext sessionContext;
 	private final Set<String> routingKeys;
 
-	private final LoadingContextBuilder<?, ?> loadingContextBuilder;
+	private final LoadingContextBuilder<?, ?, ?> loadingContextBuilder;
 	private final LuceneSearchProjection<?, H> rootProjection;
 
 	private List<LuceneFieldComparatorSource> nestedFieldSorts;
@@ -73,7 +73,7 @@ public class LuceneSearchQueryBuilder<H>
 			LuceneReadWorkOrchestrator queryOrchestrator,
 			LuceneSearchContext searchContext,
 			BackendSessionContext sessionContext,
-			LoadingContextBuilder<?, ?> loadingContextBuilder,
+			LoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			LuceneSearchProjection<?, H> rootProjection) {
 		this.workFactory = workFactory;
 		this.queryOrchestrator = queryOrchestrator;

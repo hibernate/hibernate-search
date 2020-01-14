@@ -121,7 +121,7 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 			SearchQueryHitTypeStep<?, R, E, LOS, ?, ?> original,
 			IndexScope<?> indexScope,
 			BackendSessionContext sessionContext,
-			LoadingContextBuilder<R, E> loadingContextBuilder) {
+			LoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 		if ( indexScope instanceof ElasticsearchIndexScope ) {
 			return Optional.of( new ElasticsearchSearchQueryHitTypeStepImpl<>(
 					(ElasticsearchIndexScope) indexScope, sessionContext, loadingContextBuilder

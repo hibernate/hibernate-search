@@ -52,4 +52,10 @@ public interface Log extends BasicLogger {
 			value = "The JavaBean mapper does not support named types. The type with name '%1$s' does not exist."
 	)
 	SearchException namedTypesNotSupported(String name);
+
+	@Message(id = ID_OFFSET_1 + 8,
+			value = "The JavaBean mapper cannot load entities,"
+					+ " but there was an attempt to configure entity loading."
+	)
+	SearchException entityLoadingConfigurationNotSupported();
 }

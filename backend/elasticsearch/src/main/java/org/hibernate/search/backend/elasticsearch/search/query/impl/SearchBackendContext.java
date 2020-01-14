@@ -38,7 +38,7 @@ public interface SearchBackendContext {
 	<H> ElasticsearchSearchQueryBuilder<H> createSearchQueryBuilder(
 			ElasticsearchSearchContext searchContext,
 			BackendSessionContext sessionContext,
-			LoadingContextBuilder<?, ?> loadingContextBuilder,
+			LoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			ElasticsearchSearchProjection<?, H> rootProjection);
 
 }
