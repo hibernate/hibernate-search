@@ -13,12 +13,12 @@ import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryPredicateStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
-import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQueryHitTypeStep;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 
 /**
@@ -70,7 +70,7 @@ public interface SearchScope<E> {
 	 * created using this scope or another scope instance targeting the same indexes.
 	 * <p>
 	 * Note this method is only necessary if you do not want to use lambda expressions,
-	 * since you can {@link HibernateOrmSearchQueryHitTypeStep#asProjection(Function)} define projections with lambdas}
+	 * since you can {@link SearchQueryHitTypeStep#asProjection(Function)} define projections with lambdas}
 	 * within the search query DSL,
 	 * removing the need to create separate objects to represent the projections.
 	 *

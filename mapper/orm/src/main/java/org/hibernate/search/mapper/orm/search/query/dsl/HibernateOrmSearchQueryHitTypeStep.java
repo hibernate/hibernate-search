@@ -20,7 +20,9 @@ import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsSt
  * or where the predicate can be set directly, assuming that query hits are returned as entities.
  *
  * @see SearchQueryHitTypeStep
+ * @deprecated Use {@link SearchQueryHitTypeStep} instead.
  */
+@Deprecated
 public interface HibernateOrmSearchQueryHitTypeStep<E>
 		extends SearchQueryHitTypeStep<
 						SearchQueryOptionsStep<?, E, SearchLoadingOptionsStep, ?, ?>,
@@ -37,7 +39,9 @@ public interface HibernateOrmSearchQueryHitTypeStep<E>
 	 * @param fetchSize The fetch size. Must be positive or zero.
 	 * @return {@code this} for method chaining.
 	 * @see Query#setFetchSize(int)
+	 * @deprecated Call {@code .loading( o -> o.fetchSize( ... )} near the end of the query definition instead.
 	 */
+	@Deprecated
 	HibernateOrmSearchQueryHitTypeStep<E> fetchSize(int fetchSize);
 
 	/**
@@ -45,7 +49,9 @@ public interface HibernateOrmSearchQueryHitTypeStep<E>
 	 *
 	 * @param strategy The strategy.
 	 * @return {@code this} for method chaining.
+	 * @deprecated Call {@code .loading( o -> o.cacheLookupStrategy( ... )} near the end of the query definition instead.
 	 */
+	@Deprecated
 	HibernateOrmSearchQueryHitTypeStep<E> cacheLookupStrategy(EntityLoadingCacheLookupStrategy strategy);
 
 }
