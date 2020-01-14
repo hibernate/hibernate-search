@@ -440,12 +440,12 @@ public class QueryDslIT {
 
 			// tag::cacheLookupStrategy-persistenceContextThenSecondLevelCache[]
 			SearchResult<Book> result = searchSession.search( Book.class ) // <1>
-					.cacheLookupStrategy(
-							EntityLoadingCacheLookupStrategy.PERSISTENCE_CONTEXT_THEN_SECOND_LEVEL_CACHE
-					) // <2>
 					.predicate( f -> f.match()
 							.field( "title" )
 							.matching( "robot" ) )
+					.loading( o -> o.cacheLookupStrategy( // <2>
+							EntityLoadingCacheLookupStrategy.PERSISTENCE_CONTEXT_THEN_SECOND_LEVEL_CACHE
+					) )
 					.fetch( 20 ); // <3>
 			// end::cacheLookupStrategy-persistenceContextThenSecondLevelCache[]
 
@@ -462,10 +462,10 @@ public class QueryDslIT {
 
 			// tag::fetchSize[]
 			SearchResult<Book> result = searchSession.search( Book.class ) // <1>
-					.fetchSize( 50 ) // <2>
 					.predicate( f -> f.match()
 							.field( "title" )
 							.matching( "robot" ) )
+					.loading( o -> o.fetchSize( 50 ) ) // <2>
 					.fetch( 200 ); // <3>
 			// end::fetchSize[]
 

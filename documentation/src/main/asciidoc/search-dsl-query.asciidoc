@@ -360,7 +360,8 @@ It is also possible to override the configured strategy on a per-query basis, as
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=cacheLookupStrategy-persistenceContextThenSecondLevelCache]
 ----
 <1> Start building the query.
-<2> Mention that the persistence context and second level cache should be checked
+<2> Access the loading options of the query,
+then mention that the persistence context and second level cache should be checked
 before entities are loaded from the database.
 <3> Fetch the results.
 The more entities found in the persistence context or second level cache,
@@ -388,7 +389,8 @@ It is also possible to override the configured fetch size on a per-query basis, 
 include::{sourcedir}/org/hibernate/search/documentation/search/query/QueryDslIT.java[tags=fetchSize]
 ----
 <1> Start building the query.
-<2> Set the fetch size to an arbitrary value (must be `1` or more).
+<2> Access the loading options of the query,
+then set the fetch size to an arbitrary value (must be `1` or more).
 <3> Fetch the results, limiting to the top 200 hits.
 One query will be executed to load the hits if there are less hits than the given fetch size;
 two queries if there are more hits than the fetch size but less than twice the fetch size,
