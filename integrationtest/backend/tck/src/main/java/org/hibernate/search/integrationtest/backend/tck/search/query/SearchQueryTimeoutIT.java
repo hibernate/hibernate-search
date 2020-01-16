@@ -136,6 +136,15 @@ public class SearchQueryTimeoutIT {
 		assertThat( result.isTimedOut() ).isFalse();
 	}
 
+	@Test
+	public void timeout_fastCount_largeTimeout() {
+		SearchQuery<DocumentReference> query = startFastQuery()
+				.failAfter( 1, TimeUnit.DAYS )
+				.toQuery();
+
+		assertThat( query.fetchTotalHitCount() ).isEqualTo( 0 );
+	}
+
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> startSlowQuery() {
 		return indexManager.createScope().query()
 				.predicate( f -> f.bool( b -> {
