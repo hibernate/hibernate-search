@@ -10,11 +10,17 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.JavaBeanMappingSetupHelper;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
+import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeFromDocumentIdentifierContext;
+import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
@@ -110,7 +116,22 @@ public class ProvidedIdIT {
 
 	private JavaBeanMappingSetupHelper.SetupContext withBaseConfiguration() {
 		return setupHelper.start()
-				.withConfiguration( b -> b.setImplicitProvidedId( true ) );
+				.withConfiguration( b -> b.setProvidedIdentifierBridge( BeanReference.of( NaiveIdentifierBridge.class ) ) );
 	}
 
+	public static class NaiveIdentifierBridge implements IdentifierBridge<Object> {
+		private Map<String, Object> objectIds = new HashMap<>();
+
+		@Override
+		public String toDocumentIdentifier(Object propertyValue, IdentifierBridgeToDocumentIdentifierContext context) {
+			String documentId = propertyValue.toString();
+			objectIds.put( documentId, propertyValue );
+			return documentId;
+		}
+
+		@Override
+		public Object fromDocumentIdentifier(String documentIdentifier, IdentifierBridgeFromDocumentIdentifierContext context) {
+			return objectIds.get( documentIdentifier );
+		}
+	}
 }

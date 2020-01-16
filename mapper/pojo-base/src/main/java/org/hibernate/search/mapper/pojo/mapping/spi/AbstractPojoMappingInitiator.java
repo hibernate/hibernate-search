@@ -9,12 +9,14 @@ package org.hibernate.search.mapper.pojo.mapping.spi;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
+import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
 import org.hibernate.search.mapper.pojo.extractor.spi.ContainerExtractorRegistry;
 import org.hibernate.search.mapper.pojo.mapping.building.impl.PojoMapper;
@@ -31,7 +33,7 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 
 	private final PojoBootstrapIntrospector introspector;
 
-	private boolean implicitProvidedId;
+	private BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge;
 	private boolean multiTenancyEnabled;
 
 	private final AnnotationMappingConfigurationContextImpl annotationMappingConfiguration;
@@ -70,8 +72,8 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 		return containerExtractorRegistryBuilder;
 	}
 
-	public void setImplicitProvidedId(boolean implicitProvidedId) {
-		this.implicitProvidedId = implicitProvidedId;
+	public void setProvidedIdentifierBridge(BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge) {
+		this.providedIdentifierBridge = providedIdentifierBridge;
 	}
 
 	public void setMultiTenancyEnabled(boolean multiTenancyEnabled) {
@@ -97,7 +99,7 @@ public abstract class AbstractPojoMappingInitiator<MPBS extends MappingPartialBu
 				buildContext, contributorProvider,
 				introspector,
 				containerExtractorRegistryBuilder.build(),
-				implicitProvidedId,
+				providedIdentifierBridge,
 				multiTenancyEnabled,
 				createMapperDelegate()
 		);
