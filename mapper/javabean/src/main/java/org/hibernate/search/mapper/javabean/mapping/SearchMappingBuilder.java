@@ -17,11 +17,13 @@ import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.javabean.impl.JavaBeanMappingInitiator;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMapping;
 import org.hibernate.search.mapper.javabean.mapping.impl.JavaBeanMappingKey;
 import org.hibernate.search.mapper.javabean.model.impl.JavaBeanBootstrapIntrospector;
 import org.hibernate.search.mapper.javabean.session.SearchSession;
+import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
@@ -104,8 +106,8 @@ public final class SearchMappingBuilder {
 		return this;
 	}
 
-	public SearchMappingBuilder setImplicitProvidedId(boolean multiTenancyEnabled) {
-		mappingInitiator.setImplicitProvidedId( multiTenancyEnabled );
+	public SearchMappingBuilder setProvidedIdentifierBridge(BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge) {
+		mappingInitiator.setProvidedIdentifierBridge( providedIdentifierBridge );
 		return this;
 	}
 
