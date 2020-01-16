@@ -85,14 +85,7 @@ public class CountWork extends AbstractSimpleElasticsearchWork<Long> {
 				builder.multiValuedParam( "routing", routingKeys );
 			}
 
-			if ( timeoutValue != null && timeoutUnit != null ) {
-				builder.param( "timeout", getTimeoutString( timeoutValue, timeoutUnit ) );
-			}
-
 			if ( exceptionOnTimeout ) {
-				// the default is true
-				builder.param( "allow_partial_search_results", false );
-
 				// set timeoutValue and timeoutUnit only for hard timeout
 				builder.timeout( timeoutValue, timeoutUnit );
 			}
