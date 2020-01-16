@@ -21,6 +21,6 @@ import org.junit.runner.RunWith;
  * @author Gunnar Morling
  */
 @RunWith(ClasspathSuite.class)
-@ClasspathSuite.ClassnameFilters({ ".*\\.tck\\..*MultiTenancyBaseIT" })
+@ClasspathSuite.ClassnameFilters({ ".*\\.tck\\..*" })
 public class ElasticsearchTckTestRunner {
 }
