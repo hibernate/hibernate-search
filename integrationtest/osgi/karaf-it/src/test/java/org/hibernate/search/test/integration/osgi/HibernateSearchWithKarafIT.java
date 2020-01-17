@@ -11,7 +11,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.ops4j.pax.exam.CoreOptions.maven;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.configureConsole;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.debugConfiguration;
-import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFileExtend;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.editConfigurationFilePut;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.features;
 import static org.ops4j.pax.exam.karaf.options.KarafDistributionOption.karafDistributionConfiguration;
@@ -136,6 +135,7 @@ public class HibernateSearchWithKarafIT {
 
 		String mavenLocalRepository = System.getProperty( "maven.settings.localRepository" );
 		String jbossPublicRepository = System.getProperty( "maven.jboss.public.repo.url" );
+		String mavenCentralRepository = System.getProperty( "maven.mavencentral.repo.url" );
 		String[] vmArgsFromProperties =
 				Arrays.stream(
 						System.getProperty( "pax-exam.jvm.args", "" ).split( "\\s" )
@@ -213,10 +213,13 @@ public class HibernateSearchWithKarafIT {
 						"org.ops4j.pax.url.mvn.localRepository",
 						mavenLocalRepository
 				),
-				editConfigurationFileExtend( // Extend, not put: we want to keep the defaults (Maven Central in particular)
+				editConfigurationFilePut( // Erase the defaults: Maven Central uses HTTP by default...
 						"etc/org.ops4j.pax.url.mvn.cfg",
 						"org.ops4j.pax.url.mvn.repositories",
-						jbossPublicRepository
+						mavenCentralRepository
+								+ "@id=central"
+								+ ", "
+						+ jbossPublicRepository
 								+ "@snapshots" // Include snapshots, useful when experimenting with new ORM versions
 								+ "@noreleases" // Exclude releases as we expect all releases to be available on central
 								+ "@id=jboss-public-repository"

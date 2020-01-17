@@ -175,6 +175,7 @@
                     <systemPropertyVariables>
                         <maven.settings.localRepository>${settings.localRepository}</maven.settings.localRepository>
                         <maven.jboss.public.repo.url>${jboss.public.repo.url}</maven.jboss.public.repo.url>
+                        <maven.mavencentral.repo.url>${mavencentral.repo.url}</maven.mavencentral.repo.url>
                         <pax-exam.jvm.args>${pax-exam.jvm.args}</pax-exam.jvm.args>
                     </systemPropertyVariables>
                 </configuration>
