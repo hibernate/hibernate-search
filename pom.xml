@@ -260,7 +260,7 @@
         <!-- Integration tests -->
 
         <version.org.openjdk.jmh>1.20</version.org.openjdk.jmh>
-        <version.org.jboss.arquillian>1.4.0.Final</version.org.jboss.arquillian>
+        <version.org.arquillian.universe>1.5.0.0</version.org.arquillian.universe>
         <version.org.wildfly.arquillian>2.1.1.Final</version.org.wildfly.arquillian>
         <version.org.springframework.boot>2.1.0.RELEASE</version.org.springframework.boot>
         <version.org.apache.karaf>4.2.1</version.org.apache.karaf>
