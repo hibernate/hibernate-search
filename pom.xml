@@ -348,6 +348,10 @@
         <jboss.public.repo.id>jboss-public-repository-group</jboss.public.repo.id>
         <jboss.public.repo.url>https://repository.jboss.org/nexus/content/groups/public-jboss/</jboss.public.repo.url>
 
+        <!-- Maven Central repository -->
+
+        <mavencentral.repo.url>https://repo.maven.apache.org/maven2/</mavencentral.repo.url>
+
         <!-- Repository Deployment URLs -->
 
         <jboss.releases.repo.id>jboss-releases-repository</jboss.releases.repo.id>
