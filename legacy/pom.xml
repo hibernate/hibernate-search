@@ -155,9 +155,8 @@
         <!-- Integration test dependencies -->
 
         <!-- >>> WildFly ITs-->
-        <version.org.jboss.arquillian>1.1.11.Final</version.org.jboss.arquillian>
-        <version.org.jboss.shrinkwrap.resolver>2.2.2</version.org.jboss.shrinkwrap.resolver>
-        <version.org.wildfly.arquillian>2.0.0.Final</version.org.wildfly.arquillian>
+        <version.org.arquillian.universe>1.5.0.0</version.org.arquillian.universe>
+        <version.org.wildfly.arquillian>2.2.0.Final</version.org.wildfly.arquillian>
         <version.org.jboss.spec.javax.ejb.jboss-ejb-api_3.2_spec>1.0.1.Final</version.org.jboss.spec.javax.ejb.jboss-ejb-api_3.2_spec>
         <version.org.jboss.ejb3.ext-api>2.2.0.Final</version.org.jboss.ejb3.ext-api>
         <version.org.jboss.narayana>5.8.1.Final</version.org.jboss.narayana>
