@@ -222,6 +222,7 @@
         <wildflyVersion>10.1.0.Final</wildflyVersion>
         <jmhVersion>1.11.2</jmhVersion>
         <repository.jboss-public.url>https://repository.jboss.org/nexus/content/groups/public-jboss/</repository.jboss-public.url>
+        <mavencentral.repo.url>https://repo.maven.apache.org/maven2/</mavencentral.repo.url>
 
         <!-- character encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
