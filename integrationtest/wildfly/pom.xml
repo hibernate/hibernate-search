@@ -44,9 +44,9 @@
         <dependencies>
             <!-- Imports compatible versions for each Arquillian module -->
             <dependency>
-                <groupId>org.jboss.arquillian</groupId>
-                <artifactId>arquillian-bom</artifactId>
-                <version>${version.org.jboss.arquillian}</version>
+                <groupId>org.arquillian.universe</groupId>
+                <artifactId>arquillian-core</artifactId>
+                <version>${version.org.arquillian.universe}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
