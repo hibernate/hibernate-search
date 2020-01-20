@@ -22,8 +22,9 @@ public class StubBackend implements BackendImplementor<StubDocumentElement>, Bac
 
 	private final String name;
 
-	StubBackend(String name) {
+	StubBackend(String name, BackendBuildContext context) {
 		this.name = name;
+		getBehavior().onCreateBackend( context );
 	}
 
 	@Override
@@ -44,7 +45,7 @@ public class StubBackend implements BackendImplementor<StubDocumentElement>, Bac
 
 	@Override
 	public void stop() {
-		// Nothing to do
+		getBehavior().onStopBackend();
 	}
 
 	@Override
