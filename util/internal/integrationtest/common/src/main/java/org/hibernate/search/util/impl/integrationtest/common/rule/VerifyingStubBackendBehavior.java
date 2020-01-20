@@ -31,7 +31,7 @@ import org.junit.Assert;
 
 class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
-	private final Map<IndexFieldKey, CallBehavior> indexFieldAddBehaviors = new HashMap<>();
+	private final Map<IndexFieldKey, CallBehavior<Void>> indexFieldAddBehaviors = new HashMap<>();
 
 	private final Map<String, CallQueue<PushSchemaCall>> pushSchemaCalls = new HashMap<>();
 
@@ -49,7 +49,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		this.lenient = lenient;
 	}
 
-	void setIndexFieldAddBehavior(String indexName, String absoluteFieldPath, CallBehavior behavior) {
+	void setIndexFieldAddBehavior(String indexName, String absoluteFieldPath, CallBehavior<Void> behavior) {
 		indexFieldAddBehaviors.put( new IndexFieldKey( indexName, absoluteFieldPath ), behavior );
 	}
 
@@ -88,7 +88,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	@Override
 	public void onAddField(String indexName, String absoluteFieldPath) {
-		CallBehavior behavior = indexFieldAddBehaviors.get( new IndexFieldKey( indexName, absoluteFieldPath ) );
+		CallBehavior<Void> behavior = indexFieldAddBehaviors.get( new IndexFieldKey( indexName, absoluteFieldPath ) );
 		if ( behavior != null ) {
 			behavior.execute();
 		}
