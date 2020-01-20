@@ -87,6 +87,11 @@
         </dependency>
         <dependency>
             <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-integrationtest-mapper-orm-cdi</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-integrationtest-mapper-orm-envers</artifactId>
             <scope>test</scope>
         </dependency>

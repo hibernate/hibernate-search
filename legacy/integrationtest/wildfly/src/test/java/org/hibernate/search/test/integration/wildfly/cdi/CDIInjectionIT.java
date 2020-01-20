@@ -19,9 +19,11 @@ import org.hibernate.search.test.integration.wildfly.cdi.beans.i18n.Internationa
 import org.hibernate.search.test.integration.wildfly.cdi.beans.model.EntityWithCDIAwareBridges;
 import org.hibernate.search.test.integration.wildfly.cdi.beans.model.EntityWithCDIAwareBridgesDao;
 import org.hibernate.search.testsupport.TestForIssue;
+import org.hibernate.search.testsupport.junit.PortedToSearch6;
 
 import org.junit.After;
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -44,6 +46,7 @@ import static org.hibernate.search.test.integration.VersionTestHelper.getWildFly
  */
 @RunWith(Arquillian.class)
 @TestForIssue(jiraKey = "HSEARCH-1316")
+@Category(PortedToSearch6.class)
 public class CDIInjectionIT {
 
 	@Deployment
