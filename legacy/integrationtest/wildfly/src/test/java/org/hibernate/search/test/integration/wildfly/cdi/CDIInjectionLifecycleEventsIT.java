@@ -23,8 +23,10 @@ import org.hibernate.search.test.integration.arquillian.WildFlyConfigurationExte
 import org.hibernate.search.test.integration.wildfly.PackagerHelper;
 import org.hibernate.search.test.integration.wildfly.cdi.beans.CDIBeansPackage;
 import org.hibernate.search.test.integration.wildfly.cdi.beans.event.BridgeCDILifecycleEventCounter;
+import org.hibernate.search.testsupport.junit.PortedToSearch6;
 
 import org.junit.Test;
+import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
 import org.jboss.arquillian.container.test.api.Deployer;
@@ -52,6 +54,7 @@ import static org.hibernate.search.test.integration.VersionTestHelper.getWildFly
  * @author Yoann Rodiere
  */
 @RunWith(Arquillian.class)
+@Category(PortedToSearch6.class)
 public class CDIInjectionLifecycleEventsIT {
 
 	private static final Logger log = Logger.getLogger( CDIInjectionLifecycleEventsIT.class );
