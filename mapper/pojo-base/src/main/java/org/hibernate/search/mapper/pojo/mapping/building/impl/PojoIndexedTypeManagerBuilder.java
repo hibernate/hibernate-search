@@ -12,7 +12,8 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoImplicitReindexingResolverBuildingHelper;
 import org.hibernate.search.mapper.pojo.automaticindexing.building.impl.PojoIndexingDependencyCollectorTypeNode;
@@ -53,7 +54,8 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 			PojoMappingHelper mappingHelper,
 			MappedIndexManagerBuilder<D> indexManagerBuilder,
 			PojoIndexedTypeExtendedMappingCollector extendedMappingCollector,
-			BeanHolder<? extends IdentifierBridge<Object>> providedIdentifierBridge) {
+			BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge,
+			BeanResolver beanResolver) {
 		this.typeModel = typeModel;
 		this.indexManagerBuilder = indexManagerBuilder;
 		this.extendedMappingCollector = extendedMappingCollector;
@@ -62,7 +64,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 				entityTypeMetadata,
 				mappingHelper,
 				indexManagerBuilder.getRootBindingContext(),
-				providedIdentifierBridge
+				providedIdentifierBridge, beanResolver
 		);
 		this.processorBuilder = new PojoIndexingProcessorTypeNodeBuilder<>(
 				BoundPojoModelPath.root( typeModel ),
