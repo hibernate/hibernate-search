@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
@@ -23,6 +24,16 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 public abstract class StubBackendBehavior {
 
 	private static final StubBackendBehavior DEFAULT = new StubBackendBehavior() {
+		@Override
+		public void onCreateBackend(BackendBuildContext context) {
+			throw new IllegalStateException( "The stub backend behavior was not set when creating a backend." );
+		}
+
+		@Override
+		public void onStopBackend() {
+			// This is acceptable: we probably just ended the test before the backend was stopped.
+		}
+
 		@Override
 		public void onAddField(String indexName, String absoluteFieldPath) {
 			throw new IllegalStateException( "The stub backend behavior was not set when a field was added to index '"
@@ -96,6 +107,10 @@ public abstract class StubBackendBehavior {
 
 	protected StubBackendBehavior() {
 	}
+
+	public abstract void onCreateBackend(BackendBuildContext context);
+
+	public abstract void onStopBackend();
 
 	public abstract void onAddField(String indexName, String absoluteFieldPath);
 

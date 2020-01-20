@@ -7,8 +7,10 @@
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -16,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
@@ -33,6 +36,10 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	private final Map<IndexFieldKey, CallBehavior<Void>> indexFieldAddBehaviors = new HashMap<>();
 
+	private final List<ParameterizedCallBehavior<BackendBuildContext, Void>> createBackendBehaviors = new ArrayList<>();
+
+	private final List<CallBehavior<Void>> stopBackendBehaviors = new ArrayList<>();
+
 	private final Map<String, CallQueue<PushSchemaCall>> pushSchemaCalls = new HashMap<>();
 
 	private final Map<String, CallQueue<DocumentWorkCall>> documentWorkCalls = new HashMap<>();
@@ -47,6 +54,14 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	void setLenient(boolean lenient) {
 		this.lenient = lenient;
+	}
+
+	public void addCreateBackendBehavior(ParameterizedCallBehavior<BackendBuildContext, Void> createBackendBehavior) {
+		this.createBackendBehaviors.add( createBackendBehavior );
+	}
+
+	public void addStopBackendBehavior(CallBehavior<Void> stopBackendBehavior) {
+		this.stopBackendBehaviors.add( stopBackendBehavior );
 	}
 
 	void setIndexFieldAddBehavior(String indexName, String absoluteFieldPath, CallBehavior<Void> behavior) {
@@ -74,6 +89,8 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	}
 
 	void resetExpectations() {
+		createBackendBehaviors.clear();
+		stopBackendBehaviors.clear();
 		indexFieldAddBehaviors.clear();
 		pushSchemaCalls.clear();
 		documentWorkCalls.clear();
@@ -81,9 +98,24 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	}
 
 	void verifyExpectationsMet() {
+		// We don't check anything for the various behaviors (createBackendBehaviors, ...): they are ignored if they are not executed.
 		pushSchemaCalls.values().forEach( CallQueue::verifyExpectationsMet );
 		documentWorkCalls.values().forEach( CallQueue::verifyExpectationsMet );
 		searchCalls.verifyExpectationsMet();
+	}
+
+	@Override
+	public void onCreateBackend(BackendBuildContext context) {
+		for ( ParameterizedCallBehavior<BackendBuildContext, Void> behavior : createBackendBehaviors ) {
+			behavior.execute( context );
+		}
+	}
+
+	@Override
+	public void onStopBackend() {
+		for ( CallBehavior<Void> behavior : stopBackendBehaviors ) {
+			behavior.execute();
+		}
 	}
 
 	@Override

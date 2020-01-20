@@ -17,6 +17,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -92,6 +93,22 @@ public class BackendMock implements TestRule {
 		finally {
 			behaviorMock.setLenient( false );
 		}
+	}
+
+	public BackendMock onCreate(Consumer<BackendBuildContext> behavior) {
+		behaviorMock.addCreateBackendBehavior( context -> {
+			behavior.accept( context );
+			return null;
+		} );
+		return this;
+	}
+
+	public BackendMock onStop(Runnable behavior) {
+		behaviorMock.addStopBackendBehavior( () -> {
+			behavior.run();
+			return null;
+		} );
+		return this;
 	}
 
 	public BackendMock expectFailingField(String indexName, String absoluteFieldPath,
