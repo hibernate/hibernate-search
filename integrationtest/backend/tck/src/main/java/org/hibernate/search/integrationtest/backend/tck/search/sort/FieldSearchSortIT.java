@@ -137,7 +137,29 @@ public class FieldSearchSortIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3798")
 	public void simple() {
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
+			SearchQuery<DocumentReference> query;
+			String fieldPath = fieldModel.relativeFieldName;
+
+			// Default order
+			query = matchNonEmptyQuery( b -> b.field( fieldPath ) );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+
+			// Explicit order
+			query = matchNonEmptyQuery( b -> b.field( fieldPath ).asc() );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+			query = matchNonEmptyQuery( b -> b.field( fieldPath ).desc() );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
+		}
+	}
+
+	@Test
+	public void missingValue() {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			SearchQuery<DocumentReference> query;
 			String fieldPath = fieldModel.relativeFieldName;
@@ -302,7 +324,28 @@ public class FieldSearchSortIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3798")
 	public void inFlattenedObject() {
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.flattenedObject.supportedFieldModels ) {
+			SearchQuery<DocumentReference> query;
+			String fieldPath = indexMapping.flattenedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
+
+			query = matchNonEmptyQuery( f -> f.field( fieldPath ) );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+
+			query = matchNonEmptyQuery( f -> f.field( fieldPath ).asc() );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+
+			query = matchNonEmptyQuery( f -> f.field( fieldPath ).desc() );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
+		}
+	}
+
+	@Test
+	public void inFlattenedObject_missingValue() {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.flattenedObject.supportedFieldModels ) {
 			SearchQuery<DocumentReference> query;
 			String fieldPath = indexMapping.flattenedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
@@ -330,8 +373,29 @@ public class FieldSearchSortIT {
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HSEARCH-2254" )
-	public void byField_inNestedObject() {
+	@TestForIssue(jiraKey = "HSEARCH-3798")
+	public void inNestedObject() {
+		for ( ByTypeFieldModel<?> fieldModel : indexMapping.nestedObject.supportedFieldModels ) {
+			SearchQuery<DocumentReference> query;
+			String fieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
+
+			query = matchNonEmptyQuery( f -> f.field( fieldPath ) );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+
+			query = matchNonEmptyQuery( f -> f.field( fieldPath ).asc() );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+
+			query = matchNonEmptyQuery( f -> f.field( fieldPath ).desc() );
+			assertThat( query )
+					.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-2254")
+	public void inNestedObject_missingValue() {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.nestedObject.supportedFieldModels ) {
 			SearchQuery<DocumentReference> query;
 			String fieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
@@ -603,6 +667,19 @@ public class FieldSearchSortIT {
 				.satisfies( FailureReportUtils.hasContext(
 						EventContexts.fromIndexNames( INDEX_NAME, INCOMPATIBLE_DECIMAL_SCALE_INDEX_NAME )
 				) );
+	}
+
+	private SearchQuery<DocumentReference> matchNonEmptyQuery(
+			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
+		return matchNonEmptyQuery( sortContributor, indexManager.createScope() );
+	}
+
+	private SearchQuery<DocumentReference> matchNonEmptyQuery(
+			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
+		return scope.query()
+				.predicate( f -> f.matchAll().except( f.id().matching( EMPTY ) ) )
+				.sort( sortContributor )
+				.toQuery();
 	}
 
 	private SearchQuery<DocumentReference> matchAllQuery(
