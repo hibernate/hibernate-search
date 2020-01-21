@@ -14,15 +14,20 @@ import org.hibernate.search.backend.elasticsearch.gson.spi.JsonLogHelper;
  * to display {@link ElasticsearchResponse}s in log messages.
  *
  */
-public class ElasticsearchResponseFormatter {
+public final class ElasticsearchResponseFormatter {
 
-	private final String stringRepresentation;
+	private final ElasticsearchResponse response;
 
 	public ElasticsearchResponseFormatter(ElasticsearchResponse response) {
-		this.stringRepresentation = formatResponse( response );
+		this.response = response;
 	}
 
-	public static String formatResponse(ElasticsearchResponse response) {
+	@Override
+	public String toString() {
+		return formatResponse( response );
+	}
+
+	private static String formatResponse(ElasticsearchResponse response) {
 		if ( response == null ) {
 			return "(no response)";
 		}
@@ -39,10 +44,5 @@ public class ElasticsearchResponseFormatter {
 				.append( helper.toString( response.getBody() ) );
 
 		return sb.toString();
-	}
-
-	@Override
-	public String toString() {
-		return stringRepresentation;
 	}
 }

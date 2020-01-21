@@ -8,16 +8,16 @@ package org.hibernate.search.mapper.pojo.logging.spi;
 
 import java.util.Optional;
 
-public class OptionalEmptyAsDefaultFormatter {
+public final class OptionalEmptyAsDefaultFormatter {
 
-	private final String formatted;
+	private final Optional<?> optional;
 
 	public OptionalEmptyAsDefaultFormatter(Optional<?> optional) {
-		this.formatted = optional.isPresent() ? optional.get().toString() : "<default>";
+		this.optional = optional;
 	}
 
 	@Override
 	public String toString() {
-		return formatted;
+		return optional.isPresent() ? optional.get().toString() : "<default>";
 	}
 }

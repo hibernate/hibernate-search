@@ -8,16 +8,16 @@ package org.hibernate.search.mapper.pojo.logging.spi;
 
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 
-public class PojoModelPathFormatter {
+public final class PojoModelPathFormatter {
 
-	private final String formatted;
+	private final PojoModelPath pojoModelPath;
 
 	public PojoModelPathFormatter(PojoModelPath pojoModelPath) {
-		this.formatted = pojoModelPath.toPathString();
+		this.pojoModelPath = pojoModelPath;
 	}
 
 	@Override
 	public String toString() {
-		return formatted;
+		return pojoModelPath.toPathString();
 	}
 }

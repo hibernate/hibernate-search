@@ -8,16 +8,16 @@ package org.hibernate.search.engine.logging.spi;
 
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 
-public class MappableTypeModelFormatter {
+public final class MappableTypeModelFormatter {
 
-	private final String formatted;
+	private final MappableTypeModel typeModel;
 
 	public MappableTypeModelFormatter(MappableTypeModel typeModel) {
-		this.formatted = typeModel.getName();
+		this.typeModel = typeModel;
 	}
 
 	@Override
 	public String toString() {
-		return formatted;
+		return typeModel.getName();
 	}
 }

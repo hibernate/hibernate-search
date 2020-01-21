@@ -6,16 +6,16 @@
  */
 package org.hibernate.search.engine.logging.spi;
 
-public class SimpleNameClassFormatter {
+public final class SimpleNameClassFormatter {
 
-	private final String stringRepresentation;
+	private final Class<?> clazz;
 
 	public SimpleNameClassFormatter(Class<?> clazz) {
-		this.stringRepresentation = clazz.getSimpleName();
+		this.clazz = clazz;
 	}
 
 	@Override
 	public String toString() {
-		return stringRepresentation;
+		return clazz.getSimpleName();
 	}
 }

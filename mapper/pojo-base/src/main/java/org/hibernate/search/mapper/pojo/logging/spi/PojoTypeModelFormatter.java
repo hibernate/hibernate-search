@@ -8,16 +8,16 @@ package org.hibernate.search.mapper.pojo.logging.spi;
 
 import org.hibernate.search.mapper.pojo.model.spi.PojoTypeModel;
 
-public class PojoTypeModelFormatter {
+public final class PojoTypeModelFormatter {
 
-	private final String formatted;
+	private final PojoTypeModel<?> typeModel;
 
 	public PojoTypeModelFormatter(PojoTypeModel<?> typeModel) {
-		this.formatted = typeModel.getName();
+		this.typeModel = typeModel;
 	}
 
 	@Override
 	public String toString() {
-		return formatted;
+		return typeModel.getName();
 	}
 }

@@ -8,16 +8,16 @@ package org.hibernate.search.util.common.logging.impl;
 
 import org.hibernate.search.util.common.reporting.EventContext;
 
-public class EventContextFormatter {
+public final class EventContextFormatter {
 
-	private final String formatted;
+	private final EventContext eventContext;
 
-	public EventContextFormatter(EventContext typeModel) {
-		this.formatted = typeModel.renderWithPrefix();
+	public EventContextFormatter(EventContext eventContext) {
+		this.eventContext = eventContext;
 	}
 
 	@Override
 	public String toString() {
-		return formatted;
+		return eventContext.renderWithPrefix();
 	}
 }

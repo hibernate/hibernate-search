@@ -15,16 +15,16 @@ import com.google.gson.JsonObject;
  * to display {@link JsonObject}s in log messages.
  *
  */
-public class ElasticsearchJsonObjectFormatter {
+public final class ElasticsearchJsonObjectFormatter {
 
-	private final String stringRepresentation;
+	private final JsonObject object;
 
 	public ElasticsearchJsonObjectFormatter(JsonObject object) {
-		this.stringRepresentation = JsonLogHelper.get().toString( object );
+		this.object = object;
 	}
 
 	@Override
 	public String toString() {
-		return stringRepresentation;
+		return JsonLogHelper.get().toString( object );
 	}
 }

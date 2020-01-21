@@ -13,12 +13,17 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchReques
  * to display {@link ElasticsearchRequest}s in log messages.
  *
  */
-public class ElasticsearchRequestFormatter {
+public final class ElasticsearchRequestFormatter {
 
-	private final String stringRepresentation;
+	private final ElasticsearchRequest request;
 
 	public ElasticsearchRequestFormatter(ElasticsearchRequest request) {
-		this.stringRepresentation = formatRequest( request );
+		this.request = request;
+	}
+
+	@Override
+	public String toString() {
+		return formatRequest( request );
 	}
 
 	private static String formatRequest(ElasticsearchRequest request) {
@@ -32,10 +37,5 @@ public class ElasticsearchRequestFormatter {
 				.append( request.getParameters() );
 
 		return sb.toString();
-	}
-
-	@Override
-	public String toString() {
-		return stringRepresentation;
 	}
 }
