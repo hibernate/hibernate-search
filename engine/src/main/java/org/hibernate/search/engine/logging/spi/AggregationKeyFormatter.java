@@ -8,16 +8,16 @@ package org.hibernate.search.engine.logging.spi;
 
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 
-public class AggregationKeyFormatter {
+public final class AggregationKeyFormatter {
 
-	private final String formatted;
+	private final AggregationKey<?> key;
 
 	public AggregationKeyFormatter(AggregationKey<?> key) {
-		this.formatted = key.getName();
+		this.key = key;
 	}
 
 	@Override
 	public String toString() {
-		return formatted;
+		return key.getName();
 	}
 }

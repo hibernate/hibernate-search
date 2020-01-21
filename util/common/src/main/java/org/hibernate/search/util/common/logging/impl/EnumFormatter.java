@@ -6,16 +6,16 @@
  */
 package org.hibernate.search.util.common.logging.impl;
 
-public class EnumFormatter {
+public final class EnumFormatter {
 
-	private final String formatted;
+	private final Enum<?> value;
 
 	public EnumFormatter(Enum<?> value) {
-		this.formatted = value.name();
+		this.value = value;
 	}
 
 	@Override
 	public String toString() {
-		return formatted;
+		return value.name();
 	}
 }

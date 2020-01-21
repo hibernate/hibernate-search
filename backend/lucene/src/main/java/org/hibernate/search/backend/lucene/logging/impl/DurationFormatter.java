@@ -9,16 +9,16 @@ package org.hibernate.search.backend.lucene.logging.impl;
 import java.time.Duration;
 import java.util.Locale;
 
-public class DurationFormatter {
+public final class DurationFormatter {
 
-	private final String stringRepresentation;
+	private final Duration duration;
 
 	public DurationFormatter(Duration duration) {
-		this.stringRepresentation = String.format( Locale.ROOT, "%d seconds and %d nanoseconds", duration.getSeconds(), duration.getNano() );
+		this.duration = duration;
 	}
 
 	@Override
 	public String toString() {
-		return stringRepresentation;
+		return String.format( Locale.ROOT, "%d seconds and %d nanoseconds", duration.getSeconds(), duration.getNano() );
 	}
 }

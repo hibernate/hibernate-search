@@ -12,16 +12,16 @@ package org.hibernate.search.util.common.logging.impl;
  *
  * @author Gunnar Morling
  */
-public class ClassFormatter {
+public final class ClassFormatter {
 
-	private final String stringRepresentation;
+	private final Class<?> clazz;
 
 	public ClassFormatter(Class<?> clazz) {
-		this.stringRepresentation = clazz != null ? clazz.getName() : null;
+		this.clazz = clazz;
 	}
 
 	@Override
 	public String toString() {
-		return stringRepresentation;
+		return clazz != null ? clazz.getName() : null;
 	}
 }

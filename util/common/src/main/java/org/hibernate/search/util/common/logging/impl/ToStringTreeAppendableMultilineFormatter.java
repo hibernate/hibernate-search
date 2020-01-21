@@ -14,16 +14,18 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
  * Used with JBoss Logging's {@link org.jboss.logging.annotations.FormatWith} to display
  * {@link ToStringTreeAppendable} objects in log messages.
  */
-public class ToStringTreeAppendableMultilineFormatter {
+public final class ToStringTreeAppendableMultilineFormatter {
 
-	private final String stringRepresentation;
+	private final ToStringTreeAppendable appendable;
 
 	public ToStringTreeAppendableMultilineFormatter(ToStringTreeAppendable appendable) {
-		this.stringRepresentation = new ToStringTreeBuilder( ToStringStyle.multilineDelimiterStructure() ).value( appendable ).toString();
+		this.appendable = appendable;
 	}
 
 	@Override
 	public String toString() {
-		return stringRepresentation;
+		return new ToStringTreeBuilder( ToStringStyle.multilineDelimiterStructure() )
+				.value( appendable )
+				.toString();
 	}
 }

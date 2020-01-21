@@ -8,24 +8,24 @@ package org.hibernate.search.util.common.logging.impl;
 
 import java.lang.reflect.Type;
 
-public class TypeFormatter {
+public final class TypeFormatter {
 
-	private final String formatted;
+	private final Type type;
 
 	public TypeFormatter(Type type) {
-		if ( type instanceof Class ) {
-			this.formatted = ( (Class<?>) type ).getName();
-		}
-		else if ( type != null ) {
-			this.formatted = type.toString();
-		}
-		else {
-			this.formatted = null;
-		}
+		this.type = type;
 	}
 
 	@Override
 	public String toString() {
-		return formatted;
+		if ( type instanceof Class ) {
+			return ( (Class<?>) type ).getName();
+		}
+		else if ( type != null ) {
+			return type.toString();
+		}
+		else {
+			return null;
+		}
 	}
 }
