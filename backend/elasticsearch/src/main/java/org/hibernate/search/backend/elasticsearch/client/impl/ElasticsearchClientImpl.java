@@ -13,6 +13,7 @@ import java.io.Reader;
 import java.lang.invoke.MethodHandles;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -145,11 +146,14 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 		ScheduledFuture<?> timeout = timeoutExecutorService.schedule(
 				() -> {
 					if ( !completableFuture.isDone() ) {
-						completableFuture.completeExceptionally( log.timedOut( elasticsearchRequest ) );
+						completableFuture.completeExceptionally( log.timedOut(
+								Duration.ofNanos( currentTimeoutUnit.toNanos( currentTimeoutValue ) ),
+								elasticsearchRequest
+						) );
 					}
 				},
 				currentTimeoutValue, currentTimeoutUnit
-				);
+		);
 		completableFuture.thenRun( () -> timeout.cancel( false ) );
 
 		return completableFuture;

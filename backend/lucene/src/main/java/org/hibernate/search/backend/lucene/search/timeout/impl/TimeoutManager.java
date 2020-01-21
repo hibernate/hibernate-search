@@ -25,15 +25,15 @@ public final class TimeoutManager {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	public static TimeoutManager noTimeout(TimingSource timingSource, Query query) {
-		return new TimeoutManager( timingSource, query, null, Type.NONE );
+		return new TimeoutManager( timingSource, query, null, null, Type.NONE );
 	}
 
 	public static TimeoutManager softTimeout(TimingSource timingSource, Query query, long timeout, TimeUnit timeUnit) {
-		return new TimeoutManager( timingSource, query, timeUnit.toMillis( timeout ), Type.LIMIT );
+		return new TimeoutManager( timingSource, query, timeout, timeUnit, Type.LIMIT );
 	}
 
 	public static TimeoutManager hardTimeout(TimingSource timingSource, Query query, long timeout, TimeUnit timeUnit) {
-		return new TimeoutManager( timingSource, query, timeUnit.toMillis( timeout ), Type.EXCEPTION );
+		return new TimeoutManager( timingSource, query, timeout, timeUnit, Type.EXCEPTION );
 	}
 
 	private enum Type {
@@ -44,16 +44,20 @@ public final class TimeoutManager {
 
 	private final TimingSource timingSource;
 	private final Query query;
-	private final Long timeout;
+	private final Long timeoutMs;
+	private final Long timeoutValue;
+	private final TimeUnit timeoutUnit;
 	private final Type type;
 
 	private Long start;
 	boolean timedOut = false;
 
-	private TimeoutManager(TimingSource timingSource, Query query, Long timeout, Type type) {
+	private TimeoutManager(TimingSource timingSource, Query query, Long timeoutValue, TimeUnit timeoutUnit, Type type) {
 		this.timingSource = timingSource;
 		this.query = query;
-		this.timeout = timeout;
+		this.timeoutValue = timeoutValue;
+		this.timeoutUnit = timeoutUnit;
+		this.timeoutMs = timeoutUnit == null ? null : timeoutUnit.toMillis( timeoutValue );
 		this.type = type;
 
 		timingSource.ensureInitialized();
@@ -80,12 +84,12 @@ public final class TimeoutManager {
 	 * a hard timeout was requested.
 	 */
 	public Long checkTimeLeftInMilliseconds() {
-		if ( timeout == null ) {
+		if ( timeoutMs == null ) {
 			return null;
 		}
 		else {
 			final long elapsedTime = getElapsedTimeInMilliseconds();
-			long timeLeft = timeout - elapsedTime;
+			long timeLeft = timeoutMs - elapsedTime;
 			if ( timeLeft <= 0 ) {
 				forceTimedOut();
 				// Timed out: don't return a negative number.
@@ -126,7 +130,7 @@ public final class TimeoutManager {
 
 	private void onTimedOut() {
 		if ( hasHardTimeout() ) {
-			throw log.timedOut( getTookTime(), query.toString() );
+			throw log.timedOut( Duration.ofNanos( timeoutUnit.toNanos( timeoutValue ) ), query.toString() );
 		}
 	}
 
