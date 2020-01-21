@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.orm.mapping.impl;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -25,6 +24,7 @@ import org.hibernate.mapping.ToOne;
 import org.hibernate.mapping.Value;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
+import org.hibernate.search.mapper.orm.common.impl.PropertyComparator;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBasicTypeMetadataProvider;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
@@ -100,7 +100,7 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 		while ( propertyIterator.hasNext() ) {
 			properties.add( (Property) propertyIterator.next() );
 		}
-		properties.sort( Comparator.comparing( Property::getName ) );
+		properties.sort( PropertyComparator.INSTANCE );
 
 		for ( Property property : properties ) {
 			collectPropertyMetadataContributors( collector, typeModel, property );
@@ -288,4 +288,5 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 			return result.computeIfAbsent( typeModel, ignored -> new ArrayList<>() );
 		}
 	}
+
 }
