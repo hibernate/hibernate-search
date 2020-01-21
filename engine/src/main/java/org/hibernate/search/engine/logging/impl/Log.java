@@ -16,7 +16,7 @@ import java.util.Set;
 
 import org.hibernate.search.engine.environment.classpath.spi.ClassLoadingException;
 import org.hibernate.search.engine.logging.spi.MappableTypeModelFormatter;
-import org.hibernate.search.engine.logging.spi.SimpleNameClassFormatter;
+import org.hibernate.search.util.common.logging.impl.SimpleNameClassFormatter;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.spatial.GeoPoint;
