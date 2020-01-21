@@ -1,5 +1,8 @@
 network.host: _local_
 
+# Avoid warnings related to clustering
+discovery.type: single-node
+
 # Prevent swapping
 bootstrap.memory_lock: true
 
