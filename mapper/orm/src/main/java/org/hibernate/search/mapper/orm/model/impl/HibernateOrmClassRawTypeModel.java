@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.hibernate.annotations.common.reflection.XProperty;
@@ -27,6 +28,9 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 
 	private final HibernateOrmBasicClassTypeMetadata ormTypeMetadata;
 	private final RawTypeDeclaringContext<T> rawTypeDeclaringContext;
+
+	private List<HibernateOrmClassRawTypeModel<? super T>> ascendingSuperTypesCache;
+	private List<HibernateOrmClassRawTypeModel<? super T>> descendingSuperTypesCache;
 
 	private final Map<String, HibernateOrmClassPropertyModel<?>> propertyModelCache = new HashMap<>();
 
@@ -54,12 +58,20 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 
 	@Override
 	public Stream<HibernateOrmClassRawTypeModel<? super T>> getAscendingSuperTypes() {
-		return introspector.getAscendingSuperTypes( xClass );
+		if ( ascendingSuperTypesCache == null ) {
+			ascendingSuperTypesCache = introspector.getAscendingSuperTypes( xClass )
+					.collect( Collectors.toList() );
+		}
+		return ascendingSuperTypesCache.stream();
 	}
 
 	@Override
 	public Stream<HibernateOrmClassRawTypeModel<? super T>> getDescendingSuperTypes() {
-		return introspector.getDescendingSuperTypes( xClass );
+		if ( descendingSuperTypesCache == null ) {
+			descendingSuperTypesCache = introspector.getDescendingSuperTypes( xClass )
+					.collect( Collectors.toList() );
+		}
+		return descendingSuperTypesCache.stream();
 	}
 
 	@Override
