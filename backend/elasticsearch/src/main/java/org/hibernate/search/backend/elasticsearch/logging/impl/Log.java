@@ -601,7 +601,7 @@ public interface Log extends BasicLogger {
 			+ " The URI scheme ('http://', 'https://') must not be included.")
 	SearchException invalidHostAndPort(String hostAndPort, @Cause Exception e);
 
-	@Message(id = ID_OFFSET_3 + 90, value = "Search query exceeded the timeout of %1$s: '%2$s'.")
+	@Message(id = ID_OFFSET_3 + 90, value = "Request exceeded the timeout of %1$s: '%2$s'.")
 	SearchTimeoutException timedOut(@FormatWith(DurationInSecondsAndFractionsFormatter.class) Duration timeout,
 			@FormatWith(ElasticsearchRequestFormatter.class) ElasticsearchRequest request);
 

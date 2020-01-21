@@ -244,7 +244,7 @@ public class ElasticsearchClientFactoryImplIT {
 				isException( AssertionFailure.class )
 						.causedBy( CompletionException.class )
 						.causedBy( SearchException.class )
-						.withMessage( "Search query exceeded the timeout of 1 seconds and 0 nanoseconds: 'POST /myIndex/myType with parameters {}'." )
+						.withMessage( "Request exceeded the timeout of 1 seconds and 0 nanoseconds: 'POST /myIndex/myType with parameters {}'." )
 				.build()
 		);
 
