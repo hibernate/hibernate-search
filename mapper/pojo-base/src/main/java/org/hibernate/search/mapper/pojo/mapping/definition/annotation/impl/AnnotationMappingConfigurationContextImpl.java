@@ -67,23 +67,23 @@ public class AnnotationMappingConfigurationContextImpl implements AnnotationMapp
 		 * map the types to indexes if necessary, and add a metadata contributor.
 		 */
 		Set<PojoRawTypeModel<?>> alreadyContributedTypes = new HashSet<>();
-		annotatedTypes.stream()
-				.map( introspector::getTypeModel )
-				/*
-				 * Take super types into account
-				 * Note: the order of super types (ascending or descending) does not matter here.
-				 */
-				.flatMap( PojoRawTypeModel::getAscendingSuperTypes )
-				// Ignore types that were already contributed
-				.filter( alreadyContributedTypes::add )
-				// TODO optimize by completely ignoring standard Java types, e.g. Object or standard Java interfaces such as Serializable?
-				.forEach( typeModel -> {
-					Optional<PojoTypeMetadataContributor> contributorOptional =
-							contributorFactory.createIfAnnotated( typeModel );
-					if ( contributorOptional.isPresent() ) {
-						collector.collectContributor( typeModel, contributorOptional.get() );
-					}
-				} );
+		Set<PojoRawTypeModel<?>> typesToInspect = new LinkedHashSet<>();
+		for ( Class<?> annotatedType : annotatedTypes ) {
+			introspector.getTypeModel( annotatedType ).getAscendingSuperTypes()
+					.forEach( typesToInspect::add );
+		}
+		for ( PojoRawTypeModel<?> typeModel : typesToInspect ) {
+			boolean neverContributed = alreadyContributedTypes.add( typeModel );
+			// Ignore types that were already contributed
+			// TODO optimize by completely ignoring standard Java types, e.g. Object or standard Java interfaces such as Serializable?
+			if ( neverContributed ) {
+				Optional<PojoTypeMetadataContributor> contributorOptional =
+						contributorFactory.createIfAnnotated( typeModel );
+				if ( contributorOptional.isPresent() ) {
+					collector.collectContributor( typeModel, contributorOptional.get() );
+				}
+			}
+		}
 
 		/*
 		 * If automatic discovery of annotated types is enabled,
