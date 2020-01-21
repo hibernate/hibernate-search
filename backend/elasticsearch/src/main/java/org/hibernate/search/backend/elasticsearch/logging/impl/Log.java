@@ -600,7 +600,7 @@ public interface Log extends BasicLogger {
 	SearchException invalidHostAndPort(String hostAndPort, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_3 + 90, value = "Query took longer than expected. Request: '%1$s'.")
-	SearchTimeoutException timedOut(ElasticsearchRequest request);
+	SearchTimeoutException timedOut(@FormatWith(ElasticsearchRequestFormatter.class) ElasticsearchRequest request);
 
 	@Message(id = ID_OFFSET_3 + 91, value = "Invalid name for the type-name mapping strategy: '%1$s'."
 			+ " Valid names are: %2$s.")
