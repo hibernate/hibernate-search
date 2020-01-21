@@ -5,6 +5,3 @@ discovery.type: single-node
 
 # Prevent swapping
 bootstrap.memory_lock: true
-
-# Disable starting multiple nodes on a single system:
-node.max_local_storage_nodes: 1
