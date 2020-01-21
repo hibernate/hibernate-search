@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.logging.impl;
 
 import static org.jboss.logging.Logger.Level.WARN;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,6 +26,7 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.logging.spi.AggregationKeyFormatter;
+import org.hibernate.search.util.common.logging.impl.DurationInSecondsAndFractionsFormatter;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.sort.SearchSort;
@@ -599,8 +601,9 @@ public interface Log extends BasicLogger {
 			+ " The URI scheme ('http://', 'https://') must not be included.")
 	SearchException invalidHostAndPort(String hostAndPort, @Cause Exception e);
 
-	@Message(id = ID_OFFSET_3 + 90, value = "Query took longer than expected. Request: '%1$s'.")
-	SearchTimeoutException timedOut(@FormatWith(ElasticsearchRequestFormatter.class) ElasticsearchRequest request);
+	@Message(id = ID_OFFSET_3 + 90, value = "Search query exceeded the timeout of %1$s: '%2$s'.")
+	SearchTimeoutException timedOut(@FormatWith(DurationInSecondsAndFractionsFormatter.class) Duration timeout,
+			@FormatWith(ElasticsearchRequestFormatter.class) ElasticsearchRequest request);
 
 	@Message(id = ID_OFFSET_3 + 91, value = "Invalid name for the type-name mapping strategy: '%1$s'."
 			+ " Valid names are: %2$s.")

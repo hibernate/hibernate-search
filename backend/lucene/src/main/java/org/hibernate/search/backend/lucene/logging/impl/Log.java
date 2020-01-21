@@ -29,6 +29,7 @@ import org.hibernate.search.backend.lucene.types.sort.impl.LuceneFieldSortBuilde
 import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.logging.spi.AggregationKeyFormatter;
+import org.hibernate.search.util.common.logging.impl.DurationInSecondsAndFractionsFormatter;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.sort.SearchSort;
@@ -595,6 +596,6 @@ public interface Log extends BasicLogger {
 	SearchException conflictingFieldModel(String absoluteFieldPath,
 			LuceneIndexSchemaObjectNode objectNode, LuceneIndexSchemaFieldNode fieldNode, @Param EventContext context);
 
-	@Message(id = ID_OFFSET_2 + 107, value = "Query took longer than expected: '%1$s'. Query: '%2$s'.")
-	SearchTimeoutException timedOut(@FormatWith(DurationFormatter.class) Duration duration, String queryDescription);
+	@Message(id = ID_OFFSET_2 + 107, value = "Search query exceeded the timeout of %1$s: '%2$s'.")
+	SearchTimeoutException timedOut(@FormatWith(DurationInSecondsAndFractionsFormatter.class) Duration timeout, String queryDescription);
 }
