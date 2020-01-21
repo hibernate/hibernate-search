@@ -19,6 +19,12 @@ public final class DurationInSecondsAndFractionsFormatter {
 
 	@Override
 	public String toString() {
-		return String.format( Locale.ROOT, "%d seconds and %d nanoseconds", duration.getSeconds(), duration.getNano() );
+		long nanos = duration.getNano();
+		long millis = nanos / 1_000_000;
+		nanos %= 1_000_000;
+		return String.format(
+				Locale.ROOT, "%ds, %dms and %dns",
+				duration.getSeconds(), millis, nanos
+		);
 	}
 }
