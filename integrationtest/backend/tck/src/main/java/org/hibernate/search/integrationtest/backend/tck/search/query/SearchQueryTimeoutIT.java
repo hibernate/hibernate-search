@@ -93,7 +93,7 @@ public class SearchQueryTimeoutIT {
 		SubTest.expectException( () -> query.fetchAll() )
 				.assertThrown()
 				.isInstanceOf( SearchTimeoutException.class )
-				.hasMessageContaining( "Search query exceeded the timeout of 0 seconds and 1 nanoseconds: " );
+				.hasMessageContaining( " exceeded the timeout of 0 seconds and 1 nanoseconds: " );
 	}
 
 	@Test
@@ -105,7 +105,7 @@ public class SearchQueryTimeoutIT {
 		SubTest.expectException( () -> query.fetchTotalHitCount() )
 				.assertThrown()
 				.isInstanceOf( SearchTimeoutException.class )
-				.hasMessageContaining( "Search query exceeded the timeout of 0 seconds and 1 nanoseconds: " );
+				.hasMessageContaining( " exceeded the timeout of 0 seconds and 1 nanoseconds: " );
 	}
 
 	@Test
