@@ -16,6 +16,8 @@ import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexS
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionRequestContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
@@ -61,12 +63,12 @@ public class IndexNameTypeNameMapping implements TypeNameMapping {
 		private final Map<String, String> mappedTypeNamesByElasticsearchIndexNames = new ConcurrentHashMap<>();
 
 		@Override
-		public void request(JsonObject requestBody) {
+		public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
 			// No need to request any additional information, Elasticsearch metadata is enough
 		}
 
 		@Override
-		public String extract(JsonObject hit) {
+		public String extract(JsonObject hit, SearchProjectionExtractContext context) {
 			String elasticsearchIndexName = HIT_INDEX_NAME_ACCESSOR.get( hit )
 					.orElseThrow( log::elasticsearchResponseMissingData );
 			String mappedTypeName = mappedTypeNamesByElasticsearchIndexNames.get( elasticsearchIndexName );

@@ -18,6 +18,8 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionRequestContext;
 import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchFields;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -101,12 +103,12 @@ public class DiscriminatorTypeNameMapping implements TypeNameMapping {
 
 
 		@Override
-		public void request(JsonObject requestBody) {
+		public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
 			DOCVALUE_FIELDS_ACCESSOR.addElementIfAbsent( requestBody, MAPPED_TYPE_FIELD_NAME_JSON );
 		}
 
 		@Override
-		public String extract(JsonObject hit) {
+		public String extract(JsonObject hit, SearchProjectionExtractContext context) {
 			return HIT_MAPPED_TYPE_NAME_ACCESSOR.get( hit )
 					.orElseThrow( () -> log.missingTypeFieldInDocument( MAPPED_TYPE_FIELD_NAME ) );
 		}
