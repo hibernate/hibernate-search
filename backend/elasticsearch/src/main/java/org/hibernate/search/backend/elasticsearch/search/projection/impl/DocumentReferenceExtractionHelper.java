@@ -22,15 +22,15 @@ public final class DocumentReferenceExtractionHelper implements ProjectionExtrac
 	}
 
 	@Override
-	public void request(JsonObject requestBody) {
-		mappedTypeNameHelper.request( requestBody );
-		idHelper.request( requestBody );
+	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
+		mappedTypeNameHelper.request( requestBody, context );
+		idHelper.request( requestBody, context );
 	}
 
 	@Override
-	public DocumentReference extract(JsonObject hit) {
-		String mappedTypeName = mappedTypeNameHelper.extract( hit );
-		String id = idHelper.extract( hit );
+	public DocumentReference extract(JsonObject hit, SearchProjectionExtractContext context) {
+		String mappedTypeName = mappedTypeNameHelper.extract( hit, context );
+		String id = idHelper.extract( hit, context );
 		return new ElasticsearchDocumentReference( mappedTypeName, id );
 	}
 }

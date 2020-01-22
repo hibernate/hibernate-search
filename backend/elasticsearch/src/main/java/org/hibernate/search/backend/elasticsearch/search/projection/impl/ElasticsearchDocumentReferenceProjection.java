@@ -27,13 +27,13 @@ class ElasticsearchDocumentReferenceProjection
 
 	@Override
 	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
-		helper.request( requestBody );
+		helper.request( requestBody, context );
 	}
 
 	@Override
 	public DocumentReference extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			SearchProjectionExtractContext context) {
-		return helper.extract( hit );
+		return helper.extract( hit, context );
 	}
 
 	@Override

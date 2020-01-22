@@ -10,8 +10,8 @@ import com.google.gson.JsonObject;
 
 public interface ProjectionExtractionHelper<T> {
 
-	void request(JsonObject requestBody);
+	void request(JsonObject requestBody, SearchProjectionRequestContext context);
 
-	T extract(JsonObject hit);
+	T extract(JsonObject hit, SearchProjectionExtractContext context);
 
 }

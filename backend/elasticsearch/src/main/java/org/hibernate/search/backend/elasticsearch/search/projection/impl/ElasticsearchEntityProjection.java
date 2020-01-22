@@ -25,13 +25,13 @@ public class ElasticsearchEntityProjection<E> implements ElasticsearchSearchProj
 
 	@Override
 	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
-		helper.request( requestBody );
+		helper.request( requestBody, context );
 	}
 
 	@Override
 	public Object extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			SearchProjectionExtractContext context) {
-		return projectionHitMapper.planLoading( helper.extract( hit ) );
+		return projectionHitMapper.planLoading( helper.extract( hit, context ) );
 	}
 
 	@SuppressWarnings("unchecked")

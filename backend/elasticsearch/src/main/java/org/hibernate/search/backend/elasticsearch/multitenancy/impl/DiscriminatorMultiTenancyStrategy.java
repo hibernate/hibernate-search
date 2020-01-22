@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
+import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexSchemaRootContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.PropertyMapping;
@@ -17,12 +18,13 @@ import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.R
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
+import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionRequestContext;
 import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchFields;
-import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -142,12 +144,12 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 				new JsonPrimitive( ID_FIELD_NAME );
 
 		@Override
-		public void request(JsonObject requestBody) {
+		public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
 			DOCVALUE_FIELDS_ACCESSOR.addElementIfAbsent( requestBody, ID_FIELD_NAME_JSON );
 		}
 
 		@Override
-		public String extract(JsonObject hit) {
+		public String extract(JsonObject hit, SearchProjectionExtractContext context) {
 			return HIT_ID_ACCESSOR.get( hit ).orElseThrow( log::elasticsearchResponseMissingData );
 		}
 	}

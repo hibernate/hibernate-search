@@ -25,14 +25,14 @@ public class ElasticsearchEntityReferenceProjection<R> implements ElasticsearchS
 
 	@Override
 	public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
-		helper.request( requestBody );
+		helper.request( requestBody, context );
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public R extract(ProjectionHitMapper<?, ?> projectionHitMapper, JsonObject hit,
 			SearchProjectionExtractContext context) {
-		return (R) projectionHitMapper.convertReference( helper.extract( hit ) );
+		return (R) projectionHitMapper.convertReference( helper.extract( hit, context ) );
 	}
 
 	@Override
