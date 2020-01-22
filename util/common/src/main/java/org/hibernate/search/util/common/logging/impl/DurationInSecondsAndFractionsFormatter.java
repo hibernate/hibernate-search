@@ -19,6 +19,9 @@ public final class DurationInSecondsAndFractionsFormatter {
 
 	@Override
 	public String toString() {
+		if ( duration == null ) {
+			return "null";
+		}
 		long nanos = duration.getNano();
 		long millis = nanos / 1_000_000;
 		nanos %= 1_000_000;

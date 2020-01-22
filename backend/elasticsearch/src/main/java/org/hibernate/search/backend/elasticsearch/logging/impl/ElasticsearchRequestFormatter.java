@@ -27,6 +27,10 @@ public final class ElasticsearchRequestFormatter {
 	}
 
 	private static String formatRequest(ElasticsearchRequest request) {
+		if ( request == null ) {
+			return "(no request)";
+		}
+
 		//Wild guess for some tuning. The only certainty is that the default (16) is too small.
 		StringBuilder sb = new StringBuilder( 180 );
 

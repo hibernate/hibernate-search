@@ -16,6 +16,6 @@ public final class SimpleNameClassFormatter {
 
 	@Override
 	public String toString() {
-		return clazz.getSimpleName();
+		return clazz != null ? clazz.getSimpleName() : "null";
 	}
 }

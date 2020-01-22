@@ -22,6 +22,6 @@ public final class ClassFormatter {
 
 	@Override
 	public String toString() {
-		return clazz != null ? clazz.getName() : null;
+		return clazz != null ? clazz.getName() : "null";
 	}
 }
