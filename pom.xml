@@ -460,6 +460,8 @@
 
         <!-- Elasticsearch tests properties -->
 
+        <!-- Control how an Elasticsearch instance is run automatically during tests -->
+        <test.elasticsearch.run.skip>false</test.elasticsearch.run.skip>
         <test.elasticsearch.run.java_home>${java.home}</test.elasticsearch.run.java_home>
         <!--
              These properties are transparently passed as system properties to integration tests,
@@ -2530,7 +2532,6 @@
             <properties>
                 <test.elasticsearch.connection.hosts>localhost:9200</test.elasticsearch.connection.hosts>
                 <test.elasticsearch.connection.protocol>http</test.elasticsearch.connection.protocol>
-                <test.elasticsearch.run.skip>false</test.elasticsearch.run.skip>
             </properties>
         </profile>
         <!-- Profile enabled when an Elasticsearch instance must NOT be run by Maven -->
