@@ -18,6 +18,6 @@ public final class AggregationKeyFormatter {
 
 	@Override
 	public String toString() {
-		return key.getName();
+		return key != null ? key.getName() : "null";
 	}
 }

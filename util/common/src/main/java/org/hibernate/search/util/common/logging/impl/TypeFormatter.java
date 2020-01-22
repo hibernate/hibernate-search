@@ -25,7 +25,7 @@ public final class TypeFormatter {
 			return type.toString();
 		}
 		else {
-			return null;
+			return "null";
 		}
 	}
 }

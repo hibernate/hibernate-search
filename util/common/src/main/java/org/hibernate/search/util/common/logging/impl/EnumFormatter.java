@@ -16,6 +16,6 @@ public final class EnumFormatter {
 
 	@Override
 	public String toString() {
-		return value.name();
+		return value != null ? value.name() : "null";
 	}
 }
