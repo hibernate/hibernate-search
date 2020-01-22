@@ -6,10 +6,15 @@
  */
 package org.hibernate.search.backend.elasticsearch.util.impl;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
+
 public interface ElasticsearchJsonSyntaxHelper {
 
 	String getTermAggregationOrderByTermToken();
 
 	boolean useOldSortNestedApi();
+
+	void requestDocValues(JsonObject requestBody, JsonPrimitive fieldName);
 
 }

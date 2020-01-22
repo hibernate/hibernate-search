@@ -12,24 +12,17 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-public class Elasticsearch7JsonSyntaxHelper implements ElasticsearchJsonSyntaxHelper {
+public class Elasticsearch63JsonSyntaxHelper extends Elasticsearch67JsonSyntaxHelper {
 
 	private static final JsonArrayAccessor DOCVALUE_FIELDS_ACCESSOR =
 			JsonAccessor.root().property( "docvalue_fields" ).asArray();
 
 	@Override
-	public String getTermAggregationOrderByTermToken() {
-		return "_key";
-	}
-
-	@Override
-	public boolean useOldSortNestedApi() {
-		return false;
-	}
-
-	@Override
 	public void requestDocValues(JsonObject requestBody, JsonPrimitive fieldName) {
-		// The default format is the format defined in the mapping, which is what we want
+		// Elasticsearch 5 to 6.6 doesn't allow to specify a format,
+		// but we only request doc values for String field which do not require a format,
+		// and unlike 6.7/6.8, there is no warning when we do not specify a format.
+		// So we just don't specify a format.
 		DOCVALUE_FIELDS_ACCESSOR.addElementIfAbsent( requestBody, fieldName );
 	}
 }
