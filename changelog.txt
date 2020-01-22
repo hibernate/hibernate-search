@@ -1,6 +1,40 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.Beta4 (22-01-2020)
+-------------------------
+
+** Bug
+    * HSEARCH-3802 query.fetchTotalHitCounts always fails when setting a timeout with Elasticsearch
+
+** Improvement
+    * HSEARCH-3812 Be more consistent with timeout messages in search queries across backends (Lucene/ES)
+    * HSEARCH-3810 Rework JBoss logging formatters: execute computationally intensive operations in toString rather than the constructor
+    * HSEARCH-3803 Support IdentifierBridge with provided IDs
+    * HSEARCH-3797 Two-phase projections in the Lucene backend
+    * HSEARCH-3793 Document usage of the "exists" predicate on object fields
+    * HSEARCH-3786 Lucene projections on fields in nested documents should limit children collection to the top docs
+    * HSEARCH-3729 Give more information about failures to MassIndexer users
+    * HSEARCH-3629 Move search query loading options to a better place in the search query DSL
+    * HSEARCH-3461 Do not optimize the indexes by default after mass indexing and document the drawbacks
+    * HSEARCH-3418 Document that Instants are truncated to the millisecond when indexed
+    * HSEARCH-1828 Clarify documentation about ways to disable Hibernate Search
+
+** Task
+    * HSEARCH-3813 Automatically skip Elasticsearch instance creation when skipping tests
+    * HSEARCH-3811 Various attempts at improving bootstrap performance
+    * HSEARCH-3805 Override repositories in Karaf/Paxexam config
+    * HSEARCH-3804 Upgrade to Arquillian 1.5/Shrinkwrap 3.1.3
+    * HSEARCH-3800 Add experimental tests with Hibernate Search with JDK15
+    * HSEARCH-3798 Test sorting on numeric fields without specifying missing value behavior
+    * HSEARCH-3795 Get rid of Version.logVersion()
+    * HSEARCH-3794 Break down large files in the documentation source into multiple, smaller files
+    * HSEARCH-3792 Fix warnings issued when starting Elasticsearch in integration tests
+    * HSEARCH-3790 Upgrade to Elasticsearch 5.6.16
+    * HSEARCH-3773 Simplify how HibernateOrmMappingContext/HibernateOrmSessionContext are implemented
+    * HSEARCH-3746 IndexWorkspacePurgeIT fails on windows
+    * HSEARCH-3171 Test using CDI beans referenced by their name
+
 6.0.0.Beta3 (13-12-2019)
 -------------------------
 
