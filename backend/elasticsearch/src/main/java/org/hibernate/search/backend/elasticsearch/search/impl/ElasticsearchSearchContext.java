@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
+import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchJsonSyntaxHelper;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
