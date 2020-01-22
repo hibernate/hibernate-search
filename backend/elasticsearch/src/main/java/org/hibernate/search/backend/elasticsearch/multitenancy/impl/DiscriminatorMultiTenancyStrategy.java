@@ -16,7 +16,6 @@ import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.D
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
@@ -26,7 +25,6 @@ import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchFields;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
@@ -132,20 +130,16 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 	}
 
 	private static final class DiscriminatorMultiTenancyIdProjectionExtractionHelper implements ProjectionExtractionHelper<String> {
-		private static final JsonArrayAccessor DOCVALUE_FIELDS_ACCESSOR =
-				JsonAccessor.root().property( "docvalue_fields" ).asArray();
-
 		private static final JsonAccessor<String> HIT_ID_ACCESSOR =
 				JsonAccessor.root().property( "fields" ).asObject()
 						.property( ID_FIELD_NAME ).asArray()
 						.element( 0 ).asString();
 
-		private static final JsonElement ID_FIELD_NAME_JSON =
-				new JsonPrimitive( ID_FIELD_NAME );
+		private static final JsonPrimitive ID_FIELD_NAME_JSON = new JsonPrimitive( ID_FIELD_NAME );
 
 		@Override
 		public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
-			DOCVALUE_FIELDS_ACCESSOR.addElementIfAbsent( requestBody, ID_FIELD_NAME_JSON );
+			context.getJsonSyntaxHelper().requestDocValues( requestBody, ID_FIELD_NAME_JSON );
 		}
 
 		@Override

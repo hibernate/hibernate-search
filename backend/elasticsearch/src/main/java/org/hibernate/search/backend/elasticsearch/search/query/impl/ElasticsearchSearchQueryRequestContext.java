@@ -10,8 +10,10 @@ import java.util.Collections;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.AggregationRequestContext;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DistanceSortKey;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionRequestContext;
+import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchJsonSyntaxHelper;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -31,14 +33,17 @@ import com.google.gson.JsonObject;
  */
 class ElasticsearchSearchQueryRequestContext implements SearchProjectionRequestContext, AggregationRequestContext {
 
+	private final ElasticsearchSearchContext searchContext;
 	private final BackendSessionContext sessionContext;
 	private final LoadingContext<?, ?> loadingContext;
 	private final Map<DistanceSortKey, Integer> distanceSorts;
 
 	ElasticsearchSearchQueryRequestContext(
+			ElasticsearchSearchContext searchContext,
 			BackendSessionContext sessionContext,
 			LoadingContext<?, ?> loadingContext,
 			Map<DistanceSortKey, Integer> distanceSorts) {
+		this.searchContext = searchContext;
 		this.sessionContext = sessionContext;
 		this.loadingContext = loadingContext;
 		this.distanceSorts = distanceSorts != null ? Collections.unmodifiableMap( distanceSorts ) : null;
@@ -51,6 +56,11 @@ class ElasticsearchSearchQueryRequestContext implements SearchProjectionRequestC
 		}
 
 		return distanceSorts.get( new DistanceSortKey( absoluteFieldPath, location ) );
+	}
+
+	@Override
+	public ElasticsearchJsonSyntaxHelper getJsonSyntaxHelper() {
+		return searchContext.getJsonSyntaxHelper();
 	}
 
 	ElasticsearchSearchQueryExtractContext createExtractContext(JsonObject responseBody) {

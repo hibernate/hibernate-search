@@ -15,7 +15,6 @@ import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.D
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
@@ -23,7 +22,6 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchP
 import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchFields;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
@@ -93,18 +91,17 @@ public class DiscriminatorTypeNameMapping implements TypeNameMapping {
 	}
 
 	private static final class TypeNameFromDiscriminatorExtractionHelper implements ProjectionExtractionHelper<String> {
-		private static final JsonArrayAccessor DOCVALUE_FIELDS_ACCESSOR =
-				JsonAccessor.root().property( "docvalue_fields" ).asArray();
+
 		private static final JsonAccessor<String> HIT_MAPPED_TYPE_NAME_ACCESSOR =
 				JsonAccessor.root().property( "fields" ).asObject()
 						.property( MAPPED_TYPE_FIELD_NAME ).asArray()
 						.element( 0 ).asString();
-		private static final JsonElement MAPPED_TYPE_FIELD_NAME_JSON = new JsonPrimitive( MAPPED_TYPE_FIELD_NAME );
 
+		private static final JsonPrimitive MAPPED_TYPE_FIELD_NAME_JSON = new JsonPrimitive( MAPPED_TYPE_FIELD_NAME );
 
 		@Override
 		public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
-			DOCVALUE_FIELDS_ACCESSOR.addElementIfAbsent( requestBody, MAPPED_TYPE_FIELD_NAME_JSON );
+			context.getJsonSyntaxHelper().requestDocValues( requestBody, MAPPED_TYPE_FIELD_NAME_JSON );
 		}
 
 		@Override

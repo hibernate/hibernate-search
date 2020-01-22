@@ -182,7 +182,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 		LoadingContext<?, ?> loadingContext = loadingContextBuilder.build();
 
 		ElasticsearchSearchQueryRequestContext requestContext = new ElasticsearchSearchQueryRequestContext(
-				sessionContext, loadingContext, distanceSorts
+				searchContext, sessionContext, loadingContext, distanceSorts
 		);
 
 		rootProjection.request( payload, requestContext );
