@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.dialect.protocol.impl;
 
-import org.hibernate.search.backend.elasticsearch.search.impl.Elasticsearch56JsonSyntaxHelper;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchJsonSyntaxHelper;
+import org.hibernate.search.backend.elasticsearch.util.impl.Elasticsearch56JsonSyntaxHelper;
+import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchJsonSyntaxHelper;
 
 /**
  * The protocol dialect for Elasticsearch 5.6.

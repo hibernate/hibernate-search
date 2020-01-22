@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchJsonSyntaxHelper;
+import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchJsonSyntaxHelper;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
