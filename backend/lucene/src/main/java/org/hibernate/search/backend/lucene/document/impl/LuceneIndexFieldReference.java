@@ -14,9 +14,6 @@ public class LuceneIndexFieldReference<F> implements IndexFieldReference<F> {
 
 	private LuceneIndexSchemaFieldNode<F> schemaNode;
 
-	public LuceneIndexFieldReference() {
-	}
-
 	public void enable(LuceneIndexSchemaFieldNode<F> schemaNode) {
 		this.schemaNode = schemaNode;
 	}

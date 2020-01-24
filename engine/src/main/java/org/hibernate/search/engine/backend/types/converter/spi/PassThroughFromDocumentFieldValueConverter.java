@@ -11,9 +11,6 @@ import org.hibernate.search.engine.backend.types.converter.runtime.FromDocumentF
 
 public final class PassThroughFromDocumentFieldValueConverter<F> implements FromDocumentFieldValueConverter<F, F> {
 
-	public PassThroughFromDocumentFieldValueConverter() {
-	}
-
 	@Override
 	public F convert(F value, FromDocumentFieldValueConvertContext context) {
 		return value;

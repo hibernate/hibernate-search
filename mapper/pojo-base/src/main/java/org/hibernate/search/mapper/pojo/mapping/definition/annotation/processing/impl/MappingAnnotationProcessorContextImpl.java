@@ -29,9 +29,6 @@ public class MappingAnnotationProcessorContextImpl
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public MappingAnnotationProcessorContextImpl() {
-	}
-
 	@Override
 	public Optional<PojoModelPathValueNode> toPojoModelPathValueNode(ObjectPath objectPath) {
 		PropertyValue[] inversePathElements = objectPath.value();
