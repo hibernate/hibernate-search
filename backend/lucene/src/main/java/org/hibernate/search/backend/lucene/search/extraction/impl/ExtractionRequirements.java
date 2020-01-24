@@ -73,16 +73,8 @@ public final class ExtractionRequirements {
 					// TopFieldCollector returns TopDocs whose ScoreDocs do not contain a score...
 					// Thus we will have to set the scores ourselves.
 					requireFieldDocRescoring = true;
-
 					// If there's a SCORE sort field, make sure we remember that, so that later we can optimize rescoring
-					SortField[] sortFields = sort.getSort();
-					for ( int i = 0; i < sortFields.length; i++ ) {
-						SortField sortField = sortFields[i];
-						if ( sortField.getType() == SortField.Type.SCORE ) {
-							scoreSortFieldIndexForRescoring = i;
-							break;
-						}
-					}
+					scoreSortFieldIndexForRescoring = getScoreSortFieldIndexOrNull( sort );
 				}
 				topDocsCollector = TopFieldCollector.create(
 						sort,
@@ -111,6 +103,17 @@ public final class ExtractionRequirements {
 				requiredCollectorForTopDocsFactories,
 				timeoutManager
 		);
+	}
+
+	private Integer getScoreSortFieldIndexOrNull(Sort sort) {
+		SortField[] sortFields = sort.getSort();
+		for ( int i = 0; i < sortFields.length; i++ ) {
+			SortField sortField = sortFields[i];
+			if ( sortField.getType() == SortField.Type.SCORE ) {
+				return i;
+			}
+		}
+		return null;
 	}
 
 	public static class Builder {

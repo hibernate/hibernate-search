@@ -113,7 +113,7 @@ public class ToStringTreeBuilder {
 				)
 		) {
 			appendNewline();
-			appendIndent();
+			appendIndentIfNecessary();
 		}
 
 		if ( StringHelper.isNotEmpty( name ) ) {
@@ -158,7 +158,7 @@ public class ToStringTreeBuilder {
 
 		if ( StringHelper.isNotEmpty( endDelimiter ) ) {
 			appendNewline();
-			appendIndent();
+			appendIndentIfNecessary();
 			builder.append( endDelimiter );
 		}
 		first = false;
@@ -168,7 +168,7 @@ public class ToStringTreeBuilder {
 		builder.append( style.newline );
 	}
 
-	private void appendIndent() {
+	private void appendIndentIfNecessary() {
 		if ( structureTypeStack.isEmpty() ) {
 			return;
 		}
@@ -182,34 +182,39 @@ public class ToStringTreeBuilder {
 		while ( current != null ) {
 			grandChild = iterator.hasNext() ? iterator.next() : null;
 			if ( !shouldSqueeze( current, parent, grandParent ) ) {
-				switch ( current ) {
-					case OBJECT:
-						builder.append( style.indentInObject );
-						break;
-					case LIST:
-						// Display a bullet point if:
-						if (
-								// We are adding a element directly to the list
-								child == null
-								// OR we are adding the first element to a squeezed element in the list
-								|| shouldSqueeze( grandChild, child, current ) && !iterator.hasNext() && first
-						) {
-							builder.append( style.indentInListBulletPoint );
-						}
-						else {
-							builder.append( style.indentInListNoBulletPoint );
-						}
-						break;
-					case UNNAMED_ENTRY:
-					case NAMED_ENTRY:
-						// No indent for these
-						break;
-				}
+				appendIndentIfNecessary( grandChild, child, current, iterator.hasNext() );
 			}
 			grandParent = parent;
 			parent = current;
 			current = child;
 			child = grandChild;
+		}
+	}
+
+	private void appendIndentIfNecessary(StructureType grandChild, StructureType child, StructureType current,
+			boolean hasParent) {
+		switch ( current ) {
+			case OBJECT:
+				builder.append( style.indentInObject );
+				break;
+			case LIST:
+				// Display a bullet point if:
+				if (
+						// We are adding an element directly to the list
+						child == null
+						// OR we are adding the first element to a squeezed element in the list
+						|| shouldSqueeze( grandChild, child, current ) && !hasParent && first
+				) {
+					builder.append( style.indentInListBulletPoint );
+				}
+				else {
+					builder.append( style.indentInListNoBulletPoint );
+				}
+				break;
+			case UNNAMED_ENTRY:
+			case NAMED_ENTRY:
+				// No indent for these
+				break;
 		}
 	}
 
