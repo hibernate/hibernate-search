@@ -13,7 +13,6 @@ import java.util.Set;
 
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorExecutionContext;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
-import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorKey;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.StoredFieldsCollector;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
@@ -85,11 +84,11 @@ public final class ExtractionRequirements {
 						Integer.MAX_VALUE
 				);
 			}
-			collectorsForAllMatchingDocsBuilder.add( CollectorKey.TOP_DOCS, topDocsCollector );
+			collectorsForAllMatchingDocsBuilder.add( LuceneCollectors.TOP_DOCS_KEY, topDocsCollector );
 		}
 
 		TotalHitCountCollector totalHitCountCollector = new TotalHitCountCollector();
-		collectorsForAllMatchingDocsBuilder.add( CollectorKey.TOTAL_HIT_COUNT, totalHitCountCollector );
+		collectorsForAllMatchingDocsBuilder.add( LuceneCollectors.TOTAL_HIT_COUNT_KEY, totalHitCountCollector );
 
 		collectorsForAllMatchingDocsBuilder.addAll( requiredCollectorForAllMatchingDocsFactories );
 		CollectorSet collectorsForAllMatchingDocs = collectorsForAllMatchingDocsBuilder.build();
