@@ -40,7 +40,7 @@ final class ServerUris {
 	}
 
 	private static HttpHost createHttpHost(String scheme, String hostAndPort) {
-		if ( hostAndPort.indexOf( "://" ) > 0 ) {
+		if ( hostAndPort.indexOf( "://" ) >= 0 ) {
 			throw log.invalidHostAndPort( hostAndPort, null );
 		}
 		String host;
