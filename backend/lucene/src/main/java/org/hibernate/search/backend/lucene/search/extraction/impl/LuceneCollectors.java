@@ -25,8 +25,12 @@ import org.apache.lucene.search.TimeLimitingCollector;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.search.TopDocsCollector;
 import org.apache.lucene.search.TopFieldCollector;
+import org.apache.lucene.search.TotalHitCountCollector;
 
 public class LuceneCollectors {
+
+	static final CollectorKey<TotalHitCountCollector> TOTAL_HIT_COUNT_KEY = CollectorKey.create();
+	static final CollectorKey<TopDocsCollector<?>> TOP_DOCS_KEY = CollectorKey.create();
 
 	private final IndexReaderMetadataResolver metadataResolver;
 
@@ -74,9 +78,9 @@ public class LuceneCollectors {
 			timeoutManager.forceTimedOut();
 		}
 
-		this.totalHitCount = collectorsForAllMatchingDocs.get( CollectorKey.TOTAL_HIT_COUNT ).getTotalHits();
+		this.totalHitCount = collectorsForAllMatchingDocs.get( TOTAL_HIT_COUNT_KEY ).getTotalHits();
 
-		TopDocsCollector<?> topDocsCollector = collectorsForAllMatchingDocs.get( CollectorKey.TOP_DOCS );
+		TopDocsCollector<?> topDocsCollector = collectorsForAllMatchingDocs.get( TOP_DOCS_KEY );
 		if ( topDocsCollector == null ) {
 			return;
 		}

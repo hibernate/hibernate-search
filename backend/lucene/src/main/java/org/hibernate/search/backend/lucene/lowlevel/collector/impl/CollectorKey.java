@@ -7,8 +7,6 @@
 package org.hibernate.search.backend.lucene.lowlevel.collector.impl;
 
 import org.apache.lucene.search.Collector;
-import org.apache.lucene.search.TopDocsCollector;
-import org.apache.lucene.search.TotalHitCountCollector;
 
 /**
  * Tagging interface for collector keys.
@@ -23,9 +21,5 @@ public interface CollectorKey<C extends Collector> {
 		return new CollectorKey<C>() {
 		};
 	}
-
-	CollectorKey<TotalHitCountCollector> TOTAL_HIT_COUNT = create();
-
-	CollectorKey<TopDocsCollector> TOP_DOCS = create();
 
 }
