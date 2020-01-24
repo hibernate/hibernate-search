@@ -22,5 +22,5 @@ public interface JsonArrayAccessor extends JsonAccessor<JsonArray> {
 	 * @throws UnexpectedJsonElementTypeException If an element in the path has unexpected type, preventing
 	 * write access to the array this accessor points to.
 	 */
-	void addElementIfAbsent(JsonObject root, JsonElement newValue) throws UnexpectedJsonElementTypeException;
+	void addElementIfAbsent(JsonObject root, JsonElement newValue);
 }

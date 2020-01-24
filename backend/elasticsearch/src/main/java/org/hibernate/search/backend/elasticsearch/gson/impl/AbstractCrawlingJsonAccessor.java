@@ -31,7 +31,7 @@ abstract class AbstractCrawlingJsonAccessor<P extends JsonElement> extends Abstr
 	}
 
 	@Override
-	public Optional<JsonElement> get(JsonObject root) throws UnexpectedJsonElementTypeException {
+	public Optional<JsonElement> get(JsonObject root) {
 		return getParentAccessor().get( root ).map( this::doGet );
 	}
 
@@ -43,7 +43,7 @@ abstract class AbstractCrawlingJsonAccessor<P extends JsonElement> extends Abstr
 	}
 
 	@Override
-	public void set(JsonObject root, JsonElement newValue) throws UnexpectedJsonElementTypeException {
+	public void set(JsonObject root, JsonElement newValue) {
 		P parent = getParentAccessor().getOrCreate( root );
 		doSet( parent, newValue );
 	}
@@ -51,7 +51,7 @@ abstract class AbstractCrawlingJsonAccessor<P extends JsonElement> extends Abstr
 	protected abstract void doSet(P parent, JsonElement newValue);
 
 	@Override
-	public JsonElement getOrCreate(JsonObject root, Supplier<? extends JsonElement> newValueSupplier) throws UnexpectedJsonElementTypeException {
+	public JsonElement getOrCreate(JsonObject root, Supplier<? extends JsonElement> newValueSupplier) {
 		P parent = getParentAccessor().getOrCreate( root );
 		JsonElement currentValue = doGet( parent );
 		if ( currentValue == null || currentValue.isJsonNull() ) {
@@ -65,7 +65,7 @@ abstract class AbstractCrawlingJsonAccessor<P extends JsonElement> extends Abstr
 	}
 
 	@Override
-	public void add(JsonObject root, JsonElement newValue) throws UnexpectedJsonElementTypeException {
+	public void add(JsonObject root, JsonElement newValue) {
 		P parent = getParentAccessor().getOrCreate( root );
 		JsonElement currentValue = doGet( parent );
 		if ( currentValue == null ) { // Do not overwrite JsonNull, because it might be there on purpose

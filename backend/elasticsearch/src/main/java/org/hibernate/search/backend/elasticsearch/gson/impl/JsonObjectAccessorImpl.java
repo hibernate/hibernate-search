@@ -33,7 +33,7 @@ public class JsonObjectAccessorImpl extends AbstractTypingJsonAccessor<JsonObjec
 	}
 
 	@Override
-	public JsonObject getOrCreate(JsonObject root) throws UnexpectedJsonElementTypeException {
+	public JsonObject getOrCreate(JsonObject root) {
 		return getOrCreate( root, JsonObject::new );
 	}
 

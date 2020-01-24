@@ -32,7 +32,7 @@ public interface JsonAccessor<T> {
 	 * @throws UnexpectedJsonElementTypeException If an element in the path has unexpected type,
 	 * preventing access to the element this accessor points to.
 	 */
-	Optional<T> get(JsonObject root) throws UnexpectedJsonElementTypeException;
+	Optional<T> get(JsonObject root);
 
 	/**
 	 * Detects whether the element this accessor points to for the given {@code root} has an explicit value.
@@ -57,7 +57,7 @@ public interface JsonAccessor<T> {
 	 * @throws UnexpectedJsonElementTypeException If an element in the path has unexpected type, preventing
 	 * access to the element this accessor points to.
 	 */
-	void set(JsonObject root, T newValue) throws UnexpectedJsonElementTypeException;
+	void set(JsonObject root, T newValue);
 
 	/**
 	 * Add the given primitive value to the element this accessor points to for the
@@ -79,7 +79,7 @@ public interface JsonAccessor<T> {
 	 * @throws UnexpectedJsonElementTypeException If an element in the path has unexpected type, preventing
 	 * write access to the element this accessor points to.
 	 */
-	void add(JsonObject root, T newValue) throws UnexpectedJsonElementTypeException;
+	void add(JsonObject root, T newValue);
 
 	/**
 	 * Get the current value of the element this accessor points to for the given {@code root},
@@ -92,7 +92,7 @@ public interface JsonAccessor<T> {
 	 * or if an element in the path has unexpected type, preventing access to the element this accessor
 	 * points to.
 	 */
-	T getOrCreate(JsonObject root, Supplier<? extends T> newValueSupplier) throws UnexpectedJsonElementTypeException;
+	T getOrCreate(JsonObject root, Supplier<? extends T> newValueSupplier);
 
 	/**
 	 * @return The absolute path representing this accessor, excluding runtime details such as array indices or types.
