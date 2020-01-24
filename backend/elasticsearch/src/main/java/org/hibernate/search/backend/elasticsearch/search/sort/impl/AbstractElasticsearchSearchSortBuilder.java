@@ -19,7 +19,7 @@ import com.google.gson.JsonPrimitive;
 abstract class AbstractElasticsearchSearchSortBuilder implements SearchSortBuilder<ElasticsearchSearchSortBuilder>,
 		ElasticsearchSearchSortBuilder {
 
-	private static final JsonAccessor<JsonElement> ORDER = JsonAccessor.root().property( "order" );
+	private static final JsonAccessor<JsonElement> ORDER_ACCESSOR = JsonAccessor.root().property( "order" );
 	private static final JsonPrimitive ASC_KEYWORD_JSON = new JsonPrimitive( "asc" );
 	private static final JsonPrimitive DESC_KEYWORD_JSON = new JsonPrimitive( "desc" );
 
@@ -41,10 +41,10 @@ abstract class AbstractElasticsearchSearchSortBuilder implements SearchSortBuild
 		if ( order != null ) {
 			switch ( order ) {
 				case ASC:
-					ORDER.set( innerObject, ASC_KEYWORD_JSON );
+					ORDER_ACCESSOR.set( innerObject, ASC_KEYWORD_JSON );
 					break;
 				case DESC:
-					ORDER.set( innerObject, DESC_KEYWORD_JSON );
+					ORDER_ACCESSOR.set( innerObject, DESC_KEYWORD_JSON );
 					break;
 			}
 		}

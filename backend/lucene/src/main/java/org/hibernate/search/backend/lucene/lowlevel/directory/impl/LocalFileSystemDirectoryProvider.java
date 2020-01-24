@@ -43,34 +43,34 @@ public class LocalFileSystemDirectoryProvider implements DirectoryProvider {
 					.withDefault( LuceneBackendSettings.Defaults.DIRECTORY_FILESYSTEM_ACCESS_STRATEGY )
 					.build();
 
-	private Path root;
+	private Path directoryRoot;
 	private FileSystemAccessStrategy accessStrategy;
 	private LockFactory lockFactory;
 
 	@Override
 	public String toString() {
-		return getClass().getSimpleName() + "[" + "root=" + root + "]";
+		return getClass().getSimpleName() + "[" + "root=" + directoryRoot + "]";
 	}
 
 	@Override
 	public void initialize(DirectoryProviderInitializationContext context) {
 		ConfigurationPropertySource propertySource = context.getConfigurationPropertySource();
-		this.root = ROOT.get( propertySource ).toAbsolutePath();
+		this.directoryRoot = ROOT.get( propertySource ).toAbsolutePath();
 		FileSystemAccessStrategyName accessStrategyName = FILESYSTEM_ACCESS_STRATEGY.get( propertySource );
 		this.accessStrategy = FileSystemAccessStrategy.get( accessStrategyName );
 		this.lockFactory = context.createConfiguredLockFactory().orElseGet( FSLockFactory::getDefault );
 
 		try {
-			FileSystemUtils.initializeWriteableDirectory( root );
+			FileSystemUtils.initializeWriteableDirectory( directoryRoot );
 		}
 		catch (Exception e) {
-			throw log.unableToInitializeRootDirectory( root, e.getMessage(), e );
+			throw log.unableToInitializeRootDirectory( directoryRoot, e.getMessage(), e );
 		}
 	}
 
 	@Override
 	public DirectoryHolder createDirectoryHolder(DirectoryCreationContext context) {
-		Path directoryPath = root.resolve( context.getIndexName() );
+		Path directoryPath = directoryRoot.resolve( context.getIndexName() );
 		Optional<String> shardId = context.getShardId();
 		if ( shardId.isPresent() ) {
 			directoryPath = directoryPath.resolve( shardId.get() );
