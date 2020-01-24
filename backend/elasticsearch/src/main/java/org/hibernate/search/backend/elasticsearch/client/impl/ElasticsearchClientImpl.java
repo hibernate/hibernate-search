@@ -79,7 +79,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	@Override
 	public CompletableFuture<ElasticsearchResponse> submit(ElasticsearchRequest request) {
 		CompletableFuture<ElasticsearchResponse> result = Futures.create( () -> send( request ) )
-				.thenApply( response -> convertResponse( request, response ) );
+				.thenApply( this::convertResponse );
 		if ( requestLog.isDebugEnabled() ) {
 			long startTime = System.nanoTime();
 			result.thenAccept( response -> log( request, startTime, response ) );
@@ -171,7 +171,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 		return request;
 	}
 
-	private ElasticsearchResponse convertResponse(ElasticsearchRequest request, Response response) {
+	private ElasticsearchResponse convertResponse(Response response) {
 		try {
 			JsonObject body = parseBody( response );
 			return new ElasticsearchResponse(
