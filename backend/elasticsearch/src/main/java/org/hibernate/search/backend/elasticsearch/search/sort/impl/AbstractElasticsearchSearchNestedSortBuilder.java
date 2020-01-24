@@ -18,11 +18,11 @@ import com.google.gson.JsonPrimitive;
 public abstract class AbstractElasticsearchSearchNestedSortBuilder extends AbstractElasticsearchSearchSortBuilder {
 
 	// new API
-	private static final JsonAccessor<JsonElement> NESTED = JsonAccessor.root().property( "nested" );
-	private static final JsonAccessor<JsonElement> PATH = JsonAccessor.root().property( "path" );
+	private static final JsonAccessor<JsonElement> NESTED_ACCESSOR = JsonAccessor.root().property( "nested" );
+	private static final JsonAccessor<JsonElement> PATH_ACCESSOR = JsonAccessor.root().property( "path" );
 
 	// old API
-	private static final JsonAccessor<JsonElement> NESTED_PATH = JsonAccessor.root().property( "nested_path" );
+	private static final JsonAccessor<JsonElement> NESTED_PATH_ACCESSOR = JsonAccessor.root().property( "nested_path" );
 
 	private final List<String> nestedPathHierarchy;
 	private final ElasticsearchJsonSyntaxHelper jsonSyntaxHelper;
@@ -41,15 +41,15 @@ public abstract class AbstractElasticsearchSearchNestedSortBuilder extends Abstr
 			// the old api requires only the last path ( the deepest one )
 			String lastNestedPath = nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 );
 
-			NESTED_PATH.set( innerObject, new JsonPrimitive( lastNestedPath ) );
+			NESTED_PATH_ACCESSOR.set( innerObject, new JsonPrimitive( lastNestedPath ) );
 			return;
 		}
 
 		JsonObject nextNestedObjectTarget = innerObject;
 		for ( String nestedPath : nestedPathHierarchy ) {
 			JsonObject nestedObject = new JsonObject();
-			PATH.set( nestedObject, new JsonPrimitive( nestedPath ) );
-			NESTED.set( nextNestedObjectTarget, nestedObject );
+			PATH_ACCESSOR.set( nestedObject, new JsonPrimitive( nestedPath ) );
+			NESTED_ACCESSOR.set( nextNestedObjectTarget, nestedObject );
 
 			// the new api requires a recursion on the path hierarchy
 			nextNestedObjectTarget = nestedObject;
