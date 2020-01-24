@@ -151,56 +151,81 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 	private Member findPropertyMember(String propertyName,
 			XProperty methodAccessXProperty, XProperty fieldAccessXProperty,
 			HibernateOrmBasicClassPropertyMetadata propertyMetadataFromHibernateOrmMetamodel) {
+		Member result;
 		if ( propertyMetadataFromHibernateOrmMetamodel != null ) {
-			Member memberFromHibernateOrmMetamodel = propertyMetadataFromHibernateOrmMetamodel.getMember();
-			/*
-			 * Hibernate ORM has metadata for this property,
-			 * which means this property is persisted.
-			 *
-			 * Hibernate ORM might return us the member as declared in a supertype,
-			 * in which case the type of that member will not be up-to-date.
-			 * Thus we try to get the overridden member declared in the current type,
-			 * and failing that we look for the member in supertypes.
-			 *
-			 * We still try to comply with JPA's configured access type,
-			 * which explains the two if/else branches below.
-			 */
-			if ( memberFromHibernateOrmMetamodel instanceof Method ) {
-				return methodAccessXProperty == null ? memberFromHibernateOrmMetamodel : PojoCommonsAnnotationsHelper.getUnderlyingMember( methodAccessXProperty );
-			}
-			else if ( memberFromHibernateOrmMetamodel instanceof Field ) {
-				return fieldAccessXProperty == null ? memberFromHibernateOrmMetamodel : PojoCommonsAnnotationsHelper.getUnderlyingMember( fieldAccessXProperty );
-			}
-			else {
-				/*
-				 * We don't have a declared XProperty for this member in the current type.
-				 * Try to find the member used to access the same property in the closest supertype.
-				 */
-				return getPropertyMemberFromParentTypes( propertyName );
-			}
+			// Hibernate ORM doesn't have any metadata for this property (the property is persisted).
+			// Use ORM metadata to find the corresponding member (field/method).
+			result = getPropertyMemberUsingHibernateOrmMetadataFromThisType(
+					methodAccessXProperty, fieldAccessXProperty, propertyMetadataFromHibernateOrmMetamodel
+			);
 		}
 		else {
-			/*
-			 * Hibernate ORM doesn't have any metadata for this property,
-			 * which means this property is transient.
-			 * We don't need to worry about JPA's access type.
-			 */
-			if ( methodAccessXProperty != null ) {
-				// We managed to find a declared, method-access XProperty on the current type. Use it.
-				return PojoCommonsAnnotationsHelper.getUnderlyingMember( methodAccessXProperty );
-			}
-			else if ( fieldAccessXProperty != null ) {
-				// We managed to find a declared, field-access XProperty on the current type. Use it.
-				return PojoCommonsAnnotationsHelper.getUnderlyingMember( fieldAccessXProperty );
-			}
-			else {
-				/*
-				 * We did not manage to find a declared XProperty on the current type.
-				 * Either the property is declared in a supertype, or it does not exist.
-				 * Try to find the member used to access the same property in the closest supertype.
-				 */
-				return getPropertyMemberFromParentTypes( propertyName );
-			}
+			// Hibernate ORM doesn't have any metadata for this property (the property is transient).
+			// Use reflection to find the corresponding member (field/method).
+			result = getPropertyMemberUsingReflectionFromThisType(
+					methodAccessXProperty, fieldAccessXProperty
+			);
+		}
+
+		if ( result == null ) {
+			// There is no member for this property on the current type.
+			// Try to find one in the closest supertype.
+			result = getPropertyMemberFromParentTypes( propertyName );
+		}
+
+		return result;
+	}
+
+	private Member getPropertyMemberUsingHibernateOrmMetadataFromThisType(XProperty methodAccessXProperty,
+			XProperty fieldAccessXProperty,
+			HibernateOrmBasicClassPropertyMetadata propertyMetadataFromHibernateOrmMetamodel) {
+		Member memberFromHibernateOrmMetamodel = propertyMetadataFromHibernateOrmMetamodel.getMember();
+		/*
+		 * Hibernate ORM has metadata for this property,
+		 * which means this property is persisted.
+		 *
+		 * Hibernate ORM might return us the member as declared in a supertype,
+		 * in which case the type of that member will not be up-to-date.
+		 * Thus we try to get the overridden member declared in the current type,
+		 * and failing that we look for the member in supertypes.
+		 *
+		 * We still try to comply with JPA's configured access type,
+		 * which explains the two if/else branches below.
+		 */
+		if ( memberFromHibernateOrmMetamodel instanceof Method ) {
+			return methodAccessXProperty == null
+					? memberFromHibernateOrmMetamodel
+					: PojoCommonsAnnotationsHelper.getUnderlyingMember( methodAccessXProperty );
+		}
+		else if ( memberFromHibernateOrmMetamodel instanceof Field ) {
+			return fieldAccessXProperty == null
+					? memberFromHibernateOrmMetamodel
+					: PojoCommonsAnnotationsHelper.getUnderlyingMember( fieldAccessXProperty );
+		}
+		else {
+			return null;
+		}
+	}
+
+	/*
+	 * Hibernate ORM doesn't have any metadata for this property,
+	 * which means this property is transient.
+	 * We don't need to worry about JPA's access type.
+	 */
+	private Member getPropertyMemberUsingReflectionFromThisType(
+			XProperty methodAccessXProperty, XProperty fieldAccessXProperty) {
+		if ( methodAccessXProperty != null ) {
+			// Method access is available. Get values from the getter.
+			return PojoCommonsAnnotationsHelper.getUnderlyingMember( methodAccessXProperty );
+		}
+		else if ( fieldAccessXProperty != null ) {
+			// Method access is not available, but field access is. Get values directly from the field.
+			return PojoCommonsAnnotationsHelper.getUnderlyingMember( fieldAccessXProperty );
+		}
+		else {
+			// Neither method access nor field access is available.
+			// The property is not declared in this type.
+			return null;
 		}
 	}
 

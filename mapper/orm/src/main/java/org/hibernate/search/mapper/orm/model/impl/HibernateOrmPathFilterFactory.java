@@ -164,7 +164,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 	}
 
 	private void addDirtyPathStringRepresentations(Set<String> pathsAsStrings, PojoModelPathValueNode path) {
-		Optional<Value> valueOptional = addDirtyPathStringRepresentationsRecursively( pathsAsStrings, path, true );
+		Optional<Value> valueOptional = resolvePath( pathsAsStrings, path, true );
 		if ( valueOptional.isPresent() ) {
 			Value value = valueOptional.get();
 			/*
@@ -176,19 +176,18 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 		// Else everything is good, the string representation was successfully added to the set.
 	}
 
-	private Optional<Value> addDirtyPathStringRepresentationsRecursively(Set<String> pathsAsStrings,
-			PojoModelPathValueNode path, boolean isWholePath) {
+	private Optional<Value> resolvePath(Set<String> pathsAsStrings, PojoModelPathValueNode path, boolean isWholePath) {
 		PojoModelPathPropertyNode propertyNode = path.getParent();
 		PojoModelPathValueNode propertyNodeParent = propertyNode.getParent();
 
 		Property property;
 		if ( propertyNodeParent == null ) {
-			property = resolveProperty( persistentClass, propertyNode );
+			property = resolvePropertyNode( persistentClass, propertyNode );
 		}
 		else {
 			// Recurse using a prefix of the path
 			Optional<Value> parentValueOptional =
-					addDirtyPathStringRepresentationsRecursively( pathsAsStrings, propertyNodeParent, false );
+					resolvePath( pathsAsStrings, propertyNodeParent, false );
 			if ( !parentValueOptional.isPresent() ) {
 				// The string representation of the path was added by the call above, we can stop here
 				return Optional.empty();
@@ -198,10 +197,15 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 				if ( !( parentValue instanceof Component ) ) {
 					throw log.unknownPathForDirtyChecking( propertyNode, null );
 				}
-				property = resolveProperty( (Component) parentValue, propertyNode );
+				property = resolvePropertyNode( (Component) parentValue, propertyNode );
 			}
 		}
 
+		return resolveValueNode( pathsAsStrings, path, isWholePath, propertyNode, property );
+	}
+
+	private Optional<Value> resolveValueNode(Set<String> pathsAsStrings, PojoModelPathValueNode path, boolean isWholePath,
+			PojoModelPathPropertyNode propertyNode, Property property) {
 		Value baseValue = property.getValue();
 
 		ContainerExtractorPath extractorPath = path.getExtractorPath();
@@ -218,7 +222,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 			if ( extractorPath.isEmpty() ) {
 				if ( isWholePath ) {
 					// The path as a whole (and not just a prefix) was resolved to an embedded
-					pathsAsStrings.add( path.getParent().toPropertyString() );
+					pathsAsStrings.add( propertyNode.toPropertyString() );
 					// The string representation of the path was added, we can stop here
 					return Optional.empty();
 				}
@@ -233,10 +237,9 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 			return Optional.empty();
 		}
 		else if ( SimpleValue.class.isAssignableFrom( valueClass ) ) {
-			if ( isWholePath && ToOne.class.isAssignableFrom( valueClass )
-					|| isWholePath && Any.class.isAssignableFrom( valueClass ) ) {
+			if ( isWholePath && isSingleValuedAssociation( valueClass ) ) {
 				// The path as a whole (and not just a prefix) was resolved to an association
-				pathsAsStrings.add( path.getParent().toPropertyString() );
+				pathsAsStrings.add( propertyNode.toPropertyString() );
 				// The string representation of the path was added, we can stop here
 				return Optional.empty();
 			}
@@ -250,50 +253,57 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 				 * We only allow an empty extractor path for a collection at the very end of the path,
 				 * meaning "reindex whenever that collection changes, we don't really care about the values".
 				 */
-				throw log.unknownPathForDirtyChecking( propertyNode, null );
+				throw log.unknownPathForDirtyChecking( path, null );
 			}
 
 			List<String> extractorNames = extractorPath.getExplicitExtractorNames();
 			Iterator<String> extractorNameIterator = extractorNames.iterator();
 
-			Value containedValue = baseValue;
-			org.hibernate.mapping.Collection collectionValue;
-			do {
-				collectionValue = (org.hibernate.mapping.Collection) containedValue;
-				try {
-					String extractorName = extractorNameIterator.hasNext() ? extractorNameIterator.next() : null;
-					containedValue = resolveContainedValue( collectionValue, extractorName );
-				}
-				catch (SearchException e) {
-					throw log.unknownPathForDirtyChecking( path, e );
-				}
-			}
-			while ( extractorNameIterator.hasNext() && containedValue instanceof org.hibernate.mapping.Collection );
+			return resolveExtractorPath(
+					pathsAsStrings, path, isWholePath, propertyNode, baseValue, extractorNameIterator
+			);
+		}
 
-			if ( !extractorNameIterator.hasNext() ) {
-				// We managed to resolve the whole container value extractor list
-				Class<? extends Value> containedValueClass = containedValue.getClass();
-				if ( SimpleValue.class.equals( containedValueClass ) // equals() and not isAssignableFrom(), we mean it.
-						|| Component.class.isAssignableFrom( containedValueClass )
-						|| isWholePath && OneToMany.class.isAssignableFrom( containedValueClass )
-						|| isWholePath && ToOne.class.isAssignableFrom( containedValueClass )
-						|| isWholePath && Any.class.isAssignableFrom( containedValueClass ) ) {
-					pathsAsStrings.add( propertyNode.toPropertyString() );
-					pathsAsStrings.add( collectionValue.getRole() );
-					// The string representation of the path was added, we can stop here
-					return Optional.empty();
-				}
-				else {
-					return Optional.of( containedValue );
-				}
+		throw log.unknownPathForDirtyChecking( path, null );
+	}
+
+	private Optional<Value> resolveExtractorPath(Set<String> pathsAsStrings, PojoModelPathValueNode path,
+			boolean isWholePath, PojoModelPathPropertyNode propertyNode,
+			Value baseValue, Iterator<String> extractorNameIterator) {
+		Value containedValue = baseValue;
+		org.hibernate.mapping.Collection collectionValue;
+		do {
+			collectionValue = (org.hibernate.mapping.Collection) containedValue;
+			try {
+				String extractorName = extractorNameIterator.hasNext() ? extractorNameIterator.next() : null;
+				containedValue = resolveExtractor( collectionValue, extractorName );
+			}
+			catch (SearchException e) {
+				throw log.unknownPathForDirtyChecking( path, e );
+			}
+		}
+		while ( extractorNameIterator.hasNext() && containedValue instanceof org.hibernate.mapping.Collection );
+
+		if ( !extractorNameIterator.hasNext() ) {
+			// We managed to resolve the whole container value extractor list
+			Class<? extends Value> containedValueClass = containedValue.getClass();
+			if ( SimpleValue.class.equals( containedValueClass ) // equals() and not isAssignableFrom(), we mean it.
+					|| Component.class.isAssignableFrom( containedValueClass )
+					|| isWholePath && isAssociation( containedValueClass ) ) {
+				pathsAsStrings.add( propertyNode.toPropertyString() );
+				pathsAsStrings.add( collectionValue.getRole() );
+				// The string representation of the path was added, we can stop here
+				return Optional.empty();
+			}
+			else {
+				return Optional.of( containedValue );
 			}
 		}
 
 		throw log.unknownPathForDirtyChecking( path, null );
 	}
 
-	@SuppressWarnings("rawtypes")
-	private Value resolveContainedValue(org.hibernate.mapping.Collection collectionValue, String extractorName) {
+	private Value resolveExtractor(org.hibernate.mapping.Collection collectionValue, String extractorName) {
 		if ( collectionValue instanceof org.hibernate.mapping.Array ) {
 			if ( extractorName == null || BuiltinContainerExtractors.ARRAY.equals( extractorName ) ) {
 				return collectionValue.getElement();
@@ -318,7 +328,7 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 		throw log.invalidContainerExtractorForDirtyChecking( collectionValue.getClass(), extractorName );
 	}
 
-	private Property resolveProperty(PersistentClass persistentClass, PojoModelPathPropertyNode propertyNode) {
+	private Property resolvePropertyNode(PersistentClass persistentClass, PojoModelPathPropertyNode propertyNode) {
 		try {
 			return persistentClass.getProperty( propertyNode.getPropertyName() );
 		}
@@ -327,12 +337,23 @@ public class HibernateOrmPathFilterFactory implements PojoPathFilterFactory<Set<
 		}
 	}
 
-	private Property resolveProperty(Component parentValue, PojoModelPathPropertyNode propertyNode) {
+	private Property resolvePropertyNode(Component parentValue, PojoModelPathPropertyNode propertyNode) {
 		try {
 			return parentValue.getProperty( propertyNode.getPropertyName() );
 		}
 		catch (MappingException e) {
 			throw log.unknownPathForDirtyChecking( propertyNode, e );
 		}
+	}
+
+	private static boolean isSingleValuedAssociation(Class<? extends Value> valueClass) {
+		return ToOne.class.isAssignableFrom( valueClass )
+				|| Any.class.isAssignableFrom( valueClass );
+	}
+
+	private static boolean isAssociation(Class<? extends Value> valueClass) {
+		return OneToMany.class.isAssignableFrom( valueClass )
+				|| ToOne.class.isAssignableFrom( valueClass )
+				|| Any.class.isAssignableFrom( valueClass );
 	}
 }
