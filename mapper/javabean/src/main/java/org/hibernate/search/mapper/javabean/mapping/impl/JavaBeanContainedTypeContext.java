@@ -16,7 +16,7 @@ class JavaBeanContainedTypeContext {
 	private JavaBeanContainedTypeContext() {
 	}
 
-	static class Builder<E> implements PojoContainedTypeExtendedMappingCollector {
+	static class Builder implements PojoContainedTypeExtendedMappingCollector {
 		Builder() {
 		}
 	}
