@@ -26,7 +26,7 @@ abstract class AbstractTypingJsonAccessor<T> extends AbstractNonRootJsonAccessor
 	}
 
 	@Override
-	public Optional<T> get(JsonObject root) throws UnexpectedJsonElementTypeException {
+	public Optional<T> get(JsonObject root) {
 		return getParentAccessor().get( root ).map( this::fromElement );
 	}
 
@@ -36,21 +36,21 @@ abstract class AbstractTypingJsonAccessor<T> extends AbstractNonRootJsonAccessor
 	}
 
 	@Override
-	public void set(JsonObject root, T newValue) throws UnexpectedJsonElementTypeException {
+	public void set(JsonObject root, T newValue) {
 		getParentAccessor().set( root, toElement( newValue ) );
 	}
 
 	@Override
-	public void add(JsonObject root, T newValue) throws UnexpectedJsonElementTypeException {
+	public void add(JsonObject root, T newValue) {
 		getParentAccessor().add( root, toElement( newValue ) );
 	}
 
 	@Override
-	public T getOrCreate(JsonObject root, Supplier<? extends T> newValueSupplier) throws UnexpectedJsonElementTypeException {
+	public T getOrCreate(JsonObject root, Supplier<? extends T> newValueSupplier) {
 		return fromElement( getParentAccessor().getOrCreate( root, () -> toElement( newValueSupplier.get() ) ) );
 	}
 
-	private T fromElement(JsonElement parent) throws UnexpectedJsonElementTypeException {
+	private T fromElement(JsonElement parent) {
 		JsonElementType<T> expectedType = getExpectedElementType();
 		if ( parent == null || parent.isJsonNull() ) {
 			return null;

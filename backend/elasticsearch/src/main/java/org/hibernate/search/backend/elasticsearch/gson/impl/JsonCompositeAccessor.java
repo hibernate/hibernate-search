@@ -15,6 +15,6 @@ import com.google.gson.JsonObject;
  */
 interface JsonCompositeAccessor<T extends JsonElement> extends JsonAccessor<T> {
 
-	T getOrCreate(JsonObject root) throws UnexpectedJsonElementTypeException;
+	T getOrCreate(JsonObject root);
 
 }

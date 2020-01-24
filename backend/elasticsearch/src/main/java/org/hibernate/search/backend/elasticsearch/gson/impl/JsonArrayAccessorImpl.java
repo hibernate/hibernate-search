@@ -25,7 +25,7 @@ public class JsonArrayAccessorImpl extends AbstractTypingJsonAccessor<JsonArray>
 	}
 
 	@Override
-	public JsonArray getOrCreate(JsonObject root) throws UnexpectedJsonElementTypeException {
+	public JsonArray getOrCreate(JsonObject root) {
 		return getOrCreate( root, JsonArray::new );
 	}
 
@@ -35,7 +35,7 @@ public class JsonArrayAccessorImpl extends AbstractTypingJsonAccessor<JsonArray>
 	}
 
 	@Override
-	public void addElementIfAbsent(JsonObject root, JsonElement newValue) throws UnexpectedJsonElementTypeException {
+	public void addElementIfAbsent(JsonObject root, JsonElement newValue) {
 		JsonArray array = getOrCreate( root );
 		if ( !array.contains( newValue ) ) {
 			array.add( newValue );

@@ -55,12 +55,12 @@ class RootJsonAccessor implements JsonCompositeAccessor<JsonElement> {
 	}
 
 	@Override
-	public JsonObject getOrCreate(JsonObject root, Supplier<? extends JsonElement> newValueSupplier) throws UnexpectedJsonElementTypeException {
+	public JsonObject getOrCreate(JsonObject root, Supplier<? extends JsonElement> newValueSupplier) {
 		return requireRoot( root );
 	}
 
 	@Override
-	public JsonObject getOrCreate(JsonObject root) throws UnexpectedJsonElementTypeException {
+	public JsonObject getOrCreate(JsonObject root) {
 		return requireRoot( root );
 	}
 
