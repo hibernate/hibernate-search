@@ -79,7 +79,7 @@ public class GettingStartedWithAnalysisIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			SearchResult<Book> result = searchSession.search( Book.class )
-					.where( factory -> factory.match()
+					.where( f -> f.match()
 							.fields( "title", "authors.name" )
 							.matching( "refactor" )
 					)
@@ -97,7 +97,7 @@ public class GettingStartedWithAnalysisIT {
 
 			for ( String term : new String[] { "Refactor", "refactors", "refactored", "refactoring" } ) {
 				SearchResult<Book> result = searchSession.search( Book.class )
-						.where( factory -> factory.match()
+						.where( f -> f.match()
 								.fields( "title", "authors.name" )
 								.matching( term )
 						)
