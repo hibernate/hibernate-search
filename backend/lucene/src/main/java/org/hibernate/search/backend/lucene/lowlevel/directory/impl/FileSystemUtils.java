@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.directory.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.file.Files;
@@ -22,8 +23,9 @@ final class FileSystemUtils {
 	}
 
 	static void initializeWriteableDirectory(Path directory) throws IOException {
-		if ( Files.exists( directory ) ) {
-			if ( !Files.isDirectory( directory ) || !Files.isWritable( directory ) ) {
+		File directoryFile = directory.toFile();
+		if ( directoryFile.exists() ) {
+			if ( !directoryFile.isDirectory() || !Files.isWritable( directory ) ) {
 				throw log.pathIsNotWriteableDirectory( directory );
 			}
 		}
