@@ -109,7 +109,7 @@ public class DynamicMapBaseIT {
 			SearchQuery<Map> query = searchSession.search(
 					searchSession.scope( Map.class, entityTypeName )
 			)
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery();
 
 			backendMock.expectSearchObjects(
@@ -273,7 +273,7 @@ public class DynamicMapBaseIT {
 			SearchQuery<Map> query = searchSession.search(
 					searchSession.scope( Map.class, Arrays.asList( entityA_BTypeName, entityA_CTypeName ) )
 			)
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery();
 
 			backendMock.expectSearchObjects(

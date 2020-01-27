@@ -133,7 +133,7 @@ public class WildcardSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
-				.predicate( f -> f.wildcard().field( absoluteFieldPath ).matching( queryString ) )
+				.where( f -> f.wildcard().field( absoluteFieldPath ).matching( queryString ) )
 				.toQuery();
 
 		assertThat( createQuery.apply( PATTERN_1 ) )
@@ -152,7 +152,7 @@ public class WildcardSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.normalizedField.relativeFieldName;
 		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
-				.predicate( f -> f.wildcard().field( absoluteFieldPath ).matching( queryString ) )
+				.where( f -> f.wildcard().field( absoluteFieldPath ).matching( queryString ) )
 				.toQuery();
 
 		assertThat( createQuery.apply( TERM_PATTERN_1 ) )
@@ -190,7 +190,7 @@ public class WildcardSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.analyzedStringFieldWithDslConverter.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.wildcard().field( absoluteFieldPath ).matching( PATTERN_1 ) )
+				.where( f -> f.wildcard().field( absoluteFieldPath ).matching( PATTERN_1 ) )
 				.toQuery();
 
 		assertThat( query )
@@ -203,7 +203,7 @@ public class WildcardSearchPredicateIT {
 		MainFieldModel fieldModel = indexMapping.analyzedStringField1;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.wildcard().field( fieldModel.relativeFieldName ).matching( "" ) )
+				.where( f -> f.wildcard().field( fieldModel.relativeFieldName ).matching( "" ) )
 				.toQuery();
 
 		assertThat( query )
@@ -253,7 +253,7 @@ public class WildcardSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.wildcard()
+				.where( f -> f.wildcard()
 						.field( indexMapping.analyzedStringField1.relativeFieldName ).boost( 42 )
 						.field( indexMapping.analyzedStringField2.relativeFieldName )
 						.matching( PATTERN_1 )
@@ -265,7 +265,7 @@ public class WildcardSearchPredicateIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_5 );
 
 		query = scope.query()
-				.predicate( f -> f.wildcard()
+				.where( f -> f.wildcard()
 						.field( indexMapping.analyzedStringField1.relativeFieldName )
 						.field( indexMapping.analyzedStringField2.relativeFieldName ).boost( 42 )
 						.matching( PATTERN_1 )
@@ -282,7 +282,7 @@ public class WildcardSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.should( f.wildcard().field( indexMapping.analyzedStringField1.relativeFieldName )
 								.matching( PATTERN_1 )
 						)
@@ -298,7 +298,7 @@ public class WildcardSearchPredicateIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_5, DOCUMENT_1 );
 
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.should( f.wildcard().field( indexMapping.analyzedStringField1.relativeFieldName )
 								.matching( PATTERN_1 )
 								.boost( 39 )
@@ -325,7 +325,7 @@ public class WildcardSearchPredicateIT {
 		// field(...)
 
 		createQuery = pattern -> scope.query()
-				.predicate( f -> f.wildcard().field( absoluteFieldPath1 )
+				.where( f -> f.wildcard().field( absoluteFieldPath1 )
 						.matching( pattern )
 				)
 				.toQuery();
@@ -340,7 +340,7 @@ public class WildcardSearchPredicateIT {
 		// field(...).field(...)
 
 		createQuery = pattern -> scope.query()
-				.predicate( f -> f.wildcard().field( absoluteFieldPath1 )
+				.where( f -> f.wildcard().field( absoluteFieldPath1 )
 						.field( absoluteFieldPath2 )
 						.matching( pattern )
 				)
@@ -356,7 +356,7 @@ public class WildcardSearchPredicateIT {
 		// field().fields(...)
 
 		createQuery = pattern -> scope.query()
-				.predicate( f -> f.wildcard().field( absoluteFieldPath1 )
+				.where( f -> f.wildcard().field( absoluteFieldPath1 )
 						.fields( absoluteFieldPath2, absoluteFieldPath3 )
 						.matching( pattern )
 				)
@@ -372,7 +372,7 @@ public class WildcardSearchPredicateIT {
 		// fields(...)
 
 		createQuery = pattern -> scope.query()
-				.predicate( f -> f.wildcard().fields( absoluteFieldPath1, absoluteFieldPath2 )
+				.where( f -> f.wildcard().fields( absoluteFieldPath1, absoluteFieldPath2 )
 						.matching( pattern )
 				)
 				.toQuery();
@@ -439,7 +439,7 @@ public class WildcardSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.wildcard().field( absoluteFieldPath ).matching( PATTERN_1 ) )
+				.where( f -> f.wildcard().field( absoluteFieldPath ).matching( PATTERN_1 ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
@@ -455,7 +455,7 @@ public class WildcardSearchPredicateIT {
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.wildcard().field( absoluteFieldPath ).matching( PATTERN_1 ) )
+				.where( f -> f.wildcard().field( absoluteFieldPath ).matching( PATTERN_1 ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
@@ -543,16 +543,16 @@ public class WildcardSearchPredicateIT {
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4, DOCUMENT_5, EMPTY );
 		query = compatibleIndexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
 		query = rawFieldCompatibleIndexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
 	}

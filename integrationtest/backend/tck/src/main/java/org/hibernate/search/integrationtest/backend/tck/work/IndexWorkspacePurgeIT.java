@@ -27,7 +27,7 @@ public class IndexWorkspacePurgeIT extends AbstractIndexWorkspaceSimpleOperation
 	@Override
 	protected void assertSuccess(StubMappingIndexManager indexManager) {
 		indexManager.createWorkspace().flush().join();
-		long count = indexManager.createScope().query().predicate( f -> f.matchAll() )
+		long count = indexManager.createScope().query().where( f -> f.matchAll() )
 				.fetchTotalHitCount();
 		assertThat( count ).isEqualTo( 0 );
 	}

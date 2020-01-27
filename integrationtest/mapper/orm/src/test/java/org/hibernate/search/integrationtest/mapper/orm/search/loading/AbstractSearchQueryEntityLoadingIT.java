@@ -55,7 +55,7 @@ public abstract class AbstractSearchQueryEntityLoadingIT {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<T> query = searchSession.search( targetClasses )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.loading( loadingOptionsContributor )
 					.toQuery();
 

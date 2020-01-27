@@ -97,7 +97,7 @@ public class SearchSortIT {
 			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( sortContributor )
 				.toQuery();
 	}
@@ -225,21 +225,21 @@ public class SearchSortIT {
 				.match().field( "string_analyzed_forScore" ).matching( "hooray" ).toPredicate();
 
 		query = scope.query()
-				.predicate( predicate )
+				.where( predicate )
 				.sort( f -> f.score() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
 
 		query = scope.query()
-				.predicate( predicate )
+				.where( predicate )
 				.sort( f -> f.score().desc() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID );
 
 		query = scope.query()
-				.predicate( predicate )
+				.where( predicate )
 				.sort( f -> f.score().asc() )
 				.toQuery();
 		assertThat( query )
@@ -256,7 +256,7 @@ public class SearchSortIT {
 				.toSort();
 
 		query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( sortAsc )
 				.toQuery();
 		assertThat( query )
@@ -267,7 +267,7 @@ public class SearchSortIT {
 				.toSort();
 
 		query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( sortDesc )
 				.toQuery();
 		assertThat( query )
@@ -281,7 +281,7 @@ public class SearchSortIT {
 				.sort().field( "string" ).asc().missing().last().toSort();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( sort )
 				.toQuery();
 
@@ -289,7 +289,7 @@ public class SearchSortIT {
 
 		// reuse the same sort instance on the same scope
 		query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( sort )
 				.toQuery();
 
@@ -298,7 +298,7 @@ public class SearchSortIT {
 		// reuse the same sort instance on a different scope,
 		// targeting the same index
 		query = indexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( sort )
 				.toQuery();
 
@@ -310,7 +310,7 @@ public class SearchSortIT {
 		// reuse the same sort instance on a different scope,
 		// targeting same indexes
 		query = anotherIndexManager.createScope( indexManager ).query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( sort )
 				.toQuery();
 
@@ -327,7 +327,7 @@ public class SearchSortIT {
 		// targeting a different index
 		SubTest.expectException( () ->
 				anotherIndexManager.createScope().query()
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.sort( sort )
 						.toQuery() )
 				.assertThrown()
@@ -340,7 +340,7 @@ public class SearchSortIT {
 		// targeting different indexes
 		SubTest.expectException( () ->
 				indexManager.createScope( anotherIndexManager ).query()
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.sort( sort )
 						.toQuery() )
 				.assertThrown()
@@ -680,7 +680,7 @@ public class SearchSortIT {
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
 	}

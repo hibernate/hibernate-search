@@ -67,7 +67,7 @@ public class ElasticsearchSearchQueryIT {
 
 		SearchQuery<Object> query = scope.query()
 				.asProjection( f -> f.field( "string" ) )
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		clientSpy.expectNext(
@@ -89,7 +89,7 @@ public class ElasticsearchSearchQueryIT {
 		String routingKey = "someRoutingKey";
 
 		SearchQuery<?> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.routing( routingKey )
 				.toQuery();
 

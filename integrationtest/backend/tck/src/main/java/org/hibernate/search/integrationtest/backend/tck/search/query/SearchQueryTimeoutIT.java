@@ -147,7 +147,7 @@ public class SearchQueryTimeoutIT {
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> startSlowQuery() {
 		return indexManager.createScope().query()
-				.predicate( f -> f.bool( b -> {
+				.where( f -> f.bool( b -> {
 					for ( String fieldName : FIELD_NAMES ) {
 						b.must( f.match().field( fieldName ).matching( BUZZ_WORDS ) );
 					}
@@ -156,7 +156,7 @@ public class SearchQueryTimeoutIT {
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> startFastQuery() {
 		return indexManager.createScope().query()
-				.predicate( f -> f.match().field( EMPTY_FIELD_NAME ).matching( ANY_INTEGER ) );
+				.where( f -> f.match().field( EMPTY_FIELD_NAME ).matching( ANY_INTEGER ) );
 	}
 
 	private void initData() {

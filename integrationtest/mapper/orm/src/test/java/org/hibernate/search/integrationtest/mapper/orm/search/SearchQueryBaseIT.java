@@ -98,7 +98,7 @@ public class SearchQueryBaseIT {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Book> query = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery();
 
 			backendMock.expectSearchObjects(
@@ -126,7 +126,7 @@ public class SearchQueryBaseIT {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Object> query = searchSession.search( Arrays.asList( Book.class, Author.class ) )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery();
 
 			backendMock.expectSearchObjects(
@@ -168,7 +168,7 @@ public class SearchQueryBaseIT {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Book> query = searchSession.search( searchSession.scope( Book.class, Book.NAME ) )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery();
 
 			backendMock.expectSearchObjects(
@@ -198,7 +198,7 @@ public class SearchQueryBaseIT {
 			SearchQuery<Object> query = searchSession.search( searchSession.scope(
 							Object.class, Arrays.asList( Book.NAME, Author.NAME )
 					) )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery();
 
 			backendMock.expectSearchObjects(
@@ -269,7 +269,7 @@ public class SearchQueryBaseIT {
 
 			SearchQuery<Book> query = searchSession.search( Book.class )
 					.asEntity()
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery();
 
 			backendMock.expectSearchObjects(
@@ -302,7 +302,7 @@ public class SearchQueryBaseIT {
 					.asProjection(
 							scope.projection().field( "title", String.class ).toProjection()
 					)
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery();
 
 			backendMock.expectSearchProjection(
@@ -338,7 +338,7 @@ public class SearchQueryBaseIT {
 							scope.projection().documentReference().toProjection(),
 							scope.projection().field( "author.name", String.class ).toProjection()
 					)
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery();
 
 			backendMock.expectSearchProjection(
@@ -407,7 +407,7 @@ public class SearchQueryBaseIT {
 									f.score().toProjection()
 							)
 					)
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery();
 
 			backendMock.expectSearchProjection(
@@ -455,7 +455,7 @@ public class SearchQueryBaseIT {
 									f.score()
 							)
 					)
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery();
 
 			backendMock.expectSearchProjection(
@@ -522,7 +522,7 @@ public class SearchQueryBaseIT {
 
 			SearchQuery<EntityReference> query = searchSession.search( scope )
 					.asProjection( projection )
-					.predicate( predicate )
+					.where( predicate )
 					.sort( sort )
 					.aggregation( aggregationKey, aggregation )
 					.toQuery();

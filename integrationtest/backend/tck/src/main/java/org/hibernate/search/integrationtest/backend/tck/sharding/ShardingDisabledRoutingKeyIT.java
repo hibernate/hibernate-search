@@ -69,7 +69,7 @@ public class ShardingDisabledRoutingKeyIT extends AbstractShardingIT {
 
 		// No routing key => all documents should be returned
 		SearchResultAssert.assertThat( indexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery()
 		)
 				.hits().asNormalizedDocRefs()
@@ -78,7 +78,7 @@ public class ShardingDisabledRoutingKeyIT extends AbstractShardingIT {
 
 		// Even with a routing key, all documents should be returned, since sharding is disabled
 		SearchResultAssert.assertThat( indexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.routing( docIdByRoutingKey.keySet().iterator().next() )
 				.toQuery()
 		)
@@ -92,7 +92,7 @@ public class ShardingDisabledRoutingKeyIT extends AbstractShardingIT {
 
 		// Same goes with all routing keys
 		SearchResultAssert.assertThat( indexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.routing( docIdByRoutingKey.keySet() )
 				.toQuery()
 		)

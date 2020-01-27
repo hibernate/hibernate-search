@@ -109,7 +109,7 @@ public class ExistsSearchPredicateIT {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.exists().field( absoluteFieldPath ) )
+					.where( f -> f.exists().field( absoluteFieldPath ) )
 					.toQuery();
 
 			assertThat( query )
@@ -129,7 +129,7 @@ public class ExistsSearchPredicateIT {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.exists().field( absoluteFieldPath ) )
+					.where( f -> f.exists().field( absoluteFieldPath ) )
 					.toQuery();
 
 			assertThat( query )
@@ -149,7 +149,7 @@ public class ExistsSearchPredicateIT {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.bool().mustNot( f.exists().field( absoluteFieldPath ) ) )
+					.where( f -> f.bool().mustNot( f.exists().field( absoluteFieldPath ) ) )
 					.toQuery();
 
 			assertThat( query )
@@ -162,7 +162,7 @@ public class ExistsSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.should( f.exists().field( indexMapping.string1Field.relativeFieldName ) )
 						.should( f.exists().field( indexMapping.string2Field.relativeFieldName ).boost( 7 ) )
 				)
@@ -173,7 +173,7 @@ public class ExistsSearchPredicateIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1 );
 
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.should( f.exists().field( indexMapping.string1Field.relativeFieldName ).boost( 39 ) )
 						.should( f.exists().field( indexMapping.string2Field.relativeFieldName ) )
 				)
@@ -192,7 +192,7 @@ public class ExistsSearchPredicateIT {
 			String absoluteFieldPath = indexMapping.flattenedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.exists().field( absoluteFieldPath ) )
+					.where( f -> f.exists().field( absoluteFieldPath ) )
 					.toQuery();
 
 			assertThat( query )
@@ -212,7 +212,7 @@ public class ExistsSearchPredicateIT {
 			String absoluteFieldPath = indexMapping.flattenedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.exists().field( absoluteFieldPath ) )
+					.where( f -> f.exists().field( absoluteFieldPath ) )
 					.toQuery();
 
 			assertThat( query )
@@ -231,7 +231,7 @@ public class ExistsSearchPredicateIT {
 			String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.exists().field( absoluteFieldPath ) )
+					.where( f -> f.exists().field( absoluteFieldPath ) )
 					.toQuery();
 
 			assertThat( query ).hasNoHits();
@@ -246,7 +246,7 @@ public class ExistsSearchPredicateIT {
 			String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.nested().objectField( indexMapping.nestedObject.relativeFieldName )
+					.where( f -> f.nested().objectField( indexMapping.nestedObject.relativeFieldName )
 							.nest( f.exists().field( absoluteFieldPath ) ) )
 					.toQuery();
 
@@ -267,7 +267,7 @@ public class ExistsSearchPredicateIT {
 			String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.nested().objectField( indexMapping.nestedObject.relativeFieldName )
+					.where( f -> f.nested().objectField( indexMapping.nestedObject.relativeFieldName )
 							.nest( f.exists().field( absoluteFieldPath ) ) )
 					.toQuery();
 
@@ -288,7 +288,7 @@ public class ExistsSearchPredicateIT {
 			String absoluteFieldPath = indexMapping.nestedObject.relativeFieldName + "." + fieldModel.relativeFieldName;
 
 			SearchQuery<DocumentReference> query = scope.query()
-					.predicate( f -> f.nested().objectField( indexMapping.nestedObject.relativeFieldName )
+					.where( f -> f.nested().objectField( indexMapping.nestedObject.relativeFieldName )
 							.nest( f.bool().mustNot( f.exists().field( absoluteFieldPath ) ) ) )
 					.toQuery();
 
@@ -321,7 +321,7 @@ public class ExistsSearchPredicateIT {
 				String absoluteFieldPath = model.relativeFieldName;
 
 				SearchQuery<DocumentReference> query = scope.query()
-						.predicate( f -> f.exists().field( absoluteFieldPath ) )
+						.where( f -> f.exists().field( absoluteFieldPath ) )
 						.toQuery();
 
 				assertThat( query ).hasDocRefHitsAnyOrder( b -> {
@@ -342,7 +342,7 @@ public class ExistsSearchPredicateIT {
 				String absoluteFieldPath = model.relativeFieldName;
 
 				SearchQuery<DocumentReference> query = scope.query()
-						.predicate( f -> f.exists().field( absoluteFieldPath ) )
+						.where( f -> f.exists().field( absoluteFieldPath ) )
 						.toQuery();
 
 				assertThat( query ).hasDocRefHitsAnyOrder( b -> {
@@ -450,15 +450,15 @@ public class ExistsSearchPredicateIT {
 
 		// Check that all documents are searchable
 		SearchQuery<DocumentReference> query = indexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 		query = compatibleIndexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
 		query = rawFieldCompatibleIndexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
 	}

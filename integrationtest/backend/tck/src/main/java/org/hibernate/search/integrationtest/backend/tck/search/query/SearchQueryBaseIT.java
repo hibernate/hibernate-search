@@ -25,7 +25,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryPredicateStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
@@ -73,7 +73,7 @@ public class SearchQueryBaseIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.match().field( "string" ).matching( "platypus" ) )
+				.where( f -> f.match().field( "string" ).matching( "platypus" ) )
 				.toQuery();
 
 		assertThat( query.getQueryString() ).contains( "platypus" );
@@ -84,7 +84,7 @@ public class SearchQueryBaseIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		SearchResult<DocumentReference> result = query.fetchAll();
@@ -101,7 +101,7 @@ public class SearchQueryBaseIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		// Mandatory extension, supported
@@ -157,7 +157,7 @@ public class SearchQueryBaseIT {
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		SearchResultAssert.assertThat( query ).hasTotalHitCount( documentCount );
 	}
@@ -232,14 +232,14 @@ public class SearchQueryBaseIT {
 	}
 
 	private static class MyExtendedDslContext<T> {
-		private final SearchQueryPredicateStep<?, T, ?> delegate;
+		private final SearchQueryWhereStep<?, T, ?> delegate;
 
-		MyExtendedDslContext(SearchQueryPredicateStep<?, T, ?> delegate) {
+		MyExtendedDslContext(SearchQueryWhereStep<?, T, ?> delegate) {
 			this.delegate = delegate;
 		}
 
 		public SearchQuery<T> extendedFeature(String fieldName, String value1, String value2) {
-			return delegate.predicate( f -> f.bool()
+			return delegate.where( f -> f.bool()
 					.should( f.match().field( fieldName ).matching( value1 ) )
 					.should( f.match().field( fieldName ).matching( value2 ) )
 			)

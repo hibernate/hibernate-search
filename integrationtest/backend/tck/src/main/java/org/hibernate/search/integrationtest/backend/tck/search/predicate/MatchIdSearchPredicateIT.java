@@ -77,7 +77,7 @@ public class MatchIdSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.id().matching( DOCUMENT_1 ) )
+				.where( f -> f.id().matching( DOCUMENT_1 ) )
 				.toQuery();
 
 		assertThat( query )
@@ -89,7 +89,7 @@ public class MatchIdSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.id()
+				.where( f -> f.id()
 						.matching( DOCUMENT_1 )
 						.matching( DOCUMENT_3 )
 				)
@@ -104,7 +104,7 @@ public class MatchIdSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.id()
+				.where( f -> f.id()
 						.matching( DOCUMENT_2 )
 						.matchingAny( Arrays.asList( DOCUMENT_1 ) )
 				)
@@ -119,7 +119,7 @@ public class MatchIdSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.id()
+				.where( f -> f.id()
 						.matchingAny( Arrays.asList( DOCUMENT_1 ) )
 				)
 				.toQuery();
@@ -133,7 +133,7 @@ public class MatchIdSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.id()
+				.where( f -> f.id()
 						.matchingAny( Arrays.asList( DOCUMENT_1, DOCUMENT_3 ) )
 				)
 				.toQuery();
@@ -147,7 +147,7 @@ public class MatchIdSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope( compatibleIdConverterIndexManager );
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.id().matching( DOCUMENT_1 ).matching( COMPATIBLE_ID_CONVERTER_DOCUMENT_1 ) )
+				.where( f -> f.id().matching( DOCUMENT_1 ).matching( COMPATIBLE_ID_CONVERTER_DOCUMENT_1 ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
@@ -176,7 +176,7 @@ public class MatchIdSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope( incompatibleIdConverterIndexManager );
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.id().matching( DOCUMENT_1, ValueConvert.NO )
+				.where( f -> f.id().matching( DOCUMENT_1, ValueConvert.NO )
 						.matching( INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1, ValueConvert.NO ) )
 				.toQuery();
 
@@ -204,19 +204,19 @@ public class MatchIdSearchPredicateIT {
 		// Check that all documents are searchable
 		assertThat(
 				indexManager.createScope().query()
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.toQuery()
 		)
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 		assertThat(
 				compatibleIdConverterIndexManager.createScope().query()
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.toQuery()
 		)
 				.hasDocRefHitsAnyOrder( COMPATIBLE_ID_CONVERTER_INDEX_NAME, COMPATIBLE_ID_CONVERTER_DOCUMENT_1 );
 		assertThat(
 				incompatibleIdConverterIndexManager.createScope().query()
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.toQuery()
 		)
 				.hasDocRefHitsAnyOrder( INCOMPATIBLE_ID_CONVERTER_INDEX_NAME, INCOMPATIBLE_ID_CONVERTER_DOCUMENT_1 );

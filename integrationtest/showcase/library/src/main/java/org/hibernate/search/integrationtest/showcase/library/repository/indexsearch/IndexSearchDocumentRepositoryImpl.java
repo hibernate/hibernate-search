@@ -34,7 +34,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 	public long countIndexed() {
 		return Search.session( entityManager )
 				.search( Document.class )
-				.predicate( p -> p.matchAll() )
+				.where( p -> p.matchAll() )
 				.fetchTotalHitCount();
 	}
 
@@ -42,7 +42,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 	public List<Document<?>> findAllIndexed() {
 		return Search.session( entityManager )
 				.search( DOCUMENT_CLASS )
-				.predicate( p -> p.matchAll() )
+				.where( p -> p.matchAll() )
 				.fetchAllHits();
 	}
 
@@ -54,14 +54,14 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 
 		return Search.session( entityManager ).search( Book.class )
 				// onRawField option allows to bypass the bridge in the DSL
-				.predicate( f -> f.match().field( "isbn" ).matching( isbnAsString, ValueConvert.NO ) )
+				.where( f -> f.match().field( "isbn" ).matching( isbnAsString, ValueConvert.NO ) )
 				.fetchSingleHit();
 	}
 
 	@Override
 	public List<Book> searchByMedium(String terms, BookMedium medium, int offset, int limit) {
 		return Search.session( entityManager ).search( Book.class )
-				.predicate( f -> f.bool( b -> {
+				.where( f -> f.bool( b -> {
 					if ( terms != null && !terms.isEmpty() ) {
 						b.must( f.match()
 								.field( "title" ).boost( 2.0f )
@@ -83,7 +83,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 			List<LibraryServiceOption> libraryServices,
 			int offset, int limit) {
 		return Search.session( entityManager ).search( DOCUMENT_CLASS )
-				.predicate( f -> f.bool( b -> {
+				.where( f -> f.bool( b -> {
 					// Match query
 					if ( terms != null && !terms.isEmpty() ) {
 						b.must( f.match()
@@ -142,7 +142,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 	public List<String> getAuthorsOfBooksHavingTerms(String terms, SortOrder order) {
 		return Search.session( entityManager ).search( Document.class )
 				.asProjection( f -> f.field( "author", String.class ) )
-				.predicate( f -> f.match()
+				.where( f -> f.match()
 						.field( "title" ).boost( 2.0f )
 						.field( "summary" )
 						.matching( terms )

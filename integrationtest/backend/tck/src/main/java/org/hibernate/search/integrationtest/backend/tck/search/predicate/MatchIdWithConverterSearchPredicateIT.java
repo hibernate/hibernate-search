@@ -77,7 +77,7 @@ public class MatchIdWithConverterSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.id().matching( 1 ) )
+				.where( f -> f.id().matching( 1 ) )
 				.toQuery();
 
 		assertThat( query )
@@ -89,7 +89,7 @@ public class MatchIdWithConverterSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.id()
+				.where( f -> f.id()
 						.matching( 1 )
 						.matching( 3 )
 				)
@@ -104,7 +104,7 @@ public class MatchIdWithConverterSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.id()
+				.where( f -> f.id()
 						.matching( 2 )
 						.matchingAny( Arrays.asList( 1 ) )
 				)
@@ -119,7 +119,7 @@ public class MatchIdWithConverterSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.id()
+				.where( f -> f.id()
 						.matchingAny( Arrays.asList( 1 ) )
 				)
 				.toQuery();
@@ -133,7 +133,7 @@ public class MatchIdWithConverterSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.id()
+				.where( f -> f.id()
 						.matchingAny( Arrays.asList( 1, 3 ) )
 				)
 				.toQuery();
@@ -152,7 +152,7 @@ public class MatchIdWithConverterSearchPredicateIT {
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}

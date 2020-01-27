@@ -310,7 +310,7 @@ public class AnnotationMappingSmokeIT {
 							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 					)
 					.asEntity()
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery();
 
 			backendMock.expectSearchObjects(

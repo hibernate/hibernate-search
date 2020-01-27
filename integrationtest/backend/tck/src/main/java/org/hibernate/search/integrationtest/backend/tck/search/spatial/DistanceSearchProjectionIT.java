@@ -38,7 +38,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.asProjection( f ->
 						f.distance( "projectableUnsortableGeoPoint", GeoPoint.of( 45.749828, 4.854172 ) )
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "string" ).missing().last().asc() )
 				.toQuery();
 		SearchResult<Double> results = query.fetchAll();
@@ -58,7 +58,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.asProjection( f ->
 						f.distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) )
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "string" ).missing().last().asc() )
 				.toQuery();
 		SearchResult<Double> results = query.fetchAll();
@@ -78,7 +78,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 						f.distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) )
 								.unit( DistanceUnit.KILOMETERS )
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "string" ).missing().last().asc() )
 				.toQuery();
 		SearchResult<Double> results = query.fetchAll();
@@ -102,7 +102,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 										.unit( DistanceUnit.KILOMETERS )
 						)
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "string" ).missing().last().asc() )
 				.toQuery();
 		SearchResult<List<?>> results = query.fetchAll();
@@ -133,7 +133,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 				.asProjection( f ->
 						f.distance( "geoPoint", center )
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f
 						.distance( "geoPoint", GeoPoint.of( 43.749828, 1.854172 ) ).then()
 						.distance( "geoPoint", center )
@@ -158,7 +158,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 								GeoPoint.of( 45.74982800099999888371, 4.85417200099999888371 )
 						)
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "string" ).missing().last().asc() )
 				.toQuery();
 		SearchResult<Double> results = query.fetchAll();

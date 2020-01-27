@@ -193,7 +193,7 @@ public class EnversIT {
 					)
 			);
 			Optional<IndexedEntity> loadedEntity = Search.session( session ).search( IndexedEntity.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchSingleHit();
 			SoftAssertions.assertSoftly( assertions -> {
 				assertions.assertThat( loadedEntity ).get()

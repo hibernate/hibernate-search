@@ -55,39 +55,39 @@ public class SmokeIT {
 	}
 
 	@Test
-	public void predicate_match() {
+	public void where_match() {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.match().field( "string" ).matching( "text 1" ) )
+				.where( f -> f.match().field( "string" ).matching( "text 1" ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
-				.predicate( f -> f.match().field( "string_analyzed" ).matching( "text" ) )
+				.where( f -> f.match().field( "string_analyzed" ).matching( "text" ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "3" )
 				.hasTotalHitCount( 3 );
 
 		query = scope.query()
-				.predicate( f -> f.match().field( "integer" ).matching( 1 ) )
+				.where( f -> f.match().field( "integer" ).matching( 1 ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
-				.predicate( f -> f.match().field( "localDate" ).matching( LocalDate.of( 2018, 1, 1 ) ) )
+				.where( f -> f.match().field( "localDate" ).matching( LocalDate.of( 2018, 1, 1 ) ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
-				.predicate( f -> f.match().field( "flattenedObject.string" ).matching( "text 1_1" ) )
+				.where( f -> f.match().field( "flattenedObject.string" ).matching( "text 1_1" ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
@@ -95,32 +95,32 @@ public class SmokeIT {
 	}
 
 	@Test
-	public void predicate_range() {
+	public void where_range() {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.range().field( "string" ).between( "text 2", "text 42" ) )
+				.where( f -> f.range().field( "string" ).between( "text 2", "text 42" ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2", "3" )
 				.hasTotalHitCount( 2 );
 
 		query = scope.query()
-				.predicate( f -> f.range().field( "string_analyzed" ).between( "2", "42" ) )
+				.where( f -> f.range().field( "string_analyzed" ).between( "2", "42" ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2", "3" )
 				.hasTotalHitCount( 2 );
 
 		query = scope.query()
-				.predicate( f -> f.range().field( "integer" ).between( 2, 42 ) )
+				.where( f -> f.range().field( "integer" ).between( 2, 42 ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2", "3" )
 				.hasTotalHitCount( 2 );
 
 		query = scope.query()
-				.predicate( f -> f.range().field( "localDate" )
+				.where( f -> f.range().field( "localDate" )
 						.between( LocalDate.of( 2018, 1, 2 ),
 								LocalDate.of( 2018, 2, 23 ) )
 				)
@@ -130,7 +130,7 @@ public class SmokeIT {
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
-				.predicate( f -> f.range().field( "flattenedObject.integer" ).between( 201, 242 ) )
+				.where( f -> f.range().field( "flattenedObject.integer" ).between( 201, 242 ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "2" )
@@ -138,11 +138,11 @@ public class SmokeIT {
 	}
 
 	@Test
-	public void predicate_boolean() {
+	public void where_boolean() {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.should( f.match().field( "integer" ).matching( 1 ) )
 						.should( f.match().field( "integer" ).matching( 2 ) )
 				)
@@ -152,7 +152,7 @@ public class SmokeIT {
 				.hasTotalHitCount( 2 );
 
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.must( f.match().field( "string_analyzed" ).matching( "text" ) )
 						.filter( f.match().field( "integer" ).matching( 1 ) )
 				)
@@ -162,7 +162,7 @@ public class SmokeIT {
 				.hasTotalHitCount( 1 );
 
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.must( f.match().field( "string_analyzed" ).matching( "text" ) )
 						.mustNot( f.match().field( "integer" ).matching( 2 ) )
 				)
@@ -173,12 +173,12 @@ public class SmokeIT {
 	}
 
 	@Test
-	public void predicate_nested() {
+	public void where_nested() {
 		StubMappingScope scope = indexManager.createScope();
 
 		// Without nested storage, we expect predicates to be able to match on different objects
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.must( f.match().field( "flattenedObject.string" ).matching( "text 1_2" ) )
 						.must( f.match().field( "flattenedObject.integer" ).matching( 101 ) )
 				)
@@ -189,7 +189,7 @@ public class SmokeIT {
 
 		// With nested storage, we expect direct queries to never match
 		query = scope.query()
-				.predicate( f -> f.match().field( "nestedObject.integer" ).matching( 101 ) )
+				.where( f -> f.match().field( "nestedObject.integer" ).matching( 101 ) )
 				.toQuery();
 		assertThat( query )
 				.hasNoHits()
@@ -197,7 +197,7 @@ public class SmokeIT {
 
 		// ... and predicates within nested queries to be unable to match on different objects
 		query = scope.query()
-				.predicate( f -> f.nested().objectField( "nestedObject" )
+				.where( f -> f.nested().objectField( "nestedObject" )
 						.nest( f.bool()
 								.must( f.match().field( "nestedObject.string" ).matching( "text 1_2" ) )
 								.must( f.match().field( "nestedObject.integer" ).matching( 101 ) )
@@ -210,7 +210,7 @@ public class SmokeIT {
 
 		// ... but predicates should still be able to match on the same object
 		query = scope.query()
-				.predicate( f -> f.nested().objectField( "nestedObject" )
+				.where( f -> f.nested().objectField( "nestedObject" )
 						.nest( f.bool()
 								.must( f.match().field( "nestedObject.string" ).matching( "text 1_1" ) )
 								.must( f.match().field( "nestedObject.integer" ).matching( 101 ) )
@@ -223,12 +223,12 @@ public class SmokeIT {
 	}
 
 	@Test
-	public void separatePredicate() {
+	public void where_searchPredicate() {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchPredicate predicate = scope.predicate().match().field( "string" ).matching( "text 1" ).toPredicate();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( predicate )
+				.where( predicate )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
@@ -236,7 +236,7 @@ public class SmokeIT {
 
 		predicate = scope.predicate().range().field( "integer" ).between( 1, 2 ).toPredicate();
 		query = scope.query()
-				.predicate( predicate )
+				.where( predicate )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2" )
@@ -247,7 +247,7 @@ public class SmokeIT {
 				.should( f -> f.match().field( "integer" ).matching( 2 ) )
 				.toPredicate();
 		query = scope.query()
-				.predicate( predicate )
+				.where( predicate )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2" )
@@ -319,7 +319,7 @@ public class SmokeIT {
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1", "2", "3", "neverMatching", "empty" );

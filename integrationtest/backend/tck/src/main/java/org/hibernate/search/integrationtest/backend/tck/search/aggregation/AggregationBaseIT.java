@@ -76,7 +76,7 @@ public class AggregationBaseIT {
 
 		// Mandatory extension, supported
 		query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.aggregation( aggregationKey, f -> f.extension( new SupportedExtension() )
 						.extendedAggregation( "string" ) )
 				.toQuery();
@@ -113,7 +113,7 @@ public class AggregationBaseIT {
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 	}

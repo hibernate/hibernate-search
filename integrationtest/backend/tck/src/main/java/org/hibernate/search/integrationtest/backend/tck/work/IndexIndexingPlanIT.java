@@ -56,7 +56,7 @@ public class IndexIndexingPlanIT {
 		FutureAssert.assertThat( future ).isSuccessful();
 
 		SearchQuery<DocumentReference> query = indexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		SearchResultAssert.assertThat( query )
@@ -79,7 +79,7 @@ public class IndexIndexingPlanIT {
 		FutureAssert.assertThat( future ).isSuccessful();
 
 		SearchQuery<DocumentReference> query = indexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		SearchResultAssert.assertThat( query )

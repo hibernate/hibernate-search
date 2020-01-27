@@ -108,7 +108,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 		SearchQuery<List<?>> query = scope.query()
 				.asProjections()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasTotalHitCount( 4 );
@@ -141,7 +141,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 						entityReferenceProjection,
 						objectProjection
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasListHitsAnyOrder( b -> {
 			b.list( document1Reference, document1Reference, document1Reference );
@@ -200,7 +200,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 						entityReferenceProjection,
 						objectProjection
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		verifyAll();
 
@@ -237,7 +237,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 		SearchQuery<Float> query = scope.query()
 				.asProjection( f -> f.score() )
-				.predicate( f -> f.match().field( indexMapping.scoreField.relativeFieldName ).matching( "scorepattern" ) )
+				.where( f -> f.match().field( indexMapping.scoreField.relativeFieldName ).matching( "scorepattern" ) )
 				.sort( f -> f.score().desc() )
 				.toQuery();
 
@@ -262,7 +262,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 		SearchQuery<Float> query = scope.query()
 				.asProjection( f -> f.score() )
-				.predicate( f -> f.match().field( indexMapping.scoreField.relativeFieldName ).matching( "scorepattern" ) )
+				.where( f -> f.match().field( indexMapping.scoreField.relativeFieldName ).matching( "scorepattern" ) )
 				.sort( f -> f.indexOrder() )
 				.toQuery();
 
@@ -294,7 +294,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 								f.field( indexMapping.string2Field.relativeFieldName, String.class )
 						)
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasListHitsAnyOrder( b -> {
 			b.list(
@@ -340,7 +340,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 								f.field( "nested.flattened." + indexMapping.flattenedField.relativeFieldName, String.class )
 						)
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasListHitsAnyOrder( b -> {
 			b.list(
@@ -386,7 +386,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 		SearchQuery<String> query = scope.query()
 				.asProjection( projection )
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder( value1, value2, value3, null );
@@ -394,7 +394,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		// reuse the same projection instance on the same scope
 		query = scope.query()
 				.asProjection( projection )
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder( value1, value2, value3, null );
@@ -403,7 +403,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		// targeting the same index
 		query = indexManager.createScope().query()
 				.asProjection( projection )
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder( value1, value2, value3, null );
@@ -415,7 +415,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		// targeting same indexes
 		query = anotherIndexManager.createScope( indexManager ).query()
 				.asProjection( projection )
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder( value1, value2, value3, null );
@@ -432,7 +432,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		SubTest.expectException( () ->
 				anotherIndexManager.createScope().query()
 						.asProjection( projection )
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.toQuery() )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -445,7 +445,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		SubTest.expectException( () ->
 				indexManager.createScope( anotherIndexManager ).query()
 						.asProjection( projection )
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.toQuery() )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -464,7 +464,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				.asProjection( f -> f.extension( new SupportedExtension<>() )
 						.extendedProjection( "string1", String.class )
 				)
-				.predicate( f -> f.id().matching( DOCUMENT_1 ) )
+				.where( f -> f.id().matching( DOCUMENT_1 ) )
 				.toQuery();
 		assertThat( query )
 				.hasHitsAnyOrder( indexMapping.string1Field.document1Value.indexedValue );
@@ -489,7 +489,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 						)
 						.orElseFail()
 				)
-				.predicate( f -> f.id().matching( DOCUMENT_1 ) )
+				.where( f -> f.id().matching( DOCUMENT_1 ) )
 				.toQuery();
 		assertThat( query )
 				.hasHitsAnyOrder( indexMapping.string1Field.document1Value.indexedValue );
@@ -509,7 +509,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 								shouldNotBeCalled()
 						)
 				)
-				.predicate( f -> f.id().matching( DOCUMENT_1 ) )
+				.where( f -> f.id().matching( DOCUMENT_1 ) )
 				.toQuery();
 		assertThat( query )
 				.hasHitsAnyOrder( indexMapping.string1Field.document1Value.indexedValue );
@@ -529,7 +529,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 								c -> c.field( "string1", String.class )
 						)
 				)
-				.predicate( f -> f.id().matching( DOCUMENT_1 ) )
+				.where( f -> f.id().matching( DOCUMENT_1 ) )
 				.toQuery();
 		assertThat( query )
 				.hasHitsAnyOrder( indexMapping.string1Field.document1Value.indexedValue );
@@ -589,7 +589,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );

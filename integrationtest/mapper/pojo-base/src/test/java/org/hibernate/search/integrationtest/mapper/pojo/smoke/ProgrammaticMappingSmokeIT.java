@@ -420,7 +420,7 @@ public class ProgrammaticMappingSmokeIT {
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 			)
 					.asEntityReference()
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery();
 
 			backendMock.expectSearchReferences(
@@ -455,7 +455,7 @@ public class ProgrammaticMappingSmokeIT {
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 			)
 					.asProjection( f -> f.field( "myTextField", String.class ) )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery();
 
 			backendMock.expectSearchProjection(
@@ -497,7 +497,7 @@ public class ProgrammaticMappingSmokeIT {
 							scope.projection().documentReference().toProjection(),
 							scope.projection().field( "customBridgeOnClass.text", String.class ).toProjection()
 					)
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery();
 
 			backendMock.expectSearchProjections(

@@ -78,7 +78,7 @@ public class LuceneNormalizeWildcardExpressionsIT {
 	public void wildcard_normalizeMatchingExpression() {
 		StubMappingScope scope = indexManager.createScope();
 		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
-				.predicate( f -> f.wildcard().field( "analyzed" ).matching( queryString ) )
+				.where( f -> f.wildcard().field( "analyzed" ).matching( queryString ) )
 				.toQuery();
 
 		assertThat( createQuery.apply( PATTERN_1 ) )
@@ -95,7 +95,7 @@ public class LuceneNormalizeWildcardExpressionsIT {
 	public void wildcard_tokenizeMatchingExpression() {
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.wildcard().field( "analyzed" ).matching( PATTERN_1_AND_2 ) )
+				.where( f -> f.wildcard().field( "analyzed" ).matching( PATTERN_1_AND_2 ) )
 				.toQuery();
 
 		// The matching expression is supposed to be normalized only, never tokenized.

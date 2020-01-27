@@ -70,7 +70,7 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 
 		// No routing key => all documents should be returned
 		SearchResultAssert.assertThat( indexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery()
 		)
 				.hits().asNormalizedDocRefs()
@@ -82,7 +82,7 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 
 		SearchResultAssert<DocumentReference> documentIdAsRoutingKeyQueryAssert = SearchResultAssert.assertThat(
 				indexManager.createScope().query()
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.routing( someDocumentId )
 						.toQuery()
 		);

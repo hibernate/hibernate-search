@@ -145,7 +145,7 @@ public class FieldDefaultBridgeIT<V, F> {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchQuery<V> query = session.search( expectations.getTypeWithValueBridge1() )
 					.asProjection( f -> f.field( FIELD_NAME, expectations.getProjectionType() ) )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery();
 
 			backendMock.expectSearchProjection(

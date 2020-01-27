@@ -115,7 +115,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				indexManager.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		verifyAll();
 
@@ -141,7 +141,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
@@ -153,7 +153,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.asEntity()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
@@ -180,7 +180,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 				indexManager.createGenericScope();
 		SearchQuery<StubTransformedReference> referencesQuery = scope.query( loadingContextMock )
 				.asEntityReference()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		verifyAll();
 
@@ -224,7 +224,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 				indexManager.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
 				.asEntity()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		verifyAll();
 
@@ -275,7 +275,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 								f.entity()
 						)
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		verifyAll();
 
@@ -332,7 +332,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 								f.entity().toProjection()
 						)
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		verifyAll();
 
@@ -386,7 +386,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 								f.entity().toProjection()
 						)
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		verifyAll();
 
@@ -426,19 +426,19 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertEquals( 2L, query.fetchTotalHitCount() );
 
 		query = scope.query()
-				.predicate( f -> f.match().field( "string" ).matching( STRING_VALUE ) )
+				.where( f -> f.match().field( "string" ).matching( STRING_VALUE ) )
 				.toQuery();
 
 		assertEquals( 1L, query.fetchTotalHitCount() );
 
 		query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		// Using an offset/limit should not affect later counts
@@ -457,14 +457,14 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 
 		SearchQuery<String> query = scope.query()
 				.asProjection( f -> f.field( "string", String.class ) )
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertEquals( 2L, query.fetchTotalHitCount() );
 
 		query = scope.query()
 				.asProjection( f -> f.field( "string", String.class ) )
-				.predicate( f -> f.match().field( "string" ).matching( STRING_VALUE ) )
+				.where( f -> f.match().field( "string" ).matching( STRING_VALUE ) )
 				.toQuery();
 
 		assertEquals( 1L, query.fetchTotalHitCount() );
@@ -481,7 +481,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		GenericStubMappingScope<DocumentReference, DocumentReference> scope = indexManager.createGenericScope();
 		SearchQuery<DocumentReference> query = scope.query( loadingContextMock )
 				.asEntity()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		verifyAll();
 
@@ -528,7 +528,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				indexManager.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		verifyAll();
 
@@ -573,7 +573,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );

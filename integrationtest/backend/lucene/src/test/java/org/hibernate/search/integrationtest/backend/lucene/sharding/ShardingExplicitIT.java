@@ -80,7 +80,7 @@ public class ShardingExplicitIT extends AbstractShardingIT {
 
 		// No routing key => all documents should be returned
 		SearchResultAssert.assertThat( indexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery()
 		)
 				.hits().asNormalizedDocRefs()
@@ -89,7 +89,7 @@ public class ShardingExplicitIT extends AbstractShardingIT {
 
 		// All routing keys => all documents should be returned
 		SearchResultAssert.assertThat( indexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.routing( docIdByShardId.keySet() )
 				.toQuery()
 		)
@@ -102,7 +102,7 @@ public class ShardingExplicitIT extends AbstractShardingIT {
 		 * This is the main advantage of the "explicit" sharding strategy.
 		 */
 		SearchResultAssert.assertThat( indexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.routing( SHARD_ID_2 )
 				.toQuery()
 		)

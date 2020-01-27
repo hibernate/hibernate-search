@@ -134,7 +134,7 @@ public class IndexWorkspaceIT {
 
 	private void assertBookNumberIsEqualsTo(long bookNumber, StubBackendSessionContext sessionContext) {
 		SearchQuery<DocumentReference> query = indexManager.createScope().query( sessionContext )
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		Assertions.assertThat( query.fetchTotalHitCount() ).isEqualTo( bookNumber );

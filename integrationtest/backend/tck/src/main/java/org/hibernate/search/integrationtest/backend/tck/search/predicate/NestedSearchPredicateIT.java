@@ -73,7 +73,7 @@ public class NestedSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.nested().objectField( "nestedObject" )
+				.where( f -> f.nested().objectField( "nestedObject" )
 						.nest( f.bool()
 								// This is referred to as "condition 1" in the data initialization method
 								.must( f.nested().objectField( "nestedObject.nestedObject" )
@@ -114,7 +114,7 @@ public class NestedSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						// This is referred to as "condition 1" in the data initialization method
 						.must( f.nested().objectField( "nestedObject.nestedObject" )
 								.nest( f.bool()
@@ -153,7 +153,7 @@ public class NestedSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.nested().objectField( "nestedObject" )
+				.where( f -> f.nested().objectField( "nestedObject" )
 						.nest( f.bool()
 								.must( f.match()
 										.field( "nestedObject.string" )
@@ -209,7 +209,7 @@ public class NestedSearchPredicateIT {
 				.toPredicate();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.nested().objectField( "nestedObject" )
+				.where( f -> f.nested().objectField( "nestedObject" )
 						.nest( f.bool()
 								// This is referred to as "condition 1" in the data initialization method
 								.must( predicate1 )
@@ -342,7 +342,7 @@ public class NestedSearchPredicateIT {
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder(

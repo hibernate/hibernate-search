@@ -129,7 +129,7 @@ public class ObjectExistsSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		List<DocumentReference> docs = scope.query().asEntityReference()
-				.predicate( p -> p.nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) ) )
+				.where( p -> p.nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) ) )
 				.fetchAllHits();
 
 		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
@@ -142,7 +142,7 @@ public class ObjectExistsSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		List<DocumentReference> docs = scope.query().asEntityReference()
-				.predicate( p -> p.nested().objectField( "nestedNoChild" ).nest( f -> f.exists().field( "nestedNoChild" ) ) )
+				.where( p -> p.nested().objectField( "nestedNoChild" ).nest( f -> f.exists().field( "nestedNoChild" ) ) )
 				.fetchAllHits();
 
 		assertThat( docs ).isEmpty();
@@ -153,7 +153,7 @@ public class ObjectExistsSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope( compatibleIndexManager );
 
 		List<DocumentReference> docs = scope.query().asEntityReference()
-				.predicate( p -> p.nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) ) )
+				.where( p -> p.nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) ) )
 				.fetchAllHits();
 
 		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
@@ -183,7 +183,7 @@ public class ObjectExistsSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope( emptyIndexManager );
 
 		List<DocumentReference> docs = scope.query().asEntityReference()
-				.predicate( p -> p.nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) ) )
+				.where( p -> p.nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) ) )
 				.fetchAllHits();
 
 		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
@@ -247,7 +247,7 @@ public class ObjectExistsSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		List<DocumentReference> docs = scope.query().asEntityReference()
-				.predicate( p -> p.exists().field( "flattened" ) )
+				.where( p -> p.exists().field( "flattened" ) )
 				.fetchAllHits();
 
 		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
@@ -260,7 +260,7 @@ public class ObjectExistsSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		List<DocumentReference> docs = scope.query().asEntityReference()
-				.predicate( p -> p.exists().field( "flattenedNoChild" ) )
+				.where( p -> p.exists().field( "flattenedNoChild" ) )
 				.fetchAllHits();
 
 		assertThat( docs ).isEmpty();
@@ -271,7 +271,7 @@ public class ObjectExistsSearchPredicateIT {
 		StubMappingScope scope = compatibleIndexManager.createScope( indexManager );
 
 		List<DocumentReference> docs = scope.query().asEntityReference()
-				.predicate( p -> p.exists().field( "flattened" ) )
+				.where( p -> p.exists().field( "flattened" ) )
 				.fetchAllHits();
 
 		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
@@ -301,7 +301,7 @@ public class ObjectExistsSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope( emptyIndexManager );
 
 		List<DocumentReference> docs = scope.query().asEntityReference()
-				.predicate( p -> p.exists().field( "flattened" ) )
+				.where( p -> p.exists().field( "flattened" ) )
 				.fetchAllHits();
 
 		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
@@ -407,7 +407,7 @@ public class ObjectExistsSearchPredicateIT {
 
 	private void checkDocumentsCreation() {
 		List<DocumentReference> docs = indexManager.createScope().query().asEntityReference()
-				.predicate( p -> p.matchAll() )
+				.where( p -> p.matchAll() )
 				.fetchAllHits();
 
 		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_0, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4, DOCUMENT_5 );
