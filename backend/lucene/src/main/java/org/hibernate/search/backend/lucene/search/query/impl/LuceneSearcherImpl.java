@@ -174,10 +174,8 @@ class LuceneSearcherImpl<H> implements LuceneSearcher<LuceneLoadableSearchResult
 		for ( int i = 0; i < topDocs.scoreDocs.length; i++ ) {
 			// Check for timeout every 16 elements.
 			// Do this *before* the element, so that we don't fail after the last element.
-			if ( i % 16 == 0 ) {
-				if ( timeoutManager.checkTimedOut() ) {
-					break;
-				}
+			if ( i % 16 == 0 && timeoutManager.checkTimedOut() ) {
+				break;
 			}
 
 			ScoreDoc hit = topDocs.scoreDocs[i];
