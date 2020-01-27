@@ -14,12 +14,12 @@ import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 
 import org.hibernate.Session;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
-import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQueryHitTypeStep;
+import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep;
 
 public interface SearchSession {
 
@@ -31,9 +31,9 @@ public interface SearchSession {
 	 * @param type An indexed type, or a supertype of all indexed types that will be targeted by the search query.
 	 * @param <T> An indexed type, or a supertype of all indexed types that will be targeted by the search query.
 	 * @return The initial step of a DSL where the search query can be defined.
-	 * @see SearchQueryHitTypeStep
+	 * @see SearchQuerySelectStep
 	 */
-	default <T> HibernateOrmSearchQueryHitTypeStep<T> search(Class<T> type) {
+	default <T> HibernateOrmSearchQuerySelectStep<T> search(Class<T> type) {
 		return search( Collections.singleton( type ) );
 	}
 
@@ -45,9 +45,9 @@ public interface SearchSession {
 	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the search query.
 	 * @param <T> A supertype of all indexed types that will be targeted by the search query.
 	 * @return The initial step of a DSL where the search query can be defined.
-	 * @see SearchQueryHitTypeStep
+	 * @see SearchQuerySelectStep
 	 */
-	<T> HibernateOrmSearchQueryHitTypeStep<T> search(Collection<? extends Class<? extends T>> types);
+	<T> HibernateOrmSearchQuerySelectStep<T> search(Collection<? extends Class<? extends T>> types);
 
 	/**
 	 * Initiate the building of a search query.
@@ -57,9 +57,9 @@ public interface SearchSession {
 	 * @param scope A scope representing all indexed types that will be targeted by the search query.
 	 * @param <T> A supertype of all types in the given scope.
 	 * @return The initial step of a DSL where the search query can be defined.
-	 * @see SearchQueryHitTypeStep
+	 * @see SearchQuerySelectStep
 	 */
-	<T> HibernateOrmSearchQueryHitTypeStep<T> search(SearchScope<T> scope);
+	<T> HibernateOrmSearchQuerySelectStep<T> search(SearchScope<T> scope);
 
 	/**
 	 * Create a {@link SearchWorkspace} for the indexes mapped to all indexed types.

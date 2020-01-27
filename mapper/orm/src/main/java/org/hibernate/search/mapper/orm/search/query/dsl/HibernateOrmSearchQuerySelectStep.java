@@ -10,7 +10,7 @@ import org.hibernate.query.Query;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
@@ -19,12 +19,12 @@ import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsSt
  * The initial step in a query definition, where the type of query hits can be set,
  * or where the predicate can be set directly, assuming that query hits are returned as entities.
  *
- * @see SearchQueryHitTypeStep
- * @deprecated Use {@link SearchQueryHitTypeStep} instead.
+ * @see SearchQuerySelectStep
+ * @deprecated Use {@link SearchQuerySelectStep} instead.
  */
 @Deprecated
-public interface HibernateOrmSearchQueryHitTypeStep<E>
-		extends SearchQueryHitTypeStep<
+public interface HibernateOrmSearchQuerySelectStep<E>
+		extends SearchQuerySelectStep<
 						SearchQueryOptionsStep<?, E, SearchLoadingOptionsStep, ?, ?>,
 						EntityReference,
 						E,
@@ -42,7 +42,7 @@ public interface HibernateOrmSearchQueryHitTypeStep<E>
 	 * @deprecated Call {@code .loading( o -> o.fetchSize( ... )} near the end of the query definition instead.
 	 */
 	@Deprecated
-	HibernateOrmSearchQueryHitTypeStep<E> fetchSize(int fetchSize);
+	HibernateOrmSearchQuerySelectStep<E> fetchSize(int fetchSize);
 
 	/**
 	 * Set the strategy for cache lookup before query results are loaded.
@@ -52,6 +52,6 @@ public interface HibernateOrmSearchQueryHitTypeStep<E>
 	 * @deprecated Call {@code .loading( o -> o.cacheLookupStrategy( ... )} near the end of the query definition instead.
 	 */
 	@Deprecated
-	HibernateOrmSearchQueryHitTypeStep<E> cacheLookupStrategy(EntityLoadingCacheLookupStrategy strategy);
+	HibernateOrmSearchQuerySelectStep<E> cacheLookupStrategy(EntityLoadingCacheLookupStrategy strategy);
 
 }

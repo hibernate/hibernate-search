@@ -6,33 +6,33 @@
  */
 package org.hibernate.search.mapper.orm.search.query.dsl.impl;
 
-import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
-import org.hibernate.search.engine.search.query.dsl.spi.AbstractDelegatingSearchQueryHitTypeStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
+import org.hibernate.search.engine.search.query.dsl.spi.AbstractDelegatingSearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.search.loading.dsl.SearchLoadingOptionsStep;
-import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQueryHitTypeStep;
+import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep;
 
-public class HibernateOrmSearchQueryHitTypeStepImpl<E>
-		extends AbstractDelegatingSearchQueryHitTypeStep<EntityReference, E, SearchLoadingOptionsStep>
-		implements HibernateOrmSearchQueryHitTypeStep<E> {
+public class HibernateOrmSearchQuerySelectStepImpl<E>
+		extends AbstractDelegatingSearchQuerySelectStep<EntityReference, E, SearchLoadingOptionsStep>
+		implements HibernateOrmSearchQuerySelectStep<E> {
 	private final SearchLoadingOptionsStep loadingOptions;
 
-	public HibernateOrmSearchQueryHitTypeStepImpl(
-			SearchQueryHitTypeStep<?, EntityReference, E, SearchLoadingOptionsStep, ?, ?> delegate,
+	public HibernateOrmSearchQuerySelectStepImpl(
+			SearchQuerySelectStep<?, EntityReference, E, SearchLoadingOptionsStep, ?, ?> delegate,
 			SearchLoadingOptionsStep loadingOptions) {
 		super( delegate );
 		this.loadingOptions = loadingOptions;
 	}
 
 	@Override
-	public HibernateOrmSearchQueryHitTypeStep<E> fetchSize(int fetchSize) {
+	public HibernateOrmSearchQuerySelectStep<E> fetchSize(int fetchSize) {
 		loadingOptions.fetchSize( fetchSize );
 		return this;
 	}
 
 	@Override
-	public HibernateOrmSearchQueryHitTypeStep<E> cacheLookupStrategy(EntityLoadingCacheLookupStrategy strategy) {
+	public HibernateOrmSearchQuerySelectStep<E> cacheLookupStrategy(EntityLoadingCacheLookupStrategy strategy) {
 		loadingOptions.cacheLookupStrategy( strategy );
 		return this;
 	}

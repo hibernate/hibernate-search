@@ -20,7 +20,7 @@ import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
@@ -100,7 +100,7 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 	}
 
 	@Override
-	public <LOS> SearchQueryHitTypeStep<?, R, E2, LOS, SearchProjectionFactory<R, E2>, ?> search(
+	public <LOS> SearchQuerySelectStep<?, R, E2, LOS, SearchProjectionFactory<R, E2>, ?> search(
 			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E2, LOS> loadingContextBuilder) {
 		return getIndexScope().search( sessionContext, loadingContextBuilder );

@@ -10,16 +10,16 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
 /**
  * @param <R> The type of entity references, i.e. the type of hits returned by
- * {@link SearchQueryHitTypeStep#asEntityReference() reference queries},
+ * {@link SearchQuerySelectStep#selectEntityReference() reference queries},
  * or the type of objects returned for {@link SearchProjectionFactory#entityReference() entity reference projections}.
  * @param <E> The type of entities, i.e. the type of hits returned by
- * {@link SearchQueryHitTypeStep#asEntity() entity queries}
+ * {@link SearchQuerySelectStep#selectEntity() entity queries}
  * or the type of objects returned for {@link SearchProjectionFactory#entity() entity projections}.
  */
 public interface MappedIndexScope<R, E> {
@@ -30,7 +30,7 @@ public interface MappedIndexScope<R, E> {
 	 * will be wrong.
 	 * In particular, we cannot accept a LoadingContextBuilder<R, T> with any T.
 	 */
-	<LOS> SearchQueryHitTypeStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
+	<LOS> SearchQuerySelectStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
 			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E, LOS> loadingContextBuilder);
 

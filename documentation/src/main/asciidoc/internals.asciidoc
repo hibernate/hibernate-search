@@ -174,7 +174,7 @@ Those generic APIs are mostly implemented in the engine.
 The implementation itself relies on lower-level, less "user-focused" SPIs implemented by backends,
 such as `SearchPredicateFactory` or `FieldSortBuilder`.
 
-Also, the SPIs implemented by backends allow mappers to inject a "loading context" (see `SearchQueryBuilderFactory.asEntity`)
+Also, the SPIs implemented by backends allow mappers to inject a "loading context" (see `SearchQueryBuilderFactory.selectEntity`)
 that will essentially transform document references into the entity that was initially indexed.
 
 == POJO mapper

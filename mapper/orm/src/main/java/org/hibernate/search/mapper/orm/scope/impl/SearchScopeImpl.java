@@ -14,8 +14,8 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexerImpl;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
-import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQueryHitTypeStep;
-import org.hibernate.search.mapper.orm.search.query.dsl.impl.HibernateOrmSearchQueryHitTypeStepImpl;
+import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep;
+import org.hibernate.search.mapper.orm.search.query.dsl.impl.HibernateOrmSearchQuerySelectStepImpl;
 import org.hibernate.search.mapper.orm.search.loading.context.impl.HibernateOrmLoadingContext;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.work.impl.SearchWorkspaceImpl;
@@ -33,11 +33,11 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 		this.delegate = delegate;
 	}
 
-	public HibernateOrmSearchQueryHitTypeStep<E> search(HibernateOrmScopeSessionContext sessionContext) {
+	public HibernateOrmSearchQuerySelectStep<E> search(HibernateOrmScopeSessionContext sessionContext) {
 		HibernateOrmLoadingContext.Builder<E> loadingContextBuilder = new HibernateOrmLoadingContext.Builder<>(
 				mappingContext, sessionContext, delegate.getIncludedIndexedTypes()
 		);
-		return new HibernateOrmSearchQueryHitTypeStepImpl<>(
+		return new HibernateOrmSearchQuerySelectStepImpl<>(
 				delegate.search( sessionContext.getBackendSessionContext(), loadingContextBuilder ),
 				loadingContextBuilder
 		);

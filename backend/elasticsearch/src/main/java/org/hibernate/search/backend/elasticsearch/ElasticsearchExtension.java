@@ -14,9 +14,9 @@ import org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.Elastic
 import org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.impl.ElasticsearchSearchAggregationFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.search.projection.dsl.ElasticsearchSearchProjectionFactory;
 import org.hibernate.search.backend.elasticsearch.search.projection.dsl.impl.ElasticsearchSearchProjectionFactoryImpl;
-import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryHitTypeStep;
+import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQuerySelectStep;
 import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
-import org.hibernate.search.backend.elasticsearch.search.query.dsl.impl.ElasticsearchSearchQueryHitTypeStepImpl;
+import org.hibernate.search.backend.elasticsearch.search.query.dsl.impl.ElasticsearchSearchQuerySelectStepImpl;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexScope;
@@ -39,7 +39,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryEx
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
@@ -75,7 +75,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @see #get()
  */
 public final class ElasticsearchExtension<H, R, E, LOS>
-		implements SearchQueryDslExtension<ElasticsearchSearchQueryHitTypeStep<R, E, LOS>, R, E, LOS>,
+		implements SearchQueryDslExtension<ElasticsearchSearchQuerySelectStep<R, E, LOS>, R, E, LOS>,
 		SearchQueryExtension<ElasticsearchSearchQuery<H>, H>,
 		SearchPredicateFactoryExtension<ElasticsearchSearchPredicateFactory>,
 		SearchSortFactoryExtension<ElasticsearchSearchSortFactory>,
@@ -117,13 +117,13 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<ElasticsearchSearchQueryHitTypeStep<R, E, LOS>> extendOptional(
-			SearchQueryHitTypeStep<?, R, E, LOS, ?, ?> original,
+	public Optional<ElasticsearchSearchQuerySelectStep<R, E, LOS>> extendOptional(
+			SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
 			IndexScope<?> indexScope,
 			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 		if ( indexScope instanceof ElasticsearchIndexScope ) {
-			return Optional.of( new ElasticsearchSearchQueryHitTypeStepImpl<>(
+			return Optional.of( new ElasticsearchSearchQuerySelectStepImpl<>(
 					(ElasticsearchIndexScope) indexScope, sessionContext, loadingContextBuilder
 			) );
 		}

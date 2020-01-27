@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.Elasticse
 import org.hibernate.search.backend.elasticsearch.search.projection.dsl.ElasticsearchSearchProjectionFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryOptionsStep;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryWhereStep;
-import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryHitTypeStep;
+import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQuerySelectStep;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.scope.impl.ElasticsearchIndexScope;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
@@ -23,11 +23,11 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
-import org.hibernate.search.engine.search.query.dsl.spi.AbstractSearchQueryHitTypeStep;
+import org.hibernate.search.engine.search.query.dsl.spi.AbstractSearchQuerySelectStep;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
-public class ElasticsearchSearchQueryHitTypeStepImpl<R, E, LOS>
-		extends AbstractSearchQueryHitTypeStep<
+public class ElasticsearchSearchQuerySelectStepImpl<R, E, LOS>
+		extends AbstractSearchQuerySelectStep<
 						ElasticsearchSearchQueryOptionsStep<E, LOS>,
 						R,
 						E,
@@ -36,13 +36,13 @@ public class ElasticsearchSearchQueryHitTypeStepImpl<R, E, LOS>
 						ElasticsearchSearchPredicateFactory,
 						ElasticsearchSearchQueryElementCollector
 				>
-		implements ElasticsearchSearchQueryHitTypeStep<R, E, LOS> {
+		implements ElasticsearchSearchQuerySelectStep<R, E, LOS> {
 
 	private final ElasticsearchIndexScope indexScope;
 	private final BackendSessionContext sessionContext;
 	private final LoadingContextBuilder<R, E, LOS> loadingContextBuilder;
 
-	public ElasticsearchSearchQueryHitTypeStepImpl(ElasticsearchIndexScope indexScope,
+	public ElasticsearchSearchQuerySelectStepImpl(ElasticsearchIndexScope indexScope,
 			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 		this.indexScope = indexScope;
@@ -51,51 +51,51 @@ public class ElasticsearchSearchQueryHitTypeStepImpl<R, E, LOS>
 	}
 
 	@Override
-	public ElasticsearchSearchQueryWhereStep<E, LOS> asEntity() {
+	public ElasticsearchSearchQueryWhereStep<E, LOS> selectEntity() {
 		ElasticsearchSearchQueryBuilder<E> builder = indexScope.getSearchQueryBuilderFactory()
-				.asEntity( sessionContext, loadingContextBuilder );
+				.selectEntity( sessionContext, loadingContextBuilder );
 		return createSearchQueryContext( builder );
 	}
 
 	@Override
-	public ElasticsearchSearchQueryWhereStep<R, LOS> asEntityReference() {
+	public ElasticsearchSearchQueryWhereStep<R, LOS> selectEntityReference() {
 		ElasticsearchSearchQueryBuilder<R> builder = indexScope.getSearchQueryBuilderFactory()
-				.asReference( sessionContext, loadingContextBuilder );
+				.selectEntityReference( sessionContext, loadingContextBuilder );
 		return createSearchQueryContext( builder );
 	}
 
 	@Override
-	public <P> ElasticsearchSearchQueryWhereStep<P, LOS> asProjection(
+	public <P> ElasticsearchSearchQueryWhereStep<P, LOS> select(
 			Function<? super ElasticsearchSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
 		ElasticsearchSearchProjectionFactory<R, E> factoryContext =
 				createDefaultProjectionFactory().extension( ElasticsearchExtension.get() );
 		SearchProjection<P> projection = projectionContributor.apply( factoryContext ).toProjection();
-		return asProjection( projection );
+		return select( projection );
 	}
 
 	@Override
-	public <P> ElasticsearchSearchQueryWhereStep<P, LOS> asProjection(SearchProjection<P> projection) {
+	public <P> ElasticsearchSearchQueryWhereStep<P, LOS> select(SearchProjection<P> projection) {
 		ElasticsearchSearchQueryBuilder<P> builder = indexScope.getSearchQueryBuilderFactory()
-				.asProjection( sessionContext, loadingContextBuilder, projection );
+				.select( sessionContext, loadingContextBuilder, projection );
 		return createSearchQueryContext( builder );
 	}
 
 	@Override
-	public ElasticsearchSearchQueryWhereStep<List<?>, LOS> asProjections(SearchProjection<?>... projections) {
+	public ElasticsearchSearchQueryWhereStep<List<?>, LOS> select(SearchProjection<?>... projections) {
 		ElasticsearchSearchQueryBuilder<List<?>> builder = indexScope.getSearchQueryBuilderFactory()
-				.asProjections( sessionContext, loadingContextBuilder, projections );
+				.select( sessionContext, loadingContextBuilder, projections );
 		return createSearchQueryContext( builder );
 	}
 
 	@Override
 	public ElasticsearchSearchQueryOptionsStep<E, LOS> where(SearchPredicate predicate) {
-		return asEntity().where( predicate );
+		return selectEntity().where( predicate );
 	}
 
 	@Override
 	public ElasticsearchSearchQueryOptionsStep<E, LOS> where(
 			Function<? super ElasticsearchSearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
-		return asEntity().where( predicateContributor );
+		return selectEntity().where( predicateContributor );
 	}
 
 	@Override

@@ -17,8 +17,8 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.impl.DefaultSearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.impl.DefaultSearchProjectionFactory;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
-import org.hibernate.search.engine.search.query.dsl.impl.DefaultSearchQueryHitTypeStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
+import org.hibernate.search.engine.search.query.dsl.impl.DefaultSearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.impl.DefaultSearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.impl.SearchSortDslContextImpl;
@@ -41,10 +41,10 @@ class MappedIndexScopeImpl<C, R, E> implements MappedIndexScope<R, E> {
 	}
 
 	@Override
-	public <LOS> SearchQueryHitTypeStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
+	public <LOS> SearchQuerySelectStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
 			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
-		return new DefaultSearchQueryHitTypeStep<>( delegate, sessionContext, loadingContextBuilder );
+		return new DefaultSearchQuerySelectStep<>( delegate, sessionContext, loadingContextBuilder );
 	}
 
 	@Override

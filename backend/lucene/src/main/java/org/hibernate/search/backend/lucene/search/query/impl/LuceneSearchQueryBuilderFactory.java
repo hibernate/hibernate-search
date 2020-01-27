@@ -38,19 +38,19 @@ public class LuceneSearchQueryBuilderFactory
 	}
 
 	@Override
-	public <E> LuceneSearchQueryBuilder<E> asEntity(
+	public <E> LuceneSearchQueryBuilder<E> selectEntity(
 			BackendSessionContext sessionContext, LoadingContextBuilder<?, E, ?> loadingContextBuilder) {
-		return asProjection( sessionContext, loadingContextBuilder, searchProjectionFactory.<E>entity().build() );
+		return select( sessionContext, loadingContextBuilder, searchProjectionFactory.<E>entity().build() );
 	}
 
 	@Override
-	public <R> LuceneSearchQueryBuilder<R> asReference(
+	public <R> LuceneSearchQueryBuilder<R> selectEntityReference(
 			BackendSessionContext sessionContext, LoadingContextBuilder<R, ?, ?> loadingContextBuilder) {
-		return asProjection( sessionContext, loadingContextBuilder, searchProjectionFactory.<R>entityReference().build() );
+		return select( sessionContext, loadingContextBuilder, searchProjectionFactory.<R>entityReference().build() );
 	}
 
 	@Override
-	public <P> LuceneSearchQueryBuilder<P> asProjection(
+	public <P> LuceneSearchQueryBuilder<P> select(
 			BackendSessionContext sessionContext, LoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			SearchProjection<P> projection) {
 		return createSearchQueryBuilder( sessionContext, loadingContextBuilder,
@@ -58,7 +58,7 @@ public class LuceneSearchQueryBuilderFactory
 	}
 
 	@Override
-	public LuceneSearchQueryBuilder<List<?>> asProjections(
+	public LuceneSearchQueryBuilder<List<?>> select(
 			BackendSessionContext sessionContext, LoadingContextBuilder<?, ?, ?> loadingContextBuilder,
 			SearchProjection<?>... projections) {
 		return createSearchQueryBuilder( sessionContext, loadingContextBuilder, createRootProjection( projections ) );
