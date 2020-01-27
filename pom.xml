@@ -1340,7 +1340,6 @@
                     <version>${version.javadoc.plugin}</version>
                     <configuration>
                         <!-- Fail on error alternative -->
-                        <!-- <additionalparam>-Xdoclint:none</additionalparam> -->
                         <quiet>true</quiet>
                         <verbose>false</verbose>
                         <failOnWarnings>true</failOnWarnings>
