@@ -82,14 +82,14 @@ public final class DefaultSearchQueryHitTypeStep<R, E, LOS, C>
 	}
 
 	@Override
-	public SearchQueryOptionsStep<?, E, LOS, ?, ?> predicate(
+	public SearchQueryOptionsStep<?, E, LOS, ?, ?> where(
 			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
-		return asEntity().predicate( predicateContributor );
+		return asEntity().where( predicateContributor );
 	}
 
 	@Override
-	public SearchQueryOptionsStep<?, E, LOS, ?, ?> predicate(SearchPredicate predicate) {
-		return asEntity().predicate( predicate );
+	public SearchQueryOptionsStep<?, E, LOS, ?, ?> where(SearchPredicate predicate) {
+		return asEntity().where( predicate );
 	}
 
 	@Override

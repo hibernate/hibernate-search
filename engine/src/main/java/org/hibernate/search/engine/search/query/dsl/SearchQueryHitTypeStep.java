@@ -23,7 +23,7 @@ import org.hibernate.search.util.common.SearchException;
  * or where the predicate can be set directly, assuming that query hits are returned as entities.
  *
  * @param <N> The next step if no type of hits is explicitly selected,
- * i.e. if {@link #predicate(SearchPredicate)} or {@link #predicate(Function)} is called directly
+ * i.e. if {@link #where(SearchPredicate)} or {@link #where(Function)} is called directly
  * without calling {@link #asEntity()}, or {@link #asEntityReference()}, {@link #asProjection(SearchProjection)}
  * or a similar method.
  * @param <R> The type of entity references, i.e. the type of hits returned by
@@ -34,7 +34,7 @@ import org.hibernate.search.util.common.SearchException;
  * or the type of objects returned for {@link SearchProjectionFactory#entity() entity projections}.
  * @param <LOS> The type of the initial step of the loading options definition DSL accessible through {@link SearchQueryOptionsStep#loading(Consumer)}.
  * @param <PJF> The type of factory used to create projections in {@link #asProjection(Function)}.
- * @param <PDF> The type of factory used to create predicates in {@link #predicate(Function)}.
+ * @param <PDF> The type of factory used to create predicates in {@link #where(Function)}.
  */
 public interface SearchQueryHitTypeStep<
 				N extends SearchQueryOptionsStep<?, E, LOS, ?, ?>,
@@ -44,23 +44,23 @@ public interface SearchQueryHitTypeStep<
 				PJF extends SearchProjectionFactory<R, E>,
 				PDF extends SearchPredicateFactory
 		>
-		extends SearchQueryPredicateStep<N, E, PDF> {
+		extends SearchQueryWhereStep<N, E, PDF> {
 
 	/**
 	 * Define the query results as the entity was originally indexed, loaded from an external source (database, ...).
 	 *
 	 * @return The next step.
-	 * @see SearchQueryPredicateStep
+	 * @see SearchQueryWhereStep
 	 */
-	SearchQueryPredicateStep<?, E, ?> asEntity();
+	SearchQueryWhereStep<?, E, ?> asEntity();
 
 	/**
 	 * Define the query results as a reference to the entity that was originally indexed.
 	 *
 	 * @return The next step.
-	 * @see SearchQueryPredicateStep
+	 * @see SearchQueryWhereStep
 	 */
-	SearchQueryPredicateStep<?, R, ?> asEntityReference();
+	SearchQueryWhereStep<?, R, ?> asEntityReference();
 
 	/**
 	 * Define the query results as one projection for each matching document.
@@ -70,9 +70,9 @@ public interface SearchQueryHitTypeStep<
 	 * Should generally be a lambda expression.
 	 * @param <P> The resulting type of the projection.
 	 * @return The next step.
-	 * @see SearchQueryPredicateStep
+	 * @see SearchQueryWhereStep
 	 */
-	<P> SearchQueryPredicateStep<?, P, ?> asProjection(
+	<P> SearchQueryWhereStep<?, P, ?> asProjection(
 			Function<? super PJF, ? extends ProjectionFinalStep<P>> projectionContributor);
 
 	/**
@@ -81,9 +81,9 @@ public interface SearchQueryHitTypeStep<
 	 * @param projection A previously-created {@link SearchProjection} object.
 	 * @param <P> The resulting type of the projection.
 	 * @return The next step.
-	 * @see SearchQueryPredicateStep
+	 * @see SearchQueryWhereStep
 	 */
-	<P> SearchQueryPredicateStep<?, P, ?> asProjection(SearchProjection<P> projection);
+	<P> SearchQueryWhereStep<?, P, ?> asProjection(SearchProjection<P> projection);
 
 	/**
 	 * Define the query results as a list of projections for each matching document.
@@ -96,9 +96,9 @@ public interface SearchQueryHitTypeStep<
 	 * @param projections A list of previously-created {@link SearchProjection} objects.
 	 * @return The next step.
 	 * @see SearchProjectionFactory#composite(SearchProjection[])
-	 * @see SearchQueryPredicateStep
+	 * @see SearchQueryWhereStep
 	 */
-	SearchQueryPredicateStep<?, List<?>, ?> asProjections(SearchProjection<?>... projections);
+	SearchQueryWhereStep<?, List<?>, ?> asProjections(SearchProjection<?>... projections);
 
 	/**
 	 * Extend the current DSL step with the given extension,

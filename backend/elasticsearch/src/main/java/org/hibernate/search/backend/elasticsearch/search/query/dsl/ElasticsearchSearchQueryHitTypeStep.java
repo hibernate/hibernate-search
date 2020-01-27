@@ -24,22 +24,22 @@ public interface ElasticsearchSearchQueryHitTypeStep<R, E, LOS>
 				ElasticsearchSearchProjectionFactory<R, E>,
 				ElasticsearchSearchPredicateFactory
 		>,
-		ElasticsearchSearchQueryPredicateStep<E, LOS> {
+		ElasticsearchSearchQueryWhereStep<E, LOS> {
 
 	@Override
-	ElasticsearchSearchQueryPredicateStep<E, LOS> asEntity();
+	ElasticsearchSearchQueryWhereStep<E, LOS> asEntity();
 
 	@Override
-	ElasticsearchSearchQueryPredicateStep<R, LOS> asEntityReference();
+	ElasticsearchSearchQueryWhereStep<R, LOS> asEntityReference();
 
 	@Override
-	<P> ElasticsearchSearchQueryPredicateStep<P, LOS> asProjection(
+	<P> ElasticsearchSearchQueryWhereStep<P, LOS> asProjection(
 			Function<? super ElasticsearchSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor);
 
 	@Override
-	<P> ElasticsearchSearchQueryPredicateStep<P, LOS> asProjection(SearchProjection<P> projection);
+	<P> ElasticsearchSearchQueryWhereStep<P, LOS> asProjection(SearchProjection<P> projection);
 
 	@Override
-	ElasticsearchSearchQueryPredicateStep<List<?>, LOS> asProjections(SearchProjection<?>... projections);
+	ElasticsearchSearchQueryWhereStep<List<?>, LOS> asProjections(SearchProjection<?>... projections);
 
 }

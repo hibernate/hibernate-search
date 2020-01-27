@@ -11,7 +11,7 @@ import org.hibernate.search.backend.elasticsearch.search.aggregation.dsl.Elastic
 import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryOptionsStep;
-import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryPredicateStep;
+import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryWhereStep;
 import org.hibernate.search.backend.elasticsearch.search.sort.dsl.ElasticsearchSearchSortFactory;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
@@ -35,7 +35,7 @@ class ElasticsearchSearchQueryOptionsStepImpl<H, LOS>
 						ElasticsearchSearchAggregationFactory,
 						ElasticsearchSearchQueryElementCollector
 				>
-		implements ElasticsearchSearchQueryPredicateStep<H, LOS>, ElasticsearchSearchQueryOptionsStep<H, LOS> {
+		implements ElasticsearchSearchQueryWhereStep<H, LOS>, ElasticsearchSearchQueryOptionsStep<H, LOS> {
 
 	private final ElasticsearchSearchQueryBuilder<H> searchQueryBuilder;
 
