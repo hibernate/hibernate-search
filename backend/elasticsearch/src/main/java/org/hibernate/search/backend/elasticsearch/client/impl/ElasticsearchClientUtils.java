@@ -50,25 +50,29 @@ public class ElasticsearchClientUtils {
 
 	public static ElasticsearchVersion getElasticsearchVersion(ElasticsearchClient client) {
 		try {
-			ElasticsearchRequest request = ElasticsearchRequest.get().build();
-			ElasticsearchResponse response = null;
-			try {
-				response = Futures.unwrappedExceptionJoin( client.submit( request ) );
-
-				if ( !ElasticsearchClientUtils.isSuccessCode( response.getStatusCode() ) ) {
-					throw log.elasticsearchResponseIndicatesFailure();
-				}
-
-				return VERSION_ACCESSOR.get( response.getBody() )
-						.map( ElasticsearchVersion::of )
-						.orElseThrow( () -> new AssertionFailure( "Missing version number in JSON response" ) );
-			}
-			catch (RuntimeException e) {
-				throw log.elasticsearchRequestFailed( request, response, e.getMessage(), e );
-			}
+			return tryGetElasticsearchVersion( client );
 		}
 		catch (RuntimeException e) {
 			throw log.failedToDetectElasticsearchVersion( e.getMessage(), e );
+		}
+	}
+
+	private static ElasticsearchVersion tryGetElasticsearchVersion(ElasticsearchClient client) {
+		ElasticsearchRequest request = ElasticsearchRequest.get().build();
+		ElasticsearchResponse response = null;
+		try {
+			response = Futures.unwrappedExceptionJoin( client.submit( request ) );
+
+			if ( !ElasticsearchClientUtils.isSuccessCode( response.getStatusCode() ) ) {
+				throw log.elasticsearchResponseIndicatesFailure();
+			}
+
+			return VERSION_ACCESSOR.get( response.getBody() )
+					.map( ElasticsearchVersion::of )
+					.orElseThrow( () -> new AssertionFailure( "Missing version number in JSON response" ) );
+		}
+		catch (RuntimeException e) {
+			throw log.elasticsearchRequestFailed( request, response, e.getMessage(), e );
 		}
 	}
 
