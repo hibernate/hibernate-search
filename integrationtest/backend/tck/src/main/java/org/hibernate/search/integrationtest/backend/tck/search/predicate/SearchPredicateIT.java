@@ -76,18 +76,6 @@ public class SearchPredicateIT {
 	}
 
 	@Test
-	public void match_fluid() {
-		StubMappingScope scope = indexManager.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
-				.where( f -> f.match().field( "string" ).matching( STRING_1 ) )
-				.toQuery();
-
-		assertThat( query )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
-	}
-
-	@Test
 	public void match_search_predicate() {
 		StubMappingScope scope = indexManager.createScope();
 
