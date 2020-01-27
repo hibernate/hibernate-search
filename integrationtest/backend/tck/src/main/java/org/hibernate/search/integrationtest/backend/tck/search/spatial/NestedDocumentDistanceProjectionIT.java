@@ -81,7 +81,7 @@ public class NestedDocumentDistanceProjectionIT {
 				.sort( f -> f.field( "ordinal" ).desc() )
 				.fetchAllHits();
 
-		assertEquals( hits.size(), 3 );
+		assertEquals( 3, hits.size() );
 		checkResult( hits.get( 0 ), 164d, Offset.offset( 10d ) );
 		checkResult( hits.get( 1 ), 1037d, Offset.offset( 10d ) );
 		checkResult( hits.get( 2 ), 2457d, Offset.offset( 10d ) );
@@ -96,7 +96,7 @@ public class NestedDocumentDistanceProjectionIT {
 				.sort( f -> f.field( "ordinal" ).desc() )
 				.fetchAllHits();
 
-		assertEquals( hits.size(), 3 );
+		assertEquals( 3, hits.size() );
 		checkResult( hits.get( 0 ), 164d, Offset.offset( 10d ) );
 		checkResult( hits.get( 1 ), 1037d, Offset.offset( 10d ) );
 		checkResult( hits.get( 2 ), 2457d, Offset.offset( 10d ) );
