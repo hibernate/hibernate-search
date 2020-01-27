@@ -194,7 +194,7 @@ public class LuceneSearchQueryBuilder<H>
 		ExtractionRequirements.Builder extractionRequirementsBuilder = new ExtractionRequirements.Builder();
 		SearchProjectionRequestContext projectionRequestContext =
 				new SearchProjectionRequestContext( extractionRequirementsBuilder );
-		rootProjection.request( new SearchProjectionRequestContext( extractionRequirementsBuilder ) );
+		rootProjection.request( projectionRequestContext );
 		if ( aggregations != null ) {
 			AggregationRequestContext aggregationRequestContext =
 					new AggregationRequestContext( extractionRequirementsBuilder );
