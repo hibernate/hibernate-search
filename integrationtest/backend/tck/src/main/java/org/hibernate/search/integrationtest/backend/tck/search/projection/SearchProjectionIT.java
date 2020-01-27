@@ -107,7 +107,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
-				.asProjections()
+				.select()
 				.where( f -> f.matchAll() )
 				.toQuery();
 
@@ -136,7 +136,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 				scope.projection().entity().toProjection();
 
 		query = scope.query()
-				.asProjections(
+				.select(
 						documentReferenceProjection,
 						entityReferenceProjection,
 						objectProjection
@@ -195,7 +195,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		SearchProjection<StubLoadedObject> objectProjection =
 				scope.projection().entity().toProjection();
 		query = scope.query( loadingContextMock )
-				.asProjections(
+				.select(
 						documentReferenceProjection,
 						entityReferenceProjection,
 						objectProjection
@@ -236,7 +236,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Float> query = scope.query()
-				.asProjection( f -> f.score() )
+				.select( f -> f.score() )
 				.where( f -> f.match().field( indexMapping.scoreField.relativeFieldName ).matching( "scorepattern" ) )
 				.sort( f -> f.score().desc() )
 				.toQuery();
@@ -261,7 +261,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Float> query = scope.query()
-				.asProjection( f -> f.score() )
+				.select( f -> f.score() )
 				.where( f -> f.match().field( indexMapping.scoreField.relativeFieldName ).matching( "scorepattern" ) )
 				.sort( f -> f.indexOrder() )
 				.toQuery();
@@ -287,7 +287,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		SearchQuery<List<?>> query;
 
 		query = scope.query()
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.field( indexMapping.string1Field.relativeFieldName, String.class ),
 								f.documentReference(),
@@ -331,7 +331,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		SearchQuery<List<?>> query;
 
 		query = scope.query()
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.field( indexMapping.string1Field.relativeFieldName, String.class ),
 								f.documentReference(),
@@ -385,7 +385,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		String value3 = indexMapping.string1Field.document3Value.indexedValue;
 
 		SearchQuery<String> query = scope.query()
-				.asProjection( projection )
+				.select( projection )
 				.where( f -> f.matchAll() )
 				.toQuery();
 
@@ -393,7 +393,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 		// reuse the same projection instance on the same scope
 		query = scope.query()
-				.asProjection( projection )
+				.select( projection )
 				.where( f -> f.matchAll() )
 				.toQuery();
 
@@ -402,7 +402,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		// reuse the same projection instance on a different scope,
 		// targeting the same index
 		query = indexManager.createScope().query()
-				.asProjection( projection )
+				.select( projection )
 				.where( f -> f.matchAll() )
 				.toQuery();
 
@@ -414,7 +414,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		// reuse the same projection instance on a different scope,
 		// targeting same indexes
 		query = anotherIndexManager.createScope( indexManager ).query()
-				.asProjection( projection )
+				.select( projection )
 				.where( f -> f.matchAll() )
 				.toQuery();
 
@@ -431,7 +431,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		// targeting a different index
 		SubTest.expectException( () ->
 				anotherIndexManager.createScope().query()
-						.asProjection( projection )
+						.select( projection )
 						.where( f -> f.matchAll() )
 						.toQuery() )
 				.assertThrown()
@@ -444,7 +444,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		// targeting different indexes
 		SubTest.expectException( () ->
 				indexManager.createScope( anotherIndexManager ).query()
-						.asProjection( projection )
+						.select( projection )
 						.where( f -> f.matchAll() )
 						.toQuery() )
 				.assertThrown()
@@ -461,7 +461,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 		// Mandatory extension, supported
 		query = scope.query()
-				.asProjection( f -> f.extension( new SupportedExtension<>() )
+				.select( f -> f.extension( new SupportedExtension<>() )
 						.extendedProjection( "string1", String.class )
 				)
 				.where( f -> f.id().matching( DOCUMENT_1 ) )
@@ -478,7 +478,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 		// Conditional extensions with orElse - two, both supported
 		query = scope.query()
-				.asProjection( f -> f.<String>extension()
+				.select( f -> f.<String>extension()
 						.ifSupported(
 								new SupportedExtension<>(),
 								extended -> extended.extendedProjection( "string1", String.class )
@@ -496,7 +496,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 		// Conditional extensions with orElse - two, second supported
 		query = scope.query()
-				.asProjection( f -> f.<String>extension()
+				.select( f -> f.<String>extension()
 						.ifSupported(
 								new UnSupportedExtension<>(),
 								shouldNotBeCalled()
@@ -516,7 +516,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 
 		// Conditional extensions with orElse - two, both unsupported
 		query = scope.query()
-				.asProjection( f -> f.<String>extension()
+				.select( f -> f.<String>extension()
 						.ifSupported(
 								new UnSupportedExtension<>(),
 								shouldNotBeCalled()

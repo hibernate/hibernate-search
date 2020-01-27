@@ -35,7 +35,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 		SearchQuery<Double> query = scope.query()
 				// Do NOT add any additional projection here: this serves as a non-regression test for HSEARCH-3618
-				.asProjection( f ->
+				.select( f ->
 						f.distance( "projectableUnsortableGeoPoint", GeoPoint.of( 45.749828, 4.854172 ) )
 				)
 				.where( f -> f.matchAll() )
@@ -55,7 +55,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 
 		SearchQuery<Double> query = scope.query()
 				// Do NOT add any additional projection here: this serves as a non-regression test for HSEARCH-3618
-				.asProjection( f ->
+				.select( f ->
 						f.distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) )
 				)
 				.where( f -> f.matchAll() )
@@ -74,7 +74,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Double> query = scope.query()
-				.asProjection( f ->
+				.select( f ->
 						f.distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) )
 								.unit( DistanceUnit.KILOMETERS )
 				)
@@ -94,7 +94,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.distance( "geoPoint", GeoPoint.of( 45.749828, 4.854172 ) ),
 								f.distance( "geoPoint", GeoPoint.of( 45.763363, 4.833527 ) ),
@@ -130,7 +130,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 		GeoPoint center = GeoPoint.of( 45.749828, 4.854172 );
 
 		SearchQuery<Double> query = scope.query()
-				.asProjection( f ->
+				.select( f ->
 						f.distance( "geoPoint", center )
 				)
 				.where( f -> f.matchAll() )
@@ -152,7 +152,7 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Double> query = scope.query()
-				.asProjection( f ->
+				.select( f ->
 						f.distance(
 								"geoPoint_with_a_veeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrrrryyyyyyyyyyyyyyyy_long_name",
 								GeoPoint.of( 45.74982800099999888371, 4.85417200099999888371 )

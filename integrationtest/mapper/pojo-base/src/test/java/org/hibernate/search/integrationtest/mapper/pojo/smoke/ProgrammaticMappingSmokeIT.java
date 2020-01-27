@@ -419,7 +419,7 @@ public class ProgrammaticMappingSmokeIT {
 			SearchQuery<EntityReference> query = session.search(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 			)
-					.asEntityReference()
+					.selectEntityReference()
 					.where( f -> f.matchAll() )
 					.toQuery();
 
@@ -454,7 +454,7 @@ public class ProgrammaticMappingSmokeIT {
 			SearchQuery<String> query = session.search(
 					Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 			)
-					.asProjection( f -> f.field( "myTextField", String.class ) )
+					.select( f -> f.field( "myTextField", String.class ) )
 					.where( f -> f.matchAll() )
 					.toQuery();
 
@@ -490,7 +490,7 @@ public class ProgrammaticMappingSmokeIT {
 
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchQuery<List<?>> query = session.search( scope )
-					.asProjections(
+					.select(
 							scope.projection().field( "myTextField", String.class ).toProjection(),
 							scope.projection().entityReference().toProjection(),
 							scope.projection().field( "myLocalDateField", LocalDate.class ).toProjection(),

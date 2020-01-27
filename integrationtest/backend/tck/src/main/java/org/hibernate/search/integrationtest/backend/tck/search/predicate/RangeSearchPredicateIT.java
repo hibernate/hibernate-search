@@ -987,7 +987,7 @@ public class RangeSearchPredicateIT {
 
 		SubTest.expectException(
 				() -> {
-					scope.query().asEntityReference()
+					scope.query().selectEntityReference()
 							.where( f -> f.range().field( absoluteFieldPath ).atLeast( new BigDecimal( "739.333" ) ) )
 							.toQuery();
 				}
@@ -1092,7 +1092,7 @@ public class RangeSearchPredicateIT {
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
 		query = incompatibleDecimalScaleIndexManager.createScope().query()
-				.asEntityReference()
+				.selectEntityReference()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INCOMPATIBLE_DECIMAL_SCALE_INDEX_NAME, INCOMPATIBLE_DECIMAL_SCALE_INDEX_DOCUMENT_1 );

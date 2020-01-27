@@ -117,7 +117,7 @@ public class FieldSearchProjectionIT {
 
 				assertThat(
 						scope.query()
-								.asProjection( f -> f.field( fieldPath, model.type ) )
+								.select( f -> f.field( fieldPath, model.type ) )
 								.where( f -> f.matchAll() )
 								.toQuery()
 				).hasHitsAnyOrder(
@@ -139,7 +139,7 @@ public class FieldSearchProjectionIT {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			query = scope.query()
-					.asProjection( f -> f.field( fieldPath ) )
+					.select( f -> f.field( fieldPath ) )
 					.where( f -> f.matchAll() )
 					.toQuery();
 			assertThat( query ).hasHitsAnyOrder(
@@ -156,7 +156,7 @@ public class FieldSearchProjectionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<CharSequence> query = scope.query()
-				.asProjection( f ->
+				.select( f ->
 						f.field( indexMapping.string1Field.relativeFieldName, CharSequence.class )
 				)
 				.where( f -> f.matchAll() )
@@ -286,7 +286,7 @@ public class FieldSearchProjectionIT {
 			String fieldPath = fieldModel.relativeFieldName;
 
 			query = scope.query()
-					.asProjection( f -> f.field( fieldPath, ValueWrapper.class ) )
+					.select( f -> f.field( fieldPath, ValueWrapper.class ) )
 					.where( f -> f.matchAll() )
 					.toQuery();
 			assertThat( query ).hasHitsAnyOrder(
@@ -308,7 +308,7 @@ public class FieldSearchProjectionIT {
 
 				assertThat(
 						scope.query()
-								.asProjection( f -> f.field( fieldPath, model.type, ValueConvert.NO ) )
+								.select( f -> f.field( fieldPath, model.type, ValueConvert.NO ) )
 								.where( f -> f.matchAll() )
 								.toQuery()
 				).hasHitsAnyOrder(
@@ -331,7 +331,7 @@ public class FieldSearchProjectionIT {
 
 				assertThat(
 						scope.query()
-								.asProjection( f -> f.field( fieldPath, ValueConvert.NO ) )
+								.select( f -> f.field( fieldPath, ValueConvert.NO ) )
 								.where( f -> f.matchAll() )
 								.toQuery()
 				).hasHitsAnyOrder(
@@ -371,7 +371,7 @@ public class FieldSearchProjectionIT {
 
 				assertThat(
 						scope.query()
-								.asProjection( f ->
+								.select( f ->
 										f.composite(
 												f.field( fieldPath, model.type ),
 												f.field( fieldPath, model.type )
@@ -399,7 +399,7 @@ public class FieldSearchProjectionIT {
 
 				assertThat(
 						scope.query()
-								.asProjection(
+								.select(
 										f -> f.field( fieldPath, model.type )
 								)
 								.where( f -> f.matchAll() )
@@ -424,7 +424,7 @@ public class FieldSearchProjectionIT {
 
 				assertThat(
 						scope.query()
-								.asProjection( f -> f.field( fieldPath, model.type ) )
+								.select( f -> f.field( fieldPath, model.type ) )
 								.where( f -> f.matchAll() )
 								.toQuery()
 				).hasHitsAnyOrder(
@@ -456,7 +456,7 @@ public class FieldSearchProjectionIT {
 
 				assertThat(
 						scope.query()
-								.asProjection( f -> f.field( fieldPath, model.type ) )
+								.select( f -> f.field( fieldPath, model.type ) )
 								.where( f -> f.matchAll() )
 								.toQuery()
 				).hasHitsAnyOrder(
@@ -480,7 +480,7 @@ public class FieldSearchProjectionIT {
 
 				assertThat(
 						scope.query()
-								.asProjection( f -> f.field( fieldPath, ValueWrapper.class ) )
+								.select( f -> f.field( fieldPath, ValueWrapper.class ) )
 								.where( f -> f.matchAll() )
 								.toQuery()
 				).hasHitsAnyOrder(
@@ -522,7 +522,7 @@ public class FieldSearchProjectionIT {
 
 				assertThat(
 						scope.query()
-								.asProjection( f -> f.field( fieldPath, model.type, ValueConvert.NO ) )
+								.select( f -> f.field( fieldPath, model.type, ValueConvert.NO ) )
 								.where( f -> f.matchAll() )
 								.toQuery()
 				).hasHitsAnyOrder(

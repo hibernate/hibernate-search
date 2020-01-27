@@ -21,7 +21,7 @@ import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexNameNor
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryOptionsStep;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryWhereStep;
-import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryHitTypeStep;
+import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQuerySelectStep;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
 import org.hibernate.search.engine.backend.Backend;
@@ -121,9 +121,9 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		// Put intermediary contexts into variables to check they have the right type
-		ElasticsearchSearchQueryHitTypeStep<DocumentReference, DocumentReference, StubLoadingOptionsStep> context1 =
+		ElasticsearchSearchQuerySelectStep<DocumentReference, DocumentReference, StubLoadingOptionsStep> context1 =
 				scope.query().extension( ElasticsearchExtension.get() );
-		ElasticsearchSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> context2 = context1.asProjection(
+		ElasticsearchSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> context2 = context1.select(
 				f -> f.composite(
 						// We don't care about the source, it's just to test that the factory context allows ES-specific projection
 						(docRef, source) -> docRef,
@@ -146,15 +146,15 @@ public class ElasticsearchExtensionIT {
 				.hasTotalHitCount( 6 );
 
 		// Also check (at compile time) the context type for other asXXX() methods, since we need to override each method explicitly
-		ElasticsearchSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> asReferenceContext =
-				scope.query().extension( ElasticsearchExtension.get() ).asEntityReference();
-		ElasticsearchSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> asEntityContext =
-				scope.query().extension( ElasticsearchExtension.get() ).asEntity();
+		ElasticsearchSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> selectEntityReferenceContext =
+				scope.query().extension( ElasticsearchExtension.get() ).selectEntityReference();
+		ElasticsearchSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> selectEntityContext =
+				scope.query().extension( ElasticsearchExtension.get() ).selectEntity();
 		SearchProjection<DocumentReference> projection = scope.projection().documentReference().toProjection();
-		ElasticsearchSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> asProjectionContext =
-				scope.query().extension( ElasticsearchExtension.get() ).asProjection( projection );
-		ElasticsearchSearchQueryWhereStep<List<?>, StubLoadingOptionsStep> asProjectionsContext =
-				scope.query().extension( ElasticsearchExtension.get() ).asProjections( projection, projection );
+		ElasticsearchSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> selectProjectionContext =
+				scope.query().extension( ElasticsearchExtension.get() ).select( projection );
+		ElasticsearchSearchQueryWhereStep<List<?>, StubLoadingOptionsStep> selectProjectionsContext =
+				scope.query().extension( ElasticsearchExtension.get() ).select( projection, projection );
 		ElasticsearchSearchQueryOptionsStep<DocumentReference, StubLoadingOptionsStep> defaultResultContext =
 				scope.query().extension( ElasticsearchExtension.get() )
 						.where( f -> f.fromJson( "{'match_all': {}}" ) );
@@ -223,7 +223,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		ElasticsearchSearchQuery<String> query = scope.query().extension( ElasticsearchExtension.get() )
-				.asProjection( f -> f.field( "string", String.class ) )
+				.select( f -> f.field( "string", String.class ) )
 				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
@@ -755,7 +755,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<JsonElement> query = scope.query()
-				.asProjection( f -> f.field( "nativeField_integer", JsonElement.class ) )
+				.select( f -> f.field( "nativeField_integer", JsonElement.class ) )
 				.where( f -> f.id().matching( SECOND_ID ) )
 				.toQuery();
 
@@ -767,7 +767,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<ValueWrapper> query = scope.query()
-				.asProjection( f -> f.field( "nativeField_integer_converted", ValueWrapper.class ) )
+				.select( f -> f.field( "nativeField_integer_converted", ValueWrapper.class ) )
 				.where( f -> f.id().matching( SECOND_ID ) )
 				.toQuery();
 
@@ -779,7 +779,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<JsonElement> query = scope.query()
-				.asProjection( f -> f.field( "nativeField_integer_converted", JsonElement.class, ValueConvert.NO ) )
+				.select( f -> f.field( "nativeField_integer_converted", JsonElement.class, ValueConvert.NO ) )
 				.where( f -> f.id().matching( SECOND_ID ) )
 				.toQuery();
 
@@ -791,7 +791,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<JsonObject> query = scope.query()
-				.asProjection(
+				.select(
 						f -> f.extension( ElasticsearchExtension.get() ).source()
 				)
 				.where( f -> f.id().matching( FIFTH_ID ) )
@@ -823,7 +823,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.extension( ElasticsearchExtension.get() ).source(),
 								f.field( "nativeField_string" )
@@ -856,7 +856,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<JsonObject> query = scope.query()
-				.asProjection( f -> f.extension( ElasticsearchExtension.get() ).explanation() )
+				.select( f -> f.extension( ElasticsearchExtension.get() ).explanation() )
 				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
@@ -873,7 +873,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<JsonObject> query = scope.query()
-				.asProjection( f -> f.extension( ElasticsearchExtension.get() ).jsonHit() )
+				.select( f -> f.extension( ElasticsearchExtension.get() ).jsonHit() )
 				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 

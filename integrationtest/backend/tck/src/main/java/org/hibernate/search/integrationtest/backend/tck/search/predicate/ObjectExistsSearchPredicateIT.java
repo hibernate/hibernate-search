@@ -128,7 +128,7 @@ public class ObjectExistsSearchPredicateIT {
 	public void nested() {
 		StubMappingScope scope = indexManager.createScope();
 
-		List<DocumentReference> docs = scope.query().asEntityReference()
+		List<DocumentReference> docs = scope.query().selectEntityReference()
 				.where( p -> p.nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) ) )
 				.fetchAllHits();
 
@@ -141,7 +141,7 @@ public class ObjectExistsSearchPredicateIT {
 	public void nested_noChild() {
 		StubMappingScope scope = indexManager.createScope();
 
-		List<DocumentReference> docs = scope.query().asEntityReference()
+		List<DocumentReference> docs = scope.query().selectEntityReference()
 				.where( p -> p.nested().objectField( "nestedNoChild" ).nest( f -> f.exists().field( "nestedNoChild" ) ) )
 				.fetchAllHits();
 
@@ -152,7 +152,7 @@ public class ObjectExistsSearchPredicateIT {
 	public void nested_multiIndexes_compatibleIndexMapping() {
 		StubMappingScope scope = indexManager.createScope( compatibleIndexManager );
 
-		List<DocumentReference> docs = scope.query().asEntityReference()
+		List<DocumentReference> docs = scope.query().selectEntityReference()
 				.where( p -> p.nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) ) )
 				.fetchAllHits();
 
@@ -182,7 +182,7 @@ public class ObjectExistsSearchPredicateIT {
 	public void nested_multiIndexes_emptyIndexMapping() {
 		StubMappingScope scope = indexManager.createScope( emptyIndexManager );
 
-		List<DocumentReference> docs = scope.query().asEntityReference()
+		List<DocumentReference> docs = scope.query().selectEntityReference()
 				.where( p -> p.nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) ) )
 				.fetchAllHits();
 
@@ -246,7 +246,7 @@ public class ObjectExistsSearchPredicateIT {
 	public void flattened() {
 		StubMappingScope scope = indexManager.createScope();
 
-		List<DocumentReference> docs = scope.query().asEntityReference()
+		List<DocumentReference> docs = scope.query().selectEntityReference()
 				.where( p -> p.exists().field( "flattened" ) )
 				.fetchAllHits();
 
@@ -259,7 +259,7 @@ public class ObjectExistsSearchPredicateIT {
 	public void flattened_noChild() {
 		StubMappingScope scope = indexManager.createScope();
 
-		List<DocumentReference> docs = scope.query().asEntityReference()
+		List<DocumentReference> docs = scope.query().selectEntityReference()
 				.where( p -> p.exists().field( "flattenedNoChild" ) )
 				.fetchAllHits();
 
@@ -270,7 +270,7 @@ public class ObjectExistsSearchPredicateIT {
 	public void flattened_multiIndexes_compatibleIndexMapping() {
 		StubMappingScope scope = compatibleIndexManager.createScope( indexManager );
 
-		List<DocumentReference> docs = scope.query().asEntityReference()
+		List<DocumentReference> docs = scope.query().selectEntityReference()
 				.where( p -> p.exists().field( "flattened" ) )
 				.fetchAllHits();
 
@@ -300,7 +300,7 @@ public class ObjectExistsSearchPredicateIT {
 	public void flattened_multiIndexes_emptyIndexMapping() {
 		StubMappingScope scope = indexManager.createScope( emptyIndexManager );
 
-		List<DocumentReference> docs = scope.query().asEntityReference()
+		List<DocumentReference> docs = scope.query().selectEntityReference()
 				.where( p -> p.exists().field( "flattened" ) )
 				.fetchAllHits();
 
@@ -406,7 +406,7 @@ public class ObjectExistsSearchPredicateIT {
 	}
 
 	private void checkDocumentsCreation() {
-		List<DocumentReference> docs = indexManager.createScope().query().asEntityReference()
+		List<DocumentReference> docs = indexManager.createScope().query().selectEntityReference()
 				.where( p -> p.matchAll() )
 				.fetchAllHits();
 

@@ -263,12 +263,12 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void asEntity() {
+	public void selectEntity() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Book> query = searchSession.search( Book.class )
-					.asEntity()
+					.selectEntity()
 					.where( f -> f.matchAll() )
 					.toQuery();
 
@@ -292,14 +292,14 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void asProjection_searchProjectionObject_single() {
+	public void select_searchProjection_single() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
 
 			SearchQuery<String> query = searchSession.search( scope )
-					.asProjection(
+					.select(
 							scope.projection().field( "title", String.class ).toProjection()
 					)
 					.where( f -> f.matchAll() )
@@ -325,14 +325,14 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void asProjection_searchProjectionObject_multiple() {
+	public void select_searchProjection_multiple() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchScope<Book> scope = searchSession.scope( Book.class );
 
 			SearchQuery<List<?>> query = searchSession.search( scope )
-					.asProjections(
+					.select(
 							scope.projection().field( "title", String.class ).toProjection(),
 							scope.projection().entityReference().toProjection(),
 							scope.projection().documentReference().toProjection(),
@@ -391,12 +391,12 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void asProjection_lambda() {
+	public void select_lambda() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Book_Author_Score> query = searchSession.search( Book.class )
-					.asProjection( f ->
+					.select( f ->
 							f.composite(
 									Book_Author_Score::new,
 									f.composite(
@@ -439,12 +439,12 @@ public class SearchQueryBaseIT {
 	}
 
 	@Test
-	public void asProjection_compositeAndLoading() {
+	public void select_compositeAndLoading() {
 		OrmUtils.withinSession( sessionFactory, session -> {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<Book_Author_Score> query = searchSession.search( Book.class )
-					.asProjection( f ->
+					.select( f ->
 							f.composite(
 									Book_Author_Score::new,
 									f.composite(
@@ -521,7 +521,7 @@ public class SearchQueryBaseIT {
 			SearchSession searchSession = Search.session( session );
 
 			SearchQuery<EntityReference> query = searchSession.search( scope )
-					.asProjection( projection )
+					.select( projection )
 					.where( predicate )
 					.sort( sort )
 					.aggregation( aggregationKey, aggregation )

@@ -137,10 +137,11 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 	}
 
 	@Test
-	public void references_noReferenceTransformer() {
+	public void selectEntityReference_noReferenceTransformer() {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
+				.selectEntityReference()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
@@ -148,11 +149,11 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 	}
 
 	@Test
-	public void entities_noEntityLoading() {
+	public void selectEntity_noEntityLoading() {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.asEntity()
+				.selectEntity()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
@@ -160,7 +161,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 	}
 
 	@Test
-	public void references_referenceTransformer() {
+	public void selectEntityReference_referenceTransformer() {
 		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
 		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
 		StubTransformedReference mainTransformedReference = new StubTransformedReference( mainReference );
@@ -179,7 +180,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				indexManager.createGenericScope();
 		SearchQuery<StubTransformedReference> referencesQuery = scope.query( loadingContextMock )
-				.asEntityReference()
+				.selectEntityReference()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		verifyAll();
@@ -202,7 +203,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 	}
 
 	@Test
-	public void entities_referencesTransformer_entityLoading() {
+	public void selectEntity_referencesTransformer_entityLoading() {
 		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
 		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
 		StubTransformedReference mainTransformedReference = new StubTransformedReference( mainReference );
@@ -223,7 +224,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				indexManager.createGenericScope();
 		SearchQuery<StubLoadedObject> objectsQuery = scope.query( loadingContextMock )
-				.asEntity()
+				.selectEntity()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		verifyAll();
@@ -246,7 +247,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 	}
 
 	@Test
-	public void projection_referencesTransformer_entityLoading() {
+	public void select_referencesTransformer_entityLoading() {
 		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
 		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
 		StubTransformedReference mainTransformedReference = new StubTransformedReference( mainReference );
@@ -267,7 +268,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				indexManager.createGenericScope();
 		SearchQuery<List<?>> projectionsQuery = scope.query( loadingContextMock )
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.field( "string", String.class ),
 								f.documentReference(),
@@ -306,7 +307,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 	}
 
 	@Test
-	public void projections_hitTransformer() {
+	public void select_hitTransformer() {
 		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
 		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
 		StubTransformedHit mainTransformedHit = new StubTransformedHit( mainReference );
@@ -319,7 +320,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		replayAll();
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<StubTransformedHit> query = scope.query()
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								hitTransformerMock,
 								f.field( "string", String.class ).toProjection(),
@@ -353,7 +354,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 	}
 
 	@Test
-	public void projections_hitTransformer_referencesTransformer_entityLoading() {
+	public void select_hitTransformer_referencesTransformer_entityLoading() {
 		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
 		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
 		StubTransformedHit mainTransformedHit = new StubTransformedHit( mainReference );
@@ -377,7 +378,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		GenericStubMappingScope<StubTransformedReference, StubLoadedObject> scope =
 				indexManager.createGenericScope();
 		SearchQuery<StubTransformedHit> query = scope.query( loadingContextMock )
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								hitTransformerMock,
 								f.field( "string", String.class ).toProjection(),
@@ -456,14 +457,14 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<String> query = scope.query()
-				.asProjection( f -> f.field( "string", String.class ) )
+				.select( f -> f.field( "string", String.class ) )
 				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertEquals( 2L, query.fetchTotalHitCount() );
 
 		query = scope.query()
-				.asProjection( f -> f.field( "string", String.class ) )
+				.select( f -> f.field( "string", String.class ) )
 				.where( f -> f.match().field( "string" ).matching( STRING_VALUE ) )
 				.toQuery();
 
@@ -480,7 +481,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		replayAll();
 		GenericStubMappingScope<DocumentReference, DocumentReference> scope = indexManager.createGenericScope();
 		SearchQuery<DocumentReference> query = scope.query( loadingContextMock )
-				.asEntity()
+				.selectEntity()
 				.where( f -> f.matchAll() )
 				.toQuery();
 		verifyAll();
