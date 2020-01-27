@@ -178,7 +178,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 			);
 			writeOrchestrator = createWriteOrchestrator( indexAccessor );
 
-			return new Shard( workFactory, indexAccessor, writeOrchestrator );
+			return new Shard( indexAccessor, writeOrchestrator );
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
