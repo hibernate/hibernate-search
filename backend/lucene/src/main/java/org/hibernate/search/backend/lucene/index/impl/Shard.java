@@ -15,7 +15,6 @@ import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 import org.hibernate.search.backend.lucene.lowlevel.reader.spi.DirectoryReaderHolder;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
-import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -24,13 +23,10 @@ public final class Shard {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneWorkFactory workFactory;
 	private final IndexAccessor indexAccessor;
 	private final LuceneWriteWorkOrchestratorImplementor writeOrchestrator;
 
-	Shard(LuceneWorkFactory workFactory, IndexAccessor indexAccessor,
-			LuceneWriteWorkOrchestratorImplementor writeOrchestrator) {
-		this.workFactory = workFactory;
+	Shard(IndexAccessor indexAccessor, LuceneWriteWorkOrchestratorImplementor writeOrchestrator) {
 		this.indexAccessor = indexAccessor;
 		this.writeOrchestrator = writeOrchestrator;
 	}

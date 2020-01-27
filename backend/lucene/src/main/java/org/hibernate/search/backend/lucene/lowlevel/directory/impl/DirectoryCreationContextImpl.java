@@ -6,12 +6,9 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.directory.impl;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Optional;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreationContext;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 /**
@@ -23,8 +20,6 @@ import org.hibernate.search.util.common.reporting.EventContext;
  * @author Gunnar Morling
  */
 public class DirectoryCreationContextImpl implements DirectoryCreationContext {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final EventContext eventContext;
 	private final String indexName;
