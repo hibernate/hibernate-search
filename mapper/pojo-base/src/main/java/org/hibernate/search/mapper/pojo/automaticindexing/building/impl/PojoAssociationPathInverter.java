@@ -26,6 +26,7 @@ import org.hibernate.search.mapper.pojo.model.additionalmetadata.impl.PojoValueA
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
@@ -166,7 +167,7 @@ public final class PojoAssociationPathInverter {
 			PojoTypeModel<?> inverseSideTypeModel,
 			PojoRawTypeModel<?> originalSideEntityType,
 			List<PojoModelPathValueNode> associationPathsToMatch) {
-		BoundPojoModelPathTypeNode<?> inverseSidePathTypeNode = BoundPojoModelPathTypeNode.root( inverseSideTypeModel );
+		BoundPojoModelPathTypeNode<?> inverseSidePathTypeNode = BoundPojoModelPath.root( inverseSideTypeModel );
 		Set<PojoRawTypeModel<?>> encounteredAssociationHoldingTypes = new HashSet<>();
 		return findInverseSidePathFromInverseSideRecursive(
 				inverseSidePathTypeNode, originalSideEntityType, associationPathsToMatch,
