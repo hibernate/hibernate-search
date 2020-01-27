@@ -98,7 +98,7 @@ public class ProjectionDslIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<String> result = searchSession.search( Book.class ) // <1>
-					.asProjection( f -> f.field( "title", String.class ) ) // <2>
+					.select( f -> f.field( "title", String.class ) ) // <2>
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 ); // <3>
 			// end::entryPoint-lambdas[]
@@ -117,7 +117,7 @@ public class ProjectionDslIT {
 			SearchScope<Book> scope = searchSession.scope( Book.class );
 
 			List<String> result = searchSession.search( scope )
-					.asProjection( scope.projection().field( "title", String.class )
+					.select( scope.projection().field( "title", String.class )
 							.toProjection() )
 					.where( scope.predicate().matchAll().toPredicate() )
 					.fetchHits( 20 );
@@ -136,7 +136,7 @@ public class ProjectionDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::documentReference[]
 			List<DocumentReference> hits = searchSession.search( Book.class )
-					.asProjection( f -> f.documentReference() )
+					.select( f -> f.documentReference() )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::documentReference[]
@@ -155,7 +155,7 @@ public class ProjectionDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::reference[]
 			List<EntityReference> hits = searchSession.search( Book.class )
-					.asProjection( f -> f.entityReference() )
+					.select( f -> f.entityReference() )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::reference[]
@@ -173,7 +173,7 @@ public class ProjectionDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::entity[]
 			List<Book> hits = searchSession.search( Book.class )
-					.asProjection( f -> f.entity() )
+					.select( f -> f.entity() )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::entity[]
@@ -192,7 +192,7 @@ public class ProjectionDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::field[]
 			List<Genre> hits = searchSession.search( Book.class )
-					.asProjection( f -> f.field( "genre", Genre.class ) )
+					.select( f -> f.field( "genre", Genre.class ) )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::field[]
@@ -208,7 +208,7 @@ public class ProjectionDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::field-noType[]
 			List<Object> hits = searchSession.search( Book.class )
-					.asProjection( f -> f.field( "genre" ) )
+					.select( f -> f.field( "genre" ) )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::field-noType[]
@@ -224,7 +224,7 @@ public class ProjectionDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::field-noProjectionConverter[]
 			List<String> hits = searchSession.search( Book.class )
-					.asProjection( f -> f.field(
+					.select( f -> f.field(
 							"genre", String.class, ValueConvert.NO
 					) )
 					.where( f -> f.matchAll() )
@@ -245,7 +245,7 @@ public class ProjectionDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::score[]
 			List<Float> hits = searchSession.search( Book.class )
-					.asProjection( f -> f.score() )
+					.select( f -> f.score() )
 					.where( f -> f.match().field( "title" )
 							.matching( "robot dawn" ) )
 					.fetchHits( 20 );
@@ -264,7 +264,7 @@ public class ProjectionDslIT {
 			// tag::distance[]
 			GeoPoint center = GeoPoint.of( 47.506060, 2.473916 );
 			SearchResult<Double> result = searchSession.search( Author.class )
-					.asProjection( f -> f.distance( "placeOfBirth", center ) )
+					.select( f -> f.distance( "placeOfBirth", center ) )
 					.where( f -> f.matchAll() )
 					.fetch( 20 ); // <3>
 			// end::distance[]
@@ -279,7 +279,7 @@ public class ProjectionDslIT {
 			// tag::distance-unit[]
 			GeoPoint center = GeoPoint.of( 47.506060, 2.473916 );
 			SearchResult<Double> result = searchSession.search( Author.class )
-					.asProjection( f -> f.distance( "placeOfBirth", center )
+					.select( f -> f.distance( "placeOfBirth", center )
 							.unit( DistanceUnit.KILOMETERS ) )
 					.where( f -> f.matchAll() )
 					.fetch( 20 ); // <3>
@@ -297,7 +297,7 @@ public class ProjectionDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::composite-customObject[]
 			List<MyPair<String, Genre>> hits = searchSession.search( Book.class )
-					.asProjection( f -> f.composite( // <1>
+					.select( f -> f.composite( // <1>
 							MyPair::new, // <2>
 							f.field( "title", String.class ), // <3>
 							f.field( "genre", Genre.class ) // <4>
@@ -329,7 +329,7 @@ public class ProjectionDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::composite-list[]
 			List<List<?>> hits = searchSession.search( Book.class )
-					.asProjection( f -> f.composite( // <1>
+					.select( f -> f.composite( // <1>
 							f.field( "title", String.class ), // <2>
 							f.field( "genre", Genre.class ) // <3>
 					) )
@@ -366,7 +366,7 @@ public class ProjectionDslIT {
 			// tag::lucene-document[]
 			List<Document> hits = searchSession.search( Book.class )
 					.extension( LuceneExtension.get() )
-					.asProjection( f -> f.document() )
+					.select( f -> f.document() )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::lucene-document[]
@@ -377,7 +377,7 @@ public class ProjectionDslIT {
 			// tag::lucene-explanation[]
 			List<Explanation> hits = searchSession.search( Book.class )
 					.extension( LuceneExtension.get() )
-					.asProjection( f -> f.explanation() )
+					.select( f -> f.explanation() )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::lucene-explanation[]
@@ -393,7 +393,7 @@ public class ProjectionDslIT {
 			// tag::elasticsearch-source[]
 			List<JsonObject> hits = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() )
-					.asProjection( f -> f.source() )
+					.select( f -> f.source() )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::elasticsearch-source[]
@@ -404,7 +404,7 @@ public class ProjectionDslIT {
 			// tag::elasticsearch-explanation[]
 			List<JsonObject> hits = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() )
-					.asProjection( f -> f.explanation() )
+					.select( f -> f.explanation() )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::elasticsearch-explanation[]
@@ -420,7 +420,7 @@ public class ProjectionDslIT {
 			// tag::elasticsearch-jsonHit[]
 			List<JsonObject> hits = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() )
-					.asProjection( f -> f.jsonHit() )
+					.select( f -> f.jsonHit() )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::elasticsearch-jsonHit[]

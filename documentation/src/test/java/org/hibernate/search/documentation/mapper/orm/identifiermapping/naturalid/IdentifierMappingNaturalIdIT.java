@@ -67,7 +67,7 @@ public class IdentifierMappingNaturalIdIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<DocumentReference> result = searchSession.search( Book.class )
-					.asProjection( f -> f.documentReference() )
+					.select( f -> f.documentReference() )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 

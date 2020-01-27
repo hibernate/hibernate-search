@@ -66,7 +66,7 @@ public class ValueBridgeProjectionIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<ISBN> result = searchSession.search( Book.class )
-					.asProjection( f -> f.field( "isbn", ISBN.class ) )
+					.select( f -> f.field( "isbn", ISBN.class ) )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 
