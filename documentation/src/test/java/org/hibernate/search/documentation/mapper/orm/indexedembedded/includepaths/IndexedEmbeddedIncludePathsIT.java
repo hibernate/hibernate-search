@@ -95,7 +95,7 @@ public class IndexedEmbeddedIncludePathsIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Human> result = searchSession.search( Human.class )
-					.predicate( f -> f.bool()
+					.where( f -> f.bool()
 							.must( f.match().field( "name" ).matching( "fourth" ) )
 							.must( f.match().field( "nickname" ).matching( "babe" ) )
 							.must( f.match().field( "parents.name" ).matching( "third" ) )

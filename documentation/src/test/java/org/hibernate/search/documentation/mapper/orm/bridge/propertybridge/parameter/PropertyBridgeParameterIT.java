@@ -73,7 +73,7 @@ public class PropertyBridgeParameterIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Invoice> result = searchSession.search( Invoice.class )
-					.predicate( f -> f.bool()
+					.where( f -> f.bool()
 							.must( f.range().field( "itemSummary.total" )
 									.atLeast( new BigDecimal( "20.0" ) ) )
 							.must( f.range().field( "itemSummary.shipping" )

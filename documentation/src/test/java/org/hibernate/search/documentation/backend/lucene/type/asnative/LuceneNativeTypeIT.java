@@ -70,7 +70,7 @@ public class LuceneNativeTypeIT {
 							f.entity(),
 							f.field( "pageRank", Float.class )
 					) )
-					.predicate( f -> f.fromLuceneQuery(
+					.where( f -> f.fromLuceneQuery(
 							// This affects the document score based on the pageRank
 							FeatureField.newSaturationQuery( "pageRank", "pageRank" )
 					) )

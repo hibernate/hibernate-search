@@ -66,7 +66,7 @@ public class TypeBridgeSimpleIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Author> result = searchSession.search( Author.class )
-					.predicate( f -> f.match().field( "fullName" ).matching( "isaac asimov" ) )
+					.where( f -> f.match().field( "fullName" ).matching( "isaac asimov" ) )
 					.fetchHits( 20 );
 
 			assertThat( result ).hasSize( 1 );

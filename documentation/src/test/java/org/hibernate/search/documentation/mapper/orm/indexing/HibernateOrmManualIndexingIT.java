@@ -282,7 +282,7 @@ public class HibernateOrmManualIndexingIT {
 		searchSession.workspace().flush();
 		assertThat(
 				searchSession.search( Book.class )
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.fetchTotalHitCount()
 		)
 				.isEqualTo( expectedCount );
@@ -294,7 +294,7 @@ public class HibernateOrmManualIndexingIT {
 		searchSession.workspace().flush();
 		assertThat(
 				searchSession.search( Author.class )
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.fetchTotalHitCount()
 		)
 				.isEqualTo( expectedCount );

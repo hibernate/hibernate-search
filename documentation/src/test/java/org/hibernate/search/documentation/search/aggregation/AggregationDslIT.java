@@ -90,7 +90,7 @@ public class AggregationDslIT {
 			AggregationKey<Map<Genre, Long>> countsByGenreKey = AggregationKey.of( "countsByGenre" ); // <1>
 
 			SearchResult<Book> result = searchSession.search( Book.class ) // <2>
-					.predicate( f -> f.match().field( "title" ) // <3>
+					.where( f -> f.match().field( "title" ) // <3>
 							.matching( "robot" ) )
 					.aggregation( countsByGenreKey, f -> f.terms() // <4>
 							.field( "genre", Genre.class ) )
@@ -113,7 +113,7 @@ public class AggregationDslIT {
 			AggregationKey<Map<Genre, Long>> countsByGenreKey = AggregationKey.of( "countsByGenre" );
 
 			SearchResult<Book> result = searchSession.search( scope )
-					.predicate( scope.predicate().match().field( "title" )
+					.where( scope.predicate().match().field( "title" )
 							.matching( "robot" )
 							.toPredicate() )
 					.aggregation( countsByGenreKey, scope.aggregation().terms()
@@ -136,7 +136,7 @@ public class AggregationDslIT {
 			// tag::terms[]
 			AggregationKey<Map<Genre, Long>> countsByGenreKey = AggregationKey.of( "countsByGenre" );
 			SearchResult<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.aggregation( countsByGenreKey, f -> f.terms()
 							.field( "genre", Genre.class ) ) // <1>
 					.fetch( 20 );
@@ -153,7 +153,7 @@ public class AggregationDslIT {
 			// tag::terms-noConverter[]
 			AggregationKey<Map<String, Long>> countsByGenreKey = AggregationKey.of( "countsByGenre" );
 			SearchResult<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.aggregation( countsByGenreKey, f -> f.terms()
 							.field( "genre", String.class, ValueConvert.NO ) )
 					.fetch( 20 );
@@ -170,7 +170,7 @@ public class AggregationDslIT {
 			// tag::terms-max-term-count[]
 			AggregationKey<Map<Genre, Long>> countsByGenreKey = AggregationKey.of( "countsByGenre" );
 			SearchResult<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.aggregation( countsByGenreKey, f -> f.terms()
 							.field( "genre", Genre.class )
 							.maxTermCount( 1 ) )
@@ -187,7 +187,7 @@ public class AggregationDslIT {
 			// tag::terms-min-doc-count-zero[]
 			AggregationKey<Map<Genre, Long>> countsByGenreKey = AggregationKey.of( "countsByGenre" );
 			SearchResult<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.aggregation( countsByGenreKey, f -> f.terms()
 							.field( "genre", Genre.class )
 							.minDocumentCount( 0 ) )
@@ -205,7 +205,7 @@ public class AggregationDslIT {
 			// tag::terms-min-doc-count-high[]
 			AggregationKey<Map<Genre, Long>> countsByGenreKey = AggregationKey.of( "countsByGenre" );
 			SearchResult<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.aggregation( countsByGenreKey, f -> f.terms()
 							.field( "genre", Genre.class )
 							.minDocumentCount( 2 ) )
@@ -222,7 +222,7 @@ public class AggregationDslIT {
 			// tag::terms-order-term-ascending[]
 			AggregationKey<Map<Genre, Long>> countsByGenreKey = AggregationKey.of( "countsByGenre" );
 			SearchResult<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.aggregation( countsByGenreKey, f -> f.terms()
 							.field( "genre", Genre.class )
 							.orderByTermAscending() )
@@ -240,7 +240,7 @@ public class AggregationDslIT {
 			// tag::terms-order-term-descending[]
 			AggregationKey<Map<Genre, Long>> countsByGenreKey = AggregationKey.of( "countsByGenre" );
 			SearchResult<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.aggregation( countsByGenreKey, f -> f.terms()
 							.field( "genre", Genre.class )
 							.orderByTermDescending() )
@@ -258,7 +258,7 @@ public class AggregationDslIT {
 			// tag::terms-order-count-ascending[]
 			AggregationKey<Map<Genre, Long>> countsByGenreKey = AggregationKey.of( "countsByGenre" );
 			SearchResult<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.aggregation( countsByGenreKey, f -> f.terms()
 							.field( "genre", Genre.class )
 							.orderByCountAscending() )
@@ -279,7 +279,7 @@ public class AggregationDslIT {
 			// tag::range[]
 			AggregationKey<Map<Range<Double>, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
 			SearchResult<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.aggregation( countsByPriceKey, f -> f.range()
 							.field( "price", Double.class ) // <1>
 							.range( 0.0, 10.0 ) // <2>
@@ -301,7 +301,7 @@ public class AggregationDslIT {
 			// tag::range-objects[]
 			AggregationKey<Map<Range<Double>, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
 			SearchResult<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.aggregation( countsByPriceKey, f -> f.range()
 							.field( "price", Double.class )
 							.range( Range.canonical( 0.0, 10.0 ) ) // <1>
@@ -324,7 +324,7 @@ public class AggregationDslIT {
 			// tag::range-noConverter[]
 			AggregationKey<Map<Range<Instant>, Long>> countsByPriceKey = AggregationKey.of( "countsByPrice" );
 			SearchResult<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.aggregation( countsByPriceKey, f -> f.range()
 							// Assuming "releaseDate" is of type "java.util.Date" or "java.sql.Date"
 							.field( "releaseDate", Instant.class, ValueConvert.NO )
@@ -395,7 +395,7 @@ public class AggregationDslIT {
 			AggregationKey<JsonObject> countsByPriceHistogramKey = AggregationKey.of( "countsByPriceHistogram" );
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.aggregation( countsByPriceHistogramKey, f -> f.fromJson( jsonObject ) )
 					.fetch( 20 );
 			JsonObject countsByPriceHistogram = result.getAggregation( countsByPriceHistogramKey ); // <1>
@@ -426,7 +426,7 @@ public class AggregationDslIT {
 			AggregationKey<JsonObject> countsByPriceHistogramKey = AggregationKey.of( "countsByPriceHistogram" );
 			SearchResult<Book> result = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.aggregation( countsByPriceHistogramKey, f -> f.fromJson( "{"
 									+ "\"histogram\": {"
 											+ "\"field\": \"price\","

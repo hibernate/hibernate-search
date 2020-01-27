@@ -72,7 +72,7 @@ public class HibernateOrmSimpleMappingIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class ) // <1>
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.sort( f -> f.field( "pageCount" ).desc() // <2>
 							.then().field( "title_sort" )
 					)
@@ -91,7 +91,7 @@ public class HibernateOrmSimpleMappingIT {
 
 			List<String> result = searchSession.search( Book.class ) // <1>
 					.asProjection( f -> f.field( "title", String.class ) ) // <2>
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 20 ); // <3>
 
 			assertThat( result )

@@ -76,7 +76,7 @@ public class ValueBridgeParameterIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.match().field( "published" )
+					.where( f -> f.match().field( "published" )
 							.matching( false ) )
 					.fetchHits( 20 );
 
@@ -87,7 +87,7 @@ public class ValueBridgeParameterIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.match().field( "censorshipAssessments_allYears" )
+					.where( f -> f.match().field( "censorshipAssessments_allYears" )
 							.matching( true ) )
 					.fetchHits( 20 );
 

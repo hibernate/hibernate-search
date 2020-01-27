@@ -67,7 +67,7 @@ public class IdentifierBridgeSimpleIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.id().matching( new BookId( 1L, 42L ) ) )
+					.where( f -> f.id().matching( new BookId( 1L, 42L ) ) )
 					.fetchHits( 20 );
 
 			assertThat( result ).hasSize( 1 );

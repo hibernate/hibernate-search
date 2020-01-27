@@ -133,7 +133,7 @@ public class HibernateOrmMassIndexerIT {
 		SearchSession searchSession = Search.session( entityManager );
 		assertThat(
 				searchSession.search( Book.class )
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.fetchTotalHitCount()
 		)
 				.isEqualTo( expectedCount );
@@ -143,7 +143,7 @@ public class HibernateOrmMassIndexerIT {
 		SearchSession searchSession = Search.session( entityManager );
 		assertThat(
 				searchSession.search( Author.class )
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.fetchTotalHitCount()
 		)
 				.isEqualTo( expectedCount );

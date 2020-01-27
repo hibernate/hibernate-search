@@ -72,7 +72,7 @@ public class DocumentModelDslSimpleIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Object> result = searchSession.search( Arrays.asList( Book.class, Author.class ) )
-					.predicate( f -> f.bool()
+					.where( f -> f.bool()
 							.should( f.bool()
 									.must( f.match().field( "fullName" )
 											.matching( "isaac asimov" ) )

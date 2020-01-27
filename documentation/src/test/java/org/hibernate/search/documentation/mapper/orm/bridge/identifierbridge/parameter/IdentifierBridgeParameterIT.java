@@ -67,7 +67,7 @@ public class IdentifierBridgeParameterIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.id().matching( "1", ValueConvert.NO ) )
+					.where( f -> f.id().matching( "1", ValueConvert.NO ) )
 					.fetchHits( 20 );
 
 			assertThat( result ).hasSize( 1 );

@@ -72,7 +72,7 @@ public class IdentifierBridgeOrmContextIT {
 
 			List<EntityReference> result = searchSession.search( MyEntity.class )
 					.asProjection( f -> f.entityReference() )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 
 			assertThat( result ).extracting( EntityReference::getId ).containsExactly( MyData.VALUE2 );

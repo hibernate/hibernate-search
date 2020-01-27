@@ -99,7 +99,7 @@ public class ProjectionDslIT {
 
 			List<String> result = searchSession.search( Book.class ) // <1>
 					.asProjection( f -> f.field( "title", String.class ) ) // <2>
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 20 ); // <3>
 			// end::entryPoint-lambdas[]
 			assertThat( result ).containsExactlyInAnyOrder(
@@ -119,7 +119,7 @@ public class ProjectionDslIT {
 			List<String> result = searchSession.search( scope )
 					.asProjection( scope.projection().field( "title", String.class )
 							.toProjection() )
-					.predicate( scope.predicate().matchAll().toPredicate() )
+					.where( scope.predicate().matchAll().toPredicate() )
 					.fetchHits( 20 );
 			// end::entryPoint-objects[]
 			assertThat( result ).containsExactlyInAnyOrder(
@@ -137,7 +137,7 @@ public class ProjectionDslIT {
 			// tag::documentReference[]
 			List<DocumentReference> hits = searchSession.search( Book.class )
 					.asProjection( f -> f.documentReference() )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::documentReference[]
 			SearchHitsAssert.assertThat( hits ).hasDocRefHitsAnyOrder(
@@ -156,7 +156,7 @@ public class ProjectionDslIT {
 			// tag::reference[]
 			List<EntityReference> hits = searchSession.search( Book.class )
 					.asProjection( f -> f.entityReference() )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::reference[]
 			assertThat( hits ).containsExactlyInAnyOrder(
@@ -174,7 +174,7 @@ public class ProjectionDslIT {
 			// tag::entity[]
 			List<Book> hits = searchSession.search( Book.class )
 					.asProjection( f -> f.entity() )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::entity[]
 			Session session = searchSession.toOrmSession();
@@ -193,7 +193,7 @@ public class ProjectionDslIT {
 			// tag::field[]
 			List<Genre> hits = searchSession.search( Book.class )
 					.asProjection( f -> f.field( "genre", Genre.class ) )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::field[]
 			Session session = searchSession.toOrmSession();
@@ -209,7 +209,7 @@ public class ProjectionDslIT {
 			// tag::field-noType[]
 			List<Object> hits = searchSession.search( Book.class )
 					.asProjection( f -> f.field( "genre" ) )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::field-noType[]
 			Session session = searchSession.toOrmSession();
@@ -227,7 +227,7 @@ public class ProjectionDslIT {
 					.asProjection( f -> f.field(
 							"genre", String.class, ValueConvert.NO
 					) )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::field-noProjectionConverter[]
 			Session session = searchSession.toOrmSession();
@@ -246,7 +246,7 @@ public class ProjectionDslIT {
 			// tag::score[]
 			List<Float> hits = searchSession.search( Book.class )
 					.asProjection( f -> f.score() )
-					.predicate( f -> f.match().field( "title" )
+					.where( f -> f.match().field( "title" )
 							.matching( "robot dawn" ) )
 					.fetchHits( 20 );
 			// end::score[]
@@ -265,7 +265,7 @@ public class ProjectionDslIT {
 			GeoPoint center = GeoPoint.of( 47.506060, 2.473916 );
 			SearchResult<Double> result = searchSession.search( Author.class )
 					.asProjection( f -> f.distance( "placeOfBirth", center ) )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetch( 20 ); // <3>
 			// end::distance[]
 			assertThat( result.getHits() )
@@ -281,7 +281,7 @@ public class ProjectionDslIT {
 			SearchResult<Double> result = searchSession.search( Author.class )
 					.asProjection( f -> f.distance( "placeOfBirth", center )
 							.unit( DistanceUnit.KILOMETERS ) )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetch( 20 ); // <3>
 			// end::distance-unit[]
 			assertThat( result.getHits() )
@@ -302,7 +302,7 @@ public class ProjectionDslIT {
 							f.field( "title", String.class ), // <3>
 							f.field( "genre", Genre.class ) // <4>
 					) )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 20 ); // <5>
 			// end::composite-customObject[]
 			Session session = searchSession.toOrmSession();
@@ -333,7 +333,7 @@ public class ProjectionDslIT {
 							f.field( "title", String.class ), // <2>
 							f.field( "genre", Genre.class ) // <3>
 					) )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 20 ); // <4>
 			// end::composite-list[]
 			Session session = searchSession.toOrmSession();
@@ -367,7 +367,7 @@ public class ProjectionDslIT {
 			List<Document> hits = searchSession.search( Book.class )
 					.extension( LuceneExtension.get() )
 					.asProjection( f -> f.document() )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::lucene-document[]
 			assertThat( hits ).hasSize( 4 );
@@ -378,7 +378,7 @@ public class ProjectionDslIT {
 			List<Explanation> hits = searchSession.search( Book.class )
 					.extension( LuceneExtension.get() )
 					.asProjection( f -> f.explanation() )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::lucene-explanation[]
 			assertThat( hits ).hasSize( 4 );
@@ -394,7 +394,7 @@ public class ProjectionDslIT {
 			List<JsonObject> hits = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() )
 					.asProjection( f -> f.source() )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::elasticsearch-source[]
 			assertThat( hits ).hasSize( 4 );
@@ -405,7 +405,7 @@ public class ProjectionDslIT {
 			List<JsonObject> hits = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() )
 					.asProjection( f -> f.explanation() )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::elasticsearch-explanation[]
 			assertThat( hits ).hasSize( 4 );
@@ -421,7 +421,7 @@ public class ProjectionDslIT {
 			List<JsonObject> hits = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() )
 					.asProjection( f -> f.jsonHit() )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::elasticsearch-jsonHit[]
 			assertThat( hits ).hasSize( 4 );

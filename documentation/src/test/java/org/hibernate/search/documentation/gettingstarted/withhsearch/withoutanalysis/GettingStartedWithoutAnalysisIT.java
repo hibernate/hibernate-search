@@ -105,7 +105,7 @@ public class GettingStartedWithoutAnalysisIT {
 			SearchScope<Book> scope = searchSession.scope( Book.class ); // <2>
 
 			SearchResult<Book> result = searchSession.search( scope ) // <3>
-					.predicate( scope.predicate().match() // <4>
+					.where( scope.predicate().match() // <4>
 							.fields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
 							.toPredicate()
@@ -119,7 +119,7 @@ public class GettingStartedWithoutAnalysisIT {
 					/* ... same DSL calls as above... */
 			// end::searching-objects[]
 					searchSession.search( scope )
-					.predicate( scope.predicate().match()
+					.where( scope.predicate().match()
 							.fields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
 							.toPredicate()
@@ -142,7 +142,7 @@ public class GettingStartedWithoutAnalysisIT {
 			SearchSession searchSession = Search.session( entityManager ); // <1>
 
 			SearchResult<Book> result = searchSession.search( Book.class ) // <2>
-					.predicate( f -> f.match() // <3>
+					.where( f -> f.match() // <3>
 							.fields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
 					)
@@ -155,7 +155,7 @@ public class GettingStartedWithoutAnalysisIT {
 					/* ... same DSL calls as above... */
 			// end::searching-lambdas[]
 					searchSession.search( Book.class )
-							.predicate( f -> f.match()
+							.where( f -> f.match()
 									.fields( "title", "authors.name" )
 									.matching( "Refactoring: Improving the Design of Existing Code" )
 							)
@@ -177,7 +177,7 @@ public class GettingStartedWithoutAnalysisIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			long totalHitCount = searchSession.search( Book.class )
-					.predicate( f -> f.match()
+					.where( f -> f.match()
 							.fields( "title", "authors.name" )
 							.matching( "Refactoring: Improving the Design of Existing Code" )
 					)

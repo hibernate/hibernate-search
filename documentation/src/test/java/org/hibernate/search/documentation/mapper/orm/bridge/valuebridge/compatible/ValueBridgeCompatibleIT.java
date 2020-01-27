@@ -71,7 +71,7 @@ public class ValueBridgeCompatibleIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Object> result = searchSession.search( Arrays.asList( Book1.class, Book2.class ) )
-					.predicate( f -> f.match().field( "isbn" )
+					.where( f -> f.match().field( "isbn" )
 							.matching( ISBN.parse( "978-0-58-600835-5" ) ) )
 					.fetchHits( 20 );
 
