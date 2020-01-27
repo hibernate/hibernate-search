@@ -7,9 +7,9 @@
 package org.hibernate.search.backend.elasticsearch.search.query.dsl;
 
 import org.hibernate.search.backend.elasticsearch.search.predicate.dsl.ElasticsearchSearchPredicateFactory;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryPredicateStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 
-public interface ElasticsearchSearchQueryPredicateStep<H, LOS>
-		extends SearchQueryPredicateStep<ElasticsearchSearchQueryOptionsStep<H, LOS>, H, ElasticsearchSearchPredicateFactory> {
+public interface ElasticsearchSearchQueryWhereStep<H, LOS>
+		extends SearchQueryWhereStep<ElasticsearchSearchQueryOptionsStep<H, LOS>, H, ElasticsearchSearchPredicateFactory> {
 
 }

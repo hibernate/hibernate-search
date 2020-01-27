@@ -10,7 +10,7 @@ import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.backend.lucene.search.aggregation.dsl.LuceneSearchAggregationFactory;
 import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryOptionsStep;
-import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryPredicateStep;
+import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryWhereStep;
 import org.hibernate.search.backend.lucene.search.sort.dsl.LuceneSearchSortFactory;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchQueryElementCollector;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
@@ -34,7 +34,7 @@ class LuceneSearchQueryOptionsStepImpl<H, LOS>
 						LuceneSearchAggregationFactory,
 						LuceneSearchQueryElementCollector
 				>
-		implements LuceneSearchQueryPredicateStep<H, LOS>, LuceneSearchQueryOptionsStep<H, LOS> {
+		implements LuceneSearchQueryWhereStep<H, LOS>, LuceneSearchQueryOptionsStep<H, LOS> {
 
 	private final LuceneSearchQueryBuilder<H> searchQueryBuilder;
 

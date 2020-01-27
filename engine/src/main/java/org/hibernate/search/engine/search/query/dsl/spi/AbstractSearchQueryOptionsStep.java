@@ -25,7 +25,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.impl.DefaultSearchPredicateFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryPredicateStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.engine.search.sort.dsl.impl.DefaultSearchSortFactory;
@@ -48,7 +48,7 @@ public abstract class AbstractSearchQueryOptionsStep<
 				AF extends SearchAggregationFactory,
 				C
 		>
-		implements SearchQueryPredicateStep<S, H, PDF>, SearchQueryOptionsStep<S, H, LOS, SF, AF> {
+		implements SearchQueryWhereStep<S, H, PDF>, SearchQueryOptionsStep<S, H, LOS, SF, AF> {
 
 	private final IndexScope<C> indexScope;
 	private final SearchQueryBuilder<H, C> searchQueryBuilder;
@@ -63,14 +63,14 @@ public abstract class AbstractSearchQueryOptionsStep<
 	}
 
 	@Override
-	public S predicate(SearchPredicate predicate) {
+	public S where(SearchPredicate predicate) {
 		SearchPredicateBuilderFactory<? super C, ?> factory = indexScope.getSearchPredicateBuilderFactory();
 		contribute( factory, predicate );
 		return thisAsS();
 	}
 
 	@Override
-	public S predicate(Function<? super PDF, ? extends PredicateFinalStep> predicateContributor) {
+	public S where(Function<? super PDF, ? extends PredicateFinalStep> predicateContributor) {
 		SearchPredicateBuilderFactory<? super C, ?> builderFactory = indexScope.getSearchPredicateBuilderFactory();
 		SearchPredicateFactory factory = new DefaultSearchPredicateFactory<>( builderFactory );
 		SearchPredicate predicate = predicateContributor.apply( extendPredicateFactory( factory ) ).toPredicate();

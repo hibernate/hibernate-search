@@ -17,7 +17,7 @@ import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory
 import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryPredicateStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
 
 public abstract class AbstractDelegatingSearchQueryHitTypeStep<R, E, LOS>
@@ -37,41 +37,41 @@ public abstract class AbstractDelegatingSearchQueryHitTypeStep<R, E, LOS>
 	}
 
 	@Override
-	public SearchQueryPredicateStep<?, E, ?> asEntity() {
+	public SearchQueryWhereStep<?, E, ?> asEntity() {
 		return delegate.asEntity();
 	}
 
 	@Override
-	public SearchQueryPredicateStep<?, R, ?> asEntityReference() {
+	public SearchQueryWhereStep<?, R, ?> asEntityReference() {
 		return delegate.asEntityReference();
 	}
 
 	@Override
-	public <P> SearchQueryPredicateStep<?, P, ?> asProjection(
+	public <P> SearchQueryWhereStep<?, P, ?> asProjection(
 			Function<? super SearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
 		return delegate.asProjection( projectionContributor );
 	}
 
 	@Override
-	public <P> SearchQueryPredicateStep<?, P, ?> asProjection(SearchProjection<P> projection) {
+	public <P> SearchQueryWhereStep<?, P, ?> asProjection(SearchProjection<P> projection) {
 		return delegate.asProjection( projection );
 	}
 
 	@Override
-	public SearchQueryPredicateStep<?, List<?>, ?> asProjections(
+	public SearchQueryWhereStep<?, List<?>, ?> asProjections(
 			SearchProjection<?>... projections) {
 		return delegate.asProjections( projections );
 	}
 
 	@Override
-	public SearchQueryOptionsStep<?, E, LOS, ?, ?> predicate(
+	public SearchQueryOptionsStep<?, E, LOS, ?, ?> where(
 			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor) {
-		return delegate.predicate( predicateContributor );
+		return delegate.where( predicateContributor );
 	}
 
 	@Override
-	public SearchQueryOptionsStep<?, E, LOS, ?, ?> predicate(SearchPredicate predicate) {
-		return delegate.predicate( predicate );
+	public SearchQueryOptionsStep<?, E, LOS, ?, ?> where(SearchPredicate predicate) {
+		return delegate.where( predicate );
 	}
 
 	@Override

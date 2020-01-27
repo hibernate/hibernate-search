@@ -24,22 +24,22 @@ public interface LuceneSearchQueryHitTypeStep<R, E, LOS>
 						LuceneSearchProjectionFactory<R, E>,
 						LuceneSearchPredicateFactory
 				>,
-				LuceneSearchQueryPredicateStep<E, LOS> {
+				LuceneSearchQueryWhereStep<E, LOS> {
 
 	@Override
-	LuceneSearchQueryPredicateStep<E, LOS> asEntity();
+	LuceneSearchQueryWhereStep<E, LOS> asEntity();
 
 	@Override
-	LuceneSearchQueryPredicateStep<R, LOS> asEntityReference();
+	LuceneSearchQueryWhereStep<R, LOS> asEntityReference();
 
 	@Override
-	<P> LuceneSearchQueryPredicateStep<P, LOS> asProjection(
+	<P> LuceneSearchQueryWhereStep<P, LOS> asProjection(
 			Function<? super LuceneSearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor);
 
 	@Override
-	<P> LuceneSearchQueryPredicateStep<P, LOS> asProjection(SearchProjection<P> projection);
+	<P> LuceneSearchQueryWhereStep<P, LOS> asProjection(SearchProjection<P> projection);
 
 	@Override
-	LuceneSearchQueryPredicateStep<List<?>, LOS> asProjections(SearchProjection<?>... projections);
+	LuceneSearchQueryWhereStep<List<?>, LOS> asProjections(SearchProjection<?>... projections);
 
 }
