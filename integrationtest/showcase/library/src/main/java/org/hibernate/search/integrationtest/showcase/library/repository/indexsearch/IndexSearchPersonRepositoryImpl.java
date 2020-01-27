@@ -42,7 +42,7 @@ public class IndexSearchPersonRepositoryImpl implements IndexSearchPersonReposit
 		}
 
 		return Search.session( entityManager ).search( Person.class )
-				.predicate( f -> f.match().fields( "firstName", "lastName" ).matching( terms ) )
+				.where( f -> f.match().fields( "firstName", "lastName" ).matching( terms ) )
 				.sort( f -> f.field( "lastName_sort" )
 						.then().field( "firstName_sort" )
 				)
@@ -51,7 +51,7 @@ public class IndexSearchPersonRepositoryImpl implements IndexSearchPersonReposit
 
 	private List<Person> listTopBorrowers(String borrowalsCountField, int limit, int offset) {
 		return Search.session( entityManager ).search( Person.class )
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f.field( borrowalsCountField ).desc() )
 				.fetchHits( offset, limit );
 	}

@@ -83,7 +83,7 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.requestTransformer( context -> {
 					assertThat( context.getPath() ).isEqualTo( "/" + INDEX_NAME + "/_search" );
 					context.setPath( "/" + SECOND_INDEX_NAME + "/_search" );
@@ -109,7 +109,7 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.requestTransformer( context -> {
 					assertThat( context.getParametersMap() )
 							.doesNotContainKeys( "search_type" );
@@ -138,7 +138,7 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.requestTransformer( context -> {
 					assertThat( context.getBody() )
 							.isNotNull()

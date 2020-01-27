@@ -86,7 +86,7 @@ public class LuceneSearchMultiIndexIT {
 		StubMappingScope scope = indexManager_1_1.createScope( indexManager_1_2 );
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "additionalField" ).asc().missing().last() )
 				.toQuery();
 
@@ -96,7 +96,7 @@ public class LuceneSearchMultiIndexIT {
 		} );
 
 		query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "additionalField" ).desc().missing().last() )
 				.toQuery();
 
@@ -124,7 +124,7 @@ public class LuceneSearchMultiIndexIT {
 
 		StubMappingScope scope = indexManager_1_1.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
 
@@ -140,7 +140,7 @@ public class LuceneSearchMultiIndexIT {
 
 		scope = indexManager_1_2.createScope();
 		query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME_1_2, DOCUMENT_1_2_1 );
 	}

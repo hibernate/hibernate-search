@@ -61,7 +61,7 @@ public class MatchAllSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query )
@@ -73,7 +73,7 @@ public class MatchAllSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll().except( c2 -> c2.match().field( "string" ).matching( STRING_1 ) ) )
+				.where( f -> f.matchAll().except( c2 -> c2.match().field( "string" ).matching( STRING_1 ) ) )
 				.toQuery();
 
 		assertThat( query )
@@ -81,7 +81,7 @@ public class MatchAllSearchPredicateIT {
 
 		SearchPredicate searchPredicate = scope.predicate().match().field( "string" ).matching( STRING_2 ).toPredicate();
 		query = scope.query()
-				.predicate( f -> f.matchAll().except( searchPredicate ) )
+				.where( f -> f.matchAll().except( searchPredicate ) )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
@@ -92,7 +92,7 @@ public class MatchAllSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll()
+				.where( f -> f.matchAll()
 						.except( f.match().field( "string" ).matching( STRING_1 ) )
 						.except( f.match().field( "string" ).matching( STRING_2 ) )
 				)
@@ -105,7 +105,7 @@ public class MatchAllSearchPredicateIT {
 		SearchPredicate searchPredicate2 = scope.predicate().match().field( "string" ).matching( STRING_2 ).toPredicate();
 
 		query = scope.query()
-				.predicate( f -> f.matchAll().except( searchPredicate1 ).except( searchPredicate2 ) )
+				.where( f -> f.matchAll().except( searchPredicate1 ).except( searchPredicate2 ) )
 				.toQuery();
 
 		assertThat( query )
@@ -129,7 +129,7 @@ public class MatchAllSearchPredicateIT {
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}

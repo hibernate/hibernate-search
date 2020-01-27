@@ -179,7 +179,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 		SearchResultAssert.assertThat(
 				indexManager.createScope().query()
-						.predicate( f -> f.id()
+						.where( f -> f.id()
 								.matching( firstTermEntry.getValue().get( 0 ) )
 								.matching( firstTermEntry.getValue().get( 1 ) )
 						)
@@ -386,7 +386,7 @@ public class TermsAggregationSpecificsIT<F> {
 		SearchResultAssert.assertThat(
 				indexManager.createScope().query()
 						// Exclude documents containing the first term from matches
-						.predicate( f -> f.matchAll().except(
+						.where( f -> f.matchAll().except(
 								f.id().matchingAny( firstTermEntry.getValue() )
 						) )
 						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, typeDescriptor.getJavaType() )
@@ -418,7 +418,7 @@ public class TermsAggregationSpecificsIT<F> {
 		SearchResultAssert.assertThat(
 				indexManager.createScope().query()
 						// Exclude all documents from the matches
-						.predicate( f -> f.id().matching( "none" ) )
+						.where( f -> f.id().matching( "none" ) )
 						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, typeDescriptor.getJavaType() )
 								.minDocumentCount( 0 )
 						)
@@ -448,7 +448,7 @@ public class TermsAggregationSpecificsIT<F> {
 		SearchResultAssert.assertThat(
 				indexManager.createScope().query()
 						// Exclude all documents from the matches
-						.predicate( f -> f.id().matching( "none" ) )
+						.where( f -> f.id().matching( "none" ) )
 						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, typeDescriptor.getJavaType() )
 								.minDocumentCount( 0 )
 								.orderByTermDescending()
@@ -595,7 +595,7 @@ public class TermsAggregationSpecificsIT<F> {
 	}
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllQuery() {
-		return indexManager.createScope().query().predicate( f -> f.matchAll() );
+		return indexManager.createScope().query().where( f -> f.matchAll() );
 	}
 
 	private void assumeNonDefaultOrdersSupported() {
@@ -625,7 +625,7 @@ public class TermsAggregationSpecificsIT<F> {
 		// Check that all documents are searchable
 		SearchResultAssert.assertThat(
 				indexManager.createScope().query()
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.toQuery()
 		)
 				.hasTotalHitCount( documentCount );

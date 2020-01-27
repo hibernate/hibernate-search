@@ -250,7 +250,7 @@ public class ToJpaIT {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery(
 					searchSession.search( IndexedEntity.class )
-							.predicate( f -> f.matchAll() )
+							.where( f -> f.matchAll() )
 							.failAfter( 2, TimeUnit.SECONDS )
 							.toQuery()
 			);
@@ -301,7 +301,7 @@ public class ToJpaIT {
 			SearchSession searchSession = Search.session( entityManager );
 			TypedQuery<IndexedEntity> query = Search.toJpaQuery(
 					searchSession.search( IndexedEntity.class )
-							.predicate( f -> f.matchAll() )
+							.where( f -> f.matchAll() )
 							.failAfter( 2, TimeUnit.SECONDS )
 							.toQuery()
 			);
@@ -360,7 +360,7 @@ public class ToJpaIT {
 	private SearchQuery<IndexedEntity> createSimpleQuery(SearchSession searchSession) {
 		return searchSession.search( IndexedEntity.class )
 				.asEntity()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 	}
 

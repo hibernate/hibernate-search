@@ -435,7 +435,7 @@ public class DecimalScaleIT {
 		SubTest.expectException( () -> {
 			indexManager.createScope()
 					.query().asEntityReference()
-					.predicate( p -> p.range().field( "scaled" ).atMost( tooLargeDecimal ) );
+					.where( p -> p.range().field( "scaled" ).atMost( tooLargeDecimal ) );
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -524,7 +524,7 @@ public class DecimalScaleIT {
 		SubTest.expectException( () -> {
 			indexManager.createScope()
 					.query().asEntityReference()
-					.predicate( p -> p.range().field( "scaled" ).atLeast( tooLargeInteger ) );
+					.where( p -> p.range().field( "scaled" ).atLeast( tooLargeInteger ) );
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -592,7 +592,7 @@ public class DecimalScaleIT {
 		SubTest.expectException( () -> {
 			indexManager.createScope()
 					.query().asEntityReference()
-					.predicate( p -> p.range().field( "scaled" ).atLeast( tooLargeDecimal ) );
+					.where( p -> p.range().field( "scaled" ).atLeast( tooLargeDecimal ) );
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -639,7 +639,7 @@ public class DecimalScaleIT {
 		SubTest.expectException( () -> {
 			indexManager.createScope()
 					.query().asEntityReference()
-					.predicate( p -> p.range().field( "scaled" ).atMost( tooLargeInteger ) );
+					.where( p -> p.range().field( "scaled" ).atMost( tooLargeInteger ) );
 		} )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -776,7 +776,7 @@ public class DecimalScaleIT {
 	private void matchGreaterThan(BigDecimal value) {
 		SearchQuery<DocumentReference> query = indexManager.createScope()
 				.query().asEntityReference()
-				.predicate( p -> p.range().field( "scaled" ).greaterThan( value ) )
+				.where( p -> p.range().field( "scaled" ).greaterThan( value ) )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, "1" );
 	}
@@ -784,7 +784,7 @@ public class DecimalScaleIT {
 	private void matchGreaterThan(BigInteger value) {
 		SearchQuery<DocumentReference> query = indexManager.createScope()
 				.query().asEntityReference()
-				.predicate( p -> p.range().field( "scaled" ).greaterThan( value ) )
+				.where( p -> p.range().field( "scaled" ).greaterThan( value ) )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, "1" );
 	}
@@ -792,7 +792,7 @@ public class DecimalScaleIT {
 	public void doNotMatchGreaterThan(BigDecimal value) {
 		SearchQuery<DocumentReference> query = indexManager.createScope()
 				.query().asEntityReference()
-				.predicate( p -> p.range().field( "scaled" ).greaterThan( value ) )
+				.where( p -> p.range().field( "scaled" ).greaterThan( value ) )
 				.toQuery();
 		assertThat( query ).hasNoHits();
 	}
@@ -800,7 +800,7 @@ public class DecimalScaleIT {
 	public void doNotMatchGreaterThan(BigInteger value) {
 		SearchQuery<DocumentReference> query = indexManager.createScope()
 				.query().asEntityReference()
-				.predicate( p -> p.range().field( "scaled" ).greaterThan( value ) )
+				.where( p -> p.range().field( "scaled" ).greaterThan( value ) )
 				.toQuery();
 		assertThat( query ).hasNoHits();
 	}
@@ -808,7 +808,7 @@ public class DecimalScaleIT {
 	public void projection(BigDecimal value) {
 		SearchQuery<Object> query = indexManager.createScope().query()
 				.asProjection( p -> p.field( "scaled" ) )
-				.predicate( p -> p.matchAll() )
+				.where( p -> p.matchAll() )
 				.toQuery();
 		assertThat( query ).hasHitsExactOrder( value );
 	}
@@ -816,7 +816,7 @@ public class DecimalScaleIT {
 	public void projection(BigInteger value) {
 		SearchQuery<Object> query = indexManager.createScope().query()
 				.asProjection( p -> p.field( "scaled" ) )
-				.predicate( p -> p.matchAll() )
+				.where( p -> p.matchAll() )
 				.toQuery();
 		assertThat( query ).hasHitsExactOrder( value );
 	}
@@ -824,7 +824,7 @@ public class DecimalScaleIT {
 	private void match(BigDecimal matching, String match1, String match2 ) {
 		SearchQuery<DocumentReference> query = indexManager.createScope()
 				.query().asEntityReference()
-				.predicate( p -> p.match().field( "scaled" ).matching( matching ) )
+				.where( p -> p.match().field( "scaled" ).matching( matching ) )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, match1, match2 );
 	}
@@ -832,7 +832,7 @@ public class DecimalScaleIT {
 	private void match(BigInteger matching, String match1, String match2 ) {
 		SearchQuery<DocumentReference> query = indexManager.createScope()
 				.query().asEntityReference()
-				.predicate( p -> p.match().field( "scaled" ).matching( matching ) )
+				.where( p -> p.match().field( "scaled" ).matching( matching ) )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, match1, match2 );
 	}

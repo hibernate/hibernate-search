@@ -86,7 +86,7 @@ public class CompositeSearchProjectionIT {
 								f.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
 						)
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
@@ -107,7 +107,7 @@ public class CompositeSearchProjectionIT {
 								f.field( indexMapping.title.relativeFieldName, String.class )
 						)
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
@@ -129,7 +129,7 @@ public class CompositeSearchProjectionIT {
 								f.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
 						)
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
@@ -151,7 +151,7 @@ public class CompositeSearchProjectionIT {
 								f.field( indexMapping.title.relativeFieldName, String.class )
 						)
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
@@ -172,7 +172,7 @@ public class CompositeSearchProjectionIT {
 								f.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
 						)
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
@@ -193,7 +193,7 @@ public class CompositeSearchProjectionIT {
 								f.field( indexMapping.title.relativeFieldName, String.class )
 						)
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
@@ -215,7 +215,7 @@ public class CompositeSearchProjectionIT {
 								f.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
 						)
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
@@ -237,7 +237,7 @@ public class CompositeSearchProjectionIT {
 								f.field( indexMapping.title.relativeFieldName, String.class )
 						)
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
@@ -260,7 +260,7 @@ public class CompositeSearchProjectionIT {
 								f.field( indexMapping.releaseDate.relativeFieldName, LocalDate.class ).toProjection()
 						)
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
@@ -286,7 +286,7 @@ public class CompositeSearchProjectionIT {
 								f.field( indexMapping.releaseDate.relativeFieldName, LocalDate.class )
 						)
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
@@ -315,7 +315,7 @@ public class CompositeSearchProjectionIT {
 								f.score()
 						)
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
@@ -348,7 +348,7 @@ public class CompositeSearchProjectionIT {
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );

@@ -66,7 +66,7 @@ public class DistanceSearchSearchableSortableIT {
 	public void searchableSortable() {
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.spatial().within().field( "searchableSortable" ).circle( METRO_GARIBALDI, 1_500 ) )
+				.where( f -> f.spatial().within().field( "searchableSortable" ).circle( METRO_GARIBALDI, 1_500 ) )
 				.sort( f -> f.distance( "searchableSortable", METRO_GARIBALDI ) )
 				.toQuery();
 
@@ -80,7 +80,7 @@ public class DistanceSearchSearchableSortableIT {
 
 		SubTest.expectException( () ->
 				scope.query()
-						.predicate( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
+						.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
 						.sort( f -> f.distance( fieldPath, METRO_GARIBALDI ) )
 						.toQuery()
 
@@ -92,7 +92,7 @@ public class DistanceSearchSearchableSortableIT {
 				.hasMessageContaining( fieldPath );
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
+				.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
@@ -105,7 +105,7 @@ public class DistanceSearchSearchableSortableIT {
 
 		SubTest.expectException( () ->
 				scope.query()
-						.predicate( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
+						.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
 						.sort( f -> f.distance( fieldPath, METRO_GARIBALDI ) )
 						.toQuery()
 
@@ -117,7 +117,7 @@ public class DistanceSearchSearchableSortableIT {
 				.hasMessageContaining( fieldPath );
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
+				.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, CHEZ_MARGOTTE_ID, IMOUTO_ID );
@@ -130,7 +130,7 @@ public class DistanceSearchSearchableSortableIT {
 
 		SubTest.expectException( () ->
 				scope.query()
-						.predicate( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
+						.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
 						.sort( f -> f.distance( fieldPath, METRO_GARIBALDI ) )
 						.toQuery()
 
@@ -142,7 +142,7 @@ public class DistanceSearchSearchableSortableIT {
 				.hasMessageContaining( fieldPath );
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f.distance( fieldPath, METRO_GARIBALDI ) )
 				.toQuery();
 
@@ -153,7 +153,7 @@ public class DistanceSearchSearchableSortableIT {
 	public void defaultSearchableSortable() {
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.spatial().within().field( "defaultSearchableSortable" ).circle( METRO_GARIBALDI, 1_500 ) )
+				.where( f -> f.spatial().within().field( "defaultSearchableSortable" ).circle( METRO_GARIBALDI, 1_500 ) )
 				.sort( f -> f.distance( "defaultSearchableSortable", METRO_GARIBALDI ) )
 				.toQuery();
 
@@ -188,7 +188,7 @@ public class DistanceSearchSearchableSortableIT {
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID, CHEZ_MARGOTTE_ID );
 	}

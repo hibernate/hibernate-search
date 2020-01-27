@@ -80,7 +80,7 @@ public class SearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.match().field( "string" ).matching( STRING_1 ) )
+				.where( f -> f.match().field( "string" ).matching( STRING_1 ) )
 				.toQuery();
 
 		assertThat( query )
@@ -94,7 +94,7 @@ public class SearchPredicateIT {
 		SearchPredicate predicate = scope.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( predicate )
+				.where( predicate )
 				.toQuery();
 
 		assertThat( query )
@@ -106,7 +106,7 @@ public class SearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.match().field( "string" ).matching( STRING_1 ) )
+				.where( f -> f.match().field( "string" ).matching( STRING_1 ) )
 				.toQuery();
 
 		assertThat( query )
@@ -120,14 +120,14 @@ public class SearchPredicateIT {
 				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( predicate )
+				.where( predicate )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// reuse the same predicate instance on the same scope
 		query = scope.query()
-				.predicate( predicate )
+				.where( predicate )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -135,7 +135,7 @@ public class SearchPredicateIT {
 		// reuse the same predicate instance on a different scope,
 		// targeting the same index
 		query = indexManager.createScope().query()
-				.predicate( predicate )
+				.where( predicate )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -146,7 +146,7 @@ public class SearchPredicateIT {
 		// reuse the same predicate instance on a different scope,
 		// targeting same indexes
 		query = anotherIndexManager.createScope( indexManager ).query()
-				.predicate( predicate )
+				.where( predicate )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -162,7 +162,7 @@ public class SearchPredicateIT {
 		// targeting a different index
 		SubTest.expectException( () ->
 				anotherIndexManager.createScope().query()
-						.predicate( predicate )
+						.where( predicate )
 						.toQuery() )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -174,7 +174,7 @@ public class SearchPredicateIT {
 		// targeting different indexes
 		SubTest.expectException( () ->
 				indexManager.createScope( anotherIndexManager ).query()
-						.predicate( predicate )
+						.where( predicate )
 						.toQuery() )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -190,14 +190,14 @@ public class SearchPredicateIT {
 				.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool().must( predicate ) )
+				.where( f -> f.bool().must( predicate ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		// reuse the same predicate instance on the same scope
 		query = scope.query()
-				.predicate( f -> f.bool().must( predicate ) )
+				.where( f -> f.bool().must( predicate ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -205,7 +205,7 @@ public class SearchPredicateIT {
 		// reuse the same predicate instance on a different scope,
 		// targeting the same index
 		query = indexManager.createScope().query()
-				.predicate( f -> f.bool().must( predicate ) )
+				.where( f -> f.bool().must( predicate ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
@@ -216,13 +216,13 @@ public class SearchPredicateIT {
 		// reuse the same predicate instance on a different scope,
 		// targeting same indexes
 		query = anotherIndexManager.createScope( indexManager ).query()
-				.predicate( f -> f.bool().must( multiIndexScopedPredicate ) )
+				.where( f -> f.bool().must( multiIndexScopedPredicate ) )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = anotherIndexManager.createScope( indexManager ).query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.should( multiIndexScopedPredicate )
 						.should( f.match().field( "string" ).matching( STRING_2 ) )
 				)
@@ -241,7 +241,7 @@ public class SearchPredicateIT {
 		// targeting a different index
 		SubTest.expectException( () ->
 				anotherIndexManager.createScope().query()
-						.predicate( f -> f.bool().must( predicate ) )
+						.where( f -> f.bool().must( predicate ) )
 						.toQuery() )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -253,7 +253,7 @@ public class SearchPredicateIT {
 		// targeting different indexes
 		SubTest.expectException( () ->
 				indexManager.createScope( anotherIndexManager ).query()
-						.predicate( f -> f.bool().must( predicate ) )
+						.where( f -> f.bool().must( predicate ) )
 						.toQuery() )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
@@ -269,7 +269,7 @@ public class SearchPredicateIT {
 
 		// Mandatory extension, supported
 		query = scope.query()
-				.predicate( f -> f.extension( new SupportedExtension() )
+				.where( f -> f.extension( new SupportedExtension() )
 						.extendedPredicate( "string", STRING_1 )
 				)
 				.toQuery();
@@ -285,7 +285,7 @@ public class SearchPredicateIT {
 
 		// Conditional extensions with orElse - two, both supported
 		query = scope.query()
-				.predicate( f -> f.extension()
+				.where( f -> f.extension()
 						.ifSupported(
 								new SupportedExtension(),
 								extended -> extended.extendedPredicate( "string", STRING_1 )
@@ -302,7 +302,7 @@ public class SearchPredicateIT {
 
 		// Conditional extensions with orElse - two, second supported
 		query = scope.query()
-				.predicate( f -> f.extension()
+				.where( f -> f.extension()
 						.ifSupported(
 								new UnSupportedExtension(),
 								shouldNotBeCalled()
@@ -321,7 +321,7 @@ public class SearchPredicateIT {
 
 		// Conditional extensions with orElse - two, both unsupported
 		query = scope.query()
-				.predicate( f -> f.extension()
+				.where( f -> f.extension()
 						.ifSupported(
 								new UnSupportedExtension(),
 								shouldNotBeCalled()
@@ -354,7 +354,7 @@ public class SearchPredicateIT {
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY );
 	}

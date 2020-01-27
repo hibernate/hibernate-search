@@ -86,7 +86,7 @@ public class BoolSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.must( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 				)
 				.toQuery();
@@ -95,7 +95,7 @@ public class BoolSearchPredicateIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.must( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 						.must( f.match().field( "field2" ).matching( FIELD2_VALUE2 ) )
 				)
@@ -104,7 +104,7 @@ public class BoolSearchPredicateIT {
 		assertThat( query ).hasNoHits();
 
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.must( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 						.must( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) )
 				)
@@ -119,7 +119,7 @@ public class BoolSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.must( f2 -> f2.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 				)
 				.toQuery();
@@ -135,7 +135,7 @@ public class BoolSearchPredicateIT {
 		SearchPredicate predicate = scope.predicate().match().field( "field1" ).matching( FIELD1_VALUE1 ).toPredicate();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate(	f -> f.bool().must( predicate ) )
+				.where(	f -> f.bool().must( predicate ) )
 				.toQuery();
 
 		assertThat( query )
@@ -147,7 +147,7 @@ public class BoolSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 				)
 				.toQuery();
@@ -156,7 +156,7 @@ public class BoolSearchPredicateIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 						.should( f.match().field( "field1" ).matching( FIELD1_VALUE2 ) )
 				)
@@ -171,7 +171,7 @@ public class BoolSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.should( f2 -> f2.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 						.should( f2 -> f2.match().field( "field1" ).matching( FIELD1_VALUE2 ) )
 				)
@@ -189,7 +189,7 @@ public class BoolSearchPredicateIT {
 		SearchPredicate predicate2 = scope.predicate().match().field( "field1" ).matching( FIELD1_VALUE3 ).toPredicate();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.should( predicate1 )
 						.should( predicate2 )
 				)
@@ -204,7 +204,7 @@ public class BoolSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.mustNot( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 				)
 				.toQuery();
@@ -213,7 +213,7 @@ public class BoolSearchPredicateIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.mustNot( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 						.mustNot( f.match().field( "field1" ).matching( FIELD1_VALUE3 ) )
 				)
@@ -228,7 +228,7 @@ public class BoolSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.mustNot( f2 -> f2.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 				)
 				.toQuery();
@@ -244,7 +244,7 @@ public class BoolSearchPredicateIT {
 		SearchPredicate predicate = scope.predicate().match().field( "field1" ).matching( FIELD1_VALUE2 ).toPredicate();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.mustNot( predicate )
 				)
 				.toQuery();
@@ -258,7 +258,7 @@ public class BoolSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.filter( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 				)
 				.toQuery();
@@ -267,7 +267,7 @@ public class BoolSearchPredicateIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.filter( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 						.filter( f.match().field( "field2" ).matching( FIELD2_VALUE2 ) )
 				)
@@ -276,7 +276,7 @@ public class BoolSearchPredicateIT {
 		assertThat( query ).hasNoHits();
 
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.filter( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 						.filter( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) )
 				)
@@ -291,7 +291,7 @@ public class BoolSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.filter( f2 -> f2.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 				)
 				.toQuery();
@@ -307,7 +307,7 @@ public class BoolSearchPredicateIT {
 		SearchPredicate predicate = scope.predicate().match().field( "field1" ).matching( FIELD1_VALUE1 ).toPredicate();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate(	f -> f.bool().filter( predicate ) )
+				.where(	f -> f.bool().filter( predicate ) )
 				.toQuery();
 
 		assertThat( query )
@@ -319,7 +319,7 @@ public class BoolSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 						.should( f.match().field( "field1" ).matching( FIELD1_VALUE3 ) )
 						.mustNot( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
@@ -335,7 +335,7 @@ public class BoolSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.must( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 						.mustNot( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 				)
@@ -344,7 +344,7 @@ public class BoolSearchPredicateIT {
 		assertThat( query ).hasNoHits();
 
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.must( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 						.mustNot( f.match().field( "field1" ).matching( FIELD1_VALUE2 ) )
 				)
@@ -359,7 +359,7 @@ public class BoolSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.must( f.bool()
 										.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 										.should( f.match().field( "field1" ).matching( FIELD1_VALUE3 ) )
@@ -371,7 +371,7 @@ public class BoolSearchPredicateIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
 
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.must( f.bool()
 								.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 								.should( f.match().field( "field1" ).matching( FIELD1_VALUE3 ) )
@@ -389,7 +389,7 @@ public class BoolSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						// 0.287682
 						.should( f.bool().must( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) )
 
@@ -403,7 +403,7 @@ public class BoolSearchPredicateIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
 
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						// withConstantScore 0.287682 => 1
 						.should( f.bool().constantScore().must( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) )
 
@@ -422,7 +422,7 @@ public class BoolSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.should( f.bool().constantScore().boost( 7 ).must( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) )
 						.should( f.bool().constantScore().boost( 39 ).must( f.match().field( "field1" ).matching( FIELD1_VALUE3 ) ) )
 				)
@@ -433,7 +433,7 @@ public class BoolSearchPredicateIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_1 );
 
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.should( f.bool().constantScore().boost( 39 ).must( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) ) )
 						.should( f.bool().constantScore().boost( 7 ).must( f.match().field( "field1" ).matching( FIELD1_VALUE3 ) ) )
 				)
@@ -453,7 +453,7 @@ public class BoolSearchPredicateIT {
 
 		// Non-matching "should" clauses
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.must( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 						.should( f.match().field( "field2" ).matching( FIELD2_VALUE2 ) )
 						.should( f.match().field( "field3" ).matching( FIELD3_VALUE3 ) )
@@ -465,7 +465,7 @@ public class BoolSearchPredicateIT {
 
 		// One matching and one non-matching "should" clause
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.must( f.match().field( "field1" ).matching( FIELD1_VALUE2 ) )
 						.should( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) )
 						.should( f.match().field( "field3" ).matching( FIELD3_VALUE3 ) )
@@ -485,7 +485,7 @@ public class BoolSearchPredicateIT {
 
 		// Non-matching "should" clauses
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.filter( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 						.should( f.match().field( "field2" ).matching( FIELD2_VALUE2 ) )
 						.should( f.match().field( "field3" ).matching( FIELD3_VALUE3 ) )
@@ -497,7 +497,7 @@ public class BoolSearchPredicateIT {
 
 		// One matching and one non-matching "should" clause
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.filter( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 						.should( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) )
 						.should( f.match().field( "field3" ).matching( FIELD3_VALUE3 ) )
@@ -517,7 +517,7 @@ public class BoolSearchPredicateIT {
 
 		// Non-matching "should" clauses
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.mustNot( f.match().field( "field1" ).matching( FIELD1_VALUE2 ) )
 						.mustNot( f.match().field( "field1" ).matching( FIELD1_VALUE3 ) )
 						.should( f.match().field( "field2" ).matching( FIELD2_VALUE2 ) )
@@ -530,7 +530,7 @@ public class BoolSearchPredicateIT {
 
 		// One matching and one non-matching "should" clause
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.mustNot( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 						.mustNot( f.match().field( "field1" ).matching( FIELD1_VALUE3 ) )
 						.should( f.match().field( "field2" ).matching( FIELD2_VALUE2 ) )
@@ -548,7 +548,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect default behavior (1 "should" clause has to match)
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.minimumShouldMatchNumber( 1 )
 						.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 						.should( f.match().field( "field2" ).matching( FIELD2_VALUE3 ) )
@@ -560,7 +560,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect to require 1 "should" clause to match even though there's a "must"
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.must( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) )
 						.minimumShouldMatchNumber( 1 )
 						.should( f.match().field( "field2" ).matching( FIELD2_VALUE2 ) )
@@ -573,7 +573,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect to require 2 "should" clauses to match
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.minimumShouldMatchNumber( 2 )
 						.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) )
 						.should( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) )
@@ -586,7 +586,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect to require all "should" clauses to match
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.minimumShouldMatchNumber( 2 )
 						.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) )
 						.should( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) )
@@ -603,7 +603,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect default behavior (1 "should" clause has to match)
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.minimumShouldMatchNumber( -1 )
 						.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 						.should( f.match().field( "field2" ).matching( FIELD2_VALUE3 ) )
@@ -615,7 +615,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect to require 1 "should" clause to match even though there's a "must"
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.must( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) )
 						.minimumShouldMatchNumber( -1 )
 						.should( f.match().field( "field2" ).matching( FIELD2_VALUE2 ) )
@@ -628,7 +628,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect to require 2 "should" clauses to match
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.minimumShouldMatchNumber( -1 )
 						.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) )
 						.should( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) )
@@ -646,7 +646,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect default behavior (1 "should" clause has to match)
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.minimumShouldMatchPercent( 50 )
 						.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 						.should( f.match().field( "field2" ).matching( FIELD2_VALUE3 ) )
@@ -658,7 +658,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect to require 1 "should" clause to match even though there's a "must"
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.must( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) )
 						.minimumShouldMatchPercent( 50 )
 						.should( f.match().field( "field2" ).matching( FIELD2_VALUE2 ) )
@@ -671,7 +671,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect to require 2 "should" clauses to match
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.minimumShouldMatchPercent( 70 ) // The minimum should be rounded down to 2
 						.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) )
 						.should( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) )
@@ -684,7 +684,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect to require all "should" clauses to match
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.minimumShouldMatchPercent( 100 )
 						.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) )
 						.should( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) )
@@ -701,7 +701,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect default behavior (1 "should" clause has to match)
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.minimumShouldMatchPercent( -50 )
 						.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) )
 						.should( f.match().field( "field2" ).matching( FIELD2_VALUE3 ) )
@@ -713,7 +713,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect to require 1 "should" clause to match even though there's a "must"
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.must( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) )
 						.minimumShouldMatchPercent( -50 )
 						.should( f.match().field( "field2" ).matching( FIELD2_VALUE2 ) )
@@ -726,7 +726,7 @@ public class BoolSearchPredicateIT {
 
 		// Expect to require 2 "should" clauses to match
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.minimumShouldMatchPercent( -40 ) // The minimum should be rounded up to 2
 						.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) )
 						.should( f.match().field( "field2" ).matching( FIELD2_VALUE1 ) )
@@ -748,7 +748,7 @@ public class BoolSearchPredicateIT {
 
 		// 0 "should" clause: expect the constraints to be ignored
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool( b -> {
+				.where( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.must( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) );
 				} ) )
@@ -759,7 +759,7 @@ public class BoolSearchPredicateIT {
 
 		// 1 "should" clause: expect to require all "should" clauses to match
 		query = scope.query()
-				.predicate( f -> f.bool( b -> {
+				.where( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
 				} ) )
@@ -770,7 +770,7 @@ public class BoolSearchPredicateIT {
 
 		// 2 "should" clauses: expect to require all "should" clauses to match
 		query = scope.query()
-				.predicate( f -> f.bool( b -> {
+				.where( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) );
 					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
@@ -782,7 +782,7 @@ public class BoolSearchPredicateIT {
 
 		// 3 "should" clauses: expect to require 2 "should" clauses to match
 		query = scope.query()
-				.predicate( f -> f.bool( b -> {
+				.where( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) );
 					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
@@ -795,7 +795,7 @@ public class BoolSearchPredicateIT {
 
 		// 4 "should" clauses: expect to require 3 "should" clauses to match
 		query = scope.query()
-				.predicate( f -> f.bool( b -> {
+				.where( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) );
 					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
@@ -809,7 +809,7 @@ public class BoolSearchPredicateIT {
 
 		// 5 "should" clauses: expect to require 3 "should" clauses to match
 		query = scope.query()
-				.predicate( f -> f.bool( b -> {
+				.where( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) );
 					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
@@ -824,7 +824,7 @@ public class BoolSearchPredicateIT {
 
 		// 6 "should" clauses: expect to require 4 "should" clauses to match
 		query = scope.query()
-				.predicate( f -> f.bool( b -> {
+				.where( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) );
 					b.should( f.match().field( "field5" ).matching( FIELD5_VALUE1AND2 ) );
@@ -851,7 +851,7 @@ public class BoolSearchPredicateIT {
 
 		// 1 "should" clause: expect to require 1 "should" clause to match
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool( b -> {
+				.where( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
 				} ) )
@@ -862,7 +862,7 @@ public class BoolSearchPredicateIT {
 
 		// 2 "should" clauses: expect to require 1 "should" clause to match
 		query = scope.query()
-				.predicate( f -> f.bool( b -> {
+				.where( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
 					b.should( f.match().field( "field2" ).matching( FIELD2_VALUE2 ) );
@@ -874,7 +874,7 @@ public class BoolSearchPredicateIT {
 
 		// 3 "should" clauses: expect to require 2 "should" clauses to match
 		query = scope.query()
-				.predicate( f -> f.bool( b -> {
+				.where( f -> f.bool( b -> {
 					b.minimumShouldMatch( minimumShouldMatchConstraints );
 					b.should( f.match().field( "field4" ).matching( FIELD4_VALUE1AND2 ) );
 					b.should( f.match().field( "field1" ).matching( FIELD1_VALUE1 ) );
@@ -938,7 +938,7 @@ public class BoolSearchPredicateIT {
 		// If the should is alone ( not having any sibling must ),
 		// the default minimum should match will be 1.
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.should( f.match().field( "field1" ).matching( "no-match" ) )
 				)
 				.toQuery();
@@ -948,7 +948,7 @@ public class BoolSearchPredicateIT {
 		// If the should has a sibling must,
 		// the default minimum should match will be 0.
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.should( f.match().field( "field1" ).matching( "no-match" ) )
 						.must( f.match().field( "field5" ).matching( FIELD5_VALUE1AND2 ) ) // match 1 and 2
 				)
@@ -959,7 +959,7 @@ public class BoolSearchPredicateIT {
 		// If there exists a must or a filter, but they are not a sibling of the should,
 		// the default minimum should match will be 1.
 		query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.filter( f.bool()
 								.should( f.match().field( "field1" ).matching( "no-match" ) )
 						)
@@ -979,7 +979,7 @@ public class BoolSearchPredicateIT {
 		// If the should has a sibling must, even if the should is inside a filter,
 		// the default minimum should match will be 0.
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.filter( f.bool()
 								.should( f.match().field( "field1" ).matching( "no-match" ) )
 								.must( f.match().field( "field5" ).matching( FIELD5_VALUE1AND2 ) ) // match 1 and 2
@@ -998,7 +998,7 @@ public class BoolSearchPredicateIT {
 		// if the should has a sibling must-not inside a filter,
 		// the default minimum should match will be still 1.
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.filter( f.bool()
 								.should( f.match().field( "field1" ).matching( "no-match" ) )
 								.mustNot( f.match().field( "field5" ).matching( FIELD5_VALUE1AND2 ) ) // match 3
@@ -1017,7 +1017,7 @@ public class BoolSearchPredicateIT {
 		// If the should has a sibling filter, even if the should is inside a filter,
 		// the default minimum should match will be 0.
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.filter( f.bool()
 								.should( f.match().field( "field1" ).matching( "no-match" ) )
 								.filter( p -> f.match().field( "field5" ).matching( FIELD5_VALUE1AND2 ) ) // match 1 and 2
@@ -1057,7 +1057,7 @@ public class BoolSearchPredicateIT {
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}

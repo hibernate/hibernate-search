@@ -376,7 +376,7 @@ public class RangeAggregationSpecificsIT<F> {
 
 		SearchResultAssert.assertThat(
 				indexManager.createScope().query()
-						.predicate( f -> f.id().matchingAny( Arrays.asList( "document_1", "document_5" ) ) )
+						.where( f -> f.id().matchingAny( Arrays.asList( "document_1", "document_5" ) ) )
 						.aggregation( aggregationKey, f -> f.range().field( fieldPath, typeDescriptor.getJavaType() )
 								.range( null, ascendingValues.get( 2 ) )
 								.range( ascendingValues.get( 2 ), ascendingValues.get( 5 ) )
@@ -497,7 +497,7 @@ public class RangeAggregationSpecificsIT<F> {
 	}
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllQuery() {
-		return indexManager.createScope().query().predicate( f -> f.matchAll() );
+		return indexManager.createScope().query().where( f -> f.matchAll() );
 	}
 
 	private void initData() {
@@ -517,7 +517,7 @@ public class RangeAggregationSpecificsIT<F> {
 		// Check that all documents are searchable
 		SearchResultAssert.assertThat(
 				indexManager.createScope().query()
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.toQuery()
 		)
 				.hasTotalHitCount( documentFieldValues.size() + 1 /* +1 for the empty document */ );

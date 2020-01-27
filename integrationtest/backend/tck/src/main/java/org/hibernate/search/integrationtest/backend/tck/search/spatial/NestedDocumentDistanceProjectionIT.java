@@ -77,7 +77,7 @@ public class NestedDocumentDistanceProjectionIT {
 		StubMappingScope scope = indexManager.createScope();
 		List<Double> hits = scope.query()
 				.asProjection( f -> f.distance( "flattened.geoPoint", METRO_GARIBALDI ) )
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "ordinal" ).desc() )
 				.fetchAllHits();
 
@@ -92,7 +92,7 @@ public class NestedDocumentDistanceProjectionIT {
 		StubMappingScope scope = indexManager.createScope();
 		List<Double> hits = scope.query()
 				.asProjection( f -> f.distance( "nested.geoPoint", METRO_GARIBALDI ) )
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "ordinal" ).desc() )
 				.fetchAllHits();
 
@@ -136,7 +136,7 @@ public class NestedDocumentDistanceProjectionIT {
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, OURSON_QUI_BOIT_ID, IMOUTO_ID, CHEZ_MARGOTTE_ID );
 	}

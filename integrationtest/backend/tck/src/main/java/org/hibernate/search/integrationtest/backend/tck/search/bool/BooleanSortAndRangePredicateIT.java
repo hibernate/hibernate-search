@@ -79,7 +79,7 @@ public class BooleanSortAndRangePredicateIT {
 			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( sortContributor )
 				.toQuery();
 	}
@@ -87,7 +87,7 @@ public class BooleanSortAndRangePredicateIT {
 	private SearchQuery<DocumentReference> rangeQuery(Function<SearchPredicateFactory, PredicateFinalStep> rangePredicate) {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
-				.predicate( rangePredicate )
+				.where( rangePredicate )
 				.toQuery();
 	}
 
@@ -133,7 +133,7 @@ public class BooleanSortAndRangePredicateIT {
 	public void rangeBetweenAndSortByField() {
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.range().field( FIELD_PATH ).between( Boolean.FALSE, Boolean.TRUE ) )
+				.where( f -> f.range().field( FIELD_PATH ).between( Boolean.FALSE, Boolean.TRUE ) )
 				.sort( f -> f.field( FIELD_PATH ).missing().last() )
 				.toQuery();
 
@@ -199,7 +199,7 @@ public class BooleanSortAndRangePredicateIT {
 	private void checkAllDocumentsAreSearchable() {
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4, DOCUMENT_5 );

@@ -76,7 +76,7 @@ public class ShardingHashRoutingKeyIT extends AbstractShardingIT {
 
 		// No routing key => all documents should be returned
 		SearchResultAssert.assertThat( indexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery()
 		)
 				.hits().asNormalizedDocRefs()
@@ -88,7 +88,7 @@ public class ShardingHashRoutingKeyIT extends AbstractShardingIT {
 
 		SearchResultAssert<DocumentReference> singleRoutingKeyQueryAssert = SearchResultAssert.assertThat(
 				indexManager.createScope().query()
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.routing( someRoutingKey )
 						.toQuery()
 		);
@@ -110,7 +110,7 @@ public class ShardingHashRoutingKeyIT extends AbstractShardingIT {
 		 * Let's test this.
 		 */
 		SearchResultAssert.assertThat( indexManager.createScope().query()
-				.predicate( f -> f.match().field( "indexedRoutingKey" ).matching( someRoutingKey ) )
+				.where( f -> f.match().field( "indexedRoutingKey" ).matching( someRoutingKey ) )
 				.routing( someRoutingKey )
 				.toQuery()
 		)
@@ -123,7 +123,7 @@ public class ShardingHashRoutingKeyIT extends AbstractShardingIT {
 
 		// All routing keys => all documents should be returned
 		SearchResultAssert.assertThat( indexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.routing( docIdByRoutingKey.keySet() )
 				.toQuery()
 		)

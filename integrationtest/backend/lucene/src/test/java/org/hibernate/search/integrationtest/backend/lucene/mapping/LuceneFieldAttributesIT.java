@@ -113,7 +113,7 @@ public class LuceneFieldAttributesIT {
 				.asProjection(
 						f -> f.extension( LuceneExtension.get() ).document()
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		List<Document> result = query.fetchAll().getHits();

@@ -76,7 +76,7 @@ public class MultiTenancyMismatchIT {
 
 		StubMappingScope scope = indexManager.createScope();
 		scope.query( tenant1SessionContext )
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 	}
 

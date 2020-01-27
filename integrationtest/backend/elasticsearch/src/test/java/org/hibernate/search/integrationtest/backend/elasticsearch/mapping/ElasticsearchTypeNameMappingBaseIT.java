@@ -86,7 +86,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	public void singleIndexScope() {
 		setup( IndexLifecycleStrategyName.DROP_AND_CREATE_AND_DROP );
 		SearchResultAssert.assertThat(
-				index1Manager.createScope().query().predicate( f -> f.matchAll() ).toQuery()
+				index1Manager.createScope().query().where( f -> f.matchAll() ).toQuery()
 		)
 				.hasDocRefHitsAnyOrder( c -> c
 						.doc( TYPE1_NAME, ID_1 )
@@ -98,7 +98,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	public void multiIndexScope() {
 		setup( IndexLifecycleStrategyName.DROP_AND_CREATE_AND_DROP );
 		SearchResultAssert.assertThat(
-				index1Manager.createScope( index2Manager ).query().predicate( f -> f.matchAll() ).toQuery()
+				index1Manager.createScope( index2Manager ).query().where( f -> f.matchAll() ).toQuery()
 		)
 				.hasDocRefHitsAnyOrder( c -> c
 						.doc( TYPE1_NAME, ID_1 )
@@ -114,7 +114,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 		setup( IndexLifecycleStrategyName.NONE );
 
 		SearchQuery<DocumentReference> query = index1Manager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		if ( AliasSupport.YES.equals( aliasSupport ) ) {
@@ -137,7 +137,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 		setup( IndexLifecycleStrategyName.NONE );
 
 		SearchQuery<DocumentReference> query = index1Manager.createScope( index2Manager ).query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		if ( AliasSupport.YES.equals( aliasSupport ) ) {

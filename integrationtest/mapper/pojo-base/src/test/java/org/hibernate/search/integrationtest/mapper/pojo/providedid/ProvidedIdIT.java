@@ -80,7 +80,7 @@ public class ProvidedIdIT {
 
 			SearchQuery<EntityReference> query = session.search( IndexedEntity.class )
 					.asEntityReference()
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery();
 
 			assertThat( query.fetchAll().getHits() )

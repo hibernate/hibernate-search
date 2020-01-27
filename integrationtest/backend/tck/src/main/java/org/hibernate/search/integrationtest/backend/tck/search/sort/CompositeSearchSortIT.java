@@ -264,7 +264,7 @@ public class CompositeSearchSortIT {
 		String nestedField = "nested." + indexMapping.flattenedField.relativeFieldName;
 
 		query = indexManager.createScope().query()
-				.predicate( b -> b.match().field( normalField ).matching( "aaa" ) )
+				.where( b -> b.match().field( normalField ).matching( "aaa" ) )
 				.sort( f -> f.field( flattenedField ).asc().then().field( normalField ).asc() )
 				.toQuery();
 
@@ -272,7 +272,7 @@ public class CompositeSearchSortIT {
 		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 
 		query = indexManager.createScope().query()
-				.predicate( b -> b.match().field( normalField ).matching( "aaa" ) )
+				.where( b -> b.match().field( normalField ).matching( "aaa" ) )
 				.sort( f -> f.field( nestedField ).asc().then().field( flattenedField ).asc() )
 				.toQuery();
 
@@ -280,7 +280,7 @@ public class CompositeSearchSortIT {
 		assertThat( query.fetch( 2 ) ).hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_1 );
 
 		query = indexManager.createScope().query()
-				.predicate( b -> b.match().field( normalField ).matching( "aaa" ) )
+				.where( b -> b.match().field( normalField ).matching( "aaa" ) )
 				.sort( f -> f.field( normalField ).asc().then().field( nestedField ).asc() )
 				.toQuery();
 		// [a a b][b a a] => {2+ 1+ 3}
@@ -295,14 +295,14 @@ public class CompositeSearchSortIT {
 	private SearchQuery<DocumentReference> simpleQuery(StubMappingScope scope,
 			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
 		return scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( sortContributor )
 				.toQuery();
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(StubMappingScope scope, SearchSort sort) {
 		return scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( sort )
 				.toQuery();
 	}
@@ -340,7 +340,7 @@ public class CompositeSearchSortIT {
 
 		// Check that all documents are searchable
 		SearchQuery<DocumentReference> query = indexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 	}

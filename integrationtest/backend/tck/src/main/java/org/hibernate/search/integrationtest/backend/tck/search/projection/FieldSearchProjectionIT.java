@@ -118,7 +118,7 @@ public class FieldSearchProjectionIT {
 				assertThat(
 						scope.query()
 								.asProjection( f -> f.field( fieldPath, model.type ) )
-								.predicate( f -> f.matchAll() )
+								.where( f -> f.matchAll() )
 								.toQuery()
 				).hasHitsAnyOrder(
 						model.document1Value.indexedValue,
@@ -140,7 +140,7 @@ public class FieldSearchProjectionIT {
 
 			query = scope.query()
 					.asProjection( f -> f.field( fieldPath ) )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery();
 			assertThat( query ).hasHitsAnyOrder(
 					fieldModel.document1Value.indexedValue,
@@ -159,7 +159,7 @@ public class FieldSearchProjectionIT {
 				.asProjection( f ->
 						f.field( indexMapping.string1Field.relativeFieldName, CharSequence.class )
 				)
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder(
@@ -287,7 +287,7 @@ public class FieldSearchProjectionIT {
 
 			query = scope.query()
 					.asProjection( f -> f.field( fieldPath, ValueWrapper.class ) )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery();
 			assertThat( query ).hasHitsAnyOrder(
 				new ValueWrapper<>( fieldModel.document1Value.indexedValue ),
@@ -309,7 +309,7 @@ public class FieldSearchProjectionIT {
 				assertThat(
 						scope.query()
 								.asProjection( f -> f.field( fieldPath, model.type, ValueConvert.NO ) )
-								.predicate( f -> f.matchAll() )
+								.where( f -> f.matchAll() )
 								.toQuery()
 				).hasHitsAnyOrder(
 						model.document1Value.indexedValue,
@@ -332,7 +332,7 @@ public class FieldSearchProjectionIT {
 				assertThat(
 						scope.query()
 								.asProjection( f -> f.field( fieldPath, ValueConvert.NO ) )
-								.predicate( f -> f.matchAll() )
+								.where( f -> f.matchAll() )
 								.toQuery()
 				).hasHitsAnyOrder(
 						model.document1Value.indexedValue,
@@ -377,7 +377,7 @@ public class FieldSearchProjectionIT {
 												f.field( fieldPath, model.type )
 										)
 								)
-								.predicate( f -> f.matchAll() )
+								.where( f -> f.matchAll() )
 								.toQuery()
 				).hasHitsAnyOrder(
 						Arrays.asList( model.document1Value.indexedValue, model.document1Value.indexedValue ),
@@ -402,7 +402,7 @@ public class FieldSearchProjectionIT {
 								.asProjection(
 										f -> f.field( fieldPath, model.type )
 								)
-								.predicate( f -> f.matchAll() )
+								.where( f -> f.matchAll() )
 								.toQuery()
 				).hasHitsAnyOrder(
 						model.document1Value.indexedValue,
@@ -425,7 +425,7 @@ public class FieldSearchProjectionIT {
 				assertThat(
 						scope.query()
 								.asProjection( f -> f.field( fieldPath, model.type ) )
-								.predicate( f -> f.matchAll() )
+								.where( f -> f.matchAll() )
 								.toQuery()
 				).hasHitsAnyOrder(
 						model.document1Value.indexedValue,
@@ -457,7 +457,7 @@ public class FieldSearchProjectionIT {
 				assertThat(
 						scope.query()
 								.asProjection( f -> f.field( fieldPath, model.type ) )
-								.predicate( f -> f.matchAll() )
+								.where( f -> f.matchAll() )
 								.toQuery()
 				).hasHitsAnyOrder(
 						model.document1Value.indexedValue,
@@ -481,7 +481,7 @@ public class FieldSearchProjectionIT {
 				assertThat(
 						scope.query()
 								.asProjection( f -> f.field( fieldPath, ValueWrapper.class ) )
-								.predicate( f -> f.matchAll() )
+								.where( f -> f.matchAll() )
 								.toQuery()
 				).hasHitsAnyOrder(
 						new ValueWrapper<>( model.document1Value.indexedValue ),
@@ -523,7 +523,7 @@ public class FieldSearchProjectionIT {
 				assertThat(
 						scope.query()
 								.asProjection( f -> f.field( fieldPath, model.type, ValueConvert.NO ) )
-								.predicate( f -> f.matchAll() )
+								.where( f -> f.matchAll() )
 								.toQuery()
 				).hasHitsAnyOrder(
 						model.document1Value.indexedValue,
@@ -654,11 +654,11 @@ public class FieldSearchProjectionIT {
 
 		// Check that all documents are searchable
 		SearchQuery<DocumentReference> query = indexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 		query = compatibleIndexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
 	}

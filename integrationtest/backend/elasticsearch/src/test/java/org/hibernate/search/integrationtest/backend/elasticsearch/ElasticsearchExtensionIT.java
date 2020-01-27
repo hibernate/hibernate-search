@@ -20,7 +20,7 @@ import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryOptionsStep;
-import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryPredicateStep;
+import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryWhereStep;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryHitTypeStep;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
@@ -123,7 +123,7 @@ public class ElasticsearchExtensionIT {
 		// Put intermediary contexts into variables to check they have the right type
 		ElasticsearchSearchQueryHitTypeStep<DocumentReference, DocumentReference, StubLoadingOptionsStep> context1 =
 				scope.query().extension( ElasticsearchExtension.get() );
-		ElasticsearchSearchQueryPredicateStep<DocumentReference, StubLoadingOptionsStep> context2 = context1.asProjection(
+		ElasticsearchSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> context2 = context1.asProjection(
 				f -> f.composite(
 						// We don't care about the source, it's just to test that the factory context allows ES-specific projection
 						(docRef, source) -> docRef,
@@ -132,7 +132,7 @@ public class ElasticsearchExtensionIT {
 		);
 		// Note we can use Elasticsearch-specific predicates immediately
 		ElasticsearchSearchQueryOptionsStep<DocumentReference, StubLoadingOptionsStep> context3 =
-				context2.predicate( f -> f.fromJson( "{'match_all': {}}" ) );
+				context2.where( f -> f.fromJson( "{'match_all': {}}" ) );
 		// Note we can use Elasticsearch-specific sorts immediately
 		ElasticsearchSearchQueryOptionsStep<DocumentReference, StubLoadingOptionsStep> context4 =
 				context3.sort( f -> f.fromJson( "{'nativeField_sort1': 'asc'}" ) );
@@ -146,18 +146,18 @@ public class ElasticsearchExtensionIT {
 				.hasTotalHitCount( 6 );
 
 		// Also check (at compile time) the context type for other asXXX() methods, since we need to override each method explicitly
-		ElasticsearchSearchQueryPredicateStep<DocumentReference, StubLoadingOptionsStep> asReferenceContext =
+		ElasticsearchSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> asReferenceContext =
 				scope.query().extension( ElasticsearchExtension.get() ).asEntityReference();
-		ElasticsearchSearchQueryPredicateStep<DocumentReference, StubLoadingOptionsStep> asEntityContext =
+		ElasticsearchSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> asEntityContext =
 				scope.query().extension( ElasticsearchExtension.get() ).asEntity();
 		SearchProjection<DocumentReference> projection = scope.projection().documentReference().toProjection();
-		ElasticsearchSearchQueryPredicateStep<DocumentReference, StubLoadingOptionsStep> asProjectionContext =
+		ElasticsearchSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> asProjectionContext =
 				scope.query().extension( ElasticsearchExtension.get() ).asProjection( projection );
-		ElasticsearchSearchQueryPredicateStep<List<?>, StubLoadingOptionsStep> asProjectionsContext =
+		ElasticsearchSearchQueryWhereStep<List<?>, StubLoadingOptionsStep> asProjectionsContext =
 				scope.query().extension( ElasticsearchExtension.get() ).asProjections( projection, projection );
 		ElasticsearchSearchQueryOptionsStep<DocumentReference, StubLoadingOptionsStep> defaultResultContext =
 				scope.query().extension( ElasticsearchExtension.get() )
-						.predicate( f -> f.fromJson( "{'match_all': {}}" ) );
+						.where( f -> f.fromJson( "{'match_all': {}}" ) );
 	}
 
 	@Test
@@ -165,7 +165,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> genericQuery = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		// Put the query and result into variables to check they have the right type
@@ -188,7 +188,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		ElasticsearchSearchResult<DocumentReference> result = scope.query().extension( ElasticsearchExtension.get() )
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.fetchAll();
 
 		Assertions.assertThat( result.getResponseBody() )
@@ -201,7 +201,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
-				.predicate( f -> f.id().matching( FIRST_ID ) )
+				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
 		// Matching document
@@ -224,7 +224,7 @@ public class ElasticsearchExtensionIT {
 
 		ElasticsearchSearchQuery<String> query = scope.query().extension( ElasticsearchExtension.get() )
 				.asProjection( f -> f.field( "string", String.class ) )
-				.predicate( f -> f.id().matching( FIRST_ID ) )
+				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
 		// Matching document
@@ -245,7 +245,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
-				.predicate( f -> f.id().matching( FIRST_ID ) )
+				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
 		// Non-existing document
@@ -270,7 +270,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope( otherIndexManager );
 
 		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
-				.predicate( f -> f.id().matching( FIRST_ID ) )
+				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
 		// Matching document
@@ -291,7 +291,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope( otherIndexManager );
 
 		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
-				.predicate( f -> f.id().matching( FIRST_ID ) )
+				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
 		SubTest.expectException(
@@ -313,7 +313,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope( otherIndexManager );
 
 		ElasticsearchSearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
-				.predicate( f -> f.id().matching( FIRST_ID ) )
+				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
 		SubTest.expectException(
@@ -334,7 +334,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.match().field( "nativeField_dateWithColons" )
+				.where( f -> f.match().field( "nativeField_dateWithColons" )
 						.matching( new JsonPrimitive( "2018:01:12" ) ) )
 				.toQuery();
 		assertThat( query )
@@ -347,7 +347,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.match().field( "nativeField_integer_converted" )
+				.where( f -> f.match().field( "nativeField_integer_converted" )
 						.matching( new ValueWrapper<>( new JsonPrimitive( 2 ) ) ) )
 				.toQuery();
 		assertThat( query )
@@ -360,7 +360,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.match().field( "nativeField_integer_converted" )
+				.where( f -> f.match().field( "nativeField_integer_converted" )
 						.matching( new JsonPrimitive( 2 ), ValueConvert.NO ) )
 				.toQuery();
 		assertThat( query )
@@ -373,7 +373,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.should( f.extension( ElasticsearchExtension.get() )
 								.fromJson( gson.fromJson( "{'match': {'nativeField_string': 'text 1'}}", JsonObject.class ) )
 						)
@@ -431,7 +431,7 @@ public class ElasticsearchExtensionIT {
 				.toPredicate();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( booleanPredicate )
+				.where( booleanPredicate )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
@@ -443,7 +443,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.bool()
+				.where( f -> f.bool()
 						.should( f.extension( ElasticsearchExtension.get() )
 								.fromJson( "{'match': {'nativeField_string': 'text 1'}}" )
 						)
@@ -498,7 +498,7 @@ public class ElasticsearchExtensionIT {
 				.toPredicate();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( booleanPredicate )
+				.where( booleanPredicate )
 				.toQuery();
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID )
@@ -510,7 +510,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "nativeField_sort1" )
 						.then().field( "nativeField_sort2" ).asc()
 						.then().field( "nativeField_sort3" )
@@ -524,7 +524,7 @@ public class ElasticsearchExtensionIT {
 		);
 
 		query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "nativeField_sort1" ).desc()
 						.then().field( "nativeField_sort2" ).desc()
 						.then().field( "nativeField_sort3" ).desc()
@@ -543,7 +543,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f
 						.extension( ElasticsearchExtension.get() ).fromJson( gson.fromJson(
 								"{'nativeField_sort1': 'asc'}", JsonObject.class
@@ -568,7 +568,7 @@ public class ElasticsearchExtensionIT {
 		);
 
 		query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f
 						.extension( ElasticsearchExtension.get() ).fromJson( gson.fromJson(
 								"{'nativeField_sort1': 'desc'}", JsonObject.class
@@ -619,7 +619,7 @@ public class ElasticsearchExtensionIT {
 				.toSort();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f.composite().add( sort1Asc ).add( sort2Asc ).add( sort3Asc ).add( sort4Asc ) )
 				.toQuery();
 		assertThat( query )
@@ -647,7 +647,7 @@ public class ElasticsearchExtensionIT {
 				.toSort();
 
 		query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f.composite().add( sort1Desc ).add( sort2Desc ).add( sort3Desc ).add( sort4Desc ) )
 				.toQuery();
 		assertThat( query )
@@ -659,7 +659,7 @@ public class ElasticsearchExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f
 						.extension( ElasticsearchExtension.get() )
 								.fromJson( "{'nativeField_sort1': 'asc'}" )
@@ -679,7 +679,7 @@ public class ElasticsearchExtensionIT {
 		);
 
 		query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f
 						.extension( ElasticsearchExtension.get() )
 								.fromJson( "{'nativeField_sort1': 'desc'}" )
@@ -720,7 +720,7 @@ public class ElasticsearchExtensionIT {
 				.toSort();
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f.composite().add( sort1Asc ).add( sort2Asc ).add( sort3Asc ).add( sort4Asc ) )
 				.toQuery();
 		assertThat( query )
@@ -743,7 +743,7 @@ public class ElasticsearchExtensionIT {
 				.toSort();
 
 		query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f.composite().add( sort1Desc ).add( sort2Desc ).add( sort3Desc ).add( sort4Desc ) )
 				.toQuery();
 		assertThat( query )
@@ -756,7 +756,7 @@ public class ElasticsearchExtensionIT {
 
 		SearchQuery<JsonElement> query = scope.query()
 				.asProjection( f -> f.field( "nativeField_integer", JsonElement.class ) )
-				.predicate( f -> f.id().matching( SECOND_ID ) )
+				.where( f -> f.id().matching( SECOND_ID ) )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder( new JsonPrimitive( 2 ) );
@@ -768,7 +768,7 @@ public class ElasticsearchExtensionIT {
 
 		SearchQuery<ValueWrapper> query = scope.query()
 				.asProjection( f -> f.field( "nativeField_integer_converted", ValueWrapper.class ) )
-				.predicate( f -> f.id().matching( SECOND_ID ) )
+				.where( f -> f.id().matching( SECOND_ID ) )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder( new ValueWrapper<>( new JsonPrimitive( 2 ) ) );
@@ -780,7 +780,7 @@ public class ElasticsearchExtensionIT {
 
 		SearchQuery<JsonElement> query = scope.query()
 				.asProjection( f -> f.field( "nativeField_integer_converted", JsonElement.class, ValueConvert.NO ) )
-				.predicate( f -> f.id().matching( SECOND_ID ) )
+				.where( f -> f.id().matching( SECOND_ID ) )
 				.toQuery();
 
 		assertThat( query ).hasHitsAnyOrder( new JsonPrimitive( 2 ) );
@@ -794,7 +794,7 @@ public class ElasticsearchExtensionIT {
 				.asProjection(
 						f -> f.extension( ElasticsearchExtension.get() ).source()
 				)
-				.predicate( f -> f.id().matching( FIFTH_ID ) )
+				.where( f -> f.id().matching( FIFTH_ID ) )
 				.toQuery();
 
 		List<JsonObject> result = query.fetchAll().getHits();
@@ -829,7 +829,7 @@ public class ElasticsearchExtensionIT {
 								f.field( "nativeField_string" )
 						)
 				)
-				.predicate( f -> f.id().matching( FIFTH_ID ) )
+				.where( f -> f.id().matching( FIFTH_ID ) )
 				.toQuery();
 
 		List<JsonObject> result = query.fetchAll().getHits().stream()
@@ -857,7 +857,7 @@ public class ElasticsearchExtensionIT {
 
 		SearchQuery<JsonObject> query = scope.query()
 				.asProjection( f -> f.extension( ElasticsearchExtension.get() ).explanation() )
-				.predicate( f -> f.id().matching( FIRST_ID ) )
+				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
 		List<JsonObject> result = query.fetchAll().getHits();
@@ -874,7 +874,7 @@ public class ElasticsearchExtensionIT {
 
 		SearchQuery<JsonObject> query = scope.query()
 				.asProjection( f -> f.extension( ElasticsearchExtension.get() ).jsonHit() )
-				.predicate( f -> f.id().matching( FIRST_ID ) )
+				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
 		List<JsonObject> result = query.fetchAll().getHits();
@@ -896,7 +896,7 @@ public class ElasticsearchExtensionIT {
 		AggregationKey<Map<JsonElement, Long>> documentCountPerValue = AggregationKey.of( "documentCountPerValue" );
 
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.aggregation( documentCountPerValue, f -> f.terms().field( "nativeField_aggregation", JsonElement.class ) )
 				.toQuery();
 		assertThat( query ).aggregation( documentCountPerValue )
@@ -916,7 +916,7 @@ public class ElasticsearchExtensionIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.extension( ElasticsearchExtension.get() )
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.aggregation( documentCountPerValue, f -> f.fromJson( gson.fromJson(
 						"{"
 								+ "'value_count' : {"
@@ -944,7 +944,7 @@ public class ElasticsearchExtensionIT {
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.extension( ElasticsearchExtension.get() )
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.aggregation( documentCountPerValue, f -> f.fromJson(
 						"{"
 								+ "'value_count' : {"
@@ -1095,7 +1095,7 @@ public class ElasticsearchExtensionIT {
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder(
 				INDEX_NAME,

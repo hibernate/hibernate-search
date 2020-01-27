@@ -112,7 +112,7 @@ public class IndexingIT<F> {
 							f.entityReference(),
 							f.field( absoluteFieldPath, typeDescriptor.getJavaType() )
 					) )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery();
 
 			assertThat( query ).hasHitsAnyOrder( expectedDocuments );

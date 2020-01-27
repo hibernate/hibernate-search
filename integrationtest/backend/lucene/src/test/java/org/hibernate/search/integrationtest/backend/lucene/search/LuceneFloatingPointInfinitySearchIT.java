@@ -181,7 +181,7 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 	}
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllQuery() {
-		return indexManager.createScope().query().predicate( f -> f.matchAll() );
+		return indexManager.createScope().query().where( f -> f.matchAll() );
 	}
 
 	private void initData() {
@@ -203,7 +203,7 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 		// Check that all documents are searchable
 		SearchResultAssert.assertThat(
 				indexManager.createScope().query()
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.toQuery()
 		)
 				.hasTotalHitCount( 3 );

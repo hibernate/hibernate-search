@@ -199,7 +199,7 @@ public class SingleFieldAggregationBaseIT<F> {
 
 		SearchResultAssert.assertThat(
 				scope.query()
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.aggregation( aggregationKey, f -> scenario.setup( f, fieldPath ) )
 						.toQuery()
 		)
@@ -225,7 +225,7 @@ public class SingleFieldAggregationBaseIT<F> {
 
 		SearchResultAssert.assertThat(
 				indexManager.createScope().query()
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.aggregation( aggregationKey, aggregation )
 						.toQuery()
 		)
@@ -251,7 +251,7 @@ public class SingleFieldAggregationBaseIT<F> {
 
 		SearchResultAssert.assertThat(
 				scope.query()
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.aggregation( aggregationKey, aggregation )
 						.toQuery()
 		)
@@ -263,7 +263,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		// reuse the aggregation instance on the same scope
 		SearchResultAssert.assertThat(
 				scope.query()
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.aggregation( aggregationKey, aggregation )
 						.toQuery()
 		)
@@ -276,7 +276,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		scope = indexManager.createScope();
 		SearchResultAssert.assertThat(
 				scope.query()
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.aggregation( aggregationKey, aggregation )
 						.toQuery()
 		)
@@ -303,7 +303,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		// reuse the aggregation instance on a different scope targeting a different index
 		SubTest.expectException( () ->
 				compatibleIndexManager.createScope().query()
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.aggregation( aggregationKey, aggregation )
 						.toQuery()
 		)
@@ -316,7 +316,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		// reuse the aggregation instance on a different scope targeting a superset of the original indexes
 		SubTest.expectException( () ->
 				indexManager.createScope( compatibleIndexManager ).query()
-						.predicate( f -> f.matchAll() )
+						.where( f -> f.matchAll() )
 						.aggregation( aggregationKey, aggregation )
 						.toQuery()
 		)
@@ -570,7 +570,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		AggregationKey<A> key2 = AggregationKey.of( "aggregationName2" );
 
 		SearchResultAssert.assertThat(
-				indexManager.createScope().query().predicate( f -> f.matchAll() )
+				indexManager.createScope().query().where( f -> f.matchAll() )
 						.aggregation( key1, f -> scenario.setup( f, fieldPath ) )
 						.aggregation( key2, f -> scenario.setup( f, fieldPath ) )
 						.toQuery()
@@ -602,7 +602,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		AggregationKey<A> key1 = AggregationKey.of( "aggregationName1" );
 
 		SubTest.expectException( () ->
-				indexManager.createScope().query().predicate( f -> f.matchAll() )
+				indexManager.createScope().query().where( f -> f.matchAll() )
 						.aggregation( key1, f -> scenario.setup( f, fieldPath ) )
 						.aggregation( key1, f -> scenario.setup( f, fieldPath ) )
 		)
@@ -733,7 +733,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		AggregationKey<A> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 		SearchResultAssert.assertThat(
 				scope.query()
-						.predicate( predicateContributor )
+						.where( predicateContributor )
 						.aggregation( aggregationKey, f -> aggregationContributor.apply( f, scenario ) )
 						.toQuery()
 		)
@@ -808,24 +808,24 @@ public class SingleFieldAggregationBaseIT<F> {
 
 		// Check that all documents are searchable
 		SearchResultAssert.assertThat( indexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasTotalHitCount( mainIndexDocumentFieldValues.size() + 1 /* +1 for the empty document */ );
 		SearchResultAssert.assertThat( compatibleIndexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasTotalHitCount( otherIndexDocumentFieldValues.size() );
 		SearchResultAssert.assertThat( rawFieldCompatibleIndexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasTotalHitCount( otherIndexDocumentFieldValues.size() );
 		SearchResultAssert.assertThat( nullOnlyIndexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasTotalHitCount( 1 );
 		if ( TckConfiguration.get().getBackendFeatures().aggregationsOnMultiValuedFields( typeDescriptor.getJavaType() ) ) {
 			SearchResultAssert.assertThat( multiValuedIndexManager.createScope().query()
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery() )
 					.hasTotalHitCount( multiValuedIndexDocumentFieldValues.size() + 1 /* +1 for the empty document */ );
 		}

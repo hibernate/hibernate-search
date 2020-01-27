@@ -80,7 +80,7 @@ public class IndexIndexerIT {
 		workspace.flush().join();
 
 		SearchQuery<DocumentReference> query = indexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 
 		Assertions.assertThat( query.fetchTotalHitCount() ).isEqualTo( NUMBER_OF_BOOKS );

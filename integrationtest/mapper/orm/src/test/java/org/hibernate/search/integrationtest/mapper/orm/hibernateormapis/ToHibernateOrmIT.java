@@ -243,7 +243,7 @@ public class ToHibernateOrmIT {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery(
 					searchSession.search( IndexedEntity.class )
-							.predicate( f -> f.matchAll() )
+							.where( f -> f.matchAll() )
 							.failAfter( 2, TimeUnit.SECONDS )
 							.toQuery()
 			);
@@ -342,7 +342,7 @@ public class ToHibernateOrmIT {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery(
 					searchSession.search( IndexedEntity.class )
-							.predicate( f -> f.matchAll() )
+							.where( f -> f.matchAll() )
 							.failAfter( 2, TimeUnit.SECONDS )
 							.toQuery()
 			);
@@ -371,7 +371,7 @@ public class ToHibernateOrmIT {
 			SearchSession searchSession = Search.session( session );
 			Query<IndexedEntity> query = Search.toOrmQuery(
 					searchSession.search( IndexedEntity.class )
-							.predicate( f -> f.matchAll() )
+							.where( f -> f.matchAll() )
 							.failAfter( 2, TimeUnit.SECONDS )
 							.toQuery()
 			);
@@ -453,7 +453,7 @@ public class ToHibernateOrmIT {
 	private SearchQuery<IndexedEntity> createSimpleQuery(SearchSession searchSession) {
 		return searchSession.search( IndexedEntity.class )
 				.asEntity()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 	}
 

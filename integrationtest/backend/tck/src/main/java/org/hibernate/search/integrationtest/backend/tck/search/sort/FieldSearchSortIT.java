@@ -464,7 +464,7 @@ public class FieldSearchSortIT {
 		thrown.expectMessage( INDEX_NAME );
 
 		scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f.field( absoluteFieldPath ) )
 				.toQuery();
 	}
@@ -481,7 +481,7 @@ public class FieldSearchSortIT {
 		thrown.expectMessage( INDEX_NAME );
 
 		scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f.field( absoluteFieldPath ) )
 				.toQuery();
 	}
@@ -498,7 +498,7 @@ public class FieldSearchSortIT {
 		thrown.expectMessage( INDEX_NAME );
 
 		scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f.field( absoluteFieldPath ) )
 				.toQuery();
 	}
@@ -677,7 +677,7 @@ public class FieldSearchSortIT {
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(
 			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
 		return scope.query()
-				.predicate( f -> f.matchAll().except( f.id().matching( EMPTY ) ) )
+				.where( f -> f.matchAll().except( f.id().matching( EMPTY ) ) )
 				.sort( sortContributor )
 				.toQuery();
 	}
@@ -690,7 +690,7 @@ public class FieldSearchSortIT {
 	private SearchQuery<DocumentReference> matchAllQuery(
 			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
 		return scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( sortContributor )
 				.toQuery();
 	}
@@ -789,20 +789,20 @@ public class FieldSearchSortIT {
 
 		// Check that all documents are searchable
 		SearchQuery<DocumentReference> query = indexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 		query = compatibleIndexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( COMPATIBLE_INDEX_NAME, COMPATIBLE_INDEX_DOCUMENT_1 );
 		query = rawFieldCompatibleIndexManager.createScope().query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
 		query = incompatibleDecimalScaleIndexManager.createScope().query()
 				.asEntityReference()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasDocRefHitsAnyOrder( INCOMPATIBLE_DECIMAL_SCALE_INDEX_NAME, INCOMPATIBLE_DECIMAL_SCALE_INDEX_DOCUMENT_1 );
 	}

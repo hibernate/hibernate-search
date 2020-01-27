@@ -264,27 +264,27 @@ public class SearchQueryFetchIT {
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllQuery() {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "integer" ).asc() );
 	}
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchFirstHalfQuery() {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
-				.predicate( f -> f.range().field( "integer" ).lessThan( DOCUMENT_COUNT / 2 ) )
+				.where( f -> f.range().field( "integer" ).lessThan( DOCUMENT_COUNT / 2 ) )
 				.sort( f -> f.field( "integer" ).asc() );
 	}
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchOneQuery(int id) {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
-				.predicate( f -> f.match().field( "integer" ).matching( id ) );
+				.where( f -> f.match().field( "integer" ).matching( id ) );
 	}
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchNoneQuery() {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
-				.predicate( f -> f.match().field( "integer" ).matching( DOCUMENT_COUNT + 2 ) );
+				.where( f -> f.match().field( "integer" ).matching( DOCUMENT_COUNT + 2 ) );
 	}
 
 	private void initData() {
@@ -304,7 +304,7 @@ public class SearchQueryFetchIT {
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
-				.predicate( f -> f.matchAll() )
+				.where( f -> f.matchAll() )
 				.toQuery();
 		assertThat( query ).hasTotalHitCount( DOCUMENT_COUNT );
 	}
