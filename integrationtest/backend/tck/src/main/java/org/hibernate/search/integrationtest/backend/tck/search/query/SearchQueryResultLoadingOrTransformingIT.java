@@ -423,6 +423,77 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 	}
 
 	@Test
+	public void asEntityReference_noReferenceTransformer() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.asEntityReference()
+				.where( f -> f.matchAll() )
+				.toQuery();
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
+	}
+
+	@Test
+	public void asEntity_noEntityLoading() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.asEntity()
+				.where( f -> f.matchAll() )
+				.toQuery();
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, MAIN_ID, EMPTY_ID );
+	}
+
+	@Test
+	public void asProjection_hitTransformer() {
+		DocumentReference mainReference = reference( INDEX_NAME, MAIN_ID );
+		DocumentReference emptyReference = reference( INDEX_NAME, EMPTY_ID );
+		StubTransformedHit mainTransformedHit = new StubTransformedHit( mainReference );
+		StubTransformedHit emptyTransformedHit = new StubTransformedHit( emptyReference );
+
+		Function<List<?>, StubTransformedHit> hitTransformerMock = createMock( StubHitTransformer.class );
+
+		resetAll();
+		// No calls expected on the mocks
+		replayAll();
+		StubMappingScope scope = indexManager.createScope();
+		SearchQuery<StubTransformedHit> query = scope.query()
+				.asProjection( f ->
+						f.composite(
+								hitTransformerMock,
+								f.field( "string", String.class ).toProjection(),
+								f.field( "string_analyzed", String.class ).toProjection(),
+								f.field( "integer", Integer.class ).toProjection(),
+								f.field( "localDate", LocalDate.class ).toProjection(),
+								f.field( "geoPoint", GeoPoint.class ).toProjection(),
+								f.documentReference().toProjection(),
+								f.entityReference().toProjection(),
+								f.entity().toProjection()
+						)
+				)
+				.where( f -> f.matchAll() )
+				.toQuery();
+		verifyAll();
+
+		resetAll();
+		expect( hitTransformerMock.apply( projectionMatcher(
+				STRING_VALUE, STRING_ANALYZED_VALUE, INTEGER_VALUE, LOCAL_DATE_VALUE, GEO_POINT_VALUE,
+				mainReference, mainReference, mainReference
+		) ) )
+				.andReturn( mainTransformedHit );
+		expect( hitTransformerMock.apply( projectionMatcher(
+				null, null, null, null, null,
+				emptyReference, emptyReference, emptyReference
+		) ) )
+				.andReturn( emptyTransformedHit );
+		replayAll();
+		assertThat( query ).hasHitsAnyOrder( mainTransformedHit, emptyTransformedHit );
+		verifyAll();
+	}
+
+	@Test
 	public void countQuery() {
 		StubMappingScope scope = indexManager.createScope();
 
