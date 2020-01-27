@@ -87,7 +87,7 @@ public class SortDslIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class ) // <1>
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.sort( f -> f.field( "pageCount" ).desc() // <2>
 							.then().field( "title_sort" ) )
 					.fetchHits( 20 ); // <3>
@@ -104,7 +104,7 @@ public class SortDslIT {
 			SearchScope<Book> scope = searchSession.scope( Book.class );
 
 			List<Book> result = searchSession.search( scope )
-					.predicate( scope.predicate().matchAll().toPredicate() )
+					.where( scope.predicate().matchAll().toPredicate() )
 					.sort( scope.sort()
 							.field( "pageCount" ).desc()
 							.then().field( "title_sort" )
@@ -122,7 +122,7 @@ public class SortDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::score[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.match().field( "title" )
+					.where( f -> f.match().field( "title" )
 							.matching( "robot dawn" ) )
 					.sort( f -> f.score() )
 					.fetchHits( 20 );
@@ -138,7 +138,7 @@ public class SortDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::indexOrder[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.sort( f -> f.indexOrder() )
 					.fetchHits( 20 );
 			// end::indexOrder[]
@@ -154,7 +154,7 @@ public class SortDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::field[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.sort( f -> f.field( "title_sort" ) )
 					.fetchHits( 20 );
 			// end::field[]
@@ -166,7 +166,7 @@ public class SortDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::field-missing-first[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.sort( f -> f.field( "pageCount" ).missing().first() )
 					.fetchHits( 20 );
 			// end::field-missing-first[]
@@ -178,7 +178,7 @@ public class SortDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::field-missing-last[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.sort( f -> f.field( "pageCount" ).missing().last() )
 					.fetchHits( 20 );
 			// end::field-missing-last[]
@@ -190,7 +190,7 @@ public class SortDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::field-missing-use[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.sort( f -> f.field( "pageCount" ).missing().use( 300 ) )
 					.fetchHits( 20 );
 			// end::field-missing-use[]
@@ -205,7 +205,7 @@ public class SortDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::composite[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.sort( f -> f.composite() // <1>
 							.add( f.field( "genre_sort" ) ) // <2>
 							.add( f.field( "title_sort" ) ) ) // <3>
@@ -220,7 +220,7 @@ public class SortDslIT {
 			// tag::composite_dynamicParameters[]
 			MySearchParameters searchParameters = getSearchParameters(); // <1>
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.sort( f -> f.composite( b -> { // <2>
 						for ( MySort mySort : searchParameters.getSorts() ) { // <3>
 							switch ( mySort.getType() ) {
@@ -249,7 +249,7 @@ public class SortDslIT {
 		withinSearchSession( searchSession -> {
 			// tag::then[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.sort( f -> f.field( "genre_sort" ) // <2>
 							.then().field( "title_sort" ) ) // <3>
 					.fetchHits( 20 ); // <4>
@@ -266,7 +266,7 @@ public class SortDslIT {
 			// tag::distance[]
 			GeoPoint center = GeoPoint.of( 47.506060, 2.473916 );
 			List<Author> hits = searchSession.search( Author.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.sort( f -> f.distance( "placeOfBirth", center ) )
 					.fetchHits( 20 );
 			// end::distance[]
@@ -284,7 +284,7 @@ public class SortDslIT {
 			// tag::lucene-fromLuceneSort[]
 			List<Book> hits = searchSession.search( Book.class )
 					.extension( LuceneExtension.get() )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.sort( f -> f.fromLuceneSort(
 							new Sort(
 									new SortField( "genre_sort", SortField.Type.STRING ),
@@ -302,7 +302,7 @@ public class SortDslIT {
 			// tag::lucene-fromLuceneSortField[]
 			List<Book> hits = searchSession.search( Book.class )
 					.extension( LuceneExtension.get() )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.sort( f -> f.fromLuceneSortField(
 							new SortField( "title_sort", SortField.Type.STRING )
 					) )
@@ -332,7 +332,7 @@ public class SortDslIT {
 					/* ... */;
 			List<Book> hits = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.sort( f -> f.fromJson( jsonObject ) )
 					.fetchHits( 20 );
 			// end::elasticsearch-fromJson-jsonObject[]
@@ -345,7 +345,7 @@ public class SortDslIT {
 			// tag::elasticsearch-fromJson-string[]
 			List<Book> hits = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.sort( f -> f.fromJson( "{"
 									+ "\"title_sort\": \"asc\""
 							+ "}" ) )

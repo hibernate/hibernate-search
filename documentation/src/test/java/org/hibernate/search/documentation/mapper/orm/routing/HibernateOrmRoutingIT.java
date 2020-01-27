@@ -67,7 +67,7 @@ public class HibernateOrmRoutingIT {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::routing-single[]
 			SearchResult<Book> result = searchSession.search( Book.class ) // <1>
-					.predicate( f -> f.match()
+					.where( f -> f.match()
 							.field( "genre" )
 							.matching( Genre.SCIENCE_FICTION ) ) // <2>
 					.routing( Genre.SCIENCE_FICTION.name() ) // <3>

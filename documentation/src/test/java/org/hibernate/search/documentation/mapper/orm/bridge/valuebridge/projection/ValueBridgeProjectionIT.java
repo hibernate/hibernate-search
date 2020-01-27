@@ -67,7 +67,7 @@ public class ValueBridgeProjectionIT {
 
 			List<ISBN> result = searchSession.search( Book.class )
 					.asProjection( f -> f.field( "isbn", ISBN.class ) )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 
 			assertThat( result ).containsExactly( ISBN.parse( "978-0-58-600835-5" ) );

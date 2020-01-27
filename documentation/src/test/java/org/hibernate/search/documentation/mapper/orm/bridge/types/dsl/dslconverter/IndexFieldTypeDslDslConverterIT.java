@@ -71,7 +71,7 @@ public class IndexFieldTypeDslDslConverterIT {
 					ISBN.parse( "978-0-58-600835-5" );
 			//tag::include[]
 			List<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.match().field( "isbn" )
+					.where( f -> f.match().field( "isbn" )
 							.matching( expectedISBN ) ) // <1>
 					.fetchHits( 20 );
 			//end::include[]

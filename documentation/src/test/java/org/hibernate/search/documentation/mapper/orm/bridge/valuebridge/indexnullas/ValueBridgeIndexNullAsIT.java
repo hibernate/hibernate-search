@@ -66,7 +66,7 @@ public class ValueBridgeIndexNullAsIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.match().field( "isbn" )
+					.where( f -> f.match().field( "isbn" )
 							.matching( ISBN.parse( "000-0-00-000000-0" ) ) )
 					.fetchHits( 20 );
 

@@ -79,7 +79,7 @@ public class AssociationInverseSideIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.bool()
+					.where( f -> f.bool()
 							.must( f.match().field( "editionsForSale.label" ).matching( "paperback" ) )
 							.must( f.match().field( "editionsForSale.label" ).matching( "kindle" ) )
 					)

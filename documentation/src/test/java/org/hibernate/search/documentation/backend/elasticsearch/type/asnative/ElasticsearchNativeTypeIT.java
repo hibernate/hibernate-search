@@ -54,7 +54,7 @@ public class ElasticsearchNativeTypeIT {
 
 			List<CompanyServer> result = searchSession.search( CompanyServer.class )
 					.extension( ElasticsearchExtension.get() )
-					.predicate( f -> f.fromJson(
+					.where( f -> f.fromJson(
 							"{\n" +
 							"  \"term\": {\n" +
 							"    \"ipAddress\": \"192.168.0.0/16\"\n" +

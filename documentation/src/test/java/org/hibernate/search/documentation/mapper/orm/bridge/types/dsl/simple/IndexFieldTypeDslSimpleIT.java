@@ -66,7 +66,7 @@ public class IndexFieldTypeDslSimpleIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.match().field( "isbn" )
+					.where( f -> f.match().field( "isbn" )
 							.matching( "978-0-58-600835-5" ) )
 					.fetchHits( 20 );
 

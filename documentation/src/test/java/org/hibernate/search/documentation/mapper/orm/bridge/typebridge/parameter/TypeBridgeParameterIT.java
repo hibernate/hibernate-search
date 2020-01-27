@@ -71,7 +71,7 @@ public class TypeBridgeParameterIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Author> result = searchSession.search( Author.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.sort( f -> f.field( "fullName_sort" ) )
 					.fetchHits( 20 );
 

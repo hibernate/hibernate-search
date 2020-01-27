@@ -71,7 +71,7 @@ public class ValueBridgeOrmContextIT {
 
 			List<MyData> result = searchSession.search( MyEntity.class )
 					.asProjection( f -> f.field( "myData", MyData.class ) )
-					.predicate( f -> f.match().field( "myData" )
+					.where( f -> f.match().field( "myData" )
 							.matching( "INDEXED", ValueConvert.NO ) )
 					.fetchHits( 20 );
 

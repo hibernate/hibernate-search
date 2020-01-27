@@ -68,7 +68,7 @@ public class TypeBridgeOrmContextIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<MyEntity> result = searchSession.search( MyEntity.class )
-					.predicate( f -> f.match().field( "myData" )
+					.where( f -> f.match().field( "myData" )
 							.matching( "INDEXED", ValueConvert.NO ) )
 					.fetchHits( 20 );
 

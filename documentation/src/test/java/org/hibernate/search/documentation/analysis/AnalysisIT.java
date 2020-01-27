@@ -89,7 +89,7 @@ public class AnalysisIT {
 
 			assertThat(
 					searchSession.search( IndexedEntity.class )
-							.predicate( factory -> factory.match()
+							.where( factory -> factory.match()
 									.field( "english" )
 									.matching( "worded" )
 							)
@@ -99,7 +99,7 @@ public class AnalysisIT {
 
 			assertThat(
 					searchSession.search( IndexedEntity.class )
-							.predicate( factory -> factory.match()
+							.where( factory -> factory.match()
 									.field( "french" )
 									.matching( "châtier" )
 							)
@@ -109,7 +109,7 @@ public class AnalysisIT {
 
 			assertThat(
 					searchSession.search( IndexedEntity.class )
-							.predicate( factory -> factory.match()
+							.where( factory -> factory.match()
 									.field( "lowercase" )
 									.matching( "the <strong>châtié</strong> WORDING" )
 							)
@@ -152,7 +152,7 @@ public class AnalysisIT {
 
 			assertThat(
 					searchSession.search( IndexedEntity.class )
-							.predicate( factory -> factory.match()
+							.where( factory -> factory.match()
 									.field( "standard" )
 									.matching( "wording" )
 							)
@@ -195,7 +195,7 @@ public class AnalysisIT {
 
 			assertThat(
 					searchSession.search( IndexedEntity.class )
-							.predicate( factory -> factory.match()
+							.where( factory -> factory.match()
 									.field( "standard" )
 									.matching( "wording" )
 							)

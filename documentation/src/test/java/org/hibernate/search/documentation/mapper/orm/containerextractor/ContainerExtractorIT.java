@@ -78,7 +78,7 @@ public class ContainerExtractorIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.bool()
+					.where( f -> f.bool()
 							.must( f.match().field( "availableFormats" ).matching( BookFormat.AUDIOBOOK ) )
 							.must( f.match().field( "availableFormats" ).matching( BookFormat.HARDCOVER ) )
 							.must( f.match().field( "authorCount" ).matching( 1, ValueConvert.NO ) )

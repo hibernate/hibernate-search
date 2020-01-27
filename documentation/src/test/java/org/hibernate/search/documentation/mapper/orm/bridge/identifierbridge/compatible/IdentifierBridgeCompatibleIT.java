@@ -72,7 +72,7 @@ public class IdentifierBridgeCompatibleIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Object> result = searchSession.search( Arrays.asList( Book.class, Magazine.class ) )
-					.predicate( f -> f.id().matching( new BookOrMagazineId( 1L, 42L ) ) )
+					.where( f -> f.id().matching( new BookOrMagazineId( 1L, 42L ) ) )
 					.fetchHits( 20 );
 
 			assertThat( result ).hasSize( 1 )

@@ -68,7 +68,7 @@ public class IndexFieldTypeDslProjectionConverterIT {
 			//tag::include[]
 			List<ISBN> result = searchSession.search( Book.class )
 					.asProjection( f -> f.field( "isbn", ISBN.class ) ) // <1>
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			//end::include[]
 

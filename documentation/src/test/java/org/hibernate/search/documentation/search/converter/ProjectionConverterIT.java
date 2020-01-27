@@ -72,7 +72,7 @@ public class ProjectionConverterIT {
 			// tag::projection-converter-enabled[]
 			List<OrderStatus> result = searchSession.search( Order.class )
 					.asProjection( f -> f.field( "status", OrderStatus.class ) )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::projection-converter-enabled[]
 
@@ -89,7 +89,7 @@ public class ProjectionConverterIT {
 			// tag::projection-converter-disabled[]
 			List<String> result = searchSession.search( Order.class )
 					.asProjection( f -> f.field( "status", String.class, ValueConvert.NO ) )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::projection-converter-disabled[]
 

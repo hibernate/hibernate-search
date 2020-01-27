@@ -69,7 +69,7 @@ public class IdentifierMappingCustomTypeIT {
 
 			List<DocumentReference> result = searchSession.search( Book.class )
 					.asProjection( f -> f.documentReference() )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 
 			assertThat( result )

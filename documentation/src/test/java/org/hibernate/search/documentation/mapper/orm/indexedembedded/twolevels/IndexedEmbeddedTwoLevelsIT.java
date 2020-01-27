@@ -79,7 +79,7 @@ public class IndexedEmbeddedTwoLevelsIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.bool()
+					.where( f -> f.bool()
 							.must( f.match().field( "title" ).matching( "robot" ) )
 							.must( f.match().field( "authors.name" ).matching( "isaac" ) )
 							.must( f.match().field( "authors.placeOfBirth.country" ).matching( "russia" ) )

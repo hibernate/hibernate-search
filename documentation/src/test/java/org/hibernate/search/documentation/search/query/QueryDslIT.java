@@ -102,7 +102,7 @@ public class QueryDslIT {
 			SearchSession searchSession = Search.session( entityManager ); // <1>
 
 			SearchResult<Book> result = searchSession.search( Book.class ) // <2>
-					.predicate( f -> f.match() // <3>
+					.where( f -> f.match() // <3>
 							.field( "title" )
 							.matching( "robot" ) )
 					.fetch( 20 ); // <4>
@@ -126,7 +126,7 @@ public class QueryDslIT {
 			SearchResult<Person> result = searchSession.search( Arrays.asList( // <1>
 							Manager.class, Associate.class
 					) )
-					.predicate( f -> f.match() // <2>
+					.where( f -> f.match() // <2>
 							.field( "name" )
 							.matching( "james" ) )
 					.fetch( 20 ); // <3>
@@ -151,7 +151,7 @@ public class QueryDslIT {
 									Arrays.asList( "Manager", "Associate" )
 							)
 					)
-					.predicate( f -> f.match() // <3>
+					.where( f -> f.match() // <3>
 							.field( "name" )
 							.matching( "james" ) )
 					.fetch( 20 ); // <4>
@@ -171,7 +171,7 @@ public class QueryDslIT {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-searchResult[]
 			SearchResult<Book> result = searchSession.search( Book.class ) // <1>
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetch( 20 ); // <2>
 
 			long totalHitCount = result.getTotalHitCount(); // <3>
@@ -188,7 +188,7 @@ public class QueryDslIT {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-totalHitCount[]
 			long totalHitCount = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchTotalHitCount();
 			// end::fetching-totalHitCount[]
 
@@ -199,7 +199,7 @@ public class QueryDslIT {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-hits[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 			// end::fetching-hits[]
 
@@ -211,7 +211,7 @@ public class QueryDslIT {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-singleHit[]
 			Optional<Book> hit = searchSession.search( Book.class )
-					.predicate( f -> f.id().matching( 1 ) )
+					.where( f -> f.id().matching( 1 ) )
 					.fetchSingleHit();
 			// end::fetching-singleHit[]
 
@@ -226,7 +226,7 @@ public class QueryDslIT {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-all-searchResult[]
 			SearchResult<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.id().matchingAny( Arrays.asList( 1, 2 ) ) )
+					.where( f -> f.id().matchingAny( Arrays.asList( 1, 2 ) ) )
 					.fetchAll();
 
 			long totalHitCount = result.getTotalHitCount();
@@ -242,7 +242,7 @@ public class QueryDslIT {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-all-hits[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.id().matchingAny( Arrays.asList( 1, 2 ) ) )
+					.where( f -> f.id().matchingAny( Arrays.asList( 1, 2 ) ) )
 					.fetchAllHits();
 			// end::fetching-all-hits[]
 
@@ -257,7 +257,7 @@ public class QueryDslIT {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-pagination-searchResult[]
 			SearchResult<Book> result = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetch( 40, 20 ); // <1>
 			// end::fetching-pagination-searchResult[]
 			long totalHitCount = result.getTotalHitCount();
@@ -271,7 +271,7 @@ public class QueryDslIT {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::fetching-pagination-hits[]
 			List<Book> hits = searchSession.search( Book.class )
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.fetchHits( 40, 20 ); // <1>
 			// end::fetching-pagination-hits[]
 
@@ -285,7 +285,7 @@ public class QueryDslIT {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::searchQuery[]
 			SearchQuery<Book> query = searchSession.search( Book.class ) // <1>
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery(); // <2>
 			List<Book> hits = query.fetchHits( 20 ); // <3>
 			// end::searchQuery[]
@@ -298,7 +298,7 @@ public class QueryDslIT {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::searchQuery-toORM[]
 			SearchQuery<Book> query = searchSession.search( Book.class ) // <1>
-					.predicate( f -> f.matchAll() )
+					.where( f -> f.matchAll() )
 					.toQuery(); // <2>
 			javax.persistence.TypedQuery<Book> jpaQuery = Search.toJpaQuery( query ); // <3>
 			org.hibernate.query.Query<Book> ormQuery = Search.toOrmQuery( query ); // <4>
@@ -321,7 +321,7 @@ public class QueryDslIT {
 			// tag::explain-lucene[]
 			LuceneSearchQuery<Book> query = searchSession.search( Book.class )
 					.extension( LuceneExtension.get() ) // <1>
-					.predicate( f -> f.match()
+					.where( f -> f.match()
 							.field( "title" )
 							.matching( "robot" ) )
 					.toQuery(); // <2>
@@ -349,7 +349,7 @@ public class QueryDslIT {
 			// tag::explain-elasticsearch[]
 			ElasticsearchSearchQuery<Book> query = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() ) // <1>
-					.predicate( f -> f.match()
+					.where( f -> f.match()
 							.field( "title" )
 							.matching( "robot" ) )
 					.toQuery(); // <2>
@@ -372,7 +372,7 @@ public class QueryDslIT {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::took-timedOut[]
 			SearchQuery<Book> query = searchSession.search( Book.class )
-					.predicate( f -> f.match()
+					.where( f -> f.match()
 							.field( "title" )
 							.matching( "robot" ) )
 					.toQuery();
@@ -394,7 +394,7 @@ public class QueryDslIT {
 			SearchSession searchSession = Search.session( entityManager );
 			// tag::truncateAfter[]
 			SearchResult<Book> result = searchSession.search( Book.class ) // <1>
-					.predicate( f -> f.match()
+					.where( f -> f.match()
 							.field( "title" )
 							.matching( "robot" ) )
 					.truncateAfter( 500, TimeUnit.MILLISECONDS ) // <2>
@@ -416,7 +416,7 @@ public class QueryDslIT {
 			// tag::failAfter[]
 			try {
 				SearchResult<Book> result = searchSession.search( Book.class ) // <1>
-						.predicate( f -> f.match()
+						.where( f -> f.match()
 								.field( "title" )
 								.matching( "robot" ) )
 						.failAfter( 500, TimeUnit.MILLISECONDS ) // <2>
@@ -440,7 +440,7 @@ public class QueryDslIT {
 
 			// tag::cacheLookupStrategy-persistenceContextThenSecondLevelCache[]
 			SearchResult<Book> result = searchSession.search( Book.class ) // <1>
-					.predicate( f -> f.match()
+					.where( f -> f.match()
 							.field( "title" )
 							.matching( "robot" ) )
 					.loading( o -> o.cacheLookupStrategy( // <2>
@@ -462,7 +462,7 @@ public class QueryDslIT {
 
 			// tag::fetchSize[]
 			SearchResult<Book> result = searchSession.search( Book.class ) // <1>
-					.predicate( f -> f.match()
+					.where( f -> f.match()
 							.field( "title" )
 							.matching( "robot" ) )
 					.loading( o -> o.fetchSize( 50 ) ) // <2>
@@ -483,7 +483,7 @@ public class QueryDslIT {
 			// tag::elasticsearch-requestTransformer[]
 			List<Book> hits = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() ) // <1>
-					.predicate( f -> f.match()
+					.where( f -> f.match()
 							.field( "title" )
 							.matching( "robot" ) )
 					.requestTransformer( context -> { // <2>
@@ -505,7 +505,7 @@ public class QueryDslIT {
 			// tag::elasticsearch-responseBody[]
 			ElasticsearchSearchResult<Book> result = searchSession.search( Book.class )
 					.extension( ElasticsearchExtension.get() ) // <1>
-					.predicate( f -> f.match()
+					.where( f -> f.match()
 							.field( "title" )
 							.matching( "robt" ) )
 					.requestTransformer( context -> { // <2>
