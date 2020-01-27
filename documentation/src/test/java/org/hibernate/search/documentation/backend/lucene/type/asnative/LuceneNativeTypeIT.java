@@ -65,7 +65,7 @@ public class LuceneNativeTypeIT {
 
 			List<Result> result = searchSession.search( WebPage.class )
 					.extension( LuceneExtension.get() )
-					.asProjection( f -> f.composite(
+					.select( f -> f.composite(
 							Result::new,
 							f.entity(),
 							f.field( "pageRank", Float.class )

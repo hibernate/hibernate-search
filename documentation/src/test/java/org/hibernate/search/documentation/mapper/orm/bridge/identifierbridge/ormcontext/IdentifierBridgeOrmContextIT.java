@@ -71,7 +71,7 @@ public class IdentifierBridgeOrmContextIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<EntityReference> result = searchSession.search( MyEntity.class )
-					.asProjection( f -> f.entityReference() )
+					.select( f -> f.entityReference() )
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 );
 

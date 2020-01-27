@@ -90,7 +90,7 @@ public class HibernateOrmSimpleMappingIT {
 			SearchSession searchSession = Search.session( entityManager );
 
 			List<String> result = searchSession.search( Book.class ) // <1>
-					.asProjection( f -> f.field( "title", String.class ) ) // <2>
+					.select( f -> f.field( "title", String.class ) ) // <2>
 					.where( f -> f.matchAll() )
 					.fetchHits( 20 ); // <3>
 
