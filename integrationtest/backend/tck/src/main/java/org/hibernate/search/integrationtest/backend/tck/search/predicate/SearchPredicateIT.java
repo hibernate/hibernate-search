@@ -76,7 +76,7 @@ public class SearchPredicateIT {
 	}
 
 	@Test
-	public void match_search_predicate() {
+	public void where_searchPredicate() {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchPredicate predicate = scope.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
@@ -90,11 +90,37 @@ public class SearchPredicateIT {
 	}
 
 	@Test
-	public void match_lambda() {
+	public void where_lambda() {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.match().field( "string" ).matching( STRING_1 ) )
+				.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+	}
+
+	@Test
+	public void predicate_searchPredicate() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchPredicate predicate = scope.predicate().match().field( "string" ).matching( STRING_1 ).toPredicate();
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.predicate( predicate )
+				.toQuery();
+
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+	}
+
+	@Test
+	public void predicate_lambda() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.predicate( f -> f.match().field( "string" ).matching( STRING_1 ) )
 				.toQuery();
 
 		assertThat( query )
