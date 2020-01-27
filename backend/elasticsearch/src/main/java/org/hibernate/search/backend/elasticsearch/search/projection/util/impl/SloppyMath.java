@@ -38,18 +38,23 @@ public class SloppyMath {
 	 * Returns the Haversine distance in meters between two points
 	 * given the previous result from {@link #haversinSortKey(double, double, double, double)}
 	 *
-	 * @param sortKey a sort key for distance
 	 * @return distance in meters.
 	 */
 	public static double haversinMeters(double sortKey) {
 		return TO_METERS * 2 * asin( Math.min( 1, Math.sqrt( sortKey * 0.5 ) ) );
 	}
 
+	/**
+	 * Returns a sort key for distance. This is less expensive to compute than
+	 * {@link #haversinMeters(double, double, double, double)}, but it always compares the same.
+	 * This can be converted into an actual distance with {@link #haversinMeters(double)}, which
+	 * effectively does the second half of the computation.
+	 */
 	public static double haversinSortKey(double lat1, double lon1, double lat2, double lon2) {
-		double x1 = lat1 * TO_RADIANS;
-		double x2 = lat2 * TO_RADIANS;
+		double x1 = Math.toRadians( lat1 );
+		double x2 = Math.toRadians( lat2 );
 		double h1 = 1 - cos( x1 - x2 );
-		double h2 = 1 - cos( ( lon1 - lon2 ) * TO_RADIANS );
+		double h2 = 1 - cos( Math.toRadians( lon1 - lon2 ) );
 		double h = h1 + cos( x1 ) * cos( x2 ) * h2;
 		// clobber crazy precision so subsequent rounding does not create ties.
 		return Double.longBitsToDouble( Double.doubleToRawLongBits( h ) & 0xFFFFFFFFFFFFFFF8L );
@@ -62,7 +67,7 @@ public class SloppyMath {
 	 * <p>
 	 * Special cases:
 	 * <ul>
-	 * <li>If the argument is {@code NaN} or an infinity, then the result is {@code NaN}.
+	 *  <li>If the argument is {@code NaN} or an infinity, then the result is {@code NaN}.
 	 * </ul>
 	 *
 	 * @param a an angle, in radians.
@@ -97,7 +102,7 @@ public class SloppyMath {
 	 * <p>
 	 * Special cases:
 	 * <ul>
-	 * <li>If the argument is {@code NaN} or its absolute value is greater than 1, then the result is {@code NaN}.
+	 *  <li>If the argument is {@code NaN} or its absolute value is greater than 1, then the result is {@code NaN}.
 	 * </ul>
 	 *
 	 * @param a the value whose arc sine is to be returned.
@@ -147,33 +152,6 @@ public class SloppyMath {
 		}
 	}
 
-	/**
-	 * Convert to degrees.
-	 *
-	 * @param radians radians to convert to degrees
-	 *
-	 * @return degrees
-	 */
-	public static double toDegrees(final double radians) {
-		return radians * TO_DEGREES;
-	}
-
-	/**
-	 * Convert to radians.
-	 *
-	 * @param degrees degrees to convert to radians
-	 *
-	 * @return radians
-	 */
-	public static double toRadians(final double degrees) {
-		return degrees * TO_RADIANS;
-	}
-
-	// haversin
-	// TODO: remove these for java 9, they fixed Math.toDegrees()/toRadians() to work just like this.
-	public static final double TO_RADIANS = Math.PI / 180D;
-	public static final double TO_DEGREES = 180D / Math.PI;
-
 	// Earth's mean radius, in meters and kilometers; see http://earth-info.nga.mil/GandG/publications/tr8350.2/wgs84fin.pdf
 	private static final double TO_METERS = 6_371_008.7714D; // equatorial radius
 	private static final double TO_KILOMETERS = 6_371.0087714D; // equatorial radius
@@ -183,8 +161,10 @@ public class SloppyMath {
 	private static final double ONE_DIV_F3 = 1 / 6.0;
 	private static final double ONE_DIV_F4 = 1 / 24.0;
 
-	private static final double PIO2_HI = Double.longBitsToDouble( 0x3FF921FB54400000L ); // 1.57079632673412561417e+00 first 33 bits of pi/2
-	private static final double PIO2_LO = Double.longBitsToDouble( 0x3DD0B4611A626331L ); // 6.07710050650619224932e-11 pi/2 - PIO2_HI
+	private static final double PIO2_HI = Double.longBitsToDouble(
+			0x3FF921FB54400000L ); // 1.57079632673412561417e+00 first 33 bits of pi/2
+	private static final double PIO2_LO = Double.longBitsToDouble(
+			0x3DD0B4611A626331L ); // 6.07710050650619224932e-11 pi/2 - PIO2_HI
 	private static final double TWOPI_HI = 4 * PIO2_HI;
 	private static final double TWOPI_LO = 4 * PIO2_LO;
 	private static final int SIN_COS_TABS_SIZE = ( 1 << 11 ) + 1;
@@ -202,7 +182,7 @@ public class SloppyMath {
 
 	// Supposed to be >= sin(77.2deg), as fdlibm code is supposed to work with values > 0.975,
 	// but seems to work well enough as long as value >= sin(25deg).
-	private static final double ASIN_MAX_VALUE_FOR_TABS = StrictMath.sin( toRadians( 73.0 ) );
+	private static final double ASIN_MAX_VALUE_FOR_TABS = StrictMath.sin( Math.toRadians( 73.0 ) );
 
 	private static final int ASIN_TABS_SIZE = ( 1 << 13 ) + 1;
 	private static final double ASIN_DELTA = ASIN_MAX_VALUE_FOR_TABS / ( ASIN_TABS_SIZE - 1 );
@@ -213,18 +193,30 @@ public class SloppyMath {
 	private static final double[] asinDer3DivF3Tab = new double[ASIN_TABS_SIZE];
 	private static final double[] asinDer4DivF4Tab = new double[ASIN_TABS_SIZE];
 
-	private static final double ASIN_PIO2_HI = Double.longBitsToDouble( 0x3FF921FB54442D18L ); // 1.57079632679489655800e+00
-	private static final double ASIN_PIO2_LO = Double.longBitsToDouble( 0x3C91A62633145C07L ); // 6.12323399573676603587e-17
-	private static final double ASIN_PS0 = Double.longBitsToDouble( 0x3fc5555555555555L ); //  1.66666666666666657415e-01
-	private static final double ASIN_PS1 = Double.longBitsToDouble( 0xbfd4d61203eb6f7dL ); // -3.25565818622400915405e-01
-	private static final double ASIN_PS2 = Double.longBitsToDouble( 0x3fc9c1550e884455L ); //  2.01212532134862925881e-01
-	private static final double ASIN_PS3 = Double.longBitsToDouble( 0xbfa48228b5688f3bL ); // -4.00555345006794114027e-02
-	private static final double ASIN_PS4 = Double.longBitsToDouble( 0x3f49efe07501b288L ); //  7.91534994289814532176e-04
-	private static final double ASIN_PS5 = Double.longBitsToDouble( 0x3f023de10dfdf709L ); //  3.47933107596021167570e-05
-	private static final double ASIN_QS1 = Double.longBitsToDouble( 0xc0033a271c8a2d4bL ); // -2.40339491173441421878e+00
-	private static final double ASIN_QS2 = Double.longBitsToDouble( 0x40002ae59c598ac8L ); //  2.02094576023350569471e+00
-	private static final double ASIN_QS3 = Double.longBitsToDouble( 0xbfe6066c1b8d0159L ); // -6.88283971605453293030e-01
-	private static final double ASIN_QS4 = Double.longBitsToDouble( 0x3fb3b8c5b12e9282L ); //  7.70381505559019352791e-02
+	private static final double ASIN_PIO2_HI = Double.longBitsToDouble(
+			0x3FF921FB54442D18L ); // 1.57079632679489655800e+00
+	private static final double ASIN_PIO2_LO = Double.longBitsToDouble(
+			0x3C91A62633145C07L ); // 6.12323399573676603587e-17
+	private static final double ASIN_PS0 = Double.longBitsToDouble(
+			0x3fc5555555555555L ); //  1.66666666666666657415e-01
+	private static final double ASIN_PS1 = Double.longBitsToDouble(
+			0xbfd4d61203eb6f7dL ); // -3.25565818622400915405e-01
+	private static final double ASIN_PS2 = Double.longBitsToDouble(
+			0x3fc9c1550e884455L ); //  2.01212532134862925881e-01
+	private static final double ASIN_PS3 = Double.longBitsToDouble(
+			0xbfa48228b5688f3bL ); // -4.00555345006794114027e-02
+	private static final double ASIN_PS4 = Double.longBitsToDouble(
+			0x3f49efe07501b288L ); //  7.91534994289814532176e-04
+	private static final double ASIN_PS5 = Double.longBitsToDouble(
+			0x3f023de10dfdf709L ); //  3.47933107596021167570e-05
+	private static final double ASIN_QS1 = Double.longBitsToDouble(
+			0xc0033a271c8a2d4bL ); // -2.40339491173441421878e+00
+	private static final double ASIN_QS2 = Double.longBitsToDouble(
+			0x40002ae59c598ac8L ); //  2.02094576023350569471e+00
+	private static final double ASIN_QS3 = Double.longBitsToDouble(
+			0xbfe6066c1b8d0159L ); // -6.88283971605453293030e-01
+	private static final double ASIN_QS4 = Double.longBitsToDouble(
+			0x3fb3b8c5b12e9282L ); //  7.70381505559019352791e-02
 
 	/** Initializes look-up tables. */
 	static {
