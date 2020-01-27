@@ -45,7 +45,7 @@ final class ServerUris {
 		}
 		String host;
 		int port = -1;
-		final int portIdx = hostAndPort.lastIndexOf( ":" );
+		final int portIdx = hostAndPort.lastIndexOf( ':' );
 		if ( portIdx < 0 ) {
 			host = hostAndPort;
 		}
