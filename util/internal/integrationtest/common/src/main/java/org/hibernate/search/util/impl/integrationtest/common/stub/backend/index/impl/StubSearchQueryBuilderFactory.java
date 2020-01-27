@@ -34,7 +34,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 	}
 
 	@Override
-	public <E> SearchQueryBuilder<E, StubQueryElementCollector> asEntity(BackendSessionContext sessionContext,
+	public <E> SearchQueryBuilder<E, StubQueryElementCollector> selectEntity(BackendSessionContext sessionContext,
 			LoadingContextBuilder<?, E, ?> loadingContextBuilder) {
 		return new StubSearchQueryBuilder<>(
 				backend, scopeModel, StubSearchWork.ResultType.OBJECTS,
@@ -45,7 +45,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 	}
 
 	@Override
-	public <R> SearchQueryBuilder<R, StubQueryElementCollector> asReference(BackendSessionContext sessionContext,
+	public <R> SearchQueryBuilder<R, StubQueryElementCollector> selectEntityReference(BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, ?, ?> loadingContextBuilder) {
 		return new StubSearchQueryBuilder<>(
 				backend, scopeModel, StubSearchWork.ResultType.REFERENCES,
@@ -56,7 +56,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 	}
 
 	@Override
-	public <P> SearchQueryBuilder<P, StubQueryElementCollector> asProjection(BackendSessionContext sessionContext,
+	public <P> SearchQueryBuilder<P, StubQueryElementCollector> select(BackendSessionContext sessionContext,
 			LoadingContextBuilder<?, ?, ?> loadingContextBuilder, SearchProjection<P> projection) {
 		return new StubSearchQueryBuilder<>(
 				backend, scopeModel, StubSearchWork.ResultType.PROJECTIONS,
@@ -67,7 +67,7 @@ class StubSearchQueryBuilderFactory implements SearchQueryBuilderFactory<StubQue
 	}
 
 	@Override
-	public SearchQueryBuilder<List<?>, StubQueryElementCollector> asProjections(BackendSessionContext sessionContext,
+	public SearchQueryBuilder<List<?>, StubQueryElementCollector> select(BackendSessionContext sessionContext,
 			LoadingContextBuilder<?, ?, ?> loadingContextBuilder, SearchProjection<?>... projections) {
 		return new StubSearchQueryBuilder<>(
 				backend, scopeModel, StubSearchWork.ResultType.PROJECTIONS,

@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
@@ -67,12 +67,12 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?, ?> search(Collection<? extends Class<?>> types) {
+	public SearchQuerySelectStep<?, EntityReference, ?, ?, ?, ?> search(Collection<? extends Class<?>> types) {
 		return search( scope( types ) );
 	}
 
 	@Override
-	public SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?, ?> search(SearchScope scope) {
+	public SearchQuerySelectStep<?, EntityReference, ?, ?, ?, ?> search(SearchScope scope) {
 		return search( (SearchScopeImpl) scope );
 	}
 
@@ -106,7 +106,7 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 		return new EntityReferenceImpl( typeContext.getTypeIdentifier(), typeContext.getEntityName(), id );
 	}
 
-	private SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?, ?> search(SearchScopeImpl scope) {
+	private SearchQuerySelectStep<?, EntityReference, ?, ?, ?, ?> search(SearchScopeImpl scope) {
 		return ( (SearchScopeImpl) scope ).search( this, this );
 	}
 

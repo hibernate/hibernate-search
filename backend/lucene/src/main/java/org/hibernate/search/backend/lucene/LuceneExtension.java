@@ -16,8 +16,8 @@ import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPred
 import org.hibernate.search.backend.lucene.search.predicate.dsl.impl.LuceneSearchPredicateFactoryImpl;
 import org.hibernate.search.backend.lucene.search.projection.dsl.LuceneSearchProjectionFactory;
 import org.hibernate.search.backend.lucene.search.projection.dsl.impl.LuceneSearchProjectionFactoryImpl;
-import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryHitTypeStep;
-import org.hibernate.search.backend.lucene.search.query.dsl.impl.LuceneSearchQueryHitTypeStepImpl;
+import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQuerySelectStep;
+import org.hibernate.search.backend.lucene.search.query.dsl.impl.LuceneSearchQuerySelectStepImpl;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjectionBuilderFactory;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.scope.impl.LuceneIndexScope;
@@ -39,7 +39,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactoryEx
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactoryExtension;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
@@ -75,7 +75,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @see #get()
  */
 public final class LuceneExtension<H, R, E, LOS>
-		implements SearchQueryDslExtension<LuceneSearchQueryHitTypeStep<R, E, LOS>, R, E, LOS>,
+		implements SearchQueryDslExtension<LuceneSearchQuerySelectStep<R, E, LOS>, R, E, LOS>,
 		SearchQueryExtension<LuceneSearchQuery<H>, H>,
 		SearchPredicateFactoryExtension<LuceneSearchPredicateFactory>,
 		SearchSortFactoryExtension<LuceneSearchSortFactory>,
@@ -117,13 +117,13 @@ public final class LuceneExtension<H, R, E, LOS>
 	 * {@inheritDoc}
 	 */
 	@Override
-	public Optional<LuceneSearchQueryHitTypeStep<R, E, LOS>> extendOptional(
-			SearchQueryHitTypeStep<?, R, E, LOS, ?, ?> original,
+	public Optional<LuceneSearchQuerySelectStep<R, E, LOS>> extendOptional(
+			SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
 			IndexScope<?> indexScope,
 			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E, LOS> loadingContextBuilder) {
 		if ( indexScope instanceof LuceneIndexScope ) {
-			return Optional.of( new LuceneSearchQueryHitTypeStepImpl<>(
+			return Optional.of( new LuceneSearchQuerySelectStepImpl<>(
 					(LuceneIndexScope) indexScope, sessionContext, loadingContextBuilder
 			) );
 		}

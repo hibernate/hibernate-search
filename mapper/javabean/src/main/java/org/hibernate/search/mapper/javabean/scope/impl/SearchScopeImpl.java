@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
@@ -46,7 +46,7 @@ public class SearchScopeImpl implements SearchScope {
 		return delegate.aggregation();
 	}
 
-	public SearchQueryHitTypeStep<?, EntityReference, Void, ?, ?, ?> search(BackendSessionContext sessionContext,
+	public SearchQuerySelectStep<?, EntityReference, Void, ?, ?, ?> search(BackendSessionContext sessionContext,
 			DocumentReferenceConverter<EntityReference> documentReferenceConverter) {
 		return delegate.search( sessionContext, new JavaBeanLoadingContext.Builder( documentReferenceConverter ) );
 	}

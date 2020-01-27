@@ -23,12 +23,12 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
  * and pass it to another API.
  *
  * @param <T> The type of extended steps in the search query definition DSL. Should generally extend
- * {@link SearchQueryHitTypeStep}.
+ * {@link SearchQuerySelectStep}.
  * @param <R> The reference type.
  * @param <E> The entity type.
  * @param <LOS> The type of the initial step of the loading options definition DSL.
  *
- * @see SearchQueryHitTypeStep#extension(SearchQueryDslExtension)
+ * @see SearchQuerySelectStep#extension(SearchQueryDslExtension)
  * @see AbstractSearchQueryOptionsStep
  */
 public interface SearchQueryDslExtension<T, R, E, LOS> {
@@ -38,14 +38,14 @@ public interface SearchQueryDslExtension<T, R, E, LOS> {
 	 * <p>
 	 * <strong>WARNING:</strong> this method is not API, see comments at the type level.
 	 *
-	 * @param original The original, non-extended {@link SearchQueryHitTypeStep}.
+	 * @param original The original, non-extended {@link SearchQuerySelectStep}.
 	 * @param indexScope An {@link IndexScope}.
 	 * @param sessionContext A {@link BackendSessionContext}.
 	 * @param loadingContextBuilder A {@link LoadingContextBuilder}.
 	 * @return An optional containing the extended search query DSL step ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(SearchQueryHitTypeStep<?, R, E, LOS, ?, ?> original,
+	Optional<T> extendOptional(SearchQuerySelectStep<?, R, E, LOS, ?, ?> original,
 			IndexScope<?> indexScope,
 			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E, LOS> loadingContextBuilder);

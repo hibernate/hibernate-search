@@ -34,7 +34,7 @@ import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRuntimeIntrospecto
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
 import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
-import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQueryHitTypeStep;
+import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.mapper.orm.session.context.HibernateOrmSessionContext;
@@ -129,16 +129,16 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
-	public <T> HibernateOrmSearchQueryHitTypeStep<T> search(Collection<? extends Class<? extends T>> types) {
+	public <T> HibernateOrmSearchQuerySelectStep<T> search(Collection<? extends Class<? extends T>> types) {
 		return search( scope( types ) );
 	}
 
 	@Override
-	public <T> HibernateOrmSearchQueryHitTypeStep<T> search(SearchScope<T> scope) {
+	public <T> HibernateOrmSearchQuerySelectStep<T> search(SearchScope<T> scope) {
 		return search( (SearchScopeImpl<T>) scope );
 	}
 
-	private <T> HibernateOrmSearchQueryHitTypeStep<T> search(SearchScopeImpl<T> scope) {
+	private <T> HibernateOrmSearchQuerySelectStep<T> search(SearchScopeImpl<T> scope) {
 		return scope.search( this );
 	}
 

@@ -8,7 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
 
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubBackendSessionContext;
 
 /**
@@ -23,11 +23,11 @@ public class StubMappingScope extends GenericStubMappingScope<DocumentReference,
 		super( delegate );
 	}
 
-	public SearchQueryHitTypeStep<?, DocumentReference, DocumentReference, StubLoadingOptionsStep, ?, ?> query() {
+	public SearchQuerySelectStep<?, DocumentReference, DocumentReference, StubLoadingOptionsStep, ?, ?> query() {
 		return query( new StubLoadingContext() );
 	}
 
-	public SearchQueryHitTypeStep<?, DocumentReference, DocumentReference, StubLoadingOptionsStep, ?, ?> query(
+	public SearchQuerySelectStep<?, DocumentReference, DocumentReference, StubLoadingOptionsStep, ?, ?> query(
 			StubBackendSessionContext sessionContext) {
 		return query( sessionContext, new StubLoadingContext() );
 	}

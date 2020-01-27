@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.javabean.session;
 import java.util.Collection;
 import java.util.Collections;
 
-import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.javabean.common.EntityReference;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
@@ -30,9 +30,9 @@ public interface SearchSession extends AutoCloseable {
 	 *
 	 * @param type An indexed type, or a supertype of all indexed types that will be targeted by the search query.
 	 * @return The initial step of a DSL where the search query can be defined.
-	 * @see SearchQueryHitTypeStep
+	 * @see SearchQuerySelectStep
 	 */
-	default SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?, ?> search(Class<?> type) {
+	default SearchQuerySelectStep<?, EntityReference, ?, ?, ?, ?> search(Class<?> type) {
 		return search( Collections.singleton( type ) );
 	}
 
@@ -43,9 +43,9 @@ public interface SearchSession extends AutoCloseable {
 	 *
 	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the search query.
 	 * @return The initial step of a DSL where the search query can be defined.
-	 * @see SearchQueryHitTypeStep
+	 * @see SearchQuerySelectStep
 	 */
-	SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?, ?> search(Collection<? extends Class<?>> types);
+	SearchQuerySelectStep<?, EntityReference, ?, ?, ?, ?> search(Collection<? extends Class<?>> types);
 
 	/**
 	 * Initiate the building of a search query.
@@ -54,9 +54,9 @@ public interface SearchSession extends AutoCloseable {
 	 *
 	 * @param scope A scope representing all indexed types that will be targeted by the search query.
 	 * @return The initial step of a DSL where the search query can be defined.
-	 * @see SearchQueryHitTypeStep
+	 * @see SearchQuerySelectStep
 	 */
-	SearchQueryHitTypeStep<?, EntityReference, ?, ?, ?, ?> search(SearchScope scope);
+	SearchQuerySelectStep<?, EntityReference, ?, ?, ?, ?> search(SearchScope scope);
 
 	/**
 	 * Create a {@link SearchScope} limited to the given type.

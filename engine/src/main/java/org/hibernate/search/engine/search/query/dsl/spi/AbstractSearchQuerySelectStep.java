@@ -13,11 +13,11 @@ import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory
 import org.hibernate.search.engine.search.projection.dsl.impl.DefaultSearchProjectionFactory;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.backend.scope.spi.IndexScope;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 
-public abstract class AbstractSearchQueryHitTypeStep<
+public abstract class AbstractSearchQuerySelectStep<
 				N extends SearchQueryOptionsStep<?, E, LOS, ?, ?>,
 				R,
 				E,
@@ -26,7 +26,7 @@ public abstract class AbstractSearchQueryHitTypeStep<
 				PDF extends SearchPredicateFactory,
 				C
 		>
-		implements SearchQueryHitTypeStep<N, R, E, LOS, PJF, PDF> {
+		implements SearchQuerySelectStep<N, R, E, LOS, PJF, PDF> {
 
 	@Override
 	public <T> T extension(SearchQueryDslExtension<T, R, E, LOS> extension) {

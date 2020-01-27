@@ -13,16 +13,16 @@ import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionCon
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 
 /**
  * @param <R> The type of entity references, i.e. the type of hits returned by
- * {@link SearchQueryHitTypeStep#asEntityReference()} reference queries},
+ * {@link SearchQuerySelectStep#selectEntityReference()} reference queries},
  * @param <E> The type of loaded entities, i.e. the type of hits returned by
- * {@link SearchQueryHitTypeStep#asEntity() entity queries},
+ * {@link SearchQuerySelectStep#selectEntity() entity queries},
  * or the type of objects returned for {@link SearchProjectionFactory#entity() entity projections}.
  * @param <C> The type of indexed type extended contexts; i.e. the type of elements in the set returned by
  * {@link #getIncludedIndexedTypes()}.
@@ -32,7 +32,7 @@ public interface PojoScopeDelegate<R, E, C> {
 
 	Set<C> getIncludedIndexedTypes();
 
-	<LOS> SearchQueryHitTypeStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
+	<LOS> SearchQuerySelectStep<?, R, E, LOS, SearchProjectionFactory<R, E>, ?> search(
 			BackendSessionContext sessionContext,
 			LoadingContextBuilder<R, E, LOS> loadingContextBuilder);
 

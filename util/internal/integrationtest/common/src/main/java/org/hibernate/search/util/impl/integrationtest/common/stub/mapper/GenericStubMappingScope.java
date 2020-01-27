@@ -10,7 +10,7 @@ import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
@@ -28,11 +28,11 @@ public class GenericStubMappingScope<R, E> {
 		this.delegate = delegate;
 	}
 
-	public SearchQueryHitTypeStep<?, R, E, StubLoadingOptionsStep, ?, ?> query(LoadingContext<R, E> loadingContext) {
+	public SearchQuerySelectStep<?, R, E, StubLoadingOptionsStep, ?, ?> query(LoadingContext<R, E> loadingContext) {
 		return query( new StubBackendSessionContext(), loadingContext );
 	}
 
-	public SearchQueryHitTypeStep<?, R, E, StubLoadingOptionsStep, ?, ?> query(StubBackendSessionContext sessionContext,
+	public SearchQuerySelectStep<?, R, E, StubLoadingOptionsStep, ?, ?> query(StubBackendSessionContext sessionContext,
 			LoadingContext<R, E> loadingContext) {
 		LoadingContextBuilder<R, E, StubLoadingOptionsStep> loadingContextBuilder = new LoadingContextBuilder<R, E, StubLoadingOptionsStep>() {
 			@Override

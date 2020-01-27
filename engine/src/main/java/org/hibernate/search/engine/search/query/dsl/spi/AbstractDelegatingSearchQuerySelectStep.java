@@ -18,10 +18,10 @@ import org.hibernate.search.engine.search.projection.dsl.ProjectionFinalStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryDslExtension;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
-import org.hibernate.search.engine.search.query.dsl.SearchQueryHitTypeStep;
+import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 
-public abstract class AbstractDelegatingSearchQueryHitTypeStep<R, E, LOS>
-		implements SearchQueryHitTypeStep<
+public abstract class AbstractDelegatingSearchQuerySelectStep<R, E, LOS>
+		implements SearchQuerySelectStep<
 						SearchQueryOptionsStep<?, E, LOS,?, ?>,
 						R,
 						E,
@@ -30,37 +30,37 @@ public abstract class AbstractDelegatingSearchQueryHitTypeStep<R, E, LOS>
 						SearchPredicateFactory
 				> {
 
-	private final SearchQueryHitTypeStep<?, R, E, LOS, ?, ?> delegate;
+	private final SearchQuerySelectStep<?, R, E, LOS, ?, ?> delegate;
 
-	public AbstractDelegatingSearchQueryHitTypeStep(SearchQueryHitTypeStep<?, R, E, LOS, ?, ?> delegate) {
+	public AbstractDelegatingSearchQuerySelectStep(SearchQuerySelectStep<?, R, E, LOS, ?, ?> delegate) {
 		this.delegate = delegate;
 	}
 
 	@Override
-	public SearchQueryWhereStep<?, E, ?> asEntity() {
-		return delegate.asEntity();
+	public SearchQueryWhereStep<?, E, ?> selectEntity() {
+		return delegate.selectEntity();
 	}
 
 	@Override
-	public SearchQueryWhereStep<?, R, ?> asEntityReference() {
-		return delegate.asEntityReference();
+	public SearchQueryWhereStep<?, R, ?> selectEntityReference() {
+		return delegate.selectEntityReference();
 	}
 
 	@Override
-	public <P> SearchQueryWhereStep<?, P, ?> asProjection(
+	public <P> SearchQueryWhereStep<?, P, ?> select(
 			Function<? super SearchProjectionFactory<R, E>, ? extends ProjectionFinalStep<P>> projectionContributor) {
-		return delegate.asProjection( projectionContributor );
+		return delegate.select( projectionContributor );
 	}
 
 	@Override
-	public <P> SearchQueryWhereStep<?, P, ?> asProjection(SearchProjection<P> projection) {
-		return delegate.asProjection( projection );
+	public <P> SearchQueryWhereStep<?, P, ?> select(SearchProjection<P> projection) {
+		return delegate.select( projection );
 	}
 
 	@Override
-	public SearchQueryWhereStep<?, List<?>, ?> asProjections(
+	public SearchQueryWhereStep<?, List<?>, ?> select(
 			SearchProjection<?>... projections) {
-		return delegate.asProjections( projections );
+		return delegate.select( projections );
 	}
 
 	@Override
