@@ -253,7 +253,7 @@
         <version.com.github.tomakehurst.wiremock>2.5.1</version.com.github.tomakehurst.wiremock>
         <!-- Fixes dependency convergence within Wiremock, see below -->
         <version.com.fasterxml.jackson>2.8.6</version.com.fasterxml.jackson>
-        <version.org.jboss.byteman>4.0.7</version.org.jboss.byteman>
+        <version.org.jboss.byteman>4.0.10</version.org.jboss.byteman>
         <version.io.takari.junit>1.2.7</version.io.takari.junit>
         <version.com.h2database>1.4.178</version.com.h2database>
 
