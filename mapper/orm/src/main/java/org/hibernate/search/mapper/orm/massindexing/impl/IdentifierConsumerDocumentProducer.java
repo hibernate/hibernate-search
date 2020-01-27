@@ -14,6 +14,8 @@ import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Root;
 import javax.persistence.metamodel.SingularAttribute;
+import javax.transaction.NotSupportedException;
+import javax.transaction.SystemException;
 import javax.transaction.TransactionManager;
 
 import org.hibernate.CacheMode;
@@ -105,7 +107,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		log.trace( "finished" );
 	}
 
-	private void loadAllFromQueue(SessionImplementor session) throws Exception {
+	private void loadAllFromQueue(SessionImplementor session) throws SystemException, NotSupportedException {
 		// The search session will be closed automatically with the ORM session
 		PojoIndexer indexer = mappingContext.createIndexer(
 				session, DocumentCommitStrategy.NONE
@@ -136,7 +138,8 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 	 * @param session the session to be used
 	 * @param indexer the indexer to be used
 	 */
-	private void loadList(List<I> listIds, SessionImplementor session, PojoIndexer indexer) throws Exception {
+	private void loadList(List<I> listIds, SessionImplementor session, PojoIndexer indexer)
+			throws InterruptedException, NotSupportedException, SystemException {
 		try {
 			beginTransaction( session );
 
@@ -162,7 +165,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 		}
 	}
 
-	private void beginTransaction(Session session) throws Exception {
+	private void beginTransaction(Session session) throws SystemException, NotSupportedException {
 		if ( transactionManager != null ) {
 			if ( transactionTimeout != null ) {
 				transactionManager.setTransactionTimeout( transactionTimeout );
