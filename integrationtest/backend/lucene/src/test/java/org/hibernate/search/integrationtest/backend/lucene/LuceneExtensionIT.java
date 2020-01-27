@@ -35,7 +35,7 @@ import org.hibernate.search.backend.lucene.LuceneBackend;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryOptionsStep;
 import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryWhereStep;
-import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQueryHitTypeStep;
+import org.hibernate.search.backend.lucene.search.query.dsl.LuceneSearchQuerySelectStep;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
@@ -121,9 +121,9 @@ public class LuceneExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		// Put intermediary contexts into variables to check they have the right type
-		LuceneSearchQueryHitTypeStep<DocumentReference, DocumentReference, StubLoadingOptionsStep> context1 =
+		LuceneSearchQuerySelectStep<DocumentReference, DocumentReference, StubLoadingOptionsStep> context1 =
 				scope.query().extension( LuceneExtension.get() );
-		LuceneSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> context2 = context1.asProjection(
+		LuceneSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> context2 = context1.select(
 				f -> f.composite(
 						// We don't care about the document, it's just to test that the factory context allows Lucene-specific projection
 						(docRef, document) -> docRef,
@@ -146,15 +146,15 @@ public class LuceneExtensionIT {
 				.hasTotalHitCount( 5 );
 
 		// Also check (at compile time) the context type for other asXXX() methods, since we need to override each method explicitly
-		LuceneSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> asReferenceContext =
-				scope.query().extension( LuceneExtension.get() ).asEntityReference();
-		LuceneSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> asEntityContext =
-				scope.query().extension( LuceneExtension.get() ).asEntity();
+		LuceneSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> selectEntityReferenceContext =
+				scope.query().extension( LuceneExtension.get() ).selectEntityReference();
+		LuceneSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> selectEntityContext =
+				scope.query().extension( LuceneExtension.get() ).selectEntity();
 		SearchProjection<DocumentReference> projection = scope.projection().documentReference().toProjection();
-		LuceneSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> asProjectionContext =
-				scope.query().extension( LuceneExtension.get() ).asProjection( projection );
-		LuceneSearchQueryWhereStep<List<?>, ?> asProjectionsContext =
-				scope.query().extension( LuceneExtension.get() ).asProjections( projection, projection );
+		LuceneSearchQueryWhereStep<DocumentReference, StubLoadingOptionsStep> selectProjectionContext =
+				scope.query().extension( LuceneExtension.get() ).select( projection );
+		LuceneSearchQueryWhereStep<List<?>, ?> selectProjectionsContext =
+				scope.query().extension( LuceneExtension.get() ).select( projection, projection );
 		LuceneSearchQueryOptionsStep<DocumentReference, StubLoadingOptionsStep> defaultResultContext =
 				scope.query().extension( LuceneExtension.get() )
 						.where( f -> f.fromLuceneQuery( new MatchAllDocsQuery() ) );
@@ -496,7 +496,7 @@ public class LuceneExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Integer> query = scope.query()
-				.asProjection( f -> f.field( "nativeField", Integer.class ) )
+				.select( f -> f.field( "nativeField", Integer.class ) )
 				.where( f -> f.match().field( "string" ).matching( "text 1" ) )
 				.toQuery();
 
@@ -508,7 +508,7 @@ public class LuceneExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<ValueWrapper> query = scope.query()
-				.asProjection( f -> f.field( "nativeField_converted", ValueWrapper.class ) )
+				.select( f -> f.field( "nativeField_converted", ValueWrapper.class ) )
 				.where( f -> f.match().field( "string" ).matching( "text 1" ) )
 				.toQuery();
 
@@ -520,7 +520,7 @@ public class LuceneExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Integer> query = scope.query()
-				.asProjection( f -> f.field( "nativeField_converted", Integer.class, ValueConvert.NO ) )
+				.select( f -> f.field( "nativeField_converted", Integer.class, ValueConvert.NO ) )
 				.where( f -> f.match().field( "string" ).matching( "text 1" ) )
 				.toQuery();
 
@@ -559,7 +559,7 @@ public class LuceneExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Document> query = scope.query()
-				.asProjection(
+				.select(
 						f -> f.extension( LuceneExtension.get() ).document()
 				)
 				.where( f -> f.matchAll() )
@@ -616,7 +616,7 @@ public class LuceneExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.extension( LuceneExtension.get() ).document(),
 								f.field( "string" )
@@ -644,7 +644,7 @@ public class LuceneExtensionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Explanation> query = scope.query()
-				.asProjection( f -> f.extension( LuceneExtension.get() ).explanation() )
+				.select( f -> f.extension( LuceneExtension.get() ).explanation() )
 				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 

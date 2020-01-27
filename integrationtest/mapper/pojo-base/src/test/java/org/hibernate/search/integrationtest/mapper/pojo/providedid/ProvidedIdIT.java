@@ -79,7 +79,7 @@ public class ProvidedIdIT {
 			);
 
 			SearchQuery<EntityReference> query = session.search( IndexedEntity.class )
-					.asEntityReference()
+					.selectEntityReference()
 					.where( f -> f.matchAll() )
 					.toQuery();
 

@@ -87,7 +87,7 @@ public class MultiTenancyBaseIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<List<?>> query = scope.query( tenant1SessionContext )
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
@@ -98,7 +98,7 @@ public class MultiTenancyBaseIT {
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
 		query = scope.query( tenant2SessionContext )
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
@@ -116,7 +116,7 @@ public class MultiTenancyBaseIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<List<?>> query = scope.query( tenant1SessionContext )
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
@@ -127,7 +127,7 @@ public class MultiTenancyBaseIT {
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
 		query = scope.query( tenant2SessionContext )
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
@@ -143,7 +143,7 @@ public class MultiTenancyBaseIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<List<?>> query = scope.query( tenant1SessionContext )
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
@@ -158,7 +158,7 @@ public class MultiTenancyBaseIT {
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
 		query = scope.query( tenant2SessionContext )
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
@@ -185,7 +185,7 @@ public class MultiTenancyBaseIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		SearchQuery<List<?>> projectionQuery = scope.query( tenant2SessionContext )
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
@@ -205,7 +205,7 @@ public class MultiTenancyBaseIT {
 		assertThat( query )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_2 );
 		projectionQuery = scope.query( tenant2SessionContext )
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
@@ -249,7 +249,7 @@ public class MultiTenancyBaseIT {
 		// The tenant 2 has been updated properly.
 
 		SearchQuery<List<?>> query = scope.query( tenant2SessionContext )
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
@@ -260,7 +260,7 @@ public class MultiTenancyBaseIT {
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( UPDATED_STRING, INTEGER_VALUE_4 ) );
 
 		query = scope.query( tenant2SessionContext )
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
@@ -277,7 +277,7 @@ public class MultiTenancyBaseIT {
 		// The tenant 1 has not been updated.
 
 		query = scope.query( tenant1SessionContext )
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
@@ -288,7 +288,7 @@ public class MultiTenancyBaseIT {
 		assertThat( query ).hasNoHits();
 
 		query = scope.query( tenant1SessionContext )
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
@@ -303,7 +303,7 @@ public class MultiTenancyBaseIT {
 		assertThat( query ).hasNoHits();
 
 		query = scope.query( tenant1SessionContext )
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
@@ -314,7 +314,7 @@ public class MultiTenancyBaseIT {
 		assertThat( query ).hasListHitsAnyOrder( b -> b.list( STRING_VALUE_1, INTEGER_VALUE_1 ) );
 
 		query = scope.query( tenant1SessionContext )
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
@@ -444,7 +444,7 @@ public class MultiTenancyBaseIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		SearchQuery<List<?>> projectionQuery = scope.query( tenant1SessionContext )
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )
@@ -464,7 +464,7 @@ public class MultiTenancyBaseIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_ID_1, DOCUMENT_ID_2 );
 
 		projectionQuery = scope.query( tenant2SessionContext )
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.field( "string", String.class ),
 								f.field( "integer", Integer.class )

@@ -76,7 +76,7 @@ public class NestedDocumentDistanceProjectionIT {
 	public void distance_flattenedDocument() {
 		StubMappingScope scope = indexManager.createScope();
 		List<Double> hits = scope.query()
-				.asProjection( f -> f.distance( "flattened.geoPoint", METRO_GARIBALDI ) )
+				.select( f -> f.distance( "flattened.geoPoint", METRO_GARIBALDI ) )
 				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "ordinal" ).desc() )
 				.fetchAllHits();
@@ -91,7 +91,7 @@ public class NestedDocumentDistanceProjectionIT {
 	public void distance_nestedDocument() {
 		StubMappingScope scope = indexManager.createScope();
 		List<Double> hits = scope.query()
-				.asProjection( f -> f.distance( "nested.geoPoint", METRO_GARIBALDI ) )
+				.select( f -> f.distance( "nested.geoPoint", METRO_GARIBALDI ) )
 				.where( f -> f.matchAll() )
 				.sort( f -> f.field( "ordinal" ).desc() )
 				.fetchAllHits();

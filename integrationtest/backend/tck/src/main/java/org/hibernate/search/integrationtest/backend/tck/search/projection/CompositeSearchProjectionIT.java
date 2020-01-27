@@ -80,7 +80,7 @@ public class CompositeSearchProjectionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.field( indexMapping.author.relativeFieldName, String.class ).toProjection(),
 								f.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
@@ -101,7 +101,7 @@ public class CompositeSearchProjectionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<List<?>> query = scope.query()
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								f.field( indexMapping.author.relativeFieldName, String.class ),
 								f.field( indexMapping.title.relativeFieldName, String.class )
@@ -122,7 +122,7 @@ public class CompositeSearchProjectionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Book_Bi> query = scope.query()
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								this::listToBook_Bi,
 								f.field( indexMapping.author.relativeFieldName, String.class ).toProjection(),
@@ -144,7 +144,7 @@ public class CompositeSearchProjectionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Book_Bi> query = scope.query()
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								this::listToBook_Bi,
 								f.field( indexMapping.author.relativeFieldName, String.class ),
@@ -166,7 +166,7 @@ public class CompositeSearchProjectionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Book> query = scope.query()
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								Book::new,
 								f.field( indexMapping.title.relativeFieldName, String.class ).toProjection()
@@ -187,7 +187,7 @@ public class CompositeSearchProjectionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Book> query = scope.query()
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								Book::new,
 								f.field( indexMapping.title.relativeFieldName, String.class )
@@ -208,7 +208,7 @@ public class CompositeSearchProjectionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Book_Bi> query = scope.query()
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								Book_Bi::new,
 								f.field( indexMapping.author.relativeFieldName, String.class ).toProjection(),
@@ -230,7 +230,7 @@ public class CompositeSearchProjectionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Book_Bi> query = scope.query()
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								Book_Bi::new,
 								f.field( indexMapping.author.relativeFieldName, String.class ),
@@ -252,7 +252,7 @@ public class CompositeSearchProjectionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Book_Tri> query = scope.query()
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								Book_Tri::new,
 								f.field( indexMapping.author.relativeFieldName, String.class ).toProjection(),
@@ -278,7 +278,7 @@ public class CompositeSearchProjectionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Book_Tri> query = scope.query()
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								Book_Tri::new,
 								f.field( indexMapping.author.relativeFieldName, String.class ),
@@ -304,7 +304,7 @@ public class CompositeSearchProjectionIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Book_Bi_Score> query = scope.query()
-				.asProjection( f ->
+				.select( f ->
 						f.composite(
 								Book_Bi_Score::new,
 								f.composite(

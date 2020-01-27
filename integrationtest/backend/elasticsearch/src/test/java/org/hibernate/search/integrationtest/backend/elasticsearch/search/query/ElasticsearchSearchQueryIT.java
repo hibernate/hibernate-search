@@ -66,7 +66,7 @@ public class ElasticsearchSearchQueryIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		SearchQuery<Object> query = scope.query()
-				.asProjection( f -> f.field( "string" ) )
+				.select( f -> f.field( "string" ) )
 				.where( f -> f.matchAll() )
 				.toQuery();
 

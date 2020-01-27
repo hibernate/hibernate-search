@@ -110,7 +110,7 @@ public class LuceneFieldAttributesIT {
 
 	private Document loadDocument() {
 		SearchQuery<Document> query = indexManager.createScope().query()
-				.asProjection(
+				.select(
 						f -> f.extension( LuceneExtension.get() ).document()
 				)
 				.where( f -> f.matchAll() )

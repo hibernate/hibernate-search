@@ -309,7 +309,7 @@ public class AnnotationMappingSmokeIT {
 			SearchQuery<ParentIndexedEntity> query = searchSession.search(
 							Arrays.asList( IndexedEntity.class, YetAnotherIndexedEntity.class )
 					)
-					.asEntity()
+					.selectEntity()
 					.where( f -> f.matchAll() )
 					.toQuery();
 

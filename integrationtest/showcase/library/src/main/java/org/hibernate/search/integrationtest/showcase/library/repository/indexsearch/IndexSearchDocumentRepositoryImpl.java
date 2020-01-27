@@ -141,7 +141,7 @@ public class IndexSearchDocumentRepositoryImpl implements IndexSearchDocumentRep
 	@Override
 	public List<String> getAuthorsOfBooksHavingTerms(String terms, SortOrder order) {
 		return Search.session( entityManager ).search( Document.class )
-				.asProjection( f -> f.field( "author", String.class ) )
+				.select( f -> f.field( "author", String.class ) )
 				.where( f -> f.match()
 						.field( "title" ).boost( 2.0f )
 						.field( "summary" )

@@ -452,7 +452,7 @@ public class ToHibernateOrmIT {
 
 	private SearchQuery<IndexedEntity> createSimpleQuery(SearchSession searchSession) {
 		return searchSession.search( IndexedEntity.class )
-				.asEntity()
+				.selectEntity()
 				.where( f -> f.matchAll() )
 				.toQuery();
 	}

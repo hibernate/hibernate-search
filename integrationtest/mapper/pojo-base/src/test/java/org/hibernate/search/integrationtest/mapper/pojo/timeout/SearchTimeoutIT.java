@@ -52,7 +52,7 @@ public class SearchTimeoutIT {
 	public void truncateAfter() {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchQuery<EntityReference> query = session.search( IndexedEntity.class )
-					.asEntityReference()
+					.selectEntityReference()
 					.where( f -> f.matchAll() )
 						// define a timeout
 						.truncateAfter( 5L, TimeUnit.SECONDS )
@@ -72,7 +72,7 @@ public class SearchTimeoutIT {
 	public void failAfter() {
 		try ( SearchSession session = mapping.createSession() ) {
 			SearchQuery<EntityReference> query = session.search( IndexedEntity.class )
-					.asEntityReference()
+					.selectEntityReference()
 					.where( f -> f.matchAll() )
 					// define a timeout
 					.failAfter( 5L, TimeUnit.SECONDS )

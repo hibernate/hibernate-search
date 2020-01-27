@@ -157,7 +157,7 @@ public class SearchMultiIndexIT {
 		StubMappingScope scope = indexManager_1_1.createScope( indexManager_1_2 );
 
 		SearchQuery<String> query = scope.query()
-				.asProjection( f -> f.field( "sortField", String.class ) )
+				.select( f -> f.field( "sortField", String.class ) )
 				.where( f -> f.matchAll() )
 				.toQuery();
 
@@ -188,7 +188,7 @@ public class SearchMultiIndexIT {
 		// Projection
 
 		SearchQuery<String> projectionQuery = scope.query()
-				.asProjection( f -> f.field( "additionalField", String.class ) )
+				.select( f -> f.field( "additionalField", String.class ) )
 				.where( f -> f.matchAll() )
 				.toQuery();
 
