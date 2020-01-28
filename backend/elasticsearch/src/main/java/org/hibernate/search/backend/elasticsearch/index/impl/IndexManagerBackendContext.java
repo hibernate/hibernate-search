@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
+import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorImplementor;
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.DocumentReferenceExtractionHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionBackendContext;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
@@ -49,11 +49,10 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	private final ElasticsearchWorkOrchestratorProvider orchestratorProvider;
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 
-	private final DocumentReferenceExtractionHelper documentReferenceExtractionHelper;
 	private final SearchProjectionBackendContext searchProjectionBackendContext;
 
 	public IndexManagerBackendContext(EventContext eventContext, ElasticsearchLink link, Gson userFacingGson,
-			DocumentReferenceExtractionHelper documentReferenceExtractionHelper,
+			TypeNameMapping typeNameMapping,
 			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchWorkOrchestratorProvider orchestratorProvider,
 			ElasticsearchWorkOrchestrator queryOrchestrator) {
@@ -64,9 +63,9 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		this.orchestratorProvider = orchestratorProvider;
 		this.queryOrchestrator = queryOrchestrator;
 
-		this.documentReferenceExtractionHelper = documentReferenceExtractionHelper;
 		this.searchProjectionBackendContext = new SearchProjectionBackendContext(
-				documentReferenceExtractionHelper
+				typeNameMapping.getTypeNameExtractionHelper(),
+				multiTenancyStrategy.getIdProjectionExtractionHelper()
 		);
 	}
 
@@ -112,11 +111,6 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 				link.getWorkBuilderFactory(), multiTenancyStrategy, orchestrator, indexManagerContext,
 				sessionContext
 		);
-	}
-
-	@Override
-	public DocumentReferenceExtractionHelper getDocumentReferenceExtractionHelper() {
-		return documentReferenceExtractionHelper;
 	}
 
 	@Override

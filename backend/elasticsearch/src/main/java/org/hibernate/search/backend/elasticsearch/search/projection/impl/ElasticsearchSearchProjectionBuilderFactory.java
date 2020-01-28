@@ -17,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopedIndexFieldComponent;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
+import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchFieldProjectionBuilderFactory;
 import org.hibernate.search.engine.search.projection.SearchProjection;
 import org.hibernate.search.engine.search.common.ValueConvert;
@@ -44,21 +45,23 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	private static final ProjectionBuilderFactoryRetrievalStrategy PROJECTION_BUILDER_FACTORY_RETRIEVAL_STRATEGY =
 			new ProjectionBuilderFactoryRetrievalStrategy();
 
-	private final SearchProjectionBackendContext searchProjectionBackendContext;
-
 	private final ElasticsearchScopeModel scopeModel;
 
+	private final DocumentReferenceExtractionHelper documentReferenceExtractionHelper;
+
 	public ElasticsearchSearchProjectionBuilderFactory(SearchProjectionBackendContext searchProjectionBackendContext,
+			ElasticsearchSearchContext searchContext,
 			ElasticsearchScopeModel scopeModel) {
-		this.searchProjectionBackendContext = searchProjectionBackendContext;
 		this.scopeModel = scopeModel;
+		this.documentReferenceExtractionHelper =
+				searchProjectionBackendContext.createDocumentReferenceExtractionHelper( searchContext );
 	}
 
 	@Override
 	public DocumentReferenceProjectionBuilder documentReference() {
 		return new ElasticsearchDocumentReferenceProjectionBuilder(
 				scopeModel.getHibernateSearchIndexNames(),
-				searchProjectionBackendContext.getDocumentReferenceExtractionHelper()
+				documentReferenceExtractionHelper
 		);
 	}
 
@@ -87,7 +90,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	public <E> EntityProjectionBuilder<E> entity() {
 		return new ElasticsearchEntityProjectionBuilder<>(
 				scopeModel.getHibernateSearchIndexNames(),
-				searchProjectionBackendContext.getDocumentReferenceExtractionHelper()
+				documentReferenceExtractionHelper
 		);
 	}
 
@@ -95,7 +98,7 @@ public class ElasticsearchSearchProjectionBuilderFactory implements SearchProjec
 	public <R> EntityReferenceProjectionBuilder<R> entityReference() {
 		return new ElasticsearchEntityReferenceProjectionBuilder<>(
 				scopeModel.getHibernateSearchIndexNames(),
-				searchProjectionBackendContext.getDocumentReferenceExtractionHelper()
+				documentReferenceExtractionHelper
 		);
 	}
 

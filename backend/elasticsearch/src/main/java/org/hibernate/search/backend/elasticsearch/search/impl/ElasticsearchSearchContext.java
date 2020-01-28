@@ -74,4 +74,8 @@ public final class ElasticsearchSearchContext {
 	public Set<String> getHibernateSearchIndexNames() {
 		return scopeModel.getHibernateSearchIndexNames();
 	}
+
+	public Set<String> getMappedTypeNames() {
+		return scopeModel.getMappedTypeNames();
+	}
 }

@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.DocumentReferenceExtractionHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionBackendContext;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
@@ -27,8 +26,6 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
  * we would end up with methods with many parameters.
  */
 public interface SearchBackendContext {
-
-	DocumentReferenceExtractionHelper getDocumentReferenceExtractionHelper();
 
 	SearchProjectionBackendContext getSearchProjectionBackendContext();
 

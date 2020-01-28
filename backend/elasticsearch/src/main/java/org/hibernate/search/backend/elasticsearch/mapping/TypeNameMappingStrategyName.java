@@ -16,11 +16,13 @@ public enum TypeNameMappingStrategyName {
 
 	/**
 	 * Rely on the "_index" meta-field.
+	 * <p>
 	 * Does not work with index aliases.
 	 */
 	INDEX_NAME("index-name"),
 	/**
 	 * Rely on a discriminator field added to each document to resolve the type name.
+	 * <p>
 	 * Works correctly with index aliases.
 	 */
 	DISCRIMINATOR("discriminator");
