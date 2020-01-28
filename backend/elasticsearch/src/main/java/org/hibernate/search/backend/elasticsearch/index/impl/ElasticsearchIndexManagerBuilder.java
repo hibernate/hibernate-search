@@ -33,6 +33,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 			ElasticsearchIndexSettingsBuilder settingsBuilder,
 			List<DocumentMetadataContributor> documentMetadataContributors) {
 		this.backendContext = backendContext;
+
 		this.indexNames = indexNames;
 		this.schemaRootNodeBuilder = schemaRootNodeBuilder;
 		this.settingsBuilder = settingsBuilder;
