@@ -36,9 +36,9 @@ public class ElasticsearchSchemaMigratorImpl implements ElasticsearchSchemaMigra
 	}
 
 	@Override
-	public CompletableFuture<?> migrate(IndexMetadata indexMetadata) {
-		URLEncodedString indexName = indexMetadata.getName();
-		IndexSettings settings = indexMetadata.getSettings();
+	public CompletableFuture<?> migrate(IndexMetadata expectedIndexMetadata) {
+		URLEncodedString indexName = expectedIndexMetadata.getName();
+		IndexSettings settings = expectedIndexMetadata.getSettings();
 
 		/*
 		 * We only update settings if it's really necessary, because closing the index,
@@ -49,9 +49,9 @@ public class ElasticsearchSchemaMigratorImpl implements ElasticsearchSchemaMigra
 			settingsMigration = CompletableFuture.completedFuture( null );
 		}
 		else {
-			settingsMigration = schemaValidator.isSettingsValid( indexMetadata )
-					.thenCompose( valid -> {
-						if ( valid ) {
+			settingsMigration = schemaAccessor.getCurrentIndexMetadata( indexName )
+					.thenApply( actualIndexMetadata -> {
+						if ( schemaValidator.isSettingsValid( expectedIndexMetadata, actualIndexMetadata ) ) {
 							return CompletableFuture.completedFuture( null );
 						}
 						else {
@@ -60,7 +60,7 @@ public class ElasticsearchSchemaMigratorImpl implements ElasticsearchSchemaMigra
 					} );
 		}
 
-		return settingsMigration.thenCompose( ignored -> doMigrateMapping( indexName, indexMetadata.getMapping() ) )
+		return settingsMigration.thenCompose( ignored -> doMigrateMapping( indexName, expectedIndexMetadata.getMapping() ) )
 				.exceptionally( Futures.handler( e -> {
 					throw log.schemaUpdateFailed(
 							indexName, e.getMessage(),
