@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
-import java.util.concurrent.CompletableFuture;
-
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.validation.impl.IndexSettingsValidator;
 import org.hibernate.search.backend.elasticsearch.validation.impl.RootTypeMappingValidator;
@@ -15,7 +13,6 @@ import org.hibernate.search.backend.elasticsearch.validation.impl.ValidationErro
 import org.hibernate.search.backend.elasticsearch.validation.impl.Validator;
 import org.hibernate.search.backend.elasticsearch.index.settings.esnative.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchEventContexts;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 
 /**
@@ -28,43 +25,29 @@ import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaValidator {
 
 	private final Validator<IndexSettings> indexSettingsValidator = new IndexSettingsValidator();
-	private final ElasticsearchSchemaAccessor schemaAccessor;
-
 	private final Validator<RootTypeMapping> rootTypeMappingValidator = new RootTypeMappingValidator();
 
-	public ElasticsearchSchemaValidatorImpl(ElasticsearchSchemaAccessor schemaAccessor) {
-		super();
-		this.schemaAccessor = schemaAccessor;
+	@Override
+	public void validate(IndexMetadata expectedIndexMetadata, IndexMetadata actualIndexMetadata,
+			ContextualFailureCollector contextualFailureCollector) {
+		ValidationErrorCollector errorCollector = new ValidationErrorCollector(
+				contextualFailureCollector.withContext( ElasticsearchEventContexts.getSchemaValidation() )
+		);
+
+		validateSettings( errorCollector, expectedIndexMetadata, actualIndexMetadata );
+
+		rootTypeMappingValidator.validate(
+				errorCollector, expectedIndexMetadata.getMapping(), actualIndexMetadata.getMapping()
+		);
 	}
 
 	@Override
-	public CompletableFuture<?> validate(IndexMetadata expectedIndexMetadata, ContextualFailureCollector contextualFailureCollector) {
-		URLEncodedString indexName = expectedIndexMetadata.getName();
-		return schemaAccessor.getCurrentIndexMetadata( indexName )
-				.thenAccept( actualIndexMetadata -> {
-					ValidationErrorCollector errorCollector = new ValidationErrorCollector(
-							contextualFailureCollector.withContext( ElasticsearchEventContexts.getSchemaValidation() )
-					);
+	public boolean isSettingsValid(IndexMetadata expectedIndexMetadata, IndexMetadata actualIndexMetadata) {
+		ValidationErrorCollector errorCollector = new ValidationErrorCollector();
 
-					validateSettings( errorCollector, expectedIndexMetadata, actualIndexMetadata );
+		validateSettings( errorCollector, expectedIndexMetadata, actualIndexMetadata );
 
-					rootTypeMappingValidator.validate(
-							errorCollector, expectedIndexMetadata.getMapping(), actualIndexMetadata.getMapping()
-					);
-				} );
-	}
-
-	@Override
-	public CompletableFuture<Boolean> isSettingsValid(IndexMetadata expectedIndexMetadata) {
-		URLEncodedString indexName = expectedIndexMetadata.getName();
-		return schemaAccessor.getCurrentIndexMetadata( indexName )
-				.thenApply( actualIndexMetadata -> {
-					ValidationErrorCollector errorCollector = new ValidationErrorCollector();
-
-					validateSettings( errorCollector, expectedIndexMetadata, actualIndexMetadata );
-
-					return !errorCollector.hasError();
-				} );
+		return !errorCollector.hasError();
 	}
 
 	private void validateSettings(ValidationErrorCollector errorCollector,

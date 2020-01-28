@@ -20,6 +20,7 @@ import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
  */
 public class ElasticsearchIndexAdministrationClient {
 
+	private final ElasticsearchSchemaAccessor schemaAccessor;
 	private final ElasticsearchSchemaCreator schemaCreator;
 	private final ElasticsearchSchemaDropper schemaDropper;
 	private final ElasticsearchSchemaValidator schemaValidator;
@@ -30,11 +31,11 @@ public class ElasticsearchIndexAdministrationClient {
 	public ElasticsearchIndexAdministrationClient(ElasticsearchLink link,
 			ElasticsearchWorkOrchestrator workOrchestrator,
 			IndexMetadata expectedMetadata) {
-		ElasticsearchSchemaAccessor schemaAccessor = new ElasticsearchSchemaAccessor( link, workOrchestrator );
+		this.schemaAccessor = new ElasticsearchSchemaAccessor( link, workOrchestrator );
 
 		this.schemaCreator = new ElasticsearchSchemaCreatorImpl( schemaAccessor );
 		this.schemaDropper = new ElasticsearchSchemaDropperImpl( schemaAccessor );
-		this.schemaValidator = new ElasticsearchSchemaValidatorImpl( schemaAccessor );
+		this.schemaValidator = new ElasticsearchSchemaValidatorImpl();
 		this.schemaMigrator = new ElasticsearchSchemaMigratorImpl( schemaAccessor, schemaValidator );
 
 		this.expectedMetadata = expectedMetadata;
@@ -68,6 +69,9 @@ public class ElasticsearchIndexAdministrationClient {
 	public CompletableFuture<?> validate(ElasticsearchIndexLifecycleExecutionOptions executionOptions,
 			ContextualFailureCollector failureCollector) {
 		return schemaCreator.checkIndexExists( expectedMetadata.getName(), executionOptions )
-				.thenCompose( ignored -> schemaValidator.validate( expectedMetadata, failureCollector ) );
+				.thenCompose( ignored -> schemaAccessor.getCurrentIndexMetadata( expectedMetadata.getName() ) )
+				.thenAccept( actualIndexMetadata ->
+						schemaValidator.validate( expectedMetadata, actualIndexMetadata, failureCollector )
+				);
 	}
 }
