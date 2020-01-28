@@ -29,11 +29,11 @@ public class ElasticsearchSchemaCreatorImpl implements ElasticsearchSchemaCreato
 	}
 
 	@Override
-	public CompletableFuture<?> createIndex(IndexMetadata indexMetadata,
+	public CompletableFuture<?> createIndexAssumeNonExisting(IndexMetadata indexMetadata,
 			ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		URLEncodedString indexName = indexMetadata.getName();
 
-		return schemaAccessor.createIndex(
+		return schemaAccessor.createIndexAssumeNonExisting(
 				indexName, indexMetadata.getSettings(),
 				indexMetadata.getMapping()
 		)
@@ -51,7 +51,7 @@ public class ElasticsearchSchemaCreatorImpl implements ElasticsearchSchemaCreato
 						return CompletableFuture.completedFuture( false );
 					}
 					else {
-						return schemaAccessor.createIndexIfAbsent(
+						return schemaAccessor.createIndexIgnoreExisting(
 								indexName, indexMetadata.getSettings(),
 								indexMetadata.getMapping()
 						);

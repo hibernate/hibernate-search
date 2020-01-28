@@ -47,7 +47,7 @@ public class ElasticsearchIndexAdministrationClient {
 
 	public CompletableFuture<?> dropAndCreate(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		return schemaDropper.dropIfExisting( expectedMetadata.getName() )
-				.thenCompose( ignored -> schemaCreator.createIndex( expectedMetadata, executionOptions ) );
+				.thenCompose( ignored -> schemaCreator.createIndexAssumeNonExisting( expectedMetadata, executionOptions ) );
 	}
 
 	public CompletableFuture<?> dropIfExisting(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {

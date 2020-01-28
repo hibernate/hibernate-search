@@ -25,7 +25,7 @@ public interface ElasticsearchSchemaCreator {
 	 * @return A future.
 	 * @throws SearchException If an error occurs.
 	 */
-	CompletableFuture<?> createIndex(IndexMetadata indexMetadata,
+	CompletableFuture<?> createIndexAssumeNonExisting(IndexMetadata indexMetadata,
 			ElasticsearchIndexLifecycleExecutionOptions executionOptions);
 
 	/**

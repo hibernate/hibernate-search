@@ -41,7 +41,7 @@ public class ElasticsearchSchemaAccessor {
 		this.orchestrator = orchestrator;
 	}
 
-	public CompletableFuture<?> createIndex(URLEncodedString indexName, IndexSettings settings,
+	public CompletableFuture<?> createIndexAssumeNonExisting(URLEncodedString indexName, IndexSettings settings,
 			RootTypeMapping mapping) {
 		ElasticsearchWork<?> work = getWorkFactory().createIndex( indexName )
 				.settings( settings )
@@ -55,7 +55,7 @@ public class ElasticsearchSchemaAccessor {
 	 * @param settings The settings for the newly created index
 	 * @return {@code true} if the index was actually created, {@code false} if it already existed.
 	 */
-	public CompletableFuture<Boolean> createIndexIfAbsent(URLEncodedString indexName, IndexSettings settings,
+	public CompletableFuture<Boolean> createIndexIgnoreExisting(URLEncodedString indexName, IndexSettings settings,
 			RootTypeMapping mapping) {
 		ElasticsearchWork<CreateIndexResult> work = getWorkFactory().createIndex( indexName )
 				.settings( settings )
