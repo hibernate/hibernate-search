@@ -10,7 +10,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 
 /**
@@ -26,12 +25,10 @@ public class ElasticsearchIndexAdministrationClient {
 	private final ElasticsearchSchemaValidator schemaValidator;
 	private final ElasticsearchSchemaMigrator schemaMigrator;
 
-	private final URLEncodedString elasticsearchIndexName;
 	private final IndexMetadata expectedMetadata;
 
 	public ElasticsearchIndexAdministrationClient(ElasticsearchLink link,
 			ElasticsearchWorkOrchestrator workOrchestrator,
-			URLEncodedString elasticsearchIndexName,
 			IndexMetadata expectedMetadata) {
 		ElasticsearchSchemaAccessor schemaAccessor = new ElasticsearchSchemaAccessor( link, workOrchestrator );
 
@@ -40,7 +37,6 @@ public class ElasticsearchIndexAdministrationClient {
 		this.schemaValidator = new ElasticsearchSchemaValidatorImpl( schemaAccessor );
 		this.schemaMigrator = new ElasticsearchSchemaMigratorImpl( schemaAccessor, schemaValidator );
 
-		this.elasticsearchIndexName = elasticsearchIndexName;
 		this.expectedMetadata = expectedMetadata;
 	}
 
@@ -49,12 +45,12 @@ public class ElasticsearchIndexAdministrationClient {
 	}
 
 	public CompletableFuture<?> dropAndCreate(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
-		return schemaDropper.dropIfExisting( elasticsearchIndexName )
+		return schemaDropper.dropIfExisting( expectedMetadata.getName() )
 				.thenCompose( ignored -> schemaCreator.createIndex( expectedMetadata, executionOptions ) );
 	}
 
 	public CompletableFuture<?> dropIfExisting(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
-		return schemaDropper.dropIfExisting( elasticsearchIndexName );
+		return schemaDropper.dropIfExisting( expectedMetadata.getName() );
 	}
 
 	public CompletableFuture<?> update(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
@@ -71,7 +67,7 @@ public class ElasticsearchIndexAdministrationClient {
 
 	public CompletableFuture<?> validate(ElasticsearchIndexLifecycleExecutionOptions executionOptions,
 			ContextualFailureCollector failureCollector) {
-		return schemaCreator.checkIndexExists( elasticsearchIndexName, executionOptions )
+		return schemaCreator.checkIndexExists( expectedMetadata.getName(), executionOptions )
 				.thenCompose( ignored -> schemaValidator.validate( expectedMetadata, failureCollector ) );
 	}
 }
