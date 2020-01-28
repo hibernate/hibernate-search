@@ -175,49 +175,60 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 		EventContext indexEventContext = EventContexts.fromIndexName( hibernateSearchIndexName );
 
-		String elasticsearchIndexName = ElasticsearchIndexNameNormalizer.normalize( hibernateSearchIndexName );
-		URLEncodedString encodedElasticsearchIndexName = URLEncodedString.fromString( elasticsearchIndexName );
+		return new ElasticsearchIndexManagerBuilder(
+				indexManagerBackendContext,
+				createIndexNames( hibernateSearchIndexName, mappedTypeName ),
+				createIndexSchemaRootNodeBuilder( indexEventContext, mappedTypeName ),
+				new ElasticsearchIndexSettingsBuilder( analysisDefinitionRegistry ),
+				createDocumentMetadataContributors( mappedTypeName )
+		);
+	}
+
+	private IndexNames createIndexNames(String hibernateSearchIndexName, String mappedTypeName) {
+		URLEncodedString primaryName = URLEncodedString.fromString(
+				ElasticsearchIndexNameNormalizer.normalize( hibernateSearchIndexName )
+		);
+
 		// TODO HSEARCH-3791 allow configuration of each alias
-		IndexNames names = new IndexNames(
+		IndexNames indexNames = new IndexNames(
 				hibernateSearchIndexName,
-				encodedElasticsearchIndexName,
-				encodedElasticsearchIndexName,
-				encodedElasticsearchIndexName
+				primaryName,
+				primaryName,
+				primaryName
 		);
 
 		// This will check that names are unique.
-		indexNamesRegistry.register( names );
+		indexNamesRegistry.register( indexNames );
 
 		// This will allow the type mapping to resolve the type name from the index name.
-		typeNameMapping.register( elasticsearchIndexName, mappedTypeName );
+		typeNameMapping.register( indexNames.getPrimary().original, mappedTypeName );
 
-		ElasticsearchIndexSchemaRootNodeBuilder indexSchemaRootNodeBuilder =
-				new ElasticsearchIndexSchemaRootNodeBuilder(
-						typeFactoryProvider,
-						indexEventContext,
-						mappedTypeName
-				);
+		return indexNames;
+	}
+
+	private ElasticsearchIndexSchemaRootNodeBuilder createIndexSchemaRootNodeBuilder(EventContext indexEventContext,
+			String mappedTypeName) {
+		ElasticsearchIndexSchemaRootNodeBuilder builder = new ElasticsearchIndexSchemaRootNodeBuilder(
+				typeFactoryProvider,
+				indexEventContext,
+				mappedTypeName
+		);
 
 		typeNameMapping.getIndexSchemaRootContributor()
-				.ifPresent( indexSchemaRootNodeBuilder::addSchemaRootContributor );
+				.ifPresent( builder::addSchemaRootContributor );
 
 		multiTenancyStrategy.getIndexSchemaRootContributor()
-				.ifPresent( indexSchemaRootNodeBuilder::addSchemaRootContributor );
+				.ifPresent( builder::addSchemaRootContributor );
 
-		ElasticsearchIndexSettingsBuilder settingsBuilder =
-				new ElasticsearchIndexSettingsBuilder( analysisDefinitionRegistry );
+		return builder;
+	}
 
-		List<DocumentMetadataContributor> documentMetadataContributors = new ArrayList<>();
+	private List<DocumentMetadataContributor> createDocumentMetadataContributors(String mappedTypeName) {
+		List<DocumentMetadataContributor> contributors = new ArrayList<>();
 		typeNameMapping.getDocumentMetadataContributor( mappedTypeName )
-				.ifPresent( documentMetadataContributors::add );
+				.ifPresent( contributors::add );
 		multiTenancyStrategy.getDocumentMetadataContributor()
-				.ifPresent( documentMetadataContributors::add );
-
-		return new ElasticsearchIndexManagerBuilder(
-				indexManagerBackendContext,
-				names,
-				indexSchemaRootNodeBuilder, settingsBuilder,
-				documentMetadataContributors
-		);
+				.ifPresent( contributors::add );
+		return contributors;
 	}
 }
