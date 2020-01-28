@@ -160,8 +160,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		metadata.setSettings( model.getSettings() );
 		metadata.setMapping( model.getMapping() );
 		return new ElasticsearchIndexAdministrationClient(
-				link, orchestratorProvider.getRootParallelOrchestrator(),
-				primaryName, metadata
+				link, orchestratorProvider.getRootParallelOrchestrator(), metadata
 		);
 	}
 
