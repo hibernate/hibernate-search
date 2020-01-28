@@ -97,6 +97,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	@Test
 	public void multiIndexScope() {
 		setup( IndexLifecycleStrategyName.DROP_AND_CREATE_AND_DROP );
+
 		SearchResultAssert.assertThat(
 				index1Manager.createScope( index2Manager ).query().where( f -> f.matchAll() ).toQuery()
 		)
@@ -117,18 +118,12 @@ public class ElasticsearchTypeNameMappingBaseIT {
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		if ( AliasSupport.YES.equals( aliasSupport ) ) {
-			SearchResultAssert.assertThat( query )
-					.hasDocRefHitsAnyOrder( c -> c
-							.doc( TYPE1_NAME, ID_1 )
-							.doc( TYPE1_NAME, ID_2 )
-					);
-		}
-		else {
-			SubTest.expectException( () -> query.fetch( 20 ) )
-					.assertThrown()
-					.isInstanceOf( SearchException.class );
-		}
+		// Should work even if aliases are not supported: the selected type-name mapping strategy is not actually used.
+		SearchResultAssert.assertThat( query )
+				.hasDocRefHitsAnyOrder( c -> c
+						.doc( TYPE1_NAME, ID_1 )
+						.doc( TYPE1_NAME, ID_2 )
+				);
 	}
 
 	@Test

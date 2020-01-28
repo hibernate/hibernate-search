@@ -40,8 +40,7 @@ public class ElasticsearchIndexScope
 		this.searchPredicateFactory = new ElasticsearchSearchPredicateBuilderFactoryImpl( searchContext, model );
 		this.searchSortFactory = new ElasticsearchSearchSortBuilderFactoryImpl( searchContext, model );
 		this.searchProjectionFactory = new ElasticsearchSearchProjectionBuilderFactory(
-				backendContext.getSearchProjectionBackendContext(),
-				model
+				backendContext.getSearchProjectionBackendContext(), searchContext, model
 		);
 		this.searchAggregationFactory = new ElasticsearchSearchAggregationBuilderFactory( searchContext, model );
 		this.searchQueryFactory = new ElasticsearchSearchQueryBuilderFactory(

@@ -12,6 +12,7 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import com.google.gson.JsonObject;
 
 public final class DocumentReferenceExtractionHelper implements ProjectionExtractionHelper<DocumentReference> {
+
 	private final ProjectionExtractionHelper<String> mappedTypeNameHelper;
 	private final ProjectionExtractionHelper<String> idHelper;
 

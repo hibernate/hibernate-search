@@ -473,7 +473,7 @@ and extracted from the response.
 
 Pros:
 
-* Works in every situation, even when using link:{elasticsearchDocUrl}/indices-add-alias.html[index aliases].
+* Works correctly when targeting link:{elasticsearchDocUrl}/indices-add-alias.html[index aliases].
 
 Cons:
 
@@ -492,8 +492,12 @@ Pros:
 
 Cons:
 
-* Will not work correctly when using link:{elasticsearchDocUrl}/indices-add-alias.html[index aliases],
-because in that case the `_index` meta-field contains the actual index name, not the alias.
+* Does not work when targeting multiple indexes and those indexes rely on link:{elasticsearchDocUrl}/indices-add-alias.html[index aliases],
+because in that case the `_index` meta-field contains the actual index name, not the alias,
+and the actual index name is unknown to Hibernate Search.
++
+Works correctly when targeting a _single_ index, even if it relies on index aliases
+because in that case the type name can be deduced through other means.
 
 [[backend-elasticsearch-multi-tenancy]]
 === Multi-tenancy

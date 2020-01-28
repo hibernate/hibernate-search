@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.scope.model.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -32,13 +33,16 @@ public class ElasticsearchScopeModel {
 
 	private final Set<ElasticsearchIndexModel> indexModels;
 	private final Map<String, URLEncodedString> hibernateSearchIndexNamesToIndexReadNames;
+	private final Set<String> mappedTypeNames;
 
 	public ElasticsearchScopeModel(Set<ElasticsearchIndexModel> indexModels) {
 		this.indexModels = indexModels;
-		// Use LinkedHashMap to ensure stable order when generating requests
+		// Use LinkedHashMap/LinkedHashSet to ensure stable order when generating requests
 		this.hibernateSearchIndexNamesToIndexReadNames = new LinkedHashMap<>();
+		this.mappedTypeNames = new LinkedHashSet<>();
 		for ( ElasticsearchIndexModel model : indexModels ) {
 			hibernateSearchIndexNamesToIndexReadNames.put( model.getHibernateSearchIndexName(), model.getNames().getRead() );
+			mappedTypeNames.add( model.getMappedTypeName() );
 		}
 	}
 
@@ -48,6 +52,10 @@ public class ElasticsearchScopeModel {
 
 	public Map<String, URLEncodedString> getHibernateSearchIndexNamesToIndexReadNames() {
 		return hibernateSearchIndexNamesToIndexReadNames;
+	}
+
+	public Set<String> getMappedTypeNames() {
+		return mappedTypeNames;
 	}
 
 	public EventContext getIndexesEventContext() {

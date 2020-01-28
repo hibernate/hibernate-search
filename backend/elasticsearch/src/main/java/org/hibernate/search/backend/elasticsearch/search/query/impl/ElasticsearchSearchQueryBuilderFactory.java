@@ -13,8 +13,6 @@ import java.util.function.Function;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchCompositeListProjection;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchEntityProjection;
-import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchEntityReferenceProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjectionBuilderFactory;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
@@ -41,18 +39,18 @@ public class ElasticsearchSearchQueryBuilderFactory
 	@Override
 	public <E> ElasticsearchSearchQueryBuilder<E> selectEntity(
 			BackendSessionContext sessionContext, LoadingContextBuilder<?, E, ?> loadingContextBuilder) {
-		return createSearchQueryBuilder(
+		return select(
 				sessionContext, loadingContextBuilder,
-				new ElasticsearchEntityProjection<>( searchContext.getHibernateSearchIndexNames(), searchBackendContext.getDocumentReferenceExtractionHelper() )
+				searchProjectionFactory.<E>entity().build()
 		);
 	}
 
 	@Override
 	public <R> ElasticsearchSearchQueryBuilder<R> selectEntityReference(
 			BackendSessionContext sessionContext, LoadingContextBuilder<R, ?, ?> loadingContextBuilder) {
-		return createSearchQueryBuilder(
+		return select(
 				sessionContext, loadingContextBuilder,
-				new ElasticsearchEntityReferenceProjection<>( searchContext.getHibernateSearchIndexNames(), searchBackendContext.getDocumentReferenceExtractionHelper() )
+				searchProjectionFactory.<R>entityReference().build()
 		);
 	}
 
