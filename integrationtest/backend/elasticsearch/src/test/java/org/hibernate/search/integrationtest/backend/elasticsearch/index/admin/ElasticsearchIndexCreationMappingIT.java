@@ -4,9 +4,8 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.management;
+package org.hibernate.search.integrationtest.backend.elasticsearch.index.admin;
 
-import static org.hibernate.search.integrationtest.backend.elasticsearch.management.ElasticsearchManagementTestUtils.simpleMappingForExpectations;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.util.EnumSet;
@@ -30,11 +29,12 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * Tests for the schema creation feature when using automatic index management, for all applicable strategies.
+ * Tests related to the mapping when creating indexes,
+ * for all applicable index lifecycle strategies.
  */
 @RunWith(Parameterized.class)
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.Elasticsearch5SchemaCreationIT")
-public class ElasticsearchSchemaCreationIT {
+public class ElasticsearchIndexCreationMappingIT {
 
 	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "IndexName";
@@ -55,7 +55,7 @@ public class ElasticsearchSchemaCreationIT {
 
 	private final IndexLifecycleStrategyName strategy;
 
-	public ElasticsearchSchemaCreationIT(IndexLifecycleStrategyName strategy) {
+	public ElasticsearchIndexCreationMappingIT(IndexLifecycleStrategyName strategy) {
 		super();
 		this.strategy = strategy;
 	}
@@ -74,7 +74,7 @@ public class ElasticsearchSchemaCreationIT {
 		} );
 
 		assertJsonEquals(
-				simpleMappingForExpectations(
+				ElasticsearchAdminTestUtils.simpleMappingForExpectations(
 						"'myField': {"
 								+ "'type': 'date',"
 								+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
@@ -99,7 +99,7 @@ public class ElasticsearchSchemaCreationIT {
 		} );
 
 		assertJsonEquals(
-				simpleMappingForExpectations(
+				ElasticsearchAdminTestUtils.simpleMappingForExpectations(
 						"'myField': {"
 								+ "'type': 'boolean',"
 								+ "'doc_values': false"
@@ -123,7 +123,7 @@ public class ElasticsearchSchemaCreationIT {
 		} );
 
 		assertJsonEquals(
-				simpleMappingForExpectations(
+				ElasticsearchAdminTestUtils.simpleMappingForExpectations(
 						"'myField': {"
 								+ "'type': 'keyword',"
 								+ "'doc_values': false"
@@ -147,7 +147,7 @@ public class ElasticsearchSchemaCreationIT {
 		} );
 
 		assertJsonEquals(
-				simpleMappingForExpectations(
+				ElasticsearchAdminTestUtils.simpleMappingForExpectations(
 						"'myField': {"
 								+ "'type': 'text',"
 								+ "'analyzer': 'standard'"
@@ -171,7 +171,7 @@ public class ElasticsearchSchemaCreationIT {
 		} );
 
 		assertJsonEquals(
-				simpleMappingForExpectations(
+				ElasticsearchAdminTestUtils.simpleMappingForExpectations(
 						"'myField': {"
 								+ "'type': 'text',"
 								+ "'analyzer': 'standard',"

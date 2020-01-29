@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.c
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 
-public class ElasticsearchAnalyzerManagementITAnalysisConfigurer implements ElasticsearchAnalysisConfigurer {
+public class ElasticsearchIndexAdminAnalyzerITAnalysisConfigurer implements ElasticsearchAnalysisConfigurer {
 	@Override
 	public void configure(ElasticsearchAnalysisConfigurationContext context) {
 		context.analyzer( "custom-analyzer" ).custom()

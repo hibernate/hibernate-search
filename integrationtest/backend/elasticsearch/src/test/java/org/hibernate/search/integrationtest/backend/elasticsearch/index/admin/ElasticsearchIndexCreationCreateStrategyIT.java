@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.management;
+package org.hibernate.search.integrationtest.backend.elasticsearch.index.admin;
 
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEqualsIgnoringUnknownFields;
@@ -24,12 +24,12 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Tests for aspects of the CREATE index management strategy
- * that are not addressed in {@link ElasticsearchSchemaCreationIT}
- * (because not applicable to other schema-creating strategies).
+ * Tests for aspects of the CREATE index lifecycle strategy
+ * that are not addressed in other tests
+ * (because not applicable to other index-creating strategies).
  */
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchSchemaCreateStrategyIT")
-public class ElasticsearchSchemaCreateStrategyIT {
+public class ElasticsearchIndexCreationCreateStrategyIT {
 
 	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "IndexName";

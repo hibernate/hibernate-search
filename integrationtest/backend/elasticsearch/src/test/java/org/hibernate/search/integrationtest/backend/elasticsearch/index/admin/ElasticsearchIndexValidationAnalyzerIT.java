@@ -4,14 +4,14 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.management;
+package org.hibernate.search.integrationtest.backend.elasticsearch.index.admin;
 
-import static org.hibernate.search.integrationtest.backend.elasticsearch.management.ElasticsearchManagementTestUtils.simpleMappingForInitialization;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.simpleMappingForInitialization;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchAnalyzerManagementITAnalysisConfigurer;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexAdminAnalyzerITAnalysisConfigurer;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -23,10 +23,10 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Tests for the analyzer validation feature when using automatic index management.
+ * Tests related to analyzers when validating indexes.
  */
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchAnalyzerDefinitionValidationIT")
-public class ElasticsearchAnalyzerDefinitionValidationIT {
+public class ElasticsearchIndexValidationAnalyzerIT {
 
 	private static final String SCHEMA_VALIDATION_CONTEXT = "schema validation";
 
@@ -650,7 +650,7 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 	}
 
 	private void setup() {
-		withManagementStrategyConfiguration()
+		startSetupWithLifecycleStrategy()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> { }
@@ -658,9 +658,7 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 				.setup();
 	}
 
-
-
-	private SearchSetupHelper.SetupContext withManagementStrategyConfiguration() {
+	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
 		return setupHelper.start( BACKEND_NAME )
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
@@ -670,7 +668,7 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 				.withBackendProperty(
 						BACKEND_NAME,
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
-						new ElasticsearchAnalyzerManagementITAnalysisConfigurer()
+						new ElasticsearchIndexAdminAnalyzerITAnalysisConfigurer()
 				);
 	}
 

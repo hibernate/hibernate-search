@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.management;
+package org.hibernate.search.integrationtest.backend.elasticsearch.index.admin;
 
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
@@ -13,7 +13,7 @@ import java.util.EnumSet;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchNormalizerManagementITAnalysisConfigurer;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexAdminNormalizerITAnalysisConfigurer;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
@@ -25,11 +25,12 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * Tests for the normalizer creation feature when using automatic index management.
+ * Tests related to normalizers when creating indexes,
+ * for all applicable index lifecycle strategies.
  */
 @RunWith(Parameterized.class)
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchAnalyzerDefinitionCreationIT")
-public class ElasticsearchNormalizerDefinitionCreationIT {
+public class ElasticsearchIndexCreationNormalizerIT {
 
 	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "IndexName";
@@ -50,7 +51,7 @@ public class ElasticsearchNormalizerDefinitionCreationIT {
 
 	private final IndexLifecycleStrategyName strategy;
 
-	public ElasticsearchNormalizerDefinitionCreationIT(IndexLifecycleStrategyName strategy) {
+	public ElasticsearchIndexCreationNormalizerIT(IndexLifecycleStrategyName strategy) {
 		super();
 		this.strategy = strategy;
 	}
@@ -89,7 +90,7 @@ public class ElasticsearchNormalizerDefinitionCreationIT {
 	}
 
 	private void setup() {
-		withManagementStrategyConfiguration()
+		startSetupWithLifecycleStrategy()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> { }
@@ -97,7 +98,7 @@ public class ElasticsearchNormalizerDefinitionCreationIT {
 				.setup();
 	}
 
-	private SearchSetupHelper.SetupContext withManagementStrategyConfiguration() {
+	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
 		return setupHelper.start( BACKEND_NAME )
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
@@ -107,7 +108,7 @@ public class ElasticsearchNormalizerDefinitionCreationIT {
 				.withBackendProperty(
 						BACKEND_NAME,
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
-						new ElasticsearchNormalizerManagementITAnalysisConfigurer()
+						new ElasticsearchIndexAdminNormalizerITAnalysisConfigurer()
 				);
 	}
 

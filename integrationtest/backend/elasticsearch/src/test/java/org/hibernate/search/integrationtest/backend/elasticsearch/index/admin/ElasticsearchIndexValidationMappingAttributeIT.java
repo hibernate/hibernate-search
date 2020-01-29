@@ -4,10 +4,10 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.management;
+package org.hibernate.search.integrationtest.backend.elasticsearch.index.admin;
 
-import static org.hibernate.search.integrationtest.backend.elasticsearch.management.ElasticsearchManagementTestUtils.defaultMetadataMappingAndCommaForInitialization;
-import static org.hibernate.search.integrationtest.backend.elasticsearch.management.ElasticsearchManagementTestUtils.simpleMappingForInitialization;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.defaultMetadataMappingAndCommaForInitialization;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.simpleMappingForInitialization;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -23,7 +23,7 @@ import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.TermVector;
-import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchNormalizerManagementITAnalysisConfigurer;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexAdminNormalizerITAnalysisConfigurer;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -34,7 +34,13 @@ import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class ElasticsearchSchemaAttributeValidationIT {
+/**
+ * Tests related to mapping attributes when validating indexes.
+ *
+ * These tests are more specific than {@link ElasticsearchIndexValidationMappingBaseIT}
+ * and focus on specific mapping attributes.
+ */
+public class ElasticsearchIndexValidationMappingAttributeIT {
 
 	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "IndexName";
@@ -62,7 +68,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 		);
 
 		SubTest.expectException( () ->
-				validateSchemaConfig()
+				startSetupWithLifecycleStrategy()
 						.withIndex( INDEX_NAME, ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asInteger() ).toReference();
@@ -96,7 +102,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 		);
 
 		SubTest.expectException( () ->
-				validateSchemaConfig()
+				startSetupWithLifecycleStrategy()
 						.withIndex( INDEX_NAME, ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asInteger() ).toReference();
@@ -125,7 +131,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 
 
 		SubTest.expectException( () ->
-				validateSchemaConfig()
+				startSetupWithLifecycleStrategy()
 						.withIndex( INDEX_NAME, ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asInteger() ).toReference();
@@ -157,7 +163,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 
 
 		SubTest.expectException( () ->
-				validateSchemaConfig()
+				startSetupWithLifecycleStrategy()
 						.withIndex( INDEX_NAME, ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asInteger() ).toReference();
@@ -189,7 +195,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 		);
 
 		SubTest.expectException( () ->
-				validateSchemaConfig()
+				startSetupWithLifecycleStrategy()
 						.withIndex( INDEX_NAME, ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asInteger() ).toReference();
@@ -219,7 +225,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 		);
 
 		// the expected value true is the default
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asInteger() ).toReference();
@@ -241,7 +247,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 		);
 
 		SubTest.expectException( () ->
-				validateSchemaConfig()
+				startSetupWithLifecycleStrategy()
 						.withIndex( INDEX_NAME, ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asInteger() ).toReference();
@@ -271,7 +277,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							// Searchable.NO allows to have index false
@@ -294,7 +300,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							// Searchable.NO allows to have index false
@@ -318,7 +324,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 		);
 
 		SubTest.expectException( () ->
-				validateSchemaConfig()
+				startSetupWithLifecycleStrategy()
 						.withIndex( INDEX_NAME, ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asLocalDate() ).toReference();
@@ -354,7 +360,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asLocalDate() ).toReference();
@@ -384,7 +390,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 		);
 
 		SubTest.expectException( () ->
-				validateSchemaConfig()
+				startSetupWithLifecycleStrategy()
 						.withIndex( INDEX_NAME, ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asLocalDate() ).toReference();
@@ -420,7 +426,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 		);
 
 		SubTest.expectException( () ->
-				validateSchemaConfig()
+				startSetupWithLifecycleStrategy()
 						.withIndex( INDEX_NAME, ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asLocalDate() ).toReference();
@@ -454,7 +460,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 		);
 
 		SubTest.expectException( () ->
-				validateSchemaConfig()
+				startSetupWithLifecycleStrategy()
 						.withIndex( INDEX_NAME, ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asLocalDate() ).toReference();
@@ -489,7 +495,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 		);
 
 		SubTest.expectException( () ->
-				validateSchemaConfig()
+				startSetupWithLifecycleStrategy()
 						.withIndex( INDEX_NAME, ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asString().analyzer( "keyword" ) ).toReference();
@@ -520,7 +526,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asString().analyzer( "keyword" ) ).toReference();
@@ -543,7 +549,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 		);
 
 		SubTest.expectException( () ->
-				validateSchemaConfig()
+				startSetupWithLifecycleStrategy()
 						.withIndex( INDEX_NAME, ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asString().analyzer( "default" ) ).toReference();
@@ -575,7 +581,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 		);
 
 		SubTest.expectException( () ->
-				validateSchemaConfig()
+				startSetupWithLifecycleStrategy()
 						.withIndex( INDEX_NAME, ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asString()
@@ -608,7 +614,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asString()
@@ -633,7 +639,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 		);
 
 		SubTest.expectException( () ->
-				validateSchemaConfig()
+				startSetupWithLifecycleStrategy()
 						.withIndex( INDEX_NAME, ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asString().analyzer( "keyword" ).searchAnalyzer( "italian" ) ).toReference();
@@ -663,7 +669,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asString().analyzer( "default" ).norms( Norms.NO ) ).toReference();
@@ -685,7 +691,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 		);
 
 		SubTest.expectException( () ->
-				validateSchemaConfig()
+				startSetupWithLifecycleStrategy()
 						.withIndex( INDEX_NAME, ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asString().analyzer( "default" ).norms( Norms.YES ) ).toReference();
@@ -715,7 +721,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asString().analyzer( "default" ).norms( Norms.YES ) ).toReference();
@@ -735,7 +741,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asString().norms( Norms.NO ) ).toReference();
@@ -757,7 +763,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asString().analyzer( "english" ).termVector( TermVector.WITH_POSITIONS_OFFSETS ) ).toReference();
@@ -778,7 +784,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asString().analyzer( "english" ).termVector( TermVector.NO ) ).toReference();
@@ -800,7 +806,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		SubTest.expectException( () -> validateSchemaConfig()
+		SubTest.expectException( () -> startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asString().analyzer( "english" ).termVector( TermVector.YES ) ).toReference();
@@ -830,7 +836,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asString().projectable( Projectable.YES ) ).toReference();
@@ -850,7 +856,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asString().projectable( Projectable.DEFAULT ) ).toReference();
@@ -871,7 +877,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		SubTest.expectException( () -> validateSchemaConfig()
+		SubTest.expectException( () -> startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asString().projectable( Projectable.YES ) ).toReference();
@@ -901,7 +907,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asInteger().indexNullAs( 739 ) ).toReference();
@@ -921,7 +927,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		SubTest.expectException( () -> validateSchemaConfig()
+		SubTest.expectException( () -> startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asInteger().indexNullAs( 739 ) ).toReference();
@@ -951,7 +957,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		SubTest.expectException( () -> validateSchemaConfig()
+		SubTest.expectException( () -> startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asInteger().indexNullAs( 739 ) ).toReference();
@@ -981,7 +987,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asInteger().sortable( Sortable.YES ) ).toReference();
@@ -1001,7 +1007,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asInteger().sortable( Sortable.YES ) ).toReference();
@@ -1022,7 +1028,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		SubTest.expectException( () -> validateSchemaConfig()
+		SubTest.expectException( () -> startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asInteger().sortable( Sortable.YES ) ).toReference();
@@ -1052,7 +1058,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							// Sortable.NO and Sortable.DEFAULT allow to have doc_values false
@@ -1074,7 +1080,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							// Sortable.NO or Sortable.DEFAULT does not impose doc_values false
@@ -1096,7 +1102,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asBigDecimal().decimalScale( 2 ) ).toReference();
@@ -1117,7 +1123,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				)
 		);
 
-		SubTest.expectException( () -> validateSchemaConfig()
+		SubTest.expectException( () -> startSetupWithLifecycleStrategy()
 				.withIndex( INDEX_NAME, ctx -> {
 							IndexSchemaElement root = ctx.getSchemaElement();
 							root.field( "myField", f -> f.asBigDecimal().decimalScale( 2 ) ).toReference();
@@ -1148,7 +1154,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 		);
 
 		SubTest.expectException( () ->
-				validateSchemaConfig()
+				startSetupWithLifecycleStrategy()
 						.withIndex( INDEX_NAME, ctx -> {
 									IndexSchemaElement root = ctx.getSchemaElement();
 									root.field( "myField", f -> f.asString().normalizer( "default" ) ).toReference();
@@ -1166,7 +1172,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.build() );
 	}
 
-	private SearchSetupHelper.SetupContext validateSchemaConfig() {
+	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
 		return setupHelper.start( BACKEND_NAME )
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
@@ -1291,7 +1297,7 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				.withBackendProperty(
 						BACKEND_NAME,
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
-						new ElasticsearchNormalizerManagementITAnalysisConfigurer()
+						new ElasticsearchIndexAdminNormalizerITAnalysisConfigurer()
 				);
 	}
 }
