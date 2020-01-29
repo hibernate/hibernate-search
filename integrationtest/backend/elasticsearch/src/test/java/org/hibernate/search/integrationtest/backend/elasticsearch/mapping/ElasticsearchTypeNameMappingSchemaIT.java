@@ -71,7 +71,7 @@ public class ElasticsearchTypeNameMappingSchemaIT {
 		);
 
 		clientSpy.expectNext(
-				ElasticsearchRequest.head().pathComponent( URLEncodedString.fromString( INDEX_NAME ) ).build(),
+				ElasticsearchRequest.get().pathComponent( URLEncodedString.fromString( INDEX_NAME ) ).build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
 

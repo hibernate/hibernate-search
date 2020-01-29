@@ -112,18 +112,18 @@ public interface Log extends BasicLogger {
 			@Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 34,
-			value = "Could not retrieve the index metadata from Elasticsearch for validation"
+			value = "Could not retrieve the index metadata from Elasticsearch"
 	)
-	SearchException elasticsearchIndexMetadataRetrievalForValidationFailed(@Cause Throwable cause);
+	SearchException elasticsearchIndexMetadataRetrievalFailed(@Cause Throwable cause);
 
 	@Message(id = ID_OFFSET_2 + 35,
 			value = "Could not update mappings in index '%1$s': %2$s"
 	)
-	SearchException schemaUpdateFailed(Object indexName, String causeMessage, @Cause Exception cause);
+	SearchException schemaUpdateFailed(URLEncodedString indexName, String causeMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 50,
 			value = "The index '%1$s' does not exist in the Elasticsearch cluster." )
-	SearchException indexMissing(Object indexName);
+	SearchException indexMissing(URLEncodedString indexName);
 
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = ID_OFFSET_2 + 53,

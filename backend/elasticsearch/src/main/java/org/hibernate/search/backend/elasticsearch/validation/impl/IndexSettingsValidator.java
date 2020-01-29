@@ -36,6 +36,10 @@ public class IndexSettingsValidator implements Validator<IndexSettings> {
 
 	private void validateAnalysisSettings(ValidationErrorCollector errorCollector,
 			Analysis expectedAnalysis, Analysis actualAnalysis) {
+		if ( expectedAnalysis == null || expectedAnalysis.isEmpty() ) {
+			return;
+		}
+
 		analyzerDefinitionValidator.validateAllIgnoreUnexpected(
 				errorCollector, ValidationContextType.ANALYZER,
 				ElasticsearchValidationMessages.INSTANCE.analyzerMissing(),

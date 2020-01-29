@@ -25,7 +25,6 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.DropIndexWor
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.ExplainWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.FlushWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexMetadataWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexExistsWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.OpenIndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.MergeSegmentsWorkBuilder;
@@ -48,7 +47,6 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchR
 import org.hibernate.search.backend.elasticsearch.work.impl.ExplainWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.FlushWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.GetIndexMetadataWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.IndexExistsWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.IndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.OpenIndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ForceMergeWork;
@@ -151,11 +149,6 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 	@Override
 	public CloseIndexWorkBuilder closeIndex(URLEncodedString indexName) {
 		return new CloseIndexWork.Builder( indexName );
-	}
-
-	@Override
-	public IndexExistsWorkBuilder indexExists(URLEncodedString indexName) {
-		return IndexExistsWork.Builder.forElasticsearch7AndAbove( indexName );
 	}
 
 	@Override

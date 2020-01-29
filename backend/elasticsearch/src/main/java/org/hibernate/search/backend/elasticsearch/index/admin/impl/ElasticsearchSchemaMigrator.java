@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.util.common.SearchException;
 
 /**
@@ -23,10 +24,12 @@ public interface ElasticsearchSchemaMigrator {
 	 *
 	 * <p>The index is expected to already exist.
 	 *
-	 * @param indexMetadata The expected index metadata.
+	 * @param indexName The name of the index to migrate.
+	 * @param expectedIndexMetadata The expected index metadata.
+	 * @param actualIndexMetadata The actual index metadata.
 	 * @return A future.
 	 * @throws SearchException If an error occurs.
 	 */
-	CompletableFuture<?> migrate(IndexMetadata indexMetadata);
+	CompletableFuture<?> migrate(URLEncodedString indexName, IndexMetadata expectedIndexMetadata, IndexMetadata actualIndexMetadata);
 
 }

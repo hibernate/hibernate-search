@@ -38,10 +38,6 @@ public final class ElasticsearchRequest {
 		return new Builder( "DELETE" );
 	}
 
-	public static Builder head() {
-		return new Builder( "HEAD" );
-	}
-
 	public static Builder builder(String method) {
 		return new Builder( method );
 	}
