@@ -4,9 +4,9 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.management;
+package org.hibernate.search.integrationtest.backend.elasticsearch.index.admin;
 
-import static org.hibernate.search.integrationtest.backend.elasticsearch.management.ElasticsearchManagementTestUtils.simpleMappingForInitialization;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.simpleMappingForInitialization;
 
 import java.util.EnumSet;
 
@@ -31,7 +31,8 @@ import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
 /**
- * Tests for the index status check feature when using automatic index management.
+ * Tests for the index status checks,
+ * for all applicable index lifecycle strategies.
  */
 @RunWith(Parameterized.class)
 @TestForIssue(jiraKey = "HSEARCH-2456")
@@ -145,7 +146,7 @@ public class ElasticsearchIndexStatusCheckIT {
 	}
 
 	private void setup() {
-		withManagementStrategyConfiguration()
+		startSetupWithLifecycleStrategy()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> { }
@@ -153,7 +154,7 @@ public class ElasticsearchIndexStatusCheckIT {
 				.setup();
 	}
 
-	private SearchSetupHelper.SetupContext withManagementStrategyConfiguration() {
+	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
 		return setupHelper.start( BACKEND_NAME )
 				.withBackendProperty(
 						BACKEND_NAME,

@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.management;
+package org.hibernate.search.integrationtest.backend.elasticsearch.index.admin;
 
 import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
@@ -21,10 +21,9 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Tests for aspects of the NONE lifecycle strategy
- * that are not addressed in other ITs.
+ * Tests for the NONE index lifecycle strategy.
  */
-public class ElasticsearchSchemaNoneStrategyIT {
+public class ElasticsearchIndexLifecycleNoneStrategyIT {
 
 	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "IndexName";

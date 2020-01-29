@@ -4,10 +4,10 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.management;
+package org.hibernate.search.integrationtest.backend.elasticsearch.index.admin;
 
-import static org.hibernate.search.integrationtest.backend.elasticsearch.management.ElasticsearchManagementTestUtils.defaultMetadataMappingAndCommaForInitialization;
-import static org.hibernate.search.integrationtest.backend.elasticsearch.management.ElasticsearchManagementTestUtils.simpleMappingForInitialization;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.defaultMetadataMappingAndCommaForInitialization;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.simpleMappingForInitialization;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
@@ -28,10 +28,10 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Tests for the schema validation feature when using automatic index management.
+ * Basic tests related to the mapping when validating indexes.
  */
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.Elasticsearch5SchemaValidationIT")
-public class ElasticsearchSchemaValidationIT {
+public class ElasticsearchIndexValidationMappingBaseIT {
 
 	private static final String SCHEMA_VALIDATION_CONTEXT = "schema validation";
 
@@ -91,7 +91,7 @@ public class ElasticsearchSchemaValidationIT {
 				)
 		);
 
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex(
 						INDEX1_NAME,
 						ctx -> {
@@ -155,7 +155,7 @@ public class ElasticsearchSchemaValidationIT {
 		);
 
 		setupExpectingFailure(
-				() -> validateSchemaConfig()
+				() -> startSetupWithLifecycleStrategy()
 						.withIndex(
 								INDEX1_NAME,
 								ctx -> {
@@ -194,7 +194,7 @@ public class ElasticsearchSchemaValidationIT {
 				)
 		);
 
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex(
 						INDEX1_NAME,
 						ctx -> {
@@ -231,7 +231,7 @@ public class ElasticsearchSchemaValidationIT {
 		);
 
 		setupExpectingFailure(
-				() -> validateSchemaConfig()
+				() -> startSetupWithLifecycleStrategy()
 						.withIndex(
 								INDEX1_NAME,
 								ctx -> {
@@ -315,7 +315,7 @@ public class ElasticsearchSchemaValidationIT {
 		);
 
 		setupExpectingFailure(
-				() -> validateSchemaConfig()
+				() -> startSetupWithLifecycleStrategy()
 						.withIndex(
 								INDEX1_NAME,
 								ctx -> {
@@ -363,7 +363,7 @@ public class ElasticsearchSchemaValidationIT {
 	}
 
 	private void setupSimpleIndexWithKeywordField(String indexName) {
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex(
 						indexName,
 						ctx -> {
@@ -376,7 +376,7 @@ public class ElasticsearchSchemaValidationIT {
 	}
 
 	private void setupSimpleIndexWithLocalDateField(String indexName) {
-		validateSchemaConfig()
+		startSetupWithLifecycleStrategy()
 				.withIndex(
 						indexName,
 						ctx -> {
@@ -388,7 +388,7 @@ public class ElasticsearchSchemaValidationIT {
 				.setup();
 	}
 
-	private SearchSetupHelper.SetupContext validateSchemaConfig() {
+	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
 		return setupHelper.start( BACKEND_NAME )
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,

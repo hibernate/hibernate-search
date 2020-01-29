@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.management;
+package org.hibernate.search.integrationtest.backend.elasticsearch.index.admin;
 
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettin
 import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresIndexOpenClose;
-import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchNormalizerManagementITAnalysisConfigurer;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexAdminNormalizerITAnalysisConfigurer;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
@@ -23,11 +23,11 @@ import org.junit.experimental.categories.Category;
 import org.junit.rules.ExpectedException;
 
 /**
- * Tests for the normalizer migration feature when using automatic index management.
+ * Tests related to normalizers when updating indexes.
  */
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchNormalizerDefinitionMigrationIT")
 @Category(RequiresIndexOpenClose.class)
-public class ElasticsearchNormalizerDefinitionMigrationIT {
+public class ElasticsearchIndexUpdateNormalizerIT {
 
 	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "IndexName";
@@ -306,7 +306,7 @@ public class ElasticsearchNormalizerDefinitionMigrationIT {
 	}
 
 	private void setup() {
-		withManagementStrategyConfiguration()
+		startSetupWithLifecycleStrategy()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> { }
@@ -314,7 +314,7 @@ public class ElasticsearchNormalizerDefinitionMigrationIT {
 				.setup();
 	}
 
-	private SearchSetupHelper.SetupContext withManagementStrategyConfiguration() {
+	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
 		return setupHelper.start( BACKEND_NAME )
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
@@ -324,7 +324,7 @@ public class ElasticsearchNormalizerDefinitionMigrationIT {
 				.withBackendProperty(
 						BACKEND_NAME,
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
-						new ElasticsearchNormalizerManagementITAnalysisConfigurer()
+						new ElasticsearchIndexAdminNormalizerITAnalysisConfigurer()
 				);
 	}
 

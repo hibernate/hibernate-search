@@ -4,11 +4,11 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.management;
+package org.hibernate.search.integrationtest.backend.elasticsearch.index.admin;
 
-import static org.hibernate.search.integrationtest.backend.elasticsearch.management.ElasticsearchManagementTestUtils.defaultMetadataMappingAndCommaForInitialization;
-import static org.hibernate.search.integrationtest.backend.elasticsearch.management.ElasticsearchManagementTestUtils.simpleMappingForExpectations;
-import static org.hibernate.search.integrationtest.backend.elasticsearch.management.ElasticsearchManagementTestUtils.simpleMappingForInitialization;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.defaultMetadataMappingAndCommaForInitialization;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.simpleMappingForExpectations;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.simpleMappingForInitialization;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
@@ -28,10 +28,10 @@ import org.junit.Rule;
 import org.junit.Test;
 
 /**
- * Tests for the schema migration feature when using automatic index management.
+ * Tests related to the mapping when updating indexes.
  */
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.Elasticsearch5SchemaMigrationIT")
-public class ElasticsearchSchemaMigrationIT {
+public class ElasticsearchIndexUpdateMappingIT {
 
 	private static final String UPDATE_FAILED_MESSAGE_ID = "HSEARCH400035";
 	private static final String MAPPING_CREATION_FAILED_MESSAGE_ID = "HSEARCH400020";
@@ -102,7 +102,7 @@ public class ElasticsearchSchemaMigrationIT {
 						)
 				);
 
-		withManagementStrategyConfiguration()
+		startSetupWithLifecycleStrategy()
 				.withIndex(
 						INDEX1_NAME,
 						ctx -> {
@@ -191,7 +191,7 @@ public class ElasticsearchSchemaMigrationIT {
 	public void mapping_missing() throws Exception {
 		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
 
-		withManagementStrategyConfiguration()
+		startSetupWithLifecycleStrategy()
 				.withIndex(
 						INDEX1_NAME,
 						ctx -> {
@@ -235,7 +235,7 @@ public class ElasticsearchSchemaMigrationIT {
 						+ "}"
 				);
 
-		withManagementStrategyConfiguration()
+		startSetupWithLifecycleStrategy()
 				.withIndex(
 						INDEX1_NAME,
 						ctx -> {
@@ -273,7 +273,7 @@ public class ElasticsearchSchemaMigrationIT {
 						)
 				);
 
-		withManagementStrategyConfiguration()
+		startSetupWithLifecycleStrategy()
 				.withIndex(
 						INDEX1_NAME,
 						ctx -> {
@@ -314,7 +314,7 @@ public class ElasticsearchSchemaMigrationIT {
 				);
 
 		setupExpectingFailure(
-				() -> withManagementStrategyConfiguration()
+				() -> startSetupWithLifecycleStrategy()
 						.withIndex(
 								INDEX1_NAME,
 								ctx -> {
@@ -352,7 +352,7 @@ public class ElasticsearchSchemaMigrationIT {
 		);
 
 		setupExpectingFailure(
-				() -> withManagementStrategyConfiguration()
+				() -> startSetupWithLifecycleStrategy()
 						.withIndex(
 								INDEX1_NAME,
 								ctx -> {
@@ -393,7 +393,7 @@ public class ElasticsearchSchemaMigrationIT {
 		);
 
 		setupExpectingFailure(
-				() -> withManagementStrategyConfiguration()
+				() -> startSetupWithLifecycleStrategy()
 						.withIndex(
 								INDEX1_NAME,
 								ctx -> {
@@ -426,7 +426,7 @@ public class ElasticsearchSchemaMigrationIT {
 				.hasMessageMatching( failureReportRegex );
 	}
 
-	private SearchSetupHelper.SetupContext withManagementStrategyConfiguration() {
+	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
 		return setupHelper.start( BACKEND_NAME )
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
