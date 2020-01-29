@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.management;
 
-import static org.hibernate.search.integrationtest.backend.elasticsearch.mapping.ElasticsearchTypeNameMappingTestUtils.discriminatorMappingComplete;
-import static org.hibernate.search.integrationtest.backend.elasticsearch.mapping.ElasticsearchTypeNameMappingTestUtils.discriminatorMappingOmitDefaults;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.discriminatorMappingComplete;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.discriminatorMappingOmitDefaults;
 
 class ElasticsearchManagementTestUtils {
 
