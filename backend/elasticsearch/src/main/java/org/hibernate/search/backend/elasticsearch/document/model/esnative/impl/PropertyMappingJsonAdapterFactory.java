@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.esnative.impl;
 
-import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonElement;
 
 public class PropertyMappingJsonAdapterFactory extends AbstractTypeMappingJsonAdapterFactory {
 
@@ -18,7 +18,7 @@ public class PropertyMappingJsonAdapterFactory extends AbstractTypeMappingJsonAd
 		builder.add( "norms", Boolean.class );
 		builder.add( "docValues", Boolean.class );
 		builder.add( "store", Boolean.class );
-		builder.add( "nullValue", JsonPrimitive.class );
+		builder.add( "nullValue", JsonElement.class );
 		builder.add( "analyzer", String.class );
 		builder.add( "searchAnalyzer", String.class );
 		builder.add( "normalizer", String.class );
