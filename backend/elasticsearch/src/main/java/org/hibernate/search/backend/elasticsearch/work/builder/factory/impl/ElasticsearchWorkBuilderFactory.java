@@ -24,7 +24,6 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.DropIndexWor
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.ExplainWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.FlushWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexMetadataWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexExistsWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.OpenIndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.MergeSegmentsWorkBuilder;
@@ -75,8 +74,6 @@ public interface ElasticsearchWorkBuilderFactory {
 	OpenIndexWorkBuilder openIndex(URLEncodedString indexName);
 
 	CloseIndexWorkBuilder closeIndex(URLEncodedString indexName);
-
-	IndexExistsWorkBuilder indexExists(URLEncodedString indexName);
 
 	GetIndexMetadataWorkBuilder getIndexMetadata(URLEncodedString indexName);
 

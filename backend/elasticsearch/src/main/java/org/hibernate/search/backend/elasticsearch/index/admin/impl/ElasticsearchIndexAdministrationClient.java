@@ -42,12 +42,14 @@ public class ElasticsearchIndexAdministrationClient {
 	}
 
 	public CompletableFuture<?> createIfAbsent(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
-		return schemaCreator.createIndexIfAbsent( expectedMetadata, executionOptions );
+		return schemaCreator.createIndexIfAbsent( expectedMetadata )
+				.thenCompose( ignored -> schemaAccessor.waitForIndexStatus( expectedMetadata.getName(), executionOptions ) );
 	}
 
 	public CompletableFuture<?> dropAndCreate(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		return schemaDropper.dropIfExisting( expectedMetadata.getName() )
-				.thenCompose( ignored -> schemaCreator.createIndexAssumeNonExisting( expectedMetadata, executionOptions ) );
+				.thenCompose( ignored -> schemaCreator.createIndexAssumeNonExisting( expectedMetadata ) )
+				.thenCompose( ignored -> schemaAccessor.waitForIndexStatus( expectedMetadata.getName(), executionOptions ) );
 	}
 
 	public CompletableFuture<?> dropIfExisting(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
@@ -55,23 +57,27 @@ public class ElasticsearchIndexAdministrationClient {
 	}
 
 	public CompletableFuture<?> update(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
-		return schemaCreator.createIndexIfAbsent( expectedMetadata, executionOptions )
-				.thenCompose( createdIndex -> {
-					if ( !createdIndex ) {
-						return schemaMigrator.migrate( expectedMetadata );
+		return schemaCreator.createIndexIfAbsent( expectedMetadata )
+				.thenCompose( existingIndexMetadata -> {
+					if ( existingIndexMetadata != null ) {
+						return schemaMigrator.migrate( expectedMetadata.getName(), expectedMetadata, existingIndexMetadata );
 					}
 					else {
 						return CompletableFuture.completedFuture( null );
 					}
-				} );
+				} )
+				.thenCompose( ignored -> schemaAccessor.waitForIndexStatus( expectedMetadata.getName(), executionOptions ) );
 	}
 
 	public CompletableFuture<?> validate(ElasticsearchIndexLifecycleExecutionOptions executionOptions,
 			ContextualFailureCollector failureCollector) {
-		return schemaCreator.checkIndexExists( expectedMetadata.getName(), executionOptions )
-				.thenCompose( ignored -> schemaAccessor.getCurrentIndexMetadata( expectedMetadata.getName() ) )
+		return schemaAccessor.getCurrentIndexMetadata( expectedMetadata.getName() )
 				.thenAccept( actualIndexMetadata ->
 						schemaValidator.validate( expectedMetadata, actualIndexMetadata, failureCollector )
+				)
+				.thenCompose( ignored -> failureCollector.hasFailure()
+						? CompletableFuture.completedFuture( null )
+						: schemaAccessor.waitForIndexStatus( expectedMetadata.getName(), executionOptions )
 				);
 	}
 }

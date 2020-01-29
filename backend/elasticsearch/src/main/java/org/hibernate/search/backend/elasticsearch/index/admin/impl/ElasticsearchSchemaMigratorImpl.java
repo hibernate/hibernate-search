@@ -30,34 +30,23 @@ public class ElasticsearchSchemaMigratorImpl implements ElasticsearchSchemaMigra
 
 	public ElasticsearchSchemaMigratorImpl(ElasticsearchSchemaAccessor schemaAccessor,
 			ElasticsearchSchemaValidator schemaValidator) {
-		super();
 		this.schemaAccessor = schemaAccessor;
 		this.schemaValidator = schemaValidator;
 	}
 
 	@Override
-	public CompletableFuture<?> migrate(IndexMetadata expectedIndexMetadata) {
-		URLEncodedString indexName = expectedIndexMetadata.getName();
-		IndexSettings settings = expectedIndexMetadata.getSettings();
-
+	public CompletableFuture<?> migrate(URLEncodedString indexName,
+			IndexMetadata expectedIndexMetadata, IndexMetadata actualIndexMetadata) {
 		/*
 		 * We only update settings if it's really necessary, because closing the index,
 		 * even for just a moment, may hurt if other clients are using the index.
 		 */
 		CompletableFuture<?> settingsMigration;
-		if ( settings.isEmpty() ) {
+		if ( schemaValidator.isSettingsValid( expectedIndexMetadata, actualIndexMetadata ) ) {
 			settingsMigration = CompletableFuture.completedFuture( null );
 		}
 		else {
-			settingsMigration = schemaAccessor.getCurrentIndexMetadata( indexName )
-					.thenApply( actualIndexMetadata -> {
-						if ( schemaValidator.isSettingsValid( expectedIndexMetadata, actualIndexMetadata ) ) {
-							return CompletableFuture.completedFuture( null );
-						}
-						else {
-							return doMigrateSettings( indexName, settings );
-						}
-					} );
+			settingsMigration = doMigrateSettings( indexName, expectedIndexMetadata.getSettings() );
 		}
 
 		return settingsMigration.thenCompose( ignored -> doMigrateMapping( indexName, expectedIndexMetadata.getMapping() ) )

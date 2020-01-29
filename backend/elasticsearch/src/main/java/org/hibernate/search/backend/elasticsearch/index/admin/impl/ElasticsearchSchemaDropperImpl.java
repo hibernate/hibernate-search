@@ -25,15 +25,7 @@ public class ElasticsearchSchemaDropperImpl implements ElasticsearchSchemaDroppe
 	@Override
 	public CompletableFuture<?> dropIfExisting(URLEncodedString indexName) {
 		// The first call is not actually needed, but do it to avoid cluttering the ES log
-		return schemaAccessor.indexExists( indexName )
-				.thenCompose( exists -> {
-					if ( exists ) {
-						return schemaAccessor.dropIndexIfExisting( indexName );
-					}
-					else {
-						return CompletableFuture.completedFuture( null );
-					}
-				} );
+		return schemaAccessor.dropIndexIfExisting( indexName );
 	}
 
 }

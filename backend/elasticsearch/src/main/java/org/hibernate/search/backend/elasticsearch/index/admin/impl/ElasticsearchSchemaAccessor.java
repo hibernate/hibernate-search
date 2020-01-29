@@ -41,8 +41,8 @@ public class ElasticsearchSchemaAccessor {
 		this.orchestrator = orchestrator;
 	}
 
-	public CompletableFuture<?> createIndexAssumeNonExisting(URLEncodedString indexName, IndexSettings settings,
-			RootTypeMapping mapping) {
+	public CompletableFuture<?> createIndexAssumeNonExisting(URLEncodedString indexName,
+			IndexSettings settings, RootTypeMapping mapping) {
 		ElasticsearchWork<?> work = getWorkFactory().createIndex( indexName )
 				.settings( settings )
 				.mapping( mapping )
@@ -51,12 +51,13 @@ public class ElasticsearchSchemaAccessor {
 	}
 
 	/**
-	 * @param indexName The name of the index
-	 * @param settings The settings for the newly created index
-	 * @return {@code true} if the index was actually created, {@code false} if it already existed.
+	 * @param indexName The name of the index.
+	 * @param settings The settings for the newly created index.
+	 * @param mapping The root mapping for the newly created index.
+	 * @return A future holding {@code true} if the index was actually created, {@code false} if it already existed.
 	 */
-	public CompletableFuture<Boolean> createIndexIgnoreExisting(URLEncodedString indexName, IndexSettings settings,
-			RootTypeMapping mapping) {
+	public CompletableFuture<Boolean> createIndexIgnoreExisting(URLEncodedString indexName,
+			IndexSettings settings, RootTypeMapping mapping) {
 		ElasticsearchWork<CreateIndexResult> work = getWorkFactory().createIndex( indexName )
 				.settings( settings )
 				.mapping( mapping )
@@ -65,19 +66,28 @@ public class ElasticsearchSchemaAccessor {
 		return execute( work ).thenApply( CreateIndexResult.CREATED::equals );
 	}
 
-	public CompletableFuture<Boolean> indexExists(URLEncodedString indexName) {
-		ElasticsearchWork<Boolean> work = getWorkFactory().indexExists( indexName ).build();
-		return execute( work );
+	public CompletableFuture<IndexMetadata> getCurrentIndexMetadata(URLEncodedString indexName) {
+		return getCurrentIndexMetadata( indexName, false );
 	}
 
-	public CompletableFuture<IndexMetadata> getCurrentIndexMetadata(URLEncodedString indexName) {
+	public CompletableFuture<IndexMetadata> getCurrentIndexMetadataOrNull(URLEncodedString indexName) {
+		return getCurrentIndexMetadata( indexName, true );
+	}
+
+	private CompletableFuture<IndexMetadata> getCurrentIndexMetadata(URLEncodedString indexName, boolean allowNull) {
 		ElasticsearchWork<IndexMetadata> work = getWorkFactory().getIndexMetadata( indexName ).build();
 		return execute( work )
 				.exceptionally( Futures.handler( e -> {
-					throw log.elasticsearchIndexMetadataRetrievalForValidationFailed(
+					throw log.elasticsearchIndexMetadataRetrievalFailed(
 							Throwables.expectException( e )
 					);
-				} ) );
+				} ) )
+				.thenApply( indexMetadata -> {
+					if ( indexMetadata == null && !allowNull ) {
+						throw log.indexMissing( indexName );
+					}
+					return indexMetadata;
+				} );
 	}
 
 	public CompletableFuture<?> updateSettings(URLEncodedString indexName, IndexSettings settings) {
@@ -100,13 +110,13 @@ public class ElasticsearchSchemaAccessor {
 				} ) );
 	}
 
-	public CompletableFuture<?> waitForIndexStatus(final URLEncodedString indexName, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
+	public CompletableFuture<?> waitForIndexStatus(URLEncodedString indexName, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		IndexStatus requiredIndexStatus = executionOptions.getRequiredStatus();
 		String timeoutAndUnit = executionOptions.getRequiredStatusTimeoutInMs() + "ms";
 
 		ElasticsearchWork<?> work =
 				getWorkFactory().waitForIndexStatusWork( indexName, requiredIndexStatus, timeoutAndUnit )
-				.build();
+						.build();
 		return execute( work )
 				.exceptionally( Futures.handler( e -> {
 					throw log.unexpectedIndexStatus(

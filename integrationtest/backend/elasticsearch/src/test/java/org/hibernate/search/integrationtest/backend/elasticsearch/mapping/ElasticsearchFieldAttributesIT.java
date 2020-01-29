@@ -89,10 +89,10 @@ public class ElasticsearchFieldAttributesIT {
 		}, properties );
 	}
 
-	public void matchMapping(Consumer<IndexSchemaElement> mapping, JsonObject properties) {
+	private void matchMapping(Consumer<IndexSchemaElement> mapping, JsonObject properties) {
 		clientSpy.expectNext( ElasticsearchRequest.get().build(),
 				ElasticsearchRequestAssertionMode.STRICT );
-		clientSpy.expectNext( ElasticsearchRequest.head().pathComponent( URLEncodedString.fromString( INDEX_NAME ) ).build(),
+		clientSpy.expectNext( ElasticsearchRequest.get().pathComponent( URLEncodedString.fromString( INDEX_NAME ) ).build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE );
 		clientSpy.expectNext( ElasticsearchRequest.put().pathComponent( URLEncodedString.fromString( INDEX_NAME ) ).body( createIndex( properties ) ).build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE );

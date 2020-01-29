@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
-import java.util.concurrent.CompletableFuture;
-
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 
 /**

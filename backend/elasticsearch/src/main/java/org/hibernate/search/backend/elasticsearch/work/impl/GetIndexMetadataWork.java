@@ -44,9 +44,8 @@ public class GetIndexMetadataWork extends AbstractSimpleElasticsearchWork<IndexM
 			ElasticsearchResponse response) {
 		JsonObject body = response.getBody();
 		JsonElement index = body.get( indexName.original );
-		if ( index == null || !index.isJsonObject() ) {
-			throw new AssertionFailure(
-					"Elasticsearch API call succeeded, but the requested index wasn't mentioned in the result: " + body );
+		if ( index == null || index.isJsonNull() ) {
+			return null;
 		}
 		JsonObject indexAsObject = index.getAsJsonObject();
 
@@ -127,6 +126,12 @@ public class GetIndexMetadataWork extends AbstractSimpleElasticsearchWork<IndexM
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.get()
 					.pathComponent( indexName );
+			// This prevents the request from failing if the given index name does not match anything
+			builder.param( "ignore_unavailable", true );
+			// According to the documentation, this should prevent the request from failing
+			// if the given index name does not match anything, but actually it has no effect.
+			// Leaving it anyway in case they fix it someday.
+			builder.param( "allow_no_indices", true );
 			// ES6.7 and later 6.x only
 			if ( includeTypeName != null ) {
 				builder.param( "include_type_name", includeTypeName );

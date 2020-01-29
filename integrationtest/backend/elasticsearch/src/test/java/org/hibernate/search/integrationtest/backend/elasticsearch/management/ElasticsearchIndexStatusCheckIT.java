@@ -6,8 +6,13 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.management;
 
+import static org.hibernate.search.integrationtest.backend.elasticsearch.management.ElasticsearchManagementTestUtils.simpleMappingForInitialization;
+
 import java.util.EnumSet;
 
+import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
+import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
@@ -115,7 +120,11 @@ public class ElasticsearchIndexStatusCheckIT {
 						"{'number_of_replicas': 5}"
 				);
 
-		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
+		elasticSearchClient.index( INDEX_NAME )
+				.deleteAndCreate()
+				.type().putMapping(
+						simpleMappingForInitialization( "" )
+				);
 
 		setupExpectingFailure(
 				FailureReportUtils.buildFailureReportPattern()
@@ -146,6 +155,14 @@ public class ElasticsearchIndexStatusCheckIT {
 
 	private SearchSetupHelper.SetupContext withManagementStrategyConfiguration() {
 		return setupHelper.start( BACKEND_NAME )
+				.withBackendProperty(
+						BACKEND_NAME,
+						// Don't contribute any analysis definitions, validation of those is tested in another test class
+						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
+						(ElasticsearchAnalysisConfigurer) (ElasticsearchAnalysisConfigurationContext context) -> {
+							// No-op
+						}
+				)
 				.withIndexDefaultsProperty(
 						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
