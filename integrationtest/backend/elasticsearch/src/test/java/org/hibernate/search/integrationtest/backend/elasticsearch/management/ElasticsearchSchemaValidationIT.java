@@ -34,7 +34,6 @@ import org.junit.Test;
 public class ElasticsearchSchemaValidationIT {
 
 	private static final String SCHEMA_VALIDATION_CONTEXT = "schema validation";
-	private static final String FACET_FIELD_SUFFIX = "__HSearch_Facet";
 
 	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX1_NAME = "Index1Name";
@@ -92,30 +91,6 @@ public class ElasticsearchSchemaValidationIT {
 				)
 		);
 
-		/*
-		 TODO uncomment and adapt this once we restore support for faceting; see HSEARCH-3271
-
-		elasticSearchClient.index( INDEX4_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX4_NAME ).type().putMapping(
-				simpleMappingForInitialization(
-						"'myField': {"
-								+ "'type': 'date',"
-								+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
-								+ "'ignore_malformed': true," // Ignored during validation
-								+ "'fields': {"
-										+ "'myField" + FACET_FIELD_SUFFIX + "': {"
-												+ "'type': 'date'"
-										+ "}"
-								+ "}"
-						+ "},"
-						+ "'NOTmyField': {" // Ignored during validation
-								+ "'type': 'date',"
-								+ "'index': 'false'"
-						+ "}"
-				)
-		);
-		 */
-
 		validateSchemaConfig()
 				.withIndex(
 						INDEX1_NAME,
@@ -145,7 +120,6 @@ public class ElasticsearchSchemaValidationIT {
 						}
 				)
 				.setup();
-		// TODO add an index with a faceted field once we restore support for faceting; see HSEARCH-3271
 
 		// If we get here, it means validation passed (no exception was thrown)
 	}
@@ -376,115 +350,6 @@ public class ElasticsearchSchemaValidationIT {
 						.mappingAttributeContext( "type" )
 						.failure(
 								"Invalid value. Expected 'keyword', actual is 'integer'"
-						)
-						.build()
-		);
-	}
-
-	@Test
-	public void property_fields_missing() throws Exception {
-		Assume.assumeTrue( "Faceting/sub-fields are not supported yet; see HSEARCH-3465, HSEARCH-3271", false );
-
-		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
-				simpleMappingForInitialization(
-						"'id': {"
-								+ "'type': 'keyword',"
-								+ "'store': true"
-						+ "},"
-						+ "'myField': {"
-								+ "'type': 'date'"
-						+ "}"
-				)
-		);
-
-		setupExpectingFailure(
-				() -> validateSchemaConfig()
-						// TODO add an index with a faceted field or sub-field when APIs allow it; see HSEARCH-3465, HSEARCH-3271
-						.setup(),
-				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX1_NAME )
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
-						.indexFieldContext( "myField.myField" + FACET_FIELD_SUFFIX )
-						.failure(
-								"Missing field mapping"
-						)
-						.build()
-		);
-	}
-
-	@Test
-	public void property_field_missing() throws Exception {
-		Assume.assumeTrue( "Faceting/sub-fields are not supported yet; see HSEARCH-3465, HSEARCH-3271", false );
-
-		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
-				simpleMappingForInitialization(
-						"'id': {"
-								+ "'type': 'keyword',"
-								+ "'store': true"
-						+ "},"
-						+ "'myField': {"
-								+ "'type': 'date',"
-								+ "'fields': {"
-										+ "'NOTmyField" + FACET_FIELD_SUFFIX + "': {"
-												+ "'type': 'date'"
-										+ "}"
-								+ "}"
-						+ "}"
-				)
-		);
-
-		setupExpectingFailure(
-				() -> validateSchemaConfig()
-						// TODO add an index with a faceted field or sub-field when APIs allow it; see HSEARCH-3465, HSEARCH-3271
-						.setup(),
-				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX1_NAME )
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
-						.indexFieldContext( "myField.myField" + FACET_FIELD_SUFFIX )
-						.failure(
-								"Missing field mapping"
-						)
-						.build()
-		);
-	}
-
-	@Test
-	public void property_field_attribute_invalid() throws Exception {
-		Assume.assumeTrue( "Faceting/sub-fields are not supported yet; see HSEARCH-3465, HSEARCH-3271", false );
-
-		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
-		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
-				simpleMappingForInitialization(
-						"'id': {"
-								+ "'type': 'keyword',"
-								+ "'index': 'true',"
-								+ "'store': true"
-						+ "},"
-						+ "'myField': {"
-								+ "'type': 'date',"
-								+ "'index': 'false',"
-								+ "'fields': {"
-										+ "'myField" + FACET_FIELD_SUFFIX + "': {"
-												+ "'type': 'date',"
-												+ "'index': 'false'"
-										+ "}"
-								+ "}"
-						+ "}"
-				)
-				);
-
-		setupExpectingFailure(
-				() -> validateSchemaConfig()
-						// TODO add an index with a faceted field or sub-field when APIs allow it; see HSEARCH-3465, HSEARCH-3271
-						.setup(),
-				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX1_NAME )
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
-						.indexFieldContext( "myField.myField" + FACET_FIELD_SUFFIX )
-						.failure(
-								"Invalid value for attribute 'index'. Expected 'true', actual is 'false'"
 						)
 						.build()
 		);
