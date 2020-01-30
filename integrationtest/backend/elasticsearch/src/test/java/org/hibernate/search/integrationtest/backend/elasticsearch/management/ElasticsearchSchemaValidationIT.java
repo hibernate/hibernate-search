@@ -274,7 +274,8 @@ public class ElasticsearchSchemaValidationIT {
 						.indexContext( INDEX1_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myObjectField.myField" )
-						.failure( "Invalid value for attribute 'index'. Expected 'true', actual is 'false'" )
+						.mappingAttributeContext( "index" )
+						.failure( "Invalid value. Expected 'true', actual is 'false'" )
 						.build()
 		);
 	}
@@ -299,12 +300,14 @@ public class ElasticsearchSchemaValidationIT {
 				FailureReportUtils.buildFailureReportPattern()
 						.indexContext( INDEX1_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.mappingAttributeContext( "dynamic" )
 						.failure(
-								"Invalid value for attribute 'dynamic'. Expected 'STRICT', actual is 'FALSE'"
+								"Invalid value. Expected 'STRICT', actual is 'FALSE'"
 						)
 						.indexFieldContext( "myField" )
+						.mappingAttributeContext( "type" )
 						.failure(
-								"Invalid value for attribute 'type'. Expected 'keyword', actual is 'integer'"
+								"Invalid value. Expected 'keyword', actual is 'integer'"
 						)
 						.build()
 		);
@@ -359,17 +362,20 @@ public class ElasticsearchSchemaValidationIT {
 				FailureReportUtils.buildFailureReportPattern()
 						.indexContext( INDEX1_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.mappingAttributeContext( "dynamic" )
 						.failure(
-								"Invalid value for attribute 'dynamic'. Expected 'STRICT', actual is 'FALSE'"
+								"Invalid value. Expected 'STRICT', actual is 'FALSE'"
 						)
 						.indexContext( INDEX2_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
+						.mappingAttributeContext( "dynamic" )
 						.failure(
-								"Invalid value for attribute 'dynamic'. Expected 'STRICT', actual is 'FALSE'"
+								"Invalid value. Expected 'STRICT', actual is 'FALSE'"
 						)
 						.indexFieldContext( "myField" )
+						.mappingAttributeContext( "type" )
 						.failure(
-								"Invalid value for attribute 'type'. Expected 'keyword', actual is 'integer'"
+								"Invalid value. Expected 'keyword', actual is 'integer'"
 						)
 						.build()
 		);

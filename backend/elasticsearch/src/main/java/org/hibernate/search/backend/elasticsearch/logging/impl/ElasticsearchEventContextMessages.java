@@ -20,4 +20,10 @@ public interface ElasticsearchEventContextMessages {
 	@Message(value = "schema validation")
 	String schemaValidation();
 
+	@Message(value = "attribute '%1$s'")
+	String mappingAttribute(String name);
+
+	@Message(value = "parameter '%1$s'")
+	String analysisDefinitionParameter(String name);
+
 }

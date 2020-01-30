@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.index.admin.gson.impl;
+package org.hibernate.search.backend.elasticsearch.validation.impl;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -14,9 +14,9 @@ import com.google.gson.JsonElement;
  * An {@link AnalysisJsonElementEquivalence} that considers that arrays are unordered containers.
  *
  */
-public class AnalysisJsonElementUnorderedArrayEquivalence extends AnalysisJsonElementEquivalence {
+class AnalysisJsonElementUnorderedArrayEquivalence extends AnalysisJsonElementEquivalence {
 
-	public AnalysisJsonElementUnorderedArrayEquivalence(AnalysisJsonElementEquivalence nestedEquivalence) {
+	AnalysisJsonElementUnorderedArrayEquivalence(AnalysisJsonElementEquivalence nestedEquivalence) {
 		super( nestedEquivalence );
 	}
 

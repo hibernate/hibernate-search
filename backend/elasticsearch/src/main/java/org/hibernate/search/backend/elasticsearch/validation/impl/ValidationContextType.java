@@ -4,16 +4,17 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.index.admin.impl;
+package org.hibernate.search.backend.elasticsearch.validation.impl;
 
 enum ValidationContextType {
 
 	MAPPING_PROPERTY,
-	MAPPING_PROPERTY_FIELD,
+	MAPPING_ATTRIBUTE,
 	ANALYZER,
 	NORMALIZER,
 	CHAR_FILTER,
 	TOKENIZER,
-	TOKEN_FILTER
+	TOKEN_FILTER,
+	ANALYSIS_DEFINITION_PARAMETER
 
 }

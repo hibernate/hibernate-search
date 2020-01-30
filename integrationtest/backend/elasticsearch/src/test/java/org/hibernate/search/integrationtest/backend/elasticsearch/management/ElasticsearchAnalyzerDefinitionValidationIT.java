@@ -523,8 +523,9 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.charFilterContext( "custom-pattern-replace" )
+						.analysisDefinitionParameterContext( "pattern" )
 						.failure(
-								"Invalid value for parameter 'pattern'. Expected '\"[^0-9]\"', actual is '\"[^a-z]\"'"
+								"Invalid value. Expected '\"[^0-9]\"', actual is '\"[^a-z]\"'"
 						)
 						.build()
 		);
@@ -577,9 +578,9 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.charFilterContext( "custom-pattern-replace" )
+						.analysisDefinitionParameterContext( "tags" )
 						.failure(
-								"Invalid value for parameter 'tags'."
-										+ " Expected '\"CASE_INSENSITIVE|COMMENTS\"', actual is 'null'"
+								"Invalid value. Expected '\"CASE_INSENSITIVE|COMMENTS\"', actual is 'null'"
 						)
 						.build()
 		);
@@ -633,9 +634,9 @@ public class ElasticsearchAnalyzerDefinitionValidationIT {
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.tokenFilterContext( "custom-word-delimiter" )
+						.analysisDefinitionParameterContext( "generate_number_parts" )
 						.failure(
-								"Invalid value for parameter 'generate_number_parts'."
-										+ " Expected 'null', actual is '\"false\"'"
+								"Invalid value. Expected 'null', actual is '\"false\"'"
 						)
 						.build()
 		);

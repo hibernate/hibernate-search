@@ -4,17 +4,18 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.index.admin.impl;
+package org.hibernate.search.backend.elasticsearch.validation.impl;
 
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Iterator;
 
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchEventContexts;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.AssertionFailure;
 
-final class ValidationErrorCollector {
+public final class ValidationErrorCollector {
 
 	private final Deque<ValidationContextElement> currentContext = new ArrayDeque<>();
 
@@ -22,16 +23,20 @@ final class ValidationErrorCollector {
 
 	private boolean hasError = false;
 
-	ValidationErrorCollector() {
+	public ValidationErrorCollector() {
 		this.failureCollector = null;
 	}
 
-	ValidationErrorCollector(ContextualFailureCollector failureCollector) {
+	public ValidationErrorCollector(ContextualFailureCollector failureCollector) {
 		this.failureCollector = failureCollector;
 	}
 
 	void push(ValidationContextType contextType, String name) {
 		this.currentContext.addLast( new ValidationContextElement( contextType, name ) );
+	}
+
+	String getCurrentName() {
+		return currentContext.getLast().getName();
 	}
 
 	void pop() {
@@ -45,7 +50,7 @@ final class ValidationErrorCollector {
 		hasError = true;
 	}
 
-	boolean hasError() {
+	public boolean hasError() {
 		return hasError;
 	}
 
@@ -79,8 +84,7 @@ final class ValidationErrorCollector {
 			ValidationContextElement element, StringBuilder pathBuilder, boolean hasNext) {
 		ValidationContextType type = element.getType();
 		String name = element.getName();
-		if ( ValidationContextType.MAPPING_PROPERTY.equals( type )
-				|| ValidationContextType.MAPPING_PROPERTY_FIELD.equals( type ) ) {
+		if ( ValidationContextType.MAPPING_PROPERTY.equals( type ) ) {
 			// Try to build as long a field path as we can, for the sake of brevity
 			if ( pathBuilder.length() > 0 ) {
 				pathBuilder.append( "." );
@@ -100,6 +104,8 @@ final class ValidationErrorCollector {
 				pathBuilder.setLength( 0 );
 			}
 			switch ( type ) {
+				case MAPPING_ATTRIBUTE:
+					return currentResult.withContext( ElasticsearchEventContexts.fromMappingAttribute( name ) );
 				case ANALYZER:
 					return currentResult.withContext( EventContexts.fromAnalyzer( name ) );
 				case NORMALIZER:
@@ -110,6 +116,8 @@ final class ValidationErrorCollector {
 					return currentResult.withContext( EventContexts.fromTokenizer( name ) );
 				case TOKEN_FILTER:
 					return currentResult.withContext( EventContexts.fromTokenFilter( name ) );
+				case ANALYSIS_DEFINITION_PARAMETER:
+					return currentResult.withContext( ElasticsearchEventContexts.fromAnalysisDefinitionParameter( name ) );
 				default:
 					throw new AssertionFailure( "Unexpected validation context element type: " + type );
 			}

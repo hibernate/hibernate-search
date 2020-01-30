@@ -103,6 +103,10 @@ public final class FailureReportUtils {
 			return contextLiteral( "field '" + exactPath + "'" );
 		}
 
+		public FailureReportPatternBuilder mappingAttributeContext(String exactName) {
+			return contextLiteral( "attribute '" + exactName + "'" );
+		}
+
 		public FailureReportPatternBuilder analyzerContext(String exactName) {
 			return contextLiteral( "analyzer '" + exactName + "'" );
 		}
@@ -121,6 +125,10 @@ public final class FailureReportUtils {
 
 		public FailureReportPatternBuilder tokenFilterContext(String exactName) {
 			return contextLiteral( "token filter '" + exactName + "'" );
+		}
+
+		public FailureReportPatternBuilder analysisDefinitionParameterContext(String exactName) {
+			return contextLiteral( "parameter '" + exactName + "'" );
 		}
 
 		public FailureReportPatternBuilder annotationContextAnyParameters(Class<? extends Annotation> annotationType) {

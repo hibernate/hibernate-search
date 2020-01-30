@@ -74,7 +74,8 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
-						.failure( "Invalid value for attribute 'dynamic'. Expected 'STRICT', actual is 'null'" )
+						.mappingAttributeContext( "dynamic" )
+						.failure( "Invalid value. Expected 'STRICT', actual is 'null'" )
 						.build() );
 	}
 
@@ -107,7 +108,8 @@ public class ElasticsearchSchemaAttributeValidationIT {
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
-						.failure( "Invalid value for attribute 'dynamic'. Expected 'STRICT', actual is 'FALSE'" )
+						.mappingAttributeContext( "dynamic" )
+						.failure( "Invalid value. Expected 'STRICT', actual is 'FALSE'" )
 						.build() );
 
 	}
@@ -200,7 +202,8 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
-						.failure( "Invalid value for attribute 'type'. Expected 'integer', actual is 'keyword'" )
+						.mappingAttributeContext( "type" )
+						.failure( "Invalid value. Expected 'integer', actual is 'keyword'" )
 						.build() );
 	}
 
@@ -251,7 +254,8 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
-						.failure( "Invalid value for attribute 'index'. Expected 'true', actual is 'false'" )
+						.mappingAttributeContext( "index" )
+						.failure( "Invalid value. Expected 'true', actual is 'false'" )
 						.build() );
 	}
 
@@ -327,9 +331,10 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
-						.failure( "The output format (the first format in the 'format' attribute) is invalid." )
+						.mappingAttributeContext( "format" )
+						.failure( "The output format (the first element) is invalid." )
 						.failure(
-								"Invalid formats for attribute 'format'",
+								"Invalid formats",
 								"missing elements are '" + allFormats + "'"
 						)
 						.build() );
@@ -427,8 +432,9 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
+						.mappingAttributeContext( "format" )
 						.failure(
-								"Invalid formats for attribute 'format'",
+								"Invalid formats",
 								"unexpected elements are '[yyyy]'"
 						)
 						.build() );
@@ -460,8 +466,9 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
+						.mappingAttributeContext( "format" )
 						.failure(
-								"The output format (the first format in the 'format' attribute) is invalid. Expected '"
+								"The output format (the first element) is invalid. Expected '"
 										+ elasticSearchClient.getDialect().getFirstLocalDateDefaultMappingFormat()
 										+ "', actual is 'epoch_millis'"
 						)
@@ -494,7 +501,8 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
-						.failure( "Invalid value for attribute 'analyzer'. Expected 'keyword', actual is 'null'" )
+						.mappingAttributeContext( "analyzer" )
+						.failure( "Invalid value. Expected 'keyword', actual is 'null'" )
 						.build() );
 	}
 
@@ -547,7 +555,8 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
-						.failure( "Invalid value for attribute 'analyzer'. Expected 'default', actual is 'keyword'" )
+						.mappingAttributeContext( "analyzer" )
+						.failure( "Invalid value. Expected 'default', actual is 'keyword'" )
 						.build() );
 	}
 
@@ -579,7 +588,8 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
-						.failure( "Invalid value for attribute 'search_analyzer'. Expected 'italian', actual is 'null'" )
+						.mappingAttributeContext( "search_analyzer" )
+						.failure( "Invalid value. Expected 'italian', actual is 'null'" )
 						.build() );
 	}
 
@@ -635,7 +645,8 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
-						.failure( "Invalid value for attribute 'search_analyzer'. Expected 'italian', actual is 'english'" )
+						.mappingAttributeContext( "search_analyzer" )
+						.failure( "Invalid value. Expected 'italian', actual is 'english'" )
 						.build() );
 	}
 
@@ -686,7 +697,8 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
-						.failure( "Invalid value for attribute 'norms'. Expected 'true', actual is 'false'" )
+						.mappingAttributeContext( "norms" )
+						.failure( "Invalid value. Expected 'true', actual is 'false'" )
 						.build()
 				);
 	}
@@ -800,7 +812,8 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
-						.failure( "Invalid value for attribute 'term_vector'. Expected 'yes', actual is 'with_offsets'" )
+						.mappingAttributeContext( "term_vector" )
+						.failure( "Invalid value. Expected 'yes', actual is 'with_offsets'" )
 						.build() );
 	}
 
@@ -870,7 +883,8 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
-						.failure( "Invalid value for attribute 'store'. Expected 'true', actual is 'null'" )
+						.mappingAttributeContext( "store" )
+						.failure( "Invalid value. Expected 'true', actual is 'null'" )
 						.build() );
 	}
 
@@ -919,7 +933,8 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
-						.failure( "Invalid value for attribute 'null_value'. Expected '739', actual is 'null'" )
+						.mappingAttributeContext( "null_value" )
+						.failure( "Invalid value. Expected '739', actual is 'null'" )
 						.build() );
 	}
 
@@ -948,7 +963,8 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
-						.failure( "Invalid value for attribute 'null_value'. Expected '739', actual is '777'" )
+						.mappingAttributeContext( "null_value" )
+						.failure( "Invalid value. Expected '739', actual is '777'" )
 						.build() );
 	}
 
@@ -1018,7 +1034,8 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
-						.failure( "Invalid value for attribute 'doc_values'. Expected 'true', actual is 'false'" )
+						.mappingAttributeContext( "doc_values" )
+						.failure( "Invalid value. Expected 'true', actual is 'false'" )
 						.build() );
 	}
 
@@ -1112,7 +1129,8 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
-						.failure( "Invalid value for attribute 'scaling_factor'. Expected '100.0', actual is '2.0'" )
+						.mappingAttributeContext( "scaling_factor" )
+						.failure( "Invalid value. Expected '100.0', actual is '2.0'" )
 						.build() );
 	}
 
@@ -1142,7 +1160,8 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
-						.failure( "Invalid value for attribute 'normalizer'. Expected 'default', actual is 'null'" )
+						.mappingAttributeContext( "normalizer" )
+						.failure( "Invalid value. Expected 'default', actual is 'null'" )
 						.build() );
 	}
 
@@ -1256,7 +1275,8 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
-						.failure( "Invalid value for attribute 'normalizer'. Expected 'another-normalizer', actual is 'custom-normalizer'" )
+						.mappingAttributeContext( "normalizer" )
+						.failure( "Invalid value. Expected 'another-normalizer', actual is 'custom-normalizer'" )
 						.build() );
 	}
 

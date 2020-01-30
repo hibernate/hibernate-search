@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.index.admin.gson.impl;
+package org.hibernate.search.backend.elasticsearch.validation.impl;
 
 import java.util.Map;
 import java.util.Objects;
@@ -19,15 +19,15 @@ import com.google.gson.JsonPrimitive;
  * Determines whether two {@link JsonElement}s should be considered equivalent.
  *
  */
-public class AnalysisJsonElementEquivalence {
+class AnalysisJsonElementEquivalence {
 
 	private final AnalysisJsonElementEquivalence nestedEquivalence;
 
-	public AnalysisJsonElementEquivalence() {
+	AnalysisJsonElementEquivalence() {
 		this.nestedEquivalence = this; // Use the same equivalence for array items and object properties
 	}
 
-	public AnalysisJsonElementEquivalence(AnalysisJsonElementEquivalence itemEquivalence) {
+	AnalysisJsonElementEquivalence(AnalysisJsonElementEquivalence itemEquivalence) {
 		this.nestedEquivalence = itemEquivalence; // Use the given equivalence for array items and object properties
 	}
 
