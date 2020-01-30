@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.index.admin.gson.impl;
+package org.hibernate.search.backend.elasticsearch.validation.impl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +14,7 @@ import java.util.Map;
  * for a given analysis type (analyzer type, char filter type, etc.).
  *
  */
-public class AnalysisParameterEquivalenceRegistry {
+class AnalysisParameterEquivalenceRegistry {
 
 	private static final AnalysisJsonElementEquivalence DEFAULT_ELEMENT_EQUIVALENCE =
 			new AnalysisJsonElementEquivalence();
