@@ -34,6 +34,7 @@ import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -58,7 +59,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	private final ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider;
 	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
 	private final MultiTenancyStrategy multiTenancyStrategy;
-	private final IndexNamingStrategy indexNamingStrategy;
+	private final BeanHolder<? extends IndexNamingStrategy> indexNamingStrategyHolder;
 	private final TypeNameMapping typeNameMapping;
 
 	private final ElasticsearchWorkOrchestratorImplementor queryOrchestrator;
@@ -75,7 +76,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 			Gson userFacingGson,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy,
-			IndexNamingStrategy indexNamingStrategy,
+			BeanHolder<? extends IndexNamingStrategy> indexNamingStrategyHolder,
 			TypeNameMapping typeNameMapping,
 			FailureHandler failureHandler) {
 		this.link = link;
@@ -90,7 +91,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.typeFactoryProvider = typeFactoryProvider;
-		this.indexNamingStrategy = indexNamingStrategy;
+		this.indexNamingStrategyHolder = indexNamingStrategyHolder;
 		this.typeNameMapping = typeNameMapping;
 
 		this.queryOrchestrator = orchestratorProvider.createParallelOrchestrator( "Elasticsearch query orchestrator for backend " + name );
@@ -100,7 +101,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 				eventContext, link,
 				userFacingGson,
 				multiTenancyStrategy,
-				indexNamingStrategy,
+				indexNamingStrategyHolder.get(),
 				typeNameMapping,
 				orchestratorProvider,
 				queryOrchestrator
@@ -139,6 +140,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 			closer.push( ElasticsearchWorkOrchestratorProvider::stop, orchestratorProvider );
 			// Close the client after the orchestrators, when we're sure all works have been performed
 			closer.push( ElasticsearchLinkImpl::onStop, link );
+			closer.push( BeanHolder::close, indexNamingStrategyHolder );
 		}
 		catch (IOException | RuntimeException e) {
 			throw log.failedToShutdownBackend( e, eventContext );
@@ -185,6 +187,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	}
 
 	private IndexNames createIndexNames(EventContext indexEventContext, String hibernateSearchIndexName, String mappedTypeName) {
+		IndexNamingStrategy indexNamingStrategy = indexNamingStrategyHolder.get();
 		URLEncodedString writeAlias = IndexNames.encodeName( indexNamingStrategy.createWriteAlias( hibernateSearchIndexName ) );
 		URLEncodedString readAlias = IndexNames.encodeName( indexNamingStrategy.createReadAlias( hibernateSearchIndexName ) );
 

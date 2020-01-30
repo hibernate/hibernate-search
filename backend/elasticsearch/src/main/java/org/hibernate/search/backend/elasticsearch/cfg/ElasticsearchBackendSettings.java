@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
+import org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy;
 import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
 import org.hibernate.search.backend.elasticsearch.multitenancy.MultiTenancyStrategyName;
 
@@ -197,6 +198,23 @@ public final class ElasticsearchBackendSettings {
 	 * which includes a description of the "bean reference" properties and accepted values.
 	 */
 	public static final String ANALYSIS_CONFIGURER = "analysis.configurer";
+
+	/**
+	 * The naming strategy for indexes and their aliases.
+	 * <p>
+	 * Expects a reference to a bean of type {@link IndexNamingStrategy}.
+	 * <p>
+	 * Defaults to the following:
+	 * <ul>
+	 *     <li>The non-alias name follows the format {@code <hibernateSearchIndexName>-<6 digits>}</li>
+	 *     <li>The write alias follows the format {@code <hibernateSearchIndexName>-write}</li>
+	 *     <li>The read alias follows the format {@code <hibernateSearchIndexName>-read}</li>
+	 * </ul>
+	 *
+	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
+	 * which includes a description of the "bean reference" properties and accepted values.
+	 */
+	public static final String NAMING_STRATEGY = "naming.strategy";
 
 	/**
 	 * Default values for the different settings if no values are given.

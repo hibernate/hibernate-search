@@ -88,6 +88,12 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.withDefault( ElasticsearchBackendSettings.Defaults.MAPPING_TYPE_NAME_STRATEGY )
 					.build();
 
+	private static final ConfigurationProperty<BeanReference<? extends IndexNamingStrategy>> NAMING_STRATEGY =
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.NAMING_STRATEGY )
+					.asBeanReference( IndexNamingStrategy.class )
+					.withDefault( BeanReference.of( DefaultIndexNamingStrategy.class ) )
+					.build();
+
 	@Override
 	public BackendImplementor<?> create(String name, BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
 		boolean logPrettyPrinting = LOG_JSON_PRETTY_PRINTING.get( propertySource );
@@ -102,6 +108,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 		BeanResolver beanResolver = buildContext.getBeanResolver();
 		BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder = null;
+		BeanHolder<? extends IndexNamingStrategy> indexNamingStrategyHolder = null;
 		ElasticsearchLinkImpl link = null;
 		try {
 			clientFactoryHolder = CLIENT_FACTORY.getAndTransform( propertySource, beanResolver::resolve );
@@ -134,7 +141,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry =
 					getAnalysisDefinitionRegistry( buildContext, propertySource );
 
-			IndexNamingStrategy indexNamingStrategy = createIndexNamingStrategy();
+			indexNamingStrategyHolder = createIndexNamingStrategy( buildContext, propertySource );
 
 			return new ElasticsearchBackendImpl(
 					name,
@@ -144,14 +151,15 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					userFacingGson,
 					analysisDefinitionRegistry,
 					getMultiTenancyStrategy( name, propertySource ),
-					indexNamingStrategy,
-					createTypeNameMapping( name, propertySource, indexNamingStrategy ),
+					indexNamingStrategyHolder,
+					createTypeNameMapping( name, propertySource, indexNamingStrategyHolder.get() ),
 					buildContext.getFailureHandler()
 			);
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
 					.push( BeanHolder::close, clientFactoryHolder )
+					.push( BeanHolder::close, indexNamingStrategyHolder )
 					.push( ElasticsearchLinkImpl::onStop, link );
 			throw e;
 		}
@@ -173,9 +181,10 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		}
 	}
 
-	private IndexNamingStrategy createIndexNamingStrategy() {
-		// TODO HSEARCH-3791 make this configurable
-		return new DefaultIndexNamingStrategy();
+	private BeanHolder<? extends IndexNamingStrategy> createIndexNamingStrategy(BackendBuildContext buildContext,
+			ConfigurationPropertySource propertySource) {
+		final BeanResolver beanResolver = buildContext.getBeanResolver();
+		return NAMING_STRATEGY.get( propertySource ).resolve( beanResolver );
 	}
 
 	private TypeNameMapping createTypeNameMapping(String backendName, ConfigurationPropertySource propertySource,
