@@ -33,6 +33,10 @@ public class ElasticsearchIndexMetadataTestUtils {
 		return IndexNames.encodeName( hibernateSearchIndexName + "-read" );
 	}
 
+	public static URLEncodedString encodeName(String name) {
+		return IndexNames.encodeName( name );
+	}
+
 	public static Set<URLEncodedString> defaultAliases(String hibernateSearchIndexName) {
 		return CollectionHelper.asImmutableSet(
 				defaultWriteAlias( hibernateSearchIndexName ),

@@ -7,14 +7,19 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.search.query;
 
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultReadAlias;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.encodeName;
 
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
+import org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy;
+import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.StubSingleIndexNamingStrategy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -25,6 +30,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -32,10 +39,19 @@ import com.google.gson.JsonObject;
 /**
  * Test the content of generated Elasticsearch search queries.
  */
+@RunWith(Parameterized.class)
 public class ElasticsearchSearchQueryIT {
 
 	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "indexname";
+
+	@Parameterized.Parameters(name = "IndexNamingStrategy = {0}")
+	public static Object[][] configurations() {
+		return new Object[][] {
+				{ null, defaultReadAlias( INDEX_NAME ) },
+				{ new StubSingleIndexNamingStrategy( "custom-write", "custom-read" ), encodeName( "custom-read" ) }
+		};
+	}
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -46,13 +62,24 @@ public class ElasticsearchSearchQueryIT {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
+	private final IndexNamingStrategy namingStrategy;
+	private final URLEncodedString readAlias;
+
 	private StubMappingIndexManager indexManager;
+
+	public ElasticsearchSearchQueryIT(IndexNamingStrategy namingStrategy, URLEncodedString readAlias) {
+		this.namingStrategy = namingStrategy;
+		this.readAlias = readAlias;
+	}
 
 	@Before
 	public void setup() {
 		setupHelper.start( BACKEND_NAME )
 				.withBackendProperty(
 						BACKEND_NAME, ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.getFactory()
+				)
+				.withBackendProperty(
+						BACKEND_NAME, ElasticsearchBackendSettings.NAMING_STRATEGY, namingStrategy
 				)
 				.withIndex(
 						INDEX_NAME,
@@ -73,7 +100,7 @@ public class ElasticsearchSearchQueryIT {
 
 		clientSpy.expectNext(
 				ElasticsearchRequest.post()
-						.pathComponent( defaultReadAlias( INDEX_NAME ) )
+						.pathComponent( readAlias )
 						.pathComponent( Paths._SEARCH )
 						.body( new Gson().fromJson( "{'_source':['string']}", JsonObject.class ) )
 						.build(),
@@ -96,7 +123,7 @@ public class ElasticsearchSearchQueryIT {
 
 		clientSpy.expectNext(
 				ElasticsearchRequest.post()
-						.pathComponent( defaultReadAlias( INDEX_NAME ) )
+						.pathComponent( readAlias )
 						.pathComponent( Paths._SEARCH )
 						.body( new JsonObject() ) // We don't care about the payload
 						.param( "routing", routingKey )

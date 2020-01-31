@@ -7,35 +7,50 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.work;
 
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultWriteAlias;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.encodeName;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
+import org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.StubSingleIndexNamingStrategy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import com.google.gson.JsonObject;
 
 /**
  * Test the content of generated Elasticsearch indexing requests.
  */
+@RunWith(Parameterized.class)
 public class ElasticsearchIndexingIT {
 
 	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "indexname";
+
+	@Parameterized.Parameters(name = "IndexNamingStrategy = {0}")
+	public static Object[][] configurations() {
+		return new Object[][] {
+				{ null, defaultWriteAlias( INDEX_NAME ) },
+				{ new StubSingleIndexNamingStrategy( "custom-write", "custom-read" ), encodeName( "custom-write" ) }
+		};
+	}
 
 	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
@@ -48,14 +63,25 @@ public class ElasticsearchIndexingIT {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
+	private final IndexNamingStrategy namingStrategy;
+	private final URLEncodedString writeAlias;
+
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
+
+	public ElasticsearchIndexingIT(IndexNamingStrategy namingStrategy, URLEncodedString writeAlias) {
+		this.namingStrategy = namingStrategy;
+		this.writeAlias = writeAlias;
+	}
 
 	@Before
 	public void setup() {
 		setupHelper.start( BACKEND_NAME )
 				.withBackendProperty(
 						BACKEND_NAME, ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.getFactory()
+				)
+				.withBackendProperty(
+						BACKEND_NAME, ElasticsearchBackendSettings.NAMING_STRATEGY, namingStrategy
 				)
 				.withIndex(
 						INDEX_NAME,
@@ -75,7 +101,7 @@ public class ElasticsearchIndexingIT {
 		} );
 		clientSpy.expectNext(
 				ElasticsearchRequest.put()
-						.pathComponent( defaultWriteAlias( INDEX_NAME ) )
+						.pathComponent( writeAlias )
 						.pathComponent( dialect.getTypeKeywordForNonMappingApi() )
 						.pathComponent( URLEncodedString.fromString( "1" ) )
 						.body( new JsonObject() ) // We don't care about the payload
@@ -91,7 +117,7 @@ public class ElasticsearchIndexingIT {
 		} );
 		clientSpy.expectNext(
 				ElasticsearchRequest.put()
-						.pathComponent( defaultWriteAlias( INDEX_NAME ) )
+						.pathComponent( writeAlias )
 						.pathComponent( dialect.getTypeKeywordForNonMappingApi() )
 						.pathComponent( URLEncodedString.fromString( "1" ) )
 						.body( new JsonObject() ) // We don't care about the payload
@@ -105,7 +131,7 @@ public class ElasticsearchIndexingIT {
 		plan.delete( referenceProvider( "1", routingKey ) );
 		clientSpy.expectNext(
 				ElasticsearchRequest.delete()
-						.pathComponent( defaultWriteAlias( INDEX_NAME ) )
+						.pathComponent( writeAlias )
 						.pathComponent( dialect.getTypeKeywordForNonMappingApi() )
 						.pathComponent( URLEncodedString.fromString( "1" ) )
 						.param( "routing", routingKey )
