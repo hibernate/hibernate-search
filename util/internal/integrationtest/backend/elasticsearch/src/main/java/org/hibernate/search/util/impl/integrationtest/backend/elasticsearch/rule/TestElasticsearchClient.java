@@ -52,6 +52,7 @@ import org.junit.runner.Description;
 import org.junit.runners.model.Statement;
 
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -123,11 +124,6 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 			return this;
 		}
 
-		public IndexClient addAlias(String alias) {
-			TestElasticsearchClient.this.addAlias( primaryIndexName, alias );
-			return this;
-		}
-
 		public IndexClient registerForCleanup() {
 			TestElasticsearchClient.this.registerIndexForCleanup( primaryIndexName );
 			return this;
@@ -143,6 +139,10 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 
 		public IndexSettingsClient settings(String settingsPath) {
 			return new IndexSettingsClient( this, settingsPath );
+		}
+
+		public IndexAliasesClient aliases() {
+			return new IndexAliasesClient( this );
 		}
 	}
 
@@ -217,6 +217,46 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 			URLEncodedString indexName = indexClient.primaryIndexName;
 			JsonObject settingsAsJsonObject = buildStructuredSettings( settingsPath, settings );
 			TestElasticsearchClient.this.putIndexSettingsNonDynamic( indexName, settingsAsJsonObject );
+		}
+	}
+
+	public class IndexAliasesClient {
+
+		private final IndexClient indexClient;
+
+		public IndexAliasesClient(IndexClient indexClient) {
+			this.indexClient = indexClient;
+		}
+
+		public String get() {
+			URLEncodedString indexPrimaryName = indexClient.primaryIndexName;
+			return TestElasticsearchClient.this.getAliases( indexPrimaryName );
+		}
+
+		public IndexAliasesClient put(String alias) {
+			return put( alias, (JsonObject) null );
+		}
+
+		public IndexAliasesClient put(String alias, String aliasAttributes) {
+			JsonObject aliasAttributesAsJsonObject =
+					aliasAttributes == null ? null : toJsonElement( aliasAttributes ).getAsJsonObject();
+			return put( alias, aliasAttributesAsJsonObject );
+		}
+
+		public IndexAliasesClient put(String alias, JsonObject aliasAttributes) {
+			String indexPrimaryName = indexClient.primaryIndexName.original;
+			TestElasticsearchClient.this.updateAliases(
+					TestElasticsearchClient.this.createAddAliasAction( indexPrimaryName, alias, aliasAttributes )
+			);
+			return this;
+		}
+
+		public void move(String alias, String newIndexPrimaryName, JsonObject aliasAttributes) {
+			String oldIndexPrimaryName = indexClient.primaryIndexName.original;
+			TestElasticsearchClient.this.updateAliases(
+					TestElasticsearchClient.this.createRemoveAliasAction( oldIndexPrimaryName, alias ),
+					TestElasticsearchClient.this.createAddAliasAction( newIndexPrimaryName, alias, aliasAttributes )
+			);
 		}
 	}
 
@@ -374,12 +414,61 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 				.build() );
 	}
 
-	private void addAlias(URLEncodedString indexName, String alias) {
-		performRequest( ElasticsearchRequest.put()
-				.pathComponent( indexName )
+	private JsonObject createAddAliasAction(String indexName, String alias, JsonObject aliasAttributes) {
+		JsonObject action = new JsonObject();
+		JsonObject aliasDefinition = new JsonObject();
+		action.add( "add", aliasDefinition );
+
+		aliasDefinition.addProperty( "index", indexName );
+		aliasDefinition.addProperty( "alias", alias );
+
+		if ( aliasAttributes != null ) {
+			for ( Map.Entry<String, JsonElement> entry : aliasAttributes.entrySet() ) {
+				aliasDefinition.add( entry.getKey(), entry.getValue() );
+			}
+		}
+
+		return action;
+	}
+
+	private JsonObject createRemoveAliasAction(String indexName, String alias) {
+		JsonObject action = new JsonObject();
+		JsonObject aliasDefinition = new JsonObject();
+		action.add( "remove", aliasDefinition );
+
+		aliasDefinition.addProperty( "index", indexName );
+		aliasDefinition.addProperty( "alias", alias );
+
+		return action;
+	}
+
+	private void updateAliases(JsonObject ... actions) {
+		ElasticsearchRequest.Builder builder = ElasticsearchRequest.post()
+				.pathComponent( Paths._ALIASES );
+
+		JsonObject payload = new JsonObject();
+		JsonArray actionArray = new JsonArray();
+		payload.add( "actions", actionArray );
+		for ( JsonObject action : actions ) {
+			actionArray.add( action );
+		}
+
+		builder.body( payload );
+
+		performRequest( builder.build() );
+	}
+
+	private void moveAlias(URLEncodedString oldIndexName, String alias, URLEncodedString newIndexName, JsonObject aliasAttributes) {
+		ElasticsearchRequest.Builder builder = ElasticsearchRequest.put()
+				.pathComponent( Paths._ALIASES )
 				.pathComponent( URLEncodedString.fromString( "_alias" ) )
-				.pathComponent( URLEncodedString.fromString( alias ) )
-				.build() );
+				.pathComponent( URLEncodedString.fromString( alias ) );
+
+		if ( aliasAttributes != null ) {
+			builder.body( aliasAttributes );
+		}
+
+		performRequest( builder.build() );
 	}
 
 	private void registerIndexForCleanup(URLEncodedString indexName) {
@@ -533,6 +622,22 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 			return new JsonObject().toString();
 		}
 		return settings.toString();
+	}
+
+	private String getAliases(URLEncodedString indexName) {
+		ElasticsearchResponse response = performRequest( ElasticsearchRequest.get()
+				.pathComponent( indexName ).pathComponent( URLEncodedString.fromString( "_alias" ) )
+				.build() );
+		JsonObject result = response.getBody();
+		JsonElement index = result.get( indexName.original );
+		if ( index == null ) {
+			index = new JsonObject();
+		}
+		JsonElement aliases = index.getAsJsonObject().get( "aliases" );
+		if ( aliases == null ) {
+			aliases = new JsonObject();
+		}
+		return aliases.toString();
 	}
 
 	private void index(URLEncodedString indexName, URLEncodedString id, String jsonDocument) {
