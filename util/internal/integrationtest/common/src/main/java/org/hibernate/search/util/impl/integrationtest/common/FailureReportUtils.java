@@ -131,6 +131,14 @@ public final class FailureReportUtils {
 			return contextLiteral( "parameter '" + exactName + "'" );
 		}
 
+		public FailureReportPatternBuilder aliasContext(String exactName) {
+			return contextLiteral( "alias '" + exactName + "'" );
+		}
+
+		public FailureReportPatternBuilder aliasAttributeContext(String exactName) {
+			return contextLiteral( "attribute '" + exactName + "'" );
+		}
+
 		public FailureReportPatternBuilder annotationContextAnyParameters(Class<? extends Annotation> annotationType) {
 			return contextPattern( "annotation '@\\Q" + annotationType.getName() + "\\E\\(.*'" );
 		}
