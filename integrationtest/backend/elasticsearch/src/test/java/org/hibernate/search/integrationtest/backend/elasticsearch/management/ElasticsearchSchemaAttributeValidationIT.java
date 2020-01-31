@@ -397,8 +397,9 @@ public class ElasticsearchSchemaAttributeValidationIT {
 						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
+						.mappingAttributeContext( "format" )
 						.failure(
-								"Invalid formats for attribute 'format'",
+								"Invalid formats",
 								"missing elements are '" + nextFormats + "'"
 						)
 						.build() );
