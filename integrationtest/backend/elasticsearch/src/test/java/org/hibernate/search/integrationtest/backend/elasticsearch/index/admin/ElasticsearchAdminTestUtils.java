@@ -9,9 +9,23 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.index.admin;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.discriminatorMappingComplete;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.discriminatorMappingOmitDefaults;
 
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils;
+
 class ElasticsearchAdminTestUtils {
 
 	private ElasticsearchAdminTestUtils() {
+	}
+
+	public static String simpleWriteAliasDefinition() {
+		return simpleAliasDefinition( true, "" );
+	}
+
+	public static String simpleReadAliasDefinition() {
+		return simpleAliasDefinition( false, "" );
+	}
+
+	public static String simpleAliasDefinition(boolean isWriteIndex, String otherAttributes) {
+		return ElasticsearchIndexMetadataTestUtils.aliasDefinition( isWriteIndex, otherAttributes ).toString();
 	}
 
 	static String simpleMappingForInitialization(String properties) {
