@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.validation.impl;
 
 import java.util.Objects;
 
-import org.hibernate.search.backend.elasticsearch.analysis.model.esnative.impl.AnalyzerDefinition;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerDefinition;
 
 class AnalyzerDefinitionValidator extends AnalysisDefinitionValidator<AnalyzerDefinition> {
 

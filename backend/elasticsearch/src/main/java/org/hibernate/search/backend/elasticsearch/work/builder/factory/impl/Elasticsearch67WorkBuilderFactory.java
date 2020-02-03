@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.work.builder.factory.impl;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
-import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.CreateIndexWorkBuilder;

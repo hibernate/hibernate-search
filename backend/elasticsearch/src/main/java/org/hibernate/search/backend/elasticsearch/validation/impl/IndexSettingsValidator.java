@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.validation.impl;
 
-import org.hibernate.search.backend.elasticsearch.analysis.model.esnative.impl.AnalyzerDefinition;
-import org.hibernate.search.backend.elasticsearch.analysis.model.esnative.impl.CharFilterDefinition;
-import org.hibernate.search.backend.elasticsearch.analysis.model.esnative.impl.NormalizerDefinition;
-import org.hibernate.search.backend.elasticsearch.analysis.model.esnative.impl.TokenFilterDefinition;
-import org.hibernate.search.backend.elasticsearch.analysis.model.esnative.impl.TokenizerDefinition;
-import org.hibernate.search.backend.elasticsearch.index.settings.esnative.impl.Analysis;
-import org.hibernate.search.backend.elasticsearch.index.settings.esnative.impl.IndexSettings;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerDefinition;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.CharFilterDefinition;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.NormalizerDefinition;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.TokenFilterDefinition;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.TokenizerDefinition;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.Analysis;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 
 public class IndexSettingsValidator implements Validator<IndexSettings> {
 

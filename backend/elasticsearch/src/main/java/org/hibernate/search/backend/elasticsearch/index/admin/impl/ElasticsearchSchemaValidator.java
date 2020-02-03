@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 
 /**

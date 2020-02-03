@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.validation.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.AbstractTypeMapping;
-import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.DynamicType;
-import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 
 abstract class AbstractTypeMappingValidator<T extends AbstractTypeMapping> implements Validator<T> {
 

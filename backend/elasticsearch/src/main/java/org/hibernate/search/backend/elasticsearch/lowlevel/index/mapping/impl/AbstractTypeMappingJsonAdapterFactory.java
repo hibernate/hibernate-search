@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.document.model.esnative.impl;
+package org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl;
 
 import java.util.Map;
 
@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.AbstractConfiguredEx
 
 import com.google.gson.reflect.TypeToken;
 
-public class AbstractTypeMappingJsonAdapterFactory extends AbstractConfiguredExtraPropertiesJsonAdapterFactory {
+class AbstractTypeMappingJsonAdapterFactory extends AbstractConfiguredExtraPropertiesJsonAdapterFactory {
 
 	private static final TypeToken<Map<String, PropertyMapping>> PROPERTY_MAP_TYPE_TOKEN =
 			new TypeToken<Map<String, PropertyMapping>>() {

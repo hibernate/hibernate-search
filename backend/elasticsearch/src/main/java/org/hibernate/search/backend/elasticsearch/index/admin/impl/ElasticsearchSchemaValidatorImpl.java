@@ -6,12 +6,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.validation.impl.IndexSettingsValidator;
 import org.hibernate.search.backend.elasticsearch.validation.impl.RootTypeMappingValidator;
 import org.hibernate.search.backend.elasticsearch.validation.impl.ValidationErrorCollector;
 import org.hibernate.search.backend.elasticsearch.validation.impl.Validator;
-import org.hibernate.search.backend.elasticsearch.index.settings.esnative.impl.IndexSettings;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchEventContexts;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 

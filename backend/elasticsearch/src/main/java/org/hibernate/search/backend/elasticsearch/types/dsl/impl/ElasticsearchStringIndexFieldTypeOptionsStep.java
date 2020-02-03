@@ -9,8 +9,8 @@ package org.hibernate.search.backend.elasticsearch.types.dsl.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.Locale;
 
-import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.DataTypes;
-import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.types.aggregation.impl.ElasticsearchTextFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchStringFieldCodec;

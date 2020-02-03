@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.DataTypes;
-import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 class PropertyMappingValidator extends AbstractTypeMappingValidator<PropertyMapping> {

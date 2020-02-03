@@ -9,8 +9,8 @@ package org.hibernate.search.backend.elasticsearch.gson.spi;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
-import org.hibernate.search.backend.elasticsearch.index.settings.esnative.impl.IndexSettings;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
 import com.google.gson.Gson;

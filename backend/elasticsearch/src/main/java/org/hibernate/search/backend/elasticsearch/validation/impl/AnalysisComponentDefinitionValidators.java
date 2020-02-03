@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.validation.impl;
 
-import org.hibernate.search.backend.elasticsearch.analysis.model.esnative.impl.CharFilterDefinition;
-import org.hibernate.search.backend.elasticsearch.analysis.model.esnative.impl.TokenFilterDefinition;
-import org.hibernate.search.backend.elasticsearch.analysis.model.esnative.impl.TokenizerDefinition;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.CharFilterDefinition;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.TokenFilterDefinition;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.TokenizerDefinition;
 
 class AnalysisComponentDefinitionValidators {
 
