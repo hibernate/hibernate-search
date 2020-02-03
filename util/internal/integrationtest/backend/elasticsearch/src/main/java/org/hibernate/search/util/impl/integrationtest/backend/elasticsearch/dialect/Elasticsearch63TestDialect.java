@@ -65,4 +65,9 @@ public class Elasticsearch63TestDialect implements ElasticsearchTestDialect {
 	public boolean zonedDateTimeDocValueHasUTCZoneId() {
 		return true;
 	}
+
+	@Override
+	public boolean supportsIsWriteIndex() {
+		return false;
+	}
 }

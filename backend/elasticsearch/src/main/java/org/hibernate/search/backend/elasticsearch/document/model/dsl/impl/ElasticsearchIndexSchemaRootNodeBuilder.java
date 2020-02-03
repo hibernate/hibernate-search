@@ -19,7 +19,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RoutingType;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.IndexNames;
+import org.hibernate.search.backend.elasticsearch.index.naming.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactory;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;

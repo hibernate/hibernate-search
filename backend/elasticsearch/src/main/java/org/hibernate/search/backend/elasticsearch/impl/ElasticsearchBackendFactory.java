@@ -14,6 +14,8 @@ import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysis
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl.ElasticsearchAnalysisConfigurationContextImpl;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
+import org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy;
+import org.hibernate.search.backend.elasticsearch.index.naming.impl.DefaultIndexNamingStrategy;
 import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.DiscriminatorTypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.IndexNameTypeNameMapping;
@@ -132,6 +134,8 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry =
 					getAnalysisDefinitionRegistry( buildContext, propertySource );
 
+			IndexNamingStrategy indexNamingStrategy = createIndexNamingStrategy();
+
 			return new ElasticsearchBackendImpl(
 					name,
 					link,
@@ -140,7 +144,8 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					userFacingGson,
 					analysisDefinitionRegistry,
 					getMultiTenancyStrategy( name, propertySource ),
-					createTypeNameMapping( name, propertySource ),
+					indexNamingStrategy,
+					createTypeNameMapping( name, propertySource, indexNamingStrategy ),
 					buildContext.getFailureHandler()
 			);
 		}
@@ -168,12 +173,18 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		}
 	}
 
-	private TypeNameMapping createTypeNameMapping(String backendName, ConfigurationPropertySource propertySource) {
+	private IndexNamingStrategy createIndexNamingStrategy() {
+		// TODO HSEARCH-3791 make this configurable
+		return new DefaultIndexNamingStrategy();
+	}
+
+	private TypeNameMapping createTypeNameMapping(String backendName, ConfigurationPropertySource propertySource,
+			IndexNamingStrategy indexNamingStrategy) {
 		TypeNameMappingStrategyName strategyName = MAPPING_TYPE_STRATEGY.get( propertySource );
 
 		switch ( strategyName ) {
 			case INDEX_NAME:
-				return new IndexNameTypeNameMapping();
+				return new IndexNameTypeNameMapping( indexNamingStrategy );
 			case DISCRIMINATOR:
 				return new DiscriminatorTypeNameMapping();
 			default:

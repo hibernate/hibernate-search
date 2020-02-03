@@ -8,8 +8,11 @@ package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.elasticsearch.index.naming.impl.IndexNames;
+import org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 
@@ -27,58 +30,64 @@ public class ElasticsearchIndexAdministrationClient {
 	private final ElasticsearchSchemaValidator schemaValidator;
 	private final ElasticsearchSchemaMigrator schemaMigrator;
 
+	private final IndexNames indexNames;
 	private final IndexMetadata expectedMetadata;
 
 	public ElasticsearchIndexAdministrationClient(ElasticsearchWorkBuilderFactory workBuilderFactory,
 			ElasticsearchWorkOrchestrator workOrchestrator,
-			IndexMetadata expectedMetadata) {
+			IndexNamingStrategy indexNamingStrategy,
+			IndexNames indexNames, IndexMetadata expectedMetadata) {
 		this.schemaAccessor = new ElasticsearchSchemaAccessor( workBuilderFactory, workOrchestrator );
 
-		this.schemaCreator = new ElasticsearchSchemaCreatorImpl( schemaAccessor );
+		this.schemaCreator = new ElasticsearchSchemaCreatorImpl( schemaAccessor, indexNamingStrategy );
 		this.schemaDropper = new ElasticsearchSchemaDropperImpl( schemaAccessor );
 		this.schemaValidator = new ElasticsearchSchemaValidatorImpl();
 		this.schemaMigrator = new ElasticsearchSchemaMigratorImpl( schemaAccessor, schemaValidator );
 
+		this.indexNames = indexNames;
 		this.expectedMetadata = expectedMetadata;
 	}
 
 	public CompletableFuture<?> createIfAbsent(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
-		return schemaCreator.createIndexIfAbsent( expectedMetadata )
-				.thenCompose( ignored -> schemaAccessor.waitForIndexStatus( expectedMetadata.getName(), executionOptions ) );
+		return schemaCreator.createIndexIfAbsent( indexNames, expectedMetadata )
+				.thenCompose( ignored -> schemaAccessor.waitForIndexStatus( indexNames, executionOptions ) );
 	}
 
 	public CompletableFuture<?> dropAndCreate(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
-		return schemaDropper.dropIfExisting( expectedMetadata.getName() )
-				.thenCompose( ignored -> schemaCreator.createIndexAssumeNonExisting( expectedMetadata ) )
-				.thenCompose( ignored -> schemaAccessor.waitForIndexStatus( expectedMetadata.getName(), executionOptions ) );
+		return schemaDropper.dropIfExisting( indexNames )
+				.thenCompose( ignored -> schemaCreator.createIndexAssumeNonExisting( indexNames, expectedMetadata ) )
+				.thenCompose( ignored -> schemaAccessor.waitForIndexStatus( indexNames, executionOptions ) );
 	}
 
 	public CompletableFuture<?> dropIfExisting(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
-		return schemaDropper.dropIfExisting( expectedMetadata.getName() );
+		return schemaDropper.dropIfExisting( indexNames );
 	}
 
 	public CompletableFuture<?> update(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
-		return schemaCreator.createIndexIfAbsent( expectedMetadata )
+		return schemaCreator.createIndexIfAbsent( indexNames, expectedMetadata )
 				.thenCompose( existingIndexMetadata -> {
 					if ( existingIndexMetadata != null ) {
-						return schemaMigrator.migrate( expectedMetadata.getName(), expectedMetadata, existingIndexMetadata );
+						return schemaMigrator.migrate(
+								URLEncodedString.fromString( existingIndexMetadata.getPrimaryName() ),
+								expectedMetadata, existingIndexMetadata.getMetadata()
+						);
 					}
 					else {
 						return CompletableFuture.completedFuture( null );
 					}
 				} )
-				.thenCompose( ignored -> schemaAccessor.waitForIndexStatus( expectedMetadata.getName(), executionOptions ) );
+				.thenCompose( ignored -> schemaAccessor.waitForIndexStatus( indexNames, executionOptions ) );
 	}
 
 	public CompletableFuture<?> validate(ElasticsearchIndexLifecycleExecutionOptions executionOptions,
 			ContextualFailureCollector failureCollector) {
-		return schemaAccessor.getCurrentIndexMetadata( expectedMetadata.getName() )
+		return schemaAccessor.getCurrentIndexMetadata( indexNames )
 				.thenAccept( actualIndexMetadata ->
-						schemaValidator.validate( expectedMetadata, actualIndexMetadata, failureCollector )
+						schemaValidator.validate( expectedMetadata, actualIndexMetadata.getMetadata(), failureCollector )
 				)
 				.thenCompose( ignored -> failureCollector.hasFailure()
 						? CompletableFuture.completedFuture( null )
-						: schemaAccessor.waitForIndexStatus( expectedMetadata.getName(), executionOptions )
+						: schemaAccessor.waitForIndexStatus( indexNames, executionOptions )
 				);
 	}
 }

@@ -13,6 +13,7 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
@@ -108,7 +109,7 @@ public interface Log extends BasicLogger {
 	SearchException invalidIndexStatus(String invalidRepresentation, List<String> validRepresentations);
 
 	@Message(id = ID_OFFSET_2 + 24, value = "Index '%1$s' failed to reach status '%2$s' after %3$s.")
-	SearchException unexpectedIndexStatus(String indexName, String expected, String timeoutAndUnit,
+	SearchException unexpectedIndexStatus(URLEncodedString indexName, String expected, String timeoutAndUnit,
 			@Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 34,
@@ -122,8 +123,8 @@ public interface Log extends BasicLogger {
 	SearchException schemaUpdateFailed(URLEncodedString indexName, String causeMessage, @Cause Exception cause);
 
 	@Message(id = ID_OFFSET_2 + 50,
-			value = "The index '%1$s' does not exist in the Elasticsearch cluster." )
-	SearchException indexMissing(URLEncodedString indexName);
+			value = "Index aliases [%1$s, %2$s] do not point to any index in the Elasticsearch cluster." )
+	SearchException indexMissing(URLEncodedString write, URLEncodedString read);
 
 	@LogMessage(level = Level.DEBUG)
 	@Message(id = ID_OFFSET_2 + 53,
@@ -351,8 +352,8 @@ public interface Log extends BasicLogger {
 			String secondHibernateSearchIndexName, String nameOrAlias);
 
 	@Message(id = ID_OFFSET_3 + 31,
-			value = "Unknown index name encountered in Elasticsearch response: '%1$s'")
-	SearchException elasticsearchResponseUnknownIndexName(String elasticsearchIndexName);
+			value = "Could not resolve index name '%1$s' to an entity type: %2$s")
+	SearchException elasticsearchResponseUnknownIndexName(String elasticsearchIndexName, String causeMessage, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_3 + 32,
 			value = "Unable to convert DSL parameter: %1$s")
@@ -611,4 +612,23 @@ public interface Log extends BasicLogger {
 			value = "Missing field '%1$s' for one of the search hits."
 					+ " The document was probably indexed with a different configuration: full reindexing is necessary.")
 	SearchException missingTypeFieldInDocument(String fieldName);
+
+	@Message(id = ID_OFFSET_3 + 93,
+			value = "Index aliases [%1$s, %2$s] are assigned to a single Hibernate Search index, "
+					+ " but they are already defined in Elasticsearch and point to multiple distinct indexes: %3$s.")
+	SearchException elasticsearchIndexNameAndAliasesMatchMultipleIndexes(URLEncodedString write, URLEncodedString read,
+			Set<String> matchingIndexes);
+
+	@Message(id = ID_OFFSET_3 + 94,
+			value = "Index primary name  '%1$s' does not match the expected pattern '%2$s'.")
+	SearchException invalidIndexPrimaryName(String elasticsearchIndexName, Pattern pattern);
+
+	@Message(id = ID_OFFSET_3 + 95,
+			value = "Unique key '%1$s' extracted from the index name does not match any of %2$s")
+	SearchException invalidIndexUniqueKey(String uniqueKey, Set<String> knownKeys);
+
+	@Message(id = ID_OFFSET_3 + 96,
+			value = "Write alias and read alias must be different, but were set to the same value: '%1$s'.")
+	SearchException sameWriteAndReadAliases(URLEncodedString writeAndReadAlias, @Param EventContext eventContext);
+
 }

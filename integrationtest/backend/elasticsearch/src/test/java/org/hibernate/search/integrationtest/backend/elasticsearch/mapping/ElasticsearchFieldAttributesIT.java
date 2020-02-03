@@ -6,12 +6,14 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.mapping;
 
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultAliases;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultPrimaryName;
+
 import java.util.function.Consumer;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.TermVector;
@@ -90,12 +92,23 @@ public class ElasticsearchFieldAttributesIT {
 	}
 
 	private void matchMapping(Consumer<IndexSchemaElement> mapping, JsonObject properties) {
-		clientSpy.expectNext( ElasticsearchRequest.get().build(),
-				ElasticsearchRequestAssertionMode.STRICT );
-		clientSpy.expectNext( ElasticsearchRequest.get().pathComponent( URLEncodedString.fromString( INDEX_NAME ) ).build(),
-				ElasticsearchRequestAssertionMode.EXTENSIBLE );
-		clientSpy.expectNext( ElasticsearchRequest.put().pathComponent( URLEncodedString.fromString( INDEX_NAME ) ).body( createIndex( properties ) ).build(),
-				ElasticsearchRequestAssertionMode.EXTENSIBLE );
+		clientSpy.expectNext(
+				ElasticsearchRequest.get().build(),
+				ElasticsearchRequestAssertionMode.STRICT
+		);
+		clientSpy.expectNext(
+				ElasticsearchRequest.get()
+						.multiValuedPathComponent( defaultAliases( INDEX_NAME ) )
+						.build(),
+				ElasticsearchRequestAssertionMode.EXTENSIBLE
+		);
+		clientSpy.expectNext(
+				ElasticsearchRequest.put()
+						.pathComponent( defaultPrimaryName( INDEX_NAME ) )
+						.body( createIndex( properties ) )
+						.build(),
+				ElasticsearchRequestAssertionMode.EXTENSIBLE
+		);
 
 		setupHelper.start( BACKEND_NAME )
 				.withBackendProperty( BACKEND_NAME, ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.getFactory() )

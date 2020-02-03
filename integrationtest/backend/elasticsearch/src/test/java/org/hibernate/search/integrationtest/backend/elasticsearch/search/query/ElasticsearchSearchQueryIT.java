@@ -6,10 +6,11 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.search.query;
 
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultReadAlias;
+
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -72,7 +73,7 @@ public class ElasticsearchSearchQueryIT {
 
 		clientSpy.expectNext(
 				ElasticsearchRequest.post()
-						.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
+						.pathComponent( defaultReadAlias( INDEX_NAME ) )
 						.pathComponent( Paths._SEARCH )
 						.body( new Gson().fromJson( "{'_source':['string']}", JsonObject.class ) )
 						.build(),
@@ -95,7 +96,7 @@ public class ElasticsearchSearchQueryIT {
 
 		clientSpy.expectNext(
 				ElasticsearchRequest.post()
-						.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
+						.pathComponent( defaultReadAlias( INDEX_NAME ) )
 						.pathComponent( Paths._SEARCH )
 						.body( new JsonObject() ) // We don't care about the payload
 						.param( "routing", routingKey )

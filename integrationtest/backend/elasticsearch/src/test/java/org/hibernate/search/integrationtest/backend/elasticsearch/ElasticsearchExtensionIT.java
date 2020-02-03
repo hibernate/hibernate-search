@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch;
 
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultPrimaryName;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
@@ -17,7 +18,6 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
-import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryOptionsStep;
 import org.hibernate.search.backend.elasticsearch.search.query.dsl.ElasticsearchSearchQueryWhereStep;
@@ -874,7 +874,7 @@ public class ElasticsearchExtensionIT {
 		assertJsonEquals(
 				"{"
 						+ "'_id': '" + FIRST_ID + "',"
-						+ "'_index': '" + ElasticsearchIndexNameNormalizer.normalize( INDEX_NAME ) + "'"
+						+ "'_index': '" + defaultPrimaryName( INDEX_NAME ) + "'"
 						+ "}",
 				result.get( 0 ).toString(),
 				JSONCompareMode.LENIENT

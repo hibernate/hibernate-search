@@ -20,6 +20,7 @@ import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.ElasticsearchIndexMetadataSyntax;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
@@ -45,6 +46,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 	private ElasticsearchClientImplementor clientImplementor;
 	private ElasticsearchVersion elasticsearchVersion;
 	private GsonProvider gsonProvider;
+	private ElasticsearchIndexMetadataSyntax indexMetadataSyntax;
 	private ElasticsearchSearchSyntax searchSyntax;
 	private ElasticsearchWorkBuilderFactory workBuilderFactory;
 	private ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory;
@@ -74,7 +76,14 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 	}
 
 	@Override
+	public ElasticsearchIndexMetadataSyntax getIndexMetadataSyntax() {
+		checkStarted();
+		return indexMetadataSyntax;
+	}
+
+	@Override
 	public ElasticsearchSearchSyntax getSearchSyntax() {
+		checkStarted();
 		return searchSyntax;
 	}
 
@@ -112,6 +121,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 
 			ElasticsearchProtocolDialect protocolDialect = dialectFactory.createProtocolDialect( elasticsearchVersion );
 			gsonProvider = GsonProvider.create( GsonBuilder::new, logPrettyPrinting );
+			indexMetadataSyntax = protocolDialect.createIndexMetadataSyntax();
 			searchSyntax = protocolDialect.createSearchSyntax();
 			workBuilderFactory = protocolDialect.createWorkBuilderFactory( gsonProvider );
 			searchResultExtractorFactory = protocolDialect.createSearchResultExtractorFactory();

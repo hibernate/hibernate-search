@@ -16,6 +16,7 @@ import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch56ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch60ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch63ProtocolDialect;
+import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch64ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch67ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch70ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.ElasticsearchProtocolDialect;
@@ -148,11 +149,29 @@ public class ElasticsearchDialectFactoryTest {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3791")
+	public void es64() {
+		testSuccess(
+				"6.4", "6.4.0",
+				Elasticsearch6ModelDialect.class, Elasticsearch64ProtocolDialect.class
+		);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3791")
+	public void es640() {
+		testSuccess(
+				"6.4.0", "6.4.0",
+				Elasticsearch6ModelDialect.class, Elasticsearch64ProtocolDialect.class
+		);
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3563")
 	public void es66() {
 		testSuccess(
 				"6.6", "6.6.0",
-				Elasticsearch6ModelDialect.class, Elasticsearch63ProtocolDialect.class
+				Elasticsearch6ModelDialect.class, Elasticsearch64ProtocolDialect.class
 		);
 	}
 
@@ -160,7 +179,7 @@ public class ElasticsearchDialectFactoryTest {
 	public void es660() {
 		testSuccess(
 				"6.6.0", "6.6.0",
-				Elasticsearch6ModelDialect.class, Elasticsearch63ProtocolDialect.class
+				Elasticsearch6ModelDialect.class, Elasticsearch64ProtocolDialect.class
 		);
 	}
 

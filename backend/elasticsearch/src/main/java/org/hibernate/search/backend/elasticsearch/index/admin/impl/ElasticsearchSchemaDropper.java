@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.index.naming.impl.IndexNames;
 import org.hibernate.search.util.common.SearchException;
 
 /**
@@ -22,10 +22,10 @@ public interface ElasticsearchSchemaDropper {
 	 *
 	 * <p>This method will skip operations silently if the index does not exist.
 	 *
-	 * @param indexName The name of the index to drop.
+	 * @param indexNames The names of the index to drop.
 	 * @return A future.
 	 * @throws SearchException If an error occurs.
 	 */
-	CompletableFuture<?> dropIfExisting(URLEncodedString indexName);
+	CompletableFuture<?> dropIfExisting(IndexNames indexNames);
 
 }

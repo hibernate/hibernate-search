@@ -38,8 +38,8 @@ public class Elasticsearch63WorkBuilderFactory extends Elasticsearch67WorkBuilde
 	}
 
 	@Override
-	public GetIndexMetadataWorkBuilder getIndexMetadata(URLEncodedString indexName) {
-		return GetIndexMetadataWork.Builder.forElasticsearch66AndBelow( indexName, Paths.DOC );
+	public GetIndexMetadataWorkBuilder getIndexMetadata() {
+		return GetIndexMetadataWork.Builder.forElasticsearch66AndBelow( Paths.DOC );
 	}
 
 	@Override

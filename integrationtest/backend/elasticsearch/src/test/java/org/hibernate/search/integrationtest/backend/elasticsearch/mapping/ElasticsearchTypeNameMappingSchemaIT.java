@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.mapping;
 
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultAliasDefinitions;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultAliases;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultPrimaryName;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.mappingWithDiscriminatorProperty;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.mappingWithoutAnyProperty;
 
@@ -14,7 +17,6 @@ import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysis
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -67,14 +69,15 @@ public class ElasticsearchTypeNameMappingSchemaIT {
 	@Test
 	public void schema() {
 		clientSpy.expectNext(
-				ElasticsearchRequest.get().build(), ElasticsearchRequestAssertionMode.STRICT
+				ElasticsearchRequest.get().build(),
+				ElasticsearchRequestAssertionMode.STRICT
 		);
-
 		clientSpy.expectNext(
-				ElasticsearchRequest.get().pathComponent( URLEncodedString.fromString( INDEX_NAME ) ).build(),
+				ElasticsearchRequest.get()
+						.multiValuedPathComponent( defaultAliases( INDEX_NAME ) )
+						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
-
 		clientSpy.expectNext(
 				indexCreationRequest(),
 				ElasticsearchRequestAssertionMode.STRICT
@@ -107,7 +110,7 @@ public class ElasticsearchTypeNameMappingSchemaIT {
 
 	private ElasticsearchRequest indexCreationRequest() {
 		ElasticsearchRequest.Builder schemaRequestBuilder = ElasticsearchRequest.put()
-				.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
+				.pathComponent( defaultPrimaryName( INDEX_NAME ) )
 				.body( indexCreationPayload() );
 		Boolean includeTypeName = ElasticsearchTestDialect.get().getIncludeTypeNameParameterForMappingApi();
 		if ( includeTypeName != null ) {
@@ -118,6 +121,8 @@ public class ElasticsearchTypeNameMappingSchemaIT {
 
 	private JsonObject indexCreationPayload() {
 		JsonObject payload = new JsonObject();
+
+		payload.add( "aliases", defaultAliasDefinitions( INDEX_NAME ) );
 
 		JsonObject mappings = ElasticsearchTestDialect.get().getTypeNameForMappingApi()
 				// ES6 and below: the mapping has its own object node, child of "mappings"

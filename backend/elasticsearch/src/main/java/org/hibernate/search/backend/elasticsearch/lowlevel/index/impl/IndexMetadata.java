@@ -6,30 +6,31 @@
  */
 package org.hibernate.search.backend.elasticsearch.lowlevel.index.impl;
 
+import java.util.Map;
+
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 
 import com.google.gson.GsonBuilder;
 
 /**
- * An object representing an Elasticsearch index.
- *
+ * An object representing metadata of an Elasticsearch index: aliases, mapping, settings, ...
  */
 public class IndexMetadata {
 
-	private URLEncodedString name;
+	private Map<String, IndexAliasDefinition> aliases;
 
 	private RootTypeMapping mapping;
 
 	private IndexSettings settings;
 
-	public URLEncodedString getName() {
-		return name;
+	public Map<String, IndexAliasDefinition> getAliases() {
+		return aliases;
 	}
 
-	public void setName(URLEncodedString name) {
-		this.name = name;
+	public void setAliases(Map<String, IndexAliasDefinition> aliases) {
+		this.aliases = aliases;
 	}
 
 	public RootTypeMapping getMapping() {

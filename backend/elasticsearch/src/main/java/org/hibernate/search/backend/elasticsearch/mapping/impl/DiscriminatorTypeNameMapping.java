@@ -14,6 +14,7 @@ import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexS
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
+import org.hibernate.search.backend.elasticsearch.index.naming.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
@@ -51,7 +52,7 @@ public class DiscriminatorTypeNameMapping implements TypeNameMapping {
 	}
 
 	@Override
-	public void register(String elasticsearchIndexName, String mappedTypeName) {
+	public void register(IndexNames indexNames, String mappedTypeName) {
 		// Nothing to do
 	}
 

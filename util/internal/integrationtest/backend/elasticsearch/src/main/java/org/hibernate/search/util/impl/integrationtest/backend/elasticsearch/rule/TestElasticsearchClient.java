@@ -6,6 +6,11 @@
  */
 package org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule;
 
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.aliasDefinitions;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultPrimaryName;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultReadAlias;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultWriteAlias;
+
 import java.io.Closeable;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -18,7 +23,6 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactoryImpl;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientUtils;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
@@ -27,7 +31,7 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
+import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchRequestFormatter;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchResponseFormatter;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -37,10 +41,10 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.impl.DefaultThreadProvider;
 import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 
 import org.junit.rules.TestRule;
@@ -66,8 +70,16 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		return dialect;
 	}
 
-	public IndexClient index(String indexName) {
-		return new IndexClient( URLEncodedString.fromString( ElasticsearchIndexNameNormalizer.normalize( indexName ) ) );
+	public IndexClient index(String hibernateSearchIndexName) {
+		return index(
+				defaultPrimaryName( hibernateSearchIndexName ),
+				defaultWriteAlias( hibernateSearchIndexName ),
+				defaultReadAlias( hibernateSearchIndexName )
+		);
+	}
+
+	public IndexClient index(URLEncodedString primaryIndexName, URLEncodedString writeAlias, URLEncodedString readAlias) {
+		return new IndexClient( primaryIndexName, writeAlias, readAlias );
 	}
 
 	public ClusterSettingsClient clusterSettings(String settingsPath) {
@@ -76,44 +88,48 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 
 	public class IndexClient {
 
-		private final URLEncodedString indexName;
+		private final URLEncodedString primaryIndexName;
+		private final URLEncodedString writeAlias;
+		private final URLEncodedString readAlias;
 
-		public IndexClient(URLEncodedString indexName) {
-			this.indexName = indexName;
+		public IndexClient(URLEncodedString primaryIndexName, URLEncodedString writeAlias, URLEncodedString readAlias) {
+			this.primaryIndexName = primaryIndexName;
+			this.writeAlias = writeAlias;
+			this.readAlias = readAlias;
 		}
 
 		public void waitForRequiredIndexStatus() {
-			TestElasticsearchClient.this.waitForRequiredIndexStatus( indexName );
+			TestElasticsearchClient.this.waitForRequiredIndexStatus( primaryIndexName );
 		}
 
 		public IndexClient deleteAndCreate() {
-			TestElasticsearchClient.this.deleteAndCreateIndex( indexName );
+			TestElasticsearchClient.this.deleteAndCreateIndex( primaryIndexName, writeAlias, readAlias );
 			return this;
 		}
 
 		public IndexClient deleteAndCreate(String settingsPath, String settings) {
 			JsonObject settingsAsJsonObject = buildStructuredSettings( settingsPath, settings );
-			TestElasticsearchClient.this.deleteAndCreateIndex( indexName, settingsAsJsonObject );
+			TestElasticsearchClient.this.deleteAndCreateIndex( primaryIndexName, writeAlias, readAlias, settingsAsJsonObject );
 			return this;
 		}
 
 		public IndexClient delete() {
-			TestElasticsearchClient.this.deleteIndex( indexName );
+			TestElasticsearchClient.this.deleteIndex( primaryIndexName );
 			return this;
 		}
 
 		public IndexClient ensureDoesNotExist() {
-			TestElasticsearchClient.this.ensureIndexDoesNotExist( indexName );
+			TestElasticsearchClient.this.ensureIndexDoesNotExist( primaryIndexName );
 			return this;
 		}
 
 		public IndexClient addAlias(String alias) {
-			TestElasticsearchClient.this.addAlias( indexName, alias );
+			TestElasticsearchClient.this.addAlias( primaryIndexName, alias );
 			return this;
 		}
 
 		public IndexClient registerForCleanup() {
-			TestElasticsearchClient.this.registerIndexForCleanup( indexName );
+			TestElasticsearchClient.this.registerIndexForCleanup( primaryIndexName );
 			return this;
 		}
 
@@ -144,16 +160,16 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		}
 
 		public TypeClient putMapping(JsonObject mapping) {
-			TestElasticsearchClient.this.putMapping( indexClient.indexName, mapping );
+			TestElasticsearchClient.this.putMapping( indexClient.primaryIndexName, mapping );
 			return this;
 		}
 
 		public String getMapping() {
-			return TestElasticsearchClient.this.getMapping( indexClient.indexName );
+			return TestElasticsearchClient.this.getMapping( indexClient.primaryIndexName );
 		}
 
 		public TypeClient index(URLEncodedString id, String jsonDocument) {
-			URLEncodedString indexName = indexClient.indexName;
+			URLEncodedString indexName = indexClient.primaryIndexName;
 			TestElasticsearchClient.this.index( indexName, id, jsonDocument );
 			return this;
 		}
@@ -175,7 +191,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		}
 
 		public String get() {
-			URLEncodedString indexName = indexClient.indexName;
+			URLEncodedString indexName = indexClient.primaryIndexName;
 			return TestElasticsearchClient.this.getSettings( indexName, settingsPath );
 		}
 
@@ -186,7 +202,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		 * @throws IOException
 		 */
 		public void putDynamic(String settings) {
-			URLEncodedString indexName = indexClient.indexName;
+			URLEncodedString indexName = indexClient.primaryIndexName;
 			JsonObject settingsAsJsonObject = buildStructuredSettings( settingsPath, settings );
 			TestElasticsearchClient.this.putIndexSettingsDynamic( indexName, settingsAsJsonObject );
 		}
@@ -198,7 +214,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		 * @throws IOException
 		 */
 		public void putNonDynamic(String settings) {
-			URLEncodedString indexName = indexClient.indexName;
+			URLEncodedString indexName = indexClient.primaryIndexName;
 			JsonObject settingsAsJsonObject = buildStructuredSettings( settingsPath, settings );
 			TestElasticsearchClient.this.putIndexSettingsNonDynamic( indexName, settingsAsJsonObject );
 		}
@@ -216,11 +232,11 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		}
 
 		public JsonObject getSource() {
-			return TestElasticsearchClient.this.getDocumentSource( typeClient.indexClient.indexName, id );
+			return TestElasticsearchClient.this.getDocumentSource( typeClient.indexClient.primaryIndexName, id );
 		}
 
 		public JsonElement getStoredField(String fieldName) {
-			return TestElasticsearchClient.this.getDocumentField( typeClient.indexClient.indexName, id, fieldName );
+			return TestElasticsearchClient.this.getDocumentField( typeClient.indexClient.primaryIndexName, id, fieldName );
 		}
 	}
 
@@ -281,19 +297,30 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		}
 	}
 
-	private void deleteAndCreateIndex(URLEncodedString indexName) {
-		deleteAndCreateIndex( indexName, null );
+	private void deleteAndCreateIndex(URLEncodedString primaryIndexName,
+			URLEncodedString writeAlias, URLEncodedString readAlias) {
+		deleteAndCreateIndex( primaryIndexName, writeAlias, readAlias, null );
 	}
 
-	private void deleteAndCreateIndex(URLEncodedString indexName, JsonObject settingsAsJsonObject) {
+	private void deleteAndCreateIndex(URLEncodedString primaryIndexName,
+			URLEncodedString writeAlias, URLEncodedString readAlias,
+			JsonObject settingsAsJsonObject) {
 		ElasticsearchRequest.Builder builder = ElasticsearchRequest.put()
-				.pathComponent( indexName );
+				.pathComponent( primaryIndexName );
+
+		JsonObject payload = new JsonObject();
+
+		JsonObject aliases = aliasDefinitions(
+				writeAlias != null ? writeAlias.original : null,
+				readAlias != null ? readAlias.original : null
+		);
+		payload.add( "aliases", aliases );
 
 		if ( settingsAsJsonObject != null ) {
-			JsonObject payload = new JsonObject();
 			payload.add( "settings", settingsAsJsonObject );
-			builder.body( payload );
 		}
+
+		builder.body( payload );
 
 		Boolean includeTypeName = dialect.getIncludeTypeNameParameterForMappingApi();
 		if ( includeTypeName != null ) {
@@ -301,7 +328,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		}
 
 		doDeleteAndCreateIndex(
-				indexName,
+				primaryIndexName,
 				builder.build()
 		);
 	}

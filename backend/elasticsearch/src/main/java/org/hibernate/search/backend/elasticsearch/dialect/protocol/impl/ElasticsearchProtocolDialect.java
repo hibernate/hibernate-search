@@ -8,11 +8,10 @@ package org.hibernate.search.backend.elasticsearch.dialect.protocol.impl;
 
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.ElasticsearchIndexMetadataSyntax;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
-
-import com.google.gson.GsonBuilder;
 
 /**
  * An entry point to all dialect-sensitive operations that only affect the protocol when talking to the Elasticsearch cluster,
@@ -33,6 +32,8 @@ import com.google.gson.GsonBuilder;
  * that will be passed to the part of the code that needs it.
  */
 public interface ElasticsearchProtocolDialect {
+
+	ElasticsearchIndexMetadataSyntax createIndexMetadataSyntax();
 
 	ElasticsearchSearchSyntax createSearchSyntax();
 

@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.search.query;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.entry;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultReadAlias;
 
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
@@ -85,16 +86,17 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 		SearchQuery<DocumentReference> query = scope.query().extension( ElasticsearchExtension.get() )
 				.where( f -> f.matchAll() )
 				.requestTransformer( context -> {
-					assertThat( context.getPath() ).isEqualTo( "/" + INDEX_NAME + "/_search" );
-					context.setPath( "/" + SECOND_INDEX_NAME + "/_search" );
+					assertThat( context.getPath() ).isEqualTo( "/" + defaultReadAlias( INDEX_NAME ).original + "/_search" );
+					String newPath = "/" + defaultReadAlias( SECOND_INDEX_NAME ).original + "/_search";
+					context.setPath( newPath );
 					// Changes should be visible immediately
-					assertThat( context.getPath() ).isEqualTo( "/" + SECOND_INDEX_NAME + "/_search" );
+					assertThat( context.getPath() ).isEqualTo( newPath );
 				} )
 				.toQuery();
 
 		clientSpy.expectNext(
 				ElasticsearchRequest.post()
-						.pathComponent( URLEncodedString.fromString( SECOND_INDEX_NAME ) )
+						.pathComponent( defaultReadAlias( SECOND_INDEX_NAME ) )
 						.pathComponent( URLEncodedString.fromString( "_search" ) )
 						.body( new Gson().fromJson( "{}", JsonObject.class ) )
 						.build(),
@@ -122,7 +124,7 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 
 		clientSpy.expectNext(
 				ElasticsearchRequest.post()
-						.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
+						.pathComponent( defaultReadAlias( INDEX_NAME ) )
 						.pathComponent( Paths._SEARCH )
 						.body( new Gson().fromJson( "{}", JsonObject.class ) )
 						.param( "search_type", "dfs_query_then_fetch" )
@@ -154,7 +156,7 @@ public class ElasticsearchSearchQueryRequestTransformerIT {
 
 		clientSpy.expectNext(
 				ElasticsearchRequest.post()
-						.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
+						.pathComponent( defaultReadAlias( INDEX_NAME ) )
 						.pathComponent( Paths._SEARCH )
 						.body( new Gson().fromJson( "{'min_score':0.5}", JsonObject.class ) )
 						.build(),

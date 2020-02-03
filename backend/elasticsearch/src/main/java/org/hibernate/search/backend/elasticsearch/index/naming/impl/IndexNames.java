@@ -4,21 +4,37 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.document.model.impl;
+package org.hibernate.search.backend.elasticsearch.index.naming.impl;
 
+import java.lang.invoke.MethodHandles;
+import java.util.Locale;
+
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public final class IndexNames {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	public static String normalizeName(String indexName) {
+		String esIndexName = indexName.toLowerCase( Locale.ENGLISH );
+		if ( !esIndexName.equals( indexName ) ) {
+			log.debugf( "Normalizing index name from '%1$s' to '%2$s'", indexName, esIndexName );
+		}
+		return esIndexName;
+	}
+
+	public static URLEncodedString encodeName(String name) {
+		return URLEncodedString.fromString( normalizeName( name ) );
+	}
+
 	private final String hibernateSearch;
-	private final URLEncodedString primary;
 	private final URLEncodedString write;
 	private final URLEncodedString read;
 
-	public IndexNames(String hibernateSearch, URLEncodedString primary,
-			URLEncodedString write, URLEncodedString read) {
+	public IndexNames(String hibernateSearch, URLEncodedString write, URLEncodedString read) {
 		this.hibernateSearch = hibernateSearch;
-		this.primary = primary;
 		this.write = write;
 		this.read = read;
 	}
@@ -27,7 +43,6 @@ public final class IndexNames {
 	public String toString() {
 		return "IndexNames[" +
 				"hibernateSearch=" + hibernateSearch +
-				", primary=" + primary +
 				", read=" + read +
 				", write=" + write +
 				"]";
@@ -39,16 +54,6 @@ public final class IndexNames {
 	 */
 	public String getHibernateSearch() {
 		return hibernateSearch;
-	}
-
-	/**
-	 * The primary index name,
-	 * i.e. the name that Hibernate Search is supposed to use when creating/deleting the index.
-	 * <p>
-	 * This is also the name used in {@link org.hibernate.search.backend.elasticsearch.mapping.impl.IndexNameTypeNameMapping}.
-	 */
-	public URLEncodedString getPrimary() {
-		return primary;
 	}
 
 	/**

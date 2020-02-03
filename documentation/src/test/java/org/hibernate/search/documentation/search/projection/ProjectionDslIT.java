@@ -7,6 +7,7 @@
 package org.hibernate.search.documentation.search.projection;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultPrimaryName;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.util.Arrays;
@@ -17,7 +18,6 @@ import javax.persistence.EntityManagerFactory;
 
 import org.hibernate.Session;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
-import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
 import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.ElasticsearchBackendConfiguration;
@@ -427,7 +427,7 @@ public class ProjectionDslIT {
 			assertThat( hits ).hasSize( 4 );
 			assertThat( hits ).allSatisfy( hit -> assertJsonEquals(
 					"{"
-							+ "'_index': '" + ElasticsearchIndexNameNormalizer.normalize( Book.NAME ) + "'"
+							+ "'_index': '" + defaultPrimaryName( Book.NAME ) + "'"
 							+ "}",
 					hit.toString(),
 					JSONCompareMode.LENIENT

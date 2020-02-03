@@ -155,8 +155,8 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 	}
 
 	@Override
-	public GetIndexMetadataWorkBuilder getIndexMetadata(URLEncodedString indexName) {
-		return GetIndexMetadataWork.Builder.forElasticsearch7AndAbove( indexName );
+	public GetIndexMetadataWorkBuilder getIndexMetadata() {
+		return GetIndexMetadataWork.Builder.forElasticsearch7AndAbove();
 	}
 
 	@Override

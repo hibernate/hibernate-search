@@ -6,12 +6,15 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
+import java.util.Map;
+
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientUtils;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.CreateIndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.CreateIndexResult;
@@ -71,6 +74,17 @@ public class CreateIndexWork extends AbstractSimpleElasticsearchWork<CreateIndex
 			this.indexName = indexName;
 			this.typeName = typeName;
 			this.includeTypeName = includeTypeName;
+		}
+
+		@Override
+		public Builder aliases(Map<String, IndexAliasDefinition> aliases) {
+			/*
+			 * Serializing nulls is really not a good idea here, it triggers NPEs in Elasticsearch
+			 * We better not include the null fields.
+			 */
+			Gson gson = gsonProvider.getGsonNoSerializeNulls();
+			payload.add( "aliases", gson.toJsonTree( aliases ) );
+			return this;
 		}
 
 		@Override
