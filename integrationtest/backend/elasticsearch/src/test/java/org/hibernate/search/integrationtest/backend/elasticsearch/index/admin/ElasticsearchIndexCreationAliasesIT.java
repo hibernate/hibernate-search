@@ -21,9 +21,9 @@ import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysis
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
-import org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy;
+import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.StubSingleIndexNamingStrategy;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.StubSingleIndexLayoutStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -66,7 +66,7 @@ public class ElasticsearchIndexCreationAliasesIT {
 	}
 
 	@Test
-	public void success_defaultNamingStrategy() {
+	public void success_defaultLayoutStrategy() {
 		elasticsearchClient.index( INDEX_NAME )
 				.ensureDoesNotExist().registerForCleanup();
 
@@ -82,11 +82,11 @@ public class ElasticsearchIndexCreationAliasesIT {
 	}
 
 	@Test
-	public void success_customNamingStrategy() {
+	public void success_customLayoutStrategy() {
 		elasticsearchClient.index( INDEX_NAME )
 				.ensureDoesNotExist().registerForCleanup();
 
-		setup( new StubSingleIndexNamingStrategy( "custom-write", "custom-read" ) );
+		setup( new StubSingleIndexLayoutStrategy( "custom-write", "custom-read" ) );
 
 		assertJsonEquals(
 				"{"
@@ -129,9 +129,9 @@ public class ElasticsearchIndexCreationAliasesIT {
 		);
 	}
 
-	private void setup(IndexNamingStrategy namingStrategy) {
+	private void setup(IndexLayoutStrategy layoutStrategy) {
 		startSetupWithLifecycleStrategy()
-				.withBackendProperty( BACKEND_NAME, ElasticsearchBackendSettings.NAMING_STRATEGY, namingStrategy )
+				.withBackendProperty( BACKEND_NAME, ElasticsearchBackendSettings.LAYOUT_STRATEGY, layoutStrategy )
 				.withIndex( INDEX_NAME, ctx -> { } )
 				.setup();
 	}

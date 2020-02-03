@@ -8,17 +8,17 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.c
 
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultPrimaryName;
 
-import org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy;
+import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 
 /**
- * A simple {@link org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy}
+ * A simple {@link IndexLayoutStrategy}
  * that only supports one index.
  */
-public class StubSingleIndexNamingStrategy implements IndexNamingStrategy {
+public class StubSingleIndexLayoutStrategy implements IndexLayoutStrategy {
 	private final String writeAlias;
 	private final String readAlias;
 
-	public StubSingleIndexNamingStrategy(String writeAlias, String readAlias) {
+	public StubSingleIndexLayoutStrategy(String writeAlias, String readAlias) {
 		this.writeAlias = writeAlias;
 		this.readAlias = readAlias;
 	}

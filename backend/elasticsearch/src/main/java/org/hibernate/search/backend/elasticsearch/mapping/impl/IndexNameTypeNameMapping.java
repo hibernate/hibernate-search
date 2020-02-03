@@ -13,8 +13,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexSchemaRootContributor;
-import org.hibernate.search.backend.elasticsearch.index.naming.impl.IndexNames;
-import org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy;
+import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
+import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
@@ -34,11 +34,11 @@ public class IndexNameTypeNameMapping implements TypeNameMapping {
 
 	private final TypeNameFromIndexNameExtractionHelper mappedTypeNameExtractionHelper;
 
-	private final IndexNamingStrategy indexNamingStrategy;
+	private final IndexLayoutStrategy indexLayoutStrategy;
 
-	public IndexNameTypeNameMapping(IndexNamingStrategy indexNamingStrategy) {
-		this.indexNamingStrategy = indexNamingStrategy;
-		this.mappedTypeNameExtractionHelper = new TypeNameFromIndexNameExtractionHelper( indexNamingStrategy );
+	public IndexNameTypeNameMapping(IndexLayoutStrategy indexLayoutStrategy) {
+		this.indexLayoutStrategy = indexLayoutStrategy;
+		this.mappedTypeNameExtractionHelper = new TypeNameFromIndexNameExtractionHelper( indexLayoutStrategy );
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class IndexNameTypeNameMapping implements TypeNameMapping {
 	@Override
 	public void register(IndexNames indexNames, String mappedTypeName) {
 		String uniqueKey = IndexNames.normalizeName(
-				indexNamingStrategy.extractUniqueKeyFromHibernateSearchIndexName(
+				indexLayoutStrategy.extractUniqueKeyFromHibernateSearchIndexName(
 						indexNames.getHibernateSearch()
 				)
 		);
@@ -74,11 +74,11 @@ public class IndexNameTypeNameMapping implements TypeNameMapping {
 		private static final JsonAccessor<String> HIT_INDEX_NAME_ACCESSOR =
 				JsonAccessor.root().property( "_index" ).asString();
 
-		private final IndexNamingStrategy indexNamingStrategy;
+		private final IndexLayoutStrategy indexLayoutStrategy;
 		private final Map<String, String> primaryIndexNameUniqueKeyToMappedTypeNames = new ConcurrentHashMap<>();
 
-		public TypeNameFromIndexNameExtractionHelper(IndexNamingStrategy indexNamingStrategy) {
-			this.indexNamingStrategy = indexNamingStrategy;
+		public TypeNameFromIndexNameExtractionHelper(IndexLayoutStrategy indexLayoutStrategy) {
+			this.indexLayoutStrategy = indexLayoutStrategy;
 		}
 
 		@Override
@@ -93,7 +93,7 @@ public class IndexNameTypeNameMapping implements TypeNameMapping {
 
 			String mappedTypeName;
 			try {
-				String uniqueKey = indexNamingStrategy.extractUniqueKeyFromElasticsearchIndexName( primaryIndexName );
+				String uniqueKey = indexLayoutStrategy.extractUniqueKeyFromElasticsearchIndexName( primaryIndexName );
 				mappedTypeName = primaryIndexNameUniqueKeyToMappedTypeNames.get( uniqueKey );
 				if ( mappedTypeName == null ) {
 					throw log.invalidIndexUniqueKey( uniqueKey, primaryIndexNameUniqueKeyToMappedTypeNames.keySet() );

@@ -11,7 +11,7 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
-import org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy;
+import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
 import org.hibernate.search.backend.elasticsearch.multitenancy.MultiTenancyStrategyName;
 
@@ -200,9 +200,9 @@ public final class ElasticsearchBackendSettings {
 	public static final String ANALYSIS_CONFIGURER = "analysis.configurer";
 
 	/**
-	 * The naming strategy for indexes and their aliases.
+	 * The layout strategy for indexes and their aliases.
 	 * <p>
-	 * Expects a reference to a bean of type {@link IndexNamingStrategy}.
+	 * Expects a reference to a bean of type {@link IndexLayoutStrategy}.
 	 * <p>
 	 * Defaults to the following:
 	 * <ul>
@@ -214,7 +214,7 @@ public final class ElasticsearchBackendSettings {
 	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
 	 * which includes a description of the "bean reference" properties and accepted values.
 	 */
-	public static final String NAMING_STRATEGY = "naming.strategy";
+	public static final String LAYOUT_STRATEGY = "layout.strategy";
 
 	/**
 	 * Default values for the different settings if no values are given.

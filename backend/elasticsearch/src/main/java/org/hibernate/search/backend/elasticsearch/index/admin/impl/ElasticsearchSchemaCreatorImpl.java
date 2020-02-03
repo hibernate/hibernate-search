@@ -8,8 +8,8 @@ package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.index.naming.impl.IndexNames;
-import org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy;
+import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
+import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.ExistingIndexMetadata;
@@ -22,12 +22,12 @@ public class ElasticsearchSchemaCreatorImpl implements ElasticsearchSchemaCreato
 
 	private final ElasticsearchSchemaAccessor schemaAccessor;
 
-	private final IndexNamingStrategy indexNamingStrategy;
+	private final IndexLayoutStrategy indexLayoutStrategy;
 
 	public ElasticsearchSchemaCreatorImpl(ElasticsearchSchemaAccessor schemaAccessor,
-			IndexNamingStrategy indexNamingStrategy) {
+			IndexLayoutStrategy indexLayoutStrategy) {
 		this.schemaAccessor = schemaAccessor;
-		this.indexNamingStrategy = indexNamingStrategy;
+		this.indexLayoutStrategy = indexLayoutStrategy;
 	}
 
 	@Override
@@ -61,7 +61,7 @@ public class ElasticsearchSchemaCreatorImpl implements ElasticsearchSchemaCreato
 
 	private URLEncodedString createPrimaryIndexName(IndexNames indexNames) {
 		return IndexNames.encodeName(
-				indexNamingStrategy.createInitialElasticsearchIndexName( indexNames.getHibernateSearch() )
+				indexLayoutStrategy.createInitialElasticsearchIndexName( indexNames.getHibernateSearch() )
 		);
 	}
 
