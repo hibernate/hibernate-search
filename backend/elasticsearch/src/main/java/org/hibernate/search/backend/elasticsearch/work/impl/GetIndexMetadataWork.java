@@ -7,7 +7,12 @@
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
@@ -15,45 +20,61 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Ro
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexMetadataWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.result.impl.ExistingIndexMetadata;
 import org.hibernate.search.util.common.AssertionFailure;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-public class GetIndexMetadataWork extends AbstractSimpleElasticsearchWork<IndexMetadata> {
+public class GetIndexMetadataWork extends AbstractSimpleElasticsearchWork<List<ExistingIndexMetadata>> {
 
 	private static final TypeToken<Map<String, RootTypeMapping>> STRING_TO_TYPE_MAPPING_MAP_TYPE_TOKEN =
 			new TypeToken<Map<String, RootTypeMapping>>() {
 				// Create a new class to capture generic parameters
 			};
 
-	private final URLEncodedString indexName;
 	private final URLEncodedString typeName;
 
 	private GetIndexMetadataWork(Builder builder) {
 		super( builder );
-		this.indexName = builder.indexName;
 		this.typeName = builder.typeName;
 	}
 
 	@Override
-	protected IndexMetadata generateResult(ElasticsearchWorkExecutionContext context,
+	protected List<ExistingIndexMetadata> generateResult(ElasticsearchWorkExecutionContext context,
 			ElasticsearchResponse response) {
 		JsonObject body = response.getBody();
-		JsonElement index = body.get( indexName.original );
-		if ( index == null || index.isJsonNull() ) {
-			return null;
-		}
-		JsonObject indexAsObject = index.getAsJsonObject();
+		List<ExistingIndexMetadata> result = new ArrayList<>();
+		for ( Map.Entry<String, JsonElement> entry : body.entrySet() ) {
+			JsonObject indexAsObject = entry.getValue().getAsJsonObject();
 
-		IndexMetadata indexMetadata = new IndexMetadata();
-		indexMetadata.setName( indexName );
-		indexMetadata.setSettings( getSettings( context, indexAsObject ) );
-		indexMetadata.setMapping( getMapping( context, indexAsObject ) );
-		return indexMetadata;
+			IndexMetadata metadata = new IndexMetadata();
+			metadata.setAliases( getAliases( context, indexAsObject ) );
+			metadata.setSettings( getSettings( context, indexAsObject ) );
+			metadata.setMapping( getMapping( context, indexAsObject ) );
+
+			result.add( new ExistingIndexMetadata( entry.getKey(), metadata ) );
+		}
+		return result;
+	}
+
+	private Map<String, IndexAliasDefinition> getAliases(ElasticsearchWorkExecutionContext context, JsonObject index) {
+		JsonElement aliases = index.get( "aliases" );
+		if ( aliases == null || !aliases.isJsonObject() ) {
+			throw new AssertionFailure( "Elasticsearch API call succeeded, but the aliases weren't mentioned in the result: " + index );
+		}
+
+		GsonProvider gsonProvider = context.getGsonProvider();
+		Map<String, IndexAliasDefinition> result = new LinkedHashMap<>();
+		for ( Map.Entry<String, JsonElement> entry : aliases.getAsJsonObject().entrySet() ) {
+			IndexAliasDefinition aliasDefinition = gsonProvider.getGson().fromJson( entry.getValue(), IndexAliasDefinition.class );
+			result.put( entry.getKey(), aliasDefinition );
+		}
+		return result;
 	}
 
 	private IndexSettings getSettings(ElasticsearchWorkExecutionContext context, JsonObject index) {
@@ -98,34 +119,39 @@ public class GetIndexMetadataWork extends AbstractSimpleElasticsearchWork<IndexM
 			extends AbstractBuilder<Builder>
 			implements GetIndexMetadataWorkBuilder {
 
-		private final URLEncodedString indexName;
+		private final Set<URLEncodedString> indexNames = new LinkedHashSet<>();
 		private final URLEncodedString typeName;
 		private final Boolean includeTypeName;
 
-		public static Builder forElasticsearch66AndBelow(URLEncodedString indexName, URLEncodedString typeName) {
-			return new Builder( indexName, typeName, null );
+		public static Builder forElasticsearch66AndBelow(URLEncodedString typeName) {
+			return new Builder( typeName, null );
 		}
 
-		public static Builder forElasticsearch67(URLEncodedString indexName, URLEncodedString typeName) {
-			return new Builder( indexName, typeName, true );
+		public static Builder forElasticsearch67(URLEncodedString typeName) {
+			return new Builder( typeName, true );
 		}
 
-		public static Builder forElasticsearch7AndAbove(URLEncodedString indexName) {
-			return new Builder( indexName, null, null );
+		public static Builder forElasticsearch7AndAbove() {
+			return new Builder( null, null );
 		}
 
-		private Builder(URLEncodedString indexName, URLEncodedString typeName, Boolean includeTypeName) {
+		private Builder(URLEncodedString typeName, Boolean includeTypeName) {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
-			this.indexName = indexName;
 			this.typeName = typeName;
 			this.includeTypeName = includeTypeName;
+		}
+
+		@Override
+		public GetIndexMetadataWorkBuilder index(URLEncodedString indexName) {
+			indexNames.add( indexName );
+			return this;
 		}
 
 		@Override
 		protected ElasticsearchRequest buildRequest() {
 			ElasticsearchRequest.Builder builder =
 					ElasticsearchRequest.get()
-					.pathComponent( indexName );
+					.multiValuedPathComponent( indexNames );
 			// This prevents the request from failing if the given index name does not match anything
 			builder.param( "ignore_unavailable", true );
 			// According to the documentation, this should prevent the request from failing

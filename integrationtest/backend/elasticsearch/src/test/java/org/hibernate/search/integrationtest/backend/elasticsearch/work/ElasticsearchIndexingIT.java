@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.work;
 
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultWriteAlias;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
@@ -74,7 +75,7 @@ public class ElasticsearchIndexingIT {
 		} );
 		clientSpy.expectNext(
 				ElasticsearchRequest.put()
-						.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
+						.pathComponent( defaultWriteAlias( INDEX_NAME ) )
 						.pathComponent( dialect.getTypeKeywordForNonMappingApi() )
 						.pathComponent( URLEncodedString.fromString( "1" ) )
 						.body( new JsonObject() ) // We don't care about the payload
@@ -90,7 +91,7 @@ public class ElasticsearchIndexingIT {
 		} );
 		clientSpy.expectNext(
 				ElasticsearchRequest.put()
-						.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
+						.pathComponent( defaultWriteAlias( INDEX_NAME ) )
 						.pathComponent( dialect.getTypeKeywordForNonMappingApi() )
 						.pathComponent( URLEncodedString.fromString( "1" ) )
 						.body( new JsonObject() ) // We don't care about the payload
@@ -104,7 +105,7 @@ public class ElasticsearchIndexingIT {
 		plan.delete( referenceProvider( "1", routingKey ) );
 		clientSpy.expectNext(
 				ElasticsearchRequest.delete()
-						.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
+						.pathComponent( defaultWriteAlias( INDEX_NAME ) )
 						.pathComponent( dialect.getTypeKeywordForNonMappingApi() )
 						.pathComponent( URLEncodedString.fromString( "1" ) )
 						.param( "routing", routingKey )

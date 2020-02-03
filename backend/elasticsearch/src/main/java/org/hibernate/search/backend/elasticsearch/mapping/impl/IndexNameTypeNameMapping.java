@@ -13,11 +13,14 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexSchemaRootContributor;
+import org.hibernate.search.backend.elasticsearch.index.naming.impl.IndexNames;
+import org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionRequestContext;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
@@ -29,8 +32,14 @@ import com.google.gson.JsonObject;
 public class IndexNameTypeNameMapping implements TypeNameMapping {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final TypeNameFromIndexNameExtractionHelper mappedTypeNameExtractionHelper =
-			new TypeNameFromIndexNameExtractionHelper();
+	private final TypeNameFromIndexNameExtractionHelper mappedTypeNameExtractionHelper;
+
+	private final IndexNamingStrategy indexNamingStrategy;
+
+	public IndexNameTypeNameMapping(IndexNamingStrategy indexNamingStrategy) {
+		this.indexNamingStrategy = indexNamingStrategy;
+		this.mappedTypeNameExtractionHelper = new TypeNameFromIndexNameExtractionHelper( indexNamingStrategy );
+	}
 
 	@Override
 	public Optional<IndexSchemaRootContributor> getIndexSchemaRootContributor() {
@@ -45,9 +54,14 @@ public class IndexNameTypeNameMapping implements TypeNameMapping {
 	}
 
 	@Override
-	public void register(String elasticsearchIndexName, String mappedTypeName) {
-		mappedTypeNameExtractionHelper.mappedTypeNamesByElasticsearchIndexNames
-				.put( elasticsearchIndexName, mappedTypeName );
+	public void register(IndexNames indexNames, String mappedTypeName) {
+		String uniqueKey = IndexNames.normalizeName(
+				indexNamingStrategy.extractUniqueKeyFromHibernateSearchIndexName(
+						indexNames.getHibernateSearch()
+				)
+		);
+		mappedTypeNameExtractionHelper.primaryIndexNameUniqueKeyToMappedTypeNames
+				.put( uniqueKey, mappedTypeName );
 	}
 
 	@Override
@@ -60,7 +74,12 @@ public class IndexNameTypeNameMapping implements TypeNameMapping {
 		private static final JsonAccessor<String> HIT_INDEX_NAME_ACCESSOR =
 				JsonAccessor.root().property( "_index" ).asString();
 
-		private final Map<String, String> mappedTypeNamesByElasticsearchIndexNames = new ConcurrentHashMap<>();
+		private final IndexNamingStrategy indexNamingStrategy;
+		private final Map<String, String> primaryIndexNameUniqueKeyToMappedTypeNames = new ConcurrentHashMap<>();
+
+		public TypeNameFromIndexNameExtractionHelper(IndexNamingStrategy indexNamingStrategy) {
+			this.indexNamingStrategy = indexNamingStrategy;
+		}
 
 		@Override
 		public void request(JsonObject requestBody, SearchProjectionRequestContext context) {
@@ -69,11 +88,19 @@ public class IndexNameTypeNameMapping implements TypeNameMapping {
 
 		@Override
 		public String extract(JsonObject hit, SearchProjectionExtractContext context) {
-			String elasticsearchIndexName = HIT_INDEX_NAME_ACCESSOR.get( hit )
+			String primaryIndexName = HIT_INDEX_NAME_ACCESSOR.get( hit )
 					.orElseThrow( log::elasticsearchResponseMissingData );
-			String mappedTypeName = mappedTypeNamesByElasticsearchIndexNames.get( elasticsearchIndexName );
-			if ( mappedTypeName == null ) {
-				throw log.elasticsearchResponseUnknownIndexName( elasticsearchIndexName );
+
+			String mappedTypeName;
+			try {
+				String uniqueKey = indexNamingStrategy.extractUniqueKeyFromElasticsearchIndexName( primaryIndexName );
+				mappedTypeName = primaryIndexNameUniqueKeyToMappedTypeNames.get( uniqueKey );
+				if ( mappedTypeName == null ) {
+					throw log.invalidIndexUniqueKey( uniqueKey, primaryIndexNameUniqueKeyToMappedTypeNames.keySet() );
+				}
+			}
+			catch (SearchException e) {
+				throw log.elasticsearchResponseUnknownIndexName( primaryIndexName, e.getMessage(), e );
 			}
 			return mappedTypeName;
 		}

@@ -6,22 +6,28 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.model.impl.IndexNames;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.hibernate.search.backend.elasticsearch.index.naming.impl.IndexNames;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.Analysis;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.ElasticsearchIndexMetadataSyntax;
 
 
 public class LowLevelIndexMetadataBuilder {
 
+	private final ElasticsearchIndexMetadataSyntax syntax;
 	private final IndexNames indexNames;
 	private ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
 	private RootTypeMapping mapping;
 
-	public LowLevelIndexMetadataBuilder(IndexNames indexNames) {
+	public LowLevelIndexMetadataBuilder(ElasticsearchIndexMetadataSyntax syntax, IndexNames indexNames) {
+		this.syntax = syntax;
 		this.indexNames = indexNames;
 	}
 
@@ -34,12 +40,18 @@ public class LowLevelIndexMetadataBuilder {
 	}
 
 	public IndexMetadata build() {
-		URLEncodedString primaryName = indexNames.getPrimary();
 		IndexMetadata indexMetadata = new IndexMetadata();
-		indexMetadata.setName( primaryName );
+		indexMetadata.setAliases( buildAliases() );
 		indexMetadata.setSettings( buildSettings() );
 		indexMetadata.setMapping( mapping );
 		return indexMetadata;
+	}
+
+	private Map<String, IndexAliasDefinition> buildAliases() {
+		Map<String, IndexAliasDefinition> aliases = new LinkedHashMap<>();
+		aliases.put( indexNames.getWrite().original, syntax.createWriteAliasDefinition() );
+		aliases.put( indexNames.getRead().original, syntax.createReadAliasDefinition() );
+		return aliases;
 	}
 
 	private IndexSettings buildSettings() {

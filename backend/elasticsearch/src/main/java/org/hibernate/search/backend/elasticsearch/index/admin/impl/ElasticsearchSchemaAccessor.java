@@ -7,18 +7,23 @@
 package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
+import org.hibernate.search.backend.elasticsearch.index.naming.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.CreateIndexResult;
+import org.hibernate.search.backend.elasticsearch.work.result.impl.ExistingIndexMetadata;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.Throwables;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -41,9 +46,10 @@ public class ElasticsearchSchemaAccessor {
 		this.orchestrator = orchestrator;
 	}
 
-	public CompletableFuture<?> createIndexAssumeNonExisting(URLEncodedString indexName,
-			IndexSettings settings, RootTypeMapping mapping) {
-		ElasticsearchWork<?> work = getWorkFactory().createIndex( indexName )
+	public CompletableFuture<?> createIndexAssumeNonExisting(URLEncodedString primaryIndexName,
+			Map<String, IndexAliasDefinition> aliases, IndexSettings settings, RootTypeMapping mapping) {
+		ElasticsearchWork<?> work = getWorkFactory().createIndex( primaryIndexName )
+				.aliases( aliases )
 				.settings( settings )
 				.mapping( mapping )
 				.build();
@@ -51,14 +57,16 @@ public class ElasticsearchSchemaAccessor {
 	}
 
 	/**
-	 * @param indexName The name of the index.
+	 * @param primaryIndexName The name of the created index.
+	 * @param aliases The aliases for the newly created index.
 	 * @param settings The settings for the newly created index.
 	 * @param mapping The root mapping for the newly created index.
 	 * @return A future holding {@code true} if the index was actually created, {@code false} if it already existed.
 	 */
-	public CompletableFuture<Boolean> createIndexIgnoreExisting(URLEncodedString indexName,
-			IndexSettings settings, RootTypeMapping mapping) {
-		ElasticsearchWork<CreateIndexResult> work = getWorkFactory().createIndex( indexName )
+	public CompletableFuture<Boolean> createIndexIgnoreExisting(URLEncodedString primaryIndexName,
+			Map<String, IndexAliasDefinition> aliases, IndexSettings settings, RootTypeMapping mapping) {
+		ElasticsearchWork<CreateIndexResult> work = getWorkFactory().createIndex( primaryIndexName )
+				.aliases( aliases )
 				.settings( settings )
 				.mapping( mapping )
 				.ignoreExisting()
@@ -66,27 +74,41 @@ public class ElasticsearchSchemaAccessor {
 		return execute( work ).thenApply( CreateIndexResult.CREATED::equals );
 	}
 
-	public CompletableFuture<IndexMetadata> getCurrentIndexMetadata(URLEncodedString indexName) {
-		return getCurrentIndexMetadata( indexName, false );
+	public CompletableFuture<ExistingIndexMetadata> getCurrentIndexMetadata(IndexNames indexNames) {
+		return getCurrentIndexMetadata( indexNames, false );
 	}
 
-	public CompletableFuture<IndexMetadata> getCurrentIndexMetadataOrNull(URLEncodedString indexName) {
-		return getCurrentIndexMetadata( indexName, true );
+	public CompletableFuture<ExistingIndexMetadata> getCurrentIndexMetadataOrNull(IndexNames indexNames) {
+		return getCurrentIndexMetadata( indexNames, true );
 	}
 
-	private CompletableFuture<IndexMetadata> getCurrentIndexMetadata(URLEncodedString indexName, boolean allowNull) {
-		ElasticsearchWork<IndexMetadata> work = getWorkFactory().getIndexMetadata( indexName ).build();
+	private CompletableFuture<ExistingIndexMetadata> getCurrentIndexMetadata(IndexNames indexNames, boolean allowNull) {
+		ElasticsearchWork<List<ExistingIndexMetadata>> work = getWorkFactory().getIndexMetadata()
+				.index( indexNames.getWrite() )
+				.index( indexNames.getRead() )
+				.build();
 		return execute( work )
 				.exceptionally( Futures.handler( e -> {
 					throw log.elasticsearchIndexMetadataRetrievalFailed(
 							Throwables.expectException( e )
 					);
 				} ) )
-				.thenApply( indexMetadata -> {
-					if ( indexMetadata == null && !allowNull ) {
-						throw log.indexMissing( indexName );
+				.thenApply( list -> {
+					if ( list.isEmpty() ) {
+						if ( allowNull ) {
+							return null;
+						}
+						else {
+							throw log.indexMissing( indexNames.getWrite(), indexNames.getRead() );
+						}
 					}
-					return indexMetadata;
+					if ( list.size() > 1 ) {
+						throw log.elasticsearchIndexNameAndAliasesMatchMultipleIndexes(
+								indexNames.getWrite(), indexNames.getRead(),
+								list.stream().map( ExistingIndexMetadata::getPrimaryName ).collect( Collectors.toSet() )
+						);
+					}
+					return list.get( 0 );
 				} );
 	}
 
@@ -110,17 +132,19 @@ public class ElasticsearchSchemaAccessor {
 				} ) );
 	}
 
-	public CompletableFuture<?> waitForIndexStatus(URLEncodedString indexName, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
+	public CompletableFuture<?> waitForIndexStatus(IndexNames indexNames, ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		IndexStatus requiredIndexStatus = executionOptions.getRequiredStatus();
 		String timeoutAndUnit = executionOptions.getRequiredStatusTimeoutInMs() + "ms";
 
+		URLEncodedString alias = indexNames.getWrite();
+
 		ElasticsearchWork<?> work =
-				getWorkFactory().waitForIndexStatusWork( indexName, requiredIndexStatus, timeoutAndUnit )
+				getWorkFactory().waitForIndexStatusWork( alias, requiredIndexStatus, timeoutAndUnit )
 						.build();
 		return execute( work )
 				.exceptionally( Futures.handler( e -> {
 					throw log.unexpectedIndexStatus(
-							indexName.original, requiredIndexStatus.getElasticsearchString(), timeoutAndUnit,
+							alias, requiredIndexStatus.getElasticsearchString(), timeoutAndUnit,
 							Throwables.expectException( e )
 					);
 				} ) );

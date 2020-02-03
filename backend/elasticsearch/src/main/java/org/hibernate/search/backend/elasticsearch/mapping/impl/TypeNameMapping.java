@@ -10,6 +10,7 @@ import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexSchemaRootContributor;
+import org.hibernate.search.backend.elasticsearch.index.naming.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
 
 /**
@@ -33,10 +34,10 @@ public interface TypeNameMapping {
 	/**
 	 * Register a new index => type mapping.
 	 *
-	 * @param elasticsearchIndexName The name of the index as returned by Elasticsearch.
+	 * @param indexNames The names of the index.
 	 * @param mappedTypeName The name of the type mapped to the index.
 	 */
-	void register(String elasticsearchIndexName, String mappedTypeName);
+	void register(IndexNames indexNames, String mappedTypeName);
 
 	/**
 	 * @return A helper for projections that need to extract the mapped type name from search hits.

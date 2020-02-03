@@ -62,4 +62,6 @@ public interface ElasticsearchTestDialect {
 
 	boolean zonedDateTimeDocValueHasUTCZoneId();
 
+	boolean supportsIsWriteIndex();
+
 }

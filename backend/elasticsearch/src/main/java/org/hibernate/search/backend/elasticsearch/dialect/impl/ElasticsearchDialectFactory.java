@@ -17,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch56ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch60ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch63ProtocolDialect;
+import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch64ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch67ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch70ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.ElasticsearchProtocolDialect;
@@ -85,8 +86,11 @@ public class ElasticsearchDialectFactory {
 			if ( minor < 3 ) {
 				return new Elasticsearch60ProtocolDialect();
 			}
-			if ( minor < 7 ) {
+			if ( minor < 4 ) {
 				return new Elasticsearch63ProtocolDialect();
+			}
+			if ( minor < 7 ) {
+				return new Elasticsearch64ProtocolDialect();
 			}
 			// Either the latest supported version, or a newer/unknown one
 			if ( minor > 8 ) {

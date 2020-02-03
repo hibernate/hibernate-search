@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.mapping;
 
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultAliases;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultPrimaryName;
+
 import org.hibernate.search.backend.elasticsearch.ElasticsearchExtension;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
@@ -44,17 +46,18 @@ public class ElasticsearchFieldTypesIT {
 	@Test
 	public void test() {
 		clientSpy.expectNext(
-				ElasticsearchRequest.get().build(), ElasticsearchRequestAssertionMode.STRICT
+				ElasticsearchRequest.get().build(),
+				ElasticsearchRequestAssertionMode.STRICT
 		);
-
 		clientSpy.expectNext(
-				ElasticsearchRequest.get().pathComponent( URLEncodedString.fromString( INDEX_NAME ) ).build(),
+				ElasticsearchRequest.get()
+						.multiValuedPathComponent( defaultAliases( INDEX_NAME ) )
+						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
-
 		clientSpy.expectNext(
 				ElasticsearchRequest.put()
-						.pathComponent( URLEncodedString.fromString( INDEX_NAME ) )
+						.pathComponent( defaultPrimaryName( INDEX_NAME ) )
 						.body( indexCreationPayload() )
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE

@@ -17,7 +17,8 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.IndexNames;
+import org.hibernate.search.backend.elasticsearch.index.naming.impl.IndexNames;
+import org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManagerBuilder;
 import org.hibernate.search.backend.elasticsearch.index.impl.IndexManagerBackendContext;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -57,6 +58,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	private final ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider;
 	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
 	private final MultiTenancyStrategy multiTenancyStrategy;
+	private final IndexNamingStrategy indexNamingStrategy;
 	private final TypeNameMapping typeNameMapping;
 
 	private final ElasticsearchWorkOrchestratorImplementor queryOrchestrator;
@@ -73,6 +75,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 			Gson userFacingGson,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy,
+			IndexNamingStrategy indexNamingStrategy,
 			TypeNameMapping typeNameMapping,
 			FailureHandler failureHandler) {
 		this.link = link;
@@ -87,6 +90,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.typeFactoryProvider = typeFactoryProvider;
+		this.indexNamingStrategy = indexNamingStrategy;
 		this.typeNameMapping = typeNameMapping;
 
 		this.queryOrchestrator = orchestratorProvider.createParallelOrchestrator( "Elasticsearch query orchestrator for backend " + name );
@@ -95,8 +99,9 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		this.indexManagerBackendContext = new IndexManagerBackendContext(
 				eventContext, link,
 				userFacingGson,
-				typeNameMapping,
 				multiTenancyStrategy,
+				indexNamingStrategy,
+				typeNameMapping,
 				orchestratorProvider,
 				queryOrchestrator
 		);
@@ -170,7 +175,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 		EventContext indexEventContext = EventContexts.fromIndexName( hibernateSearchIndexName );
 
-		IndexNames indexNames = createIndexNames( hibernateSearchIndexName, mappedTypeName );
+		IndexNames indexNames = createIndexNames( indexEventContext, hibernateSearchIndexName, mappedTypeName );
 
 		return new ElasticsearchIndexManagerBuilder(
 				indexManagerBackendContext,
@@ -179,24 +184,25 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		);
 	}
 
-	private IndexNames createIndexNames(String hibernateSearchIndexName, String mappedTypeName) {
-		URLEncodedString primaryName = URLEncodedString.fromString(
-				ElasticsearchIndexNameNormalizer.normalize( hibernateSearchIndexName )
-		);
+	private IndexNames createIndexNames(EventContext indexEventContext, String hibernateSearchIndexName, String mappedTypeName) {
+		URLEncodedString writeAlias = IndexNames.encodeName( indexNamingStrategy.createWriteAlias( hibernateSearchIndexName ) );
+		URLEncodedString readAlias = IndexNames.encodeName( indexNamingStrategy.createReadAlias( hibernateSearchIndexName ) );
 
-		// TODO HSEARCH-3791 allow configuration of each alias
+		if ( writeAlias.equals( readAlias ) ) {
+			throw log.sameWriteAndReadAliases( writeAlias, indexEventContext );
+		}
+
 		IndexNames indexNames = new IndexNames(
 				hibernateSearchIndexName,
-				primaryName,
-				primaryName,
-				primaryName
+				writeAlias,
+				readAlias
 		);
 
 		// This will check that names are unique.
 		indexNamesRegistry.register( indexNames );
 
 		// This will allow the type mapping to resolve the type name from the index name.
-		typeNameMapping.register( indexNames.getPrimary().original, mappedTypeName );
+		typeNameMapping.register( indexNames, mappedTypeName );
 
 		return indexNames;
 	}

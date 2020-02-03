@@ -75,7 +75,7 @@ public interface ElasticsearchWorkBuilderFactory {
 
 	CloseIndexWorkBuilder closeIndex(URLEncodedString indexName);
 
-	GetIndexMetadataWorkBuilder getIndexMetadata(URLEncodedString indexName);
+	GetIndexMetadataWorkBuilder getIndexMetadata();
 
 	PutIndexSettingsWorkBuilder putIndexSettings(URLEncodedString indexName, IndexSettings settings);
 

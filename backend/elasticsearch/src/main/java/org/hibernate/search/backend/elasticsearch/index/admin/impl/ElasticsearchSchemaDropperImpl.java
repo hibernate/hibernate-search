@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.elasticsearch.index.naming.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
 /**
@@ -23,9 +24,21 @@ public class ElasticsearchSchemaDropperImpl implements ElasticsearchSchemaDroppe
 	}
 
 	@Override
-	public CompletableFuture<?> dropIfExisting(URLEncodedString indexName) {
-		// The first call is not actually needed, but do it to avoid cluttering the ES log
-		return schemaAccessor.dropIndexIfExisting( indexName );
+	public CompletableFuture<?> dropIfExisting(IndexNames indexNames) {
+		return schemaAccessor.getCurrentIndexMetadataOrNull( indexNames )
+				.thenCompose( existingIndexMetadata -> {
+					if ( existingIndexMetadata == null ) {
+						// Index does not exist: nothing to do.
+						return CompletableFuture.completedFuture( null );
+					}
+					else {
+						// Index exists: delete.
+						// We need to use the primary name of the index: passing an alias to the drop-index call won't work.
+						return schemaAccessor.dropIndexIfExisting(
+								URLEncodedString.fromString( existingIndexMetadata.getPrimaryName() )
+						);
+					}
+				} );
 	}
 
 }

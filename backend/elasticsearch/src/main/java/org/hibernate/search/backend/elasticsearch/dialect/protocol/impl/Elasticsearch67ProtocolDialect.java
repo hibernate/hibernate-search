@@ -7,6 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.dialect.protocol.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.Elasticsearch64IndexMetadataSyntax;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.ElasticsearchIndexMetadataSyntax;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.Elasticsearch56SearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.Elasticsearch67SearchSyntax;
@@ -18,6 +20,11 @@ import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elas
  * The protocol dialect for Elasticsearch 6.7 and later 6.x.
  */
 public class Elasticsearch67ProtocolDialect implements ElasticsearchProtocolDialect {
+
+	@Override
+	public ElasticsearchIndexMetadataSyntax createIndexMetadataSyntax() {
+		return new Elasticsearch64IndexMetadataSyntax();
+	}
 
 	@Override
 	public ElasticsearchSearchSyntax createSearchSyntax() {

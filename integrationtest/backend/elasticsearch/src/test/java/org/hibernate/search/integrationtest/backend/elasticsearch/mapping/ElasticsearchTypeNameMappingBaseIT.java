@@ -6,13 +6,17 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.mapping;
 
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultReadAlias;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultWriteAlias;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.mappingWithDiscriminatorProperty;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.mappingWithoutAnyProperty;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
+import org.hibernate.search.backend.elasticsearch.index.naming.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
+import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -43,12 +47,10 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	private static final String TYPE2_NAME = "type2_name";
 	private static final String INDEX2_NAME = "index2_name";
 
-	private static final String INDEX_NAME_SUFFIX_WHEN_ALIASES = "_actual";
-
 	private static final String ID_1 = "id_1";
 	private static final String ID_2 = "id_2";
 
-	private enum AliasSupport {
+	private enum IrregularIndexNameSupport {
 		YES,
 		NO
 	}
@@ -56,9 +58,9 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	@Parameterized.Parameters(name = "{0}")
 	public static Object[][] configurations() {
 		return new Object[][] {
-				{ null, mappingWithDiscriminatorProperty( "_entity_type" ), AliasSupport.YES },
-				{ "index-name", mappingWithoutAnyProperty(), AliasSupport.NO },
-				{ "discriminator", mappingWithDiscriminatorProperty( "_entity_type" ), AliasSupport.YES }
+				{ null, mappingWithDiscriminatorProperty( "_entity_type" ), IrregularIndexNameSupport.YES },
+				{ "index-name", mappingWithoutAnyProperty(), IrregularIndexNameSupport.NO },
+				{ "discriminator", mappingWithDiscriminatorProperty( "_entity_type" ), IrregularIndexNameSupport.YES }
 		};
 	}
 
@@ -70,16 +72,16 @@ public class ElasticsearchTypeNameMappingBaseIT {
 
 	private final String strategyName;
 	private final JsonObject expectedMappingContent;
-	private final AliasSupport aliasSupport;
+	private final IrregularIndexNameSupport irregularIndexNameSupport;
 
 	private StubMappingIndexManager index1Manager;
 	private StubMappingIndexManager index2Manager;
 
 	public ElasticsearchTypeNameMappingBaseIT(String strategyName, JsonObject expectedMappingContent,
-			AliasSupport aliasSupport) {
+			IrregularIndexNameSupport irregularIndexNameSupport) {
 		this.strategyName = strategyName;
 		this.expectedMappingContent = expectedMappingContent;
-		this.aliasSupport = aliasSupport;
+		this.irregularIndexNameSupport = irregularIndexNameSupport;
 	}
 
 	@Test
@@ -110,15 +112,15 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	}
 
 	@Test
-	public void alias_singleIndexScope() {
-		createIndexAndAliases();
+	public void irregularIndexName_correctNamingSchemeAndIncorrectUniqueKey_singleIndexScope() {
+		createIndexesWithCorrectNamingSchemeIncorrectUniqueKeyAndCorrectAliases();
 		setup( IndexLifecycleStrategyName.NONE );
 
 		SearchQuery<DocumentReference> query = index1Manager.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		// Should work even if aliases are not supported: the selected type-name mapping strategy is not actually used.
+		// Should work even if the index has an irregular name: the selected type-name mapping strategy is not actually used.
 		SearchResultAssert.assertThat( query )
 				.hasDocRefHitsAnyOrder( c -> c
 						.doc( TYPE1_NAME, ID_1 )
@@ -127,15 +129,15 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	}
 
 	@Test
-	public void alias_multiIndexScope() {
-		createIndexAndAliases();
+	public void irregularIndexName_correctNamingSchemeAndIncorrectUniqueKey_multiIndexScope() {
+		createIndexesWithCorrectNamingSchemeIncorrectUniqueKeyAndCorrectAliases();
 		setup( IndexLifecycleStrategyName.NONE );
 
 		SearchQuery<DocumentReference> query = index1Manager.createScope( index2Manager ).query()
 				.where( f -> f.matchAll() )
 				.toQuery();
 
-		if ( AliasSupport.YES.equals( aliasSupport ) ) {
+		if ( IrregularIndexNameSupport.YES.equals( irregularIndexNameSupport ) ) {
 			SearchResultAssert.assertThat( query )
 					.hasDocRefHitsAnyOrder( c -> c
 							.doc( TYPE1_NAME, ID_1 )
@@ -151,15 +153,76 @@ public class ElasticsearchTypeNameMappingBaseIT {
 		}
 	}
 
-	private void createIndexAndAliases() {
-		String index1ActualName = INDEX1_NAME + INDEX_NAME_SUFFIX_WHEN_ALIASES;
-		elasticsearchClient.index( index1ActualName ).deleteAndCreate();
-		elasticsearchClient.index( index1ActualName ).type().putMapping( expectedMappingContent );
-		elasticsearchClient.index( index1ActualName ).addAlias( INDEX1_NAME );
-		String index2ActualName = INDEX2_NAME + INDEX_NAME_SUFFIX_WHEN_ALIASES;
-		elasticsearchClient.index( index2ActualName ).deleteAndCreate();
-		elasticsearchClient.index( index2ActualName ).type().putMapping( expectedMappingContent );
-		elasticsearchClient.index( index2ActualName ).addAlias( INDEX2_NAME );
+	@Test
+	public void irregularIndexName_incorrectNamingScheme_singleIndexScope() {
+		createIndexesWithIncorrectNamingSchemeAndCorrectAliases();
+		setup( IndexLifecycleStrategyName.NONE );
+
+		SearchQuery<DocumentReference> query = index1Manager.createScope().query()
+				.where( f -> f.matchAll() )
+				.toQuery();
+
+		// Should work even if the index has an irregular name: the selected type-name mapping strategy is not actually used.
+		SearchResultAssert.assertThat( query )
+				.hasDocRefHitsAnyOrder( c -> c
+						.doc( TYPE1_NAME, ID_1 )
+						.doc( TYPE1_NAME, ID_2 )
+				);
+	}
+
+	@Test
+	public void irregularIndexName_incorrectNamingScheme_multiIndexScope() {
+		createIndexesWithIncorrectNamingSchemeAndCorrectAliases();
+		setup( IndexLifecycleStrategyName.NONE );
+
+		SearchQuery<DocumentReference> query = index1Manager.createScope( index2Manager ).query()
+				.where( f -> f.matchAll() )
+				.toQuery();
+
+		if ( IrregularIndexNameSupport.YES.equals( irregularIndexNameSupport ) ) {
+			SearchResultAssert.assertThat( query )
+					.hasDocRefHitsAnyOrder( c -> c
+							.doc( TYPE1_NAME, ID_1 )
+							.doc( TYPE1_NAME, ID_2 )
+							.doc( TYPE2_NAME, ID_1 )
+							.doc( TYPE2_NAME, ID_2 )
+					);
+		}
+		else {
+			SubTest.expectException( () -> query.fetch( 20 ) )
+					.assertThrown()
+					.isInstanceOf( SearchException.class );
+		}
+	}
+
+	private void createIndexesWithCorrectNamingSchemeIncorrectUniqueKeyAndCorrectAliases() {
+		URLEncodedString index1PrimaryName = IndexNames.encodeName( INDEX1_NAME + "-000001-somesuffix-000001" );
+		URLEncodedString index1WriteAlias = defaultWriteAlias( INDEX1_NAME );
+		URLEncodedString index1ReadAlias = defaultReadAlias( INDEX1_NAME );
+		elasticsearchClient.index( index1PrimaryName, index1WriteAlias, index1ReadAlias )
+				.deleteAndCreate()
+				.type().putMapping( expectedMappingContent );
+		URLEncodedString index2PrimaryName = IndexNames.encodeName( INDEX2_NAME + "-000001-somesuffix-000001" );
+		URLEncodedString index2WriteAlias = defaultWriteAlias( INDEX2_NAME );
+		URLEncodedString index2ReadAlias = defaultReadAlias( INDEX2_NAME );
+		elasticsearchClient.index( index2PrimaryName, index2WriteAlias, index2ReadAlias )
+				.deleteAndCreate()
+				.type().putMapping( expectedMappingContent );
+	}
+
+	private void createIndexesWithIncorrectNamingSchemeAndCorrectAliases() {
+		URLEncodedString index1PrimaryName = IndexNames.encodeName( INDEX1_NAME + "-somesuffix" );
+		URLEncodedString index1WriteAlias = defaultWriteAlias( INDEX1_NAME );
+		URLEncodedString index1ReadAlias = defaultReadAlias( INDEX1_NAME );
+		elasticsearchClient.index( index1PrimaryName, index1WriteAlias, index1ReadAlias )
+				.deleteAndCreate()
+				.type().putMapping( expectedMappingContent );
+		URLEncodedString index2PrimaryName = IndexNames.encodeName( INDEX2_NAME + "-somesuffix" );
+		URLEncodedString index2WriteAlias = defaultWriteAlias( INDEX2_NAME );
+		URLEncodedString index2ReadAlias = defaultReadAlias( INDEX2_NAME );
+		elasticsearchClient.index( index2PrimaryName, index2WriteAlias, index2ReadAlias )
+				.deleteAndCreate()
+				.type().putMapping( expectedMappingContent );
 	}
 
 	private void setup(IndexLifecycleStrategyName lifecycleStrategy) {

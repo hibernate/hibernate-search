@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
+import org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.LowLevelIndexMetadataBuilder;
@@ -46,20 +47,23 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	private final ElasticsearchLink link;
 	private final Gson userFacingGson;
 	private final MultiTenancyStrategy multiTenancyStrategy;
+	private final IndexNamingStrategy indexNamingStrategy;
 	private final ElasticsearchWorkOrchestratorProvider orchestratorProvider;
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 
 	private final SearchProjectionBackendContext searchProjectionBackendContext;
 
 	public IndexManagerBackendContext(EventContext eventContext, ElasticsearchLink link, Gson userFacingGson,
-			TypeNameMapping typeNameMapping,
 			MultiTenancyStrategy multiTenancyStrategy,
+			IndexNamingStrategy indexNamingStrategy,
+			TypeNameMapping typeNameMapping,
 			ElasticsearchWorkOrchestratorProvider orchestratorProvider,
 			ElasticsearchWorkOrchestrator queryOrchestrator) {
 		this.eventContext = eventContext;
 		this.link = link;
 		this.userFacingGson = userFacingGson;
 		this.multiTenancyStrategy = multiTenancyStrategy;
+		this.indexNamingStrategy = indexNamingStrategy;
 		this.orchestratorProvider = orchestratorProvider;
 		this.queryOrchestrator = queryOrchestrator;
 
@@ -148,12 +152,15 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	}
 
 	ElasticsearchIndexAdministrationClient createAdministrationClient(ElasticsearchIndexModel model) {
-		LowLevelIndexMetadataBuilder builder = new LowLevelIndexMetadataBuilder( model.getNames() );
+		LowLevelIndexMetadataBuilder builder = new LowLevelIndexMetadataBuilder(
+				link.getIndexMetadataSyntax(),
+				model.getNames()
+		);
 		model.contributeLowLevelMetadata( builder );
 		IndexMetadata expectedMetadata = builder.build();
 		return new ElasticsearchIndexAdministrationClient(
 				link.getWorkBuilderFactory(), orchestratorProvider.getRootParallelOrchestrator(),
-				expectedMetadata
+				indexNamingStrategy, model.getNames(), expectedMetadata
 		);
 	}
 
