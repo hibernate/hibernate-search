@@ -14,6 +14,9 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.Gson;
 
+/**
+ * The index field type factory provider for ES7.x.
+ */
 public class Elasticsearch7IndexFieldTypeFactoryProvider
 		implements ElasticsearchIndexFieldTypeFactoryProvider {
 

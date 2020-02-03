@@ -14,14 +14,17 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.Gson;
 
-public class Elasticsearch6IndexFieldTypeFactoryProvider
+/**
+ * The index field type factory provider for ES5.6 and 6.x.
+ */
+public class Elasticsearch56IndexFieldTypeFactoryProvider
 		implements ElasticsearchIndexFieldTypeFactoryProvider {
 
 	private final Gson userFacingGson;
 	private final Elasticsearch6DefaultFieldFormatProvider defaultFieldFormatProvider =
 			new Elasticsearch6DefaultFieldFormatProvider();
 
-	public Elasticsearch6IndexFieldTypeFactoryProvider(Gson userFacingGson) {
+	public Elasticsearch56IndexFieldTypeFactoryProvider(Gson userFacingGson) {
 		this.userFacingGson = userFacingGson;
 	}
 

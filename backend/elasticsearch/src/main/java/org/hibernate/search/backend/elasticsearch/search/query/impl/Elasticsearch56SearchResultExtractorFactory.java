@@ -13,13 +13,16 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.Elastic
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 
-public class Elasticsearch6SearchResultExtractorFactory implements ElasticsearchSearchResultExtractorFactory {
+/**
+ * @see Elasticsearch56SearchResultExtractor
+ */
+public class Elasticsearch56SearchResultExtractorFactory implements ElasticsearchSearchResultExtractorFactory {
 	@Override
 	public <H> ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> createResultExtractor(
 			ElasticsearchSearchQueryRequestContext requestContext,
 			ElasticsearchSearchProjection<?, H> rootProjection,
 			Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations) {
-		return new Elasticsearch6SearchResultExtractor<>(
+		return new Elasticsearch56SearchResultExtractor<>(
 				requestContext,
 				rootProjection, aggregations
 		);

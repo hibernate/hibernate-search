@@ -6,7 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl;
 
-public class Elasticsearch56SearchSyntax extends Elasticsearch63SearchSyntax {
+/**
+ * The search syntax for ES5.6 to 6.2.
+ */
+public class Elasticsearch56SearchSyntax extends Elasticsearch60SearchSyntax {
 
 	@Override
 	public String getTermAggregationOrderByTermToken() {

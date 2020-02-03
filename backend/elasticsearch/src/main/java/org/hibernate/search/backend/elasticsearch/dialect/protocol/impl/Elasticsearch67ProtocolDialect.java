@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.dialect.protocol.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.search.query.impl.Elasticsearch6SearchResultExtractorFactory;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.Elasticsearch56SearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.Elasticsearch67SearchSyntax;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
@@ -17,8 +17,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elas
 /**
  * The protocol dialect for Elasticsearch 6.7 and later 6.x.
  */
-public class Elasticsearch67ProtocolDialect extends Elasticsearch70ProtocolDialect
-		implements ElasticsearchProtocolDialect {
+public class Elasticsearch67ProtocolDialect implements ElasticsearchProtocolDialect {
 
 	@Override
 	public ElasticsearchSearchSyntax createSearchSyntax() {
@@ -27,13 +26,11 @@ public class Elasticsearch67ProtocolDialect extends Elasticsearch70ProtocolDiale
 
 	@Override
 	public ElasticsearchWorkBuilderFactory createWorkBuilderFactory(GsonProvider gsonProvider) {
-		// Necessary because of the breaking changes related to type names in ES7
 		return new Elasticsearch67WorkBuilderFactory( gsonProvider );
 	}
 
 	@Override
 	public ElasticsearchSearchResultExtractorFactory createSearchResultExtractorFactory() {
-		// Necessary because the total hit count is formatted differently in ES7
-		return new Elasticsearch6SearchResultExtractorFactory();
+		return new Elasticsearch56SearchResultExtractorFactory();
 	}
 }

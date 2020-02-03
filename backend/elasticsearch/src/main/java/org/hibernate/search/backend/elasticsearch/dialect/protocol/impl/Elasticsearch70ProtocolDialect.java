@@ -22,11 +22,6 @@ import com.google.gson.GsonBuilder;
 public class Elasticsearch70ProtocolDialect implements ElasticsearchProtocolDialect {
 
 	@Override
-	public GsonBuilder createGsonBuilderBase() {
-		return new GsonBuilder();
-	}
-
-	@Override
 	public ElasticsearchSearchSyntax createSearchSyntax() {
 		return new Elasticsearch7SearchSyntax();
 	}

@@ -6,11 +6,19 @@
  */
 package org.hibernate.search.backend.elasticsearch.dialect.model.impl;
 
+import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.Elasticsearch56IndexFieldTypeFactoryProvider;
+import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
+
+import com.google.gson.Gson;
+
 /**
  * The model dialect for Elasticsearch 5.6.
  */
-public class Elasticsearch56ModelDialect extends Elasticsearch6ModelDialect implements ElasticsearchModelDialect {
+public class Elasticsearch56ModelDialect implements ElasticsearchModelDialect {
 
-	// Nothing specific so far. This may change if we add new features that work better in later versions.
+	@Override
+	public ElasticsearchIndexFieldTypeFactoryProvider createIndexTypeFieldFactoryProvider(Gson userFacingGson) {
+		return new Elasticsearch56IndexFieldTypeFactoryProvider( userFacingGson );
+	}
 
 }
