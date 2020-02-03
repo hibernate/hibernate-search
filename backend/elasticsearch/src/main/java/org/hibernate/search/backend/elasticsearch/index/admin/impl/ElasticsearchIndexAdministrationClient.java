@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.index.naming.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy;
+import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchEventContexts;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -83,7 +84,10 @@ public class ElasticsearchIndexAdministrationClient {
 			ContextualFailureCollector failureCollector) {
 		return schemaAccessor.getCurrentIndexMetadata( indexNames )
 				.thenAccept( actualIndexMetadata ->
-						schemaValidator.validate( expectedMetadata, actualIndexMetadata.getMetadata(), failureCollector )
+						schemaValidator.validate(
+								expectedMetadata, actualIndexMetadata.getMetadata(),
+								failureCollector.withContext( ElasticsearchEventContexts.getSchemaValidation() )
+						)
 				)
 				.thenCompose( ignored -> failureCollector.hasFailure()
 						? CompletableFuture.completedFuture( null )

@@ -6,14 +6,17 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
+import org.hibernate.search.backend.elasticsearch.validation.impl.ElasticsearchValidationMessages;
+import org.hibernate.search.backend.elasticsearch.validation.impl.IndexAliasDefinitionValidator;
 import org.hibernate.search.backend.elasticsearch.validation.impl.IndexSettingsValidator;
 import org.hibernate.search.backend.elasticsearch.validation.impl.RootTypeMappingValidator;
+import org.hibernate.search.backend.elasticsearch.validation.impl.ValidationContextType;
 import org.hibernate.search.backend.elasticsearch.validation.impl.ValidationErrorCollector;
 import org.hibernate.search.backend.elasticsearch.validation.impl.Validator;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
-import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchEventContexts;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 
 /**
@@ -25,14 +28,19 @@ import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
  */
 public class ElasticsearchSchemaValidatorImpl implements ElasticsearchSchemaValidator {
 
+	private final Validator<IndexAliasDefinition> aliasDefinitionValidator = new IndexAliasDefinitionValidator();
 	private final Validator<IndexSettings> indexSettingsValidator = new IndexSettingsValidator();
 	private final Validator<RootTypeMapping> rootTypeMappingValidator = new RootTypeMappingValidator();
 
 	@Override
 	public void validate(IndexMetadata expectedIndexMetadata, IndexMetadata actualIndexMetadata,
 			ContextualFailureCollector contextualFailureCollector) {
-		ValidationErrorCollector errorCollector = new ValidationErrorCollector(
-				contextualFailureCollector.withContext( ElasticsearchEventContexts.getSchemaValidation() )
+		ValidationErrorCollector errorCollector = new ValidationErrorCollector( contextualFailureCollector );
+
+		aliasDefinitionValidator.validateAllIgnoreUnexpected(
+				errorCollector, ValidationContextType.ALIAS,
+				ElasticsearchValidationMessages.INSTANCE.aliasMissing(),
+				expectedIndexMetadata.getAliases(), actualIndexMetadata.getAliases()
 		);
 
 		validateSettings( errorCollector, expectedIndexMetadata, actualIndexMetadata );
