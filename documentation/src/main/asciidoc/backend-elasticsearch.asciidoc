@@ -265,6 +265,67 @@ Elasticsearch disables sharding by default.
 To enable it,
 link:{elasticsearchDocUrl}/index-modules.html#_static_index_settings[set the property `index.number_of_shards` in your cluster].
 
+[[backend-elasticsearch-indexlayout]]
+== Index layout
+
+Hibernate Search works with link:{elasticsearchDocUrl}/indices-aliases.html[aliased] indexes.
+This means an index with a given name in Hibernate Search will not directly be mapped
+to an index with the same name in Elasticsearch.
+
+By default, for an index whose name in Hibernate Search is `myIndex`:
+
+* Write operations (indexing, purge, ...) will target the alias `myindex-write`.
+* Read operations (searching, explaining, ...) will target the alias `myindex-read`.
+* If Hibernate Search <<backend-elasticsearch-index-lifecycle,creates the index automatically>>,
+it will name the index `myindex-000001` and will automatically create the write and read aliases.
+
+[TIP]
+====
+This layout is a bit more complex than it could be, but it follows the best practices.
+
+Using aliases has a significant advantage over directly targeting the index:
+it makes full reindexing on a live application possible.
+With aliases, you just need to direct the read alias (used by search queries) to an old copy of the index,
+while the write alias (used by document writes) is redirected to a new copy of the index.
+
+This "zero-downtime" reindexing,
+which shares some characteristics with link:https://martinfowler.com/bliki/BlueGreenDeployment.html["blue/green" deployment],
+is not currently provided by Hibernate Search itself.
+However, you can implement it in your application
+by directly issuing commands to Elasticsearch's REST APIs.
+The basic sequence of actions is the following:
+
+1. Create a new index, `myindex-000002`.
+2. Switch the write alias, `myindex-write`, from `myindex-000001` to `myindex-000002`.
+3. Reindex, for example using the <<mapper-orm-indexing-massindexer,mass indexer>>.
+4. Switch the read alias, `myindex-read`, from `myindex-000001` to `myindex-000002`.
+5. Delete `myindex-000001`.
+====
+
+If the default names and aliases used by Hibernate Search do not match your needs,
+you can define a custom layout in two simple steps:
+
+1. Define a class that implements the interface `org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy`.
+2. Configure the backend to use that implementation by setting the configuration property
+`hibernate.search.backends.<backend name>.layout.strategy`
+to a <<configuration-property-types,bean reference>> pointing to the implementation.
+
+For example, the implementation below will lead to the following layout for an index named `myIndex`:
+
+* Write operations (indexing, purge, ...) will target the alias `myindex-write`.
+* Read operations (searching, explaining, ...) will target the alias `myindex` (no suffix).
+* If Hibernate Search <<backend-elasticsearch-index-lifecycle,creates the index automatically>>
+at exactly 19:19:00 on November 6th, 2017,
+it will name the index `myindex-20201106-191900-000000000`.
+
+.Implementing a custom index layout strategy with the Elasticsearch backend
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/backend/elasticsearch/layout/CustomLayoutStrategy.java[tags=include]
+----
+====
+
 [[backend-elasticsearch-schema]]
 == Schema ("mapping")
 
@@ -492,12 +553,11 @@ Pros:
 
 Cons:
 
-* Does not work when targeting multiple indexes and those indexes rely on link:{elasticsearchDocUrl}/indices-add-alias.html[index aliases],
-because in that case the `_index` meta-field contains the actual index name, not the alias,
-and the actual index name is unknown to Hibernate Search.
-+
-Works correctly when targeting a _single_ index, even if it relies on index aliases
-because in that case the type name can be deduced through other means.
+* Relies on the actual index name, not aliases,
+because the `_index` meta-field returned by Elasticsearch
+contains the actual index name (e.g. `myindex-000001`), not the alias (e.g. `myindex-read`).
+If indexes do not follow the default naming scheme `<hibernateSearchIndexName>-<6 digits>`,
+a custom <<backend-elasticsearch-indexlayout,index layout>> must be configured.
 
 [[backend-elasticsearch-multi-tenancy]]
 === Multi-tenancy
