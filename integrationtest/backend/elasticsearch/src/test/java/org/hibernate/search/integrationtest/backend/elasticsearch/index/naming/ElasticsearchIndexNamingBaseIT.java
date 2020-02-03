@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.elasticsearch.index.naming;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy;
+import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
@@ -117,11 +117,11 @@ public class ElasticsearchIndexNamingBaseIT {
 				);
 	}
 
-	private void setup(IndexNamingStrategy strategy) {
+	private void setup(IndexLayoutStrategy strategy) {
 		setupHelper.start( BACKEND_NAME )
 				.withBackendProperty(
 						BACKEND_NAME,
-						ElasticsearchBackendSettings.NAMING_STRATEGY,
+						ElasticsearchBackendSettings.LAYOUT_STRATEGY,
 						strategy
 				)
 				.withIndex( INDEX1_NAME, ctx -> { } )
@@ -129,9 +129,9 @@ public class ElasticsearchIndexNamingBaseIT {
 				.setup();
 	}
 
-	private static IndexNamingStrategy hardcodedStrategy(String index1WriteAlias, String index1ReadAlias,
+	private static IndexLayoutStrategy hardcodedStrategy(String index1WriteAlias, String index1ReadAlias,
 			String index2WriteAlias, String index2ReadAlias) {
-		return new IndexNamingStrategy() {
+		return new IndexLayoutStrategy() {
 			@Override
 			public String createInitialElasticsearchIndexName(String hibernateSearchIndexName) {
 				return hibernateSearchIndexName + "-actual";

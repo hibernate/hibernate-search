@@ -14,8 +14,8 @@ import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysis
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl.ElasticsearchAnalysisConfigurationContextImpl;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
-import org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy;
-import org.hibernate.search.backend.elasticsearch.index.naming.impl.DefaultIndexNamingStrategy;
+import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
+import org.hibernate.search.backend.elasticsearch.index.layout.impl.DefaultIndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.DiscriminatorTypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.IndexNameTypeNameMapping;
@@ -88,10 +88,10 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.withDefault( ElasticsearchBackendSettings.Defaults.MAPPING_TYPE_NAME_STRATEGY )
 					.build();
 
-	private static final ConfigurationProperty<BeanReference<? extends IndexNamingStrategy>> NAMING_STRATEGY =
-			ConfigurationProperty.forKey( ElasticsearchBackendSettings.NAMING_STRATEGY )
-					.asBeanReference( IndexNamingStrategy.class )
-					.withDefault( BeanReference.of( DefaultIndexNamingStrategy.class ) )
+	private static final ConfigurationProperty<BeanReference<? extends IndexLayoutStrategy>> LAYOUT_STRATEGY =
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.LAYOUT_STRATEGY )
+					.asBeanReference( IndexLayoutStrategy.class )
+					.withDefault( BeanReference.of( DefaultIndexLayoutStrategy.class ) )
 					.build();
 
 	@Override
@@ -108,7 +108,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 		BeanResolver beanResolver = buildContext.getBeanResolver();
 		BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder = null;
-		BeanHolder<? extends IndexNamingStrategy> indexNamingStrategyHolder = null;
+		BeanHolder<? extends IndexLayoutStrategy> indexLayoutStrategyHolder = null;
 		ElasticsearchLinkImpl link = null;
 		try {
 			clientFactoryHolder = CLIENT_FACTORY.getAndTransform( propertySource, beanResolver::resolve );
@@ -141,7 +141,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry =
 					getAnalysisDefinitionRegistry( buildContext, propertySource );
 
-			indexNamingStrategyHolder = createIndexNamingStrategy( buildContext, propertySource );
+			indexLayoutStrategyHolder = createIndexLayoutStrategy( buildContext, propertySource );
 
 			return new ElasticsearchBackendImpl(
 					name,
@@ -151,15 +151,15 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					userFacingGson,
 					analysisDefinitionRegistry,
 					getMultiTenancyStrategy( name, propertySource ),
-					indexNamingStrategyHolder,
-					createTypeNameMapping( name, propertySource, indexNamingStrategyHolder.get() ),
+					indexLayoutStrategyHolder,
+					createTypeNameMapping( name, propertySource, indexLayoutStrategyHolder.get() ),
 					buildContext.getFailureHandler()
 			);
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
 					.push( BeanHolder::close, clientFactoryHolder )
-					.push( BeanHolder::close, indexNamingStrategyHolder )
+					.push( BeanHolder::close, indexLayoutStrategyHolder )
 					.push( ElasticsearchLinkImpl::onStop, link );
 			throw e;
 		}
@@ -181,19 +181,19 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		}
 	}
 
-	private BeanHolder<? extends IndexNamingStrategy> createIndexNamingStrategy(BackendBuildContext buildContext,
+	private BeanHolder<? extends IndexLayoutStrategy> createIndexLayoutStrategy(BackendBuildContext buildContext,
 			ConfigurationPropertySource propertySource) {
 		final BeanResolver beanResolver = buildContext.getBeanResolver();
-		return NAMING_STRATEGY.get( propertySource ).resolve( beanResolver );
+		return LAYOUT_STRATEGY.get( propertySource ).resolve( beanResolver );
 	}
 
 	private TypeNameMapping createTypeNameMapping(String backendName, ConfigurationPropertySource propertySource,
-			IndexNamingStrategy indexNamingStrategy) {
+			IndexLayoutStrategy indexLayoutStrategy) {
 		TypeNameMappingStrategyName strategyName = MAPPING_TYPE_STRATEGY.get( propertySource );
 
 		switch ( strategyName ) {
 			case INDEX_NAME:
-				return new IndexNameTypeNameMapping( indexNamingStrategy );
+				return new IndexNameTypeNameMapping( indexLayoutStrategy );
 			case DISCRIMINATOR:
 				return new DiscriminatorTypeNameMapping();
 			default:

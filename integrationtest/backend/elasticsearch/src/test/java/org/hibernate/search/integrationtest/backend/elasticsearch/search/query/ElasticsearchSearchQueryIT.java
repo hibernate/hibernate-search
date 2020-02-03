@@ -13,13 +13,13 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettin
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy;
+import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.StubSingleIndexNamingStrategy;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.StubSingleIndexLayoutStrategy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -45,11 +45,11 @@ public class ElasticsearchSearchQueryIT {
 	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "indexname";
 
-	@Parameterized.Parameters(name = "IndexNamingStrategy = {0}")
+	@Parameterized.Parameters(name = "IndexLayoutStrategy = {0}")
 	public static Object[][] configurations() {
 		return new Object[][] {
 				{ null, defaultReadAlias( INDEX_NAME ) },
-				{ new StubSingleIndexNamingStrategy( "custom-write", "custom-read" ), encodeName( "custom-read" ) }
+				{ new StubSingleIndexLayoutStrategy( "custom-write", "custom-read" ), encodeName( "custom-read" ) }
 		};
 	}
 
@@ -62,13 +62,13 @@ public class ElasticsearchSearchQueryIT {
 	@Rule
 	public ExpectedException thrown = ExpectedException.none();
 
-	private final IndexNamingStrategy namingStrategy;
+	private final IndexLayoutStrategy layoutStrategy;
 	private final URLEncodedString readAlias;
 
 	private StubMappingIndexManager indexManager;
 
-	public ElasticsearchSearchQueryIT(IndexNamingStrategy namingStrategy, URLEncodedString readAlias) {
-		this.namingStrategy = namingStrategy;
+	public ElasticsearchSearchQueryIT(IndexLayoutStrategy layoutStrategy, URLEncodedString readAlias) {
+		this.layoutStrategy = layoutStrategy;
 		this.readAlias = readAlias;
 	}
 
@@ -79,7 +79,7 @@ public class ElasticsearchSearchQueryIT {
 						BACKEND_NAME, ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.getFactory()
 				)
 				.withBackendProperty(
-						BACKEND_NAME, ElasticsearchBackendSettings.NAMING_STRATEGY, namingStrategy
+						BACKEND_NAME, ElasticsearchBackendSettings.LAYOUT_STRATEGY, layoutStrategy
 				)
 				.withIndex(
 						INDEX_NAME,

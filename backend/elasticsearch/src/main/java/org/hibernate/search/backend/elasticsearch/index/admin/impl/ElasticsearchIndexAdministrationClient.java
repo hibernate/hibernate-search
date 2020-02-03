@@ -8,8 +8,8 @@ package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.index.naming.impl.IndexNames;
-import org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy;
+import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
+import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchEventContexts;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
@@ -36,11 +36,11 @@ public class ElasticsearchIndexAdministrationClient {
 
 	public ElasticsearchIndexAdministrationClient(ElasticsearchWorkBuilderFactory workBuilderFactory,
 			ElasticsearchWorkOrchestrator workOrchestrator,
-			IndexNamingStrategy indexNamingStrategy,
+			IndexLayoutStrategy indexLayoutStrategy,
 			IndexNames indexNames, IndexMetadata expectedMetadata) {
 		this.schemaAccessor = new ElasticsearchSchemaAccessor( workBuilderFactory, workOrchestrator );
 
-		this.schemaCreator = new ElasticsearchSchemaCreatorImpl( schemaAccessor, indexNamingStrategy );
+		this.schemaCreator = new ElasticsearchSchemaCreatorImpl( schemaAccessor, indexLayoutStrategy );
 		this.schemaDropper = new ElasticsearchSchemaDropperImpl( schemaAccessor );
 		this.schemaValidator = new ElasticsearchSchemaValidatorImpl();
 		this.schemaMigrator = new ElasticsearchSchemaMigratorImpl( schemaAccessor, schemaValidator );

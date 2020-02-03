@@ -17,8 +17,8 @@ import org.hibernate.search.backend.elasticsearch.analysis.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
-import org.hibernate.search.backend.elasticsearch.index.naming.impl.IndexNames;
-import org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy;
+import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
+import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManagerBuilder;
 import org.hibernate.search.backend.elasticsearch.index.impl.IndexManagerBackendContext;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -59,7 +59,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	private final ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider;
 	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
 	private final MultiTenancyStrategy multiTenancyStrategy;
-	private final BeanHolder<? extends IndexNamingStrategy> indexNamingStrategyHolder;
+	private final BeanHolder<? extends IndexLayoutStrategy> indexLayoutStrategyHolder;
 	private final TypeNameMapping typeNameMapping;
 
 	private final ElasticsearchWorkOrchestratorImplementor queryOrchestrator;
@@ -76,7 +76,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 			Gson userFacingGson,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy,
-			BeanHolder<? extends IndexNamingStrategy> indexNamingStrategyHolder,
+			BeanHolder<? extends IndexLayoutStrategy> indexLayoutStrategyHolder,
 			TypeNameMapping typeNameMapping,
 			FailureHandler failureHandler) {
 		this.link = link;
@@ -91,7 +91,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.typeFactoryProvider = typeFactoryProvider;
-		this.indexNamingStrategyHolder = indexNamingStrategyHolder;
+		this.indexLayoutStrategyHolder = indexLayoutStrategyHolder;
 		this.typeNameMapping = typeNameMapping;
 
 		this.queryOrchestrator = orchestratorProvider.createParallelOrchestrator( "Elasticsearch query orchestrator for backend " + name );
@@ -101,7 +101,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 				eventContext, link,
 				userFacingGson,
 				multiTenancyStrategy,
-				indexNamingStrategyHolder.get(),
+				indexLayoutStrategyHolder.get(),
 				typeNameMapping,
 				orchestratorProvider,
 				queryOrchestrator
@@ -140,7 +140,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 			closer.push( ElasticsearchWorkOrchestratorProvider::stop, orchestratorProvider );
 			// Close the client after the orchestrators, when we're sure all works have been performed
 			closer.push( ElasticsearchLinkImpl::onStop, link );
-			closer.push( BeanHolder::close, indexNamingStrategyHolder );
+			closer.push( BeanHolder::close, indexLayoutStrategyHolder );
 		}
 		catch (IOException | RuntimeException e) {
 			throw log.failedToShutdownBackend( e, eventContext );
@@ -187,9 +187,9 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	}
 
 	private IndexNames createIndexNames(EventContext indexEventContext, String hibernateSearchIndexName, String mappedTypeName) {
-		IndexNamingStrategy indexNamingStrategy = indexNamingStrategyHolder.get();
-		URLEncodedString writeAlias = IndexNames.encodeName( indexNamingStrategy.createWriteAlias( hibernateSearchIndexName ) );
-		URLEncodedString readAlias = IndexNames.encodeName( indexNamingStrategy.createReadAlias( hibernateSearchIndexName ) );
+		IndexLayoutStrategy indexLayoutStrategy = indexLayoutStrategyHolder.get();
+		URLEncodedString writeAlias = IndexNames.encodeName( indexLayoutStrategy.createWriteAlias( hibernateSearchIndexName ) );
+		URLEncodedString readAlias = IndexNames.encodeName( indexLayoutStrategy.createReadAlias( hibernateSearchIndexName ) );
 
 		if ( writeAlias.equals( readAlias ) ) {
 			throw log.sameWriteAndReadAliases( writeAlias, indexEventContext );

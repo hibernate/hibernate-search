@@ -4,15 +4,16 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.index.naming;
+package org.hibernate.search.backend.elasticsearch.index.layout;
 
 import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
 
 /**
- * Defines the aliases to assign to Elasticsearch indexes,
+ * Defines the layout of indexes on the Elasticsearch side:
+ * the name of aliases to assign to Elasticsearch indexes,
  * as well as the structure of non-alias names.
  */
-public interface IndexNamingStrategy {
+public interface IndexLayoutStrategy {
 
 	/**
 	 * Generates an initial non-alias Elasticsearch name for an index.

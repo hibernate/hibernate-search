@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
-import org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy;
+import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.LowLevelIndexMetadataBuilder;
@@ -47,7 +47,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	private final ElasticsearchLink link;
 	private final Gson userFacingGson;
 	private final MultiTenancyStrategy multiTenancyStrategy;
-	private final IndexNamingStrategy indexNamingStrategy;
+	private final IndexLayoutStrategy indexLayoutStrategy;
 	private final ElasticsearchWorkOrchestratorProvider orchestratorProvider;
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
 
@@ -55,7 +55,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 
 	public IndexManagerBackendContext(EventContext eventContext, ElasticsearchLink link, Gson userFacingGson,
 			MultiTenancyStrategy multiTenancyStrategy,
-			IndexNamingStrategy indexNamingStrategy,
+			IndexLayoutStrategy indexLayoutStrategy,
 			TypeNameMapping typeNameMapping,
 			ElasticsearchWorkOrchestratorProvider orchestratorProvider,
 			ElasticsearchWorkOrchestrator queryOrchestrator) {
@@ -63,7 +63,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		this.link = link;
 		this.userFacingGson = userFacingGson;
 		this.multiTenancyStrategy = multiTenancyStrategy;
-		this.indexNamingStrategy = indexNamingStrategy;
+		this.indexLayoutStrategy = indexLayoutStrategy;
 		this.orchestratorProvider = orchestratorProvider;
 		this.queryOrchestrator = queryOrchestrator;
 
@@ -160,7 +160,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		IndexMetadata expectedMetadata = builder.build();
 		return new ElasticsearchIndexAdministrationClient(
 				link.getWorkBuilderFactory(), orchestratorProvider.getRootParallelOrchestrator(),
-				indexNamingStrategy, model.getNames(), expectedMetadata
+				indexLayoutStrategy, model.getNames(), expectedMetadata
 		);
 	}
 

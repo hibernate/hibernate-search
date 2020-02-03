@@ -4,18 +4,18 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.index.naming.impl;
+package org.hibernate.search.backend.elasticsearch.index.layout.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy;
+import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
- * The default naming strategy for indexes:
+ * The default layout strategy for indexes:
  * <ul>
  *     <li>Elasticsearch index names follow the format used by Elasticsearch's Rollover API: {@code <hsearchname>-<6 digits>}.
  *     See {@code <target-index>} here:
@@ -25,7 +25,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  *     <li>The read alias is {@code <hsearchname>-read}.
  * </ul>
  */
-public final class DefaultIndexNamingStrategy implements IndexNamingStrategy {
+public final class DefaultIndexLayoutStrategy implements IndexLayoutStrategy {
 
 	static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
