@@ -110,12 +110,12 @@ public class ElasticsearchTermsAggregation<F, K>
 
 		@Override
 		public void orderByTermAscending() {
-			order( searchContext.getJsonSyntaxHelper().getTermAggregationOrderByTermToken(), "asc" );
+			order( searchContext.getSearchSyntax().getTermAggregationOrderByTermToken(), "asc" );
 		}
 
 		@Override
 		public void orderByTermDescending() {
-			order( searchContext.getJsonSyntaxHelper().getTermAggregationOrderByTermToken(), "desc" );
+			order( searchContext.getSearchSyntax().getTermAggregationOrderByTermToken(), "desc" );
 		}
 
 		@Override

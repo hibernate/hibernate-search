@@ -11,7 +11,7 @@ import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
-import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchJsonSyntaxHelper;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.types.converter.runtime.ToDocumentFieldValueConvertContext;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
@@ -29,20 +29,20 @@ public final class ElasticsearchSearchContext {
 
 	// Backend context
 	private final Gson userFacingGson;
-	private final ElasticsearchJsonSyntaxHelper jsonSyntaxHelper;
+	private final ElasticsearchSearchSyntax searchSyntax;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	// Targeted indexes
 	private final ElasticsearchScopeModel scopeModel;
 
 	public ElasticsearchSearchContext(BackendMappingContext mappingContext,
-			Gson userFacingGson, ElasticsearchJsonSyntaxHelper jsonSyntaxHelper,
+			Gson userFacingGson, ElasticsearchSearchSyntax searchSyntax,
 			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchScopeModel scopeModel) {
 		this.toDocumentIdentifierValueConvertContext = new ToDocumentIdentifierValueConvertContextImpl( mappingContext );
 		this.toDocumentFieldValueConvertContext = new ToDocumentFieldValueConvertContextImpl( mappingContext );
 		this.userFacingGson = userFacingGson;
-		this.jsonSyntaxHelper = jsonSyntaxHelper;
+		this.searchSyntax = searchSyntax;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.scopeModel = scopeModel;
 	}
@@ -59,8 +59,8 @@ public final class ElasticsearchSearchContext {
 		return userFacingGson;
 	}
 
-	public ElasticsearchJsonSyntaxHelper getJsonSyntaxHelper() {
-		return jsonSyntaxHelper;
+	public ElasticsearchSearchSyntax getSearchSyntax() {
+		return searchSyntax;
 	}
 
 	public String toElasticsearchId(String tenantId, String id) {

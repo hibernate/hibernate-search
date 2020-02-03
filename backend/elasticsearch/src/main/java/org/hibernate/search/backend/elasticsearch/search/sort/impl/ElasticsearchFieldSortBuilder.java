@@ -49,7 +49,7 @@ public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearc
 			String absoluteFieldPath, List<String> nestedPathHierarchy,
 			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchFieldCodec<F> codec) {
-		super( nestedPathHierarchy, searchContext.getJsonSyntaxHelper() );
+		super( nestedPathHierarchy, searchContext.getSearchSyntax() );
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;

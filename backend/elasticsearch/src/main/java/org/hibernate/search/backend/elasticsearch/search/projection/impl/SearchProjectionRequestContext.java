@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.projection.impl;
 
-import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchJsonSyntaxHelper;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 public interface SearchProjectionRequestContext {
 
 	Integer getDistanceSortIndex(String absoluteFieldPath, GeoPoint location);
 
-	ElasticsearchJsonSyntaxHelper getJsonSyntaxHelper();
+	ElasticsearchSearchSyntax getSearchSyntax();
 
 }

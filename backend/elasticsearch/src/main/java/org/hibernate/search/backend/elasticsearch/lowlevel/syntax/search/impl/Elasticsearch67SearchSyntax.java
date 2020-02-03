@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.util.impl;
+package org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
@@ -13,7 +13,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-public class Elasticsearch67JsonSyntaxHelper extends Elasticsearch7JsonSyntaxHelper {
+public class Elasticsearch67SearchSyntax extends Elasticsearch7SearchSyntax {
 
 	private static final JsonArrayAccessor DOCVALUE_FIELDS_ACCESSOR =
 			JsonAccessor.root().property( "docvalue_fields" ).asArray();

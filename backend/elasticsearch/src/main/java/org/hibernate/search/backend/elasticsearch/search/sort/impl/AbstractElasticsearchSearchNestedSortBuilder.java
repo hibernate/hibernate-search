@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.search.sort.impl;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchJsonSyntaxHelper;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -25,11 +25,11 @@ public abstract class AbstractElasticsearchSearchNestedSortBuilder extends Abstr
 	private static final JsonAccessor<JsonElement> NESTED_PATH_ACCESSOR = JsonAccessor.root().property( "nested_path" );
 
 	private final List<String> nestedPathHierarchy;
-	private final ElasticsearchJsonSyntaxHelper jsonSyntaxHelper;
+	private final ElasticsearchSearchSyntax searchSyntax;
 
-	public AbstractElasticsearchSearchNestedSortBuilder(List<String> nestedPathHierarchy, ElasticsearchJsonSyntaxHelper jsonSyntaxHelper) {
+	public AbstractElasticsearchSearchNestedSortBuilder(List<String> nestedPathHierarchy, ElasticsearchSearchSyntax searchSyntax) {
 		this.nestedPathHierarchy = nestedPathHierarchy;
-		this.jsonSyntaxHelper = jsonSyntaxHelper;
+		this.searchSyntax = searchSyntax;
 	}
 
 	@Override
@@ -37,7 +37,7 @@ public abstract class AbstractElasticsearchSearchNestedSortBuilder extends Abstr
 		if ( nestedPathHierarchy.isEmpty() ) {
 			return;
 		}
-		if ( jsonSyntaxHelper.useOldSortNestedApi() ) {
+		if ( searchSyntax.useOldSortNestedApi() ) {
 			// the old api requires only the last path ( the deepest one )
 			String lastNestedPath = nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 );
 
