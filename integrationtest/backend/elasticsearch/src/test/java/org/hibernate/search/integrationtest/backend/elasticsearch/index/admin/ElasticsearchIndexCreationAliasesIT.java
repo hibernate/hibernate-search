@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch.index.admin;
 
+import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.simpleMappingForInitialization;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.simpleReadAliasDefinition;
 import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.simpleWriteAliasDefinition;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultReadAlias;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultWriteAlias;
+import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.encodeName;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.util.EnumSet;
@@ -20,6 +22,7 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettin
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.index.naming.IndexNamingStrategy;
+import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.StubSingleIndexNamingStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
@@ -91,6 +94,38 @@ public class ElasticsearchIndexCreationAliasesIT {
 						+ "'custom-read': " + simpleReadAliasDefinition()
 				+ "}",
 				elasticsearchClient.index( INDEX_NAME ).aliases().get()
+		);
+	}
+
+	/**
+	 * Test that migrating from 6.0.0.Beta4 or earlier will just create new (empty) indexes,
+	 * keeping the old ones in place.
+	 */
+	@Test
+	public void migrationFrom6Beta4OrEarlier() {
+		// Index layout of 6.0.0.Beta4 and before: aliases are missing,
+		// and the primary Elasticsearch index name is just the Hibernate Search index name.
+		URLEncodedString oldIndexName = encodeName( INDEX_NAME );
+		elasticsearchClient.index( oldIndexName, null, null )
+				.deleteAndCreate()
+				.type().putMapping( simpleMappingForInitialization( "" ) );
+		elasticsearchClient.index( INDEX_NAME )
+				.deleteAndCreate();
+
+		setup( null );
+
+		// New indexes are created
+		assertJsonEquals(
+				"{"
+						+ "'" + defaultWriteAlias( INDEX_NAME ) + "': " + simpleWriteAliasDefinition() + ", "
+						+ "'" + defaultReadAlias( INDEX_NAME ) + "': " + simpleReadAliasDefinition()
+						+ "}",
+				elasticsearchClient.index( INDEX_NAME ).aliases().get()
+		);
+		// Old indexes are still there: we expect users to reindex and delete old indexes.
+		assertJsonEquals(
+				"{}",
+				elasticsearchClient.index( oldIndexName, null, null ).aliases().get()
 		);
 	}
 
