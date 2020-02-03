@@ -15,6 +15,27 @@ import com.google.gson.JsonObject;
 
 public interface ElasticsearchTestDialect {
 
+	static ElasticsearchTestDialect get() {
+		String dialectClassName = System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.testdialect" );
+		try {
+			@SuppressWarnings("unchecked")
+			Class<? extends ElasticsearchTestDialect> dialectClass =
+					(Class<? extends ElasticsearchTestDialect>) Class.forName( dialectClassName );
+			return dialectClass.getConstructor().newInstance();
+		}
+		catch (Exception | LinkageError e) {
+			throw new IllegalStateException(
+					"Unexpected error while initializing the ElasticsearchTestDialect with name '" + dialectClassName + "'."
+							+ " Did you properly set the appropriate elasticsearch-x.x profile?",
+					e
+			);
+		}
+	}
+
+	static String getClusterVersion() {
+		return System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.version" );
+	}
+
 	boolean isEmptyMappingPossible();
 
 	URLEncodedString getTypeKeywordForNonMappingApi();
@@ -37,27 +58,6 @@ public interface ElasticsearchTestDialect {
 
 	default boolean isGeoPointIndexNullAsPossible() {
 		return true;
-	}
-
-	static ElasticsearchTestDialect get() {
-		String dialectClassName = System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.testdialect" );
-		try {
-			@SuppressWarnings("unchecked")
-			Class<? extends ElasticsearchTestDialect> dialectClass =
-					(Class<? extends ElasticsearchTestDialect>) Class.forName( dialectClassName );
-			return dialectClass.getConstructor().newInstance();
-		}
-		catch (Exception | LinkageError e) {
-			throw new IllegalStateException(
-					"Unexpected error while initializing the ElasticsearchTestDialect with name '" + dialectClassName + "'."
-							+ " Did you properly set the appropriate elasticsearch-x.x profile?",
-					e
-			);
-		}
-	}
-
-	static String getClusterVersion() {
-		return System.getProperty( "org.hibernate.search.integrationtest.backend.elasticsearch.version" );
 	}
 
 	default boolean worksFineWithStrictGraterThanRangedQueriesOnScaledFloatField() {
