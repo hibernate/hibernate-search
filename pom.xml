@@ -2547,7 +2547,7 @@
             </properties>
         </profile>
 
-        <!-- Elasticsearch 5.6+ test environment -->
+        <!-- Elasticsearch 5.6 test environment -->
         <profile>
             <id>elasticsearch-5.6</id>
             <properties>
@@ -2571,12 +2571,60 @@
             </build>
         </profile>
 
-        <!-- Elasticsearch 6.0 to 6.6 test environment -->
+        <!-- Elasticsearch 6.0 to 6.2 test environment -->
         <profile>
             <id>elasticsearch-6.0</id>
             <properties>
-                <test.elasticsearch.connection.version>6.6.2</test.elasticsearch.connection.version>
+                <test.elasticsearch.connection.version>6.2.4</test.elasticsearch.connection.version>
                 <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch60TestDialect</test.elasticsearch.testdialect>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.github.alexcojocaru</groupId>
+                            <artifactId>elasticsearch-maven-plugin</artifactId>
+                            <version>${version.com.github.alexcojocaru.elasticsearch.plugin}</version>
+                            <configuration>
+                                <pathConf>${project.build.directory}/elasticsearch-maven-plugin/6.0/configuration/</pathConf>
+                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/6.0/init/init.script</pathInitScript>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+
+        <!-- Elasticsearch 6.3 test environment -->
+        <profile>
+            <id>elasticsearch-6.3</id>
+            <properties>
+                <test.elasticsearch.connection.version>6.3.2</test.elasticsearch.connection.version>
+                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch63TestDialect</test.elasticsearch.testdialect>
+            </properties>
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>com.github.alexcojocaru</groupId>
+                            <artifactId>elasticsearch-maven-plugin</artifactId>
+                            <version>${version.com.github.alexcojocaru.elasticsearch.plugin}</version>
+                            <configuration>
+                                <pathConf>${project.build.directory}/elasticsearch-maven-plugin/6.0/configuration/</pathConf>
+                                <pathInitScript>${project.build.directory}/elasticsearch-maven-plugin/6.0/init/init.script</pathInitScript>
+                            </configuration>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+
+        <!-- Elasticsearch 6.4 to 6.6 test environment -->
+        <profile>
+            <id>elasticsearch-6.4</id>
+            <properties>
+                <test.elasticsearch.connection.version>6.6.2</test.elasticsearch.connection.version>
+                <test.elasticsearch.testdialect>org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.Elasticsearch64TestDialect</test.elasticsearch.testdialect>
             </properties>
             <build>
                 <pluginManagement>

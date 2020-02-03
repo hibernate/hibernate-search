@@ -196,7 +196,12 @@ stage('Configure') {
 			esLocal: [
 					new EsLocalBuildEnvironment(versionRange: '[5.6,6.0)', mavenProfile: 'elasticsearch-5.6',
 							jdkTool: 'OpenJDK 8 Latest', status: BuildEnvironmentStatus.SUPPORTED),
-					new EsLocalBuildEnvironment(versionRange: '[6.0,6.7)', mavenProfile: 'elasticsearch-6.0',
+					new EsLocalBuildEnvironment(versionRange: '[6.0,6.2)', mavenProfile: 'elasticsearch-6.0',
+							jdkTool: 'OpenJDK 8 Latest', status: BuildEnvironmentStatus.SUPPORTED),
+					// ES 6.3 has a bug that prevents IndexingIT from passing. See https://github.com/elastic/elasticsearch/issues/32395
+					new EsLocalBuildEnvironment(versionRange: '[6.3,6.4)', mavenProfile: 'elasticsearch-6.3',
+							jdkTool: 'OpenJDK 8 Latest', status: BuildEnvironmentStatus.EXPERIMENTAL),
+					new EsLocalBuildEnvironment(versionRange: '[6.4,6.7)', mavenProfile: 'elasticsearch-6.4',
 							jdkTool: 'OpenJDK 8 Latest', status: BuildEnvironmentStatus.SUPPORTED),
 					new EsLocalBuildEnvironment(versionRange: '[6.7,7.0)', mavenProfile: 'elasticsearch-6.7',
 							jdkTool: 'OpenJDK 8 Latest', status: BuildEnvironmentStatus.SUPPORTED),
@@ -207,10 +212,10 @@ stage('Configure') {
 					new EsAwsBuildEnvironment(version: '5.6', mavenProfile: 'elasticsearch-5.6', status: BuildEnvironmentStatus.SUPPORTED),
 					new EsAwsBuildEnvironment(version: '6.0', mavenProfile: 'elasticsearch-6.0', status: BuildEnvironmentStatus.SUPPORTED),
 					new EsAwsBuildEnvironment(version: '6.2', mavenProfile: 'elasticsearch-6.0', status: BuildEnvironmentStatus.SUPPORTED),
-					new EsAwsBuildEnvironment(version: '6.3', mavenProfile: 'elasticsearch-6.0', status: BuildEnvironmentStatus.SUPPORTED),
-					// ES 6.4 has a bug that prevents our integration tests from passing. See https://github.com/hibernate/hibernate-search/pull/1981/
-					new EsAwsBuildEnvironment(version: '6.4', mavenProfile: 'elasticsearch-6.0', status: BuildEnvironmentStatus.EXPERIMENTAL),
-					new EsAwsBuildEnvironment(version: '6.5', mavenProfile: 'elasticsearch-6.0', status: BuildEnvironmentStatus.SUPPORTED),
+					// ES 6.3 has a bug that prevents IndexingIT from passing. See https://github.com/elastic/elasticsearch/issues/32395
+					new EsAwsBuildEnvironment(version: '6.3', mavenProfile: 'elasticsearch-6.3', status: BuildEnvironmentStatus.EXPERIMENTAL),
+					new EsAwsBuildEnvironment(version: '6.4', mavenProfile: 'elasticsearch-6.4', status: BuildEnvironmentStatus.SUPPORTED),
+					new EsAwsBuildEnvironment(version: '6.5', mavenProfile: 'elasticsearch-6.4', status: BuildEnvironmentStatus.SUPPORTED),
 					new EsAwsBuildEnvironment(version: '6.7', mavenProfile: 'elasticsearch-6.7', status: BuildEnvironmentStatus.SUPPORTED),
 					new EsAwsBuildEnvironment(version: '7.1', mavenProfile: 'elasticsearch-7.0', status: BuildEnvironmentStatus.SUPPORTED)
 			]
