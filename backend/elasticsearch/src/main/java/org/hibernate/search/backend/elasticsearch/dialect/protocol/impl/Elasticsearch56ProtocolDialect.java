@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.dialect.protocol.impl;
 
-import org.hibernate.search.backend.elasticsearch.util.impl.Elasticsearch56JsonSyntaxHelper;
-import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchJsonSyntaxHelper;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.Elasticsearch56SearchSyntax;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 
 /**
  * The protocol dialect for Elasticsearch 5.6.
@@ -16,7 +16,7 @@ public class Elasticsearch56ProtocolDialect extends Elasticsearch60ProtocolDiale
 		implements ElasticsearchProtocolDialect {
 
 	@Override
-	public ElasticsearchJsonSyntaxHelper createJsonSyntaxHelper() {
-		return new Elasticsearch56JsonSyntaxHelper();
+	public ElasticsearchSearchSyntax createSearchSyntax() {
+		return new Elasticsearch56SearchSyntax();
 	}
 }

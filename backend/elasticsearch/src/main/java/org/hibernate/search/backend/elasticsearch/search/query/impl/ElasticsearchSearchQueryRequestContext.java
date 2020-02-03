@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.Aggreg
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DistanceSortKey;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionRequestContext;
-import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchJsonSyntaxHelper;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -59,8 +59,8 @@ class ElasticsearchSearchQueryRequestContext implements SearchProjectionRequestC
 	}
 
 	@Override
-	public ElasticsearchJsonSyntaxHelper getJsonSyntaxHelper() {
-		return searchContext.getJsonSyntaxHelper();
+	public ElasticsearchSearchSyntax getSearchSyntax() {
+		return searchContext.getSearchSyntax();
 	}
 
 	ElasticsearchSearchQueryExtractContext createExtractContext(JsonObject responseBody) {

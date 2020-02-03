@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.link.impl;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchJsonSyntaxHelper;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 
@@ -24,7 +24,7 @@ public interface ElasticsearchLink {
 
 	GsonProvider getGsonProvider();
 
-	ElasticsearchJsonSyntaxHelper getJsonSyntaxHelper();
+	ElasticsearchSearchSyntax getSearchSyntax();
 
 	ElasticsearchWorkBuilderFactory getWorkBuilderFactory();
 

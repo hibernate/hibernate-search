@@ -123,7 +123,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 			ElasticsearchScopeModel scopeModel) {
 		return new ElasticsearchSearchContext(
 				mappingContext,
-				userFacingGson, link.getJsonSyntaxHelper(),
+				userFacingGson, link.getSearchSyntax(),
 				multiTenancyStrategy,
 				scopeModel
 		);

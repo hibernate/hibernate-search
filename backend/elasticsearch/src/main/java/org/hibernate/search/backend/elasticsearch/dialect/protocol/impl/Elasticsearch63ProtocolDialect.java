@@ -7,8 +7,8 @@
 package org.hibernate.search.backend.elasticsearch.dialect.protocol.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.util.impl.Elasticsearch63JsonSyntaxHelper;
-import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchJsonSyntaxHelper;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.Elasticsearch63SearchSyntax;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elasticsearch63WorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 
@@ -19,8 +19,8 @@ public class Elasticsearch63ProtocolDialect extends Elasticsearch67ProtocolDiale
 		implements ElasticsearchProtocolDialect {
 
 	@Override
-	public ElasticsearchJsonSyntaxHelper createJsonSyntaxHelper() {
-		return new Elasticsearch63JsonSyntaxHelper();
+	public ElasticsearchSearchSyntax createSearchSyntax() {
+		return new Elasticsearch63SearchSyntax();
 	}
 
 	@Override
