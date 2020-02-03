@@ -21,7 +21,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionRequestContext;
-import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchFields;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.MetadataFields;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -32,9 +32,9 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final String ID_FIELD_NAME = ElasticsearchFields.internalFieldName( "tenant_doc_id" );
+	private static final String ID_FIELD_NAME = MetadataFields.internalFieldName( "tenant_doc_id" );
 
-	private static final String TENANT_ID_FIELD_NAME = ElasticsearchFields.internalFieldName( "tenant_id" );
+	private static final String TENANT_ID_FIELD_NAME = MetadataFields.internalFieldName( "tenant_id" );
 
 	private static final Pattern UNDERSCORE_PATTERN = Pattern.compile( "_" );
 
