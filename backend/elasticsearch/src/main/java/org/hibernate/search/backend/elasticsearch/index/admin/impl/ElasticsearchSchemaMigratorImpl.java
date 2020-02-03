@@ -7,8 +7,10 @@
 package org.hibernate.search.backend.elasticsearch.index.admin.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
@@ -39,15 +41,22 @@ public class ElasticsearchSchemaMigratorImpl implements ElasticsearchSchemaMigra
 	public CompletableFuture<?> migrate(URLEncodedString indexName,
 			IndexMetadata expectedIndexMetadata, IndexMetadata actualIndexMetadata) {
 		/*
+		 * We only update aliases if it's really necessary,
+		 * because we might overwrite custom user attributes.
+		 */
+		CompletableFuture<?> aliasMigration = doMigrateAliases( indexName, expectedIndexMetadata.getAliases() );
+
+		/*
 		 * We only update settings if it's really necessary, because closing the index,
 		 * even for just a moment, may hurt if other clients are using the index.
 		 */
 		CompletableFuture<?> settingsMigration;
 		if ( schemaValidator.isSettingsValid( expectedIndexMetadata, actualIndexMetadata ) ) {
-			settingsMigration = CompletableFuture.completedFuture( null );
+			settingsMigration = aliasMigration;
 		}
 		else {
-			settingsMigration = doMigrateSettings( indexName, expectedIndexMetadata.getSettings() );
+			settingsMigration = aliasMigration
+					.thenCompose( ignored -> doMigrateSettings( indexName, expectedIndexMetadata.getSettings() ) );
 		}
 
 		return settingsMigration.thenCompose( ignored -> doMigrateMapping( indexName, expectedIndexMetadata.getMapping() ) )
@@ -57,6 +66,10 @@ public class ElasticsearchSchemaMigratorImpl implements ElasticsearchSchemaMigra
 							Throwables.expectException( e )
 					);
 				} ) );
+	}
+
+	private CompletableFuture<?> doMigrateAliases(URLEncodedString indexName, Map<String, IndexAliasDefinition> aliases) {
+		return schemaAccessor.putAliases( indexName, aliases );
 	}
 
 	private CompletableFuture<?> doMigrateSettings(URLEncodedString indexName, IndexSettings settings) {
