@@ -21,7 +21,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Pr
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.util.impl.ElasticsearchFields;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.MetadataFields;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
@@ -46,7 +46,7 @@ class ElasticsearchIndexSchemaObjectFieldNodeBuilder extends AbstractElasticsear
 		this.parent = parent;
 		String parentAbsolutePath = parent.getAbsolutePath();
 		this.absoluteFieldPath = parentAbsolutePath == null ? relativeFieldName
-				: ElasticsearchFields.compose( parentAbsolutePath, relativeFieldName );
+				: MetadataFields.compose( parentAbsolutePath, relativeFieldName );
 		this.relativeFieldName = relativeFieldName;
 		this.storage = storage;
 	}
