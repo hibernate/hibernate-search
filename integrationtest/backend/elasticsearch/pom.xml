@@ -14,10 +14,12 @@
 
     <properties>
         <surefire.executing-module>it-elasticsearch</surefire.executing-module>
+        <!-- By default we don't exclude tests because of the version, but profiles override this -->
+        <failsafe.excludedGroups.elasticsearch.version />
         <!-- By default AWS is not enabled, which means we need to exclude these categories -->
-        <failsafe.excludedGroups.aws>
+        <failsafe.excludedGroups.elasticsearch.aws>
             org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresRequestPostProcessing
-        </failsafe.excludedGroups.aws>
+        </failsafe.excludedGroups.elasticsearch.aws>
     </properties>
 
     <dependencies>
@@ -97,8 +99,10 @@
                             <dependenciesToScan>
                                 <dependency>${project.groupId}:hibernate-search-integrationtest-backend-tck</dependency>
                             </dependenciesToScan>
+                            <!-- Note trailing commas are ignored. -->
                             <excludedGroups>
-                                ${failsafe.excludedGroups.aws}
+                                ${failsafe.excludedGroups.elasticsearch.aws}
+                                ${failsafe.excludedGroups.elasticsearch.version}
                             </excludedGroups>
                         </configuration>
                     </execution>
@@ -127,11 +131,11 @@
                 </property>
             </activation>
             <properties>
-                <failsafe.excludedGroups.aws>
+                <failsafe.excludedGroups.elasticsearch.aws>
                     org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresIndexOpenClose,
                     org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresNoRequestPostProcessing,
                     org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresNoAutomaticAuthenticationHeader
-                </failsafe.excludedGroups.aws>
+                </failsafe.excludedGroups.elasticsearch.aws>
                 <test.elasticsearch.connection.aws.signing.enabled>true</test.elasticsearch.connection.aws.signing.enabled>
             </properties>
             <dependencies>
@@ -141,6 +145,76 @@
                     <scope>test</scope>
                 </dependency>
             </dependencies>
+        </profile>
+
+        <!-- Elasticsearch 5.6 test environment -->
+        <profile>
+            <id>elasticsearch-5.6</id>
+            <properties>
+                <failsafe.excludedGroups.elasticsearch.version>
+                    ,
+                    org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresIndexAliasIsWriteIndex
+                </failsafe.excludedGroups.elasticsearch.version>
+            </properties>
+        </profile>
+
+        <!-- Elasticsearch 6.0 to 6.2 test environment -->
+        <profile>
+            <id>elasticsearch-6.0</id>
+            <properties>
+                <failsafe.excludedGroups.elasticsearch.version>
+                    ,
+                    org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresIndexAliasIsWriteIndex
+                </failsafe.excludedGroups.elasticsearch.version>
+            </properties>
+        </profile>
+
+        <!-- Elasticsearch 6.3 test environment -->
+        <profile>
+            <id>elasticsearch-6.3</id>
+            <properties>
+                <failsafe.excludedGroups.elasticsearch.version>
+                    ,
+                    org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresIndexAliasIsWriteIndex
+                </failsafe.excludedGroups.elasticsearch.version>
+            </properties>
+        </profile>
+
+        <!-- Elasticsearch 6.4 to 6.6 test environment -->
+        <profile>
+            <id>elasticsearch-6.4</id>
+            <properties>
+                <failsafe.excludedGroups.elasticsearch.version>
+                    <!-- Nothing here -->
+                </failsafe.excludedGroups.elasticsearch.version>
+            </properties>
+        </profile>
+
+        <!-- Elasticsearch 6.7 to 6.8 test environment -->
+        <profile>
+            <id>elasticsearch-6.7</id>
+            <properties>
+                <failsafe.excludedGroups.elasticsearch.version>
+                    <!-- Nothing here -->
+                </failsafe.excludedGroups.elasticsearch.version>
+            </properties>
+        </profile>
+
+        <!-- Elasticsearch 7.0+ test environment (default) -->
+        <profile>
+            <id>elasticsearch-7.0</id>
+            <activation>
+                <!-- This must be re-defined here: the activation defined in the parent pom is not enough -->
+                <!-- Activate by default, i.e. if test.elasticsearch.connection.version has not been defined explicitly -->
+                <property>
+                    <name>!test.elasticsearch.connection.version</name>
+                </property>
+            </activation>
+            <properties>
+                <failsafe.excludedGroups.elasticsearch.version>
+                    <!-- Nothing here -->
+                </failsafe.excludedGroups.elasticsearch.version>
+            </properties>
         </profile>
     </profiles>
 
