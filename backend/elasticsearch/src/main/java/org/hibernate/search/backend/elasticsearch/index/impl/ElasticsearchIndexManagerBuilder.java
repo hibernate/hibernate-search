@@ -12,8 +12,6 @@ import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadata
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.IndexNames;
-import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 
@@ -22,21 +20,15 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 
 	private final IndexManagerBackendContext backendContext;
 
-	private final IndexNames indexNames;
 	private final ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder;
-	private final ElasticsearchIndexSettingsBuilder settingsBuilder;
 	private final List<DocumentMetadataContributor> documentMetadataContributors;
 
 	public ElasticsearchIndexManagerBuilder(IndexManagerBackendContext backendContext,
-			IndexNames indexNames,
 			ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder,
-			ElasticsearchIndexSettingsBuilder settingsBuilder,
 			List<DocumentMetadataContributor> documentMetadataContributors) {
 		this.backendContext = backendContext;
 
-		this.indexNames = indexNames;
 		this.schemaRootNodeBuilder = schemaRootNodeBuilder;
-		this.settingsBuilder = settingsBuilder;
 		this.documentMetadataContributors = documentMetadataContributors;
 	}
 
@@ -52,8 +44,7 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 
 	@Override
 	public ElasticsearchIndexManagerImpl build() {
-		ElasticsearchIndexModel model = schemaRootNodeBuilder
-				.build( indexNames, settingsBuilder );
+		ElasticsearchIndexModel model = schemaRootNodeBuilder.build();
 
 		return new ElasticsearchIndexManagerImpl(
 				backendContext,

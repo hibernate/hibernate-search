@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
@@ -19,7 +20,6 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Dy
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RoutingType;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.IndexNames;
-import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactory;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
@@ -36,17 +36,22 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 	private final EventContext indexEventContext;
 	private final List<IndexSchemaRootContributor> schemaRootContributors = new ArrayList<>();
 
+	private final IndexNames indexNames;
 	private final String mappedTypeName;
+	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
 	private RoutingType routing = null;
 	private ToDocumentIdentifierValueConverter<?> idDslConverter;
 
 	public ElasticsearchIndexSchemaRootNodeBuilder(ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
 			EventContext indexEventContext,
-			String mappedTypeName) {
+			IndexNames indexNames, String mappedTypeName,
+			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry) {
 		this.typeFactoryProvider = typeFactoryProvider;
 		this.indexEventContext = indexEventContext;
+		this.indexNames = indexNames;
 		this.mappedTypeName = mappedTypeName;
+		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 	}
 
 	@Override
@@ -74,8 +79,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 		schemaRootContributors.add( schemaRootContributor );
 	}
 
-	public ElasticsearchIndexModel build(IndexNames names,
-			ElasticsearchIndexSettingsBuilder settingsBuilder) {
+	public ElasticsearchIndexModel build() {
 		RootTypeMapping mapping = new RootTypeMapping();
 		if ( routing != null ) {
 			mapping.setRouting( routing );
@@ -107,9 +111,9 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 		contributeChildren( mapping, rootNode, collector );
 
 		return new ElasticsearchIndexModel(
-				names,
+				indexNames,
 				mappedTypeName,
-				settingsBuilder,
+				analysisDefinitionRegistry,
 				mapping,
 				idDslConverter == null ? new StringToDocumentIdentifierValueConverter() : idDslConverter,
 				objectNodes,

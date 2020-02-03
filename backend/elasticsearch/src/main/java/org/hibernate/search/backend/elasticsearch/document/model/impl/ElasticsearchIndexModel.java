@@ -8,9 +8,9 @@ package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
 import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.LowLevelIndexMetadataBuilder;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
-import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -20,8 +20,8 @@ public class ElasticsearchIndexModel {
 
 	private final IndexNames names;
 	private final String mappedTypeName;
+	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
 	private final RootTypeMapping mapping;
-	private final IndexSettings settings;
 
 	private final ToDocumentIdentifierValueConverter<?> idDslConverter;
 	private final Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes;
@@ -29,17 +29,17 @@ public class ElasticsearchIndexModel {
 
 	public ElasticsearchIndexModel(IndexNames names,
 			String mappedTypeName,
-			ElasticsearchIndexSettingsBuilder settingsBuilder,
+			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			RootTypeMapping mapping, ToDocumentIdentifierValueConverter<?> idDslConverter,
 			Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes,
 			Map<String, ElasticsearchIndexSchemaFieldNode<?>> fieldNodes) {
 		this.names = names;
 		this.mappedTypeName = mappedTypeName;
-		this.settings = settingsBuilder.build();
+		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
+		this.mapping = mapping;
 		this.idDslConverter = idDslConverter;
 		this.objectNodes = objectNodes;
 		this.fieldNodes = fieldNodes;
-		this.mapping = mapping;
 	}
 
 	public String getHibernateSearchIndexName() {
@@ -58,14 +58,6 @@ public class ElasticsearchIndexModel {
 		return EventContexts.fromIndexName( getHibernateSearchIndexName() );
 	}
 
-	public RootTypeMapping getMapping() {
-		return mapping;
-	}
-
-	public IndexSettings getSettings() {
-		return settings;
-	}
-
 	public ToDocumentIdentifierValueConverter<?> getIdDslConverter() {
 		return idDslConverter;
 	}
@@ -78,6 +70,11 @@ public class ElasticsearchIndexModel {
 		return fieldNodes.get( absoluteFieldPath );
 	}
 
+	public void contributeLowLevelMetadata(LowLevelIndexMetadataBuilder builder) {
+		builder.setAnalysisDefinitionRegistry( analysisDefinitionRegistry );
+		builder.setMapping( mapping );
+	}
+
 	@Override
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
@@ -87,5 +84,4 @@ public class ElasticsearchIndexModel {
 				.append( "]" )
 				.toString();
 	}
-
 }
