@@ -22,6 +22,11 @@ public interface ElasticsearchValidationMessages {
 	ElasticsearchValidationMessages INSTANCE = Messages.getBundle( ElasticsearchValidationMessages.class );
 
 	@Message(
+			value = "Missing alias"
+	)
+	String aliasMissing();
+
+	@Message(
 			value = "Missing type mapping"
 	)
 	String mappingMissing();

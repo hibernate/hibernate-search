@@ -26,4 +26,9 @@ public interface ElasticsearchEventContextMessages {
 	@Message(value = "parameter '%1$s'")
 	String analysisDefinitionParameter(String name);
 
+	@Message(value = "alias '%1$s'")
+	String aliasDefinition(String name);
+
+	@Message(value = "attribute '%1$s'")
+	String analysisDefinitionAttribute(String name);
 }

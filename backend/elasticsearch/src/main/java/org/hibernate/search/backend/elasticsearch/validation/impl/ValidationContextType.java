@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.validation.impl;
 
-enum ValidationContextType {
+public enum ValidationContextType {
 
+	ALIAS,
+	ALIAS_ATTRIBUTE,
 	MAPPING_PROPERTY,
 	MAPPING_ATTRIBUTE,
 	ANALYZER,

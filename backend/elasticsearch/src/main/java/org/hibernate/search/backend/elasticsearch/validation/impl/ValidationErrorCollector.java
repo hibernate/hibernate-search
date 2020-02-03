@@ -104,6 +104,10 @@ public final class ValidationErrorCollector {
 				pathBuilder.setLength( 0 );
 			}
 			switch ( type ) {
+				case ALIAS:
+					return currentResult.withContext( ElasticsearchEventContexts.fromAliasDefinition( name ) );
+				case ALIAS_ATTRIBUTE:
+					return currentResult.withContext( ElasticsearchEventContexts.fromAliasDefinitionAttribute( name ) );
 				case MAPPING_ATTRIBUTE:
 					return currentResult.withContext( ElasticsearchEventContexts.fromMappingAttribute( name ) );
 				case ANALYZER:
