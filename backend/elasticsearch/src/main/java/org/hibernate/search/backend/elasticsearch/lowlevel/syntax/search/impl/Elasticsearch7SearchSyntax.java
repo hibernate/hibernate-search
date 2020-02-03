@@ -12,6 +12,9 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
+/**
+ * The search syntax for ES7.0 and later.
+ */
 public class Elasticsearch7SearchSyntax implements ElasticsearchSearchSyntax {
 
 	private static final JsonArrayAccessor DOCVALUE_FIELDS_ACCESSOR =

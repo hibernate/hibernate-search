@@ -34,8 +34,6 @@ import com.google.gson.GsonBuilder;
  */
 public interface ElasticsearchProtocolDialect {
 
-	GsonBuilder createGsonBuilderBase();
-
 	ElasticsearchSearchSyntax createSearchSyntax();
 
 	ElasticsearchWorkBuilderFactory createWorkBuilderFactory(GsonProvider gsonProvider);

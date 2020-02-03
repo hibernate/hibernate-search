@@ -16,19 +16,19 @@ import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import com.google.gson.JsonObject;
 
 /**
- * A search result extractor for ES6.
+ * A search result extractor for ES5.6 to 6.x.
  * <p>
  * Compared to ES7:
  * <ul>
  *     <li>The total hit count is retrieved from hits.total instead of hits.total.value</li>
  * </ul>
  */
-class Elasticsearch6SearchResultExtractor<H> extends Elasticsearch7SearchResultExtractor<H> {
+class Elasticsearch56SearchResultExtractor<H> extends Elasticsearch7SearchResultExtractor<H> {
 
 	private static final JsonAccessor<Long> HITS_TOTAL_ACCESSOR =
 			HITS_ACCESSOR.property( "total" ).asLong();
 
-	Elasticsearch6SearchResultExtractor(
+	Elasticsearch56SearchResultExtractor(
 			ElasticsearchSearchQueryRequestContext requestContext,
 			ElasticsearchSearchProjection<?, H> rootProjection,
 			Map<AggregationKey<?>, ElasticsearchSearchAggregation<?>> aggregations) {

@@ -7,18 +7,30 @@
 package org.hibernate.search.backend.elasticsearch.dialect.protocol.impl;
 
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elasticsearch60WorkBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.Elasticsearch60SearchSyntax;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.Elasticsearch56SearchResultExtractorFactory;
+import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
+import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elasticsearch56WorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 
 /**
  * The protocol dialect for Elasticsearch 6.0 to 6.2.
  */
-public class Elasticsearch60ProtocolDialect extends Elasticsearch67ProtocolDialect
-		implements ElasticsearchProtocolDialect {
+public class Elasticsearch60ProtocolDialect implements ElasticsearchProtocolDialect {
+
+	@Override
+	public ElasticsearchSearchSyntax createSearchSyntax() {
+		return new Elasticsearch60SearchSyntax();
+	}
 
 	@Override
 	public ElasticsearchWorkBuilderFactory createWorkBuilderFactory(GsonProvider gsonProvider) {
-		// Necessary because of the "allow_partial_search_results" flag for search APIs introduced in ES6.3
-		return new Elasticsearch60WorkBuilderFactory( gsonProvider );
+		return new Elasticsearch56WorkBuilderFactory( gsonProvider );
+	}
+
+	@Override
+	public ElasticsearchSearchResultExtractorFactory createSearchResultExtractorFactory() {
+		return new Elasticsearch56SearchResultExtractorFactory();
 	}
 }

@@ -12,7 +12,10 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonArrayAccessor;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-public class Elasticsearch63SearchSyntax extends Elasticsearch67SearchSyntax {
+/**
+ * The search syntax for ES6.0 to 6.6.
+ */
+public class Elasticsearch60SearchSyntax extends Elasticsearch67SearchSyntax {
 
 	private static final JsonArrayAccessor DOCVALUE_FIELDS_ACCESSOR =
 			JsonAccessor.root().property( "docvalue_fields" ).asArray();

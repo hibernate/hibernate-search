@@ -30,6 +30,8 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import com.google.gson.GsonBuilder;
+
 class ElasticsearchLinkImpl implements ElasticsearchLink {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -109,7 +111,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 			}
 
 			ElasticsearchProtocolDialect protocolDialect = dialectFactory.createProtocolDialect( elasticsearchVersion );
-			gsonProvider = GsonProvider.create( protocolDialect::createGsonBuilderBase, logPrettyPrinting );
+			gsonProvider = GsonProvider.create( GsonBuilder::new, logPrettyPrinting );
 			searchSyntax = protocolDialect.createSearchSyntax();
 			workBuilderFactory = protocolDialect.createWorkBuilderFactory( gsonProvider );
 			searchResultExtractorFactory = protocolDialect.createSearchResultExtractorFactory();

@@ -13,6 +13,9 @@ import org.hibernate.search.backend.elasticsearch.search.projection.impl.Elastic
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 
+/**
+ * @see Elasticsearch7SearchResultExtractor
+ */
 public class Elasticsearch7SearchResultExtractorFactory implements ElasticsearchSearchResultExtractorFactory {
 	@Override
 	public <H> ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> createResultExtractor(

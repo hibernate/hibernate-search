@@ -14,16 +14,16 @@ import org.hibernate.search.backend.elasticsearch.work.impl.SearchWork;
 import com.google.gson.JsonObject;
 
 /**
- * A work builder factory for ES6.0 to ES6.3.
+ * A work builder factory for ES5.6 to ES6.2.
  * <p>
  * Compared to ES6.3:
  * <ul>
  *     <li>We do NOT set the "allow_partial_search_results" query parameter in search APIs</li>
  * </ul>
  */
-public class Elasticsearch60WorkBuilderFactory extends Elasticsearch63WorkBuilderFactory {
+public class Elasticsearch56WorkBuilderFactory extends Elasticsearch63WorkBuilderFactory {
 
-	public Elasticsearch60WorkBuilderFactory(GsonProvider gsonProvider) {
+	public Elasticsearch56WorkBuilderFactory(GsonProvider gsonProvider) {
 		super( gsonProvider );
 	}
 

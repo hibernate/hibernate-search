@@ -29,7 +29,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.SearchWork;
 import com.google.gson.JsonObject;
 
 /**
- * A work builder factory for ES6.3 to ES6.7.
+ * A work builder factory for ES6.7 and later 6.x.
  * <p>
  * Compared to ES7:
  * <ul>

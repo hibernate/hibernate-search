@@ -12,13 +12,12 @@ import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.Elasti
 import com.google.gson.Gson;
 
 /**
- * The model dialect for Elasticsearch 7.
+ * The model dialect for Elasticsearch 7.x.
  */
 public class Elasticsearch7ModelDialect implements ElasticsearchModelDialect {
 
 	@Override
-	public ElasticsearchIndexFieldTypeFactoryProvider createIndexTypeFieldFactoryProvider(
-			Gson userFacingGson) {
+	public ElasticsearchIndexFieldTypeFactoryProvider createIndexTypeFieldFactoryProvider(Gson userFacingGson) {
 		return new Elasticsearch7IndexFieldTypeFactoryProvider( userFacingGson );
 	}
 }

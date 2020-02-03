@@ -59,6 +59,9 @@ import org.hibernate.search.backend.elasticsearch.work.impl.WaitForIndexStatusWo
 
 import com.google.gson.JsonObject;
 
+/**
+ * A work builder factory for ES7.0+.
+ */
 public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilderFactory {
 
 	protected final GsonProvider gsonProvider;
