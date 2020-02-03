@@ -8,7 +8,9 @@ package org.hibernate.search.backend.elasticsearch.work.builder.factory.impl;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
@@ -28,6 +30,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.GetIndexMeta
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.OpenIndexWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.MergeSegmentsWorkBuilder;
+import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexAliasesWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexMappingWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.PutIndexSettingsWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.RefreshWorkBuilder;
@@ -50,6 +53,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.GetIndexMetadataWork
 import org.hibernate.search.backend.elasticsearch.work.impl.IndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.OpenIndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ForceMergeWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.PutIndexAliasesWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.PutIndexSettingsWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.PutIndexTypeMappingWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.RefreshWork;
@@ -174,4 +178,9 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 		return new WaitForIndexStatusWork.Builder( indexName, requiredStatus, timeout );
 	}
 
+	@Override
+	public PutIndexAliasesWorkBuilder putIndexAliases(URLEncodedString indexName,
+			Map<String, IndexAliasDefinition> aliases) {
+		return new PutIndexAliasesWork.Builder( gsonProvider, indexName, aliases );
+	}
 }

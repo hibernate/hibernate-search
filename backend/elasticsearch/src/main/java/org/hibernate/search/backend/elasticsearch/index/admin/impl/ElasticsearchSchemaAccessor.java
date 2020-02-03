@@ -112,6 +112,16 @@ public class ElasticsearchSchemaAccessor {
 				} );
 	}
 
+	public CompletableFuture<?> putAliases(URLEncodedString indexName, Map<String, IndexAliasDefinition> aliases) {
+		ElasticsearchWork<?> work = getWorkFactory().putIndexAliases( indexName, aliases ).build();
+		return execute( work )
+				.exceptionally( Futures.handler( e -> {
+					throw log.elasticsearchSettingsUpdateFailed(
+							indexName.original, Throwables.expectException( e )
+					);
+				} ) );
+	}
+
 	public CompletableFuture<?> updateSettings(URLEncodedString indexName, IndexSettings settings) {
 		ElasticsearchWork<?> work = getWorkFactory().putIndexSettings( indexName, settings ).build();
 		return execute( work )
