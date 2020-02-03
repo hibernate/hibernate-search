@@ -56,15 +56,10 @@ public interface ElasticsearchTestDialect {
 
 	void setTemplatePattern(JsonObject object, String pattern);
 
-	default boolean isGeoPointIndexNullAsPossible() {
-		return true;
-	}
+	boolean supportsGeoPointIndexNullAs();
 
-	default boolean worksFineWithStrictGraterThanRangedQueriesOnScaledFloatField() {
-		return true;
-	}
+	boolean supportsStrictGreaterThanRangedQueriesOnScaledFloatField();
 
-	default boolean zonedDateTimeDocValueHasUTCZoneId() {
-		return false;
-	}
+	boolean zonedDateTimeDocValueHasUTCZoneId();
+
 }
