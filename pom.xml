@@ -289,13 +289,13 @@
         <version.com.buschmais.jqassistant.plugin>1.5.0</version.com.buschmais.jqassistant.plugin>
         <version.com.github.alexcojocaru.elasticsearch.plugin>6.15</version.com.github.alexcojocaru.elasticsearch.plugin>
         <version.moditect.plugin>1.0.0.Beta2</version.moditect.plugin>
-
         <!--
             Please don't change the name of this property, it may be used and
             overridden by a CI job of the Checkstyle project so that they can
             check for regressions. Which is obviously good for us, too.
          -->
         <puppycrawl.checkstyle.version>8.29</puppycrawl.checkstyle.version>
+        <version.com.puppycrawl.tools.checkstyle>${puppycrawl.checkstyle.version}</version.com.puppycrawl.tools.checkstyle>
 
         <!-- Asciidoctor -->
 
@@ -1609,7 +1609,7 @@
                         <dependency>
                             <groupId>com.puppycrawl.tools</groupId>
                             <artifactId>checkstyle</artifactId>
-                            <version>${puppycrawl.checkstyle.version}</version>
+                            <version>${version.com.puppycrawl.tools.checkstyle}</version>
                         </dependency>
                         <dependency>
                             <groupId>org.slf4j</groupId>
