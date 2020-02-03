@@ -10,19 +10,18 @@ import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.CreateIndexResult;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.Throwables;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A utility implementing primitives for the various {@code ElasticsearchSchema*Impl}.
@@ -32,13 +31,13 @@ public class ElasticsearchSchemaAccessor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchLink link;
+	private final ElasticsearchWorkBuilderFactory workBuilderFactory;
 
 	private final ElasticsearchWorkOrchestrator orchestrator;
 
-	public ElasticsearchSchemaAccessor(ElasticsearchLink link,
+	public ElasticsearchSchemaAccessor(ElasticsearchWorkBuilderFactory workBuilderFactory,
 			ElasticsearchWorkOrchestrator orchestrator) {
-		this.link = link;
+		this.workBuilderFactory = workBuilderFactory;
 		this.orchestrator = orchestrator;
 	}
 
@@ -145,7 +144,7 @@ public class ElasticsearchSchemaAccessor {
 	}
 
 	private ElasticsearchWorkBuilderFactory getWorkFactory() {
-		return link.getWorkBuilderFactory();
+		return workBuilderFactory;
 	}
 
 	private <T> CompletableFuture<T> execute(ElasticsearchWork<T> work) {

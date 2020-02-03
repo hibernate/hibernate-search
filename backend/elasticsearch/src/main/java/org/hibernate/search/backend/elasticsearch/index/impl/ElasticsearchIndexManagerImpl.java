@@ -80,8 +80,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	private final ElasticsearchWorkOrchestratorImplementor serialOrchestrator;
 	private final ElasticsearchWorkOrchestratorImplementor parallelOrchestrator;
 
-	private final ElasticsearchIndexAdministrationClient administrationClient;
-
+	private ElasticsearchIndexAdministrationClient administrationClient;
 	private ElasticsearchIndexLifecycleStrategy lifecycleStrategy;
 
 	ElasticsearchIndexManagerImpl(IndexManagerBackendContext backendContext,
@@ -92,7 +91,6 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 		this.documentMetadataContributors = documentMetadataContributors;
 		this.parallelOrchestrator = backendContext.createParallelOrchestrator( model.getHibernateSearchIndexName() );
 		this.serialOrchestrator = backendContext.createSerialOrchestrator( model.getHibernateSearchIndexName() );
-		this.administrationClient = backendContext.createAdministrationClient( model );
 	}
 
 	@Override
@@ -108,9 +106,12 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	public CompletableFuture<?> start(IndexManagerStartContext context) {
 		try {
 			/*
-			 * Create the lifecycle strategy late to allow the related settings to be changed
-			 * after the first phase of bootstrap (useful for compile-time boot).
+			 * Create the administration client and lifecycle strategy late to allow the behavior to change
+			 * after the first phase of bootstrap,
+			 * based on runtime data such as runtime user configuration or the detected ES version.
+			 * Useful for compile-time boot.
 			 */
+			administrationClient = backendContext.createAdministrationClient( model );
 			lifecycleStrategy = createLifecycleStrategy( context.getConfigurationPropertySource() );
 
 			serialOrchestrator.start();
@@ -139,6 +140,8 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 			closer.push( ElasticsearchWorkOrchestratorImplementor::stop, serialOrchestrator );
 			closer.push( ElasticsearchWorkOrchestratorImplementor::stop, parallelOrchestrator );
 			closer.push( strategy -> strategy.onStop( administrationClient ), lifecycleStrategy );
+			lifecycleStrategy = null;
+			administrationClient = null;
 		}
 		catch (IOException e) {
 			throw log.failedToShutdownIndexManager( model.getHibernateSearchIndexName(), e, backendContext.getEventContext() );

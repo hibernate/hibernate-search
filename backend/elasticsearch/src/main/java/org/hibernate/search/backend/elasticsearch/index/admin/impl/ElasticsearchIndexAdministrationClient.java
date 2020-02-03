@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
+import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 
 /**
@@ -29,10 +29,10 @@ public class ElasticsearchIndexAdministrationClient {
 
 	private final IndexMetadata expectedMetadata;
 
-	public ElasticsearchIndexAdministrationClient(ElasticsearchLink link,
+	public ElasticsearchIndexAdministrationClient(ElasticsearchWorkBuilderFactory workBuilderFactory,
 			ElasticsearchWorkOrchestrator workOrchestrator,
 			IndexMetadata expectedMetadata) {
-		this.schemaAccessor = new ElasticsearchSchemaAccessor( link, workOrchestrator );
+		this.schemaAccessor = new ElasticsearchSchemaAccessor( workBuilderFactory, workOrchestrator );
 
 		this.schemaCreator = new ElasticsearchSchemaCreatorImpl( schemaAccessor );
 		this.schemaDropper = new ElasticsearchSchemaDropperImpl( schemaAccessor );

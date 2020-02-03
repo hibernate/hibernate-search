@@ -6,35 +6,35 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
-import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorImplementor;
+import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
+import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.LowLevelIndexMetadataBuilder;
+import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexAdministrationClient;
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
+import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
+import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorImplementor;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorProvider;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ElasticsearchSearchProjection;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionBackendContext;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchQueryBuilder;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.SearchBackendContext;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
-import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
-import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexAdministrationClient;
-import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
-import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorProvider;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.ElasticsearchIndexIndexer;
-import org.hibernate.search.backend.elasticsearch.work.execution.impl.ElasticsearchIndexWorkspace;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.ElasticsearchIndexIndexingPlan;
+import org.hibernate.search.backend.elasticsearch.work.execution.impl.ElasticsearchIndexWorkspace;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.WorkExecutionBackendContext;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.WorkExecutionIndexManagerContext;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
-import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -148,13 +148,12 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	}
 
 	ElasticsearchIndexAdministrationClient createAdministrationClient(ElasticsearchIndexModel model) {
-		URLEncodedString primaryName = model.getNames().getPrimary();
-		IndexMetadata metadata = new IndexMetadata();
-		metadata.setName( primaryName );
-		metadata.setSettings( model.getSettings() );
-		metadata.setMapping( model.getMapping() );
+		LowLevelIndexMetadataBuilder builder = new LowLevelIndexMetadataBuilder( model.getNames() );
+		model.contributeLowLevelMetadata( builder );
+		IndexMetadata expectedMetadata = builder.build();
 		return new ElasticsearchIndexAdministrationClient(
-				link, orchestratorProvider.getRootParallelOrchestrator(), metadata
+				link.getWorkBuilderFactory(), orchestratorProvider.getRootParallelOrchestrator(),
+				expectedMetadata
 		);
 	}
 

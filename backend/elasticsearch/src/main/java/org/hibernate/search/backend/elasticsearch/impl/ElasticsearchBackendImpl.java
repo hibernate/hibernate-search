@@ -20,7 +20,6 @@ import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.Elasti
 import org.hibernate.search.backend.elasticsearch.document.model.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.index.impl.ElasticsearchIndexManagerBuilder;
 import org.hibernate.search.backend.elasticsearch.index.impl.IndexManagerBackendContext;
-import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
@@ -171,11 +170,11 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 		EventContext indexEventContext = EventContexts.fromIndexName( hibernateSearchIndexName );
 
+		IndexNames indexNames = createIndexNames( hibernateSearchIndexName, mappedTypeName );
+
 		return new ElasticsearchIndexManagerBuilder(
 				indexManagerBackendContext,
-				createIndexNames( hibernateSearchIndexName, mappedTypeName ),
-				createIndexSchemaRootNodeBuilder( indexEventContext, mappedTypeName ),
-				new ElasticsearchIndexSettingsBuilder( analysisDefinitionRegistry ),
+				createIndexSchemaRootNodeBuilder( indexEventContext, indexNames, mappedTypeName ),
 				createDocumentMetadataContributors( mappedTypeName )
 		);
 	}
@@ -203,11 +202,13 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	}
 
 	private ElasticsearchIndexSchemaRootNodeBuilder createIndexSchemaRootNodeBuilder(EventContext indexEventContext,
-			String mappedTypeName) {
+			IndexNames indexNames, String mappedTypeName) {
 		ElasticsearchIndexSchemaRootNodeBuilder builder = new ElasticsearchIndexSchemaRootNodeBuilder(
 				typeFactoryProvider,
 				indexEventContext,
-				mappedTypeName
+				indexNames,
+				mappedTypeName,
+				analysisDefinitionRegistry
 		);
 
 		typeNameMapping.getIndexSchemaRootContributor()
