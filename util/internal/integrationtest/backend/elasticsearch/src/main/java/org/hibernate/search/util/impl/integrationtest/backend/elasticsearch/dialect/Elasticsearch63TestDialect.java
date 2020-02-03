@@ -52,6 +52,16 @@ public class Elasticsearch63TestDialect implements ElasticsearchTestDialect {
 	}
 
 	@Override
+	public boolean supportsGeoPointIndexNullAs() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsStrictGreaterThanRangedQueriesOnScaledFloatField() {
+		return true;
+	}
+
+	@Override
 	public boolean zonedDateTimeDocValueHasUTCZoneId() {
 		return true;
 	}

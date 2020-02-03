@@ -20,12 +20,12 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 
 	@Override
 	public boolean geoPointIndexNullAs() {
-		return dialect.isGeoPointIndexNullAsPossible();
+		return dialect.supportsGeoPointIndexNullAs();
 	}
 
 	@Override
 	public boolean worksFineWithStrictAboveRangedQueriesOnDecimalScaledField() {
-		return dialect.worksFineWithStrictGraterThanRangedQueriesOnScaledFloatField();
+		return dialect.supportsStrictGreaterThanRangedQueriesOnScaledFloatField();
 	}
 
 	@Override
@@ -41,6 +41,7 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 		return ! ElasticsearchTestHostConnectionConfiguration.get().isAwsSigningEnabled();
 	}
 
+	@Override
 	public boolean zonedDateTimeDocValueHasUTCZoneId() {
 		return dialect.zonedDateTimeDocValueHasUTCZoneId();
 	}

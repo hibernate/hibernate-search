@@ -49,4 +49,19 @@ public class Elasticsearch7TestDialect implements ElasticsearchTestDialect {
 		array.add( pattern );
 		object.add( "index_patterns", array );
 	}
+
+	@Override
+	public boolean supportsGeoPointIndexNullAs() {
+		return true;
+	}
+
+	@Override
+	public boolean supportsStrictGreaterThanRangedQueriesOnScaledFloatField() {
+		return true;
+	}
+
+	@Override
+	public boolean zonedDateTimeDocValueHasUTCZoneId() {
+		return false;
+	}
 }
