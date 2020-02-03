@@ -23,7 +23,8 @@ public class Clock {
 	private Integer id;
 	private String brand;
 
-	public Clock() { }
+	public Clock() {
+	}
 
 	public Clock(Integer id, String brand) {
 		this.id = id;

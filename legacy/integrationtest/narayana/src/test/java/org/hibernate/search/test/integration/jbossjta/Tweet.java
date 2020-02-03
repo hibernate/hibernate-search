@@ -22,7 +22,8 @@ import org.hibernate.search.annotations.Indexed;
 @Indexed
 public class Tweet {
 
-	public Tweet() { }
+	public Tweet() {
+	}
 
 	public Tweet(String tweet) {
 		this.text = tweet;

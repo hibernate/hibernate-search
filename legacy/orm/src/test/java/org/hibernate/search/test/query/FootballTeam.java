@@ -20,7 +20,8 @@ import javax.persistence.Id;
 @Indexed
 public class FootballTeam {
 
-	public FootballTeam() { }
+	public FootballTeam() {
+	}
 
 	public FootballTeam(int id, String name, double debtInMillions, int nrTitles) {
 		this.id = id;

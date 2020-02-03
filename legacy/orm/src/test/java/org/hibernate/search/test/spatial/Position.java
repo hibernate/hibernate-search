@@ -35,6 +35,7 @@ public class Position {
 		};
 	}
 
-	public Position() { }
+	public Position() {
+	}
 
 }

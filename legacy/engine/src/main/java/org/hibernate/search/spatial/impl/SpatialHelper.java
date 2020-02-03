@@ -31,7 +31,8 @@ public abstract class SpatialHelper {
 	/**
 	 * Private constructor locking down utility class
 	 */
-	private SpatialHelper() { };
+	private SpatialHelper() {
+	}
 
 	/**
 	 * Generate a Cell Index on one axis
