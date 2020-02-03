@@ -12,9 +12,9 @@ import java.util.regex.Pattern;
 
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.IndexSchemaRootContributor;
-import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.DataTypes;
-import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;

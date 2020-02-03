@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionCollector;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionContributor;
-import org.hibernate.search.backend.elasticsearch.analysis.model.esnative.impl.NormalizerDefinition;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.NormalizerDefinition;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.ElasticsearchNormalizerOptionalComponentsStep;
 
 

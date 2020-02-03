@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.document.model.esnative.impl;
+package org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -17,7 +17,7 @@ import com.google.gson.stream.JsonWriter;
 
 
 
-public class ElasticsearchFormatJsonAdapter extends TypeAdapter<List<String>> {
+public class FormatJsonAdapter extends TypeAdapter<List<String>> {
 
 	private static final String FORMAT_SEPARATOR_REGEX = "\\|\\|";
 	private static final String FORMAT_SEPARATOR = "||";

@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.validation.impl;
 
-import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.PropertyMapping;
-import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
+import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 
 public class RootTypeMappingValidator extends AbstractTypeMappingValidator<RootTypeMapping> {
 	private final Validator<PropertyMapping> propertyMappingValidator = new PropertyMappingValidator();
