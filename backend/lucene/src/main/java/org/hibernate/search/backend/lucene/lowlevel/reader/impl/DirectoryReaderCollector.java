@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.reader.impl;
 
-import org.hibernate.search.backend.lucene.lowlevel.reader.spi.DirectoryReaderHolder;
+import org.apache.lucene.index.DirectoryReader;
 
 public interface DirectoryReaderCollector {
 
-	void collect(String mappedTypeName, DirectoryReaderHolder directoryReaderHolder);
+	void collect(String mappedTypeName, DirectoryReader directoryReader);
 
 }
