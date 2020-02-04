@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.impl;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
@@ -66,8 +67,8 @@ public final class ElasticsearchSearchContext {
 		return multiTenancyStrategy.toElasticsearchId( tenantId, id );
 	}
 
-	public Set<URLEncodedString> getIndexNames() {
-		return scopeModel.getElasticsearchIndexNames();
+	public Map<String, URLEncodedString> getHibernateSearchIndexNamesToIndexReadNames() {
+		return scopeModel.getHibernateSearchIndexNamesToIndexReadNames();
 	}
 
 	public Set<String> getHibernateSearchIndexNames() {

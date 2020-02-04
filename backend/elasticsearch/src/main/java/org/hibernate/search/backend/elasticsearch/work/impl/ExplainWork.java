@@ -28,12 +28,10 @@ public class ExplainWork extends AbstractSimpleElasticsearchWork<ExplainResult> 
 	private static final ElasticsearchRequestSuccessAssessor SUCCESS_ASSESSOR =
 			DefaultElasticsearchRequestSuccessAssessor.builder().ignoreErrorStatuses( 404 ).build();
 
-	private final URLEncodedString indexName;
 	private final URLEncodedString id;
 
 	private ExplainWork(Builder builder) {
 		super( builder );
-		this.indexName = builder.indexName;
 		this.id = builder.id;
 	}
 
@@ -41,7 +39,7 @@ public class ExplainWork extends AbstractSimpleElasticsearchWork<ExplainResult> 
 	protected ExplainResult generateResult(ElasticsearchWorkExecutionContext context,
 			ElasticsearchResponse response) {
 		if ( response.getStatusCode() == 404 ) {
-			throw log.explainUnkownDocument( indexName, id );
+			throw log.explainUnknownDocument( id );
 		}
 		JsonObject body = response.getBody();
 		return new ExplainResultImpl( body );

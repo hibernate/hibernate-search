@@ -12,8 +12,8 @@ import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadata
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 
@@ -22,21 +22,18 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 
 	private final IndexManagerBackendContext backendContext;
 
-	private final String hibernateSearchIndexName;
-	private final String elasticsearchIndexName;
+	private final IndexNames indexNames;
 	private final ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder;
 	private final ElasticsearchIndexSettingsBuilder settingsBuilder;
 	private final List<DocumentMetadataContributor> documentMetadataContributors;
 
 	public ElasticsearchIndexManagerBuilder(IndexManagerBackendContext backendContext,
-			String hibernateSearchIndexName, String elasticsearchIndexName,
+			IndexNames indexNames,
 			ElasticsearchIndexSchemaRootNodeBuilder schemaRootNodeBuilder,
 			ElasticsearchIndexSettingsBuilder settingsBuilder,
 			List<DocumentMetadataContributor> documentMetadataContributors) {
 		this.backendContext = backendContext;
-
-		this.hibernateSearchIndexName = hibernateSearchIndexName;
-		this.elasticsearchIndexName = elasticsearchIndexName;
+		this.indexNames = indexNames;
 		this.schemaRootNodeBuilder = schemaRootNodeBuilder;
 		this.settingsBuilder = settingsBuilder;
 		this.documentMetadataContributors = documentMetadataContributors;
@@ -54,14 +51,11 @@ public class ElasticsearchIndexManagerBuilder implements IndexManagerBuilder<Ela
 
 	@Override
 	public ElasticsearchIndexManagerImpl build() {
-		URLEncodedString encodedElasticsearchIndexName = URLEncodedString.fromString( elasticsearchIndexName );
-
 		ElasticsearchIndexModel model = schemaRootNodeBuilder
-				.build( hibernateSearchIndexName, encodedElasticsearchIndexName, settingsBuilder );
+				.build( indexNames, settingsBuilder );
 
 		return new ElasticsearchIndexManagerImpl(
 				backendContext,
-				hibernateSearchIndexName, encodedElasticsearchIndexName,
 				model,
 				documentMetadataContributors
 		);

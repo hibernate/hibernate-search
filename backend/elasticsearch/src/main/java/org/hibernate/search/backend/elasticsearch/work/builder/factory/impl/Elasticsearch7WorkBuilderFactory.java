@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.builder.factory.impl;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
@@ -114,7 +114,7 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 	}
 
 	@Override
-	public CountWorkBuilder count(Set<URLEncodedString> indexNames) {
+	public CountWorkBuilder count(Collection<URLEncodedString> indexNames) {
 		return new CountWork.Builder( indexNames );
 	}
 

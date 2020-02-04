@@ -48,7 +48,7 @@ public class ElasticsearchIndexIndexer implements IndexIndexer<ElasticsearchDocu
 
 		ElasticsearchWork<Void> work = factory.index(
 				indexManagerContext.getMappedTypeName(),
-				indexManagerContext.getElasticsearchIndexName(),
+				indexManagerContext.getElasticsearchIndexWriteName(),
 				URLEncodedString.fromString( elasticsearchId ), routingKey, document
 		)
 				.build();

@@ -7,13 +7,13 @@
 package org.hibernate.search.backend.elasticsearch.search.query.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.impl.ElasticsearchIndexNameNormalizer;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
@@ -107,7 +107,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	public ElasticsearchSearchResult<H> fetch(Integer offset, Integer limit) {
 		// TODO restore scrolling support. See HSEARCH-3323
 		ElasticsearchWork<ElasticsearchLoadableSearchResult<H>> work = workFactory.search( payload, searchResultExtractor )
-				.indexes( searchContext.getIndexNames() )
+				.indexes( searchContext.getHibernateSearchIndexNamesToIndexReadNames().values() )
 				.paging( defaultedLimit( limit, offset ), offset )
 				.routingKeys( routingKeys )
 				.timeout( timeoutValue, timeoutUnit, exceptionOnTimeout )
@@ -135,7 +135,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			filteredPayload.add( "query", querySubTree.get() );
 		}
 
-		ElasticsearchWork<Long> work = workFactory.count( searchContext.getIndexNames() )
+		ElasticsearchWork<Long> work = workFactory.count( searchContext.getHibernateSearchIndexNamesToIndexReadNames().values() )
 				.query( filteredPayload )
 				.routingKeys( routingKeys )
 				.timeout( timeoutValue, timeoutUnit, exceptionOnTimeout )
@@ -150,12 +150,12 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	public JsonObject explain(String id) {
 		Contracts.assertNotNull( id, "id" );
 
-		Set<URLEncodedString> targetedIndexNames = searchContext.getIndexNames();
+		Map<String, URLEncodedString> targetedIndexNames = searchContext.getHibernateSearchIndexNamesToIndexReadNames();
 		if ( targetedIndexNames.size() != 1 ) {
-			throw log.explainRequiresIndexName( targetedIndexNames );
+			throw log.explainRequiresIndexName( targetedIndexNames.keySet() );
 		}
 
-		return doExplain( targetedIndexNames.iterator().next(), id );
+		return doExplain( targetedIndexNames.entrySet().iterator().next().getValue(), id );
 	}
 
 	@Override
@@ -163,15 +163,13 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 		Contracts.assertNotNull( indexName, "indexName" );
 		Contracts.assertNotNull( id, "id" );
 
-		Set<URLEncodedString> targetedIndexNames = searchContext.getIndexNames();
-		URLEncodedString encodedIndexName = URLEncodedString.fromString(
-				ElasticsearchIndexNameNormalizer.normalize( indexName )
-		);
-		if ( !targetedIndexNames.contains( encodedIndexName ) ) {
-			throw log.explainRequiresIndexTargetedByQuery( targetedIndexNames, encodedIndexName );
+		Map<String, URLEncodedString> targetedIndexNames = searchContext.getHibernateSearchIndexNamesToIndexReadNames();
+		URLEncodedString indexReadName = targetedIndexNames.get( indexName );
+		if ( indexReadName == null ) {
+			throw log.explainRequiresIndexTargetedByQuery( targetedIndexNames.keySet(), indexName );
 		}
 
-		return doExplain( encodedIndexName, id );
+		return doExplain( indexReadName, id );
 	}
 
 	private Integer defaultedLimit(Integer limit, Integer offset) {
