@@ -74,8 +74,6 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 
 	private final IndexManagerBackendContext backendContext;
 
-	private final String hibernateSearchIndexName;
-	private final URLEncodedString elasticsearchIndexName;
 	private final ElasticsearchIndexModel model;
 	private final List<DocumentMetadataContributor> documentMetadataContributors;
 
@@ -87,27 +85,21 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	private ElasticsearchIndexLifecycleStrategy lifecycleStrategy;
 
 	ElasticsearchIndexManagerImpl(IndexManagerBackendContext backendContext,
-			String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName,
 			ElasticsearchIndexModel model,
 			List<DocumentMetadataContributor> documentMetadataContributors) {
 		this.backendContext = backendContext;
-		this.hibernateSearchIndexName = hibernateSearchIndexName;
-		this.elasticsearchIndexName = elasticsearchIndexName;
 		this.model = model;
 		this.documentMetadataContributors = documentMetadataContributors;
-		this.parallelOrchestrator = backendContext.createParallelOrchestrator( hibernateSearchIndexName );
-		this.serialOrchestrator = backendContext.createSerialOrchestrator( hibernateSearchIndexName );
-		this.administrationClient = backendContext.createAdministrationClient(
-				elasticsearchIndexName, model
-		);
+		this.parallelOrchestrator = backendContext.createParallelOrchestrator( model.getHibernateSearchIndexName() );
+		this.serialOrchestrator = backendContext.createSerialOrchestrator( model.getHibernateSearchIndexName() );
+		this.administrationClient = backendContext.createAdministrationClient( model );
 	}
 
 	@Override
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "name=" ).append( hibernateSearchIndexName )
-				.append( "elasticsearchName=" ).append( elasticsearchIndexName.original )
+				.append( "names=" ).append( model.getNames() )
 				.append( "]" )
 				.toString();
 	}
@@ -149,7 +141,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 			closer.push( strategy -> strategy.onStop( administrationClient ), lifecycleStrategy );
 		}
 		catch (IOException e) {
-			throw log.failedToShutdownIndexManager( hibernateSearchIndexName, e, backendContext.getEventContext() );
+			throw log.failedToShutdownIndexManager( model.getHibernateSearchIndexName(), e, backendContext.getEventContext() );
 		}
 	}
 
@@ -159,8 +151,8 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	}
 
 	@Override
-	public URLEncodedString getElasticsearchIndexName() {
-		return elasticsearchIndexName;
+	public URLEncodedString getElasticsearchIndexWriteName() {
+		return model.getNames().getWrite();
 	}
 
 	@Override
@@ -251,7 +243,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 
 	private EventContext getBackendAndIndexEventContext() {
 		return backendContext.getEventContext().append(
-				EventContexts.fromIndexName( hibernateSearchIndexName )
+				EventContexts.fromIndexName( model.getHibernateSearchIndexName() )
 		);
 	}
 

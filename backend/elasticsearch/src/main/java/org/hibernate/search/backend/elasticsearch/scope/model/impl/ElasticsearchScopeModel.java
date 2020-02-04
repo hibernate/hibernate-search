@@ -8,12 +8,12 @@ package org.hibernate.search.backend.elasticsearch.scope.model.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Iterator;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
@@ -31,30 +31,27 @@ public class ElasticsearchScopeModel {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Set<ElasticsearchIndexModel> indexModels;
-	private final Set<String> hibernateSearchIndexNames;
-	private final Set<URLEncodedString> elasticsearchIndexNames;
+	private final Map<String, URLEncodedString> hibernateSearchIndexNamesToIndexReadNames;
 
 	public ElasticsearchScopeModel(Set<ElasticsearchIndexModel> indexModels) {
 		this.indexModels = indexModels;
-		this.hibernateSearchIndexNames = indexModels.stream()
-				.map( ElasticsearchIndexModel::getHibernateSearchIndexName )
-				.collect( Collectors.toSet() );
-		// Use LinkedHashSet to ensure stable order when generating requests
-		this.elasticsearchIndexNames = indexModels.stream()
-				.map( ElasticsearchIndexModel::getElasticsearchIndexName )
-				.collect( Collectors.toCollection( LinkedHashSet::new ) );
+		// Use LinkedHashMap to ensure stable order when generating requests
+		this.hibernateSearchIndexNamesToIndexReadNames = new LinkedHashMap<>();
+		for ( ElasticsearchIndexModel model : indexModels ) {
+			hibernateSearchIndexNamesToIndexReadNames.put( model.getHibernateSearchIndexName(), model.getNames().getRead() );
+		}
 	}
 
 	public Set<String> getHibernateSearchIndexNames() {
-		return hibernateSearchIndexNames;
+		return hibernateSearchIndexNamesToIndexReadNames.keySet();
 	}
 
-	public Set<URLEncodedString> getElasticsearchIndexNames() {
-		return elasticsearchIndexNames;
+	public Map<String, URLEncodedString> getHibernateSearchIndexNamesToIndexReadNames() {
+		return hibernateSearchIndexNamesToIndexReadNames;
 	}
 
 	public EventContext getIndexesEventContext() {
-		return EventContexts.fromIndexNames( hibernateSearchIndexNames );
+		return EventContexts.fromIndexNames( getHibernateSearchIndexNames() );
 	}
 
 	public ElasticsearchScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> getIdDslConverter() {

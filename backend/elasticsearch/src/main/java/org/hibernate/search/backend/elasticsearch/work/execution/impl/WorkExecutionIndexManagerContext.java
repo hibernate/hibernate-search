@@ -27,7 +27,7 @@ public interface WorkExecutionIndexManagerContext {
 
 	String getMappedTypeName();
 
-	URLEncodedString getElasticsearchIndexName();
+	URLEncodedString getElasticsearchIndexWriteName();
 
 	String toElasticsearchId(String tenantId, String id);
 

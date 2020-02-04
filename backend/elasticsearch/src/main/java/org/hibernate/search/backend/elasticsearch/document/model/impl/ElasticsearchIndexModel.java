@@ -11,7 +11,6 @@ import java.util.Map;
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.backend.elasticsearch.index.settings.esnative.impl.IndexSettings;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -19,8 +18,7 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 public class ElasticsearchIndexModel {
 
-	private final String hibernateSearchIndexName;
-	private final URLEncodedString elasticsearchIndexName;
+	private final IndexNames names;
 	private final String mappedTypeName;
 	private final RootTypeMapping mapping;
 	private final IndexSettings settings;
@@ -29,15 +27,13 @@ public class ElasticsearchIndexModel {
 	private final Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes;
 	private final Map<String, ElasticsearchIndexSchemaFieldNode<?>> fieldNodes;
 
-	public ElasticsearchIndexModel(String hibernateSearchIndexName,
-			URLEncodedString elasticsearchIndexName,
+	public ElasticsearchIndexModel(IndexNames names,
 			String mappedTypeName,
 			ElasticsearchIndexSettingsBuilder settingsBuilder,
 			RootTypeMapping mapping, ToDocumentIdentifierValueConverter<?> idDslConverter,
 			Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes,
 			Map<String, ElasticsearchIndexSchemaFieldNode<?>> fieldNodes) {
-		this.hibernateSearchIndexName = hibernateSearchIndexName;
-		this.elasticsearchIndexName = elasticsearchIndexName;
+		this.names = names;
 		this.mappedTypeName = mappedTypeName;
 		this.settings = settingsBuilder.build();
 		this.idDslConverter = idDslConverter;
@@ -47,11 +43,11 @@ public class ElasticsearchIndexModel {
 	}
 
 	public String getHibernateSearchIndexName() {
-		return hibernateSearchIndexName;
+		return names.getHibernateSearch();
 	}
 
-	public URLEncodedString getElasticsearchIndexName() {
-		return elasticsearchIndexName;
+	public IndexNames getNames() {
+		return names;
 	}
 
 	public String getMappedTypeName() {
@@ -59,7 +55,7 @@ public class ElasticsearchIndexModel {
 	}
 
 	public EventContext getEventContext() {
-		return EventContexts.fromIndexName( hibernateSearchIndexName );
+		return EventContexts.fromIndexName( getHibernateSearchIndexName() );
 	}
 
 	public RootTypeMapping getMapping() {
@@ -86,7 +82,7 @@ public class ElasticsearchIndexModel {
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "elasticsearchIndexName=" ).append( elasticsearchIndexName )
+				.append( "names=" ).append( names )
 				.append( ", mapping=" ).append( mapping )
 				.append( "]" )
 				.toString();

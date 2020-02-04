@@ -14,12 +14,14 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorImplementor;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorProvider;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.DocumentReferenceExtractionHelper;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
+import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
@@ -174,9 +176,17 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 		EventContext indexEventContext = EventContexts.fromIndexName( hibernateSearchIndexName );
 
 		String elasticsearchIndexName = ElasticsearchIndexNameNormalizer.normalize( hibernateSearchIndexName );
+		URLEncodedString encodedElasticsearchIndexName = URLEncodedString.fromString( elasticsearchIndexName );
+		// TODO HSEARCH-3791 allow configuration of each alias
+		IndexNames names = new IndexNames(
+				hibernateSearchIndexName,
+				encodedElasticsearchIndexName,
+				encodedElasticsearchIndexName,
+				encodedElasticsearchIndexName
+		);
 
 		// This will check that names are unique.
-		indexNamesRegistry.register( elasticsearchIndexName, hibernateSearchIndexName );
+		indexNamesRegistry.register( names );
 
 		// This will allow the type mapping to resolve the type name from the index name.
 		typeNameMapping.register( elasticsearchIndexName, mappedTypeName );
@@ -205,8 +215,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 
 		return new ElasticsearchIndexManagerBuilder(
 				indexManagerBackendContext,
-				hibernateSearchIndexName,
-				elasticsearchIndexName,
+				names,
 				indexSchemaRootNodeBuilder, settingsBuilder,
 				documentMetadataContributors
 		);

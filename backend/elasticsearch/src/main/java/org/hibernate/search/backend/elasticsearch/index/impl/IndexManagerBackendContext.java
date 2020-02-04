@@ -153,15 +153,15 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		return eventContext;
 	}
 
-	ElasticsearchIndexAdministrationClient createAdministrationClient(URLEncodedString indexName,
-			ElasticsearchIndexModel model) {
+	ElasticsearchIndexAdministrationClient createAdministrationClient(ElasticsearchIndexModel model) {
+		URLEncodedString primaryName = model.getNames().getPrimary();
 		IndexMetadata metadata = new IndexMetadata();
-		metadata.setName( model.getElasticsearchIndexName() );
+		metadata.setName( primaryName );
 		metadata.setSettings( model.getSettings() );
 		metadata.setMapping( model.getMapping() );
 		return new ElasticsearchIndexAdministrationClient(
 				link, orchestratorProvider.getRootParallelOrchestrator(),
-				indexName, metadata
+				primaryName, metadata
 		);
 	}
 

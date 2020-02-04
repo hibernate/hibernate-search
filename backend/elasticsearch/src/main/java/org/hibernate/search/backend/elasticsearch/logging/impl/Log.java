@@ -346,10 +346,9 @@ public interface Log extends BasicLogger {
 	SearchException minimumShouldMatchConflictingConstraints(int ceiling);
 
 	@Message(id = ID_OFFSET_3 + 30,
-			value = "Duplicate index names when normalized to conform to Elasticsearch rules:"
-					+ " '%1$s' and '%2$s' both become '%3$s'")
-	SearchException duplicateNormalizedIndexNames(String firstHibernateSearchIndexName,
-			String secondHibernateSearchIndexName, String elasticsearchIndexName);
+			value = "Conflicting index names: Hibernate Search indexes '%1$s' and '%2$s' both target the name or alias '%3$s'")
+	SearchException conflictingIndexNames(String firstHibernateSearchIndexName,
+			String secondHibernateSearchIndexName, String nameOrAlias);
 
 	@Message(id = ID_OFFSET_3 + 31,
 			value = "Unknown index name encountered in Elasticsearch response: '%1$s'")
@@ -491,15 +490,15 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 64,
 			value = "explain(String id) cannot be used when the query targets multiple indexes."
 					+ " Use explain(String indexName, String id) and pass one of %1$s as the index name." )
-	SearchException explainRequiresIndexName(Set<URLEncodedString> targetedIndexNames);
+	SearchException explainRequiresIndexName(Set<String> targetedIndexNames);
 
 	@Message(id = ID_OFFSET_3 + 65,
 			value = "The given index name '%2$s' is not among the indexes targeted by this query: %1$s." )
-	SearchException explainRequiresIndexTargetedByQuery(Set<URLEncodedString> targetedIndexNames, URLEncodedString encodedIndexName);
+	SearchException explainRequiresIndexTargetedByQuery(Set<String> targetedIndexNames, String indexName);
 
 	@Message(id = ID_OFFSET_3 + 66,
-			value = "Document with id '%2$s' does not exist in index '%1$s' and thus its match cannot be explained." )
-	SearchException explainUnkownDocument(URLEncodedString indexName, URLEncodedString d);
+			value = "Document with id '%1$s' does not exist in the targeted index and thus its match cannot be explained." )
+	SearchException explainUnknownDocument(URLEncodedString id);
 
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET_3 + 67,

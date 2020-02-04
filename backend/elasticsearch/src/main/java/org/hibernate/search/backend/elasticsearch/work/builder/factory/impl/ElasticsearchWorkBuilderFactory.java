@@ -6,8 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.builder.factory.impl;
 
+import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
@@ -60,7 +60,7 @@ public interface ElasticsearchWorkBuilderFactory {
 
 	<T> SearchWorkBuilder<T> search(JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor);
 
-	CountWorkBuilder count(Set<URLEncodedString> indexNames);
+	CountWorkBuilder count(Collection<URLEncodedString> indexNames);
 
 	ExplainWorkBuilder explain(URLEncodedString indexName, URLEncodedString id, JsonObject payload);
 

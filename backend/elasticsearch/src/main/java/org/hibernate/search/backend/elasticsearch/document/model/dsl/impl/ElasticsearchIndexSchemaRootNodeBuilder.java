@@ -18,10 +18,10 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.DynamicType;
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.document.model.esnative.impl.RoutingType;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.index.settings.impl.ElasticsearchIndexSettingsBuilder;
 import org.hibernate.search.backend.elasticsearch.types.dsl.ElasticsearchIndexFieldTypeFactory;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.spi.StringToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
@@ -74,7 +74,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 		schemaRootContributors.add( schemaRootContributor );
 	}
 
-	public ElasticsearchIndexModel build(String hibernateSearchIndexName, URLEncodedString elasticsearchIndexName,
+	public ElasticsearchIndexModel build(IndexNames names,
 			ElasticsearchIndexSettingsBuilder settingsBuilder) {
 		RootTypeMapping mapping = new RootTypeMapping();
 		if ( routing != null ) {
@@ -107,8 +107,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 		contributeChildren( mapping, rootNode, collector );
 
 		return new ElasticsearchIndexModel(
-				hibernateSearchIndexName,
-				elasticsearchIndexName,
+				names,
 				mappedTypeName,
 				settingsBuilder,
 				mapping,

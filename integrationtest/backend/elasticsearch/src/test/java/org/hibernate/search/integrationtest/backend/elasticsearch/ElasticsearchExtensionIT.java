@@ -257,8 +257,7 @@ public class ElasticsearchExtensionIT {
 						ExceptionMatcherBuilder.isException( SearchException.class )
 								.causedBy( SearchException.class )
 								.withMessage(
-										"Document with id 'InvalidId' does not exist in index '"
-												+ ElasticsearchIndexNameNormalizer.normalize( INDEX_NAME ) + "'"
+										"Document with id 'InvalidId' does not exist in the targeted index"
 								)
 								.withMessage( "its match cannot be explained" )
 								.build()
@@ -300,12 +299,7 @@ public class ElasticsearchExtensionIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "explain(String id) cannot be used when the query targets multiple indexes" )
-				.hasMessageContaining(
-						"pass one of [" +
-						ElasticsearchIndexNameNormalizer.normalize( INDEX_NAME )
-						+ ", " + ElasticsearchIndexNameNormalizer.normalize( OTHER_INDEX_NAME )
-						+ "]"
-				);
+				.hasMessageContaining( "pass one of [" + INDEX_NAME + ", " + OTHER_INDEX_NAME + "]" );
 	}
 
 	@Test
@@ -322,10 +316,8 @@ public class ElasticsearchExtensionIT {
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
-						"index name 'notanindexname' is not among the indexes targeted by this query: ["
-						+ ElasticsearchIndexNameNormalizer.normalize( INDEX_NAME )
-						+ ", " + ElasticsearchIndexNameNormalizer.normalize( OTHER_INDEX_NAME )
-						+ "]"
+						"index name 'NotAnIndexName' is not among the indexes targeted by this query: ["
+						+ INDEX_NAME + ", " + OTHER_INDEX_NAME + "]"
 				);
 	}
 

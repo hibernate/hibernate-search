@@ -68,7 +68,7 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan<Elastic
 		collect(
 				builderFactory.delete(
 						indexManagerContext.getMappedTypeName(),
-						indexManagerContext.getElasticsearchIndexName(),
+						indexManagerContext.getElasticsearchIndexWriteName(),
 						URLEncodedString.fromString( elasticsearchId ), routingKey
 				)
 						.refresh( refreshStrategy )
@@ -112,7 +112,7 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan<Elastic
 		collect(
 				builderFactory.index(
 						indexManagerContext.getMappedTypeName(),
-						indexManagerContext.getElasticsearchIndexName(),
+						indexManagerContext.getElasticsearchIndexWriteName(),
 						URLEncodedString.fromString( elasticsearchId ), routingKey, document
 				)
 						.refresh( refreshStrategy )
