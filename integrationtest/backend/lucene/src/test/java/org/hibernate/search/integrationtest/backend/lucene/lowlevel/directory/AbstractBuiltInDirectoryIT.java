@@ -14,7 +14,7 @@ import java.util.function.Function;
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerImpl;
 import org.hibernate.search.backend.lucene.index.impl.Shard;
-import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
+import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
@@ -127,7 +127,7 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 		LuceneIndexManagerImpl luceneIndexManager = indexManager.unwrapForTests( LuceneIndexManagerImpl.class );
 		assertThat( luceneIndexManager.getShardsForTests() )
 				.extracting( Shard::getIndexAccessorForTests )
-				.extracting( IndexAccessor::getDirectoryForTests )
+				.extracting( IndexAccessorImpl::getDirectoryForTests )
 				.allSatisfy( directory -> {
 					try ( Lock lock = directory.obtainLock( "my-lock" ) ) {
 						Assertions.assertThat( lock.getClass().getName() )

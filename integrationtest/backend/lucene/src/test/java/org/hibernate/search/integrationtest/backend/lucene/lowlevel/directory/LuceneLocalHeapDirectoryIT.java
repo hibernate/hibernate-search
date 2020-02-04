@@ -10,7 +10,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerImpl;
 import org.hibernate.search.backend.lucene.index.impl.Shard;
-import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
+import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -36,7 +36,7 @@ public class LuceneLocalHeapDirectoryIT extends AbstractBuiltInDirectoryIT {
 		LuceneIndexManagerImpl luceneIndexManager = indexManager.unwrapForTests( LuceneIndexManagerImpl.class );
 		assertThat( luceneIndexManager.getShardsForTests() )
 				.extracting( Shard::getIndexAccessorForTests )
-				.extracting( IndexAccessor::getDirectoryForTests )
+				.extracting( IndexAccessorImpl::getDirectoryForTests )
 				.allSatisfy( directory -> assertThat( directory ).isInstanceOf( ByteBuffersDirectory.class ) );
 	}
 
