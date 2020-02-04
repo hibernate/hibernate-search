@@ -16,7 +16,8 @@ import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryCrea
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreationContext;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
-import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
+import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
+import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterProvider;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneBatchingWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
@@ -170,15 +171,18 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 
 	Shard createShard(LuceneIndexModel model, Optional<String> shardId) {
 		LuceneWriteWorkOrchestratorImplementor writeOrchestrator = null;
-		IndexAccessor indexAccessor = null;
+		IndexAccessorImpl indexAccessor = null;
+		String indexName = model.getIndexName();
+		EventContext shardEventContext = EventContexts.fromIndexNameAndShardId( model.getIndexName(), shardId );
 
 		try {
 			indexAccessor = createIndexAccessor(
-					model.getIndexName(), shardId, model.getScopedAnalyzer()
+					indexName, shardEventContext,
+					shardId, model.getScopedAnalyzer()
 			);
-			writeOrchestrator = createWriteOrchestrator( indexAccessor );
+			writeOrchestrator = createWriteOrchestrator( indexName, shardEventContext, indexAccessor );
 
-			return new Shard( indexAccessor, writeOrchestrator );
+			return new Shard( shardEventContext, indexAccessor, writeOrchestrator );
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
@@ -188,7 +192,8 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		}
 	}
 
-	private IndexAccessor createIndexAccessor(String indexName, Optional<String> shardId, Analyzer analyzer) {
+	private IndexAccessorImpl createIndexAccessor(String indexName, EventContext eventContext,
+			Optional<String> shardId, Analyzer analyzer) {
 		DirectoryHolder directoryHolder;
 		DirectoryCreationContext context = new DirectoryCreationContextImpl(
 				shardId.isPresent() ? EventContexts.fromShardId( shardId.get() ) : null,
@@ -196,29 +201,34 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 				shardId
 		);
 		directoryHolder = directoryProvider.createDirectoryHolder( context );
+		IndexWriterProvider indexWriterProvider = null;
 		try {
-			return new IndexAccessor(
-					indexName, EventContexts.fromIndexNameAndShardId( indexName, shardId ),
+			indexWriterProvider = new IndexWriterProvider(
+					indexName, eventContext,
 					directoryHolder, analyzer,
 					threadPoolProvider.getThreadProvider(),
 					failureHandler
 			);
+			return new IndexAccessorImpl(
+					eventContext,
+					directoryHolder, indexWriterProvider
+			);
 		}
 		catch (RuntimeException e) {
-			new SuppressingCloser( e ).push( directoryHolder );
+			new SuppressingCloser( e )
+					.push( IndexWriterProvider::clear, indexWriterProvider )
+					.push( directoryHolder );
 			throw e;
 		}
 	}
 
-	private LuceneWriteWorkOrchestratorImplementor createWriteOrchestrator(IndexAccessor indexAccessor) {
-		EventContext indexEventContext = indexAccessor.getIndexEventContext();
+	private LuceneWriteWorkOrchestratorImplementor createWriteOrchestrator(String indexName,
+			EventContext eventContext, IndexAccessorImpl indexAccessor) {
 		return new LuceneBatchingWriteWorkOrchestrator(
-				"Lucene write work orchestrator for " + indexEventContext.render(),
+				"Lucene write work orchestrator for " + eventContext.render(),
 				new LuceneWriteWorkProcessor(
-						indexAccessor.getIndexName(),
-						indexEventContext,
-						indexAccessor.getIndexWriterDelegator(),
-						failureHandler
+						indexName, eventContext,
+						indexAccessor, failureHandler
 				),
 				threadPoolProvider,
 				failureHandler

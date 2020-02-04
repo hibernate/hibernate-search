@@ -94,8 +94,8 @@ public interface Log extends BasicLogger {
 
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET_1 + 52,
-			value = "Going to force release of the IndexWriter lock. %1$s")
-	void forcingReleaseIndexWriterLock(@FormatWith(EventContextFormatter.class) EventContext context);
+			value = "Going to reset the index writer and force release of the IndexWriter lock. %1$s")
+	void indexAccessorReset(@FormatWith(EventContextFormatter.class) EventContext context);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ID_OFFSET_1 + 55,

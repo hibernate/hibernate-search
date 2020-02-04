@@ -8,90 +8,44 @@ package org.hibernate.search.backend.lucene.lowlevel.index.impl;
 
 import java.io.IOException;
 
-import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
-import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegatorImpl;
-import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
-import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.reporting.EventContext;
 
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.IndexWriter;
-import org.apache.lucene.store.Directory;
 
 /**
- * @author Sanne Grinovero (C) 2011 Red Hat Inc.
+ * The entry point for low-level I/O operations on a Lucene index.
+ * <p>
+ * Used to retrieve the index writer and index reader in particular.
  */
-public class IndexAccessor implements AutoCloseable {
-	private final String indexName;
-	private final EventContext indexEventContext;
-	private final DirectoryHolder directoryHolder;
-	private final IndexWriterDelegatorImpl indexWriterDelegator;
-
-	public IndexAccessor(String indexName, EventContext indexEventContext,
-			DirectoryHolder directoryHolder, Analyzer analyzer,
-			ThreadProvider threadProvider,
-			FailureHandler failureHandler) {
-		this.indexName = indexName;
-		this.indexEventContext = indexEventContext;
-		this.directoryHolder = directoryHolder;
-		this.indexWriterDelegator = new IndexWriterDelegatorImpl(
-				indexName, indexEventContext,
-				directoryHolder, analyzer, threadProvider, failureHandler
-		);
-	}
-
-	public String getIndexName() {
-		return indexName;
-	}
-
-	public EventContext getIndexEventContext() {
-		return indexEventContext;
-	}
-
-	public void start() throws IOException {
-		directoryHolder.start();
-	}
-
-	@Override
-	public void close() throws IOException {
-		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( IndexWriterDelegatorImpl::close, indexWriterDelegator );
-			closer.push( DirectoryHolder::close, directoryHolder );
-		}
-	}
-
-	public IndexWriterDelegator getIndexWriterDelegator() {
-		return indexWriterDelegator;
-	}
+public interface IndexAccessor {
 
 	/**
-	 * Opens an IndexReader having visibility on uncommitted writes from
-	 * the IndexWriter, if any writer is open, or null if no IndexWriter is open.
-	 * @param applyDeletes Applying deletes is expensive, say no if you can deal with stale hits during queries
-	 * @return a new NRT IndexReader if an IndexWriter is available, or <code>null</code> otherwise
+	 * Closes and drops any cached resources: index writers, index readers.
+	 * <p>
+	 * Should be used when stopping the index or to clean up upon error.
 	 */
-	public DirectoryReader openNRTIndexReader(boolean applyDeletes) throws IOException {
-		final IndexWriter indexWriter = indexWriterDelegator.getIndexWriterOrNull();
-		if ( indexWriter != null ) {
-			// TODO HSEARCH-3775 should parameter writeAllDeletes take the same value as applyDeletes?
-			return DirectoryReader.open( indexWriter, applyDeletes, applyDeletes );
-		}
-		else {
-			return null;
-		}
-	}
+	void reset() throws IOException;
 
 	/**
-	 * Opens an IndexReader from the Directory (not using the IndexWriter)
+	 * Checks whether the index exists (on disk, ...), and creates it if necessary.
+	 * <p>
+	 * Should only be used when starting an index.
 	 */
-	public DirectoryReader openDirectoryIndexReader() throws IOException {
-		return DirectoryReader.open( directoryHolder.get() );
-	}
+	void ensureIndexExists() throws IOException;
 
-	public Directory getDirectoryForTests() {
-		return directoryHolder.get();
-	}
+	/**
+	 * Commits the underlying index writer, if any.
+	 */
+	void commit() throws IOException;
+
+	/**
+	 * @return The index writer delegator.
+	 */
+	IndexWriterDelegator getIndexWriterDelegator() throws IOException;
+
+	/**
+	 * @return The most up-to-date index reader available.
+	 */
+	DirectoryReader getIndexReader() throws IOException;
+
 }

@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
+import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -34,8 +34,8 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String indexName;
-	private final EventContext indexEventContext;
-	private final IndexWriterDelegator indexWriterDelegator;
+	private final EventContext eventContext;
+	private final IndexAccessor indexAccessor;
 	private final LuceneWriteWorkExecutionContextImpl context;
 	private final FailureHandler failureHandler;
 
@@ -45,13 +45,12 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 	private List<LuceneWriteWork<?>> workSetUncommittedWorks = new ArrayList<>();
 	private boolean workSetHasFailure;
 
-	public LuceneWriteWorkProcessor(String indexName, EventContext indexEventContext,
-			IndexWriterDelegator indexWriterDelegator,
-			FailureHandler failureHandler) {
+	public LuceneWriteWorkProcessor(String indexName, EventContext eventContext,
+			IndexAccessor indexAccessor, FailureHandler failureHandler) {
 		this.indexName = indexName;
-		this.indexEventContext = indexEventContext;
-		this.indexWriterDelegator = indexWriterDelegator;
-		this.context = new LuceneWriteWorkExecutionContextImpl( indexEventContext, indexWriterDelegator );
+		this.eventContext = eventContext;
+		this.indexAccessor = indexAccessor;
+		this.context = new LuceneWriteWorkExecutionContextImpl( eventContext, indexAccessor );
 		this.failureHandler = failureHandler;
 	}
 
@@ -96,11 +95,11 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 	 */
 	void ensureIndexExists() {
 		try {
-			indexWriterDelegator.ensureIndexExists();
+			indexAccessor.ensureIndexExists();
 		}
 		catch (IOException | RuntimeException e) {
 			throw log.unableToInitializeIndexDirectory(
-					e.getMessage(), indexEventContext, e
+					e.getMessage(), eventContext, e
 			);
 		}
 	}
@@ -146,10 +145,10 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 	private void commit() {
 		try {
 			// TODO HSEARCH-3775 restore the commit policy feature to allow scheduled commits?
-			indexWriterDelegator.commit();
+			indexAccessor.commit();
 		}
 		catch (RuntimeException | IOException e) {
-			throw log.unableToCommitIndex( indexEventContext, e );
+			throw log.unableToCommitIndex( eventContext, e );
 		}
 	}
 
@@ -159,10 +158,10 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 			 * Note this will close the index writer,
 			 * which with the default settings will trigger a commit.
 			 */
-			indexWriterDelegator.forceLockRelease();
+			indexAccessor.reset();
 		}
 		catch (RuntimeException | IOException e) {
-			throwable.addSuppressed( log.unableToCleanUpAfterError( indexEventContext, e ) );
+			throwable.addSuppressed( log.unableToCleanUpAfterError( eventContext, e ) );
 		}
 
 		if ( previousWorkSetsUncommittedWorks.isEmpty() ) {

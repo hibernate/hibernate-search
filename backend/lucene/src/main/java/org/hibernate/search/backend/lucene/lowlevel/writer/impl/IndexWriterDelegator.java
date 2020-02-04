@@ -14,20 +14,11 @@ import org.apache.lucene.search.Query;
 
 /**
  * A component exposing features similar to {@link org.apache.lucene.index.IndexWriter},
- * except it only delegates to a writer, opening and closing it as needed.
+ * but simpler to use, and delegated to an actual writer.
  * <p>
- * Implementations are not thread safe.
- * <p>
- * This interface also allows to mock the index writer easily in unit tests.
+ * This interface also allows easy mocking of the index writer in unit tests.
  */
 public interface IndexWriterDelegator {
-
-	/**
-	 * Checks whether the index exists (on disk, ...), and creates it if necessary.
-	 * <p>
-	 * Should only be used when starting an index.
-	 */
-	void ensureIndexExists() throws IOException;
 
 	long addDocuments(Iterable<? extends Iterable<? extends IndexableField>> docs) throws IOException;
 
@@ -39,15 +30,8 @@ public interface IndexWriterDelegator {
 
 	long deleteAll() throws IOException;
 
-	void commit() throws IOException;
-
 	void flush() throws IOException;
 
 	void mergeSegments() throws IOException;
-
-	/**
-	 * Forces release of Directory lock. Should be used only to cleanup as error recovery.
-	 */
-	void forceLockRelease() throws IOException;
 
 }
