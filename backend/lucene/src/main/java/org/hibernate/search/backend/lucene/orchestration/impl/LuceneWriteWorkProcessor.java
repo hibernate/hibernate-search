@@ -90,7 +90,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 
 	/**
 	 * This bypasses the normal {@link #submit(LuceneWriteWork)} method in order
-	 * to avoid setting {@link #hasUncommittedWorks} to {@code true},
+	 * to avoid appending works to {@link #workSetUncommittedWorks},
 	 * so that we skip the end-of-batch commit and thus avoid the creation of an IndexWriter,
 	 * which would be pointless in this case.
 	 */
