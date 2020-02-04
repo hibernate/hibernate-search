@@ -12,7 +12,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HolderMultiReader;
+import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HibernateSearchMultiReader;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
 import org.hibernate.search.backend.lucene.work.impl.LuceneReadWork;
@@ -93,7 +93,7 @@ public class LuceneReadWorkOrchestratorImpl
 
 	static class ReadTask<T> implements AutoCloseable, LuceneReadWorkExecutionContext {
 		private final Set<String> indexNames;
-		private final HolderMultiReader indexReader;
+		private final HibernateSearchMultiReader indexReader;
 		private final LuceneReadWork<T> work;
 
 		private T result;
@@ -101,7 +101,7 @@ public class LuceneReadWorkOrchestratorImpl
 		ReadTask(Set<String> indexNames, Set<? extends ReadIndexManagerContext> indexManagerContexts,
 				Set<String> routingKeys, LuceneReadWork<T> work) {
 			this.indexNames = indexNames;
-			this.indexReader = HolderMultiReader.open( indexNames, indexManagerContexts, routingKeys );
+			this.indexReader = HibernateSearchMultiReader.open( indexNames, indexManagerContexts, routingKeys );
 			this.work = work;
 		}
 
