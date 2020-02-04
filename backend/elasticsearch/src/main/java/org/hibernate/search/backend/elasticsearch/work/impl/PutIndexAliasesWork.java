@@ -57,7 +57,8 @@ public class PutIndexAliasesWork extends AbstractSimpleElasticsearchWork<Void> {
 			return new PutIndexAliasesWork( this );
 		}
 
-		private JsonObject createPayload(GsonProvider gsonProvider, String indexName, Map<String, IndexAliasDefinition> aliases) {
+		private static JsonObject createPayload(GsonProvider gsonProvider, String indexName,
+				Map<String, IndexAliasDefinition> aliases) {
 			/*
 			 * Serializing nulls is really not a good idea here, it triggers NPEs in Elasticsearch
 			 * We better not include the null fields.
