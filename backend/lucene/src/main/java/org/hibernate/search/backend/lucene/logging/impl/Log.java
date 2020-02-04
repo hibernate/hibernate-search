@@ -58,7 +58,6 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		// Exceptions for legacy messages from Search 5
 		@ValidIdRange(min = 35, max = 35),
 		@ValidIdRange(min = 41, max = 41),
-		@ValidIdRange(min = 49, max = 49),
 		@ValidIdRange(min = 52, max = 52),
 		@ValidIdRange(min = 55, max = 55),
 		@ValidIdRange(min = 75, max = 75),
@@ -92,11 +91,6 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = INFO)
 	@Message(id = ID_OFFSET_1 + 41, value = "Index directory not found, creating: '%1$s'")
 	void indexDirectoryNotFoundCreatingNewOne(Path absolutePath);
-
-	@LogMessage(level = WARN)
-	@Message(id = ID_OFFSET_1 + 49,
-			value = "'%s' was interrupted while waiting for index activity to finish. Index might be inconsistent or have a stale lock")
-	void interruptedWhileWaitingForIndexActivity(String name, @Cause InterruptedException e);
 
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET_1 + 52,
