@@ -49,6 +49,15 @@ public class NearRealTimeIndexReaderProvider implements IndexReaderProvider {
 	}
 
 	@Override
+	public void refresh() throws IOException {
+		IndexReaderEntry entry = currentReaderEntry;
+
+		if ( entry != null ) {
+			entry.forceRefresh();
+		}
+	}
+
+	@Override
 	public DirectoryReader getOrCreate() throws IOException {
 		IndexReaderEntry entry = currentReaderEntry;
 
@@ -103,13 +112,29 @@ public class NearRealTimeIndexReaderProvider implements IndexReaderProvider {
 		private final TimingSource timingSource;
 		private final long expiration;
 
+		private volatile boolean refreshForced = false;
+
 		private IndexReaderEntry(DirectoryReader reader, TimingSource timingSource, int refreshInterval) {
 			this.reader = reader;
 			this.timingSource = timingSource;
 			this.expiration = refreshInterval == 0 ? 0 : timingSource.getMonotonicTimeEstimate() + refreshInterval;
 		}
 
+		public void forceRefresh() {
+			refreshForced = true;
+		}
+
+		/**
+		 * @return {@code true} if the reader is still fresh enough to be used,
+		 * i.e. if it is completely up-to-date with the state of the index writer
+		 * OR is out-of-date by less than the configured refresh interval,
+		 * and refresh wasn't forced by a previous write.
+		 * @throws IOException If an I/O failure occurs.
+		 */
 		boolean isFresh() throws IOException {
+			if ( refreshForced ) {
+				return false;
+			}
 			if ( expiration == 0 || expiration < timingSource.getMonotonicTimeEstimate() ) {
 				// The last refresh was a long time ago. Let's check if the reader is really fresh.
 				return reader.isCurrent();

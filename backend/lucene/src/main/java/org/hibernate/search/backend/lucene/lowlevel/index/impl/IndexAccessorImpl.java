@@ -97,6 +97,11 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 	}
 
 	@Override
+	public void refresh() throws IOException {
+		indexReaderProvider.refresh();
+	}
+
+	@Override
 	public IndexWriterDelegator getIndexWriterDelegator() throws IOException {
 		return indexWriterProvider.getOrCreate();
 	}

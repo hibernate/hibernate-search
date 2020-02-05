@@ -20,6 +20,12 @@ public interface IndexReaderProvider {
 	void clear() throws IOException;
 
 	/**
+	 * Make sure the index reader returned by the next call to {@link #getOrCreate()}
+	 * will return an up-to-date view of the index.
+	 */
+	void refresh() throws IOException;
+
+	/**
 	 * @return A ready-to-use index reader, with its reference count already increased.
 	 * Callers are responsible for calling {@link DirectoryReader#decRef()} when they are done with the index reader.
 	 * Callers <strong>must not</strong> call {@link DirectoryReader#close()},
