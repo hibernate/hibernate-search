@@ -12,12 +12,9 @@ import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDef
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
-import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryCreationContextImpl;
-import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreationContext;
-import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
+import org.hibernate.search.backend.lucene.lowlevel.index.impl.IOStrategy;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
-import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterProvider;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneBatchingWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
@@ -43,6 +40,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -50,7 +48,6 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuil
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.facet.FacetsConfig;
 
 public class IndexManagerBackendContext implements WorkExecutionBackendContext, SearchBackendContext {
@@ -169,14 +166,19 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		return new LuceneIndexEntryFactory( multiTenancyStrategy, indexName, facetsConfig );
 	}
 
-	Shard createShard(LuceneIndexModel model, Optional<String> shardId) {
-		LuceneWriteWorkOrchestratorImplementor writeOrchestrator = null;
+	IOStrategy createIOStrategy(ConfigurationPropertySource propertySource) {
+		// FIXME HSEARCH-3775 this should use the property source to define refresh intervals, etc.
+		return new IOStrategy( directoryProvider, threadPoolProvider, failureHandler );
+	}
+
+	Shard createShard(IOStrategy ioStrategy, LuceneIndexModel model, Optional<String> shardId) {
+		LuceneWriteWorkOrchestratorImplementor writeOrchestrator;
 		IndexAccessorImpl indexAccessor = null;
 		String indexName = model.getIndexName();
 		EventContext shardEventContext = EventContexts.fromIndexNameAndShardId( model.getIndexName(), shardId );
 
 		try {
-			indexAccessor = createIndexAccessor(
+			indexAccessor = ioStrategy.createIndexAccessor(
 					indexName, shardEventContext,
 					shardId, model.getScopedAnalyzer()
 			);
@@ -188,36 +190,6 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 			new SuppressingCloser( e )
 					// No need to stop the orchestrator, we didn't start it
 					.push( indexAccessor );
-			throw e;
-		}
-	}
-
-	private IndexAccessorImpl createIndexAccessor(String indexName, EventContext eventContext,
-			Optional<String> shardId, Analyzer analyzer) {
-		DirectoryHolder directoryHolder;
-		DirectoryCreationContext context = new DirectoryCreationContextImpl(
-				shardId.isPresent() ? EventContexts.fromShardId( shardId.get() ) : null,
-				indexName,
-				shardId
-		);
-		directoryHolder = directoryProvider.createDirectoryHolder( context );
-		IndexWriterProvider indexWriterProvider = null;
-		try {
-			indexWriterProvider = new IndexWriterProvider(
-					indexName, eventContext,
-					directoryHolder, analyzer,
-					threadPoolProvider.getThreadProvider(),
-					failureHandler
-			);
-			return new IndexAccessorImpl(
-					eventContext,
-					directoryHolder, indexWriterProvider
-			);
-		}
-		catch (RuntimeException e) {
-			new SuppressingCloser( e )
-					.push( IndexWriterProvider::clear, indexWriterProvider )
-					.push( directoryHolder );
 			throw e;
 		}
 	}
@@ -234,5 +206,4 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 				failureHandler
 		);
 	}
-
 }
