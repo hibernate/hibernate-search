@@ -183,24 +183,22 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 	private void processBatch() {
 		try {
 			CompletableFuture<?> batchFuture;
-			synchronized (processor) {
-				processor.beginBatch();
-				workBuffer.clear();
+			processor.beginBatch();
+			workBuffer.clear();
 
-				workQueue.drainTo( workBuffer, maxTasksPerBatch );
+			workQueue.drainTo( workBuffer, maxTasksPerBatch );
 
-				for ( W workset : workBuffer ) {
-					try {
-						workset.submitTo( processor );
-					}
-					catch (Throwable e) {
-						workset.markAsFailed( e );
-					}
+			for ( W workset : workBuffer ) {
+				try {
+					workset.submitTo( processor );
 				}
-
-				// Nothing more to do, end the batch and terminate
-				batchFuture = processor.endBatch();
+				catch (Throwable e) {
+					workset.markAsFailed( e );
+				}
 			}
+
+			// Nothing more to do, end the batch and terminate
+			batchFuture = processor.endBatch();
 
 			/*
 			 * Wait for works to complete before trying to handle the next batch.
