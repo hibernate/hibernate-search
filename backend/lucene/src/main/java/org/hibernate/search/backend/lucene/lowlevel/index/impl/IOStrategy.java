@@ -12,6 +12,7 @@ import org.hibernate.search.backend.lucene.lowlevel.directory.impl.DirectoryCrea
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryCreationContext;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
+import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderProvider;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterProvider;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
@@ -21,13 +22,13 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.analysis.Analyzer;
 
-public final class IOStrategy {
+public abstract class IOStrategy {
 
 	private final DirectoryProvider directoryProvider;
 	private final ThreadPoolProvider threadPoolProvider;
 	private final FailureHandler failureHandler;
 
-	public IOStrategy(DirectoryProvider directoryProvider, ThreadPoolProvider threadPoolProvider,
+	protected IOStrategy(DirectoryProvider directoryProvider, ThreadPoolProvider threadPoolProvider,
 			FailureHandler failureHandler) {
 		this.directoryProvider = directoryProvider;
 		this.threadPoolProvider = threadPoolProvider;
@@ -44,16 +45,19 @@ public final class IOStrategy {
 		);
 		directoryHolder = directoryProvider.createDirectoryHolder( context );
 		IndexWriterProvider indexWriterProvider = null;
+		IndexReaderProvider indexReaderProvider = null;
 		try {
 			indexWriterProvider = createIndexWriterProvider( indexName, eventContext, analyzer, directoryHolder );
+			indexReaderProvider = createIndexReaderProvider( directoryHolder, indexWriterProvider );
 			return new IndexAccessorImpl(
 					eventContext,
-					directoryHolder, indexWriterProvider
+					directoryHolder, indexWriterProvider, indexReaderProvider
 			);
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
 					.push( IndexWriterProvider::clear, indexWriterProvider )
+					.push( IndexReaderProvider::clear, indexReaderProvider )
 					.push( directoryHolder );
 			throw e;
 		}
@@ -68,5 +72,8 @@ public final class IOStrategy {
 				failureHandler
 		);
 	}
+
+	abstract IndexReaderProvider createIndexReaderProvider(DirectoryHolder directoryHolder,
+			IndexWriterProvider indexWriterProvider);
 
 }
