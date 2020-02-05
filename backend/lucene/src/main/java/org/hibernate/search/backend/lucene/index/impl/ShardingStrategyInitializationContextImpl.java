@@ -17,6 +17,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.index.spi.ShardingStrategy;
 import org.hibernate.search.backend.lucene.index.spi.ShardingStrategyInitializationContext;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.index.impl.IOStrategy;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
@@ -40,6 +41,7 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 					.build();
 
 	private final IndexManagerBackendContext backendContext;
+	private final IOStrategy ioStrategy;
 	private final LuceneIndexModel model;
 	private final IndexManagerStartContext startContext;
 	private final ConfigurationPropertySource propertySource;
@@ -48,10 +50,11 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 
 	ShardingStrategyInitializationContextImpl(
 			IndexManagerBackendContext backendContext,
-			LuceneIndexModel model,
+			IOStrategy ioStrategy, LuceneIndexModel model,
 			IndexManagerStartContext startContext,
 			ConfigurationPropertySource propertySource) {
 		this.backendContext = backendContext;
+		this.ioStrategy = ioStrategy;
 		this.model = model;
 		this.startContext = startContext;
 		this.propertySource = propertySource;
@@ -110,7 +113,7 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 
 	private void contributeShardWithSilentFailure(Map<String, Shard> shardCollector, Optional<String> shardId) {
 		try {
-			Shard shard = backendContext.createShard( model, shardId );
+			Shard shard = backendContext.createShard( ioStrategy, model, shardId );
 			shardCollector.put( shardId.orElse( null ), shard );
 		}
 		catch (RuntimeException e) {

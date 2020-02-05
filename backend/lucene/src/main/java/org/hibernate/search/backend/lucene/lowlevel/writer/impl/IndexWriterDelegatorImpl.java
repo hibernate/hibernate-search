@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 
 import java.io.IOException;
 
+import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.Term;
@@ -63,8 +64,15 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 		delegate.commit();
 	}
 
+	public DirectoryReader openReader() throws IOException {
+		return DirectoryReader.open( delegate );
+	}
+
+	public DirectoryReader openReaderIfChanged(DirectoryReader oldReader) throws IOException {
+		return DirectoryReader.openIfChanged( oldReader, delegate );
+	}
+
 	void close() throws IOException {
 		delegate.close();
 	}
-
 }

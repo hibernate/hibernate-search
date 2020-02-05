@@ -18,6 +18,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.index.spi.ShardingStrategy;
+import org.hibernate.search.backend.lucene.lowlevel.index.impl.IOStrategy;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.DirectoryReaderCollector;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
@@ -53,9 +54,11 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 		ConfigurationPropertySource propertySource = startContext.getConfigurationPropertySource();
 
 		try {
+			IOStrategy ioStrategy = backendContext.createIOStrategy( propertySource );
 			ShardingStrategyInitializationContextImpl initializationContext =
 					new ShardingStrategyInitializationContextImpl(
 							backendContext,
+							ioStrategy,
 							model,
 							startContext,
 							propertySource.withMask( "sharding" )
