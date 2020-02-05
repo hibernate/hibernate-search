@@ -46,11 +46,10 @@ public interface ThreadPoolProvider {
 	ThreadPoolExecutor newFixedThreadPool(int threads, String threadNamePrefix, int queueSize);
 
 	/**
-	 * Creates an executor for recurring tasks
+	 * Get the executor for short, scheduled tasks.
 	 *
-	 * @param threadNamePrefix a label to identify the threads; useful for profiling.
-	 * @return instance of {@link ScheduledExecutorService}
+	 * @return A (shared) instance of {@link ScheduledExecutorService}.
 	 */
-	ScheduledExecutorService newScheduledThreadPool(String threadNamePrefix);
+	ScheduledExecutorService getSharedScheduledThreadPool();
 
 }

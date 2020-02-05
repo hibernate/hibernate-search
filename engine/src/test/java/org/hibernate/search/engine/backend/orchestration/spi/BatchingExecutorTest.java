@@ -15,11 +15,11 @@ import static org.easymock.EasyMock.expectLastCall;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.thread.impl.DefaultThreadProvider;
 import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.engine.environment.thread.impl.DefaultThreadProvider;
 import org.hibernate.search.util.impl.test.FutureAssert;
 
 import org.junit.After;
@@ -35,7 +35,8 @@ public class BatchingExecutorTest extends EasyMockSupport {
 
 	private final StubWorkProcessor processorMock = createMock( StubWorkProcessor.class );
 	private final FailureHandler failureHandlerMock = createMock( FailureHandler.class );
-	private final ThreadPoolProvider threadPoolProvider = new ThreadPoolProviderImpl( new DefaultThreadProvider() );
+	private final ThreadPoolProviderImpl threadPoolProvider =
+			new ThreadPoolProviderImpl( BeanHolder.of( new DefaultThreadProvider() ) );
 
 	// To execute code asynchronously. Just use more threads than we'll ever need, we don't care about performance.
 	private final ForkJoinPool asyncExecutor = new ForkJoinPool( 12 );
@@ -44,6 +45,7 @@ public class BatchingExecutorTest extends EasyMockSupport {
 
 	@After
 	public void cleanup() {
+		threadPoolProvider.close();
 		asyncExecutor.shutdownNow();
 		executor.stop();
 	}

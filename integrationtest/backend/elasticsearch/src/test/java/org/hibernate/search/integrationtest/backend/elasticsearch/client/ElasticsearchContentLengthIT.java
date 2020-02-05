@@ -36,7 +36,6 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.impl.DefaultThreadProvider;
 import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresNoRequestPostProcessing;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresRequestPostProcessing;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckBackendHelper;
@@ -44,6 +43,7 @@ import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationPr
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -92,6 +92,15 @@ public class ElasticsearchContentLengthIT {
 
 	@Rule
 	public TestConfigurationProvider testConfigurationProvider = new TestConfigurationProvider();
+
+	private final ThreadPoolProviderImpl threadPoolProvider = new ThreadPoolProviderImpl(
+			BeanHolder.of( new DefaultThreadProvider( ElasticsearchContentLengthIT.class.getName() + ": " ) )
+	);
+
+	@After
+	public void cleanup() {
+		threadPoolProvider.close();
+	}
 
 	@Test
 	public void tinyPayload() throws Exception {
@@ -175,9 +184,6 @@ public class ElasticsearchContentLengthIT {
 		ConfigurationPropertySource defaultBackendProperties =
 				new ElasticsearchTckBackendHelper().createDefaultBackendSetupStrategy()
 						.createBackendConfigurationPropertySource( testConfigurationProvider );
-		ThreadPoolProvider threadPoolProvider = new ThreadPoolProviderImpl(
-				new DefaultThreadProvider( ElasticsearchContentLengthIT.class.getName() + ": " )
-		);
 
 		// Redirect requests to Wiremock
 		Map<String, Object> configurationOverride = new HashMap<>();

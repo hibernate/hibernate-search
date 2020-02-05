@@ -194,12 +194,12 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			FailureHandler failureHandler = failureHandlerHolder.get();
 
 			threadProviderHolder = THREAD_PROVIDER.getAndTransform( propertySource, beanResolver::resolve );
-			ThreadPoolProviderImpl executorProvider = new ThreadPoolProviderImpl( threadProviderHolder.get() );
+			ThreadPoolProviderImpl threadPoolProvider = new ThreadPoolProviderImpl( threadProviderHolder );
 
 			RootBuildContext rootBuildContext = new RootBuildContext(
 					propertySource,
 					classResolver, resourceResolver, beanResolver,
-					failureCollector, executorProvider, failureHandler
+					failureCollector, threadPoolProvider, failureHandler
 			);
 
 			indexManagerBuildingStateHolder = new IndexManagerBuildingStateHolder( beanResolver, propertySource, rootBuildContext );
@@ -263,7 +263,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 			return new SearchIntegrationPartialBuildStateImpl(
 					beanProvider, beanResolver,
 					failureHandlerHolder,
-					threadProviderHolder,
+					threadPoolProvider,
 					partiallyBuiltMappings,
 					indexManagerBuildingStateHolder.getBackendPartialBuildStates(),
 					indexManagerBuildingStateHolder.getIndexManagersByName(),
