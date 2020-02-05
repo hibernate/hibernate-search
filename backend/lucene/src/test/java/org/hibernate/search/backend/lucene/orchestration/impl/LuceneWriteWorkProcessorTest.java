@@ -24,7 +24,6 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.reporting.IndexFailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.test.SubTest;
 
@@ -320,19 +319,12 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		replayAll();
 		SubTest.expectException( () -> processor.afterSuccessfulWorkSet() )
 				.assertThrown()
-				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Unable to commit" )
-				.hasMessageContaining( INDEX_NAME )
-				.hasCause( commitException );
+				.isSameAs( commitException );
 		verifyAll();
 
 		IndexFailureContext failureContext = failureContextCapture.getValue();
 		assertThat( failureContext.getIndexName() ).isEqualTo( INDEX_NAME );
-		assertThat( failureContext.getThrowable() )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Unable to commit" )
-				.hasMessageContaining( INDEX_NAME )
-				.hasCause( commitException );
+		assertThat( failureContext.getThrowable() ).isSameAs( commitException );
 		assertThat( failureContext.getFailingOperation() ).asString()
 				.contains( "Commit after a set of index works" );
 		Assertions.<Object>assertThat( failureContext.getUncommittedOperations() )
@@ -397,10 +389,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		replayAll();
 		SubTest.expectException( () -> processor.afterSuccessfulWorkSet() )
 				.assertThrown()
-				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Unable to refresh" )
-				.hasMessageContaining( INDEX_NAME )
-				.hasCause( refreshException );
+				.isSameAs( refreshException );
 		verifyAll();
 
 		resetAll();
@@ -458,19 +447,12 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		replayAll();
 		SubTest.expectException( () -> processor.afterSuccessfulWorkSet() )
 				.assertThrown()
-				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Unable to commit" )
-				.hasMessageContaining( INDEX_NAME )
-				.hasCause( commitException );
+				.isSameAs( commitException );
 		verifyAll();
 
 		IndexFailureContext failureContext = failureContextCapture.getValue();
 		assertThat( failureContext.getIndexName() ).isEqualTo( INDEX_NAME );
-		assertThat( failureContext.getThrowable() )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Unable to commit" )
-				.hasMessageContaining( INDEX_NAME )
-				.hasCause( commitException );
+		assertThat( failureContext.getThrowable() ).isSameAs( commitException );
 		assertThat( failureContext.getFailingOperation() ).asString()
 				.contains( "Commit after a set of index works" );
 		Assertions.<Object>assertThat( failureContext.getUncommittedOperations() )
@@ -539,11 +521,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 		IndexFailureContext failureContext = failureContextCapture.getValue();
 		assertThat( failureContext.getIndexName() ).isEqualTo( INDEX_NAME );
-		assertThat( failureContext.getThrowable() )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Unable to commit" )
-				.hasMessageContaining( INDEX_NAME )
-				.hasCause( commitException );
+		assertThat( failureContext.getThrowable() ).isSameAs( commitException );
 		assertThat( failureContext.getFailingOperation() ).asString()
 				.contains( "Commit after a batch of index works" );
 		// Uncommitted operations must include works from all previous works since the last commit
@@ -603,11 +581,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 		IndexFailureContext failureContext = failureContextCapture.getValue();
 		assertThat( failureContext.getIndexName() ).isEqualTo( INDEX_NAME );
-		assertThat( failureContext.getThrowable() )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContaining( "Unable to commit" )
-				.hasMessageContaining( INDEX_NAME )
-				.hasCause( commitException );
+		assertThat( failureContext.getThrowable() ).isSameAs( commitException );
 		assertThat( failureContext.getFailingOperation() ).asString()
 				.contains( "Commit after a batch of index works" );
 		// Uncommitted operations must include works from all previous works since the last commit

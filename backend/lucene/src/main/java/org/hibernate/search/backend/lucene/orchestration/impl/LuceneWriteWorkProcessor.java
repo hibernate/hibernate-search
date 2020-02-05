@@ -21,7 +21,6 @@ import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.reporting.IndexFailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.impl.Throwables;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -65,7 +64,8 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 	public CompletableFuture<?> endBatch() {
 		if ( !previousWorkSetsUncommittedWorks.isEmpty() ) {
 			try {
-				commit();
+				// TODO HSEARCH-3775 restore the commit policy feature to allow scheduled commits?
+				indexAccessor.commit();
 			}
 			catch (RuntimeException e) {
 				cleanUpAfterFailure( e, "Commit after a batch of index works" );
@@ -94,14 +94,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 	 * which would be pointless in this case.
 	 */
 	void ensureIndexExists() {
-		try {
-			indexAccessor.ensureIndexExists();
-		}
-		catch (IOException | RuntimeException e) {
-			throw log.unableToInitializeIndexDirectory(
-					e.getMessage(), eventContext, e
-			);
-		}
+		indexAccessor.ensureIndexExists();
 	}
 
 	public <T> T submit(LuceneWriteWork<T> work) {
@@ -124,7 +117,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 	public void afterSuccessfulWorkSet() {
 		if ( workSetForcesCommit ) {
 			try {
-				commit();
+				indexAccessor.commit();
 			}
 			catch (RuntimeException e) {
 				cleanUpAfterFailure( e, "Commit after a set of index works" );
@@ -145,26 +138,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 		if ( workSetForcesRefresh ) {
 			// In case of failure, just propagate the exception:
 			// we don't expect a refresh failure to affect the writer.
-			refresh();
-		}
-	}
-
-	private void refresh() {
-		try {
 			indexAccessor.refresh();
-		}
-		catch (RuntimeException | IOException e) {
-			throw log.unableToRefreshIndex( eventContext, e );
-		}
-	}
-
-	private void commit() {
-		try {
-			// TODO HSEARCH-3775 restore the commit policy feature to allow scheduled commits?
-			indexAccessor.commit();
-		}
-		catch (RuntimeException | IOException e) {
-			throw log.unableToCommitIndex( eventContext, e );
 		}
 	}
 

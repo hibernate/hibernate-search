@@ -67,38 +67,44 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 	}
 
 	@Override
-	public void ensureIndexExists() throws IOException {
-		Directory directory = directoryHolder.get();
-
-		if ( DirectoryReader.indexExists( directory ) ) {
-			return;
-		}
-
+	public void ensureIndexExists() {
 		try {
-			IndexWriterConfig iwriterConfig = new IndexWriterConfig( AnalyzerConstants.KEYWORD_ANALYZER )
-					.setOpenMode( IndexWriterConfig.OpenMode.CREATE_OR_APPEND );
-			//Needs to have a timeout higher than zero to prevent race conditions over (network) RPCs
-			//for distributed indexes (Infinispan but probably also NFS and similar)
-			SleepingLockWrapper delayedDirectory = new SleepingLockWrapper( directory, 2000, 20 );
-			IndexWriter iw = new IndexWriter( delayedDirectory, iwriterConfig );
-			iw.close();
+			Directory directory = directoryHolder.get();
+
+			if ( DirectoryReader.indexExists( directory ) ) {
+				return;
+			}
+
+			initializeDirectory( directory );
 		}
-		catch (LockObtainFailedException lofe) {
-			log.lockingFailureDuringInitialization( directory.toString(), eventContext );
+		catch (IOException | RuntimeException e) {
+			throw log.unableToInitializeIndexDirectory(
+					e.getMessage(), eventContext, e
+			);
 		}
 	}
 
 	@Override
-	public void commit() throws IOException {
-		IndexWriterDelegatorImpl delegator = indexWriterProvider.getOrNull();
-		if ( delegator != null ) {
-			delegator.commit();
+	public void commit() {
+		try {
+			IndexWriterDelegatorImpl delegator = indexWriterProvider.getOrNull();
+			if ( delegator != null ) {
+				delegator.commit();
+			}
+		}
+		catch (RuntimeException | IOException e) {
+			throw log.unableToCommitIndex( eventContext, e );
 		}
 	}
 
 	@Override
-	public void refresh() throws IOException {
-		indexReaderProvider.refresh();
+	public void refresh() {
+		try {
+			indexReaderProvider.refresh();
+		}
+		catch (RuntimeException | IOException e) {
+			throw log.unableToRefreshIndex( eventContext, e );
+		}
 	}
 
 	@Override
@@ -113,6 +119,21 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 
 	public Directory getDirectoryForTests() {
 		return directoryHolder.get();
+	}
+
+	private void initializeDirectory(Directory directory) throws IOException {
+		try {
+			IndexWriterConfig iwriterConfig = new IndexWriterConfig( AnalyzerConstants.KEYWORD_ANALYZER )
+					.setOpenMode( IndexWriterConfig.OpenMode.CREATE_OR_APPEND );
+			//Needs to have a timeout higher than zero to prevent race conditions over (network) RPCs
+			//for distributed indexes (Infinispan but probably also NFS and similar)
+			SleepingLockWrapper delayedDirectory = new SleepingLockWrapper( directory, 2000, 20 );
+			IndexWriter iw = new IndexWriter( delayedDirectory, iwriterConfig );
+			iw.close();
+		}
+		catch (LockObtainFailedException lofe) {
+			log.lockingFailureDuringInitialization( directory.toString(), eventContext );
+		}
 	}
 
 }
