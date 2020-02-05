@@ -6,30 +6,55 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.index.impl;
 
+import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderProvider;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.NearRealTimeIndexReaderProvider;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterProvider;
+import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 
 public class NearRealTimeIOStrategy extends IOStrategy {
 
-	public static NearRealTimeIOStrategy create(DirectoryProvider directoryProvider, ThreadPoolProvider threadPoolProvider,
-			FailureHandler failureHandler) {
-		return new NearRealTimeIOStrategy( directoryProvider, threadPoolProvider, failureHandler );
+	private static final ConfigurationProperty<Integer> REFRESH_INTERVAL =
+			ConfigurationProperty.forKey( LuceneIndexSettings.IO_REFRESH_INTERVAL )
+					.asInteger()
+					.withDefault( LuceneIndexSettings.Defaults.IO_REFRESH_INTERVAL )
+					.build();
+
+	public static NearRealTimeIOStrategy create(ConfigurationPropertySource propertySource,
+			DirectoryProvider directoryProvider, TimingSource timingSource,
+			ThreadPoolProvider threadPoolProvider, FailureHandler failureHandler) {
+		int refreshInterval = REFRESH_INTERVAL.get( propertySource );
+		return new NearRealTimeIOStrategy(
+				directoryProvider, timingSource, refreshInterval,
+				threadPoolProvider, failureHandler
+		);
 	}
 
-	private NearRealTimeIOStrategy(DirectoryProvider directoryProvider, ThreadPoolProvider threadPoolProvider,
+	private final TimingSource timingSource;
+	private final int refreshInterval;
+
+	private NearRealTimeIOStrategy(DirectoryProvider directoryProvider,
+			TimingSource timingSource, int refreshInterval,
+			ThreadPoolProvider threadPoolProvider,
 			FailureHandler failureHandler) {
 		super( directoryProvider, threadPoolProvider, failureHandler );
+		this.timingSource = timingSource;
+		this.refreshInterval = refreshInterval;
 	}
 
 	@Override
 	IndexReaderProvider createIndexReaderProvider(DirectoryHolder directoryHolder,
 			IndexWriterProvider indexWriterProvider) {
-		return new NearRealTimeIndexReaderProvider( indexWriterProvider );
+		if ( refreshInterval != 0 ) {
+			timingSource.ensureInitialized();
+		}
+		return new NearRealTimeIndexReaderProvider( indexWriterProvider, timingSource, refreshInterval );
 	}
 
 }
