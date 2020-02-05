@@ -31,17 +31,17 @@ public interface IndexAccessor {
 	 * <p>
 	 * Should only be used when starting an index.
 	 */
-	void ensureIndexExists() throws IOException;
+	void ensureIndexExists();
 
 	/**
 	 * Commits the underlying index writer, if any.
 	 */
-	void commit() throws IOException;
+	void commit();
 
 	/**
 	 * Refreshes the underlying index readers.
 	 */
-	void refresh() throws IOException;
+	void refresh();
 
 	/**
 	 * @return The index writer delegator.
