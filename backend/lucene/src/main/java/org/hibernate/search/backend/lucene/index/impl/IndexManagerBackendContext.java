@@ -9,12 +9,16 @@ package org.hibernate.search.backend.lucene.index.impl;
 import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
+import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
+import org.hibernate.search.backend.lucene.lowlevel.index.IOStrategyName;
+import org.hibernate.search.backend.lucene.lowlevel.index.impl.DebugIOStrategy;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IOStrategy;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
+import org.hibernate.search.backend.lucene.lowlevel.index.impl.NearRealTimeIOStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneBatchingWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
@@ -40,6 +44,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
@@ -51,6 +56,12 @@ import org.hibernate.search.util.common.reporting.EventContext;
 import org.apache.lucene.facet.FacetsConfig;
 
 public class IndexManagerBackendContext implements WorkExecutionBackendContext, SearchBackendContext {
+
+	private static final ConfigurationProperty<IOStrategyName> IO_STRATEGY =
+			ConfigurationProperty.forKey( LuceneIndexSettings.IO_STRATEGY )
+					.as( IOStrategyName.class, IOStrategyName::of )
+					.withDefault( LuceneIndexSettings.Defaults.IO_STRATEGY )
+					.build();
 
 	private final EventContext eventContext;
 
@@ -167,8 +178,14 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	}
 
 	IOStrategy createIOStrategy(ConfigurationPropertySource propertySource) {
-		// FIXME HSEARCH-3775 this should use the property source to define refresh intervals, etc.
-		return new IOStrategy( directoryProvider, threadPoolProvider, failureHandler );
+		switch ( IO_STRATEGY.get( propertySource ) ) {
+			case DEBUG:
+				return DebugIOStrategy.create( directoryProvider, threadPoolProvider, failureHandler );
+			case NEAR_REAL_TIME:
+			default:
+				// FIXME HSEARCH-3775 this should use the property source to define refresh interval, etc.
+				return NearRealTimeIOStrategy.create( directoryProvider, threadPoolProvider, failureHandler );
+		}
 	}
 
 	Shard createShard(IOStrategy ioStrategy, LuceneIndexModel model, Optional<String> shardId) {

@@ -592,4 +592,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 107, value = "Search query exceeded the timeout of %1$s: '%2$s'.")
 	SearchTimeoutException timedOut(@FormatWith(DurationInSecondsAndFractionsFormatter.class) Duration timeout, String queryDescription);
+
+	@Message(id = ID_OFFSET_2 + 108,
+			value = "Invalid I/O strategy name: '%1$s'. Valid names are: %2$s.")
+	SearchException invalidIOStrategyName(String invalidRepresentation, List<String> validRepresentations);
 }

@@ -12,6 +12,7 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
+import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderProvider;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegatorImpl;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterProvider;
@@ -35,12 +36,14 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 	private final EventContext eventContext;
 	private final DirectoryHolder directoryHolder;
 	private final IndexWriterProvider indexWriterProvider;
+	private final IndexReaderProvider indexReaderProvider;
 
 	public IndexAccessorImpl(EventContext eventContext, DirectoryHolder directoryHolder,
-			IndexWriterProvider indexWriterProvider) {
+			IndexWriterProvider indexWriterProvider, IndexReaderProvider indexReaderProvider) {
 		this.eventContext = eventContext;
 		this.directoryHolder = directoryHolder;
 		this.indexWriterProvider = indexWriterProvider;
+		this.indexReaderProvider = indexReaderProvider;
 	}
 
 	public void start() throws IOException {
@@ -50,6 +53,7 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 	@Override
 	public void close() throws IOException {
 		try ( Closer<IOException> closer = new Closer<>() ) {
+			closer.push( IndexReaderProvider::clear, indexReaderProvider );
 			closer.push( IndexWriterProvider::clear, indexWriterProvider );
 			closer.push( DirectoryHolder::close, directoryHolder );
 		}
@@ -59,6 +63,7 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 	public void reset() throws IOException {
 		log.indexAccessorReset( eventContext );
 		indexWriterProvider.clear();
+		indexReaderProvider.clear();
 	}
 
 	@Override
@@ -98,7 +103,7 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 
 	@Override
 	public DirectoryReader getIndexReader() throws IOException {
-		return DirectoryReader.open( directoryHolder.get() );
+		return indexReaderProvider.getOrCreate();
 	}
 
 	public Directory getDirectoryForTests() {

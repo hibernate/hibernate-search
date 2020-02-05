@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.cfg;
 
+import org.hibernate.search.backend.lucene.lowlevel.index.IOStrategyName;
+
 /**
  * Configuration properties for Lucene indexes.
  * <p>
@@ -16,6 +18,20 @@ public final class LuceneIndexSettings {
 
 	private LuceneIndexSettings() {
 	}
+
+	/**
+	 * The prefix for I/O-related property keys.
+	 */
+	public static final String IO_PREFIX = "io.";
+
+	/**
+	 * The I/O strategy, deciding how indexes are written to and read from.
+	 * <p>
+	 * Expects a {@link IOStrategyName} value, or a String representation of such value.
+	 * <p>
+	 * Defaults to {@link LuceneIndexSettings.Defaults#IO_STRATEGY}.
+	 */
+	public static final String IO_STRATEGY = IO_PREFIX + IORadicals.STRATEGY;
 
 	/**
 	 * The prefix for sharding-related property keys.
@@ -59,6 +75,17 @@ public final class LuceneIndexSettings {
 	public static final String SHARDING_SHARD_IDENTIFIERS = SHARDING_PREFIX + ShardingRadicals.SHARD_IDENTIFIERS;
 
 	/**
+	 * Configuration property keys for I/O, without the {@link #IO_PREFIX prefix}.
+	 */
+	public static final class IORadicals {
+
+		private IORadicals() {
+		}
+
+		public static final String STRATEGY = "strategy";
+	}
+
+	/**
 	 * Configuration property keys for sharding, without the {@link #SHARDING_PREFIX prefix}.
 	 */
 	public static final class ShardingRadicals {
@@ -80,5 +107,6 @@ public final class LuceneIndexSettings {
 		}
 
 		public static final String SHARDING_STRATEGY = "none";
+		public static final IOStrategyName IO_STRATEGY = IOStrategyName.NEAR_REAL_TIME;
 	}
 }
