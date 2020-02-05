@@ -21,6 +21,7 @@ import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.reporting.IndexFailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.impl.Throwables;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -42,6 +43,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 	private List<LuceneWriteWork<?>> previousWorkSetsUncommittedWorks = new ArrayList<>();
 
 	private boolean workSetForcesCommit;
+	private boolean workSetForcesRefresh;
 	private List<LuceneWriteWork<?>> workSetUncommittedWorks = new ArrayList<>();
 	private boolean workSetHasFailure;
 
@@ -79,10 +81,8 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 	}
 
 	public void beforeWorkSet(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		workSetForcesCommit = DocumentCommitStrategy.FORCE.equals( commitStrategy )
-				// We need to commit in order to make the changes visible
-				// TODO HSEARCH-3775 this may not be true with the NRT implementation from Search 5
-				|| DocumentRefreshStrategy.FORCE.equals( refreshStrategy );
+		workSetForcesCommit = DocumentCommitStrategy.FORCE.equals( commitStrategy );
+		workSetForcesRefresh = DocumentRefreshStrategy.FORCE.equals( refreshStrategy );
 		workSetUncommittedWorks.clear();
 		workSetHasFailure = false;
 	}
@@ -128,6 +128,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 			}
 			catch (RuntimeException e) {
 				cleanUpAfterFailure( e, "Commit after a set of index works" );
+				// We'll skip the refresh, but that's okay: we just reset the writer/reader anyway.
 				throw e;
 			}
 			finally {
@@ -139,6 +140,21 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 		else {
 			previousWorkSetsUncommittedWorks.addAll( workSetUncommittedWorks );
 			workSetUncommittedWorks.clear();
+		}
+
+		if ( workSetForcesRefresh ) {
+			// In case of failure, just propagate the exception:
+			// we don't expect a refresh failure to affect the writer.
+			refresh();
+		}
+	}
+
+	private void refresh() {
+		try {
+			indexAccessor.refresh();
+		}
+		catch (RuntimeException | IOException e) {
+			throw log.unableToRefreshIndex( eventContext, e );
 		}
 	}
 

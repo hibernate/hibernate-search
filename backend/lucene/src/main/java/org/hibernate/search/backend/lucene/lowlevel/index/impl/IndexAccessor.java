@@ -39,6 +39,11 @@ public interface IndexAccessor {
 	void commit() throws IOException;
 
 	/**
+	 * Refreshes the underlying index readers.
+	 */
+	void refresh() throws IOException;
+
+	/**
 	 * @return The index writer delegator.
 	 */
 	IndexWriterDelegator getIndexWriterDelegator() throws IOException;

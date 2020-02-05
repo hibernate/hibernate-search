@@ -252,8 +252,8 @@ public interface Log extends BasicLogger {
 	SearchException unableToCommitIndex(@Param EventContext context, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_2 + 22,
-			value = "Could not open an index reader.")
-	SearchException unableToCreateIndexReader(@Param EventContext context, @Cause Exception e);
+			value = "Unable to refresh.")
+	SearchException unableToRefreshIndex(@Param EventContext context, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_2 + 24,
 			value = "A multi-index scope cannot include both a Lucene index and another type of index."
