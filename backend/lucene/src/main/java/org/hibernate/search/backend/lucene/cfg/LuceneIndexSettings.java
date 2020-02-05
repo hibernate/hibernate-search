@@ -34,6 +34,31 @@ public final class LuceneIndexSettings {
 	public static final String IO_STRATEGY = IO_PREFIX + IORadicals.STRATEGY;
 
 	/**
+	 * How much time may pass after an index write
+	 * until the index reader is considered stale and re-created.
+	 * <p>
+	 * Only available for the "near-real-time" I/O strategy.
+	 * <p>
+	 * This effectively defines how out-of-date search query results may be. For example:
+	 * <ul>
+	 *   <li>If set to 0, search results will always be completely in sync with the index writes.</li>
+	 *   <li>If set to 1000, search results may reflect the state of the index at most 1 second ago.
+	 * 	 There is a benefit, though: in situations where the index is being frequently written to,
+	 * 	 search queries executed less than 1 second after another query may execute faster.</li>
+	 * </ul>
+	 * <p>
+	 * Note that individual write operations may trigger a forced refresh
+	 * (for example with the "searchable" automatic indexing synchronization strategy in the ORM mapper),
+	 * in which case you will only benefit from a non-zero refresh interval during intensive indexing (mass indexer, ...).
+	 * <p>
+	 * Expects a positive Integer value in milliseconds, such as {@code 1000},
+	 * or a String that can be parsed into such Integer value.
+	 * <p>
+	 * Defaults to {@link LuceneIndexSettings.Defaults#IO_REFRESH_INTERVAL}.
+	 */
+	public static final String IO_REFRESH_INTERVAL = IO_PREFIX + IORadicals.REFRESH_INTERVAL;
+
+	/**
 	 * The prefix for sharding-related property keys.
 	 */
 	public static final String SHARDING_PREFIX = "sharding.";
@@ -83,6 +108,7 @@ public final class LuceneIndexSettings {
 		}
 
 		public static final String STRATEGY = "strategy";
+		public static final String REFRESH_INTERVAL = "refresh_interval";
 	}
 
 	/**
@@ -108,5 +134,6 @@ public final class LuceneIndexSettings {
 
 		public static final String SHARDING_STRATEGY = "none";
 		public static final IOStrategyName IO_STRATEGY = IOStrategyName.NEAR_REAL_TIME;
+		public static final int IO_REFRESH_INTERVAL = 0;
 	}
 }

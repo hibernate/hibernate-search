@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.lowlevel.reader.impl;
 import java.io.IOException;
 
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterProvider;
+import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
 
 import org.apache.lucene.index.DirectoryReader;
 
@@ -27,64 +28,96 @@ import org.apache.lucene.index.DirectoryReader;
 public class NearRealTimeIndexReaderProvider implements IndexReaderProvider {
 
 	private final IndexWriterProvider indexWriterProvider;
+	private final TimingSource timingSource;
+	private final int refreshInterval;
 
 	/**
 	 * Current open IndexReader, or null when closed.
 	 */
-	private volatile DirectoryReader currentReader = null;
+	private volatile IndexReaderEntry currentReaderEntry = null;
 
-	public NearRealTimeIndexReaderProvider(IndexWriterProvider indexWriterProvider) {
+	public NearRealTimeIndexReaderProvider(IndexWriterProvider indexWriterProvider,
+			TimingSource timingSource, int refreshInterval) {
 		this.indexWriterProvider = indexWriterProvider;
+		this.timingSource = timingSource;
+		this.refreshInterval = refreshInterval;
 	}
 
 	@Override
 	public synchronized void clear() throws IOException {
-		setCurrentReader( null );
+		setCurrentReaderEntry( null );
 	}
 
 	@Override
 	public DirectoryReader getOrCreate() throws IOException {
-		DirectoryReader indexReader = currentReader;
+		IndexReaderEntry entry = currentReaderEntry;
 
 		// Optimistic checks and locking to avoid synchronization
-		if ( indexReader != null && indexReader.isCurrent() && indexReader.tryIncRef() ) {
-			return indexReader;
+		if ( entry != null && entry.isFresh() && entry.reader.tryIncRef() ) {
+			return entry.reader;
 		}
 
-		return getFreshIndexReader();
+		return getFreshIndexReader().reader;
 	}
 
-	private synchronized DirectoryReader getFreshIndexReader() throws IOException {
-		DirectoryReader oldReader = currentReader;
-		DirectoryReader freshReader;
-		if ( oldReader == null ) {
-			freshReader = indexWriterProvider.getOrCreate().openReader();
+	private synchronized IndexReaderEntry getFreshIndexReader() throws IOException {
+		IndexReaderEntry oldEntry = currentReaderEntry;
+		IndexReaderEntry freshEntry;
+		if ( oldEntry == null ) {
+			DirectoryReader newReader = indexWriterProvider.getOrCreate().openReader();
+			freshEntry = new IndexReaderEntry( newReader, timingSource, refreshInterval );
 		}
 		else {
-			freshReader = indexWriterProvider.getOrCreate().openReaderIfChanged( oldReader );
-			if ( freshReader == null ) {
+			DirectoryReader newReaderOrNull = indexWriterProvider.getOrCreate().openReaderIfChanged( oldEntry.reader );
+			if ( newReaderOrNull == null ) {
 				// No change, keep the old reader
-				freshReader = oldReader;
+				freshEntry = oldEntry;
+			}
+			else {
+				freshEntry = new IndexReaderEntry( newReaderOrNull, timingSource, refreshInterval );
 			}
 		}
 
-		if ( oldReader != freshReader ) {
-			setCurrentReader( freshReader );
+		if ( oldEntry != freshEntry ) {
+			setCurrentReaderEntry( freshEntry );
 		}
 
 		// At this point the reference count is at least one, for the holder.
 		// Let's also increment the reference for the caller.
-		freshReader.incRef();
+		freshEntry.reader.incRef();
 
-		return freshReader;
+		return freshEntry;
 	}
 
-	private synchronized void setCurrentReader(DirectoryReader newReader) throws IOException {
-		DirectoryReader oldReader = currentReader;
-		currentReader = newReader;
-		if ( oldReader != null ) {
+	private synchronized void setCurrentReaderEntry(IndexReaderEntry newEntry) throws IOException {
+		IndexReaderEntry oldEntry = currentReaderEntry;
+		currentReaderEntry = newEntry;
+		if ( oldEntry != null ) {
 			// Make sure to close the old reader as soon as no user thread is using it.
-			oldReader.decRef();
+			oldEntry.reader.decRef();
+		}
+	}
+
+	private static class IndexReaderEntry {
+		private final DirectoryReader reader;
+		private final TimingSource timingSource;
+		private final long expiration;
+
+		private IndexReaderEntry(DirectoryReader reader, TimingSource timingSource, int refreshInterval) {
+			this.reader = reader;
+			this.timingSource = timingSource;
+			this.expiration = refreshInterval == 0 ? 0 : timingSource.getMonotonicTimeEstimate() + refreshInterval;
+		}
+
+		boolean isFresh() throws IOException {
+			if ( expiration == 0 || expiration < timingSource.getMonotonicTimeEstimate() ) {
+				// The last refresh was a long time ago. Let's check if the reader is really fresh.
+				return reader.isCurrent();
+			}
+			else {
+				// The last refresh was recent enough. Let's assume the reader is fresh.
+				return true;
+			}
 		}
 	}
 }

@@ -183,8 +183,10 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 				return DebugIOStrategy.create( directoryProvider, threadPoolProvider, failureHandler );
 			case NEAR_REAL_TIME:
 			default:
-				// FIXME HSEARCH-3775 this should use the property source to define refresh interval, etc.
-				return NearRealTimeIOStrategy.create( directoryProvider, threadPoolProvider, failureHandler );
+				return NearRealTimeIOStrategy.create(
+						propertySource, directoryProvider,
+						timingSource, threadPoolProvider, failureHandler
+				);
 		}
 	}
 
