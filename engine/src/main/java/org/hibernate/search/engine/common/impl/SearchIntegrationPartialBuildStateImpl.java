@@ -16,19 +16,19 @@ import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
-import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
+import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingFinalizationContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingFinalizer;
-import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.impl.RootFailureCollector;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
@@ -41,7 +41,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 	private final BeanProvider beanProvider;
 	private final BeanResolver beanResolver;
 	private final BeanHolder<? extends FailureHandler> failureHandlerHolder;
-	private final BeanHolder<? extends ThreadProvider> threadProviderHolder;
+	private final ThreadPoolProviderImpl threadPoolProvider;
 
 	private final Map<MappingKey<?, ?>, MappingPartialBuildState> partiallyBuiltMappings;
 	private final List<MappingImplementor<?>> fullyBuiltMappings = new ArrayList<>();
@@ -55,7 +55,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 	SearchIntegrationPartialBuildStateImpl(
 			BeanProvider beanProvider, BeanResolver beanResolver,
 			BeanHolder<? extends FailureHandler> failureHandlerHolder,
-			BeanHolder<? extends ThreadProvider> threadProviderHolder,
+			ThreadPoolProviderImpl threadPoolProvider,
 			Map<MappingKey<?, ?>, MappingPartialBuildState> partiallyBuiltMappings,
 			Map<String, BackendPartialBuildState> partiallyBuiltBackends,
 			Map<String, IndexManagerPartialBuildState> partiallyBuiltIndexManagers,
@@ -63,7 +63,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 		this.beanProvider = beanProvider;
 		this.beanResolver = beanResolver;
 		this.failureHandlerHolder = failureHandlerHolder;
-		this.threadProviderHolder = threadProviderHolder;
+		this.threadPoolProvider = threadPoolProvider;
 		this.partiallyBuiltMappings = partiallyBuiltMappings;
 		this.partiallyBuiltBackends = partiallyBuiltBackends;
 		this.partiallyBuiltIndexManagers = partiallyBuiltIndexManagers;
@@ -79,7 +79,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 			closer.pushAll( IndexManagerImplementor::stop, fullyBuiltIndexManagers.values() );
 			closer.pushAll( BackendPartialBuildState::closeOnFailure, partiallyBuiltBackends.values() );
 			closer.pushAll( BackendImplementor::stop, fullyBuiltBackends.values() );
-			closer.pushAll( BeanHolder::close, threadProviderHolder );
+			closer.pushAll( ThreadPoolProviderImpl::close, threadPoolProvider );
 			closer.pushAll( BeanHolder::close, failureHandlerHolder );
 			closer.pushAll( BeanProvider::close, beanProvider );
 		}
@@ -173,7 +173,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 			return new SearchIntegrationImpl(
 					beanProvider,
 					failureHandlerHolder,
-					threadProviderHolder,
+					threadPoolProvider,
 					fullyBuiltMappings,
 					fullyBuiltBackends,
 					fullyBuiltIndexManagers

@@ -14,8 +14,10 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
+import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -30,15 +32,25 @@ public final class ThreadPoolProviderImpl implements ThreadPoolProvider {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ThreadProvider threadProvider;
+	private final BeanHolder<? extends ThreadProvider> threadProviderHolder;
 
-	public ThreadPoolProviderImpl(ThreadProvider threadProvider) {
-		this.threadProvider = threadProvider;
+	private volatile ScheduledExecutorService scheduledExecutorService;
+
+	public ThreadPoolProviderImpl(BeanHolder<? extends ThreadProvider> threadProviderHolder) {
+		this.threadProviderHolder = threadProviderHolder;
+	}
+
+	public void close() {
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.push( ScheduledExecutorService::shutdownNow, scheduledExecutorService );
+			scheduledExecutorService = null;
+			closer.push( BeanHolder::close, threadProviderHolder );
+		}
 	}
 
 	@Override
 	public ThreadProvider getThreadProvider() {
-		return threadProvider;
+		return threadProviderHolder.get();
 	}
 
 	@Override
@@ -54,14 +66,23 @@ public final class ThreadPoolProviderImpl implements ThreadPoolProvider {
 				0L,
 				TimeUnit.MILLISECONDS,
 				new LinkedBlockingQueue<>( queueSize ),
-				threadProvider.createThreadFactory( threadNamePrefix ),
+				threadProviderHolder.get().createThreadFactory( threadNamePrefix ),
 				new BlockPolicy()
 		);
 	}
 
 	@Override
-	public ScheduledExecutorService newScheduledThreadPool(String threadNamePrefix) {
-		return new ScheduledThreadPoolExecutor( 1, threadProvider.createThreadFactory( threadNamePrefix ) );
+	public ScheduledExecutorService getSharedScheduledThreadPool() {
+		if ( scheduledExecutorService == null ) {
+			synchronized ( this ) {
+				if ( scheduledExecutorService == null ) {
+					scheduledExecutorService = new ScheduledThreadPoolExecutor(
+							1, threadProviderHolder.get().createThreadFactory( "Scheduled task executor" )
+					);
+				}
+			}
+		}
+		return scheduledExecutorService;
 	}
 
 	/**

@@ -47,7 +47,6 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
 import org.hibernate.search.engine.environment.thread.impl.DefaultThreadProvider;
 import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresNoAutomaticAuthenticationHeader;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchTckBackendHelper;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -59,6 +58,7 @@ import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -101,6 +101,15 @@ public class ElasticsearchClientFactoryImplIT {
 
 	@Rule
 	public TestConfigurationProvider testConfigurationProvider = new TestConfigurationProvider();
+
+	private ThreadPoolProviderImpl threadPoolProvider = new ThreadPoolProviderImpl(
+			BeanHolder.of( new DefaultThreadProvider( ElasticsearchClientFactoryImplIT.class.getName() + ": " ) )
+	);
+
+	@After
+	public void cleanup() {
+		threadPoolProvider.close();
+	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2274")
@@ -622,9 +631,6 @@ public class ElasticsearchClientFactoryImplIT {
 		ConfigurationPropertySource defaultBackendProperties =
 				new ElasticsearchTckBackendHelper().createDefaultBackendSetupStrategy()
 						.createBackendConfigurationPropertySource( testConfigurationProvider );
-		ThreadPoolProvider threadPoolProvider = new ThreadPoolProviderImpl(
-				new DefaultThreadProvider( ElasticsearchClientFactoryImplIT.class.getName() + ": " )
-		);
 
 		Map<String, Object> configurationOverride = new HashMap<>();
 		// Redirect requests to Wiremock (rule 1 only by default)

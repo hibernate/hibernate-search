@@ -40,7 +40,6 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.impl.DefaultThreadProvider;
 import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
@@ -61,6 +60,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 
 	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
+	private ThreadPoolProviderImpl threadPoolProvider;
 	private ElasticsearchClientImplementor client;
 
 	private final List<URLEncodedString> createdIndicesNames = new ArrayList<>();
@@ -691,8 +691,8 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		Map<String, Object> map = new LinkedHashMap<>();
 		ElasticsearchTestHostConnectionConfiguration.get().addToBackendProperties( map );
 		ConfigurationPropertySource backendProperties = ConfigurationPropertySource.fromMap( map );
-		ThreadPoolProvider threadPoolProvider = new ThreadPoolProviderImpl(
-				new DefaultThreadProvider( "Test Elasticsearch client: " )
+		threadPoolProvider = new ThreadPoolProviderImpl(
+				BeanHolder.of( new DefaultThreadProvider( "Test Elasticsearch client: " ) )
 		);
 
 		BeanResolver beanResolver = configurationProvider.createBeanResolverForTest();
@@ -724,6 +724,8 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		closer.pushAll( this::tryDeleteESTemplate, createdTemplatesNames );
 		createdTemplatesNames.clear();
 		closer.push( this::tryCloseClient, client );
+		client = null;
+		closer.push( ThreadPoolProviderImpl::close, threadPoolProvider );
 		client = null;
 	}
 

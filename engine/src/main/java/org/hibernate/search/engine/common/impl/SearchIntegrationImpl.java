@@ -15,13 +15,13 @@ import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
-import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
-import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanProvider;
+import org.hibernate.search.engine.environment.thread.impl.ThreadPoolProviderImpl;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
+import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -32,7 +32,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 
 	private final BeanProvider beanProvider;
 	private final BeanHolder<? extends FailureHandler> failureHandlerHolder;
-	private final BeanHolder<? extends ThreadProvider> threadProviderHolder;
+	private final ThreadPoolProviderImpl threadPoolProvider;
 
 	private final List<MappingImplementor<?>> mappings;
 	private final Map<String, BackendImplementor<?>> backends;
@@ -40,13 +40,13 @@ public class SearchIntegrationImpl implements SearchIntegration {
 
 	SearchIntegrationImpl(BeanProvider beanProvider,
 			BeanHolder<? extends FailureHandler> failureHandlerHolder,
-			BeanHolder<? extends ThreadProvider> threadProviderHolder,
+			ThreadPoolProviderImpl threadPoolProvider,
 			List<MappingImplementor<?>> mappings,
 			Map<String, BackendImplementor<?>> backends,
 			Map<String, IndexManagerImplementor<?>> indexManagers) {
 		this.beanProvider = beanProvider;
 		this.failureHandlerHolder = failureHandlerHolder;
-		this.threadProviderHolder = threadProviderHolder;
+		this.threadPoolProvider = threadPoolProvider;
 		this.mappings = mappings;
 		this.backends = backends;
 		this.indexManagers = indexManagers;
@@ -78,7 +78,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 			closer.pushAll( IndexManagerImplementor::stop, indexManagers.values() );
 			closer.push( SearchIntegrationImpl::preStopBackends, this );
 			closer.pushAll( BackendImplementor::stop, backends.values() );
-			closer.pushAll( BeanHolder::close, threadProviderHolder );
+			closer.pushAll( ThreadPoolProviderImpl::close, threadPoolProvider );
 			closer.pushAll( BeanHolder::close, failureHandlerHolder );
 			closer.pushAll( BeanProvider::close, beanProvider );
 		}

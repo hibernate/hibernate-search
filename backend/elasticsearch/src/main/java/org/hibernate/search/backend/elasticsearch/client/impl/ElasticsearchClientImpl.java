@@ -16,7 +16,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.Map.Entry;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
@@ -69,7 +68,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 			Gson gson, JsonLogHelper jsonLogHelper) {
 		this.restClient = restClient;
 		this.sniffer = sniffer;
-		this.timeoutExecutorService = threadPoolProvider.newScheduledThreadPool( "Elasticsearch request timeout executor" );
+		this.timeoutExecutorService = threadPoolProvider.getSharedScheduledThreadPool();
 		this.globalTimeoutValue = globalTimeoutValue;
 		this.globalTimeoutUnit = globalTimeoutUnit;
 		this.gson = gson;
@@ -227,11 +226,9 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	public void close() throws IOException {
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			/*
-			 * There's no point waiting for timeouts: we'll just cancel
-			 * all timeouts and expect the RestClient to cancel all
+			 * There's no point waiting for timeouts: we'll just expect the RestClient to cancel all
 			 * currently running requests when closing.
 			 */
-			closer.push( ExecutorService::shutdownNow, this.timeoutExecutorService );
 			closer.push( Sniffer::close, this.sniffer );
 			closer.push( RestClient::close, this.restClient );
 		}
