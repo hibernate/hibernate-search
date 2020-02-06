@@ -67,8 +67,6 @@ public class BatchingExecutorTest extends EasyMockSupport {
 		verifyAllAsynchronously();
 
 		StubWorkSet workSet2Mock = createMock( StubWorkSet.class );
-		// The batch is already completed when the endBatch() method returns,
-		// allowing the executor to handle the next batch immediately.
 		CompletableFuture<Object> batch2Future = CompletableFuture.completedFuture( null );
 		resetAll();
 		processorMock.beginBatch();
