@@ -13,6 +13,9 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.hibernate.search.engine.logging.impl.Log;
@@ -46,7 +49,9 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 	private final AtomicReference<ProcessingStatus> processingStatus;
 
 	private ExecutorService executorService;
+	private ScheduledExecutorService scheduledExecutorService;
 	private volatile CompletableFuture<?> completionFuture;
+	private volatile ScheduledFuture<?> scheduledNextProcessing;
 
 	/**
 	 * @param name The name of the executor thread (and of this executor when reporting errors)
@@ -79,6 +84,7 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 	public synchronized void start(ThreadPoolProvider threadPoolProvider) {
 		log.startingExecutor( name );
 		executorService = threadPoolProvider.newFixedThreadPool( 1, name );
+		scheduledExecutorService = threadPoolProvider.getSharedScheduledThreadPool();
 	}
 
 	/**
@@ -91,6 +97,7 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 	public synchronized void stop() {
 		log.stoppingExecutor( name );
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			// scheduledExecutorService is not ours to close: it's shared
 			closer.push( ExecutorService::shutdownNow, executorService );
 			executorService = null;
 			workQueue.clear();
@@ -148,6 +155,15 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 		 * processing wasn't in progress, and we're now responsible for scheduling it.
 		 */
 		try {
+			if ( scheduledNextProcessing != null ) {
+				/*
+				 * We scheduled processing at a later time.
+				 * Since we're going to execute processing right now,
+				 * we can cancel this scheduling.
+				 */
+				scheduledNextProcessing.cancel( false );
+				scheduledNextProcessing = null;
+			}
 			if ( completionFuture == null ) {
 				/*
 				 * The executor was previously idle:
@@ -156,7 +172,7 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 				 */
 				completionFuture = new CompletableFuture<>();
 			}
-			executorService.submit( this::processBatch );
+			executorService.submit( this::process );
 		}
 		catch (Throwable e) {
 			/*
@@ -180,33 +196,14 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 	/**
 	 * Takes a batch of worksets from the queue and processes them.
 	 */
-	private void processBatch() {
+	private void process() {
 		try {
-			CompletableFuture<?> batchFuture;
-			processor.beginBatch();
 			workBuffer.clear();
-
 			workQueue.drainTo( workBuffer, maxTasksPerBatch );
 
-			for ( W workset : workBuffer ) {
-				try {
-					workset.submitTo( processor );
-				}
-				catch (Throwable e) {
-					workset.markAsFailed( e );
-				}
+			if ( !workBuffer.isEmpty() ) {
+				processBatch( workBuffer );
 			}
-
-			// Nothing more to do, end the batch and terminate
-			batchFuture = processor.endBatch();
-
-			/*
-			 * Wait for works to complete before trying to handle the next batch.
-			 * Note: timeout is expected to be handled by the processor
-			 * (the Elasticsearch client adds per-request timeouts, in particular),
-			 * so this "join" will not last forever
-			 */
-			Futures.unwrappedExceptionJoin( batchFuture );
 		}
 		catch (Throwable e) {
 			// This will only happen if there is a bug in the processor
@@ -217,47 +214,111 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 		}
 		finally {
 			// We're done executing this batch.
-			if ( workQueue.isEmpty() ) {
-				// We're done executing the whole queue: handle getCompletion().
-				CompletableFuture<?> justFinishedQueueFuture = this.completionFuture;
-				completionFuture = null;
-				justFinishedQueueFuture.complete( null );
-			}
-			// Allow this thread (or others) to run processing again.
-			processingStatus.set( ProcessingStatus.IDLE );
-			if ( !workQueue.isEmpty() ) {
-				/*
-				 * Either the work queue wasn't empty and the "if" block above wasn't executed,
-				 * or the "if" block above was executed but someone submitted new work between
-				 * the call to workQueue.isEmpty() and the call to processingStatus.set( ... ).
-				 * In either case, we need to re-schedule processing, because no one else will.
-				 */
-				try {
+			try {
+				if ( workQueue.isEmpty() ) {
+					// We managed to process the whole queue.
+					// Inform the processor and callers.
+					handleCompletion();
+				}
+				// Allow this thread (or others) to run processing again.
+				processingStatus.set( ProcessingStatus.IDLE );
+				// Call workQueue.isEmpty() again, since its content may have changed since the last call a few lines above.
+				if ( !workQueue.isEmpty() ) {
+					// There are still worksets in the queue.
+					// Make sure they will be processed.
 					ensureProcessingRunning();
 				}
-				catch (Throwable e) {
-					// This will only happen if there is a bug in this class, but we don't want to fail silently
-					FailureContext.Builder contextBuilder = FailureContext.builder();
-					contextBuilder.throwable( e );
-					contextBuilder.failingOperation( "Scheduling the next batch in executor '" + name + "'" );
-					failureHandler.handle( contextBuilder.build() );
-				}
 			}
+			catch (Throwable e) {
+				// This will only happen if there is a bug in this class, but we don't want to fail silently
+				FailureContext.Builder contextBuilder = FailureContext.builder();
+				contextBuilder.throwable( e );
+				contextBuilder.failingOperation( "Handling post-execution in executor '" + name + "'" );
+				failureHandler.handle( contextBuilder.build() );
+			}
+		}
+	}
+
+	private void processBatch(List<W> works) {
+		processor.beginBatch();
+
+		for ( W workset : works ) {
+			try {
+				workset.submitTo( processor );
+			}
+			catch (Throwable e) {
+				workset.markAsFailed( e );
+			}
+		}
+
+		// Nothing more to do, end the batch and terminate
+		CompletableFuture<?> batchFuture = processor.endBatch();
+
+		/*
+		 * Wait for works to complete before trying to handle the next batch.
+		 * Note: timeout is expected to be handled by the processor
+		 * (the Elasticsearch client adds per-request timeouts, in particular),
+		 * so this "join" will not last forever
+		 */
+		Futures.unwrappedExceptionJoin( batchFuture );
+	}
+
+	private void handleCompletion() {
+		// First, tell the processor that we're done processing.
+		long delay = 0;
+		try {
+			delay = processor.completeOrDelay();
+		}
+		catch (Throwable e) {
+			// This will only happen if there is a bug in this class, but we don't want to fail silently
+			FailureContext.Builder contextBuilder = FailureContext.builder();
+			contextBuilder.throwable( e );
+			contextBuilder.failingOperation( "Calling processor.complete() in executor '" + name + "'" );
+			failureHandler.handle( contextBuilder.build() );
+		}
+
+		if ( delay <= 0 ) {
+			// The processor acknowledged that all outstanding operations (commit, ...) have completed.
+			// Tell callers of getCompletion()
+			CompletableFuture<?> justFinishedQueueFuture = this.completionFuture;
+			completionFuture = null;
+			justFinishedQueueFuture.complete( null );
+		}
+		else {
+			// The processor requested that we wait because some outstanding operations (commit, ...)
+			// need to be performed later.
+			scheduledNextProcessing = scheduledExecutorService.schedule(
+					this::ensureProcessingRunning, delay, TimeUnit.MILLISECONDS
+			);
 		}
 	}
 
 	public interface WorkProcessor {
 
+		/**
+		 * Initializes internal state before works are {@link WorkSet#submit(WorkSet) submitted}.
+		 */
 		void beginBatch();
 
 		/**
-		 * Ensure all works submitted since the last call to {@link #beginBatch()} will actually be executed,
-		 * along with any finishing task (commit, ...).
+		 * Ensures all works {@link WorkSet#submit(WorkSet) submitted} since the last call to {@link #beginBatch()}
+		 * will actually be executed, along with any finishing task (commit, ...).
 		 *
-		 * @return A future completing when all works submitted since the last call to {@link #beginBatch()}
-		 * have completed.
+		 * @return A future completing when the executor is allowed to start another batch.
 		 */
 		CompletableFuture<?> endBatch();
+
+		/**
+		 * Executes any outstanding operation if possible, or return an estimation of when they can be executed.
+		 * <p>
+		 * Called when the executor considers the work queue complete
+		 * and does not plan on submitting another batch due to work starvation.
+		 *
+		 * @return {@code 0} if there is no outstanding operation, or a positive number of milliseconds
+		 * if there are outstanding operations and {@link #completeOrDelay()}
+		 * must be called again that many milliseconds later.
+		 */
+		long completeOrDelay();
 
 	}
 

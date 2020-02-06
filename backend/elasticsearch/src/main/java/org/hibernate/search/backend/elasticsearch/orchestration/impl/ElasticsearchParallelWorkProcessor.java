@@ -70,6 +70,12 @@ class ElasticsearchParallelWorkProcessor implements ElasticsearchWorkProcessor {
 		return future;
 	}
 
+	@Override
+	public long completeOrDelay() {
+		// Nothing to do: if all individual works have completed, we're done.
+		return 0;
+	}
+
 	private static class BulkAndSequenceAggregator implements ElasticsearchWorkAggregator {
 
 		private final ElasticsearchWorkSequenceBuilder sequenceBuilder;
