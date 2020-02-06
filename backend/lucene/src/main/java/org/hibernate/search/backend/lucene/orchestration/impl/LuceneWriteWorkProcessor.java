@@ -61,7 +61,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 	}
 
 	@Override
-	public CompletableFuture<?> endBatch() {
+	public CompletableFuture<Long> endBatch() {
 		if ( !previousWorkSetsUncommittedWorks.isEmpty() ) {
 			try {
 				// TODO HSEARCH-3775 restore the commit policy feature to allow scheduled commits?
@@ -78,6 +78,12 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 		}
 		// Everything was already executed, so just return a completed future.
 		return CompletableFuture.completedFuture( null );
+	}
+
+	@Override
+	public long completeOrDelay() {
+		// TODO HSEARCH-3775 execute commit here and return a positive number if it's too early for a commit
+		return 0;
 	}
 
 	public void beforeWorkSet(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {

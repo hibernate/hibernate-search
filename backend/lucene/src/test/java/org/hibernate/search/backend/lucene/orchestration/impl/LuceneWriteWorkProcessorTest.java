@@ -89,6 +89,8 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		replayAll();
 		processor.endBatch();
 		verifyAll();
+
+		checkCompleteOrDelay();
 	}
 
 	@Test
@@ -182,6 +184,8 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		replayAll();
 		processor.endBatch();
 		verifyAll();
+
+		checkCompleteOrDelay();
 	}
 
 	@Test
@@ -264,6 +268,8 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		replayAll();
 		processor.endBatch();
 		verifyAll();
+
+		checkCompleteOrDelay();
 	}
 
 	@Test
@@ -338,6 +344,8 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		replayAll();
 		processor.endBatch();
 		verifyAll();
+
+		checkCompleteOrDelay();
 	}
 
 	@Test
@@ -400,6 +408,8 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		replayAll();
 		processor.endBatch();
 		verifyAll();
+
+		checkCompleteOrDelay();
 	}
 
 	@Test
@@ -475,6 +485,8 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		replayAll();
 		processor.endBatch();
 		verifyAll();
+
+		checkCompleteOrDelay();
 	}
 
 	@Test
@@ -533,6 +545,8 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 						workInfo( 6 ), workInfo( 7 ), workInfo( 8 ), workInfo( 9 ),
 						workInfo( 10 ), workInfo( 11 )
 				);
+
+		checkCompleteOrDelay();
 	}
 
 	@Test
@@ -605,6 +619,8 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 		assertThat( failureContext.getFailingOperation() ).asString()
 				.contains( "Commit after a batch of index works" );
+
+		checkCompleteOrDelay();
 	}
 
 	private void testSuccessfulWorkSet(int workCount,
@@ -645,6 +661,13 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 			testContext( contextCapture.getValue() );
 		}
+	}
+
+	private void checkCompleteOrDelay() {
+		resetAll();
+		replayAll();
+		Assertions.assertThat( processor.completeOrDelay() ).isEqualTo( 0 );
+		verifyAll();
 	}
 
 	private void expectWorkGetInfo(int ... ids) {
