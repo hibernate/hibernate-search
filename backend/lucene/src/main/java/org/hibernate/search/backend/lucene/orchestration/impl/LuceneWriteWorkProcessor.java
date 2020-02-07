@@ -61,12 +61,10 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 	}
 
 	@Override
-	public CompletableFuture<Long> endBatch() {
+	public CompletableFuture<?> endBatch() {
 		if ( !previousWorkSetsUncommittedWorks.isEmpty() ) {
 			try {
-				// TODO HSEARCH-3775 restore the commit policy feature to allow scheduled commits?
-				indexAccessor.commit();
-				previousWorkSetsUncommittedWorks.clear();
+				tryCommitOrDelay();
 			}
 			catch (RuntimeException e) {
 				cleanUpAfterFailure( e, "Commit after a batch of index works" );
@@ -79,8 +77,21 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 
 	@Override
 	public long completeOrDelay() {
-		// TODO HSEARCH-3775 execute commit here and return a positive number if it's too early for a commit
-		return 0;
+		if ( previousWorkSetsUncommittedWorks.isEmpty() ) {
+			// Nothing to commit
+			return 0L;
+		}
+
+		try {
+			return tryCommitOrDelay();
+		}
+		catch (RuntimeException e) {
+			cleanUpAfterFailure( e, "Commit after completion of all remaining index works" );
+			// The exception was reported to the failure handler, no need to propagate it.
+
+			// Tell the executor there's no need to call us again later: the index writer was lost anyway.
+			return 0;
+		}
 	}
 
 	public void beforeWorkSet(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
@@ -143,6 +154,18 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 			// we don't expect a refresh failure to affect the writer.
 			indexAccessor.refresh();
 		}
+	}
+
+	private long tryCommitOrDelay() {
+		long timeToCommit = indexAccessor.commitOrDelay();
+
+		if ( timeToCommit == 0 ) {
+			// The commit was executed
+			previousWorkSetsUncommittedWorks.clear();
+		}
+		// else: the commit was delayed to a later time
+
+		return timeToCommit;
 	}
 
 	private void cleanUpAfterFailure(Throwable throwable, Object failingOperation) {

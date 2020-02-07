@@ -17,8 +17,17 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.util.common.reporting.EventContext;
+
+import org.apache.lucene.analysis.Analyzer;
 
 public class NearRealTimeIOStrategy extends IOStrategy {
+
+	private static final ConfigurationProperty<Integer> COMMIT_INTERVAL =
+			ConfigurationProperty.forKey( LuceneIndexSettings.IO_COMMIT_INTERVAL )
+					.asInteger()
+					.withDefault( LuceneIndexSettings.Defaults.IO_COMMIT_INTERVAL )
+					.build();
 
 	private static final ConfigurationProperty<Integer> REFRESH_INTERVAL =
 			ConfigurationProperty.forKey( LuceneIndexSettings.IO_REFRESH_INTERVAL )
@@ -29,23 +38,40 @@ public class NearRealTimeIOStrategy extends IOStrategy {
 	public static NearRealTimeIOStrategy create(ConfigurationPropertySource propertySource,
 			DirectoryProvider directoryProvider, TimingSource timingSource,
 			ThreadPoolProvider threadPoolProvider, FailureHandler failureHandler) {
+		int commitInterval = COMMIT_INTERVAL.get( propertySource );
 		int refreshInterval = REFRESH_INTERVAL.get( propertySource );
 		return new NearRealTimeIOStrategy(
-				directoryProvider, timingSource, refreshInterval,
+				directoryProvider, timingSource, commitInterval, refreshInterval,
 				threadPoolProvider, failureHandler
 		);
 	}
 
 	private final TimingSource timingSource;
+	private final int commitInterval;
 	private final int refreshInterval;
 
 	private NearRealTimeIOStrategy(DirectoryProvider directoryProvider,
-			TimingSource timingSource, int refreshInterval,
+			TimingSource timingSource, int commitInterval, int refreshInterval,
 			ThreadPoolProvider threadPoolProvider,
 			FailureHandler failureHandler) {
 		super( directoryProvider, threadPoolProvider, failureHandler );
 		this.timingSource = timingSource;
+		this.commitInterval = commitInterval;
 		this.refreshInterval = refreshInterval;
+	}
+
+	@Override
+	IndexWriterProvider createIndexWriterProvider(String indexName, EventContext eventContext, Analyzer analyzer,
+			DirectoryHolder directoryHolder) {
+		if ( commitInterval != 0 ) {
+			timingSource.ensureInitialized();
+		}
+		return new IndexWriterProvider(
+				indexName, eventContext,
+				directoryHolder, analyzer,
+				timingSource, commitInterval, threadPoolProvider.getThreadProvider(),
+				failureHandler
+		);
 	}
 
 	@Override

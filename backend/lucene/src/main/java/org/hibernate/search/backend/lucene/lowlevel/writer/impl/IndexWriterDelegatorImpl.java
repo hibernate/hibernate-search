@@ -8,6 +8,8 @@ package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 
 import java.io.IOException;
 
+import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
+
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
 import org.apache.lucene.index.IndexableField;
@@ -20,9 +22,16 @@ import org.apache.lucene.search.Query;
 public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 
 	private final IndexWriter delegate;
+	private final TimingSource timingSource;
+	private final int commitInterval;
 
-	public IndexWriterDelegatorImpl(IndexWriter delegate) {
+	private long commitExpiration;
+
+	public IndexWriterDelegatorImpl(IndexWriter delegate, TimingSource timingSource, int commitInterval) {
 		this.delegate = delegate;
+		this.timingSource = timingSource;
+		this.commitInterval = commitInterval;
+		updateCommitExpiration();
 	}
 
 	@Override
@@ -61,7 +70,19 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 	}
 
 	public void commit() throws IOException {
-		delegate.commit();
+		doCommit();
+	}
+
+	public long commitOrDelay() throws IOException {
+		long timeToCommit = commitInterval == 0 ? 0L : commitExpiration - timingSource.getMonotonicTimeEstimate();
+
+		if ( timeToCommit > 0L ) {
+			return timeToCommit;
+		}
+		else {
+			doCommit();
+			return 0L;
+		}
 	}
 
 	public DirectoryReader openReader() throws IOException {
@@ -74,5 +95,14 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 
 	void close() throws IOException {
 		delegate.close();
+	}
+
+	private void doCommit() throws IOException {
+		delegate.commit();
+		updateCommitExpiration();
+	}
+
+	private void updateCommitExpiration() {
+		commitExpiration = commitInterval == 0 ? 0L : timingSource.getMonotonicTimeEstimate() + commitInterval;
 	}
 }

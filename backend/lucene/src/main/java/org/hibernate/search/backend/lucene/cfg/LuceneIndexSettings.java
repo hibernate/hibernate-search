@@ -34,6 +34,34 @@ public final class LuceneIndexSettings {
 	public static final String IO_STRATEGY = IO_PREFIX + IORadicals.STRATEGY;
 
 	/**
+	 * How much time may pass after an index change until the change is committed.
+	 * <p>
+	 * Only available for the "near-real-time" I/O strategy.
+	 * <p>
+	 * This effectively defines how long changes may be in an "unsafe" state,
+	 * where a crash or power loss will result in data loss. For example:
+	 * <ul>
+	 *   <li>if set to 0, changes are safe as soon as the background process finishes treating a batch of changes.</li>
+	 *   <li>if set to 1000, changes may not be safe for an additional 1 second
+	 *   after the background process finishes treating a batch.
+	 * 	 There is a benefit, though: index changes occurring less than 1 second after another change may execute faster.</li>
+	 * </ul>
+	 * <p>
+	 * Note that individual write operations may trigger a forced commit
+	 * (for example with the "committed" and "searchable" automatic indexing synchronization strategies in the ORM mapper),
+	 * in which case you will only benefit from a non-zero commit interval during intensive indexing (mass indexer, ...).
+	 * <p>
+	 * Note that saving is <strong>not</strong> necessary to make changes visible to search queries:
+	 * the two concepts are unrelated. See {@link #IO_REFRESH_INTERVAL}.
+	 * <p>
+	 * Expects a positive Integer value in milliseconds, such as {@code 1000},
+	 * or a String that can be parsed into such Integer value.
+	 * <p>
+	 * Defaults to {@link LuceneIndexSettings.Defaults#IO_COMMIT_INTERVAL}.
+	 */
+	public static final String IO_COMMIT_INTERVAL = IO_PREFIX + IORadicals.COMMIT_INTERVAL;
+
+	/**
 	 * How much time may pass after an index write
 	 * until the index reader is considered stale and re-created.
 	 * <p>
@@ -108,6 +136,7 @@ public final class LuceneIndexSettings {
 		}
 
 		public static final String STRATEGY = "strategy";
+		public static final String COMMIT_INTERVAL = "commit_interval";
 		public static final String REFRESH_INTERVAL = "refresh_interval";
 	}
 
@@ -134,6 +163,7 @@ public final class LuceneIndexSettings {
 
 		public static final String SHARDING_STRATEGY = "none";
 		public static final IOStrategyName IO_STRATEGY = IOStrategyName.NEAR_REAL_TIME;
+		public static final int IO_COMMIT_INTERVAL = 0;
 		public static final int IO_REFRESH_INTERVAL = 0;
 	}
 }
