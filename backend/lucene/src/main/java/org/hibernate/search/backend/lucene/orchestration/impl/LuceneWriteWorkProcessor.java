@@ -66,14 +66,11 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 			try {
 				// TODO HSEARCH-3775 restore the commit policy feature to allow scheduled commits?
 				indexAccessor.commit();
+				previousWorkSetsUncommittedWorks.clear();
 			}
 			catch (RuntimeException e) {
 				cleanUpAfterFailure( e, "Commit after a batch of index works" );
 				// The exception was reported to the failure handler, no need to propagate it.
-			}
-			finally {
-				// Only clear the lists after the commit succeeds or failures are reported.
-				previousWorkSetsUncommittedWorks.clear();
 			}
 		}
 		// Everything was already executed, so just return a completed future.
@@ -124,6 +121,8 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 		if ( workSetForcesCommit ) {
 			try {
 				indexAccessor.commit();
+				// Previous worksets were committed along with this workset
+				previousWorkSetsUncommittedWorks.clear();
 			}
 			catch (RuntimeException e) {
 				cleanUpAfterFailure( e, "Commit after a set of index works" );
@@ -131,15 +130,13 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 				throw e;
 			}
 			finally {
-				// Only clear the lists after the commit succeeds or failures are reported.
-				previousWorkSetsUncommittedWorks.clear();
+				// Whether the commit succeeded or not, we should not care about these works any longer
 				workSetUncommittedWorks.clear();
 			}
 		}
-		else {
-			previousWorkSetsUncommittedWorks.addAll( workSetUncommittedWorks );
-			workSetUncommittedWorks.clear();
-		}
+
+		previousWorkSetsUncommittedWorks.addAll( workSetUncommittedWorks );
+		workSetUncommittedWorks.clear();
 
 		if ( workSetForcesRefresh ) {
 			// In case of failure, just propagate the exception:
