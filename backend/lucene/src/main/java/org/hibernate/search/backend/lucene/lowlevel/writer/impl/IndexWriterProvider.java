@@ -13,6 +13,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
+import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -35,6 +36,8 @@ public class IndexWriterProvider {
 	private final EventContext eventContext;
 	private final DirectoryHolder directoryHolder;
 	private final Analyzer analyzer;
+	private final TimingSource timingSource;
+	private final int commitInterval;
 	private final ThreadProvider threadProvider;
 	private final FailureHandler failureHandler;
 
@@ -56,12 +59,15 @@ public class IndexWriterProvider {
 
 	public IndexWriterProvider(String indexName, EventContext eventContext,
 			DirectoryHolder directoryHolder, Analyzer analyzer,
+			TimingSource timingSource, int commitInterval,
 			ThreadProvider threadProvider,
 			FailureHandler failureHandler) {
 		this.indexName = indexName;
 		this.eventContext = eventContext;
 		this.directoryHolder = directoryHolder;
 		this.analyzer = analyzer;
+		this.timingSource = timingSource;
+		this.commitInterval = commitInterval;
 		this.threadProvider = threadProvider;
 		this.failureHandler = failureHandler;
 		/* TODO HSEARCH-3776 re-allow configuring index writers
@@ -107,7 +113,7 @@ public class IndexWriterProvider {
 				indexWriterDelegator = currentWriter.get();
 				if ( indexWriterDelegator == null ) {
 					IndexWriter indexWriter = createNewIndexWriter();
-					indexWriterDelegator = new IndexWriterDelegatorImpl( indexWriter );
+					indexWriterDelegator = new IndexWriterDelegatorImpl( indexWriter, timingSource, commitInterval );
 					log.trace( "IndexWriter opened" );
 					currentWriter.set( indexWriterDelegator );
 				}

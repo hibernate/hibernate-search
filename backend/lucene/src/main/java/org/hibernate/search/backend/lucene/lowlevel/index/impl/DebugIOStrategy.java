@@ -13,6 +13,9 @@ import org.hibernate.search.backend.lucene.lowlevel.reader.impl.NotSharedIndexRe
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterProvider;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.util.common.reporting.EventContext;
+
+import org.apache.lucene.analysis.Analyzer;
 
 public class DebugIOStrategy extends IOStrategy {
 
@@ -24,6 +27,18 @@ public class DebugIOStrategy extends IOStrategy {
 	private DebugIOStrategy(DirectoryProvider directoryProvider, ThreadPoolProvider threadPoolProvider,
 			FailureHandler failureHandler) {
 		super( directoryProvider, threadPoolProvider, failureHandler );
+	}
+
+	@Override
+	IndexWriterProvider createIndexWriterProvider(String indexName, EventContext eventContext, Analyzer analyzer,
+			DirectoryHolder directoryHolder) {
+		return new IndexWriterProvider(
+				indexName, eventContext,
+				directoryHolder, analyzer,
+				null, 0,
+				threadPoolProvider.getThreadProvider(),
+				failureHandler
+		);
 	}
 
 	@Override

@@ -51,7 +51,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 	private List<LuceneWriteWork<?>> workMocks = new ArrayList<>();
 
 	@Test
-	public void simple() throws IOException {
+	public void immediateCommitStrategy() throws IOException {
 		resetAll();
 		replayAll();
 		processor.beginBatch();
@@ -67,7 +67,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 		resetAll();
 		// There was no commit in the last workset, there must be one here
-		indexAccessorMock.commit();
+		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
 		replayAll();
 		processor.endBatch();
 		verifyAll();
@@ -90,7 +90,201 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		processor.endBatch();
 		verifyAll();
 
-		checkCompleteOrDelay();
+		checkCompleteOrDelayWithNothingToCommit();
+	}
+
+	@Test
+	public void delayedCommitStrategy_endBatchCommitNotNecessary() throws IOException {
+		resetAll();
+		replayAll();
+		processor.beginBatch();
+		verifyAll();
+
+		testSuccessfulWorkSet( 3, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
+		testSuccessfulWorkSet( 5, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.FORCE, false, true );
+		testSuccessfulWorkSet( 3, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE, true, false );
+
+		resetAll();
+		// The last workset triggered a commit: no need for a commit here
+		replayAll();
+		processor.endBatch();
+		verifyAll();
+
+		// The executor does not have any additional work, so it calls completeOrDelay() just after endBatch().
+		resetAll();
+		// The last workset triggered a commit: no need for a commit here
+		replayAll();
+		assertThat( processor.completeOrDelay() ).isEqualTo( 0L );
+		verifyAll();
+	}
+
+	@Test
+	public void delayedCommitStrategy_endBatchCommitNecessary_noAdditionalWorkDuringDelay() throws IOException {
+		resetAll();
+		replayAll();
+		processor.beginBatch();
+		verifyAll();
+
+		testSuccessfulWorkSet( 3, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
+		testSuccessfulWorkSet( 3, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, true, true );
+		testSuccessfulWorkSet( 5, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
+
+		resetAll();
+		// There was no commit in the last workset, there must be one here
+		expect( indexAccessorMock.commitOrDelay() )
+				// The I/O strategy decides that it's too early for a commit.
+				.andReturn( 1000L );
+		replayAll();
+		processor.endBatch();
+		verifyAll();
+
+		// The executor does not have any additional work, so it calls completeOrDelay() just after endBatch().
+		resetAll();
+		// There was no commit in the last batch, there must be one here
+		expect( indexAccessorMock.commitOrDelay() )
+				// Almost no time passed since the call to endBatch(),
+				// so the I/O strategy decides that it's still too early for a commit.
+				.andReturn( 999L );
+		replayAll();
+		assertThat( processor.completeOrDelay() ).isEqualTo( 999L );
+		verifyAll();
+
+		// 999 ms pass...
+
+		// The executor didn't receive any additional work, so it calls completeOrDelay() again some time later.
+		resetAll();
+		// There was no commit in the last batch, there must be one here
+		expect( indexAccessorMock.commitOrDelay() )
+				// The I/O strategy decides that it's now time for a commit.
+				.andReturn( 0L );
+		replayAll();
+		assertThat( processor.completeOrDelay() ).isEqualTo( 0L );
+		verifyAll();
+	}
+
+	@Test
+	public void delayedCommitStrategy_endBatchCommitNecessary_someAdditionalWorkDuringDelay_endBatchCommitNotNecessary() throws IOException {
+		resetAll();
+		replayAll();
+		processor.beginBatch();
+		verifyAll();
+
+		testSuccessfulWorkSet( 3, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
+		testSuccessfulWorkSet( 3, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, true, true );
+		testSuccessfulWorkSet( 5, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
+
+		resetAll();
+		// There was no commit in the last workset, there must be one here
+		expect( indexAccessorMock.commitOrDelay() )
+				// The I/O strategy decides that it's too early for a commit.
+				.andReturn( 1000L );
+		replayAll();
+		processor.endBatch();
+		verifyAll();
+
+		// The executor does not have any additional work, so it calls completeOrDelay() just after endBatch().
+		resetAll();
+		// There was no commit in the last batch, there must be one here
+		expect( indexAccessorMock.commitOrDelay() )
+				// Almost no time passed since the call to endBatch(),
+				// so the I/O strategy decides that it's still too early for a commit.
+				.andReturn( 999L );
+		replayAll();
+		assertThat( processor.completeOrDelay() ).isEqualTo( 999L );
+		verifyAll();
+
+		// 500 ms pass...
+
+		// Some work is submitted to the executor!
+		resetAll();
+		replayAll();
+		processor.beginBatch();
+		verifyAll();
+		testSuccessfulWorkSet( 3, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE, true, false );
+		resetAll();
+		// The last workset triggered a commit: no need for a commit here
+		replayAll();
+		processor.endBatch();
+		verifyAll();
+
+		// The executor does not have any additional work, so it calls completeOrDelay() just after endBatch().
+		resetAll();
+		// The last workset triggered a commit: no need for a commit here
+		replayAll();
+		assertThat( processor.completeOrDelay() ).isEqualTo( 0L );
+		verifyAll();
+	}
+
+	@Test
+	public void delayedCommitStrategy_endBatchCommitNecessary_someAdditionalWorkDuringDelay_endBatchCommitNecessary() throws IOException {
+		resetAll();
+		replayAll();
+		processor.beginBatch();
+		verifyAll();
+
+		testSuccessfulWorkSet( 3, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
+		testSuccessfulWorkSet( 3, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, true, true );
+		testSuccessfulWorkSet( 5, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
+
+		resetAll();
+		// There was no commit in the last workset, there must be one here
+		expect( indexAccessorMock.commitOrDelay() )
+				// The I/O strategy decides that it's too early for a commit.
+				.andReturn( 1000L );
+		replayAll();
+		processor.endBatch();
+		verifyAll();
+
+		// The executor does not have any additional work, so it calls completeOrDelay() just after endBatch().
+		resetAll();
+		// There was no commit in the last batch, there must be one here
+		expect( indexAccessorMock.commitOrDelay() )
+				// Almost no time passed since the call to endBatch(),
+				// so the I/O strategy decides that it's still too early for a commit.
+				.andReturn( 999L );
+		replayAll();
+		assertThat( processor.completeOrDelay() ).isEqualTo( 999L );
+		verifyAll();
+
+		// 500 ms pass...
+
+		// Some work is submitted to the executor!
+		resetAll();
+		replayAll();
+		processor.beginBatch();
+		verifyAll();
+		testSuccessfulWorkSet( 3, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
+		resetAll();
+		// There was no commit in the last workset, there must be one here
+		expect( indexAccessorMock.commitOrDelay() )
+				// The I/O strategy decides that it's too early for a commit.
+				.andReturn( 499L );
+		replayAll();
+		processor.endBatch();
+		verifyAll();
+
+		// The executor does not have any additional work, so it calls completeOrDelay() just after endBatch().
+		resetAll();
+		// There was no commit in the last batch, there must be one here
+		expect( indexAccessorMock.commitOrDelay() )
+				// Almost no time passed since the call to endBatch(),
+				// so the I/O strategy decides that it's still too early for a commit.
+				.andReturn( 498L );
+		replayAll();
+		assertThat( processor.completeOrDelay() ).isEqualTo( 498L );
+		verifyAll();
+
+		// 498 ms pass...
+
+		// The executor didn't receive any additional work, so it calls completeOrDelay() again some time later.
+		resetAll();
+		// There was no commit in the last batch, there must be one here
+		expect( indexAccessorMock.commitOrDelay() )
+				// The I/O strategy decides that it's now time for a commit.
+				.andReturn( 0L );
+		replayAll();
+		assertThat( processor.completeOrDelay() ).isEqualTo( 0L );
+		verifyAll();
 	}
 
 	@Test
@@ -180,12 +374,12 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 		// A work may have failed, but there still were successful changes after the failure: these must be committed
 		resetAll();
-		indexAccessorMock.commit();
+		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
 		replayAll();
 		processor.endBatch();
 		verifyAll();
 
-		checkCompleteOrDelay();
+		checkCompleteOrDelayWithNothingToCommit();
 	}
 
 	@Test
@@ -264,12 +458,12 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 		// A work may have failed, but there were still successful changes, before and after the failure: these must be committed
 		resetAll();
-		indexAccessorMock.commit();
+		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
 		replayAll();
 		processor.endBatch();
 		verifyAll();
 
-		checkCompleteOrDelay();
+		checkCompleteOrDelayWithNothingToCommit();
 	}
 
 	@Test
@@ -345,7 +539,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		processor.endBatch();
 		verifyAll();
 
-		checkCompleteOrDelay();
+		checkCompleteOrDelayWithNothingToCommit();
 	}
 
 	@Test
@@ -403,13 +597,13 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		resetAll();
 		if ( !expectWorkSetCommit ) {
 			// There was no commit in the last workset, there must be one here
-			indexAccessorMock.commit();
+			expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
 		}
 		replayAll();
 		processor.endBatch();
 		verifyAll();
 
-		checkCompleteOrDelay();
+		checkCompleteOrDelayWithNothingToCommit();
 	}
 
 	@Test
@@ -486,7 +680,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		processor.endBatch();
 		verifyAll();
 
-		checkCompleteOrDelay();
+		checkCompleteOrDelayWithNothingToCommit();
 	}
 
 	@Test
@@ -522,8 +716,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 		Capture<IndexFailureContext> failureContextCapture = Capture.newInstance();
 		resetAll();
-		indexAccessorMock.commit();
-		expectLastCall().andThrow( commitException );
+		expect( indexAccessorMock.commitOrDelay() ).andThrow( commitException );
 		indexAccessorMock.reset();
 		expectWorkGetInfo( 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 );
 		failureHandlerMock.handle( capture( failureContextCapture ) );
@@ -546,7 +739,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 						workInfo( 10 ), workInfo( 11 )
 				);
 
-		checkCompleteOrDelay();
+		checkCompleteOrDelayWithNothingToCommit();
 	}
 
 	@Test
@@ -583,8 +776,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 		Capture<IndexFailureContext> failureContextCapture = Capture.newInstance();
 		resetAll();
-		indexAccessorMock.commit();
-		expectLastCall().andThrow( commitException );
+		expect( indexAccessorMock.commitOrDelay() ).andThrow( commitException );
 		indexAccessorMock.reset();
 		expectLastCall().andThrow( forceLockReleaseException );
 		failureHandlerMock.handle( capture( failureContextCapture ) );
@@ -620,7 +812,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		assertThat( failureContext.getFailingOperation() ).asString()
 				.contains( "Commit after a batch of index works" );
 
-		checkCompleteOrDelay();
+		checkCompleteOrDelayWithNothingToCommit();
 	}
 
 	private void testSuccessfulWorkSet(int workCount,
@@ -663,8 +855,9 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		}
 	}
 
-	private void checkCompleteOrDelay() {
+	private void checkCompleteOrDelayWithNothingToCommit() {
 		resetAll();
+		// We don't expect any call on mocks here, because there's nothing to commit.
 		replayAll();
 		Assertions.assertThat( processor.completeOrDelay() ).isEqualTo( 0 );
 		verifyAll();

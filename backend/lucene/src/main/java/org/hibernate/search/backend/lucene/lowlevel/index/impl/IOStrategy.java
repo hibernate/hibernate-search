@@ -25,8 +25,8 @@ import org.apache.lucene.analysis.Analyzer;
 public abstract class IOStrategy {
 
 	private final DirectoryProvider directoryProvider;
-	private final ThreadPoolProvider threadPoolProvider;
-	private final FailureHandler failureHandler;
+	final ThreadPoolProvider threadPoolProvider;
+	final FailureHandler failureHandler;
 
 	protected IOStrategy(DirectoryProvider directoryProvider, ThreadPoolProvider threadPoolProvider,
 			FailureHandler failureHandler) {
@@ -63,15 +63,8 @@ public abstract class IOStrategy {
 		}
 	}
 
-	private IndexWriterProvider createIndexWriterProvider(String indexName, EventContext eventContext, Analyzer analyzer,
-			DirectoryHolder directoryHolder) {
-		return new IndexWriterProvider(
-				indexName, eventContext,
-				directoryHolder, analyzer,
-				threadPoolProvider.getThreadProvider(),
-				failureHandler
-		);
-	}
+	abstract IndexWriterProvider createIndexWriterProvider(String indexName, EventContext eventContext, Analyzer analyzer,
+			DirectoryHolder directoryHolder);
 
 	abstract IndexReaderProvider createIndexReaderProvider(DirectoryHolder directoryHolder,
 			IndexWriterProvider indexWriterProvider);
