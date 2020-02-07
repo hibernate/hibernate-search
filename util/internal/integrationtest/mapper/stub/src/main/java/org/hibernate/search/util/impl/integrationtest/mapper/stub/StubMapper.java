@@ -118,10 +118,11 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 		for ( Map.Entry<StubTypeModel, MappedIndexManagerBuilder<?>> entry : indexManagerBuilders.entrySet() ) {
 			StubTypeModel typeModel = entry.getKey();
 			try {
+				String indexName = entry.getValue().getIndexName();
 				MappedIndexManager<?> indexManager = entry.getValue().build();
 				indexMappingsByTypeIdentifier.put(
 						typeModel.asString(),
-						new StubMappingIndexManager( indexManager )
+						new StubMappingIndexManager( indexName, indexManager )
 				);
 			}
 			catch (RuntimeException e) {

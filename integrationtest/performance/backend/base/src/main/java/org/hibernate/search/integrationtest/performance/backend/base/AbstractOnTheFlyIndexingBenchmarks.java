@@ -1,0 +1,197 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.integrationtest.performance.backend.base;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Random;
+import java.util.stream.Stream;
+
+import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
+import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.integrationtest.performance.backend.base.testsupport.dataset.Dataset;
+import org.hibernate.search.integrationtest.performance.backend.base.testsupport.dataset.DatasetHolder;
+import org.hibernate.search.integrationtest.performance.backend.base.testsupport.index.AbstractBackendHolder;
+import org.hibernate.search.integrationtest.performance.backend.base.testsupport.index.MappedIndex;
+import org.hibernate.search.integrationtest.performance.backend.base.testsupport.index.PerThreadIndexPartition;
+import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+
+import org.openjdk.jmh.annotations.Benchmark;
+import org.openjdk.jmh.annotations.Fork;
+import org.openjdk.jmh.annotations.Group;
+import org.openjdk.jmh.annotations.GroupThreads;
+import org.openjdk.jmh.annotations.Level;
+import org.openjdk.jmh.annotations.Param;
+import org.openjdk.jmh.annotations.Scope;
+import org.openjdk.jmh.annotations.Setup;
+import org.openjdk.jmh.annotations.State;
+import org.openjdk.jmh.annotations.Threads;
+import org.openjdk.jmh.infra.Blackhole;
+
+/**
+ * Abstract class for JMH benchmarks related to on-the-fly indexing,
+ * which is primarily used when doing CRUD operations on the database
+ * in the ORM integration.
+ * <p>
+ * This benchmark generates and executes worksets on the index from a single thread,
+ * guaranteeing not to conflict with any other thread in the same trial.
+ * <p>
+ * Internally, this object keeps tab of documents currently present in the index
+ * and generates worksets accordingly.
+ */
+@Fork(1)
+@State(Scope.Thread)
+public abstract class AbstractOnTheFlyIndexingBenchmarks extends AbstractBackendBenchmarks {
+
+	@Param({ "NONE" })
+	private DocumentRefreshStrategy refreshStrategy;
+
+	/**
+	 * The number of works of each type (add/update/delete)
+	 * to put in each workset.
+	 */
+	@Param({ "3" })
+	private int worksPerTypePerWorkset;
+
+	/*
+	 * We just want a sequence of numbers that spreads uniformly over a large interval,
+	 * but we don't need cryptographically secure randomness,
+	 * and we want the sequence to be the same from one test run to another.
+	 * That's why we simply use {@link Random} and that's why we set the seed to
+	 * a hard-coded value.
+	 * Also, we use one random generator per thread to avoid contention.
+	 */
+	private final Random idShufflingRandom = new Random( 3210140441369L );
+
+	private Dataset dataset;
+
+	private long invocationCount;
+
+	private List<Long> idsToAdd;
+	private List<Long> idsToUpdate;
+	private List<Long> idsToDelete;
+
+	@Setup(Level.Iteration)
+	public void prepareIteration(DatasetHolder datasetHolder) {
+		this.dataset = datasetHolder.getDataset();
+		this.invocationCount = 0L;
+
+		int threadIdIntervalSize = 3 * worksPerTypePerWorkset;
+
+		// Initialize the ID lists
+		idsToAdd = new ArrayList<>();
+		idsToUpdate = new ArrayList<>();
+		idsToDelete = new ArrayList<>();
+		List<Long> shuffledIds = createShuffledIndexList( threadIdIntervalSize );
+		int offset = 0;
+		for ( int i = 0; i < worksPerTypePerWorkset; ++i ) {
+			idsToAdd.add( shuffledIds.get( i ) );
+		}
+		offset += worksPerTypePerWorkset;
+		for ( int i = 0; i < worksPerTypePerWorkset; ++i ) {
+			idsToDelete.add( shuffledIds.get( offset + i ) );
+		}
+		offset += worksPerTypePerWorkset;
+		for ( int i = 0; i < worksPerTypePerWorkset; ++i ) {
+			idsToUpdate.add( shuffledIds.get( offset + i ) );
+		}
+
+		getIndexInitializer().addToIndex(
+				getIndexPartition().getIndex(),
+				Stream.concat( idsToUpdate.stream(), idsToDelete.stream() )
+						.mapToLong( getIndexPartition()::toDocumentId )
+		);
+	}
+
+	@Benchmark
+	@Threads(3 * AbstractBackendHolder.INDEX_COUNT)
+	public void workset(WriteCounters counters) {
+		StubBackendSessionContext sessionContext = new StubBackendSessionContext();
+		PerThreadIndexPartition partition = getIndexPartition();
+		MappedIndex index = partition.getIndex();
+		IndexIndexingPlan<? extends DocumentElement> indexingPlan = index.getIndexManager()
+				.createIndexingPlan( sessionContext, getCommitStrategyParam(), refreshStrategy );
+
+		for ( Long documentIdInThread : idsToAdd ) {
+			long documentId = partition.toDocumentId( documentIdInThread );
+			indexingPlan.add(
+					StubMapperUtils.referenceProvider( String.valueOf( documentId ) ),
+					document -> dataset.populate( index, document, documentId, invocationCount )
+			);
+		}
+		for ( Long documentIdInThread : idsToUpdate ) {
+			long documentId = partition.toDocumentId( documentIdInThread );
+			indexingPlan.update(
+					StubMapperUtils.referenceProvider( String.valueOf( documentId ) ),
+					document -> dataset.populate( index, document, documentId, invocationCount )
+			);
+		}
+		for ( Long documentIdInThread : idsToDelete ) {
+			long documentId = partition.toDocumentId( documentIdInThread );
+			indexingPlan.delete(
+					StubMapperUtils.referenceProvider( String.valueOf( documentId ) )
+			);
+		}
+
+		// Do not return until works are *actually* executed
+		Futures.unwrappedExceptionJoin( indexingPlan.execute() );
+
+		counters.write += 3 * worksPerTypePerWorkset;
+
+		++invocationCount;
+
+		List<Long> nextToDelete = idsToUpdate;
+		idsToUpdate = idsToAdd;
+		idsToAdd = idsToDelete;
+		idsToDelete = nextToDelete;
+	}
+
+	@Benchmark
+	@GroupThreads(2 * AbstractBackendHolder.INDEX_COUNT)
+	@Group("concurrentReadWrite")
+	public void concurrentWorkset(WriteCounters counters) {
+		workset( counters );
+	}
+
+	@Benchmark
+	@GroupThreads(2 * AbstractBackendHolder.INDEX_COUNT)
+	@Group("concurrentReadWrite")
+	public void concurrentQuery(QueryParams params, Blackhole blackhole) {
+		PerThreadIndexPartition partition = getIndexPartition();
+		StubMappingIndexManager indexManager = partition.getIndex().getIndexManager();
+
+		SearchResult<DocumentReference> results = indexManager.createScope().query()
+				.where( f -> f.matchAll() )
+				.sort( f -> f.field( MappedIndex.SHORT_TEXT_FIELD_NAME ) )
+				.fetch( params.getQueryMaxResults() );
+
+		blackhole.consume( results.getTotalHitCount() );
+		for ( DocumentReference hit : results.getHits() ) {
+			blackhole.consume( hit );
+		}
+	}
+
+	protected abstract DocumentCommitStrategy getCommitStrategyParam();
+
+	private List<Long> createShuffledIndexList(int size) {
+		List<Long> result = new ArrayList<>( size );
+		for ( int i = 0; i < size; ++i ) {
+			result.add( (long) i );
+		}
+		Collections.shuffle( result, idShufflingRandom );
+		return result;
+	}
+
+}

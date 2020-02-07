@@ -23,10 +23,16 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
  */
 public class StubMappingIndexManager {
 
+	private final String indexName;
 	private final MappedIndexManager<?> indexManager;
 
-	StubMappingIndexManager(MappedIndexManager<?> indexManager) {
+	StubMappingIndexManager(String indexName, MappedIndexManager<?> indexManager) {
+		this.indexName = indexName;
 		this.indexManager = indexManager;
+	}
+
+	public String getName() {
+		return indexName;
 	}
 
 	public <T> T unwrapForTests(Class<T> clazz) {

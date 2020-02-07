@@ -21,6 +21,7 @@
         <module>mapper/orm</module>
         <module>mapper/orm-cdi</module>
         <module>mapper/orm-envers</module>
+        <module>performance</module>
         <module>showcase/library</module>
     </modules>
 

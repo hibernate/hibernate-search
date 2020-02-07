@@ -169,7 +169,7 @@
     </modules>
 
     <properties>
-        <!-- Dependencies versions -->
+        <!-- Main dependencies -->
 
         <!-- >>> Common -->
         <version.org.jboss.logging.jboss-logging>3.4.0.Final</version.org.jboss.logging.jboss-logging>
@@ -229,6 +229,7 @@
 
         <!-- Test dependencies -->
 
+        <!-- >>> Common -->
         <version.org.slf4j>1.7.25</version.org.slf4j>
         <version.log4j>1.2.16</version.log4j>
         <version.junit>4.12</version.junit>
@@ -244,6 +245,9 @@
         <version.com.github.tomakehurst.wiremock>2.25.1</version.com.github.tomakehurst.wiremock>
         <version.org.apache.commons.lang3>3.8.1</version.org.apache.commons.lang3>
         <version.org.jboss.weld>3.1.3.Final</version.org.jboss.weld>
+
+        <!-- >>> Performance tests -->
+        <version.org.openjdk.jmh>1.23</version.org.openjdk.jmh>
 
         <!-- Maven plugins versions -->
 
@@ -982,6 +986,13 @@
                 <groupId>org.jboss.weld.se</groupId>
                 <artifactId>weld-se-shaded</artifactId>
                 <version>${version.org.jboss.weld}</version>
+            </dependency>
+
+            <!-- Performance tests -->
+            <dependency>
+                <groupId>org.openjdk.jmh</groupId>
+                <artifactId>jmh-core</artifactId>
+                <version>${version.org.openjdk.jmh}</version>
             </dependency>
 
             <!-- Hibernate ORM testing tools -->
@@ -2003,6 +2014,12 @@
                     <groupId>org.jboss.logging</groupId>
                     <artifactId>jboss-logging-processor</artifactId>
                     <version>${version.org.jboss.logging.jboss-logging-tools}</version>
+                    <scope>compile</scope>
+                </dependency>
+                <dependency>
+                    <groupId>org.openjdk.jmh</groupId>
+                    <artifactId>jmh-generator-annprocess</artifactId>
+                    <version>${version.org.openjdk.jmh}</version>
                     <scope>compile</scope>
                 </dependency>
             </dependencies>
