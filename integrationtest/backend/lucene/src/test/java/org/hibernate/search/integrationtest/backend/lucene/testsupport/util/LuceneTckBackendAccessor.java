@@ -21,7 +21,7 @@ import org.hibernate.search.util.common.impl.Throwables;
 
 import org.jboss.logging.Logger;
 
-class LuceneTckBackendAccessor implements TckBackendAccessor {
+public class LuceneTckBackendAccessor implements TckBackendAccessor {
 
 	private static final Logger log = Logger.getLogger( LuceneTestIndexesPathConfiguration.class.getName() );
 
@@ -53,6 +53,26 @@ class LuceneTckBackendAccessor implements TckBackendAccessor {
 							+ " to trigger failures in tests.", e
 			);
 		}
+	}
+
+	public void copyIndexContent(Path copyPath, String indexName) throws IOException {
+		Path indexPath = indexesPath.resolve( indexName );
+
+		Files.walkFileTree( indexPath, new SimpleFileVisitor<Path>() {
+			@Override
+			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+				Path relativePath = indexPath.relativize( dir );
+				Files.createDirectory( copyPath.resolve( relativePath ) );
+				return FileVisitResult.CONTINUE;
+			}
+
+			@Override
+			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+				Path relativePath = indexPath.relativize( file );
+				Files.copy( file, copyPath.resolve( relativePath ) );
+				return FileVisitResult.CONTINUE;
+			}
+		} );
 	}
 
 	private void nukeOrLogRecursively(Path path, String indexName) {
