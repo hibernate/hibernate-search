@@ -24,9 +24,12 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMap
 
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 import org.awaitility.Awaitility;
 
+@RunWith(Parameterized.class)
 public class LuceneIndexReaderRefreshIT {
 
 	private static final String INDEX_NAME = "IndexName";
@@ -38,11 +41,35 @@ public class LuceneIndexReaderRefreshIT {
 	 */
 	private static final int NON_ZERO_DELAY = 2000;
 
+	/**
+	 * These parameters should not have any effect on the test.
+	 * They are here to check that we get the same behavior independently from these parameters.
+	 */
+	@Parameterized.Parameters(name = "Commit strategy {0}, commit_interval {1}")
+	public static Object[][] strategies() {
+		return new Object[][] {
+				{ DocumentCommitStrategy.NONE, null },
+				{ DocumentCommitStrategy.FORCE, null },
+				{ DocumentCommitStrategy.NONE, 0 },
+				{ DocumentCommitStrategy.FORCE, 0 },
+				{ DocumentCommitStrategy.NONE, NON_ZERO_DELAY },
+				{ DocumentCommitStrategy.FORCE, NON_ZERO_DELAY }
+		};
+	}
+
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
+	private final DocumentCommitStrategy commitStrategy;
+	private final Integer commitInterval;
+
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
+
+	public LuceneIndexReaderRefreshIT(DocumentCommitStrategy commitStrategy, Integer commitInterval) {
+		this.commitStrategy = commitStrategy;
+		this.commitInterval = commitInterval;
+	}
 
 	@Test
 	public void ioStrategyDefault_refreshIntervalDefault() {
@@ -56,7 +83,7 @@ public class LuceneIndexReaderRefreshIT {
 
 		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan(
 				new StubBackendSessionContext(),
-				DocumentCommitStrategy.NONE, // The commit should not be necessary for changes to be visible
+				commitStrategy, // This is irrelevant
 				DocumentRefreshStrategy.NONE // The refresh should be executed regardless of this parameter
 		);
 		plan.add( referenceProvider( "1" ), document -> document.addValue( indexMapping.textField, "text1" ) );
@@ -78,7 +105,7 @@ public class LuceneIndexReaderRefreshIT {
 
 		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan(
 				new StubBackendSessionContext(),
-				DocumentCommitStrategy.NONE, // The commit should not be necessary for changes to be visible
+				commitStrategy, // This is irrelevant
 				DocumentRefreshStrategy.NONE // The refresh should be executed regardless of this parameter
 		);
 		plan.add( referenceProvider( "1" ), document -> document.addValue( indexMapping.textField, "text1" ) );
@@ -100,7 +127,7 @@ public class LuceneIndexReaderRefreshIT {
 
 		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan(
 				new StubBackendSessionContext(),
-				DocumentCommitStrategy.NONE, // The commit should not be necessary for changes to be visible
+				commitStrategy, // This is irrelevant
 				DocumentRefreshStrategy.NONE // This means no refresh will take place until after the refresh interval
 		);
 		plan.add( referenceProvider( "1" ), document -> document.addValue( indexMapping.textField, "text1" ) );
@@ -125,7 +152,7 @@ public class LuceneIndexReaderRefreshIT {
 
 		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan(
 				new StubBackendSessionContext(),
-				DocumentCommitStrategy.NONE, // The commit should not be necessary for changes to be visible
+				commitStrategy, // This is irrelevant
 				DocumentRefreshStrategy.FORCE // This will force a refresh before the end of the refresh interval
 		);
 		plan.add( referenceProvider( "1" ), document -> document.addValue( indexMapping.textField, "text1" ) );
@@ -147,7 +174,7 @@ public class LuceneIndexReaderRefreshIT {
 
 		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan(
 				new StubBackendSessionContext(),
-				DocumentCommitStrategy.NONE, // The commit should not be necessary for changes to be visible
+				DocumentCommitStrategy.FORCE, // With the debug IO strategy, commit is necessary for changes to be visible
 				DocumentRefreshStrategy.NONE // The refresh should be executed regardless of this parameter
 		);
 		plan.add( referenceProvider( "1" ), document -> document.addValue( indexMapping.textField, "text1" ) );
@@ -166,6 +193,7 @@ public class LuceneIndexReaderRefreshIT {
 				)
 				.withIndexDefaultsProperty( LuceneIndexSettings.IO_STRATEGY, ioStrategyName )
 				.withIndexDefaultsProperty( LuceneIndexSettings.IO_REFRESH_INTERVAL, refreshIntervalMs )
+				.withIndexDefaultsProperty( LuceneIndexSettings.IO_COMMIT_INTERVAL, commitInterval )
 				.setup();
 	}
 
