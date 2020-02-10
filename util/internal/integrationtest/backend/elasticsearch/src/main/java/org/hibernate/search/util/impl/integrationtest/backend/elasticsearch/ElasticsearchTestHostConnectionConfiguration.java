@@ -52,7 +52,7 @@ public class ElasticsearchTestHostConnectionConfiguration {
 		return awsSigningEnabled;
 	}
 
-	public void addToBackendProperties(Map<String, Object> properties) {
+	public void addToBackendProperties(Map<String, ? super String> properties) {
 		properties.put( "hosts", hosts );
 		properties.put( "protocol", protocol );
 		properties.put( "username", username );
