@@ -38,7 +38,6 @@ import org.junit.runners.Parameterized.Parameters;
 @TestForIssue(jiraKey = "HSEARCH-2456")
 public class ElasticsearchIndexStatusCheckIT {
 
-	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "IndexName";
 
 	@Parameters(name = "With strategy {0}")
@@ -155,9 +154,8 @@ public class ElasticsearchIndexStatusCheckIT {
 	}
 
 	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
-		return setupHelper.start( BACKEND_NAME )
+		return setupHelper.start()
 				.withBackendProperty(
-						BACKEND_NAME,
 						// Don't contribute any analysis definitions, validation of those is tested in another test class
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
 						(ElasticsearchAnalysisConfigurer) (ElasticsearchAnalysisConfigurationContext context) -> {
@@ -165,17 +163,14 @@ public class ElasticsearchIndexStatusCheckIT {
 						}
 				)
 				.withIndexDefaultsProperty(
-						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
 						strategy.getExternalRepresentation()
 				)
 				.withIndexDefaultsProperty(
-						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS,
 						IndexStatus.GREEN.getElasticsearchString()
 				)
 				.withIndexDefaultsProperty(
-						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT,
 						"100"
 				);

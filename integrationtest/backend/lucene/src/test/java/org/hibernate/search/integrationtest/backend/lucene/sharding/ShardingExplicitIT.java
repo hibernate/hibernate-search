@@ -27,8 +27,6 @@ import org.junit.Test;
  */
 public class ShardingExplicitIT extends AbstractShardingIT {
 
-	private static final String BACKEND_NAME = "BackendName";
-
 	private static final String SHARD_ID_1 = "first";
 	private static final String SHARD_ID_2 = "second";
 	private static final String SHARD_ID_3 = "third";
@@ -41,17 +39,17 @@ public class ShardingExplicitIT extends AbstractShardingIT {
 
 	@Before
 	public void setup() {
-		setupHelper.start( BACKEND_NAME )
+		setupHelper.start()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx, RoutingMode.EXPLICIT_ROUTING_KEYS ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.withIndexDefaultsProperty(
-						BACKEND_NAME, LuceneIndexSettings.SHARDING_STRATEGY, "explicit"
+						LuceneIndexSettings.SHARDING_STRATEGY, "explicit"
 				)
 				.withIndexDefaultsProperty(
-						BACKEND_NAME, LuceneIndexSettings.SHARDING_SHARD_IDENTIFIERS,
+						LuceneIndexSettings.SHARDING_SHARD_IDENTIFIERS,
 						SHARD_ID_1 + "," + SHARD_ID_2 + "," + SHARD_ID_3
 				)
 				.setup();

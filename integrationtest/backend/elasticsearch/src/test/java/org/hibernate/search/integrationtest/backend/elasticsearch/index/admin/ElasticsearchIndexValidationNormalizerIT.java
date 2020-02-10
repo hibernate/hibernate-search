@@ -30,7 +30,6 @@ public class ElasticsearchIndexValidationNormalizerIT {
 
 	private static final String SCHEMA_VALIDATION_CONTEXT = "schema validation";
 
-	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "IndexName";
 
 	@Rule
@@ -121,14 +120,12 @@ public class ElasticsearchIndexValidationNormalizerIT {
 	}
 
 	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
-		return setupHelper.start( BACKEND_NAME )
+		return setupHelper.start()
 				.withIndexDefaultsProperty(
-						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
 						IndexLifecycleStrategyName.VALIDATE.getExternalRepresentation()
 				)
 				.withBackendProperty(
-						BACKEND_NAME,
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
 						new ElasticsearchIndexAdminNormalizerITAnalysisConfigurer()
 				);

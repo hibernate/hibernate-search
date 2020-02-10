@@ -23,8 +23,6 @@ import org.junit.Test;
 
 public class ElasticsearchBootstrapIT {
 
-	private static final String BACKEND_NAME = "BackendName";
-
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
@@ -38,16 +36,16 @@ public class ElasticsearchBootstrapIT {
 	 */
 	@Test
 	public void explicitModelDialect() {
-		SearchSetupHelper.PartialSetup partialSetup = setupHelper.start( BACKEND_NAME )
+		SearchSetupHelper.PartialSetup partialSetup = setupHelper.start()
 				.withBackendProperty(
-						BACKEND_NAME, ElasticsearchBackendSettings.VERSION, ElasticsearchTestDialect.getClusterVersion()
+						ElasticsearchBackendSettings.VERSION, ElasticsearchTestDialect.getClusterVersion()
 				)
 				.withBackendProperty(
-						BACKEND_NAME, ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
+						ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
 						elasticsearchClientSpy.getFactory()
 				)
 				.withIndexDefaultsProperty(
-						BACKEND_NAME, ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
+						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
 						IndexLifecycleStrategyName.NONE
 				)
 				.withIndex(

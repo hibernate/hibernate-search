@@ -45,7 +45,7 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 				.doesNotExist();
 
 		setup( c -> c.withBackendProperty(
-				BACKEND_NAME, LuceneBackendSettings.DIRECTORY_ROOT,
+				LuceneBackendSettings.DIRECTORY_ROOT,
 				temporaryFolder.getRoot().getAbsolutePath()
 		) );
 
@@ -102,7 +102,7 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.FSDirectorySelectionTest.testInvalidDirectoryType")
 	public void filesystemAccessStrategy_invalid() {
 		SubTest.expectException( () -> setup( c -> c.withBackendProperty(
-				BACKEND_NAME, LuceneBackendSettings.DIRECTORY_FILESYSTEM_ACCESS_STRATEGY,
+				LuceneBackendSettings.DIRECTORY_FILESYSTEM_ACCESS_STRATEGY,
 				"some_invalid_name"
 		) ) )
 				.assertThrown()
@@ -136,7 +136,7 @@ public class LuceneLocalFileSystemDirectoryIT extends AbstractBuiltInDirectoryIT
 	private void testFileSystemAccessStrategy(String strategyName,
 			Class<? extends Directory> expectedDirectoryClass) {
 		setup( c -> c.withBackendProperty(
-				BACKEND_NAME, LuceneBackendSettings.DIRECTORY_FILESYSTEM_ACCESS_STRATEGY,
+				LuceneBackendSettings.DIRECTORY_FILESYSTEM_ACCESS_STRATEGY,
 				strategyName
 		) );
 

@@ -24,7 +24,6 @@ import org.junit.Test;
 @TestForIssue(jiraKey = "HSEARCH-3791")
 public class ElasticsearchIndexNamingBaseIT {
 
-	private static final String BACKEND_NAME = "backendname";
 	private static final String INDEX1_NAME = "index1_name";
 	private static final String INDEX2_NAME = "index2_name";
 
@@ -118,9 +117,8 @@ public class ElasticsearchIndexNamingBaseIT {
 	}
 
 	private void setup(IndexLayoutStrategy strategy) {
-		setupHelper.start( BACKEND_NAME )
+		setupHelper.start()
 				.withBackendProperty(
-						BACKEND_NAME,
 						ElasticsearchBackendSettings.LAYOUT_STRATEGY,
 						strategy
 				)

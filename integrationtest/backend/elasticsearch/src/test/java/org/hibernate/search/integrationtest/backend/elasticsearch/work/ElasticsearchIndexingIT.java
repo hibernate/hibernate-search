@@ -41,7 +41,6 @@ import com.google.gson.JsonObject;
 @RunWith(Parameterized.class)
 public class ElasticsearchIndexingIT {
 
-	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "indexname";
 
 	@Parameterized.Parameters(name = "IndexLayoutStrategy = {0}")
@@ -76,12 +75,12 @@ public class ElasticsearchIndexingIT {
 
 	@Before
 	public void setup() {
-		setupHelper.start( BACKEND_NAME )
+		setupHelper.start()
 				.withBackendProperty(
-						BACKEND_NAME, ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.getFactory()
+						ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.getFactory()
 				)
 				.withBackendProperty(
-						BACKEND_NAME, ElasticsearchBackendSettings.LAYOUT_STRATEGY, layoutStrategy
+						ElasticsearchBackendSettings.LAYOUT_STRATEGY, layoutStrategy
 				)
 				.withIndex(
 						INDEX_NAME,

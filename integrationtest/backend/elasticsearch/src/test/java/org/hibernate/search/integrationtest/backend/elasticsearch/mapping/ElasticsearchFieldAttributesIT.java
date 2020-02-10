@@ -29,7 +29,6 @@ import com.google.gson.JsonObject;
 
 public class ElasticsearchFieldAttributesIT {
 
-	private static final String BACKEND_NAME = "my-backend";
 	private static final String INDEX_NAME = "my-index";
 
 	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
@@ -110,8 +109,8 @@ public class ElasticsearchFieldAttributesIT {
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
 
-		setupHelper.start( BACKEND_NAME )
-				.withBackendProperty( BACKEND_NAME, ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.getFactory() )
+		setupHelper.start()
+				.withBackendProperty( ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.getFactory() )
 				.withIndex( INDEX_NAME, ctx -> mapping.accept( ctx.getSchemaElement() ) )
 				.setup();
 

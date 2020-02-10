@@ -29,7 +29,6 @@ import org.junit.rules.ExpectedException;
 @Category(RequiresIndexOpenClose.class)
 public class ElasticsearchIndexUpdateNormalizerIT {
 
-	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "IndexName";
 
 	@Rule
@@ -315,14 +314,12 @@ public class ElasticsearchIndexUpdateNormalizerIT {
 	}
 
 	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
-		return setupHelper.start( BACKEND_NAME )
+		return setupHelper.start()
 				.withIndexDefaultsProperty(
-						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
 						IndexLifecycleStrategyName.UPDATE.getExternalRepresentation()
 				)
 				.withBackendProperty(
-						BACKEND_NAME,
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
 						new ElasticsearchIndexAdminNormalizerITAnalysisConfigurer()
 				);

@@ -42,7 +42,6 @@ import org.junit.Test;
  */
 public class ElasticsearchIndexValidationMappingAttributeIT {
 
-	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "IndexName";
 	private static final String SCHEMA_VALIDATION_CONTEXT = "schema validation";
 
@@ -1173,14 +1172,12 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 	}
 
 	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
-		return setupHelper.start( BACKEND_NAME )
+		return setupHelper.start()
 				.withIndexDefaultsProperty(
-						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
 						IndexLifecycleStrategyName.VALIDATE.getExternalRepresentation()
 				)
 				.withBackendProperty(
-						BACKEND_NAME,
 						// Don't contribute any analysis definitions, migration of those is tested in another test class
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
 						(ElasticsearchAnalysisConfigurer) (ElasticsearchAnalysisConfigurationContext context) -> {
@@ -1288,14 +1285,12 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 	}
 
 	private SearchSetupHelper.SetupContext validateSchemaWithAnalyzerConfig() {
-		return setupHelper.start( BACKEND_NAME )
+		return setupHelper.start()
 				.withIndexDefaultsProperty(
-						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
 						IndexLifecycleStrategyName.VALIDATE.getExternalRepresentation()
 				)
 				.withBackendProperty(
-						BACKEND_NAME,
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
 						new ElasticsearchIndexAdminNormalizerITAnalysisConfigurer()
 				);

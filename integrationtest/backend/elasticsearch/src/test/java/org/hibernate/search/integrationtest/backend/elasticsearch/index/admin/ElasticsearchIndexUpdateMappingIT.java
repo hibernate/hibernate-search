@@ -37,7 +37,6 @@ public class ElasticsearchIndexUpdateMappingIT {
 	private static final String MAPPING_CREATION_FAILED_MESSAGE_ID = "HSEARCH400020";
 	private static final String ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID = "HSEARCH400007";
 
-	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX1_NAME = "Index1Name";
 	private static final String INDEX2_NAME = "Index2Name";
 	private static final String INDEX3_NAME = "Index3Name";
@@ -427,14 +426,12 @@ public class ElasticsearchIndexUpdateMappingIT {
 	}
 
 	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
-		return setupHelper.start( BACKEND_NAME )
+		return setupHelper.start()
 				.withIndexDefaultsProperty(
-						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
 						IndexLifecycleStrategyName.UPDATE.getExternalRepresentation()
 				)
 				.withBackendProperty(
-						BACKEND_NAME,
 						// Don't contribute any analysis definitions, migration of those is tested in another test class
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
 						(ElasticsearchAnalysisConfigurer) (ElasticsearchAnalysisConfigurationContext context) -> {

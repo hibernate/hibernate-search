@@ -83,7 +83,7 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.CustomLockProviderTest.testFailOnNonExistentLockingFactory")
 	public void lockingStrategy_invalid() {
 		SubTest.expectException( () -> setup( c -> c.withBackendProperty(
-				BACKEND_NAME, LuceneBackendSettings.DIRECTORY_LOCKING_STRATEGY,
+				LuceneBackendSettings.DIRECTORY_LOCKING_STRATEGY,
 				"some_invalid_name"
 		) ) )
 				.assertThrown()
@@ -115,7 +115,7 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 		setup( c -> {
 			if ( strategyName != null ) {
 				c.withBackendProperty(
-						BACKEND_NAME, LuceneBackendSettings.DIRECTORY_LOCKING_STRATEGY,
+						LuceneBackendSettings.DIRECTORY_LOCKING_STRATEGY,
 						strategyName
 				);
 			}
@@ -141,7 +141,7 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 
 	private void testInvalidFSLockingStrategy(String strategyName) {
 		SubTest.expectException( () -> setup( c -> c.withBackendProperty(
-				BACKEND_NAME, LuceneBackendSettings.DIRECTORY_LOCKING_STRATEGY,
+				LuceneBackendSettings.DIRECTORY_LOCKING_STRATEGY,
 				strategyName
 		) ) )
 				.assertThrown()

@@ -79,7 +79,7 @@ public abstract class AbstractDirectoryIT {
 								indexManager -> this.indexManager = indexManager
 						)
 						.withBackendProperty(
-								BACKEND_NAME, LuceneBackendSettings.DIRECTORY_TYPE, directoryType
+								LuceneBackendSettings.DIRECTORY_TYPE, directoryType
 						)
 		)
 				.setup();

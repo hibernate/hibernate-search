@@ -37,7 +37,7 @@ public class ElasticsearchBootstrapFailureIT {
 				"Closed port",
 				() -> setupHelper.start( BACKEND_NAME )
 						.withBackendProperty(
-								BACKEND_NAME, ElasticsearchBackendSettings.HOSTS,
+								ElasticsearchBackendSettings.HOSTS,
 								// We just need a closed port, hopefully this one will generally be closed
 								"localhost:9199"
 						)

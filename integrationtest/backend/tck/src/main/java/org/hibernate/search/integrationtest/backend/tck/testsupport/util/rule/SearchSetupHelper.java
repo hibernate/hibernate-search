@@ -74,7 +74,7 @@ public class SearchSetupHelper implements TestRule {
 		// Hack to have the resolve() method ignore the various masks and prefixes that we added for TCK purposes only
 		propertySource = ConfigurationPropertySource.empty().withOverride( propertySource );
 
-		SetupContext setupContext = new SetupContext( propertySource )
+		SetupContext setupContext = new SetupContext( backendName, propertySource )
 				.withProperty( EngineSettings.DEFAULT_BACKEND, backendName );
 
 		return setupStrategy.startSetup( setupContext );
@@ -129,6 +129,7 @@ public class SearchSetupHelper implements TestRule {
 
 	public class SetupContext {
 
+		private final String defaultBackendName;
 		private final ConfigurationPropertyChecker unusedPropertyChecker;
 		private final ConfigurationPropertySource propertySource;
 		// Use a LinkedHashMap for deterministic iteration
@@ -136,7 +137,8 @@ public class SearchSetupHelper implements TestRule {
 		private final List<IndexDefinition> indexDefinitions = new ArrayList<>();
 		private boolean multiTenancyEnabled = false;
 
-		SetupContext(ConfigurationPropertySource basePropertySource) {
+		SetupContext(String defaultBackendName, ConfigurationPropertySource basePropertySource) {
+			this.defaultBackendName = defaultBackendName;
 			this.unusedPropertyChecker = ConfigurationPropertyChecker.create();
 			this.propertySource = basePropertySource.withOverride( ConfigurationPropertySource.fromMap( overriddenProperties ) );
 		}
@@ -151,8 +153,16 @@ public class SearchSetupHelper implements TestRule {
 			return this;
 		}
 
+		public SetupContext withBackendProperty(String keyRadical, Object value) {
+			return withBackendProperty( defaultBackendName, keyRadical, value );
+		}
+
 		public SetupContext withBackendProperty(String backendName, String keyRadical, Object value) {
 			return withProperty( EngineSettings.BACKENDS + "." + backendName + "." + keyRadical, value );
+		}
+
+		public SetupContext withIndexDefaultsProperty(String keyRadical, Object value) {
+			return withIndexDefaultsProperty( defaultBackendName, keyRadical, value );
 		}
 
 		public SetupContext withIndexDefaultsProperty(String backendName, String keyRadical, Object value) {
