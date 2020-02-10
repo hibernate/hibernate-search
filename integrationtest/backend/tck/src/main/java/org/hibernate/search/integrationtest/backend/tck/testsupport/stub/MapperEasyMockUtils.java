@@ -38,7 +38,7 @@ public final class MapperEasyMockUtils {
 	 * @param <R> The reference type.
 	 * @param <E> The entity type.
 	 */
-	@SuppressWarnings({"unchecked", "rawtypes"})
+	@SuppressWarnings({"unchecked"})
 	public static <R, E> void expectHitMapping(
 			LoadingContext<R, E> loadingContextMock,
 			DocumentReferenceConverter<R> referenceTransformerMock,
@@ -67,12 +67,9 @@ public final class MapperEasyMockUtils {
 		expect( objectLoaderMock.loadBlocking(
 				EasyMockUtils.collectionAnyOrderMatcher( new ArrayList<>( context.loadingMap.keySet() ) )
 		) )
-				.andAnswer(
-						// We need to cast to a raw type to conform to List<? extends E>
-						() -> (List) ( (List<R>) EasyMock.getCurrentArguments()[0] ).stream()
+				.andAnswer( () -> ( (List<R>) EasyMock.getCurrentArguments()[0] ).stream()
 						.map( context.loadingMap::get )
-						.collect( Collectors.toList() )
-				);
+						.collect( Collectors.toList() ) );
 	}
 
 	public static class HitMappingDefinitionContext<R, E> {
