@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
+package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
 import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
@@ -14,7 +14,6 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubBackendSessionContext;
 
 /**
  * A wrapper around {@link MappedIndexScope} providing some syntactic sugar,

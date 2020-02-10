@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.lucene.lowlevel.writer;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.fail;
-import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
+import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -26,8 +26,8 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneTckBackendAccessor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubBackendSessionContext;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 
 import org.junit.Rule;
 import org.junit.Test;

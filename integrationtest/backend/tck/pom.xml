@@ -21,6 +21,10 @@
             <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-util-internal-integrationtest-common</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-mapper-stub</artifactId>
+        </dependency>
     </dependencies>
 
 </project>

@@ -10,7 +10,7 @@ import static org.easymock.EasyMock.expect;
 import static org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils.projectionMatcher;
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
+import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 import static org.junit.Assert.assertEquals;
 
 import java.time.LocalDate;
@@ -40,10 +40,10 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTra
 import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTransformedReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.GenericStubMappingScope;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.MapperEasyMockUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -125,7 +125,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		 * which must happen every time we execute the query,
 		 * so that the mapper can run state checks (session is still open, ...).
 		 */
-		StubMapperUtils.expectHitMapping(
+		MapperEasyMockUtils.expectHitMapping(
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				c -> c
 						.load( mainReference, mainTransformedReference, mainLoadedObject )
@@ -191,7 +191,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		 * which must happen every time we execute the query,
 		 * so that the mapper can run state checks (session is still open, ...).
 		 */
-		StubMapperUtils.expectHitMapping(
+		MapperEasyMockUtils.expectHitMapping(
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				c -> c
 						.entityReference( mainReference, mainTransformedReference )
@@ -235,7 +235,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		 * which must happen every time we execute the query,
 		 * so that the mapper can run state checks (session is still open, ...).
 		 */
-		StubMapperUtils.expectHitMapping(
+		MapperEasyMockUtils.expectHitMapping(
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				c -> c
 						.load( mainReference, mainTransformedReference, mainLoadedObject )
@@ -286,7 +286,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		 * which must happen every time we execute the query,
 		 * so that the mapper can run state checks (session is still open, ...).
 		 */
-		StubMapperUtils.expectHitMapping(
+		MapperEasyMockUtils.expectHitMapping(
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				/*
 				 * Expect each reference to be transformed because of the entity reference projection,
@@ -397,7 +397,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		 * which must happen every time we execute the query,
 		 * so that the mapper can run state checks (session is still open, ...).
 		 */
-		StubMapperUtils.expectHitMapping(
+		MapperEasyMockUtils.expectHitMapping(
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				/*
 				 * Expect each reference to be transformed because of the entity reference projection,
@@ -605,7 +605,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
-		StubMapperUtils.expectHitMapping(
+		MapperEasyMockUtils.expectHitMapping(
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				c -> c
 						// Return "null" when loading, meaning the entity failed to load

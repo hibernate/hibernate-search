@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.util.impl.integrationtest.common.stub.mapper;
+package org.hibernate.search.integrationtest.backend.tck.testsupport.stub;
 
 import static org.easymock.EasyMock.expect;
 import static org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils.referenceMatcher;
@@ -16,27 +16,18 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.loading.spi.DefaultProjectionHitMapper;
 import org.hibernate.search.engine.search.loading.spi.EntityLoader;
-import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.util.impl.integrationtest.common.EasyMockUtils;
 
 import org.easymock.EasyMock;
 
-public final class StubMapperUtils {
+public final class MapperEasyMockUtils {
 
-	private StubMapperUtils() {
-	}
-
-	public static DocumentReferenceProvider referenceProvider(String identifier) {
-		return referenceProvider( identifier, null );
-	}
-
-	public static DocumentReferenceProvider referenceProvider(String identifier, String routingKey) {
-		return new StubDocumentReferenceProvider( identifier, routingKey );
+	private MapperEasyMockUtils() {
 	}
 
 	/**

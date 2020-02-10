@@ -576,6 +576,11 @@
             </dependency>
             <dependency>
                 <groupId>org.hibernate.search</groupId>
+                <artifactId>hibernate-search-mapper-stub</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.hibernate.search</groupId>
                 <artifactId>hibernate-search-integrationtest-backend-elasticsearch</artifactId>
                 <version>${project.version}</version>
             </dependency>

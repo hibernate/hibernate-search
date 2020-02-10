@@ -27,13 +27,13 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBack
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapping;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingInitiator;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingInitiator;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingKey;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingKey;
 
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;

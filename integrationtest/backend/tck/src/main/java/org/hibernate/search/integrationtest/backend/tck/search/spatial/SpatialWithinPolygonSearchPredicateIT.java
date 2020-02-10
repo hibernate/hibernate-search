@@ -11,7 +11,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
