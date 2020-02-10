@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
 import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.reference;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
+import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.List;
 import java.util.Optional;
@@ -43,10 +43,10 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.StubTra
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.GenericStubMappingScope;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.stub.MapperEasyMockUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.GenericStubMappingScope;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -205,7 +205,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
-		StubMapperUtils.expectHitMapping(
+		MapperEasyMockUtils.expectHitMapping(
 				loadingContextMock, documentReferenceConverterMock, objectLoaderMock,
 				/*
 				 * Expect each reference to be transformed because of the reference projection,

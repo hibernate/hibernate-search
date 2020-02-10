@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.work;
 
-import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
+import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -20,8 +20,8 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.common.stub.StubBackendSessionContext;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 
 import org.junit.Rule;
 import org.junit.Test;

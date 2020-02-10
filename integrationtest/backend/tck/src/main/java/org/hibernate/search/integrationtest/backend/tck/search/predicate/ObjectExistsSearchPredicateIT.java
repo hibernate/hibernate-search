@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.search.predicate;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
+import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 import static org.junit.Assume.assumeFalse;
 
 import java.util.List;
@@ -26,8 +26,8 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConf
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;

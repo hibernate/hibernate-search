@@ -7,7 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.indexnull;
 
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
-import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
+import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,8 +26,8 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.Standar
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingIndexManager;
-import org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMappingScope;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Assume;

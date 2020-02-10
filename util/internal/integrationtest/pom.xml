@@ -32,6 +32,7 @@
         <module>common</module>
         <module>backend/elasticsearch</module>
         <module>mapper/orm</module>
+        <module>mapper/stub</module>
         <module>sharedresources</module>
     </modules>
 
