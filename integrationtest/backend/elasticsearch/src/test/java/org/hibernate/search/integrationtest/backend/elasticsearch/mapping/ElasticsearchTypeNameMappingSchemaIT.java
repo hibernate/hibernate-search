@@ -36,7 +36,6 @@ import com.google.gson.JsonObject;
 @RunWith(Parameterized.class)
 public class ElasticsearchTypeNameMappingSchemaIT {
 
-	private static final String BACKEND_NAME = "backendname";
 	private static final String TYPE_NAME = "typename";
 	private static final String INDEX_NAME = "indexname";
 
@@ -83,12 +82,11 @@ public class ElasticsearchTypeNameMappingSchemaIT {
 				ElasticsearchRequestAssertionMode.STRICT
 		);
 
-		setupHelper.start( BACKEND_NAME )
+		setupHelper.start()
 				.withBackendProperty(
-						BACKEND_NAME, ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.getFactory()
+						ElasticsearchBackendSpiSettings.CLIENT_FACTORY, clientSpy.getFactory()
 				)
 				.withBackendProperty(
-						BACKEND_NAME,
 						// Don't contribute any analysis definitions, it messes with our assertions
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
 						(ElasticsearchAnalysisConfigurer) (ElasticsearchAnalysisConfigurationContext context) -> {
@@ -96,7 +94,7 @@ public class ElasticsearchTypeNameMappingSchemaIT {
 						}
 				)
 				.withBackendProperty(
-						BACKEND_NAME, ElasticsearchBackendSettings.MAPPING_TYPE_NAME_STRATEGY, strategyName
+						ElasticsearchBackendSettings.MAPPING_TYPE_NAME_STRATEGY, strategyName
 				)
 				.withIndex(
 						INDEX_NAME,

@@ -31,7 +31,6 @@ import org.junit.Test;
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchSchemaCreateStrategyIT")
 public class ElasticsearchIndexCreationCreateStrategyIT {
 
-	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "IndexName";
 
 	@Rule
@@ -75,7 +74,7 @@ public class ElasticsearchIndexCreationCreateStrategyIT {
 	}
 
 	private void setup() {
-		setupHelper.start( BACKEND_NAME )
+		setupHelper.start()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> {
@@ -85,12 +84,10 @@ public class ElasticsearchIndexCreationCreateStrategyIT {
 						}
 				)
 				.withIndexDefaultsProperty(
-						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
 						IndexLifecycleStrategyName.CREATE.getExternalRepresentation()
 				)
 				.withBackendProperty(
-						BACKEND_NAME,
 						// Don't contribute any analysis definitions, migration of those is tested in another test class
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
 						(ElasticsearchAnalysisConfigurer) (ElasticsearchAnalysisConfigurationContext context) -> {

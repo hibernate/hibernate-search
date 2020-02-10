@@ -38,7 +38,6 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.DirectoryLifecycleTest.testLifecycle")
 	public void valid() {
 		setup( CustomDirectoryProvider.class, c -> c.withBackendProperty(
-				BACKEND_NAME,
 				"directory." + CustomDirectoryProvider.CONFIGURATION_PROPERTY_KEY_RADICAL,
 				CustomDirectoryProvider.CONFIGURATION_PROPERTY_EXPECTED_VALUE
 		) );

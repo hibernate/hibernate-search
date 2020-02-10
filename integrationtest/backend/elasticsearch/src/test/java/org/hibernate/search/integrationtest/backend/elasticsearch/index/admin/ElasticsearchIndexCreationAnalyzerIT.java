@@ -32,7 +32,6 @@ import org.junit.runners.Parameterized.Parameters;
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchAnalyzerDefinitionCreationIT")
 public class ElasticsearchIndexCreationAnalyzerIT {
 
-	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "IndexName";
 
 	@Parameters(name = "With strategy {0}")
@@ -123,14 +122,12 @@ public class ElasticsearchIndexCreationAnalyzerIT {
 	}
 
 	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
-		return setupHelper.start( BACKEND_NAME )
+		return setupHelper.start()
 				.withIndexDefaultsProperty(
-						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
 						strategy.getExternalRepresentation()
 				)
 				.withBackendProperty(
-						BACKEND_NAME,
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
 						new ElasticsearchIndexAdminAnalyzerITAnalysisConfigurer()
 				);

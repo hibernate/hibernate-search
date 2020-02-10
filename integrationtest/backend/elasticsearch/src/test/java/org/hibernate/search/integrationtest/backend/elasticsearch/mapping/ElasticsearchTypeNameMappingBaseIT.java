@@ -41,7 +41,6 @@ import com.google.gson.JsonObject;
 @RunWith(Parameterized.class)
 public class ElasticsearchTypeNameMappingBaseIT {
 
-	private static final String BACKEND_NAME = "backendname";
 	private static final String TYPE1_NAME = "type1_name";
 	private static final String INDEX1_NAME = "index1_name";
 	private static final String TYPE2_NAME = "type2_name";
@@ -226,12 +225,12 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	}
 
 	private void setup(IndexLifecycleStrategyName lifecycleStrategy) {
-		setupHelper.start( BACKEND_NAME )
+		setupHelper.start()
 				.withIndexDefaultsProperty(
-						BACKEND_NAME, ElasticsearchIndexSettings.LIFECYCLE_STRATEGY, lifecycleStrategy
+						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY, lifecycleStrategy
 				)
 				.withBackendProperty(
-						BACKEND_NAME, ElasticsearchBackendSettings.MAPPING_TYPE_NAME_STRATEGY, strategyName
+						ElasticsearchBackendSettings.MAPPING_TYPE_NAME_STRATEGY, strategyName
 				)
 				.withIndex(
 						INDEX1_NAME,

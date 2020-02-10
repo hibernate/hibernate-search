@@ -37,7 +37,6 @@ import org.assertj.core.api.Assertions;
 
 public class LuceneFieldAttributesIT {
 
-	private static final String BACKEND_NAME = "my-backend";
 	private static final String INDEX_NAME = "my-index";
 	private static final String ANALYZER_NAME = "my-analyzer";
 
@@ -51,8 +50,8 @@ public class LuceneFieldAttributesIT {
 
 	@Before
 	public void setup() {
-		setupHelper.start( BACKEND_NAME )
-				.withBackendProperty( BACKEND_NAME, LuceneBackendSettings.ANALYSIS_CONFIGURER,
+		setupHelper.start()
+				.withBackendProperty( LuceneBackendSettings.ANALYSIS_CONFIGURER,
 						(LuceneAnalysisConfigurer) ctx -> ctx
 								.analyzer( ANALYZER_NAME ).custom()
 								.tokenizer( NGramTokenizerFactory.class )

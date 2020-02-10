@@ -36,7 +36,6 @@ import org.junit.runners.Parameterized.Parameters;
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.Elasticsearch5SchemaCreationIT")
 public class ElasticsearchIndexCreationMappingIT {
 
-	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "IndexName";
 
 	@Parameters(name = "With strategy {0}")
@@ -183,18 +182,16 @@ public class ElasticsearchIndexCreationMappingIT {
 	}
 
 	private void setup(Consumer<IndexBindingContext> mappingContributor) {
-		setupHelper.start( BACKEND_NAME )
+		setupHelper.start()
 				.withIndex(
 						INDEX_NAME,
 						mappingContributor
 				)
 				.withIndexDefaultsProperty(
-						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
 						strategy.getExternalRepresentation()
 				)
 				.withBackendProperty(
-						BACKEND_NAME,
 						// Don't contribute any analysis definitions, migration of those is tested in another test class
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
 						(ElasticsearchAnalysisConfigurer) (ElasticsearchAnalysisConfigurationContext context) -> {

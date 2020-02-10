@@ -38,7 +38,6 @@ import org.junit.runners.Parameterized.Parameters;
 @TestForIssue(jiraKey = "HSEARCH-3791")
 public class ElasticsearchIndexInspectionAliasesIT {
 
-	private static final String BACKEND_NAME = "myElasticsearchBackend";
 	private static final String INDEX_NAME = "IndexName";
 
 	@Parameters(name = "With strategy {0}")
@@ -122,14 +121,12 @@ public class ElasticsearchIndexInspectionAliasesIT {
 	}
 
 	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
-		return setupHelper.start( BACKEND_NAME )
+		return setupHelper.start()
 				.withIndexDefaultsProperty(
-						BACKEND_NAME,
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
 						strategy.getExternalRepresentation()
 				)
 				.withBackendProperty(
-						BACKEND_NAME,
 						// Don't contribute any analysis definitions, migration of those is tested in another test class
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
 						(ElasticsearchAnalysisConfigurer) (ElasticsearchAnalysisConfigurationContext context) -> {
