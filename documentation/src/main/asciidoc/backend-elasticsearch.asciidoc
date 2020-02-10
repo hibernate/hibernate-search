@@ -44,7 +44,7 @@ make Hibernate Search re-create the indexes along with their schema,
 and <<mapper-orm-indexing-massindexer,reindex your data>>.
 
 [[backend-elasticsearch-configuration]]
-== General configuration
+== Basic configuration
 // Search 5 anchors backward compatibility
 [[elasticsearch-integration-configuration]]
 
@@ -53,88 +53,57 @@ the `hibernate.search.backends.<backend name>.type` property must be set to `ela
 
 All other configuration properties are optional,
 but the defaults might not suit everyone.
-In particular your production Elasticsearch cluster is probably not reachable at `http://localhost:9200`.
-See below for the details of every configuration property.
+In particular your production Elasticsearch cluster is probably not reachable at `http://localhost:9200`,
+so you will need to set the address of your cluster by <<backend-elasticsearch-configuration-client,configuring the client>>.
+
+Configuration properties are mentioned in the relevant parts of this documentation.
+You can find a full reference of available properties in the Hibernate Search javadoc:
+
+* link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchBackendSettings.html[org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings].
+* link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchIndexSettings.html[org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings].
+
+== Configuration of the Elasticsearch cluster
+// Search 5 anchors backward compatibility
+[[elasticsearch-integration-server-configuration]]
+
+Most of the time, Hibernate Search does not require any specific configuration
+to be applied by hand to the Elasticsearch cluster,
+beyond the index mapping which <<backend-elasticsearch-index-lifecycle,can be automatically generated>>.
+
+The only exception is <<backend-elasticsearch-configuration-sharding>>,
+which needs to be enabled explicitly.
 
 [[backend-elasticsearch-configuration-client]]
-=== Client properties
+== Client configuration
 
-Hosts::
-+
+An Elasticsearch backend communicates with an Elasticsearch cluster through a REST client.
+Below are the options that affect this client.
+
+=== Target hosts
+
+The following property configures the Elasticsearch host (or hosts)
+to send indexing requests and search queries to:
+
 [source]
 ----
 hibernate.search.backends.<backend name>.hosts = localhost:9200 (default)
 ----
-+
-The Elasticsearch host (or hosts) to send indexing requests and search queries to.
-+
-Expects a String representing a host and port such as `localhost` or `es.mycompany.com:4400`,
+
+This property may be set to a String representing a host and port such as `localhost` or `es.mycompany.com:4400`,
 or a String containing multiple such host-and-port strings separated by commas,
 or a `Collection<String>` containing such host-and-port strings.
 
-Protocol::
-+
+You may change the protocol used to communicate with the hosts using this configuration property:
+
 [source]
 ----
 hibernate.search.backends.<backend name>.protocol = http (default)
 ----
-+
-The protocol to use when sending indexing requests and search queries to Elasticsearch hosts.
-+
-Expects a String: either `http` or `https`.
 
-HTTP authentication::
-+
-[source]
-----
-hibernate.search.backends.<backend name>.username = ironman (default is empty)
-hibernate.search.backends.<backend name>.password = j@rv1s (default is empty)
-----
-+
-The username and password to send when connecting to the Elasticsearch servers.
-+
-[CAUTION]
-====
-If you use HTTP instead of HTTPS (see above),
-your password will be transmitted in clear text over the network.
-====
-
-Timeouts::
-+
-[source]
-----
-hibernate.search.backends.<backend name>.request_timeout = 60000 (default)
-hibernate.search.backends.<backend name>.connection_timeout = 3000 (default)
-hibernate.search.backends.<backend name>.read_timeout = 60000 (default)
-----
-
-* `request_timeout` defines the timeout when executing a request.
-This includes the time needed to establish a connection,
-send the request and read the response.
-* `connection_timeout` defines the timeout when establishing a connection.
-* `read_timeout` defines the timeout when reading a response.
-
-+
-These properties expect a positive <<configuration-property-types,Integer value>> in milliseconds, such as `3000`.
-
-Connections::
-+
-[source]
-----
-hibernate.search.backends.<backend name>.max_connections = 20 (default)
-hibernate.search.backends.<backend name>.max_connections_per_route = 10 (default)
-----
-
-* `max_connections` defines maximum number of simultaneous connections
-to the Elasticsearch cluster, all hosts taken together.
-* `max_connections_per_route` defines maximum number of simultaneous connections
-to each host of the Elasticsearch cluster.
-
-+
-These properties expect a positive <<configuration-property-types,Integer value>>, such as `20`.
+This property may be set to either `http` or `https`.
 
 [[backend-elasticsearch-configuration-discovery]]
-=== Discovery
+=== Node discovery
 
 When using automatic discovery, the Elasticsearch client will periodically probe for new nodes in the cluster,
 and will add those to the host list (see `hosts` in <<backend-elasticsearch-configuration-client>>).
@@ -152,41 +121,25 @@ Expects a boolean value.
 * `discovery.refresh_interval` defines the interval between two executions of the automatic discovery.
 Expects a positive integer, in seconds.
 
-[[backend-elasticsearch-configuration-version]]
-=== Version
-// Keep the old anchor to avoid dead links
-[[backend-elasticsearch-configuration-dialect]]
+[[backend-elasticsearch-authentication-http]]
+=== HTTP authentication
 
-Different versions of Elasticsearch expose slightly different APIs.
-As a result, Hibernate Search needs to be aware of the version of Elasticsearch it is talking to
-in order to generate correct HTTP requests.
+HTTP authentication is disabled by default,
+but may be enabled by setting the following configuration properties:
 
-By default, Hibernate Search will query the Elasticsearch cluster at boot time to know its version,
-and will infer the correct behavior to adopt.
+[source]
+----
+hibernate.search.backends.<backend name>.username = ironman (default is empty)
+hibernate.search.backends.<backend name>.password = j@rv1s (default is empty)
+----
 
-Alternatively, you can tell Hibernate Search the Elasticsearch version to target.
-Hibernate Search will still query the Elasticsearch cluster to check that the configured version matches the actual version,
-but only after most of the metadata has been validated.
-This can be helpful when developing, in particular.
+The username and password to send when connecting to the Elasticsearch servers.
 
-To configure the version, set the `hibernate.search.backends.<backend name>.version` property
-to a string following the format `x.y.z-qualifier`,
-where `x`, `y` and `z` are integers
-and `qualifier` is an optional string of word characters (alphanumeric or `_`).
-
-Incomplete versions are allowed in some cases, for example `7.0` or just `7`.
-This is not possible for all versions, however.
-For example, Elasticsearch 5 is only supported from 5.6.0 onwards,
-so `5` is not an acceptable value and will trigger an exception: `5.6` must be used instead.
-
-[[backend-elasticsearch-configuration-logging]]
-=== Logging
-// Search 5 anchors backward compatibility
-[[elasticsearch-log-json-pretty-printing]]
-
-The `hibernate.search.backends.<backend name>.log.json_pretty_printing` <<configuration-property-types,boolean property>>
-defines whether JSON included in logs should be pretty-printed (indented, with line breaks).
-It defaults to `false`.
+[CAUTION]
+====
+If you use HTTP instead of HTTPS (see above),
+your password will be transmitted in clear text over the network.
+====
 
 [[backend-elasticsearch-configuration-aws]]
 === Authentication on Amazon Web Services
@@ -242,28 +195,173 @@ please refer to the AWS documentation related to http://docs.aws.amazon.com/gene
 and http://docs.aws.amazon.com/general/latest/gr/rande.html[regions].
 ====
 
-=== Other configuration properties
+=== Connection tuning
 
-Other configuration properties are mentioned in the relevant parts of this documentation.
-You can find a full reference of available properties in the Hibernate Search javadoc:
+Timeouts::
++
+[source]
+----
+hibernate.search.backends.<backend name>.request_timeout = 60000 (default)
+hibernate.search.backends.<backend name>.connection_timeout = 3000 (default)
+hibernate.search.backends.<backend name>.read_timeout = 60000 (default)
+----
 
-* link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchBackendSettings.html[org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings].
-* link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchIndexSettings.html[org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings].
+* `request_timeout` defines the timeout when executing a request.
+This includes the time needed to establish a connection,
+send the request and read the response.
+* `connection_timeout` defines the timeout when establishing a connection.
+* `read_timeout` defines the timeout when reading a response.
 
-=== Configuration of the Elasticsearch cluster
++
+These properties expect a positive <<configuration-property-types,Integer value>> in milliseconds, such as `3000`.
+
+Connection pool::
++
+[source]
+----
+hibernate.search.backends.<backend name>.max_connections = 20 (default)
+hibernate.search.backends.<backend name>.max_connections_per_route = 10 (default)
+----
+
+* `max_connections` defines maximum number of simultaneous connections
+to the Elasticsearch cluster, all hosts taken together.
+* `max_connections_per_route` defines maximum number of simultaneous connections
+to each host of the Elasticsearch cluster.
+
++
+These properties expect a positive <<configuration-property-types,Integer value>>, such as `20`.
+
+[[backend-elasticsearch-configuration-version]]
+=== Version
+// Keep the old anchor to avoid dead links
+[[backend-elasticsearch-configuration-dialect]]
+
+Different versions of Elasticsearch expose slightly different APIs.
+As a result, Hibernate Search needs to be aware of the version of Elasticsearch it is talking to
+in order to generate correct HTTP requests.
+
+By default, Hibernate Search will query the Elasticsearch cluster at boot time to know its version,
+and will infer the correct behavior to adopt.
+
+Alternatively, you can tell Hibernate Search the Elasticsearch version to target.
+Hibernate Search will still query the Elasticsearch cluster to check that the configured version matches the actual version,
+but only after most of the metadata has been validated.
+This can be helpful when developing, in particular.
+
+To configure the version, set the `hibernate.search.backends.<backend name>.version` property
+to a string following the format `x.y.z-qualifier`,
+where `x`, `y` and `z` are integers
+and `qualifier` is an optional string of word characters (alphanumeric or `_`).
+
+Incomplete versions are allowed in some cases, for example `7.0` or just `7`.
+This is not possible for all versions, however.
+For example, Elasticsearch 5 is only supported from 5.6.0 onwards,
+so `5` is not an acceptable value and will trigger an exception: `5.6` must be used instead.
+
+[[backend-elasticsearch-configuration-logging]]
+=== Logging
 // Search 5 anchors backward compatibility
-[[elasticsearch-integration-server-configuration]]
+[[elasticsearch-log-json-pretty-printing]]
 
-include::todo-placeholder.asciidoc[]
+The `hibernate.search.backends.<backend name>.log.json_pretty_printing` <<configuration-property-types,boolean property>>
+defines whether JSON included in logs should be pretty-printed (indented, with line breaks).
+It defaults to `false`.
 
 [[backend-elasticsearch-configuration-sharding]]
-==== Sharding
+== Sharding
 
 include::components/sharding-intro-note.asciidoc[]
 
 Elasticsearch disables sharding by default.
 To enable it,
 link:{elasticsearchDocUrl}/index-modules.html#_static_index_settings[set the property `index.number_of_shards` in your cluster].
+
+[[backend-elasticsearch-index-lifecycle]]
+== Index lifecycle
+// Search 5 anchors backward compatibility
+[[elasticsearch-schema-management-strategy]]
+
+Hibernate Search includes a feature named "index lifecycle management",
+where it will automatically create, validate, update, or drop an index on startup or shutdown.
+`hibernate.search.default.elasticsearch.lifecycle.strategy CREATE` (default)
+
+The following strategies are available:
+
+[options="header"]
+|====
+|Value|Definition
+|`none`|The index, its mappings and the analyzer definitions will not be created, deleted nor altered.
+Hibernate Search will **not even check** that the index already exists.
+|`validate`|The index, its existing mappings and analyzer definitions will be checked to be compatible with the mapping defined in your application.
+The index, its mappings and analyzer definitions will not be created, deleted nor altered.
+|`update`|The index, its mappings and analyzer definitions will be created, existing mappings will be updated if there are no conflicts.
+Caution: if analyzer definitions have to be updated, the index will be closed automatically during the update.
+|`create`|**The default**: an existing index will not be altered, a missing index will be created along with their mappings and analyzer definitions.
+|`drop-and-create`|Indexes will be deleted if existing and then created along with their mappings and analyzer definitions to match the mapping defined in your application.
+This will delete all content from the indexes! Useful during development.
+|`drop-and-create-and-drop`|Similar to `drop-and-create` but will also delete the index at shutdown. Commonly used for tests.
+|====
+
+[NOTE]
+====
+Mapping validation is as permissive as possible.
+Fields or mappings that are unknown to Hibernate Search will be ignored,
+and settings that are more powerful than required will be deemed valid.
+For example, a field that is not marked as sortable in Hibernate Search
+but marked as `"docvalues": true` in Elasticsearch will be deemed valid.
+
+One exception: date formats must match exactly the formats specified by Hibernate Search, due to implementation constraints.
+====
+
+You can fine-tune the strategy using the following properties:
+
+[source]
+----
+hibernate.search.backends.<backend name>.indexes.<index name>.lifecycle.strategy create (default)
+hibernate.search.backends.<backend name>.indexes.<index name>.lifecycle.minimal_required_status green (default)
+hibernate.search.backends.<backend name>.indexes.<index name>.lifecycle.minimal_required_status_wait_timeout 10000 (default)
+# OR
+hibernate.search.backends.<backend name>.index_defaults.lifecycle.strategy create (default)
+hibernate.search.backends.<backend name>.index_defaults.lifecycle.minimal_required_status green (default)
+hibernate.search.backends.<backend name>.index_defaults.lifecycle.minimal_required_status_wait_timeout 10000 (default)
+----
+
+The properties `minimal_required_status` and `minimal_required_status_wait_timeout` define
+the minimal required status of the index on startup, before Hibernate Search can start using it,
+and the maximum time to wait for this status, as an <<configuration-property-types,integer value>> in milliseconds.
+These properties are ignored when the `none` strategy is selected,
+because the index will not be checked on startup (see above).
+
+[WARNING]
+====
+Since Elasticsearch on Amazon Web Services (AWS)
+https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/aes-supported-es-operations.html[does not support the `_close`/`_open` operations],
+the `update` strategy will fail when trying to update analyzer definitions
+on an AWS Elasticsearch cluster.
+
+The only workaround is to avoid the `update` strategy on AWS.
+====
+
+[WARNING]
+.Strategies in production environments
+====
+It is strongly recommended to use either `none` or `validate` in a production environment.
+
+The alternatives `drop-and-create` and `drop-and-create-and-drop` are obviously unsuitable in this context
+unless you want to reindex everything upon every startup,
+and `update` may leave your mapping half-updated in case of conflict.
+
+To be precise, if your mapping changed in an incompatible way, such as a field having its type changed,
+updating the mapping may be impossible without manual intervention.
+In this case, the `update` strategy will prevent Hibernate Search from starting,
+but it may already have successfully updated the mappings for another index, making a rollback difficult.
+
+When updating analyzer definitions Hibernate Search will temporarily stop the affected indexes during the update.
+This means the `update` strategy should be used with caution when multiple clients use Elasticsearch indexes managed by Hibernate Search:
+those clients should be synchronized in such a way that while Hibernate Search is starting, no other client needs to access the index.
+
+For these reasons, migrating your mapping on a live cluster should be carefully planned as part of the deployment process.
+====
 
 [[backend-elasticsearch-indexlayout]]
 == Index layout
@@ -682,91 +780,4 @@ refer to the documentation:
 {elasticsearchDocUrl}/analysis-charfilters.html[character filters],
 {elasticsearchDocUrl}/analysis-tokenizers.html[tokenizers],
 {elasticsearchDocUrl}/analysis-tokenfilters.html[token filters].
-====
-
-[[backend-elasticsearch-index-lifecycle]]
-== Index lifecycle
-// Search 5 anchors backward compatibility
-[[elasticsearch-schema-management-strategy]]
-
-Hibernate Search includes a feature named "index lifecycle management",
-where it will automatically create, validate, update, or drop an index on startup or shutdown.
-`hibernate.search.default.elasticsearch.lifecycle.strategy CREATE` (default)
-
-The following strategies are available:
-
-[options="header"]
-|====
-|Value|Definition
-|`none`|The index, its mappings and the analyzer definitions will not be created, deleted nor altered.
-Hibernate Search will **not even check** that the index already exists.
-|`validate`|The index, its existing mappings and analyzer definitions will be checked to be compatible with the mapping defined in your application.
-The index, its mappings and analyzer definitions will not be created, deleted nor altered.
-|`update`|The index, its mappings and analyzer definitions will be created, existing mappings will be updated if there are no conflicts.
-Caution: if analyzer definitions have to be updated, the index will be closed automatically during the update.
-|`create`|**The default**: an existing index will not be altered, a missing index will be created along with their mappings and analyzer definitions.
-|`drop-and-create`|Indexes will be deleted if existing and then created along with their mappings and analyzer definitions to match the mapping defined in your application.
-This will delete all content from the indexes! Useful during development.
-|`drop-and-create-and-drop`|Similar to `drop-and-create` but will also delete the index at shutdown. Commonly used for tests.
-|====
-
-[NOTE]
-====
-Mapping validation is as permissive as possible.
-Fields or mappings that are unknown to Hibernate Search will be ignored,
-and settings that are more powerful than required will be deemed valid.
-For example, a field that is not marked as sortable in Hibernate Search
-but marked as `"docvalues": true` in Elasticsearch will be deemed valid.
-
-One exception: date formats must match exactly the formats specified by Hibernate Search, due to implementation constraints.
-====
-
-You can fine-tune the strategy using the following properties:
-
-[source]
-----
-hibernate.search.backends.<backend name>.indexes.<index name>.lifecycle.strategy create (default)
-hibernate.search.backends.<backend name>.indexes.<index name>.lifecycle.minimal_required_status green (default)
-hibernate.search.backends.<backend name>.indexes.<index name>.lifecycle.minimal_required_status_wait_timeout 10000 (default)
-# OR
-hibernate.search.backends.<backend name>.index_defaults.lifecycle.strategy create (default)
-hibernate.search.backends.<backend name>.index_defaults.lifecycle.minimal_required_status green (default)
-hibernate.search.backends.<backend name>.index_defaults.lifecycle.minimal_required_status_wait_timeout 10000 (default)
-----
-
-The properties `minimal_required_status` and `minimal_required_status_wait_timeout` define
-the minimal required status of the index on startup, before Hibernate Search can start using it,
-and the maximum time to wait for this status, as an <<configuration-property-types,integer value>> in milliseconds.
-These properties are ignored when the `none` strategy is selected,
-because the index will not be checked on startup (see above).
-
-[WARNING]
-====
-Since Elasticsearch on Amazon Web Services (AWS)
-https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/aes-supported-es-operations.html[does not support the `_close`/`_open` operations],
-the `update` strategy will fail when trying to update analyzer definitions
-on an AWS Elasticsearch cluster.
-
-The only workaround is to avoid the `update` strategy on AWS.
-====
-
-[WARNING]
-.Strategies in production environments
-====
-It is strongly recommended to use either `none` or `validate` in a production environment.
-
-The alternatives `drop-and-create` and `drop-and-create-and-drop` are obviously unsuitable in this context
-unless you want to reindex everything upon every startup,
-and `update` may leave your mapping half-updated in case of conflict.
-
-To be precise, if your mapping changed in an incompatible way, such as a field having its type changed,
-updating the mapping may be impossible without manual intervention.
-In this case, the `update` strategy will prevent Hibernate Search from starting,
-but it may already have successfully updated the mappings for another index, making a rollback difficult.
-
-When updating analyzer definitions Hibernate Search will temporarily stop the affected indexes during the update.
-This means the `update` strategy should be used with caution when multiple clients use Elasticsearch indexes managed by Hibernate Search:
-those clients should be synchronized in such a way that while Hibernate Search is starting, no other client needs to access the index.
-
-For these reasons, migrating your mapping on a live cluster should be carefully planned as part of the deployment process.
 ====

@@ -2,18 +2,24 @@
 = Lucene backend
 
 [[backend-lucene-configuration]]
-== General configuration
+== Basic configuration
 
 In order to define a Lucene backend,
 the `hibernate.search.backends.<backend name>.type` property must be set to `lucene`.
 
 All other configuration properties are optional,
 but the defaults might not suit everyone.
-In particular, you might want to set the location of your indexes in the filesystem.
-See below for the details of every configuration property.
+In particular, you might want to
+<<backend-lucene-configuration-directory-local-filesystem-location,set the location of your indexes in the filesystem>>.
+
+Other configuration properties are mentioned in the relevant parts of this documentation.
+You can find a full reference of available properties in the Hibernate Search javadoc:
+
+* link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneBackendSettings.html[org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings].
+* link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneIndexSettings.html[org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings].
 
 [[backend-lucene-configuration-directory]]
-=== Index storage (`Directory`)
+== Index storage (`Directory`)
 // Search 5 anchors backward compatibility
 [[search-configuration-directory]]
 
@@ -46,7 +52,7 @@ See <<backend-lucene-configuration-directory-local-heap>>
 for details and configuration options.
 
 [[backend-lucene-configuration-directory-local-filesystem]]
-==== Local filesystem storage
+=== Local filesystem storage
 
 The `local-filesystem` directory type will store each index in
 a subdirectory of a configured filesystem directory.
@@ -67,7 +73,8 @@ the Elasticsearch backend will be a better choice.
 Refer to <<architecture>> for more information.
 ====
 
-===== Index location
+[[backend-lucene-configuration-directory-local-filesystem-location]]
+==== Index location
 
 Each index is assigned a subdirectory under a root directory.
 
@@ -87,7 +94,7 @@ If that entity is explicitly assigned the index name "orders"
 it will instead be indexed in directory
 `/path/to/my/root/orders/`.
 
-===== Filesystem access strategy
+==== Filesystem access strategy
 
 The default strategy for accessing the filesystem is determined automatically
 based on the operating system and architecture.
@@ -121,13 +128,13 @@ Implementations offering better performance
 also bring issues of their own.
 ====
 
-===== Other configuration options
+==== Other configuration options
 
 The `local-filesystem` directory also allows configuring a
 <<backend-lucene-configuration-directory-locking-strategy,locking strategy>>.
 
 [[backend-lucene-configuration-directory-local-heap]]
-==== Local heap storage
+=== Local heap storage
 
 The `local-heap` directory type will store indexes in the local JVM's heap.
 
@@ -144,7 +151,7 @@ The `local-heap` directory does not offer any specific option
 beyond the <<backend-lucene-configuration-directory-locking-strategy,locking strategy>>.
 
 [[backend-lucene-configuration-directory-locking-strategy]]
-==== Locking strategy
+=== Locking strategy
 // Search 5 anchors backward compatibility
 [[search-configuration-directory-lockfactories]]
 
@@ -200,7 +207,7 @@ Test your application carefully and make sure you know what it means.
 See `org.apache.lucene.store.NoLockFactory`.
 
 [[backend-lucene-configuration-sharding]]
-=== Sharding
+== Sharding
 
 include::components/sharding-intro-note.asciidoc[]
 
@@ -260,7 +267,7 @@ This strategy is suitable when there an explicit routing key
 <<mapper-orm-bridge-routingkeybridge,configured in the mapping>>,
 and that routing key has a limited number of possible values that are known before starting the application.
 
-=== Index format compatibility
+== Index format compatibility
 
 While Hibernate Search strives to offer a backwards compatible API,
 making it easy to port your application to newer versions,
@@ -306,14 +313,6 @@ but if you are also making use of Lucene bypassing Hibernate Search
 (for example when instantiating an Analyzer yourself),
 make sure to use the same value.
 ====
-
-=== Other configuration properties
-
-Other configuration properties are mentioned in the relevant parts of this documentation.
-You can find a full reference of available properties in the Hibernate Search javadoc:
-
-* link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneBackendSettings.html[org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings].
-* link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneIndexSettings.html[org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings].
 
 [[backend-lucene-schema]]
 == Schema
