@@ -542,3 +542,136 @@ link:http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters[Solr Wiki]
 (you don't need Solr to use these analyzers,
 it's just that there is no documentation page for Lucene proper).
 ====
+
+[[backend-lucene-io]]
+== Writing and reading
+
+=== Basics
+
+At any given time, the Lucene backend holds for each index:
+
+* One `IndexWriter` instance that allows for writes to the index,
+e.g. adding/deleting a document.
++
+The index writer buffers writes,
+and "pushes" the changes to the index when it is <<backend-lucene-io-commit,_committed_>>.
+Not committing the index writer means that,
+in the event of a server crash or power loss, uncommitted writes will be lost.
+* One `IndexReader` instance that allows for reads from the index,
+e.g. executing a search query.
++
+The index reader exposes a view of the index as it was when the reader was opened,
+and updates that view when it is <<backend-lucene-io-refresh,_refreshed_>>.
+Not refreshing the index reader means that search queries will return potentially outdated results
+that do not take into account the latest changes to the index.
+
+Hibernate Search chooses when to commit or refresh.
+The default configuration focuses on safety (making sure that writes are committed as soon as possible)
+and on providing an always up-to-date view of the index.
+
+Custom configuration, explained in the following sections,
+can provide performance boosts in some situations at the cost of lower write safety
+and/or occasional out-of-date reads.
+
+[NOTE]
+====
+After a refresh, *all* changes to the index are taken into account:
+those committed to the index, but *also* those that are still buffered in the index writer.
+
+For that reason, commits and refreshes can be treated are completely orthogonal concepts:
+certain configurations will occasionally lead to committed changes not being be visible in search queries,
+while other configurations will allow even uncommitted changes to be visible in search queries.
+====
+
+[[backend-lucene-io-commit]]
+=== Commit
+
+In Lucene terminology, a _commit_ is when changes buffered in an index writer
+are pushed to the index itself,
+so that a crash or power loss will no longer result in data loss.
+
+Performance-wise, committing may be an expensive operation,
+which is why Hibernate Search tries not to commit too often.
+Changes are processed in batches of a few hundred writes,
+and unless required otherwise,
+they are committed at the end of the batch, without delay.
+
+Some operations are critical and must be committed before they can be considered complete,
+which is why writes can be explicitly marked for commit.
+This is the case for changes triggered by <<mapper-orm-indexing-automatic,automatic indexing>>
+(unless <<mapper-orm-indexing-automatic-synchronization,configured otherwise>>),
+and also for large-scale operations such as a <<mapper-orm-indexing-manual-largescale,purge>>.
+When such an operation is encountered, a commit will be performed immediately,
+guaranteeing that the operation is only considered complete after all changes are safely stored on disk.
+
+Changes contributed by the <<mapper-orm-indexing-massindexer,mass indexer>>,
+or by automatic indexing when using the
+<<mapper-orm-indexing-automatic-synchronization,`QUEUED` synchronization strategy>>
+are *not* marked for commit,
+leading to less frequent commits and thus higher write throughput.
+
+In write-intensive scenarios where a commit at the end of the batch is still too frequent,
+it is possible to commit less frequently
+and thus improve write throughput by setting a commit interval in milliseconds.
+When set to a value higher than 0, Hibernate Search will no longer commit at the end of each batch:
+if, at the end of a batch, it notices that a commit occurred less than X milliseconds ago,
+it will schedule a commit for later, when at least X milliseconds have elapsed.
+
+[WARNING]
+====
+Setting a commit interval is inherently unsafe:
+waiting 1 second before committing means that for 1 second,
+should the application crash or the server suffer a power loss,
+the changes will be lost.
+
+However, the performance boost might be worth the risk in some scenarios.
+====
+
+The commit interval is set at the index level:
+
+[source]
+----
+hibernate.search.backends.<backend name>.indexes.<index name>.io.commit_interval = 0 (default)
+# OR
+hibernate.search.backends.<backend name>.index_defaults.io.commit_interval = 0 (default)
+----
+
+[NOTE]
+====
+Remember that individual write operations may force a commit,
+which may cancel out the potential performance gains from setting a commit interval.
+
+By default, the commit interval may only improve throughput
+of the <<mapper-orm-indexing-massindexer,mass indexer>>.
+If you want changes triggered by <<mapper-orm-indexing-automatic,automatic indexing>>
+to benefit from it too, you will need to select a non-default
+<<mapper-orm-indexing-automatic-synchronization,synchronization strategy>>,
+so as not to require a commit after each change.
+====
+
+[[backend-lucene-io-refresh]]
+=== Refresh
+
+In Lucene terminology, a _refresh_ is when a new index reader is opened,
+so that the next search queries will take into account the latest changes to the index.
+
+Performance-wise, refreshing may be an expensive operation,
+which is why Hibernate Search tries not to refresh too often.
+The index reader is refreshed upon every search query,
+but only if writes have occurred since the last refresh.
+
+In write-intensive scenarios where refreshing after each write is still too frequent,
+it is possible to refresh less frequently
+and thus improve read throughput by setting a refresh interval in milliseconds.
+When set to a value higher than 0, the index reader will no longer be refreshed upon every search query:
+if, when a search query starts, the refresh occurred less than X milliseconds ago,
+then the index reader will not be refreshed, even though it may be out-of-date.
+
+The refresh interval is set at the index level:
+
+[source]
+----
+hibernate.search.backends.<backend name>.indexes.<index name>.io.refresh_interval = 0 (default)
+# OR
+hibernate.search.backends.<backend name>.index_defaults.io.refresh_interval = 0 (default)
+----

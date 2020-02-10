@@ -244,6 +244,7 @@ and then some extra care with Hibernate Search.
 See <<mapper-orm-indexing-manual-indexingplan-process-execute>> for more information.
 ====
 
+[[mapper-orm-indexing-manual-largescale]]
 == Explicitly altering a whole index
 
 Some index operations are not about a specific entity/document,
