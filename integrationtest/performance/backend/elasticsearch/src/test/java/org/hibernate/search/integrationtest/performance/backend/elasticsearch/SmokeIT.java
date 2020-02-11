@@ -47,6 +47,11 @@ public class SmokeIT {
 				.warmupIterations( 0 )
 				.measurementIterations( 1 )
 				.measurementTime( TimeValue.seconds( 1 ) )
+				.param(
+						"configuration",
+						"",
+						"max_connections_per_route=30"
+				)
 				.param( "initialIndexSize", "100" )
 				.param( "batchSize", "10" )
 				.param( "maxResults", "10" )

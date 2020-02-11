@@ -30,6 +30,11 @@ public class SmokeIT {
 				.warmupIterations( 0 )
 				.measurementIterations( 1 )
 				.measurementTime( TimeValue.seconds( 1 ) )
+				.param(
+						"configuration",
+						"",
+						"io.commit_interval=100&io.refresh_interval=100"
+				)
 				.param( "initialIndexSize", "100" )
 				.param( "batchSize", "10" )
 				.param( "maxResults", "10" )

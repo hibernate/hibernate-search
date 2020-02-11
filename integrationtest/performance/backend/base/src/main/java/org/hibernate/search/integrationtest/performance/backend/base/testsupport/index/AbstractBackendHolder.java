@@ -12,6 +12,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertyChecker;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
@@ -46,11 +47,19 @@ public abstract class AbstractBackendHolder {
 		Map<String, Object> baseProperties = new LinkedHashMap<>();
 		baseProperties.put( EngineSettings.DEFAULT_BACKEND, BACKEND_NAME );
 
+		ConfigurationPropertySource configurationFromParameter =
+				ConfigurationPropertySource.fromMap( stringToMap( getConfigurationParameter() ) );
+
 		ConfigurationPropertySource propertySource = ConfigurationPropertySource.fromMap( baseProperties )
 				.withOverride(
 						getDefaultBackendProperties( temporaryFileHolder )
 								// Allow overrides at the backend level using system properties
 								.withOverride( ConfigurationPropertySource.system() )
+								// Allow multiple backend configurations to be tested using a benchmark parameter
+								// > Apply the configuration at the backend level
+								.withOverride( configurationFromParameter )
+								// > Apply the configuration at the index level (for convenience)
+								.withOverride( configurationFromParameter.withPrefix( BackendSettings.INDEX_DEFAULTS ) )
 								.withPrefix( EngineSettings.BACKENDS + "." + BACKEND_NAME )
 				);
 
@@ -110,7 +119,22 @@ public abstract class AbstractBackendHolder {
 		return indexes;
 	}
 
+	protected final Map<String, String> stringToMap(String settings) {
+		String[] settingsSplit = settings.split( "&" );
+		Map<String, String> map = new LinkedHashMap<>();
+		for ( String keyValue : settingsSplit ) {
+			if ( keyValue.isEmpty() ) {
+				continue;
+			}
+			String[] keyValueSplit = keyValue.split( "=" );
+			map.put( keyValueSplit[0], keyValueSplit[1] );
+		}
+		return map;
+	}
+
 	protected abstract ConfigurationPropertySource getDefaultBackendProperties(TemporaryFileHolder temporaryFileHolder)
 			throws IOException;
+
+	protected abstract String getConfigurationParameter();
 
 }

@@ -18,11 +18,25 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.filesystem.TemporaryFileHolder;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.index.AbstractBackendHolder;
 
+import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 
 @State(Scope.Benchmark)
 public class ElasticsearchBackendHolder extends AbstractBackendHolder {
+
+	/**
+	 * A list of configuration properties to apply to the backend and indexes.
+	 * <p>
+	 * Format: {@code <key>=<value>&<key2>=<value2>} (etc.).
+	 * Multiple configurations can be tested by providing multiple values for this parameter,
+	 * e.g. {@code foo=1&bar=2,foo=2&bar=1} for two configurations setting {@code foo} and {@code bar} to different values.
+	 * <p>
+	 * Note that configuration properties are applied both at the backend level and at the index level,
+	 * so using the "index_defaults." prefix is optional when setting index-level properties.
+	 */
+	@Param({ "", "max_connections_per_route=1" })
+	private String configuration;
 
 	@Override
 	protected ConfigurationPropertySource getDefaultBackendProperties(TemporaryFileHolder temporaryFileHolder) {
@@ -43,5 +57,10 @@ public class ElasticsearchBackendHolder extends AbstractBackendHolder {
 		);
 
 		return ConfigurationPropertySource.fromMap( map );
+	}
+
+	@Override
+	protected String getConfigurationParameter() {
+		return configuration;
 	}
 }
