@@ -15,6 +15,7 @@ import org.hibernate.search.engine.cfg.impl.MapConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.MaskedConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.OverriddenConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.PrefixedConfigurationPropertySource;
+import org.hibernate.search.engine.cfg.impl.SystemConfigurationPropertySource;
 
 /**
  * A source of property values for Hibernate Search.
@@ -95,6 +96,13 @@ public interface ConfigurationPropertySource {
 	 */
 	static AllAwareConfigurationPropertySource fromMap(Map<String, ?> map) {
 		return new MapConfigurationPropertySource( map );
+	}
+
+	/**
+	 * @return A source containing the system properties ({@link System#getProperty(String)}).
+	 */
+	static AllAwareConfigurationPropertySource system() {
+		return SystemConfigurationPropertySource.get();
 	}
 
 	/**
