@@ -11,11 +11,16 @@ import org.hibernate.search.integrationtest.performance.backend.base.testsupport
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.index.PerThreadIndexPartition;
 
 import org.openjdk.jmh.annotations.CompilerControl;
+import org.openjdk.jmh.annotations.Measurement;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.infra.ThreadParams;
 
 @State(Scope.Thread)
+// Use a longer iteration time than the default of 10s:
+// backends have background operations that execute every second,
+// which could introduce significant errors in 10-second iterations.
+@Measurement(time = 30)
 public abstract class AbstractBackendBenchmarks {
 
 	private IndexInitializer indexInitializer;
