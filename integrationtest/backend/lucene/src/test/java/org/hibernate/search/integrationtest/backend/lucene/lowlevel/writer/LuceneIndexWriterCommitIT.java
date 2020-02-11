@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.lucene.lowlevel.writer;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.search.util.impl.integrationtest.common.stub.mapper.StubMapperUtils.referenceProvider;
 
 import java.io.IOException;
@@ -97,7 +98,15 @@ public class LuceneIndexWriterCommitIT {
 		plan.execute().join();
 
 		// Commit will happen some time after indexing finished
-		Awaitility.await().untilAsserted( () -> assertThat( countDocsOnDisk() ).isEqualTo( 1 ) );
+		Awaitility.await().untilAsserted( () -> {
+			try {
+				assertThat( countDocsOnDisk() ).isEqualTo( 1 );
+			}
+			catch (IOException e) {
+				// May happen if we call the method *right* as a commit is executing
+				fail( "countDocsOnDisk() failed: " + e.getMessage(), e );
+			}
+		} );
 	}
 
 	@Test
