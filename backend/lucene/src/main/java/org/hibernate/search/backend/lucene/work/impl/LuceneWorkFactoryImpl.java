@@ -48,6 +48,11 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	}
 
 	@Override
+	public LuceneWriteWork<?> noOp() {
+		return new LuceneNoOpWriteWork();
+	}
+
+	@Override
 	public LuceneWriteWork<?> mergeSegments() {
 		return new LuceneMergeSegmentsWork();
 	}

@@ -33,34 +33,37 @@ public class LuceneIndexWorkspace implements IndexWorkspace {
 
 	@Override
 	public CompletableFuture<?> mergeSegments() {
-		return doSubmit( factory.mergeSegments() );
+		return doSubmit( factory.mergeSegments(), DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE );
 	}
 
 	@Override
 	public CompletableFuture<?> purge() {
-		return doSubmit( factory.deleteAll( sessionContext.getTenantIdentifier() ) );
+		return doSubmit(
+				factory.deleteAll( sessionContext.getTenantIdentifier() ),
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE
+		);
 	}
 
 	@Override
 	public CompletableFuture<?> flush() {
-		return doSubmit( factory.flush() );
+		return doSubmit( factory.flush(), DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE );
 	}
 
 	@Override
 	public CompletableFuture<?> refresh() {
-		// TODO HSEARCH-3460
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return doSubmit( factory.noOp(), DocumentCommitStrategy.NONE, DocumentRefreshStrategy.FORCE );
 	}
 
-	private CompletableFuture<?> doSubmit(LuceneWriteWork<?> work) {
+	private CompletableFuture<?> doSubmit(LuceneWriteWork<?> work,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		Collection<LuceneWriteWorkOrchestrator> orchestrators = indexManagerContext.getAllWriteOrchestrators();
 		CompletableFuture<?>[] futures = new CompletableFuture[orchestrators.size()];
 		int i = 0;
 		for ( LuceneWriteWorkOrchestrator orchestrator : orchestrators ) {
 			futures[i] = orchestrator.submit(
 					work,
-					DocumentCommitStrategy.FORCE,
-					DocumentRefreshStrategy.NONE
+					commitStrategy,
+					refreshStrategy
 			);
 			++i;
 		}
