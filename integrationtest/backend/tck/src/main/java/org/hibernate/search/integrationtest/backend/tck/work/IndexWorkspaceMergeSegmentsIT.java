@@ -24,6 +24,11 @@ public class IndexWorkspaceMergeSegmentsIT extends AbstractIndexWorkspaceSimpleO
 	}
 
 	@Override
+	protected void assertPreconditions(StubMappingIndexManager indexManager) {
+		// No measurable effect: don't assert anything.
+	}
+
+	@Override
 	protected void assertSuccess(StubMappingIndexManager indexManager) {
 		// No measurable effect: don't assert anything.
 	}
