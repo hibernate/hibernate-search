@@ -25,6 +25,14 @@ public class IndexWorkspacePurgeIT extends AbstractIndexWorkspaceSimpleOperation
 	}
 
 	@Override
+	protected void assertPreconditions(StubMappingIndexManager indexManager) {
+		indexManager.createWorkspace().refresh().join();
+		long count = indexManager.createScope().query().where( f -> f.matchAll() )
+				.fetchTotalHitCount();
+		assertThat( count ).isGreaterThan( 0 );
+	}
+
+	@Override
 	protected void assertSuccess(StubMappingIndexManager indexManager) {
 		indexManager.createWorkspace().refresh().join();
 		long count = indexManager.createScope().query().where( f -> f.matchAll() )

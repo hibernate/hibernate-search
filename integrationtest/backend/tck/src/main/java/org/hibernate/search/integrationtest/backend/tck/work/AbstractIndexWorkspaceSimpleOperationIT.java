@@ -50,6 +50,8 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 
 		IndexWorkspace workspace = indexManager.createWorkspace();
 
+		assertPreconditions( indexManager );
+
 		CompletableFuture<?> future = executeAsync( workspace );
 		Awaitility.await().until( future::isDone );
 
@@ -86,6 +88,8 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 
 	protected abstract boolean operationWillFailIfAppliedToDeletedIndex();
 
+	protected abstract void assertPreconditions(StubMappingIndexManager indexManager);
+
 	protected abstract CompletableFuture<?> executeAsync(IndexWorkspace workspace);
 
 	protected abstract void assertSuccess(StubMappingIndexManager indexManager);
@@ -109,7 +113,6 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 			} );
 		}
 		CompletableFuture.allOf( tasks ).join();
-		indexManager.createWorkspace().refresh().join();
 	}
 
 	private static class IndexMapping {
