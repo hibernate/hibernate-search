@@ -86,4 +86,30 @@ public class ElasticsearchTckBackendHelper implements TckBackendHelper {
 			}
 		};
 	}
+
+	@Override
+	public TckBackendSetupStrategy createPeriodicRefreshBackendSetupStrategy(int refreshIntervalMs) {
+		return new ElasticsearchTckBackendSetupStrategy() {
+			private final TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
+
+			@Override
+			public Optional<TestRule> getTestRule() {
+				return Optional.of( elasticsearchClient );
+			}
+
+			@Override
+			public SearchSetupHelper.SetupContext startSetup(SearchSetupHelper.SetupContext setupHelper) {
+				// Make sure automatically created indexes will have an appropriate number of shards
+				elasticsearchClient.template( "explicit_refresh_interval" )
+						.create(
+								"*",
+								99999, // Override other templates, if any
+								"{'refresh_interval': '" + refreshIntervalMs + "ms' }"
+						);
+
+				// Nothing to change in the Hibernate Search configuration
+				return setupHelper;
+			}
+		};
+	}
 }

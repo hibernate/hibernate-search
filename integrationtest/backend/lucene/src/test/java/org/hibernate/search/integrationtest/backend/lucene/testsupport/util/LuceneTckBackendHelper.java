@@ -58,4 +58,13 @@ public class LuceneTckBackendHelper implements TckBackendHelper {
 				.setProperty( BackendSettings.INDEX_DEFAULTS + ".sharding.number_of_shards",
 						String.valueOf( shardCount ) );
 	}
+
+	@Override
+	public TckBackendSetupStrategy createPeriodicRefreshBackendSetupStrategy(int refreshIntervalMs) {
+		return new LuceneTckBackendSetupStrategy()
+				.setProperty(
+						BackendSettings.INDEX_DEFAULTS + ".io.refresh_interval",
+						String.valueOf( refreshIntervalMs )
+				);
+	}
 }
