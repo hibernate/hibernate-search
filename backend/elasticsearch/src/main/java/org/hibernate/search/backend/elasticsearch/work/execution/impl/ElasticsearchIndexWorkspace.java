@@ -61,7 +61,6 @@ public class ElasticsearchIndexWorkspace implements IndexWorkspace {
 
 	@Override
 	public CompletableFuture<?> refresh() {
-		// TODO HSEARCH-3460
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return orchestrator.submit( builderFactory.refresh().index( indexName ).build() );
 	}
 }
