@@ -14,7 +14,7 @@ import groovy.transform.Field
 import org.hibernate.jenkins.pipeline.helpers.job.JobHelper
 
 @Field final String MAVEN_TOOL = 'Apache Maven 3.6'
-@Field final String JDK_TOOL = 'OpenJDK 8 Latest'
+@Field final String JDK_TOOL = 'OpenJDK 11 Latest'
 
 // Performance node pattern, to be used for stages involving performance tests.
 @Field final String PERFORMANCE_NODE_PATTERN = 'Performance'
@@ -77,6 +77,7 @@ node (PERFORMANCE_NODE_PATTERN) {
 					java \
 					-jar benchmarks.jar \
 					-wi 1 -i 10 \
+					-prof org.hibernate.search.integrationtest.performance.backend.base.profiler.JfrProfiler:outputDir=output \
 					-rff output/benchmark-results-lucene.csv \
 			"""
 		}
