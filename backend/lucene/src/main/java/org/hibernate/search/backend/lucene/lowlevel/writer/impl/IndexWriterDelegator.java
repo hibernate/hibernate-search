@@ -30,8 +30,6 @@ public interface IndexWriterDelegator {
 
 	long deleteAll() throws IOException;
 
-	void flush() throws IOException;
-
 	void mergeSegments() throws IOException;
 
 }

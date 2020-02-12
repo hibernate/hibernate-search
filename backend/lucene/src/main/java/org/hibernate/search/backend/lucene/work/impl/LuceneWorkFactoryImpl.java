@@ -43,11 +43,6 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	}
 
 	@Override
-	public LuceneWriteWork<?> flush() {
-		return new LuceneFlushWork();
-	}
-
-	@Override
 	public LuceneWriteWork<?> noOp() {
 		return new LuceneNoOpWriteWork();
 	}

@@ -46,7 +46,7 @@ public class LuceneIndexWorkspace implements IndexWorkspace {
 
 	@Override
 	public CompletableFuture<?> flush() {
-		return doSubmit( factory.flush(), DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE );
+		return doSubmit( factory.noOp(), DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE );
 	}
 
 	@Override
