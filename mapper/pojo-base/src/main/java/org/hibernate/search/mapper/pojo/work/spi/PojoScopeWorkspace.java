@@ -16,4 +16,6 @@ public interface PojoScopeWorkspace {
 
 	CompletableFuture<?> flush();
 
+	CompletableFuture<?> refresh();
+
 }

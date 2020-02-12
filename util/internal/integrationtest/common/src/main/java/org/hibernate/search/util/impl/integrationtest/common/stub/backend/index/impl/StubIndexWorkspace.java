@@ -46,4 +46,10 @@ class StubIndexWorkspace implements IndexWorkspace {
 		StubIndexScopeWork work = StubIndexScopeWork.builder( StubIndexScopeWork.Type.FLUSH ).build();
 		return behavior.executeIndexScopeWork( Collections.singleton( indexName ), work );
 	}
+
+	@Override
+	public CompletableFuture<?> refresh() {
+		StubIndexScopeWork work = StubIndexScopeWork.builder( StubIndexScopeWork.Type.REFRESH ).build();
+		return behavior.executeIndexScopeWork( Collections.singleton( indexName ), work );
+	}
 }

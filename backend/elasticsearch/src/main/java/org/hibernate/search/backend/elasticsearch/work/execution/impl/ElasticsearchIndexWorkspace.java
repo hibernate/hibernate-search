@@ -58,4 +58,10 @@ public class ElasticsearchIndexWorkspace implements IndexWorkspace {
 	public CompletableFuture<?> flush() {
 		return orchestrator.submit( builderFactory.flush().index( indexName ).build() );
 	}
+
+	@Override
+	public CompletableFuture<?> refresh() {
+		// TODO HSEARCH-3460
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
 }

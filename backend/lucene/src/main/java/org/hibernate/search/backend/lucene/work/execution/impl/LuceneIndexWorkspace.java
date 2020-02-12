@@ -46,6 +46,12 @@ public class LuceneIndexWorkspace implements IndexWorkspace {
 		return doSubmit( factory.flush() );
 	}
 
+	@Override
+	public CompletableFuture<?> refresh() {
+		// TODO HSEARCH-3460
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
 	private CompletableFuture<?> doSubmit(LuceneWriteWork<?> work) {
 		Collection<LuceneWriteWorkOrchestrator> orchestrators = indexManagerContext.getAllWriteOrchestrators();
 		CompletableFuture<?>[] futures = new CompletableFuture[orchestrators.size()];
@@ -59,6 +65,5 @@ public class LuceneIndexWorkspace implements IndexWorkspace {
 			++i;
 		}
 		return CompletableFuture.allOf( futures );
-
 	}
 }
