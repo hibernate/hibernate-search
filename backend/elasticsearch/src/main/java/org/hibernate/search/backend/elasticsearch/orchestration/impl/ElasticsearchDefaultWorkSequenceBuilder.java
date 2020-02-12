@@ -322,7 +322,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		}
 
 		private CompletableFuture<R> extract() {
-			return extractor.extract( bulkedWork, index );
+			return CompletableFuture.completedFuture( extractor.extract( bulkedWork, index ) );
 		}
 
 		private void failBecauseBulkFailed(Throwable throwable) {

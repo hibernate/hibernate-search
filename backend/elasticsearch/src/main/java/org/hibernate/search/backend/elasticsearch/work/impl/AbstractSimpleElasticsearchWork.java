@@ -86,15 +86,10 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 							Throwables.expectException( throwable )
 					);
 				} ) )
-				.thenCompose( response -> handleResult( executionContext, response ) );
+				.thenApply( response -> handleResult( executionContext, response ) );
 	}
 
 	protected CompletableFuture<?> beforeExecute(ElasticsearchWorkExecutionContext executionContext, ElasticsearchRequest request) {
-		// Do nothing by default
-		return SUCCESSFUL_FUTURE;
-	}
-
-	protected CompletableFuture<?> afterSuccess(ElasticsearchWorkExecutionContext executionContext) {
 		// Do nothing by default
 		return SUCCESSFUL_FUTURE;
 	}
@@ -107,7 +102,7 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 		return aggregator.addNonBulkable( this );
 	}
 
-	private CompletableFuture<R> handleResult(ElasticsearchWorkExecutionContext executionContext, ElasticsearchResponse response) {
+	private R handleResult(ElasticsearchWorkExecutionContext executionContext, ElasticsearchResponse response) {
 		R result;
 		try {
 			resultAssessor.checkSuccess( response );
@@ -126,15 +121,7 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 			throw log.elasticsearchRequestFailed( request, response, e.getMessage(), e );
 		}
 
-		return afterSuccess( executionContext )
-				.exceptionally( Futures.handler( throwable -> {
-					throw log.elasticsearchRequestFailed(
-							request, response,
-							throwable.getMessage(),
-							Throwables.expectException( throwable )
-					);
-				} ) )
-				.thenApply( ignored -> result );
+		return result;
 	}
 
 	@SuppressWarnings("unchecked") // By contract, subclasses must implement B

@@ -15,9 +15,7 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.common.impl.Throwables;
 
 import com.google.gson.JsonObject;
 
@@ -60,8 +58,8 @@ public abstract class AbstractSimpleBulkableElasticsearchWork<R>
 	}
 
 	@Override
-	public CompletableFuture<R> handleBulkResult(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem) {
-		return Futures.create( () -> handleResult( context, bulkResponseItem ) );
+	public R handleBulkResult(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem) {
+		return handleResult( context, bulkResponseItem );
 	}
 
 	@Override
@@ -80,7 +78,7 @@ public abstract class AbstractSimpleBulkableElasticsearchWork<R>
 
 	protected abstract R generateResult(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem);
 
-	private CompletableFuture<R> handleResult(ElasticsearchWorkExecutionContext executionContext, JsonObject bulkResponseItem) {
+	private R handleResult(ElasticsearchWorkExecutionContext executionContext, JsonObject bulkResponseItem) {
 		R result;
 		try {
 			resultAssessor.checkSuccess( bulkResponseItem );
@@ -103,15 +101,7 @@ public abstract class AbstractSimpleBulkableElasticsearchWork<R>
 			);
 		}
 
-		return afterSuccess( executionContext )
-				.exceptionally( Futures.handler( throwable -> {
-					throw log.elasticsearchBulkedRequestFailed(
-							getBulkableActionMetadata(), bulkResponseItem,
-							throwable.getMessage(),
-							Throwables.expectException( throwable )
-					);
-				} ) )
-				.thenApply( ignored -> result );
+		return result;
 	}
 
 	protected abstract static class AbstractBuilder<B>
