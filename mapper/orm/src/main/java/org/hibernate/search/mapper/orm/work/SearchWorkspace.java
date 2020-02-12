@@ -50,7 +50,7 @@ public interface SearchWorkspace {
 	 * in particular operations queued as part of automatic indexing before a transaction
 	 * is committed.
 	 * These operations will not be applied immediately just because  a call to {@link #flush()} is issued:
-	 * the "flush" here is a very low-level operation managed by the backend.
+	 * the "flush" here is a very low-level operation handled by the backend.
 	 */
 	void flush();
 
@@ -61,6 +61,30 @@ public interface SearchWorkspace {
 	 * @see #flush()
 	 */
 	CompletableFuture<?> flushAsync();
+
+	/**
+	 * Refresh the indexes so that all changes executed so far will be visible in search queries.
+	 * <p>
+	 * This is generally not useful as indexes are refreshed automatically,
+	 * either after every change (default for the Lucene backend)
+	 * or periodically (default for the Elasticsearch backend,
+	 * possible for the Lucene backend by setting a refresh interval).
+	 * Only to be used by experts fully aware of the implications.
+	 * <p>
+	 * Note that some operations may still be waiting in a queue when {@link #refresh()} is called,
+	 * in particular operations queued as part of automatic indexing before a transaction is committed.
+	 * These operations will not be applied immediately just because  a call to {@link #refresh()} is issued:
+	 * the "refresh" here is a very low-level operation handled by the backend.
+	 */
+	void refresh();
+
+	/**
+	 * Asynchronous version of {@link #refresh()}, returning as soon as the operation is queued.
+	 *
+	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
+	 * @see #refresh()
+	 */
+	CompletableFuture<?> refreshAsync();
 
 	/**
 	 * Merge all segments of the indexes targeted by this workspace into a single one.
