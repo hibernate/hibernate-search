@@ -61,9 +61,16 @@ public class NearRealTimeIndexReaderProvider implements IndexReaderProvider {
 	public DirectoryReader getOrCreate() throws IOException {
 		IndexReaderEntry entry = currentReaderEntry;
 
-		// Optimistic checks and locking to avoid synchronization
-		if ( entry != null && entry.isFresh() && entry.reader.tryIncRef() ) {
-			return entry.reader;
+		// Optimistic locking and checks to avoid synchronization
+		if ( entry != null && entry.reader.tryIncRef() ) {
+			// Do this *after* tryIncRef,
+			// otherwise the reader could get closed between the call to isFresh and the return
+			if ( entry.isFresh() ) {
+				return entry.reader;
+			}
+			else {
+				entry.reader.decRef();
+			}
 		}
 
 		return getFreshIndexReader().reader;
