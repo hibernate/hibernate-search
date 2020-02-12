@@ -60,11 +60,6 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 	}
 
 	@Override
-	public void flush() throws IOException {
-		delegate.flush();
-	}
-
-	@Override
 	public void mergeSegments() throws IOException {
 		delegate.forceMerge( 1 );
 	}

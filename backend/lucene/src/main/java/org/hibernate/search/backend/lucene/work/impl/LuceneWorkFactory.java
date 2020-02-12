@@ -22,8 +22,6 @@ public interface LuceneWorkFactory {
 
 	LuceneWriteWork<?> deleteAll(String tenantId);
 
-	LuceneWriteWork<?> flush();
-
 	LuceneWriteWork<?> noOp();
 
 	LuceneWriteWork<?> mergeSegments();
