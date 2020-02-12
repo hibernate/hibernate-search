@@ -48,4 +48,14 @@ public class SearchWorkspaceImpl implements SearchWorkspace {
 	public CompletableFuture<?> flushAsync() {
 		return delegate.flush();
 	}
+
+	@Override
+	public void refresh() {
+		Futures.unwrappedExceptionJoin( refreshAsync() );
+	}
+
+	@Override
+	public CompletableFuture<?> refreshAsync() {
+		return delegate.refresh();
+	}
 }
