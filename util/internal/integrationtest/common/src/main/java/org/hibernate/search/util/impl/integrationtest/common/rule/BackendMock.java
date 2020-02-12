@@ -363,6 +363,14 @@ public class BackendMock implements TestRule {
 			return indexScopeWork( StubIndexScopeWork.Type.FLUSH, future );
 		}
 
+		public IndexScopeWorkCallListContext refresh() {
+			return indexScopeWork( StubIndexScopeWork.Type.REFRESH );
+		}
+
+		public IndexScopeWorkCallListContext refresh(CompletableFuture<?> future) {
+			return indexScopeWork( StubIndexScopeWork.Type.REFRESH, future );
+		}
+
 		public IndexScopeWorkCallListContext indexScopeWork(StubIndexScopeWork.Type type) {
 			return indexScopeWork( type, CompletableFuture.completedFuture( null ) );
 		}

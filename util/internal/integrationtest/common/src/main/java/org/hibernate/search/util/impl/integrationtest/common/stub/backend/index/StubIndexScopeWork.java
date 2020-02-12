@@ -9,7 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index
 public final class StubIndexScopeWork {
 
 	public enum Type {
-		MERGE_SEGMENTS, PURGE, FLUSH
+		MERGE_SEGMENTS, PURGE, FLUSH, REFRESH
 	}
 
 	public static Builder builder(Type type) {

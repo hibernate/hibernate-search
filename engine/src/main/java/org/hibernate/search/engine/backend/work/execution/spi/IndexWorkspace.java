@@ -19,4 +19,6 @@ public interface IndexWorkspace {
 
 	CompletableFuture<?> flush();
 
+	CompletableFuture<?> refresh();
+
 }

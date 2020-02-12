@@ -42,6 +42,11 @@ public class PojoScopeWorkspaceImpl implements PojoScopeWorkspace {
 		return doOperationOnTypes( IndexWorkspace::flush );
 	}
 
+	@Override
+	public CompletableFuture<?> refresh() {
+		return doOperationOnTypes( IndexWorkspace::refresh );
+	}
+
 	private CompletableFuture<?> doOperationOnTypes(Function<IndexWorkspace, CompletableFuture<?>> operation) {
 		CompletableFuture<?>[] futures = new CompletableFuture<?>[delegates.size()];
 		int typeCounter = 0;
