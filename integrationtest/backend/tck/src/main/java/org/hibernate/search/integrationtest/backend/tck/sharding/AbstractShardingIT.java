@@ -67,7 +67,7 @@ public abstract class AbstractShardingIT {
 		CompletableFuture.allOf( tasks.toArray( new CompletableFuture<?>[0] ) ).join();
 
 		IndexWorkspace workspace = indexManager.createWorkspace();
-		workspace.flush().join();
+		workspace.refresh().join();
 	}
 
 	protected class IndexMapping {

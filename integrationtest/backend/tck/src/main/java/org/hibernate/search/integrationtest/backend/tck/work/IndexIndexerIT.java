@@ -77,7 +77,7 @@ public class IndexIndexerIT {
 		// The operations should succeed.
 		FutureAssert.assertThat( future ).isSuccessful();
 
-		workspace.flush().join();
+		workspace.refresh().join();
 
 		SearchQuery<DocumentReference> query = indexManager.createScope().query()
 				.where( f -> f.matchAll() )

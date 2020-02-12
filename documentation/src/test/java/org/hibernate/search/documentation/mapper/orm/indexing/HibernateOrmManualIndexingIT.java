@@ -278,8 +278,7 @@ public class HibernateOrmManualIndexingIT {
 
 	private void assertBookCount(EntityManager entityManager, int expectedCount) {
 		SearchSession searchSession = Search.session( entityManager );
-		// Ensure every committed work is searchable: flush also executes a refresh on Elasticsearch
-		searchSession.workspace().flush();
+		searchSession.workspace().refresh();
 		assertThat(
 				searchSession.search( Book.class )
 						.where( f -> f.matchAll() )
@@ -290,8 +289,7 @@ public class HibernateOrmManualIndexingIT {
 
 	private void assertAuthorCount(EntityManager entityManager, int expectedCount) {
 		SearchSession searchSession = Search.session( entityManager );
-		// Ensure every committed work is searchable: flush also executes a refresh on Elasticsearch
-		searchSession.workspace().flush();
+		searchSession.workspace().refresh();
 		assertThat(
 				searchSession.search( Author.class )
 						.where( f -> f.matchAll() )

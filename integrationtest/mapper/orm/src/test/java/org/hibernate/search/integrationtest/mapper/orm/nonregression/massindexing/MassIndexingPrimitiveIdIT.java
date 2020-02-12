@@ -75,7 +75,8 @@ public class MassIndexingPrimitiveIdIT {
 			backendMock.expectIndexScopeWorks( EntityWithPrimitiveId.INDEX, session.getTenantIdentifier() )
 					.purge()
 					.mergeSegments()
-					.flush();
+					.flush()
+					.refresh();
 
 			try {
 				indexer.startAndWait();

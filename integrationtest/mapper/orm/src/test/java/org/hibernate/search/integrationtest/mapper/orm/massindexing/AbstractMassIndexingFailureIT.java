@@ -87,7 +87,8 @@ public abstract class AbstractMassIndexingFailureIT {
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.FAIL ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.SUCCEED )
+				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.REFRESH, ExecutionExpectation.SUCCEED )
 		);
 
 		assertEntityIndexingFailureHandling(
@@ -127,7 +128,8 @@ public abstract class AbstractMassIndexingFailureIT {
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SKIP ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.SUCCEED )
+				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.REFRESH, ExecutionExpectation.SUCCEED )
 		);
 
 		assertEntityGetterFailureHandling(
@@ -167,7 +169,8 @@ public abstract class AbstractMassIndexingFailureIT {
 				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SKIP ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.SUCCEED )
+				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.REFRESH, ExecutionExpectation.SUCCEED )
 		);
 
 		assertEntityGetterFailureHandling(

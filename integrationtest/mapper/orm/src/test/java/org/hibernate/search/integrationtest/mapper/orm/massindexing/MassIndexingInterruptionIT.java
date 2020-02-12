@@ -144,6 +144,7 @@ public class MassIndexingInterruptionIT {
 
 		backendMock.expectIndexScopeWorks( Book.INDEX )
 				.flush()
+				.refresh()
 				.mergeSegments();
 
 		return indexer;

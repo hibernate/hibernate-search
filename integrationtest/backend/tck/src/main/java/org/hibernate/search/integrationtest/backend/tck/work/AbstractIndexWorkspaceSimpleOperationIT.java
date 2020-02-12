@@ -109,7 +109,7 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 			} );
 		}
 		CompletableFuture.allOf( tasks ).join();
-		indexManager.createWorkspace().flush().join();
+		indexManager.createWorkspace().refresh().join();
 	}
 
 	private static class IndexMapping {
