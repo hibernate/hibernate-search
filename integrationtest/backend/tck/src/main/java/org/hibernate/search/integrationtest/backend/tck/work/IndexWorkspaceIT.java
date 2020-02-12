@@ -31,7 +31,7 @@ import org.assertj.core.api.Assertions;
 
 /**
  * Verify that the work executor operations:
- * {@link IndexWorkspace#mergeSegments()}, {@link IndexWorkspace#purge()}, {@link IndexWorkspace#flush()}
+ * {@link IndexWorkspace#mergeSegments()}, {@link IndexWorkspace#purge()}, {@link IndexWorkspace#flush()}, {@link IndexWorkspace#refresh()}
  * work properly, in every backends.
  */
 public class IndexWorkspaceIT {
@@ -59,7 +59,7 @@ public class IndexWorkspaceIT {
 	private StubMappingIndexManager indexManager;
 
 	@Test
-	public void runMergeSegmentsPurgeAndFlushInSequence() {
+	public void runMergeSegmentsPurgeAndFlushAndRefreshInSequence() {
 		setupHelper.start()
 				.withIndex(
 						INDEX_NAME,
@@ -72,7 +72,7 @@ public class IndexWorkspaceIT {
 		IndexWorkspace workspace = indexManager.createWorkspace();
 		createBookIndexes( noTenantSessionContext );
 
-		workspace.flush().join();
+		workspace.refresh().join();
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, noTenantSessionContext );
 
 		workspace.mergeSegments().join();
@@ -81,12 +81,13 @@ public class IndexWorkspaceIT {
 		// purge without providing a tenant
 		workspace.purge().join();
 		workspace.flush().join();
+		workspace.refresh().join();
 
 		assertBookNumberIsEqualsTo( 0, noTenantSessionContext );
 	}
 
 	@Test
-	public void runMergeSegmentsPurgeAndFlushWithMultiTenancy() {
+	public void runMergeSegmentsPurgeAndFlushAndRefreshWithMultiTenancy() {
 		multiTenancySetupHelper.start()
 				.withIndex(
 						INDEX_NAME,
@@ -101,7 +102,7 @@ public class IndexWorkspaceIT {
 
 		createBookIndexes( tenant1SessionContext );
 		createBookIndexes( tenant2SessionContext );
-		workspace.flush().join();
+		workspace.refresh().join();
 
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant1SessionContext );
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant2SessionContext );
@@ -112,6 +113,7 @@ public class IndexWorkspaceIT {
 
 		workspace.purge().join();
 		workspace.flush().join();
+		workspace.refresh().join();
 
 		// check that only TENANT_1 is affected by the purge
 		assertBookNumberIsEqualsTo( 0, tenant1SessionContext );

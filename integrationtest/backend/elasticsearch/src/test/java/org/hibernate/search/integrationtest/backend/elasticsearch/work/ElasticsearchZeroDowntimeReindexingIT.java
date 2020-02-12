@@ -70,7 +70,7 @@ public class ElasticsearchZeroDowntimeReindexingIT {
 		indexer.add( referenceProvider( "1" ), document -> {
 			document.addValue( indexMapping.text, "text1" );
 		} ).join();
-		workspace.flush().join();
+		workspace.refresh().join();
 
 		SearchQuery<DocumentReference> text1Query = indexManager
 				.createScope().query()
@@ -103,7 +103,7 @@ public class ElasticsearchZeroDowntimeReindexingIT {
 		indexer.add( referenceProvider( "1" ), document -> {
 			document.addValue( indexMapping.text, "text2" );
 		} ).join();
-		workspace.flush().join();
+		workspace.refresh().join();
 
 		// Search queries are unaffected: text == "text1"
 		assertThat( text1Query ).hasTotalHitCount( 1 );

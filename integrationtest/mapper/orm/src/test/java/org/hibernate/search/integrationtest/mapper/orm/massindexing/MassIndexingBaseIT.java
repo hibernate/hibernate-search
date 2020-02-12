@@ -97,7 +97,8 @@ public class MassIndexingBaseIT {
 			backendMock.expectIndexScopeWorks( Book.INDEX, session.getTenantIdentifier() )
 					.purge()
 					.mergeSegments()
-					.flush();
+					.flush()
+					.refresh();
 
 			try {
 				indexer.startAndWait();
@@ -143,7 +144,8 @@ public class MassIndexingBaseIT {
 					.purge()
 					.mergeSegments()
 					.mergeSegments()
-					.flush();
+					.flush()
+					.refresh();
 
 			try {
 				indexer.startAndWait();
@@ -186,7 +188,8 @@ public class MassIndexingBaseIT {
 		backendMock.expectIndexScopeWorks( Book.INDEX )
 				.purge()
 				.mergeSegments()
-				.flush();
+				.flush()
+				.refresh();
 
 		try {
 			indexer.startAndWait();

@@ -162,6 +162,7 @@ public class BatchCoordinator extends FailureHandledRunnable {
 			Futures.unwrappedExceptionGet( scopeWorkspace.mergeSegments() );
 		}
 		Futures.unwrappedExceptionGet( scopeWorkspace.flush() );
+		Futures.unwrappedExceptionGet( scopeWorkspace.refresh() );
 	}
 
 	/**
@@ -169,6 +170,7 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	 */
 	private void afterBatchOnInterruption() throws InterruptedException {
 		Futures.unwrappedExceptionGet( scopeWorkspace.flush() );
+		Futures.unwrappedExceptionGet( scopeWorkspace.refresh() );
 	}
 
 	/**

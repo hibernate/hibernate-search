@@ -8,15 +8,12 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import java.util.HashSet;
 import java.util.Set;
-import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.FlushWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.builder.impl.RefreshWorkBuilder;
 
 /**
  * A flush work for ES5, using the Flush API then the Refresh API.
@@ -27,16 +24,8 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.RefreshWorkB
  */
 public class FlushWork extends AbstractSimpleElasticsearchWork<Void> {
 
-	private final ElasticsearchWork<?> refreshWork;
-
 	protected FlushWork(Builder builder) {
 		super( builder );
-		this.refreshWork = builder.buildRefreshWork();
-	}
-
-	@Override
-	protected CompletableFuture<?> afterSuccess(ElasticsearchWorkExecutionContext executionContext) {
-		return refreshWork.execute( executionContext );
 	}
 
 	@Override
@@ -47,18 +36,15 @@ public class FlushWork extends AbstractSimpleElasticsearchWork<Void> {
 	public static class Builder
 			extends AbstractBuilder<Builder>
 			implements FlushWorkBuilder {
-		private final RefreshWorkBuilder refreshWorkBuilder;
 		private final Set<URLEncodedString> indexNames = new HashSet<>();
 
-		public Builder(ElasticsearchWorkBuilderFactory workFactory) {
+		public Builder() {
 			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
-			this.refreshWorkBuilder = workFactory.refresh();
 		}
 
 		@Override
 		public Builder index(URLEncodedString indexName) {
 			this.indexNames.add( indexName );
-			this.refreshWorkBuilder.index( indexName );
 			return this;
 		}
 
@@ -74,10 +60,6 @@ public class FlushWork extends AbstractSimpleElasticsearchWork<Void> {
 			builder.pathComponent( Paths._FLUSH );
 
 			return builder.build();
-		}
-
-		protected ElasticsearchWork<?> buildRefreshWork() {
-			return refreshWorkBuilder.build();
 		}
 
 		@Override

@@ -96,7 +96,8 @@ public class MassIndexingNonEntityIdDocumentIdIT {
 			backendMock.expectIndexScopeWorks( Book.INDEX, session.getTenantIdentifier() )
 					.purge()
 					.mergeSegments()
-					.flush();
+					.flush()
+					.refresh();
 
 			try {
 				indexer.startAndWait();

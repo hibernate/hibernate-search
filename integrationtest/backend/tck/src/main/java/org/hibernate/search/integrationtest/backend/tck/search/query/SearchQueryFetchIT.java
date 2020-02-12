@@ -299,7 +299,7 @@ public class SearchQueryFetchIT {
 		}
 
 		CompletableFuture.allOf( futures.toArray( new CompletableFuture<?>[0] ) ).join();
-		indexManager.createWorkspace().flush().join();
+		indexManager.createWorkspace().refresh().join();
 
 		// Check that all documents are searchable
 		StubMappingScope scope = indexManager.createScope();

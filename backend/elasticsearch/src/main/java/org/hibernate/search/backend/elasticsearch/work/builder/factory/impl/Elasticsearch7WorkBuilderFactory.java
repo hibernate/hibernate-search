@@ -95,7 +95,7 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 
 	@Override
 	public FlushWorkBuilder flush() {
-		return new FlushWork.Builder( this );
+		return new FlushWork.Builder();
 	}
 
 	@Override

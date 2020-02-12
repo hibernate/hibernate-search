@@ -92,7 +92,8 @@ public class MassIndexingMonitorIT {
 			backendMock.expectIndexScopeWorks( Book.INDEX, session.getTenantIdentifier() )
 					.purge()
 					.mergeSegments()
-					.flush();
+					.flush()
+					.refresh();
 
 			try {
 				indexer.monitor( new StaticCountersMonitor() )
