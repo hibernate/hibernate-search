@@ -199,7 +199,7 @@ public class BulkWork implements ElasticsearchWork<BulkResult> {
 		}
 
 		@Override
-		public <T> CompletableFuture<T> extract(BulkableElasticsearchWork<T> work, int index) {
+		public <T> T extract(BulkableElasticsearchWork<T> work, int index) {
 			JsonObject bulkItemResponse = results.get( index ).getAsJsonObject();
 			return work.handleBulkResult( context, bulkItemResponse );
 		}
