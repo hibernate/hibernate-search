@@ -45,7 +45,7 @@ public abstract class AbstractMassIndexingBenchmarks extends AbstractBackendBenc
 	/**
 	 * Equivalent to the MassIndexer's "batchSizeToLoadObjects".
 	 */
-	@Param({ "10" })
+	@Param({ "200" })
 	private int batchSize;
 
 	private MappedIndex index;
@@ -64,7 +64,7 @@ public abstract class AbstractMassIndexingBenchmarks extends AbstractBackendBenc
 	}
 
 	@Benchmark
-	@Threads(3 * AbstractBackendHolder.INDEX_COUNT)
+	@Threads(10 * AbstractBackendHolder.INDEX_COUNT)
 	public void writeBatch(WriteCounters counters) throws InterruptedException {
 		CompletableFuture<?>[] futures = new CompletableFuture<?>[batchSize];
 

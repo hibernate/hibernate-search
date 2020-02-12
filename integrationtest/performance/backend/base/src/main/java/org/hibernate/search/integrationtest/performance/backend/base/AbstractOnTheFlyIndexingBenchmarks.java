@@ -62,7 +62,7 @@ public abstract class AbstractOnTheFlyIndexingBenchmarks extends AbstractBackend
 	 * The number of works of each type (add/update/delete)
 	 * to put in each workset.
 	 */
-	@Param({ "3" })
+	@Param({ "20" })
 	private int worksPerTypePerWorkset;
 
 	/*
@@ -116,7 +116,7 @@ public abstract class AbstractOnTheFlyIndexingBenchmarks extends AbstractBackend
 	}
 
 	@Benchmark
-	@Threads(3 * AbstractBackendHolder.INDEX_COUNT)
+	@Threads(10 * AbstractBackendHolder.INDEX_COUNT)
 	public void workset(WriteCounters counters) {
 		StubBackendSessionContext sessionContext = new StubBackendSessionContext();
 		PerThreadIndexPartition partition = getIndexPartition();
@@ -159,7 +159,7 @@ public abstract class AbstractOnTheFlyIndexingBenchmarks extends AbstractBackend
 	}
 
 	@Benchmark
-	@GroupThreads(2 * AbstractBackendHolder.INDEX_COUNT)
+	@GroupThreads(10 * AbstractBackendHolder.INDEX_COUNT)
 	@Group("concurrentReadWrite")
 	public void concurrentWorkset(WriteCounters counters) {
 		workset( counters );
