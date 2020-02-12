@@ -109,10 +109,6 @@ and link:{hibernateDocUrl}#fetching-batch[the `@BatchSize` annotation].
 [[mapper-orm-indexing-automatic-synchronization]]
 == Synchronization with the indexes
 
-include::todo-placeholder.asciidoc[]
-// TODO HSEARCH-3317 explain in transaction/post transaction synchronizations, when they can be used and what they mean
-// TODO HSEARCH-3305 explain explicit flush/refresh
-
 Hibernate Search offers multiple strategies to control synchronization with the indexes
 during automatic indexing,
 i.e. to control the minimum progress of indexing before the application thread is resumed.
@@ -141,14 +137,14 @@ took appropriate measures to be able to recover the changes in the event of a cr
 and confirmed to Hibernate Search it did so
 (e.g. for Elasticsearch, Hibernate Search received a successful response to the HTTP request).
 +
-This strategy offers no guarantee as to whether indexed documents are searchable:
-the backend may delay indexing in order to improve performance,
+This strategy offers no guarantee as to whether indexed documents are searchable,
 meaning a search query executed immediately after the application thread is resumed
 may return outdated information.
-+
-This is true in particular with the Elasticsearch backend,
-which is link:{elasticsearchDocUrl}/getting-started-concepts.html#_near_realtime_nrt[near-real-time]
-by default.
+Documents are searchable as soon as a refresh is performed,
+either automatically after every change (default for the Lucene backend)
+periodically (link:{elasticsearchDocUrl}/getting-started-concepts.html#_near_realtime_nrt[default for the Elasticsearch backend],
+opt-in for the Lucene backend by <<backend-lucene-io-refresh,setting a refresh interval>>),
+or <<mapper-orm-indexing-manual-refresh,explicitly>>.
 +
 With this strategy, indexing failures will lead to an exception being thrown in the application thread.
 * when set to `searchable`, the application thread will be resumed as soon as
