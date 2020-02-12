@@ -107,6 +107,8 @@ lock(label: esAwsBuildEnv.lockedResourcesLabel) {
 							-jvmArgsAppend -Daws.signing.access_key=$AWS_ACCESS_KEY_ID \
 							-jvmArgsAppend -Daws.signing.secret_key=$AWS_SECRET_ACCESS_KEY \
 							-jvmArgsAppend -Daws.signing.region=$esAwsBuildEnv.awsRegion \
+							-e OnTheFlyIndexingBenchmarks.concurrentReadWrite \
+							-e OnTheFlyIndexingBenchmarks.query \
 							-wi 1 -i 10 \
 							-prof org.hibernate.search.integrationtest.performance.backend.base.profiler.JfrProfiler:outputDir=output \
 							-rff output/benchmark-results-elasticsearch.csv \

@@ -76,6 +76,8 @@ node (PERFORMANCE_NODE_PATTERN) {
 			sh """ \
 					java \
 					-jar benchmarks.jar \
+					-e OnTheFlyIndexingBenchmarks.concurrentReadWrite \
+					-e OnTheFlyIndexingBenchmarks.query \
 					-wi 1 -i 10 \
 					-prof org.hibernate.search.integrationtest.performance.backend.base.profiler.JfrProfiler:outputDir=output \
 					-rff output/benchmark-results-lucene.csv \
