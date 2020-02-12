@@ -39,10 +39,18 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 	private static final Integer DOCUMENT_COUNT = 50;
 
 	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	public SearchSetupHelper setupHelper;
 
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
+
+	protected AbstractIndexWorkspaceSimpleOperationIT() {
+		this( new SearchSetupHelper() );
+	}
+
+	protected AbstractIndexWorkspaceSimpleOperationIT(SearchSetupHelper setupHelper) {
+		this.setupHelper = setupHelper;
+	}
 
 	@Test
 	public void success() {
@@ -102,6 +110,10 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
+
+		// Make sure index readers are initialized before writing,
+		// otherwise some assumptions made in the refresh IT won't hold.
+		indexManager.createScope().query().where( f -> f.matchAll() ).fetchTotalHitCount();
 
 		IndexIndexer<? extends DocumentElement> indexer =
 				indexManager.createIndexer( DocumentCommitStrategy.NONE );
