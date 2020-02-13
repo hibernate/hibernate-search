@@ -9,9 +9,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>hibernate-search-parent</artifactId>
+        <artifactId>hibernate-search-parent-public</artifactId>
         <groupId>org.hibernate.search</groupId>
         <version>6.0.0-SNAPSHOT</version>
+        <relativePath>../parents/public</relativePath>
     </parent>
 
     <artifactId>hibernate-search-distribution</artifactId>
@@ -21,7 +22,7 @@
     <packaging>pom</packaging>
 
     <properties>
-        <!-- Skip artifact deployment -->
+        <!-- Skip artifact deployment: we publish through other means. -->
         <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
     </properties>
 

@@ -152,6 +152,7 @@
 
     <modules>
         <module>build-config</module>
+        <module>parents/public</module>
         <module>util/common</module>
         <module>util/internal/test</module>
         <module>engine</module>
@@ -1160,28 +1161,13 @@
                         <phase>deploy</phase>
                         <goals>
                             <!--
-                                 Use the default "deploy" goal in every module, except in the "reports" module where
-                                 this is overridden
+                                This will only put artifacts in a staging directory.
+                                See the "reports" module for actual deployment, at the end of the build.
                              -->
                             <goal>deploy</goal>
                         </goals>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <configuration>
-                    <archive>
-                        <manifestEntries>
-                            <Implementation-Title>${project.name}</Implementation-Title>
-                            <Implementation-Version>${project.version}</Implementation-Version>
-                            <Implementation-Vendor>hibernate.org</Implementation-Vendor>
-                            <Implementation-Vendor-Id>hibernate.org</Implementation-Vendor-Id>
-                            <Implementation-URL>http://hibernate.org/search/</Implementation-URL>
-                        </manifestEntries>
-                    </archive>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -1338,44 +1324,6 @@
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
                     <version>${version.javadoc.plugin}</version>
-                    <configuration>
-                        <!-- Fail on error alternative -->
-                        <quiet>true</quiet>
-                        <verbose>false</verbose>
-                        <failOnWarnings>true</failOnWarnings>
-                        <failOnError>true</failOnError>
-                        <!-- Exclude implementation classes from the javadoc -->
-                        <excludePackageNames>*.impl,*.impl.*</excludePackageNames>
-                        <links>
-                            <link>${javadoc.javase.url}</link>
-                            <link>${javadoc.org.hibernate.url}</link>
-                            <link>${javadoc.org.apache.lucene.core.url}</link>
-                            <link>${javadoc.org.apache.lucene.analyzers-common.url}</link>
-                            <link>${javadoc.org.apache.lucene.queryparser.url}</link>
-                            <!-- For Java EE APIs, in particular javax.batch in the JSR 352 modules -->
-                            <link>${javadoc.javaee.url}</link>
-                            <!-- For the JSR 352 modules -->
-                            <link>${javadoc.org.jberet.url}</link>
-                        </links>
-                        <bottom>
-                            <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="https://www.redhat.com/">Red Hat, Inc.</a> and others. Licensed under the GNU Lesser General Public License (LGPL), version 2.1 or later.]]>
-                        </bottom>
-                        <additionalDependencies>
-                            <additionalDependency>
-                                <groupId>org.jboss.logging</groupId>
-                                <artifactId>jboss-logging-annotations</artifactId>
-                                <version>${version.org.jboss.logging.jboss-logging-tools}</version>
-                            </additionalDependency>
-                        </additionalDependencies>
-                        <tags>
-                            <tag>
-                                <name>hsearch.experimental</name>
-                                <placement>a</placement>
-                                <head>Experimental</head>
-                            </tag>
-                        </tags>
-                        <additionalOptions>${javadoc.additionalOptions.java-version}</additionalOptions>
-                    </configuration>
                 </plugin>
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -1911,22 +1859,6 @@
             <modules>
                 <module>distribution</module>
             </modules>
-            <build>
-                <plugins>
-                    <plugin>
-                        <artifactId>maven-javadoc-plugin</artifactId>
-                        <executions>
-                            <execution>
-                                <id>generate-javadoc</id>
-                                <goals>
-                                    <goal>javadoc-no-fork</goal>
-                                </goals>
-                                <phase>prepare-package</phase>
-                            </execution>
-                        </executions>
-                    </plugin>
-                </plugins>
-            </build>
         </profile>
 
         <profile>
