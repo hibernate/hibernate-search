@@ -808,6 +808,36 @@
                 <module>integrationtest/jdk9-modules</module>
             </modules>
         </profile>
+        <!-- The profiles `skippingAllTests` and `skippingIntegrationTests` are currently duplicates,
+            as one can't trigger the profile activation on either/or property -->
+        <profile>
+            <id>skippingAllTests</id>
+            <activation>
+                <property>
+                    <name>skipTests</name>
+                </property>
+            </activation>
+            <properties>
+                <!-- This is to avoid starting an Elasticsearch node for each module needing integration test -->
+                <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
+                <!-- This is to avoid unzipping any WildFly server, included modules, configurations and JDBC drivers -->
+                <skipWildFlyPreparation>true</skipWildFlyPreparation>
+            </properties>
+        </profile>
+        <profile>
+            <id>skippingIntegrationTests</id>
+            <activation>
+                <property>
+                    <name>skipITs</name>
+                </property>
+            </activation>
+            <properties>
+                <!-- This is to avoid starting an Elasticsearch node for each module needing integration test -->
+                <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
+                <!-- This is to avoid unzipping any WildFly server, included modules, configurations and JDBC drivers -->
+                <skipWildFlyPreparation>true</skipWildFlyPreparation>
+            </properties>
+        </profile>
 
         <!-- Elasticsearch 5.6+ test environment (default) -->
         <profile>

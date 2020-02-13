@@ -9,8 +9,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.hibernate.search</groupId>
-        <artifactId>hibernate-search-parent</artifactId>
+        <artifactId>hibernate-search-parent-integrationtest</artifactId>
         <version>6.0.0-SNAPSHOT</version>
+        <relativePath>../parents/integrationtest</relativePath>
     </parent>
     <artifactId>hibernate-search-documentation</artifactId>
     <packaging>jar</packaging>
@@ -32,8 +33,6 @@
         <html.google-analytics.tag-manager.id>GTM-NJWS5L</html.google-analytics.tag-manager.id>
         <html.google-analytics.tag-manager.channel>Hibernate</html.google-analytics.tag-manager.channel>
         <html.outdated-content.project-key>${html.meta.project-key}</html.outdated-content.project-key>
-
-        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
     </properties>
 
     <dependencies>
@@ -53,22 +52,13 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-util-internal-integrationtest-sharedresources</artifactId>
-            <classifier>build-resources</classifier>
-            <type>zip</type>
-            <version>${project.version}</version>
-        </dependency>
-        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-util-internal-integrationtest-backend-elasticsearch</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-util-internal-integrationtest-mapper-orm</artifactId>
-            <version>${project.version}</version>
             <scope>test</scope>
         </dependency>
         <!--
@@ -91,16 +81,8 @@
         </testResources>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-            </plugin>
-            <plugin>
                 <groupId>com.github.alexcojocaru</groupId>
                 <artifactId>elasticsearch-maven-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -33,16 +33,6 @@
             <artifactId>takari-cpsuite</artifactId>
             <scope>test</scope>
         </dependency>
-
-        <!-- Enable extracting shared test build resources -->
-        <!-- See how maven-dependency-plugin is configured in the parent pom -->
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-util-internal-integrationtest-sharedresources</artifactId>
-            <classifier>build-resources</classifier>
-            <type>zip</type>
-            <scope>provided</scope>
-        </dependency>
     </dependencies>
 
     <build>
@@ -53,9 +43,6 @@
             </testResource>
         </testResources>
         <plugins>
-            <plugin>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-            </plugin>
             <plugin>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <executions>
@@ -72,10 +59,6 @@
                         </configuration>
                     </execution>
                 </executions>
-            </plugin>
-            <plugin>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <!-- Inherit execution unpack-shared-test-build-resources -->
             </plugin>
         </plugins>
     </build>
