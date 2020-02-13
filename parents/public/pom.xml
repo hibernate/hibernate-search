@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ ~ Hibernate Search, full-text search for your domain model
+ ~
+ ~ License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ ~ See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+  -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.hibernate.search</groupId>
+        <artifactId>hibernate-search-parent</artifactId>
+        <version>6.0.0-SNAPSHOT</version>
+        <relativePath>../..</relativePath>
+    </parent>
+    <artifactId>hibernate-search-parent-public</artifactId>
+    <packaging>pom</packaging>
+
+    <name>Hibernate Search Parent POM for Public Artifacts</name>
+    <description>Common build configuration for all public artifacts</description>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <configuration>
+                        <archive>
+                            <manifestEntries>
+                                <Implementation-Title>${project.name}</Implementation-Title>
+                                <Implementation-Version>${project.version}</Implementation-Version>
+                                <Implementation-Vendor>hibernate.org</Implementation-Vendor>
+                                <Implementation-Vendor-Id>hibernate.org</Implementation-Vendor-Id>
+                                <Implementation-URL>http://hibernate.org/search/</Implementation-URL>
+                                <Automatic-Module-Name>${java.module.name}</Automatic-Module-Name>
+                            </manifestEntries>
+                        </archive>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-javadoc-plugin</artifactId>
+                    <version>${version.javadoc.plugin}</version>
+                    <configuration>
+                        <!-- Fail on error alternative -->
+                        <quiet>true</quiet>
+                        <verbose>false</verbose>
+                        <failOnWarnings>true</failOnWarnings>
+                        <failOnError>true</failOnError>
+                        <!-- Exclude implementation classes from the javadoc -->
+                        <excludePackageNames>*.impl,*.impl.*</excludePackageNames>
+                        <links>
+                            <link>${javadoc.javase.url}</link>
+                            <link>${javadoc.org.hibernate.url}</link>
+                            <link>${javadoc.org.apache.lucene.core.url}</link>
+                            <link>${javadoc.org.apache.lucene.analyzers-common.url}</link>
+                            <link>${javadoc.org.apache.lucene.queryparser.url}</link>
+                            <!-- For Java EE APIs, in particular javax.batch in the JSR 352 modules -->
+                            <link>${javadoc.javaee.url}</link>
+                            <!-- For the JSR 352 modules -->
+                            <link>${javadoc.org.jberet.url}</link>
+                        </links>
+                        <bottom>
+                            <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="https://www.redhat.com/">Red Hat, Inc.</a> and others. Licensed under the GNU Lesser General Public License (LGPL), version 2.1 or later.]]>
+                        </bottom>
+                        <additionalDependencies>
+                            <additionalDependency>
+                                <groupId>org.jboss.logging</groupId>
+                                <artifactId>jboss-logging-annotations</artifactId>
+                                <version>${version.org.jboss.logging.jboss-logging-tools}</version>
+                            </additionalDependency>
+                        </additionalDependencies>
+                        <tags>
+                            <tag>
+                                <name>hsearch.experimental</name>
+                                <placement>a</placement>
+                                <head>Experimental</head>
+                            </tag>
+                        </tags>
+                        <additionalOptions>${javadoc.additionalOptions.java-version}</additionalOptions>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.bsc.maven</groupId>
+                <artifactId>maven-processor-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>dist</id>
+            <build>
+                <plugins>
+                    <plugin>
+                        <artifactId>maven-javadoc-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>generate-javadoc</id>
+                                <goals>
+                                    <goal>javadoc-no-fork</goal>
+                                </goals>
+                                <phase>prepare-package</phase>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>jqassistant</id>
+            <build>
+                <plugins>
+                    <!--
+                         This is the last module: we want to execute analysis here so as to fail the build if anything is wrong.
+                         Reminder: jqassistant only executes analysis in the last module of the build,
+                         so if we skip it in the last module, it just won't execute analysis... ever.
+                     -->
+                    <plugin>
+                        <groupId>com.buschmais.jqassistant</groupId>
+                        <artifactId>jqassistant-maven-plugin</artifactId>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>module-descriptors</id>
+            <!--
+                TODO HSEARCH-3274 enable this profile by default to add module descriptors to Hibernate Search modules
+             -->
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.moditect</groupId>
+                        <artifactId>moditect-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>add-module-infos</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>add-module-info</goal>
+                                </goals>
+                                <configuration>
+                                    <module>
+                                        <moduleInfo>
+                                            <name>${java.module.name}</name>
+                                            <exports>
+                                                !org.hibernate.search.*.impl;
+                                                !org.hibernate.search.*.impl.*;
+                                                *;
+                                            </exports>
+                                        </moduleInfo>
+                                    </module>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
+</project>

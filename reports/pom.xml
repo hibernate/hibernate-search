@@ -19,7 +19,6 @@
     <packaging>pom</packaging>
 
     <properties>
-        <maven.javadoc.skip>true</maven.javadoc.skip>
         <!--
              Do NOT skip jqassistant: we want to execute analysis here so as to fail the build if anything is wrong.
              Reminder: jqassistant only executes analysis in the last module of the build,

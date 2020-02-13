@@ -34,7 +34,6 @@
         <html.outdated-content.project-key>${html.meta.project-key}</html.outdated-content.project-key>
 
         <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
-        <maven.javadoc.skip>true</maven.javadoc.skip>
     </properties>
 
     <dependencies>

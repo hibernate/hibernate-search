@@ -5,9 +5,9 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.hibernate.search</groupId>
-        <artifactId>hibernate-search-parent</artifactId>
+        <artifactId>hibernate-search-parent-public</artifactId>
         <version>6.0.0-SNAPSHOT</version>
-        <relativePath>../..</relativePath>
+        <relativePath>../../parents/public</relativePath>
     </parent>
     <artifactId>hibernate-search-backend-lucene</artifactId>
 
@@ -62,47 +62,6 @@
         </dependency>
     </dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-checkstyle-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.bsc.maven</groupId>
-                <artifactId>maven-processor-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-surefire-plugin</artifactId>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>default-jar</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                        <configuration>
-                            <archive>
-                                <manifestEntries>
-                                    <Automatic-Module-Name>${java.module.name}</Automatic-Module-Name>
-                                </manifestEntries>
-                            </archive>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-        </plugins>
-    </build>
-
     <profiles>
         <profile>
             <id>module-descriptors</id>
@@ -125,36 +84,23 @@
 
                 A second step would be to express the dependency to the unnamed module directly in the module-info descriptor,
                 but I'm not sure this is even possible.
+            -->
             <build>
                 <plugins>
                     <plugin>
                         <groupId>org.moditect</groupId>
                         <artifactId>moditect-maven-plugin</artifactId>
+                        <!-- Override the executions defined in the parent module -->
                         <executions>
                             <execution>
                                 <id>add-module-infos</id>
-                                <phase>package</phase>
-                                <goals>
-                                    <goal>add-module-info</goal>
-                                </goals>
-                                <configuration>
-                                    <module>
-                                        <moduleInfo>
-                                            <name>${java.module.name}</name>
-                                            <exports>
-                                                !org.hibernate.search.*.impl;
-                                                !org.hibernate.search.*.impl.*;
-                                                *;
-                                            </exports>
-                                        </moduleInfo>
-                                    </module>
-                                </configuration>
+                                <!-- Disable the plugin, see above -->
+                                <phase>none</phase>
                             </execution>
                         </executions>
                     </plugin>
                 </plugins>
             </build>
-            -->
         </profile>
     </profiles>
 </project>

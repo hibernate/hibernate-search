@@ -19,7 +19,6 @@
 
     <properties>
         <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
-        <maven.javadoc.skip>true</maven.javadoc.skip>
         <jqassistant.skip>true</jqassistant.skip>
 
         <!--

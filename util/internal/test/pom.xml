@@ -14,6 +14,15 @@
 
     <properties>
         <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
+        <!--
+             Skip javadoc generation for this module: we don't want to publish it.
+             Note this shouldn't be necessary because we don't even use the maven-javadoc-plugin
+             in this module.
+             However, the maven-javadoc-plugin sometimes invokes the javadoc goal on this module explicitly
+             from other (published) modules; probably because it tries to generate the javadoc of dependencies,
+             even test dependencies.
+             Whatever the reason, this triggers errors, so we better just disable the plugin explicitly.
+         -->
         <maven.javadoc.skip>true</maven.javadoc.skip>
 
         <!-- Apply the test source/target settings to all code in test utils, even code in src/main -->
