@@ -74,19 +74,6 @@
         </dependencies>
     </dependencyManagement>
 
-    <dependencies>
-        <!-- Enable extracting shared integration test resources -->
-        <!-- See how maven-dependency-plugin is configured below -->
-        <dependency>
-            <groupId>org.hibernate.search</groupId>
-            <artifactId>hibernate-search-util-internal-integrationtest-sharedresources</artifactId>
-            <version>${project.version}</version>
-            <classifier>build-resources</classifier>
-            <type>zip</type>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
-
     <build>
         <pluginManagement>
             <plugins>
@@ -159,22 +146,39 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <!-- See http://blog.sonatype.com/2008/04/how-to-share-resources-across-projects-in-maven/ -->
-                        <id>unpack-shared-test-build-resources</id>
-                        <goals>
-                            <goal>unpack-dependencies</goal>
-                        </goals>
+                        <id>unpack-integrationtest-sharedresources</id>
                         <phase>generate-test-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
                         <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>${project.groupId}</groupId>
+                                    <artifactId>hibernate-search-util-internal-integrationtest-sharedresources</artifactId>
+                                    <classifier>build-resources</classifier>
+                                    <type>zip</type>
+                                    <version>${project.version}</version>
+                                </artifactItem>
+                            </artifactItems>
                             <outputDirectory>${project.build.directory}/</outputDirectory>
-                            <includeGroupIds>${project.groupId}</includeGroupIds>
-                            <includeArtifacIds>hibernate-search-util-internal-integrationtest-sharedresources</includeArtifacIds>
-                            <includeTypes>zip</includeTypes>
-                            <includeClassifiers>build-resources</includeClassifiers>
-                            <excludeTransitive>true</excludeTransitive>
+                            <overWriteSnapshots>true</overWriteSnapshots>
                         </configuration>
                     </execution>
                 </executions>
+                <dependencies>
+                    <!--
+                        This ensures that using mvn install -pl <some project> -am
+                        will correctly force the build of the integrationtest-sharedresources module.
+                     -->
+                    <dependency>
+                        <groupId>${project.groupId}</groupId>
+                        <artifactId>hibernate-search-util-internal-integrationtest-sharedresources</artifactId>
+                        <classifier>build-resources</classifier>
+                        <type>zip</type>
+                        <version>${project.version}</version>
+                    </dependency>
+                </dependencies>
             </plugin>
         </plugins>
     </build>
