@@ -56,10 +56,6 @@
                         <source>${maven.compiler.source}</source>
                         <!-- Exclude implementation classes from the javadoc -->
                         <excludePackageNames>*.impl,*.impl.*</excludePackageNames>
-                        <links>
-                            <!-- For the JSR 352 modules -->
-                            <link>${javadoc.org.jberet.url}</link>
-                        </links>
                         <!--
                             Make sure to always use offline links,
                             otherwise the build will need to access external websites,
