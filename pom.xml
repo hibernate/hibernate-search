@@ -1903,6 +1903,8 @@
             <properties>
                 <!-- 'java.specification.version' is only correct from Java 9 onwards -->
                 <java-version.jdk.major>${java.specification.version}</java-version.jdk.major>
+                <!-- Java 9+ supports HTML5 for javadoc generation -->
+                <javadoc.additionalOptions.java-version>-html5</javadoc.additionalOptions.java-version>
             </properties>
         </profile>
 
@@ -1961,16 +1963,6 @@
             <modules>
                 <!-- Nothing at the moment -->
             </modules>
-        </profile>
-
-        <profile>
-            <id>jdk12+</id>
-            <activation>
-                <jdk>[12,)</jdk>
-            </activation>
-            <properties>
-                <javadoc.additionalOptions.java-version>-html5</javadoc.additionalOptions.java-version>
-            </properties>
         </profile>
 
         <profile>
