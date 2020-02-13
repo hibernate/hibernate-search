@@ -268,6 +268,30 @@ public abstract class AbstractMassIndexingFailureIT {
 	}
 
 	@Test
+	public void refresh() {
+		SessionFactory sessionFactory = setup();
+
+		String exceptionMessage = "REFRESH failure";
+		String failingOperationAsString = "MassIndexer operation";
+
+		expectMassIndexerOperationFailureHandling( exceptionMessage, failingOperationAsString );
+
+		doMassIndexingWithFailure(
+				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
+				ThreadExpectation.CREATED_AND_TERMINATED,
+				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
+						.hasMessageContaining( exceptionMessage ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
+				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.REFRESH, ExecutionExpectation.FAIL )
+		);
+
+		assertMassIndexerOperationFailureHandling( exceptionMessage, failingOperationAsString );
+	}
+
+	@Test
 	public void indexingAndFlush() {
 		SessionFactory sessionFactory = setup();
 
@@ -305,6 +329,54 @@ public abstract class AbstractMassIndexingFailureIT {
 				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.FAIL ),
 				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.FAIL )
+		);
+
+		assertEntityIndexingAndMassIndexerOperationFailureHandling(
+				entityName, entityReferenceAsString,
+				failingEntityIndexingExceptionMessage, failingEntityIndexingOperationAsString,
+				failingMassIndexerOperationExceptionMessage, failingMassIndexerOperationAsString
+		);
+	}
+
+	@Test
+	public void indexingAndRefresh() {
+		SessionFactory sessionFactory = setup();
+
+		String entityName = Book.NAME;
+		String entityReferenceAsString = Book.NAME + "#2";
+		String failingEntityIndexingExceptionMessage = "Indexing failure";
+		String failingEntityIndexingOperationAsString = "Indexing instance of entity '" + entityName + "' during mass indexing";
+		String failingMassIndexerOperationExceptionMessage = "REFRESH failure";
+		String failingMassIndexerOperationAsString = "MassIndexer operation";
+
+		expectEntityIndexingAndMassIndexerOperationFailureHandling(
+				entityName, entityReferenceAsString,
+				failingEntityIndexingExceptionMessage, failingEntityIndexingOperationAsString,
+				failingMassIndexerOperationExceptionMessage, failingMassIndexerOperationAsString
+		);
+
+		doMassIndexingWithFailure(
+				Search.mapping( sessionFactory ).scope( Object.class ).massIndexer(),
+				ThreadExpectation.CREATED_AND_TERMINATED,
+				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
+						.hasMessageContaining( failingMassIndexerOperationExceptionMessage )
+						// Indexing failure should also be mentioned as a suppressed exception
+						.extracting( Throwable::getSuppressed ).asInstanceOf( InstanceOfAssertFactories.ARRAY )
+						.anySatisfy( suppressed -> assertThat( suppressed ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
+								.isInstanceOf( SearchException.class )
+								.hasMessageContainingAll(
+										"1 entities could not be indexed",
+										"See the logs for details.",
+										"First failure on entity 'Book#2': ",
+										failingEntityIndexingExceptionMessage
+								)
+								.hasCauseInstanceOf( SimulatedFailure.class )
+						),
+				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
+				expectIndexingWorks( ExecutionExpectation.FAIL ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
+				expectIndexScopeWork( StubIndexScopeWork.Type.REFRESH, ExecutionExpectation.FAIL )
 		);
 
 		assertEntityIndexingAndMassIndexerOperationFailureHandling(
