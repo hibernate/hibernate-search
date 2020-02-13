@@ -181,9 +181,9 @@
         <!-- >>> Lucene -->
         <version.org.apache.lucene>8.4.1</version.org.apache.lucene>
         <javadoc.org.apache.lucene.tag>${parsed-version.org.apache.lucene.majorVersion}_${parsed-version.org.apache.lucene.minorVersion}_${parsed-version.org.apache.lucene.incrementalVersion}</javadoc.org.apache.lucene.tag>
-        <javadoc.org.apache.lucene.core.url>http://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/core/</javadoc.org.apache.lucene.core.url>
-        <javadoc.org.apache.lucene.analyzers-common.url>http://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/analyzers-common/</javadoc.org.apache.lucene.analyzers-common.url>
-        <javadoc.org.apache.lucene.queryparser.url>http://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/queryparser/</javadoc.org.apache.lucene.queryparser.url>
+        <javadoc.org.apache.lucene.core.url>https://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/core/</javadoc.org.apache.lucene.core.url>
+        <javadoc.org.apache.lucene.analyzers-common.url>https://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/analyzers-common/</javadoc.org.apache.lucene.analyzers-common.url>
+        <javadoc.org.apache.lucene.queryparser.url>https://lucene.apache.org/core/${javadoc.org.apache.lucene.tag}/queryparser/</javadoc.org.apache.lucene.queryparser.url>
 
         <!-- >>> Elasticsearch -->
         <!-- When updating the following versions you will likely need to update the
@@ -207,8 +207,8 @@
 
         <!-- >>> ORM -->
         <version.org.hibernate>5.4.10.Final</version.org.hibernate>
-        <javadoc.org.hibernate.url>http://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/javadocs/</javadoc.org.hibernate.url>
-        <documentation.org.hibernate.url>http://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.url>
+        <javadoc.org.hibernate.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/javadocs/</javadoc.org.hibernate.url>
+        <documentation.org.hibernate.url>https://docs.jboss.org/hibernate/orm/${parsed-version.org.hibernate.majorVersion}.${parsed-version.org.hibernate.minorVersion}/userguide/html_single/Hibernate_User_Guide.html</documentation.org.hibernate.url>
         <version.org.hibernate.commons.annotations>5.1.0.Final</version.org.hibernate.commons.annotations>
         <version.javax.persistence>2.2</version.javax.persistence>
 
