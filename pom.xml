@@ -224,7 +224,7 @@
         <version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>1.0.2.Final</version.org.jboss.spec.javax.annotation.jboss-annotations-api_1.2_spec>
         <version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>1.1.1.Final</version.org.jboss.spec.javax.transaction.jboss-transaction-api_1.2_spec>
         <!-- This is used to generate a link to the Java EE javadoc -->
-        <javadoc.javaee.url>https://docs.oracle.com/javaee/7/api/</javadoc.javaee.url>
+        <javadoc.javaee.url>https://javaee.github.io/javaee-spec/javadocs/</javadoc.javaee.url>
 
         <!-- Test dependencies -->
 
