@@ -27,6 +27,8 @@
          -->
         <checkstyle.skip>true</checkstyle.skip>
         <forbiddenapis.skip>true</forbiddenapis.skip>
+
+        <tmpdir.dependencies-javadoc-packagelists>${project.build.directory}/dependencies-javadoc-packagelists</tmpdir.dependencies-javadoc-packagelists>
     </properties>
 
     <dependencies>
@@ -47,4 +49,86 @@
             <artifactId>junit</artifactId>
         </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <!-- See https://maven.apache.org/plugins/maven-dependency-plugin/examples/unpacking-artifacts.html -->
+                    <execution>
+                        <id>unpack-dependencies-javadoc-packagelists</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>unpack</goal>
+                        </goals>
+                        <configuration>
+                            <artifactItems>
+                                <artifactItem>
+                                    <groupId>org.hibernate</groupId>
+                                    <artifactId>hibernate-core</artifactId>
+                                    <classifier>javadoc</classifier>
+                                    <type>jar</type>
+                                    <version>${version.org.hibernate}</version>
+                                    <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/hibernate-core</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-core</artifactId>
+                                    <classifier>javadoc</classifier>
+                                    <type>jar</type>
+                                    <version>${version.org.apache.lucene}</version>
+                                    <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/lucene-core</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-analyzers-common</artifactId>
+                                    <classifier>javadoc</classifier>
+                                    <type>jar</type>
+                                    <version>${version.org.apache.lucene}</version>
+                                    <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/lucene-analyzers-common</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>org.apache.lucene</groupId>
+                                    <artifactId>lucene-queryparser</artifactId>
+                                    <classifier>javadoc</classifier>
+                                    <type>jar</type>
+                                    <version>${version.org.apache.lucene}</version>
+                                    <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/lucene-queryparser</outputDirectory>
+                                </artifactItem>
+                                <artifactItem>
+                                    <groupId>javax.batch</groupId>
+                                    <artifactId>javax.batch-api</artifactId>
+                                    <classifier>javadoc</classifier>
+                                    <type>jar</type>
+                                    <version>${version.javax.batch}</version>
+                                    <outputDirectory>${tmpdir.dependencies-javadoc-packagelists}/batch-api</outputDirectory>
+                                </artifactItem>
+                            </artifactItems>
+                            <includes>package-list</includes>
+                            <overWriteSnapshots>true</overWriteSnapshots>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>package-dependencies-javadoc-packagelists</id>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <phase>package</phase>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/main/assembly/dependencies-javadoc-packagelists.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>
