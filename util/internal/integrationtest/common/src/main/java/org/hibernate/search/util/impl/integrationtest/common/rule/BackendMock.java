@@ -27,7 +27,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBa
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScopeWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 
 import org.junit.rules.TestRule;
@@ -165,17 +165,17 @@ public class BackendMock implements TestRule {
 		);
 	}
 
-	public IndexScopeWorkCallListContext expectIndexScopeWorks(String indexName) {
-		return expectIndexScopeWorks( indexName , null );
+	public IndexScaleWorkCallListContext expectIndexScaleWorks(String indexName) {
+		return expectIndexScaleWorks( indexName , null );
 	}
 
-	public IndexScopeWorkCallListContext expectIndexScopeWorks(String indexName, String tenantId) {
-		return expectIndexScopeWorks( Collections.singletonList( indexName ), tenantId );
+	public IndexScaleWorkCallListContext expectIndexScaleWorks(String indexName, String tenantId) {
+		return expectIndexScaleWorks( Collections.singletonList( indexName ), tenantId );
 	}
 
-	public IndexScopeWorkCallListContext expectIndexScopeWorks(Collection<String> indexNames, String tenantId) {
-		CallQueue<IndexScopeWorkCall> callQueue = behaviorMock.getIndexScopeWorkCalls();
-		return new IndexScopeWorkCallListContext(
+	public IndexScaleWorkCallListContext expectIndexScaleWorks(Collection<String> indexNames, String tenantId) {
+		CallQueue<IndexScaleWorkCalls> callQueue = behaviorMock.getIndexScaleWorkCalls();
+		return new IndexScaleWorkCallListContext(
 				new LinkedHashSet<>( indexNames ), tenantId,
 				callQueue::expectInOrder
 		);
@@ -326,58 +326,58 @@ public class BackendMock implements TestRule {
 		}
 	}
 
-	public class IndexScopeWorkCallListContext {
+	public class IndexScaleWorkCallListContext {
 		private final Set<String> indexNames;
 		private final String tenantIdentifier;
-		private final Consumer<IndexScopeWorkCall> expectationConsumer;
+		private final Consumer<IndexScaleWorkCalls> expectationConsumer;
 
-		private IndexScopeWorkCallListContext(Set<String> indexNames,
+		private IndexScaleWorkCallListContext(Set<String> indexNames,
 				String tenantIdentifier,
-				Consumer<IndexScopeWorkCall> expectationConsumer) {
+				Consumer<IndexScaleWorkCalls> expectationConsumer) {
 			this.indexNames = indexNames;
 			this.tenantIdentifier = tenantIdentifier;
 			this.expectationConsumer = expectationConsumer;
 		}
 
-		public IndexScopeWorkCallListContext mergeSegments() {
-			return indexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS );
+		public IndexScaleWorkCallListContext mergeSegments() {
+			return indexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS );
 		}
 
-		public IndexScopeWorkCallListContext mergeSegments(CompletableFuture<?> future) {
-			return indexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, future );
+		public IndexScaleWorkCallListContext mergeSegments(CompletableFuture<?> future) {
+			return indexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, future );
 		}
 
-		public IndexScopeWorkCallListContext purge() {
-			return indexScopeWork( StubIndexScopeWork.Type.PURGE );
+		public IndexScaleWorkCallListContext purge() {
+			return indexScaleWork( StubIndexScaleWork.Type.PURGE );
 		}
 
-		public IndexScopeWorkCallListContext purge(CompletableFuture<?> future) {
-			return indexScopeWork( StubIndexScopeWork.Type.PURGE, future );
+		public IndexScaleWorkCallListContext purge(CompletableFuture<?> future) {
+			return indexScaleWork( StubIndexScaleWork.Type.PURGE, future );
 		}
 
-		public IndexScopeWorkCallListContext flush() {
-			return indexScopeWork( StubIndexScopeWork.Type.FLUSH );
+		public IndexScaleWorkCallListContext flush() {
+			return indexScaleWork( StubIndexScaleWork.Type.FLUSH );
 		}
 
-		public IndexScopeWorkCallListContext flush(CompletableFuture<?> future) {
-			return indexScopeWork( StubIndexScopeWork.Type.FLUSH, future );
+		public IndexScaleWorkCallListContext flush(CompletableFuture<?> future) {
+			return indexScaleWork( StubIndexScaleWork.Type.FLUSH, future );
 		}
 
-		public IndexScopeWorkCallListContext refresh() {
-			return indexScopeWork( StubIndexScopeWork.Type.REFRESH );
+		public IndexScaleWorkCallListContext refresh() {
+			return indexScaleWork( StubIndexScaleWork.Type.REFRESH );
 		}
 
-		public IndexScopeWorkCallListContext refresh(CompletableFuture<?> future) {
-			return indexScopeWork( StubIndexScopeWork.Type.REFRESH, future );
+		public IndexScaleWorkCallListContext refresh(CompletableFuture<?> future) {
+			return indexScaleWork( StubIndexScaleWork.Type.REFRESH, future );
 		}
 
-		public IndexScopeWorkCallListContext indexScopeWork(StubIndexScopeWork.Type type) {
-			return indexScopeWork( type, CompletableFuture.completedFuture( null ) );
+		public IndexScaleWorkCallListContext indexScaleWork(StubIndexScaleWork.Type type) {
+			return indexScaleWork( type, CompletableFuture.completedFuture( null ) );
 		}
 
-		public IndexScopeWorkCallListContext indexScopeWork(StubIndexScopeWork.Type type, CompletableFuture<?> future) {
-			StubIndexScopeWork work = StubIndexScopeWork.builder( type ).build();
-			expectationConsumer.accept( new IndexScopeWorkCall( indexNames, work, future ) );
+		public IndexScaleWorkCallListContext indexScaleWork(StubIndexScaleWork.Type type, CompletableFuture<?> future) {
+			StubIndexScaleWork work = StubIndexScaleWork.builder( type ).build();
+			expectationConsumer.accept( new IndexScaleWorkCalls( indexNames, work, future ) );
 			return this;
 		}
 	}

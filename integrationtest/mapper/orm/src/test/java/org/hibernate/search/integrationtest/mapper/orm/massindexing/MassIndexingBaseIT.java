@@ -94,7 +94,7 @@ public class MassIndexingBaseIT {
 
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
-			backendMock.expectIndexScopeWorks( Book.INDEX, session.getTenantIdentifier() )
+			backendMock.expectIndexScaleWorks( Book.INDEX, session.getTenantIdentifier() )
 					.purge()
 					.mergeSegments()
 					.flush()
@@ -140,7 +140,7 @@ public class MassIndexingBaseIT {
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// and optimizeOnFinish is enabled explicitly,
 			// so we expect 1 purge, 2 optimize and 1 flush calls in this order:
-			backendMock.expectIndexScopeWorks( Book.INDEX, session.getTenantIdentifier() )
+			backendMock.expectIndexScaleWorks( Book.INDEX, session.getTenantIdentifier() )
 					.purge()
 					.mergeSegments()
 					.mergeSegments()
@@ -185,7 +185,7 @@ public class MassIndexingBaseIT {
 
 		// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 		// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
-		backendMock.expectIndexScopeWorks( Book.INDEX )
+		backendMock.expectIndexScaleWorks( Book.INDEX )
 				.purge()
 				.mergeSegments()
 				.flush()

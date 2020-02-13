@@ -10,30 +10,30 @@ import java.util.Objects;
 
 import org.hibernate.search.util.common.impl.ToStringStyle;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScopeWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 
 import org.junit.Assert;
 
-public class StubIndexScopeWorkAssert {
+public class StubIndexScaleWorkAssert {
 
-	public static StubIndexScopeWorkAssert assertThat(StubIndexScopeWork work) {
-		return new StubIndexScopeWorkAssert( work );
+	public static StubIndexScaleWorkAssert assertThat(StubIndexScaleWork work) {
+		return new StubIndexScaleWorkAssert( work );
 	}
 
-	private final StubIndexScopeWork actual;
+	private final StubIndexScaleWork actual;
 
-	private String messageBase = "Index-scope work did not match: ";
+	private String messageBase = "Index-scale work did not match: ";
 
-	private StubIndexScopeWorkAssert(StubIndexScopeWork actual) {
+	private StubIndexScaleWorkAssert(StubIndexScaleWork actual) {
 		this.actual = actual;
 	}
 
-	public StubIndexScopeWorkAssert as(String messageBase) {
+	public StubIndexScaleWorkAssert as(String messageBase) {
 		this.messageBase = messageBase;
 		return this;
 	}
 
-	public StubIndexScopeWorkAssert matches(StubIndexScopeWork expected) {
+	public StubIndexScaleWorkAssert matches(StubIndexScaleWork expected) {
 		ToStringTreeBuilder builder = new ToStringTreeBuilder( ToStringStyle.multilineDelimiterStructure() );
 
 		builder.startObject();

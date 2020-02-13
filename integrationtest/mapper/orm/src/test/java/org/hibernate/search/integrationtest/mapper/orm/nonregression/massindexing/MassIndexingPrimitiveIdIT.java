@@ -72,7 +72,7 @@ public class MassIndexingPrimitiveIdIT {
 
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
-			backendMock.expectIndexScopeWorks( EntityWithPrimitiveId.INDEX, session.getTenantIdentifier() )
+			backendMock.expectIndexScaleWorks( EntityWithPrimitiveId.INDEX, session.getTenantIdentifier() )
 					.purge()
 					.mergeSegments()
 					.flush()

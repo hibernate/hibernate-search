@@ -153,7 +153,7 @@ public class DynamicMapBaseIT {
 
 			SearchScope<Map> scope = searchSession.scope( Map.class, entityTypeName );
 
-			backendMock.expectIndexScopeWorks( INDEX1_NAME )
+			backendMock.expectIndexScaleWorks( INDEX1_NAME )
 					.purge()
 					.mergeSegments();
 

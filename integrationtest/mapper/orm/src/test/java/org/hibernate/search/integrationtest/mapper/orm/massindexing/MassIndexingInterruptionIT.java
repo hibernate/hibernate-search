@@ -128,7 +128,7 @@ public class MassIndexingInterruptionIT {
 				.typesToIndexInParallel( 1 )
 				.threadsToLoadObjects( 1 );
 
-		backendMock.expectIndexScopeWorks( Book.INDEX )
+		backendMock.expectIndexScaleWorks( Book.INDEX )
 				.purge()
 				.mergeSegments();
 
@@ -142,7 +142,7 @@ public class MassIndexingInterruptionIT {
 				// Return a CompletableFuture that will never complete
 				.processedThenExecuted( new CompletableFuture<>() );
 
-		backendMock.expectIndexScopeWorks( Book.INDEX )
+		backendMock.expectIndexScaleWorks( Book.INDEX )
 				.flush()
 				.refresh()
 				.mergeSegments();
