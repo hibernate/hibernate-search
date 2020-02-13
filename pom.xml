@@ -340,8 +340,6 @@
 
         <maven.compiler.target>${java-version.baseline.major}</maven.compiler.target>
         <maven.compiler.source>${java-version.baseline.major}</maven.compiler.source>
-        <!-- This is used to generate a link to the standard Java library javadoc -->
-        <javadoc.javase.url>http://download.oracle.com/javase/8/docs/api/</javadoc.javase.url>
         <!-- Generate Java 13/14 bytecode for tests when building with JDK13/14 -->
         <maven.compiler.testTarget>${java-version.jdk.major}</maven.compiler.testTarget>
         <maven.compiler.testSource>${maven.compiler.source}</maven.compiler.testSource>
@@ -1971,8 +1969,7 @@
                 <jdk>[12,)</jdk>
             </activation>
             <properties>
-                <!-- https://bugs.openjdk.java.net/browse/JDK-8212233?focusedCommentId=14245762 -->
-                <javadoc.additionalOptions.java-version>-html5 -source 8</javadoc.additionalOptions.java-version>
+                <javadoc.additionalOptions.java-version>-html5</javadoc.additionalOptions.java-version>
             </properties>
         </profile>
 

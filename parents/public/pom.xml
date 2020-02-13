@@ -53,10 +53,10 @@
                         <verbose>false</verbose>
                         <failOnWarnings>true</failOnWarnings>
                         <failOnError>true</failOnError>
+                        <source>${maven.compiler.source}</source>
                         <!-- Exclude implementation classes from the javadoc -->
                         <excludePackageNames>*.impl,*.impl.*</excludePackageNames>
                         <links>
-                            <link>${javadoc.javase.url}</link>
                             <!-- For the JSR 352 modules -->
                             <link>${javadoc.org.jberet.url}</link>
                         </links>
