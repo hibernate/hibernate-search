@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScopeWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 
 class StubIndexWorkspace implements IndexWorkspace {
 
@@ -29,27 +29,27 @@ class StubIndexWorkspace implements IndexWorkspace {
 
 	@Override
 	public CompletableFuture<?> mergeSegments() {
-		StubIndexScopeWork work = StubIndexScopeWork.builder( StubIndexScopeWork.Type.MERGE_SEGMENTS ).build();
-		return behavior.executeIndexScopeWork( Collections.singleton( indexName ), work );
+		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.MERGE_SEGMENTS ).build();
+		return behavior.executeIndexScaleWork( Collections.singleton( indexName ), work );
 	}
 
 	@Override
 	public CompletableFuture<?> purge() {
-		StubIndexScopeWork work = StubIndexScopeWork.builder( StubIndexScopeWork.Type.PURGE )
+		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.PURGE )
 				.tenantIdentifier( sessionContext.getTenantIdentifier() )
 				.build();
-		return behavior.executeIndexScopeWork( Collections.singleton( indexName ), work );
+		return behavior.executeIndexScaleWork( Collections.singleton( indexName ), work );
 	}
 
 	@Override
 	public CompletableFuture<?> flush() {
-		StubIndexScopeWork work = StubIndexScopeWork.builder( StubIndexScopeWork.Type.FLUSH ).build();
-		return behavior.executeIndexScopeWork( Collections.singleton( indexName ), work );
+		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.FLUSH ).build();
+		return behavior.executeIndexScaleWork( Collections.singleton( indexName ), work );
 	}
 
 	@Override
 	public CompletableFuture<?> refresh() {
-		StubIndexScopeWork work = StubIndexScopeWork.builder( StubIndexScopeWork.Type.REFRESH ).build();
-		return behavior.executeIndexScopeWork( Collections.singleton( indexName ), work );
+		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.REFRESH ).build();
+		return behavior.executeIndexScaleWork( Collections.singleton( indexName ), work );
 	}
 }

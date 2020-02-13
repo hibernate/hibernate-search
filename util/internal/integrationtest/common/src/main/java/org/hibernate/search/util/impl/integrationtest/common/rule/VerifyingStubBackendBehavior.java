@@ -25,7 +25,7 @@ import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScopeWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
@@ -44,7 +44,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	private final Map<String, CallQueue<DocumentWorkCall>> documentWorkCalls = new HashMap<>();
 
-	private final CallQueue<IndexScopeWorkCall> indexScopeWorkCalls = new CallQueue<>();
+	private final CallQueue<IndexScaleWorkCalls> indexScaleWorkCalls = new CallQueue<>();
 
 	private final CallQueue<SearchWorkCall<?>> searchCalls = new CallQueue<>();
 
@@ -76,8 +76,8 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		return documentWorkCalls.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
 	}
 
-	CallQueue<IndexScopeWorkCall> getIndexScopeWorkCalls() {
-		return indexScopeWorkCalls;
+	CallQueue<IndexScaleWorkCalls> getIndexScaleWorkCalls() {
+		return indexScaleWorkCalls;
 	}
 
 	CallQueue<SearchWorkCall<?>> getSearchWorkCalls() {
@@ -195,10 +195,10 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	}
 
 	@Override
-	public CompletableFuture<?> executeIndexScopeWork(Set<String> indexNames, StubIndexScopeWork work) {
-		return indexScopeWorkCalls.verify(
-				new IndexScopeWorkCall( indexNames, work ),
-				IndexScopeWorkCall::verify,
+	public CompletableFuture<?> executeIndexScaleWork(Set<String> indexNames, StubIndexScaleWork work) {
+		return indexScaleWorkCalls.verify(
+				new IndexScaleWorkCalls( indexNames, work ),
+				IndexScaleWorkCalls::verify,
 				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
 		);
 	}

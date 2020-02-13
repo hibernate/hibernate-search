@@ -16,7 +16,7 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 public class SearchWorkspaceMergeSegmentsIT extends AbstractSearchWorkspaceSimpleOperationIT {
 	@Override
 	protected void expectWork(BackendMock backendMock, String indexName, CompletableFuture<?> future) {
-		backendMock.expectIndexScopeWorks( indexName )
+		backendMock.expectIndexScaleWorks( indexName )
 				.mergeSegments( future );
 	}
 

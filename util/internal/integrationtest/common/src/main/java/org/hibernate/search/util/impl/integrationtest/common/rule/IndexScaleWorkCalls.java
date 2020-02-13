@@ -10,39 +10,39 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.util.impl.integrationtest.common.assertion.StubIndexScopeWorkAssert;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScopeWork;
+import org.hibernate.search.util.impl.integrationtest.common.assertion.StubIndexScaleWorkAssert;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 
-class IndexScopeWorkCall extends Call<IndexScopeWorkCall> {
+class IndexScaleWorkCalls extends Call<IndexScaleWorkCalls> {
 
 	private final Set<String> indexNames;
-	private final StubIndexScopeWork work;
+	private final StubIndexScaleWork work;
 	private final CompletableFuture<?> completableFuture;
 
-	IndexScopeWorkCall(Set<String> indexNames, StubIndexScopeWork work,
+	IndexScaleWorkCalls(Set<String> indexNames, StubIndexScaleWork work,
 			CompletableFuture<?> completableFuture) {
 		this.indexNames = indexNames;
 		this.work = work;
 		this.completableFuture = completableFuture;
 	}
 
-	IndexScopeWorkCall(Set<String> indexNames, StubIndexScopeWork work) {
+	IndexScaleWorkCalls(Set<String> indexNames, StubIndexScaleWork work) {
 		this.indexNames = indexNames;
 		this.work = work;
 		this.completableFuture = null;
 	}
 
-	public CallBehavior<CompletableFuture<?>> verify(IndexScopeWorkCall actualCall) {
+	public CallBehavior<CompletableFuture<?>> verify(IndexScaleWorkCalls actualCall) {
 		String whenThisWorkWasExpected = "when an index-scope work on indexes '" + indexNames
 				+ "' was expected";
-		StubIndexScopeWorkAssert.assertThat( actualCall.work )
+		StubIndexScaleWorkAssert.assertThat( actualCall.work )
 				.as( "Incorrect work " + whenThisWorkWasExpected + ":\n" )
 				.matches( work );
 		return () -> completableFuture;
 	}
 
 	@Override
-	protected boolean isSimilarTo(IndexScopeWorkCall other) {
+	protected boolean isSimilarTo(IndexScaleWorkCalls other) {
 		return Objects.equals( indexNames, other.indexNames )
 				&& Objects.equals( work.getTenantIdentifier(), other.work.getTenantIdentifier() );
 	}

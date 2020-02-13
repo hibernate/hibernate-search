@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScopeWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
@@ -79,8 +79,8 @@ public abstract class StubBackendBehavior {
 		}
 
 		@Override
-		public CompletableFuture<?> executeIndexScopeWork(Set<String> indexNames, StubIndexScopeWork work) {
-			throw new IllegalStateException( "The stub backend behavior was not set during execution of an index-scope work for indexes "
+		public CompletableFuture<?> executeIndexScaleWork(Set<String> indexNames, StubIndexScaleWork work) {
+			throw new IllegalStateException( "The stub backend behavior was not set during execution of an index-scale work for indexes "
 					+ indexNames + ": " + work );
 		}
 
@@ -128,7 +128,7 @@ public abstract class StubBackendBehavior {
 			StubSearchProjectionContext projectionContext,
 			LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection);
 
-	public abstract CompletableFuture<?> executeIndexScopeWork(Set<String> indexNames, StubIndexScopeWork work);
+	public abstract CompletableFuture<?> executeIndexScaleWork(Set<String> indexNames, StubIndexScaleWork work);
 
 	public abstract long executeCountWork(Set<String> indexNames);
 }

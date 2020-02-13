@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index;
 
-public final class StubIndexScopeWork {
+public final class StubIndexScaleWork {
 
 	public enum Type {
 		MERGE_SEGMENTS, PURGE, FLUSH, REFRESH
@@ -19,7 +19,7 @@ public final class StubIndexScopeWork {
 	private final Type type;
 	private final String tenantIdentifier;
 
-	private StubIndexScopeWork(Builder builder) {
+	private StubIndexScaleWork(Builder builder) {
 		this.type = builder.type;
 		this.tenantIdentifier = builder.tenantIdentifier;
 	}
@@ -54,8 +54,8 @@ public final class StubIndexScopeWork {
 			return this;
 		}
 
-		public StubIndexScopeWork build() {
-			return new StubIndexScopeWork( this );
+		public StubIndexScaleWork build() {
+			return new StubIndexScaleWork( this );
 		}
 	}
 

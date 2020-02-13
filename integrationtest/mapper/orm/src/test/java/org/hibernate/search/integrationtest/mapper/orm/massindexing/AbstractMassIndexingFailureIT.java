@@ -30,7 +30,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.ThreadSpy;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScopeWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.SubTest;
@@ -84,11 +84,11 @@ public abstract class AbstractMassIndexingFailureIT {
 								exceptionMessage
 						)
 						.hasCauseInstanceOf( SimulatedFailure.class ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.FAIL ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.REFRESH, ExecutionExpectation.SUCCEED )
+				expectIndexScaleWork( StubIndexScaleWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.REFRESH, ExecutionExpectation.SUCCEED )
 		);
 
 		assertEntityIndexingFailureHandling(
@@ -125,11 +125,11 @@ public abstract class AbstractMassIndexingFailureIT {
 						.isInstanceOf( SearchException.class )
 						.hasMessageContaining( "Exception while invoking" ),
 				ExecutionExpectation.FAIL, ExecutionExpectation.SKIP,
-				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SKIP ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.REFRESH, ExecutionExpectation.SUCCEED )
+				expectIndexScaleWork( StubIndexScaleWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.REFRESH, ExecutionExpectation.SUCCEED )
 		);
 
 		assertEntityGetterFailureHandling(
@@ -166,11 +166,11 @@ public abstract class AbstractMassIndexingFailureIT {
 						.isInstanceOf( SearchException.class )
 						.hasMessageContaining( "Exception while invoking" ),
 				ExecutionExpectation.SUCCEED, ExecutionExpectation.FAIL,
-				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SKIP ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.REFRESH, ExecutionExpectation.SUCCEED )
+				expectIndexScaleWork( StubIndexScaleWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.REFRESH, ExecutionExpectation.SUCCEED )
 		);
 
 		assertEntityGetterFailureHandling(
@@ -193,7 +193,7 @@ public abstract class AbstractMassIndexingFailureIT {
 				ThreadExpectation.NOT_CREATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
 						.hasMessageContaining( exceptionMessage ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.FAIL )
+				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.FAIL )
 		);
 
 		assertMassIndexerOperationFailureHandling( exceptionMessage, failingOperationAsString );
@@ -213,8 +213,8 @@ public abstract class AbstractMassIndexingFailureIT {
 				ThreadExpectation.NOT_CREATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
 						.hasMessageContaining( exceptionMessage ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.FAIL )
+				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.FAIL )
 		);
 
 		assertMassIndexerOperationFailureHandling( exceptionMessage, failingOperationAsString );
@@ -235,10 +235,10 @@ public abstract class AbstractMassIndexingFailureIT {
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
 						.hasMessageContaining( exceptionMessage ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.FAIL )
+				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.FAIL )
 		);
 
 		assertMassIndexerOperationFailureHandling( exceptionMessage, failingOperationAsString );
@@ -258,10 +258,10 @@ public abstract class AbstractMassIndexingFailureIT {
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
 						.hasMessageContaining( exceptionMessage ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.FAIL )
+				expectIndexScaleWork( StubIndexScaleWork.Type.FLUSH, ExecutionExpectation.FAIL )
 		);
 
 		assertMassIndexerOperationFailureHandling( exceptionMessage, failingOperationAsString );
@@ -281,11 +281,11 @@ public abstract class AbstractMassIndexingFailureIT {
 				ThreadExpectation.CREATED_AND_TERMINATED,
 				throwable -> assertThat( throwable ).isInstanceOf( SimulatedFailure.class )
 						.hasMessageContaining( exceptionMessage ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.REFRESH, ExecutionExpectation.FAIL )
+				expectIndexScaleWork( StubIndexScaleWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.REFRESH, ExecutionExpectation.FAIL )
 		);
 
 		assertMassIndexerOperationFailureHandling( exceptionMessage, failingOperationAsString );
@@ -325,10 +325,10 @@ public abstract class AbstractMassIndexingFailureIT {
 								)
 								.hasCauseInstanceOf( SimulatedFailure.class )
 						),
-				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.FAIL ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.FAIL )
+				expectIndexScaleWork( StubIndexScaleWork.Type.FLUSH, ExecutionExpectation.FAIL )
 		);
 
 		assertEntityIndexingAndMassIndexerOperationFailureHandling(
@@ -372,11 +372,11 @@ public abstract class AbstractMassIndexingFailureIT {
 								)
 								.hasCauseInstanceOf( SimulatedFailure.class )
 						),
-				expectIndexScopeWork( StubIndexScopeWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.PURGE, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.MERGE_SEGMENTS, ExecutionExpectation.SUCCEED ),
 				expectIndexingWorks( ExecutionExpectation.FAIL ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
-				expectIndexScopeWork( StubIndexScopeWork.Type.REFRESH, ExecutionExpectation.FAIL )
+				expectIndexScaleWork( StubIndexScaleWork.Type.FLUSH, ExecutionExpectation.SUCCEED ),
+				expectIndexScaleWork( StubIndexScaleWork.Type.REFRESH, ExecutionExpectation.FAIL )
 		);
 
 		assertEntityIndexingAndMassIndexerOperationFailureHandling(
@@ -505,18 +505,18 @@ public abstract class AbstractMassIndexingFailureIT {
 		}
 	}
 
-	private Runnable expectIndexScopeWork(StubIndexScopeWork.Type type, ExecutionExpectation executionExpectation) {
+	private Runnable expectIndexScaleWork(StubIndexScaleWork.Type type, ExecutionExpectation executionExpectation) {
 		return () -> {
 			switch ( executionExpectation ) {
 				case SUCCEED:
-					backendMock.expectIndexScopeWorks( Book.NAME )
-							.indexScopeWork( type );
+					backendMock.expectIndexScaleWorks( Book.NAME )
+							.indexScaleWork( type );
 					break;
 				case FAIL:
 					CompletableFuture<?> failingFuture = new CompletableFuture<>();
 					failingFuture.completeExceptionally( new SimulatedFailure( type.name() + " failure" ) );
-					backendMock.expectIndexScopeWorks( Book.NAME )
-							.indexScopeWork( type, failingFuture );
+					backendMock.expectIndexScaleWorks( Book.NAME )
+							.indexScaleWork( type, failingFuture );
 					break;
 				case SKIP:
 					break;
