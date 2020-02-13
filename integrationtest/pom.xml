@@ -3,29 +3,15 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>org.hibernate.search</groupId>
-        <artifactId>hibernate-search-parent</artifactId>
+        <artifactId>hibernate-search-parent-integrationtest</artifactId>
         <version>6.0.0-SNAPSHOT</version>
+        <relativePath>../parents/integrationtest</relativePath>
     </parent>
     <artifactId>hibernate-search-integrationtest</artifactId>
     <packaging>pom</packaging>
 
-    <name>Hibernate Search Integration Tests - Parent POM</name>
-    <description>Parent POM of Hibernate Search integration tests</description>
-
-    <properties>
-        <skipNexusStagingDeployMojo>true</skipNexusStagingDeployMojo>
-
-        <!-- Apply the test source/target settings to all code in integration test utils, even code in src/main -->
-        <maven.compiler.argument.source>${maven.compiler.argument.testSource}</maven.compiler.argument.source>
-        <maven.compiler.argument.target>${maven.compiler.argument.testTarget}</maven.compiler.argument.target>
-
-        <!--
-            Consider all sources as tests during Sonar analysis.
-            This is important because some analysis rules do not apply to test code.
-         -->
-        <sonar.sources>${rootProject.emptySubdirectory}</sonar.sources>
-        <sonar.tests>${project.basedir}/src</sonar.tests>
-    </properties>
+    <name>Hibernate Search Integration Tests - Aggregator POM</name>
+    <description>Aggregator POM of Hibernate Search integration tests (except documentation)</description>
 
     <modules>
         <module>backend/tck</module>
@@ -37,65 +23,6 @@
         <module>mapper/orm-envers</module>
         <module>showcase/library</module>
     </modules>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-integrationtest-common</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-integrationtest-backend-elasticsearch</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-integrationtest-mapper-orm</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-integrationtest-backend-tck</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>org.hibernate.search</groupId>
-                <artifactId>hibernate-search-util-internal-integrationtest-sharedresources</artifactId>
-                <classifier>build-resources</classifier>
-                <type>zip</type>
-                <version>${project.version}</version>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
-
-    <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>de.thetaphi</groupId>
-                    <artifactId>forbiddenapis</artifactId>
-                    <!-- Override the executions defined in the parent module -->
-                    <executions>
-                        <execution>
-                            <id>verify-forbidden-apis</id>
-                            <!-- Do not use the main rules at all in integration tests, see below -->
-                            <phase>none</phase>
-                        </execution>
-                        <execution>
-                            <id>verify-forbidden-test-apis</id>
-                            <goals>
-                                <!-- Apply the test rules to all code in integration tests, even code in src/main -->
-                                <goal>check</goal>
-                                <goal>testCheck</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-    </build>
 
     <profiles>
         <profile>
