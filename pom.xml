@@ -216,8 +216,6 @@
         <version.javax.batch>1.0</version.javax.batch>
         <!-- in line with the version used in WildFly 13 -->
         <version.org.jberet>1.2.4.Final</version.org.jberet>
-        <!-- they didn't publish the javadoc for the other 1.2.x -->
-        <javadoc.org.jberet.url>http://docs.jboss.org/jberet/1.2.0.Final/javadoc/jberet-core/</javadoc.org.jberet.url>
 
         <!-- >>> Java EE/Jakarta EE dependencies -->
         <!-- Used in the JSR352 integration in particular, but also in the ORM integration (?) and various tests -->
