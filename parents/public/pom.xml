@@ -20,6 +20,10 @@
     <name>Hibernate Search Parent POM for Public Artifacts</name>
     <description>Common build configuration for all public artifacts</description>
 
+    <properties>
+        <javadoc.packagelists.directory>${project.build.directory}/dependencies-javadoc-packagelists</javadoc.packagelists.directory>
+    </properties>
+
     <build>
         <pluginManagement>
             <plugins>
@@ -53,15 +57,45 @@
                         <excludePackageNames>*.impl,*.impl.*</excludePackageNames>
                         <links>
                             <link>${javadoc.javase.url}</link>
-                            <link>${javadoc.org.hibernate.url}</link>
-                            <link>${javadoc.org.apache.lucene.core.url}</link>
-                            <link>${javadoc.org.apache.lucene.analyzers-common.url}</link>
-                            <link>${javadoc.org.apache.lucene.queryparser.url}</link>
-                            <!-- For Java EE APIs, in particular javax.batch in the JSR 352 modules -->
-                            <link>${javadoc.javaee.url}</link>
                             <!-- For the JSR 352 modules -->
                             <link>${javadoc.org.jberet.url}</link>
                         </links>
+                        <!--
+                            Make sure to always use offline links,
+                            otherwise the build will need to access external websites,
+                            which leads to build failures from time to time when the websites are not available
+                            (used to happen a lot with apache.org in particular).
+                            maven-javadoc-plugin needs a package-list file to determine,
+                            for each package/class, the most appropriate link.
+                            These files are fetched from javadoc Maven artifacts
+                            in the build-config module and regrouped in a single ZIP
+                            (see maven-assembly-plugin config in the build-config POM)
+                            which is then extracted to target/ in each module that needs to generate javadoc
+                            (see maven-dependency-plugin config in this POM).
+                          -->
+                        <offlineLinks>
+                            <offlineLink>
+                                <url>${javadoc.org.hibernate.url}</url>
+                                <location>${javadoc.packagelists.directory}/hibernate-core</location>
+                            </offlineLink>
+                            <offlineLink>
+                                <url>${javadoc.org.apache.lucene.core.url}</url>
+                                <location>${javadoc.packagelists.directory}/lucene-core</location>
+                            </offlineLink>
+                            <offlineLink>
+                                <url>${javadoc.org.apache.lucene.analyzers-common.url}</url>
+                                <location>${javadoc.packagelists.directory}/lucene-analyzers-common</location>
+                            </offlineLink>
+                            <offlineLink>
+                                <url>${javadoc.org.apache.lucene.queryparser.url}</url>
+                                <location>${javadoc.packagelists.directory}/lucene-queryparser</location>
+                            </offlineLink>
+                            <!-- For javax.batch in the JSR 352 modules -->
+                            <offlineLink>
+                                <url>${javadoc.javaee.url}</url>
+                                <location>${javadoc.packagelists.directory}/batch-api</location>
+                            </offlineLink>
+                        </offlineLinks>
                         <bottom>
                             <![CDATA[Copyright &copy; ${project.inceptionYear}-{currentYear} <a href="https://www.redhat.com/">Red Hat, Inc.</a> and others. Licensed under the GNU Lesser General Public License (LGPL), version 2.1 or later.]]>
                         </bottom>
@@ -109,6 +143,45 @@
             <id>dist</id>
             <build>
                 <plugins>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-dependency-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>unpack-dependencies-javadoc-packagelists</id>
+                                <phase>generate-resources</phase>
+                                <goals>
+                                    <goal>unpack</goal>
+                                </goals>
+                                <configuration>
+                                    <artifactItems>
+                                        <artifactItem>
+                                            <groupId>${project.groupId}</groupId>
+                                            <artifactId>hibernate-search-build-config</artifactId>
+                                            <classifier>dependencies-javadoc-packagelists</classifier>
+                                            <type>zip</type>
+                                            <version>${project.version}</version>
+                                        </artifactItem>
+                                    </artifactItems>
+                                    <outputDirectory>${javadoc.packagelists.directory}</outputDirectory>
+                                    <overWriteSnapshots>true</overWriteSnapshots>
+                                </configuration>
+                            </execution>
+                        </executions>
+                        <dependencies>
+                            <!--
+                                This ensures that using mvn install -pl <some project> -am
+                                will correctly force the build of the build-config module.
+                             -->
+                            <dependency>
+                                <groupId>${project.groupId}</groupId>
+                                <artifactId>hibernate-search-build-config</artifactId>
+                                <classifier>dependencies-javadoc-packagelists</classifier>
+                                <type>zip</type>
+                                <version>${project.version}</version>
+                            </dependency>
+                        </dependencies>
+                    </plugin>
                     <plugin>
                         <artifactId>maven-javadoc-plugin</artifactId>
                         <executions>
