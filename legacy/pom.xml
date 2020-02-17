@@ -731,6 +731,36 @@
     </dependencyManagement>
 
     <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <!-- See http://blog.sonatype.com/2008/04/how-to-share-resources-across-projects-in-maven/ -->
+                            <!--
+                                 This will only be effective if
+                                 hibernate-search-util-internal-integrationtest-sharedresources
+                                 is actually a project dependency
+                              -->
+                            <id>unpack-shared-test-build-resources</id>
+                            <goals>
+                                <goal>unpack-dependencies</goal>
+                            </goals>
+                            <phase>generate-test-resources</phase>
+                            <configuration>
+                                <outputDirectory>${project.build.directory}/</outputDirectory>
+                                <includeGroupIds>${project.groupId}</includeGroupIds>
+                                <includeArtifacIds>hibernate-search-util-internal-integrationtest-sharedresources</includeArtifacIds>
+                                <includeTypes>zip</includeTypes>
+                                <excludeTransitive>true</excludeTransitive>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+            </plugins>
+        </pluginManagement>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -836,6 +866,34 @@
                 <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
                 <!-- This is to avoid unzipping any WildFly server, included modules, configurations and JDBC drivers -->
                 <skipWildFlyPreparation>true</skipWildFlyPreparation>
+            </properties>
+        </profile>
+
+        <!-- Profile enabled when an Elasticsearch instance must be run by Maven -->
+        <profile>
+            <id>elasticsearch-run</id>
+            <activation>
+                <!-- Activate by default, i.e. if test.elasticsearch.connection.hosts has not been defined explicitly -->
+                <property>
+                    <name>!test.elasticsearch.connection.hosts</name>
+                </property>
+            </activation>
+            <properties>
+                <test.elasticsearch.connection.hosts>localhost:9200</test.elasticsearch.connection.hosts>
+                <test.elasticsearch.connection.protocol>http</test.elasticsearch.connection.protocol>
+            </properties>
+        </profile>
+        <!-- Profile enabled when an Elasticsearch instance must NOT be run by Maven -->
+        <profile>
+            <id>elasticsearch-do-not-run</id>
+            <activation>
+                <!-- Activate if test.elasticsearch.connection.hosts has been defined explicitly -->
+                <property>
+                    <name>test.elasticsearch.connection.hosts</name>
+                </property>
+            </activation>
+            <properties>
+                <test.elasticsearch.run.skip>true</test.elasticsearch.run.skip>
             </properties>
         </profile>
 
