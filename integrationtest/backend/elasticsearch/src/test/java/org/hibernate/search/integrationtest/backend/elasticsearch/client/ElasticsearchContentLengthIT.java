@@ -188,6 +188,7 @@ public class ElasticsearchContentLengthIT {
 		// Redirect requests to Wiremock
 		Map<String, Object> configurationOverride = new HashMap<>();
 		configurationOverride.put( ElasticsearchBackendSettings.HOSTS, hostAndPortFor( wireMockRule ) );
+		configurationOverride.put( ElasticsearchBackendSettings.PROTOCOL, "http" );
 		ConfigurationPropertySource backendProperties =
 				defaultBackendProperties.withOverride( ConfigurationPropertySource.fromMap( configurationOverride ) );
 
