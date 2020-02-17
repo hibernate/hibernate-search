@@ -173,8 +173,14 @@ public class LuceneIndexWriterCommitIT {
 				DirectoryReader reader = DirectoryReader.open( directory ) ) {
 			result = reader.getDocCount( MetadataFields.idFieldName() );
 		}
-
-		deleteRecursively( indexCopyPath );
+		finally {
+			try {
+				deleteRecursively( indexCopyPath );
+			}
+			catch (RuntimeException | IOException e) {
+				System.out.println( "Could not delete '" + indexCopyPath + "': " + e );
+			}
+		}
 
 		return result;
 	}
