@@ -9,7 +9,7 @@ package org.hibernate.search.integrationtest.java.module.config;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 
-public class MyElasticsearchAnalysisConfigurer implements ElasticsearchAnalysisConfigurer  {
+public class MyElasticsearchAnalysisConfigurer implements ElasticsearchAnalysisConfigurer {
 
 	public static final String MY_ANALYZER = "myAnalyzer";
 
