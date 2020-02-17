@@ -767,6 +767,15 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <configuration >
                     <skipIfEmpty>true</skipIfEmpty>
+                    <archive>
+                        <manifestEntries>
+                            <Implementation-Title>${project.name}</Implementation-Title>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                            <Implementation-Vendor>hibernate.org</Implementation-Vendor>
+                            <Implementation-Vendor-Id>hibernate.org</Implementation-Vendor-Id>
+                            <Implementation-URL>http://hibernate.org/search/</Implementation-URL>
+                        </manifestEntries>
+                    </archive>
                 </configuration>
                 <executions>
                     <execution>
