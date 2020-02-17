@@ -1578,7 +1578,8 @@
                         <!-- generated respectively copied code -->
                         <excludes>
                             **/Generated.java,**/TypeHelper*.java,**/MatchSuppressor.java,**/CommentSuppressor.java,**/NeverSuppress.java,
-                            **/*_$logger.java,**/*_$bundle.java
+                            **/*_$logger.java,**/*_$bundle.java,
+                            **/module-info.java
                         </excludes>
                     </configuration>
                     <executions>
