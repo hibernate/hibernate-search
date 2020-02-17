@@ -93,11 +93,11 @@ public interface SearchSortFactory {
 	 * This is mainly useful to mix imperative and declarative style when building sorts, e.g.:
 	 * <pre>{@code
 	 * f.composite( c -> {
-	 *    c.add( f.byField( "category" ) );
+	 *    c.add( f.field( "category" ) );
 	 *    if ( someInput != null ) {
-	 *        c.add( f.byDistance( "location", someInput.getLatitude(), someInput.getLongitude() );
+	 *        c.add( f.distance( "location", someInput.getLatitude(), someInput.getLongitude() );
 	 *    }
-	 *    c.add( f.byIndexOrder() );
+	 *    c.add( f.indexOrder() );
 	 * } )
 	 * }</pre>
 	 *
