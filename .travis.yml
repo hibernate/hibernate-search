@@ -28,12 +28,12 @@ install:
   # We want to start as many plugins as possible (so that their dependencies are downloaded),
   # but we want the plugins to be skipped if they are not essential,
   # because they will be re-executed later and we don't want to waste time.
-  - ./mvnw $BUILD_OPTIONS -B -q clean install javadoc:javadoc
+  - ./mvnw $BUILD_OPTIONS -B -q clean install
     -DskipTests -Dmaven.javadoc.skip=true -Dcheckstyle.skip=true -Dforbiddenapis.skip=true -Djqassistant.skip=true
 script:
   # We run checks first to fail fast if there is a styling error, then we run the actual build.
   - ./mvnw $BUILD_OPTIONS checkstyle:check
-    && ./mvnw $BUILD_OPTIONS install javadoc:javadoc -Dcheckstyle.skip
+    && ./mvnw $BUILD_OPTIONS install -Dcheckstyle.skip
 before_cache:
   # Do not put the artifacts we just built into the cache
   - rm -r $HOME/.m2/repository/org/hibernate/search/
