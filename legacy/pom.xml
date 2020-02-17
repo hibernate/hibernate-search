@@ -935,5 +935,269 @@
                 </pluginManagement>
             </build>
         </profile>
+
+        <!-- =============================== -->
+        <!-- Database profiles               -->
+        <!-- =============================== -->
+        <!-- H2 is the default -->
+        <profile>
+            <id>h2</id>
+            <activation>
+                <property>
+                    <name>inMemoryTests</name>
+                    <value>!true</value>
+                </property>
+            </activation>
+            <properties>
+                <db.dialect>org.hibernate.dialect.H2Dialect</db.dialect>
+                <jdbc.driver.groupId>com.h2database</jdbc.driver.groupId>
+                <jdbc.driver.artifactId>h2</jdbc.driver.artifactId>
+                <jdbc.driver.version>${version.com.h2database}</jdbc.driver.version>
+                <jdbc.driver>org.h2.Driver</jdbc.driver>
+                <jdbc.url>jdbc:h2:mem:db1;DB_CLOSE_DELAY=-1</jdbc.url>
+                <jdbc.user>sa</jdbc.user>
+                <jdbc.pass>sa</jdbc.pass>
+                <jdbc.isolation />
+            </properties>
+        </profile>
+
+        <!--
+            ###################################################################
+            Profiles naming db instances in the Red Hat QA/QE lab
+
+            First, those with OSS drivers
+            ###################################################################
+        -->
+
+        <!-- The MySQL 5.1 test environment -->
+        <profile>
+            <id>mysql51</id>
+            <properties>
+                <db.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</db.dialect>
+                <jdbc.driver.groupId>mysql</jdbc.driver.groupId>
+                <jdbc.driver.artifactId>mysql-connector-java</jdbc.driver.artifactId>
+                <!-- Version 6.0.5 fails with a ArrayIndexOutOfBoundsException during connection, so we'll stick to 5.x for now -->
+                <jdbc.driver.version>5.1.13</jdbc.driver.version>
+                <jdbc.driver>com.mysql.jdbc.Driver</jdbc.driver>
+                <jdbc.url>jdbc:mysql://vmg02.mw.lab.eng.bos.redhat.com/searctru</jdbc.url>
+                <jdbc.user>searctru</jdbc.user>
+                <jdbc.pass>searctru</jdbc.pass>
+                <jdbc.isolation />
+            </properties>
+        </profile>
+
+        <!-- The PostgreSQL 8.4  test environment -->
+        <profile>
+            <id>postgresql84</id>
+            <properties>
+                <db.dialect>org.hibernate.dialect.PostgreSQL82Dialect</db.dialect>
+                <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
+                <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
+                <jdbc.driver.version>42.1.1</jdbc.driver.version>
+                <jdbc.driver>org.postgresql.Driver</jdbc.driver>
+                <jdbc.url>jdbc:postgresql://notinstalled.lab.eng.bos.redhat.com:5432:searctru</jdbc.url>
+                <jdbc.user>searctru</jdbc.user>
+                <jdbc.pass>searctru</jdbc.pass>
+                <jdbc.isolation />
+            </properties>
+        </profile>
+
+        <!-- The PostgreSQL test environment on ci.hibernate.org (v. 9.3.9)-->
+        <profile>
+            <id>ci-postgresql</id>
+            <properties>
+                <db.dialect>org.hibernate.dialect.PostgreSQL92Dialect</db.dialect>
+                <jdbc.driver.groupId>org.postgresql</jdbc.driver.groupId>
+                <jdbc.driver.artifactId>postgresql</jdbc.driver.artifactId>
+                <jdbc.driver.version>42.1.1</jdbc.driver.version>
+                <jdbc.driver>org.postgresql.Driver</jdbc.driver>
+                <jdbc.url>jdbc:postgresql://localhost:5432/testingdb</jdbc.url>
+                <jdbc.user>hibernate_user</jdbc.user>
+                <jdbc.pass>hibernate_password</jdbc.pass>
+                <jdbc.isolation />
+            </properties>
+        </profile>
+
+        <!-- The MySQL test environment test environment on ci.hibernate.org (v. 10.0.19-MariaDB)-->
+        <profile>
+            <id>ci-mariadb</id>
+            <properties>
+                <db.dialect>org.hibernate.dialect.MySQL5InnoDBDialect</db.dialect>
+                <jdbc.driver.groupId>org.mariadb.jdbc</jdbc.driver.groupId>
+                <jdbc.driver.artifactId>mariadb-java-client</jdbc.driver.artifactId>
+                <jdbc.driver.version>2.2.4</jdbc.driver.version>
+                <jdbc.driver>org.mariadb.jdbc.Driver</jdbc.driver>
+                <jdbc.url>jdbc:mariadb://localhost/testingdb</jdbc.url>
+                <jdbc.user>hibernate_user</jdbc.user>
+                <jdbc.pass>hibernate_password</jdbc.pass>
+                <jdbc.isolation />
+            </properties>
+        </profile>
+
+        <!--
+            ###################################################################
+            Then, those with commercial drivers
+            ###################################################################
+        -->
+        <!--
+             Those drivers are not available on public repos.
+             In CI jobs, we use internal build tools to fetch the drivers
+             and make the jars available to the build.
+             Thus, the maven coordinates of the drivers below are fake.
+             See https://svn.devel.redhat.com/repos/jboss-qa/hudson/config_repository/scripts/groovy.classes/hudson/util/JDBCLoader.groovy
+        -->
+
+        <!-- The DB2 9.7 test environment (using 9x drivers)-->
+        <profile>
+            <id>db2-97</id>
+            <properties>
+                <db.dialect>org.hibernate.dialect.DB2Dialect</db.dialect>
+                <!-- These maven coordinates are fake (see above) -->
+                <jdbc.driver.groupId>jdbcdrivers</jdbc.driver.groupId>
+                <jdbc.driver.artifactId>db2-97</jdbc.driver.artifactId>
+                <jdbc.driver.version>4.11.77</jdbc.driver.version>
+                <jdbc.driver>com.ibm.db2.jcc.DB2Driver</jdbc.driver>
+                <jdbc.url>jdbc:db2://vmg06.mw.lab.eng.bos.redhat.com:50000/jbossqa</jdbc.url>
+                <jdbc.user>searctru</jdbc.user>
+                <jdbc.pass>searctru</jdbc.pass>
+                <jdbc.isolation />
+            </properties>
+        </profile>
+
+        <!-- The Oracle11g test environment -->
+        <profile>
+            <id>oracle11gR1</id>
+            <properties>
+                <db.dialect>org.hibernate.dialect.Oracle10gDialect</db.dialect>
+                <!-- These maven coordinates are fake (see above) -->
+                <jdbc.driver.groupId>jdbcdrivers</jdbc.driver.groupId>
+                <jdbc.driver.artifactId>oracle</jdbc.driver.artifactId>
+                <jdbc.driver.version>11.2.0.2.0</jdbc.driver.version>
+                <jdbc.driver>oracle.jdbc.driver.OracleDriver</jdbc.driver>
+                <jdbc.url>jdbc:oracle:thin:@dev04.qa.atl2.redhat.com:1521:qaora11</jdbc.url>
+                <jdbc.user>searctru</jdbc.user>
+                <jdbc.pass>searctru</jdbc.pass>
+                <jdbc.isolation />
+            </properties>
+        </profile>
+
+        <profile>
+            <id>oracle11gR2</id>
+            <properties>
+                <db.dialect>org.hibernate.dialect.Oracle10gDialect</db.dialect>
+                <!-- These maven coordinates are fake (see above) -->
+                <jdbc.driver.groupId>jdbcdrivers</jdbc.driver.groupId>
+                <jdbc.driver.artifactId>oracle</jdbc.driver.artifactId>
+                <jdbc.driver.version>11.2.0.2.0</jdbc.driver.version>
+                <jdbc.driver>oracle.jdbc.driver.OracleDriver</jdbc.driver>
+                <jdbc.url>jdbc:oracle:thin:@dev04.qa.atl2.redhat.com:1521:qaora11</jdbc.url>
+                <jdbc.user>searctru</jdbc.user>
+                <jdbc.pass>searctru</jdbc.pass>
+                <jdbc.isolation />
+            </properties>
+        </profile>
+
+        <!-- The Oracle11gRAC test environment -->
+        <profile>
+            <id>oracle11gR1RAC</id>
+            <properties>
+                <db.dialect>org.hibernate.dialect.Oracle10gDialect</db.dialect>
+                <!-- These maven coordinates are fake (see above) -->
+                <jdbc.driver.groupId>jdbcdrivers</jdbc.driver.groupId>
+                <jdbc.driver.artifactId>oracle</jdbc.driver.artifactId>
+                <jdbc.driver.version>11.2.0.2.0</jdbc.driver.version>
+                <jdbc.driver>oracle.jdbc.driver.OracleDriver</jdbc.driver>
+                <jdbc.url>
+                    jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(LOAD_BALANCE=ON)(ADDRESS=(PROTOCOL=TCP)(HOST=vmg24-vip.mw.lab.eng.bos.redhat.com)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=vmg25-vip.mw.lab.eng.bos.redhat.com)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=qarac.jboss)))
+                </jdbc.url>
+                <jdbc.user>searctru</jdbc.user>
+                <jdbc.pass>searctru</jdbc.pass>
+                <jdbc.isolation />
+            </properties>
+        </profile>
+        <profile>
+            <id>oracle11gR2RAC</id>
+            <properties>
+                <db.dialect>org.hibernate.dialect.Oracle10gDialect</db.dialect>
+                <!-- These maven coordinates are fake (see above) -->
+                <jdbc.driver.groupId>jdbcdrivers</jdbc.driver.groupId>
+                <jdbc.driver.artifactId>oracle</jdbc.driver.artifactId>
+                <jdbc.driver.version>11.2.0.2.0</jdbc.driver.version>
+                <jdbc.driver>oracle.jdbc.driver.OracleDriver</jdbc.driver>
+                <jdbc.url>
+                    jdbc:oracle:thin:@(DESCRIPTION=(ADDRESS_LIST=(LOAD_BALANCE=ON)(ADDRESS=(PROTOCOL=TCP)(HOST=vmg24-vip.mw.lab.eng.bos.redhat.com)(PORT=1521))(ADDRESS=(PROTOCOL=TCP)(HOST=vmg25-vip.mw.lab.eng.bos.redhat.com)(PORT=1521)))(CONNECT_DATA=(SERVICE_NAME=qarac.jboss)))
+                </jdbc.url>
+                <jdbc.user>searctru</jdbc.user>
+                <jdbc.pass>searctru</jdbc.pass>
+                <jdbc.isolation />
+            </properties>
+        </profile>
+
+        <!-- The Sybase ASE 15.5 test environment -->
+        <profile>
+            <id>sybase155</id>
+            <properties>
+                <db.dialect>org.hibernate.dialect.SybaseASE15Dialect</db.dialect>
+                <!-- These maven coordinates are fake (see above) -->
+                <jdbc.driver.groupId>jdbcdrivers</jdbc.driver.groupId>
+                <jdbc.driver.artifactId>sybase</jdbc.driver.artifactId>
+                <jdbc.driver.version>26502</jdbc.driver.version>
+                <jdbc.driver>com.sybase.jdbc4.jdbc.SybDriver</jdbc.driver>
+                <jdbc.url>jdbc:sybase:Tds:vmg07.mw.lab.eng.bos.redhat.com:5000/searctru</jdbc.url>
+                <jdbc.user>searctru</jdbc.user>
+                <jdbc.pass>searctru</jdbc.pass>
+                <jdbc.isolation />
+            </properties>
+        </profile>
+        <profile>
+            <id>sybase155-jtds</id>
+            <properties>
+                <db.dialect>org.hibernate.dialect.SybaseASE15Dialect</db.dialect>
+                <!-- These maven coordinates are fake (see above) -->
+                <jdbc.driver.groupId>net.sourceforge.jtds</jdbc.driver.groupId>
+                <jdbc.driver.artifactId>jtds</jdbc.driver.artifactId>
+                <jdbc.driver.version>1.2.4</jdbc.driver.version>
+                <jdbc.driver>net.sourceforge.jtds.jdbc.Driver</jdbc.driver>
+                <jdbc.url>jdbc:jtds:sybase://vmg07.mw.lab.eng.bos.redhat.com:5000/searctru</jdbc.url>
+                <jdbc.user>searctru</jdbc.user>
+                <jdbc.pass>searctru</jdbc.pass>
+                <jdbc.isolation />
+            </properties>
+        </profile>
+
+        <!-- The SQLServer2008 R1 (MS JDBC) test environment -->
+        <profile>
+            <id>mssql2008R1</id>
+            <properties>
+                <db.dialect>org.hibernate.dialect.SQLServer2008Dialect</db.dialect>
+                <!-- These maven coordinates are fake (see above) -->
+                <jdbc.driver.groupId>jdbcdrivers</jdbc.driver.groupId>
+                <jdbc.driver.artifactId>mssql</jdbc.driver.artifactId>
+                <jdbc.driver.version>3.0.1301.101</jdbc.driver.version>
+                <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
+                <jdbc.url>jdbc:sqlserver://vmg04.mw.lab.eng.bos.redhat.com:1433</jdbc.url>
+                <jdbc.user>searctru</jdbc.user>
+                <jdbc.pass>searctru</jdbc.pass>
+                <jdbc.isolation>4096</jdbc.isolation>
+            </properties>
+        </profile>
+
+        <!-- The SQLServer2008 R2 (MS JDBC) test environment -->
+        <profile>
+            <id>mssql2008R2</id>
+            <properties>
+                <db.dialect>org.hibernate.dialect.SQLServer2008Dialect</db.dialect>
+                <!-- These maven coordinates are fake (see above) -->
+                <jdbc.driver.groupId>jdbcdrivers</jdbc.driver.groupId>
+                <jdbc.driver.artifactId>mssql</jdbc.driver.artifactId>
+                <jdbc.driver.version>3.0.1301.101</jdbc.driver.version>
+                <jdbc.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</jdbc.driver>
+                <jdbc.url>jdbc:sqlserver://vmg04.mw.lab.eng.bos.redhat.com:1433</jdbc.url>
+                <jdbc.user>searctru</jdbc.user>
+                <jdbc.pass>searctru</jdbc.pass>
+                <jdbc.isolation>4096</jdbc.isolation>
+            </properties>
+        </profile>
+
     </profiles>
 </project>
