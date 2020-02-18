@@ -91,6 +91,9 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 			case WRITE_SYNC:
 				synchronizationStrategy = AutomaticIndexingSynchronizationStrategy.writeSync();
 				break;
+			case READ_SYNC:
+				synchronizationStrategy = AutomaticIndexingSynchronizationStrategy.readSync();
+				break;
 			case SYNC:
 				synchronizationStrategy = AutomaticIndexingSynchronizationStrategy.sync();
 				break;
