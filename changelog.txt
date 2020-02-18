@@ -1,6 +1,20 @@
 Hibernate Search Changelog
 ==========================
 
+5.11.5.Final (18-02-2020)
+-------------------------
+
+** Bug
+    * HSEARCH-3801 Hibernate Search blocks loading of non hibernate batch jobs
+
+** Task
+    * HSEARCH-3830 Upgrade to Hibernate ORM 5.4.12.Final
+    * HSEARCH-3806 Upgrade to Byteman 4.0.10
+    * HSEARCH-3805 Override repositories in Karaf/Paxexam config
+    * HSEARCH-3804 Upgrade to Arquillian 1.5/Shrinkwrap 3.1.3
+    * HSEARCH-3790 Upgrade to Elasticsearch 5.6.16
+    * HSEARCH-3781 Upgrade to Hibernate ORM 5.4.10.Final
+
 5.11.4.Final (21-11-2019)
 -------------------------
 
