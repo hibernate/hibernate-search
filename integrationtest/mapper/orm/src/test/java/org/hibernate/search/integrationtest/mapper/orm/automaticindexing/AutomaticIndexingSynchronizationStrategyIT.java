@@ -129,6 +129,28 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
+	public void success_readSync() throws InterruptedException, TimeoutException, ExecutionException {
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.READ_SYNC );
+		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
+
+		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingBlock(
+				sessionFactory, null,
+				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.FORCE, indexingWorkFuture
+		);
+
+		// The transaction thread should be blocked because the indexing work is not complete
+		assertThat( transactionThreadFuture ).isPending();
+
+		// Completing the work should allow the synchronization strategy to unblock the transaction thread
+		indexingWorkFuture.complete( null );
+		Awaitility.await().atMost( ALMOST_FOREVER_VALUE, ALMOST_FOREVER_UNIT )
+				.until( transactionThreadFuture::isDone );
+		// The transaction thread should proceed successfully,
+		// because the indexing work was successful.
+		assertThat( transactionThreadFuture ).isSuccessful();
+	}
+
+	@Test
 	public void success_sync() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
@@ -254,6 +276,31 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingBlock(
 				sessionFactory, null,
 				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE, indexingWorkFuture
+		);
+
+		// The transaction thread should be blocked because the indexing work is not complete
+		assertThat( transactionThreadFuture ).isPending();
+
+		// Completing the work should allow the synchronization strategy to unblock the thread
+		indexingWorkFuture.completeExceptionally( indexingWorkException );
+		Awaitility.await().atMost( ALMOST_FOREVER_VALUE, ALMOST_FOREVER_UNIT )
+				.until( transactionThreadFuture::isDone );
+		// The transaction thread should proceed but throw an exception,
+		// because the indexing work failed.
+		assertThat( transactionThreadFuture ).isFailed(
+				transactionSynchronizationExceptionMatcher( indexingWorkException )
+		);
+	}
+
+	@Test
+	public void failure_readSync() throws InterruptedException, TimeoutException, ExecutionException {
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.READ_SYNC );
+		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
+		Throwable indexingWorkException = new RuntimeException( "Some message" );
+
+		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingBlock(
+				sessionFactory, null,
+				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.FORCE, indexingWorkFuture
 		);
 
 		// The transaction thread should be blocked because the indexing work is not complete

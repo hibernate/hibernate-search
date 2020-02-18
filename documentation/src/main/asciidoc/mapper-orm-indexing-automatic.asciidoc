@@ -142,6 +142,7 @@ h|Changes safe from crash/power loss (<<concepts-commit-refresh,commit>>)
 h|Changes visible on search (<<concepts-commit-refresh,refresh>>)
 |`async`|No guarantee|No guarantee|No guarantee|Best
 |`write-sync` (**default**)|Guaranteed|Guaranteed|No guarantee|Medium
+|`read-sync`|Guaranteed|No guarantee|Guaranteed|Medium to <<mapper-orm-indexing-automatic-synchronization-refresh-throughput,worst>>
 |`sync`|Guaranteed|Guaranteed|Guaranteed|<<mapper-orm-indexing-automatic-synchronization-refresh-throughput,Worst>>
 |====
 
@@ -149,7 +150,7 @@ h|Changes visible on search (<<concepts-commit-refresh,refresh>>)
 [WARNING]
 ====
 Depending on the backend and its configuration,
-the `sync` strategy may lead to poor indexing throughput,
+the `sync` and `read-sync` strategies may lead to poor indexing throughput,
 because the backend may not be designed for frequent, on-demand index refreshes.
 
 This is why this strategy is only recommended if you know your backend is designed for it, or for integration tests.
@@ -184,6 +185,7 @@ The built-in strategies can be retrieved by calling:
 
 * `AutomaticIndexingSynchronizationStrategy.async()`
 * `AutomaticIndexingSynchronizationStrategy.writeSync()`
+* `AutomaticIndexingSynchronizationStrategy.readSync()`
 * or `AutomaticIndexingSynchronizationStrategy.sync()`
 
 Alternatively, you can also implement a custom strategy.

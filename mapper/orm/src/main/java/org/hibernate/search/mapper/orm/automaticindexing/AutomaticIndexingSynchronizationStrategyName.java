@@ -27,6 +27,12 @@ public enum AutomaticIndexingSynchronizationStrategyName {
 	 */
 	WRITE_SYNC( "write-sync" ),
 	/**
+	 * A strategy that waits for index changes to be queued and applied, forces a refresh, and waits for the refresh to complete.
+	 * <p>
+	 * See the reference documentation for details.
+	 */
+	READ_SYNC( "read-sync" ),
+	/**
 	 * A strategy that waits for index changes to be queued and applied, forces a commit and a refresh,
 	 * and waits for the commit and refresh to complete.
 	 * <p>

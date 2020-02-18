@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.session;
 
+import org.hibernate.search.mapper.orm.session.impl.ReadSyncAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.impl.WriteSyncAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.impl.AsyncAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.session.impl.SyncAutomaticIndexingSynchronizationStrategy;
@@ -34,6 +35,14 @@ public interface AutomaticIndexingSynchronizationStrategy {
 	 */
 	static AutomaticIndexingSynchronizationStrategy writeSync() {
 		return WriteSyncAutomaticIndexingSynchronizationStrategy.INSTANCE;
+	}
+
+	/**
+	 * @return A strategy that waits for index changes to be queued and applied, forces a refresh, and waits for the refresh to complete.
+	 * See the reference documentation for details.
+	 */
+	static AutomaticIndexingSynchronizationStrategy readSync() {
+		return ReadSyncAutomaticIndexingSynchronizationStrategy.INSTANCE;
 	}
 
 	/**
