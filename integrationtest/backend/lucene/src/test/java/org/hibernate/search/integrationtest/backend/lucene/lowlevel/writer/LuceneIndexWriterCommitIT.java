@@ -164,14 +164,16 @@ public class LuceneIndexWriterCommitIT {
 	private int countDocsOnDisk() throws IOException {
 		Path indexCopyPath = temporaryFolder.getRoot().toPath().resolve( INDEX_NAME + "_copy" );
 
-		LuceneTckBackendAccessor accessor = (LuceneTckBackendAccessor) setupHelper.getBackendAccessor();
-		// Copy the index to be able to open a directory despite the lock
-		accessor.copyIndexContent( indexCopyPath, INDEX_NAME );
-
 		int result;
-		try ( Directory directory = FSDirectory.open( indexCopyPath );
-				DirectoryReader reader = DirectoryReader.open( directory ) ) {
-			result = reader.getDocCount( MetadataFields.idFieldName() );
+		LuceneTckBackendAccessor accessor = (LuceneTckBackendAccessor) setupHelper.getBackendAccessor();
+		try {
+			// Copy the index to be able to open a directory despite the lock
+			accessor.copyIndexContent( indexCopyPath, INDEX_NAME );
+
+			try ( Directory directory = FSDirectory.open( indexCopyPath );
+					DirectoryReader reader = DirectoryReader.open( directory ) ) {
+				result = reader.getDocCount( MetadataFields.idFieldName() );
+			}
 		}
 		finally {
 			try {
@@ -195,7 +197,7 @@ public class LuceneIndexWriterCommitIT {
 
 			@Override
 			public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-				Files.delete( dir );
+				Files.deleteIfExists( dir );
 				return FileVisitResult.CONTINUE;
 			}
 		} );
