@@ -48,7 +48,7 @@ public class IndexedEmbeddedTwoLevelsIT {
 		entityManagerFactory = setupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
-						AutomaticIndexingSynchronizationStrategyName.SEARCHABLE
+						AutomaticIndexingSynchronizationStrategyName.SYNC
 				)
 				.setup( Book.class, Author.class, Address.class );
 	}

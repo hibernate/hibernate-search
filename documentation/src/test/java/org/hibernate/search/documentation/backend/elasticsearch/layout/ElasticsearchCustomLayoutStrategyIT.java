@@ -54,7 +54,7 @@ public class ElasticsearchCustomLayoutStrategyIT {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
-						AutomaticIndexingSynchronizationStrategyName.SEARCHABLE
+						AutomaticIndexingSynchronizationStrategyName.SYNC
 				)
 				.withBackendProperty(
 						BACKEND_NAME,

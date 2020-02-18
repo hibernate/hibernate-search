@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.mapper.orm.session;
 
-import org.hibernate.search.mapper.orm.session.impl.CommittedAutomaticIndexingSynchronizationStrategy;
-import org.hibernate.search.mapper.orm.session.impl.QueuedAutomaticIndexingSynchronizationStrategy;
-import org.hibernate.search.mapper.orm.session.impl.SearchableAutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.session.impl.WriteSyncAutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.session.impl.AsyncAutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.session.impl.SyncAutomaticIndexingSynchronizationStrategy;
 
 /**
  * Determines how the thread will block upon committing a transaction
@@ -24,16 +24,16 @@ public interface AutomaticIndexingSynchronizationStrategy {
 	 * @return A strategy that only waits for index changes to be queued in the backend.
 	 * See the reference documentation for details.
 	 */
-	static AutomaticIndexingSynchronizationStrategy queued() {
-		return QueuedAutomaticIndexingSynchronizationStrategy.INSTANCE;
+	static AutomaticIndexingSynchronizationStrategy async() {
+		return AsyncAutomaticIndexingSynchronizationStrategy.INSTANCE;
 	}
 
 	/**
 	 * @return A strategy that waits for index changes to be queued and applied, forces a commit, and waits for the commit to complete.
 	 * See the reference documentation for details.
 	 */
-	static AutomaticIndexingSynchronizationStrategy committed() {
-		return CommittedAutomaticIndexingSynchronizationStrategy.INSTANCE;
+	static AutomaticIndexingSynchronizationStrategy writeSync() {
+		return WriteSyncAutomaticIndexingSynchronizationStrategy.INSTANCE;
 	}
 
 	/**
@@ -41,8 +41,8 @@ public interface AutomaticIndexingSynchronizationStrategy {
 	 * and waits for the commit and refresh to complete.
 	 * See the reference documentation for details.
 	 */
-	static AutomaticIndexingSynchronizationStrategy searchable() {
-		return SearchableAutomaticIndexingSynchronizationStrategy.INSTANCE;
+	static AutomaticIndexingSynchronizationStrategy sync() {
+		return SyncAutomaticIndexingSynchronizationStrategy.INSTANCE;
 	}
 
 }

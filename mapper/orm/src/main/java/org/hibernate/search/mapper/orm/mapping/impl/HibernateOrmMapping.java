@@ -85,14 +85,14 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 				AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.get( propertySource );
 		AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 		switch ( synchronizationStrategyName ) {
-			case QUEUED:
-				synchronizationStrategy = AutomaticIndexingSynchronizationStrategy.queued();
+			case ASYNC:
+				synchronizationStrategy = AutomaticIndexingSynchronizationStrategy.async();
 				break;
-			case COMMITTED:
-				synchronizationStrategy = AutomaticIndexingSynchronizationStrategy.committed();
+			case WRITE_SYNC:
+				synchronizationStrategy = AutomaticIndexingSynchronizationStrategy.writeSync();
 				break;
-			case SEARCHABLE:
-				synchronizationStrategy = AutomaticIndexingSynchronizationStrategy.searchable();
+			case SYNC:
+				synchronizationStrategy = AutomaticIndexingSynchronizationStrategy.sync();
 				break;
 			default:
 				throw new AssertionFailure(
