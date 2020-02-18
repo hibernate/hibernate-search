@@ -19,19 +19,19 @@ import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationS
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public final class QueuedAutomaticIndexingSynchronizationStrategy
+public final class AsyncAutomaticIndexingSynchronizationStrategy
 		implements AutomaticIndexingSynchronizationStrategy {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public static final AutomaticIndexingSynchronizationStrategy INSTANCE = new QueuedAutomaticIndexingSynchronizationStrategy();
+	public static final AutomaticIndexingSynchronizationStrategy INSTANCE = new AsyncAutomaticIndexingSynchronizationStrategy();
 
-	private QueuedAutomaticIndexingSynchronizationStrategy() {
+	private AsyncAutomaticIndexingSynchronizationStrategy() {
 	}
 
 	@Override
 	public String toString() {
-		return AutomaticIndexingSynchronizationStrategy.class.getSimpleName() + ".queued()";
+		return AutomaticIndexingSynchronizationStrategy.class.getSimpleName() + ".async()";
 	}
 
 	@Override

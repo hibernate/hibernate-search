@@ -60,7 +60,7 @@ public class HibernateOrmIndexedIT {
 
 		setupContext.withProperty(
 				HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
-				AutomaticIndexingSynchronizationStrategyName.SEARCHABLE
+				AutomaticIndexingSynchronizationStrategyName.SYNC
 		);
 
 		entityManagerFactory = setupContext.setup( Book.class, User.class, Author.class );

@@ -93,7 +93,7 @@
             <property name="hibernate.search.backends.myBackend.index_defaults.lifecycle.minimal_required_status"
                       value="yellow"/>
             <property name="hibernate.search.automatic_indexing.synchronization.strategy"
-                      value="searchable"/>
+                      value="sync"/>
         </properties>
     </persistence-unit>
 
@@ -164,7 +164,7 @@
             <property name="hibernate.search.backends.myBackend.index_defaults.lifecycle.minimal_required_status"
                       value="yellow"/>
             <property name="hibernate.search.automatic_indexing.synchronization.strategy"
-                      value="searchable"/>
+                      value="sync"/>
         </properties>
     </persistence-unit>
 </persistence>

@@ -140,20 +140,20 @@ Below is a reference of all available strategies and their guarantees.
 h|Changes applied (with or without <<concepts-commit-refresh,commit>>)
 h|Changes safe from crash/power loss (<<concepts-commit-refresh,commit>>)
 h|Changes visible on search (<<concepts-commit-refresh,refresh>>)
-|`queued`|No guarantee|No guarantee|No guarantee|Best
-|`committed` (**default**)|Guaranteed|Guaranteed|No guarantee|Medium
-|`searchable`|Guaranteed|Guaranteed|Guaranteed|<<mapper-orm-indexing-automatic-synchronization-refresh-throughput,Worst>>
+|`async`|No guarantee|No guarantee|No guarantee|Best
+|`write-sync` (**default**)|Guaranteed|Guaranteed|No guarantee|Medium
+|`sync`|Guaranteed|Guaranteed|Guaranteed|<<mapper-orm-indexing-automatic-synchronization-refresh-throughput,Worst>>
 |====
 
 [[mapper-orm-indexing-automatic-synchronization-refresh-throughput]]
 [WARNING]
 ====
 Depending on the backend and its configuration,
-the `searchable` strategy may lead to poor indexing throughput,
+the `sync` strategy may lead to poor indexing throughput,
 because the backend may not be designed for frequent, on-demand index refreshes.
 
 This is why this strategy is only recommended if you know your backend is designed for it, or for integration tests.
-In particular, the `searchable` strategy will work fine with the default configuration of the Lucene backend,
+In particular, the `sync` strategy will work fine with the default configuration of the Lucene backend,
 but will perform poorly with the Elasticsearch backend.
 ====
 
@@ -182,9 +182,9 @@ by calling `SearchSession#setAutomaticIndexingSynchronizationStrategy` and passi
 
 The built-in strategies can be retrieved by calling:
 
-* `AutomaticIndexingSynchronizationStrategy.queued()`
-* `AutomaticIndexingSynchronizationStrategy.committed()`
-* or `AutomaticIndexingSynchronizationStrategy.searchable()`
+* `AutomaticIndexingSynchronizationStrategy.async()`
+* `AutomaticIndexingSynchronizationStrategy.writeSync()`
+* or `AutomaticIndexingSynchronizationStrategy.sync()`
 
 Alternatively, you can also implement a custom strategy.
 

@@ -19,20 +19,20 @@ public enum AutomaticIndexingSynchronizationStrategyName {
 	 * <p>
 	 * See the reference documentation for details.
 	 */
-	QUEUED( "queued" ),
+	ASYNC( "async" ),
 	/**
 	 * A strategy that waits for index changes to be queued and applied, forces a commit, and waits for the commit to complete.
 	 * <p>
 	 * See the reference documentation for details.
 	 */
-	COMMITTED( "committed" ),
+	WRITE_SYNC( "write-sync" ),
 	/**
 	 * A strategy that waits for index changes to be queued and applied, forces a commit and a refresh,
 	 * and waits for the commit and refresh to complete.
 	 * <p>
 	 * See the reference documentation for details.
 	 */
-	SEARCHABLE( "searchable" );
+	SYNC( "sync" );
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

@@ -87,7 +87,7 @@ public class QueryDslIT {
 		entityManagerFactory = setupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
-						AutomaticIndexingSynchronizationStrategyName.SEARCHABLE
+						AutomaticIndexingSynchronizationStrategyName.SYNC
 				)
 				.withProperty( AvailableSettings.JPA_SHARED_CACHE_MODE, SharedCacheMode.ENABLE_SELECTIVE.name() )
 				.setup( Book.class, Manager.class, Associate.class );

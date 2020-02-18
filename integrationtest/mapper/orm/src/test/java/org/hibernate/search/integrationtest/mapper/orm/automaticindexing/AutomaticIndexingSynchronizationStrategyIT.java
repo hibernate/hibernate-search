@@ -70,8 +70,8 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
 
 	@Test
-	public void success_queued() throws InterruptedException, ExecutionException, TimeoutException {
-		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.QUEUED );
+	public void success_async() throws InterruptedException, ExecutionException, TimeoutException {
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.ASYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
 		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingNoBlock(
@@ -85,7 +85,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void success_committed_default() throws InterruptedException, TimeoutException, ExecutionException {
+	public void success_writeSync_default() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( null );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
@@ -107,8 +107,8 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void success_committed_explicit() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.COMMITTED );
+	public void success_writeSync_explicit() throws InterruptedException, TimeoutException, ExecutionException {
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
 		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingBlock(
@@ -129,8 +129,8 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void success_searchable() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.SEARCHABLE );
+	public void success_sync() throws InterruptedException, TimeoutException, ExecutionException {
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
 		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingBlock(
@@ -151,12 +151,12 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void success_override_committedToSearchable() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.COMMITTED );
+	public void success_override_writeSyncToSync() throws InterruptedException, TimeoutException, ExecutionException {
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
 		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingBlock(
-				sessionFactory, AutomaticIndexingSynchronizationStrategy.searchable(),
+				sessionFactory, AutomaticIndexingSynchronizationStrategy.sync(),
 				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, indexingWorkFuture
 		);
 
@@ -173,8 +173,8 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void success_override_committedToCustom() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.COMMITTED );
+	public void success_override_writeSyncToCustom() throws InterruptedException, TimeoutException, ExecutionException {
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
 		AtomicReference<CompletableFuture<?>> futureThatTookTooLong = new AtomicReference<>( null );
@@ -193,8 +193,8 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void failure_queued() throws InterruptedException, ExecutionException, TimeoutException {
-		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.QUEUED );
+	public void failure_async() throws InterruptedException, ExecutionException, TimeoutException {
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.ASYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
 
@@ -221,7 +221,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void failure_committed_default() throws InterruptedException, TimeoutException, ExecutionException {
+	public void failure_writeSync_default() throws InterruptedException, TimeoutException, ExecutionException {
 		SessionFactory sessionFactory = setup( null );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
@@ -246,8 +246,8 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void failure_committed_explicit() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.COMMITTED );
+	public void failure_writeSync_explicit() throws InterruptedException, TimeoutException, ExecutionException {
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
 
@@ -271,8 +271,8 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void failure_searchable() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.SEARCHABLE );
+	public void failure_sync() throws InterruptedException, TimeoutException, ExecutionException {
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
 
@@ -296,13 +296,13 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void failure_override_committedToSearchable() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.COMMITTED );
+	public void failure_override_writeSyncToSync() throws InterruptedException, TimeoutException, ExecutionException {
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
 
 		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingBlock(
-				sessionFactory, AutomaticIndexingSynchronizationStrategy.searchable(),
+				sessionFactory, AutomaticIndexingSynchronizationStrategy.sync(),
 				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, indexingWorkFuture
 		);
 
@@ -321,8 +321,8 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	@Test
-	public void failure_override_committedToCustom() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.COMMITTED );
+	public void failure_override_writeSyncToCustom() throws InterruptedException, TimeoutException, ExecutionException {
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
 

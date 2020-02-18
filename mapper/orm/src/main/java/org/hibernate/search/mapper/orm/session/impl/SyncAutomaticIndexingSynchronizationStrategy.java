@@ -17,19 +17,19 @@ import org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public final class SearchableAutomaticIndexingSynchronizationStrategy
+public final class SyncAutomaticIndexingSynchronizationStrategy
 		implements AutomaticIndexingSynchronizationStrategy {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public static final AutomaticIndexingSynchronizationStrategy INSTANCE = new SearchableAutomaticIndexingSynchronizationStrategy();
+	public static final AutomaticIndexingSynchronizationStrategy INSTANCE = new SyncAutomaticIndexingSynchronizationStrategy();
 
-	private SearchableAutomaticIndexingSynchronizationStrategy() {
+	private SyncAutomaticIndexingSynchronizationStrategy() {
 	}
 
 	@Override
 	public String toString() {
-		return AutomaticIndexingSynchronizationStrategy.class.getSimpleName() + ".searchable()";
+		return AutomaticIndexingSynchronizationStrategy.class.getSimpleName() + ".sync()";
 	}
 
 	@Override

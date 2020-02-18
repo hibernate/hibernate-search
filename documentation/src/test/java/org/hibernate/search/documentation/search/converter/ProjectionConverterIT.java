@@ -58,7 +58,7 @@ public class ProjectionConverterIT {
 		entityManagerFactory = setupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
-						AutomaticIndexingSynchronizationStrategyName.SEARCHABLE
+						AutomaticIndexingSynchronizationStrategyName.SYNC
 				)
 				.setup( Order.class );
 		initData();

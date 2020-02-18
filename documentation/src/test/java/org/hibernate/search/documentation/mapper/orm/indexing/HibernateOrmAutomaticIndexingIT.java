@@ -53,7 +53,7 @@ public class HibernateOrmAutomaticIndexingIT {
 				.withProperty(
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
 						// To be overridden below
-						AutomaticIndexingSynchronizationStrategyName.QUEUED
+						AutomaticIndexingSynchronizationStrategyName.ASYNC
 				)
 				.setup( Book.class, Author.class );
 		initData( entityManagerFactory );
@@ -62,7 +62,7 @@ public class HibernateOrmAutomaticIndexingIT {
 			// tag::automatic-indexing-synchronization-strategy-override[]
 			SearchSession searchSession = Search.session( entityManager ); // <1>
 			searchSession.setAutomaticIndexingSynchronizationStrategy(
-					AutomaticIndexingSynchronizationStrategy.searchable()
+					AutomaticIndexingSynchronizationStrategy.sync()
 			); // <2>
 
 			entityManager.getTransaction().begin();

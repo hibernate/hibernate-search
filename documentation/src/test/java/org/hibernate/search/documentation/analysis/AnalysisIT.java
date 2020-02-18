@@ -59,7 +59,7 @@ public class AnalysisIT {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
-						AutomaticIndexingSynchronizationStrategyName.SEARCHABLE
+						AutomaticIndexingSynchronizationStrategyName.SYNC
 				)
 				.withProperties(
 						backendConfiguration instanceof LuceneBackendConfiguration
@@ -126,7 +126,7 @@ public class AnalysisIT {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
-						AutomaticIndexingSynchronizationStrategyName.SEARCHABLE
+						AutomaticIndexingSynchronizationStrategyName.SYNC
 				)
 				.withBackendProperty(
 						BACKEND_NAME, LuceneBackendSettings.ANALYSIS_CONFIGURER,
@@ -169,7 +169,7 @@ public class AnalysisIT {
 		EntityManagerFactory entityManagerFactory = setupHelper.start()
 				.withProperty(
 						HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
-						AutomaticIndexingSynchronizationStrategyName.SEARCHABLE
+						AutomaticIndexingSynchronizationStrategyName.SYNC
 				)
 				.withBackendProperty(
 						BACKEND_NAME, ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,

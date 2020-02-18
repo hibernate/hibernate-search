@@ -147,7 +147,7 @@ public final class HibernateOrmMapperSettings {
 		public static final AutomaticIndexingStrategyName AUTOMATIC_INDEXING_STRATEGY =
 				AutomaticIndexingStrategyName.SESSION;
 		public static final AutomaticIndexingSynchronizationStrategyName AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
-				AutomaticIndexingSynchronizationStrategyName.COMMITTED;
+				AutomaticIndexingSynchronizationStrategyName.WRITE_SYNC;
 		public static final boolean AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = true;
 		public static final EntityLoadingCacheLookupStrategy QUERY_LOADING_CACHE_LOOKUP_STRATEGY =
 				EntityLoadingCacheLookupStrategy.SKIP;
