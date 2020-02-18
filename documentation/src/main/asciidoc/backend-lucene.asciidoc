@@ -582,7 +582,7 @@ guaranteeing that the operation is only considered complete after all changes ar
 
 Changes contributed by the <<mapper-orm-indexing-massindexer,mass indexer>>,
 or by automatic indexing when using the
-<<mapper-orm-indexing-automatic-synchronization,`QUEUED` synchronization strategy>>
+<<mapper-orm-indexing-automatic-synchronization,`queued` synchronization strategy>>
 are *not* marked for commit,
 leading to less frequent commits and thus higher write throughput.
 
