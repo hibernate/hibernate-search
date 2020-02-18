@@ -493,7 +493,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	}
 
-	private class CustomAutomaticIndexingSynchronizationStrategy implements AutomaticIndexingSynchronizationStrategy {
+	private static class CustomAutomaticIndexingSynchronizationStrategy implements AutomaticIndexingSynchronizationStrategy {
 
 		private final AtomicReference<CompletableFuture<?>> futureThatTookTooLong;
 
