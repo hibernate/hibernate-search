@@ -780,3 +780,21 @@ refer to the documentation:
 {elasticsearchDocUrl}/analysis-tokenizers.html[tokenizers],
 {elasticsearchDocUrl}/analysis-tokenfilters.html[token filters].
 ====
+
+[[backend-elasticsearch-io]]
+== Writing and reading
+
+include::components/writing-reading-intro-note.asciidoc[]
+
+When writing to indexes, Elasticsearch relies on a link:{elasticsearchDocUrl}/index-modules-translog.html[transaction log]
+to make sure that changes, even uncommitted, are always safe as soon as the REST API call returns.
+For that reason, the concept of "commit" is not as important to the Elasticsearch backend,
+and commit requirements are largely irrelevant.
+
+When reading from indexes, Elasticsearch relies on a periodically refreshed index reader,
+meaning that search queries will return slightly out-of-date results,
+unless a refresh was forced:
+this is called link:{elasticsearchDocUrl}/getting-started-concepts.html#_near_realtime_nrt[near-real-time] behavior.
+By default, the index reader is refreshed every second,
+but this can be customized on the Elasticsearch side through index settings:
+see the `refresh_interval` setting on link:{elasticsearchDocUrl}/index-modules.html[this page].

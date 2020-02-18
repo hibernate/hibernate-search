@@ -15,19 +15,20 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 public enum AutomaticIndexingSynchronizationStrategyName {
 
 	/**
-	 * A strategy that only waits for indexing requests to be queued in the backend.
+	 * A strategy that only waits for index changes to be queued in the backend.
 	 * <p>
 	 * See the reference documentation for details.
 	 */
 	QUEUED( "queued" ),
 	/**
-	 * A strategy that waits for indexing requests to be committed.
+	 * A strategy that waits for index changes to be queued and applied, forces a commit, and waits for the commit to complete.
 	 * <p>
 	 * See the reference documentation for details.
 	 */
 	COMMITTED( "committed" ),
 	/**
-	 * A strategy that waits for indexing requests to be committed and forces index refreshes.
+	 * A strategy that waits for index changes to be queued and applied, forces a commit and a refresh,
+	 * and waits for the commit and refresh to complete.
 	 * <p>
 	 * See the reference documentation for details.
 	 */

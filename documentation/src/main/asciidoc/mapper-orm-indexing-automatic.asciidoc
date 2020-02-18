@@ -109,67 +109,84 @@ and link:{hibernateDocUrl}#fetching-batch[the `@BatchSize` annotation].
 [[mapper-orm-indexing-automatic-synchronization]]
 == Synchronization with the indexes
 
-Hibernate Search offers multiple strategies to control synchronization with the indexes
-during automatic indexing,
-i.e. to control the minimum progress of indexing before the application thread is resumed.
+include::components/writing-reading-intro-note.asciidoc[]
 
-You can define a default strategy for all sessions by setting the configuration property
-`hibernate.search.automatic_indexing.synchronization.strategy`:
+When a transaction is committed,
+automatic indexing can (and, by default, will) block the application thread
+until indexing reaches a certain level of completion.
 
-* [[mapper-orm-indexing-automatic-synchronization-queued]] when set to `queued`, the application thread will be resumed as soon as
-the index changes are queued in the backend.
-+
-This strategy offers no guarantee as to whether indexing will be performed successfully,
-or even whether indexing will be performed at all:
-the local JVM may crash before the works are executed, in which case the indexing requests will be forgotten,
-or indexing may simply fail.
-+
-With this strategy, failures to extract data from entities will lead to an exception being thrown in the application thread,
-but failures to perform indexing in the backend (i.e. I/O operations on the index)
-will be forwarded to the <<configuration-background-failure-handling,failure handler>>,
-which by default will simply log them.
-* by default or when set to `committed`, the application thread will be resumed as soon as
-the index changes are committed to disk.
-+
-This generally means that at the very least
-that the backend validated the index changes,
-took appropriate measures to be able to recover the changes in the event of a crash,
-and confirmed to Hibernate Search it did so
-(e.g. for Elasticsearch, Hibernate Search received a successful response to the HTTP request).
-+
-This strategy offers no guarantee as to whether indexed documents are searchable,
-meaning a search query executed immediately after the application thread is resumed
-may return outdated information.
-Documents are searchable as soon as a refresh is performed,
-either automatically after every change (default for the Lucene backend)
-periodically (link:{elasticsearchDocUrl}/getting-started-concepts.html#_near_realtime_nrt[default for the Elasticsearch backend],
-opt-in for the Lucene backend by <<backend-lucene-io-refresh,setting a refresh interval>>),
-or <<mapper-orm-indexing-manual-refresh,explicitly>>.
-+
-With this strategy, indexing failures will lead to an exception being thrown in the application thread.
-* when set to `searchable`, the application thread will be resumed as soon as
-the index changes are committed to disk
-*and* the relevant documents are searchable.
-The backend will be told to make the documents searchable as soon as possible.
-+
+There are two main reasons for blocking the thread:
+
+1. *Indexed data safety*:
+if, once the database transaction completes,
+index data must be safely stored to disk,
+an <<concepts-commit-refresh,index commit>> is necessary.
+Without it, index changes may only be safe after a few seconds,
+when a periodic index commit happens in the background.
+2. *Real-time search queries*:
+if, once the database transaction completes,
+any search query must immediately take the index changes into account,
+an <<concepts-commit-refresh,index refresh>> is necessary.
+Without it, index changes may only be visible after a few seconds,
+when a periodic index refresh happens in the background.
+
+These two requirements are controlled by the _synchronization strategy_.
+The default strategy is defined by the configuration property
+`hibernate.search.automatic_indexing.synchronization.strategy`.
+Below is a reference of all available strategies and their guarantees.
+
+|====
+.2+h|Strategy 3+h| Guarantees when the application thread resumes .2+h|Throughput
+h|Changes applied (with or without <<concepts-commit-refresh,commit>>)
+h|Changes safe from crash/power loss (<<concepts-commit-refresh,commit>>)
+h|Changes visible on search (<<concepts-commit-refresh,refresh>>)
+|`queued`|No guarantee|No guarantee|No guarantee|Best
+|`committed` (**default**)|Guaranteed|Guaranteed|No guarantee|Medium
+|`searchable`|Guaranteed|Guaranteed|Guaranteed|<<mapper-orm-indexing-automatic-synchronization-refresh-throughput,Worst>>
+|====
+
+[[mapper-orm-indexing-automatic-synchronization-refresh-throughput]]
+[WARNING]
+====
 Depending on the backend and its configuration,
-this strategy may lead to poor indexing throughput,
-because the backend may not be optimized for frequent, on-demand index refreshes.
-+
-That is why this strategy is only recommended if you know your backend is optimized for it
-(for example this is true for the default configuration of the Lucene backend, but not for the Elasticsearch backend),
-or for integration tests.
-+
-With this strategy, indexing failures will lead to an exception being thrown in the application thread.
+the `searchable` strategy may lead to poor indexing throughput,
+because the backend may not be designed for frequent, on-demand index refreshes.
 
-While the above configuration property defines a default,
+This is why this strategy is only recommended if you know your backend is designed for it, or for integration tests.
+In particular, the `searchable` strategy will work fine with the default configuration of the Lucene backend,
+but will perform poorly with the Elasticsearch backend.
+====
+
+[[mapper-orm-indexing-automatic-synchronization-failures]]
+[NOTE]
+====
+Indexing failures may be reported differently depending on the chosen strategy:
+
+* Failure to extract data from entities:
+** Regardless of the strategy, throws an exception in the application thread.
+* Failure to apply index changes (i.e. I/O operations on the index):
+** For strategies that apply changes immediately: throws an exception in the application thread.
+** For strategies that do *not* apply changes immediately:
+forwards the failure to the <<configuration-background-failure-handling,failure handler>>,
+which by default will simply log the failure.
+* Failure to commit index changes:
+** For strategies that guarantee an index commit: throws an exception in the application thread.
+** For strategies that do *not* guarantee an index commit:
+forwards the failure to the <<configuration-background-failure-handling,failure handler>>,
+which by default will simply log the failure.
+====
+
+While the configuration property mentioned above defines a default,
 it is possible to override this default on a particular session
 by calling `SearchSession#setAutomaticIndexingSynchronizationStrategy` and passing a different strategy.
-The built-in strategies can be retrieved by calling
-`AutomaticIndexingSynchronizationStrategy.queued()`,
-`AutomaticIndexingSynchronizationStrategy.committed()`
-or `AutomaticIndexingSynchronizationStrategy.searchable()`,
-but you can also define a custom strategy.
+
+The built-in strategies can be retrieved by calling:
+
+* `AutomaticIndexingSynchronizationStrategy.queued()`
+* `AutomaticIndexingSynchronizationStrategy.committed()`
+* or `AutomaticIndexingSynchronizationStrategy.searchable()`
+
+Alternatively, you can also implement a custom strategy.
 
 .Overriding the automatic indexing synchronization strategy
 ====

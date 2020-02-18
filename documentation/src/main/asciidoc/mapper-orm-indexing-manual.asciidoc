@@ -267,23 +267,20 @@ When using multi-tenancy, only documents of one tenant will be removed:
 the tenant of the session from which this workspace originated.
 `purgeAsync()`::
 Asynchronous version of `purge()` returning a `CompletableFuture`.
-`flush()`::
+[[mapper-orm-indexing-manual-flush]]`flush()`::
 Flush to disk the changes to indexes that have not been committed yet.
 In the case of backends with a transaction log (Elasticsearch),
 also apply operations from the transaction log that were not applied yet.
 +
 This is generally not useful as Hibernate Search commits changes automatically.
-Only to be used by experts fully aware of the implications.
+See <<concepts-commit-refresh>> for more information.
 `flushAsync()`::
 Asynchronous version of `flush()` returning a `CompletableFuture`.
 [[mapper-orm-indexing-manual-refresh]]`refresh()`::
 Refresh the indexes so that all changes executed so far will be visible in search queries.
 +
 This is generally not useful as indexes are refreshed automatically.
-either after every change (default for the Lucene backend)
-or periodically (link:{elasticsearchDocUrl}/getting-started-concepts.html#_near_realtime_nrt[default for the Elasticsearch backend],
-opt-in for the Lucene backend by <<backend-lucene-io-refresh,setting a refresh interval>>).
-Only to be used by experts fully aware of the implications.
+See <<concepts-commit-refresh>> for more information.
 `refreshAsync()`::
 Asynchronous version of `refresh()` returning a `CompletableFuture`.
 `mergeSegments()`::

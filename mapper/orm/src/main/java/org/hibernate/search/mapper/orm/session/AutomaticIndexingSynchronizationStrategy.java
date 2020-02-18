@@ -21,7 +21,7 @@ public interface AutomaticIndexingSynchronizationStrategy {
 	void apply(AutomaticIndexingSynchronizationConfigurationContext context);
 
 	/**
-	 * @return A strategy that only waits for indexing requests to be queued in the backend.
+	 * @return A strategy that only waits for index changes to be queued in the backend.
 	 * See the reference documentation for details.
 	 */
 	static AutomaticIndexingSynchronizationStrategy queued() {
@@ -29,7 +29,7 @@ public interface AutomaticIndexingSynchronizationStrategy {
 	}
 
 	/**
-	 * @return A strategy that waits for indexing requests to be committed.
+	 * @return A strategy that waits for index changes to be queued and applied, forces a commit, and waits for the commit to complete.
 	 * See the reference documentation for details.
 	 */
 	static AutomaticIndexingSynchronizationStrategy committed() {
@@ -37,7 +37,8 @@ public interface AutomaticIndexingSynchronizationStrategy {
 	}
 
 	/**
-	 * @return A strategy that waits for indexing requests to be committed and forces index refreshes.
+	 * @return A strategy that waits for index changes to be queued and applied, forces a commit and a refresh,
+	 * and waits for the commit and refresh to complete.
 	 * See the reference documentation for details.
 	 */
 	static AutomaticIndexingSynchronizationStrategy searchable() {
