@@ -1,0 +1,6 @@
+[NOTE]
+====
+For a preliminary introduction to writing to and reading from indexes in Hibernate Search,
+including in particular the concepts of _commit_ and _refresh_,
+see <<concepts-commit-refresh>>.
+====

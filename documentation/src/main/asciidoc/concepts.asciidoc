@@ -157,6 +157,64 @@ See the documentation of each backend for more information:
 * <<backend-lucene-analysis,Analysis for the Lucene backend>>
 * <<backend-elasticsearch-analysis,Analysis for the Elasticsearch backend>>
 
+[[concepts-commit-refresh]]
+== Commit and refresh
+
+In order to get the best throughput when indexing and when searching,
+both Elasticsearch and Lucene rely on "buffers" when writing to and reading from the index:
+
+* When writing, changes are not _directly_ written to the index,
+but to an "index writer" that buffers changes in-memory or in temporary files.
++
+The changes are "pushed" to the actual index when the writer is _committed_.
+Until the commit happens, uncommitted changes are in an "unsafe" state:
+if the application crashes or if the server suffers from a power loss,
+uncommitted changes will be lost.
+* When reading, e.g. when executing a search query,
+data is not read _directly_ from the index,
+but from an "index reader" that exposes a view of the index as it was at some point in the past.
++
+The view is updated when the reader is _refreshed_.
+Until the refresh happens, results of search queries might be slightly out of date:
+documents added since the last refresh will be missing,
+documents delete since the last refresh will still be there, etc.
+
+Unsafe changes and out-of-date indexes are obviously undesirable,
+but they are a trade-off that improves performance.
+
+Different factors influence when refreshes and commit happen:
+
+* <<mapper-orm-indexing-automatic,Automatic indexing>> will, by default,
+require that a commit of the index writer is performed after each set of changes,
+meaning the changes are safe after the Hibernate ORM transaction commit returns.
+However, no refresh is requested by default, meaning the changes may only be visible at a later time,
+when the backend decides to refresh the index reader.
+This behavior can be customized by setting a different <<mapper-orm-indexing-automatic-synchronization,synchronization strategy>>.
+* The <<mapper-orm-indexing-massindexer,mass indexer>>
+will not require any commit or refresh until the very end of mass indexing,
+so as to maximize indexing throughput.
+* Whenever there are no particular commit or refresh requirements,
+backend defaults will apply:
+** See <<backend-elasticsearch-io,here for Elasticsearch>>.
+** See <<backend-lucene-io,here for Lucene>>.
+* A commit may be forced explicitly through the <<mapper-orm-indexing-manual-flush,`flush()` API>>.
+* A refresh may be forced explicitly though the <<mapper-orm-indexing-manual-flush,`refresh()` API>>.
+
+[NOTE]
+====
+Even though we use the word "commit",
+this is not the same concept as a commit in relational database transactions:
+there is no transaction and no "rollback" is possible.
+
+There is no concept of isolation, either.
+After a refresh, *all* changes to the index are taken into account:
+those committed to the index, but also those that are still buffered in the index writer.
+
+For this reason, commits and refreshes can be treated as completely orthogonal concepts:
+certain setups will occasionally lead to committed changes not being be visible in search queries,
+while others will allow even uncommitted changes to be visible in search queries.
+====
+
 [[concepts-sharding-routing]]
 == Sharding and routing
 

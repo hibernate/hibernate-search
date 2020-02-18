@@ -548,40 +548,16 @@ it's just that there is no documentation page for Lucene proper).
 
 === Basics
 
-At any given time, the Lucene backend holds for each index:
+include::components/writing-reading-intro-note.asciidoc[]
 
-* One `IndexWriter` instance that allows for writes to the index,
-e.g. adding/deleting a document.
-+
-The index writer buffers writes,
-and "pushes" the changes to the index when it is <<backend-lucene-io-commit,_committed_>>.
-Not committing the index writer means that,
-in the event of a server crash or power loss, uncommitted writes will be lost.
-* One `IndexReader` instance that allows for reads from the index,
-e.g. executing a search query.
-+
-The index reader exposes a view of the index as it was when the reader was opened,
-and updates that view when it is <<backend-lucene-io-refresh,_refreshed_>>.
-Not refreshing the index reader means that search queries will return potentially outdated results
-that do not take into account the latest changes to the index.
+The default configuration of the Lucene backend focuses on safety and freshness:
 
-Hibernate Search chooses when to commit or refresh.
-The default configuration focuses on safety (making sure that writes are committed as soon as possible)
-and on providing an always up-to-date view of the index.
+* Changes are committed as soon as possible (at the end of each batch of changes).
+* Indexes are refreshed as soon as a change happens.
 
 Custom configuration, explained in the following sections,
 can provide performance boosts in some situations at the cost of lower write safety
 and/or occasional out-of-date reads.
-
-[NOTE]
-====
-After a refresh, *all* changes to the index are taken into account:
-those committed to the index, but *also* those that are still buffered in the index writer.
-
-For that reason, commits and refreshes can be treated are completely orthogonal concepts:
-certain configurations will occasionally lead to committed changes not being be visible in search queries,
-while other configurations will allow even uncommitted changes to be visible in search queries.
-====
 
 [[backend-lucene-io-commit]]
 === Commit
