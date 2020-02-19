@@ -184,7 +184,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 	private BeanHolder<? extends IndexLayoutStrategy> createIndexLayoutStrategy(BackendBuildContext buildContext,
 			ConfigurationPropertySource propertySource) {
 		final BeanResolver beanResolver = buildContext.getBeanResolver();
-		return LAYOUT_STRATEGY.get( propertySource ).resolve( beanResolver );
+		return LAYOUT_STRATEGY.getAndTransform( propertySource, beanResolver::resolve );
 	}
 
 	private TypeNameMapping createTypeNameMapping(String backendName, ConfigurationPropertySource propertySource,
