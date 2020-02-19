@@ -38,6 +38,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
+import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
 import org.junit.Rule;
@@ -203,6 +204,26 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingNoBlock(
 				sessionFactory, new CustomAutomaticIndexingSynchronizationStrategy( futureThatTookTooLong ),
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, indexingWorkFuture
+		);
+
+		// The transaction should be complete, because the indexing work took too long to execute
+		// (this is how the custom automatic indexing strategy is implemented)
+		assertThat( transactionThreadFuture ).isSuccessful();
+
+		// Upon timing out, the strategy should have set this reference
+		Assertions.assertThat( futureThatTookTooLong ).doesNotHaveValue( null );
+	}
+
+	@Test
+	public void success_custom() throws InterruptedException, TimeoutException, ExecutionException {
+		AtomicReference<CompletableFuture<?>> futureThatTookTooLong = new AtomicReference<>( null );
+
+		SessionFactory sessionFactory = setup( new CustomAutomaticIndexingSynchronizationStrategy( futureThatTookTooLong ) );
+		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
+
+		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingNoBlock(
+				sessionFactory, null,
 				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, indexingWorkFuture
 		);
 
@@ -394,6 +415,47 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		Assertions.assertThat( futureThatTookTooLong ).hasValue( null );
 	}
 
+	@Test
+	public void failure_custom() throws InterruptedException, ExecutionException, TimeoutException {
+		AtomicReference<CompletableFuture<?>> futureThatTookTooLong = new AtomicReference<>( null );
+
+		SessionFactory sessionFactory = setup( new CustomAutomaticIndexingSynchronizationStrategy( futureThatTookTooLong ) );
+		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
+		Throwable indexingWorkException = new RuntimeException( "Some message" );
+
+		// This should be ignored by the transaction (see below)
+		indexingWorkFuture.completeExceptionally( indexingWorkException );
+
+		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingNoBlock(
+				sessionFactory, null,
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, indexingWorkFuture
+		);
+
+		// The transaction thread should proceed but throw an exception,
+		// because the indexing work failed before the timeout
+		// (this is how the custom automatic indexing strategy is implemented)
+		assertThat( transactionThreadFuture ).isFailed(
+				transactionSynchronizationExceptionMatcher( indexingWorkException )
+		);
+
+		// There was no timeout, so the strategy should not have set this reference
+		Assertions.assertThat( futureThatTookTooLong ).hasValue( null );
+	}
+
+	@Test
+	public void invalidReference() {
+		SubTest.expectException( () -> setup( "invalidName" ) )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Unable to convert configuration property '"
+								+ HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY + "'",
+						"with value 'invalidName'",
+						"Unable to find " + AutomaticIndexingSynchronizationStrategy.class.getName()
+								+ " implementation class: invalidName"
+				);
+	}
+
 	private CompletableFuture<?> runTransactionInDifferentThreadExpectingBlock(SessionFactory sessionFactory,
 			AutomaticIndexingSynchronizationStrategy customStrategy,
 			DocumentCommitStrategy expectedCommitStrategy,
@@ -417,14 +479,14 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	}
 
 	private CompletableFuture<?> runTransactionInDifferentThreadExpectingNoBlock(SessionFactory sessionFactory,
-			AutomaticIndexingSynchronizationStrategy customStrategy,
+			AutomaticIndexingSynchronizationStrategy overriddenStrategy,
 			DocumentCommitStrategy expectedCommitStrategy,
 			DocumentRefreshStrategy expectedRefreshStrategy,
 			CompletableFuture<?> indexingWorkFuture)
 			throws InterruptedException, ExecutionException, TimeoutException {
 		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThread(
 				sessionFactory,
-				customStrategy,
+				overriddenStrategy,
 				expectedCommitStrategy, expectedRefreshStrategy,
 				indexingWorkFuture
 		);
@@ -440,7 +502,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	 * Run a transaction in a different thread so that its progress can be inspected from the current thread.
 	 */
 	private CompletableFuture<?> runTransactionInDifferentThread(SessionFactory sessionFactory,
-			AutomaticIndexingSynchronizationStrategy customStrategy,
+			AutomaticIndexingSynchronizationStrategy overriddenStrategy,
 			DocumentCommitStrategy expectedCommitStrategy,
 			DocumentRefreshStrategy expectedRefreshStrategy,
 			CompletableFuture<?> indexingWorkFuture)
@@ -448,8 +510,8 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		CompletableFuture<?> justBeforeTransactionCommitFuture = new CompletableFuture<>();
 		CompletableFuture<?> transactionThreadFuture = CompletableFuture.runAsync( () -> {
 			OrmUtils.withinTransaction( sessionFactory, session -> {
-				if ( customStrategy != null ) {
-					Search.session( session ).setAutomaticIndexingSynchronizationStrategy( customStrategy );
+				if ( overriddenStrategy != null ) {
+					Search.session( session ).setAutomaticIndexingSynchronizationStrategy( overriddenStrategy );
 				}
 				IndexedEntity entity1 = new IndexedEntity();
 				entity1.setId( 1 );
@@ -473,12 +535,12 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		return transactionThreadFuture;
 	}
 
-	private SessionFactory setup(String strategyName) {
+	private SessionFactory setup(Object strategyReference) {
 		OrmSetupHelper.SetupContext setupContext = ormSetupHelper.start();
-		if ( strategyName != null ) {
+		if ( strategyReference != null ) {
 			setupContext.withProperty(
 					HibernateOrmMapperSettings.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY,
-					strategyName
+					strategyReference
 			);
 		}
 

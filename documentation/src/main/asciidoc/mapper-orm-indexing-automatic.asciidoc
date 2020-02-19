@@ -109,6 +109,8 @@ and link:{hibernateDocUrl}#fetching-batch[the `@BatchSize` annotation].
 [[mapper-orm-indexing-automatic-synchronization]]
 == Synchronization with the indexes
 
+=== Basics
+
 include::components/writing-reading-intro-note.asciidoc[]
 
 When a transaction is committed,
@@ -177,6 +179,8 @@ forwards the failure to the <<configuration-background-failure-handling,failure 
 which by default will simply log the failure.
 ====
 
+=== Per-session override
+
 While the configuration property mentioned above defines a default,
 it is possible to override this default on a particular session
 by calling `SearchSession#setAutomaticIndexingSynchronizationStrategy` and passing a different strategy.
@@ -187,8 +191,6 @@ The built-in strategies can be retrieved by calling:
 * `AutomaticIndexingSynchronizationStrategy.writeSync()`
 * `AutomaticIndexingSynchronizationStrategy.readSync()`
 * or `AutomaticIndexingSynchronizationStrategy.sync()`
-
-Alternatively, you can also implement a custom strategy.
 
 .Overriding the automatic indexing synchronization strategy
 ====
@@ -203,3 +205,14 @@ include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/indexing/Hibe
 <5> The overridden strategy guarantees that the modified book will be present in these results,
 even though the query was executed _just after_ the transaction commit.
 ====
+
+=== Custom strategy
+
+You can also implement custom strategy.
+The custom strategy can then be set just like the built-in strategies:
+
+* as the default by setting
+the configuration property `hibernate.search.automatic_indexing.synchronization.strategy`
+to a <<configuration-property-types,bean reference>> pointing to the custom implementation.
+* at the session level by passing an instance of the custom implementation
+to `SearchSession#setAutomaticIndexingSynchronizationStrategy`.
