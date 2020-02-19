@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.mapper.mapping.building.spi;
 
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 
 /**
  * The context passed to the mapper during the very last step of bootstrap.
@@ -14,5 +15,7 @@ import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 public interface MappingFinalizationContext {
 
 	ConfigurationPropertySource getConfigurationPropertySource();
+
+	BeanResolver getBeanResolver();
 
 }
