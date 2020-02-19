@@ -32,7 +32,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class AnnotationMappingRoutingIT {
+public class RoutingBaseIT {
 
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
