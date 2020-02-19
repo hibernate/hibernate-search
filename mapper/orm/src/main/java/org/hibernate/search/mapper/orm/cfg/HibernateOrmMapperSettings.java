@@ -53,11 +53,14 @@ public final class HibernateOrmMapperSettings {
 	/**
 	 * The synchronization strategy to use when indexing automatically.
 	 * <p>
-	 * Expects one of the strings defined in {@link AutomaticIndexingSynchronizationStrategyNames}.
+	 * Expects one of the strings defined in {@link AutomaticIndexingSynchronizationStrategyNames},
+	 * or a reference to a bean of type {@link AutomaticIndexingSynchronizationStrategy}.
 	 * <p>
 	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY}.
 	 *
 	 * @see AutomaticIndexingSynchronizationStrategyNames
+	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
+	 * which includes a description of the "bean reference" properties and accepted values.
 	 */
 	public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = PREFIX + Radicals.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY;
 
