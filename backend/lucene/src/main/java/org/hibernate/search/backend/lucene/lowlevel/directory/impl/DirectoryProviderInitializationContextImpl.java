@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.lowlevel.directory.impl;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.backend.lucene.lowlevel.directory.LockingStrategyName;
@@ -69,10 +70,10 @@ public class DirectoryProviderInitializationContextImpl implements DirectoryProv
 	}
 
 	@Override
-	public Optional<LockFactory> createConfiguredLockFactory() {
+	public Optional<Supplier<LockFactory>> createConfiguredLockFactorySupplier() {
 		// TODO HSEARCH-3635 Restore support for configuring a custom LockFactory
 		return LOCKING_STRATEGY.get( configurationPropertySource )
-				.map( DirectoryProviderInitializationContextImpl::createLockFactory );
+				.map( DirectoryProviderInitializationContextImpl::createLockFactorySupplier );
 	}
 
 	public BeanHolder<? extends DirectoryProvider> createDirectoryProvider() {
@@ -93,16 +94,16 @@ public class DirectoryProviderInitializationContextImpl implements DirectoryProv
 		}
 	}
 
-	private static LockFactory createLockFactory(LockingStrategyName name) {
+	private static Supplier<LockFactory> createLockFactorySupplier(LockingStrategyName name) {
 		switch ( name ) {
 			case SIMPLE_FILESYSTEM:
-				return SimpleFSLockFactory.INSTANCE;
+				return () -> SimpleFSLockFactory.INSTANCE;
 			case NATIVE_FILESYSTEM:
-				return NativeFSLockFactory.INSTANCE;
+				return () -> NativeFSLockFactory.INSTANCE;
 			case SINGLE_INSTANCE:
-				return new SingleInstanceLockFactory();
+				return () -> new SingleInstanceLockFactory();
 			case NONE:
-				return NoLockFactory.INSTANCE;
+				return () -> NoLockFactory.INSTANCE;
 		}
 		throw new AssertionFailure( "Unexpected name: " + name );
 	}
