@@ -88,7 +88,7 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 
 	public BeanHolder<? extends ShardingStrategy> create(Map<String, Shard> shardCollector) {
 		BeanHolder<? extends ShardingStrategy> shardingStrategyHolder =
-				SHARDING_STRATEGY.get( propertySource ).resolve( getBeanResolver() );
+				SHARDING_STRATEGY.getAndTransform( propertySource, getBeanResolver()::resolve );
 
 		shardingStrategyHolder.get().initialize( this );
 
