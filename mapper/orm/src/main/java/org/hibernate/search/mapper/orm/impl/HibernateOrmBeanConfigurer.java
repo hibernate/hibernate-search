@@ -9,8 +9,8 @@ package org.hibernate.search.mapper.orm.impl;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurationContext;
 import org.hibernate.search.engine.environment.bean.spi.BeanConfigurer;
-import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyNames;
-import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
+import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
 
 public class HibernateOrmBeanConfigurer implements BeanConfigurer {
 	@Override

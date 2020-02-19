@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.transaction.Status;
 import javax.transaction.Synchronization;
 
+import org.hibernate.search.mapper.orm.automaticindexing.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;

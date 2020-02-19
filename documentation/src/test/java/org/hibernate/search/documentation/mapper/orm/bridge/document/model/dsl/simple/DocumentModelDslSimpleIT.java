@@ -14,7 +14,7 @@ import javax.persistence.EntityManagerFactory;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.data.ISBN;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyNames;
+import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;

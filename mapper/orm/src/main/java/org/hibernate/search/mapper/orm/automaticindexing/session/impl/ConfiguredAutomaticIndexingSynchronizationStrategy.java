@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.session.impl;
+package org.hibernate.search.mapper.orm.automaticindexing.session.impl;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -16,13 +16,13 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.common.EntityReference;
-import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationConfigurationContext;
+import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationConfigurationContext;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport;
 import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanExecutionReportImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.impl.Contracts;
 
-public class ConfiguredAutomaticIndexingSynchronizationStrategy {
+public final class ConfiguredAutomaticIndexingSynchronizationStrategy {
 
 	private final DocumentCommitStrategy documentCommitStrategy;
 	private final DocumentRefreshStrategy documentRefreshStrategy;
@@ -36,11 +36,11 @@ public class ConfiguredAutomaticIndexingSynchronizationStrategy {
 		this.reportFactory = configurationContext.reportFactory;
 	}
 
-	DocumentCommitStrategy getDocumentCommitStrategy() {
+	public DocumentCommitStrategy getDocumentCommitStrategy() {
 		return documentCommitStrategy;
 	}
 
-	DocumentRefreshStrategy getDocumentRefreshStrategy() {
+	public DocumentRefreshStrategy getDocumentRefreshStrategy() {
 		return documentRefreshStrategy;
 	}
 
@@ -50,7 +50,7 @@ public class ConfiguredAutomaticIndexingSynchronizationStrategy {
 		indexingFutureHandler.accept( reportFuture );
 	}
 
-	public static class Builder
+	public static final class Builder
 			implements AutomaticIndexingSynchronizationConfigurationContext {
 
 		private final FailureHandler failureHandler;
@@ -61,7 +61,7 @@ public class ConfiguredAutomaticIndexingSynchronizationStrategy {
 		private Consumer<CompletableFuture<SearchIndexingPlanExecutionReport>> indexingFutureHandler = future -> {
 		};
 
-		Builder(FailureHandler failureHandler,
+		public Builder(FailureHandler failureHandler,
 				DocumentReferenceConverter<EntityReference> documentReferenceConverter) {
 			this.failureHandler = failureHandler;
 			this.reportFactory = SearchIndexingPlanExecutionReportImpl.factory( documentReferenceConverter );
