@@ -8,6 +8,7 @@ package org.hibernate.search.backend.elasticsearch.work.execution.impl;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.elasticsearch.lowlevel.query.Queries;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -43,15 +44,15 @@ public class ElasticsearchIndexWorkspace implements IndexWorkspace {
 
 	@Override
 	public CompletableFuture<?> purge() {
-		JsonObject matchAll = new JsonObject();
-		matchAll.add( "match_all", new JsonObject() );
-		JsonObject document = new JsonObject();
-		document.add(
+		JsonObject filter = multiTenancyStrategy.getFilterOrNull( sessionContext.getTenantIdentifier() );
+
+		JsonObject payload = new JsonObject();
+		payload.add(
 				"query",
-				multiTenancyStrategy.decorateJsonQuery( matchAll, sessionContext.getTenantIdentifier() )
+				Queries.boolFilter( Queries.matchAll(), filter )
 		);
 
-		return orchestrator.submit( builderFactory.deleteByQuery( indexName, document ).build() );
+		return orchestrator.submit( builderFactory.deleteByQuery( indexName, payload ).build() );
 	}
 
 	@Override

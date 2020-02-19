@@ -51,8 +51,9 @@ public class NoMultiTenancyStrategy implements MultiTenancyStrategy {
 	}
 
 	@Override
-	public JsonObject decorateJsonQuery(JsonObject originalJsonQuery, String tenantId) {
-		return originalJsonQuery;
+	public JsonObject getFilterOrNull(String tenantId) {
+		// No need for a filter
+		return null;
 	}
 
 	@Override

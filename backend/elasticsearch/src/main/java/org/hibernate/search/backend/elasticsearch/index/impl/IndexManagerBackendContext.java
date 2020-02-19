@@ -142,7 +142,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 		return new ElasticsearchSearchQueryBuilder<>(
 				link.getWorkBuilderFactory(), link.getSearchResultExtractorFactory(),
-				queryOrchestrator, multiTenancyStrategy,
+				queryOrchestrator,
 				searchContext, sessionContext, loadingContextBuilder, rootProjection
 		);
 	}

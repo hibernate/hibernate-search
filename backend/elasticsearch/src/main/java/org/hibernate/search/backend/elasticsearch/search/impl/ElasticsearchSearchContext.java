@@ -20,6 +20,7 @@ import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumen
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 public final class ElasticsearchSearchContext {
 
@@ -77,5 +78,9 @@ public final class ElasticsearchSearchContext {
 
 	public Set<String> getMappedTypeNames() {
 		return scopeModel.getMappedTypeNames();
+	}
+
+	public JsonObject getFilterOrNull(String tenantId) {
+		return multiTenancyStrategy.getFilterOrNull( tenantId );
 	}
 }

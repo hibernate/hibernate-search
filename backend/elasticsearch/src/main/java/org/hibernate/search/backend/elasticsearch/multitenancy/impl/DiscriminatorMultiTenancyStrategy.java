@@ -16,8 +16,8 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.Da
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.backend.elasticsearch.lowlevel.query.Queries;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.ProjectionExtractionHelper;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionExtractContext;
 import org.hibernate.search.backend.elasticsearch.search.projection.impl.SearchProjectionRequestContext;
@@ -70,19 +70,8 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 	}
 
 	@Override
-	public JsonObject decorateJsonQuery(JsonObject originalJsonQuery, String tenantId) {
-		JsonObject jsonQuery = new JsonObject();
-		JsonObjectAccessor boolQuery = JsonAccessor.root().property( "bool" ).asObject();
-		boolQuery.property( "filter" ).asObject()
-				.property( "term" ).asObject()
-				.property( TENANT_ID_FIELD_NAME ).asString()
-				.set( jsonQuery, tenantId );
-
-		if ( originalJsonQuery != null ) {
-			boolQuery.property( "must" ).set( jsonQuery, originalJsonQuery );
-		}
-
-		return jsonQuery;
+	public JsonObject getFilterOrNull(String tenantId) {
+		return Queries.term( TENANT_ID_FIELD_NAME, tenantId );
 	}
 
 	@Override

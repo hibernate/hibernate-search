@@ -50,13 +50,12 @@ public interface MultiTenancyStrategy {
 	Optional<DocumentMetadataContributor> getDocumentMetadataContributor();
 
 	/**
-	 * Decorate the query with the tenant constraint.
+	 * Generate a filter for the given tenant ID, to be applied to search queries.
 	 *
-	 * @param originalJsonQuery The original JSON query.
 	 * @param tenantId The tenant id.
-	 * @return The decorated query.
+	 * @return The filter, or {@code null} if no filter is necessary.
 	 */
-	JsonObject decorateJsonQuery(JsonObject originalJsonQuery, String tenantId);
+	JsonObject getFilterOrNull(String tenantId);
 
 	/**
 	 * @return A helper for projections that need to extract the document id from search hits.

@@ -14,9 +14,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.hibernate.search.backend.elasticsearch.lowlevel.query.Queries;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregation;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
@@ -50,7 +50,6 @@ public class ElasticsearchSearchQueryBuilder<H>
 	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory;
 	private final ElasticsearchWorkOrchestrator queryOrchestrator;
-	private final MultiTenancyStrategy multiTenancyStrategy;
 
 	private final ElasticsearchSearchContext searchContext;
 	private final BackendSessionContext sessionContext;
@@ -73,7 +72,6 @@ public class ElasticsearchSearchQueryBuilder<H>
 			ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory,
 			ElasticsearchWorkOrchestrator queryOrchestrator,
-			MultiTenancyStrategy multiTenancyStrategy,
 			ElasticsearchSearchContext searchContext,
 			BackendSessionContext sessionContext,
 			LoadingContextBuilder<?, ?, ?> loadingContextBuilder,
@@ -81,7 +79,6 @@ public class ElasticsearchSearchQueryBuilder<H>
 		this.workFactory = workFactory;
 		this.searchResultExtractorFactory = searchResultExtractorFactory;
 		this.queryOrchestrator = queryOrchestrator;
-		this.multiTenancyStrategy = multiTenancyStrategy;
 
 		this.searchContext = searchContext;
 		this.sessionContext = sessionContext;
@@ -168,9 +165,9 @@ public class ElasticsearchSearchQueryBuilder<H>
 	public ElasticsearchSearchQuery<H> build() {
 		JsonObject payload = new JsonObject();
 
-		JsonObject jsonQuery = multiTenancyStrategy.decorateJsonQuery(
-				jsonPredicate, sessionContext.getTenantIdentifier()
-		);
+		JsonObject filter = searchContext.getFilterOrNull( sessionContext.getTenantIdentifier() );
+		JsonObject jsonQuery = Queries.boolFilter( jsonPredicate, filter );
+
 		if ( jsonQuery != null ) {
 			payload.add( "query", jsonQuery );
 		}
