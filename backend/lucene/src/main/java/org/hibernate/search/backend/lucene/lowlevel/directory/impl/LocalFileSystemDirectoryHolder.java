@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.lowlevel.directory.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.file.Path;
+import java.util.function.Supplier;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
@@ -24,16 +25,16 @@ final class LocalFileSystemDirectoryHolder implements DirectoryHolder {
 
 	private final Path directoryPath;
 	private final FileSystemAccessStrategy accessStrategy;
-	private final LockFactory lockFactory;
+	private final Supplier<LockFactory> lockFactorySupplier;
 	private final EventContext eventContext;
 
 	private Directory directory;
 
 	LocalFileSystemDirectoryHolder(Path directoryPath, FileSystemAccessStrategy accessStrategy,
-			LockFactory lockFactory, EventContext eventContext) {
+			Supplier<LockFactory> lockFactorySupplier, EventContext eventContext) {
 		this.directoryPath = directoryPath;
 		this.accessStrategy = accessStrategy;
-		this.lockFactory = lockFactory;
+		this.lockFactorySupplier = lockFactorySupplier;
 		this.eventContext = eventContext;
 	}
 
@@ -46,7 +47,7 @@ final class LocalFileSystemDirectoryHolder implements DirectoryHolder {
 			throw log.unableToInitializeIndexDirectory( e.getMessage(), eventContext, e );
 		}
 
-		this.directory = accessStrategy.createDirectory( directoryPath, lockFactory );
+		this.directory = accessStrategy.createDirectory( directoryPath, lockFactorySupplier.get() );
 	}
 
 	@Override

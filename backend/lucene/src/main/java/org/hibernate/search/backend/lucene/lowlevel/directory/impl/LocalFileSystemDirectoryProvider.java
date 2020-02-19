@@ -10,6 +10,7 @@ import java.lang.invoke.MethodHandles;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
@@ -45,7 +46,7 @@ public class LocalFileSystemDirectoryProvider implements DirectoryProvider {
 
 	private Path directoryRoot;
 	private FileSystemAccessStrategy accessStrategy;
-	private LockFactory lockFactory;
+	private Supplier<LockFactory> lockFactorySupplier;
 
 	@Override
 	public String toString() {
@@ -58,7 +59,7 @@ public class LocalFileSystemDirectoryProvider implements DirectoryProvider {
 		this.directoryRoot = ROOT.get( propertySource ).toAbsolutePath();
 		FileSystemAccessStrategyName accessStrategyName = FILESYSTEM_ACCESS_STRATEGY.get( propertySource );
 		this.accessStrategy = FileSystemAccessStrategy.get( accessStrategyName );
-		this.lockFactory = context.createConfiguredLockFactorySupplier().orElseGet( () -> FSLockFactory::getDefault ).get();
+		this.lockFactorySupplier = context.createConfiguredLockFactorySupplier().orElseGet( () -> FSLockFactory::getDefault );
 
 		try {
 			FileSystemUtils.initializeWriteableDirectory( directoryRoot );
@@ -76,7 +77,7 @@ public class LocalFileSystemDirectoryProvider implements DirectoryProvider {
 			directoryPath = directoryPath.resolve( shardId.get() );
 		}
 		return new LocalFileSystemDirectoryHolder(
-				directoryPath, accessStrategy, lockFactory, context.getEventContext()
+				directoryPath, accessStrategy, lockFactorySupplier, context.getEventContext()
 		);
 	}
 
