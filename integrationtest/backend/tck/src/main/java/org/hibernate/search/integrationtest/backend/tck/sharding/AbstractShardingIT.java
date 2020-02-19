@@ -26,7 +26,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingInd
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
 /**
- * A basic test regarding routing keys when hash-based sharding is enabled.
+ * An abstract base for sharding-related tests.
  */
 @PortedFromSearch5(original = "org.hibernate.search.test.shards.ShardsTest")
 public abstract class AbstractShardingIT {
@@ -70,7 +70,7 @@ public abstract class AbstractShardingIT {
 		workspace.refresh().join();
 	}
 
-	protected class IndexMapping {
+	protected static class IndexMapping {
 		final IndexFieldReference<String> indexedRoutingKey;
 
 		public IndexMapping(IndexedEntityBindingContext ctx, RoutingMode routingMode) {
