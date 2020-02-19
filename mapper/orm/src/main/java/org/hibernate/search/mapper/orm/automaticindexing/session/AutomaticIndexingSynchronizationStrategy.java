@@ -4,12 +4,13 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.mapper.orm.session;
+package org.hibernate.search.mapper.orm.automaticindexing.session;
 
-import org.hibernate.search.mapper.orm.session.impl.ReadSyncAutomaticIndexingSynchronizationStrategy;
-import org.hibernate.search.mapper.orm.session.impl.WriteSyncAutomaticIndexingSynchronizationStrategy;
-import org.hibernate.search.mapper.orm.session.impl.AsyncAutomaticIndexingSynchronizationStrategy;
-import org.hibernate.search.mapper.orm.session.impl.SyncAutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.session.SearchSession;
+import org.hibernate.search.mapper.orm.automaticindexing.session.impl.ReadSyncAutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.automaticindexing.session.impl.WriteSyncAutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.automaticindexing.session.impl.AsyncAutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.automaticindexing.session.impl.SyncAutomaticIndexingSynchronizationStrategy;
 
 /**
  * Determines how the thread will block upon committing a transaction
