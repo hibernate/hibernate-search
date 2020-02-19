@@ -24,6 +24,6 @@ abstract class AbstractPojoTypeIndexingPlan {
 
 	abstract void delete(Object providedId, Object entity);
 
-	abstract void purge(Object providedId);
+	abstract void purge(Object providedId, String providedRoutingKey);
 
 }

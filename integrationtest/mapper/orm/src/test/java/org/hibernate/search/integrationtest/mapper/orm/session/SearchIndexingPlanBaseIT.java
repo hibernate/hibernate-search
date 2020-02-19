@@ -64,7 +64,7 @@ public class SearchIndexingPlanBaseIT {
 			indexingPlan.addOrUpdate( entity1 );
 			indexingPlan.addOrUpdate( entity2 );
 			indexingPlan.delete( entity3 );
-			indexingPlan.purge( IndexedEntity1.class, 42 ); // Does not exist in database, but may exist in the index
+			indexingPlan.purge( IndexedEntity1.class, 42, null ); // Does not exist in database, but may exist in the index
 
 			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.update( "1", b -> b.field( "text", "number1" ) )
@@ -113,19 +113,19 @@ public class SearchIndexingPlanBaseIT {
 			indexingPlan.delete( entity4 );
 			indexingPlan.addOrUpdate( entity4 );
 
-			indexingPlan.purge( IndexedEntity1.class, 42 );
-			indexingPlan.purge( IndexedEntity1.class, 42 );
+			indexingPlan.purge( IndexedEntity1.class, 42, null );
+			indexingPlan.purge( IndexedEntity1.class, 42, null );
 
 			indexingPlan.delete( entity5 );
-			indexingPlan.purge( IndexedEntity1.class, 5 );
+			indexingPlan.purge( IndexedEntity1.class, 5, null );
 
-			indexingPlan.purge( IndexedEntity1.class, 6 );
+			indexingPlan.purge( IndexedEntity1.class, 6, null );
 			indexingPlan.delete( entity6 );
 
 			indexingPlan.addOrUpdate( entity7 );
-			indexingPlan.purge( IndexedEntity1.class, 7 );
+			indexingPlan.purge( IndexedEntity1.class, 7, null );
 
-			indexingPlan.purge( IndexedEntity1.class, 8 );
+			indexingPlan.purge( IndexedEntity1.class, 8, null );
 			indexingPlan.addOrUpdate( entity8 );
 
 			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
@@ -161,7 +161,7 @@ public class SearchIndexingPlanBaseIT {
 		withinTransaction( sessionFactory, session -> {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
 			SubTest.expectException(
-					() -> indexingPlan.purge( invalidClass, 42 )
+					() -> indexingPlan.purge( invalidClass, 42, null )
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -181,7 +181,7 @@ public class SearchIndexingPlanBaseIT {
 		withinTransaction( sessionFactory, session -> {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
 			SubTest.expectException(
-					() -> indexingPlan.purge( invalidClass, 42 )
+					() -> indexingPlan.purge( invalidClass, 42, null )
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )
@@ -198,7 +198,7 @@ public class SearchIndexingPlanBaseIT {
 
 		withinTransaction( sessionFactory, session -> {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
-			indexingPlan.purge( IndexedEntity1.NAME, 42 ); // Does not exist in database, but may exist in the index
+			indexingPlan.purge( IndexedEntity1.NAME, 42, null ); // Does not exist in database, but may exist in the index
 
 			backend1Mock.expectWorks( IndexedEntity1.INDEX_NAME )
 					.delete( "42" )
@@ -216,7 +216,7 @@ public class SearchIndexingPlanBaseIT {
 		withinTransaction( sessionFactory, session -> {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
 			SubTest.expectException(
-					() -> indexingPlan.purge( invalidName, 42 )
+					() -> indexingPlan.purge( invalidName, 42, null )
 			)
 					.assertThrown()
 					.isInstanceOf( SearchException.class )

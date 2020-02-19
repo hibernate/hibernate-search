@@ -34,15 +34,15 @@ public final class SearchIndexingPlanImpl implements SearchIndexingPlan {
 	}
 
 	@Override
-	public void purge(Class<?> entityClass, Object providedId) {
+	public void purge(Class<?> entityClass, Object providedId, String providedRoutingKey) {
 		sessionContext.getCurrentIndexingPlan( true )
-				.purge( getTypeIdentifier( entityClass ), providedId );
+				.purge( getTypeIdentifier( entityClass ), providedId, providedRoutingKey );
 	}
 
 	@Override
-	public void purge(String entityName, Object providedId) {
+	public void purge(String entityName, Object providedId, String providedRoutingKey) {
 		sessionContext.getCurrentIndexingPlan( true )
-				.purge( getTypeIdentifier( entityName ), providedId );
+				.purge( getTypeIdentifier( entityName ), providedId, providedRoutingKey );
 	}
 
 	@Override

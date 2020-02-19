@@ -80,9 +80,9 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 	}
 
 	@Override
-	public void purge(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId) {
+	public void purge(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey) {
 		AbstractPojoTypeIndexingPlan delegate = getDelegate( typeIdentifier );
-		delegate.purge( providedId );
+		delegate.purge( providedId, providedRoutingKey );
 	}
 
 	@Override

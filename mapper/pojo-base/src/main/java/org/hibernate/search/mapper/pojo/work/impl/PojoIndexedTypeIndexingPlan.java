@@ -70,9 +70,9 @@ public class PojoIndexedTypeIndexingPlan<I, E, D extends DocumentElement> extend
 	}
 
 	@Override
-	void purge(Object providedId) {
+	void purge(Object providedId, String providedRoutingKey) {
 		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId );
-		getPlan( identifier ).purge();
+		getPlan( identifier ).purge( providedRoutingKey );
 	}
 
 	void updateBecauseOfContained(Object entity) {
@@ -136,6 +136,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, D extends DocumentElement> extend
 
 	private class IndexedEntityIndexingPlan {
 		private final I identifier;
+		private String providedRoutingKey;
 		private Supplier<E> entitySupplier;
 
 		private boolean delete;
@@ -152,6 +153,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, D extends DocumentElement> extend
 
 		void add(Supplier<E> entitySupplier) {
 			this.entitySupplier = entitySupplier;
+			providedRoutingKey = null;
 			shouldResolveToReindex = true;
 			add = true;
 		}
@@ -185,6 +187,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, D extends DocumentElement> extend
 
 		void delete(Supplier<E> entitySupplier) {
 			this.entitySupplier = entitySupplier;
+			providedRoutingKey = null;
 			if ( add && !delete ) {
 				/*
 				 * We called add() in the same plan, so we don't expect the document to be in the index.
@@ -203,9 +206,10 @@ public class PojoIndexedTypeIndexingPlan<I, E, D extends DocumentElement> extend
 			}
 		}
 
-		void purge() {
-			// This is a purge: do not resolve reindexing
+		void purge(String providedRoutingKey) {
 			entitySupplier = null;
+			this.providedRoutingKey = providedRoutingKey;
+			// This is a purge: do not resolve reindexing
 			shouldResolveToReindex = false;
 			// This is a purge: force deletion even if it doesn't seem this document was added
 			considerAllDirty = false;
@@ -225,31 +229,34 @@ public class PojoIndexedTypeIndexingPlan<I, E, D extends DocumentElement> extend
 		}
 
 		void sendCommandsToDelegate() {
-			DocumentReferenceProvider referenceProvider =
-					typeContext.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier );
 			if ( add ) {
 				if ( delete ) {
 					if ( considerAllDirty || updatedBecauseOfContained || typeContext.requiresSelfReindexing( dirtyPaths ) ) {
 						delegate.update(
-								referenceProvider,
+								typeContext.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier ),
 								typeContext.toDocumentContributor( entitySupplier, sessionContext )
 						);
 					}
 				}
 				else {
 					delegate.add(
-							referenceProvider,
+							typeContext.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier ),
 							typeContext.toDocumentContributor( entitySupplier, sessionContext )
 					);
 				}
 			}
 			else if ( delete ) {
+				DocumentReferenceProvider referenceProvider =
+						entitySupplier == null
+								? typeContext.toDocumentReferenceProvider( sessionContext, identifier, providedRoutingKey )
+								: typeContext.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier );
 				delegate.delete( referenceProvider );
 			}
 		}
 
 		private void doUpdate(Supplier<E> entitySupplier) {
 			this.entitySupplier = entitySupplier;
+			providedRoutingKey = null;
 			/*
 			 * If add is true, either this is already an update (in which case we don't need to change the flags)
 			 * or we called add() in the same plan (in which case we don't expect the document to be in the index).

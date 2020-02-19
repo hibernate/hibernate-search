@@ -37,6 +37,9 @@ public interface PojoWorkIndexedTypeContext<I, E, D extends DocumentElement> {
 	DocumentReferenceProvider toDocumentReferenceProvider(PojoWorkSessionContext sessionContext,
 			I identifier, Supplier<E> entitySupplier);
 
+	DocumentReferenceProvider toDocumentReferenceProvider(PojoWorkSessionContext sessionContext,
+			I identifier, String providedRoutingKey);
+
 	PojoDocumentContributor<D, E> toDocumentContributor(Supplier<E> entitySupplier,
 			PojoWorkSessionContext sessionContext);
 

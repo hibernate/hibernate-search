@@ -90,12 +90,12 @@ public interface PojoIndexingPlan {
 	 * Entities to reindex as a result from this operation will not be resolved.
 	 * <p>
 	 * No effect on the index if the entity is not in the index.
-	 *
-	 * @param typeIdentifier The identifier of the entity type.
+	 *  @param typeIdentifier The identifier of the entity type.
 	 * @param providedId A value to extract the document ID from.
-	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
+	 * @param providedRoutingKey The routing key to route the purge request to the appropriate index shard.
+	 * Leave {@code null} if sharding is disabled or if you don't use a custom {@link org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge}.
 	 */
-	void purge(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId);
+	void purge(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, String providedRoutingKey);
 
 	/**
 	 * Extract all data from objects passed to the indexing plan so far,

@@ -71,10 +71,12 @@ public interface SearchIndexingPlan {
 	 * @param entityClass The class of the entity to delete from the index.
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
+	 * @param providedRoutingKey The routing key to route the purge request to the appropriate index shard.
+	 * Leave null if sharding is disabled or if you don't use a custom {@link org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge}.
 	 * @throws org.hibernate.search.util.common.SearchException If the entity type is not indexed directly
 	 * ({@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed}).
 	 */
-	void purge(Class<?> entityClass, Object providedId);
+	void purge(Class<?> entityClass, Object providedId, String providedRoutingKey);
 
 	/**
 	 * Delete the entity from the index.
@@ -89,10 +91,12 @@ public interface SearchIndexingPlan {
 	 * @param entityName An entity name. See {@link Entity#name()}.
 	 * @param providedId A value to extract the document ID from.
 	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
+	 * @param providedRoutingKey The routing key to route the purge request to the appropriate index shard.
+	 * Leave {@code null} if sharding is disabled or if you don't use a custom {@link org.hibernate.search.mapper.pojo.bridge.RoutingKeyBridge}.
 	 * @throws org.hibernate.search.util.common.SearchException If the entity type is not indexed directly
 	 * ({@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed}).
 	 */
-	void purge(String entityName, Object providedId);
+	void purge(String entityName, Object providedId, String providedRoutingKey);
 
 	/**
 	 * Extract all data from objects passed to the indexing plan so far,

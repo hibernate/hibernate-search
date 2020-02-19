@@ -6,35 +6,20 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
-import java.util.function.Supplier;
-
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
-import org.hibernate.search.mapper.pojo.bridge.runtime.impl.RoutingKeyProvider;
-import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 /**
  * @param <E> The entity type mapped to an index.
  */
 public final class PojoDocumentReferenceProvider<E> implements DocumentReferenceProvider {
 
-	private final RoutingKeyProvider<E> routingKeyProvider;
-
-	private final PojoWorkSessionContext sessionContext;
-	private final Object identifier;
 	private final String documentIdentifier;
-	private final Supplier<E> entitySupplier;
+	private final String routingKey;
 
-	public PojoDocumentReferenceProvider(
-			RoutingKeyProvider<E> routingKeyProvider,
-			PojoWorkSessionContext sessionContext,
-			Object identifier,
-			String documentIdentifier,
-			Supplier<E> entitySupplier) {
-		this.routingKeyProvider = routingKeyProvider;
-		this.sessionContext = sessionContext;
-		this.identifier = identifier;
+	public PojoDocumentReferenceProvider(String documentIdentifier,
+			String routingKey) {
 		this.documentIdentifier = documentIdentifier;
-		this.entitySupplier = entitySupplier;
+		this.routingKey = routingKey;
 	}
 
 	@Override
@@ -44,11 +29,7 @@ public final class PojoDocumentReferenceProvider<E> implements DocumentReference
 
 	@Override
 	public String getRoutingKey() {
-		return routingKeyProvider.toRoutingKey(
-				identifier,
-				entitySupplier,
-				sessionContext
-		);
+		return routingKey;
 	}
 
 }
