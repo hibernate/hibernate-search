@@ -36,10 +36,10 @@ public interface MultiTenancyStrategy {
 	void contributeToIndexedDocument(Document document, String tenantId);
 
 	/**
-	 * Decorate the query with the tenant constraint.
+	 * Generate a filter for the given tenant ID, to be applied to search queries.
 	 *
 	 * @param tenantId The tenant id.
-	 * @return The decorated query.
+	 * @return The filter, or {@code null} if no filter is necessary.
 	 */
 	Query getFilterOrNull(String tenantId);
 
