@@ -27,6 +27,7 @@ import org.hibernate.search.mapper.pojo.model.PojoElementAccessor;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -99,6 +100,21 @@ public class RoutingBaseIT {
 									.field( "value", entity1.getValue() )
 									.build()
 							)
+					)
+					.processedThenExecuted();
+		}
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3825")
+	public void purge() {
+		try ( SearchSession session = mapping.createSession() ) {
+			session.indexingPlan().purge( IndexedEntity.class, 42, "category_2" );
+
+			backendMock.expectWorks( IndexedEntity.INDEX )
+					.delete( b -> b
+							.identifier( "42" )
+							.routingKey( "category_2" )
 					)
 					.processedThenExecuted();
 		}
