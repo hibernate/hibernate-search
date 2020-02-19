@@ -65,6 +65,11 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 		delegate.delete( getTypeIdentifier( entity ), providedId, entity );
 	}
 
+	@Override
+	public void purge(Class<?> entityClass, Object providedId) {
+		delegate.purge( getTypeIdentifier( entityClass ), providedId );
+	}
+
 	public CompletableFuture<?> execute() {
 		return delegate.executeAndReport().thenApply( report -> {
 			report.getThrowable().ifPresent( t -> {
@@ -76,5 +81,9 @@ public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	private <T> PojoRawTypeIdentifier<? extends T> getTypeIdentifier(T entity) {
 		return introspector.getEntityTypeIdentifier( entity );
+	}
+
+	private <T> PojoRawTypeIdentifier<T> getTypeIdentifier(Class<T> entityType) {
+		return PojoRawTypeIdentifier.of( entityType );
 	}
 }

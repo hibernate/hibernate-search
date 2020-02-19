@@ -107,4 +107,24 @@ public interface SearchIndexingPlan {
 	 */
 	void delete(Object providedId, Object entity);
 
+	/**
+	 * Delete the entity from the index.
+	 * <p>
+	 * No effect on the index if the entity is not in the index.
+	 * <p>
+	 * On contrary to {@link #delete(Object)},
+	 * if documents embed this entity
+	 * (through {@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded} for example),
+	 * these documents will <strong>not</strong> be re-indexed,
+	 * leaving the indexes in an inconsistent state
+	 * until they are re-indexed manually.
+	 *
+	 * @param entityClass The class of the entity to delete from the index.
+	 * @param providedId A value to extract the document ID from.
+	 * Generally the expected value is the entity ID, but a different value may be expected depending on the mapping.
+	 * @throws org.hibernate.search.util.common.SearchException If the entity type is not indexed directly
+	 * ({@link org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed}).
+	 */
+	void purge(Class<?> entityClass, Object providedId);
+
 }
