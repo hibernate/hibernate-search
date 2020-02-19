@@ -45,7 +45,7 @@ public class LuceneIndexIndexer implements IndexIndexer<LuceneRootDocumentBuilde
 		String id = referenceProvider.getIdentifier();
 		String routingKey = referenceProvider.getRoutingKey();
 
-		LuceneIndexEntry indexEntry = indexEntryFactory.create( tenantId, id, documentContributor );
+		LuceneIndexEntry indexEntry = indexEntryFactory.create( tenantId, id, routingKey, documentContributor );
 
 		// Route the work to the appropriate shard
 		LuceneWriteWorkOrchestrator orchestrator = indexManagerContext.getWriteOrchestrator( id, routingKey );

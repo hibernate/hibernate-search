@@ -56,7 +56,7 @@ public class LuceneIndexIndexingPlan implements IndexIndexingPlan<LuceneRootDocu
 		String id = referenceProvider.getIdentifier();
 		String routingKey = referenceProvider.getRoutingKey();
 
-		LuceneIndexEntry indexEntry = indexEntryFactory.create( tenantId, id, documentContributor );
+		LuceneIndexEntry indexEntry = indexEntryFactory.create( tenantId, id, routingKey, documentContributor );
 
 		collect( id, routingKey, factory.add( tenantId, id, indexEntry ) );
 	}
@@ -67,7 +67,7 @@ public class LuceneIndexIndexingPlan implements IndexIndexingPlan<LuceneRootDocu
 		String id = referenceProvider.getIdentifier();
 		String routingKey = referenceProvider.getRoutingKey();
 
-		LuceneIndexEntry indexEntry = indexEntryFactory.create( tenantId, id, documentContributor );
+		LuceneIndexEntry indexEntry = indexEntryFactory.create( tenantId, id, routingKey, documentContributor );
 
 		collect( id, routingKey, factory.update( tenantId, id, indexEntry ) );
 	}

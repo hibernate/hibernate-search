@@ -53,8 +53,8 @@ abstract class AbstractLuceneNonFlattenedDocumentBuilder extends AbstractLuceneD
 	}
 
 	@Override
-	void contribute(String rootIndexName, MultiTenancyStrategy multiTenancyStrategy, String tenantId, String rootId,
-			List<Document> nestedDocuments) {
+	void contribute(String rootIndexName, MultiTenancyStrategy multiTenancyStrategy, String tenantId, String routingKey,
+			String rootId, List<Document> nestedDocuments) {
 		for ( Map.Entry<String, EncounteredFieldStatus> entry : fieldStatus.entrySet() ) {
 			EncounteredFieldStatus status = entry.getValue();
 			if ( EncounteredFieldStatus.ENCOUNTERED_AND_NAME_INDEXED.equals( status ) ) {
@@ -63,9 +63,18 @@ abstract class AbstractLuceneNonFlattenedDocumentBuilder extends AbstractLuceneD
 			}
 		}
 
+		// The following must be added to both the root document and nested documents,
+		// so that delete operations delete nested documents, too.
+
+		if ( routingKey != null ) {
+			document.add( MetadataFields.searchableMetadataField(
+					MetadataFields.routingKeyFieldName(), routingKey
+			) );
+		}
+
 		multiTenancyStrategy.contributeToIndexedDocument( document, tenantId );
 
-		super.contribute( rootIndexName, multiTenancyStrategy, tenantId, rootId, nestedDocuments );
+		super.contribute( rootIndexName, multiTenancyStrategy, tenantId, routingKey, rootId, nestedDocuments );
 	}
 
 	private enum EncounteredFieldStatus {

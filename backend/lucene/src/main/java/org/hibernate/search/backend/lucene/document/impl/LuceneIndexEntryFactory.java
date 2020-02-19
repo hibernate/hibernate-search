@@ -24,13 +24,13 @@ public class LuceneIndexEntryFactory {
 		this.facetsConfig = facetsConfig;
 	}
 
-	public LuceneIndexEntry create(String tenantId, String id,
+	public LuceneIndexEntry create(String tenantId, String id, String routingKey,
 			DocumentContributor<LuceneRootDocumentBuilder> documentContributor) {
 		LuceneRootDocumentBuilder builder = new LuceneRootDocumentBuilder(
 				multiTenancyStrategy, indexName, facetsConfig
 		);
 		documentContributor.contribute( builder );
-		return builder.build( tenantId, id );
+		return builder.build( tenantId, id, routingKey );
 	}
 
 }
