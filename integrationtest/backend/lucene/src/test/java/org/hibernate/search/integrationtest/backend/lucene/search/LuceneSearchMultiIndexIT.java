@@ -9,26 +9,30 @@ package org.hibernate.search.integrationtest.backend.lucene.search;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.search.SearchMultiIndexIT;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+import org.junit.runners.Parameterized.Parameters;
 
 /**
  * This is an extension of the backend TCK test {@link SearchMultiIndexIT}.
  */
+@RunWith(Parameterized.class)
 public class LuceneSearchMultiIndexIT {
 
 	private static final String STRING_1 = "string_1";
@@ -50,6 +54,8 @@ public class LuceneSearchMultiIndexIT {
 
 	private static final String DOCUMENT_1_2_1 = "1_2_1";
 
+	private final String directoryType;
+
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
@@ -63,9 +69,19 @@ public class LuceneSearchMultiIndexIT {
 	private IndexMapping_1_2 indexMapping_1_2;
 	private StubMappingIndexManager indexManager_1_2;
 
+	@Parameters(name = "Lucene directory type {0}")
+	public static Object[] data() {
+		return new Object[] { "local-heap", "local-filesystem" };
+	}
+
+	public LuceneSearchMultiIndexIT(String directoryType) {
+		this.directoryType = directoryType;
+	}
+
 	@Before
 	public void setup() {
 		setupHelper.start()
+				.withBackendProperty( "directory.type", directoryType )
 				.withIndex(
 						INDEX_NAME_1_1,
 						ctx -> this.indexMapping_1_1 = new IndexMapping_1_1( ctx.getSchemaElement() ),
