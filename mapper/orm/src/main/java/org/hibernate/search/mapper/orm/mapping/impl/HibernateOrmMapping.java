@@ -23,10 +23,12 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
+import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.HibernateOrmUtils;
@@ -50,7 +52,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
-import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class HibernateOrmMapping extends AbstractPojoMappingImplementor<HibernateOrmMapping>
@@ -60,9 +62,9 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ConfigurationProperty<AutomaticIndexingSynchronizationStrategyName> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
+	private static final ConfigurationProperty<BeanReference<? extends AutomaticIndexingSynchronizationStrategy>> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
 			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY )
-					.as( AutomaticIndexingSynchronizationStrategyName.class, AutomaticIndexingSynchronizationStrategyName::of )
+					.asBeanReference( AutomaticIndexingSynchronizationStrategy.class )
 					.withDefault( HibernateOrmMapperSettings.Defaults.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY )
 					.build();
 
@@ -80,61 +82,55 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 	public static MappingImplementor<HibernateOrmMapping> create(
 			PojoMappingDelegate mappingDelegate, HibernateOrmTypeContextContainer typeContextContainer,
-			SessionFactoryImplementor sessionFactory, ConfigurationPropertySource propertySource) {
-		AutomaticIndexingSynchronizationStrategyName synchronizationStrategyName =
-				AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.get( propertySource );
-		AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
-		switch ( synchronizationStrategyName ) {
-			case ASYNC:
-				synchronizationStrategy = AutomaticIndexingSynchronizationStrategy.async();
-				break;
-			case WRITE_SYNC:
-				synchronizationStrategy = AutomaticIndexingSynchronizationStrategy.writeSync();
-				break;
-			case READ_SYNC:
-				synchronizationStrategy = AutomaticIndexingSynchronizationStrategy.readSync();
-				break;
-			case SYNC:
-				synchronizationStrategy = AutomaticIndexingSynchronizationStrategy.sync();
-				break;
-			default:
-				throw new AssertionFailure(
-						"Unexpected automatic indexing synchronization strategy name: " + synchronizationStrategyName
-				);
+			SessionFactoryImplementor sessionFactory, ConfigurationPropertySource propertySource,
+			BeanResolver beanResolver) {
+		BeanHolder<? extends AutomaticIndexingSynchronizationStrategy> synchronizationStrategyHolder =
+				AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY.getAndTransform( propertySource, beanResolver::resolve );
+
+		try {
+			log.defaultAutomaticIndexingSynchronizationStrategy( synchronizationStrategyHolder.get() );
+
+			EntityLoadingCacheLookupStrategy cacheLookupStrategy =
+					QUERY_LOADING_CACHE_LOOKUP_STRATEGY.get( propertySource );
+
+			int fetchSize = QUERY_LOADING_FETCH_SIZE.get( propertySource );
+
+			return new HibernateOrmMapping(
+					mappingDelegate, typeContextContainer, sessionFactory,
+					synchronizationStrategyHolder,
+					cacheLookupStrategy, fetchSize
+			);
 		}
-
-		log.defaultAutomaticIndexingSynchronizationStrategy( synchronizationStrategyName );
-
-		EntityLoadingCacheLookupStrategy cacheLookupStrategy =
-				QUERY_LOADING_CACHE_LOOKUP_STRATEGY.get( propertySource );
-
-		int fetchSize = QUERY_LOADING_FETCH_SIZE.get( propertySource );
-
-		return new HibernateOrmMapping(
-				mappingDelegate, typeContextContainer, sessionFactory,
-				synchronizationStrategy,
-				cacheLookupStrategy, fetchSize
-		);
+		catch (RuntimeException e) {
+			new SuppressingCloser( e )
+					.push( synchronizationStrategyHolder );
+			throw e;
+		}
 	}
 
 	private final SessionFactoryImplementor sessionFactory;
 	private final HibernateOrmTypeContextContainer typeContextContainer;
-	private final AutomaticIndexingSynchronizationStrategy synchronizationStrategy;
+	private final BeanHolder<? extends AutomaticIndexingSynchronizationStrategy> defaultSynchronizationStrategyHolder;
 	private final EntityLoadingCacheLookupStrategy cacheLookupStrategy;
 	private final int fetchSize;
 
 	private HibernateOrmMapping(PojoMappingDelegate mappingDelegate,
 			HibernateOrmTypeContextContainer typeContextContainer,
 			SessionFactoryImplementor sessionFactory,
-			AutomaticIndexingSynchronizationStrategy synchronizationStrategy,
+			BeanHolder<? extends AutomaticIndexingSynchronizationStrategy> defaultSynchronizationStrategyHolder,
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy,
 			int fetchSize) {
 		super( mappingDelegate );
 		this.typeContextContainer = typeContextContainer;
 		this.sessionFactory = sessionFactory;
-		this.synchronizationStrategy = synchronizationStrategy;
+		this.defaultSynchronizationStrategyHolder = defaultSynchronizationStrategyHolder;
 		this.cacheLookupStrategy = cacheLookupStrategy;
 		this.fetchSize = fetchSize;
+	}
+
+	@Override
+	protected void doClose() {
+		defaultSynchronizationStrategyHolder.close();
 	}
 
 	@Override
@@ -259,7 +255,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		return new HibernateOrmSearchSession.Builder(
 				this, typeContextContainer,
 				sessionImplementor,
-				synchronizationStrategy
+				defaultSynchronizationStrategyHolder.get()
 		);
 	}
 

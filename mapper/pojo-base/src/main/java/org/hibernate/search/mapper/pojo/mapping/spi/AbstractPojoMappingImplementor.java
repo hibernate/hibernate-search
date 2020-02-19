@@ -41,12 +41,14 @@ public abstract class AbstractPojoMappingImplementor<M>
 	}
 
 	@Override
-	public void close() {
+	public final void close() {
 		if ( !closed ) {
 			// Make sure to avoid infinite recursion when one of the delegates calls this.close()
 			closed = true;
 			try ( Closer<RuntimeException> closer = new Closer<>() ) {
 				closer.push( PojoMappingDelegate::close, delegate );
+				closer.push( AbstractPojoMappingImplementor::doClose, this );
+				doClose();
 				closer.pushAll( CloseDelegate::close, closeDelegates );
 			}
 		}
@@ -73,12 +75,15 @@ public abstract class AbstractPojoMappingImplementor<M>
 		return delegate.createIndexer( context, commitStrategy );
 	}
 
+	public void onClose(CloseDelegate closeable) {
+		closeDelegates.add( closeable );
+	}
+
 	protected final PojoMappingDelegate getDelegate() {
 		return delegate;
 	}
 
-	public void onClose(CloseDelegate closeable) {
-		closeDelegates.add( closeable );
+	protected void doClose() {
 	}
 
 	public interface CloseDelegate extends AutoCloseable {

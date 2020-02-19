@@ -7,10 +7,12 @@
 package org.hibernate.search.mapper.orm.cfg;
 
 import org.hibernate.search.engine.cfg.EngineSettings;
+import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
-import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyName;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
+import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationStrategy;
 
 /**
  * @author Emmanuel Bernard
@@ -51,12 +53,11 @@ public final class HibernateOrmMapperSettings {
 	/**
 	 * The synchronization strategy to use when indexing automatically.
 	 * <p>
-	 * Expects a {@link AutomaticIndexingSynchronizationStrategyName} value,
-	 * or a String representation of such value.
+	 * Expects one of the strings defined in {@link AutomaticIndexingSynchronizationStrategyNames}.
 	 * <p>
 	 * Defaults to {@link Defaults#AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY}.
 	 *
-	 * @see AutomaticIndexingSynchronizationStrategyName
+	 * @see AutomaticIndexingSynchronizationStrategyNames
 	 */
 	public static final String AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY = PREFIX + Radicals.AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY;
 
@@ -146,8 +147,8 @@ public final class HibernateOrmMapperSettings {
 		public static final boolean ENABLED = true;
 		public static final AutomaticIndexingStrategyName AUTOMATIC_INDEXING_STRATEGY =
 				AutomaticIndexingStrategyName.SESSION;
-		public static final AutomaticIndexingSynchronizationStrategyName AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
-				AutomaticIndexingSynchronizationStrategyName.WRITE_SYNC;
+		public static final BeanReference<AutomaticIndexingSynchronizationStrategy> AUTOMATIC_INDEXING_SYNCHRONIZATION_STRATEGY =
+				BeanReference.of( AutomaticIndexingSynchronizationStrategy.class, "write-sync" );
 		public static final boolean AUTOMATIC_INDEXING_ENABLE_DIRTY_CHECK = true;
 		public static final EntityLoadingCacheLookupStrategy QUERY_LOADING_CACHE_LOOKUP_STRATEGY =
 				EntityLoadingCacheLookupStrategy.SKIP;

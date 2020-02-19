@@ -24,7 +24,7 @@ import org.hibernate.SessionFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.mapper.orm.Search;
-import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyName;
+import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.session.AutomaticIndexingSynchronizationConfigurationContext;
@@ -71,7 +71,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void success_async() throws InterruptedException, ExecutionException, TimeoutException {
-		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.ASYNC );
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.ASYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
 		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingNoBlock(
@@ -108,7 +108,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void success_writeSync_explicit() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.WRITE_SYNC );
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
 		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingBlock(
@@ -130,7 +130,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void success_readSync() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.READ_SYNC );
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.READ_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
 		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingBlock(
@@ -152,7 +152,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void success_sync() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.SYNC );
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
 		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingBlock(
@@ -174,7 +174,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void success_override_writeSyncToSync() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.WRITE_SYNC );
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
 		CompletableFuture<?> transactionThreadFuture = runTransactionInDifferentThreadExpectingBlock(
@@ -196,7 +196,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void success_override_writeSyncToCustom() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.WRITE_SYNC );
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 
 		AtomicReference<CompletableFuture<?>> futureThatTookTooLong = new AtomicReference<>( null );
@@ -216,7 +216,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void failure_async() throws InterruptedException, ExecutionException, TimeoutException {
-		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.ASYNC );
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.ASYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
 
@@ -269,7 +269,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void failure_writeSync_explicit() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.WRITE_SYNC );
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
 
@@ -294,7 +294,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void failure_readSync() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.READ_SYNC );
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.READ_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
 
@@ -319,7 +319,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void failure_sync() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.SYNC );
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
 
@@ -344,7 +344,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void failure_override_writeSyncToSync() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.WRITE_SYNC );
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
 
@@ -369,7 +369,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void failure_override_writeSyncToCustom() throws InterruptedException, TimeoutException, ExecutionException {
-		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyName.WRITE_SYNC );
+		SessionFactory sessionFactory = setup( AutomaticIndexingSynchronizationStrategyNames.WRITE_SYNC );
 		CompletableFuture<?> indexingWorkFuture = new CompletableFuture<>();
 		Throwable indexingWorkException = new RuntimeException( "Some message" );
 
@@ -473,7 +473,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		return transactionThreadFuture;
 	}
 
-	private SessionFactory setup(AutomaticIndexingSynchronizationStrategyName strategyName) {
+	private SessionFactory setup(String strategyName) {
 		OrmSetupHelper.SetupContext setupContext = ormSetupHelper.start();
 		if ( strategyName != null ) {
 			setupContext.withProperty(

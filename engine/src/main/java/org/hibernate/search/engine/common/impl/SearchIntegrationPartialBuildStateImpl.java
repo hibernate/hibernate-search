@@ -118,7 +118,8 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 				);
 			}
 
-			MappingFinalizationContext mappingFinalizationContext = new MappingFinalizationContextImpl( propertySource );
+			MappingFinalizationContext mappingFinalizationContext =
+					new MappingFinalizationContextImpl( propertySource, beanResolver );
 
 			MappingImplementor<M> mapping = finalizer.finalizeMapping( mappingFinalizationContext, partiallyBuiltMapping );
 			fullyBuiltMappings.add( mapping );
