@@ -58,7 +58,7 @@ public class LocalFileSystemDirectoryProvider implements DirectoryProvider {
 		this.directoryRoot = ROOT.get( propertySource ).toAbsolutePath();
 		FileSystemAccessStrategyName accessStrategyName = FILESYSTEM_ACCESS_STRATEGY.get( propertySource );
 		this.accessStrategy = FileSystemAccessStrategy.get( accessStrategyName );
-		this.lockFactory = context.createConfiguredLockFactory().orElseGet( FSLockFactory::getDefault );
+		this.lockFactory = context.createConfiguredLockFactorySupplier().orElseGet( () -> FSLockFactory::getDefault ).get();
 
 		try {
 			FileSystemUtils.initializeWriteableDirectory( directoryRoot );
