@@ -259,7 +259,7 @@ public class ElasticsearchIndexValidationAnalyzerIT {
 							+ "'custom-analyzer': {"
 									+ "'char_filter': ['custom-pattern-replace'],"
 									+ "'tokenizer': 'custom-edgeNGram',"
-									+ "'filter': ['standard', 'custom-word-delimiter']"
+									+ "'filter': ['lowercase', 'custom-word-delimiter']"
 							+ "}"
 					+ "},"
 					+ "'char_filter': {"
@@ -299,7 +299,7 @@ public class ElasticsearchIndexValidationAnalyzerIT {
 						.analyzerContext( "custom-analyzer" )
 						.failure(
 								"Invalid token filters. Expected '[custom-keep-types, custom-word-delimiter]',"
-										+ " actual is '[standard, custom-word-delimiter]'"
+										+ " actual is '[lowercase, custom-word-delimiter]'"
 						)
 						.build()
 		);
