@@ -82,7 +82,7 @@ public interface Log extends BasicLogger {
 	void indexingSpeed(float estimateSpeed, float estimatePercentileComplete);
 
 	@LogMessage(level = INFO)
-	@Message(id = ID_OFFSET_1 + 34, value = "Hibernate Search {%1$s}")
+	@Message(id = ID_OFFSET_1 + 34, value = "Hibernate Search version %1$s")
 	void version(String versionString);
 
 	@LogMessage(level = WARN)
