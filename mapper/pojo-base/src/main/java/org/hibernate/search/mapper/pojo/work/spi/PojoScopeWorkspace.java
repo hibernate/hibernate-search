@@ -6,13 +6,14 @@
  */
 package org.hibernate.search.mapper.pojo.work.spi;
 
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 public interface PojoScopeWorkspace {
 
 	CompletableFuture<?> mergeSegments();
 
-	CompletableFuture<?> purge();
+	CompletableFuture<?> purge(Set<String> routingKeys);
 
 	CompletableFuture<?> flush();
 

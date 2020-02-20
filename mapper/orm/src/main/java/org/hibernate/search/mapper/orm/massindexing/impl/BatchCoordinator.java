@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.orm.massindexing.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -178,7 +179,7 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	 */
 	private void beforeBatch() throws InterruptedException {
 		if ( this.purgeAtStart ) {
-			Futures.unwrappedExceptionGet( scopeWorkspace.purge() );
+			Futures.unwrappedExceptionGet( scopeWorkspace.purge( Collections.emptySet() ) );
 			if ( this.mergeSegmentsAfterPurge ) {
 				Futures.unwrappedExceptionGet( scopeWorkspace.mergeSegments() );
 			}

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.mapper.orm.work;
 
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -23,9 +24,9 @@ import java.util.concurrent.CompletableFuture;
 public interface SearchWorkspace {
 
 	/**
-	 * Purge the data targeted by this workspaces, removing all documents.
+	 * Delete all documents from indexes targeted by this workspace.
 	 * <p>
-	 * When using multi-tenancy, only documents of one tenant will be removed:
+	 * With multi-tenancy enabled, only documents of the current tenant will be removed:
 	 * the tenant that was targeted by the session from where this workspace originated.
 	 */
 	void purge();
@@ -37,6 +38,28 @@ public interface SearchWorkspace {
 	 * @see #purge()
 	 */
 	CompletableFuture<?> purgeAsync();
+
+	/**
+	 * Delete documents from indexes targeted by this workspace
+	 * that were indexed with any of the given routing keys.
+	 * <p>
+	 * With multi-tenancy enabled, only documents of the current tenant will be removed:
+	 * the tenant that was targeted by the session from where this workspace originated.
+	 *
+	 * @param routingKeys The set of routing keys.
+	 * If non-empty, only documents that were indexed with these routing keys will be deleted.
+	 * If empty, documents will be deleted regardless of their routing key.
+	 */
+	void purge(Set<String> routingKeys);
+
+	/**
+	 * Asynchronous version of {@link #purge(Set)}, returning as soon as the operation is queued.
+	 *
+	 * @param routingKeys The set of routing keys.
+	 * @return A {@link CompletableFuture} reflecting the completion state of the operation.
+	 * @see #purge(Set)
+	 */
+	CompletableFuture<?> purgeAsync(Set<String> routingKeys);
 
 	/**
 	 * Flush to disk the changes to indexes that were not committed yet.

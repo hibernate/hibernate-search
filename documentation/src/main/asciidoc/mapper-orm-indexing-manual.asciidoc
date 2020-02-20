@@ -261,12 +261,20 @@ without waiting for the transaction commit.
 This interface offers the following methods:
 
 `purge()`::
-Purge the indexes targeted by this workspace, removing all documents.
+Delete all documents from indexes targeted by this workspace.
 +
-When using multi-tenancy, only documents of one tenant will be removed:
+With multi-tenancy enabled, only documents of the current tenant will be removed:
 the tenant of the session from which this workspace originated.
 `purgeAsync()`::
 Asynchronous version of `purge()` returning a `CompletableFuture`.
+`purge(Set<String> routingKeys)`::
+Delete documents from indexes targeted by this workspace
+that were indexed with any of the given routing keys.
++
+With multi-tenancy enabled, only documents of the current tenant will be removed:
+the tenant of the session from which this workspace originated.
+`purgeAsync(Set<String> routingKeys)`::
+Asynchronous version of `purge(Set<String>)` returning a `CompletableFuture`.
 [[mapper-orm-indexing-manual-flush]]`flush()`::
 Flush to disk the changes to indexes that have not been committed yet.
 In the case of backends with a transaction log (Elasticsearch),

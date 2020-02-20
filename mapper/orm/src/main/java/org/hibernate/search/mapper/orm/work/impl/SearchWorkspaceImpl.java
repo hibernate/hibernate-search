@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.work.impl;
 
+import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
@@ -31,12 +33,22 @@ public class SearchWorkspaceImpl implements SearchWorkspace {
 
 	@Override
 	public void purge() {
-		Futures.unwrappedExceptionJoin( purgeAsync() );
+		purge( Collections.emptySet() );
 	}
 
 	@Override
 	public CompletableFuture<?> purgeAsync() {
-		return delegate.purge();
+		return purgeAsync( Collections.emptySet() );
+	}
+
+	@Override
+	public void purge(Set<String> routingKeys) {
+		Futures.unwrappedExceptionJoin( purgeAsync() );
+	}
+
+	@Override
+	public CompletableFuture<?> purgeAsync(Set<String> routingKeys) {
+		return delegate.purge( routingKeys );
 	}
 
 	@Override
