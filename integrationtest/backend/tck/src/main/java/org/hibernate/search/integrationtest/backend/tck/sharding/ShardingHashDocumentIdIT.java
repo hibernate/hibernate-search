@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.sharding;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -96,6 +97,22 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 						.toQuery()
 		)
 				.hasNoHits();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3824")
+	public void purgeWithRoutingKey() {
+		Iterator<String> iterator = docIds.iterator();
+		String someDocumentId = iterator.next();
+
+		indexManager.createWorkspace().purge( Collections.singleton( someDocumentId ) ).join();
+
+		// One or more explicit routing key => no document should be purged, since no documents was indexed with that routing key.
+		indexManager.createWorkspace().refresh().join();
+		SearchResultAssert.assertThat( indexManager.createScope().query().where( f -> f.matchAll() ).toQuery() )
+				.hits().asNormalizedDocRefs()
+				.hasSize( TOTAL_DOCUMENT_COUNT )
+				.containsExactlyInAnyOrder( allDocRefs( docIdByRoutingKey ) );
 	}
 
 }

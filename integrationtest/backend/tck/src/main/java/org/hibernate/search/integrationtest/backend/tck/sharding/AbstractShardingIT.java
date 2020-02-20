@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.sharding;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -44,7 +45,7 @@ public abstract class AbstractShardingIT {
 		return docRefs( docIdByRoutingKey.get( routingKey ).stream() );
 	}
 
-	protected static DocumentReference[] docRefsForRoutingKeys(List<String> routingKeys, Map<String, List<String>> docIdByRoutingKey) {
+	protected static DocumentReference[] docRefsForRoutingKeys(Collection<String> routingKeys, Map<String, List<String>> docIdByRoutingKey) {
 		return docRefs( routingKeys.stream().flatMap( routingKey -> docIdByRoutingKey.get( routingKey ).stream() ) );
 	}
 

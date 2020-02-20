@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.sharding;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
@@ -20,9 +21,11 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBack
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
+import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -134,6 +137,80 @@ public abstract class AbstractShardingRoutingKeyIT extends AbstractShardingIT {
 				.hits().asNormalizedDocRefs()
 				.hasSize( totalDocumentCount )
 				.containsExactlyInAnyOrder( allDocRefs( docIdByRoutingKey ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3824")
+	public void purge_noRoutingKey() {
+		indexManager.createWorkspace().purge( Collections.emptySet() ).join();
+
+		// No routing key => all documents should be purged
+		indexManager.createWorkspace().refresh().join();
+		SearchResultAssert.assertThat( indexManager.createScope().query().where( f -> f.matchAll() ).toQuery() )
+				.hasNoHits();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3824")
+	public void purge_oneRoutingKey() {
+		Iterator<String> iterator = docIdByRoutingKey.keySet().iterator();
+		String someRoutingKey = iterator.next();
+
+		Set<String> otherRoutingKeys = new LinkedHashSet<>( routingKeys );
+		otherRoutingKeys.remove( someRoutingKey );
+
+		indexManager.createWorkspace().purge( Collections.singleton( someRoutingKey ) ).join();
+
+		/*
+		 * One routing key => all documents indexed with that routing key should be purged,
+		 * and only those documents.
+		 */
+		indexManager.createWorkspace().refresh().join();
+		SearchResultAssert.assertThat( indexManager.createScope().query().where( f -> f.matchAll() ).toQuery() )
+				.hits().asNormalizedDocRefs()
+				.containsExactlyInAnyOrder( docRefsForRoutingKeys( otherRoutingKeys, docIdByRoutingKey ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3824")
+	public void purge_twoRoutingKeys() {
+		Assume.assumeTrue(
+				"Passing multiple routing keys is not supported in this configuration",
+				TckConfiguration.get().getBackendFeatures().supportsManyRoutingKeys()
+		);
+
+		Iterator<String> iterator = docIdByRoutingKey.keySet().iterator();
+		Set<String> twoRoutingKeys = CollectionHelper.asImmutableSet( iterator.next(), iterator.next() );
+
+		Set<String> otherRoutingKeys = new LinkedHashSet<>( routingKeys );
+		otherRoutingKeys.removeAll( twoRoutingKeys );
+
+		indexManager.createWorkspace().purge( twoRoutingKeys ).join();
+
+		/*
+		 * Two routing keys => all documents indexed with these routing keys should be returned,
+		 * and only those documents.
+		 */
+		indexManager.createWorkspace().refresh().join();
+		SearchResultAssert.assertThat( indexManager.createScope().query().where( f -> f.matchAll() ).toQuery() )
+				.hits().asNormalizedDocRefs()
+				.containsExactlyInAnyOrder( docRefsForRoutingKeys( otherRoutingKeys, docIdByRoutingKey ) );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3824")
+	public void purge_allRoutingKeys() {
+		Assume.assumeTrue(
+				"Passing multiple routing keys is not supported in this configuration",
+				TckConfiguration.get().getBackendFeatures().supportsManyRoutingKeys()
+		);
+
+		indexManager.createWorkspace().purge( routingKeys ).join();
+
+		// All routing keys => all documents should be purged
+		indexManager.createWorkspace().refresh().join();
+		SearchResultAssert.assertThat( indexManager.createScope().query().where( f -> f.matchAll() ).toQuery() )
+				.hasNoHits();
 	}
 
 	protected void configure(SearchSetupHelper.SetupContext setupContext) {
