@@ -7,7 +7,9 @@
 package org.hibernate.search.integrationtest.backend.tck.sharding;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -76,21 +78,45 @@ public class ShardingDisabledRoutingKeyIT extends AbstractShardingIT {
 				.hasSize( totalDocumentCount )
 				.containsExactlyInAnyOrder( allDocRefs( docIdByRoutingKey ) );
 
-		// Even with a routing key, all documents should be returned, since sharding is disabled
-		SearchResultAssert.assertThat( indexManager.createScope().query()
-				.where( f -> f.matchAll() )
-				.routing( docIdByRoutingKey.keySet().iterator().next() )
-				.toQuery()
+		// Now test with a specific routing key
+		Iterator<String> iterator = docIdByRoutingKey.keySet().iterator();
+		String someRoutingKey = iterator.next();
+		String someOtherRoutingKey = iterator.next();
+
+		/*
+		 * One routing key => all documents indexed with that routing key should be returned,
+		 * and only those documents.
+		 */
+		SearchResultAssert.assertThat(
+				indexManager.createScope().query()
+						.where( f -> f.matchAll() )
+						.routing( someRoutingKey )
+						.toQuery()
 		)
 				.hits().asNormalizedDocRefs()
-				.hasSize( totalDocumentCount )
-				.containsExactlyInAnyOrder( allDocRefs( docIdByRoutingKey ) );
+				.hasSize( documentCountPerRoutingKey )
+				.containsExactlyInAnyOrder( docRefsForRoutingKey( someRoutingKey, docIdByRoutingKey ) );
 
 		if ( !TckConfiguration.get().getBackendFeatures().supportsManyRoutingKeys() ) {
 			return;
 		}
 
-		// Same goes with all routing keys
+		/*
+		 * Two routing keys => all documents indexed with these routing keys should be returned,
+		 * and only those documents.
+		 */
+		List<String> twoRoutingKeys = Arrays.asList( someRoutingKey, someOtherRoutingKey );
+		SearchResultAssert.assertThat(
+				indexManager.createScope().query()
+						.where( f -> f.matchAll() )
+						.routing( twoRoutingKeys )
+						.toQuery()
+		)
+				.hits().asNormalizedDocRefs()
+				.hasSize( documentCountPerRoutingKey * 2 )
+				.containsExactlyInAnyOrder( docRefsForRoutingKeys( twoRoutingKeys, docIdByRoutingKey ) );
+
+		// All routing keys => all documents should be returned
 		SearchResultAssert.assertThat( indexManager.createScope().query()
 				.where( f -> f.matchAll() )
 				.routing( docIdByRoutingKey.keySet() )

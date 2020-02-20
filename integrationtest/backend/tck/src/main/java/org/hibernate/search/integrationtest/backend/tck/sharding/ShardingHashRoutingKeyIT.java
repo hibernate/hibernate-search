@@ -6,14 +6,13 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.sharding;
 
-import static org.assertj.core.api.Assertions.withinPercentage;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
@@ -55,7 +54,6 @@ public class ShardingHashRoutingKeyIT extends AbstractShardingIT {
 		int routingKeyCount = SHARD_COUNT * 4;
 		int documentCountPerRoutingKey = 100;
 		int totalDocumentCount = routingKeyCount * documentCountPerRoutingKey;
-		int estimatedDocumentCountPerShard = totalDocumentCount / SHARD_COUNT;
 
 		// Provide explicit routing keys when indexing
 		Map<String, List<String>> docIdByRoutingKey = new HashMap<>();
@@ -84,42 +82,42 @@ public class ShardingHashRoutingKeyIT extends AbstractShardingIT {
 				.containsExactlyInAnyOrder( allDocRefs( docIdByRoutingKey ) );
 
 		// Now test with a specific routing key
-		String someRoutingKey = docIdByRoutingKey.keySet().iterator().next();
+		Iterator<String> iterator = docIdByRoutingKey.keySet().iterator();
+		String someRoutingKey = iterator.next();
+		String someOtherRoutingKey = iterator.next();
 
-		SearchResultAssert<DocumentReference> singleRoutingKeyQueryAssert = SearchResultAssert.assertThat(
+		/*
+		 * One routing key => all documents indexed with that routing key should be returned,
+		 * and only those documents.
+		 */
+		SearchResultAssert.assertThat(
 				indexManager.createScope().query()
 						.where( f -> f.matchAll() )
 						.routing( someRoutingKey )
 						.toQuery()
-		);
-		/*
-		 * Targeting one specific routing key, when there is a reasonable number of shards,
-		 * must return approximately (total number of documents) / (total number of shards).
-		 * Hash functions are not perfect, so we accept a difference of more or less 50%.
-		 */
-		singleRoutingKeyQueryAssert.totalHitCount()
-				.isCloseTo( estimatedDocumentCountPerShard, withinPercentage( 50 ) );
-		// Targeting one specific routing key must return at least all documents indexed with that routing key.
-		singleRoutingKeyQueryAssert.hits().asNormalizedDocRefs()
-				.contains( docRefsForRoutingKey( someRoutingKey, docIdByRoutingKey ) );
-
-		/*
-		 * In a real world scenario, users would add a predicate to the query
-		 * to restrict the hits to only those documents that had this exact routing key
-		 * (and not documents with different routing keys that happen to be in the same shard).
-		 * Let's test this.
-		 */
-		SearchResultAssert.assertThat( indexManager.createScope().query()
-				.where( f -> f.match().field( "indexedRoutingKey" ).matching( someRoutingKey ) )
-				.routing( someRoutingKey )
-				.toQuery()
 		)
 				.hits().asNormalizedDocRefs()
+				.hasSize( documentCountPerRoutingKey )
 				.containsExactlyInAnyOrder( docRefsForRoutingKey( someRoutingKey, docIdByRoutingKey ) );
 
 		if ( !TckConfiguration.get().getBackendFeatures().supportsManyRoutingKeys() ) {
 			return;
 		}
+
+		/*
+		 * Two routing keys => all documents indexed with these routing keys should be returned,
+		 * and only those documents.
+		 */
+		List<String> twoRoutingKeys = Arrays.asList( someRoutingKey, someOtherRoutingKey );
+		SearchResultAssert.assertThat(
+				indexManager.createScope().query()
+						.where( f -> f.matchAll() )
+						.routing( twoRoutingKeys )
+						.toQuery()
+		)
+				.hits().asNormalizedDocRefs()
+				.hasSize( documentCountPerRoutingKey * 2 )
+				.containsExactlyInAnyOrder( docRefsForRoutingKeys( twoRoutingKeys, docIdByRoutingKey ) );
 
 		// All routing keys => all documents should be returned
 		SearchResultAssert.assertThat( indexManager.createScope().query()

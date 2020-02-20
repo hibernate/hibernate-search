@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.work.execution.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.lowlevel.query.Queries;
+import org.hibernate.search.backend.elasticsearch.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -16,6 +16,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elas
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 public class ElasticsearchIndexWorkspace implements IndexWorkspace {
@@ -44,12 +45,16 @@ public class ElasticsearchIndexWorkspace implements IndexWorkspace {
 
 	@Override
 	public CompletableFuture<?> purge() {
+		JsonArray filters = new JsonArray();
 		JsonObject filter = multiTenancyStrategy.getFilterOrNull( sessionContext.getTenantIdentifier() );
+		if ( filter != null ) {
+			filters.add( filter );
+		}
 
 		JsonObject payload = new JsonObject();
 		payload.add(
 				"query",
-				Queries.boolFilter( Queries.matchAll(), filter )
+				Queries.boolFilter( Queries.matchAll(), filters )
 		);
 
 		return orchestrator.submit( builderFactory.deleteByQuery( indexName, payload ).build() );

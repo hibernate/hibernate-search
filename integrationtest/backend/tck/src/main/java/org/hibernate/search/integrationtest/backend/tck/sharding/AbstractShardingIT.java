@@ -44,6 +44,10 @@ public abstract class AbstractShardingIT {
 		return docRefs( docIdByRoutingKey.get( routingKey ).stream() );
 	}
 
+	protected static DocumentReference[] docRefsForRoutingKeys(List<String> routingKeys, Map<String, List<String>> docIdByRoutingKey) {
+		return docRefs( routingKeys.stream().flatMap( routingKey -> docIdByRoutingKey.get( routingKey ).stream() ) );
+	}
+
 	protected static DocumentReference[] docRefs(Stream<String> docIds) {
 		return NormalizedDocRefHit.of( b -> {
 			docIds.forEach( docId -> b.doc( INDEX_NAME, docId ) );

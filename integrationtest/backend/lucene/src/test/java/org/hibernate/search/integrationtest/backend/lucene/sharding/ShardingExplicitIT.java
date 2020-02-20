@@ -97,7 +97,6 @@ public class ShardingExplicitIT extends AbstractShardingIT {
 
 		/*
 		 * Specific routing key => all documents from the corresponding shards should be returned, and only those.
-		 * This is the main advantage of the "explicit" sharding strategy.
 		 */
 		SearchResultAssert.assertThat( indexManager.createScope().query()
 				.where( f -> f.matchAll() )

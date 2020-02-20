@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-import org.hibernate.search.backend.elasticsearch.lowlevel.query.Queries;
+import org.hibernate.search.backend.elasticsearch.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
@@ -165,8 +165,15 @@ public class ElasticsearchSearchQueryBuilder<H>
 	public ElasticsearchSearchQuery<H> build() {
 		JsonObject payload = new JsonObject();
 
+		JsonArray filters = new JsonArray();
 		JsonObject filter = searchContext.getFilterOrNull( sessionContext.getTenantIdentifier() );
-		JsonObject jsonQuery = Queries.boolFilter( jsonPredicate, filter );
+		if ( filter != null ) {
+			filters.add( filter );
+		}
+		if ( !routingKeys.isEmpty() ) {
+			filters.add( Queries.anyTerm( "_routing", routingKeys ) );
+		}
+		JsonObject jsonQuery = Queries.boolFilter( jsonPredicate, filters );
 
 		if ( jsonQuery != null ) {
 			payload.add( "query", jsonQuery );

@@ -263,7 +263,7 @@ If it does, the document will be routed to that shard.
 If it does not, an exception will be thrown.
 The routing key cannot be null, and the document ID will be ignored.
 +
-This strategy is suitable when there an explicit routing key
+This strategy is suitable when there is an explicit routing key
 <<mapper-orm-bridge-routingkeybridge,configured in the mapping>>,
 and that routing key has a limited number of possible values that are known before starting the application.
 

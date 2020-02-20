@@ -6,16 +6,14 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.sharding;
 
-import static org.assertj.core.api.Assertions.withinPercentage;
-
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.NormalizedDocRefHit;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -77,22 +75,27 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 				.hasSize( totalDocumentCount )
 				.containsExactlyInAnyOrder( allDocRefs( docIdByRoutingKey ) );
 
-		// Now test with a specific document ID as routing key
-		String someDocumentId = docIds.iterator().next();
+		Iterator<String> iterator = docIds.iterator();
+		String someDocumentId = iterator.next();
+		String someOtherDocumentId = iterator.next();
 
-		SearchResultAssert<DocumentReference> documentIdAsRoutingKeyQueryAssert = SearchResultAssert.assertThat(
+		// One or more explicit routing key => no document should be returned, since no documents was indexed with that routing key.
+		SearchResultAssert.assertThat(
 				indexManager.createScope().query()
 						.where( f -> f.matchAll() )
 						.routing( someDocumentId )
 						.toQuery()
-		);
-		// Targeting one specific routing key, when there is a reasonable number of shards,
-		// must return approximately (total number of documents) / (total number of shards).
-		documentIdAsRoutingKeyQueryAssert.totalHitCount()
-				.isCloseTo( estimatedDocumentCountPerShard, withinPercentage( 20 ) );
-		// Check that the document ID was used as routing key
-		documentIdAsRoutingKeyQueryAssert.hits().asNormalizedDocRefs()
-				.contains( NormalizedDocRefHit.of( INDEX_NAME, someDocumentId ) );
+		)
+				.hasNoHits();
+
+		// Multiple explicit routing keys => no result: documents were indexed without a routing key.
+		SearchResultAssert.assertThat(
+				indexManager.createScope().query()
+						.where( f -> f.matchAll() )
+						.routing( Arrays.asList( someDocumentId, someOtherDocumentId ) )
+						.toQuery()
+		)
+				.hasNoHits();
 	}
 
 }

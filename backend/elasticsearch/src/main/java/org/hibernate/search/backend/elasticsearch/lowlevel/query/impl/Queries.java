@@ -4,8 +4,11 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.lowlevel.query;
+package org.hibernate.search.backend.elasticsearch.lowlevel.query.impl;
 
+import java.util.Set;
+
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 public final class Queries {
@@ -30,8 +33,23 @@ public final class Queries {
 		return predicate;
 	}
 
-	public static JsonObject boolFilter(JsonObject must, JsonObject filter) {
-		if ( filter == null ) {
+	public static JsonObject anyTerm(String absoluteFieldPath, Set<String> values) {
+		JsonObject predicate = new JsonObject();
+
+		JsonObject innerObject = new JsonObject();
+		predicate.add( "terms", innerObject );
+
+		JsonArray terms = new JsonArray();
+		innerObject.add( absoluteFieldPath, terms );
+		for ( String value : values ) {
+			terms.add( value );
+		}
+
+		return predicate;
+	}
+
+	public static JsonObject boolFilter(JsonObject must, JsonArray filters) {
+		if ( filters == null || filters.size() == 0 ) {
 			return must;
 		}
 
@@ -42,7 +60,7 @@ public final class Queries {
 		if ( must != null ) {
 			innerObject.add( "must", must );
 		}
-		innerObject.add( "filter", filter );
+		innerObject.add( "filter", filters );
 
 		return predicate;
 	}

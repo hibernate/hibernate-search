@@ -17,6 +17,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
@@ -168,6 +169,10 @@ public class LuceneSearchQueryBuilder<H>
 		BooleanQuery.Builder luceneQueryBuilder = new BooleanQuery.Builder();
 		luceneQueryBuilder.add( luceneQuery, Occur.MUST );
 		luceneQueryBuilder.add( Queries.mainDocumentQuery(), Occur.FILTER );
+		if ( !routingKeys.isEmpty() ) {
+			Query routingKeysQuery = Queries.anyTerm( MetadataFields.routingKeyFieldName(), routingKeys );
+			luceneQueryBuilder.add( routingKeysQuery, Occur.FILTER );
+		}
 
 		Query filter = searchContext.getFilterOrNull( sessionContext.getTenantIdentifier() );
 		if ( filter != null ) {

@@ -233,24 +233,27 @@ When indexing:
 are generated from the indexed entity.
 * The document, along with its identifier and optionally its routing key,
 is passed to the backend.
-* The backend "routes" the document to the correct shard.
+* The backend "routes" the document to the correct shard,
+and adds the routing key (if any) to a special field in the document (so that it's indexed).
 * The document is indexed in that shard.
 
 When searching:
 
 * The search query can optionally be passed one or more routing keys.
-* If no routing key was passed,
+* If no routing key is passed,
 the query will be executed on all shards.
-* If one or more routing keys were passed,
-the backend will resolve these routing key into a set of shards,
+* If one or more routing keys are passed:
+** The backend resolves these routing keys into a set of shards,
 and the query will only be executed on all shards,
 ignoring the other shards.
+** A filter is added to the query so that only documents indexed with
+one of the given routing keys are matched.
 
 Sharding, then, can be leveraged to boost performance in two ways:
 
-* When indexing: a sharded index can spread the "stress"
-onto multiple shards, which can be located on different disks (Lucene)
-or even different servers (Elasticsearch).
+* When indexing: a sharded index can spread the "stress" onto multiple shards,
+which can be handled by separate threads and located on different disks (Lucene)
+or be located on different servers (Elasticsearch).
 * When searching: if one property, let's call it `category`,
 is often used to select a subset of documents,
 this property can be <<mapper-orm-bridge-routingkeybridge,defined as a routing key in the mapping>>,
@@ -258,7 +261,7 @@ so that it's used to route documents instead of the document ID.
 As a result, documents with the same value for `category` will be indexed in the same shard.
 Then when searching, if a query already filters documents so that it is known that the hits
 will all have the same value for `category`,
-the query can be <<search-dsl-query-routing,routed to the shards containing documents with this value>>,
+the query can be manually <<search-dsl-query-routing,routed to the shards containing documents with this value>>,
 *and the other shards can be ignored*.
 
 To enable sharding, some configuration is required:
@@ -269,6 +272,7 @@ and <<backend-elasticsearch-configuration-sharding,here for Elasticsearch>>.
 * In most cases, document IDs are used to route documents to shards by default.
 This does not allow taking advantage of routing when searching,
 which requires multiple documents to share the same routing key.
+Applying routing to a search query in that case will not return any result.
 To define the routing key to assign to each document,
 assign <<mapper-orm-bridge-routingkeybridge,routing key bridges>> to your entities.
 

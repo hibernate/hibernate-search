@@ -50,6 +50,17 @@ public class Queries {
 		return new TermQuery( new Term( MetadataFields.tenantIdFieldName(), tenantId ) );
 	}
 
+	public static Query anyTerm(String absoluteFieldPath, Set<String> values) {
+		BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder();
+		for ( String routingKey : values ) {
+			queryBuilder.add(
+					new TermQuery( new Term( absoluteFieldPath, routingKey ) ),
+					Occur.SHOULD
+			);
+		}
+		return queryBuilder.build();
+	}
+
 	public static BooleanQuery findChildQuery(Set<String> nestedDocumentPaths, Query originalParentQuery) {
 		QueryBitSetProducer parentsFilter = new QueryBitSetProducer( mainDocumentQuery() );
 		return findChildQuery( nestedDocumentPaths, originalParentQuery, parentsFilter );
