@@ -42,7 +42,7 @@ import org.junit.runners.Parameterized;
  * @param <F> The type of field values.
  */
 @RunWith(Parameterized.class)
-public class IndexingIT<F> {
+public class IndexingFieldTypesIT<F> {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -62,7 +62,7 @@ public class IndexingIT<F> {
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
 
-	public IndexingIT(FieldTypeDescriptor<F> typeDescriptor, Optional<IndexingExpectations<F>> expectations) {
+	public IndexingFieldTypesIT(FieldTypeDescriptor<F> typeDescriptor, Optional<IndexingExpectations<F>> expectations) {
 		Assume.assumeTrue(
 				"Type " + typeDescriptor + " does not define indexing expectations", expectations.isPresent()
 		);
