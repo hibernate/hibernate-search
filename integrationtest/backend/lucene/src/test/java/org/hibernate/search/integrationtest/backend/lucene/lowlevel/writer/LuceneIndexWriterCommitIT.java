@@ -11,11 +11,6 @@ import static org.assertj.core.api.Assertions.fail;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
@@ -24,7 +19,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
-import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneTckBackendAccessor;
+import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneIndexContentUtils;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
@@ -35,9 +30,6 @@ import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.store.Directory;
-import org.apache.lucene.store.FSDirectory;
 import org.awaitility.Awaitility;
 
 @RunWith(Parameterized.class)
@@ -162,45 +154,10 @@ public class LuceneIndexWriterCommitIT {
 	 * @throws IOException If an I/O failure occurs.
 	 */
 	private int countDocsOnDisk() throws IOException {
-		Path indexCopyPath = temporaryFolder.getRoot().toPath().resolve( INDEX_NAME + "_copy" );
-
-		int result;
-		LuceneTckBackendAccessor accessor = (LuceneTckBackendAccessor) setupHelper.getBackendAccessor();
-		try {
-			// Copy the index to be able to open a directory despite the lock
-			accessor.copyIndexContent( indexCopyPath, INDEX_NAME );
-
-			try ( Directory directory = FSDirectory.open( indexCopyPath );
-					DirectoryReader reader = DirectoryReader.open( directory ) ) {
-				result = reader.getDocCount( MetadataFields.idFieldName() );
-			}
-		}
-		finally {
-			try {
-				deleteRecursively( indexCopyPath );
-			}
-			catch (RuntimeException | IOException e) {
-				System.out.println( "Could not delete '" + indexCopyPath + "': " + e );
-			}
-		}
-
-		return result;
-	}
-
-	private void deleteRecursively(Path path) throws IOException {
-		Files.walkFileTree( path, new SimpleFileVisitor<Path>() {
-			@Override
-			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-				Files.delete( file );
-				return FileVisitResult.CONTINUE;
-			}
-
-			@Override
-			public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-				Files.deleteIfExists( dir );
-				return FileVisitResult.CONTINUE;
-			}
-		} );
+		return LuceneIndexContentUtils.doOnIndexCopy(
+				setupHelper, temporaryFolder, INDEX_NAME,
+				reader -> reader.getDocCount( MetadataFields.idFieldName() )
+		);
 	}
 
 	private SearchIntegration setup() {
