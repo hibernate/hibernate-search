@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
+import java.util.Set;
+
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 
-import org.apache.lucene.search.Query;
 import org.apache.lucene.search.Explanation;
+import org.apache.lucene.search.Query;
 
 
 public interface LuceneWorkFactory {
@@ -20,7 +22,7 @@ public interface LuceneWorkFactory {
 
 	LuceneSingleDocumentWriteWork<?> delete(String tenantId, String id);
 
-	LuceneWriteWork<?> deleteAll(String tenantId);
+	LuceneWriteWork<?> deleteAll(String tenantId, Set<String> routingKeys);
 
 	LuceneWriteWork<?> noOp();
 

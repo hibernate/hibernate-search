@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.query.impl;
 
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
@@ -43,6 +44,19 @@ public class Queries {
 		BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder();
 		queryBuilder.add( must, Occur.MUST );
 		queryBuilder.add( filter, Occur.FILTER );
+		return queryBuilder.build();
+	}
+
+	public static Query boolFilter(Query must, List<Query> filters) {
+		if ( filters == null || filters.isEmpty() ) {
+			return must;
+		}
+
+		BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder();
+		queryBuilder.add( must, Occur.MUST );
+		for ( Query filter : filters ) {
+			queryBuilder.add( filter, Occur.FILTER );
+		}
 		return queryBuilder.build();
 	}
 

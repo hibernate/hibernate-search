@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.work.impl;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -34,7 +35,8 @@ public class PojoScopeWorkspaceImpl implements PojoScopeWorkspace {
 
 	@Override
 	public CompletableFuture<?> purge() {
-		return doOperationOnTypes( IndexWorkspace::purge );
+		// TODO HSEARCH-3836 expose the routingKey parameter
+		return doOperationOnTypes( indexWorkspace -> indexWorkspace.purge( Collections.emptySet() ) );
 	}
 
 	@Override

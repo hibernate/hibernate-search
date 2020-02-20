@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.lowlevel.query.impl;
 
-import java.util.Set;
+import java.util.Collection;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -33,7 +33,7 @@ public final class Queries {
 		return predicate;
 	}
 
-	public static JsonObject anyTerm(String absoluteFieldPath, Set<String> values) {
+	public static JsonObject anyTerm(String absoluteFieldPath, Collection<String> values) {
 		JsonObject predicate = new JsonObject();
 
 		JsonObject innerObject = new JsonObject();

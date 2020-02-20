@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.backend.work.execution.spi;
 
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -15,7 +16,7 @@ public interface IndexWorkspace {
 
 	CompletableFuture<?> mergeSegments();
 
-	CompletableFuture<?> purge();
+	CompletableFuture<?> purge(Set<String> routingKeys);
 
 	CompletableFuture<?> flush();
 

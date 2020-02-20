@@ -7,6 +7,7 @@
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl;
 
 import java.util.Collections;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
@@ -34,9 +35,10 @@ class StubIndexWorkspace implements IndexWorkspace {
 	}
 
 	@Override
-	public CompletableFuture<?> purge() {
+	public CompletableFuture<?> purge(Set<String> routingKeys) {
 		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.PURGE )
 				.tenantIdentifier( sessionContext.getTenantIdentifier() )
+				.routingKeys( routingKeys )
 				.build();
 		return behavior.executeIndexScaleWork( Collections.singleton( indexName ), work );
 	}

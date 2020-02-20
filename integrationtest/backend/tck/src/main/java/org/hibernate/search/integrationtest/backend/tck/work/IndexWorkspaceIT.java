@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.work;
 
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -31,7 +32,7 @@ import org.assertj.core.api.Assertions;
 
 /**
  * Verify that the work executor operations:
- * {@link IndexWorkspace#mergeSegments()}, {@link IndexWorkspace#purge()}, {@link IndexWorkspace#flush()}, {@link IndexWorkspace#refresh()}
+ * {@link IndexWorkspace#mergeSegments()}, {@link IndexWorkspace#purge(java.util.Set)}, {@link IndexWorkspace#flush()}, {@link IndexWorkspace#refresh()}
  * work properly, in every backends.
  */
 public class IndexWorkspaceIT {
@@ -79,7 +80,7 @@ public class IndexWorkspaceIT {
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, noTenantSessionContext );
 
 		// purge without providing a tenant
-		workspace.purge().join();
+		workspace.purge( Collections.emptySet() ).join();
 		workspace.flush().join();
 		workspace.refresh().join();
 
@@ -111,7 +112,7 @@ public class IndexWorkspaceIT {
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant1SessionContext );
 		assertBookNumberIsEqualsTo( NUMBER_OF_BOOKS, tenant2SessionContext );
 
-		workspace.purge().join();
+		workspace.purge( Collections.emptySet() ).join();
 		workspace.flush().join();
 		workspace.refresh().join();
 

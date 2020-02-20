@@ -6,7 +6,13 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
+import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 
 import org.apache.lucene.search.Explanation;
@@ -41,9 +47,17 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	}
 
 	@Override
-	public LuceneWriteWork<?> deleteAll(String tenantId) {
+	public LuceneWriteWork<?> deleteAll(String tenantId, Set<String> routingKeys) {
+		List<Query> filters = new ArrayList<>();
 		Query filter = multiTenancyStrategy.getFilterOrNull( tenantId );
-		return new LuceneDeleteEntriesByQueryWork( filter != null ? filter : new MatchAllDocsQuery() );
+		if ( filter != null ) {
+			filters.add( filter );
+		}
+		if ( !routingKeys.isEmpty() ) {
+			filters.add( Queries.anyTerm( MetadataFields.routingKeyFieldName(), routingKeys ) );
+		}
+
+		return new LuceneDeleteEntriesByQueryWork( Queries.boolFilter( new MatchAllDocsQuery(), filters ) );
 	}
 
 	@Override

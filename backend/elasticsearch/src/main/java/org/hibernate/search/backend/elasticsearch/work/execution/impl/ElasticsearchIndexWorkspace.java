@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.execution.impl;
 
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.query.impl.Queries;
@@ -44,11 +45,14 @@ public class ElasticsearchIndexWorkspace implements IndexWorkspace {
 	}
 
 	@Override
-	public CompletableFuture<?> purge() {
+	public CompletableFuture<?> purge(Set<String> routingKeys) {
 		JsonArray filters = new JsonArray();
 		JsonObject filter = multiTenancyStrategy.getFilterOrNull( sessionContext.getTenantIdentifier() );
 		if ( filter != null ) {
 			filters.add( filter );
+		}
+		if ( !routingKeys.isEmpty() ) {
+			filters.add( Queries.anyTerm( "_routing", routingKeys ) );
 		}
 
 		JsonObject payload = new JsonObject();
@@ -57,7 +61,11 @@ public class ElasticsearchIndexWorkspace implements IndexWorkspace {
 				Queries.boolFilter( Queries.matchAll(), filters )
 		);
 
-		return orchestrator.submit( builderFactory.deleteByQuery( indexName, payload ).build() );
+		return orchestrator.submit(
+				builderFactory.deleteByQuery( indexName, payload )
+						.routingKeys( routingKeys )
+						.build()
+		);
 	}
 
 	@Override

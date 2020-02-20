@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -53,6 +54,8 @@ public class DeleteByQueryWork extends AbstractSimpleElasticsearchWork<Void> {
 		private final JsonObject payload;
 		private final Set<URLEncodedString> typeNames = new HashSet<>();
 
+		private Collection<String> routingKeys;
+
 		private final RefreshWorkBuilder refreshWorkBuilder;
 
 		public Builder(URLEncodedString indexName, JsonObject payload, ElasticsearchWorkBuilderFactory workFactory) {
@@ -60,6 +63,12 @@ public class DeleteByQueryWork extends AbstractSimpleElasticsearchWork<Void> {
 			this.indexName = indexName;
 			this.payload = payload;
 			this.refreshWorkBuilder = workFactory.refresh().index( indexName );
+		}
+
+		@Override
+		public DeleteByQueryWorkBuilder routingKeys(Collection<String> routingKeys) {
+			this.routingKeys = routingKeys;
+			return this;
 		}
 
 		@Override
@@ -75,6 +84,10 @@ public class DeleteByQueryWork extends AbstractSimpleElasticsearchWork<Void> {
 
 			if ( !typeNames.isEmpty() ) {
 				builder.multiValuedPathComponent( typeNames );
+			}
+
+			if ( routingKeys != null && !routingKeys.isEmpty() ) {
+				builder.multiValuedParam( "routing", routingKeys );
 			}
 
 			builder.pathComponent( Paths._DELETE_BY_QUERY )

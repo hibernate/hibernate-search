@@ -151,7 +151,7 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 				builder.param( "scroll", scrollTimeout );
 			}
 
-			if ( !routingKeys.isEmpty() ) {
+			if ( routingKeys != null && !routingKeys.isEmpty() ) {
 				builder.multiValuedParam( "routing", routingKeys );
 			}
 

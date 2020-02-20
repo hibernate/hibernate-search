@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.performance.backend.base.testsupport.index;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
@@ -95,7 +96,7 @@ public class IndexInitializer {
 		log( index, "Purging..." );
 		IndexWorkspace workspace = index.getIndexManager()
 				.createWorkspace( DetachedBackendSessionContext.of( sessionContext ) );
-		workspace.purge().join();
+		workspace.purge( Collections.emptySet() ).join();
 		log( index, "Finished purge." );
 
 		addToIndex( index, idStream );
