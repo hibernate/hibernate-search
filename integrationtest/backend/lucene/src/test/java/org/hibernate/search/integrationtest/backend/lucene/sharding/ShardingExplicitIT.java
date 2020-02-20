@@ -6,107 +6,37 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.sharding;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
-import org.hibernate.search.integrationtest.backend.tck.sharding.AbstractShardingIT;
+import org.hibernate.search.integrationtest.backend.tck.sharding.AbstractShardingRoutingKeyIT;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.impl.CollectionHelper;
-import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
-import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
 
 /**
  * A basic test for explicit sharding with explicit routing keys.
  */
-public class ShardingExplicitIT extends AbstractShardingIT {
+public class ShardingExplicitIT extends AbstractShardingRoutingKeyIT {
 
 	private static final String SHARD_ID_1 = "first";
 	private static final String SHARD_ID_2 = "second";
 	private static final String SHARD_ID_3 = "third";
-	private static final List<String> SHARD_IDS = CollectionHelper.asImmutableList(
+	private static final Set<String> SHARD_IDS = CollectionHelper.asImmutableSet(
 			SHARD_ID_1, SHARD_ID_2, SHARD_ID_3
 	);
 
-	private static final int DOCUMENT_COUNT_PER_SHARD = 100;
-	private static final int TOTAL_DOCUMENT_COUNT = SHARD_IDS.size() * DOCUMENT_COUNT_PER_SHARD;
+	public ShardingExplicitIT() {
+		super( TckBackendHelper::createDefaultBackendSetupStrategy, SHARD_IDS );
+	}
 
-	@Rule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	private final Map<String, List<String>> docIdByShardId = new HashMap<>();
-
-	@Before
-	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx, RoutingMode.EXPLICIT_ROUTING_KEYS ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.withIndexDefaultsProperty(
-						LuceneIndexSettings.SHARDING_STRATEGY, "explicit"
-				)
+	@Override
+	protected void configure(SearchSetupHelper.SetupContext setupContext) {
+		setupContext.withIndexDefaultsProperty( LuceneIndexSettings.SHARDING_STRATEGY, "explicit" )
 				.withIndexDefaultsProperty(
 						LuceneIndexSettings.SHARDING_SHARD_IDENTIFIERS,
 						SHARD_ID_1 + "," + SHARD_ID_2 + "," + SHARD_ID_3
-				)
-				.setup();
-
-		// Provide explicit routing keys when indexing; the routing keys are the shard IDs
-		for ( String shardId : SHARD_IDS ) {
-			for ( int documentIdAsIntegerForRoutingKey = 0;
-					documentIdAsIntegerForRoutingKey < DOCUMENT_COUNT_PER_SHARD;
-					documentIdAsIntegerForRoutingKey++ ) {
-				// Just make sure document IDs are unique across all shards
-				String documentId = shardId + "_" + documentIdAsIntegerForRoutingKey;
-				docIdByShardId.computeIfAbsent( shardId, ignored -> new ArrayList<>() )
-						.add( documentId );
-			}
-		}
-
-		initData( docIdByShardId );
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3314")
-	public void search() {
-		// No routing key => all documents should be returned
-		SearchResultAssert.assertThat( indexManager.createScope().query()
-				.where( f -> f.matchAll() )
-				.toQuery()
-		)
-				.hits().asNormalizedDocRefs()
-				.hasSize( TOTAL_DOCUMENT_COUNT )
-				.containsExactlyInAnyOrder( allDocRefs( docIdByShardId ) );
-
-		// All routing keys => all documents should be returned
-		SearchResultAssert.assertThat( indexManager.createScope().query()
-				.where( f -> f.matchAll() )
-				.routing( docIdByShardId.keySet() )
-				.toQuery()
-		)
-				.hits().asNormalizedDocRefs()
-				.hasSize( TOTAL_DOCUMENT_COUNT )
-				.containsExactlyInAnyOrder( allDocRefs( docIdByShardId ) );
-
-		/*
-		 * Specific routing key => all documents from the corresponding shards should be returned, and only those.
-		 */
-		SearchResultAssert.assertThat( indexManager.createScope().query()
-				.where( f -> f.matchAll() )
-				.routing( SHARD_ID_2 )
-				.toQuery()
-		)
-				.hits().asNormalizedDocRefs()
-				.hasSize( DOCUMENT_COUNT_PER_SHARD )
-				.containsExactlyInAnyOrder( docRefsForRoutingKey( SHARD_ID_2, docIdByShardId ) );
+				);
 	}
 
 }
