@@ -12,16 +12,15 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.MappedTypeNameQuery;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
+import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import org.apache.lucene.index.Term;
 import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.search.TopDocs;
 
 class LuceneExplainWork implements LuceneReadWork<Explanation> {
@@ -79,7 +78,8 @@ class LuceneExplainWork implements LuceneReadWork<Explanation> {
 
 	private Query createExplainedDocumentQuery(LuceneReadWorkExecutionContext context) {
 		BooleanQuery.Builder builder = new BooleanQuery.Builder()
-				.add( new TermQuery( new Term( MetadataFields.idFieldName(), explainedDocumentId ) ), BooleanClause.Occur.FILTER )
+				.add( Queries.mainDocumentQuery(), BooleanClause.Occur.FILTER )
+				.add( Queries.term( MetadataFields.idFieldName(), explainedDocumentId ), BooleanClause.Occur.FILTER )
 				.add( new MappedTypeNameQuery( context.getIndexReaderMetadataResolver(), explainedDocumentIndexName ), BooleanClause.Occur.FILTER );
 		if ( explainedDocumentFilter != null ) {
 			builder.add( explainedDocumentFilter, BooleanClause.Occur.FILTER );
