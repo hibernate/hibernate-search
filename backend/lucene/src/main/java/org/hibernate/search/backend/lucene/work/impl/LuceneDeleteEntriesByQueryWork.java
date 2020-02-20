@@ -13,37 +13,38 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public abstract class AbstractLuceneDeleteAllEntriesWork extends AbstractLuceneWriteWork<Long> {
+import org.apache.lucene.search.Query;
+
+public class LuceneDeleteEntriesByQueryWork extends AbstractLuceneWriteWork<Long> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final String tenantId;
+	private final Query query;
 
-	AbstractLuceneDeleteAllEntriesWork(String tenantId) {
-		super( "deleteAllEntries" );
-		this.tenantId = tenantId;
+	LuceneDeleteEntriesByQueryWork(Query query) {
+		super( "deleteByQuery" );
+		this.query = query;
 	}
-
-	@Override
-	public Long execute(LuceneWriteWorkExecutionContext context) {
-		try {
-			IndexWriterDelegator indexWriterDelegator = context.getIndexWriterDelegator();
-			return doDeleteDocuments( indexWriterDelegator, tenantId );
-		}
-		catch (IOException e) {
-			throw log.unableToDeleteAllEntriesFromIndex( tenantId, context.getEventContext(), e );
-		}
-	}
-
-	protected abstract long doDeleteDocuments(IndexWriterDelegator indexWriterDelegator, String tenantId)
-			throws IOException;
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
 				.append( "type=" ).append( workType )
+				.append( "query=" ).append( query )
 				.append( "]" );
 		return sb.toString();
 	}
+
+	@Override
+	public Long execute(LuceneWriteWorkExecutionContext context) {
+		try {
+			IndexWriterDelegator indexWriterDelegator = context.getIndexWriterDelegator();
+			return indexWriterDelegator.deleteDocuments( query );
+		}
+		catch (IOException e) {
+			throw log.unableToDeleteAllEntriesFromIndex( query, context.getEventContext(), e );
+		}
+	}
+
 }

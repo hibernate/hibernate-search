@@ -10,6 +10,7 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 
 import org.apache.lucene.search.Explanation;
+import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Query;
 
 public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
@@ -39,7 +40,8 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 
 	@Override
 	public LuceneWriteWork<?> deleteAll(String tenantId) {
-		return multiTenancyStrategy.createDeleteAllEntriesLuceneWork( tenantId );
+		Query filter = multiTenancyStrategy.getFilterOrNull( tenantId );
+		return new LuceneDeleteEntriesByQueryWork( filter != null ? filter : new MatchAllDocsQuery() );
 	}
 
 	@Override

@@ -55,11 +55,6 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 	}
 
 	@Override
-	public long deleteAll() throws IOException {
-		return delegate.deleteAll();
-	}
-
-	@Override
 	public void mergeSegments() throws IOException {
 		delegate.forceMerge( 1 );
 	}

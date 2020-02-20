@@ -28,8 +28,6 @@ public interface IndexWriterDelegator {
 
 	long deleteDocuments(Query query) throws IOException;
 
-	long deleteAll() throws IOException;
-
 	void mergeSegments() throws IOException;
 
 }

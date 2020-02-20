@@ -12,7 +12,6 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
-import org.hibernate.search.backend.lucene.work.impl.LuceneQueryBasedDeleteWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryBasedDeleteEntryWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneQueryBasedUpdateEntryWork;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -49,11 +48,6 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 	@Override
 	public LuceneQueryBasedDeleteEntryWork createDeleteEntryLuceneWork(String tenantId, String id) {
 		return new LuceneQueryBasedDeleteEntryWork( tenantId, id );
-	}
-
-	@Override
-	public LuceneQueryBasedDeleteWork createDeleteAllEntriesLuceneWork(String tenantId) {
-		return new LuceneQueryBasedDeleteWork( tenantId );
 	}
 
 	@Override

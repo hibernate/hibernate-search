@@ -9,7 +9,6 @@ package org.hibernate.search.backend.lucene.multitenancy.impl;
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
-import org.hibernate.search.backend.lucene.work.impl.AbstractLuceneDeleteAllEntriesWork;
 import org.hibernate.search.backend.lucene.work.impl.AbstractLuceneDeleteEntryWork;
 import org.hibernate.search.backend.lucene.work.impl.AbstractLuceneUpdateEntryWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
@@ -71,11 +70,4 @@ public interface MultiTenancyStrategy {
 	 */
 	AbstractLuceneDeleteEntryWork createDeleteEntryLuceneWork(String tenantId, String id);
 
-	/**
-	 * Creates the according delete {@link LuceneWriteWork}, for deleting all documents.
-	 *
-	 * @param tenantId The tenant id.
-	 * @return The delete {@link LuceneWriteWork}.
-	 */
-	AbstractLuceneDeleteAllEntriesWork createDeleteAllEntriesLuceneWork(String tenantId);
 }
