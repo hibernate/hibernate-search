@@ -68,7 +68,7 @@ public class BootstrapLogsIT {
 
 	@Test
 	public void versionLogEvent() {
-		logged.expectMessage( "HSEARCH000034", "Hibernate Search {" ).once();
+		logged.expectMessage( "HSEARCH000034", "Hibernate Search version" ).once();
 
 		backendMock.expectAnySchema( IndexedEntity.NAME );
 
