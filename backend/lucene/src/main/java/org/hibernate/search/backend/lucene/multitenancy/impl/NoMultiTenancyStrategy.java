@@ -10,10 +10,7 @@ import java.lang.invoke.MethodHandles;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.work.impl.LuceneTermBasedDeleteEntryWork;
-import org.hibernate.search.backend.lucene.work.impl.LuceneTermBasedUpdateEntryWork;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -34,17 +31,6 @@ public class NoMultiTenancyStrategy implements MultiTenancyStrategy {
 	@Override
 	public Query getFilterOrNull(String tenantId) {
 		return null;
-	}
-
-	@Override
-	public LuceneTermBasedUpdateEntryWork createUpdateEntryLuceneWork(String tenantId, String id,
-			LuceneIndexEntry indexEntry) {
-		return new LuceneTermBasedUpdateEntryWork( tenantId, id, indexEntry );
-	}
-
-	@Override
-	public LuceneTermBasedDeleteEntryWork createDeleteEntryLuceneWork(String tenantId, String id) {
-		return new LuceneTermBasedDeleteEntryWork( tenantId, id );
 	}
 
 	@Override

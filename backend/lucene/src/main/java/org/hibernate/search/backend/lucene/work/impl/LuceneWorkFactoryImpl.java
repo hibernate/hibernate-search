@@ -30,12 +30,14 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	@Override
 	public LuceneSingleDocumentWriteWork<?> update(String tenantId, String id,
 			LuceneIndexEntry indexEntry) {
-		return multiTenancyStrategy.createUpdateEntryLuceneWork( tenantId, id, indexEntry );
+		Query filter = multiTenancyStrategy.getFilterOrNull( tenantId );
+		return new LuceneUpdateEntryWork( tenantId, id, filter, indexEntry );
 	}
 
 	@Override
 	public LuceneSingleDocumentWriteWork<?> delete(String tenantId, String id) {
-		return multiTenancyStrategy.createDeleteEntryLuceneWork( tenantId, id );
+		Query filter = multiTenancyStrategy.getFilterOrNull( tenantId );
+		return new LuceneDeleteEntryWork( tenantId, id, filter );
 	}
 
 	@Override

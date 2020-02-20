@@ -39,15 +39,15 @@ public class Queries {
 		return new TermQuery( new Term( MetadataFields.nestedDocumentPathFieldName(), absoluteFieldPath ) );
 	}
 
-	public static Query singleDocumentQuery(String tenantId, String id) {
+	public static Query boolFilter(Query must, Query filter) {
 		BooleanQuery.Builder queryBuilder = new BooleanQuery.Builder();
-		queryBuilder.add( new TermQuery( new Term( MetadataFields.idFieldName(), id ) ), Occur.MUST );
-		queryBuilder.add( tenantIdQuery( tenantId ), Occur.FILTER );
+		queryBuilder.add( must, Occur.MUST );
+		queryBuilder.add( filter, Occur.FILTER );
 		return queryBuilder.build();
 	}
 
-	public static Query tenantIdQuery(String tenantId) {
-		return new TermQuery( new Term( MetadataFields.tenantIdFieldName(), tenantId ) );
+	public static Query term(String absoluteFieldPath, String value) {
+		return new TermQuery( new Term( absoluteFieldPath, value ) );
 	}
 
 	public static Query anyTerm(String absoluteFieldPath, Set<String> values) {

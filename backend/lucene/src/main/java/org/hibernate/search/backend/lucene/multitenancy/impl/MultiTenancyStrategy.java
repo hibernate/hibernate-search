@@ -8,10 +8,6 @@ package org.hibernate.search.backend.lucene.multitenancy.impl;
 
 import org.apache.lucene.document.Document;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
-import org.hibernate.search.backend.lucene.work.impl.AbstractLuceneDeleteEntryWork;
-import org.hibernate.search.backend.lucene.work.impl.AbstractLuceneUpdateEntryWork;
-import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 /**
@@ -35,7 +31,8 @@ public interface MultiTenancyStrategy {
 	void contributeToIndexedDocument(Document document, String tenantId);
 
 	/**
-	 * Generate a filter for the given tenant ID, to be applied to search queries.
+	 * Generate a filter for the given tenant ID, to be applied to search queries
+	 * and update/delete operations.
 	 *
 	 * @param tenantId The tenant id.
 	 * @return The filter, or {@code null} if no filter is necessary.
@@ -49,25 +46,5 @@ public interface MultiTenancyStrategy {
 	 * @param backendContext The backend.
 	 */
 	void checkTenantId(String tenantId, EventContext backendContext);
-
-	/**
-	 * Creates the according update {@link LuceneWriteWork}.
-	 *
-	 * @param tenantId The tenant id.
-	 * @param id The document id.
-	 * @param indexEntry The index entry.
-	 * @return The update {@link LuceneWriteWork}.
-	 */
-	AbstractLuceneUpdateEntryWork createUpdateEntryLuceneWork(String tenantId, String id,
-			LuceneIndexEntry indexEntry);
-
-	/**
-	 * Creates the according delete {@link LuceneWriteWork}.
-	 *
-	 * @param tenantId The tenant id.
-	 * @param id The document id.
-	 * @return The delete {@link LuceneWriteWork}.
-	 */
-	AbstractLuceneDeleteEntryWork createDeleteEntryLuceneWork(String tenantId, String id);
 
 }

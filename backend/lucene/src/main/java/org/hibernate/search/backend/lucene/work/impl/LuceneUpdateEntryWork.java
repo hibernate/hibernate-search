@@ -11,11 +11,17 @@ import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
+import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
+import org.apache.lucene.index.Term;
+import org.apache.lucene.search.Query;
+import org.apache.lucene.search.TermQuery;
 
-public abstract class AbstractLuceneUpdateEntryWork extends AbstractLuceneWriteWork<Long>
+
+public class LuceneUpdateEntryWork extends AbstractLuceneWriteWork<Long>
 		implements LuceneSingleDocumentWriteWork<Long> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -24,37 +30,46 @@ public abstract class AbstractLuceneUpdateEntryWork extends AbstractLuceneWriteW
 
 	private final String id;
 
+	private final Query filter;
+
 	private final LuceneIndexEntry indexEntry;
 
-	AbstractLuceneUpdateEntryWork(String tenantId, String id, LuceneIndexEntry indexEntry) {
+	LuceneUpdateEntryWork(String tenantId, String id, Query filter, LuceneIndexEntry indexEntry) {
 		super( "updateEntry" );
 		this.tenantId = tenantId;
 		this.id = id;
+		this.filter = filter;
 		this.indexEntry = indexEntry;
 	}
-
-	@Override
-	public Long execute(LuceneWriteWorkExecutionContext context) {
-		try {
-			IndexWriterDelegator indexWriterDelegator = context.getIndexWriterDelegator();
-			return doUpdateEntry( indexWriterDelegator, tenantId, id, indexEntry );
-		}
-		catch (IOException e) {
-			throw log.unableToIndexEntry( tenantId, id, context.getEventContext(), e );
-		}
-	}
-
-	protected abstract long doUpdateEntry(IndexWriterDelegator indexWriterDelegator, String tenantId, String id,
-			LuceneIndexEntry indexEntry) throws IOException;
 
 	@Override
 	public String toString() {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
 				.append( "type=" ).append( workType )
+				.append( ", tenantId=" ).append( tenantId )
 				.append( ", entry=" ).append( indexEntry )
 				.append( "]" );
 		return sb.toString();
+	}
+
+	@Override
+	public Long execute(LuceneWriteWorkExecutionContext context) {
+		try {
+			IndexWriterDelegator indexWriterDelegator = context.getIndexWriterDelegator();
+			Term idTerm = new Term( MetadataFields.idFieldName(), id );
+			if ( filter == null ) {
+				// Atomic update: presumably more efficient.
+				return indexWriterDelegator.updateDocuments( idTerm, indexEntry );
+			}
+			else {
+				indexWriterDelegator.deleteDocuments( Queries.boolFilter( new TermQuery( idTerm ), filter ) );
+				return indexWriterDelegator.addDocuments( indexEntry );
+			}
+		}
+		catch (IOException e) {
+			throw log.unableToIndexEntry( tenantId, id, context.getEventContext(), e );
+		}
 	}
 
 	@Override

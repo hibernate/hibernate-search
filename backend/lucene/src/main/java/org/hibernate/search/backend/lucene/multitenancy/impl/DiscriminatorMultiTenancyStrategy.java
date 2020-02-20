@@ -8,12 +8,9 @@ package org.hibernate.search.backend.lucene.multitenancy.impl;
 
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
-import org.hibernate.search.backend.lucene.work.impl.LuceneQueryBasedDeleteEntryWork;
-import org.hibernate.search.backend.lucene.work.impl.LuceneQueryBasedUpdateEntryWork;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -36,18 +33,7 @@ public class DiscriminatorMultiTenancyStrategy implements MultiTenancyStrategy {
 
 	@Override
 	public Query getFilterOrNull(String tenantId) {
-		return Queries.tenantIdQuery( tenantId );
-	}
-
-	@Override
-	public LuceneQueryBasedUpdateEntryWork createUpdateEntryLuceneWork(String tenantId, String id,
-			LuceneIndexEntry indexEntry) {
-		return new LuceneQueryBasedUpdateEntryWork( tenantId, id, indexEntry );
-	}
-
-	@Override
-	public LuceneQueryBasedDeleteEntryWork createDeleteEntryLuceneWork(String tenantId, String id) {
-		return new LuceneQueryBasedDeleteEntryWork( tenantId, id );
+		return Queries.term( MetadataFields.tenantIdFieldName(), tenantId );
 	}
 
 	@Override
