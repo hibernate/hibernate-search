@@ -30,11 +30,16 @@ import org.junit.Test;
 public class ShardingHashRoutingKeyIT extends AbstractShardingIT {
 
 	private static final int SHARD_COUNT = 3;
+	// Use more routing keys than shards, so that multiple routing keys lead to the same shard, like in real life
+	private static final int ROUTING_KEY_COUNT = SHARD_COUNT * 4;
+	private static final int DOCUMENT_COUNT_PER_ROUTING_KEY = 100;
+	private static final int TOTAL_DOCUMENT_COUNT = ROUTING_KEY_COUNT * DOCUMENT_COUNT_PER_ROUTING_KEY;
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper(
 			tckBackendHelper -> tckBackendHelper.createHashBasedShardingBackendSetupStrategy( SHARD_COUNT )
 	);
+	private Map<String, List<String>> docIdByRoutingKey = new HashMap<>();
 
 	@Before
 	public void setup() {
@@ -45,23 +50,13 @@ public class ShardingHashRoutingKeyIT extends AbstractShardingIT {
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3314")
-	public void test() {
-		// Use more routing keys than shards, so that multiple routing keys lead to the same shard, like in real life
-		int routingKeyCount = SHARD_COUNT * 4;
-		int documentCountPerRoutingKey = 100;
-		int totalDocumentCount = routingKeyCount * documentCountPerRoutingKey;
 
 		// Provide explicit routing keys when indexing
-		Map<String, List<String>> docIdByRoutingKey = new HashMap<>();
-		for ( int routingKeyAsInteger = 0; routingKeyAsInteger < routingKeyCount; routingKeyAsInteger++ ) {
+		for ( int routingKeyAsInteger = 0; routingKeyAsInteger < ROUTING_KEY_COUNT; routingKeyAsInteger++ ) {
 			// Turn into actual text, to check that support is not limited to just numbers
 			String routingKey = "someText_" + routingKeyAsInteger;
 			for ( int documentIdAsIntegerForRoutingKey = 0;
-					documentIdAsIntegerForRoutingKey < documentCountPerRoutingKey;
+					documentIdAsIntegerForRoutingKey < DOCUMENT_COUNT_PER_ROUTING_KEY;
 					documentIdAsIntegerForRoutingKey++ ) {
 				// Just make sure document IDs are unique across all routing keys
 				String documentId = routingKeyAsInteger + "_" + documentIdAsIntegerForRoutingKey;
@@ -71,14 +66,18 @@ public class ShardingHashRoutingKeyIT extends AbstractShardingIT {
 		}
 
 		initData( docIdByRoutingKey );
+	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3314")
+	public void search() {
 		// No routing key => all documents should be returned
 		SearchResultAssert.assertThat( indexManager.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery()
 		)
 				.hits().asNormalizedDocRefs()
-				.hasSize( totalDocumentCount )
+				.hasSize( TOTAL_DOCUMENT_COUNT )
 				.containsExactlyInAnyOrder( allDocRefs( docIdByRoutingKey ) );
 
 		// Now test with a specific routing key
@@ -97,7 +96,7 @@ public class ShardingHashRoutingKeyIT extends AbstractShardingIT {
 						.toQuery()
 		)
 				.hits().asNormalizedDocRefs()
-				.hasSize( documentCountPerRoutingKey )
+				.hasSize( DOCUMENT_COUNT_PER_ROUTING_KEY )
 				.containsExactlyInAnyOrder( docRefsForRoutingKey( someRoutingKey, docIdByRoutingKey ) );
 
 		if ( !TckConfiguration.get().getBackendFeatures().supportsManyRoutingKeys() ) {
@@ -116,7 +115,7 @@ public class ShardingHashRoutingKeyIT extends AbstractShardingIT {
 						.toQuery()
 		)
 				.hits().asNormalizedDocRefs()
-				.hasSize( documentCountPerRoutingKey * 2 )
+				.hasSize( DOCUMENT_COUNT_PER_ROUTING_KEY * 2 )
 				.containsExactlyInAnyOrder( docRefsForRoutingKeys( twoRoutingKeys, docIdByRoutingKey ) );
 
 		// All routing keys => all documents should be returned
@@ -126,7 +125,7 @@ public class ShardingHashRoutingKeyIT extends AbstractShardingIT {
 				.toQuery()
 		)
 				.hits().asNormalizedDocRefs()
-				.hasSize( totalDocumentCount )
+				.hasSize( TOTAL_DOCUMENT_COUNT )
 				.containsExactlyInAnyOrder( allDocRefs( docIdByRoutingKey ) );
 	}
 

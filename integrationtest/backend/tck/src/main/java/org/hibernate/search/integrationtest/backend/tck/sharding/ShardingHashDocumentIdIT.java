@@ -29,11 +29,17 @@ import org.junit.Test;
 public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 
 	private static final int SHARD_COUNT = 3;
+	// Create more document than shards, so that multiple documents end up in the same shard, like in real life
+	private static final int ESTIMATED_DOCUMENT_COUNT_PER_SHARD = 100;
+	private static final int TOTAL_DOCUMENT_COUNT = SHARD_COUNT * ESTIMATED_DOCUMENT_COUNT_PER_SHARD;
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper(
 			tckBackendHelper -> tckBackendHelper.createHashBasedShardingBackendSetupStrategy( SHARD_COUNT )
 	);
+
+	private final Map<String, List<String>> docIdByRoutingKey = new HashMap<>();
+	private final List<String> docIds = new ArrayList<>();
 
 	@Before
 	public void setup() {
@@ -44,35 +50,29 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3314")
-	public void test() {
-		// Use more routing keys than shards, so that multiple routing keys lead to the same shard, like in real life
-		int estimatedDocumentCountPerShard = 100;
-		int totalDocumentCount = SHARD_COUNT * estimatedDocumentCountPerShard;
 
 		// Do not provide explicit routing keys when indexing; the backend should fall back to using IDs
-		List<String> docIds = new ArrayList<>();
-		for ( int documentIdAsInteger = 0; documentIdAsInteger < totalDocumentCount;
+		for ( int documentIdAsInteger = 0; documentIdAsInteger < TOTAL_DOCUMENT_COUNT;
 				documentIdAsInteger++ ) {
 			// Just make sure document IDs are unique across all routing keys
 			String documentId = "someText_" + documentIdAsInteger;
 			docIds.add( documentId );
 		}
 
-		Map<String, List<String>> docIdByRoutingKey = new HashMap<>();
 		docIdByRoutingKey.put( null, docIds );
 		initData( docIdByRoutingKey );
+	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3314")
+	public void search() {
 		// No routing key => all documents should be returned
 		SearchResultAssert.assertThat( indexManager.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery()
 		)
 				.hits().asNormalizedDocRefs()
-				.hasSize( totalDocumentCount )
+				.hasSize( TOTAL_DOCUMENT_COUNT )
 				.containsExactlyInAnyOrder( allDocRefs( docIdByRoutingKey ) );
 
 		Iterator<String> iterator = docIds.iterator();

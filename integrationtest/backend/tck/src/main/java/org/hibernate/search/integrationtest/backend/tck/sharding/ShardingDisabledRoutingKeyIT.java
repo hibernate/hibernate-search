@@ -28,10 +28,17 @@ import org.junit.Test;
  */
 public class ShardingDisabledRoutingKeyIT extends AbstractShardingIT {
 
+	// Use more than one routing key
+	private static final int ROUTING_KEY_COUNT = 10;
+	private static final int DOCUMENT_COUNT_PER_ROUTING_KEY = 100;
+	private static final int TOTAL_DOCUMENT_COUNT = ROUTING_KEY_COUNT * DOCUMENT_COUNT_PER_ROUTING_KEY;
+
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper(
 			TckBackendHelper::createNoShardingBackendSetupStrategy
 	);
+
+	private final Map<String, List<String>> docIdByRoutingKey = new HashMap<>();
 
 	@Before
 	public void setup() {
@@ -42,23 +49,13 @@ public class ShardingDisabledRoutingKeyIT extends AbstractShardingIT {
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3314")
-	public void test() {
-		// Use more than one routing key
-		int routingKeyCount = 10;
-		int documentCountPerRoutingKey = 100;
-		int totalDocumentCount = routingKeyCount * documentCountPerRoutingKey;
 
 		// Provide explicit routing keys when indexing
-		Map<String, List<String>> docIdByRoutingKey = new HashMap<>();
-		for ( int routingKeyAsInteger = 0; routingKeyAsInteger < routingKeyCount; routingKeyAsInteger++ ) {
+		for ( int routingKeyAsInteger = 0; routingKeyAsInteger < ROUTING_KEY_COUNT; routingKeyAsInteger++ ) {
 			// Turn into actual text, to check that support is not limited to just numbers
 			String routingKey = "someText_" + routingKeyAsInteger;
 			for ( int documentIdAsIntegerForRoutingKey = 0;
-					documentIdAsIntegerForRoutingKey < documentCountPerRoutingKey;
+					documentIdAsIntegerForRoutingKey < DOCUMENT_COUNT_PER_ROUTING_KEY;
 					documentIdAsIntegerForRoutingKey++ ) {
 				// Just make sure document IDs are unique across all routing keys
 				String documentId = routingKeyAsInteger + "_" + documentIdAsIntegerForRoutingKey;
@@ -68,14 +65,18 @@ public class ShardingDisabledRoutingKeyIT extends AbstractShardingIT {
 		}
 
 		initData( docIdByRoutingKey );
+	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3314")
+	public void search() {
 		// No routing key => all documents should be returned
 		SearchResultAssert.assertThat( indexManager.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery()
 		)
 				.hits().asNormalizedDocRefs()
-				.hasSize( totalDocumentCount )
+				.hasSize( TOTAL_DOCUMENT_COUNT )
 				.containsExactlyInAnyOrder( allDocRefs( docIdByRoutingKey ) );
 
 		// Now test with a specific routing key
@@ -94,7 +95,7 @@ public class ShardingDisabledRoutingKeyIT extends AbstractShardingIT {
 						.toQuery()
 		)
 				.hits().asNormalizedDocRefs()
-				.hasSize( documentCountPerRoutingKey )
+				.hasSize( DOCUMENT_COUNT_PER_ROUTING_KEY )
 				.containsExactlyInAnyOrder( docRefsForRoutingKey( someRoutingKey, docIdByRoutingKey ) );
 
 		if ( !TckConfiguration.get().getBackendFeatures().supportsManyRoutingKeys() ) {
@@ -113,7 +114,7 @@ public class ShardingDisabledRoutingKeyIT extends AbstractShardingIT {
 						.toQuery()
 		)
 				.hits().asNormalizedDocRefs()
-				.hasSize( documentCountPerRoutingKey * 2 )
+				.hasSize( DOCUMENT_COUNT_PER_ROUTING_KEY * 2 )
 				.containsExactlyInAnyOrder( docRefsForRoutingKeys( twoRoutingKeys, docIdByRoutingKey ) );
 
 		// All routing keys => all documents should be returned
@@ -123,7 +124,7 @@ public class ShardingDisabledRoutingKeyIT extends AbstractShardingIT {
 				.toQuery()
 		)
 				.hits().asNormalizedDocRefs()
-				.hasSize( totalDocumentCount )
+				.hasSize( TOTAL_DOCUMENT_COUNT )
 				.containsExactlyInAnyOrder( allDocRefs( docIdByRoutingKey ) );
 	}
 }

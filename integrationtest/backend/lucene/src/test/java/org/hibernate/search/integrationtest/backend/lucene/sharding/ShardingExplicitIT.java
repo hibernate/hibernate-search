@@ -34,8 +34,13 @@ public class ShardingExplicitIT extends AbstractShardingIT {
 			SHARD_ID_1, SHARD_ID_2, SHARD_ID_3
 	);
 
+	private static final int DOCUMENT_COUNT_PER_SHARD = 100;
+	private static final int TOTAL_DOCUMENT_COUNT = SHARD_IDS.size() * DOCUMENT_COUNT_PER_SHARD;
+
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+
+	private final Map<String, List<String>> docIdByShardId = new HashMap<>();
 
 	@Before
 	public void setup() {
@@ -53,19 +58,11 @@ public class ShardingExplicitIT extends AbstractShardingIT {
 						SHARD_ID_1 + "," + SHARD_ID_2 + "," + SHARD_ID_3
 				)
 				.setup();
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3314")
-	public void test() {
-		int documentCountPerShard = 100;
-		int totalDocumentCount = SHARD_IDS.size() * documentCountPerShard;
 
 		// Provide explicit routing keys when indexing; the routing keys are the shard IDs
-		Map<String, List<String>> docIdByShardId = new HashMap<>();
 		for ( String shardId : SHARD_IDS ) {
 			for ( int documentIdAsIntegerForRoutingKey = 0;
-					documentIdAsIntegerForRoutingKey < documentCountPerShard;
+					documentIdAsIntegerForRoutingKey < DOCUMENT_COUNT_PER_SHARD;
 					documentIdAsIntegerForRoutingKey++ ) {
 				// Just make sure document IDs are unique across all shards
 				String documentId = shardId + "_" + documentIdAsIntegerForRoutingKey;
@@ -75,14 +72,18 @@ public class ShardingExplicitIT extends AbstractShardingIT {
 		}
 
 		initData( docIdByShardId );
+	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3314")
+	public void search() {
 		// No routing key => all documents should be returned
 		SearchResultAssert.assertThat( indexManager.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery()
 		)
 				.hits().asNormalizedDocRefs()
-				.hasSize( totalDocumentCount )
+				.hasSize( TOTAL_DOCUMENT_COUNT )
 				.containsExactlyInAnyOrder( allDocRefs( docIdByShardId ) );
 
 		// All routing keys => all documents should be returned
@@ -92,7 +93,7 @@ public class ShardingExplicitIT extends AbstractShardingIT {
 				.toQuery()
 		)
 				.hits().asNormalizedDocRefs()
-				.hasSize( totalDocumentCount )
+				.hasSize( TOTAL_DOCUMENT_COUNT )
 				.containsExactlyInAnyOrder( allDocRefs( docIdByShardId ) );
 
 		/*
@@ -104,7 +105,7 @@ public class ShardingExplicitIT extends AbstractShardingIT {
 				.toQuery()
 		)
 				.hits().asNormalizedDocRefs()
-				.hasSize( documentCountPerShard )
+				.hasSize( DOCUMENT_COUNT_PER_SHARD )
 				.containsExactlyInAnyOrder( docRefsForRoutingKey( SHARD_ID_2, docIdByShardId ) );
 	}
 
