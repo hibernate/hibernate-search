@@ -16,7 +16,6 @@ import org.apache.lucene.util.BytesRef;
 public class MetadataFields {
 
 	private static final FieldType METADATA_FIELD_TYPE_WITH_INDEX;
-	private static final FieldType METADATA_FIELD_TYPE_WITH_DOCVALUES;
 	private static final FieldType METADATA_FIELD_TYPE_WITH_INDEX_WITH_DOCVALUES;
 	static {
 		METADATA_FIELD_TYPE_WITH_INDEX = new FieldType();
@@ -24,13 +23,6 @@ public class MetadataFields {
 		METADATA_FIELD_TYPE_WITH_INDEX.setOmitNorms( true );
 		METADATA_FIELD_TYPE_WITH_INDEX.setIndexOptions( IndexOptions.DOCS );
 		METADATA_FIELD_TYPE_WITH_INDEX.freeze();
-
-		METADATA_FIELD_TYPE_WITH_DOCVALUES = new FieldType( METADATA_FIELD_TYPE_WITH_INDEX );
-		METADATA_FIELD_TYPE_WITH_DOCVALUES.setTokenized( false );
-		METADATA_FIELD_TYPE_WITH_DOCVALUES.setOmitNorms( true );
-		METADATA_FIELD_TYPE_WITH_DOCVALUES.setIndexOptions( IndexOptions.NONE );
-		METADATA_FIELD_TYPE_WITH_DOCVALUES.setDocValuesType( DocValuesType.BINARY );
-		METADATA_FIELD_TYPE_WITH_DOCVALUES.freeze();
 
 		METADATA_FIELD_TYPE_WITH_INDEX_WITH_DOCVALUES = new FieldType();
 		METADATA_FIELD_TYPE_WITH_INDEX_WITH_DOCVALUES.setTokenized( false );
@@ -57,10 +49,6 @@ public class MetadataFields {
 	public static final String TYPE_MAIN_DOCUMENT = "main";
 
 	public static final String TYPE_CHILD_DOCUMENT = "child";
-
-	private static final String ROOT_ID_FIELD_NAME = internalFieldName( "root_id" );
-
-	private static final String ROOT_INDEX_FIELD_NAME = internalFieldName( "root_index" );
 
 	private static final String NESTED_DOCUMENT_PATH = internalFieldName( "nested_document_path" );
 
@@ -91,10 +79,6 @@ public class MetadataFields {
 		return new Field( name, new BytesRef( value ), METADATA_FIELD_TYPE_WITH_INDEX_WITH_DOCVALUES );
 	}
 
-	public static IndexableField retrievableMetadataField(String name, String value) {
-		return new Field( name, new BytesRef( value ), METADATA_FIELD_TYPE_WITH_DOCVALUES );
-	}
-
 	public static String idFieldName() {
 		return ID_FIELD_NAME;
 	}
@@ -113,14 +97,6 @@ public class MetadataFields {
 
 	public static String fieldNamesFieldName() {
 		return FIELD_NAMES_FIELD_NAME;
-	}
-
-	public static String rootIdFieldName() {
-		return ROOT_ID_FIELD_NAME;
-	}
-
-	public static String rootIndexFieldName() {
-		return ROOT_INDEX_FIELD_NAME;
 	}
 
 	public static String nestedDocumentPathFieldName() {

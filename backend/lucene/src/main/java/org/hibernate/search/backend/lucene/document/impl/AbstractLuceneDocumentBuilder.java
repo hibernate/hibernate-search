@@ -121,12 +121,12 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 		}
 	}
 
-	void contribute(String rootIndexName, MultiTenancyStrategy multiTenancyStrategy, String tenantId, String routingKey,
+	void contribute(MultiTenancyStrategy multiTenancyStrategy, String tenantId, String routingKey,
 			String rootId, List<Document> nestedDocuments) {
 		if ( flattenedObjectDocumentBuilders != null ) {
 			for ( LuceneFlattenedObjectDocumentBuilder flattenedObjectDocumentBuilder : flattenedObjectDocumentBuilders ) {
 				flattenedObjectDocumentBuilder.contribute(
-						rootIndexName, multiTenancyStrategy, tenantId, routingKey,
+						multiTenancyStrategy, tenantId, routingKey,
 						rootId, nestedDocuments
 				);
 			}
@@ -135,7 +135,7 @@ abstract class AbstractLuceneDocumentBuilder implements LuceneDocumentBuilder {
 		if ( nestedObjectDocumentBuilders != null ) {
 			for ( LuceneNestedObjectDocumentBuilder nestedObjectDocumentBuilder : nestedObjectDocumentBuilders ) {
 				nestedObjectDocumentBuilder.contribute(
-						rootIndexName, multiTenancyStrategy, tenantId, routingKey,
+						multiTenancyStrategy, tenantId, routingKey,
 						rootId, nestedDocuments
 				);
 			}
