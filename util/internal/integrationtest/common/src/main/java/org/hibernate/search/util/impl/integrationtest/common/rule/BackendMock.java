@@ -355,6 +355,14 @@ public class BackendMock implements TestRule {
 			return indexScaleWork( StubIndexScaleWork.Type.PURGE, future );
 		}
 
+		public IndexScaleWorkCallListContext purge(Set<String> routingKeys) {
+			return indexScaleWork( StubIndexScaleWork.Type.PURGE, routingKeys );
+		}
+
+		public IndexScaleWorkCallListContext purge(Set<String> routingKeys, CompletableFuture<?> future) {
+			return indexScaleWork( StubIndexScaleWork.Type.PURGE, routingKeys, future );
+		}
+
 		public IndexScaleWorkCallListContext flush() {
 			return indexScaleWork( StubIndexScaleWork.Type.FLUSH );
 		}
@@ -372,12 +380,22 @@ public class BackendMock implements TestRule {
 		}
 
 		public IndexScaleWorkCallListContext indexScaleWork(StubIndexScaleWork.Type type) {
-			return indexScaleWork( type, CompletableFuture.completedFuture( null ) );
+			return indexScaleWork( type, Collections.emptySet() );
 		}
 
 		public IndexScaleWorkCallListContext indexScaleWork(StubIndexScaleWork.Type type, CompletableFuture<?> future) {
+			return indexScaleWork( type, Collections.emptySet(), future );
+		}
+
+		public IndexScaleWorkCallListContext indexScaleWork(StubIndexScaleWork.Type type, Set<String> routingKeys) {
+			return indexScaleWork( type, routingKeys, CompletableFuture.completedFuture( null ) );
+		}
+
+		public IndexScaleWorkCallListContext indexScaleWork(StubIndexScaleWork.Type type, Set<String> routingKeys,
+				CompletableFuture<?> future) {
 			StubIndexScaleWork work = StubIndexScaleWork.builder( type )
 					.tenantIdentifier( tenantIdentifier )
+					.routingKeys( routingKeys )
 					.build();
 			expectationConsumer.accept( new IndexScaleWorkCalls( indexNames, work, future ) );
 			return this;

@@ -43,7 +43,7 @@ public class SearchWorkspaceImpl implements SearchWorkspace {
 
 	@Override
 	public void purge(Set<String> routingKeys) {
-		Futures.unwrappedExceptionJoin( purgeAsync() );
+		Futures.unwrappedExceptionJoin( purgeAsync( routingKeys ) );
 	}
 
 	@Override
