@@ -376,7 +376,9 @@ public class BackendMock implements TestRule {
 		}
 
 		public IndexScaleWorkCallListContext indexScaleWork(StubIndexScaleWork.Type type, CompletableFuture<?> future) {
-			StubIndexScaleWork work = StubIndexScaleWork.builder( type ).build();
+			StubIndexScaleWork work = StubIndexScaleWork.builder( type )
+					.tenantIdentifier( tenantIdentifier )
+					.build();
 			expectationConsumer.accept( new IndexScaleWorkCalls( indexNames, work, future ) );
 			return this;
 		}
