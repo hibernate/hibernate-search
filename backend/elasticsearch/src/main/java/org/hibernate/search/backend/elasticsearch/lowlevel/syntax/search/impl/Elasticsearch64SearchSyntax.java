@@ -14,9 +14,9 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 /**
- * The search syntax for ES6.7 and later 6.x.
+ * The search syntax for ES6.4 and later 6.x.
  */
-public class Elasticsearch67SearchSyntax extends Elasticsearch7SearchSyntax {
+public class Elasticsearch64SearchSyntax extends Elasticsearch7SearchSyntax {
 
 	private static final JsonArrayAccessor DOCVALUE_FIELDS_ACCESSOR =
 			JsonAccessor.root().property( "docvalue_fields" ).asArray();

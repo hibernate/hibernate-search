@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.dialect.protocol.impl;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.Elasticsearch64IndexMetadataSyntax;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.ElasticsearchIndexMetadataSyntax;
-import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.Elasticsearch60SearchSyntax;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.Elasticsearch64SearchSyntax;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.Elasticsearch56SearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
@@ -28,7 +28,7 @@ public class Elasticsearch64ProtocolDialect implements ElasticsearchProtocolDial
 
 	@Override
 	public ElasticsearchSearchSyntax createSearchSyntax() {
-		return new Elasticsearch60SearchSyntax();
+		return new Elasticsearch64SearchSyntax();
 	}
 
 	@Override

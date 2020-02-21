@@ -13,16 +13,16 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
 /**
- * The search syntax for ES6.0 to 6.6.
+ * The search syntax for ES6.0 to 6.3.
  */
-public class Elasticsearch60SearchSyntax extends Elasticsearch67SearchSyntax {
+public class Elasticsearch60SearchSyntax extends Elasticsearch64SearchSyntax {
 
 	private static final JsonArrayAccessor DOCVALUE_FIELDS_ACCESSOR =
 			JsonAccessor.root().property( "docvalue_fields" ).asArray();
 
 	@Override
 	public void requestDocValues(JsonObject requestBody, JsonPrimitive fieldName) {
-		// Elasticsearch 5 to 6.6 doesn't allow to specify a format,
+		// Elasticsearch 5 to 6.3 doesn't allow to specify a format,
 		// but we only request doc values for String field which do not require a format,
 		// and unlike 6.7/6.8, there is no warning when we do not specify a format.
 		// So we just don't specify a format.

@@ -11,7 +11,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.ElasticsearchIndexMetadataSyntax;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.Elasticsearch56SearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
-import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.Elasticsearch67SearchSyntax;
+import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.Elasticsearch64SearchSyntax;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.Elasticsearch67WorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
@@ -28,7 +28,7 @@ public class Elasticsearch67ProtocolDialect implements ElasticsearchProtocolDial
 
 	@Override
 	public ElasticsearchSearchSyntax createSearchSyntax() {
-		return new Elasticsearch67SearchSyntax();
+		return new Elasticsearch64SearchSyntax();
 	}
 
 	@Override
