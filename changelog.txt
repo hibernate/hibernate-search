@@ -1,6 +1,47 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.Beta5 (21-02-2020)
+-------------------------
+
+** Bug
+    * HSEARCH-3834 Nested documents are never deleted
+    * HSEARCH-3833 Writing on different local-heap indexes will provoke LockObtainFailedException 
+    * HSEARCH-3825 Purging a document from the POJO mapper will lead to NPE
+    * HSEARCH-3801 Hibernate Search blocks loading of non hibernate batch jobs
+
+** Improvement
+    * HSEARCH-3835 Remove the unused "__HSEARCH_root_index_name" and "__HSEARCH_root_id" fields from nested documents
+    * HSEARCH-3831 Allow setting the automatic indexing sync strategy to a custom bean in configuration
+    * HSEARCH-3824 Automatically filter search results based on provided routing keys
+    * HSEARCH-3808 Rename and clarify automatic indexing synchronization strategies
+    * HSEARCH-3807 Use more generic wording in the query DSL
+    * HSEARCH-3460 Remove the confusion between flush and refresh
+
+** New Feature
+    * HSEARCH-3836 Allow explicit routing for purges
+    * HSEARCH-3791 Configurable alias-based reads/writes for Elasticsearch indexes
+
+** Remove Feature
+    * HSEARCH-3826 Drop support for non-exclusive index use
+    * HSEARCH-3779 Remove automatic index optimization
+    * HSEARCH-3778 Remove "index_metadata_complete" configuration property
+
+** Task
+    * HSEARCH-3837 Fix dependency convergence error caused by the ES client dependency
+    * HSEARCH-3830 Upgrade to Hibernate ORM 5.4.12.Final
+    * HSEARCH-3829 Upgrade to Elasticsearch 7.6
+    * HSEARCH-3828 Change the format of the version logged on boot
+    * HSEARCH-3827 Restore simple backend performance tests
+    * HSEARCH-3823 Make the build independent from linked javadoc websites
+    * HSEARCH-3820 Refactor ElasticsearchSchemaValidator to ease maintenance
+    * HSEARCH-3819 JsonSyntaxException when validating or migrating an Elasticsearch schema with a geo_point field with null_value
+    * HSEARCH-3818 Upgrade to checkstyle 8.29
+    * HSEARCH-3817 Upgrade to Elasticsearch 7.5.2
+    * HSEARCH-3815 Stop publishing the mapper-javabean module
+    * HSEARCH-3799 Upgrade to Lucene 8.4.1
+    * HSEARCH-3775 Restore advanced Reader/Writer handling in the Lucene backend
+
 6.0.0.Beta4 (22-01-2020)
 -------------------------
 
