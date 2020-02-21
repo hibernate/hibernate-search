@@ -25,11 +25,6 @@
         <module>showcase/library</module>
     </modules>
 
-    <properties>
-        <!-- Skip javadoc generation (forced by releases) -->
-        <maven.javadoc.skip>true</maven.javadoc.skip>
-    </properties>
-
     <profiles>
         <profile>
             <id>jdk9+</id>
