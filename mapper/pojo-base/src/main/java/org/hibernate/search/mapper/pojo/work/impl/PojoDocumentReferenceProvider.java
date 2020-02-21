@@ -8,10 +8,7 @@ package org.hibernate.search.mapper.pojo.work.impl;
 
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 
-/**
- * @param <E> The entity type mapped to an index.
- */
-public final class PojoDocumentReferenceProvider<E> implements DocumentReferenceProvider {
+public final class PojoDocumentReferenceProvider implements DocumentReferenceProvider {
 
 	private final String documentIdentifier;
 	private final String routingKey;

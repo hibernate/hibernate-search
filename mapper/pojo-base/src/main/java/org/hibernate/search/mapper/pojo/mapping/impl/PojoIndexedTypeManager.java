@@ -122,7 +122,7 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 				entitySupplier,
 				sessionContext
 		);
-		return new PojoDocumentReferenceProvider<>( documentIdentifier, routingKey );
+		return new PojoDocumentReferenceProvider( documentIdentifier, routingKey );
 	}
 
 	@Override
@@ -131,7 +131,7 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 		String documentIdentifier = identifierMapping.toDocumentIdentifier(
 				identifier, sessionContext.getMappingContext()
 		);
-		return new PojoDocumentReferenceProvider<>( documentIdentifier, providedRoutingKey );
+		return new PojoDocumentReferenceProvider( documentIdentifier, providedRoutingKey );
 	}
 
 	@Override
