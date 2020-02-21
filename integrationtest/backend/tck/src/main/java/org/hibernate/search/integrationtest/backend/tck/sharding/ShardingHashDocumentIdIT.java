@@ -14,6 +14,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
@@ -88,6 +89,10 @@ public class ShardingHashDocumentIdIT extends AbstractShardingIT {
 						.toQuery()
 		)
 				.hasNoHits();
+
+		if ( !TckConfiguration.get().getBackendFeatures().supportsManyRoutingKeys() ) {
+			return;
+		}
 
 		// Multiple explicit routing keys => no result: documents were indexed without a routing key.
 		SearchResultAssert.assertThat(
