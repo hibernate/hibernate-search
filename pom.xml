@@ -270,6 +270,7 @@
         <version.forbiddenapis.plugin>2.7</version.forbiddenapis.plugin>
         <version.help.plugin>2.2</version.help.plugin>
         <version.install.plugin>2.5.2</version.install.plugin>
+        <version.io.takari.maven>0.7.6</version.io.takari.maven>
         <version.japicmp.plugin>0.9.3</version.japicmp.plugin>
         <version.jar.plugin>3.0.2</version.jar.plugin>
         <version.javadoc.plugin>3.1.0</version.javadoc.plugin>
@@ -1233,6 +1234,14 @@
                     Build configuration
                  -->
 
+                <plugin>
+                    <groupId>io.takari</groupId>
+                    <artifactId>maven</artifactId>
+                    <version>${version.io.takari.maven}</version>
+                    <configuration>
+                        <maven>${maven.min.version}</maven>
+                    </configuration>
+                </plugin>
                 <plugin>
                     <groupId>org.wildfly.build</groupId>
                     <artifactId>wildfly-feature-pack-build-maven-plugin</artifactId>
