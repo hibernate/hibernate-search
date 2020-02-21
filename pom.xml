@@ -388,7 +388,13 @@
 
         <!-- JDK version required for the build; we target 1.8 since Hibernate ORM 5.3 requires Java 8 -->
         <jdk.min.version>${maven.compiler.argument.source}</jdk.min.version>
-        <maven.min.version>3.2.3</maven.min.version>
+
+        <!-- Maven version required for the build -->
+        <!--
+             We need at least 3.6.2, which includes Maven-resolver 1.4.0+,
+             which fixes https://issues.apache.org/jira/browse/MRESOLVER-33
+         -->
+        <maven.min.version>3.6.2</maven.min.version>
 
         <!-- Whether javadoc problems (errors, warnings) should fail the build) -->
         <failOnJavadocError>true</failOnJavadocError>
