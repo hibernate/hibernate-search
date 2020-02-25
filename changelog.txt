@@ -41,6 +41,7 @@ Hibernate Search Changelog
     * HSEARCH-3815 Stop publishing the mapper-javabean module
     * HSEARCH-3799 Upgrade to Lucene 8.4.1
     * HSEARCH-3775 Restore advanced Reader/Writer handling in the Lucene backend
+    * HSEARCH-3838 Use an explicit format for docvalue projections on ES 6.6
 
 6.0.0.Beta4 (22-01-2020)
 -------------------------
