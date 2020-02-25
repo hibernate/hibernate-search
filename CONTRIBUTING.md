@@ -4,8 +4,6 @@ Guidelines for contributing to Hibernate Search
 Contributions from the community are essential in keeping Hibernate Search strong and successful.
 
 This guide focuses on how to contribute back to Hibernate Search using GitHub pull requests.
-If you need help with cloning, compiling or setting the project up in an IDE please refer to
-[this page](http://hibernate.org/search/contribute/).
 
 ## Legal
 
@@ -18,7 +16,23 @@ in the root directory of the repository.
 All contributions are subject to the [Developer Certificate of Origin (DCO)](https://developercertificate.org/).
 The DCO text is also included verbatim in the [dco.txt](dco.txt) file in the root directory of the repository.
 
-## Getting Started
+## Contributing a bug report
+
+If you want to see something fixed, but are not comfortable enough to dig into the codebase,
+you can help us by providing a well-documented bug report:
+
+* Open a bug report on our [JIRA instance](https://hibernate.atlassian.net/browse/HSEARCH).
+Make sure to provide enough information, in particular:
+the code you wrote, the expected result, the result you got instead,
+the version of your dependencies. 
+* Ideally (and this helps a lot), provide a self-contained test case.
+We provide [test case templates for all Hibernate projects](https://github.com/hibernate/hibernate-test-case-templates)
+to help you get started:
+just fork this repository, build your test case and attach it as an archive to a JIRA issue.
+
+## Contributing code
+
+### Prerequisites
 
 If you are just getting started with Git, GitHub and/or contributing to Hibernate Search there are a
 few prerequisite steps:
@@ -29,18 +43,8 @@ few prerequisite steps:
 As discussed in the linked page, this also includes:
     * [Setting](https://help.github.com/articles/set-up-git) up your local git install
     * Cloning your fork
-
-## Create a test case
-
-If you have opened a JIRA issue but are not comfortable enough to contribute code directly, creating a self
-contained test case is a good first step towards contributing.
-
-As part of our efforts to simplify access to new contributors, we provide [test case templates for the Hibernate family
-projects](https://github.com/hibernate/hibernate-test-case-templates).
-
-Just fork this repository, build your test case and attach it as an archive to a JIRA issue.
-
-## Create a topic branch
+    
+### Create a topic branch
 
 Create a "topic" branch on which you will work.  The convention is to name the branch
 using the JIRA issue key.  If there is not already a JIRA issue covering the work you
@@ -50,32 +54,43 @@ on the JIRA HSEARCH-123:
 git checkout -b HSEARCH-123 master
 ```
 
-## Code
+### Formatting rules and style conventions
 
-Code away...
+The Hibernate family projects share the same style conventions,
+and we provide settings for some IDEs to help you follow these conventions.
+See:
 
-## Formatting rules and style conventions
+* [here for IntelliJ IDEA](https://hibernate.org/community/contribute/intellij-idea/)
+* [here for Eclipse IDE](https://hibernate.org/community/contribute/eclipse-ide/)
 
-The Hibernate family projects share the same style conventions. You can download the appropriate configuration
-files for your IDE from [the IDE codestyles GitHub repository](https://github.com/hibernate/hibernate-ide-codestyles).
-
-You can very quickly check that you have respected the formatting rules by running Checkstyle:
+If you built the project at least once (`mvn clean install`),
+you can very quickly check that you have respected the formatting rules by running Checkstyle:
 ```bash
-mvn checkstyle:check
+mvn checkstyle:check -fn
 ```
 
-## Commit
+### Code
+  
+See the [README](README.md) for details about how to build the project and about the structure of the source code.
+
+If you need help, feel free to contact us, be it through comments on your JIRA ticket,
+emails on the mailing list, or directly though our chat:
+see [here](https://hibernate.org/community/#contribute) for more information.
+
+### Commit
 
 * Make commits of logical units.
-* Be sure to start the commit messages with the JIRA issue key you are working on. This is how JIRA will pick
-up the related commits and display them on the JIRA issue.
-* Avoid formatting changes to existing code as much as possible: they make the intent of your patch less clear.
+* Be sure to start the commit messages with the key of the JIRA issue you are working on.
+This is how JIRA will pick up the related commits and display them on the JIRA issue.
+* Avoid formatting changes to existing code as much as possible:
+they make the intent of your patch less clear.
 * Make sure you have added the necessary tests for your changes.
+* If relevant, make sure you have updated the documentation to match your changes.
 * Run _all_ the tests to assure nothing else was accidentally broken:
 
-```bash
-mvn verify
-```
+    ```bash
+    mvn clean install
+    ```
 
 _Prior to committing, if you want to pull in the latest upstream changes (highly
 appreciated by the way), please use rebasing rather than merging (see instructions below).  Merging creates
@@ -91,7 +106,8 @@ If you want to rebase your branch on top of the master branch, you can use the f
 git pull --rebase upstream master
 ```
 
-## Submit
+### Submit
+
 * Push your changes to a topic branch in your fork of the repository.
 * Initiate a [pull request](http://help.github.com/send-pull-requests/).
 * Update the JIRA issue, using the "Link to pull request" button to include a link to the created pull request.
