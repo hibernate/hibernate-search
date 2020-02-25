@@ -151,9 +151,11 @@ See <http://hibernate.org/community/>.
 
 ## Building from source
 
-    > git clone git@github.com:hibernate/hibernate-search.git
-    > cd hibernate-search
-    > mvn clean install
+```bash
+git clone git@github.com:hibernate/hibernate-search.git
+cd hibernate-search
+mvn clean install
+```
 
 ### Build options (profiles and properties)
 
@@ -161,17 +163,23 @@ See <http://hibernate.org/community/>.
 The documentation is based on [Asciidoctor](http://asciidoctor.org/). By default only the HTML
 output is enabled; to also generate the PDF output use:
 
-    > mvn clean install -Pdocumentation-pdf
+```bash
+mvn clean install -Pdocumentation-pdf
+```
 
-+You can then find the freshly built documentation in the following location:
-  
-    > ./documentation/target/asciidoctor/en-US
+You can then find the freshly built documentation in the following location:
+
+```
+./documentation/target/asciidoctor/en-US
+```
 
 #### Distribution
 
 To build the distribution bundle run:
 
-    > mvn clean install -Pdocumentation-pdf,dist
+```bash
+mvn clean install -Pdocumentation-pdf,dist
+```
 
 #### Elasticsearch
 
@@ -180,7 +188,9 @@ launching an Elasticsearch server automatically on port 9200.
 You may redefine the version to use by specifying the right profile and using the
 `test.elasticsearch.connection.version` property:
 
-    > mvn clean install -Pelasticsearch-6.0 -Dtest.elasticsearch.connection.version=6.0.0
+```bash
+mvn clean install -Pelasticsearch-6.0 -Dtest.elasticsearch.connection.version=6.0.0
+```
 
 The following profiles are available:
 
@@ -198,46 +208,62 @@ Alternatively, you can prevent the build from launching an Elasticsearch server 
 and run Elasticsearch-related tests against your own server using the
 `test.elasticsearch.connection.hosts` properties:
 
-    > mvn clean install -Dtest.elasticsearch.connection.hosts=http://localhost:9200
+```bash
+mvn clean install -Dtest.elasticsearch.connection.hosts=http://localhost:9200
+```
 
 If you want to run tests against a different Elasticsearch version  (6.x for instance),
 you will still have to select a profile among those listed above, and specify the version:
 
-    > mvn clean install -Pelasticsearch-6.0 -Dtest.elasticsearch.connection.version=6.0.0 -Dtest.elasticsearch.connection.hosts=http://localhost:9200
+```bash
+mvn clean install -Pelasticsearch-6.0 -Dtest.elasticsearch.connection.version=6.0.0 -Dtest.elasticsearch.connection.hosts=http://localhost:9200
+```
 
 You may also use authentication:
 
-    > mvn clean install -Dtest.elasticsearch.connection.hosts=https://localhost:9200 -Dtest.elasticsearch.connection.username=ironman -Dtest.elasticsearch.connection.password=j@rV1s
+```bash
+mvn clean install -Dtest.elasticsearch.connection.hosts=https://localhost:9200 -Dtest.elasticsearch.connection.username=ironman -Dtest.elasticsearch.connection.password=j@rV1s
+```
 
 Also, the elasticsearch integration tests can be executed
 against an Elasticsearch service on AWS.
 You will need to execute something along the lines of:
 
-    > mvn clean install -Dtest.elasticsearch.connection.hosts=<The full URL of your Elasticsearch endpoint> -Dtest.elasticsearch.connection.aws.signing.access_key=<Your access key> -Dtest.elasticsearch.connection.aws.signing.secret_key=<Your secret key> -Dtest.elasticsearch.connection.aws.signing.region=<Your AWS region ID>
+```bash
+mvn clean install -Dtest.elasticsearch.connection.hosts=<The full URL of your Elasticsearch endpoint> -Dtest.elasticsearch.connection.aws.signing.access_key=<Your access key> -Dtest.elasticsearch.connection.aws.signing.secret_key=<Your secret key> -Dtest.elasticsearch.connection.aws.signing.region=<Your AWS region ID>
+```
 
 When building Hibernate Search with new JDKs, you may want to run Elasticsearch with a different JDK than the one used by Maven.
 This can be done by setting a property
 (**this will only work with the profiles for Elasticsearch 5 and above**):
 
-    > mvn clean install -Dtest.elasticsearch.run.java_home=/path/to/my/jdk
+```bash
+mvn clean install -Dtest.elasticsearch.run.java_home=/path/to/my/jdk
+```
 
 ## JQAssistant
 
 You can request static analysis and sanity checks with the `jqassistant` profile.
 Tests do not need to be run for these checks.
 
-    > mvn clean install -Pjqassistant -DskipTests
+```bash
+mvn clean install -Pjqassistant -DskipTests
+```
 
 To also check cyclic dependencies between packages, use `-Djqassistant.groups=default,cycles`.
 Cyclic dependency analysis is costly and may add significant overhead to the build:
 at least 10 seconds, maybe one minute or more depending on your setup.
 
-    > mvn clean install -Pjqassistant -DskipTests -Djqassistant.groups=default,cycles
+```bash
+mvn clean install -Pjqassistant -DskipTests -Djqassistant.groups=default,cycles
+```
 
 You can also inspect the created Neo4j datastore after a build,
 provided that build had the `jqassistant` profile enabled:
 
-    > mvn jqassistant:server -Pjqassistant-server -pl reports
+```bash
+mvn jqassistant:server -Pjqassistant-server -pl reports
+```
 
 The Neo4j web UI will be accessible from http://localhost:7474/.
 

@@ -46,7 +46,7 @@ Create a "topic" branch on which you will work.  The convention is to name the b
 using the JIRA issue key.  If there is not already a JIRA issue covering the work you
 want to do, create one.  Assuming you will be working from the master branch and working
 on the JIRA HSEARCH-123:
-```shell
+```bash
 git checkout -b HSEARCH-123 master
 ```
 
@@ -60,7 +60,7 @@ The Hibernate family projects share the same style conventions. You can download
 files for your IDE from [the IDE codestyles GitHub repository](https://github.com/hibernate/hibernate-ide-codestyles).
 
 You can very quickly check that you have respected the formatting rules by running Checkstyle:
-```shell
+```bash
 mvn checkstyle:check
 ```
 
@@ -122,7 +122,7 @@ up the related commits and display them on the JIRA issue.
 * Make sure you have added the necessary tests for your changes.
 * Run _all_ the tests to assure nothing else was accidentally broken:
 
-```shell
+```bash
 mvn verify
 ```
 
@@ -131,12 +131,12 @@ appreciated by the way), please use rebasing rather than merging (see instructio
 "merge commits" that really muck up the project timeline._
 
 Add the original Hibernate Search repository as a remote repository called upstream:
-```shell
+```bash
 git remote add upstream https://github.com/hibernate/hibernate-search.git
 ```
 
 If you want to rebase your branch on top of the master branch, you can use the following git command:
-```shell
+```bash
 git pull --rebase upstream master
 ```
 
