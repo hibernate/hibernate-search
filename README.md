@@ -1,5 +1,6 @@
 # Hibernate Search
 
+[![Maven Central](https://img.shields.io/maven-central/v/org.hibernate.search/hibernate-search-mapper-orm.svg?label=Maven%20Central)](https://search.maven.org/search?q=g:%22org.hibernate.search%22)
 [![Build Status](https://ci.hibernate.org/buildStatus/icon?job=hibernate-search/master)](https://ci.hibernate.org/job/hibernate-search/job/master)
 [![Coverage Status](https://coveralls.io/repos/github/hibernate/hibernate-search/badge.svg?branch=master)](https://coveralls.io/github/hibernate/hibernate-search?branch=master)
 [![Quality gate](https://sonarcloud.io/api/project_badges/measure?project=org.hibernate.search%3Ahibernate-search-parent&metric=alert_status)](https://sonarcloud.io/dashboard?id=org.hibernate.search%3Ahibernate-search-parent)
