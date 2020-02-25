@@ -302,7 +302,7 @@ and do the work of converting between user entities and documents to be indexed.
   * `javabean`: An experimental (not published) mapper for Java Beans without Hibernate ORM.
   Mostly useful for tests of the `pojo` module.
   * `orm`: A mapper for [Hibernate ORM](http://hibernate.org/orm/) entities.
-  * `pojo`: Contains base classes and APIs that are re-used in other POJO-based mapper.
+  * `pojo-base`: Contains base classes and APIs that are re-used in other POJO-based mapper.
 * `reports`: Module built last, producing reports related to test coverage in particular.
 * `util`: Various modules containing util classes, both for runtime and for tests.
 
