@@ -117,6 +117,11 @@ long totalHitCount = result.getTotalHitCount();
 List<Book> hits = result.getHits();
 ```
 
+## License
+
+This software and its documentation are distributed under the terms of the FSF Lesser GNU Public
+License (see lgpl.txt).
+
 ## Getting started
 
 A getting started guide is available
@@ -129,6 +134,20 @@ Fore more information, refer to the Hibernate Search website:
 
 For offline use, distribution bundles downloaded from [SourceForge](https://sourceforge.net/projects/hibernate/files/hibernate-search/)
 also include the reference documentation for the downloaded version in PDF and HTML format. 
+
+## Contact
+
+### Latest Documentation
+
+See <http://hibernate.org/search/documentation/>.
+
+### Bug Reports
+
+See the HSEARCH project on the Hibernate JIRA instance: <https://hibernate.atlassian.net/browse/HSEARCH>.
+
+### Community Support
+
+See <http://hibernate.org/community/>.
 
 ## Building from source
 
@@ -261,22 +280,4 @@ and do the work of converting between user entities and documents to be indexed.
 * `reports`: Module built last, producing reports related to test coverage in particular.
 * `util`: Various modules containing util classes, both for runtime and for tests.
 
-## Contact
-
-### Latest Documentation
-
-See <http://hibernate.org/search/documentation/>.
-
-### Bug Reports
-
-See the HSEARCH project on the Hibernate JIRA instance: <https://hibernate.atlassian.net/browse/HSEARCH>.
-
-### Community Support
-
-See <http://hibernate.org/community/>.
-
-## License
-
-This software and its documentation are distributed under the terms of the FSF Lesser GNU Public
-License (see lgpl.txt).
 
