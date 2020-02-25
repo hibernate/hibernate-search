@@ -149,6 +149,11 @@ See the HSEARCH project on the Hibernate JIRA instance: <https://hibernate.atlas
 
 See <http://hibernate.org/community/>.
 
+## Contributing
+
+New contributors are always welcome.
+See [CONTRIBUTING.md](CONTRIBUTING.md) to get started.
+
 ## Building from source
 
 ```bash
@@ -266,11 +271,6 @@ mvn jqassistant:server -Pjqassistant-server -pl reports
 ```
 
 The Neo4j web UI will be accessible from http://localhost:7474/.
-
-## Contributing
-
-New contributors are always welcome. We collected some helpful hints on how to get started
-on our website at [Contribute to Hibernate Search](http://hibernate.org/search/contribute/)
 
 ## Source code structure
 
