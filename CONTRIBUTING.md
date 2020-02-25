@@ -64,7 +64,41 @@ You can very quickly check that you have respected the formatting rules by runni
 mvn checkstyle:check
 ```
 
-## Naming and architecture rules
+## Commit
+
+* Make commits of logical units.
+* Be sure to start the commit messages with the JIRA issue key you are working on. This is how JIRA will pick
+up the related commits and display them on the JIRA issue.
+* Avoid formatting changes to existing code as much as possible: they make the intent of your patch less clear.
+* Make sure you have added the necessary tests for your changes.
+* Run _all_ the tests to assure nothing else was accidentally broken:
+
+```bash
+mvn verify
+```
+
+_Prior to committing, if you want to pull in the latest upstream changes (highly
+appreciated by the way), please use rebasing rather than merging (see instructions below).  Merging creates
+"merge commits" that really muck up the project timeline._
+
+Add the original Hibernate Search repository as a remote repository called upstream:
+```bash
+git remote add upstream https://github.com/hibernate/hibernate-search.git
+```
+
+If you want to rebase your branch on top of the master branch, you can use the following git command:
+```bash
+git pull --rebase upstream master
+```
+
+## Submit
+* Push your changes to a topic branch in your fork of the repository.
+* Initiate a [pull request](http://help.github.com/send-pull-requests/).
+* Update the JIRA issue, using the "Link to pull request" button to include a link to the created pull request.
+
+## More conventions
+
+### Naming and architecture rules
 
 Some rules are not checked by Checkstyle, but will only be checked automatically when you submit a PR.
 You will spare yourself some back-and-forth by complying with them from the start.
@@ -112,35 +146,3 @@ or the return type or parameter type of public or protected methods.
 * Types from a given module A **must not** depend on a internal type defined in another module B.
 There are exceptions, for example if module B is purely internal (named `hibernate-search-*-internal-*`),
 like `hibernate-search-util-interal-common`.
-
-## Commit
-
-* Make commits of logical units.
-* Be sure to start the commit messages with the JIRA issue key you are working on. This is how JIRA will pick
-up the related commits and display them on the JIRA issue.
-* Avoid formatting changes to existing code as much as possible: they make the intent of your patch less clear.
-* Make sure you have added the necessary tests for your changes.
-* Run _all_ the tests to assure nothing else was accidentally broken:
-
-```bash
-mvn verify
-```
-
-_Prior to committing, if you want to pull in the latest upstream changes (highly
-appreciated by the way), please use rebasing rather than merging (see instructions below).  Merging creates
-"merge commits" that really muck up the project timeline._
-
-Add the original Hibernate Search repository as a remote repository called upstream:
-```bash
-git remote add upstream https://github.com/hibernate/hibernate-search.git
-```
-
-If you want to rebase your branch on top of the master branch, you can use the following git command:
-```bash
-git pull --rebase upstream master
-```
-
-## Submit
-* Push your changes to a topic branch in your fork of the repository.
-* Initiate a [pull request](http://help.github.com/send-pull-requests/).
-* Update the JIRA issue, using the "Link to pull request" button to include a link to the created pull request.
