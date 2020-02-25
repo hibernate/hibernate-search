@@ -296,7 +296,7 @@ Parts of it will progressively be re-integrated into the main (Search 6+) code b
 Note that compilation and tests in this directory are disabled by default
 (they are only enabled when the property `legacy.skip` is set to `false`).
 When enabled, Elasticsearch integration test in this directory 
-are executed against Elasticsearch 5.6 by default (instead of 6.0).
+are executed against Elasticsearch 5.6 by default.
 * `mapper`: The mappers, i.e. the modules that expose APIs to index and search user entities,
 and do the work of converting between user entities and documents to be indexed.
   * `javabean`: An experimental (not published) mapper for Java Beans without Hibernate ORM.
