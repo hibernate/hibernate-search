@@ -6,60 +6,123 @@
 [![Quality gate](https://sonarcloud.io/api/project_badges/measure?project=org.hibernate.search%3Ahibernate-search-parent&metric=alert_status)](https://sonarcloud.io/dashboard?id=org.hibernate.search%3Ahibernate-search-parent)
 [![Language Grade: Java](https://img.shields.io/lgtm/grade/java/g/hibernate/hibernate-search.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/hibernate/hibernate-search/context:java)
 
-## Warning: this is Hibernate Search 6 
-
-This branch currently contains the code of Hibernate Search version 6,
-a new major version which is very different from Hibernate Search 5,
-and is still in its early stages.
-
-If you are looking for the code of the version of Hibernate Search you are currently using,
-you should try branch [5.11](https://github.com/hibernate/hibernate-search/tree/5.11) instead,
-or any of the [older branches](https://github.com/hibernate/hibernate-search/branches/all).
-
-If you are looking for version 6, then keep in mind that most of the old codebase
-has been moved to the `legacy` directory, creating several modules with the same artifact ID.
-
-When importing the Maven modules in Eclipse, you are advised to use
-the `[groupId]:[artifactId]` project name template, in order to avoid conflicts.
-You can distinguish between old and new modules by their group ID:
-legacy modules use `org.hibernate`, while newer modules use `org.hibernate.search`.
-
-
 ## Description
 
-*Full text search for Java objects*
+Hibernate Search automatically extracts data from Hibernate ORM entities to push it to
+local [Apache Lucene](http://lucene.apache.org/) indexes
+or remote [Elasticsearch](https://www.elastic.co/products/elasticsearch) indexes.
 
-This project provides synchronization between entities managed by Hibernate ORM and full-text
-indexing backends like Apache Lucene and Elasticsearch.
+It features:
 
-It will automatically apply changes to indexes, which is tedious and error prone coding work,
-while leaving you full control on the query aspects. The development community constantly
-researches and refines the index writing techniques to improve performance.
+* [**Declarative mapping**](https://docs.jboss.org/hibernate/search/6.0/reference/en-US/html_single/#mapper-orm-mapping)
+of entity properties to index fields,
+either through annotations or a programmatic API.
+* [**On-demand mass indexing**](https://docs.jboss.org/hibernate/search/6.0/reference/en-US/html_single/#mapper-orm-indexing-massindexer)
+of all entities in the database,
+to initialize the indexes with pre-existing data.
+* [**On-the-fly automatic indexing**](https://docs.jboss.org/hibernate/search/6.0/reference/en-US/html_single/#mapper-orm-indexing-automatic)
+of entities modified through a Hibernate ORM session,
+to always keep the indexes up-to-date.
+* [**A Search DSL**](https://docs.jboss.org/hibernate/search/6.0/reference/en-US/html_single/#search-dsl)
+to easily build full-text search queries
+and retrieve the hits as Hibernate ORM entities.
+* And more: [configuration of analyzers](https://docs.jboss.org/hibernate/search/6.0/reference/en-US/html_single/#concepts-analysis),
+many different [predicates](https://docs.jboss.org/hibernate/search/6.0/reference/en-US/html_single/#search-dsl-predicate)
+and [sorts](https://docs.jboss.org/hibernate/search/6.0/reference/en-US/html_single/#search-dsl-sort)
+in the Search DSL,
+[spatial support](https://docs.jboss.org/hibernate/search/6.0/reference/en-US/html_single/#mapper-orm-geopoint).
+search queries returning [projections](https://docs.jboss.org/hibernate/search/6.0/reference/en-US/html_single/#search-dsl-projection)
+instead of entities,
+[aggregations](https://docs.jboss.org/hibernate/search/6.0/reference/en-US/html_single/#search-dsl-aggregation),
+advanced customization of the mapping using [bridges](https://docs.jboss.org/hibernate/search/6.0/reference/en-US/html_single/#mapper-orm-bridge),
+...
 
-Mapping your objects to the indexes is declarative, using a combination of Hibernate Search
-specific annotations and the knowledge it can gather from your existing Hibernate/JPA
-mapping.
+For example, map your entities like this:
 
-Queries can be defined by any combination of:
-* passing "native" queries directly (`org.apache.lucene.Query` for the Lucene backend, JSON for the Elasticsearch backend)
-* using our backend-agnostic DSL which generates the appropriate native queries based on the available schema metadata
+```java
+@Entity
+@Indexed // => This entity is mapped to an index
+public class Book {
 
-Query results can include projections to be loaded directly from the index, or can materialize
-fully managed Hibernate entities loaded from the database within the current transactional scope.
+	@Id // => The entity ID is the document ID
+	@GeneratedValue
+	private Integer id;
 
-Hibernate Search provides two backends, you can use whichever suits your application best:
-* an embedded [Apache Lucene](http://lucene.apache.org/) backend,
-which runs the indexing engine in the same JVM as your application.
-* an [Elasticsearch](https://www.elastic.co/products/elasticsearch) backend,
-which connects to an external Elasticsearch cluster over the network.
+	@FullTextField(analyzer = "english") // => This property is mapped to a document field
+	private String title;
+
+	@ManyToMany
+	@IndexedEmbedded // => Authors will be embedded in Book documents
+	private Set<Author> authors = new HashSet<>();
+
+	// Getters and setters
+	// ...
+}
+
+@Entity
+public class Author {
+
+	@Id
+	@GeneratedValue
+	private Integer id;
+
+	@FullTextField(analyzer = "name") // => This property is mapped to a document field
+	private String name;
+
+	@ManyToMany(mappedBy = "authors")
+	private Set<Book> books = new HashSet<>();
+
+	public Author() {
+	}
+
+	// Getters and setters
+	// ...
+}
+```
+
+Index existing data like this:
+
+```java
+SearchSession searchSession = Search.session( entityManager );
+MassIndexer indexer = searchSession.massIndexer( Book.class );
+indexer.startAndWait();
+```
+
+Automatic indexing does not require any change to code based on JPA or Hibernate ORM:
+
+```java
+Author author = new Author();
+author.setName( "John Doe" );
+
+Book book = new Book();
+book.setTitle( "Refactoring: Improving the Design of Existing Code" );
+book.getAuthors().add( author );
+author.getBooks().add( book );
+
+entityManager.persist( author );
+entityManager.persist( book );
+```
+
+And search like this:
+
+```java
+SearchResult<Book> result = Search.session( entityManager ).search( Book.class )
+        .where( f -> f.match()
+                .fields( "title", "authors.name" )
+                .matching( "Refactoring: Improving the Design of Existing Code" )
+        )
+        .fetch( 20 );
+
+long totalHitCount = result.getTotalHitCount();
+List<Book> hits = result.getHits();
+```
 
 ## Getting started
 
-**NOTE**: Hibernate Search 6 is still work in progress.
-Summary documentation will be made available with the first Alpha release,
-and will be progressively improved with each subsequent Alpha/Beta release.
+A getting started guide is available
+[in the reference documentation](https://docs.jboss.org/hibernate/search/6.0/reference/en-US/html_single/#getting-started).
 
-All necessary information is available on the Hibernate Search website:
+Fore more information, refer to the Hibernate Search website:
 
 * [Available versions and compatibility matrix](http://hibernate.org/search/releases/)
 * [Reference documentation for all versions (current and past)](http://hibernate.org/search/documentation/)
