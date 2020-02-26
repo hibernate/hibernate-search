@@ -8,24 +8,30 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.lucene.work.impl.LuceneSchemaManagementWork;
+
 /**
- * A special workset that won't trigger the creation of the index writer.
+ * A special write workset that won't trigger the creation of the index writer.
  * <p>
  * Useful to make sure that read-only applications never create any index writer.
  */
-class LuceneEnsureIndexExistsWriteWorkSet implements LuceneWriteWorkSet {
+class LuceneSchemaManagementWorkSet<T> implements LuceneWriteWorkSet {
 
-	private final CompletableFuture<?> future;
+	private final LuceneSchemaManagementWork<T> work;
 
-	LuceneEnsureIndexExistsWriteWorkSet(CompletableFuture<?> future) {
+	private final CompletableFuture<T> future;
+
+	LuceneSchemaManagementWorkSet(LuceneSchemaManagementWork<T> work,
+			CompletableFuture<T> future) {
+		this.work = work;
 		this.future = future;
 	}
 
 	@Override
 	public void submitTo(LuceneWriteWorkProcessor processor) {
 		try {
-			processor.ensureIndexExists();
-			future.complete( null );
+			T result = processor.submit( work );
+			future.complete( result );
 		}
 		catch (RuntimeException e) {
 			markAsFailed( e );

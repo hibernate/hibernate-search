@@ -67,7 +67,7 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 	}
 
 	@Override
-	public void ensureIndexExists() {
+	public void createIndexIfMissing() {
 		try {
 			Directory directory = directoryHolder.get();
 
