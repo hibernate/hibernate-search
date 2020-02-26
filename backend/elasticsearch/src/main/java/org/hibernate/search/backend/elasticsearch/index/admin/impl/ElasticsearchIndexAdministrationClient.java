@@ -33,11 +33,13 @@ public class ElasticsearchIndexAdministrationClient {
 
 	private final IndexNames indexNames;
 	private final IndexMetadata expectedMetadata;
+	private final ElasticsearchIndexLifecycleExecutionOptions executionOptions;
 
 	public ElasticsearchIndexAdministrationClient(ElasticsearchWorkBuilderFactory workBuilderFactory,
 			ElasticsearchWorkOrchestrator workOrchestrator,
 			IndexLayoutStrategy indexLayoutStrategy,
-			IndexNames indexNames, IndexMetadata expectedMetadata) {
+			IndexNames indexNames, IndexMetadata expectedMetadata,
+			ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
 		this.schemaAccessor = new ElasticsearchSchemaAccessor( workBuilderFactory, workOrchestrator );
 
 		this.schemaCreator = new ElasticsearchSchemaCreatorImpl( schemaAccessor, indexLayoutStrategy );
@@ -47,24 +49,25 @@ public class ElasticsearchIndexAdministrationClient {
 
 		this.indexNames = indexNames;
 		this.expectedMetadata = expectedMetadata;
+		this.executionOptions = executionOptions;
 	}
 
-	public CompletableFuture<?> createIfAbsent(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
+	public CompletableFuture<?> createIfAbsent() {
 		return schemaCreator.createIndexIfAbsent( indexNames, expectedMetadata )
 				.thenCompose( ignored -> schemaAccessor.waitForIndexStatus( indexNames, executionOptions ) );
 	}
 
-	public CompletableFuture<?> dropAndCreate(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
+	public CompletableFuture<?> dropAndCreate() {
 		return schemaDropper.dropIfExisting( indexNames )
 				.thenCompose( ignored -> schemaCreator.createIndexAssumeNonExisting( indexNames, expectedMetadata ) )
 				.thenCompose( ignored -> schemaAccessor.waitForIndexStatus( indexNames, executionOptions ) );
 	}
 
-	public CompletableFuture<?> dropIfExisting(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
+	public CompletableFuture<?> dropIfExisting() {
 		return schemaDropper.dropIfExisting( indexNames );
 	}
 
-	public CompletableFuture<?> update(ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
+	public CompletableFuture<?> update() {
 		return schemaCreator.createIndexIfAbsent( indexNames, expectedMetadata )
 				.thenCompose( existingIndexMetadata -> {
 					if ( existingIndexMetadata != null ) {
@@ -80,8 +83,7 @@ public class ElasticsearchIndexAdministrationClient {
 				.thenCompose( ignored -> schemaAccessor.waitForIndexStatus( indexNames, executionOptions ) );
 	}
 
-	public CompletableFuture<?> validate(ElasticsearchIndexLifecycleExecutionOptions executionOptions,
-			ContextualFailureCollector failureCollector) {
+	public CompletableFuture<?> validate(ContextualFailureCollector failureCollector) {
 		return schemaAccessor.getCurrentIndexMetadata( indexNames )
 				.thenAccept( actualIndexMetadata ->
 						schemaValidator.validate(
