@@ -23,6 +23,8 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneBatchingWrit
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkProcessor;
+import org.hibernate.search.backend.lucene.schema.management.impl.LuceneIndexSchemaManager;
+import org.hibernate.search.backend.lucene.schema.management.impl.SchemaManagementIndexManagerContext;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
@@ -190,6 +192,10 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 						timingSource, threadPoolProvider, failureHandler
 				);
 		}
+	}
+
+	LuceneIndexSchemaManager createSchemaManager(SchemaManagementIndexManagerContext context) {
+		return new LuceneIndexSchemaManager( workFactory, context );
 	}
 
 	Shard createShard(IOStrategy ioStrategy, LuceneIndexModel model, Optional<String> shardId) {

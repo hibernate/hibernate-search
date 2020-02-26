@@ -33,6 +33,16 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	}
 
 	@Override
+	public LuceneSchemaManagementWork<Void> dropIndexIfExisting() {
+		return new LuceneDropIndexIfExistingWork();
+	}
+
+	@Override
+	public LuceneSchemaManagementWork<Void> validateIndexExists() {
+		return new LuceneValidateIndexExistsWork();
+	}
+
+	@Override
 	public LuceneSingleDocumentWriteWork<?> add(String tenantId, String entityTypeName, Object entityIdentifier,
 			LuceneIndexEntry indexEntry) {
 		return new LuceneAddEntryWork( tenantId, entityTypeName, entityIdentifier, indexEntry );

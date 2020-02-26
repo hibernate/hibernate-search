@@ -18,6 +18,10 @@ public interface LuceneWorkFactory {
 
 	LuceneSchemaManagementWork<Void> createIndexIfMissing();
 
+	LuceneSchemaManagementWork<Void> dropIndexIfExisting();
+
+	LuceneSchemaManagementWork<Void> validateIndexExists();
+
 	LuceneSingleDocumentWriteWork<?> add(String tenantId, String entityTypeName, Object entityIdentifier,
 			LuceneIndexEntry indexEntry);
 

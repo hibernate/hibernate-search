@@ -15,6 +15,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.DirectoryReaderCollector;
+import org.hibernate.search.backend.lucene.schema.management.impl.LuceneIndexSchemaManager;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeIndexManagerContext;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
@@ -51,6 +52,8 @@ public class LuceneIndexManagerImpl
 
 	private final ShardHolder shardHolder;
 
+	private final LuceneIndexSchemaManager schemaManager;
+
 	LuceneIndexManagerImpl(IndexManagerBackendContext backendContext,
 			String indexName, LuceneIndexModel model, LuceneIndexEntryFactory indexEntryFactory) {
 		this.backendContext = backendContext;
@@ -60,6 +63,7 @@ public class LuceneIndexManagerImpl
 		this.indexEntryFactory = indexEntryFactory;
 
 		this.shardHolder = new ShardHolder( backendContext, model );
+		this.schemaManager = backendContext.createSchemaManager( shardHolder );
 	}
 
 	@Override
@@ -94,7 +98,7 @@ public class LuceneIndexManagerImpl
 
 	@Override
 	public IndexSchemaManager getSchemaManager() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return schemaManager;
 	}
 
 	@Override
