@@ -14,6 +14,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
+import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -28,19 +29,22 @@ public final class Shard {
 	private final EventContext eventContext;
 	private final IndexAccessorImpl indexAccessor;
 	private final LuceneWriteWorkOrchestratorImplementor writeOrchestrator;
+	private final LuceneWorkFactory workFactory;
 
 	Shard(EventContext eventContext, IndexAccessorImpl indexAccessor,
-			LuceneWriteWorkOrchestratorImplementor writeOrchestrator) {
+			LuceneWriteWorkOrchestratorImplementor writeOrchestrator,
+			LuceneWorkFactory workFactory) {
 		this.eventContext = eventContext;
 		this.indexAccessor = indexAccessor;
 		this.writeOrchestrator = writeOrchestrator;
+		this.workFactory = workFactory;
 	}
 
 	CompletableFuture<?> start() {
 		try {
 			indexAccessor.start();
 			writeOrchestrator.start();
-			return writeOrchestrator.ensureIndexExists();
+			return writeOrchestrator.submit( workFactory.createIndexIfMissing() );
 		}
 		catch (IOException | RuntimeException e) {
 			new SuppressingCloser( e )

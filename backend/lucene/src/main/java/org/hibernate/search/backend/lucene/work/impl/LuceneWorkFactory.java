@@ -16,6 +16,8 @@ import org.apache.lucene.search.Query;
 
 public interface LuceneWorkFactory {
 
+	LuceneSchemaManagementWork<Void> createIndexIfMissing();
+
 	LuceneSingleDocumentWriteWork<?> add(String tenantId, String entityTypeName, Object entityIdentifier,
 			LuceneIndexEntry indexEntry);
 

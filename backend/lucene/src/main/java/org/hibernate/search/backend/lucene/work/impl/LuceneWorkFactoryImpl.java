@@ -28,6 +28,11 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	}
 
 	@Override
+	public LuceneSchemaManagementWork<Void> createIndexIfMissing() {
+		return new LuceneCreateIndexIfMissingWork();
+	}
+
+	@Override
 	public LuceneSingleDocumentWriteWork<?> add(String tenantId, String entityTypeName, Object entityIdentifier,
 			LuceneIndexEntry indexEntry) {
 		return new LuceneAddEntryWork( tenantId, entityTypeName, entityIdentifier, indexEntry );

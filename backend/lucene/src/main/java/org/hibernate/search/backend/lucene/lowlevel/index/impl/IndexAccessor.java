@@ -31,7 +31,7 @@ public interface IndexAccessor {
 	 * <p>
 	 * Should only be used when starting an index.
 	 */
-	void ensureIndexExists();
+	void createIndexIfMissing();
 
 	/**
 	 * Commits the underlying index writer, if any.
