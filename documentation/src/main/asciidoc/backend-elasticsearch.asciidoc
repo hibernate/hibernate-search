@@ -243,24 +243,26 @@ in order to generate correct HTTP requests.
 By default, Hibernate Search will query the Elasticsearch cluster at boot time to know its version,
 and will infer the correct behavior to adopt.
 
-Alternatively, you can tell Hibernate Search the Elasticsearch version to target.
-Hibernate Search will still query the Elasticsearch cluster to check that the configured version matches the actual version,
-but only after most of the metadata has been validated.
-This can be helpful when developing, in particular.
-
-To configure the version, set the `hibernate.search.backends.<backend name>.version` property
+If necessary, you can disable the call to the Elasticsearch cluster for version checks on startup.
+To do that, set `hibernate.search.backends.<backend name>.version_check.enabled` to `false`,
+and set the property `hibernate.search.backends.<backend name>.version`
 to a string following the format `x.y.z-qualifier`,
 where `x`, `y` and `z` are integers
 and `qualifier` is an optional string of word characters (alphanumeric or `_`).
 
-Incomplete versions are allowed in some cases, for example `7.0` or just `7`.
-This is not possible for all versions, however.
-For example, Elasticsearch 5 is only supported from 5.6.0 onwards,
-so `5` is not an acceptable value and will trigger an exception: `5.6` must be used instead.
+The major and minor version numbers (`x` and `y` in the format above) are mandatory,
+but other numbers are optional.
 
-You can also disable the query made to the Elasticsearch cluster which could be useful in some cases.
-To do that you have to set the `hibernate.search.backends.<backend name>.version_check.enabled` to `false` but if you do
-that you have to specify the version of Elasticsearch as we see just before with at least the major and minor version `x` and `y`.
+[TIP]
+====
+The property `hibernate.search.backends.<backend name>.version` can also be set
+when `hibernate.search.backends.<backend name>.version_check.enabled` is `true` (the default).
+
+In that case,
+Hibernate Search will still query the Elasticsearch cluster to know the actual version of the cluster,
+and will check that the configured version matches the actual version.
+This can be helpful while developing, in particular.
+====
 
 [[backend-elasticsearch-configuration-logging]]
 === Logging
