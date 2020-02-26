@@ -17,9 +17,6 @@ import org.jboss.logging.annotations.MessageBundle;
 @MessageBundle(projectCode = MessageConstants.PROJECT_CODE)
 public interface ElasticsearchEventContextMessages {
 
-	@Message(value = "schema validation")
-	String schemaValidation();
-
 	@Message(value = "attribute '%1$s'")
 	String mappingAttribute(String name);
 

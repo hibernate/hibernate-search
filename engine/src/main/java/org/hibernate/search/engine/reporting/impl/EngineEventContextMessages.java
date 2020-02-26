@@ -60,6 +60,9 @@ public interface EngineEventContextMessages {
 	@Message(value = "shard '%1$s'")
 	String shard(String shardId);
 
+	@Message(value = "schema validation")
+	String schemaValidation();
+
 	@Message(value = "index schema root")
 	String indexSchemaRoot();
 

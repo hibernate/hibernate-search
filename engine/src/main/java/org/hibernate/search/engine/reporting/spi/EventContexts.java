@@ -51,11 +51,33 @@ public class EventContexts {
 			}
 	);
 
+	private static final EventContext SCHEMA_VALIDATION = EventContext.create(
+			new EventContextElement() {
+				@Override
+				public String toString() {
+					return "EventContextElement[" + render() + "]";
+				}
+
+				@Override
+				public String render() {
+					return MESSAGES.schemaValidation();
+				}
+			}
+	);
+
 	private EventContexts() {
 	}
 
 	public static EventContext getDefault() {
 		return DEFAULT;
+	}
+
+	public static EventContext indexSchemaRoot() {
+		return INDEX_SCHEMA_ROOT;
+	}
+
+	public static EventContext schemaValidation() {
+		return SCHEMA_VALIDATION;
 	}
 
 	public static EventContext fromType(MappableTypeModel typeModel) {
@@ -119,10 +141,6 @@ public class EventContexts {
 				return MESSAGES.shard( param );
 			}
 		} );
-	}
-
-	public static EventContext indexSchemaRoot() {
-		return INDEX_SCHEMA_ROOT;
 	}
 
 	public static EventContext fromIndexFieldAbsolutePath(String absolutePath) {
