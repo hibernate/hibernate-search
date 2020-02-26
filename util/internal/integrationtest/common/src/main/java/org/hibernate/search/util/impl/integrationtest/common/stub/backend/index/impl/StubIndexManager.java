@@ -9,6 +9,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
+import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
@@ -75,6 +76,11 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 	@Override
 	public String toString() {
 		return StubIndexManager.class.getSimpleName() + "[" + name + "]";
+	}
+
+	@Override
+	public IndexSchemaManager getSchemaManager() {
+		throw new UnsupportedOperationException( "Not implemented yet" );
 	}
 
 	@Override

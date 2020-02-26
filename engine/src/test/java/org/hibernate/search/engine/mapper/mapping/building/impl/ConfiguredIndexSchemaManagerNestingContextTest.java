@@ -36,7 +36,7 @@ import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 
-public class ConfiguredIndexSchemaNestingContextTest extends EasyMockSupport {
+public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupport {
 
 	@Rule
 	public final ExpectedException thrown = ExpectedException.none();
