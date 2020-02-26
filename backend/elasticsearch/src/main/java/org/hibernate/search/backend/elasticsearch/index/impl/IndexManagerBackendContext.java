@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
+import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexLifecycleExecutionOptions;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.LowLevelIndexMetadataBuilder;
@@ -152,7 +153,8 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		return eventContext;
 	}
 
-	ElasticsearchIndexAdministrationClient createAdministrationClient(ElasticsearchIndexModel model) {
+	ElasticsearchIndexAdministrationClient createAdministrationClient(ElasticsearchIndexModel model,
+			ElasticsearchIndexLifecycleExecutionOptions lifecycleExecutionOptions) {
 		LowLevelIndexMetadataBuilder builder = new LowLevelIndexMetadataBuilder(
 				link.getIndexMetadataSyntax(),
 				model.getNames()
@@ -161,7 +163,8 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		IndexMetadata expectedMetadata = builder.build();
 		return new ElasticsearchIndexAdministrationClient(
 				link.getWorkBuilderFactory(), orchestratorProvider.getRootParallelOrchestrator(),
-				indexLayoutStrategy, model.getNames(), expectedMetadata
+				indexLayoutStrategy, model.getNames(), expectedMetadata,
+				lifecycleExecutionOptions
 		);
 	}
 

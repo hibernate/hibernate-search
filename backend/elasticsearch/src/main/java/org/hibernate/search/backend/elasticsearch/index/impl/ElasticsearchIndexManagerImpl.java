@@ -113,7 +113,9 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 			 * based on runtime data such as runtime user configuration or the detected ES version.
 			 * Useful for compile-time boot.
 			 */
-			administrationClient = backendContext.createAdministrationClient( model );
+			administrationClient = backendContext.createAdministrationClient(
+					model, createLifecycleExecutionOptions( context.getConfigurationPropertySource() )
+			);
 			lifecycleStrategy = createLifecycleStrategy( context.getConfigurationPropertySource() );
 
 			serialOrchestrator.start();
@@ -260,12 +262,14 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 	}
 
 	private ElasticsearchIndexLifecycleStrategy createLifecycleStrategy(ConfigurationPropertySource propertySource) {
-		return new ElasticsearchIndexLifecycleStrategy(
-				LIFECYCLE_STRATEGY.get( propertySource ),
-				new ElasticsearchIndexLifecycleExecutionOptions(
-						LIFECYCLE_MINIMAL_REQUIRED_STATUS.get( propertySource ),
-						LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT.get( propertySource )
-				)
+		return new ElasticsearchIndexLifecycleStrategy( LIFECYCLE_STRATEGY.get( propertySource ) );
+	}
+
+	private ElasticsearchIndexLifecycleExecutionOptions createLifecycleExecutionOptions(
+			ConfigurationPropertySource propertySource) {
+		return new ElasticsearchIndexLifecycleExecutionOptions(
+				LIFECYCLE_MINIMAL_REQUIRED_STATUS.get( propertySource ),
+				LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT.get( propertySource )
 		);
 	}
 

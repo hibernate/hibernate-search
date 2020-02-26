@@ -10,7 +10,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexAdministrationClient;
-import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexLifecycleExecutionOptions;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
@@ -18,26 +17,22 @@ import org.hibernate.search.util.common.impl.Futures;
 public class ElasticsearchIndexLifecycleStrategy {
 
 	private final IndexLifecycleStrategyName strategyName;
-	protected final ElasticsearchIndexLifecycleExecutionOptions executionOptions;
 
-	public ElasticsearchIndexLifecycleStrategy(
-			IndexLifecycleStrategyName strategyName,
-			ElasticsearchIndexLifecycleExecutionOptions executionOptions) {
+	public ElasticsearchIndexLifecycleStrategy(IndexLifecycleStrategyName strategyName) {
 		this.strategyName = strategyName;
-		this.executionOptions = executionOptions;
 	}
 
 	public CompletableFuture<?> onStart(ElasticsearchIndexAdministrationClient client, IndexManagerStartContext context) {
 		switch ( strategyName ) {
 			case CREATE:
-				return client.createIfAbsent( executionOptions );
+				return client.createIfAbsent();
 			case DROP_AND_CREATE:
 			case DROP_AND_CREATE_AND_DROP:
-				return client.dropAndCreate( executionOptions );
+				return client.dropAndCreate();
 			case UPDATE:
-				return client.update( executionOptions );
+				return client.update();
 			case VALIDATE:
-				return client.validate( executionOptions, context.getFailureCollector() );
+				return client.validate( context.getFailureCollector() );
 			case NONE:
 				// Nothing to do
 				return CompletableFuture.completedFuture( null );
@@ -49,7 +44,7 @@ public class ElasticsearchIndexLifecycleStrategy {
 	public void onStop(ElasticsearchIndexAdministrationClient client) {
 		switch ( strategyName ) {
 			case DROP_AND_CREATE_AND_DROP:
-				Futures.unwrappedExceptionJoin( client.dropIfExisting( executionOptions ) );
+				Futures.unwrappedExceptionJoin( client.dropIfExisting() );
 				break;
 			case CREATE:
 			case DROP_AND_CREATE:
