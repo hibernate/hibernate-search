@@ -41,42 +41,47 @@ For example, map your entities like this:
 
 ```java
 @Entity
-@Indexed // => This entity is mapped to an index
+// This entity is mapped to an index
+@Indexed
 public class Book {
 
-	@Id // => The entity ID is the document ID
-	@GeneratedValue
-	private Integer id;
+    // The entity ID is the document ID
+    @Id
+    @GeneratedValue
+    private Integer id;
 
-	@FullTextField(analyzer = "english") // => This property is mapped to a document field
-	private String title;
+    // This property is mapped to a document field
+    @FullTextField(analyzer = "english")
+    private String title;
 
-	@ManyToMany
-	@IndexedEmbedded // => Authors will be embedded in Book documents
-	private Set<Author> authors = new HashSet<>();
+    @ManyToMany
+    // Authors will be embedded in Book documents
+    @IndexedEmbedded
+    private Set<Author> authors = new HashSet<>();
 
-	// Getters and setters
-	// ...
+    // Getters and setters
+    // ...
 }
 
 @Entity
 public class Author {
 
-	@Id
-	@GeneratedValue
-	private Integer id;
+    @Id
+    @GeneratedValue
+    private Integer id;
 
-	@FullTextField(analyzer = "name") // => This property is mapped to a document field
-	private String name;
+    // This property is mapped to a document field
+    @FullTextField(analyzer = "name")
+    private String name;
 
-	@ManyToMany(mappedBy = "authors")
-	private Set<Book> books = new HashSet<>();
+    @ManyToMany(mappedBy = "authors")
+    private Set<Book> books = new HashSet<>();
 
-	public Author() {
-	}
+    public Author() {
+    }
 
-	// Getters and setters
-	// ...
+    // Getters and setters
+    // ...
 }
 ```
 
@@ -92,10 +97,10 @@ Automatic indexing does not require any change to code based on JPA or Hibernate
 
 ```java
 Author author = new Author();
-author.setName( "John Doe" );
+author.setName( "Isaac Asimov" );
 
 Book book = new Book();
-book.setTitle( "Refactoring: Improving the Design of Existing Code" );
+book.setTitle( "The Caves Of Steel" );
 book.getAuthors().add( author );
 author.getBooks().add( book );
 
@@ -106,10 +111,11 @@ entityManager.persist( book );
 And search like this:
 
 ```java
-SearchResult<Book> result = Search.session( entityManager ).search( Book.class )
+SearchResult<Book> result = Search.session( entityManager )
+        .search( Book.class )
         .where( f -> f.match()
                 .fields( "title", "authors.name" )
-                .matching( "Refactoring: Improving the Design of Existing Code" )
+                .matching( "Isaac" )
         )
         .fetch( 20 );
 
