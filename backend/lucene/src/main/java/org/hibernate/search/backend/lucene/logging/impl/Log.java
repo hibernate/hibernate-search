@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.lucene.search.Query;
+import org.apache.lucene.store.Directory;
 import org.apache.lucene.util.Version;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
@@ -596,4 +597,18 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 108,
 			value = "Invalid I/O strategy name: '%1$s'. Valid names are: %2$s.")
 	SearchException invalidIOStrategyName(String invalidRepresentation, List<String> validRepresentations);
+
+	@Message(id = ID_OFFSET_2 + 109,
+			value = "Index does not exist for directory '%1$s'")
+	SearchException missingIndex(Directory directory, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 110,
+			value = "Unable to validate index directory: %1$s")
+	SearchException unableToValidateIndexDirectory(String causeMessage,
+			@Param EventContext context, @Cause Exception cause);
+
+	@Message(id = ID_OFFSET_2 + 111,
+			value = "Unable to drop index directory: %1$s")
+	SearchException unableToDropIndexDirectory(String causeMessage,
+			@Param EventContext context, @Cause Exception cause);
 }

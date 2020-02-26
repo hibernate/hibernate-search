@@ -85,6 +85,45 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 	}
 
 	@Override
+	public void validateIndexExists() {
+		Directory directory = directoryHolder.get();
+
+		try {
+			if ( DirectoryReader.indexExists( directory ) ) {
+				return;
+			}
+		}
+		catch (IOException | RuntimeException e) {
+			throw log.unableToValidateIndexDirectory( e.getMessage(), eventContext, e );
+		}
+
+		throw log.missingIndex( directory, eventContext );
+	}
+
+	@Override
+	public void dropIndexIfExisting() {
+		try {
+			// Ensure no one is using the directory
+			indexWriterProvider.clear();
+			indexReaderProvider.clear();
+
+			Directory directory = directoryHolder.get();
+
+			if ( !DirectoryReader.indexExists( directory ) ) {
+				return;
+			}
+
+			String[] files = directory.listAll();
+			for ( String file : files ) {
+				directory.deleteFile( file );
+			}
+		}
+		catch (IOException | RuntimeException e) {
+			throw log.unableToDropIndexDirectory( e.getMessage(), eventContext, e );
+		}
+	}
+
+	@Override
 	public void commit() {
 		try {
 			IndexWriterDelegatorImpl delegator = indexWriterProvider.getOrNull();
