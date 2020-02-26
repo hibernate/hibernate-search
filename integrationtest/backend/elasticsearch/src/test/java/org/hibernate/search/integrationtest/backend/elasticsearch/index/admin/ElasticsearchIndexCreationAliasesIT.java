@@ -108,8 +108,6 @@ public class ElasticsearchIndexCreationAliasesIT {
 		elasticsearchClient.index( oldIndexName, null, null )
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );
-		elasticsearchClient.index( INDEX_NAME )
-				.deleteAndCreate();
 
 		setup( null );
 
