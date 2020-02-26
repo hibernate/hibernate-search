@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
-import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexLifecycleExecutionOptions;
+import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexLifecycleExecutionOptions;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.LowLevelIndexMetadataBuilder;
-import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexAdministrationClient;
+import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexSchemaManager;
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
@@ -153,7 +153,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		return eventContext;
 	}
 
-	ElasticsearchIndexAdministrationClient createAdministrationClient(ElasticsearchIndexModel model,
+	ElasticsearchIndexSchemaManager createSchemaManager(ElasticsearchIndexModel model,
 			ElasticsearchIndexLifecycleExecutionOptions lifecycleExecutionOptions) {
 		LowLevelIndexMetadataBuilder builder = new LowLevelIndexMetadataBuilder(
 				link.getIndexMetadataSyntax(),
@@ -161,7 +161,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		);
 		model.contributeLowLevelMetadata( builder );
 		IndexMetadata expectedMetadata = builder.build();
-		return new ElasticsearchIndexAdministrationClient(
+		return new ElasticsearchIndexSchemaManager(
 				link.getWorkBuilderFactory(), orchestratorProvider.getRootParallelOrchestrator(),
 				indexLayoutStrategy, model.getNames(), expectedMetadata,
 				lifecycleExecutionOptions
