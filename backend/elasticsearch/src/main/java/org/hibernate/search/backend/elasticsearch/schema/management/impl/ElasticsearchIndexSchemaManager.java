@@ -10,7 +10,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
-import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchEventContexts;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -87,7 +86,7 @@ public class ElasticsearchIndexSchemaManager implements IndexSchemaManager {
 		return schemaAccessor.getCurrentIndexMetadata( indexNames )
 				.thenAccept( actualIndexMetadata -> schemaValidator.validate(
 						expectedMetadata, actualIndexMetadata.getMetadata(),
-						failureCollector.withContext( ElasticsearchEventContexts.getSchemaValidation() )
+						failureCollector
 				) )
 				.thenCompose( ignored -> failureCollector.hasFailure()
 						? CompletableFuture.completedFuture( null )

@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.logging.impl;
 
 import org.hibernate.search.util.common.reporting.EventContext;
-import org.hibernate.search.util.common.reporting.EventContextElement;
 import org.hibernate.search.util.common.reporting.impl.AbstractSimpleEventContextElement;
 
 import org.jboss.logging.Messages;
@@ -16,25 +15,7 @@ public final class ElasticsearchEventContexts {
 
 	private static final ElasticsearchEventContextMessages MESSAGES = Messages.getBundle( ElasticsearchEventContextMessages.class );
 
-	private static final EventContext SCHEMA_VALIDATION = EventContext.create(
-			new EventContextElement() {
-				@Override
-				public String toString() {
-					return "EventContextElement[" + render() + "]";
-				}
-
-				@Override
-				public String render() {
-					return MESSAGES.schemaValidation();
-				}
-			}
-	);
-
 	private ElasticsearchEventContexts() {
-	}
-
-	public static EventContext getSchemaValidation() {
-		return SCHEMA_VALIDATION;
 	}
 
 	public static EventContext fromMappingAttribute(String attributeName) {

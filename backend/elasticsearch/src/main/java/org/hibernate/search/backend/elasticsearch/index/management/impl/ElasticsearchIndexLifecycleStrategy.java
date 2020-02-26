@@ -11,6 +11,8 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexSchemaManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
+import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
+import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
 
@@ -32,7 +34,9 @@ public class ElasticsearchIndexLifecycleStrategy {
 			case UPDATE:
 				return manager.createOrUpdate();
 			case VALIDATE:
-				return manager.validate( context.getFailureCollector() );
+				ContextualFailureCollector validationFailureCollector =
+						context.getFailureCollector().withContext( EventContexts.schemaValidation() );
+				return manager.validate( validationFailureCollector );
 			case NONE:
 				// Nothing to do
 				return CompletableFuture.completedFuture( null );
