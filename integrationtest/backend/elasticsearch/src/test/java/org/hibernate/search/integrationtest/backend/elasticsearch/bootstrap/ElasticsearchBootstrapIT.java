@@ -9,19 +9,25 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.bootstrap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
+import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
+import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.test.SubTest;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
 
 public class ElasticsearchBootstrapIT {
+
+	private static final String BACKEND_NAME = "BackendName";
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -50,7 +56,8 @@ public class ElasticsearchBootstrapIT {
 				)
 				.withIndex(
 						"EmptyIndexName",
-						ctx -> { }
+						ctx -> {
+						}
 				)
 				.setupFirstPhaseOnly();
 
@@ -66,4 +73,121 @@ public class ElasticsearchBootstrapIT {
 		elasticsearchClientSpy.verifyExpectationsMet();
 	}
 
+	/**
+	 * Check that an exception is thrown when version check is at false without explicit cluster version specified
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3841")
+	public void explicitProtocolDialect_noVersionCheck() {
+		SubTest.expectException(
+				"NO version check without explicit version number",
+				() -> setupHelper.start( BACKEND_NAME )
+						.withBackendProperty(
+								ElasticsearchBackendSettings.VERSION_CHECK_ENABLED, false
+						)
+						.withBackendProperty(
+								ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
+								elasticsearchClientSpy.getFactory()
+						)
+						.withIndexDefaultsProperty(
+								ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
+								IndexLifecycleStrategyName.NONE
+						)
+						.withIndex(
+								"EmptyIndexName",
+								ctx -> {
+								}
+						)
+						.setupFirstPhaseOnly()
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.backendContext( BACKEND_NAME )
+						.failure(
+								"Invalid Elasticsearch version",
+								"When version_check.enabled is set to false",
+								"the version must at least be in the form 'x.y'"
+						)
+						.build()
+				);
+	}
+
+	/**
+	 * Check that an exception is thrown when version check is at false with a partial version is specified
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3841")
+	public void explicitProtocolDialect_noVersionCheck_incompleteVersion() {
+		SubTest.expectException(
+				"NO version check with partial version number",
+				() -> setupHelper.start( BACKEND_NAME )
+						.withBackendProperty(
+								ElasticsearchBackendSettings.VERSION_CHECK_ENABLED, false
+						)
+						.withBackendProperty(
+								ElasticsearchBackendSettings.VERSION, "7"
+						)
+						.withBackendProperty(
+								ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
+								elasticsearchClientSpy.getFactory()
+						)
+						.withIndexDefaultsProperty(
+								ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
+								IndexLifecycleStrategyName.NONE
+						)
+						.withIndex(
+								"EmptyIndexName",
+								ctx -> {
+								}
+						)
+						.setupFirstPhaseOnly()
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
+						.backendContext( BACKEND_NAME )
+						.failure(
+								"Invalid Elasticsearch version",
+								"When version_check.enabled is set to false",
+								"the version must at least be in the form 'x.y'"
+						)
+						.build()
+				);
+	}
+
+	/**
+	 * Check that everything is fine when version check is at false with a version is specified with major & minor
+	 */
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3841")
+	public void explicitProtocolDialect_noVersionCheck_completeVersion() {
+		SearchSetupHelper.PartialSetup partialSetup = setupHelper.start( BACKEND_NAME )
+				.withBackendProperty(
+						ElasticsearchBackendSettings.VERSION_CHECK_ENABLED, false
+				)
+				.withBackendProperty(
+						ElasticsearchBackendSettings.VERSION, "7.6"
+				)
+				.withBackendProperty(
+						ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
+						elasticsearchClientSpy.getFactory()
+				)
+				.withIndexDefaultsProperty(
+						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
+						IndexLifecycleStrategyName.NONE
+				)
+				.withIndex(
+						"EmptyIndexName",
+						ctx -> {
+						}
+				)
+				.setupFirstPhaseOnly();
+		// We do not expect the client to be created in the first phase
+		assertThat( elasticsearchClientSpy.getCreatedClientCount() ).isEqualTo( 0 );
+		elasticsearchClientSpy.verifyExpectationsMet();
+
+		partialSetup.doSecondPhase();
+		elasticsearchClientSpy.verifyExpectationsMet();
+	}
 }
