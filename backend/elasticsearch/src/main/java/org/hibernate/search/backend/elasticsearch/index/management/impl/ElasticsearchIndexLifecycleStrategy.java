@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.index.management.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
-import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexAdministrationClient;
+import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexSchemaManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
@@ -22,17 +22,17 @@ public class ElasticsearchIndexLifecycleStrategy {
 		this.strategyName = strategyName;
 	}
 
-	public CompletableFuture<?> onStart(ElasticsearchIndexAdministrationClient client, IndexManagerStartContext context) {
+	public CompletableFuture<?> onStart(ElasticsearchIndexSchemaManager manager, IndexManagerStartContext context) {
 		switch ( strategyName ) {
 			case CREATE:
-				return client.createIfAbsent();
+				return manager.createIfMissing();
 			case DROP_AND_CREATE:
 			case DROP_AND_CREATE_AND_DROP:
-				return client.dropAndCreate();
+				return manager.dropAndCreate();
 			case UPDATE:
-				return client.update();
+				return manager.createOrUpdate();
 			case VALIDATE:
-				return client.validate( context.getFailureCollector() );
+				return manager.validate( context.getFailureCollector() );
 			case NONE:
 				// Nothing to do
 				return CompletableFuture.completedFuture( null );
@@ -41,10 +41,10 @@ public class ElasticsearchIndexLifecycleStrategy {
 		}
 	}
 
-	public void onStop(ElasticsearchIndexAdministrationClient client) {
+	public void onStop(ElasticsearchIndexSchemaManager manager) {
 		switch ( strategyName ) {
 			case DROP_AND_CREATE_AND_DROP:
-				Futures.unwrappedExceptionJoin( client.dropIfExisting() );
+				Futures.unwrappedExceptionJoin( manager.dropIfExisting() );
 				break;
 			case CREATE:
 			case DROP_AND_CREATE:

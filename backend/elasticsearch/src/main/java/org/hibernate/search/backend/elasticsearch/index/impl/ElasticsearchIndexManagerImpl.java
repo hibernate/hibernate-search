@@ -18,8 +18,8 @@ import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
-import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexAdministrationClient;
-import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexLifecycleExecutionOptions;
+import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexSchemaManager;
+import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexLifecycleExecutionOptions;
 import org.hibernate.search.backend.elasticsearch.index.management.impl.ElasticsearchIndexLifecycleStrategy;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorImplementor;
@@ -82,7 +82,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 	private final ElasticsearchWorkOrchestratorImplementor serialOrchestrator;
 	private final ElasticsearchWorkOrchestratorImplementor parallelOrchestrator;
 
-	private ElasticsearchIndexAdministrationClient administrationClient;
+	private ElasticsearchIndexSchemaManager schemaManager;
 	private ElasticsearchIndexLifecycleStrategy lifecycleStrategy;
 
 	ElasticsearchIndexManagerImpl(IndexManagerBackendContext backendContext,
@@ -108,19 +108,19 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 	public CompletableFuture<?> start(IndexManagerStartContext context) {
 		try {
 			/*
-			 * Create the administration client and lifecycle strategy late to allow the behavior to change
+			 * Create the initializer and lifecycle strategy late to allow the behavior to change
 			 * after the first phase of bootstrap,
 			 * based on runtime data such as runtime user configuration or the detected ES version.
 			 * Useful for compile-time boot.
 			 */
-			administrationClient = backendContext.createAdministrationClient(
+			schemaManager = backendContext.createSchemaManager(
 					model, createLifecycleExecutionOptions( context.getConfigurationPropertySource() )
 			);
 			lifecycleStrategy = createLifecycleStrategy( context.getConfigurationPropertySource() );
 
 			serialOrchestrator.start();
 			parallelOrchestrator.start();
-			return lifecycleStrategy.onStart( administrationClient, context );
+			return lifecycleStrategy.onStart( schemaManager, context );
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
@@ -143,9 +143,9 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			closer.push( ElasticsearchWorkOrchestratorImplementor::stop, serialOrchestrator );
 			closer.push( ElasticsearchWorkOrchestratorImplementor::stop, parallelOrchestrator );
-			closer.push( strategy -> strategy.onStop( administrationClient ), lifecycleStrategy );
+			closer.push( strategy -> strategy.onStop( schemaManager ), lifecycleStrategy );
 			lifecycleStrategy = null;
-			administrationClient = null;
+			schemaManager = null;
 		}
 		catch (IOException e) {
 			throw log.failedToShutdownIndexManager( model.getHibernateSearchIndexName(), e, backendContext.getEventContext() );
@@ -187,7 +187,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 
 	@Override
 	public IndexSchemaManager getSchemaManager() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return schemaManager;
 	}
 
 	@Override
