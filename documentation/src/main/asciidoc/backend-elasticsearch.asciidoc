@@ -258,7 +258,7 @@ This is not possible for all versions, however.
 For example, Elasticsearch 5 is only supported from 5.6.0 onwards,
 so `5` is not an acceptable value and will trigger an exception: `5.6` must be used instead.
 
-You can also disable the query made to the Elasticsearch cluster wich could be usefull in some cases.
+You can also disable the query made to the Elasticsearch cluster which could be useful in some cases.
 To do that you have to set the `hibernate.search.backends.<backend name>.version_check.enabled` to `false` but if you do
 that you have to specify the version of Elasticsearch as we see just before with at least the major and minor version `x` and `y`.
 
