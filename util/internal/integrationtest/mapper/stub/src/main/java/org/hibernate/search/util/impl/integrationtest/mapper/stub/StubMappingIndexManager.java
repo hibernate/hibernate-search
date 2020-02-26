@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 
+import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -36,6 +37,10 @@ public class StubMappingIndexManager {
 
 	public <T> T unwrapForTests(Class<T> clazz) {
 		return clazz.cast( indexManager.toAPI() );
+	}
+
+	public IndexSchemaManager getSchemaManager() {
+		return indexManager.getSchemaManager();
 	}
 
 	public IndexIndexingPlan<StubEntityReference> createIndexingPlan() {

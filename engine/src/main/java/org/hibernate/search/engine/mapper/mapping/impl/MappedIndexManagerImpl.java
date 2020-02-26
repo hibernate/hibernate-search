@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.mapper.mapping.impl;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
+import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
@@ -32,6 +33,11 @@ public class MappedIndexManagerImpl implements MappedIndexManager {
 	@Override
 	public IndexManager toAPI() {
 		return implementor.toAPI();
+	}
+
+	@Override
+	public IndexSchemaManager getSchemaManager() {
+		return implementor.getSchemaManager();
 	}
 
 	@Override
