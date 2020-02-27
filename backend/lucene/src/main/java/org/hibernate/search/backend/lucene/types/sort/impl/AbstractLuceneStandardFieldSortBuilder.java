@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneSearchSortBuilder;
@@ -28,8 +29,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @see LuceneStandardFieldCodec
  */
 abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStandardFieldCodec<F, E>>
-		extends AbstractLuceneSearchSortBuilder
-		implements FieldSortBuilder<LuceneSearchSortBuilder> {
+	extends AbstractLuceneSearchSortBuilder
+	implements FieldSortBuilder<LuceneSearchSortBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -49,11 +50,11 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 	protected Object missingValue;
 
 	protected AbstractLuceneStandardFieldSortBuilder(
-			LuceneSearchContext searchContext,
-			String absoluteFieldPath, String nestedDocumentPath,
-			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
-			LuceneCompatibilityChecker converterChecker, C codec,
-			Object sortMissingValueFirstPlaceholder, Object sortMissingValueLastPlaceholder) {
+		LuceneSearchContext searchContext,
+		String absoluteFieldPath, String nestedDocumentPath,
+		DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
+		LuceneCompatibilityChecker converterChecker, C codec,
+		Object sortMissingValueFirstPlaceholder, Object sortMissingValueLastPlaceholder) {
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.nestedDocumentPath = nestedDocumentPath;
@@ -84,7 +85,7 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 		}
 		catch (RuntimeException e) {
 			throw log.cannotConvertDslParameter(
-					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+				e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 			);
 		}
 	}
@@ -117,4 +118,29 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 				return converter;
 		}
 	}
+
+	protected MultiValueMode getMultiValueMode() {
+		MultiValueMode sortMode = MultiValueMode.MIN;
+		if ( multi != null ) {
+			switch ( multi ) {
+				case MIN:
+					sortMode = MultiValueMode.MIN;
+					break;
+				case MAX:
+					sortMode = MultiValueMode.MAX;
+					break;
+				case AVG:
+					sortMode = MultiValueMode.AVG;
+					break;
+				case SUM:
+					sortMode = MultiValueMode.SUM;
+					break;
+				case MEDIAN:
+					sortMode = MultiValueMode.MEDIAN;
+					break;
+			}
+		}
+		return sortMode;
+	}
+
 }

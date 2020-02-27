@@ -9,24 +9,31 @@ package org.hibernate.search.backend.lucene.types.lowlevel.impl;
 import java.io.IOException;
 import java.util.Collection;
 
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DocValuesJoin;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.util.common.data.Range;
 
 import org.apache.lucene.document.FloatDocValuesField;
 import org.apache.lucene.document.FloatPoint;
+import org.apache.lucene.document.SortedNumericDocValuesField;
 import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.facet.LongValueFacetCounts;
 import org.apache.lucene.facet.range.DoubleRangeFacetCounts;
+import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
+import org.apache.lucene.index.SortedNumericDocValues;
+import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.DoubleValuesSource;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.LongValuesSource;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.util.BitSet;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.FieldData;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.SortedNumericDoubleValues;
 
 public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	private static final LuceneNumericDomain<Float> INSTANCE = new LuceneFloatDomain();
@@ -63,7 +70,7 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	@Override
 	public Query createRangeQuery(String absoluteFieldPath, Float lowerLimit, Float upperLimit) {
 		return FloatPoint.newRangeQuery(
-				absoluteFieldPath, lowerLimit, upperLimit
+			absoluteFieldPath, lowerLimit, upperLimit
 		);
 	}
 
@@ -77,20 +84,20 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	@Override
 	public LongValueFacetCounts createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector) throws IOException {
 		return new LongValueFacetCounts(
-				absoluteFieldPath,
-				// We can't use DoubleValueSource here because it drops the decimals...
-				// So we use this to get raw bits, and then apply fromDocValue to get back the original value.
-				LongValuesSource.fromIntField( absoluteFieldPath ),
-				facetsCollector
+			absoluteFieldPath,
+			// We can't use DoubleValueSource here because it drops the decimals...
+			// So we use this to get raw bits, and then apply fromDocValue to get back the original value.
+			LongValuesSource.fromIntField( absoluteFieldPath ),
+			facetsCollector
 		);
 	}
 
 	@Override
 	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-			Collection<? extends Range<? extends Float>> ranges) throws IOException {
+		Collection<? extends Range<? extends Float>> ranges) throws IOException {
 		return new DoubleRangeFacetCounts(
-				absoluteFieldPath, DoubleValuesSource.fromFloatField( absoluteFieldPath ),
-				facetsCollector, FacetCountsUtils.createDoubleRanges( ranges )
+			absoluteFieldPath, DoubleValuesSource.fromFloatField( absoluteFieldPath ),
+			facetsCollector, FacetCountsUtils.createDoubleRanges( ranges )
 		);
 	}
 
@@ -105,21 +112,56 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	}
 
 	@Override
-	public FieldComparator.NumericComparator<Float> createFieldComparator(String fieldname, int numHits, Float missingValue, NestedDocsProvider nestedDocsProvider) {
-		return new FloatFieldComparator( numHits, fieldname, missingValue, nestedDocsProvider );
+	public IndexableField createSortedField(String absoluteFieldPath, Float numericValue) {
+		return new SortedFloatDocValuesField( absoluteFieldPath, numericValue );
+	}
+
+	@Override
+	public FieldComparator.NumericComparator<Float> createFieldComparator(String fieldname, int numHits, MultiValueMode sortMode, Float missingValue, NestedDocsProvider nestedDocsProvider) {
+		return new FloatFieldComparator( numHits, sortMode, fieldname, missingValue, nestedDocsProvider );
 	}
 
 	public static class FloatFieldComparator extends FieldComparator.FloatComparator {
-		private NestedDocsProvider nestedDocsProvider;
 
-		public FloatFieldComparator(int numHits, String field, Float missingValue, NestedDocsProvider nestedDocsProvider) {
+		private NestedDocsProvider nested;
+		private final MultiValueMode sortMode;
+
+		public FloatFieldComparator(int numHits, MultiValueMode sortMode, String field, Float missingValue, NestedDocsProvider nested) {
 			super( numHits, field, missingValue );
-			this.nestedDocsProvider = nestedDocsProvider;
+			this.nested = nested;
+			this.sortMode = sortMode;
 		}
 
 		@Override
 		protected NumericDocValues getNumericDocValues(LeafReaderContext context, String field) throws IOException {
-			return DocValuesJoin.getJoinedAsSingleValuedNumericFloat( context, field, nestedDocsProvider, missingValue );
+			SortedNumericDocValues numericDocValues = DocValues.getSortedNumeric( context.reader(), field );
+			final SortedNumericDoubleValues values = FieldData.castToFloat( numericDocValues );
+			if ( nested == null ) {
+				return FieldData.replaceMissing( sortMode.select( values ), missingValue ).getRawDoubleValues();
+			}
+			else {
+				final BitSet rootDocs = nested.parentDocs( context );
+				final DocIdSetIterator innerDocs = nested.childDocs( context );
+				return sortMode.select( values, missingValue, rootDocs, innerDocs, context.reader().maxDoc(), Integer.MAX_VALUE ).getRawDoubleValues();
+			}
 		}
 	}
+
+	public class SortedFloatDocValuesField extends SortedNumericDocValuesField {
+
+		public SortedFloatDocValuesField(String name, float value) {
+			super( name, Float.floatToRawIntBits( value ) );
+		}
+
+		@Override
+		public void setFloatValue(float value) {
+			super.setLongValue( Float.floatToRawIntBits( value ) );
+		}
+
+		@Override
+		public void setLongValue(long value) {
+			throw new IllegalArgumentException( "cannot change value type from Float to Long" );
+		}
+	}
+
 }

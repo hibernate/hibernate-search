@@ -23,4 +23,11 @@ public interface FieldSortOptionsStep<S extends FieldSortOptionsStep<?>>
 	 */
 	FieldSortMissingValueBehaviorStep<S> missing();
 
+	/**
+	 * Start describing the behavior of this sort when a document do have multi values for the targeted field.
+	 *
+	 * @return The next step.
+	 */
+	SortMultiValueStep<S> multi();
+
 }

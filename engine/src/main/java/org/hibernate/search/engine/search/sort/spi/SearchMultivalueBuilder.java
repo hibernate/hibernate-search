@@ -6,20 +6,16 @@
  */
 package org.hibernate.search.engine.search.sort.spi;
 
-
 import org.hibernate.search.engine.search.sort.dsl.SortMultiFunc;
-import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 
 /**
- * A search sort builder, i.e. an object responsible for collecting parameters
+ * A search multivalue builder, i.e. an object responsible for collecting parameters
  * and then building a search sort.
  *
  * @param <B> The implementation type of the builder, which should expose a {@code build()} method.
  * This type is backend-specific, as the parameters to the build method may vary from one backend to another.
  */
-public interface SearchSortBuilder<B> {
-
-	void order(SortOrder order);
+public interface SearchMultivalueBuilder<B> {
 
 	void multi(SortMultiFunc multi);
 

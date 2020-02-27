@@ -9,23 +9,29 @@ package org.hibernate.search.backend.lucene.types.lowlevel.impl;
 import java.io.IOException;
 import java.util.Collection;
 
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DocValuesJoin;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.util.common.data.Range;
 
 import org.apache.lucene.document.LongPoint;
 import org.apache.lucene.document.NumericDocValuesField;
+import org.apache.lucene.document.SortedNumericDocValuesField;
 import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.facet.LongValueFacetCounts;
 import org.apache.lucene.facet.range.LongRangeFacetCounts;
+import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
+import org.apache.lucene.index.SortedNumericDocValues;
+import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.LongValuesSource;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.util.BitSet;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.FieldData;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 
 public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 	private static final LuceneNumericDomain<Long> INSTANCE = new LuceneLongDomain();
@@ -62,7 +68,7 @@ public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 	@Override
 	public Query createRangeQuery(String absoluteFieldPath, Long lowerLimit, Long upperLimit) {
 		return LongPoint.newRangeQuery(
-				absoluteFieldPath, lowerLimit, upperLimit
+			absoluteFieldPath, lowerLimit, upperLimit
 		);
 	}
 
@@ -74,17 +80,17 @@ public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 	@Override
 	public LongValueFacetCounts createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector) throws IOException {
 		return new LongValueFacetCounts(
-				absoluteFieldPath, LongValuesSource.fromLongField( absoluteFieldPath ),
-				facetsCollector
+			absoluteFieldPath, LongValuesSource.fromLongField( absoluteFieldPath ),
+			facetsCollector
 		);
 	}
 
 	@Override
 	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-			Collection<? extends Range<? extends Long>> ranges) throws IOException {
+		Collection<? extends Range<? extends Long>> ranges) throws IOException {
 		return new LongRangeFacetCounts(
-				absoluteFieldPath,
-				facetsCollector, FacetCountsUtils.createLongRanges( ranges )
+			absoluteFieldPath,
+			facetsCollector, FacetCountsUtils.createLongRanges( ranges )
 		);
 	}
 
@@ -99,21 +105,37 @@ public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 	}
 
 	@Override
-	public FieldComparator.NumericComparator<Long> createFieldComparator(String fieldName, int numHits, Long missingValue, NestedDocsProvider nestedDocsProvider) {
-		return new LongFieldComparator( numHits, fieldName, missingValue, nestedDocsProvider );
+	public IndexableField createSortedField(String absoluteFieldPath, Long numericValue) {
+		return new SortedNumericDocValuesField( absoluteFieldPath, numericValue );
+	}
+
+	@Override
+	public FieldComparator.NumericComparator<Long> createFieldComparator(String fieldName, int numHits, MultiValueMode sortMode, Long missingValue, NestedDocsProvider nestedDocsProvider) {
+		return new LongFieldComparator( numHits, sortMode, fieldName, missingValue, nestedDocsProvider );
 	}
 
 	public static class LongFieldComparator extends FieldComparator.LongComparator {
-		private NestedDocsProvider nestedDocsProvider;
 
-		public LongFieldComparator(int numHits, String field, Long missingValue, NestedDocsProvider nestedDocsProvider) {
+		private NestedDocsProvider nested;
+		private final MultiValueMode sortMode;
+
+		public LongFieldComparator(int numHits, MultiValueMode sortMode, String field, Long missingValue, NestedDocsProvider nested) {
 			super( numHits, field, missingValue );
-			this.nestedDocsProvider = nestedDocsProvider;
+			this.nested = nested;
+			this.sortMode = sortMode;
 		}
 
 		@Override
 		protected NumericDocValues getNumericDocValues(LeafReaderContext context, String field) throws IOException {
-			return DocValuesJoin.getJoinedAsSingleValuedNumeric( context, field, nestedDocsProvider, missingValue );
+			SortedNumericDocValues values = DocValues.getSortedNumeric( context.reader(), field );
+			if ( nested == null ) {
+				return FieldData.replaceMissing( sortMode.select( values ), missingValue );
+			}
+			else {
+				final BitSet rootDocs = nested.parentDocs( context );
+				final DocIdSetIterator innerDocs = nested.childDocs( context );
+				return sortMode.select( values, missingValue, rootDocs, innerDocs, context.reader().maxDoc(), Integer.MAX_VALUE );
+			}
 		}
 	}
 }

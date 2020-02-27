@@ -16,6 +16,7 @@ import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 import com.google.gson.JsonObject;
+import org.hibernate.search.engine.search.sort.dsl.SortMultiFunc;
 
 public class ElasticsearchDistanceSortBuilder extends AbstractElasticsearchSearchNestedSortBuilder
 		implements DistanceSortBuilder<ElasticsearchSearchSortBuilder> {
@@ -38,5 +39,10 @@ public class ElasticsearchDistanceSortBuilder extends AbstractElasticsearchSearc
 		JsonObject outerObject = new JsonObject();
 		GEO_DISTANCE_ACCESSOR.add( outerObject, innerObject );
 		collector.collectDistanceSort( outerObject, absoluteFieldPath, location );
+	}
+
+	@Override
+	public void multi(SortMultiFunc multi) {
+		throw new UnsupportedOperationException( "Not supported yet." ); //To change body of generated methods, choose Tools | Templates.
 	}
 }

@@ -23,6 +23,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import org.hibernate.search.engine.search.sort.dsl.SortMultiFunc;
 
 public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearchNestedSortBuilder
 		implements FieldSortBuilder<ElasticsearchSearchSortBuilder> {
@@ -107,5 +108,10 @@ public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearc
 				converterChecker.failIfNotCompatible();
 				return converter;
 		}
+	}
+
+	@Override
+	public void multi(SortMultiFunc multi) {
+		throw new UnsupportedOperationException( "Not supported yet." ); //To change body of generated methods, choose Tools | Templates.
 	}
 }
