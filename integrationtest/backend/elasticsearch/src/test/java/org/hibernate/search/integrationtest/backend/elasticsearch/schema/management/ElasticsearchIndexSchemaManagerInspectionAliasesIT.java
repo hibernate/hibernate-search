@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.index.admin;
+package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultPrimaryName;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultReadAlias;
@@ -19,11 +19,13 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings
 import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
-import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -32,20 +34,17 @@ import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Tests related to aliases when inspecting existing indexes,
- * for all applicable index lifecycle strategies.
+ * for all alias-inspecting schema management operations.
  */
 @RunWith(Parameterized.class)
 @TestForIssue(jiraKey = "HSEARCH-3791")
-public class ElasticsearchIndexInspectionAliasesIT {
+public class ElasticsearchIndexSchemaManagerInspectionAliasesIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
-	@Parameters(name = "With strategy {0}")
-	public static EnumSet<IndexLifecycleStrategyName> strategies() {
-		return EnumSet.complementOf( EnumSet.of(
-				// This strategies doesn't inspect the existing indexes, so we don't test it
-				IndexLifecycleStrategyName.NONE
-		) );
+	@Parameters(name = "With operation {0}")
+	public static EnumSet<ElasticsearchIndexSchemaManagerOperation> strategies() {
+		return ElasticsearchIndexSchemaManagerOperation.aliasInspecting();
 	}
 
 	@Rule
@@ -54,10 +53,19 @@ public class ElasticsearchIndexInspectionAliasesIT {
 	@Rule
 	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
 
-	private final IndexLifecycleStrategyName strategy;
+	private final ElasticsearchIndexSchemaManagerOperation operation;
 
-	public ElasticsearchIndexInspectionAliasesIT(IndexLifecycleStrategyName strategy) {
-		this.strategy = strategy;
+	private StubMappingIndexManager indexManager;
+
+	public ElasticsearchIndexSchemaManagerInspectionAliasesIT(ElasticsearchIndexSchemaManagerOperation operation) {
+		this.operation = operation;
+	}
+
+	@After
+	public void cleanUp() {
+		if ( indexManager != null ) {
+			indexManager.getSchemaManager().dropIfExisting();
+		}
 	}
 
 	@Test
@@ -70,23 +78,16 @@ public class ElasticsearchIndexInspectionAliasesIT {
 				.aliases().put( defaultWriteAlias( INDEX_NAME ).original );
 
 		SubTest.expectException(
-				() -> startSetupWithLifecycleStrategy()
-						.withIndex( INDEX_NAME, ctx -> { } )
-						.setup()
+				this::setupAndInspectIndex
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching(
-						FailureReportUtils.buildFailureReportPattern()
-								.indexContext( INDEX_NAME )
-								.failure(
-										"Index aliases [" + defaultWriteAlias( INDEX_NAME ) + ", " + defaultReadAlias( INDEX_NAME )
-												+ "] are assigned to a single Hibernate Search index, "
-												+ " but they are already defined in Elasticsearch and point to multiple distinct indexes: "
-												+ "[" + defaultPrimaryName( INDEX_NAME ) + ", "
-												+ defaultPrimaryName( "otherIndex" ) + "]"
-								)
-								.build()
+				.hasMessageContaining(
+						"Index aliases [" + defaultWriteAlias( INDEX_NAME ) + ", " + defaultReadAlias( INDEX_NAME )
+								+ "] are assigned to a single Hibernate Search index, "
+								+ " but they are already defined in Elasticsearch and point to multiple distinct indexes: "
+								+ "[" + defaultPrimaryName( INDEX_NAME ) + ", "
+								+ defaultPrimaryName( "otherIndex" ) + "]"
 				);
 	}
 
@@ -100,31 +101,24 @@ public class ElasticsearchIndexInspectionAliasesIT {
 				.aliases().put( defaultReadAlias( INDEX_NAME ).original );
 
 		SubTest.expectException(
-				() -> startSetupWithLifecycleStrategy()
-						.withIndex( INDEX_NAME, ctx -> { } )
-						.setup()
+				this::setupAndInspectIndex
 		)
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching(
-						FailureReportUtils.buildFailureReportPattern()
-								.indexContext( INDEX_NAME )
-								.failure(
-										"Index aliases [" + defaultWriteAlias( INDEX_NAME ) + ", " + defaultReadAlias( INDEX_NAME )
-												+ "] are assigned to a single Hibernate Search index, "
-												+ " but they are already defined in Elasticsearch and point to multiple distinct indexes: "
-												+ "[" + defaultPrimaryName( INDEX_NAME ) + ", "
-												+ defaultPrimaryName( "otherIndex" ) + "]"
-								)
-								.build()
+				.hasMessageContaining(
+							"Index aliases [" + defaultWriteAlias( INDEX_NAME ) + ", " + defaultReadAlias( INDEX_NAME )
+									+ "] are assigned to a single Hibernate Search index, "
+									+ " but they are already defined in Elasticsearch and point to multiple distinct indexes: "
+									+ "[" + defaultPrimaryName( INDEX_NAME ) + ", "
+									+ defaultPrimaryName( "otherIndex" ) + "]"
 				);
 	}
 
-	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
-		return setupHelper.start()
+	private void setupAndInspectIndex() {
+		setupHelper.start()
 				.withIndexDefaultsProperty(
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						strategy.getExternalRepresentation()
+						IndexLifecycleStrategyName.NONE
 				)
 				.withBackendProperty(
 						// Don't contribute any analysis definitions, migration of those is tested in another test class
@@ -132,7 +126,11 @@ public class ElasticsearchIndexInspectionAliasesIT {
 						(ElasticsearchAnalysisConfigurer) (ElasticsearchAnalysisConfigurationContext context) -> {
 							// No-op
 						}
-				);
+				)
+				.withIndex( INDEX_NAME, ctx -> { }, indexManager -> this.indexManager = indexManager )
+				.setup();
+
+		Futures.unwrappedExceptionJoin( operation.apply( indexManager.getSchemaManager() ) );
 	}
 
 }

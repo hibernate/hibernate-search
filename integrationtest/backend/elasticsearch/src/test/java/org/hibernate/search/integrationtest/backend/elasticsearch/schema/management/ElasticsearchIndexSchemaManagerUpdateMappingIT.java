@@ -4,12 +4,14 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.index.admin;
+package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
-import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.defaultMetadataMappingAndCommaForInitialization;
-import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.simpleMappingForExpectations;
-import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.simpleMappingForInitialization;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.defaultMetadataMappingAndCommaForInitialization;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForExpectations;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
+
+import java.util.function.Consumer;
 
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
@@ -17,13 +19,16 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettin
 import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
+import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -31,15 +36,13 @@ import org.junit.Test;
  * Tests related to the mapping when updating indexes.
  */
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.Elasticsearch5SchemaMigrationIT")
-public class ElasticsearchIndexUpdateMappingIT {
+public class ElasticsearchIndexSchemaManagerUpdateMappingIT {
 
 	private static final String UPDATE_FAILED_MESSAGE_ID = "HSEARCH400035";
 	private static final String MAPPING_CREATION_FAILED_MESSAGE_ID = "HSEARCH400020";
 	private static final String ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID = "HSEARCH400007";
 
-	private static final String INDEX1_NAME = "Index1Name";
-	private static final String INDEX2_NAME = "Index2Name";
-	private static final String INDEX3_NAME = "Index3Name";
+	private static final String INDEX_NAME = "IndexName";
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -47,9 +50,18 @@ public class ElasticsearchIndexUpdateMappingIT {
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
+	private StubMappingIndexManager indexManager;
+
+	@After
+	public void cleanUp() {
+		if ( indexManager != null ) {
+			indexManager.getSchemaManager().dropIfExisting();
+		}
+	}
+
 	@Test
-	public void nothingToDo() throws Exception {
-		elasticSearchClient.index( INDEX1_NAME )
+	public void nothingToDo_1() {
+		elasticSearchClient.index( INDEX_NAME )
 				.deleteAndCreate()
 				.type().putMapping(
 						simpleMappingForInitialization(
@@ -66,7 +78,32 @@ public class ElasticsearchIndexUpdateMappingIT {
 								+ "}"
 						)
 				);
-		elasticSearchClient.index( INDEX2_NAME )
+
+		setupAndUpdateIndex( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asLocalDate() )
+					.toReference();
+		} );
+
+		assertJsonEquals(
+				simpleMappingForExpectations(
+						"'myField': {"
+								+ "'type': 'date',"
+								+ "'doc_values': false,"
+								+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
+								+ "'ignore_malformed': true" // Assert it was not removed
+						+ "},"
+						+ "'NOTmyField': {" // Assert it was not removed
+								+ "'type': 'date'"
+						+ "}"
+				),
+				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+		);
+	}
+
+	@Test
+	public void nothingToDo_2() {
+		elasticSearchClient.index( INDEX_NAME )
 				.deleteAndCreate()
 				.type().putMapping(
 						simpleMappingForInitialization(
@@ -81,10 +118,33 @@ public class ElasticsearchIndexUpdateMappingIT {
 								+ "}"
 						)
 				);
-		elasticSearchClient.index( INDEX3_NAME ).deleteAndCreate(
+
+		setupAndUpdateIndex( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asBoolean() )
+					.toReference();
+		} );
+
+		assertJsonEquals(
+				simpleMappingForExpectations(
+						"'myField': {"
+								+ "'type': 'boolean',"
+								+ "'doc_values': false"
+						+ "},"
+						+ "'NOTmyField': {" // Assert it was not removed
+								+ "'type': 'boolean'"
+						+ "}"
+				),
+				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
+		);
+	}
+
+	@Test
+	public void nothingToDo_3() {
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
 				"index.analysis", generateAnalysisSettings()
 				);
-		elasticSearchClient.index( INDEX3_NAME ).type().putMapping(
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
 						simpleMappingForInitialization(
 								"'defaultAnalyzer': {"
 										+ "'type': 'text'"
@@ -101,72 +161,25 @@ public class ElasticsearchIndexUpdateMappingIT {
 						)
 				);
 
-		startSetupWithLifecycleStrategy()
-				.withIndex(
-						INDEX1_NAME,
-						ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asLocalDate() )
-									.toReference();
-						}
-				)
-				.withIndex(
-						INDEX2_NAME,
-						ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asBoolean() )
-									.toReference();
-						}
-				)
-				.withIndex(
-						INDEX3_NAME,
-						ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field(
-									"defaultAnalyzer",
-									f -> f.asString().analyzer( "default" )
-							)
-									.toReference();
-							root.field(
-									"nonDefaultAnalyzer",
-									f -> f.asString().analyzer( "customAnalyzer" )
-							)
-									.toReference();
-							root.field(
-									"normalizer",
-									f -> f.asString().normalizer( "customNormalizer" )
-							)
-									.toReference();
-						}
-				)
-				.setup();
+		setupAndUpdateIndex( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field(
+					"defaultAnalyzer",
+					f -> f.asString().analyzer( "default" )
+			)
+					.toReference();
+			root.field(
+					"nonDefaultAnalyzer",
+					f -> f.asString().analyzer( "customAnalyzer" )
+			)
+					.toReference();
+			root.field(
+					"normalizer",
+					f -> f.asString().normalizer( "customNormalizer" )
+			)
+					.toReference();
+		} );
 
-		assertJsonEquals(
-				simpleMappingForExpectations(
-						"'myField': {"
-								+ "'type': 'date',"
-								+ "'doc_values': false,"
-								+ "'format': '" + elasticSearchClient.getDialect().getConcatenatedLocalDateDefaultMappingFormats() + "',"
-								+ "'ignore_malformed': true" // Assert it was not removed
-						+ "},"
-						+ "'NOTmyField': {" // Assert it was not removed
-								+ "'type': 'date'"
-						+ "}"
-				),
-				elasticSearchClient.index( INDEX1_NAME ).type().getMapping()
-		);
-		assertJsonEquals(
-				simpleMappingForExpectations(
-						"'myField': {"
-								+ "'type': 'boolean',"
-								+ "'doc_values': false"
-						+ "},"
-						+ "'NOTmyField': {" // Assert it was not removed
-								+ "'type': 'boolean'"
-						+ "}"
-				),
-				elasticSearchClient.index( INDEX2_NAME ).type().getMapping()
-		);
 		assertJsonEquals(
 				simpleMappingForExpectations(
 						"'defaultAnalyzer': {"
@@ -182,24 +195,20 @@ public class ElasticsearchIndexUpdateMappingIT {
 								+ "'normalizer': 'customNormalizer'"
 						+ "}"
 				),
-				elasticSearchClient.index( INDEX3_NAME ).type().getMapping()
+				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void mapping_missing() throws Exception {
-		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate();
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate();
 
-		startSetupWithLifecycleStrategy()
-				.withIndex(
-						INDEX1_NAME,
-						ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asBoolean() )
-									.toReference();
-						}
-				)
-				.setup();
+		setupAndUpdateIndex( ctx -> {
+					IndexSchemaElement root = ctx.getSchemaElement();
+					root.field( "myField", f -> f.asBoolean() )
+							.toReference();
+				}
+		);
 
 		assertJsonEquals(
 				simpleMappingForExpectations(
@@ -208,13 +217,13 @@ public class ElasticsearchIndexUpdateMappingIT {
 									+ "'doc_values': false"
 							+ "}"
 				),
-				elasticSearchClient.index( INDEX1_NAME ).type().getMapping()
+				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void rootMapping_attribute_missing() throws Exception {
-		elasticSearchClient.index( INDEX1_NAME )
+		elasticSearchClient.index( INDEX_NAME )
 				.deleteAndCreate()
 				.type().putMapping(
 						"{"
@@ -234,16 +243,11 @@ public class ElasticsearchIndexUpdateMappingIT {
 						+ "}"
 				);
 
-		startSetupWithLifecycleStrategy()
-				.withIndex(
-						INDEX1_NAME,
-						ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asBoolean() )
-									.toReference();
-						}
-				)
-				.setup();
+		setupAndUpdateIndex( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asBoolean() )
+					.toReference();
+		} );
 
 		assertJsonEquals(
 				simpleMappingForExpectations(
@@ -255,13 +259,13 @@ public class ElasticsearchIndexUpdateMappingIT {
 								+ "'type': 'boolean'"
 						+ "}"
 				),
-				elasticSearchClient.index( INDEX1_NAME ).type().getMapping()
+				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void property_missing() throws Exception {
-		elasticSearchClient.index( INDEX1_NAME )
+		elasticSearchClient.index( INDEX_NAME )
 				.deleteAndCreate()
 				.type().putMapping(
 						simpleMappingForInitialization(
@@ -272,16 +276,11 @@ public class ElasticsearchIndexUpdateMappingIT {
 						)
 				);
 
-		startSetupWithLifecycleStrategy()
-				.withIndex(
-						INDEX1_NAME,
-						ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asLocalDate() )
-									.toReference();
-						}
-				)
-				.setup();
+		setupAndUpdateIndex( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asLocalDate() )
+					.toReference();
+		} );
 
 		assertJsonEquals(
 				simpleMappingForExpectations(
@@ -294,13 +293,13 @@ public class ElasticsearchIndexUpdateMappingIT {
 								+ "'type': 'date'"
 						+ "}"
 				),
-				elasticSearchClient.index( INDEX1_NAME ).type().getMapping()
+				elasticSearchClient.index( INDEX_NAME ).type().getMapping()
 		);
 	}
 
 	@Test
 	public void property_attribute_invalid() {
-		elasticSearchClient.index( INDEX1_NAME )
+		elasticSearchClient.index( INDEX_NAME )
 				.deleteAndCreate()
 				.type().putMapping(
 						simpleMappingForInitialization(
@@ -312,36 +311,26 @@ public class ElasticsearchIndexUpdateMappingIT {
 						)
 				);
 
-		setupExpectingFailure(
-				() -> startSetupWithLifecycleStrategy()
-						.withIndex(
-								INDEX1_NAME,
-								ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field( "myField", f -> f.asLocalDate() )
-											.toReference();
-								}
-						)
-						.setup(),
-				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX1_NAME )
-						.multilineFailure(
-								UPDATE_FAILED_MESSAGE_ID,
-								MAPPING_CREATION_FAILED_MESSAGE_ID,
-								ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID,
-								"Elasticsearch request failed",
-								"different [index]"
-						)
-						.build()
+		setupAndUpdateIndexIndexExpectingFailure(
+				ctx -> {
+					IndexSchemaElement root = ctx.getSchemaElement();
+					root.field( "myField", f -> f.asLocalDate() )
+							.toReference();
+				},
+				UPDATE_FAILED_MESSAGE_ID,
+				MAPPING_CREATION_FAILED_MESSAGE_ID,
+				ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID,
+				"Elasticsearch request failed",
+				"different [index]"
 		);
 	}
 
 	@Test
 	public void property_attribute_invalid_conflictingAnalyzer() {
-		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate(
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
 				"index.analysis", generateAnalysisSettings()
 				);
-		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
 				simpleMappingForInitialization(
 					"'analyzer': {"
 							+ "'type': 'text',"
@@ -350,39 +339,29 @@ public class ElasticsearchIndexUpdateMappingIT {
 				)
 		);
 
-		setupExpectingFailure(
-				() -> startSetupWithLifecycleStrategy()
-						.withIndex(
-								INDEX1_NAME,
-								ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field(
-											"analyzer",
-											f -> f.asString().analyzer( "customAnalyzer" )
-									)
-											.toReference();
-								}
-						)
-						.setup(),
-				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX1_NAME )
-						.multilineFailure(
-								UPDATE_FAILED_MESSAGE_ID,
-								MAPPING_CREATION_FAILED_MESSAGE_ID,
-								ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID,
-								"Elasticsearch request failed",
-								"different [analyzer]"
-						)
-						.build()
+		setupAndUpdateIndexIndexExpectingFailure(
+				ctx -> {
+					IndexSchemaElement root = ctx.getSchemaElement();
+					root.field(
+							"analyzer",
+							f -> f.asString().analyzer( "customAnalyzer" )
+					)
+							.toReference();
+				},
+				UPDATE_FAILED_MESSAGE_ID,
+				MAPPING_CREATION_FAILED_MESSAGE_ID,
+				ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID,
+				"Elasticsearch request failed",
+				"different [analyzer]"
 		);
 	}
 
 	@Test
 	public void property_attribute_invalid_conflictingNormalizer() {
-		elasticSearchClient.index( INDEX1_NAME ).deleteAndCreate(
+		elasticSearchClient.index( INDEX_NAME ).deleteAndCreate(
 				"index.analysis", generateAnalysisSettings()
 				);
-		elasticSearchClient.index( INDEX1_NAME ).type().putMapping(
+		elasticSearchClient.index( INDEX_NAME ).type().putMapping(
 				simpleMappingForInitialization(
 						"'normalizer': {"
 								+ "'type': 'keyword',"
@@ -391,45 +370,36 @@ public class ElasticsearchIndexUpdateMappingIT {
 				)
 		);
 
-		setupExpectingFailure(
-				() -> startSetupWithLifecycleStrategy()
-						.withIndex(
-								INDEX1_NAME,
-								ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field(
-											"normalizer",
-											f -> f.asString().normalizer( "customNormalizer" )
-									)
-											.toReference();
-								}
-						)
-						.setup(),
-				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX1_NAME )
-						.multilineFailure(
-								UPDATE_FAILED_MESSAGE_ID,
-								MAPPING_CREATION_FAILED_MESSAGE_ID,
-								ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID,
-								"Elasticsearch request failed",
-								"different [normalizer]"
-						)
-						.build()
+		setupAndUpdateIndexIndexExpectingFailure(
+				ctx -> {
+					IndexSchemaElement root = ctx.getSchemaElement();
+					root.field(
+							"normalizer",
+							f -> f.asString().normalizer( "customNormalizer" )
+					)
+							.toReference();
+				},
+				UPDATE_FAILED_MESSAGE_ID,
+				MAPPING_CREATION_FAILED_MESSAGE_ID,
+				ELASTICSEARCH_REQUEST_FAILED_MESSAGE_ID,
+				"Elasticsearch request failed",
+				"different [normalizer]"
 		);
 	}
 
-	private void setupExpectingFailure(Runnable setupAction, String failureReportRegex) {
-		SubTest.expectException( setupAction )
+	private void setupAndUpdateIndexIndexExpectingFailure(
+			Consumer<? super IndexedEntityBindingContext> mappingContributor, String ... messageContent) {
+		SubTest.expectException( () -> setupAndUpdateIndex( mappingContributor ) )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( failureReportRegex );
+				.hasMessageContainingAll( messageContent );
 	}
 
-	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
-		return setupHelper.start()
+	private void setupAndUpdateIndex(Consumer<? super IndexedEntityBindingContext> mappingContributor) {
+		setupHelper.start()
 				.withIndexDefaultsProperty(
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						IndexLifecycleStrategyName.UPDATE.getExternalRepresentation()
+						IndexLifecycleStrategyName.NONE
 				)
 				.withBackendProperty(
 						// Don't contribute any analysis definitions, migration of those is tested in another test class
@@ -437,7 +407,11 @@ public class ElasticsearchIndexUpdateMappingIT {
 						(ElasticsearchAnalysisConfigurer) (ElasticsearchAnalysisConfigurationContext context) -> {
 							// No-op
 						}
-				);
+				)
+				.withIndex( INDEX_NAME, mappingContributor, indexManager -> this.indexManager = indexManager )
+				.setup();
+
+		Futures.unwrappedExceptionJoin( indexManager.getSchemaManager().createOrUpdate() );
 	}
 
 	private String generateAnalysisSettings() {

@@ -4,52 +4,82 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.index.admin;
+package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
-import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.defaultMetadataMappingAndCommaForInitialization;
-import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.simpleMappingForInitialization;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.defaultMetadataMappingAndCommaForInitialization;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
 
+import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
+import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
+import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.TermVector;
-import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexAdminNormalizerITAnalysisConfigurer;
-import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.common.impl.Futures;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.test.SubTest;
 
+import org.junit.After;
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 /**
- * Tests related to mapping attributes when validating indexes.
- *
- * These tests are more specific than {@link ElasticsearchIndexValidationMappingBaseIT}
+ * Tests related to mapping attributes when validating indexes,
+ * for all index-validating schema management operations.
+ * <p>
+ * These tests are more specific than {@link ElasticsearchIndexSchemaManagerValidationMappingBaseIT}
  * and focus on specific mapping attributes.
  */
-public class ElasticsearchIndexValidationMappingAttributeIT {
+@RunWith(Parameterized.class)
+public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 
 	private static final String INDEX_NAME = "IndexName";
 	private static final String SCHEMA_VALIDATION_CONTEXT = "schema validation";
+
+	@Parameterized.Parameters(name = "With operation {0}")
+	public static EnumSet<ElasticsearchIndexSchemaManagerValidationOperation> operations() {
+		return ElasticsearchIndexSchemaManagerValidationOperation.all();
+	}
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
+
+	private final ElasticsearchIndexSchemaManagerValidationOperation operation;
+
+	private StubMappingIndexManager indexManager;
+
+	public ElasticsearchIndexSchemaManagerValidationMappingAttributeIT(
+			ElasticsearchIndexSchemaManagerValidationOperation operation) {
+		this.operation = operation;
+	}
+
+	@After
+	public void cleanUp() {
+		if ( indexManager != null ) {
+			indexManager.getSchemaManager().dropIfExisting();
+		}
+	}
 
 	@Test
 	public void attribute_dynamic_missing() {
@@ -66,18 +96,13 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				+ "}"
 		);
 
-		SubTest.expectException( () ->
-				startSetupWithLifecycleStrategy()
-						.withIndex( INDEX_NAME, ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field( "myField", f -> f.asInteger() ).toReference();
-								}
-						)
-						.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asInteger() ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.mappingAttributeContext( "dynamic" )
 						.failure( "Invalid value. Expected 'STRICT', actual is 'null'" )
@@ -100,18 +125,13 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				+ "}"
 		);
 
-		SubTest.expectException( () ->
-				startSetupWithLifecycleStrategy()
-						.withIndex( INDEX_NAME, ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field( "myField", f -> f.asInteger() ).toReference();
-								}
-						)
-						.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asInteger() ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.mappingAttributeContext( "dynamic" )
 						.failure( "Invalid value. Expected 'STRICT', actual is 'FALSE'" )
@@ -128,19 +148,13 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				+ "}"
 		);
 
-
-		SubTest.expectException( () ->
-				startSetupWithLifecycleStrategy()
-						.withIndex( INDEX_NAME, ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field( "myField", f -> f.asInteger() ).toReference();
-								}
-						)
-						.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asInteger() ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "_entity_type" )
 						.failure( "Missing property mapping" )
@@ -160,19 +174,13 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				+ "}"
 		);
 
-
-		SubTest.expectException( () ->
-				startSetupWithLifecycleStrategy()
-						.withIndex( INDEX_NAME, ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field( "myField", f -> f.asInteger() ).toReference();
-								}
-						)
-						.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asInteger() ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "_entity_type" )
 						.failure( "Missing property mapping" )
@@ -193,18 +201,13 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () ->
-				startSetupWithLifecycleStrategy()
-						.withIndex( INDEX_NAME, ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field( "myField", f -> f.asInteger() ).toReference();
-								}
-						)
-						.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asInteger() ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "type" )
@@ -224,13 +227,10 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 		);
 
 		// the expected value true is the default
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asInteger() ).toReference();
-						}
-				)
-				.setup();
+		setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asInteger() ).toReference();
+		} );
 	}
 
 	@Test
@@ -245,18 +245,13 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () ->
-				startSetupWithLifecycleStrategy()
-						.withIndex( INDEX_NAME, ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field( "myField", f -> f.asInteger() ).toReference();
-								}
-						)
-						.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asInteger() ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "index" )
@@ -276,14 +271,11 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							// Searchable.NO allows to have index false
-							root.field( "myField", f -> f.asInteger().searchable( Searchable.NO ) ).toReference();
-						}
-				)
-				.setup();
+		setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			// Searchable.NO allows to have index false
+			root.field( "myField", f -> f.asInteger().searchable( Searchable.NO ) ).toReference();
+		} );
 	}
 
 	@Test
@@ -299,14 +291,11 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							// Searchable.NO allows to have index false
-							root.field( "myField", f -> f.asString().analyzer( "keyword" ).searchable( Searchable.NO ) ).toReference();
-						}
-				)
-				.setup();
+		setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			// Searchable.NO allows to have index false
+			root.field( "myField", f -> f.asString().analyzer( "keyword" ).searchable( Searchable.NO ) ).toReference();
+		} );
 	}
 
 	@Test
@@ -322,18 +311,13 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () ->
-				startSetupWithLifecycleStrategy()
-						.withIndex( INDEX_NAME, ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field( "myField", f -> f.asLocalDate() ).toReference();
-								}
-						)
-						.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asLocalDate() ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "format" )
@@ -359,13 +343,10 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asLocalDate() ).toReference();
-						}
-				)
-				.setup();
+		setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asLocalDate() ).toReference();
+		} );
 	}
 
 	@Test
@@ -388,18 +369,13 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () ->
-				startSetupWithLifecycleStrategy()
-						.withIndex( INDEX_NAME, ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field( "myField", f -> f.asLocalDate() ).toReference();
-								}
-						)
-						.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asLocalDate() ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "format" )
@@ -424,18 +400,13 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () ->
-				startSetupWithLifecycleStrategy()
-						.withIndex( INDEX_NAME, ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field( "myField", f -> f.asLocalDate() ).toReference();
-								}
-						)
-						.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asLocalDate() ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "format" )
@@ -458,18 +429,13 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () ->
-				startSetupWithLifecycleStrategy()
-						.withIndex( INDEX_NAME, ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field( "myField", f -> f.asLocalDate() ).toReference();
-								}
-						)
-						.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asLocalDate() ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "format" )
@@ -493,18 +459,13 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () ->
-				startSetupWithLifecycleStrategy()
-						.withIndex( INDEX_NAME, ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field( "myField", f -> f.asString().analyzer( "keyword" ) ).toReference();
-								}
-						)
-						.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asString().analyzer( "keyword" ) ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "analyzer" )
@@ -525,13 +486,10 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asString().analyzer( "keyword" ) ).toReference();
-						}
-				)
-				.setup();
+		setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asString().analyzer( "keyword" ) ).toReference();
+		} );
 	}
 
 	@Test
@@ -547,18 +505,13 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () ->
-				startSetupWithLifecycleStrategy()
-						.withIndex( INDEX_NAME, ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field( "myField", f -> f.asString().analyzer( "default" ) ).toReference();
-								}
-						)
-						.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asString().analyzer( "default" ) ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "analyzer" )
@@ -579,19 +532,14 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () ->
-				startSetupWithLifecycleStrategy()
-						.withIndex( INDEX_NAME, ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field( "myField", f -> f.asString()
-											.analyzer( "keyword" ).searchAnalyzer( "italian" ) ).toReference();
-								}
-						)
-						.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asString()
+					.analyzer( "keyword" ).searchAnalyzer( "italian" ) ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "search_analyzer" )
@@ -613,14 +561,11 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asString()
-									.analyzer( "keyword" ).searchAnalyzer( "english" ) ).toReference();
-						}
-				)
-				.setup();
+		setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asString()
+					.analyzer( "keyword" ).searchAnalyzer( "english" ) ).toReference();
+		} );
 	}
 
 	@Test
@@ -637,18 +582,13 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () ->
-				startSetupWithLifecycleStrategy()
-						.withIndex( INDEX_NAME, ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field( "myField", f -> f.asString().analyzer( "keyword" ).searchAnalyzer( "italian" ) ).toReference();
-								}
-						)
-						.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asString().analyzer( "keyword" ).searchAnalyzer( "italian" ) ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "search_analyzer" )
@@ -668,13 +608,10 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asString().analyzer( "default" ).norms( Norms.NO ) ).toReference();
-						}
-				)
-				.setup();
+		setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asString().analyzer( "default" ).norms( Norms.NO ) ).toReference();
+		} );
 	}
 
 	@Test
@@ -689,18 +626,13 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () ->
-				startSetupWithLifecycleStrategy()
-						.withIndex( INDEX_NAME, ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field( "myField", f -> f.asString().analyzer( "default" ).norms( Norms.YES ) ).toReference();
-								}
-						)
-						.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asString().analyzer( "default" ).norms( Norms.YES ) ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "norms" )
@@ -720,13 +652,10 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asString().analyzer( "default" ).norms( Norms.YES ) ).toReference();
-						}
-				)
-				.setup();
+		setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asString().analyzer( "default" ).norms( Norms.YES ) ).toReference();
+		} );
 	}
 
 	@Test
@@ -740,13 +669,10 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asString().norms( Norms.NO ) ).toReference();
-						}
-				)
-				.setup();
+		setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asString().norms( Norms.NO ) ).toReference();
+		} );
 	}
 
 	@Test
@@ -762,13 +688,10 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asString().analyzer( "english" ).termVector( TermVector.WITH_POSITIONS_OFFSETS ) ).toReference();
-						}
-				)
-				.setup();
+		setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asString().analyzer( "english" ).termVector( TermVector.WITH_POSITIONS_OFFSETS ) ).toReference();
+		} );
 	}
 
 	@Test
@@ -783,13 +706,10 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asString().analyzer( "english" ).termVector( TermVector.NO ) ).toReference();
-						}
-				)
-				.setup();
+		setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asString().analyzer( "english" ).termVector( TermVector.NO ) ).toReference();
+		} );
 	}
 
 	@Test
@@ -805,17 +725,13 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asString().analyzer( "english" ).termVector( TermVector.YES ) ).toReference();
-						}
-				)
-				.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asString().analyzer( "english" ).termVector( TermVector.YES ) ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "term_vector" )
@@ -835,13 +751,10 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asString().projectable( Projectable.YES ) ).toReference();
-						}
-				)
-				.setup();
+		setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asString().projectable( Projectable.YES ) ).toReference();
+		} );
 	}
 
 	@Test
@@ -855,13 +768,10 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asString().projectable( Projectable.DEFAULT ) ).toReference();
-						}
-				)
-				.setup();
+		setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asString().projectable( Projectable.DEFAULT ) ).toReference();
+		} );
 	}
 
 	@Test
@@ -876,17 +786,13 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asString().projectable( Projectable.YES ) ).toReference();
-						}
-				)
-				.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asString().projectable( Projectable.YES ) ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "store" )
@@ -906,13 +812,10 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asInteger().indexNullAs( 739 ) ).toReference();
-						}
-				)
-				.setup();
+		setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asInteger().indexNullAs( 739 ) ).toReference();
+		} );
 	}
 
 	@Test
@@ -926,17 +829,13 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asInteger().indexNullAs( 739 ) ).toReference();
-						}
-				)
-				.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asInteger().indexNullAs( 739 ) ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "null_value" )
@@ -956,17 +855,13 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asInteger().indexNullAs( 739 ) ).toReference();
-						}
-				)
-				.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asInteger().indexNullAs( 739 ) ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "null_value" )
@@ -986,13 +881,10 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asInteger().sortable( Sortable.YES ) ).toReference();
-						}
-				)
-				.setup();
+		setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asInteger().sortable( Sortable.YES ) ).toReference();
+		} );
 	}
 
 	@Test
@@ -1006,13 +898,10 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asInteger().sortable( Sortable.YES ) ).toReference();
-						}
-				)
-				.setup();
+		setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asInteger().sortable( Sortable.YES ) ).toReference();
+		} );
 	}
 
 	@Test
@@ -1027,17 +916,13 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asInteger().sortable( Sortable.YES ) ).toReference();
-						}
-				)
-				.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asInteger().sortable( Sortable.YES ) ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "doc_values" )
@@ -1057,14 +942,11 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							// Sortable.NO and Sortable.DEFAULT allow to have doc_values false
-							root.field( "myField", f -> f.asInteger() ).toReference();
-						}
-				)
-				.setup();
+		setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			// Sortable.NO and Sortable.DEFAULT allow to have doc_values false
+			root.field( "myField", f -> f.asInteger() ).toReference();
+		} );
 	}
 
 	@Test
@@ -1079,14 +961,11 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							// Sortable.NO or Sortable.DEFAULT does not impose doc_values false
-							root.field( "myField", f -> f.asString().sortable( Sortable.NO ) ).toReference();
-						}
-				)
-				.setup();
+		setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			// Sortable.NO or Sortable.DEFAULT does not impose doc_values false
+			root.field( "myField", f -> f.asString().sortable( Sortable.NO ) ).toReference();
+		} );
 	}
 
 	@Test
@@ -1101,13 +980,10 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asBigDecimal().decimalScale( 2 ) ).toReference();
-						}
-				)
-				.setup();
+		setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asBigDecimal().decimalScale( 2 ) ).toReference();
+		} );
 	}
 
 	@Test
@@ -1122,17 +998,13 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asBigDecimal().decimalScale( 2 ) ).toReference();
-						}
-				)
-				.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asBigDecimal().decimalScale( 2 ) ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "scaling_factor" )
@@ -1152,38 +1024,18 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () ->
-				startSetupWithLifecycleStrategy()
-						.withIndex( INDEX_NAME, ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field( "myField", f -> f.asString().normalizer( "default" ) ).toReference();
-								}
-						)
-						.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asString().normalizer( "default" ) ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "normalizer" )
 						.failure( "Invalid value. Expected 'default', actual is 'null'" )
 						.build() );
-	}
-
-	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
-		return setupHelper.start()
-				.withIndexDefaultsProperty(
-						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						IndexLifecycleStrategyName.VALIDATE.getExternalRepresentation()
-				)
-				.withBackendProperty(
-						// Don't contribute any analysis definitions, migration of those is tested in another test class
-						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
-						(ElasticsearchAnalysisConfigurer) (ElasticsearchAnalysisConfigurationContext context) -> {
-							// No-op
-						}
-				);
 	}
 
 	@Test
@@ -1221,13 +1073,10 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		validateSchemaWithAnalyzerConfig()
-				.withIndex( INDEX_NAME, ctx -> {
-							IndexSchemaElement root = ctx.getSchemaElement();
-							root.field( "myField", f -> f.asString().normalizer( "custom-normalizer" ) ).toReference();
-						}
-				)
-				.setup();
+		setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asString().normalizer( "custom-normalizer" ) ).toReference();
+		} );
 	}
 
 	@Test
@@ -1265,18 +1114,13 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () ->
-				validateSchemaWithAnalyzerConfig()
-						.withIndex( INDEX_NAME, ctx -> {
-									IndexSchemaElement root = ctx.getSchemaElement();
-									root.field( "myField", f -> f.asString().normalizer( "another-normalizer" ) ).toReference();
-								}
-						)
-						.setup() )
+		SubTest.expectException( () -> setupAndValidate( ctx -> {
+			IndexSchemaElement root = ctx.getSchemaElement();
+			root.field( "myField", f -> f.asString().normalizer( "another-normalizer" ) ).toReference();
+		} ) )
 				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.indexFieldContext( "myField" )
 						.mappingAttributeContext( "normalizer" )
@@ -1284,15 +1128,22 @@ public class ElasticsearchIndexValidationMappingAttributeIT {
 						.build() );
 	}
 
-	private SearchSetupHelper.SetupContext validateSchemaWithAnalyzerConfig() {
-		return setupHelper.start()
+	private void setupAndValidate(Consumer<? super IndexedEntityBindingContext> mappingContributor) {
+		setupHelper.start()
 				.withIndexDefaultsProperty(
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						IndexLifecycleStrategyName.VALIDATE.getExternalRepresentation()
+						IndexLifecycleStrategyName.NONE
 				)
 				.withBackendProperty(
+						// Don't contribute any analysis definitions, migration of those is tested in another test class
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
-						new ElasticsearchIndexAdminNormalizerITAnalysisConfigurer()
-				);
+						(ElasticsearchAnalysisConfigurer) (ElasticsearchAnalysisConfigurationContext context) -> {
+							// No-op
+						}
+				)
+				.withIndex( INDEX_NAME, mappingContributor, indexManager -> this.indexManager = indexManager )
+				.setup();
+
+		Futures.unwrappedExceptionJoin( operation.apply( indexManager.getSchemaManager() ) );
 	}
 }

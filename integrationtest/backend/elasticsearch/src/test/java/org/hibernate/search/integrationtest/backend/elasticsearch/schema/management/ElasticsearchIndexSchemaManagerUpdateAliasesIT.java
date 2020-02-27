@@ -4,12 +4,8 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.index.admin;
+package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
-import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.simpleAliasDefinition;
-import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.simpleMappingForInitialization;
-import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.simpleReadAliasDefinition;
-import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.simpleWriteAliasDefinition;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultPrimaryName;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultReadAlias;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultWriteAlias;
@@ -23,8 +19,10 @@ import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyNa
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresIndexAliasIsWriteIndex;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -33,7 +31,7 @@ import org.junit.experimental.categories.Category;
  * Tests related to aliases when updating indexes.
  */
 @TestForIssue(jiraKey = "HSEARCH-3791")
-public class ElasticsearchIndexUpdateAliasesIT {
+public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -43,22 +41,31 @@ public class ElasticsearchIndexUpdateAliasesIT {
 	@Rule
 	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
 
+	private StubMappingIndexManager indexManager;
+
+	@After
+	public void cleanUp() {
+		if ( indexManager != null ) {
+			indexManager.getSchemaManager().dropIfExisting();
+		}
+	}
+
 	@Test
 	public void nothingToDo() {
 		elasticsearchClient.index( INDEX_NAME )
 				.deleteAndCreate()
-				.type().putMapping( simpleMappingForInitialization( "" ) );
+				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
 		elasticsearchClient.index( INDEX_NAME ).aliases()
 				.put( "somePreExistingAlias" );
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> { } )
-				.setup();
+		setupAndUpdateIndex();
 
 		assertJsonEquals(
 				"{"
-						+ "'" + defaultWriteAlias( INDEX_NAME ) + "': " + simpleWriteAliasDefinition() + ", "
-						+ "'" + defaultReadAlias( INDEX_NAME ) + "': " + simpleReadAliasDefinition() + ", "
+						+ "'" + defaultWriteAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						.simpleWriteAliasDefinition() + ", "
+						+ "'" + defaultReadAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						.simpleReadAliasDefinition() + ", "
 						+ "'somePreExistingAlias': {"
 						+ "}"
 				+ "}",
@@ -70,18 +77,18 @@ public class ElasticsearchIndexUpdateAliasesIT {
 	public void writeAlias_missing() {
 		elasticsearchClient.index( defaultPrimaryName( INDEX_NAME ), null, defaultReadAlias( INDEX_NAME ) )
 				.deleteAndCreate()
-				.type().putMapping( simpleMappingForInitialization( "" ) );
+				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
 		elasticsearchClient.index( INDEX_NAME ).aliases()
 				.put( "somePreExistingAlias" );
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> { } )
-				.setup();
+		setupAndUpdateIndex();
 
 		assertJsonEquals(
 				"{"
-						+ "'" + defaultWriteAlias( INDEX_NAME ) + "': " + simpleWriteAliasDefinition() + ", "
-						+ "'" + defaultReadAlias( INDEX_NAME ) + "': " + simpleReadAliasDefinition() + ", "
+						+ "'" + defaultWriteAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						.simpleWriteAliasDefinition() + ", "
+						+ "'" + defaultReadAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						.simpleReadAliasDefinition() + ", "
 						+ "'somePreExistingAlias': {"
 						+ "}"
 				+ "}",
@@ -93,20 +100,20 @@ public class ElasticsearchIndexUpdateAliasesIT {
 	public void writeAlias_invalid_filter() {
 		elasticsearchClient.index( INDEX_NAME )
 				.deleteAndCreate()
-				.type().putMapping( simpleMappingForInitialization( "" ) );
+				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
 		elasticsearchClient.index( INDEX_NAME ).aliases()
 				.put( "somePreExistingAlias" );
 		elasticsearchClient.index( INDEX_NAME ).aliases()
 				.put( defaultWriteAlias( INDEX_NAME ).original, "{'filter': {'term': {'user_id': 12}}}" );
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> { } )
-				.setup();
+		setupAndUpdateIndex();
 
 		assertJsonEquals(
 				"{"
-						+ "'" + defaultWriteAlias( INDEX_NAME ) + "': " + simpleWriteAliasDefinition() + ", "
-						+ "'" + defaultReadAlias( INDEX_NAME ) + "': " + simpleReadAliasDefinition() + ", "
+						+ "'" + defaultWriteAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						.simpleWriteAliasDefinition() + ", "
+						+ "'" + defaultReadAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						.simpleReadAliasDefinition() + ", "
 						+ "'somePreExistingAlias': {}"
 						+ "}",
 				elasticsearchClient.index( INDEX_NAME ).aliases().get()
@@ -118,20 +125,21 @@ public class ElasticsearchIndexUpdateAliasesIT {
 	public void writeAlias_invalid_isWriteIndex() {
 		elasticsearchClient.index( INDEX_NAME )
 				.deleteAndCreate()
-				.type().putMapping( simpleMappingForInitialization( "" ) );
+				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
 		elasticsearchClient.index( INDEX_NAME ).aliases()
 				.put( "somePreExistingAlias" );
 		elasticsearchClient.index( INDEX_NAME ).aliases()
-				.put( defaultWriteAlias( INDEX_NAME ).original, simpleAliasDefinition( false, "" ) );
+				.put( defaultWriteAlias( INDEX_NAME ).original, ElasticsearchIndexSchemaManagerTestUtils
+						.simpleAliasDefinition( false, "" ) );
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> { } )
-				.setup();
+		setupAndUpdateIndex();
 
 		assertJsonEquals(
 				"{"
-						+ "'" + defaultWriteAlias( INDEX_NAME ) + "': " + simpleWriteAliasDefinition() + ", "
-						+ "'" + defaultReadAlias( INDEX_NAME ) + "': " + simpleReadAliasDefinition() + ", "
+						+ "'" + defaultWriteAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						.simpleWriteAliasDefinition() + ", "
+						+ "'" + defaultReadAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						.simpleReadAliasDefinition() + ", "
 						+ "'somePreExistingAlias': {}"
 				+ "}",
 				elasticsearchClient.index( INDEX_NAME ).aliases().get()
@@ -142,18 +150,18 @@ public class ElasticsearchIndexUpdateAliasesIT {
 	public void readAlias_missing() {
 		elasticsearchClient.index( defaultPrimaryName( INDEX_NAME ), defaultWriteAlias( INDEX_NAME ), null )
 				.deleteAndCreate()
-				.type().putMapping( simpleMappingForInitialization( "" ) );
+				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
 		elasticsearchClient.index( INDEX_NAME ).aliases()
 				.put( "somePreExistingAlias" );
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> { } )
-				.setup();
+		setupAndUpdateIndex();
 
 		assertJsonEquals(
 				"{"
-						+ "'" + defaultWriteAlias( INDEX_NAME ) + "': " + simpleWriteAliasDefinition() + ", "
-						+ "'" + defaultReadAlias( INDEX_NAME ) + "': " + simpleReadAliasDefinition() + ", "
+						+ "'" + defaultWriteAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						.simpleWriteAliasDefinition() + ", "
+						+ "'" + defaultReadAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						.simpleReadAliasDefinition() + ", "
 						+ "'somePreExistingAlias': {}"
 				+ "}",
 				elasticsearchClient.index( INDEX_NAME ).aliases().get()
@@ -164,31 +172,31 @@ public class ElasticsearchIndexUpdateAliasesIT {
 	public void readAlias_invalid_filter() {
 		elasticsearchClient.index( INDEX_NAME )
 				.deleteAndCreate()
-				.type().putMapping( simpleMappingForInitialization( "" ) );
+				.type().putMapping( ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization( "" ) );
 		elasticsearchClient.index( INDEX_NAME ).aliases()
 				.put( "somePreExistingAlias" );
 		elasticsearchClient.index( INDEX_NAME ).aliases()
 				.put( defaultReadAlias( INDEX_NAME ).original, "{'filter': {'term': {'user_id': 12}}}" );
 
-		startSetupWithLifecycleStrategy()
-				.withIndex( INDEX_NAME, ctx -> { } )
-				.setup();
+		setupAndUpdateIndex();
 
 		assertJsonEquals(
 				"{"
-						+ "'" + defaultWriteAlias( INDEX_NAME ) + "': " + simpleWriteAliasDefinition() + ", "
-						+ "'" + defaultReadAlias( INDEX_NAME ) + "': " + simpleReadAliasDefinition() + ", "
+						+ "'" + defaultWriteAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						.simpleWriteAliasDefinition() + ", "
+						+ "'" + defaultReadAlias( INDEX_NAME ) + "': " + ElasticsearchIndexSchemaManagerTestUtils
+						.simpleReadAliasDefinition() + ", "
 						+ "'somePreExistingAlias': {}"
 				+ "}",
 				elasticsearchClient.index( INDEX_NAME ).aliases().get()
 		);
 	}
 
-	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
-		return setupHelper.start()
+	private void setupAndUpdateIndex() {
+		setupHelper.start()
 				.withIndexDefaultsProperty(
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						IndexLifecycleStrategyName.UPDATE.getExternalRepresentation()
+						IndexLifecycleStrategyName.NONE
 				)
 				.withBackendProperty(
 						// Don't contribute any analysis definitions, migration of those is tested in another test class
@@ -196,7 +204,11 @@ public class ElasticsearchIndexUpdateAliasesIT {
 						(ElasticsearchAnalysisConfigurer) (ElasticsearchAnalysisConfigurationContext context) -> {
 							// No-op
 						}
-				);
+				)
+				.withIndex( INDEX_NAME, ctx -> { }, indexManager -> this.indexManager = indexManager )
+				.setup();
+
+		indexManager.getSchemaManager().createOrUpdate().join();
 	}
 
 }

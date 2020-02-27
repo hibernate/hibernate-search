@@ -4,20 +4,22 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.index.admin;
+package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
 import java.util.EnumSet;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexAdminAnalyzerITAnalysisConfigurer;
+import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexSchemaManagerAnalyzerITAnalysisConfigurer;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,20 +28,17 @@ import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Tests related to analyzers when creating indexes,
- * for all applicable index lifecycle strategies.
+ * for all index-creating schema management operations.
  */
 @RunWith(Parameterized.class)
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchAnalyzerDefinitionCreationIT")
-public class ElasticsearchIndexCreationAnalyzerIT {
+public class ElasticsearchIndexSchemaManagerCreationAnalyzerIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
-	@Parameters(name = "With strategy {0}")
-	public static EnumSet<IndexLifecycleStrategyName> strategies() {
-		return EnumSet.complementOf( EnumSet.of(
-				// Those strategies don't create the schema, so we don't test them
-				IndexLifecycleStrategyName.NONE, IndexLifecycleStrategyName.VALIDATE
-		) );
+	@Parameters(name = "With operation {0}")
+	public static EnumSet<ElasticsearchIndexSchemaManagerOperation> operations() {
+		return ElasticsearchIndexSchemaManagerOperation.creating();
 	}
 
 	@Rule
@@ -48,11 +47,19 @@ public class ElasticsearchIndexCreationAnalyzerIT {
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
-	private final IndexLifecycleStrategyName strategy;
+	private final ElasticsearchIndexSchemaManagerOperation operation;
 
-	public ElasticsearchIndexCreationAnalyzerIT(IndexLifecycleStrategyName strategy) {
-		super();
-		this.strategy = strategy;
+	private StubMappingIndexManager indexManager;
+
+	public ElasticsearchIndexSchemaManagerCreationAnalyzerIT(ElasticsearchIndexSchemaManagerOperation operation) {
+		this.operation = operation;
+	}
+
+	@After
+	public void cleanUp() {
+		if ( indexManager != null ) {
+			indexManager.getSchemaManager().dropIfExisting();
+		}
 	}
 
 	@Test
@@ -60,7 +67,7 @@ public class ElasticsearchIndexCreationAnalyzerIT {
 		elasticSearchClient.index( INDEX_NAME )
 				.ensureDoesNotExist().registerForCleanup();
 
-		setup();
+		setupAndCreateIndex();
 
 		assertJsonEquals(
 				"{"
@@ -112,25 +119,20 @@ public class ElasticsearchIndexCreationAnalyzerIT {
 				);
 	}
 
-	private void setup() {
-		startSetupWithLifecycleStrategy()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> { }
-				)
-				.setup();
-	}
-
-	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
-		return setupHelper.start()
+	private void setupAndCreateIndex() {
+		setupHelper.start()
 				.withIndexDefaultsProperty(
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						strategy.getExternalRepresentation()
+						IndexLifecycleStrategyName.NONE
 				)
 				.withBackendProperty(
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
-						new ElasticsearchIndexAdminAnalyzerITAnalysisConfigurer()
-				);
+						new ElasticsearchIndexSchemaManagerAnalyzerITAnalysisConfigurer()
+				)
+				.withIndex( INDEX_NAME, ctx -> { }, indexManager -> this.indexManager = indexManager )
+				.setup();
+
+		operation.apply( indexManager.getSchemaManager() ).join();
 	}
 
 }

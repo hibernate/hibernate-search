@@ -4,39 +4,69 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.index.admin;
+package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
-import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.simpleMappingForInitialization;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
+
+import java.util.EnumSet;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexAdminNormalizerITAnalysisConfigurer;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexSchemaManagerNormalizerITAnalysisConfigurer;
+import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 /**
- * Tests related to normalizers when validating indexes.
+ * Tests related to normalizers when validating indexes,
+ * for all index-validating schema management operations.
  */
+@RunWith(Parameterized.class)
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchNormalizerDefinitionValidationIT")
-public class ElasticsearchIndexValidationNormalizerIT {
+public class ElasticsearchIndexSchemaManagerValidationNormalizerIT {
 
 	private static final String SCHEMA_VALIDATION_CONTEXT = "schema validation";
 
 	private static final String INDEX_NAME = "IndexName";
+
+	@Parameterized.Parameters(name = "With operation {0}")
+	public static EnumSet<ElasticsearchIndexSchemaManagerValidationOperation> operations() {
+		return ElasticsearchIndexSchemaManagerValidationOperation.all();
+	}
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
+
+	private final ElasticsearchIndexSchemaManagerValidationOperation operation;
+
+	private StubMappingIndexManager indexManager;
+
+	public ElasticsearchIndexSchemaManagerValidationNormalizerIT(
+			ElasticsearchIndexSchemaManagerValidationOperation operation) {
+		this.operation = operation;
+	}
+
+	@After
+	public void cleanUp() {
+		if ( indexManager != null ) {
+			indexManager.getSchemaManager().dropIfExisting();
+		}
+	}
 
 	@Test
 	public void success_simple() throws Exception {
@@ -66,7 +96,7 @@ public class ElasticsearchIndexValidationNormalizerIT {
 
 		putMapping();
 
-		setup();
+		setupAndValidate();
 
 		// If we get here, it means validation passed (no exception was thrown)
 	}
@@ -93,9 +123,8 @@ public class ElasticsearchIndexValidationNormalizerIT {
 
 		putMapping();
 
-		setupExpectingFailure(
+		setupAndValidateExpectingFailure(
 				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.normalizerContext( "custom-normalizer" )
 						.failure( "Missing normalizer" )
@@ -103,32 +132,27 @@ public class ElasticsearchIndexValidationNormalizerIT {
 		);
 	}
 
-	private void setupExpectingFailure(String failureReportPattern) {
-		SubTest.expectException( this::setup )
+	private void setupAndValidateExpectingFailure(String failureReportPattern) {
+		SubTest.expectException( this::setupAndValidate )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( failureReportPattern );
 	}
 
-	private void setup() {
-		startSetupWithLifecycleStrategy()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> { }
-				)
-				.setup();
-	}
-
-	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
-		return setupHelper.start()
+	private void setupAndValidate() {
+		setupHelper.start()
 				.withIndexDefaultsProperty(
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						IndexLifecycleStrategyName.VALIDATE.getExternalRepresentation()
+						IndexLifecycleStrategyName.NONE
 				)
 				.withBackendProperty(
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
-						new ElasticsearchIndexAdminNormalizerITAnalysisConfigurer()
-				);
+						new ElasticsearchIndexSchemaManagerNormalizerITAnalysisConfigurer()
+				)
+				.withIndex( INDEX_NAME, ctx -> { }, indexManager -> this.indexManager = indexManager )
+				.setup();
+
+		Futures.unwrappedExceptionJoin( operation.apply( indexManager.getSchemaManager() ) );
 	}
 
 	protected void putMapping() {
