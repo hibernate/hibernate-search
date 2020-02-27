@@ -25,7 +25,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingInd
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -58,9 +57,6 @@ public class LuceneIndexWriterCommitIT {
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	@Rule
-	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 	private final String ioStrategyName;
 	private final Integer commitInterval;
@@ -153,8 +149,8 @@ public class LuceneIndexWriterCommitIT {
 	 * @throws IOException If an I/O failure occurs.
 	 */
 	private int countDocsOnDisk() throws IOException {
-		return LuceneIndexContentUtils.doOnIndexCopy(
-				setupHelper, temporaryFolder, INDEX_NAME,
+		return LuceneIndexContentUtils.readIndex(
+				setupHelper, INDEX_NAME,
 				reader -> reader.getDocCount( MetadataFields.idFieldName() )
 		);
 	}

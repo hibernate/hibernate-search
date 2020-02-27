@@ -29,7 +29,6 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 /**
  * Test indexing, and more importantly updates and deletions,
@@ -42,9 +41,6 @@ public class LuceneIndexingNestedIT {
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	@Rule
-	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
@@ -157,8 +153,8 @@ public class LuceneIndexingNestedIT {
 	}
 
 	private int countWithField(String absoluteFieldPath) throws IOException {
-		return LuceneIndexContentUtils.doOnIndexCopy(
-				setupHelper, temporaryFolder, INDEX_NAME,
+		return LuceneIndexContentUtils.readIndex(
+				setupHelper, INDEX_NAME,
 				reader -> reader.getDocCount( absoluteFieldPath )
 		);
 	}
