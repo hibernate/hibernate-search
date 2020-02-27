@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.extractor;
 import java.util.List;
 
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
+import org.hibernate.search.util.common.annotaion.Incubating;
 
 /**
  * A context to assign names to container extractor implementations.
@@ -16,10 +17,8 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.Container
  * @see ContainerExtractor
  * @see ContainerExtractorPath#explicitExtractor(String)
  * @see ContainerExtractorPath#explicitExtractors(List)
- *
- * @hsearch.experimental This type is under active development.
- *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
  */
+@Incubating
 @SuppressWarnings("rawtypes") // We need to allow raw container types, e.g. MapValueExtractor.class
 public interface ContainerExtractorConfigurationContext {
 

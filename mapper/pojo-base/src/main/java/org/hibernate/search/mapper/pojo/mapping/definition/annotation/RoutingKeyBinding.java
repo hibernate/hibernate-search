@@ -19,6 +19,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBi
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.RoutingKeyBindingProcessor;
+import org.hibernate.search.util.common.annotaion.Incubating;
 
 /**
  * Maps an indexed type to its routing keys using a {@link RoutingKeyBinder},
@@ -26,11 +27,9 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
  * <p>
  * See the reference documentation for more information about bridges in general,
  * and routing key bridges in particular.
- *
- * @hsearch.experimental This type is under active development.
- *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
  */
 @Documented
+@Incubating
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
 @Repeatable(RoutingKeyBinding.List.class)

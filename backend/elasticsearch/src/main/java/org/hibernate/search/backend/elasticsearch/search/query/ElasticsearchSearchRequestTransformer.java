@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query;
 
+import org.hibernate.search.util.common.annotaion.Incubating;
+
 /**
  * A pluggable component that gets the chance to transform search requests (path, body, ...)
  * before they are sent to Elasticsearch.
@@ -15,10 +17,8 @@ package org.hibernate.search.backend.elasticsearch.search.query;
  * Thus they cannot be guaranteed to continue to work when upgrading Hibernate Search,
  * even for micro upgrades ({@code x.y.z} to {@code x.y.(z+1)}).
  * Use this at your own risk.
- *
- * @hsearch.experimental This type is under active development.
- *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
  */
+@Incubating
 public interface ElasticsearchSearchRequestTransformer {
 
 	void transform(ElasticsearchSearchRequestTransformerContext context);

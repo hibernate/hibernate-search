@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.model.dependency;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+import org.hibernate.search.util.common.annotaion.Incubating;
 
 public interface PojoPropertyIndexingDependencyConfigurationContext {
 
@@ -105,9 +106,8 @@ public interface PojoPropertyIndexingDependencyConfigurationContext {
 	 * @throws org.hibernate.search.util.common.SearchException If the bridged property does not point to an entity type,
 	 * or the given type is not an entity type,
 	 * or the given path cannot be applied to the given entity type.
-	 * @hsearch.experimental This feature is under active development.
-	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
+	@Incubating
 	default PojoOtherEntityIndexingDependencyConfigurationContext fromOtherEntity(Class<?> otherEntityType,
 			String pathFromOtherEntityTypeToBridgedType) {
 		return fromOtherEntity( otherEntityType, PojoModelPath.parse( pathFromOtherEntityTypeToBridgedType ) );
@@ -128,9 +128,8 @@ public interface PojoPropertyIndexingDependencyConfigurationContext {
 	 * @throws org.hibernate.search.util.common.SearchException If the bridged property does not point to an entity type,
 	 * or the given type is not an entity type,
 	 * or the given path cannot be applied to the given entity type.
-	 * @hsearch.experimental This feature is under active development.
-	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
+	@Incubating
 	default PojoOtherEntityIndexingDependencyConfigurationContext fromOtherEntity(Class<?> otherEntityType,
 			PojoModelPathValueNode pathFromOtherEntityTypeToBridgedType) {
 		return fromOtherEntity(
@@ -155,9 +154,8 @@ public interface PojoPropertyIndexingDependencyConfigurationContext {
 	 * or the given type is not an entity type,
 	 * or the given extractor path cannot be applied to the bridged property,
 	 * or the given path cannot be applied to the given entity type.
-	 * @hsearch.experimental This feature is under active development.
-	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
+	@Incubating
 	PojoOtherEntityIndexingDependencyConfigurationContext fromOtherEntity(ContainerExtractorPath extractorPathFromBridgedProperty,
 			Class<?> otherEntityType,
 			PojoModelPathValueNode pathFromOtherEntityTypeToBridgedPropertyExtractedType);

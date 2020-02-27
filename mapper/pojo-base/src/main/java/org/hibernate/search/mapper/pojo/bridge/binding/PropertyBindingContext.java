@@ -13,6 +13,7 @@ import org.hibernate.search.mapper.pojo.bridge.PropertyBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.PropertyBinder;
 import org.hibernate.search.mapper.pojo.model.PojoModelProperty;
 import org.hibernate.search.mapper.pojo.model.dependency.PojoPropertyIndexingDependencyConfigurationContext;
+import org.hibernate.search.util.common.annotaion.Incubating;
 
 /**
  * The context provided to the {@link PropertyBinder#bind(PropertyBindingContext)} method.
@@ -41,9 +42,8 @@ public interface PropertyBindingContext extends BindingContext {
 
 	/**
 	 * @return An entry point allowing to declare expectations and retrieve accessors to the bridged POJO property.
-	 * @hsearch.experimental This feature is under active development.
-	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
+	@Incubating
 	PojoModelProperty getBridgedElement();
 
 	/**

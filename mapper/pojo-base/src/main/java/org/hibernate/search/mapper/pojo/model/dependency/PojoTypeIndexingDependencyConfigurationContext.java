@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.model.dependency;
 
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
+import org.hibernate.search.util.common.annotaion.Incubating;
 
 public interface PojoTypeIndexingDependencyConfigurationContext {
 
@@ -47,9 +48,8 @@ public interface PojoTypeIndexingDependencyConfigurationContext {
 	 * @param pathFromBridgedTypeToUsedValue The path from the bridged type to the value used by the bridge.
 	 * @return {@code this}, for method chaining.
 	 * @throws org.hibernate.search.util.common.SearchException If the given path cannot be applied to the bridged type.
-	 * @hsearch.experimental This feature is under active development.
-	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
+	@Incubating
 	PojoTypeIndexingDependencyConfigurationContext use(PojoModelPathValueNode pathFromBridgedTypeToUsedValue);
 
 	/**
@@ -68,9 +68,8 @@ public interface PojoTypeIndexingDependencyConfigurationContext {
 	 * @throws org.hibernate.search.util.common.SearchException If the bridged type is not an entity type,
 	 * or the given type is not an entity type,
 	 * or the given path cannot be applied to the given entity type.
-	 * @hsearch.experimental This feature is under active development.
-	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
+	@Incubating
 	default PojoOtherEntityIndexingDependencyConfigurationContext fromOtherEntity(Class<?> otherEntityType,
 			String pathFromOtherEntityTypeToBridgedType) {
 		return fromOtherEntity( otherEntityType, PojoModelPath.parse( pathFromOtherEntityTypeToBridgedType ) );
@@ -91,9 +90,8 @@ public interface PojoTypeIndexingDependencyConfigurationContext {
 	 * @throws org.hibernate.search.util.common.SearchException If the bridged type is not an entity type,
 	 * or the given type is not an entity type,
 	 * or the given path cannot be applied to the given entity type.
-	 * @hsearch.experimental This feature is under active development.
-	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
+	@Incubating
 	PojoOtherEntityIndexingDependencyConfigurationContext fromOtherEntity(Class<?> otherEntityType,
 			PojoModelPathValueNode pathFromOtherEntityTypeToBridgedType);
 

@@ -8,6 +8,8 @@ package org.hibernate.search.backend.elasticsearch.search.query;
 
 import java.util.Map;
 
+import org.hibernate.search.util.common.annotaion.Incubating;
+
 import com.google.gson.JsonObject;
 
 /**
@@ -18,10 +20,8 @@ import com.google.gson.JsonObject;
  * Thus they cannot be guaranteed to continue to work when upgrading Hibernate Search,
  * even for micro upgrades ({@code x.y.z} to {@code x.y.(z+1)}).
  * Use this at your own risk.
- *
- * @hsearch.experimental This type is under active development.
- *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
  */
+@Incubating
 public interface ElasticsearchSearchRequestTransformerContext {
 
 	/**
