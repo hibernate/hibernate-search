@@ -15,15 +15,15 @@ import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
+import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.OverrideAnalysisDefinitions;
@@ -151,6 +151,22 @@ public class PhraseSearchPredicateIT {
 				.toQuery();
 
 		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+	}
+
+	@Test
+	public void phrase_nonAnalyzedField() {
+		StubMappingScope scope = indexManager.createScope();
+		String absoluteFieldPath = indexMapping.nonAnalyzedField.relativeFieldName;
+
+		assertThat( scope.query()
+				.where( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1 ) )
+				.toQuery() )
+				.hasNoHits();
+
+		assertThat( scope.query()
+				.where( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1_TEXT_EXACT_MATCH ) )
+				.toQuery() )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 	}
 
@@ -781,6 +797,7 @@ public class PhraseSearchPredicateIT {
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toLowerCase( Locale.ROOT ) );
 			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toLowerCase( Locale.ROOT ) );
 			document.addValue( indexMapping.whitespaceLowercaseSearchAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toLowerCase( Locale.ROOT ) );
+			document.addValue( indexMapping.nonAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
 		} );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_1_MATCH );
@@ -788,6 +805,7 @@ public class PhraseSearchPredicateIT {
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toUpperCase( Locale.ROOT ) );
 			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toUpperCase( Locale.ROOT ) );
 			document.addValue( indexMapping.whitespaceLowercaseSearchAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH.toUpperCase( Locale.ROOT ) );
+			document.addValue( indexMapping.nonAnalyzedField.reference, PHRASE_1_TEXT_SLOP_1_MATCH );
 		} );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_2_MATCH );
@@ -796,6 +814,7 @@ public class PhraseSearchPredicateIT {
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
 			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
 			document.addValue( indexMapping.whitespaceLowercaseSearchAnalyzedField.reference, PHRASE_1_TEXT_EXACT_MATCH );
+			document.addValue( indexMapping.nonAnalyzedField.reference, PHRASE_1_TEXT_SLOP_2_MATCH );
 		} );
 		plan.add( referenceProvider( DOCUMENT_4 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_SLOP_3_MATCH );
@@ -887,6 +906,7 @@ public class PhraseSearchPredicateIT {
 		final MainFieldModel whitespaceAnalyzedField;
 		final MainFieldModel whitespaceLowercaseAnalyzedField;
 		final MainFieldModel whitespaceLowercaseSearchAnalyzedField;
+		final MainFieldModel nonAnalyzedField;
 
 		IndexMapping(IndexSchemaElement root) {
 			mapByTypeFields(
@@ -927,6 +947,8 @@ public class PhraseSearchPredicateIT {
 							.searchAnalyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
 			)
 					.map( root, "whitespaceLowercaseSearchAnalyzed" );
+			nonAnalyzedField = MainFieldModel.mapper( c -> c.asString() )
+					.map( root, "nonAnalyzedField" );
 		}
 	}
 
