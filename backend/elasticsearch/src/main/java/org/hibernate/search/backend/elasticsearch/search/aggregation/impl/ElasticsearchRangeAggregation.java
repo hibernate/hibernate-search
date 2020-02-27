@@ -27,6 +27,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.hibernate.search.engine.search.common.MultiValue;
 
 /**
  * @param <F> The type of field values.
@@ -82,6 +83,7 @@ public class ElasticsearchRangeAggregation<F, K>
 
 		private final List<Range<K>> rangesInOrder = new ArrayList<>();
 		private final JsonArray rangesJson = new JsonArray();
+		private MultiValue mode;
 
 		public Builder(ElasticsearchSearchContext searchContext, String absoluteFieldPath,
 				DslConverter<?, ? extends F> toFieldValueConverter,
@@ -114,6 +116,11 @@ public class ElasticsearchRangeAggregation<F, K>
 			rangeJson.addProperty( "key", String.valueOf( rangesJson.size() ) );
 			rangesInOrder.add( range.map( Function.identity() ) );
 			rangesJson.add( rangeJson );
+		}
+
+		@Override
+		public void mode(MultiValue mode) {
+			this.mode = mode;
 		}
 
 		@Override

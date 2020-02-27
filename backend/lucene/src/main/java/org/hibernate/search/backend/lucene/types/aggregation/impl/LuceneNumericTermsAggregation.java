@@ -47,7 +47,8 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 	@Override
 	FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector, int limit)
 			throws IOException {
-		LongValueFacetCounts facetCounts = numericDomain.createTermsFacetCounts( absoluteFieldPath, facetsCollector );
+		LongValueFacetCounts facetCounts = numericDomain.createTermsFacetCounts(
+				absoluteFieldPath, facetsCollector, multiValueMode, nestedDocsProvider );
 		return facetCounts.getTopChildren( limit, absoluteFieldPath );
 	}
 
@@ -95,10 +96,10 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
-		public Builder(LuceneSearchContext searchContext, String absoluteFieldPath,
+		public Builder(LuceneSearchContext searchContext, String nestedDocumentPath, String absoluteFieldPath,
 				ProjectionConverter<? super F, ? extends K> fromFieldValueConverter,
 				AbstractLuceneNumericFieldCodec<F, E> codec) {
-			super( searchContext, absoluteFieldPath, fromFieldValueConverter );
+			super( searchContext, nestedDocumentPath, absoluteFieldPath, fromFieldValueConverter );
 			this.codec = codec;
 		}
 

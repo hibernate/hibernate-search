@@ -43,7 +43,7 @@ public class LuceneTextFieldAggregationBuilderFactory
 
 	@Override
 	public <K> TermsAggregationBuilder<K> createTermsAggregationBuilder(LuceneSearchContext searchContext,
-			String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
+			String nestedDocumentPath, String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
 		if ( tokenized ) {
 			throw log.termsAggregationsNotSupportedByAnalyzedTextFieldType(
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
@@ -56,13 +56,13 @@ public class LuceneTextFieldAggregationBuilderFactory
 				getFromFieldValueConverter( absoluteFieldPath, expectedType, convert );
 
 		return new LuceneTextTermsAggregation.Builder<>(
-				searchContext, absoluteFieldPath, fromFieldValueConverter
+				searchContext, nestedDocumentPath, absoluteFieldPath, fromFieldValueConverter
 		);
 	}
 
 	@Override
 	public <K> RangeAggregationBuilder<K> createRangeAggregationBuilder(LuceneSearchContext searchContext,
-			String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
+			String nestedDocumentPath, String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
 		throw log.rangeAggregationsNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);

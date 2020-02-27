@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort;
 
+import org.hibernate.search.engine.search.common.MultiValue;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
@@ -41,6 +42,11 @@ public class StubSortBuilder implements ScoreSortBuilder<StubSortBuilder>,
 	}
 
 	void simulateBuild() {
+		// No-op, just simulates a call on this object
+	}
+
+	@Override
+	public void mode(MultiValue mode) {
 		// No-op, just simulates a call on this object
 	}
 }

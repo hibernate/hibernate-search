@@ -51,8 +51,11 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> imple
 
 		LuceneNumericDomain<E> domain = getDomain();
 
-		if ( sortable || aggregable ) {
-			documentBuilder.addField( domain.createDocValuesField( absoluteFieldPath, encodedValue ) );
+		if ( sortable ) {
+			documentBuilder.addField( domain.createSortedDocValuesField( absoluteFieldPath, encodedValue ) );
+		}
+		else if ( aggregable ) {
+			documentBuilder.addField( domain.createSortedDocValuesField( absoluteFieldPath, encodedValue ) );
 		}
 		else {
 			// For createExistsQuery()
@@ -85,8 +88,8 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> imple
 
 		AbstractLuceneNumericFieldCodec<?, ?> other = (AbstractLuceneNumericFieldCodec<?, ?>) obj;
 
-		return ( projectable == other.projectable ) && ( searchable == other.searchable )
-				&& ( sortable == other.sortable ) && ( aggregable == other.aggregable );
+		return (projectable == other.projectable) && (searchable == other.searchable)
+			&& (sortable == other.sortable) && (aggregable == other.aggregable);
 	}
 
 	public abstract F decode(E encoded);

@@ -8,10 +8,12 @@ package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
 import java.util.Map;
 import java.util.Set;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilder;
+import org.hibernate.search.engine.search.common.MultiValue;
 
 /**
  * @param <K> The type of keys in the returned map.
@@ -40,5 +42,30 @@ public abstract class AbstractLuceneBucketAggregation<K, V> implements LuceneSea
 
 		@Override
 		public abstract LuceneSearchAggregation<Map<K, V>> build();
+
+		protected MultiValueMode getMultiValueMode(MultiValue multi) {
+			MultiValueMode sortMode = MultiValueMode.MIN;
+			if ( multi != null ) {
+				switch ( multi ) {
+					case MIN:
+						sortMode = MultiValueMode.MIN;
+						break;
+					case MAX:
+						sortMode = MultiValueMode.MAX;
+						break;
+					case AVG:
+						sortMode = MultiValueMode.AVG;
+						break;
+					case SUM:
+						sortMode = MultiValueMode.SUM;
+						break;
+					case MEDIAN:
+						sortMode = MultiValueMode.MEDIAN;
+						break;
+				}
+			}
+			return sortMode;
+		}
+
 	}
 }

@@ -28,8 +28,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @see LuceneStandardFieldCodec
  */
 abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStandardFieldCodec<F, E>>
-		extends AbstractLuceneSearchSortBuilder
-		implements FieldSortBuilder<LuceneSearchSortBuilder> {
+	extends AbstractLuceneSearchSortBuilder
+	implements FieldSortBuilder<LuceneSearchSortBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -48,12 +48,12 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 
 	protected Object missingValue;
 
-	protected AbstractLuceneStandardFieldSortBuilder(
-			LuceneSearchContext searchContext,
+	protected AbstractLuceneStandardFieldSortBuilder(LuceneSearchContext searchContext,
 			String absoluteFieldPath, String nestedDocumentPath,
 			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			LuceneCompatibilityChecker converterChecker, C codec,
 			Object sortMissingValueFirstPlaceholder, Object sortMissingValueLastPlaceholder) {
+
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.nestedDocumentPath = nestedDocumentPath;
@@ -117,4 +117,5 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 				return converter;
 		}
 	}
+
 }

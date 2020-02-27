@@ -45,14 +45,14 @@ public class LuceneSearchAggregationBuilderFactory
 	@Override
 	public <A> void contribute(LuceneSearchAggregationCollector collector,
 			AggregationKey<A> key, SearchAggregation<A> aggregation) {
-		if ( !( aggregation instanceof LuceneSearchAggregation ) ) {
+		if ( !(aggregation instanceof LuceneSearchAggregation) ) {
 			throw log.cannotMixLuceneSearchQueryWithOtherAggregations( aggregation );
 		}
 
 		LuceneSearchAggregation<A> casted = (LuceneSearchAggregation<A>) aggregation;
 		if ( !scopeModel.getIndexNames().equals( casted.getIndexNames() ) ) {
 			throw log.aggregationDefinedOnDifferentIndexes(
-					aggregation, casted.getIndexNames(), scopeModel.getIndexNames()
+				aggregation, casted.getIndexNames(), scopeModel.getIndexNames()
 			);
 		}
 
@@ -65,8 +65,11 @@ public class LuceneSearchAggregationBuilderFactory
 		LuceneScopedIndexFieldComponent<LuceneFieldAggregationBuilderFactory> fieldComponent =
 				scopeModel.getSchemaNodeComponent( absoluteFieldPath, AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 		checkConverterCompatibility( fieldComponent, convert );
+
+		String nestedDocumentPath = scopeModel.getNestedDocumentPath( absoluteFieldPath );
+
 		return fieldComponent.getComponent().createTermsAggregationBuilder(
-				searchContext, absoluteFieldPath, expectedType, convert
+				searchContext, nestedDocumentPath, absoluteFieldPath, expectedType, convert
 		);
 	}
 
@@ -76,8 +79,11 @@ public class LuceneSearchAggregationBuilderFactory
 		LuceneScopedIndexFieldComponent<LuceneFieldAggregationBuilderFactory> fieldComponent =
 				scopeModel.getSchemaNodeComponent( absoluteFieldPath, AGGREGATION_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 		checkConverterCompatibility( fieldComponent, convert );
+
+		String nestedDocumentPath = scopeModel.getNestedDocumentPath( absoluteFieldPath );
+
 		return fieldComponent.getComponent().createRangeAggregationBuilder(
-				searchContext, absoluteFieldPath, expectedType, convert
+				searchContext, nestedDocumentPath, absoluteFieldPath, expectedType, convert
 		);
 	}
 

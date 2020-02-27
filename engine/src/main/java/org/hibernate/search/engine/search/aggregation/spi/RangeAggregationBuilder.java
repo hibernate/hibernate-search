@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.search.aggregation.spi;
 
 import java.util.Map;
+import org.hibernate.search.engine.search.common.MultiValue;
 
 import org.hibernate.search.util.common.data.Range;
 
@@ -14,4 +15,5 @@ public interface RangeAggregationBuilder<K> extends SearchAggregationBuilder<Map
 
 	void range(Range<? extends K> range);
 
+	void mode(MultiValue mode);
 }

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.sort.spi;
 
+import org.hibernate.search.engine.search.common.MultiValue;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 
 /**
@@ -19,10 +20,11 @@ public interface SearchSortBuilder<B> {
 
 	void order(SortOrder order);
 
+	void mode(MultiValue mode);
+
 	/**
 	 * @return An implementation-specific view of this builder,
 	 * allowing the backend to call a {@code build()} method in particular.
 	 */
 	B toImplementation();
-
 }
