@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.types.codec.impl;
 import java.util.Objects;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneDocumentBuilder;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 
 import org.apache.lucene.analysis.Analyzer;
@@ -120,7 +121,8 @@ public final class LuceneStringFieldCodec implements LuceneTextFieldCodec<String
 		if ( value == null ) {
 			return null;
 		}
-		if ( analyzerOrNormalizer == null ) {
+		if ( analyzerOrNormalizer == AnalyzerConstants.KEYWORD_ANALYZER ) {
+			// Optimization when analysis is disabled
 			return new BytesRef( value );
 		}
 		return analyzerOrNormalizer.normalize( absoluteFieldPath, value );

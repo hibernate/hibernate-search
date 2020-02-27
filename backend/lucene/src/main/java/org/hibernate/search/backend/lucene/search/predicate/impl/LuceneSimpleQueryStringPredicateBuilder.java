@@ -115,7 +115,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 			return overrideAnalyzer;
 		}
 		if ( fields.size() == 1 ) {
-			return fields.values().iterator().next().getAnalyzer();
+			return fields.values().iterator().next().getAnalyzerOrNormalizer();
 		}
 
 		/*
@@ -134,7 +134,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 		 */
 		ScopedAnalyzer.Builder builder = new ScopedAnalyzer.Builder();
 		for ( Map.Entry<String, LuceneSimpleQueryStringPredicateBuilderFieldState> entry : fields.entrySet() ) {
-			builder.setAnalyzer( entry.getKey(), entry.getValue().getAnalyzer() );
+			builder.setAnalyzer( entry.getKey(), entry.getValue().getAnalyzerOrNormalizer() );
 		}
 		return builder.build();
 	}
