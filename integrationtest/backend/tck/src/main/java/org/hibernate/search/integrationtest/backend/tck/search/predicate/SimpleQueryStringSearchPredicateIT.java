@@ -192,6 +192,31 @@ public class SimpleQueryStringSearchPredicateIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3844") // Used to throw NPE
+	public void simpleQueryString_nonAnalyzedField() {
+		StubMappingScope scope = indexManager.createScope();
+		String absoluteFieldPath = indexMapping.nonAnalyzedField.relativeFieldName;
+		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
+				.where( f -> f.simpleQueryString().field( absoluteFieldPath ).matching( queryString ) )
+				.toQuery();
+
+		assertThat( createQuery.apply( TERM_1 + " " + TERM_2 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+
+		assertThat( createQuery.apply( TERM_1 + " | " + TERM_2 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+
+		assertThat( createQuery.apply( TERM_1 + " + " + TERM_2 ) )
+				.hasNoHits();
+
+		assertThat( createQuery.apply( "-" + TERM_1 + " + " + TERM_2 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+
+		assertThat( createQuery.apply( TERM_1 + " + -" + TERM_2 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+	}
+
+	@Test
 	public void simpleQueryString_unsearchable() {
 		StubMappingScope scope = unsearchableFieldsIndexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
@@ -874,6 +899,7 @@ public class SimpleQueryStringSearchPredicateIT {
 	private void initData() {
 		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
+			document.addValue( indexMapping.nonAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2 );
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_1_AND_TERM_2 );
 			document.addValue( indexMapping.analyzedStringFieldWithDslConverter.reference, TEXT_TERM_1_AND_TERM_2 );
 			document.addValue( indexMapping.analyzedStringField2.reference, TEXT_TERM_1_AND_TERM_3 );
@@ -884,6 +910,7 @@ public class SimpleQueryStringSearchPredicateIT {
 			document.addValue( indexMapping.whitespaceLowercaseSearchAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toLowerCase( Locale.ROOT ) );
 		} );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
+			document.addValue( indexMapping.nonAnalyzedField.reference, TERM_1 );
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_1_AND_TERM_3 );
 			document.addValue( indexMapping.analyzedStringField4.reference, PREFIX_2 );
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toUpperCase( Locale.ROOT ) );
@@ -891,6 +918,7 @@ public class SimpleQueryStringSearchPredicateIT {
 			document.addValue( indexMapping.whitespaceLowercaseSearchAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toUpperCase( Locale.ROOT ) );
 		} );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
+			document.addValue( indexMapping.nonAnalyzedField.reference, TERM_2 );
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_2_IN_PHRASE );
 			document.addValue( indexMapping.analyzedStringField4.reference, PREFIX_3 );
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2 );
@@ -991,6 +1019,8 @@ public class SimpleQueryStringSearchPredicateIT {
 		final MainFieldModel whitespaceLowercaseAnalyzedField;
 		final MainFieldModel whitespaceLowercaseSearchAnalyzedField;
 
+		final MainFieldModel nonAnalyzedField;
+
 		IndexMapping(IndexSchemaElement root) {
 			mapByTypeFields(
 					root, "byType_",
@@ -1034,6 +1064,9 @@ public class SimpleQueryStringSearchPredicateIT {
 							.searchAnalyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
 			)
 					.map( root, "whitespaceLowercaseSearchAnalyzed" );
+			// A field without any analyzer or normalizer
+			nonAnalyzedField = MainFieldModel.mapper( c -> c.asString() )
+					.map( root, "nonAnalyzed" );
 		}
 	}
 
