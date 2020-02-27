@@ -4,39 +4,69 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.index.admin;
+package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
-import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.simpleMappingForInitialization;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
+
+import java.util.EnumSet;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexAdminAnalyzerITAnalysisConfigurer;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexSchemaManagerAnalyzerITAnalysisConfigurer;
+import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
 
 /**
- * Tests related to analyzers when validating indexes.
+ * Tests related to analyzers when validating indexes,
+ * for all index-validating schema management operations.
  */
+@RunWith(Parameterized.class)
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchAnalyzerDefinitionValidationIT")
-public class ElasticsearchIndexValidationAnalyzerIT {
+public class ElasticsearchIndexSchemaManagerValidationAnalyzerIT {
 
 	private static final String SCHEMA_VALIDATION_CONTEXT = "schema validation";
 
 	private static final String INDEX_NAME = "IndexName";
+
+	@Parameterized.Parameters(name = "With operation {0}")
+	public static EnumSet<ElasticsearchIndexSchemaManagerValidationOperation> operations() {
+		return ElasticsearchIndexSchemaManagerValidationOperation.all();
+	}
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
+
+	private final ElasticsearchIndexSchemaManagerValidationOperation operation;
+
+	private StubMappingIndexManager indexManager;
+
+	public ElasticsearchIndexSchemaManagerValidationAnalyzerIT(
+			ElasticsearchIndexSchemaManagerValidationOperation operation) {
+		this.operation = operation;
+	}
+
+	@After
+	public void cleanUp() {
+		if ( indexManager != null ) {
+			indexManager.getSchemaManager().dropIfExisting();
+		}
+	}
 
 	@Test
 	public void success_simple() throws Exception {
@@ -90,7 +120,7 @@ public class ElasticsearchIndexValidationAnalyzerIT {
 
 		putMapping();
 
-		setup();
+		setupAndValidate();
 
 		// If we get here, it means validation passed (no exception was thrown)
 	}
@@ -130,9 +160,8 @@ public class ElasticsearchIndexValidationAnalyzerIT {
 
 		putMapping();
 
-		setupExpectingFailure(
+		setupAndValidateExpectingFailure(
 				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.analyzerContext( "custom-analyzer" )
 						.failure( "Missing analyzer" )
@@ -182,9 +211,8 @@ public class ElasticsearchIndexValidationAnalyzerIT {
 
 		putMapping();
 
-		setupExpectingFailure(
+		setupAndValidateExpectingFailure(
 				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.analyzerContext( "custom-analyzer" )
 						.failure(
@@ -237,9 +265,8 @@ public class ElasticsearchIndexValidationAnalyzerIT {
 
 		putMapping();
 
-		setupExpectingFailure(
+		setupAndValidateExpectingFailure(
 				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.analyzerContext( "custom-analyzer" )
 						.failure(
@@ -292,9 +319,8 @@ public class ElasticsearchIndexValidationAnalyzerIT {
 
 		putMapping();
 
-		setupExpectingFailure(
+		setupAndValidateExpectingFailure(
 				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.analyzerContext( "custom-analyzer" )
 						.failure(
@@ -332,9 +358,8 @@ public class ElasticsearchIndexValidationAnalyzerIT {
 
 		putMapping();
 
-		setupExpectingFailure(
+		setupAndValidateExpectingFailure(
 				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.analyzerContext( "custom-analyzer" )
 						.failure( "Missing analyzer" )
@@ -372,9 +397,8 @@ public class ElasticsearchIndexValidationAnalyzerIT {
 
 		putMapping();
 
-		setupExpectingFailure(
+		setupAndValidateExpectingFailure(
 				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.analyzerContext( "custom-analyzer" )
 						.failure( "Missing analyzer" )
@@ -409,9 +433,8 @@ public class ElasticsearchIndexValidationAnalyzerIT {
 
 		putMapping();
 
-		setupExpectingFailure(
+		setupAndValidateExpectingFailure(
 				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.analyzerContext( "custom-analyzer" )
 						.failure( "Missing analyzer" )
@@ -463,9 +486,8 @@ public class ElasticsearchIndexValidationAnalyzerIT {
 
 		putMapping();
 
-		setupExpectingFailure(
+		setupAndValidateExpectingFailure(
 				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.charFilterContext( "custom-pattern-replace" )
 						.failure(
@@ -517,9 +539,8 @@ public class ElasticsearchIndexValidationAnalyzerIT {
 
 		putMapping();
 
-		setupExpectingFailure(
+		setupAndValidateExpectingFailure(
 				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.charFilterContext( "custom-pattern-replace" )
 						.analysisDefinitionParameterContext( "pattern" )
@@ -572,10 +593,8 @@ public class ElasticsearchIndexValidationAnalyzerIT {
 
 		putMapping();
 
-		setupExpectingFailure(
+		setupAndValidateExpectingFailure(
 				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
-						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.charFilterContext( "custom-pattern-replace" )
 						.analysisDefinitionParameterContext( "tags" )
 						.failure(
@@ -628,9 +647,8 @@ public class ElasticsearchIndexValidationAnalyzerIT {
 
 		putMapping();
 
-		setupExpectingFailure(
+		setupAndValidateExpectingFailure(
 				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
 						.tokenFilterContext( "custom-word-delimiter" )
 						.analysisDefinitionParameterContext( "generate_number_parts" )
@@ -641,32 +659,27 @@ public class ElasticsearchIndexValidationAnalyzerIT {
 		);
 	}
 
-	private void setupExpectingFailure(String failureReportPattern) {
-		SubTest.expectException( this::setup )
+	private void setupAndValidateExpectingFailure(String failureReportPattern) {
+		SubTest.expectException( this::setupAndValidate )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( failureReportPattern );
 	}
 
-	private void setup() {
-		startSetupWithLifecycleStrategy()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> { }
-				)
-				.setup();
-	}
-
-	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
-		return setupHelper.start()
+	private void setupAndValidate() {
+		setupHelper.start()
 				.withIndexDefaultsProperty(
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						IndexLifecycleStrategyName.VALIDATE.getExternalRepresentation()
+						IndexLifecycleStrategyName.NONE
 				)
 				.withBackendProperty(
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
-						new ElasticsearchIndexAdminAnalyzerITAnalysisConfigurer()
-				);
+						new ElasticsearchIndexSchemaManagerAnalyzerITAnalysisConfigurer()
+				)
+				.withIndex( INDEX_NAME, ctx -> { }, indexManager -> this.indexManager = indexManager )
+				.setup();
+
+		Futures.unwrappedExceptionJoin( operation.apply( indexManager.getSchemaManager() ) );
 	}
 
 	protected void putMapping() {

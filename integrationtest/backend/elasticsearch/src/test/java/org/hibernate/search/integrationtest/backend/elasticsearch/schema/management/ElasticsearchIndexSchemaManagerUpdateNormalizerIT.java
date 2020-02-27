@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.index.admin;
+package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
 import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 
@@ -12,11 +12,13 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettin
 import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresIndexOpenClose;
-import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexAdminNormalizerITAnalysisConfigurer;
+import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.ElasticsearchIndexSchemaManagerNormalizerITAnalysisConfigurer;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -27,7 +29,7 @@ import org.junit.rules.ExpectedException;
  */
 @PortedFromSearch5(original = "org.hibernate.search.elasticsearch.test.ElasticsearchNormalizerDefinitionMigrationIT")
 @Category(RequiresIndexOpenClose.class)
-public class ElasticsearchIndexUpdateNormalizerIT {
+public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
@@ -39,6 +41,15 @@ public class ElasticsearchIndexUpdateNormalizerIT {
 
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
+
+	private StubMappingIndexManager indexManager;
+
+	@After
+	public void cleanUp() {
+		if ( indexManager != null ) {
+			indexManager.getSchemaManager().dropIfExisting();
+		}
+	}
 
 	@Test
 	public void nothingToDo() throws Exception {
@@ -66,7 +77,7 @@ public class ElasticsearchIndexUpdateNormalizerIT {
 				+ "}"
 				);
 
-		setup();
+		setupAndUpdateIndex();
 
 		assertJsonEquals(
 				"{"
@@ -113,7 +124,7 @@ public class ElasticsearchIndexUpdateNormalizerIT {
 				+ "}"
 				);
 
-		setup();
+		setupAndUpdateIndex();
 
 		assertJsonEquals(
 				"{"
@@ -160,7 +171,7 @@ public class ElasticsearchIndexUpdateNormalizerIT {
 				+ "}"
 				);
 
-		setup();
+		setupAndUpdateIndex();
 
 		assertJsonEquals(
 				"{"
@@ -218,7 +229,7 @@ public class ElasticsearchIndexUpdateNormalizerIT {
 				+ "}"
 				);
 
-		setup();
+		setupAndUpdateIndex();
 
 		assertJsonEquals(
 				"{"
@@ -276,7 +287,7 @@ public class ElasticsearchIndexUpdateNormalizerIT {
 				+ "}"
 				);
 
-		setup();
+		setupAndUpdateIndex();
 
 		assertJsonEquals(
 				"{"
@@ -304,25 +315,20 @@ public class ElasticsearchIndexUpdateNormalizerIT {
 				);
 	}
 
-	private void setup() {
-		startSetupWithLifecycleStrategy()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> { }
-				)
-				.setup();
-	}
-
-	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
-		return setupHelper.start()
+	private void setupAndUpdateIndex() {
+		setupHelper.start()
 				.withIndexDefaultsProperty(
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						IndexLifecycleStrategyName.UPDATE.getExternalRepresentation()
+						IndexLifecycleStrategyName.NONE
 				)
 				.withBackendProperty(
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
-						new ElasticsearchIndexAdminNormalizerITAnalysisConfigurer()
-				);
+						new ElasticsearchIndexSchemaManagerNormalizerITAnalysisConfigurer()
+				)
+				.withIndex( INDEX_NAME, ctx -> { }, indexManager -> this.indexManager = indexManager )
+				.setup();
+
+		indexManager.getSchemaManager().createOrUpdate().join();
 	}
 
 }

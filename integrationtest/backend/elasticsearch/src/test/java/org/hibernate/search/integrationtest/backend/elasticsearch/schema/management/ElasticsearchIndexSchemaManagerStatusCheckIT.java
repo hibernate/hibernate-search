@@ -4,9 +4,9 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.index.admin;
+package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
-import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.simpleMappingForInitialization;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
 
 import java.util.EnumSet;
 
@@ -16,13 +16,15 @@ import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettin
 import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
+import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
+import org.junit.After;
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
@@ -32,18 +34,17 @@ import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Tests for the index status checks,
- * for all applicable index lifecycle strategies.
+ * for all status-checking schema management operations.
  */
 @RunWith(Parameterized.class)
 @TestForIssue(jiraKey = "HSEARCH-2456")
-public class ElasticsearchIndexStatusCheckIT {
+public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
-	@Parameters(name = "With strategy {0}")
-	public static EnumSet<IndexLifecycleStrategyName> strategies() {
-		// The "NONE" strategy never checks that the index exists.
-		return EnumSet.complementOf( EnumSet.of( IndexLifecycleStrategyName.NONE ) );
+	@Parameters(name = "With operation {0}")
+	public static EnumSet<ElasticsearchIndexSchemaManagerOperation> operations() {
+		return ElasticsearchIndexSchemaManagerOperation.statusChecking();
 	}
 
 	@Rule
@@ -52,36 +53,37 @@ public class ElasticsearchIndexStatusCheckIT {
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
-	private IndexLifecycleStrategyName strategy;
+	private final ElasticsearchIndexSchemaManagerOperation operation;
 
-	public ElasticsearchIndexStatusCheckIT(IndexLifecycleStrategyName strategy) {
-		super();
-		this.strategy = strategy;
+	private StubMappingIndexManager indexManager;
+
+	public ElasticsearchIndexSchemaManagerStatusCheckIT(ElasticsearchIndexSchemaManagerOperation operation) {
+		this.operation = operation;
+	}
+
+	@After
+	public void cleanUp() {
+		if ( indexManager != null ) {
+			indexManager.getSchemaManager().dropIfExisting();
+		}
 	}
 
 	@Test
 	public void indexMissing() throws Exception {
-		Assume.assumeFalse( "The strategy " + strategy + " creates an index automatically."
+		Assume.assumeFalse( "The operation " + operation + " creates an index automatically."
 				+ " No point running this test.",
-				createsIndex( strategy ) );
+				ElasticsearchIndexSchemaManagerOperation.creating().contains( operation ) );
 
 		elasticSearchClient.index( INDEX_NAME ).ensureDoesNotExist();
 
-		setupExpectingFailure(
-				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
-						.multilineFailure(
-								"HSEARCH400050"
-						)
-						.build()
-		);
+		setupAndInspectIndexExpectingFailure( "HSEARCH400050" );
 	}
 
 	@Test
 	public void invalidIndexStatus_creatingIndex() throws Exception {
-		Assume.assumeTrue( "The strategy " + strategy + " doesn't creates an index automatically."
+		Assume.assumeTrue( "The operation " + operation + " doesn't create an index automatically."
 				+ " No point running this test.",
-				createsIndex( strategy ) );
+				ElasticsearchIndexSchemaManagerOperation.creating().contains( operation ) );
 
 		// Make sure automatically created indexes will never be green
 		elasticSearchClient.template( "yellow_index_because_not_enough_nodes_for_so_many_replicas" )
@@ -96,19 +98,15 @@ public class ElasticsearchIndexStatusCheckIT {
 
 		elasticSearchClient.index( INDEX_NAME ).ensureDoesNotExist();
 
-		setupExpectingFailure(
-				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
-						.multilineFailure(
-								"HSEARCH400024",
-								"100ms"
-						)
-						.build()
-		);
+		setupAndInspectIndexExpectingFailure( "HSEARCH400024", "100ms" );
 	}
 
 	@Test
 	public void invalidIndexStatus_usingPreexistingIndex() throws Exception {
+		Assume.assumeFalse( "The operation " + operation + " drops the existing index automatically."
+						+ " No point running this test.",
+				ElasticsearchIndexSchemaManagerOperation.dropping().contains( operation ) );
+
 		// Make sure automatically created indexes will never be green
 		elasticSearchClient.template( "yellow_index_because_not_enough_nodes_for_so_many_replicas" )
 				.create(
@@ -126,35 +124,18 @@ public class ElasticsearchIndexStatusCheckIT {
 						simpleMappingForInitialization( "" )
 				);
 
-		setupExpectingFailure(
-				FailureReportUtils.buildFailureReportPattern()
-						.indexContext( INDEX_NAME )
-						.multilineFailure(
-								"HSEARCH400024",
-								"100ms"
-						)
-						.build()
-		);
+		setupAndInspectIndexExpectingFailure( "HSEARCH400024", "100ms" );
 	}
 
-	private void setupExpectingFailure(String failureReportRegex) {
-		SubTest.expectException( this::setup )
+	private void setupAndInspectIndexExpectingFailure(String ... messageContent) {
+		SubTest.expectException( this::setupAndInspectIndex )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
-				.hasMessageMatching( failureReportRegex );
+				.hasMessageContainingAll( messageContent );
 	}
 
-	private void setup() {
-		startSetupWithLifecycleStrategy()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> { }
-				)
-				.setup();
-	}
-
-	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
-		return setupHelper.start()
+	private void setupAndInspectIndex() {
+		setupHelper.start()
 				.withBackendProperty(
 						// Don't contribute any analysis definitions, validation of those is tested in another test class
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
@@ -164,7 +145,7 @@ public class ElasticsearchIndexStatusCheckIT {
 				)
 				.withIndexDefaultsProperty(
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						strategy.getExternalRepresentation()
+						IndexLifecycleStrategyName.NONE
 				)
 				.withIndexDefaultsProperty(
 						ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS,
@@ -173,12 +154,11 @@ public class ElasticsearchIndexStatusCheckIT {
 				.withIndexDefaultsProperty(
 						ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT,
 						"100"
-				);
-	}
+				)
+				.withIndex( INDEX_NAME, ctx -> { }, indexManager -> this.indexManager = indexManager )
+				.setup();
 
-	private boolean createsIndex(IndexLifecycleStrategyName strategy) {
-		return !IndexLifecycleStrategyName.NONE.equals( strategy )
-				&& !IndexLifecycleStrategyName.VALIDATE.equals( strategy );
+		Futures.unwrappedExceptionJoin( operation.apply( indexManager.getSchemaManager() ) );
 	}
 
 }

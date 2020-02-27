@@ -4,11 +4,11 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.integrationtest.backend.elasticsearch.index.admin;
+package org.hibernate.search.integrationtest.backend.elasticsearch.schema.management;
 
-import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.simpleMappingForInitialization;
-import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.simpleReadAliasDefinition;
-import static org.hibernate.search.integrationtest.backend.elasticsearch.index.admin.ElasticsearchAdminTestUtils.simpleWriteAliasDefinition;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleMappingForInitialization;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleReadAliasDefinition;
+import static org.hibernate.search.integrationtest.backend.elasticsearch.schema.management.ElasticsearchIndexSchemaManagerTestUtils.simpleWriteAliasDefinition;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultReadAlias;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultWriteAlias;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.encodeName;
@@ -26,8 +26,10 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.configuration.StubSingleIndexLayoutStrategy;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
+import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,20 +38,17 @@ import org.junit.runners.Parameterized.Parameters;
 
 /**
  * Tests related to aliases when creating indexes,
- * for all applicable index lifecycle strategies.
+ * for all index-creating schema management operations.
  */
 @RunWith(Parameterized.class)
 @TestForIssue(jiraKey = "HSEARCH-3791")
-public class ElasticsearchIndexCreationAliasesIT {
+public class ElasticsearchIndexSchemaManagerCreationAliasesIT {
 
 	private static final String INDEX_NAME = "IndexName";
 
-	@Parameters(name = "With strategy {0}")
-	public static EnumSet<IndexLifecycleStrategyName> strategies() {
-		return EnumSet.complementOf( EnumSet.of(
-				// These strategies don't create the indexes, so we don't test them.
-				IndexLifecycleStrategyName.NONE, IndexLifecycleStrategyName.VALIDATE
-		) );
+	@Parameters(name = "With operation {0}")
+	public static EnumSet<ElasticsearchIndexSchemaManagerOperation> operations() {
+		return ElasticsearchIndexSchemaManagerOperation.creating();
 	}
 
 	@Rule
@@ -58,10 +57,19 @@ public class ElasticsearchIndexCreationAliasesIT {
 	@Rule
 	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
 
-	private final IndexLifecycleStrategyName strategy;
+	private final ElasticsearchIndexSchemaManagerOperation operation;
 
-	public ElasticsearchIndexCreationAliasesIT(IndexLifecycleStrategyName strategy) {
-		this.strategy = strategy;
+	private StubMappingIndexManager indexManager;
+
+	public ElasticsearchIndexSchemaManagerCreationAliasesIT(ElasticsearchIndexSchemaManagerOperation operation) {
+		this.operation = operation;
+	}
+
+	@After
+	public void cleanUp() {
+		if ( indexManager != null ) {
+			indexManager.getSchemaManager().dropIfExisting();
+		}
 	}
 
 	@Test
@@ -69,7 +77,7 @@ public class ElasticsearchIndexCreationAliasesIT {
 		elasticsearchClient.index( INDEX_NAME )
 				.ensureDoesNotExist().registerForCleanup();
 
-		setup( null );
+		setupAndCreateIndex( null );
 
 		assertJsonEquals(
 				"{"
@@ -85,7 +93,7 @@ public class ElasticsearchIndexCreationAliasesIT {
 		elasticsearchClient.index( INDEX_NAME )
 				.ensureDoesNotExist().registerForCleanup();
 
-		setup( new StubSingleIndexLayoutStrategy( "custom-write", "custom-read" ) );
+		setupAndCreateIndex( new StubSingleIndexLayoutStrategy( "custom-write", "custom-read" ) );
 
 		assertJsonEquals(
 				"{"
@@ -109,7 +117,7 @@ public class ElasticsearchIndexCreationAliasesIT {
 				.deleteAndCreate()
 				.type().putMapping( simpleMappingForInitialization( "" ) );
 
-		setup( null );
+		setupAndCreateIndex( null );
 
 		// New indexes are created
 		assertJsonEquals(
@@ -126,18 +134,11 @@ public class ElasticsearchIndexCreationAliasesIT {
 		);
 	}
 
-	private void setup(IndexLayoutStrategy layoutStrategy) {
-		startSetupWithLifecycleStrategy()
-				.withBackendProperty( ElasticsearchBackendSettings.LAYOUT_STRATEGY, layoutStrategy )
-				.withIndex( INDEX_NAME, ctx -> { } )
-				.setup();
-	}
-
-	private SearchSetupHelper.SetupContext startSetupWithLifecycleStrategy() {
-		return setupHelper.start()
+	private void setupAndCreateIndex(IndexLayoutStrategy layoutStrategy) {
+		setupHelper.start()
 				.withIndexDefaultsProperty(
 						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						strategy.getExternalRepresentation()
+						IndexLifecycleStrategyName.NONE
 				)
 				.withBackendProperty(
 						// Don't contribute any analysis definitions, migration of those is tested in another test class
@@ -145,7 +146,12 @@ public class ElasticsearchIndexCreationAliasesIT {
 						(ElasticsearchAnalysisConfigurer) (ElasticsearchAnalysisConfigurationContext context) -> {
 							// No-op
 						}
-				);
+				)
+				.withBackendProperty( ElasticsearchBackendSettings.LAYOUT_STRATEGY, layoutStrategy )
+				.withIndex( INDEX_NAME, ctx -> { }, indexManager -> this.indexManager = indexManager )
+				.setup();
+
+		operation.apply( indexManager.getSchemaManager() ).join();
 	}
 
 }
