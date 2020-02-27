@@ -99,6 +99,10 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 			this.readAlias = readAlias;
 		}
 
+		public boolean exists() {
+			return TestElasticsearchClient.this.exists( primaryIndexName );
+		}
+
 		public void waitForRequiredIndexStatus() {
 			TestElasticsearchClient.this.waitForRequiredIndexStatus( primaryIndexName );
 		}
@@ -477,6 +481,14 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 
 	private void registerTemplateForCleanup(String templateName) {
 		createdTemplatesNames.add( templateName );
+	}
+
+	private boolean exists(final URLEncodedString indexName) {
+		ElasticsearchResponse response = performRequestIgnore404( ElasticsearchRequest.get()
+				.pathComponent( indexName )
+				.build() );
+		int code = response.getStatusCode();
+		return 200 <= code && code < 300;
 	}
 
 	private void waitForRequiredIndexStatus(final URLEncodedString indexName) {
