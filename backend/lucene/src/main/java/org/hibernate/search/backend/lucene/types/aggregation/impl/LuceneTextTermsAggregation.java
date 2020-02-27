@@ -102,9 +102,9 @@ public class LuceneTextTermsAggregation<K>
 	public static class Builder<K>
 			extends AbstractBuilder<String, String, K> {
 
-		public Builder(LuceneSearchContext searchContext, String absoluteFieldPath,
+		public Builder(LuceneSearchContext searchContext, String nestedDocumentPath, String absoluteFieldPath,
 				ProjectionConverter<? super String, ? extends K> fromFieldValueConverter) {
-			super( searchContext, absoluteFieldPath, fromFieldValueConverter );
+			super( searchContext, nestedDocumentPath, absoluteFieldPath, fromFieldValueConverter );
 		}
 
 		@Override

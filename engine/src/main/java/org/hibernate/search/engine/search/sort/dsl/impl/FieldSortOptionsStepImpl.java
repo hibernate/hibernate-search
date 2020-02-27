@@ -12,12 +12,13 @@ import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.dsl.spi.AbstractSortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.common.MultiValue;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
 class FieldSortOptionsStepImpl<B>
 		extends AbstractSortThenStep<B>
 		implements FieldSortOptionsStep<FieldSortOptionsStepImpl<B>>,
-				FieldSortMissingValueBehaviorStep<FieldSortOptionsStepImpl<B>> {
+	FieldSortMissingValueBehaviorStep<FieldSortOptionsStepImpl<B>> {
 
 	private final FieldSortBuilder<B> builder;
 
@@ -30,6 +31,12 @@ class FieldSortOptionsStepImpl<B>
 	@Override
 	public FieldSortOptionsStepImpl<B> order(SortOrder order) {
 		builder.order( order );
+		return this;
+	}
+
+	@Override
+	public FieldSortOptionsStepImpl<B> mode(MultiValue mode) {
+		builder.mode( mode );
 		return this;
 	}
 

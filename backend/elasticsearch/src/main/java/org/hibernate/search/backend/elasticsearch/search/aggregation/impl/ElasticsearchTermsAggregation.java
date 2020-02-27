@@ -18,6 +18,7 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import org.hibernate.search.engine.search.common.MultiValue;
 
 /**
  * @param <F> The type of field values.
@@ -86,6 +87,7 @@ public class ElasticsearchTermsAggregation<F, K>
 		private final ElasticsearchFieldCodec<F> codec;
 
 		private JsonObject order;
+		private MultiValue multi;
 		private int minDocCount = 1;
 		private int size = 100;
 
@@ -126,6 +128,11 @@ public class ElasticsearchTermsAggregation<F, K>
 		@Override
 		public void maxTermCount(int maxTermCount) {
 			this.size = maxTermCount;
+		}
+
+		@Override
+		public void multi(MultiValue multi) {
+			this.multi = multi;
 		}
 
 		@Override

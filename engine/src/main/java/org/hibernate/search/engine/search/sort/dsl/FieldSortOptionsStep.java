@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.sort.dsl;
 
+import org.hibernate.search.engine.search.common.MultiValue;
+
 /**
  * The initial and final step in a "field" sort definition, where optional parameters can be set.
  *
@@ -23,4 +25,12 @@ public interface FieldSortOptionsStep<S extends FieldSortOptionsStep<?>>
 	 */
 	FieldSortMissingValueBehaviorStep<S> missing();
 
+	/**
+	 * Start describing the behavior of this sort when a document do have
+	 * mode values for the targeted field.
+	 *
+	 * @param mode The mode.
+	 * @return {@code this}, for method chaining.
+	 */
+	S mode(MultiValue mode);
 }
