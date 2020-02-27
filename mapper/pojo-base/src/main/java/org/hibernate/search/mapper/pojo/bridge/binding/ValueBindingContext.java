@@ -17,6 +17,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
+import org.hibernate.search.util.common.annotaion.Incubating;
 
 /**
  * The context provided to the {@link ValueBinder#bind(ValueBindingContext)} method.
@@ -86,9 +87,8 @@ public interface ValueBindingContext<V> extends BindingContext {
 
 	/**
 	 * @return An entry point allowing to inspect the type of values that will be passed to this bridge.
-	 * @hsearch.experimental This feature is under active development.
-	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
+	@Incubating
 	PojoModelValue<V> getBridgedElement();
 
 	/**

@@ -7,15 +7,13 @@
 package org.hibernate.search.backend.elasticsearch.search.query;
 
 import org.hibernate.search.engine.search.query.SearchResult;
+import org.hibernate.search.util.common.annotaion.Incubating;
 
 import com.google.gson.JsonObject;
 
 public interface ElasticsearchSearchResult<H> extends SearchResult<H> {
 
 	/**
-	 * @hsearch.experimental This part of the API is under active development.
-	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
-	 *
 	 * @return The body of the response to the search request as a {@link JsonObject}.
 	 * The returned object must not be modified; use {@link JsonObject#deepCopy()} if necessary.
 	 * <p>
@@ -26,6 +24,7 @@ public interface ElasticsearchSearchResult<H> extends SearchResult<H> {
 	 * even for micro upgrades ({@code x.y.z} to {@code x.y.(z+1)}).
 	 * Use this at your own risk.
 	 */
+	@Incubating
 	JsonObject getResponseBody();
 
 }

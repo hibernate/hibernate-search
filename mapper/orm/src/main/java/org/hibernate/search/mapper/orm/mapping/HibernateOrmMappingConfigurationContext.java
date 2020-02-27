@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.orm.mapping;
 import org.hibernate.search.mapper.pojo.extractor.ContainerExtractorConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AnnotationMappingConfigurationContext;
 import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.ProgrammaticMappingConfigurationContext;
+import org.hibernate.search.util.common.annotaion.Incubating;
 
 public interface HibernateOrmMappingConfigurationContext {
 
@@ -27,10 +28,8 @@ public interface HibernateOrmMappingConfigurationContext {
 	/**
 	 * Start the definition of container extractors available for use in mappings.
 	 * @return A context to define container extractors.
-	 *
-	 * @hsearch.experimental This feature is under active development.
-	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
+	@Incubating
 	ContainerExtractorConfigurationContext containerExtractors();
 
 }

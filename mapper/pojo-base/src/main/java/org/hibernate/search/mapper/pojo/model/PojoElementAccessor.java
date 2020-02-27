@@ -7,13 +7,14 @@
 package org.hibernate.search.mapper.pojo.model;
 
 
+import org.hibernate.search.util.common.annotaion.Incubating;
+
 /**
  * An accessor allowing the retrieval of an element, for example a property, from a POJO.
  * <p>
  * Accessors are created by {@link PojoModelCompositeElement} instances.
- * @hsearch.experimental This type is under active development.
- *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
  */
+@Incubating
 public interface PojoElementAccessor<T> {
 
 	/**

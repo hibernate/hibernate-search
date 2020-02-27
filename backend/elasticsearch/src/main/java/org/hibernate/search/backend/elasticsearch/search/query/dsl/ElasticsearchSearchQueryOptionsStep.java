@@ -12,6 +12,7 @@ import org.hibernate.search.backend.elasticsearch.search.sort.dsl.ElasticsearchS
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchFetchable;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
+import org.hibernate.search.util.common.annotaion.Incubating;
 
 public interface ElasticsearchSearchQueryOptionsStep<H, LOS>
 		extends SearchQueryOptionsStep<
@@ -32,12 +33,10 @@ public interface ElasticsearchSearchQueryOptionsStep<H, LOS>
 	 * even for micro upgrades ({@code x.y.z} to {@code x.y.(z+1)}).
 	 * Use this at your own risk.
 	 *
-	 * @hsearch.experimental This part of the API is under active development.
-	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
-	 *
 	 * @param transformer The search request transformer.
 	 * @return {@code this}, for method chaining.
 	 */
+	@Incubating
 	ElasticsearchSearchQueryOptionsStep<H, LOS> requestTransformer(ElasticsearchSearchRequestTransformer transformer);
 
 	@Override
