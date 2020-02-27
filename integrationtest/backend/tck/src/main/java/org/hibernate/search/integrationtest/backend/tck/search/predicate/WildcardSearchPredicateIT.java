@@ -69,6 +69,9 @@ public class WildcardSearchPredicateIT {
 	private static final String TERM_PATTERN_1 = "lOCAl*N";
 	private static final String TERM_PATTERN_2 = "IN*oN";
 	private static final String TERM_PATTERN_3 = "INteR*oN";
+	private static final String TERM_PATTERN_1_EXACT_CASE = "Local*n";
+	private static final String TERM_PATTERN_2_EXACT_CASE = "iN*On";
+	private static final String TERM_PATTERN_3_EXACT_CASE = "Inter*on";
 	private static final String TERM_MATCHING_PATTERN_1 = "Localization";
 	private static final String TERM_MATCHING_PATTERN_2 = "iNTroSPEctiOn";
 	private static final String TERM_MATCHING_PATTERN_2_AND_3 = "Internationalization";
@@ -162,6 +165,31 @@ public class WildcardSearchPredicateIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
 
 		assertThat( createQuery.apply( TERM_PATTERN_3 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3844") // Used to throw NPE
+	public void wildcard_nonAnalyzedField() {
+		StubMappingScope scope = indexManager.createScope();
+		String absoluteFieldPath = indexMapping.nonAnalyzedField.relativeFieldName;
+		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
+				.where( f -> f.wildcard().field( absoluteFieldPath ).matching( queryString ) )
+				.toQuery();
+
+		assertThat( createQuery.apply( TERM_PATTERN_1 ) )
+				.hasNoHits();
+		assertThat( createQuery.apply( TERM_PATTERN_1_EXACT_CASE ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+
+		assertThat( createQuery.apply( TERM_PATTERN_2 ) )
+				.hasNoHits();
+		assertThat( createQuery.apply( TERM_PATTERN_2_EXACT_CASE ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+
+		assertThat( createQuery.apply( TERM_PATTERN_3 ) )
+				.hasNoHits();
+		assertThat( createQuery.apply( TERM_PATTERN_3_EXACT_CASE ) )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 	}
 
@@ -508,14 +536,17 @@ public class WildcardSearchPredicateIT {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_MATCHING_PATTERN_1 );
 			document.addValue( indexMapping.analyzedStringFieldWithDslConverter.reference, TEXT_MATCHING_PATTERN_1 );
 			document.addValue( indexMapping.normalizedField.reference, TERM_MATCHING_PATTERN_1 );
+			document.addValue( indexMapping.nonAnalyzedField.reference, TERM_MATCHING_PATTERN_1 );
 		} );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_MATCHING_PATTERN_2 );
 			document.addValue( indexMapping.normalizedField.reference, TERM_MATCHING_PATTERN_2 );
+			document.addValue( indexMapping.nonAnalyzedField.reference, TERM_MATCHING_PATTERN_2 );
 		} );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_MATCHING_PATTERN_3 );
 			document.addValue( indexMapping.normalizedField.reference, TERM_MATCHING_PATTERN_2_AND_3 );
+			document.addValue( indexMapping.nonAnalyzedField.reference, TERM_MATCHING_PATTERN_2_AND_3 );
 		} );
 		plan.add( referenceProvider( DOCUMENT_4 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_MATCHING_PATTERN_2_AND_3 );
@@ -580,6 +611,7 @@ public class WildcardSearchPredicateIT {
 		final MainFieldModel analyzedStringField3;
 		final MainFieldModel analyzedStringFieldWithDslConverter;
 		final MainFieldModel normalizedField;
+		final MainFieldModel nonAnalyzedField;
 
 		IndexMapping(IndexSchemaElement root) {
 			mapByTypeFields(
@@ -611,6 +643,8 @@ public class WildcardSearchPredicateIT {
 					c -> c.asString().normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name )
 			)
 					.map( root, "normalized" );
+			nonAnalyzedField = MainFieldModel.mapper( c -> c.asString() )
+					.map( root, "nonAnalyzed" );
 		}
 	}
 
