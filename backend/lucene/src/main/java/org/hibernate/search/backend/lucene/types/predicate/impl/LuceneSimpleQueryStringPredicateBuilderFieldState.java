@@ -16,11 +16,11 @@ import org.apache.lucene.search.Query;
 public final class LuceneSimpleQueryStringPredicateBuilderFieldState
 		implements SimpleQueryStringPredicateBuilder.FieldState, FieldContextSimpleQueryParser.FieldContext {
 
-	private final Analyzer analyzer;
+	private final Analyzer analyzerOrNormalizer;
 	private Float boost;
 
-	LuceneSimpleQueryStringPredicateBuilderFieldState(Analyzer analyzer) {
-		this.analyzer = analyzer;
+	LuceneSimpleQueryStringPredicateBuilderFieldState(Analyzer analyzerOrNormalizer) {
+		this.analyzerOrNormalizer = analyzerOrNormalizer;
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public final class LuceneSimpleQueryStringPredicateBuilderFieldState
 		}
 	}
 
-	public Analyzer getAnalyzer() {
-		return analyzer;
+	public Analyzer getAnalyzerOrNormalizer() {
+		return analyzerOrNormalizer;
 	}
 }

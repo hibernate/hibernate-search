@@ -40,7 +40,7 @@ class LuceneTextMatchPredicateBuilder<F>
 	private Integer maxEditDistance;
 	private Integer prefixLength;
 
-	private Analyzer analyzer;
+	private Analyzer analyzerOrNormalizer;
 	private boolean analyzerOverridden = false;
 
 	LuceneTextMatchPredicateBuilder(
@@ -50,7 +50,7 @@ class LuceneTextMatchPredicateBuilder<F>
 			LuceneCompatibilityChecker converterChecker, LuceneTextFieldCodec<F> codec,
 			Analyzer analyzerOrNormalizer, LuceneCompatibilityChecker analyzerChecker) {
 		super( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
-		this.analyzer = analyzerOrNormalizer;
+		this.analyzerOrNormalizer = analyzerOrNormalizer;
 		this.analyzerChecker = analyzerChecker;
 		this.analysisDefinitionRegistry = searchContext.getAnalysisDefinitionRegistry();
 	}
@@ -63,8 +63,8 @@ class LuceneTextMatchPredicateBuilder<F>
 
 	@Override
 	public void analyzer(String analyzerName) {
-		this.analyzer = analysisDefinitionRegistry.getAnalyzerDefinition( analyzerName );
-		if ( analyzer == null ) {
+		this.analyzerOrNormalizer = analysisDefinitionRegistry.getAnalyzerDefinition( analyzerName );
+		if ( analyzerOrNormalizer == null ) {
 			throw log.unknownAnalyzer( analyzerName, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );
 		}
 		this.analyzerOverridden = true;
@@ -72,7 +72,7 @@ class LuceneTextMatchPredicateBuilder<F>
 
 	@Override
 	public void skipAnalysis() {
-		this.analyzer = AnalyzerConstants.KEYWORD_ANALYZER;
+		this.analyzerOrNormalizer = AnalyzerConstants.KEYWORD_ANALYZER;
 		this.analyzerOverridden = true;
 	}
 
@@ -84,28 +84,9 @@ class LuceneTextMatchPredicateBuilder<F>
 			analyzerChecker.failIfNotCompatible();
 		}
 
-		if ( analyzer != null ) {
-			QueryBuilder effectiveQueryBuilder;
-			if ( maxEditDistance != null ) {
-				effectiveQueryBuilder = new FuzzyQueryBuilder( analyzer, maxEditDistance, prefixLength );
-			}
-			else {
-				effectiveQueryBuilder = new QueryBuilder( analyzer );
-			}
-
-			Query analyzed = effectiveQueryBuilder.createBooleanQuery( absoluteFieldPath, value );
-			if ( analyzed == null ) {
-				// Either the value was an empty string
-				// or the analysis removed all tokens (that can happen if the value contained only stopwords, for example)
-				// In any case, use the same behavior as Elasticsearch: don't match anything
-				analyzed = new MatchNoDocsQuery( "No tokens after analysis of the value to match" );
-			}
-			return analyzed;
-		}
-		else {
-			// we are in the case where we a have a normalizer here as the analyzer case has already been treated by
-			// the queryBuilder case above
-			Term term = new Term( absoluteFieldPath, codec.normalize( absoluteFieldPath, value ) );
+		if ( analyzerOrNormalizer == AnalyzerConstants.KEYWORD_ANALYZER ) {
+			// Optimization when analysis is disabled
+			Term term = new Term( absoluteFieldPath, value );
 
 			if ( maxEditDistance != null ) {
 				return new FuzzyQuery( term, maxEditDistance, prefixLength );
@@ -114,5 +95,22 @@ class LuceneTextMatchPredicateBuilder<F>
 				return new TermQuery( term );
 			}
 		}
+
+		QueryBuilder effectiveQueryBuilder;
+		if ( maxEditDistance != null ) {
+			effectiveQueryBuilder = new FuzzyQueryBuilder( analyzerOrNormalizer, maxEditDistance, prefixLength );
+		}
+		else {
+			effectiveQueryBuilder = new QueryBuilder( analyzerOrNormalizer );
+		}
+
+		Query analyzed = effectiveQueryBuilder.createBooleanQuery( absoluteFieldPath, value );
+		if ( analyzed == null ) {
+			// Either the value was an empty string
+			// or the analysis removed all tokens (that can happen if the value contained only stopwords, for example)
+			// In any case, use the same behavior as Elasticsearch: don't match anything
+			analyzed = new MatchNoDocsQuery( "No tokens after analysis of the value to match" );
+		}
+		return analyzed;
 	}
 }
