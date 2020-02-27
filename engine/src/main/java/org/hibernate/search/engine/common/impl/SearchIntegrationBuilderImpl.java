@@ -54,7 +54,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
 import org.hibernate.search.engine.reporting.impl.FailSafeFailureHandlerWrapper;
-import org.hibernate.search.engine.reporting.impl.RootFailureCollector;
+import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;

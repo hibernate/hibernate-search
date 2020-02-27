@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.engine.reporting.impl;
+package org.hibernate.search.engine.reporting.spi;
 
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
@@ -14,12 +14,10 @@ import java.util.Map;
 import java.util.StringJoiner;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
-import org.hibernate.search.engine.reporting.spi.FailureCollector;
+import org.hibernate.search.engine.reporting.impl.EngineEventContextMessages;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.reporting.EventContextElement;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.ToStringStyle;
@@ -28,7 +26,7 @@ import org.hibernate.search.util.common.reporting.impl.CommonEventContextMessage
 
 import org.jboss.logging.Messages;
 
-public class RootFailureCollector implements FailureCollector {
+public final class RootFailureCollector implements FailureCollector {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

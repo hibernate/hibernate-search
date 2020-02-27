@@ -10,7 +10,7 @@ import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.EngineConfigurationUtils;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.engine.reporting.impl.RootFailureCollector;
+import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 
