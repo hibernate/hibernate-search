@@ -29,4 +29,10 @@ public final class LuceneIndexContentUtils {
 		}
 	}
 
+	public static boolean indexExists(SearchSetupHelper setupHelper, String indexName) throws IOException {
+		LuceneTckBackendAccessor accessor = (LuceneTckBackendAccessor) setupHelper.getBackendAccessor();
+		try ( Directory directory = accessor.openDirectory( indexName ) ) {
+			return DirectoryReader.indexExists( directory );
+		}
+	}
 }
