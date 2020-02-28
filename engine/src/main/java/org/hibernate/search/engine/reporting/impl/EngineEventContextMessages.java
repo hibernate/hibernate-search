@@ -26,6 +26,9 @@ public interface EngineEventContextMessages {
 	@Message(value = "bootstrap")
 	String bootstrap();
 
+	@Message(value = "shutdown")
+	String shutdown();
+
 	@Message(value = "    ")
 	String failureReportContextIndent();
 

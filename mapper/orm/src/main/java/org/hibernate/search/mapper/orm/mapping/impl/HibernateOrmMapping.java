@@ -129,7 +129,7 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	protected void doClose() {
+	protected void doStop() {
 		defaultSynchronizationStrategyHolder.close();
 	}
 

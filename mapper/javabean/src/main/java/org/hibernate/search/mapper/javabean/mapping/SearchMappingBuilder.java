@@ -151,7 +151,7 @@ public final class SearchMappingBuilder {
 			 * make sure to close the integration whenever the mapping is closed by the user.
 			 */
 			JavaBeanMapping mappingImpl = (JavaBeanMapping) mapping;
-			mappingImpl.onClose( integration::close );
+			mappingImpl.setIntegration( integration );
 			return mappingImpl;
 		}
 		catch (RuntimeException e) {

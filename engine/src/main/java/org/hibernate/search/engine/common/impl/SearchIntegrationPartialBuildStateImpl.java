@@ -6,9 +6,7 @@
  */
 package org.hibernate.search.engine.common.impl;
 
-import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
@@ -48,9 +46,11 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 
 	private final ConfigurationPropertyChecker partialConfigurationPropertyChecker;
 
-	private final List<MappingImplementor<?>> fullyBuiltMappings = new ArrayList<>();
+	private final Map<MappingKey<?, ?>, MappingNonStartedState> fullyBuiltNonStartedMappings = new LinkedHashMap<>();
+
 	private final Map<String, BackendImplementor> startedBackends = new LinkedHashMap<>();
 	private final Map<String, IndexManagerImplementor> startedIndexManagers = new LinkedHashMap<>();
+	private final Map<MappingKey<?, ?>, MappingImplementor<?>> fullyBuiltStartedMappings = new LinkedHashMap<>();
 
 	SearchIntegrationPartialBuildStateImpl(
 			BeanProvider beanProvider, BeanResolver beanResolver,
@@ -74,7 +74,8 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 	public void closeOnFailure() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.pushAll( MappingPartialBuildState::closeOnFailure, partiallyBuiltMappings.values() );
-			closer.pushAll( MappingImplementor::close, fullyBuiltMappings );
+			closer.pushAll( MappingNonStartedState::closeOnFailure, fullyBuiltNonStartedMappings.values() );
+			closer.pushAll( MappingImplementor::stop, fullyBuiltStartedMappings.values() );
 			closer.pushAll( IndexManagerNonStartedState::closeOnFailure, nonStartedIndexManagers.values() );
 			closer.pushAll( IndexManagerImplementor::stop, startedIndexManagers.values() );
 			closer.pushAll( BackendNonStartedState::closeOnFailure, nonStartedBackends.values() );
@@ -122,7 +123,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 					new MappingFinalizationContextImpl( propertySource, beanResolver );
 
 			MappingImplementor<M> mapping = finalizer.finalizeMapping( mappingFinalizationContext, partiallyBuiltMapping );
-			fullyBuiltMappings.add( mapping );
+			fullyBuiltNonStartedMappings.put( mappingKey, new MappingNonStartedState( mappingKey, mapping ) );
 			partiallyBuiltMappings.remove( mappingKey );
 
 			return mapping.toConcreteType();
@@ -168,13 +169,29 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 				);
 			}
 
+			// Start mappings
+			CompletableFuture<?>[] mappingFutures = new CompletableFuture<?>[fullyBuiltNonStartedMappings.size()];
+			int mappingIndex = 0;
+			// Start
+			for ( MappingNonStartedState state : fullyBuiltNonStartedMappings.values() ) {
+				mappingFutures[mappingIndex] = state.start( failureCollector, beanResolver, propertySource );
+				++mappingIndex;
+			}
+			// Wait for the starting operation to finish
+			Futures.unwrappedExceptionJoin( CompletableFuture.allOf( mappingFutures ) );
+			failureCollector.checkNoFailure();
+			// Everything went well: register the mappings
+			for ( Map.Entry<MappingKey<?, ?>, MappingNonStartedState> entry : fullyBuiltNonStartedMappings.entrySet() ) {
+				fullyBuiltStartedMappings.put( entry.getKey(), entry.getValue().getMapping() );
+			}
+
 			propertyChecker.afterBoot( partialConfigurationPropertyChecker );
 
 			return new SearchIntegrationImpl(
 					beanProvider,
 					failureHandlerHolder,
 					threadPoolProvider,
-					fullyBuiltMappings,
+					fullyBuiltStartedMappings,
 					startedBackends,
 					startedIndexManagers
 			);
