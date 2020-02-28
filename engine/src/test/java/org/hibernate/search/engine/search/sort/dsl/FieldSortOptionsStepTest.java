@@ -1,7 +1,8 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
 package org.hibernate.search.engine.search.sort.dsl;
 
@@ -56,19 +57,19 @@ public class FieldSortOptionsStepTest extends EasyMockSupport {
 //                SearchSession session = Search.session(em);
 //                SearchScope<Assortment> scope = session.scope(Assortment.class);
 //
-//                SearchSortFactory sorter = null;
-//                CompositeSortComponentsStep sort = sorter.composite();
+//		SearchSortFactory sorter = null;
+//		CompositeSortComponentsStep sort = sorter.composite();
 //
-//                sort.add(sorter.field("prices.bruttoPrice_sort")
-//                        .asc()
-//                        .multi().sum());
+//		sort.add( sorter.field( "prices.bruttoPrice_sort" )
+//			.asc()
+//			.multi().sum() );
 //
-//                SearchQuery query = session.search(scope)
-//                        .where((f) -> {
-//                            return f.matchAll();
-//                        })
-//                        .sort(sort.toSort()).toQuery();
-//		
+//		SearchQuery query = session.search( scope )
+//			.where( (f) -> {
+//				return f.matchAll();
+//			} )
+//			.sort( sort.toSort() ).toQuery();
+//
 	}
 
 }
