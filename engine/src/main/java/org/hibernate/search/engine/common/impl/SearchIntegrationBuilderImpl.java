@@ -75,8 +75,6 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 					.withDefault( EngineSpiSettings.Defaults.THREAD_PROVIDER )
 					.build();
 
-	private static final int FAILURE_LIMIT = 100;
-
 	private final ConfigurationPropertyChecker propertyChecker;
 	private final ConfigurationPropertySource propertySource;
 	private final Map<MappingKey<?, ?>, MappingInitiator<?, ?>> mappingInitiators = new LinkedHashMap<>();
@@ -154,7 +152,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 		// Use a LinkedHashMap for deterministic iteration
 		List<MappingBuildingState<?, ?>> mappingBuildingStates = new ArrayList<>();
 		Map<MappingKey<?, ?>, MappingPartialBuildState> partiallyBuiltMappings = new HashMap<>();
-		RootFailureCollector failureCollector = new RootFailureCollector( FAILURE_LIMIT );
+		RootFailureCollector failureCollector = new RootFailureCollector();
 		boolean checkingRootFailures = false;
 
 		try {
