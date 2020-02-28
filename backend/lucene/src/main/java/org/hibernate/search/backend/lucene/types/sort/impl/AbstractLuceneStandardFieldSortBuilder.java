@@ -49,12 +49,12 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 
 	protected Object missingValue;
 
-	protected AbstractLuceneStandardFieldSortBuilder(
-		LuceneSearchContext searchContext,
+	protected AbstractLuceneStandardFieldSortBuilder(LuceneSearchContext searchContext,
 		String absoluteFieldPath, String nestedDocumentPath,
 		DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 		LuceneCompatibilityChecker converterChecker, C codec,
 		Object sortMissingValueFirstPlaceholder, Object sortMissingValueLastPlaceholder) {
+		
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.nestedDocumentPath = nestedDocumentPath;
