@@ -45,7 +45,7 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 		this.name = name;
 		this.mappedTypeName = mappedTypeName;
 		this.rootSchemaNode = rootSchemaNode;
-		backend.getBehavior().pushSchema( name, rootSchemaNode );
+		backend.getBehavior().defineSchema( name, rootSchemaNode );
 	}
 
 	@Override

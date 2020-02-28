@@ -126,16 +126,16 @@ public class BackendMock implements TestRule {
 
 	public BackendMock expectSchema(String indexName, Consumer<StubIndexSchemaNode.Builder> contributor,
 			Capture<StubIndexSchemaNode> capture) {
-		CallQueue<PushSchemaCall> callQueue = behaviorMock.getPushSchemaCalls( indexName );
+		CallQueue<SchemaDefinitionCall> callQueue = behaviorMock.getSchemaDefinitionCalls( indexName );
 		StubIndexSchemaNode.Builder builder = StubIndexSchemaNode.schema();
 		contributor.accept( builder );
-		callQueue.expectOutOfOrder( new PushSchemaCall( indexName, builder.build(), capture ) );
+		callQueue.expectOutOfOrder( new SchemaDefinitionCall( indexName, builder.build(), capture ) );
 		return this;
 	}
 
 	public BackendMock expectAnySchema(String indexName) {
-		CallQueue<PushSchemaCall> callQueue = behaviorMock.getPushSchemaCalls( indexName );
-		callQueue.expectOutOfOrder( new PushSchemaCall( indexName, null ) );
+		CallQueue<SchemaDefinitionCall> callQueue = behaviorMock.getSchemaDefinitionCalls( indexName );
+		callQueue.expectOutOfOrder( new SchemaDefinitionCall( indexName, null ) );
 		return this;
 	}
 

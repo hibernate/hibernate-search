@@ -43,7 +43,7 @@ public abstract class StubBackendBehavior {
 		}
 
 		@Override
-		public void pushSchema(String indexName, StubIndexSchemaNode rootSchemaNode) {
+		public void defineSchema(String indexName, StubIndexSchemaNode rootSchemaNode) {
 			throw new IllegalStateException( "The stub backend behavior was not set when a schema was pushed for index '"
 					+ indexName + "': " + rootSchemaNode );
 		}
@@ -123,7 +123,7 @@ public abstract class StubBackendBehavior {
 
 	public abstract void onAddField(String indexName, String absoluteFieldPath);
 
-	public abstract void pushSchema(String indexName, StubIndexSchemaNode rootSchemaNode);
+	public abstract void defineSchema(String indexName, StubIndexSchemaNode rootSchemaNode);
 
 	public abstract CompletableFuture<?> executeSchemaManagementWork(String indexName, StubSchemaManagementWork work,
 			ContextualFailureCollector failureCollector);

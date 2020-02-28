@@ -13,25 +13,25 @@ import org.hibernate.search.util.impl.integrationtest.common.assertion.StubTreeN
 
 import org.easymock.Capture;
 
-class PushSchemaCall extends Call<PushSchemaCall> {
+class SchemaDefinitionCall extends Call<SchemaDefinitionCall> {
 
 	private final String indexName;
 	private final StubIndexSchemaNode schemaNode;
 	private final Capture<StubIndexSchemaNode> capture;
 
-	PushSchemaCall(String indexName, StubIndexSchemaNode schemaNode) {
+	SchemaDefinitionCall(String indexName, StubIndexSchemaNode schemaNode) {
 		this.indexName = indexName;
 		this.schemaNode = schemaNode;
 		this.capture = null;
 	}
 
-	PushSchemaCall(String indexName, StubIndexSchemaNode schemaNode, Capture<StubIndexSchemaNode> capture) {
+	SchemaDefinitionCall(String indexName, StubIndexSchemaNode schemaNode, Capture<StubIndexSchemaNode> capture) {
 		this.indexName = indexName;
 		this.schemaNode = schemaNode;
 		this.capture = capture;
 	}
 
-	public CallBehavior<Void> verify(PushSchemaCall actualCall) {
+	public CallBehavior<Void> verify(SchemaDefinitionCall actualCall) {
 		if ( schemaNode != null ) {
 			StubTreeNodeAssert.assertThat( actualCall.schemaNode )
 					.as( "Schema for index '" + indexName + "' did not match:\n" )
@@ -48,13 +48,13 @@ class PushSchemaCall extends Call<PushSchemaCall> {
 	}
 
 	@Override
-	protected boolean isSimilarTo(PushSchemaCall other) {
+	protected boolean isSimilarTo(SchemaDefinitionCall other) {
 		return Objects.equals( indexName, other.indexName );
 	}
 
 	@Override
 	public String toString() {
-		return "push schema to index '" + indexName + "'; schema = " + schemaNode;
+		return "schema definition for index '" + indexName + "'; schema = " + schemaNode;
 	}
 
 }
