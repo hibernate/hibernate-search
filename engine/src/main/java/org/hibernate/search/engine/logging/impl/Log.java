@@ -129,24 +129,24 @@ public interface Log extends BasicLogger {
 	IllegalArgumentException invalidGeoPolygonFirstPointNotIdenticalToLastPoint(GeoPoint firstPoint, GeoPoint lastPoint);
 
 	@Message(id = ID_OFFSET_2 + 19,
-			value = "Hibernate Search bootstrap failed; stopped collecting failures after '%2$s' failures."
-					+ " Failures:\n%1$s")
-	SearchException boostrapCollectedFailureLimitReached(String renderedFailures, int failureCount);
+			value = "Hibernate Search encountered failures during %1$s. Stopped collecting failures after '%3$s' failures."
+					+ " Failures:\n%2$s")
+	SearchException collectedFailureLimitReached(String process, String renderedFailures, int failureCount);
 
 	@Message(id = ID_OFFSET_2 + 20,
-			value = "Hibernate Search bootstrap failed."
-					+ " Failures:\n%1$s")
-	SearchException bootstrapCollectedFailures(String renderedFailures);
+			value = "Hibernate Search encountered failures during %1$s."
+					+ " Failures:\n%2$s")
+	SearchException collectedFailures(String process, String renderedFailures);
 
 	@LogMessage(level = Logger.Level.ERROR)
 	@Message(id = ID_OFFSET_2 + 21,
-			value = "Hibernate Search bootstrap encountered a non-fatal failure;"
-					+ " continuing bootstrap for now to list all mapping problems,"
-					+ " but the bootstrap process will ultimately be aborted.\n"
-					+ "Context: %1$s\n"
+			value = "Hibernate Search encountered a failure during %1$s;"
+					+ " continuing for now to list all problems,"
+					+ " but the process will ultimately be aborted.\n"
+					+ "Context: %2$s\n"
 					+ "Failure:" // The stack trace follows
 	)
-	void newBootstrapCollectedFailure(String context, @Cause Throwable failure);
+	void newCollectedFailure(String process, String context, @Cause Throwable failure);
 
 	@LogMessage(level = Logger.Level.DEBUG)
 	@Message(id = ID_OFFSET_2 + 22,

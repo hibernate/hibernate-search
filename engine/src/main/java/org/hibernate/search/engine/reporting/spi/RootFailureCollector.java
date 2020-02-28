@@ -35,17 +35,19 @@ public final class RootFailureCollector implements FailureCollector {
 	 */
 	private static final int FAILURE_LIMIT = 100;
 
+	private final String process;
 	private final NonRootFailureCollector delegate;
 	private final AtomicInteger failureCount = new AtomicInteger();
 
-	public RootFailureCollector() {
+	public RootFailureCollector(String process) {
+		this.process = process;
 		this.delegate = new NonRootFailureCollector( this );
 	}
 
 	public void checkNoFailure() {
 		if ( failureCount.get() > 0 ) {
 			String renderedFailures = renderFailures();
-			throw log.bootstrapCollectedFailures( renderedFailures );
+			throw log.collectedFailures( process, renderedFailures );
 		}
 	}
 
@@ -77,7 +79,7 @@ public final class RootFailureCollector implements FailureCollector {
 		int theFailureCount = failureCount.incrementAndGet();
 		if ( theFailureCount >= FAILURE_LIMIT ) {
 			String renderedFailures = renderFailures();
-			throw log.boostrapCollectedFailureLimitReached( renderedFailures, theFailureCount );
+			throw log.collectedFailureLimitReached( process, renderedFailures, theFailureCount );
 		}
 	}
 
@@ -224,7 +226,7 @@ public final class RootFailureCollector implements FailureCollector {
 		private synchronized void doAdd(Throwable failure, String failureMessage) {
 			StringJoiner contextJoiner = new StringJoiner( CommonEventContextMessages.INSTANCE.contextSeparator() );
 			appendContextTo( contextJoiner );
-			log.newBootstrapCollectedFailure( contextJoiner.toString(), failure );
+			log.newCollectedFailure( root.process, contextJoiner.toString(), failure );
 
 			doAdd( failureMessage );
 		}

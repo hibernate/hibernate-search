@@ -53,6 +53,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildConte
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.engine.reporting.impl.EngineEventContextMessages;
 import org.hibernate.search.engine.reporting.impl.FailSafeFailureHandlerWrapper;
 import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
@@ -152,7 +153,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 		// Use a LinkedHashMap for deterministic iteration
 		List<MappingBuildingState<?, ?>> mappingBuildingStates = new ArrayList<>();
 		Map<MappingKey<?, ?>, MappingPartialBuildState> partiallyBuiltMappings = new HashMap<>();
-		RootFailureCollector failureCollector = new RootFailureCollector();
+		RootFailureCollector failureCollector = new RootFailureCollector( EngineEventContextMessages.INSTANCE.bootstrap() );
 		boolean checkingRootFailures = false;
 
 		try {
