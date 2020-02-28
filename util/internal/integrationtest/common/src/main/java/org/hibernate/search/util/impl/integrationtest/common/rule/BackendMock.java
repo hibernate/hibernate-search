@@ -170,13 +170,9 @@ public class BackendMock implements TestRule {
 	}
 
 	public IndexScaleWorkCallListContext expectIndexScaleWorks(String indexName, String tenantId) {
-		return expectIndexScaleWorks( Collections.singletonList( indexName ), tenantId );
-	}
-
-	public IndexScaleWorkCallListContext expectIndexScaleWorks(Collection<String> indexNames, String tenantId) {
-		CallQueue<IndexScaleWorkCalls> callQueue = behaviorMock.getIndexScaleWorkCalls();
+		CallQueue<IndexScaleWorkCall> callQueue = behaviorMock.getIndexScaleWorkCalls();
 		return new IndexScaleWorkCallListContext(
-				new LinkedHashSet<>( indexNames ), tenantId,
+				indexName, tenantId,
 				callQueue::expectInOrder
 		);
 	}
@@ -327,14 +323,14 @@ public class BackendMock implements TestRule {
 	}
 
 	public class IndexScaleWorkCallListContext {
-		private final Set<String> indexNames;
+		private final String indexName;
 		private final String tenantIdentifier;
-		private final Consumer<IndexScaleWorkCalls> expectationConsumer;
+		private final Consumer<IndexScaleWorkCall> expectationConsumer;
 
-		private IndexScaleWorkCallListContext(Set<String> indexNames,
+		private IndexScaleWorkCallListContext(String indexName,
 				String tenantIdentifier,
-				Consumer<IndexScaleWorkCalls> expectationConsumer) {
-			this.indexNames = indexNames;
+				Consumer<IndexScaleWorkCall> expectationConsumer) {
+			this.indexName = indexName;
 			this.tenantIdentifier = tenantIdentifier;
 			this.expectationConsumer = expectationConsumer;
 		}
@@ -397,7 +393,7 @@ public class BackendMock implements TestRule {
 					.tenantIdentifier( tenantIdentifier )
 					.routingKeys( routingKeys )
 					.build();
-			expectationConsumer.accept( new IndexScaleWorkCalls( indexNames, work, future ) );
+			expectationConsumer.accept( new IndexScaleWorkCall( indexName, work, future ) );
 			return this;
 		}
 	}

@@ -44,7 +44,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	private final Map<String, CallQueue<DocumentWorkCall>> documentWorkCalls = new HashMap<>();
 
-	private final CallQueue<IndexScaleWorkCalls> indexScaleWorkCalls = new CallQueue<>();
+	private final CallQueue<IndexScaleWorkCall> indexScaleWorkCalls = new CallQueue<>();
 
 	private final CallQueue<SearchWorkCall<?>> searchCalls = new CallQueue<>();
 
@@ -76,7 +76,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		return documentWorkCalls.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
 	}
 
-	CallQueue<IndexScaleWorkCalls> getIndexScaleWorkCalls() {
+	CallQueue<IndexScaleWorkCall> getIndexScaleWorkCalls() {
 		return indexScaleWorkCalls;
 	}
 
@@ -195,10 +195,10 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	}
 
 	@Override
-	public CompletableFuture<?> executeIndexScaleWork(Set<String> indexNames, StubIndexScaleWork work) {
+	public CompletableFuture<?> executeIndexScaleWork(String indexName, StubIndexScaleWork work) {
 		return indexScaleWorkCalls.verify(
-				new IndexScaleWorkCalls( indexNames, work ),
-				IndexScaleWorkCalls::verify,
+				new IndexScaleWorkCall( indexName, work ),
+				IndexScaleWorkCall::verify,
 				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
 		);
 	}

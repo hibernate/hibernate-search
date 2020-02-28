@@ -79,9 +79,9 @@ public abstract class StubBackendBehavior {
 		}
 
 		@Override
-		public CompletableFuture<?> executeIndexScaleWork(Set<String> indexNames, StubIndexScaleWork work) {
-			throw new IllegalStateException( "The stub backend behavior was not set during execution of an index-scale work for indexes "
-					+ indexNames + ": " + work );
+		public CompletableFuture<?> executeIndexScaleWork(String indexName, StubIndexScaleWork work) {
+			throw new IllegalStateException( "The stub backend behavior was not set during execution of an index-scale work for index "
+					+ indexName + ": " + work );
 		}
 
 		@Override
@@ -128,7 +128,7 @@ public abstract class StubBackendBehavior {
 			StubSearchProjectionContext projectionContext,
 			LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection);
 
-	public abstract CompletableFuture<?> executeIndexScaleWork(Set<String> indexNames, StubIndexScaleWork work);
+	public abstract CompletableFuture<?> executeIndexScaleWork(String indexName, StubIndexScaleWork work);
 
 	public abstract long executeCountWork(Set<String> indexNames);
 }

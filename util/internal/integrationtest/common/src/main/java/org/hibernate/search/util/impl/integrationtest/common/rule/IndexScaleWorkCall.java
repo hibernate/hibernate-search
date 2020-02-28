@@ -7,33 +7,32 @@
 package org.hibernate.search.util.impl.integrationtest.common.rule;
 
 import java.util.Objects;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.util.impl.integrationtest.common.assertion.StubIndexScaleWorkAssert;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
 
-class IndexScaleWorkCalls extends Call<IndexScaleWorkCalls> {
+class IndexScaleWorkCall extends Call<IndexScaleWorkCall> {
 
-	private final Set<String> indexNames;
+	private final String indexName;
 	private final StubIndexScaleWork work;
 	private final CompletableFuture<?> completableFuture;
 
-	IndexScaleWorkCalls(Set<String> indexNames, StubIndexScaleWork work,
+	IndexScaleWorkCall(String indexName, StubIndexScaleWork work,
 			CompletableFuture<?> completableFuture) {
-		this.indexNames = indexNames;
+		this.indexName = indexName;
 		this.work = work;
 		this.completableFuture = completableFuture;
 	}
 
-	IndexScaleWorkCalls(Set<String> indexNames, StubIndexScaleWork work) {
-		this.indexNames = indexNames;
+	IndexScaleWorkCall(String indexName, StubIndexScaleWork work) {
+		this.indexName = indexName;
 		this.work = work;
 		this.completableFuture = null;
 	}
 
-	public CallBehavior<CompletableFuture<?>> verify(IndexScaleWorkCalls actualCall) {
-		String whenThisWorkWasExpected = "when an index-scope work on indexes '" + indexNames
+	public CallBehavior<CompletableFuture<?>> verify(IndexScaleWorkCall actualCall) {
+		String whenThisWorkWasExpected = "when an index-scope work on index '" + indexName
 				+ "' was expected";
 		StubIndexScaleWorkAssert.assertThat( actualCall.work )
 				.as( "Incorrect work " + whenThisWorkWasExpected + ":\n" )
@@ -42,14 +41,13 @@ class IndexScaleWorkCalls extends Call<IndexScaleWorkCalls> {
 	}
 
 	@Override
-	protected boolean isSimilarTo(IndexScaleWorkCalls other) {
-		return Objects.equals( indexNames, other.indexNames )
+	protected boolean isSimilarTo(IndexScaleWorkCall other) {
+		return Objects.equals( indexName, other.indexName )
 				&& Objects.equals( work.getTenantIdentifier(), other.work.getTenantIdentifier() );
 	}
 
 	@Override
 	public String toString() {
-		return "index-scope work on indexes " + indexNames
-				+ "'; work = " + work;
+		return "index-scope work on index " + indexName + "'; work = " + work;
 	}
 }
