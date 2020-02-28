@@ -24,8 +24,6 @@ import org.hibernate.search.util.common.impl.ToStringStyle;
 import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 import org.hibernate.search.util.common.reporting.impl.CommonEventContextMessages;
 
-import org.jboss.logging.Messages;
-
 public final class RootFailureCollector implements FailureCollector {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -36,10 +34,6 @@ public final class RootFailureCollector implements FailureCollector {
 	 * that will cause almost every operation to fail.
 	 */
 	private static final int FAILURE_LIMIT = 100;
-
-	private static final CommonEventContextMessages COMMON_MESSAGES = Messages.getBundle( CommonEventContextMessages.class );
-
-	private static final EngineEventContextMessages ENGINE_MESSAGES = Messages.getBundle( EngineEventContextMessages.class );
 
 	private final NonRootFailureCollector delegate;
 	private final AtomicInteger failureCount = new AtomicInteger();
@@ -57,10 +51,10 @@ public final class RootFailureCollector implements FailureCollector {
 
 	private String renderFailures() {
 		ToStringStyle style = ToStringStyle.multilineIndentStructure(
-				ENGINE_MESSAGES.failureReportContextFailuresSeparator(),
-				ENGINE_MESSAGES.failureReportContextIndent(),
-				ENGINE_MESSAGES.failureReportFailuresBulletPoint(),
-				ENGINE_MESSAGES.failureReportFailuresNoBulletPoint()
+				EngineEventContextMessages.INSTANCE.failureReportContextFailuresSeparator(),
+				EngineEventContextMessages.INSTANCE.failureReportContextIndent(),
+				EngineEventContextMessages.INSTANCE.failureReportFailuresBulletPoint(),
+				EngineEventContextMessages.INSTANCE.failureReportFailuresNoBulletPoint()
 		);
 		ToStringTreeBuilder builder = new ToStringTreeBuilder( style );
 		if ( delegate != null ) {
@@ -217,7 +211,7 @@ public final class RootFailureCollector implements FailureCollector {
 		synchronized void appendFailuresTo(ToStringTreeBuilder builder) {
 			builder.startObject( context.render() );
 			if ( !failureMessages.isEmpty() ) {
-				builder.startList( ENGINE_MESSAGES.failureReportFailures() );
+				builder.startList( EngineEventContextMessages.INSTANCE.failureReportFailures() );
 				for ( String failureMessage : failureMessages ) {
 					builder.value( failureMessage );
 				}
@@ -228,7 +222,7 @@ public final class RootFailureCollector implements FailureCollector {
 		}
 
 		private synchronized void doAdd(Throwable failure, String failureMessage) {
-			StringJoiner contextJoiner = new StringJoiner( COMMON_MESSAGES.contextSeparator() );
+			StringJoiner contextJoiner = new StringJoiner( CommonEventContextMessages.INSTANCE.contextSeparator() );
 			appendContextTo( contextJoiner );
 			log.newBootstrapCollectedFailure( contextJoiner.toString(), failure );
 
