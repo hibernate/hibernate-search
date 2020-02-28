@@ -36,8 +36,6 @@ import org.hibernate.search.util.common.impl.Futures;
 
 class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartialBuildState {
 
-	private static final int FAILURE_LIMIT = 100;
-
 	private final BeanProvider beanProvider;
 	private final BeanResolver beanResolver;
 	private final BeanHolder<? extends FailureHandler> failureHandlerHolder;
@@ -137,7 +135,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 				);
 			}
 
-			RootFailureCollector failureCollector = new RootFailureCollector( FAILURE_LIMIT );
+			RootFailureCollector failureCollector = new RootFailureCollector();
 
 			// Start backends
 			for ( Map.Entry<String, BackendPartialBuildState> entry : partiallyBuiltBackends.entrySet() ) {

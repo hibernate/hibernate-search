@@ -30,22 +30,21 @@ public final class RootFailureCollector implements FailureCollector {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final CommonEventContextMessages COMMON_MESSAGES = Messages.getBundle( CommonEventContextMessages.class );
-
-	private static final EngineEventContextMessages ENGINE_MESSAGES = Messages.getBundle( EngineEventContextMessages.class );
-
 	/**
 	 * This prevents Hibernate Search from trying too hard to collect errors,
 	 * which could be a problem when there is something fundamentally wrong
 	 * that will cause almost every operation to fail.
 	 */
-	private final int failureLimit;
+	private static final int FAILURE_LIMIT = 100;
+
+	private static final CommonEventContextMessages COMMON_MESSAGES = Messages.getBundle( CommonEventContextMessages.class );
+
+	private static final EngineEventContextMessages ENGINE_MESSAGES = Messages.getBundle( EngineEventContextMessages.class );
 
 	private final NonRootFailureCollector delegate;
 	private final AtomicInteger failureCount = new AtomicInteger();
 
-	public RootFailureCollector(int failureLimit) {
-		this.failureLimit = failureLimit;
+	public RootFailureCollector() {
 		this.delegate = new NonRootFailureCollector( this );
 	}
 
@@ -82,7 +81,7 @@ public final class RootFailureCollector implements FailureCollector {
 
 	private void onAddFailure() {
 		int theFailureCount = failureCount.incrementAndGet();
-		if ( theFailureCount >= failureLimit ) {
+		if ( theFailureCount >= FAILURE_LIMIT ) {
 			String renderedFailures = renderFailures();
 			throw log.boostrapCollectedFailureLimitReached( renderedFailures, theFailureCount );
 		}
