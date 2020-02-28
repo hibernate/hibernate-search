@@ -88,6 +88,16 @@ public class EventContexts {
 		} );
 	}
 
+	public static EventContext fromType(Object typeIdentifier) {
+		return EventContext.create( new AbstractSimpleEventContextElement<Object>( typeIdentifier ) {
+			@Override
+			public String render(Object param) {
+				String typeName = param.toString();
+				return MESSAGES.type( typeName );
+			}
+		} );
+	}
+
 	public static EventContext fromBackendName(String name) {
 		return EventContext.create( new AbstractSimpleEventContextElement<String>( name ) {
 			@Override

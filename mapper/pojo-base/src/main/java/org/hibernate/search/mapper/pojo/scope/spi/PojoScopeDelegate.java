@@ -16,6 +16,7 @@ import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
+import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 
 /**
@@ -45,5 +46,7 @@ public interface PojoScopeDelegate<R, E, C> {
 	SearchAggregationFactory aggregation();
 
 	PojoScopeWorkspace workspace(DetachedBackendSessionContext sessionContext);
+
+	PojoScopeSchemaManager schemaManager();
 
 }

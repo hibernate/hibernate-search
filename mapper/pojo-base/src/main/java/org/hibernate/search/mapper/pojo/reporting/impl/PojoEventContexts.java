@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.reporting.impl;
 import java.lang.annotation.Annotation;
 
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.reporting.impl.AbstractSimpleEventContextElement;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -23,6 +24,10 @@ public final class PojoEventContexts {
 
 	public static EventContext fromType(PojoRawTypeModel<?> typeModel) {
 		return EventContexts.fromType( typeModel );
+	}
+
+	public static EventContext fromType(PojoRawTypeIdentifier<?> typeIdentifier) {
+		return EventContexts.fromType( typeIdentifier );
 	}
 
 	public static EventContext fromPath(PojoModelPath unboundPath) {

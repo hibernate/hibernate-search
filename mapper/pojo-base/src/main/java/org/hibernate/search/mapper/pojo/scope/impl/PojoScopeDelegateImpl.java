@@ -24,6 +24,8 @@ import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
 import org.hibernate.search.mapper.pojo.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.schema.management.impl.PojoScopeSchemaManagerImpl;
+import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeMappingContext;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeTypeExtendedContextProvider;
@@ -131,6 +133,11 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 		return new PojoScopeWorkspaceImpl(
 				targetedTypeContexts, sessionContext
 		);
+	}
+
+	@Override
+	public PojoScopeSchemaManager schemaManager() {
+		return new PojoScopeSchemaManagerImpl( targetedTypeContexts );
 	}
 
 	private MappedIndexScope<R, E2> getIndexScope() {
