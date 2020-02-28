@@ -7,6 +7,9 @@
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -73,6 +76,25 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 				targetedTypes,
 				indexedTypeExtendedContextProvider
 		);
+	}
+
+	@Override
+	public <R, C> Optional<PojoScopeDelegate<R, Object, C>> createPojoAllScope(PojoScopeMappingContext mappingContext,
+			PojoScopeTypeExtendedContextProvider<Object, C> indexedTypeExtendedContextProvider) {
+		if ( indexedTypeManagers.getAll().isEmpty() ) {
+			return Optional.empty();
+		}
+		Set<PojoRawTypeIdentifier<?>> typeIdentifiers = new LinkedHashSet<>();
+		for ( PojoIndexedTypeManager<?, ?> typeManager : indexedTypeManagers.getAll() ) {
+			typeIdentifiers.add( typeManager.getTypeIdentifier() );
+		}
+		return Optional.of( PojoScopeDelegateImpl.create(
+				mappingContext,
+				indexedTypeManagers,
+				containedTypeManagers,
+				typeIdentifiers,
+				indexedTypeExtendedContextProvider
+		) );
 	}
 
 	@Override
