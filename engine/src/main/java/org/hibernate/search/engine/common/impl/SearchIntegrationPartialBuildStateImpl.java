@@ -29,6 +29,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
 import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.engine.reporting.impl.EngineEventContextMessages;
 import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
@@ -135,7 +136,8 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 				);
 			}
 
-			RootFailureCollector failureCollector = new RootFailureCollector();
+			RootFailureCollector failureCollector =
+					new RootFailureCollector( EngineEventContextMessages.INSTANCE.bootstrap() );
 
 			// Start backends
 			for ( Map.Entry<String, BackendPartialBuildState> entry : partiallyBuiltBackends.entrySet() ) {
