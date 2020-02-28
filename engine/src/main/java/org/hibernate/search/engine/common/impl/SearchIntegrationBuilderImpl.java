@@ -264,8 +264,8 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 					failureHandlerHolder,
 					threadPoolProvider,
 					partiallyBuiltMappings,
-					indexManagerBuildingStateHolder.getBackendPartialBuildStates(),
-					indexManagerBuildingStateHolder.getIndexManagersByName(),
+					indexManagerBuildingStateHolder.getBackendNonStartedStates(),
+					indexManagerBuildingStateHolder.getIndexManagersNonStartedStates(),
 					propertyChecker
 			);
 		}
