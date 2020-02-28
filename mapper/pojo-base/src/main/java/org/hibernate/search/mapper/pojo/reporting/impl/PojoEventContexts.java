@@ -14,11 +14,9 @@ import org.hibernate.search.util.common.reporting.impl.AbstractSimpleEventContex
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 
-import org.jboss.logging.Messages;
-
 public final class PojoEventContexts {
 
-	private static final PojoEventContextMessages MESSAGES = Messages.getBundle( PojoEventContextMessages.class );
+	private static final PojoEventContextMessages MESSAGES = PojoEventContextMessages.INSTANCE;
 
 	private PojoEventContexts() {
 	}

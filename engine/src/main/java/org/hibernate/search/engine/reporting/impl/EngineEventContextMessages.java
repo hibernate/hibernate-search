@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
+import org.jboss.logging.Messages;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;
 
@@ -19,6 +20,11 @@ import org.jboss.logging.annotations.MessageBundle;
  */
 @MessageBundle(projectCode = MessageConstants.PROJECT_CODE)
 public interface EngineEventContextMessages {
+
+	EngineEventContextMessages INSTANCE = Messages.getBundle( EngineEventContextMessages.class );
+
+	@Message(value = "bootstrap")
+	String bootstrap();
 
 	@Message(value = "    ")
 	String failureReportContextIndent();

@@ -17,11 +17,9 @@ import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.reporting.EventContextElement;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
-import org.jboss.logging.Messages;
-
 public class EventContexts {
 
-	private static final EngineEventContextMessages MESSAGES = Messages.getBundle( EngineEventContextMessages.class );
+	private static final EngineEventContextMessages MESSAGES = EngineEventContextMessages.INSTANCE;
 
 	private static final EventContext DEFAULT = EventContext.create(
 			new EventContextElement() {

@@ -9,11 +9,9 @@ package org.hibernate.search.backend.elasticsearch.logging.impl;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.reporting.impl.AbstractSimpleEventContextElement;
 
-import org.jboss.logging.Messages;
-
 public final class ElasticsearchEventContexts {
 
-	private static final ElasticsearchEventContextMessages MESSAGES = Messages.getBundle( ElasticsearchEventContextMessages.class );
+	private static final ElasticsearchEventContextMessages MESSAGES = ElasticsearchEventContextMessages.INSTANCE;
 
 	private ElasticsearchEventContexts() {
 	}

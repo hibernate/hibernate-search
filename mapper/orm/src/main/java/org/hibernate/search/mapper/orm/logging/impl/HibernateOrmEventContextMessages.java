@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.orm.logging.impl;
 
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
+import org.jboss.logging.Messages;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;
 
@@ -16,6 +17,8 @@ import org.jboss.logging.annotations.MessageBundle;
  */
 @MessageBundle(projectCode = MessageConstants.PROJECT_CODE)
 public interface HibernateOrmEventContextMessages {
+
+	HibernateOrmEventContextMessages INSTANCE = Messages.getBundle( HibernateOrmEventContextMessages.class );
 
 	@Message(value = "Hibernate ORM mapping")
 	String mapping();
