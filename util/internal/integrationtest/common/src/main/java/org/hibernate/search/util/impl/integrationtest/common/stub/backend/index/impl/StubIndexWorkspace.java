@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl;
 
-import java.util.Collections;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
@@ -31,7 +30,7 @@ class StubIndexWorkspace implements IndexWorkspace {
 	@Override
 	public CompletableFuture<?> mergeSegments() {
 		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.MERGE_SEGMENTS ).build();
-		return behavior.executeIndexScaleWork( Collections.singleton( indexName ), work );
+		return behavior.executeIndexScaleWork( indexName, work );
 	}
 
 	@Override
@@ -40,18 +39,18 @@ class StubIndexWorkspace implements IndexWorkspace {
 				.tenantIdentifier( sessionContext.getTenantIdentifier() )
 				.routingKeys( routingKeys )
 				.build();
-		return behavior.executeIndexScaleWork( Collections.singleton( indexName ), work );
+		return behavior.executeIndexScaleWork( indexName, work );
 	}
 
 	@Override
 	public CompletableFuture<?> flush() {
 		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.FLUSH ).build();
-		return behavior.executeIndexScaleWork( Collections.singleton( indexName ), work );
+		return behavior.executeIndexScaleWork( indexName, work );
 	}
 
 	@Override
 	public CompletableFuture<?> refresh() {
 		StubIndexScaleWork work = StubIndexScaleWork.builder( StubIndexScaleWork.Type.REFRESH ).build();
-		return behavior.executeIndexScaleWork( Collections.singleton( indexName ), work );
+		return behavior.executeIndexScaleWork( indexName, work );
 	}
 }
