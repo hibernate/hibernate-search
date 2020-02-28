@@ -28,6 +28,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.docume
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 
 import org.junit.rules.TestRule;
@@ -138,6 +139,14 @@ public class BackendMock implements TestRule {
 		return this;
 	}
 
+	public SchemaManagementWorkCallListContext expectSchemaManagementWorks(String indexName) {
+		CallQueue<SchemaManagementWorkCall> callQueue = behaviorMock.getSchemaManagementWorkCalls( indexName );
+		return new SchemaManagementWorkCallListContext(
+				indexName,
+				callQueue::expectInOrder
+		);
+	}
+
 	public DocumentWorkCallListContext expectWorks(String indexName) {
 		// Default to force commit and no refresh, which is what the mapper should use by default
 		return expectWorks( indexName, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE );
@@ -210,6 +219,33 @@ public class BackendMock implements TestRule {
 		CallQueue<CountWorkCall> callQueue = behaviorMock.getCountWorkCalls();
 		callQueue.expectInOrder( new CountWorkCall( new LinkedHashSet<>( indexNames ), expectedResult ) );
 		return this;
+	}
+
+	public static class SchemaManagementWorkCallListContext {
+		private final String indexName;
+		private final Consumer<SchemaManagementWorkCall> expectationConsumer;
+
+		private SchemaManagementWorkCallListContext(String indexName,
+				Consumer<SchemaManagementWorkCall> expectationConsumer) {
+			this.indexName = indexName;
+			this.expectationConsumer = expectationConsumer;
+		}
+
+		public SchemaManagementWorkCallListContext work(StubSchemaManagementWork.Type type) {
+			return work( type, CompletableFuture.completedFuture( null ) );
+		}
+
+		public SchemaManagementWorkCallListContext work(StubSchemaManagementWork.Type type, CompletableFuture<?> future) {
+			return work( type, failureCollector -> future );
+		}
+
+		public SchemaManagementWorkCallListContext work(StubSchemaManagementWork.Type type,
+				SchemaManagementWorkBehavior behavior) {
+			StubSchemaManagementWork work = StubSchemaManagementWork.builder( type )
+					.build();
+			expectationConsumer.accept( new SchemaManagementWorkCall( indexName, work, behavior ) );
+			return this;
+		}
 	}
 
 	public class DocumentWorkCallListContext {
@@ -322,7 +358,7 @@ public class BackendMock implements TestRule {
 		}
 	}
 
-	public class IndexScaleWorkCallListContext {
+	public static class IndexScaleWorkCallListContext {
 		private final String indexName;
 		private final String tenantIdentifier;
 		private final Consumer<IndexScaleWorkCall> expectationConsumer;

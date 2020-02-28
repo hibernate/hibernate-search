@@ -80,7 +80,7 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 
 	@Override
 	public IndexSchemaManager getSchemaManager() {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return new StubIndexSchemaManager( name, backend.getBehavior() );
 	}
 
 	@Override
