@@ -11,6 +11,7 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigurer;
+import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.mapper.orm.search.loading.EntityLoadingCacheLookupStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
 
@@ -122,9 +123,21 @@ public final class HibernateOrmMapperSettings {
 	public static final String MAPPING_CONFIGURER = PREFIX + Radicals.MAPPING_CONFIGURER;
 
 	/**
+	 * The schema management strategy, controlling how indexes and their schema
+	 * are created, updated, validated or dropped on startup and shutdown.
+	 * <p>
+	 * Expects a {@link SchemaManagementStrategyName} value, or a String representation of such value.
+	 * <p>
+	 * Defaults to {@link Defaults#SCHEMA_MANAGEMENT_STRATEGY}.
+	 *
+	 * @see SchemaManagementStrategyName
+	 */
+	public static final String SCHEMA_MANAGEMENT_STRATEGY = PREFIX + Radicals.SCHEMA_MANAGEMENT_STRATEGY;
+
+	/**
 	 * Configuration property keys without the {@link #PREFIX prefix}.
 	 */
-	public static class Radicals {
+	public static final class Radicals {
 
 		private Radicals() {
 		}
@@ -137,6 +150,7 @@ public final class HibernateOrmMapperSettings {
 		public static final String QUERY_LOADING_FETCH_SIZE = "query.loading.fetch_size";
 		public static final String MAPPING_PROCESS_ANNOTATIONS = "mapping.process_annotations";
 		public static final String MAPPING_CONFIGURER = "mapping.configurer";
+		public static final String SCHEMA_MANAGEMENT_STRATEGY = "schema_management.strategy";
 	}
 
 	/**
@@ -157,6 +171,7 @@ public final class HibernateOrmMapperSettings {
 				EntityLoadingCacheLookupStrategy.SKIP;
 		public static final int QUERY_LOADING_FETCH_SIZE = 100;
 		public static final boolean MAPPING_PROCESS_ANNOTATIONS = true;
+		public static final SchemaManagementStrategyName SCHEMA_MANAGEMENT_STRATEGY = SchemaManagementStrategyName.NONE;
 	}
 
 }

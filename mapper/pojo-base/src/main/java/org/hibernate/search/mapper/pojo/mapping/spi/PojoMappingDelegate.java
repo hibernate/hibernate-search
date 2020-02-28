@@ -7,6 +7,7 @@
 package org.hibernate.search.mapper.pojo.mapping.spi;
 
 import java.util.Collection;
+import java.util.Optional;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -33,6 +34,10 @@ public interface PojoMappingDelegate extends AutoCloseable {
 			PojoScopeMappingContext mappingContext,
 			Collection<? extends PojoRawTypeIdentifier<? extends E>> targetedTypes,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider);
+
+	<R, C> Optional<PojoScopeDelegate<R, Object, C>> createPojoAllScope(
+			PojoScopeMappingContext mappingContext,
+			PojoScopeTypeExtendedContextProvider<Object, C> indexedTypeExtendedContextProvider);
 
 	<R> PojoIndexingPlan<R> createIndexingPlan(PojoWorkSessionContext<R> context,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);

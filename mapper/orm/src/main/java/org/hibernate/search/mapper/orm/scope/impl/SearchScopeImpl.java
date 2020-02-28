@@ -19,6 +19,7 @@ import org.hibernate.search.mapper.orm.search.query.dsl.impl.HibernateOrmSearchQ
 import org.hibernate.search.mapper.orm.search.loading.context.impl.HibernateOrmLoadingContext;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.work.impl.SearchWorkspaceImpl;
+import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 
@@ -94,5 +95,9 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 				detachedSessionContext,
 				delegate.workspace( detachedSessionContext )
 		);
+	}
+
+	public PojoScopeSchemaManager schemaManagerDelegate() {
+		return delegate.schemaManager();
 	}
 }
