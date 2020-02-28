@@ -19,6 +19,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
+import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
@@ -26,6 +27,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBa
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
@@ -41,6 +43,8 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	private final List<CallBehavior<Void>> stopBackendBehaviors = new ArrayList<>();
 
 	private final Map<String, CallQueue<PushSchemaCall>> pushSchemaCalls = new HashMap<>();
+
+	private final Map<String, CallQueue<SchemaManagementWorkCall>> schemaManagementWorkCall = new HashMap<>();
 
 	private final Map<String, CallQueue<DocumentWorkCall>> documentWorkCalls = new HashMap<>();
 
@@ -70,6 +74,10 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	CallQueue<PushSchemaCall> getPushSchemaCalls(String indexName) {
 		return pushSchemaCalls.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
+	}
+
+	CallQueue<SchemaManagementWorkCall> getSchemaManagementWorkCalls(String indexName) {
+		return schemaManagementWorkCall.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
 	}
 
 	CallQueue<DocumentWorkCall> getDocumentWorkCalls(String indexName) {
@@ -133,6 +141,17 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 						new PushSchemaCall( indexName, rootSchemaNode ),
 						PushSchemaCall::verify,
 						noExpectationsBehavior( () -> null )
+				);
+	}
+
+	@Override
+	public CompletableFuture<?> executeSchemaManagementWork(String indexName, StubSchemaManagementWork work,
+			ContextualFailureCollector failureCollector) {
+		return getSchemaManagementWorkCalls( indexName )
+				.verify(
+						new SchemaManagementWorkCall( indexName, work, failureCollector ),
+						SchemaManagementWorkCall::verify,
+						noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
 				);
 	}
 
