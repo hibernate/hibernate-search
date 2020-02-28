@@ -27,6 +27,17 @@ public interface SimpleQueryFlagsStep<S extends SimpleQueryStringPredicateOption
 	}
 
 	/**
+	 * Disable all operation in the given flags.
+	 *
+	 * @return {@code this}, for method chaining.
+	 */
+	default SimpleQueryFlagsStep<S> none() {
+		EnumSet set = EnumSet.allOf( SimpleQueryFlag.class );
+		disable( set );
+		return this;
+	}
+
+	/**
 	 * Enable operation in the given flags.
 	 *
 	 * @param operation The operation.

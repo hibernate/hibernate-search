@@ -85,7 +85,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 	@Override
 	public void disable(SimpleQueryFlag operation) {
 		if ( this.operations == null ) {
-			this.operations = EnumSet.noneOf( SimpleQueryFlag.class );
+			this.operations = EnumSet.allOf( SimpleQueryFlag.class );
 		}
 		this.operations.remove( operation );
 	}
@@ -93,7 +93,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 	@Override
 	public void disable(EnumSet<SimpleQueryFlag> operations) {
 		if ( this.operations == null ) {
-			this.operations = EnumSet.noneOf( SimpleQueryFlag.class );
+			this.operations = EnumSet.allOf( SimpleQueryFlag.class );
 		}
 		this.operations.removeAll( operations );
 	}

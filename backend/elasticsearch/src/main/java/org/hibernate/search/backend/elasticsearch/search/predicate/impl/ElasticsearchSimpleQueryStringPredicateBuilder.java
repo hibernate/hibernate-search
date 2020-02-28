@@ -29,7 +29,7 @@ import java.util.EnumSet;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 
 public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
-		implements SimpleQueryStringPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
+	implements SimpleQueryStringPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final JsonObjectAccessor SIMPLE_QUERY_STRING_ACCESSOR = JsonAccessor.root().property( "simple_query_string" ).asObject();
 	private static final JsonAccessor<String> QUERY_ACCESSOR = JsonAccessor.root().property( "query" ).asString();
@@ -39,7 +39,6 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 
 	private static final JsonPrimitive AND_OPERATOR_KEYWORD_JSON = new JsonPrimitive( "and" );
 	private static final JsonPrimitive OR_OPERATOR_KEYWORD_JSON = new JsonPrimitive( "or" );
-
 
 	private final ElasticsearchScopeModel scopeModel;
 
@@ -85,7 +84,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	@Override
 	public void disable(SimpleQueryFlag operation) {
 		if ( this.operations == null ) {
-			this.operations = EnumSet.noneOf( SimpleQueryFlag.class );
+			this.operations = EnumSet.allOf( SimpleQueryFlag.class );
 		}
 		this.operations.remove( operation );
 	}
@@ -93,7 +92,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	@Override
 	public void disable(EnumSet<SimpleQueryFlag> operations) {
 		if ( this.operations == null ) {
-			this.operations = EnumSet.noneOf( SimpleQueryFlag.class );
+			this.operations = EnumSet.allOf( SimpleQueryFlag.class );
 		}
 		this.operations.removeAll( operations );
 	}
@@ -103,7 +102,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 		ElasticsearchSimpleQueryStringPredicateBuilderFieldState field = fields.get( absoluteFieldPath );
 		if ( field == null ) {
 			ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldPredicateBuilderFactory> fieldComponent = scopeModel.getSchemaNodeComponent(
-					absoluteFieldPath, ElasticsearchSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+				absoluteFieldPath, ElasticsearchSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 			field = fieldComponent.getComponent().createSimpleQueryStringFieldContext( absoluteFieldPath );
 			analyzerChecker = analyzerChecker.combine( fieldComponent.getAnalyzerCompatibilityChecker() );
 			fields.put( absoluteFieldPath, field );
@@ -128,7 +127,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 
 	@Override
 	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
-			JsonObject outerObject, JsonObject innerObject) {
+		JsonObject outerObject, JsonObject innerObject) {
 		if ( analyzer == null ) {
 			analyzerChecker.failIfNotCompatible();
 		}
