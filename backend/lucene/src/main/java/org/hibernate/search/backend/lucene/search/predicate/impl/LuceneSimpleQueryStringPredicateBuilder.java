@@ -7,8 +7,10 @@
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
@@ -30,6 +32,7 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.queryparser.simple.SimpleQueryParser;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.Query;
+import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 
 public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
 	implements SimpleQueryStringPredicateBuilder<LuceneSearchPredicateBuilder> {
@@ -44,6 +47,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 	private String simpleQueryString;
 	private Analyzer overrideAnalyzer;
 	private boolean ignoreAnalyzer = false;
+	private EnumSet<SimpleQueryFlag> flags;
 	private LuceneCompatibilityChecker analyzerChecker = new LuceneSucceedingCompatibilityChecker();
 
 	LuceneSimpleQueryStringPredicateBuilder(LuceneSearchContext searchContext, LuceneScopeModel scopeModel) {
@@ -61,6 +65,11 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 				this.defaultOperator = Occur.SHOULD;
 				break;
 		}
+	}
+
+	@Override
+	public void flags(Set<SimpleQueryFlag> flags) {
+		this.flags = EnumSet.copyOf( flags );
 	}
 
 	@Override
@@ -102,6 +111,45 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 
 		Analyzer analyzer = buildAnalyzer();
 
+		int flag = -1;
+		if ( flags != null ) {
+			flag = 0;
+			for ( SimpleQueryFlag operation : flags ) {
+				switch ( operation ) {
+					case AND:
+						flag |= SimpleQueryParser.AND_OPERATOR;
+						break;
+					case NOT:
+						flag |= SimpleQueryParser.NOT_OPERATOR;
+						break;
+					case OR:
+						flag |= SimpleQueryParser.OR_OPERATOR;
+						break;
+					case PREFIX:
+						flag |= SimpleQueryParser.PREFIX_OPERATOR;
+						break;
+					case PHRASE:
+						flag |= SimpleQueryParser.PHRASE_OPERATOR;
+						break;
+					case PRECEDENCE:
+						flag |= SimpleQueryParser.PRECEDENCE_OPERATORS;
+						break;
+					case ESCAPE:
+						flag |= SimpleQueryParser.ESCAPE_OPERATOR;
+						break;
+					case WHITESPACE:
+						flag |= SimpleQueryParser.WHITESPACE_OPERATOR;
+						break;
+					case FUZZY:
+						flag |= SimpleQueryParser.FUZZY_OPERATOR;
+						break;
+					case NEAR:
+						flag |= SimpleQueryParser.NEAR_OPERATOR;
+						break;
+				}
+			}
+		}
+
 		Map<String, Float> weights = new LinkedHashMap<>();
 		for ( Map.Entry<String, LuceneSimpleQueryStringPredicateBuilderFieldState> entry : fields.entrySet() ) {
 			LuceneSimpleQueryStringPredicateBuilderFieldState state = entry.getValue();
@@ -113,7 +161,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 			weights.put( entry.getKey(), boost );
 		}
 
-		SimpleQueryParser queryParser = new SimpleQueryParser( analyzer, weights, -1 );
+		SimpleQueryParser queryParser = new SimpleQueryParser( analyzer, weights, flag );
 		queryParser.setDefaultOperator( defaultOperator );
 
 		return queryParser.parse( simpleQueryString );

@@ -10,10 +10,12 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.common.BooleanOperator;
+import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
@@ -127,6 +129,13 @@ class SimpleQueryStringPredicateFieldMoreStepImpl<B>
 			return fieldSetStates.stream().flatMap( f -> f.absoluteFieldPaths.stream() )
 					.collect( Collectors.toList() );
 		}
+
+		@Override
+		public CommonState<B> flags(Set<SimpleQueryFlag> flags) {
+			builder.flags( flags );
+			return this;
+		}
+
 	}
 
 }
