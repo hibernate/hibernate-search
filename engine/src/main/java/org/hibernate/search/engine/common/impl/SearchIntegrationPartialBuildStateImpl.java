@@ -43,29 +43,30 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 	private final ThreadPoolProviderImpl threadPoolProvider;
 
 	private final Map<MappingKey<?, ?>, MappingPartialBuildState> partiallyBuiltMappings;
-	private final List<MappingImplementor<?>> fullyBuiltMappings = new ArrayList<>();
-	private final Map<String, BackendPartialBuildState> partiallyBuiltBackends;
+	private final Map<String, BackendNonStartedState> nonStartedBackends;
+	private final Map<String, IndexManagerNonStartedState> nonStartedIndexManagers;
+
 	private final ConfigurationPropertyChecker partialConfigurationPropertyChecker;
 
-	private final Map<String, BackendImplementor> fullyBuiltBackends = new LinkedHashMap<>();
-	private final Map<String, IndexManagerPartialBuildState> partiallyBuiltIndexManagers;
-	private final Map<String, IndexManagerImplementor> fullyBuiltIndexManagers = new LinkedHashMap<>();
+	private final List<MappingImplementor<?>> fullyBuiltMappings = new ArrayList<>();
+	private final Map<String, BackendImplementor> startedBackends = new LinkedHashMap<>();
+	private final Map<String, IndexManagerImplementor> startedIndexManagers = new LinkedHashMap<>();
 
 	SearchIntegrationPartialBuildStateImpl(
 			BeanProvider beanProvider, BeanResolver beanResolver,
 			BeanHolder<? extends FailureHandler> failureHandlerHolder,
 			ThreadPoolProviderImpl threadPoolProvider,
 			Map<MappingKey<?, ?>, MappingPartialBuildState> partiallyBuiltMappings,
-			Map<String, BackendPartialBuildState> partiallyBuiltBackends,
-			Map<String, IndexManagerPartialBuildState> partiallyBuiltIndexManagers,
+			Map<String, BackendNonStartedState> nonStartedBackends,
+			Map<String, IndexManagerNonStartedState> nonStartedIndexManagers,
 			ConfigurationPropertyChecker partialConfigurationPropertyChecker) {
 		this.beanProvider = beanProvider;
 		this.beanResolver = beanResolver;
 		this.failureHandlerHolder = failureHandlerHolder;
 		this.threadPoolProvider = threadPoolProvider;
 		this.partiallyBuiltMappings = partiallyBuiltMappings;
-		this.partiallyBuiltBackends = partiallyBuiltBackends;
-		this.partiallyBuiltIndexManagers = partiallyBuiltIndexManagers;
+		this.nonStartedBackends = nonStartedBackends;
+		this.nonStartedIndexManagers = nonStartedIndexManagers;
 		this.partialConfigurationPropertyChecker = partialConfigurationPropertyChecker;
 	}
 
@@ -74,10 +75,10 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
 			closer.pushAll( MappingPartialBuildState::closeOnFailure, partiallyBuiltMappings.values() );
 			closer.pushAll( MappingImplementor::close, fullyBuiltMappings );
-			closer.pushAll( IndexManagerPartialBuildState::closeOnFailure, partiallyBuiltIndexManagers.values() );
-			closer.pushAll( IndexManagerImplementor::stop, fullyBuiltIndexManagers.values() );
-			closer.pushAll( BackendPartialBuildState::closeOnFailure, partiallyBuiltBackends.values() );
-			closer.pushAll( BackendImplementor::stop, fullyBuiltBackends.values() );
+			closer.pushAll( IndexManagerNonStartedState::closeOnFailure, nonStartedIndexManagers.values() );
+			closer.pushAll( IndexManagerImplementor::stop, startedIndexManagers.values() );
+			closer.pushAll( BackendNonStartedState::closeOnFailure, nonStartedBackends.values() );
+			closer.pushAll( BackendImplementor::stop, startedBackends.values() );
 			closer.pushAll( ThreadPoolProviderImpl::close, threadPoolProvider );
 			closer.pushAll( BeanHolder::close, failureHandlerHolder );
 			closer.pushAll( BeanProvider::close, beanProvider );
@@ -140,30 +141,29 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 					new RootFailureCollector( EngineEventContextMessages.INSTANCE.bootstrap() );
 
 			// Start backends
-			for ( Map.Entry<String, BackendPartialBuildState> entry : partiallyBuiltBackends.entrySet() ) {
+			for ( Map.Entry<String, BackendNonStartedState> entry : nonStartedBackends.entrySet() ) {
 				// TODO HSEARCH-3084 perform backend initialization in parallel for all backends?
-				fullyBuiltBackends.put(
+				startedBackends.put(
 						entry.getKey(),
-						entry.getValue().finalizeBuild( failureCollector, beanResolver, propertySource )
+						entry.getValue().start( failureCollector, beanResolver, propertySource )
 				);
 			}
 			failureCollector.checkNoFailure();
 
 			// Start indexes
-			CompletableFuture<?>[] indexManagerFutures = new CompletableFuture<?>[partiallyBuiltIndexManagers.size()];
+			CompletableFuture<?>[] indexManagerFutures = new CompletableFuture<?>[nonStartedIndexManagers.size()];
 			int indexManagerIndex = 0;
 			// Start
-			for ( IndexManagerPartialBuildState state : partiallyBuiltIndexManagers.values() ) {
-				indexManagerFutures[indexManagerIndex] =
-						state.finalizeBuild( failureCollector, beanResolver, propertySource );
+			for ( IndexManagerNonStartedState state : nonStartedIndexManagers.values() ) {
+				indexManagerFutures[indexManagerIndex] = state.start( failureCollector, beanResolver, propertySource );
 				++indexManagerIndex;
 			}
 			// Wait for the starting operation to finish
 			Futures.unwrappedExceptionJoin( CompletableFuture.allOf( indexManagerFutures ) );
 			failureCollector.checkNoFailure();
 			// Everything went well: register the index managers
-			for ( Map.Entry<String, IndexManagerPartialBuildState> entry : partiallyBuiltIndexManagers.entrySet() ) {
-				fullyBuiltIndexManagers.put(
+			for ( Map.Entry<String, IndexManagerNonStartedState> entry : nonStartedIndexManagers.entrySet() ) {
+				startedIndexManagers.put(
 						entry.getKey(),
 						entry.getValue().getIndexManager()
 				);
@@ -176,8 +176,8 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 					failureHandlerHolder,
 					threadPoolProvider,
 					fullyBuiltMappings,
-					fullyBuiltBackends,
-					fullyBuiltIndexManagers
+					startedBackends,
+					startedIndexManagers
 			);
 		}
 	}

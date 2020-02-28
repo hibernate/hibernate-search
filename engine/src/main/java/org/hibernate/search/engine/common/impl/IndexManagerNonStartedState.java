@@ -18,24 +18,24 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.Throwables;
 
-class IndexManagerPartialBuildState {
+class IndexManagerNonStartedState {
 
 	private final String backendName;
 	private final String indexName;
-	private final IndexManagerImplementor partiallyBuiltIndexManager;
+	private final IndexManagerImplementor indexManager;
 
-	IndexManagerPartialBuildState(String backendName,
-			String indexName, IndexManagerImplementor partiallyBuiltIndexManager) {
+	IndexManagerNonStartedState(String backendName,
+			String indexName, IndexManagerImplementor indexManager) {
 		this.backendName = backendName;
 		this.indexName = indexName;
-		this.partiallyBuiltIndexManager = partiallyBuiltIndexManager;
+		this.indexManager = indexManager;
 	}
 
 	void closeOnFailure() {
-		partiallyBuiltIndexManager.stop();
+		indexManager.stop();
 	}
 
-	CompletableFuture<?> finalizeBuild(RootFailureCollector rootFailureCollector,
+	CompletableFuture<?> start(RootFailureCollector rootFailureCollector,
 			BeanResolver beanResolver,
 			ConfigurationPropertySource rootPropertySource) {
 		ContextualFailureCollector indexFailureCollector =
@@ -51,7 +51,7 @@ class IndexManagerPartialBuildState {
 		IndexManagerStartContextImpl startContext = new IndexManagerStartContextImpl(
 				indexFailureCollector, beanResolver, indexPropertySource
 		);
-		return partiallyBuiltIndexManager.start( startContext )
+		return indexManager.start( startContext )
 				.exceptionally( Futures.handler( e -> {
 					indexFailureCollector.add( Throwables.expectException( e ) );
 					return null;
@@ -59,6 +59,6 @@ class IndexManagerPartialBuildState {
 	}
 
 	public IndexManagerImplementor getIndexManager() {
-		return partiallyBuiltIndexManager;
+		return indexManager;
 	}
 }

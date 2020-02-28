@@ -14,21 +14,21 @@ import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 
-class BackendPartialBuildState {
+class BackendNonStartedState {
 
 	private final String backendName;
-	private final BackendImplementor partiallyBuiltBackend;
+	private final BackendImplementor backend;
 
-	BackendPartialBuildState(String backendName, BackendImplementor partiallyBuiltBackend) {
+	BackendNonStartedState(String backendName, BackendImplementor backend) {
 		this.backendName = backendName;
-		this.partiallyBuiltBackend = partiallyBuiltBackend;
+		this.backend = backend;
 	}
 
 	void closeOnFailure() {
-		partiallyBuiltBackend.stop();
+		backend.stop();
 	}
 
-	BackendImplementor finalizeBuild(RootFailureCollector rootFailureCollector,
+	BackendImplementor start(RootFailureCollector rootFailureCollector,
 			BeanResolver beanResolver,
 			ConfigurationPropertySource rootPropertySource) {
 		ContextualFailureCollector backendFailureCollector =
@@ -41,11 +41,11 @@ class BackendPartialBuildState {
 				backendPropertySource
 		);
 		try {
-			partiallyBuiltBackend.start( startContext );
+			backend.start( startContext );
 		}
 		catch (RuntimeException e) {
 			backendFailureCollector.add( e );
 		}
-		return partiallyBuiltBackend; // The backend is now fully built
+		return backend; // The backend is now started
 	}
 }

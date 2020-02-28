@@ -113,20 +113,20 @@ class IndexManagerBuildingStateHolder {
 		}
 	}
 
-	Map<String, BackendPartialBuildState> getBackendPartialBuildStates() {
+	Map<String, BackendNonStartedState> getBackendNonStartedStates() {
 		// Use a LinkedHashMap for deterministic iteration
-		Map<String, BackendPartialBuildState> backendsByName = new LinkedHashMap<>();
+		Map<String, BackendNonStartedState> backendsByName = new LinkedHashMap<>();
 		for ( Map.Entry<String, BackendInitialBuildState> entry : backendBuildStateByName.entrySet() ) {
-			backendsByName.put( entry.getKey(), entry.getValue().getPartiallyBuilt() );
+			backendsByName.put( entry.getKey(), entry.getValue().getNonStartedState() );
 		}
 		return backendsByName;
 	}
 
-	Map<String, IndexManagerPartialBuildState> getIndexManagersByName() {
+	Map<String, IndexManagerNonStartedState> getIndexManagersNonStartedStates() {
 		// Use a LinkedHashMap for deterministic iteration
-		Map<String, IndexManagerPartialBuildState> indexManagersByName = new LinkedHashMap<>();
+		Map<String, IndexManagerNonStartedState> indexManagersByName = new LinkedHashMap<>();
 		for ( Map.Entry<String, IndexManagerInitialBuildState> entry : indexManagerBuildStateByName.entrySet() ) {
-			indexManagersByName.put( entry.getKey(), entry.getValue().getPartialBuildState() );
+			indexManagersByName.put( entry.getKey(), entry.getValue().getNonStartedState() );
 		}
 		return indexManagersByName;
 	}
@@ -196,12 +196,12 @@ class IndexManagerBuildingStateHolder {
 			backend.stop();
 		}
 
-		BackendPartialBuildState getPartiallyBuilt() {
-			return new BackendPartialBuildState( backendName, backend );
+		BackendNonStartedState getNonStartedState() {
+			return new BackendNonStartedState( backendName, backend );
 		}
 	}
 
-	private class IndexManagerInitialBuildState implements IndexManagerBuildingState {
+	private static class IndexManagerInitialBuildState implements IndexManagerBuildingState {
 
 		private final String backendName;
 		private final String indexName;
@@ -250,14 +250,14 @@ class IndexManagerBuildingStateHolder {
 			return indexManager;
 		}
 
-		IndexManagerPartialBuildState getPartialBuildState() {
+		IndexManagerNonStartedState getNonStartedState() {
 			if ( indexManager == null ) {
 				throw new AssertionFailure(
 						"Index manager " + indexName + " was not built by the mapper as expected."
 						+ " There is probably a bug in the mapper implementation."
 				);
 			}
-			return new IndexManagerPartialBuildState( backendName, indexName, indexManager );
+			return new IndexManagerNonStartedState( backendName, indexName, indexManager );
 		}
 	}
 
