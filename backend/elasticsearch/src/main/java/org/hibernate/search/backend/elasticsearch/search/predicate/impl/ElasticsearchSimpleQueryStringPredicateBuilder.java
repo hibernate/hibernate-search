@@ -25,6 +25,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import java.util.EnumSet;
+import java.util.Set;
+import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 
 public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
 		implements SimpleQueryStringPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
@@ -38,13 +41,13 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	private static final JsonPrimitive AND_OPERATOR_KEYWORD_JSON = new JsonPrimitive( "and" );
 	private static final JsonPrimitive OR_OPERATOR_KEYWORD_JSON = new JsonPrimitive( "or" );
 
-
 	private final ElasticsearchScopeModel scopeModel;
 
 	private final Map<String, ElasticsearchSimpleQueryStringPredicateBuilderFieldState> fields = new LinkedHashMap<>();
 	private JsonPrimitive defaultOperator = OR_OPERATOR_KEYWORD_JSON;
 	private String simpleQueryString;
 	private String analyzer;
+	private EnumSet<SimpleQueryFlag> flags;
 	private ElasticsearchCompatibilityChecker analyzerChecker = new ElasticsearchSucceedingCompatibilityChecker();
 
 	ElasticsearchSimpleQueryStringPredicateBuilder(ElasticsearchScopeModel scopeModel) {
@@ -61,6 +64,11 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 				this.defaultOperator = OR_OPERATOR_KEYWORD_JSON;
 				break;
 		}
+	}
+
+	@Override
+	public void flags(Set<SimpleQueryFlag> flags) {
+		this.flags = EnumSet.copyOf( flags );
 	}
 
 	@Override
