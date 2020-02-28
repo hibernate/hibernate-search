@@ -21,18 +21,18 @@ import org.hibernate.search.backend.lucene.scope.model.impl.LuceneSucceedingComp
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQueryStringPredicateBuilderFieldState;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
-import org.hibernate.search.backend.lucene.lowlevel.query.impl.FieldContextSimpleQueryParser;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.queryparser.simple.SimpleQueryParser;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.Query;
 
 public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
-		implements SimpleQueryStringPredicateBuilder<LuceneSearchPredicateBuilder> {
+	implements SimpleQueryStringPredicateBuilder<LuceneSearchPredicateBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -68,7 +68,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 		LuceneSimpleQueryStringPredicateBuilderFieldState field = fields.get( absoluteFieldPath );
 		if ( field == null ) {
 			LuceneScopedIndexFieldComponent<LuceneFieldPredicateBuilderFactory> fieldComponent = scopeModel.getSchemaNodeComponent(
-					absoluteFieldPath, LuceneSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+				absoluteFieldPath, LuceneSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 			field = fieldComponent.getComponent().createSimpleQueryStringFieldContext( absoluteFieldPath );
 			analyzerChecker = analyzerChecker.combine( fieldComponent.getAnalyzerCompatibilityChecker() );
 			fields.put( absoluteFieldPath, field );
@@ -101,7 +101,19 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 		}
 
 		Analyzer analyzer = buildAnalyzer();
-		FieldContextSimpleQueryParser queryParser = new FieldContextSimpleQueryParser( analyzer, fields );
+
+		Map<String, Float> weights = new LinkedHashMap<>();
+		for ( String fieldName : fields.keySet() ) {
+			LuceneSimpleQueryStringPredicateBuilderFieldState state = fields.get( fieldName );
+			Float boost = state.getBoost();
+			if ( boost == null ) {
+				boost = 1f;
+			}
+
+			weights.put( fieldName, boost );
+		}
+
+		SimpleQueryParser queryParser = new SimpleQueryParser( analyzer, weights, -1 );
 		queryParser.setDefaultOperator( defaultOperator );
 
 		return queryParser.parse( simpleQueryString );
