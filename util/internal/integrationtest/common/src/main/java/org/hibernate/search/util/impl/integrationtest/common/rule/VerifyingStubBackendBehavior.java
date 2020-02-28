@@ -42,7 +42,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	private final List<CallBehavior<Void>> stopBackendBehaviors = new ArrayList<>();
 
-	private final Map<String, CallQueue<PushSchemaCall>> pushSchemaCalls = new HashMap<>();
+	private final Map<String, CallQueue<SchemaDefinitionCall>> schemaDefinitionCalls = new HashMap<>();
 
 	private final Map<String, CallQueue<SchemaManagementWorkCall>> schemaManagementWorkCall = new HashMap<>();
 
@@ -72,8 +72,8 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		indexFieldAddBehaviors.put( new IndexFieldKey( indexName, absoluteFieldPath ), behavior );
 	}
 
-	CallQueue<PushSchemaCall> getPushSchemaCalls(String indexName) {
-		return pushSchemaCalls.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
+	CallQueue<SchemaDefinitionCall> getSchemaDefinitionCalls(String indexName) {
+		return schemaDefinitionCalls.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
 	}
 
 	CallQueue<SchemaManagementWorkCall> getSchemaManagementWorkCalls(String indexName) {
@@ -100,14 +100,14 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		createBackendBehaviors.clear();
 		stopBackendBehaviors.clear();
 		indexFieldAddBehaviors.clear();
-		pushSchemaCalls.clear();
+		schemaDefinitionCalls.clear();
 		documentWorkCalls.clear();
 		searchCalls.reset();
 	}
 
 	void verifyExpectationsMet() {
 		// We don't check anything for the various behaviors (createBackendBehaviors, ...): they are ignored if they are not executed.
-		pushSchemaCalls.values().forEach( CallQueue::verifyExpectationsMet );
+		schemaDefinitionCalls.values().forEach( CallQueue::verifyExpectationsMet );
 		documentWorkCalls.values().forEach( CallQueue::verifyExpectationsMet );
 		searchCalls.verifyExpectationsMet();
 	}
@@ -135,11 +135,11 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	}
 
 	@Override
-	public void pushSchema(String indexName, StubIndexSchemaNode rootSchemaNode) {
-		getPushSchemaCalls( indexName )
+	public void defineSchema(String indexName, StubIndexSchemaNode rootSchemaNode) {
+		getSchemaDefinitionCalls( indexName )
 				.verify(
-						new PushSchemaCall( indexName, rootSchemaNode ),
-						PushSchemaCall::verify,
+						new SchemaDefinitionCall( indexName, rootSchemaNode ),
+						SchemaDefinitionCall::verify,
 						noExpectationsBehavior( () -> null )
 				);
 	}

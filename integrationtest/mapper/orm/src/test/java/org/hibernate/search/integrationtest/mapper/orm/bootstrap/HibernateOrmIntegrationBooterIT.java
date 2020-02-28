@@ -61,7 +61,7 @@ public class HibernateOrmIntegrationBooterIT {
 		HibernateOrmIntegrationBooter booter = createBooter( IndexedEntity.class );
 		Map<String, Object> booterGeneratedProperties = new LinkedHashMap<>();
 
-		// Pre-booting should lead to a schema creation in the backend.
+		// Pre-booting should lead to a schema definition in the backend.
 		backendMock.expectSchema( INDEX_NAME, b -> { } );
 		booter.preBoot( booterGeneratedProperties::put );
 		backendMock.verifyExpectationsMet();
