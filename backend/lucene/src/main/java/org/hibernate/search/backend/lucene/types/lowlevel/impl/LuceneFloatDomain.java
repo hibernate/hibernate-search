@@ -147,7 +147,7 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 		}
 	}
 
-	public class SortedFloatDocValuesField extends SortedNumericDocValuesField {
+	public static class SortedFloatDocValuesField extends SortedNumericDocValuesField {
 
 		public SortedFloatDocValuesField(String name, float value) {
 			super( name, Float.floatToRawIntBits( value ) );

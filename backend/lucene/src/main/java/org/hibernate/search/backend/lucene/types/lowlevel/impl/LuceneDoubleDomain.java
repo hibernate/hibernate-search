@@ -146,7 +146,7 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 		}
 	}
 
-	public class SortedDoubleDocValuesField extends SortedNumericDocValuesField {
+	public static class SortedDoubleDocValuesField extends SortedNumericDocValuesField {
 
 		public SortedDoubleDocValuesField(String name, double value) {
 			super( name, Double.doubleToRawLongBits( value ) );
