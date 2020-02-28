@@ -17,22 +17,22 @@ import org.junit.Test;
  * @author Waldemar Kłaczyński
  */
 public class FieldSortOptionsStepTest extends EasyMockSupport {
-	
+
 	public FieldSortOptionsStepTest() {
 	}
-	
+
 	@BeforeClass
 	public static void setUpClass() {
 	}
-	
+
 	@AfterClass
 	public static void tearDownClass() {
 	}
-	
+
 	@Before
 	public void setUp() {
 	}
-	
+
 	@After
 	public void tearDown() {
 	}
@@ -69,9 +69,6 @@ public class FieldSortOptionsStepTest extends EasyMockSupport {
 //                        })
 //                        .sort(sort.toSort()).toQuery();
 //		
-
 	}
 
-
-	
 }
