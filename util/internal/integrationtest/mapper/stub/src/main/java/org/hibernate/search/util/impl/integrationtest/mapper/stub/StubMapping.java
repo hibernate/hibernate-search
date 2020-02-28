@@ -7,8 +7,11 @@
 package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
 
 public class StubMapping implements MappingImplementor<StubMapping> {
 
@@ -23,12 +26,24 @@ public class StubMapping implements MappingImplementor<StubMapping> {
 		return this;
 	}
 
-	public StubMappingIndexManager getIndexMappingByTypeIdentifier(String typeId) {
-		return indexMappingsByTypeIdentifier.get( typeId );
+	@Override
+	public CompletableFuture<?> start(MappingStartContext context) {
+		// Nothing to do
+		return CompletableFuture.completedFuture( null );
 	}
 
 	@Override
-	public void close() {
+	public CompletableFuture<?> preStop(MappingPreStopContext context) {
 		// Nothing to do
+		return CompletableFuture.completedFuture( null );
+	}
+
+	@Override
+	public void stop() {
+		// Nothing to do
+	}
+
+	public StubMappingIndexManager getIndexMappingByTypeIdentifier(String typeId) {
+		return indexMappingsByTypeIdentifier.get( typeId );
 	}
 }
