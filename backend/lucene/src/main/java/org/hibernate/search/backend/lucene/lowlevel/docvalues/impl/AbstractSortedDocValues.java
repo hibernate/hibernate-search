@@ -14,7 +14,10 @@ import org.apache.lucene.index.SortedDocValues;
  * {@link DocIdSetIterator} APIs. This impl is safe to use for sorting and
  * aggregations, which only use {@link #advanceExact(int)} and
  * {@link #ordValue()}.
- */
+ * <p>
+ * Copied and adapted from {@code PUT THE ORIGINAL CLASS NAME HERE}
+ * of <a href="https://github.com/elastic/elasticsearch">Elasticsearch project</a>.
+*/
 public abstract class AbstractSortedDocValues extends SortedDocValues {
 
 	@Override

@@ -16,7 +16,7 @@ import org.apache.lucene.index.SortedNumericDocValues;
  * <p>
  * Copied and adapted from {@code org.elasticsearch.index.fielddata.SortedNumericDoubleValues} class
  * of <a href="https://github.com/elastic/elasticsearch">Elasticsearch project</a>.
- */
+*/
 public abstract class SortedNumericDoubleValues {
 
 	/**

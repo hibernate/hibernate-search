@@ -20,7 +20,10 @@ import org.apache.lucene.util.BytesRef;
 /**
  * Defines what values to pick in the case a document contains multiple values
  * for a particular field.
- */
+ * <p>
+ * Copied and adapted from {@code PUT THE ORIGINAL CLASS NAME HERE}
+ * of <a href="https://github.com/elastic/elasticsearch">Elasticsearch project</a>.
+*/
 public enum MultiValueMode {
 	/**
 	 * Pick the sum of all the values.

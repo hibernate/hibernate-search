@@ -13,7 +13,10 @@ import org.apache.lucene.index.SortedNumericDocValues;
 
 /**
  * Utility methods, similar to Lucene's {@link DocValues}.
- */
+ * <p>
+ * Copied and adapted from {@code PUT THE ORIGINAL CLASS NAME HERE}
+ * of <a href="https://github.com/elastic/elasticsearch">Elasticsearch project</a>.
+*/
 public class FieldData {
 
 	private FieldData() {
