@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 import java.util.Set;
 import java.util.function.Supplier;
 
+import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
@@ -152,6 +153,11 @@ public class PojoIndexedTypeManager<I, E>
 		reindexingResolver.resolveEntitiesToReindex(
 				collector, runtimeIntrospector, entitySupplier.get(), dirtyPaths
 		);
+	}
+
+	@Override
+	public IndexSchemaManager getSchemaManager() {
+		return indexManager.getSchemaManager();
 	}
 
 	@Override
