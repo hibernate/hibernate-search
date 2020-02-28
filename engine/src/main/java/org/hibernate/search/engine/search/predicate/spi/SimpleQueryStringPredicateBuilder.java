@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
+import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
+import java.util.EnumSet;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 
 public interface SimpleQueryStringPredicateBuilder<B> extends SearchPredicateBuilder<B> {
@@ -20,7 +22,15 @@ public interface SimpleQueryStringPredicateBuilder<B> extends SearchPredicateBui
 
 	void skipAnalysis();
 
-	interface FieldState {
+	void enable(SimpleQueryFlag operation);
+
+	void enable(EnumSet<SimpleQueryFlag> operations);
+
+	void disable(SimpleQueryFlag operation);
+
+	void disable(EnumSet<SimpleQueryFlag> operations);
+
+	interface FieldState<B> {
 
 		void boost(float boost);
 

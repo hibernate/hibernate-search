@@ -46,4 +46,11 @@ public interface SimpleQueryStringPredicateOptionsStep<S extends SimpleQueryStri
 	 */
 	S skipAnalysis();
 
+	/**
+	 * Set options flag for search query.
+	 *
+	 * @return {@code this}, for method chaining.
+	 */
+	SimpleQueryFlagsStep<SimpleQueryStringPredicateOptionsStep<S>> flags();
+
 }

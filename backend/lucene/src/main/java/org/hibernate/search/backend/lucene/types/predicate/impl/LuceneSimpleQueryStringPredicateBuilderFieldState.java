@@ -14,7 +14,7 @@ import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.Query;
 
 public final class LuceneSimpleQueryStringPredicateBuilderFieldState
-		implements SimpleQueryStringPredicateBuilder.FieldState, FieldContextSimpleQueryParser.FieldContext {
+	implements SimpleQueryStringPredicateBuilder.FieldState, FieldContextSimpleQueryParser.FieldContext {
 
 	private final Analyzer analyzer;
 	private Float boost;
@@ -41,4 +41,9 @@ public final class LuceneSimpleQueryStringPredicateBuilderFieldState
 	public Analyzer getAnalyzer() {
 		return analyzer;
 	}
+
+	public Float getBoost() {
+		return boost;
+	}
+
 }

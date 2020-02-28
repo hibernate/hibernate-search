@@ -25,6 +25,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import java.util.EnumSet;
+import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 
 public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
 		implements SimpleQueryStringPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
@@ -45,6 +47,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	private JsonPrimitive defaultOperator = OR_OPERATOR_KEYWORD_JSON;
 	private String simpleQueryString;
 	private String analyzer;
+	private EnumSet<SimpleQueryFlag> operations;
 	private ElasticsearchCompatibilityChecker analyzerChecker = new ElasticsearchSucceedingCompatibilityChecker();
 
 	ElasticsearchSimpleQueryStringPredicateBuilder(ElasticsearchScopeModel scopeModel) {
@@ -61,6 +64,38 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 				this.defaultOperator = OR_OPERATOR_KEYWORD_JSON;
 				break;
 		}
+	}
+
+	@Override
+	public void enable(SimpleQueryFlag operation) {
+		if ( this.operations == null ) {
+			this.operations = EnumSet.noneOf( SimpleQueryFlag.class );
+		}
+		this.operations.add( operation );
+	}
+
+	@Override
+	public void enable(EnumSet<SimpleQueryFlag> operations) {
+		if ( this.operations == null ) {
+			this.operations = EnumSet.noneOf( SimpleQueryFlag.class );
+		}
+		this.operations.addAll( operations );
+	}
+
+	@Override
+	public void disable(SimpleQueryFlag operation) {
+		if ( this.operations == null ) {
+			this.operations = EnumSet.noneOf( SimpleQueryFlag.class );
+		}
+		this.operations.remove( operation );
+	}
+
+	@Override
+	public void disable(EnumSet<SimpleQueryFlag> operations) {
+		if ( this.operations == null ) {
+			this.operations = EnumSet.noneOf( SimpleQueryFlag.class );
+		}
+		this.operations.removeAll( operations );
 	}
 
 	@Override

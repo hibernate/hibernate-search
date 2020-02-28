@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.types.dsl.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.apache.lucene.analysis.Analyzer;
+import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.FieldType;
 import org.apache.lucene.index.IndexOptions;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
@@ -132,6 +133,10 @@ class LuceneStringIndexFieldTypeOptionsStep
 		}
 
 		Analyzer analyzerOrNormalizer = analyzer != null ? analyzer : normalizer;
+
+		if ( analyzerOrNormalizer == null ) {
+			analyzerOrNormalizer = new StandardAnalyzer();
+		}
 
 		DslConverter<?, ? extends String> dslConverter = createDslConverter();
 		DslConverter<String, ? extends String> rawDslConverter = createRawDslConverter();

@@ -9,16 +9,19 @@ package org.hibernate.search.engine.search.predicate.dsl.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.search.common.BooleanOperator;
+import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateFieldMoreStep;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredicateOptionsStep;
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
+import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlagsStep;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
@@ -61,7 +64,7 @@ class SimpleQueryStringPredicateFieldMoreStepImpl<B>
 	}
 
 	static class CommonState<B> extends AbstractPredicateFinalStep<B>
-			implements SimpleQueryStringPredicateOptionsStep<CommonState<B>> {
+			implements SimpleQueryStringPredicateOptionsStep<CommonState<B>>, SimpleQueryFlagsStep<CommonState<B>> {
 
 		private final SimpleQueryStringPredicateBuilder<B> builder;
 
@@ -127,6 +130,36 @@ class SimpleQueryStringPredicateFieldMoreStepImpl<B>
 			return fieldSetStates.stream().flatMap( f -> f.absoluteFieldPaths.stream() )
 					.collect( Collectors.toList() );
 		}
+
+		@Override
+		public SimpleQueryFlagsStep flags() {
+			return this;
+		}
+
+		@Override
+		public SimpleQueryFlagsStep enable(SimpleQueryFlag operation) {
+			builder.enable( operation );
+			return this;
+		}
+
+		@Override
+		public SimpleQueryFlagsStep enable(EnumSet<SimpleQueryFlag> operations) {
+			builder.enable( operations );
+			return this;
+		}
+
+		@Override
+		public SimpleQueryFlagsStep disable(SimpleQueryFlag operation) {
+			builder.disable( operation );
+			return this;
+		}
+
+		@Override
+		public SimpleQueryFlagsStep disable(EnumSet<SimpleQueryFlag> operations) {
+			builder.disable( operations );
+			return this;
+		}
+
 	}
 
 }
