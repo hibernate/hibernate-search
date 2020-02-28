@@ -142,7 +142,6 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 
 			// Start backends
 			for ( Map.Entry<String, BackendNonStartedState> entry : nonStartedBackends.entrySet() ) {
-				// TODO HSEARCH-3084 perform backend initialization in parallel for all backends?
 				startedBackends.put(
 						entry.getKey(),
 						entry.getValue().start( failureCollector, beanResolver, propertySource )
