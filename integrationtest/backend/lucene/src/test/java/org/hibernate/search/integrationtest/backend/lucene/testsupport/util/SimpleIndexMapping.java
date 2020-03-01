@@ -10,17 +10,18 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
+import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 
 public class SimpleIndexMapping {
 
 	private final Map<String, RefType> references = new LinkedHashMap<>();
 
 	public final <T> void add(String path, Class<T> type, IndexFieldReference<T> reference) {
-		references.put( path, new RefType( type, reference ) );
+		references.put( path, new RefType( type, reference, null ) );
 	}
 
-	public final void add(String path, IndexObjectFieldReference reference) {
-		references.put( path, new RefType( IndexObjectFieldReference.class, reference ) );
+	public final void add(String path, ObjectFieldStorage storage, IndexObjectFieldReference reference) {
+		references.put( path, new RefType( IndexObjectFieldReference.class, reference, storage ) );
 	}
 
 	public final Object getReference(String path) {
@@ -47,6 +48,14 @@ public class SimpleIndexMapping {
 		return null;
 	}
 
+	public final ObjectFieldStorage getObjectStorage(String path) {
+		RefType ref = references.get( path );
+		if ( ref != null ) {
+			return ref.storage;
+		}
+		return null;
+	}
+
 	public final Class<?> getType(String path) {
 		RefType ref = references.get( path );
 		if ( ref != null ) {
@@ -59,10 +68,12 @@ public class SimpleIndexMapping {
 
 		Class<?> type;
 		Object reference;
+		ObjectFieldStorage storage;
 
-		public RefType(Class<?> type, Object reference) {
+		public RefType(Class<?> type, Object reference, ObjectFieldStorage storage) {
 			this.type = type;
 			this.reference = reference;
+			this.storage = storage;
 		}
 
 	}

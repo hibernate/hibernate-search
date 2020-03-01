@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.search;
 
+import java.util.List;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -261,17 +262,17 @@ public class LuceneSimpleQueryParserPredicateIT1 {
 				"string", f -> f.asString() )
 				.multiValued().toReference() );
 
-			add( "flattended", fSubInd.toReference() );
+			add( "flattended", ObjectFieldStorage.FLATTENED, fSubInd.toReference() );
 
 			//Add nested index
 			IndexSchemaObjectField nSubInd = root.objectField(
-				"nested", ObjectFieldStorage.NESTED );
+				"nested", ObjectFieldStorage.NESTED ).multiValued();
 
 			add( "nested.string", String.class, nSubInd.field(
 				"string", f -> f.asString() )
 				.multiValued().toReference() );
 
-			add( "nested", nSubInd.toReference() );
+			add( "nested", ObjectFieldStorage.NESTED, nSubInd.toReference() );
 
 		}
 	}
