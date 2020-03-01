@@ -13,6 +13,7 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneIndexContentUtils;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.SimpleIndexMapping;
@@ -791,6 +792,39 @@ public class LuceneMultiValueSearchPredicateIT1 {
 
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3839")
+	public void double_searchNestedMultivaluesWithFilter() {
+
+		if ( SKIP_TEST_NESTED ) {
+			return;
+		}
+
+		if ( SKIP_TEST_DOUBLE ) {
+			return;
+		}
+
+		StubMappingScope scope = indexManager_1_1.createScope();
+
+		PredicateFinalStep filter = scope.predicate()
+			.nested().objectField( "nested" ).nest( (f) -> {
+			return f.match().field( "nested.active" ).matching( true );
+		} );
+
+		SearchQuery<DocumentReference> query = scope.query()
+			.where( f -> {
+				return f.bool().must( f.matchAll() )
+					.filter( filter );
+			} )
+			.sort( f -> f.field( "nested.additionalDoubleField" ).asc().multi().min() )
+			.toQuery();
+
+		assertThat( query ).hasDocRefHitsExactOrder( c -> {
+			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
+		} );
+
+	}
+
 	private void initData() {
 		try {
 			// Backend 1 / Index 1
@@ -888,6 +922,10 @@ public class LuceneMultiValueSearchPredicateIT1 {
 			//Add nested index
 			IndexSchemaObjectField nSubInd = root.objectField(
 				"nested", ObjectFieldStorage.NESTED );
+
+			add( "nested.active", Boolean.class, nSubInd.field(
+				"active", f -> f.asBoolean() )
+				.multiValued().toReference() );
 
 			add( "nested.double", Double.class, nSubInd.field(
 				"additionalDoubleField",

@@ -36,24 +36,28 @@
 
 			"nested": {
 				"1_1_1_1": {
+					"active": false,
 					"double": [7.5],
 					"float": [7.5],
 					"long": [8],
 					"integer": [8]
 				},
 				"1_1_1_2": {
+					"active": false,
 					"double": [8.8],
 					"float": [8.8],
 					"long": [9],
 					"integer": [9]
 				},
 				"1_1_1_3": {
+					"active": true,
 					"double": [1.1],
 					"float": [1.1],
 					"long": [1],
 					"integer": [1]
 				},
 				"1_1_1_4": {
+					"active": true,
 					"double": [2.2],
 					"float": [2.2],
 					"long": [2],
@@ -97,24 +101,28 @@
 
 			"nested": {
 				"1_1_1_1": {
+					"active": true,
 					"double": [4.5],
 					"float": [4.5],
 					"long": [5],
 					"integer": [5]
 				},
 				"1_1_1_2": {
+					"active": true,
 					"double": [2.8],
 					"float": [2.8],
 					"long": [3],
 					"integer": [3]
 				},
 				"1_1_1_3": {
+					"active": false,
 					"double": [0.1],
 					"float": [0.1],
 					"long": [0],
 					"integer": [0]
 				},
 				"1_1_1_4": {
+					"active": true,
 					"double": [4.2],
 					"float": [4.2],
 					"long": [4],
