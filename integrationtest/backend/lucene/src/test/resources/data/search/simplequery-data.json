@@ -1,0 +1,102 @@
+{
+	"IndexName_1_1": {
+		"1_1_1": {
+			"string": "robots are fast",
+
+			"flattended": {
+				"1_1_1_1": {
+					"string": "robots are fast"
+				},
+				"1_1_1_2": {
+					"string": "if he wants to"
+				}
+			},
+
+			"nested": {
+				"1_1_1_1": {
+					"string": "robots are fast"
+				},
+				"1_1_1_2": {
+					"string": "if he wants to"
+				}
+			}
+		},
+		"1_1_2": {
+			"string": "hibernate is the best",
+
+			"flattended": {
+				"1_1_2_1": {
+					"string": "hibernate is the best"
+				},
+				"1_1_2_2": {
+					"string": "especially in searching for objects"
+				}
+			},
+
+			"nested": {
+				"1_1_2_1": {
+					"string": "hibernate is the best"
+				},
+				"1_1_2_2": {
+					"string": "especially in searching for objects"
+				}
+			}
+		},
+		"1_1_3": {
+			"string": "the robot likes hibernate",
+
+			"flattended": {
+				"1_1_3_1": {
+					"string": "the robot likes hibernate"
+				},
+				"1_1_3_2": {
+					"string": "because it's the best"
+				}
+			},
+
+			"nested": {
+				"1_1_3_1": {
+					"string": "the robot likes hibernate"
+				},
+				"1_1_3_2": {
+					"string": "because it's the best"
+				}
+			}
+		},
+		"1_1_4": {
+			"string": "Robots are fast. The robot likes hibernate. Hibernate is the best",
+
+			"flattended": {
+				"1_1_4_1": {
+					"string": "robots are fast"
+				},
+				"1_1_4_2": {
+					"string": "hibernate is the best"
+				},
+				"1_1_4_3": {
+					"string": "the robot likes hibernate"
+				}
+			},
+
+			"nested": {
+				"1_1_4_1": {
+					"string": "robots are fast"
+				},
+				"1_1_4_2": {
+					"string": "hibernate is the best"
+				},
+				"1_1_4_3": {
+					"string": "the robot likes hibernate"
+				}
+			}
+		}
+	},
+	"IndexName_1_2": {
+		"1_2_1":{
+			"string": "Everyone likes hibernate."
+		},
+		"1_2_2":{
+			"string": "Everyone knows that hibernate is the best."
+		}
+	}
+}
