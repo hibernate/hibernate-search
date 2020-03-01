@@ -137,26 +137,32 @@ class SimpleQueryStringPredicateFieldMoreStepImpl<B>
 		}
 
 		@Override
-		public SimpleQueryFlagsStep enable(SimpleQueryFlag operation) {
+		public SimpleQueryFlagsStep<CommonState<B>> enable(SimpleQueryFlag... operation) {
 			builder.enable( operation );
 			return this;
 		}
 
 		@Override
-		public SimpleQueryFlagsStep enable(EnumSet<SimpleQueryFlag> operations) {
+		public SimpleQueryFlagsStep<CommonState<B>> enable(EnumSet<SimpleQueryFlag> operations) {
 			builder.enable( operations );
 			return this;
 		}
 
 		@Override
-		public SimpleQueryFlagsStep disable(SimpleQueryFlag operation) {
+		public SimpleQueryFlagsStep<CommonState<B>> disable(SimpleQueryFlag... operation) {
 			builder.disable( operation );
 			return this;
 		}
 
 		@Override
-		public SimpleQueryFlagsStep disable(EnumSet<SimpleQueryFlag> operations) {
+		public SimpleQueryFlagsStep<CommonState<B>> disable(EnumSet<SimpleQueryFlag> operations) {
 			builder.disable( operations );
+			return this;
+		}
+
+		@Override
+		public SimpleQueryFlagsStep<CommonState<B>> set(EnumSet<SimpleQueryFlag> operations) {
+			builder.set( operations );
 			return this;
 		}
 

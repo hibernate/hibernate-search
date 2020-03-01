@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -67,11 +68,11 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 	}
 
 	@Override
-	public void enable(SimpleQueryFlag operation) {
+	public void enable(SimpleQueryFlag... operation) {
 		if ( this.operations == null ) {
 			this.operations = EnumSet.noneOf( SimpleQueryFlag.class );
 		}
-		this.operations.add( operation );
+		this.operations.addAll( Arrays.asList( operation ) );
 	}
 
 	@Override
@@ -83,11 +84,11 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 	}
 
 	@Override
-	public void disable(SimpleQueryFlag operation) {
+	public void disable(SimpleQueryFlag... operation) {
 		if ( this.operations == null ) {
 			this.operations = EnumSet.allOf( SimpleQueryFlag.class );
 		}
-		this.operations.remove( operation );
+		this.operations.removeAll( Arrays.asList( operation ) );
 	}
 
 	@Override
@@ -96,6 +97,11 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 			this.operations = EnumSet.allOf( SimpleQueryFlag.class );
 		}
 		this.operations.removeAll( operations );
+	}
+
+	@Override
+	public void set(EnumSet<SimpleQueryFlag> operations) {
+		this.operations = operations.clone();
 	}
 
 	@Override

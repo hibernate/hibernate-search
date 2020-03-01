@@ -25,6 +25,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import java.util.Arrays;
 import java.util.EnumSet;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 
@@ -66,11 +67,11 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	}
 
 	@Override
-	public void enable(SimpleQueryFlag operation) {
+	public void enable(SimpleQueryFlag... operation) {
 		if ( this.operations == null ) {
 			this.operations = EnumSet.noneOf( SimpleQueryFlag.class );
 		}
-		this.operations.add( operation );
+		this.operations.addAll( Arrays.asList( operation ) );
 	}
 
 	@Override
@@ -82,11 +83,11 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	}
 
 	@Override
-	public void disable(SimpleQueryFlag operation) {
+	public void disable(SimpleQueryFlag... operation) {
 		if ( this.operations == null ) {
 			this.operations = EnumSet.allOf( SimpleQueryFlag.class );
 		}
-		this.operations.remove( operation );
+		this.operations.removeAll( Arrays.asList( operation ) );
 	}
 
 	@Override
@@ -95,6 +96,11 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 			this.operations = EnumSet.allOf( SimpleQueryFlag.class );
 		}
 		this.operations.removeAll( operations );
+	}
+
+	@Override
+	public void set(EnumSet<SimpleQueryFlag> operations) {
+		this.operations = operations.clone();
 	}
 
 	@Override

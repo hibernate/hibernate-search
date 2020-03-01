@@ -38,12 +38,20 @@ public interface SimpleQueryFlagsStep<S extends SimpleQueryStringPredicateOption
 	}
 
 	/**
+	 * Set operation in the given flags.
+	 *
+	 * @param operations The operation.
+	 * @return {@code this}, for method chaining.
+	 */
+	SimpleQueryFlagsStep<S> set(EnumSet<SimpleQueryFlag> operations);
+
+	/**
 	 * Enable operation in the given flags.
 	 *
 	 * @param operation The operation.
 	 * @return {@code this}, for method chaining.
 	 */
-	SimpleQueryFlagsStep<S> enable(SimpleQueryFlag operation);
+	SimpleQueryFlagsStep<S> enable(SimpleQueryFlag... operation);
 
 	/**
 	 * Enable operation in the given flags.
@@ -59,7 +67,7 @@ public interface SimpleQueryFlagsStep<S extends SimpleQueryStringPredicateOption
 	 * @param operation The operation.
 	 * @return {@code this}, for method chaining.
 	 */
-	SimpleQueryFlagsStep<S> disable(SimpleQueryFlag operation);
+	SimpleQueryFlagsStep<S> disable(SimpleQueryFlag... operation);
 
 	/**
 	 * Disable operation in the given flags.

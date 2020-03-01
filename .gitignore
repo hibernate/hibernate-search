@@ -45,3 +45,11 @@ atlassian-ide-plugin.xml
 # Maven wrapper files
 .mvn
 mvnw*
+/backend/elasticsearch/nb-configuration.xml
+/backend/elasticsearch/licenseheader.txt
+/backend/lucene/licenseheader.txt
+/backend/lucene/nb-configuration.xml
+/engine/licenseheader.txt
+/engine/nb-configuration.xml
+/integrationtest/backend/lucene/nb-configuration.xml
+/util/internal/integrationtest/common/nb-configuration.xml

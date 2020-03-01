@@ -22,15 +22,17 @@ public interface SimpleQueryStringPredicateBuilder<B> extends SearchPredicateBui
 
 	void skipAnalysis();
 
-	void enable(SimpleQueryFlag operation);
+	void enable(SimpleQueryFlag... operation);
 
 	void enable(EnumSet<SimpleQueryFlag> operations);
 
-	void disable(SimpleQueryFlag operation);
+	void disable(SimpleQueryFlag... operation);
 
 	void disable(EnumSet<SimpleQueryFlag> operations);
 
-	interface FieldState<B> {
+	void set(EnumSet<SimpleQueryFlag> operations);
+
+	interface FieldState {
 
 		void boost(float boost);
 
