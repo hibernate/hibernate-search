@@ -137,7 +137,7 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 			SortedNumericDocValues numericDocValues = DocValues.getSortedNumeric( context.reader(), field );
 			final SortedNumericDoubleValues values = FieldData.castToFloat( numericDocValues );
 			if ( nested == null ) {
-				return FieldData.replaceMissing( sortMode.select( values ), missingValue ).getRawDoubleValues();
+				return FieldData.replaceMissing( sortMode.select( values ), missingValue ).getRawFloatValues();
 			}
 			else {
 				final BitSet rootDocs = nested.parentDocs( context );

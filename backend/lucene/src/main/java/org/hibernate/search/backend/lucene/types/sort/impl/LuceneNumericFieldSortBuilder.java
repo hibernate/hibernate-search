@@ -15,6 +15,7 @@ import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 
 import org.apache.lucene.search.SortField;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 
 public class LuceneNumericFieldSortBuilder<F, E extends Number>
 	extends AbstractLuceneStandardFieldSortBuilder<F, E, AbstractLuceneNumericFieldCodec<F, E>> {
@@ -37,6 +38,31 @@ public class LuceneNumericFieldSortBuilder<F, E extends Number>
 			nestedDocumentPath, codec.getDomain(), (E) getEffectiveMissingValue( missingValue, order ), getMultiValueMode() );
 		SortField sortField = new SortField( absoluteFieldPath, fieldComparatorSource, order == SortOrder.DESC );
 
-		collector.collectSortField( sortField, ( nestedDocumentPath != null ) ? fieldComparatorSource : null );
+		collector.collectSortField( sortField, (nestedDocumentPath != null) ? fieldComparatorSource : null );
 	}
+
+	protected MultiValueMode getMultiValueMode() {
+		MultiValueMode sortMode = MultiValueMode.MIN;
+		if ( multi != null ) {
+			switch ( multi ) {
+				case MIN:
+					sortMode = MultiValueMode.MIN;
+					break;
+				case MAX:
+					sortMode = MultiValueMode.MAX;
+					break;
+				case AVG:
+					sortMode = MultiValueMode.AVG;
+					break;
+				case SUM:
+					sortMode = MultiValueMode.SUM;
+					break;
+				case MEDIAN:
+					sortMode = MultiValueMode.MEDIAN;
+					break;
+			}
+		}
+		return sortMode;
+	}
+
 }

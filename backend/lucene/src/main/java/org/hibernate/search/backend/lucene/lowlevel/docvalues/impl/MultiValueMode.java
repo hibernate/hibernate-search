@@ -292,7 +292,7 @@ public enum MultiValueMode {
 		@Override
 		protected long pick(SortedNumericDocValues values) throws IOException {
 			final int count = values.docValueCount();
-			long max = Long.MAX_VALUE;
+			long max = Long.MIN_VALUE;
 			for ( int index = 0; index < count; ++index ) {
 				max = Math.max( max, values.nextValue() );
 			}
