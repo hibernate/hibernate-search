@@ -44,9 +44,9 @@ public class LuceneMultiValueSearchPredicateIT1 {
 	private static final boolean SKIP_TEST_LONG = false;
 	private static final boolean SKIP_TEST_INTEGER = false;
 
-	private static final boolean SKIP_TEST_PARENT = true;
-	private static final boolean SKIP_TEST_FLATTENDED = true;
-	private static final boolean SKIP_TEST_NESTED = true;
+	private static final boolean SKIP_TEST_PARENT = false;
+	private static final boolean SKIP_TEST_FLATTENDED = false;
+	private static final boolean SKIP_TEST_NESTED = false;
 	private static final boolean SKIP_TEST_NESTED_WITH_FILTER = false;
 
 	private final String VALUES = "data/search/multivalues-data.json";
