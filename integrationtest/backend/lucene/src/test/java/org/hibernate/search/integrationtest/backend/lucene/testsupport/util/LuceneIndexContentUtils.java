@@ -28,6 +28,7 @@ import org.assertj.core.api.iterable.ThrowingExtractor;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
+import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.util.common.AssertionFailure;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
@@ -135,16 +136,25 @@ public final class LuceneIndexContentUtils {
 			}
 
 			if ( IndexObjectFieldReference.class.equals( type ) ) {
+				ObjectFieldStorage storage = mapping.getObjectStorage( path );
+
 				JSONObject jsubdata = jdocument.getJSONObject( name );
 				IndexObjectFieldReference reference = mapping.getObjectReference( path );
 				for ( int j = 0; j < jsubdata.length(); j++ ) {
 					String subid = jsubdata.names().getString( j );
 					JSONObject jsub = jsubdata.getJSONObject( subid );
 
-					DocumentElement subdocument = refmap.get( path );
-					if ( subdocument == null ) {
+					DocumentElement subdocument;
+
+					if ( storage == ObjectFieldStorage.NESTED ) {
 						subdocument = document.addObject( reference );
-						refmap.put( path, subdocument );
+					}
+					else {
+						subdocument = refmap.get( path );
+						if ( subdocument == null ) {
+							subdocument = document.addObject( reference );
+							refmap.put( path, subdocument );
+						}
 					}
 
 					initIndexDocumentFromJson( path + ".",

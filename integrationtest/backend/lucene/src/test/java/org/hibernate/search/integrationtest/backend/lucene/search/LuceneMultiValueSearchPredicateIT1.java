@@ -44,9 +44,10 @@ public class LuceneMultiValueSearchPredicateIT1 {
 	private static final boolean SKIP_TEST_LONG = false;
 	private static final boolean SKIP_TEST_INTEGER = false;
 
-	private static final boolean SKIP_TEST_PARENT = false;
-	private static final boolean SKIP_TEST_FLATTENDED = false;
-	private static final boolean SKIP_TEST_NESTED = false;
+	private static final boolean SKIP_TEST_PARENT = true;
+	private static final boolean SKIP_TEST_FLATTENDED = true;
+	private static final boolean SKIP_TEST_NESTED = true;
+	private static final boolean SKIP_TEST_NESTED_WITH_FILTER = false;
 
 	private final String VALUES = "data/search/multivalues-data.json";
 
@@ -796,7 +797,7 @@ public class LuceneMultiValueSearchPredicateIT1 {
 	@TestForIssue(jiraKey = "HSEARCH-3839")
 	public void double_searchNestedMultivaluesWithFilter() {
 
-		if ( SKIP_TEST_NESTED ) {
+		if ( SKIP_TEST_NESTED_WITH_FILTER ) {
 			return;
 		}
 
@@ -808,7 +809,7 @@ public class LuceneMultiValueSearchPredicateIT1 {
 
 		PredicateFinalStep filter = scope.predicate()
 			.nested().objectField( "nested" ).nest( (f) -> {
-			return f.match().field( "nested.active" ).matching( true );
+			return f.match().field( "nested.active" ).matching( false );
 		} );
 
 		SearchQuery<DocumentReference> query = scope.query()
@@ -816,7 +817,7 @@ public class LuceneMultiValueSearchPredicateIT1 {
 				return f.bool().must( f.matchAll() )
 					.filter( filter );
 			} )
-			.sort( f -> f.field( "nested.additionalDoubleField" ).asc().multi().min() )
+			.sort( f -> f.field( "nested.additionalIntegerField" ).asc().multi().sum() )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -917,11 +918,11 @@ public class LuceneMultiValueSearchPredicateIT1 {
 				f -> f.asInteger().sortable( Sortable.YES ) )
 				.multiValued().toReference() );
 
-			add( "flattended", fSubInd.toReference() );
+			add( "flattended", ObjectFieldStorage.FLATTENED, fSubInd.toReference() );
 
 			//Add nested index
 			IndexSchemaObjectField nSubInd = root.objectField(
-				"nested", ObjectFieldStorage.NESTED );
+				"nested", ObjectFieldStorage.NESTED ).multiValued();
 
 			add( "nested.active", Boolean.class, nSubInd.field(
 				"active", f -> f.asBoolean() )
@@ -947,7 +948,7 @@ public class LuceneMultiValueSearchPredicateIT1 {
 				f -> f.asInteger().sortable( Sortable.YES ) )
 				.multiValued().toReference() );
 
-			add( "nested", nSubInd.toReference() );
+			add( "nested", ObjectFieldStorage.NESTED, nSubInd.toReference() );
 
 		}
 	}

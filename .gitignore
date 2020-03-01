@@ -47,7 +47,9 @@ atlassian-ide-plugin.xml
 mvnw*
 /backend/elasticsearch/licenseheader.txt
 /backend/lucene/licenseheader.txt
+/backend/lucene/nb-configuration.xml
 /engine/licenseheader.txt
 /licenseheader.txt
 /util/internal/integrationtest/common/nb-configuration.xml
 /integrationtest/backend/lucene/nb-configuration.xml
+/integrationtest/backend/lucene/licenseheader.txt
