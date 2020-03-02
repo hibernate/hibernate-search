@@ -54,3 +54,4 @@ mvnw*
 /integrationtest/backend/lucene/nb-configuration.xml
 /util/internal/integrationtest/common/nb-configuration.xml
 /licenseheader.txt
+/integrationtest/backend/lucene/licenseheader.txt
