@@ -34,10 +34,10 @@ import org.junit.runners.Parameterized;
 
 /**
  * This is an extension of the backend TCK test
- * {@link LuceneMultiValueSearchPredicateIT1}.
+ * {@link LuceneMultiValueSearchPredicateIT}.
  */
 @RunWith(Parameterized.class)
-public class LuceneMultiValueSearchPredicateIT1 {
+public class LuceneMultiValueSearchPredicateIT {
 
 	private static final boolean SKIP_TEST_DOUBLE = false;
 	private static final boolean SKIP_TEST_FLOAT = false;
@@ -82,7 +82,7 @@ public class LuceneMultiValueSearchPredicateIT1 {
 		return new Object[]{"local-heap", "local-filesystem"};
 	}
 
-	public LuceneMultiValueSearchPredicateIT1(String directoryType) {
+	public LuceneMultiValueSearchPredicateIT(String directoryType) {
 		this.directoryType = directoryType;
 	}
 
