@@ -40,7 +40,7 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class LuceneSimpleQueryParserPredicateIT {
 
-	private final String VALUES = "/data/search/simplequery-data.json";
+	private final String VALUES = "data/search/simplequery-data.json";
 
 	// Backend 1 / Index 1
 	private static final String INDEX_NAME_1_1 = "IndexName_1_1";
