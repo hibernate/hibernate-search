@@ -32,17 +32,12 @@ public final class JSONTestModelLoader {
 
 	public static JSONObject loadIndexData(String resource) {
 		try {
-			Path path = Paths.get( "src", "test", "resources", resource );
-			if ( !Files.exists( path ) ) {
-
-				ClassLoader cl = JSONTestModelLoader.class.getClassLoader();
-				URL url = cl.getResource( "/" + resource );
-				if ( url == null ) {
-					throw new AssertionFailure( "can not find resorce file " + resource );
-				}
-				path = Paths.get( url.toURI() );
+			ClassLoader cl = JSONTestModelLoader.class.getClassLoader();
+			URL url = cl.getResource( resource );
+			if ( url == null ) {
+				throw new AssertionFailure( "can not find resorce file " + resource );
 			}
-
+			Path path = Paths.get( url.toURI() );
 			String content = new String( Files.readAllBytes( path ), "UTF8" );
 			JSONObject result = new JSONObject( content );
 			return result;
