@@ -6,15 +6,26 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.search;
 
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.aggregation.dsl.AggregationFinalStep;
+import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactory;
+import org.hibernate.search.engine.search.aggregation.dsl.SearchAggregationFactoryExtension;
+import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.sort.dsl.SortMultiValue;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.JSONTestModelLoader;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.SimpleIndexMapping;
@@ -39,6 +50,9 @@ import org.junit.runners.Parameterized;
  */
 @RunWith(Parameterized.class)
 public class LuceneMultiValueSearchPredicateNestedWithFilterIT {
+
+	private static final String STRING_1 = "string_1";
+	private static final String STRING_2 = "string_2";
 
 	private final String VALUES = "data/search/multivalues-nested-data.json";
 
@@ -121,6 +135,62 @@ public class LuceneMultiValueSearchPredicateNestedWithFilterIT {
 		} );
 
 	}
+	
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3839")
+	public void double_searchNestedMultivaluesStringAggregation() {
+
+		StubMappingScope scope = indexManager_1_1.createScope();
+		AggregationKey<Map<String, Long>> aggregationKey = AggregationKey.of( "someAggregation" );
+
+		PredicateFinalStep filter = scope.predicate()
+			.nested().objectField( "nested" ).nest( (f) -> {
+			return f.match().field( "nested.active" ).matching( true );
+		} );
+
+		SearchQuery<DocumentReference> query = scope.query()
+			.where( f -> {
+				return f.bool().must( f.matchAll() )
+					.must( filter );
+			} )
+			.aggregation( aggregationKey, f -> f.extension( new SupportedExtension() )
+			.extendedAggregation( "string" ) )
+			.sort( f -> f.field( "nested.additionalIntegerField" )
+			.asc().multi( SortMultiValue.SUM ) )
+			.toQuery();
+
+		SearchResult<DocumentReference> result = query.fetchAll();
+
+		assertThat( query )
+			.aggregation( aggregationKey )
+			.satisfies( map -> Assertions.assertThat( map ).containsExactly(
+			Assertions.entry( STRING_1, 1L ),
+			Assertions.entry( STRING_2, 1L )
+		) );
+
+	}
+
+	private static class SupportedExtension implements SearchAggregationFactoryExtension<MyExtendedFactory> {
+		@Override
+		public Optional<MyExtendedFactory> extendOptional(SearchAggregationFactory original,
+			SearchAggregationDslContext<?> dslContext) {
+			Assertions.assertThat( original ).isNotNull();
+			Assertions.assertThat( dslContext ).isNotNull();
+			return Optional.of( new MyExtendedFactory( original ) );
+		}
+	}
+
+	private static class MyExtendedFactory {
+		private final SearchAggregationFactory delegate;
+
+		MyExtendedFactory(SearchAggregationFactory delegate) {
+			this.delegate = delegate;
+		}
+
+		public AggregationFinalStep<Map<String, Long>> extendedAggregation(String absoluteFieldPath) {
+			return delegate.terms().field( absoluteFieldPath, String.class );
+		}
+	}
 
 	private void initData() {
 		try {
@@ -167,7 +237,7 @@ public class LuceneMultiValueSearchPredicateNestedWithFilterIT {
 		IndexMapping_1_1(IndexSchemaElement root) {
 
 			add( "string", String.class, root.field(
-				"string", f -> f.asString() )
+				"string", f -> f.asString().aggregable( Aggregable.YES ) )
 				.toReference() );
 
 			//Add nested index
