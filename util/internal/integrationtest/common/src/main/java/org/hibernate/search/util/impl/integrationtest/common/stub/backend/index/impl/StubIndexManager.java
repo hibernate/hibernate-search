@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
@@ -36,7 +38,7 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 	private final String mappedTypeName;
 	private final StubIndexSchemaNode rootSchemaNode;
 
-	private boolean running = true;
+	private State state = State.STOPPED;
 
 	StubIndexManager(StubBackend backend, String name, String mappedTypeName,
 			StubIndexSchemaNode rootSchemaNode) {
@@ -50,12 +52,14 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 
 	@Override
 	public CompletableFuture<?> start(IndexManagerStartContext context) {
+		this.state = State.STARTED;
 		// Nothing to do
 		return CompletableFuture.completedFuture( null );
 	}
 
 	@Override
 	public CompletableFuture<?> preStop() {
+		this.state = State.STOPPING;
 		// Nothing to do
 		return CompletableFuture.completedFuture( null );
 	}
@@ -66,11 +70,11 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 		 * This is important so that multiple calls to close on a single index manager
 		 * won't be interpreted as closing multiple objects in test assertions.
 		 */
-		if ( !running ) {
+		if ( State.STOPPED.equals( state ) ) {
 			return;
 		}
 		StaticCounters.get().increment( STOP_COUNTER_KEY );
-		running = false;
+		state = State.STOPPED;
 	}
 
 	@Override
@@ -80,6 +84,7 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 
 	@Override
 	public IndexSchemaManager getSchemaManager() {
+		checkStarted();
 		return new StubIndexSchemaManager( name, backend.getBehavior() );
 	}
 
@@ -87,6 +92,7 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 	public <R> IndexIndexingPlan<R> createIndexingPlan(BackendSessionContext context,
 			EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		checkStarted();
 		return new StubIndexIndexingPlan<>(
 				name, mappedTypeName, backend.getBehavior(),
 				context, entityReferenceFactory, commitStrategy, refreshStrategy
@@ -96,21 +102,25 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 	@Override
 	public IndexIndexer createIndexer(BackendSessionContext context,
 			DocumentCommitStrategy commitStrategy) {
+		checkStarted();
 		return new StubIndexIndexer( name, backend.getBehavior(), context, commitStrategy );
 	}
 
 	@Override
 	public IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext) {
+		checkStarted();
 		return new StubIndexWorkspace( name, backend.getBehavior(), sessionContext );
 	}
 
 	@Override
 	public IndexScopeBuilder createScopeBuilder(BackendMappingContext mappingContext) {
+		checkStarted();
 		return new StubIndexScope.Builder( backend, mappingContext, name, rootSchemaNode );
 	}
 
 	@Override
 	public void addTo(IndexScopeBuilder builder) {
+		checkStarted();
 		((StubIndexScope.Builder) builder ).add( backend, name, rootSchemaNode );
 	}
 
@@ -128,4 +138,13 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 		throw new SearchException( "Cannot unwrap " + this + " to " + clazz );
 	}
 
+	private void checkStarted() {
+		assertThat( state ).isEqualTo( State.STARTED );
+	}
+
+	private enum State {
+		STOPPED,
+		STARTED,
+		STOPPING;
+	}
 }
