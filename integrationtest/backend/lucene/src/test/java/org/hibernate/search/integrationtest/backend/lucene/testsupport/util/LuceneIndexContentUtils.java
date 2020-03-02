@@ -86,7 +86,7 @@ public final class LuceneIndexContentUtils {
 	public static JSONObject loadIndexData(String values) {
 		Path path = Paths.get( "src", "test", "resources", values );
 		if ( !Files.exists( path ) ) {
-			throw new AssertionFailure( String.format( "can not find resorce file %s.", values ) );
+			throw new AssertionFailure( "can not find resorce file " + values );
 		}
 
 		try {
