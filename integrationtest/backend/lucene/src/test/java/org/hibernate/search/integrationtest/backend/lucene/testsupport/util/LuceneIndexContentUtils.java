@@ -7,15 +7,19 @@
 package org.hibernate.search.integrationtest.backend.lucene.testsupport.util;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 
@@ -85,14 +89,19 @@ public final class LuceneIndexContentUtils {
 	}
 
 	public static JSONObject loadIndexData(String values) {
-		URL resource = LuceneIndexContentUtils.class.getClassLoader().getResource( values );
-		try ( Scanner scanner = new Scanner( resource.openStream(), "UTF8" ) ) {
-			String content = scanner.useDelimiter( "\\A" ).next();
+		Path path = Paths.get( "src", "test", "resources", values );
+		if ( !Files.exists( path ) ) {
+			throw new AssertionFailure( String.format( "can not find resorce file %s.", values ) );
+		}
+
+		try {
+			path = path.toAbsolutePath();
+			String content = new String( Files.readAllBytes( path ), "UTF8" );
 			JSONObject result = new JSONObject( content );
 			return result;
 		}
-		catch (Exception e) {
-			throw new AssertionFailure( "load json index data", e );
+		catch (IOException | JSONException ex) {
+			throw new AssertionFailure( "load json index data", ex );
 		}
 	}
 
