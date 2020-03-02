@@ -7,10 +7,10 @@
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
@@ -47,7 +47,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 	private String simpleQueryString;
 	private Analyzer overrideAnalyzer;
 	private boolean ignoreAnalyzer = false;
-	private EnumSet<SimpleQueryFlag> operations;
+	private EnumSet<SimpleQueryFlag> flags;
 	private LuceneCompatibilityChecker analyzerChecker = new LuceneSucceedingCompatibilityChecker();
 
 	LuceneSimpleQueryStringPredicateBuilder(LuceneSearchContext searchContext, LuceneScopeModel scopeModel) {
@@ -68,40 +68,8 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 	}
 
 	@Override
-	public void enable(SimpleQueryFlag... operation) {
-		if ( this.operations == null ) {
-			this.operations = EnumSet.noneOf( SimpleQueryFlag.class );
-		}
-		this.operations.addAll( Arrays.asList( operation ) );
-	}
-
-	@Override
-	public void enable(EnumSet<SimpleQueryFlag> operations) {
-		if ( this.operations == null ) {
-			this.operations = EnumSet.noneOf( SimpleQueryFlag.class );
-		}
-		this.operations.addAll( operations );
-	}
-
-	@Override
-	public void disable(SimpleQueryFlag... operation) {
-		if ( this.operations == null ) {
-			this.operations = EnumSet.allOf( SimpleQueryFlag.class );
-		}
-		this.operations.removeAll( Arrays.asList( operation ) );
-	}
-
-	@Override
-	public void disable(EnumSet<SimpleQueryFlag> operations) {
-		if ( this.operations == null ) {
-			this.operations = EnumSet.allOf( SimpleQueryFlag.class );
-		}
-		this.operations.removeAll( operations );
-	}
-
-	@Override
-	public void set(EnumSet<SimpleQueryFlag> operations) {
-		this.operations = operations.clone();
+	public void flags(Set<SimpleQueryFlag> flags) {
+		this.flags = EnumSet.copyOf( flags );
 	}
 
 	@Override
@@ -144,9 +112,9 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 		Analyzer analyzer = buildAnalyzer();
 
 		int flag = -1;
-		if ( operations != null ) {
+		if ( flags != null ) {
 			flag = 0;
-			for ( SimpleQueryFlag operation : operations ) {
+			for ( SimpleQueryFlag operation : flags ) {
 				switch ( operation ) {
 					case AND:
 						flag |= SimpleQueryParser.AND_OPERATOR;

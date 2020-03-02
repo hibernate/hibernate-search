@@ -25,8 +25,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.Set;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 
 public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
@@ -47,7 +47,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	private JsonPrimitive defaultOperator = OR_OPERATOR_KEYWORD_JSON;
 	private String simpleQueryString;
 	private String analyzer;
-	private EnumSet<SimpleQueryFlag> operations;
+	private EnumSet<SimpleQueryFlag> flags;
 	private ElasticsearchCompatibilityChecker analyzerChecker = new ElasticsearchSucceedingCompatibilityChecker();
 
 	ElasticsearchSimpleQueryStringPredicateBuilder(ElasticsearchScopeModel scopeModel) {
@@ -67,40 +67,8 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	}
 
 	@Override
-	public void enable(SimpleQueryFlag... operation) {
-		if ( this.operations == null ) {
-			this.operations = EnumSet.noneOf( SimpleQueryFlag.class );
-		}
-		this.operations.addAll( Arrays.asList( operation ) );
-	}
-
-	@Override
-	public void enable(EnumSet<SimpleQueryFlag> operations) {
-		if ( this.operations == null ) {
-			this.operations = EnumSet.noneOf( SimpleQueryFlag.class );
-		}
-		this.operations.addAll( operations );
-	}
-
-	@Override
-	public void disable(SimpleQueryFlag... operation) {
-		if ( this.operations == null ) {
-			this.operations = EnumSet.allOf( SimpleQueryFlag.class );
-		}
-		this.operations.removeAll( Arrays.asList( operation ) );
-	}
-
-	@Override
-	public void disable(EnumSet<SimpleQueryFlag> operations) {
-		if ( this.operations == null ) {
-			this.operations = EnumSet.allOf( SimpleQueryFlag.class );
-		}
-		this.operations.removeAll( operations );
-	}
-
-	@Override
-	public void set(EnumSet<SimpleQueryFlag> operations) {
-		this.operations = operations.clone();
+	public void flags(Set<SimpleQueryFlag> flags) {
+		this.flags = EnumSet.copyOf( flags );
 	}
 
 	@Override

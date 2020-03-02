@@ -112,7 +112,6 @@ public class LuceneSimpleQueryParserPredicateIT {
 				return f.simpleQueryString()
 					.field( "string" ).boost( 0.5f )
 					.matching( "hiber* robot" )
-					.flags().all()
 					.defaultOperator( BooleanOperator.AND );
 			} )
 			.toQuery();
@@ -126,8 +125,7 @@ public class LuceneSimpleQueryParserPredicateIT {
 				return f.simpleQueryString()
 					.field( "string" ).boost( 0.5f )
 					.matching( "hiber* robot" )
-					.flags()
-					.disable( SimpleQueryFlag.PREFIX )
+					.flags( SimpleQueryFlag.PREFIX )
 					.defaultOperator( BooleanOperator.AND );
 			} )
 			.toQuery();
@@ -146,7 +144,6 @@ public class LuceneSimpleQueryParserPredicateIT {
 				return f.simpleQueryString()
 					.field( "flattended.string" ).boost( 0.5f )
 					.matching( "hiber* robot" )
-					.flags().all()
 					.defaultOperator( BooleanOperator.AND );
 			} )
 			.toQuery();
@@ -160,8 +157,7 @@ public class LuceneSimpleQueryParserPredicateIT {
 				return f.simpleQueryString()
 					.field( "flattended.string" ).boost( 0.5f )
 					.matching( "hiber* robot" )
-					.flags()
-					.disable( SimpleQueryFlag.PREFIX )
+					.flags( SimpleQueryFlag.PREFIX )
 					.defaultOperator( BooleanOperator.AND );
 			} )
 			.toQuery();
@@ -181,7 +177,6 @@ public class LuceneSimpleQueryParserPredicateIT {
 			return f.simpleQueryString()
 				.field( "nested.string" )
 				.matching( "hiber* robot" )
-				.flags().all()
 				.defaultOperator( BooleanOperator.AND );
 		} ).toPredicate();
 
@@ -198,8 +193,7 @@ public class LuceneSimpleQueryParserPredicateIT {
 			return f.simpleQueryString()
 				.field( "nested.string" )
 				.matching( "hiber* robot" )
-				.flags()
-				.disable( SimpleQueryFlag.PREFIX )
+				.flags( SimpleQueryFlag.PREFIX )
 				.defaultOperator( BooleanOperator.AND );
 		} ).toPredicate();
 

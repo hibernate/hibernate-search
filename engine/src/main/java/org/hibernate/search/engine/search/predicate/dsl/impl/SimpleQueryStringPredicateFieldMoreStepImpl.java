@@ -9,8 +9,8 @@ package org.hibernate.search.engine.search.predicate.dsl.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.hibernate.search.engine.logging.impl.Log;
@@ -21,15 +21,11 @@ import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryStringPredica
 import org.hibernate.search.engine.search.predicate.dsl.spi.AbstractPredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
-import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlagsStep;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-
 class SimpleQueryStringPredicateFieldMoreStepImpl<B>
-		implements SimpleQueryStringPredicateFieldMoreStep<
-				SimpleQueryStringPredicateFieldMoreStepImpl<B>,
-				SimpleQueryStringPredicateOptionsStep<?>
-		> {
+	implements SimpleQueryStringPredicateFieldMoreStep<
+				SimpleQueryStringPredicateFieldMoreStepImpl<B>, SimpleQueryStringPredicateOptionsStep<?>> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -64,7 +60,7 @@ class SimpleQueryStringPredicateFieldMoreStepImpl<B>
 	}
 
 	static class CommonState<B> extends AbstractPredicateFinalStep<B>
-			implements SimpleQueryStringPredicateOptionsStep<CommonState<B>>, SimpleQueryFlagsStep<CommonState<B>> {
+		implements SimpleQueryStringPredicateOptionsStep<CommonState<B>> {
 
 		private final SimpleQueryStringPredicateBuilder<B> builder;
 
@@ -128,41 +124,12 @@ class SimpleQueryStringPredicateFieldMoreStepImpl<B>
 
 		private List<String> collectAbsoluteFieldPaths() {
 			return fieldSetStates.stream().flatMap( f -> f.absoluteFieldPaths.stream() )
-					.collect( Collectors.toList() );
+				.collect( Collectors.toList() );
 		}
 
 		@Override
-		public SimpleQueryFlagsStep flags() {
-			return this;
-		}
-
-		@Override
-		public SimpleQueryFlagsStep<CommonState<B>> enable(SimpleQueryFlag... operation) {
-			builder.enable( operation );
-			return this;
-		}
-
-		@Override
-		public SimpleQueryFlagsStep<CommonState<B>> enable(EnumSet<SimpleQueryFlag> operations) {
-			builder.enable( operations );
-			return this;
-		}
-
-		@Override
-		public SimpleQueryFlagsStep<CommonState<B>> disable(SimpleQueryFlag... operation) {
-			builder.disable( operation );
-			return this;
-		}
-
-		@Override
-		public SimpleQueryFlagsStep<CommonState<B>> disable(EnumSet<SimpleQueryFlag> operations) {
-			builder.disable( operations );
-			return this;
-		}
-
-		@Override
-		public SimpleQueryFlagsStep<CommonState<B>> set(EnumSet<SimpleQueryFlag> operations) {
-			builder.set( operations );
+		public CommonState<B> flags(Set<SimpleQueryFlag> flags) {
+			builder.flags( flags );
 			return this;
 		}
 

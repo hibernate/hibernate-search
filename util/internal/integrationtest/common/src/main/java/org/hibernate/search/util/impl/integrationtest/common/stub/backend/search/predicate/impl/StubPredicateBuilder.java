@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.predicate.impl;
 
-import java.util.EnumSet;
+import java.util.Set;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
@@ -169,28 +169,8 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 	}
 
 	@Override
-	public void enable(SimpleQueryFlag... operation) {
-		// No-op
-	}
-
-	@Override
-	public void enable(EnumSet<SimpleQueryFlag> operations) {
-		// No-op
-	}
-
-	@Override
-	public void disable(SimpleQueryFlag... operation) {
-		// No-op
-	}
-
-	@Override
-	public void disable(EnumSet<SimpleQueryFlag> operations) {
-		// No-op
-	}
-
-	@Override
-	public void set(EnumSet<SimpleQueryFlag> operations) {
-		// No-op
+	public void flags(Set<SimpleQueryFlag> flags) {
+		// No-op, just simulates a call on this object
 	}
 
 	private static class StubFieldState implements FieldState {
