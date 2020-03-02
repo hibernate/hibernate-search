@@ -18,6 +18,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.util.common.impl.Throwables;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneTestIndexesPathConfiguration;
 
 import org.jboss.logging.Logger;
 

@@ -33,6 +33,7 @@
     <modules>
         <module>common</module>
         <module>backend/elasticsearch</module>
+        <module>backend/lucene</module>
         <module>mapper/orm</module>
         <module>mapper/stub</module>
         <module>sharedresources</module>

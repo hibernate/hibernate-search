@@ -58,6 +58,11 @@
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-backend-lucene</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>${project.groupId}</groupId>
             <artifactId>hibernate-search-util-internal-integrationtest-mapper-orm</artifactId>
             <scope>test</scope>
         </dependency>
