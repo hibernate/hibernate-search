@@ -8,7 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.common.ValueConvert;
-import org.hibernate.search.engine.search.sort.dsl.SortMultiFunc;
+import org.hibernate.search.engine.search.sort.dsl.SortMultiValue;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
@@ -46,7 +46,7 @@ public class StubSortBuilder implements ScoreSortBuilder<StubSortBuilder>,
 	}
 
 	@Override
-	public void multi(SortMultiFunc multi) {
+	public void multi(SortMultiValue multi) {
 		// No-op, just simulates a call on this object
 	}
 }

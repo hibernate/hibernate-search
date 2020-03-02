@@ -10,7 +10,7 @@ import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import org.hibernate.search.engine.search.sort.dsl.SortMultiFunc;
+import org.hibernate.search.engine.search.sort.dsl.SortMultiValue;
 
 class ElasticsearchScoreSortBuilder extends AbstractElasticsearchSearchSortBuilder
 		implements ScoreSortBuilder<ElasticsearchSearchSortBuilder> {
@@ -31,7 +31,7 @@ class ElasticsearchScoreSortBuilder extends AbstractElasticsearchSearchSortBuild
 	}
 
 	@Override
-	public void multi(SortMultiFunc multi) {
+	public void multi(SortMultiValue multi) {
 		throw new UnsupportedOperationException( "Not supported yet." );
 	}
 }

@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.search.sort.dsl;
 
 
-public enum SortMultiFunc {
+public enum SortMultiValue {
 
 	/**
 	 * Multivalue the sum of all the values.

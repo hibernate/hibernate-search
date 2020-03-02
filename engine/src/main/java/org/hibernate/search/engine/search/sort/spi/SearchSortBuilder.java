@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.search.sort.spi;
 
 
-import org.hibernate.search.engine.search.sort.dsl.SortMultiFunc;
+import org.hibernate.search.engine.search.sort.dsl.SortMultiValue;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 
 /**
@@ -21,7 +21,7 @@ public interface SearchSortBuilder<B> {
 
 	void order(SortOrder order);
 
-	void multi(SortMultiFunc multi);
+	void multi(SortMultiValue multi);
 
 	/**
 	 * @return An implementation-specific view of this builder,

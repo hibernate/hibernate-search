@@ -13,15 +13,13 @@ import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.dsl.spi.AbstractSortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.common.ValueConvert;
-import org.hibernate.search.engine.search.sort.dsl.SortMultiFunc;
+import org.hibernate.search.engine.search.sort.dsl.SortMultiValue;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
-import org.hibernate.search.engine.search.sort.dsl.SortMultiValueStep;
 
 class FieldSortOptionsStepImpl<B>
 	extends AbstractSortThenStep<B>
 	implements FieldSortOptionsStep<FieldSortOptionsStepImpl<B>>,
-	FieldSortMissingValueBehaviorStep<FieldSortOptionsStepImpl<B>>,
-	SortMultiValueStep<FieldSortOptionsStepImpl<B>> {
+	FieldSortMissingValueBehaviorStep<FieldSortOptionsStepImpl<B>> {
 
 	private final FieldSortBuilder<B> builder;
 
@@ -43,7 +41,8 @@ class FieldSortOptionsStepImpl<B>
 	}
 
 	@Override
-	public SortMultiValueStep<FieldSortOptionsStepImpl<B>> multi() {
+	public FieldSortOptionsStepImpl<B> multi(SortMultiValue multi) {
+		builder.multi( multi );
 		return this;
 	}
 
@@ -68,12 +67,6 @@ class FieldSortOptionsStepImpl<B>
 	@Override
 	protected B toImplementation() {
 		return builder.toImplementation();
-	}
-
-	@Override
-	public FieldSortOptionsStepImpl<B> func(SortMultiFunc multi) {
-		builder.multi( multi );
-		return this;
 	}
 
 }
