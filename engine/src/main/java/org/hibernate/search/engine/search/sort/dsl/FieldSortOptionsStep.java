@@ -26,7 +26,7 @@ public interface FieldSortOptionsStep<S extends FieldSortOptionsStep<?>>
 	/**
 	 * Start describing the behavior of this sort when a document do have multi values for the targeted field.
 	 *
-	 * @param multi
+	 * @param multi The multi.
 	 * @return The next step.
 	 */
 	S multi(SortMultiValue multi);
