@@ -76,10 +76,8 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public CompletableFuture<?> start(IndexManagerStartContext context) {
+	public void start(IndexManagerStartContext context) {
 		shardHolder.start( context );
-		// TODO HSEARCH-3759 remove the return type?
-		return CompletableFuture.completedFuture( null );
 	}
 
 	@Override

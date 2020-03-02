@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.common.impl;
 
-import java.util.concurrent.CompletableFuture;
-
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.EngineConfigurationUtils;
@@ -15,8 +13,6 @@ import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.common.impl.Throwables;
 
 class IndexManagerNonStartedState {
 
@@ -35,7 +31,7 @@ class IndexManagerNonStartedState {
 		indexManager.stop();
 	}
 
-	CompletableFuture<?> start(RootFailureCollector rootFailureCollector,
+	IndexManagerImplementor start(RootFailureCollector rootFailureCollector,
 			BeanResolver beanResolver,
 			ConfigurationPropertySource rootPropertySource) {
 		ContextualFailureCollector indexFailureCollector =
@@ -51,14 +47,13 @@ class IndexManagerNonStartedState {
 		IndexManagerStartContextImpl startContext = new IndexManagerStartContextImpl(
 				indexFailureCollector, beanResolver, indexPropertySource
 		);
-		return indexManager.start( startContext )
-				.exceptionally( Futures.handler( e -> {
-					indexFailureCollector.add( Throwables.expectException( e ) );
-					return null;
-				} ) );
+		try {
+			indexManager.start( startContext );
+		}
+		catch (RuntimeException e) {
+			indexFailureCollector.add( e );
+		}
+		return indexManager; // The index is now started
 	}
 
-	public IndexManagerImplementor getIndexManager() {
-		return indexManager;
-	}
 }
