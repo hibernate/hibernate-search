@@ -11,16 +11,14 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
-import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
+import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
 import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexSchemaManager;
 import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexLifecycleExecutionOptions;
-import org.hibernate.search.backend.elasticsearch.index.management.impl.ElasticsearchIndexLifecycleStrategy;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorImplementor;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -40,6 +38,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
@@ -56,22 +55,21 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private static final ConfigurationProperty<IndexLifecycleStrategyName> LIFECYCLE_STRATEGY =
-			ConfigurationProperty.forKey( ElasticsearchIndexSettings.LIFECYCLE_STRATEGY )
-					.as( IndexLifecycleStrategyName.class, IndexLifecycleStrategyName::of )
-					.withDefault( ElasticsearchIndexSettings.Defaults.LIFECYCLE_STRATEGY )
+	private static final OptionalConfigurationProperty<String> OBSOLETE_LIFECYCLE_STRATEGY =
+			ConfigurationProperty.forKey( "lifecycle.strategy" )
+					.asString()
 					.build();
 
 	private static final ConfigurationProperty<IndexStatus> LIFECYCLE_MINIMAL_REQUIRED_STATUS =
-			ConfigurationProperty.forKey( ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS )
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS )
 					.as( IndexStatus.class, IndexStatus::of )
-					.withDefault( ElasticsearchIndexSettings.Defaults.LIFECYCLE_MINIMAL_REQUIRED_STATUS )
+					.withDefault( ElasticsearchIndexSettings.Defaults.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS )
 					.build();
 
 	private static final ConfigurationProperty<Integer> LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT =
-			ConfigurationProperty.forKey( ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT )
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT )
 					.asInteger()
-					.withDefault( ElasticsearchIndexSettings.Defaults.LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT )
+					.withDefault( ElasticsearchIndexSettings.Defaults.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT )
 					.build();
 
 	private final IndexManagerBackendContext backendContext;
@@ -83,7 +81,6 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 	private final ElasticsearchWorkOrchestratorImplementor parallelOrchestrator;
 
 	private ElasticsearchIndexSchemaManager schemaManager;
-	private ElasticsearchIndexLifecycleStrategy lifecycleStrategy;
 
 	ElasticsearchIndexManagerImpl(IndexManagerBackendContext backendContext,
 			ElasticsearchIndexModel model,
@@ -116,11 +113,19 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 			schemaManager = backendContext.createSchemaManager(
 					model, createLifecycleExecutionOptions( context.getConfigurationPropertySource() )
 			);
-			lifecycleStrategy = createLifecycleStrategy( context.getConfigurationPropertySource() );
+
+			// HSEARCH-3759: the lifecycle strategy is now the schema management strategy, at the mapper level
+			OBSOLETE_LIFECYCLE_STRATEGY.getAndMap(
+					context.getConfigurationPropertySource(),
+					ignored -> {
+						throw log.lifecycleStrategyMovedToMapper();
+					}
+			);
 
 			serialOrchestrator.start();
 			parallelOrchestrator.start();
-			return lifecycleStrategy.onStart( schemaManager, context );
+			// TODO HSEARCH-3759 remove the return type?
+			return CompletableFuture.completedFuture( null );
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
@@ -143,8 +148,6 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			closer.push( ElasticsearchWorkOrchestratorImplementor::stop, serialOrchestrator );
 			closer.push( ElasticsearchWorkOrchestratorImplementor::stop, parallelOrchestrator );
-			closer.push( strategy -> strategy.onStop( schemaManager ), lifecycleStrategy );
-			lifecycleStrategy = null;
 			schemaManager = null;
 		}
 		catch (IOException e) {
@@ -259,10 +262,6 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 		return backendContext.getEventContext().append(
 				EventContexts.fromIndexName( model.getHibernateSearchIndexName() )
 		);
-	}
-
-	private ElasticsearchIndexLifecycleStrategy createLifecycleStrategy(ConfigurationPropertySource propertySource) {
-		return new ElasticsearchIndexLifecycleStrategy( LIFECYCLE_STRATEGY.get( propertySource ) );
 	}
 
 	private ElasticsearchIndexLifecycleExecutionOptions createLifecycleExecutionOptions(

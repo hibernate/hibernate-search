@@ -22,6 +22,7 @@ import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.Luce
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -70,7 +71,7 @@ public class LuceneIndexWriterCommitIT {
 
 	@Test
 	public void commitStrategyNone() throws IOException {
-		setup();
+		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP );
 
 		// Initially our document is not in the index
 		assertThat( countDocsOnDisk() ).isEqualTo( 0 );
@@ -98,7 +99,7 @@ public class LuceneIndexWriterCommitIT {
 
 	@Test
 	public void commitStrategyForce() throws IOException {
-		setup();
+		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP );
 
 		// Initially our document is not in the index
 		assertThat( countDocsOnDisk() ).isEqualTo( 0 );
@@ -121,7 +122,7 @@ public class LuceneIndexWriterCommitIT {
 	 */
 	@Test
 	public void integrationClose() throws IOException {
-		SearchIntegration integration = setup();
+		SearchIntegration integration = setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY );
 
 		// Initially our document is not in the index
 		assertThat( countDocsOnDisk() ).isEqualTo( 0 );
@@ -155,8 +156,9 @@ public class LuceneIndexWriterCommitIT {
 		);
 	}
 
-	private SearchIntegration setup() {
+	private SearchIntegration setup(StubMappingSchemaManagementStrategy schemaManagementStrategy) {
 		return setupHelper.start()
+				.withSchemaManagement( schemaManagementStrategy )
 				.withIndex(
 						INDEX_NAME,
 						ctx -> { },
