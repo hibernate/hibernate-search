@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.documentation.testsupport;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Optional;
 
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
-import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchTestHostConnectionConfiguration;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 
 import org.junit.rules.TestRule;
@@ -30,17 +30,17 @@ public class ElasticsearchBackendConfiguration extends AbstractDocumentationBack
 	}
 
 	@Override
-	public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setupWithName(C setupContext,
-			String backendName, TestConfigurationProvider configurationProvider) {
-		return setupContext
-				.withBackendProperties(
-						backendName,
-						getBackendProperties( configurationProvider, "backend-elasticsearch" )
-				)
-				.withBackendProperty(
-						backendName,
-						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
-						new ElasticsearchSimpleMappingAnalysisConfigurer()
-				);
+	protected Map<String, Object> getBackendProperties() {
+		Map<String, Object> properties = new LinkedHashMap<>();
+		properties.put( "type", "elasticsearch" );
+		properties.put( "log.json_pretty_printing", "true" );
+		properties.put( "index_defaults.lifecycle.strategy", "drop-and-create-and-drop" );
+		properties.put( "index_defaults.lifecycle.minimal_required_status", "yellow" );
+		ElasticsearchTestHostConnectionConfiguration.get().addToBackendProperties( properties );
+		properties.put(
+				"analysis.configurer",
+				new ElasticsearchSimpleMappingAnalysisConfigurer()
+		);
+		return properties;
 	}
 }
