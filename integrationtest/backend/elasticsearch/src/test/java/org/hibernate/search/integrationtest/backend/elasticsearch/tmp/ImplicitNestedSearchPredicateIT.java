@@ -1,0 +1,189 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.integrationtest.backend.elasticsearch.tmp;
+
+import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchHitsAssert.assertThat;
+import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
+
+import java.util.List;
+
+import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
+public class ImplicitNestedSearchPredicateIT {
+
+	private static final String INDEX_NAME = "IndexName";
+
+	private static final String DOCUMENT_1 = "1";
+
+	public static final String ANY_STRING = "Any String";
+	public static final int ANY_INTEGER = 173173;
+
+	@Rule
+	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+
+	private IndexMapping indexMapping;
+	private StubMappingIndexManager indexManager;
+
+	@Before
+	public void setup() {
+		setupHelper.start()
+				.withIndex(
+						INDEX_NAME,
+						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.indexManager = indexManager
+				)
+				.setup();
+
+		initData();
+	}
+
+	@Test
+	public void scope_predicate() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchPredicate matchPredicate = scope.predicate().match().field( "nested.string" ).matching( ANY_STRING ).toPredicate();
+		SearchPredicate nestedPredicate = scope.predicate().nested().objectField( "nested" ).nest( matchPredicate ).toPredicate();
+
+		List<DocumentReference> docs = scope.query().selectEntityReference()
+				.where( nestedPredicate )
+				.fetchAllHits();
+
+		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+
+		docs = scope.query().selectEntityReference()
+				.where( matchPredicate )
+				.fetchAllHits();
+
+		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+	}
+
+	@Test
+	public void nested_explicit() {
+		StubMappingScope scope = indexManager.createScope();
+
+		List<DocumentReference> docs = scope.query().selectEntityReference()
+				.where( p -> p.nested().objectField( "nested" )
+						.nest( f -> f.match().field( "nested.string" ).matching( ANY_STRING ) ) )
+				.fetchAllHits();
+
+		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+
+		docs = scope.query().selectEntityReference()
+				.where( p -> p.nested().objectField( "nested" )
+						.nest( f -> f.match().field( "nested.numeric" ).matching( ANY_INTEGER ) ) )
+				.fetchAllHits();
+
+		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+	}
+
+	@Test
+	public void nested_implicit() {
+		StubMappingScope scope = indexManager.createScope();
+
+		List<DocumentReference> docs = scope.query().selectEntityReference()
+				.where( f -> f.match().field( "nested.string" ).matching( ANY_STRING ) )
+				.fetchAllHits();
+
+		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+
+		docs = scope.query().selectEntityReference()
+				.where( f -> f.match().field( "nested.numeric" ).matching( ANY_INTEGER ) )
+				.fetchAllHits();
+
+		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+	}
+
+	@Test
+	public void nested_X2_explicit() {
+		StubMappingScope scope = indexManager.createScope();
+
+		List<DocumentReference> docs = scope.query().selectEntityReference()
+				.where( p -> p.nested().objectField( "nested" )
+						.nest( f -> f.nested().objectField( "nested.nested" )
+								.nest( g -> g.match().field( "nested.nested.numeric" ).matching( ANY_INTEGER ) )
+						) )
+				.fetchAllHits();
+
+		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+	}
+
+	@Test
+	public void nested_X2_implicit() {
+		StubMappingScope scope = indexManager.createScope();
+
+		List<DocumentReference> docs = scope.query().selectEntityReference()
+				.where( f -> f.match().field( "nested.nested.numeric" ).matching( ANY_INTEGER ) )
+				.fetchAllHits();
+
+		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+	}
+
+	@Test
+	public void nested_X2_explicit_implicit() {
+		StubMappingScope scope = indexManager.createScope();
+
+		List<DocumentReference> docs = scope.query().selectEntityReference()
+				.where( p -> p.nested().objectField( "nested" )
+						.nest( g -> g.match().field( "nested.nested.numeric" ).matching( ANY_INTEGER ) )
+				)
+				.fetchAllHits();
+
+		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+	}
+
+	private void initData() {
+		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
+			DocumentElement nestedDocument = document.addObject( indexMapping.nested );
+			nestedDocument.addValue( indexMapping.nestedString, ANY_STRING );
+			nestedDocument.addValue( indexMapping.nestedNumeric, ANY_INTEGER );
+
+			DocumentElement nestedDocumentX2 = nestedDocument.addObject( indexMapping.nestedX2 );
+			nestedDocumentX2.addValue( indexMapping.nestedX2Numeric, ANY_INTEGER );
+		} );
+		plan.execute().join();
+	}
+
+	private static class IndexMapping {
+		final IndexObjectFieldReference nested;
+		final IndexFieldReference<String> nestedString;
+		final IndexFieldReference<Integer> nestedNumeric;
+
+		final IndexObjectFieldReference nestedX2;
+		final IndexFieldReference<Integer> nestedX2Numeric;
+
+		IndexMapping(IndexSchemaElement root) {
+			IndexSchemaObjectField nestedObject = root.objectField( "nested", ObjectFieldStorage.NESTED );
+			this.nested = nestedObject.toReference();
+			this.nestedString = nestedObject.field( "string", f -> f.asString().projectable( Projectable.YES ).sortable( Sortable.YES ) )
+					.toReference();
+			this.nestedNumeric = nestedObject.field( "numeric", f -> f.asInteger() ).toReference();
+
+			IndexSchemaObjectField nestedObjectX2 = nestedObject.objectField( "nested", ObjectFieldStorage.NESTED );
+			this.nestedX2 = nestedObjectX2.toReference();
+			this.nestedX2Numeric = nestedObjectX2.field( "numeric", f -> f.asInteger() ).toReference();
+		}
+	}
+
+}
