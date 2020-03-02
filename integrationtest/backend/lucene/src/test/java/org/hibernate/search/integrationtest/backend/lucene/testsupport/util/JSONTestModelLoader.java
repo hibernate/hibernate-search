@@ -6,12 +6,10 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.testsupport.util;
 
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import org.hibernate.search.engine.backend.document.DocumentElement;
@@ -31,18 +29,23 @@ public final class JSONTestModelLoader {
 	}
 
 	public static JSONObject loadIndexData(String resource) {
-		try {
-			ClassLoader cl = JSONTestModelLoader.class.getClassLoader();
-			URL url = cl.getResource( resource );
-			if ( url == null ) {
+		ClassLoader cl = JSONTestModelLoader.class.getClassLoader();
+		try ( InputStream in = cl.getResourceAsStream( resource ) ) {
+			if ( in == null ) {
 				throw new AssertionFailure( "can not find resorce file " + resource );
 			}
-			Path path = Paths.get( url.toURI() );
-			String content = new String( Files.readAllBytes( path ), "UTF8" );
+
+			BufferedReader reader = new BufferedReader( new InputStreamReader( in, "UTF8" ) );
+			StringBuilder out = new StringBuilder();
+			String line;
+			while ( (line = reader.readLine()) != null ) {
+				out.append( line ).append( "\n" );
+			}
+			String content = out.toString();
 			JSONObject result = new JSONObject( content );
 			return result;
 		}
-		catch (URISyntaxException | IOException | JSONException ex) {
+		catch (IOException | JSONException ex) {
 			throw new AssertionFailure( "load json index data", ex );
 		}
 	}
