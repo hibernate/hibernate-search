@@ -187,13 +187,14 @@ public class SmokeIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, "1" )
 				.hasTotalHitCount( 1 );
 
-		// With nested storage, we expect direct queries to never match
-		query = scope.query()
-				.where( f -> f.match().field( "nestedObject.integer" ).matching( 101 ) )
-				.toQuery();
-		assertThat( query )
-				.hasNoHits()
-				.hasTotalHitCount( 0 );
+//		TODO HSEARCH-3752 with implicit nested predicates, this is not true anymore:
+//		// With nested storage, we expect direct queries to never match
+//		query = scope.query()
+//				.where( f -> f.match().field( "nestedObject.integer" ).matching( 101 ) )
+//				.toQuery();
+//		assertThat( query )
+//				.hasNoHits()
+//				.hasTotalHitCount( 0 );
 
 		// ... and predicates within nested queries to be unable to match on different objects
 		query = scope.query()
