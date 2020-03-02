@@ -37,9 +37,8 @@ public interface IndexManagerImplementor {
 	 * was called on the corresponding backend.
 	 *
 	 * @param context The start context.
-	 * @return A future that completes when the index manager is completely started.
 	 */
-	CompletableFuture<?> start(IndexManagerStartContext context);
+	void start(IndexManagerStartContext context);
 
 	/**
 	 * Prepare for {@link #stop()}.

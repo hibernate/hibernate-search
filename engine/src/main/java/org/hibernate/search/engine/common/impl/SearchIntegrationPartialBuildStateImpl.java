@@ -151,23 +151,13 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 			failureCollector.checkNoFailure();
 
 			// Start indexes
-			CompletableFuture<?>[] indexManagerFutures = new CompletableFuture<?>[nonStartedIndexManagers.size()];
-			int indexManagerIndex = 0;
-			// Start
-			for ( IndexManagerNonStartedState state : nonStartedIndexManagers.values() ) {
-				indexManagerFutures[indexManagerIndex] = state.start( failureCollector, beanResolver, propertySource );
-				++indexManagerIndex;
-			}
-			// Wait for the starting operation to finish
-			Futures.unwrappedExceptionJoin( CompletableFuture.allOf( indexManagerFutures ) );
-			failureCollector.checkNoFailure();
-			// Everything went well: register the index managers
 			for ( Map.Entry<String, IndexManagerNonStartedState> entry : nonStartedIndexManagers.entrySet() ) {
 				startedIndexManagers.put(
 						entry.getKey(),
-						entry.getValue().getIndexManager()
+						entry.getValue().start( failureCollector, beanResolver, propertySource )
 				);
 			}
+			failureCollector.checkNoFailure();
 
 			// Start mappings
 			CompletableFuture<?>[] mappingFutures = new CompletableFuture<?>[fullyBuiltNonStartedMappings.size()];

@@ -102,7 +102,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 	}
 
 	@Override
-	public CompletableFuture<?> start(IndexManagerStartContext context) {
+	public void start(IndexManagerStartContext context) {
 		try {
 			/*
 			 * Create the initializer and lifecycle strategy late to allow the behavior to change
@@ -124,8 +124,6 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 
 			serialOrchestrator.start();
 			parallelOrchestrator.start();
-			// TODO HSEARCH-3759 remove the return type?
-			return CompletableFuture.completedFuture( null );
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )

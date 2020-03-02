@@ -51,10 +51,9 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 	}
 
 	@Override
-	public CompletableFuture<?> start(IndexManagerStartContext context) {
+	public void start(IndexManagerStartContext context) {
 		this.state = State.STARTED;
 		// Nothing to do
-		return CompletableFuture.completedFuture( null );
 	}
 
 	@Override
