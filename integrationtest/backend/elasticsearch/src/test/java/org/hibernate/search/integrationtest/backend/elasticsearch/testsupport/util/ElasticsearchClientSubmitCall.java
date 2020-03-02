@@ -16,7 +16,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.Call;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import org.assertj.core.api.Assertions;
+import org.assertj.core.api.SoftAssertions;
 import org.skyscreamer.jsonassert.JSONCompareMode;
 
 class ElasticsearchClientSubmitCall extends Call<ElasticsearchClientSubmitCall> {
@@ -47,33 +47,35 @@ class ElasticsearchClientSubmitCall extends Call<ElasticsearchClientSubmitCall> 
 	}
 
 	void verify(ElasticsearchClientSubmitCall actualCall) {
-		Assertions.assertThat( actualCall.request.getPath() ).isEqualTo( request.getPath() );
-		Assertions.assertThat( actualCall.request.getMethod() ).isEqualTo( request.getMethod() );
-		switch ( assertionMode ) {
-			case PATH_AND_METHOD:
-				break;
-			case EXTENSIBLE:
-				// containsAllEntriesOf( emptyMap ) has a special, inconsistent meaning: "the actual map is empty"
-				// Avoid that...
-				if ( !request.getParameters().isEmpty() ) {
-					Assertions.assertThat( actualCall.request.getParameters() )
-							.containsAllEntriesOf( request.getParameters() );
-				}
-				assertJsonEquals(
-						toComparableJson( request.getBodyParts() ),
-						toComparableJson( actualCall.request.getBodyParts() ),
-						JSONCompareMode.STRICT_ORDER
-				);
-				break;
-			case STRICT:
-				Assertions.assertThat( actualCall.request.getParameters() ).isEqualTo( request.getParameters() );
-				assertJsonEquals(
-						toComparableJson( request.getBodyParts() ),
-						toComparableJson( actualCall.request.getBodyParts() ),
-						JSONCompareMode.STRICT
-				);
-				break;
-		}
+		SoftAssertions.assertSoftly( assertion -> {
+			assertion.assertThat( actualCall.request.getPath() ).isEqualTo( request.getPath() );
+			assertion.assertThat( actualCall.request.getMethod() ).isEqualTo( request.getMethod() );
+			switch ( assertionMode ) {
+				case PATH_AND_METHOD:
+					break;
+				case EXTENSIBLE:
+					// containsAllEntriesOf( emptyMap ) has a special, inconsistent meaning: "the actual map is empty"
+					// Avoid that...
+					if ( !request.getParameters().isEmpty() ) {
+						assertion.assertThat( actualCall.request.getParameters() )
+								.containsAllEntriesOf( request.getParameters() );
+					}
+					assertion.check( () -> assertJsonEquals(
+							toComparableJson( request.getBodyParts() ),
+							toComparableJson( actualCall.request.getBodyParts() ),
+							JSONCompareMode.STRICT_ORDER
+					) );
+					break;
+				case STRICT:
+					assertion.assertThat( actualCall.request.getParameters() ).isEqualTo( request.getParameters() );
+					assertion.check( () -> assertJsonEquals(
+							toComparableJson( request.getBodyParts() ),
+							toComparableJson( actualCall.request.getBodyParts() ),
+							JSONCompareMode.STRICT
+					) );
+					break;
+			}
+		} );
 	}
 
 	private String toComparableJson(List<JsonObject> bodyParts) {
