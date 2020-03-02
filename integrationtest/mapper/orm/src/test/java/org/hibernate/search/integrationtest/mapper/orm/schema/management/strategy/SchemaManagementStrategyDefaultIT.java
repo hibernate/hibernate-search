@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.schema.management.strategy;
 
-public class SchemaManagementStrategyDefaultIT extends SchemaManagementStrategyNoneIT {
+import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
+
+public class SchemaManagementStrategyDefaultIT extends SchemaManagementStrategyCreateIT {
 
 	@Override
-	protected String getStrategyName() {
+	protected SchemaManagementStrategyName getStrategyName() {
 		return null; // Set it to default
 	}
 }

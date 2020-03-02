@@ -38,6 +38,8 @@
                 WARNING: if you update the property name below,
                 take care to also update the name of the commented property just above.
              -->
+            <property name="hibernate.search.schema_management.strategy"
+                      value="drop-and-create-and-drop"/>
             <property name="hibernate.search.backends.myBackend.directory.root"
                       value="${project.build.directory}/test-indexes/gettingstarted/withoutanalysis/"/>
         </properties>
@@ -71,6 +73,8 @@
                 WARNING: if you update the property names below,
                 take care to also update the name of the commented properties just above.
              -->
+            <property name="hibernate.search.schema_management.strategy"
+                      value="drop-and-create-and-drop"/>
             <property name="hibernate.search.backends.myBackend.hosts"
                       value="${test.elasticsearch.connection.hosts}"/>
             <property name="hibernate.search.backends.myBackend.protocol"
@@ -87,10 +91,8 @@
                       value="${test.elasticsearch.connection.aws.signing.secret_key}"/>
             <property name="hibernate.search.backends.myBackend.aws.signing.region"
                       value="${test.elasticsearch.connection.aws.signing.region}"/>
-            <property name="hibernate.search.backends.myBackend.index_defaults.lifecycle.strategy"
-                      value="drop-and-create-and-drop"/>
             <!-- Make this test work even if there is only a single node in the cluster -->
-            <property name="hibernate.search.backends.myBackend.index_defaults.lifecycle.minimal_required_status"
+            <property name="hibernate.search.backends.myBackend.index_defaults.schema_management.minimal_required_status"
                       value="yellow"/>
             <property name="hibernate.search.automatic_indexing.synchronization.strategy"
                       value="sync"/>
@@ -117,6 +119,8 @@
                 WARNING: if you update the property name below,
                 take care to also update the name of the commented property just above.
              -->
+            <property name="hibernate.search.schema_management.strategy"
+                      value="drop-and-create-and-drop"/>
             <property name="hibernate.search.backends.myBackend.directory.root"
                       value="${project.build.directory}/test-indexes/gettingstarted/withanalysis/"/>
         </properties>
@@ -142,6 +146,8 @@
                 WARNING: if you update the property names below,
                 take care to also update the name of the commented properties just above.
              -->
+            <property name="hibernate.search.schema_management.strategy"
+                      value="drop-and-create-and-drop"/>
             <property name="hibernate.search.backends.myBackend.hosts"
                       value="${test.elasticsearch.connection.hosts}"/>
             <property name="hibernate.search.backends.myBackend.protocol"
@@ -158,10 +164,8 @@
                       value="${test.elasticsearch.connection.aws.signing.secret_key}"/>
             <property name="hibernate.search.backends.myBackend.aws.signing.region"
                       value="${test.elasticsearch.connection.aws.signing.region}"/>
-            <property name="hibernate.search.backends.myBackend.index_defaults.lifecycle.strategy"
-                      value="drop-and-create-and-drop"/>
             <!-- Make this test work even if there is only a single node in the cluster -->
-            <property name="hibernate.search.backends.myBackend.index_defaults.lifecycle.minimal_required_status"
+            <property name="hibernate.search.backends.myBackend.index_defaults.schema_management.minimal_required_status"
                       value="yellow"/>
             <property name="hibernate.search.automatic_indexing.synchronization.strategy"
                       value="sync"/>

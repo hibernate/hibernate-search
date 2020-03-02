@@ -9,16 +9,15 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.bootstrap;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchClientSpy;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.util.ElasticsearchRequestAssertionMode;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -50,10 +49,7 @@ public class ElasticsearchBootstrapIT {
 						ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
 						elasticsearchClientSpy.getFactory()
 				)
-				.withIndexDefaultsProperty(
-						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						IndexLifecycleStrategyName.NONE
-				)
+				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withIndex(
 						"EmptyIndexName",
 						ctx -> {
@@ -89,10 +85,7 @@ public class ElasticsearchBootstrapIT {
 								ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
 								elasticsearchClientSpy.getFactory()
 						)
-						.withIndexDefaultsProperty(
-								ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-								IndexLifecycleStrategyName.NONE
-						)
+						.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 						.withIndex(
 								"EmptyIndexName",
 								ctx -> {
@@ -132,10 +125,7 @@ public class ElasticsearchBootstrapIT {
 								ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
 								elasticsearchClientSpy.getFactory()
 						)
-						.withIndexDefaultsProperty(
-								ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-								IndexLifecycleStrategyName.NONE
-						)
+						.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 						.withIndex(
 								"EmptyIndexName",
 								ctx -> {
@@ -173,10 +163,7 @@ public class ElasticsearchBootstrapIT {
 						ElasticsearchBackendSpiSettings.CLIENT_FACTORY,
 						elasticsearchClientSpy.getFactory()
 				)
-				.withIndexDefaultsProperty(
-						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						IndexLifecycleStrategyName.NONE
-				)
+				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withIndex(
 						"EmptyIndexName",
 						ctx -> {

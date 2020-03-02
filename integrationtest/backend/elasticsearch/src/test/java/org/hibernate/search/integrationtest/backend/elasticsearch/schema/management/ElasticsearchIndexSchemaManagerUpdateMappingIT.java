@@ -16,8 +16,6 @@ import java.util.function.Consumer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.util.common.impl.Futures;
@@ -25,10 +23,10 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
-import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -51,13 +49,6 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingIT {
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();
 
 	private StubMappingIndexManager indexManager;
-
-	@After
-	public void cleanUp() {
-		if ( indexManager != null ) {
-			indexManager.getSchemaManager().dropIfExisting();
-		}
-	}
 
 	@Test
 	public void nothingToDo_1() {
@@ -397,10 +388,7 @@ public class ElasticsearchIndexSchemaManagerUpdateMappingIT {
 
 	private void setupAndUpdateIndex(Consumer<? super IndexedEntityBindingContext> mappingContributor) {
 		setupHelper.start()
-				.withIndexDefaultsProperty(
-						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						IndexLifecycleStrategyName.NONE
-				)
+				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(
 						// Don't contribute any analysis definitions, migration of those is tested in another test class
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,

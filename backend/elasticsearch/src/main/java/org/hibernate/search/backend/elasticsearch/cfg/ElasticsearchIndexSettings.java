@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.cfg;
 
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
-import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 
 /**
  * Configuration properties for Elasticsearch indexes.
@@ -21,32 +20,23 @@ public final class ElasticsearchIndexSettings {
 	}
 
 	/**
-	 * The index lifecycle strategy to use, i.e. how to automatically administrate the index on startup/shutdown.
-	 * <p>
-	 * Expects an {@link IndexLifecycleStrategyName} value, or a String representation of such value.
-	 * <p>
-	 * Defaults to {@link Defaults#LIFECYCLE_STRATEGY}.
-	 */
-	public static final String LIFECYCLE_STRATEGY = "lifecycle.strategy";
-
-	/**
-	 * The minimal required status of the index on startup, before Hibernate Search can start using it.
+	 * The minimal required status of an index on startup, before Hibernate Search can start using it.
 	 * <p>
 	 * Expects an {@link IndexStatus} value, or a String representation of such value.
 	 * <p>
-	 * Defaults to {@link Defaults#LIFECYCLE_MINIMAL_REQUIRED_STATUS}.
+	 * Defaults to {@link Defaults#SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS}.
 	 */
-	public static final String LIFECYCLE_MINIMAL_REQUIRED_STATUS = "lifecycle.minimal_required_status";
+	public static final String SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS = "schema_management.minimal_required_status";
 
 	/**
-	 * The timeout when waiting for the {@link #LIFECYCLE_MINIMAL_REQUIRED_STATUS required status}.
+	 * The timeout when waiting for the {@link #SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS required status}.
 	 * <p>
 	 * Expects a positive Integer value in milliseconds, such as {@code 60000},
 	 * or a String that can be parsed into such Integer value.
 	 * <p>
-	 * Defaults to {@link Defaults#LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT}.
+	 * Defaults to {@link Defaults#SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT}.
 	 */
-	public static final String LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT = "lifecycle.minimal_required_status_wait_timeout";
+	public static final String SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT = "schema_management.minimal_required_status_wait_timeout";
 
 	/**
 	 * Default values for the different settings if no values are given.
@@ -56,9 +46,8 @@ public final class ElasticsearchIndexSettings {
 		private Defaults() {
 		}
 
-		public static final IndexLifecycleStrategyName LIFECYCLE_STRATEGY = IndexLifecycleStrategyName.CREATE;
-		public static final IndexStatus LIFECYCLE_MINIMAL_REQUIRED_STATUS = IndexStatus.GREEN;
-		public static final int LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT = 10_000;
+		public static final IndexStatus SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS = IndexStatus.GREEN;
+		public static final int SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT = 10_000;
 	}
 
 }

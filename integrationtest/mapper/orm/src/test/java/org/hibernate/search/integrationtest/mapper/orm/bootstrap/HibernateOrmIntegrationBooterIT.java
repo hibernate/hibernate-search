@@ -30,6 +30,7 @@ import org.hibernate.search.mapper.orm.mapping.HibernateOrmSearchMappingConfigur
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.impl.StubBackendFactory;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.SimpleSessionFactoryBuilder;
@@ -83,6 +84,9 @@ public class HibernateOrmIntegrationBooterIT {
 			builder.setProperty( booterGeneratedProperty.getKey(), booterGeneratedProperty.getValue() );
 		}
 
+		// Actually booting the session factory should lead to a schema creation in the backend.
+		backendMock.expectSchemaManagementWorks( INDEX_NAME )
+				.work( StubSchemaManagementWork.Type.CREATE_IF_MISSING );
 		try ( SessionFactory sessionFactory = builder.build() ) {
 			/*
 			 * Building the session should NOT lead to a second schema creation in the backend:

@@ -13,7 +13,6 @@ import java.util.EnumSet;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.util.common.impl.Futures;
@@ -21,10 +20,10 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.After;
 import org.junit.Assume;
 import org.junit.Rule;
 import org.junit.Test;
@@ -59,13 +58,6 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 
 	public ElasticsearchIndexSchemaManagerStatusCheckIT(ElasticsearchIndexSchemaManagerOperation operation) {
 		this.operation = operation;
-	}
-
-	@After
-	public void cleanUp() {
-		if ( indexManager != null ) {
-			indexManager.getSchemaManager().dropIfExisting();
-		}
 	}
 
 	@Test
@@ -143,16 +135,13 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 							// No-op
 						}
 				)
+				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withIndexDefaultsProperty(
-						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						IndexLifecycleStrategyName.NONE
-				)
-				.withIndexDefaultsProperty(
-						ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS,
+						ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS,
 						IndexStatus.GREEN.getElasticsearchString()
 				)
 				.withIndexDefaultsProperty(
-						ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT,
+						ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT,
 						"100"
 				)
 				.withIndex( INDEX_NAME, ctx -> { }, indexManager -> this.indexManager = indexManager )

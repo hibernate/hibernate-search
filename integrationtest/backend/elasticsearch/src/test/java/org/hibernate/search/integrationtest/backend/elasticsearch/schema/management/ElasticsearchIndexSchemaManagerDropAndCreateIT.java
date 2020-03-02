@@ -14,13 +14,12 @@ import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -115,10 +114,7 @@ public class ElasticsearchIndexSchemaManagerDropAndCreateIT {
 						},
 						indexManager -> this.indexManager = indexManager
 				)
-				.withIndexDefaultsProperty(
-						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						IndexLifecycleStrategyName.NONE
-				)
+				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(
 						// Don't contribute any analysis definitions, migration of those is tested in another test class
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,

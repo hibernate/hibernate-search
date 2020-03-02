@@ -25,6 +25,7 @@ import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingInitiator;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingKey;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 
 import org.openjdk.jmh.annotations.Level;
 import org.openjdk.jmh.annotations.Scope;
@@ -87,7 +88,9 @@ public abstract class AbstractBackendHolder {
 			SearchIntegrationFinalizer finalizer =
 					integrationPartialBuildState.finalizer( propertySource, unusedPropertyChecker );
 			StubMapping mapping = finalizer.finalizeMapping(
-					mappingKey, (context, partialMapping) -> partialMapping.finalizeMapping()
+					mappingKey,
+					(context, partialMapping) ->
+							partialMapping.finalizeMapping( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP )
 			);
 			for ( int i = 0; i < INDEX_COUNT; ++i ) {
 				MappedIndex index = indexes.get( i );

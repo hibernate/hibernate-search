@@ -14,15 +14,13 @@ import static org.hibernate.search.util.impl.test.JsonHelper.assertJsonEquals;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.categories.RequiresIndexAliasIsWriteIndex;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
@@ -42,13 +40,6 @@ public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 	public TestElasticsearchClient elasticsearchClient = new TestElasticsearchClient();
 
 	private StubMappingIndexManager indexManager;
-
-	@After
-	public void cleanUp() {
-		if ( indexManager != null ) {
-			indexManager.getSchemaManager().dropIfExisting();
-		}
-	}
 
 	@Test
 	public void nothingToDo() {
@@ -194,10 +185,7 @@ public class ElasticsearchIndexSchemaManagerUpdateAliasesIT {
 
 	private void setupAndUpdateIndex() {
 		setupHelper.start()
-				.withIndexDefaultsProperty(
-						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						IndexLifecycleStrategyName.NONE
-				)
+				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(
 						// Don't contribute any analysis definitions, migration of those is tested in another test class
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,

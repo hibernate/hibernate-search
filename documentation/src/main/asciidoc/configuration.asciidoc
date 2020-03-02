@@ -76,10 +76,10 @@ Index names can be customized in the mapping.
 +
 Examples:
 
-* `hibernate.search.backends.myBackend.index_defaults.lifecycle.strategy = validate`
-sets the `lifecycle.strategy` property for all indexes of the backend `myBackend`.
-* `hibernate.search.backends.myBackend.indexes.Product.lifecycle.strategy = none`
-sets the `lifecycle.strategy` property for the `Product` index of the backend `myBackend`.
+* `hibernate.search.backends.myBackend.index_defaults.io.commit_interval = 500`
+sets the `io.commit_interval` property for all indexes of the backend `myBackend`.
+* `hibernate.search.backends.myBackend.indexes.Product.io.commit_interval = 2000`
+sets the `io.commit_interval` property for the `Product` index of the backend `myBackend`.
 
 +
 Other index properties are explained in the relevant parts of this documentation:

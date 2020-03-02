@@ -636,4 +636,7 @@ public interface Log extends BasicLogger {
 			+ " the version must at least be in the form 'x.y', where 'x' and 'y' are integers")
 	SearchException invalidElasticsearchVersionCheckConfiguration(String versionString);
 
+	@Message(id = ID_OFFSET_3 + 98, value = "The lifecycle strategy cannot be set at the index level anymore."
+			+ " Set the schema management strategy via the property 'hibernate.search.schema_management.strategy' instead.")
+	SearchException lifecycleStrategyMovedToMapper();
 }

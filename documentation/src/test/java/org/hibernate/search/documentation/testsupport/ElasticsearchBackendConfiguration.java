@@ -34,8 +34,7 @@ public class ElasticsearchBackendConfiguration extends AbstractDocumentationBack
 		Map<String, Object> properties = new LinkedHashMap<>();
 		properties.put( "type", "elasticsearch" );
 		properties.put( "log.json_pretty_printing", "true" );
-		properties.put( "index_defaults.lifecycle.strategy", "drop-and-create-and-drop" );
-		properties.put( "index_defaults.lifecycle.minimal_required_status", "yellow" );
+		properties.put( "index_defaults.schema_management.minimal_required_status", "yellow" );
 		ElasticsearchTestHostConnectionConfiguration.get().addToBackendProperties( properties );
 		properties.put(
 				"analysis.configurer",

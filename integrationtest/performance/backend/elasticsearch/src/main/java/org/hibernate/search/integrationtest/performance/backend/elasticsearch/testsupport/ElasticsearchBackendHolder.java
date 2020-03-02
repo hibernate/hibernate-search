@@ -11,7 +11,6 @@ import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
@@ -48,11 +47,7 @@ public class ElasticsearchBackendHolder extends AbstractBackendHolder {
 		map.put( ElasticsearchBackendSettings.ANALYSIS_CONFIGURER, ElasticsearchPerformanceAnalysisConfigurer.class );
 
 		map.put(
-				BackendSettings.INDEX_DEFAULTS + "." + ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-				IndexLifecycleStrategyName.DROP_AND_CREATE_AND_DROP
-		);
-		map.put(
-				BackendSettings.INDEX_DEFAULTS + "." + ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS,
+				BackendSettings.INDEX_DEFAULTS + "." + ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS,
 				IndexStatus.YELLOW
 		);
 

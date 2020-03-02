@@ -14,16 +14,14 @@ import java.util.function.Consumer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurationContext;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.engine.backend.types.Norms;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
-import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -57,13 +55,6 @@ public class ElasticsearchIndexSchemaManagerCreationMappingIT {
 
 	public ElasticsearchIndexSchemaManagerCreationMappingIT(ElasticsearchIndexSchemaManagerOperation operation) {
 		this.operation = operation;
-	}
-
-	@After
-	public void cleanUp() {
-		if ( indexManager != null ) {
-			indexManager.getSchemaManager().dropIfExisting();
-		}
 	}
 
 	@Test
@@ -195,10 +186,7 @@ public class ElasticsearchIndexSchemaManagerCreationMappingIT {
 						mappingContributor,
 						indexManager -> this.indexManager = indexManager
 				)
-				.withIndexDefaultsProperty(
-						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY,
-						IndexLifecycleStrategyName.NONE
-				)
+				.withSchemaManagement( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY )
 				.withBackendProperty(
 						// Don't contribute any analysis definitions, migration of those is tested in another test class
 						ElasticsearchBackendSettings.ANALYSIS_CONFIGURER,
