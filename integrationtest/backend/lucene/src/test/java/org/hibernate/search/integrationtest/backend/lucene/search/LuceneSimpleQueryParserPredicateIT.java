@@ -16,7 +16,7 @@ import org.hibernate.search.engine.search.common.BooleanOperator;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.query.SearchQuery;
-import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneIndexContentUtils;
+import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.JSONTestModelLoader;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.SimpleIndexMapping;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.AssertionFailure;
@@ -210,10 +210,10 @@ public class LuceneSimpleQueryParserPredicateIT {
 			// Backend 1 / Index 1
 			IndexIndexingPlan<? extends DocumentElement> plan = indexManager_1_1.createIndexingPlan();
 
-			JSONObject dobj = LuceneIndexContentUtils.loadIndexData( VALUES );
+			JSONObject dobj = JSONTestModelLoader.loadIndexData( VALUES );
 			JSONObject dind1 = dobj.getJSONObject( INDEX_NAME_1_1 );
 
-			LuceneIndexContentUtils.initIndexFromJson( dind1, indexMapping_1_1, plan );
+			JSONTestModelLoader.initIndexFromJson( dind1, indexMapping_1_1, plan );
 
 			plan.execute().join();
 
@@ -229,7 +229,7 @@ public class LuceneSimpleQueryParserPredicateIT {
 
 			JSONObject dind2 = dobj.getJSONObject( INDEX_NAME_1_2 );
 
-			LuceneIndexContentUtils.initIndexFromJson( dind2, indexMapping_1_2, plan );
+			JSONTestModelLoader.initIndexFromJson( dind2, indexMapping_1_2, plan );
 
 			plan.execute().join();
 
