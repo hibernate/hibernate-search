@@ -35,10 +35,10 @@ import org.junit.runners.Parameterized;
 
 /**
  * This is an extension of the backend TCK test
- * {@link LuceneSimpleQueryParserPredicateIT1}.
+ * {@link LuceneSimpleQueryParserPredicateIT}.
  */
 @RunWith(Parameterized.class)
-public class LuceneSimpleQueryParserPredicateIT1 {
+public class LuceneSimpleQueryParserPredicateIT {
 
 	private final String VALUES = "data/search/simplequery-data.json";
 
@@ -78,7 +78,7 @@ public class LuceneSimpleQueryParserPredicateIT1 {
 		return new Object[]{"local-heap", "local-filesystem"};
 	}
 
-	public LuceneSimpleQueryParserPredicateIT1(String directoryType) {
+	public LuceneSimpleQueryParserPredicateIT(String directoryType) {
 		this.directoryType = directoryType;
 	}
 
