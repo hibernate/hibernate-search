@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.search;
 
-import java.util.List;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -14,6 +13,7 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.search.common.BooleanOperator;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.LuceneIndexContentUtils;
@@ -176,29 +176,35 @@ public class LuceneSimpleQueryParserPredicateIT1 {
 
 		StubMappingScope scope = indexManager_1_1.createScope();
 
+		SearchPredicate nested = scope.predicate()
+			.nested().objectField( "nested" ).nest( (f) -> {
+			return f.simpleQueryString()
+				.field( "nested.string" )
+				.matching( "hiber* robot" )
+				.flags().all()
+				.defaultOperator( BooleanOperator.AND );
+		} ).toPredicate();
+
 		SearchQuery<DocumentReference> query = scope.query()
-			.where( f -> {
-				return f.simpleQueryString()
-					.field( "nested.string" ).boost( 0.5f )
-					.matching( "hiber* robot" )
-					.flags().all()
-					.defaultOperator( BooleanOperator.AND );
-			} )
+			.where( nested )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
 			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_4, DOCUMENT_1_1_3 );
 		} );
 
+		nested = scope.predicate()
+			.nested().objectField( "nested" ).nest( (f) -> {
+			return f.simpleQueryString()
+				.field( "nested.string" )
+				.matching( "hiber* robot" )
+				.flags()
+				.disable( SimpleQueryFlag.PREFIX )
+				.defaultOperator( BooleanOperator.AND );
+		} ).toPredicate();
+
 		query = scope.query()
-			.where( f -> {
-				return f.simpleQueryString()
-					.field( "nested.string" ).boost( 0.5f )
-					.matching( "hiber* robot" )
-					.flags()
-					.disable( SimpleQueryFlag.PREFIX )
-					.defaultOperator( BooleanOperator.AND );
-			} )
+			.where( nested )
 			.toQuery();
 
 		assertThat( query ).hasNoHits();
