@@ -12,10 +12,9 @@ import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 import com.google.gson.JsonObject;
 
 
-
 public abstract class AbstractElasticsearchSearchPredicateBuilder
 		implements SearchPredicateBuilder<ElasticsearchSearchPredicateBuilder>,
-				ElasticsearchSearchPredicateBuilder {
+		ElasticsearchSearchPredicateBuilder {
 
 	private static final JsonAccessor<Float> BOOST_ACCESSOR = JsonAccessor.root().property( "boost" ).asFloat();
 
@@ -38,7 +37,7 @@ public abstract class AbstractElasticsearchSearchPredicateBuilder
 	}
 
 	@Override
-	public final JsonObject build(ElasticsearchSearchPredicateContext context) {
+	public JsonObject build(ElasticsearchSearchPredicateContext context) {
 		JsonObject outerObject = new JsonObject();
 		JsonObject innerObject = new JsonObject();
 

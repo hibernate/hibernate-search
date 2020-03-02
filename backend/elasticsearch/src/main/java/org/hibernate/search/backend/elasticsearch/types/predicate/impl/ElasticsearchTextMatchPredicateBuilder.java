@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DataTypes;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
@@ -39,11 +40,11 @@ class ElasticsearchTextMatchPredicateBuilder extends ElasticsearchStandardMatchP
 
 	ElasticsearchTextMatchPredicateBuilder(
 			ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath,
+			String absoluteFieldPath, List<String> nestedPathHierarchy,
 			DslConverter<?, ? extends String> converter, DslConverter<String, ? extends String> rawConverter,
 			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchFieldCodec<String> codec,
 			String type, ElasticsearchCompatibilityChecker analyzerChecker) {
-		super( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
+		super( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec );
 		this.type = type;
 		this.analyzerChecker = analyzerChecker;
 	}

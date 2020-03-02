@@ -12,7 +12,6 @@ import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import com.google.gson.JsonObject;
 
 
-
 class ElasticsearchNestedPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
 		implements NestedPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
@@ -35,8 +34,10 @@ class ElasticsearchNestedPredicateBuilder extends AbstractElasticsearchSearchPre
 	@Override
 	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
 			JsonObject outerObject, JsonObject innerObject) {
+		ElasticsearchSearchPredicateContext nestedContext = context.explicitNested( absoluteFieldPath );
+
 		PATH_ACCESSOR.set( innerObject, absoluteFieldPath );
-		QUERY_ACCESSOR.set( innerObject, nestedBuilder.build( context ) );
+		QUERY_ACCESSOR.set( innerObject, nestedBuilder.build( nestedContext ) );
 		outerObject.add( "nested", innerObject );
 		return outerObject;
 	}
