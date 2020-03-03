@@ -1454,7 +1454,8 @@ e.g. removing an index field, or removing the need for a field to be stored.
 However, you will still need to:
 
 * create missing indexes: this can generally be done automatically
-by starting up the application with the <<mapper-orm-schema-management-strategy-create,`create`>>
+by starting up the application with the <<mapper-orm-schema-management-strategy-create,`create`>>,
+<<mapper-orm-schema-management-strategy-create-or-validate,`create-or-validate`>>,
 or <<mapper-orm-schema-management-strategy-create-or-update,`create-or-update`>>
 schema management strategy.
 * (Elasticsearch only:) update the schema of existing indexes to declare the new fields.

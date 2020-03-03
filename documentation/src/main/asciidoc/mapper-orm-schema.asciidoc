@@ -36,7 +36,7 @@ but checks that indexes exist and validates their schema on startup.
 An exception will be thrown on startup if:
 
 * Indexes are missing
-* OR, with Elasticsearch only, indexes exist but their schema does not match the requirements
+* OR, with the Elasticsearch backend only, indexes exist but their schema does not match the requirements
 of the Hibernate Search mapping:
 missing fields, fields with incorrect type, missing analyzer definitions or normalizer definitions, ...
 
@@ -49,6 +49,19 @@ because <<mapper-orm-schema-management-concepts-lucene-schema,local Lucene index
 |A strategy that creates missing indexes and their schema on startup,
 but does not touch existing indexes and assumes their schema is correct without validating it.
 |<<mapper-orm-schema-management-concepts-massindexing,Creating a schema does not populate indexed data>>.
+|[[mapper-orm-schema-management-strategy-create-or-validate]]`create-or-validate`
+|A strategy that creates missing indexes and their schema on startup,
+and validates the schema of existing indexes.
+
+With the Elasticsearch backend only, an exception will be thrown on startup if some indexes already exist
+but their schema does not match the requirements of the Hibernate Search mapping:
+missing fields, fields with incorrect type, missing analyzer definitions or normalizer definitions, ...
+
+"Compatible" differences such as extra fields <<mapper-orm-schema-management-concepts-validation-permissive, are ignored>>.
+|<<mapper-orm-schema-management-concepts-massindexing,Creating a schema does not populate indexed data>>.
+
+With the Lucene backend, validation is limited to checking that the indexes exist,
+because <<mapper-orm-schema-management-concepts-lucene-schema,local Lucene indexes don't have a schema>>.
 |[[mapper-orm-schema-management-strategy-create-or-update]]`create-or-update`
 |A strategy that creates missing indexes and their schema on startup,
 and updates the schema of existing indexes if possible.
