@@ -54,7 +54,19 @@ public class ElasticsearchIndexSchemaManager implements IndexSchemaManager {
 
 	@Override
 	public CompletableFuture<?> createOrValidate(ContextualFailureCollector failureCollector) {
-		throw new UnsupportedOperationException( "Not implemented yet" );
+		return schemaCreator.createIndexIfAbsent( indexNames, expectedMetadata )
+				.thenAccept( preExistingIndexMetadata -> {
+					if ( preExistingIndexMetadata != null ) {
+						schemaValidator.validate(
+								expectedMetadata, preExistingIndexMetadata.getMetadata(),
+								failureCollector
+						);
+					}
+				} )
+				.thenCompose( ignored -> failureCollector.hasFailure()
+						? CompletableFuture.completedFuture( null )
+						: schemaAccessor.waitForIndexStatus( indexNames, executionOptions )
+				);
 	}
 
 	@Override
