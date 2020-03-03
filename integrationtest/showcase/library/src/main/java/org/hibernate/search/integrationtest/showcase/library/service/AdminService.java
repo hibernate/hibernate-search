@@ -25,4 +25,8 @@ public class AdminService {
 	public MassIndexer createMassIndexer() {
 		return Search.session( entityManager ).massIndexer();
 	}
+
+	public void dropAndCreateSchema() {
+		Search.session( entityManager ).schemaManager().dropAndCreate();
+	}
 }
