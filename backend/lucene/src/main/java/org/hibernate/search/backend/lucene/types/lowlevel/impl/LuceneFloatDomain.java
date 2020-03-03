@@ -20,20 +20,15 @@ import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.facet.LongValueFacetCounts;
 import org.apache.lucene.facet.range.DoubleRangeFacetCounts;
-import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
-import org.apache.lucene.index.SortedNumericDocValues;
-import org.apache.lucene.search.DocIdSetIterator;
-import org.apache.lucene.search.DoubleValuesSource;
+import org.apache.lucene.search.DoubleValues;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.LongValuesSource;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.util.BitSet;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.FieldData;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.SortedNumericDoubleValues;
 
 public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	private static final LuceneNumericDomain<Float> INSTANCE = new LuceneFloatDomain();
@@ -95,8 +90,10 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	@Override
 	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 		Collection<? extends Range<? extends Float>> ranges) throws IOException {
+
+		DoubleMultiValuesSource source = DoubleMultiValuesSource.fromFloatField( absoluteFieldPath, MultiValueMode.MIN );
 		return new DoubleRangeFacetCounts(
-			absoluteFieldPath, DoubleValuesSource.fromFloatField( absoluteFieldPath ),
+			absoluteFieldPath, source,
 			facetsCollector, FacetCountsUtils.createDoubleRanges( ranges )
 		);
 	}
@@ -118,32 +115,22 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 
 	@Override
 	public FieldComparator.NumericComparator<Float> createFieldComparator(String fieldname, int numHits, MultiValueMode sortMode, Float missingValue, NestedDocsProvider nestedDocsProvider) {
-		return new FloatFieldComparator( numHits, sortMode, fieldname, missingValue, nestedDocsProvider );
+
+		DoubleMultiValuesSource source = DoubleMultiValuesSource.fromFloatField( fieldname, sortMode, nestedDocsProvider );
+		return new FloatFieldComparator( numHits, fieldname, missingValue, source );
 	}
 
 	public static class FloatFieldComparator extends FieldComparator.FloatComparator {
+		private final DoubleMultiValuesSource source;
 
-		private NestedDocsProvider nested;
-		private final MultiValueMode sortMode;
-
-		public FloatFieldComparator(int numHits, MultiValueMode sortMode, String field, Float missingValue, NestedDocsProvider nested) {
+		public FloatFieldComparator(int numHits, String field, Float missingValue, DoubleMultiValuesSource source) {
 			super( numHits, field, missingValue );
-			this.nested = nested;
-			this.sortMode = sortMode;
+			this.source = source;
 		}
 
 		@Override
 		protected NumericDocValues getNumericDocValues(LeafReaderContext context, String field) throws IOException {
-			SortedNumericDocValues numericDocValues = DocValues.getSortedNumeric( context.reader(), field );
-			final SortedNumericDoubleValues values = FieldData.castToFloat( numericDocValues );
-			if ( nested == null ) {
-				return FieldData.replaceMissing( sortMode.select( values ), missingValue ).getRawFloatValues();
-			}
-			else {
-				final BitSet rootDocs = nested.parentDocs( context );
-				final DocIdSetIterator innerDocs = nested.childDocs( context );
-				return sortMode.select( values, missingValue, rootDocs, innerDocs, context.reader().maxDoc(), Integer.MAX_VALUE ).getRawFloatValues();
-			}
+			return source.getFloatNumericDocValues( context, DoubleValues.withDefault( DoubleValues.EMPTY, missingValue ) );
 		}
 	}
 

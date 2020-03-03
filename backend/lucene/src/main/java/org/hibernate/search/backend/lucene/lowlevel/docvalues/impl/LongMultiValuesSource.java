@@ -8,141 +8,89 @@ package org.hibernate.search.backend.lucene.lowlevel.docvalues.impl;
 
 import java.io.IOException;
 import java.util.Objects;
-import java.util.function.DoubleToLongFunction;
-import java.util.function.LongToDoubleFunction;
 import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.index.SortedNumericDocValues;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.search.DoubleValues;
-import org.apache.lucene.search.DoubleValuesSource;
-import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
+import org.apache.lucene.search.LongValues;
+import org.apache.lucene.search.LongValuesSource;
 import org.apache.lucene.util.BitSet;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 
-public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
+public abstract class LongMultiValuesSource extends LongValuesSource {
 
 	final String field;
 	final MultiValueMode mode;
-	final LongToDoubleFunction decoder;
 
-	public DoubleMultiValuesSource(String field, MultiValueMode mode, LongToDoubleFunction decoder) {
+	public LongMultiValuesSource(String field, MultiValueMode mode) {
 		this.field = field;
 		this.mode = mode;
-		this.decoder = decoder;
 	}
 
 	/**
-	 * Creates a DoubleMultiValuesSource that wraps a generic NumericDocValues
+	 * Creates a LongMultiValuesSource that wraps a generic NumericDocValues
 	 * field
 	 *
 	 * @param field the field to wrap, must have NumericDocValues
 	 * @param mode the multivalue mode
 	 * @param nested the nested provider
-	 * @param decoder a function to convert the long-valued doc values to
-	 * doubles
 	 * @return The DoubleMultiValuesSource
 	 */
-	public static DoubleMultiValuesSource fromField(String field, MultiValueMode mode, NestedDocsProvider nested, LongToDoubleFunction decoder) {
+	public static LongMultiValuesSource fromField(String field, MultiValueMode mode, NestedDocsProvider nested) {
 		if ( nested == null ) {
-			return new MultiFieldValuesSource( field, mode, decoder );
+			return new MultiFieldValuesSource( field, mode );
 		}
 		else {
-			return new NestedMultiFieldValuesSource( field, mode, nested, decoder );
+			return new NestedMultiFieldValuesSource( field, mode, nested );
 		}
 	}
 
 	/**
-	 * Creates a DoubleMultiValuesSource that wraps a double-valued field
+	 * Creates a LongMultiValuesSource that wraps a long-valued field
 	 *
 	 * @param field the field
 	 * @param mode the mode
 	 * @param nested the nested provider
 	 * @return DoubleMultiValuesSource
 	 */
-	public static DoubleMultiValuesSource fromDoubleField(String field, MultiValueMode mode, NestedDocsProvider nested) {
-		return fromField( field, mode, nested, Double::longBitsToDouble );
+	public static LongMultiValuesSource fromLongField(String field, MultiValueMode mode, NestedDocsProvider nested) {
+		return fromField( field, mode, nested );
 	}
 
 	/**
-	 * Creates a DoubleMultiValuesSource that wraps a double-valued field
+	 * Creates a LongMultiValuesSource that wraps a long-valued field
 	 *
 	 * @param field the field
 	 * @param mode the mode
 	 * @return DoubleMultiValuesSource
 	 */
-	public static DoubleMultiValuesSource fromDoubleField(String field, MultiValueMode mode) {
-		return fromDoubleField( field, mode, null );
-	}
-
-	/**
-	 * Creates a DoubleMultiValuesSource that wraps a float-valued field
-	 *
-	 * @param field the field
-	 * @param mode the mode
-	 * @param nested the nested provider
-	 * @return DoubleMultiValuesSource
-	 */
-	public static DoubleMultiValuesSource fromFloatField(String field, MultiValueMode mode, NestedDocsProvider nested) {
-		return fromField( field, mode, nested, (v) -> (double) Float.intBitsToFloat( (int) v ) );
-	}
-
-	/**
-	 * Creates a DoubleMultiValuesSource that wraps a float-valued field
-	 *
-	 * @param field the field
-	 * @param mode the mode
-	 * @return DoubleMultiValuesSource
-	 */
-	public static DoubleMultiValuesSource fromFloatField(String field, MultiValueMode mode) {
-		return fromFloatField( field, mode, null );
-	}
-
-	/**
-	 * Creates a DoubleMultiValuesSource that wraps a long-valued field
-	 *
-	 * @param field the field
-	 * @param mode the mode
-	 * @param nested the nested provider
-	 * @return DoubleMultiValuesSource
-	 */
-	public static DoubleMultiValuesSource fromLongField(String field, MultiValueMode mode, NestedDocsProvider nested) {
-		return fromField( field, mode, nested, (v) -> (double) v );
-	}
-
-	/**
-	 * Creates a DoubleMultiValuesSource that wraps a long-valued field
-	 *
-	 * @param field the field
-	 * @param mode the mode
-	 * @return DoubleMultiValuesSource
-	 */
-	public static DoubleMultiValuesSource fromLongField(String field, MultiValueMode mode) {
+	public static LongMultiValuesSource fromLongField(String field, MultiValueMode mode) {
 		return fromLongField( field, mode, null );
 	}
 
 	/**
-	 * Creates a DoubleMultiValuesSource that wraps an int-valued field
+	 * Creates a LongMultiValuesSource that wraps an int-valued field
 	 *
 	 * @param field the field
 	 * @param mode the mode
 	 * @param nested the nested provider
 	 * @return DoubleMultiValuesSource
 	 */
-	public static DoubleMultiValuesSource fromIntField(String field, MultiValueMode mode, NestedDocsProvider nested) {
+	public static LongMultiValuesSource fromIntField(String field, MultiValueMode mode, NestedDocsProvider nested) {
 		return fromLongField( field, mode, nested );
 	}
 
 	/**
-	 * Creates a DoubleMultiValuesSource that wraps an int-valued field
+	 * Creates a LongMultiValuesSource that wraps an int-valued field
 	 *
 	 * @param field the field
 	 * @param mode the mode
 	 * @return DoubleMultiValuesSource
 	 */
-	public static DoubleMultiValuesSource fromIntField(String field, MultiValueMode mode) {
+	public static LongMultiValuesSource fromIntField(String field, MultiValueMode mode) {
 		return fromIntField( field, mode, null );
 	}
 
@@ -157,38 +105,8 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 	 * @return NumericDocValues
 	 * @throws java.io.IOException
 	 */
-	public NumericDocValues getDoubleNumericDocValues(LeafReaderContext ctx, DoubleValues scores) throws IOException {
-		return new RawNumericDocValues( getValues( ctx, scores ), Double::doubleToRawLongBits );
-	}
-
-	/**
-	 * Returns a {@link NumericDocValues} instance for the passed-in LeafReaderContext and scores
-	 *
-	 * If scores are not needed to calculate the values (ie {@link #needsScores() returns false}, callers
-	 * may safely pass {@code null} for the {@code scores} parameter.
-	 *
-	 * @param ctx the ctx
-	 * @param scores the scores
-	 * @return NumericDocValues
-	 * @throws java.io.IOException
-	 */
-	public NumericDocValues getFloatNumericDocValues(LeafReaderContext ctx, DoubleValues scores) throws IOException {
-		return new RawNumericDocValues( getValues( ctx, scores ), (v) -> (long) Float.floatToRawIntBits( (float) v ) );
-	}
-
-	/**
-	 * Returns a {@link NumericDocValues} instance for the passed-in LeafReaderContext and scores
-	 *
-	 * If scores are not needed to calculate the values (ie {@link #needsScores() returns false}, callers
-	 * may safely pass {@code null} for the {@code scores} parameter.
-	 *
-	 * @param ctx the ctx
-	 * @param scores the scores
-	 * @return NumericDocValues
-	 * @throws java.io.IOException
-	 */
 	public NumericDocValues getLongNumericDocValues(LeafReaderContext ctx, DoubleValues scores) throws IOException {
-		return new RawNumericDocValues( getValues( ctx, scores ), (v) -> (long) v );
+		return new RawNumericDocValues( getValues( ctx, scores ) );
 	}
 
 	/**
@@ -206,17 +124,14 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 		return getLongNumericDocValues( ctx, scores );
 	}
 
-	private double decode(long value) {
-		return decoder.applyAsDouble( value );
-	}
-
-	protected DoubleValues select(final SortedNumericDocValues values, final DoubleValues scores) {
+	protected LongValues select(final SortedNumericDocValues values, final DoubleValues scores) {
 		final NumericDocValues singleton = DocValues.unwrapSingleton( values );
 		if ( singleton != null ) {
-			return replaceScores( new DoubleValues() {
+			return replaceScores( new LongValues() {
+
 				@Override
-				public double doubleValue() throws IOException {
-					return decode( singleton.longValue() );
+				public long longValue() throws IOException {
+					return singleton.longValue();
 				}
 
 				@Override
@@ -226,12 +141,12 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 			}, scores );
 		}
 		else {
-			return new DoubleValues() {
+			return new LongValues() {
 
-				private double value;
+				private long value;
 
 				@Override
-				public double doubleValue() throws IOException {
+				public long longValue() throws IOException {
 					return value;
 				}
 
@@ -242,7 +157,7 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 						return true;
 					}
 					else if ( scores != null && scores.advanceExact( doc ) ) {
-						value = scores.doubleValue();
+						value = (long) scores.doubleValue();
 					}
 					return false;
 				}
@@ -250,19 +165,19 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 		}
 	}
 
-	protected DoubleValues select(final SortedNumericDocValues values, final DoubleValues scores, final BitSet parentDocs,
+	protected LongValues select(final SortedNumericDocValues values, final DoubleValues scores, final BitSet parentDocs,
 		final DocIdSetIterator childDocs, int maxDoc, int maxChildren) throws IOException {
 		if ( parentDocs == null || childDocs == null ) {
 			return replaceScores( DoubleValues.EMPTY, scores );
 		}
 
-		return new DoubleValues() {
+		return new LongValues() {
 
 			int lastSeenParentDoc = -1;
-			double lastEmittedValue = -1;
+			long lastEmittedValue = -1;
 
 			@Override
-			public double doubleValue() throws IOException {
+			public long longValue() throws IOException {
 				return lastEmittedValue;
 			}
 
@@ -274,7 +189,7 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 				}
 				else if ( parentDoc == 0 ) {
 					if ( scores != null && scores.advanceExact( parentDoc ) ) {
-						lastEmittedValue = scores.doubleValue();
+						lastEmittedValue = (long) scores.doubleValue();
 						return true;
 					}
 					else {
@@ -298,35 +213,35 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 		};
 	}
 
-	protected double pick(SortedNumericDocValues values, DoubleValues scores, int doc) throws IOException {
+	protected long pick(SortedNumericDocValues values, DoubleValues scores, int doc) throws IOException {
 		final int count = values.docValueCount();
-		double result = 0;
+		long result = 0;
 
 		switch ( mode ) {
 			case SUM: {
 				for ( int index = 0; index < count; ++index ) {
-					result += decode( values.nextValue() );
+					result += values.nextValue();
 				}
 				break;
 			}
 			case AVG: {
 				for ( int index = 0; index < count; ++index ) {
-					result += decode( values.nextValue() );
+					result += values.nextValue();
 				}
 				result = result / count;
 				break;
 			}
 			case MIN: {
-				result = Double.POSITIVE_INFINITY;
+				result = Long.MAX_VALUE;
 				for ( int index = 0; index < count; ++index ) {
-					result = Math.min( result, decode( values.nextValue() ) );
+					result = Math.min( result, values.nextValue() );
 				}
 				break;
 			}
 			case MAX: {
-				result = Double.NEGATIVE_INFINITY;
+				result = Long.MIN_VALUE;
 				for ( int index = 0; index < count; ++index ) {
-					result = Math.max( result, decode( values.nextValue() ) );
+					result = Math.max( result, values.nextValue() );
 				}
 				break;
 			}
@@ -335,10 +250,10 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 					values.nextValue();
 				}
 				if ( count % 2 == 0 ) {
-					result = (decode( values.nextValue() ) + decode( values.nextValue() )) / 2;
+					result = (values.nextValue() + values.nextValue()) / 2;
 				}
 				else {
-					result = decode( values.nextValue() );
+					result = values.nextValue();
 				}
 				break;
 			}
@@ -347,17 +262,17 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 		}
 
 		if ( count == 0 && scores != null && scores.advanceExact( doc ) ) {
-			result = scores.doubleValue();
+			result = (long) scores.doubleValue();
 		}
 
 		return result;
 	}
 
-	protected double pick(SortedNumericDocValues values, DoubleValues scores, DocIdSetIterator docItr, int startDoc, int endDoc,
+	protected long pick(SortedNumericDocValues values, DoubleValues scores, DocIdSetIterator docItr, int startDoc, int endDoc,
 		int maxChildren) throws IOException {
 		boolean hasValue = false;
 		int totalCount = 0;
-		double returnValue = 0;
+		long returnValue = 0;
 
 		switch ( mode ) {
 			case SUM: {
@@ -369,7 +284,7 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 						}
 						final int docCount = values.docValueCount();
 						for ( int index = 0; index < docCount; ++index ) {
-							returnValue += decode( values.nextValue() );
+							returnValue += values.nextValue();
 						}
 						totalCount += docCount;
 						hasValue = true;
@@ -386,7 +301,7 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 						}
 						final int docCount = values.docValueCount();
 						for ( int index = 0; index < docCount; ++index ) {
-							returnValue += decode( values.nextValue() );
+							returnValue += values.nextValue();
 						}
 						totalCount += docCount;
 						hasValue = true;
@@ -401,28 +316,28 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 				break;
 			}
 			case MIN: {
-				returnValue = Double.POSITIVE_INFINITY;
+				returnValue = Long.MAX_VALUE;
 				int count = 0;
 				for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
 					if ( values.advanceExact( doc ) ) {
 						if ( ++count > maxChildren ) {
 							break;
 						}
-						returnValue = Math.min( returnValue, decode( values.nextValue() ) );
+						returnValue = Math.min( returnValue, values.nextValue() );
 						hasValue = true;
 					}
 				}
 				break;
 			}
 			case MAX: {
-				returnValue = Double.NEGATIVE_INFINITY;
+				returnValue = Long.MIN_VALUE;
 				int count = 0;
 				for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
 					if ( values.advanceExact( doc ) ) {
 						if ( ++count > maxChildren ) {
 							break;
 						}
-						returnValue = Math.max( returnValue, decode( values.nextValue() ) );
+						returnValue = Math.max( returnValue, values.nextValue() );
 						hasValue = true;
 					}
 				}
@@ -433,15 +348,38 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 		}
 
 		if ( !hasValue && scores != null && scores.advanceExact( endDoc ) ) {
-			returnValue = scores.doubleValue();
+			returnValue = (long) scores.doubleValue();
 		}
 
 		return returnValue;
 
 	}
 
-	protected DoubleValues replaceScores(DoubleValues values, DoubleValues scores) {
-		return new DoubleValues() {
+	protected LongValues replaceScores(LongValues values, DoubleValues scores) {
+		return new LongValues() {
+
+			private long value;
+
+			@Override
+			public boolean advanceExact(int target) throws IOException {
+				if ( values.advanceExact( target ) ) {
+					value = values.longValue();
+				}
+				else if ( scores != null && scores.advanceExact( target ) ) {
+					value = (long) scores.doubleValue();
+				}
+				return false;
+			}
+
+			@Override
+			public long longValue() throws IOException {
+				return value;
+			}
+		};
+	}
+
+	protected LongValues replaceScores(DoubleValues values, DoubleValues scores) {
+		return new LongValues() {
 
 			private double value;
 
@@ -457,16 +395,16 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 			}
 
 			@Override
-			public double doubleValue() throws IOException {
-				return value;
+			public long longValue() throws IOException {
+				return (long) value;
 			}
 		};
 	}
 
-	private static class MultiFieldValuesSource extends DoubleMultiValuesSource {
+	private static class MultiFieldValuesSource extends LongMultiValuesSource {
 
-		private MultiFieldValuesSource(String field, MultiValueMode mode, LongToDoubleFunction decoder) {
-			super( field, mode, decoder );
+		private MultiFieldValuesSource(String field, MultiValueMode mode) {
+			super( field, mode );
 		}
 
 		@Override
@@ -477,23 +415,22 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 			if ( o == null || getClass() != o.getClass() ) {
 				return false;
 			}
-			MultiFieldValuesSource that = (MultiFieldValuesSource) o;
-			return Objects.equals( field, that.field )
-				&& Objects.equals( decoder, that.decoder );
+			NestedMultiFieldValuesSource that = (NestedMultiFieldValuesSource) o;
+			return Objects.equals( field, that.field );
 		}
 
 		@Override
 		public String toString() {
-			return "double(" + field + ")";
+			return "long(" + field + ")";
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hash( field, decoder );
+			return Objects.hash( field );
 		}
 
 		@Override
-		public DoubleValues getValues(LeafReaderContext ctx, DoubleValues scores) throws IOException {
+		public LongValues getValues(LeafReaderContext ctx, DoubleValues scores) throws IOException {
 			SortedNumericDocValues values = DocValues.getSortedNumeric( ctx.reader(), field );
 			return select( values, scores );
 		}
@@ -509,29 +446,18 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 		}
 
 		@Override
-		public Explanation explain(LeafReaderContext ctx, int docId, Explanation scoreExplanation) throws IOException {
-			DoubleValues values = getValues( ctx, null );
-			if ( values.advanceExact( docId ) ) {
-				return Explanation.match( values.doubleValue(), this.toString() );
-			}
-			else {
-				return Explanation.noMatch( this.toString() );
-			}
-		}
-
-		@Override
-		public DoubleValuesSource rewrite(IndexSearcher searcher) throws IOException {
+		public LongValuesSource rewrite(IndexSearcher searcher) throws IOException {
 			return this;
 		}
 
 	}
 
-	private static class NestedMultiFieldValuesSource extends DoubleMultiValuesSource {
+	private static class NestedMultiFieldValuesSource extends LongMultiValuesSource {
 
 		private final NestedDocsProvider nested;
 
-		private NestedMultiFieldValuesSource(String field, MultiValueMode mode, NestedDocsProvider nested, LongToDoubleFunction decoder) {
-			super( field, mode, decoder );
+		private NestedMultiFieldValuesSource(String field, MultiValueMode mode, NestedDocsProvider nested) {
+			super( field, mode );
 			this.nested = nested;
 		}
 
@@ -543,23 +469,22 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 			if ( o == null || getClass() != o.getClass() ) {
 				return false;
 			}
-			MultiFieldValuesSource that = (MultiFieldValuesSource) o;
-			return Objects.equals( field, that.field )
-				&& Objects.equals( decoder, that.decoder );
+			NestedMultiFieldValuesSource that = (NestedMultiFieldValuesSource) o;
+			return Objects.equals( field, that.field );
 		}
 
 		@Override
 		public String toString() {
-			return "double(" + field + ")";
+			return "long(" + field + ")";
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hash( field, decoder );
+			return Objects.hash( field );
 		}
 
 		@Override
-		public DoubleValues getValues(LeafReaderContext ctx, DoubleValues scores) throws IOException {
+		public LongValues getValues(LeafReaderContext ctx, DoubleValues scores) throws IOException {
 			SortedNumericDocValues values = DocValues.getSortedNumeric( ctx.reader(), field );
 
 			if ( scores == null ) {
@@ -583,18 +508,7 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 		}
 
 		@Override
-		public Explanation explain(LeafReaderContext ctx, int docId, Explanation scoreExplanation) throws IOException {
-			DoubleValues values = getValues( ctx, null );
-			if ( values.advanceExact( docId ) ) {
-				return Explanation.match( values.doubleValue(), this.toString() );
-			}
-			else {
-				return Explanation.noMatch( this.toString() );
-			}
-		}
-
-		@Override
-		public DoubleValuesSource rewrite(IndexSearcher searcher) throws IOException {
+		public LongValuesSource rewrite(IndexSearcher searcher) throws IOException {
 			return this;
 		}
 
@@ -602,12 +516,10 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 
 	private static class RawNumericDocValues extends NumericDocValues {
 		private int docID = -1;
-		private final DoubleValues values;
-		private final DoubleToLongFunction decorator;
+		private final LongValues values;
 
-		public RawNumericDocValues(DoubleValues values, DoubleToLongFunction decorator) {
+		public RawNumericDocValues(LongValues values) {
 			this.values = values;
-			this.decorator = decorator;
 		}
 
 		@Override
@@ -618,7 +530,7 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 
 		@Override
 		public long longValue() throws IOException {
-			return decorator.applyAsLong( values.doubleValue() );
+			return values.longValue();
 		}
 
 		@Override
