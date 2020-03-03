@@ -36,6 +36,11 @@ public class SearchSchemaManagerImpl implements SearchSchemaManager {
 	}
 
 	@Override
+	public void createOrValidate() {
+		doOperation( PojoScopeSchemaManager::createOrValidate );
+	}
+
+	@Override
 	public void createOrUpdate() {
 		doOperation( PojoScopeSchemaManager::createOrUpdate );
 	}
