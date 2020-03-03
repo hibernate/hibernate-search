@@ -171,7 +171,7 @@ public final class HibernateOrmMapperSettings {
 				EntityLoadingCacheLookupStrategy.SKIP;
 		public static final int QUERY_LOADING_FETCH_SIZE = 100;
 		public static final boolean MAPPING_PROCESS_ANNOTATIONS = true;
-		public static final SchemaManagementStrategyName SCHEMA_MANAGEMENT_STRATEGY = SchemaManagementStrategyName.CREATE;
+		public static final SchemaManagementStrategyName SCHEMA_MANAGEMENT_STRATEGY = SchemaManagementStrategyName.CREATE_OR_VALIDATE;
 	}
 
 }

@@ -45,11 +45,11 @@ missing fields, fields with incorrect type, missing analyzer definitions or norm
 
 With the Lucene backend, validation is limited to checking that the indexes exist,
 because <<mapper-orm-schema-management-concepts-lucene-schema,local Lucene indexes don't have a schema>>.
-|[[mapper-orm-schema-management-strategy-create]]`create` (**default**)
+|[[mapper-orm-schema-management-strategy-create]]`create`
 |A strategy that creates missing indexes and their schema on startup,
 but does not touch existing indexes and assumes their schema is correct without validating it.
 |<<mapper-orm-schema-management-concepts-massindexing,Creating a schema does not populate indexed data>>.
-|[[mapper-orm-schema-management-strategy-create-or-validate]]`create-or-validate`
+|[[mapper-orm-schema-management-strategy-create-or-validate]]`create-or-validate` (**default**)
 |A strategy that creates missing indexes and their schema on startup,
 and validates the schema of existing indexes.
 
