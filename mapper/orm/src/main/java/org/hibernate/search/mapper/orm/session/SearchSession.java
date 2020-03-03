@@ -16,6 +16,7 @@ import javax.persistence.EntityManager;
 import org.hibernate.Session;
 import org.hibernate.search.engine.search.query.dsl.SearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
@@ -61,6 +62,33 @@ public interface SearchSession {
 	 * @see SearchQuerySelectStep
 	 */
 	<T> HibernateOrmSearchQuerySelectStep<T> search(SearchScope<T> scope);
+
+	/**
+	 * Create a {@link SearchSchemaManager} for all indexes.
+	 *
+	 * @return A {@link SearchSchemaManager}.
+	 */
+	default SearchSchemaManager schemaManager() {
+		return schemaManager( Collections.singleton( Object.class ) );
+	}
+
+	/**
+	 * Create a {@link SearchSchemaManager} for the indexes mapped to the given type, or to any of its sub-types.
+	 *
+	 * @param types One or more indexed types, or supertypes of all indexed types that will be targeted by the schema manager.
+	 * @return A {@link SearchSchemaManager}.
+	 */
+	default SearchSchemaManager schemaManager(Class<?> ... types) {
+		return schemaManager( Arrays.asList( types ) );
+	}
+
+	/**
+	 * Create a {@link SearchSchemaManager} for the indexes mapped to the given types, or to any of their sub-types.
+	 *
+	 * @param types A collection of indexed types, or supertypes of all indexed types that will be targeted by the schema manager.
+	 * @return A {@link SearchSchemaManager}.
+	 */
+	SearchSchemaManager schemaManager(Collection<? extends Class<?>> types);
 
 	/**
 	 * Create a {@link SearchWorkspace} for the indexes mapped to all indexed types.

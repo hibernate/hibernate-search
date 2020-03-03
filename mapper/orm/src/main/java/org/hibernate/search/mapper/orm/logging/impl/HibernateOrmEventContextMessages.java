@@ -23,4 +23,6 @@ public interface HibernateOrmEventContextMessages {
 	@Message(value = "Hibernate ORM mapping")
 	String mapping();
 
+	@Message(value = "Schema management")
+	String schemaManagement();
 }
