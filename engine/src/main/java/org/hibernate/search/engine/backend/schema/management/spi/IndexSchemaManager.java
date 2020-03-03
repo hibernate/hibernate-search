@@ -35,6 +35,18 @@ public interface IndexSchemaManager {
 
 	/**
 	 * Creates the schema if it doesn't already exist,
+	 * or validates the existing schema against requirements expressed by the mapper.
+	 * <p>
+	 * If the schema exists and validation happens, validation failures do not trigger an exception,
+	 * but instead are pushed to the given collector.
+	 *
+	 * @param failureCollector A collector for validation failures.
+	 * @return A future.
+	 */
+	CompletableFuture<?> createOrValidate(ContextualFailureCollector failureCollector);
+
+	/**
+	 * Creates the schema if it doesn't already exist,
 	 * or updates the existing schema to match requirements expressed by the mapper.
 	 * <p>
 	 * Updating the schema may be impossible (for example if the type of a field changed).

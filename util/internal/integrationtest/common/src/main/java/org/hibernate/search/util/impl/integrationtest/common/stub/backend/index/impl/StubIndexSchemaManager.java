@@ -30,6 +30,11 @@ public class StubIndexSchemaManager implements IndexSchemaManager {
 	}
 
 	@Override
+	public CompletableFuture<?> createOrValidate(ContextualFailureCollector failureCollector) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
+	@Override
 	public CompletableFuture<?> createOrUpdate() {
 		StubSchemaManagementWork work = StubSchemaManagementWork.builder( StubSchemaManagementWork.Type.CREATE_OR_UPDATE ).build();
 		return behavior.executeSchemaManagementWork( indexName, work, null );

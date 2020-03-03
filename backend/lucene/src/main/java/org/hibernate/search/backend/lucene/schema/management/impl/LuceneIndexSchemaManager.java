@@ -32,6 +32,11 @@ public class LuceneIndexSchemaManager implements IndexSchemaManager {
 	}
 
 	@Override
+	public CompletableFuture<?> createOrValidate(ContextualFailureCollector failureCollector) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
+	@Override
 	public CompletableFuture<?> createOrUpdate() {
 		// We don't perform any update whatsoever.
 		return createIfMissing();
