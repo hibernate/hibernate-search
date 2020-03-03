@@ -57,7 +57,7 @@ public class LibraryShowcaseMassIndexingIT {
 	private DocumentService documentService;
 
 	@Autowired
-	private AdminService massiveIndexer;
+	private AdminService adminService;
 
 	@Autowired
 	private TestDataService testDataService;
@@ -70,7 +70,7 @@ public class LibraryShowcaseMassIndexingIT {
 	@Test
 	public void testMassIndexing() {
 		assertThat( documentService.countIndexed() ).isEqualTo( 0 );
-		MassIndexer indexer = massiveIndexer.createMassIndexer();
+		MassIndexer indexer = adminService.createMassIndexer();
 		try {
 			indexer.startAndWait();
 		}
@@ -83,7 +83,7 @@ public class LibraryShowcaseMassIndexingIT {
 	@Test
 	public void testMassIndexingMonitor() {
 		assertThat( documentService.countIndexed() ).isEqualTo( 0 );
-		MassIndexer indexer = massiveIndexer.createMassIndexer();
+		MassIndexer indexer = adminService.createMassIndexer();
 		try {
 			/*
 			 * The default period for logging in the default mass indexing monitor is 50.
