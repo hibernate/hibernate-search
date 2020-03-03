@@ -71,6 +71,91 @@ then drops the indexes on shutdown.
 |<<mapper-orm-schema-management-concepts-drop-loses-data,All indexed data will be lost>> on startup and shutdown.
 |====
 
+[[mapper-orm-schema-management-manager]]
+== Manual schema management
+
+Schema management does not have to happen automatically on startup and shutdown.
+
+Using the `SearchSchemaManager` interface,
+it is possible to trigger schema management operations explicitly
+after Hibernate Search has started.
+
+[TIP]
+====
+The most common use case is to set the <<mapper-orm-schema-management-strategy,automatic schema management strategy>> to `none`
+and handle the creation/deletion of indexes manually when some other conditions are met,
+for example the Elasticsearch cluster has finished booting.
+
+After schema management operations are complete,
+you will often want to populate indexes.
+To that end, use the <<mapper-orm-indexing-massindexer,mass indexer>>.
+====
+
+The `SearchSchemaManager` interface exposes the following methods.
+
+[cols="1a,2a,1a",options="header"]
+|====
+|Method|Definition|Warnings
+|[[mapper-orm-schema-management-manager-validate]]`validate()`
+|Does not change indexes nor their schema,
+but checks that indexes exist and validates their schema.
+|With the Lucene backend, validation is limited to checking that the indexes exist,
+because <<mapper-orm-schema-management-concepts-lucene-schema,local Lucene indexes don't have a schema>>.
+|[[mapper-orm-schema-management-manager-create-if-missing]]`createIfMissing()`
+|Creates missing indexes and their schema,
+but does not touch existing indexes and assumes their schema is correct without validating it.
+|<<mapper-orm-schema-management-concepts-massindexing,Creating a schema does not populate indexed data>>.
+|[[mapper-orm-schema-management-manager-create-or-update]]`createOrUpdate()`
+|Creates missing indexes and their schema,
+and updates the schema of existing indexes if possible.
+|<<mapper-orm-schema-management-concepts-massindexing,Updating a schema does not update indexed data>>.
+
+With the Elasticsearch backend, <<mapper-orm-schema-management-concepts-update-failure,updating a schema may fail>>.
+
+With the Elasticsearch backend, <<mapper-orm-schema-management-concepts-index-closing,updating a schema may close indexes while updating analyzer definitions>>
+(which is not possible at all on AWS).
+
+With the Lucene backend, schema update is a no-op,
+because <<mapper-orm-schema-management-concepts-lucene-schema,local Lucene indexes don't have a schema>>.
+(it just creates missing indexes).
+|[[mapper-orm-schema-management-manager-drop-if-existing]]`dropIfExisting()`
+|Drops existing indexes.
+|<<mapper-orm-schema-management-concepts-drop-loses-data,All indexed data will be lost>>.
+|[[mapper-orm-schema-management-manager-drop-and-create]]`dropAndCreate()`
+|Drops existing indexes and re-creates them and their schema.
+|<<mapper-orm-schema-management-concepts-drop-loses-data,All indexed data will be lost>>.
+|====
+
+Below is an example using a `SearchSchemaManager` to drop and create indexes,
+then using a <<mapper-orm-indexing-massindexer,mass indexer>> to re-populate the indexes.
+
+.Reinitializing indexes using a `SearchSchemaManager`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/schema/management/HibernateOrmSchemaManagerIT.java[tags=simple]
+----
+<1> Get a `SearchSession`.
+<2> Get a schema manager.
+<3> Drop and create the indexes.
+This method is synchronous and will only return after the operation is complete.
+<4> Optionally, trigger <<mapper-orm-indexing-massindexer,mass indexing>>.
+====
+
+You can also select entity types when creating a schema manager,
+so as to manage the indexes of these types only (and their indexed subtypes, if any):
+
+.Reinitializing only some indexes using a `SearchSchemaManager`
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/mapper/orm/schema/management/HibernateOrmSchemaManagerIT.java[tags=select-type]
+----
+<1> Get a schema manager targeting the index mapped to the `Book` entity type.
+<2> Drop and create the index for the `Book` entity only.
+Other indexes are unaffected.
+====
+
 [[mapper-orm-schema-management-concepts]]
 == How schema management works
 
