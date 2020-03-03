@@ -13,6 +13,8 @@ import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexerImpl;
+import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
+import org.hibernate.search.mapper.orm.schema.management.impl.SearchSchemaManagerImpl;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.search.query.dsl.impl.HibernateOrmSearchQuerySelectStepImpl;
@@ -62,6 +64,11 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 	@Override
 	public SearchAggregationFactory aggregation() {
 		return delegate.aggregation();
+	}
+
+	@Override
+	public SearchSchemaManager schemaManager() {
+		return new SearchSchemaManagerImpl( schemaManagerDelegate() );
 	}
 
 	@Override

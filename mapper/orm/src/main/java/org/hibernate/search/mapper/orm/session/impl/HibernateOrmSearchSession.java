@@ -32,6 +32,7 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRuntimeIntrospector;
+import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
 import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
@@ -142,6 +143,11 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 
 	private <T> HibernateOrmSearchQuerySelectStep<T> search(SearchScopeImpl<T> scope) {
 		return scope.search( this );
+	}
+
+	@Override
+	public SearchSchemaManager schemaManager(Collection<? extends Class<?>> types) {
+		return scope( types ).schemaManager();
 	}
 
 	@Override
