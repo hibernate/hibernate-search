@@ -77,7 +77,7 @@ public class LibraryShowcaseMassIndexingIT {
 		catch (InterruptedException e) {
 			fail( "Unexpected InterruptedException: " + e.getMessage() );
 		}
-		assertThat( documentService.countIndexed() ).isEqualTo( 200 );
+		assertThat( documentService.countIndexed() ).isEqualTo( NUMBER_OF_BOOKS );
 	}
 
 	@Test
@@ -108,6 +108,6 @@ public class LibraryShowcaseMassIndexingIT {
 		catch (InterruptedException e) {
 			fail( "Unexpected InterruptedException: " + e.getMessage() );
 		}
-		assertThat( documentService.countIndexed() ).isEqualTo( 200 );
+		assertThat( documentService.countIndexed() ).isEqualTo( NUMBER_OF_BOOKS );
 	}
 }
