@@ -81,6 +81,30 @@ public class LibraryShowcaseMassIndexingIT {
 	}
 
 	@Test
+	public void testMassIndexingWithDropAndCreate() {
+		assertThat( documentService.countIndexed() ).isEqualTo( 0 );
+		MassIndexer indexer = adminService.createMassIndexer();
+		try {
+			indexer.startAndWait();
+		}
+		catch (InterruptedException e) {
+			fail( "Unexpected InterruptedException: " + e.getMessage() );
+		}
+		assertThat( documentService.countIndexed() ).isEqualTo( NUMBER_OF_BOOKS );
+
+		adminService.dropAndCreateSchema();
+		assertThat( documentService.countIndexed() ).isEqualTo( 0 );
+		indexer = adminService.createMassIndexer();
+		try {
+			indexer.startAndWait();
+		}
+		catch (InterruptedException e) {
+			fail( "Unexpected InterruptedException: " + e.getMessage() );
+		}
+		assertThat( documentService.countIndexed() ).isEqualTo( NUMBER_OF_BOOKS );
+	}
+
+	@Test
 	public void testMassIndexingMonitor() {
 		assertThat( documentService.countIndexed() ).isEqualTo( 0 );
 		MassIndexer indexer = adminService.createMassIndexer();
