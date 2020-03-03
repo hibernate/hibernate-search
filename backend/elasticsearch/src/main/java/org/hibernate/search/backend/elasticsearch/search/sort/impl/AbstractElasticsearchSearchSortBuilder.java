@@ -13,6 +13,7 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import org.hibernate.search.engine.search.common.MultiValue;
 
 
 
@@ -24,6 +25,7 @@ abstract class AbstractElasticsearchSearchSortBuilder implements SearchSortBuild
 	private static final JsonPrimitive DESC_KEYWORD_JSON = new JsonPrimitive( "desc" );
 
 	private SortOrder order;
+	private MultiValue multi;
 
 	@Override
 	public ElasticsearchSearchSortBuilder toImplementation() {
@@ -33,6 +35,11 @@ abstract class AbstractElasticsearchSearchSortBuilder implements SearchSortBuild
 	@Override
 	public void order(SortOrder order) {
 		this.order = order;
+	}
+
+	@Override
+	public void multi(MultiValue multi) {
+		this.multi = multi;
 	}
 
 	@Override

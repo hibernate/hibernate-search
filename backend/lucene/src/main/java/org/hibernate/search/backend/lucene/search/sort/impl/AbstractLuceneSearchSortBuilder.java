@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
-import org.hibernate.search.engine.search.sort.dsl.SortMultiValue;
+import org.hibernate.search.engine.search.common.MultiValue;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilder;
 
@@ -15,7 +15,7 @@ public abstract class AbstractLuceneSearchSortBuilder implements SearchSortBuild
 
 	protected SortOrder order;
 
-	protected SortMultiValue multi;
+	protected MultiValue multi;
 
 	@Override
 	public LuceneSearchSortBuilder toImplementation() {
@@ -28,7 +28,7 @@ public abstract class AbstractLuceneSearchSortBuilder implements SearchSortBuild
 	}
 
 	@Override
-	public void multi(SortMultiValue multi) {
+	public void multi(MultiValue multi) {
 		this.multi = multi;
 	}
 

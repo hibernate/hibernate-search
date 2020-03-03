@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.aggregation.dsl;
 
+import org.hibernate.search.engine.search.common.MultiValue;
 
 /**
  * The final step in a "range" aggregation definition, where optional parameters can be set.
@@ -15,6 +16,14 @@ package org.hibernate.search.engine.search.aggregation.dsl;
  * @param <A> The type of result for this aggregation.
  */
 public interface RangeAggregationOptionsStep<S extends RangeAggregationOptionsStep<?, F, A>, F, A>
-		extends AggregationFinalStep<A> {
+	extends AggregationFinalStep<A> {
 
+	/**
+	 * Start describing the behavior of this sort when a document do have
+	 * multi values for the targeted field.
+	 *
+	 * @param multi The multi.
+	 * @return The next step.
+	 */
+	S multi(MultiValue multi);
 }

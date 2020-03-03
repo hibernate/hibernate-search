@@ -13,6 +13,7 @@ import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationRangeMoreStep;
 import org.hibernate.search.engine.search.aggregation.dsl.RangeAggregationRangeStep;
+import org.hibernate.search.engine.search.common.MultiValue;
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.impl.Contracts;
 
@@ -38,6 +39,12 @@ class RangeAggregationRangeStepImpl<F>
 		for ( Range<? extends F> range : ranges ) {
 			range( range );
 		}
+		return this;
+	}
+
+	@Override
+	public RangeAggregationRangeStepImpl<F> multi(MultiValue multi) {
+		builder.multi( multi );
 		return this;
 	}
 

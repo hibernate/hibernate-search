@@ -43,7 +43,7 @@ public class LuceneGeoPointFieldAggregationBuilderFactory
 
 	@Override
 	public <K> TermsAggregationBuilder<K> createTermsAggregationBuilder(LuceneSearchContext searchContext,
-			String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
+			String nestedDocumentPath, String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
 		throw log.directValueLookupNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
@@ -51,7 +51,7 @@ public class LuceneGeoPointFieldAggregationBuilderFactory
 
 	@Override
 	public <K> RangeAggregationBuilder<K> createRangeAggregationBuilder(LuceneSearchContext searchContext,
-			String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
+			String nestedDocumentPath, String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
 		throw log.rangesNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);

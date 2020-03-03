@@ -6,15 +6,15 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort;
 
+import org.hibernate.search.engine.search.common.MultiValue;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.common.ValueConvert;
-import org.hibernate.search.engine.search.sort.dsl.SortMultiValue;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 
 public class StubSortBuilder implements ScoreSortBuilder<StubSortBuilder>,
-		FieldSortBuilder<StubSortBuilder>, DistanceSortBuilder<StubSortBuilder> {
+	FieldSortBuilder<StubSortBuilder>, DistanceSortBuilder<StubSortBuilder> {
 
 	@Override
 	public StubSortBuilder toImplementation() {
@@ -46,7 +46,7 @@ public class StubSortBuilder implements ScoreSortBuilder<StubSortBuilder>,
 	}
 
 	@Override
-	public void multi(SortMultiValue multi) {
+	public void multi(MultiValue multi) {
 		// No-op, just simulates a call on this object
 	}
 }

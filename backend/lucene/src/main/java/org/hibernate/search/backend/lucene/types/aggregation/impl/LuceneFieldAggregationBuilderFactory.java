@@ -24,10 +24,10 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 public interface LuceneFieldAggregationBuilderFactory {
 
 	<K> TermsAggregationBuilder<K> createTermsAggregationBuilder(LuceneSearchContext searchContext,
-			String absoluteFieldPath, Class<K> expectedType, ValueConvert convert);
+			String nestedDocumentPath, String absoluteFieldPath, Class<K> expectedType, ValueConvert convert);
 
 	<K> RangeAggregationBuilder<K> createRangeAggregationBuilder(LuceneSearchContext searchContext,
-			String absoluteFieldPath, Class<K> expectedType, ValueConvert convert);
+			String nestedDocumentPath, String absoluteFieldPath, Class<K> expectedType, ValueConvert convert);
 
 	boolean hasCompatibleCodec(LuceneFieldAggregationBuilderFactory other);
 

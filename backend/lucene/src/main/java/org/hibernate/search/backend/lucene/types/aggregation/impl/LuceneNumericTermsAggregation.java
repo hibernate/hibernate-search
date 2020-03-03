@@ -31,7 +31,7 @@ import org.apache.lucene.search.DocIdSetIterator;
  * or a different type if value converters are used.
  */
 public class LuceneNumericTermsAggregation<F, E extends Number, K>
-		extends AbstractLuceneFacetsBasedTermsAggregation<F, Long, K> {
+	extends AbstractLuceneFacetsBasedTermsAggregation<F, Long, K> {
 
 	private static final Comparator<Long> LONG_COMPARATOR = Comparator.naturalOrder();
 
@@ -46,14 +46,15 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 
 	@Override
 	FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector, int limit)
-			throws IOException {
-		LongValueFacetCounts facetCounts = numericDomain.createTermsFacetCounts( absoluteFieldPath, facetsCollector );
+		throws IOException {
+		LongValueFacetCounts facetCounts = numericDomain.createTermsFacetCounts(
+			absoluteFieldPath, facetsCollector, multiValueMode, nestedDocsProvider );
 		return facetCounts.getTopChildren( limit, absoluteFieldPath );
 	}
 
 	@Override
 	SortedSet<Long> collectFirstTerms(IndexReader reader, boolean descending, int limit)
-			throws IOException {
+		throws IOException {
 		// TODO HSEARCH-1927 when we switch to Sorted/SortedSetDocValues, this can be implemented in a much more efficient way
 		//  since docvalues will be sorted. See the same method in LuceneTextTermsAggregation.
 		TreeSet<Long> collectedTerms = new TreeSet<>( descending ? LONG_COMPARATOR.reversed() : LONG_COMPARATOR );
@@ -91,14 +92,14 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 	}
 
 	public static class Builder<F, E extends Number, K>
-			extends AbstractBuilder<F, Long, K> {
+		extends AbstractBuilder<F, Long, K> {
 
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
-		public Builder(LuceneSearchContext searchContext, String absoluteFieldPath,
-				ProjectionConverter<? super F, ? extends K> fromFieldValueConverter,
-				AbstractLuceneNumericFieldCodec<F, E> codec) {
-			super( searchContext, absoluteFieldPath, fromFieldValueConverter );
+		public Builder(LuceneSearchContext searchContext, String nestedDocumentPath, String absoluteFieldPath,
+			ProjectionConverter<? super F, ? extends K> fromFieldValueConverter,
+			AbstractLuceneNumericFieldCodec<F, E> codec) {
+			super( searchContext, nestedDocumentPath, absoluteFieldPath, fromFieldValueConverter );
 			this.codec = codec;
 		}
 

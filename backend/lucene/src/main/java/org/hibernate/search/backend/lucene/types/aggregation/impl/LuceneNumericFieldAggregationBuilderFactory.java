@@ -33,27 +33,29 @@ public class LuceneNumericFieldAggregationBuilderFactory<F>
 
 	@Override
 	public <K> TermsAggregationBuilder<K> createTermsAggregationBuilder(LuceneSearchContext searchContext,
-			String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
+			String nestedDocumentPath, String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
 		checkAggregable( absoluteFieldPath );
 
 		ProjectionConverter<? super F, ? extends K> fromFieldValueConverter =
 				getFromFieldValueConverter( absoluteFieldPath, expectedType, convert );
 
 		return new LuceneNumericTermsAggregation.Builder<>(
-				searchContext, absoluteFieldPath, fromFieldValueConverter, getCodec()
+				searchContext, nestedDocumentPath, absoluteFieldPath, fromFieldValueConverter, getCodec()
 		);
 	}
 
 	@Override
 	public <K> RangeAggregationBuilder<K> createRangeAggregationBuilder(LuceneSearchContext searchContext,
-			String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
+			String nestedDocumentPath, String absoluteFieldPath,
+			Class<K> expectedType, ValueConvert convert) {
 		checkAggregable( absoluteFieldPath );
 
 		DslConverter<?, ? extends F> toFieldValueConverter =
 				getToFieldValueConverter( absoluteFieldPath, expectedType, convert );
 
 		return new LuceneNumericRangeAggregation.Builder<>(
-				searchContext, absoluteFieldPath, toFieldValueConverter, codec
+				searchContext, nestedDocumentPath, absoluteFieldPath,
+				toFieldValueConverter, codec
 		);
 	}
 

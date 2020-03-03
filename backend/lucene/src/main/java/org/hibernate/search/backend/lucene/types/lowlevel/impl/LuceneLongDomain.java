@@ -25,7 +25,6 @@ import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.search.DoubleValues;
 import org.apache.lucene.search.FieldComparator;
-import org.apache.lucene.search.LongValuesSource;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
@@ -75,18 +74,21 @@ public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 	}
 
 	@Override
-	public LongValueFacetCounts createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector) throws IOException {
+	public LongValueFacetCounts createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
+		MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
+
+		LongMultiValuesSource source = LongMultiValuesSource.fromLongField( absoluteFieldPath, multiValueMode, nestedDocsProvider );
 		return new LongValueFacetCounts(
-			absoluteFieldPath, LongValuesSource.fromLongField( absoluteFieldPath ),
+			absoluteFieldPath, source,
 			facetsCollector
 		);
 	}
 
 	@Override
 	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-		Collection<? extends Range<? extends Long>> ranges) throws IOException {
+		Collection<? extends Range<? extends Long>> ranges, MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
 
-		LongMultiValuesSource source = LongMultiValuesSource.fromLongField( absoluteFieldPath, MultiValueMode.MIN );
+		LongMultiValuesSource source = LongMultiValuesSource.fromLongField( absoluteFieldPath, multiValueMode, nestedDocsProvider );
 		return new LongRangeFacetCounts(
 			absoluteFieldPath, source,
 			facetsCollector, FacetCountsUtils.createLongRanges( ranges )
@@ -109,8 +111,8 @@ public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 	}
 
 	@Override
-	public FieldComparator.NumericComparator<Long> createFieldComparator(String fieldName, int numHits, MultiValueMode sortMode, Long missingValue, NestedDocsProvider nestedDocsProvider) {
-		LongMultiValuesSource source = LongMultiValuesSource.fromLongField( fieldName, sortMode, nestedDocsProvider );
+	public FieldComparator.NumericComparator<Long> createFieldComparator(String fieldName, int numHits, MultiValueMode multiValueMode, Long missingValue, NestedDocsProvider nestedDocsProvider) {
+		LongMultiValuesSource source = LongMultiValuesSource.fromLongField( fieldName, multiValueMode, nestedDocsProvider );
 		return new LongFieldComparator( numHits, fieldName, missingValue, source );
 	}
 
@@ -125,7 +127,7 @@ public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 
 		@Override
 		protected NumericDocValues getNumericDocValues(LeafReaderContext context, String field) throws IOException {
-			return source.getLongNumericDocValues( context, DoubleValues.withDefault( DoubleValues.EMPTY, missingValue ) );
+			return source.getRawNumericDocValues( context, DoubleValues.withDefault( DoubleValues.EMPTY, missingValue ) );
 		}
 	}
 }

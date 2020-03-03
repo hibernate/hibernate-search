@@ -6,19 +6,32 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.search;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
+import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.common.MultiValue;
+import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.JSONTestModelLoader;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.SimpleIndexMapping;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.data.Range;
+import static org.hibernate.search.util.impl.integrationtest.common.NormalizationUtils.normalize;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
@@ -37,7 +50,10 @@ import org.junit.runners.Parameterized;
  * {@link LuceneMultiValueSearchPredicateIT}.
  */
 @RunWith(Parameterized.class)
-public class LuceneMultiValueSearchPredicateNestedIT {
+public class LuceneMultiValueSearchPredicateNestedAggregationT1 {
+
+	private static final String STRING_1 = "string_1";
+	private static final String STRING_2 = "string_2";
 
 	private final String VALUES = "data/search/multivalues-nested-data.json";
 
@@ -72,7 +88,7 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 		return new Object[]{"local-heap", "local-filesystem"};
 	}
 
-	public LuceneMultiValueSearchPredicateNestedIT(String directoryType) {
+	public LuceneMultiValueSearchPredicateNestedAggregationT1(String directoryType) {
 		this.directoryType = directoryType;
 	}
 
@@ -97,194 +113,135 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3839")
-	public void double_searchNestedMultivalues() {
-
+	public void double_searchNestedMultivaluesRangeAggregation() {
 		StubMappingScope scope = indexManager_1_1.createScope();
+		AggregationKey<Map<Range<Double>, Long>> aggregationKey = AggregationKey.of( "someAggregation" );
+
+		PredicateFinalStep filter = scope.predicate()
+			.nested().objectField( "nested" ).nest( (f) -> {
+			return f.match().field( "nested.active" ).matching( true );
+		} );
 
 		SearchQuery<DocumentReference> query = scope.query()
-			.where( f -> f.matchAll() )
-			.sort( f -> f.field( "nested.additionalDoubleField" )
-			.asc().multi( MultiValue.MIN ) )
-			.toQuery();
-
-		assertThat( query ).hasDocRefHitsExactOrder( c -> {
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
-		} );
-
-		query = scope.query()
-			.where( f -> f.matchAll() )
-			.sort( f -> f.field( "nested.additionalDoubleField" )
-			.asc().multi( MultiValue.MAX ) )
-			.toQuery();
-
-		assertThat( query ).hasDocRefHitsExactOrder( c -> {
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
-		} );
-
-		query = scope.query()
-			.where( f -> f.matchAll() )
+			.where( f -> {
+				return f.bool().must( f.matchAll() )
+					.must( filter );
+			} )
+			.aggregation( aggregationKey, f -> f.range()
+			.field( "nested.additionalDoubleField", Double.class )
+			.range( 0.0, 2.0 )
+			.range( 2.0, 4.0 )
+			.range( 4.0, 6.0 )
+			.range( 6.0, null )
+			.multi( MultiValue.AVG ) )
 			.sort( f -> f.field( "nested.additionalDoubleField" )
 			.asc().multi( MultiValue.AVG ) )
 			.toQuery();
 
-		assertThat( query ).hasDocRefHitsExactOrder( c -> {
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
-		} );
+		SearchResult<DocumentReference> result = query.fetchAll();
+		List<DocumentReference> hits = result.getHits();
 
-		query = scope.query()
-			.where( f -> f.matchAll() )
-			.sort( f -> f.field( "nested.additionalDoubleField" )
-			.asc().multi( MultiValue.SUM ) )
-			.toQuery();
+		Map<Range<Double>, Long> aggregation = result.getAggregation( aggregationKey );
+		for ( Range<Double> key : aggregation.keySet() ) {
+			System.out.println( key + " " + aggregation.get( key ) );
+		}
 
-		assertThat( query ).hasDocRefHitsExactOrder( c -> {
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
-		} );
-
+//		SearchResultAssert.assertThat( query )
+//			.aggregation( aggregationKey, containsExactly( c -> {
+//				c.accept( Range.between( 0.0, 2.0 ), 0L );
+//				c.accept( Range.between( 2.0, 4.0 ), 1L );
+//				c.accept( Range.between( 4.0, 6.0 ), 1L );
+//				c.accept( Range.between( 6.0, null ), 0L );
+//			} ) );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3839")
-	public void float_searchNestedMultivalues() {
-
+	public void integer_searchNestedMultivaluesRangeAggregation() {
 		StubMappingScope scope = indexManager_1_1.createScope();
+		AggregationKey<Map<Range<Integer>, Long>> aggregationKey = AggregationKey.of( "someAggregation" );
+
+		PredicateFinalStep filter = scope.predicate()
+			.nested().objectField( "nested" ).nest( (f) -> {
+			return f.match().field( "nested.active" ).matching( true );
+		} );
 
 		SearchQuery<DocumentReference> query = scope.query()
-			.where( f -> f.matchAll() )
-			.sort( f -> f.field( "nested.additionalFloatField" )
-			.asc().multi( MultiValue.MIN ) )
-			.toQuery();
-
-		assertThat( query ).hasDocRefHitsExactOrder( c -> {
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
-		} );
-
-		query = scope.query()
-			.where( f -> f.matchAll() )
-			.sort( f -> f.field( "nested.additionalFloatField" )
-			.asc().multi( MultiValue.MAX ) )
-			.toQuery();
-
-		assertThat( query ).hasDocRefHitsExactOrder( c -> {
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
-		} );
-
-		query = scope.query()
-			.where( f -> f.matchAll() )
-			.sort( f -> f.field( "nested.additionalFloatField" )
+			.where( f -> {
+				return f.bool().must( f.matchAll() )
+					.must( filter );
+			} )
+			.aggregation( aggregationKey, f -> f.range()
+			.field( "nested.additionalIntegerField", Integer.class )
+			.range( 0, 2 )
+			.range( 2, 4 )
+			.range( 4, 6 )
+			.range( 6, null )
+			.multi( MultiValue.AVG ) )
+			.sort( f -> f.field( "nested.additionalIntegerField" )
 			.asc().multi( MultiValue.AVG ) )
 			.toQuery();
 
-		assertThat( query ).hasDocRefHitsExactOrder( c -> {
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
-		} );
+		SearchResult<DocumentReference> result = query.fetchAll();
+		List<DocumentReference> hits = result.getHits();
 
-		query = scope.query()
-			.where( f -> f.matchAll() )
-			.sort( f -> f.field( "nested.additionalFloatField" )
-			.asc().multi( MultiValue.SUM ) )
-			.toQuery();
-
-		assertThat( query ).hasDocRefHitsExactOrder( c -> {
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
-		} );
-
+		Map<Range<Integer>, Long> aggregation = result.getAggregation( aggregationKey );
+		for ( Range<Integer> key : aggregation.keySet() ) {
+			System.out.println( key + " " + aggregation.get( key ) );
+		}
+//
+//		SearchResultAssert.assertThat( query )
+//			.aggregation( aggregationKey, containsExactly( c -> {
+//				c.accept( Range.between( 0, 2 ), 0L );
+//				c.accept( Range.between( 2, 4 ), 1L );
+//				c.accept( Range.between( 4, 6 ), 1L );
+//				c.accept( Range.between( 6, null ), 0L );
+//			} ) );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3839")
-	public void long_searchNestedMultivalues() {
-
+	public void integer_searchNestedMultivaluesTermAggregation() {
 		StubMappingScope scope = indexManager_1_1.createScope();
+		AggregationKey<Map<Double, Long>> aggregationKey = AggregationKey.of( "someAggregation" );
+
+		PredicateFinalStep filter = scope.predicate()
+			.nested().objectField( "nested" ).nest( (f) -> {
+			return f.match().field( "nested.active" ).matching( true );
+		} );
 
 		SearchQuery<DocumentReference> query = scope.query()
-			.where( f -> f.matchAll() )
-			.sort( f -> f.field( "nested.additionalLongField" )
-			.asc().multi( MultiValue.MIN ) )
-			.toQuery();
-
-		assertThat( query ).hasDocRefHitsExactOrder( c -> {
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
-		} );
-
-		query = scope.query()
-			.where( f -> f.matchAll() )
-			.sort( f -> f.field( "nested.additionalLongField" )
-			.asc().multi( MultiValue.MAX ) )
-			.toQuery();
-
-		assertThat( query ).hasDocRefHitsExactOrder( c -> {
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
-		} );
-
-		query = scope.query()
-			.where( f -> f.matchAll() )
-			.sort( f -> f.field( "nested.additionalLongField" )
+			.where( f -> {
+				return f.bool().must( f.matchAll() )
+					.must( filter );
+			} )
+			.aggregation( aggregationKey, f -> f.terms()
+			.field( "nested.additionalDoubleField", Double.class )
+			.multi( MultiValue.AVG ) )
+			.sort( f -> f.field( "nested.additionalDoubleField" )
 			.asc().multi( MultiValue.AVG ) )
 			.toQuery();
 
-		assertThat( query ).hasDocRefHitsExactOrder( c -> {
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
-		} );
+		SearchResult<DocumentReference> result = query.fetchAll();
+		List<DocumentReference> hits = result.getHits();
 
-		query = scope.query()
-			.where( f -> f.matchAll() )
-			.sort( f -> f.field( "nested.additionalLongField" )
-			.asc().multi( MultiValue.SUM ) )
-			.toQuery();
+		Map<Double, Long> aggregation = result.getAggregation( aggregationKey );
+		for ( Double key : aggregation.keySet() ) {
+			System.out.println( key + " " + aggregation.get( key ) );
+		}
 
-		assertThat( query ).hasDocRefHitsExactOrder( c -> {
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
-		} );
-
+//		SearchResultAssert.assertThat( query )
+//			.aggregation( aggregationKey, containsExactly( c -> {
+//
+//			} ) );
 	}
 
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3839")
-	public void integer_searchNestedMultivalues() {
-
-		StubMappingScope scope = indexManager_1_1.createScope();
-
-		SearchQuery<DocumentReference> query = scope.query()
-			.where( f -> f.matchAll() )
-			.sort( f -> f.field( "nested.additionalIntegerField" )
-			.asc().multi( MultiValue.MIN ) )
-			.toQuery();
-
-		assertThat( query ).hasDocRefHitsExactOrder( c -> {
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
-		} );
-
-		query = scope.query()
-			.where( f -> f.matchAll() )
-			.sort( f -> f.field( "nested.additionalIntegerField" )
-			.asc().multi( MultiValue.MAX ) )
-			.toQuery();
-
-		assertThat( query ).hasDocRefHitsExactOrder( c -> {
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
-		} );
-
-		query = scope.query()
-			.where( f -> f.matchAll() )
-			.sort( f -> f.field( "nested.additionalIntegerField" )
-			.asc().multi( MultiValue.AVG ) )
-			.toQuery();
-
-		assertThat( query ).hasDocRefHitsExactOrder( c -> {
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
-		} );
-
-		query = scope.query()
-			.where( f -> f.matchAll() )
-			.sort( f -> f.field( "nested.additionalIntegerField" )
-			.asc().multi( MultiValue.SUM ) )
-			.toQuery();
-
-		assertThat( query ).hasDocRefHitsExactOrder( c -> {
-			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
-		} );
-
+	@SuppressWarnings("unchecked")
+	private <K, V> Consumer<Map<K, V>> containsExactly(Consumer<BiConsumer<K, V>> expectationBuilder) {
+		List<Map.Entry<K, V>> expected = new ArrayList<>();
+		expectationBuilder.accept( (k, v) -> expected.add( entry( k, v ) ) );
+		return actual -> assertThat( normalize( actual ) )
+			.containsExactly( normalize( expected ).toArray( new Map.Entry[0] ) );
 	}
 
 	private void initData() {
@@ -332,7 +289,7 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 		IndexMapping_1_1(IndexSchemaElement root) {
 
 			add( "string", String.class, root.field(
-				"string", f -> f.asString() )
+				"string", f -> f.asString().aggregable( Aggregable.YES ) )
 				.toReference() );
 
 			//Add nested index
@@ -345,22 +302,22 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 
 			add( "nested.double", Double.class, nSubInd.field(
 				"additionalDoubleField",
-				f -> f.asDouble().sortable( Sortable.YES ) )
+				f -> f.asDouble().sortable( Sortable.YES ).aggregable( Aggregable.YES ) )
 				.multiValued().toReference() );
 
 			add( "nested.float", Float.class, nSubInd.field(
 				"additionalFloatField",
-				f -> f.asFloat().sortable( Sortable.YES ) )
+				f -> f.asFloat().sortable( Sortable.YES ).aggregable( Aggregable.YES ) )
 				.multiValued().toReference() );
 
 			add( "nested.long", Long.class, nSubInd.field(
 				"additionalLongField",
-				f -> f.asLong().sortable( Sortable.YES ) )
+				f -> f.asLong().sortable( Sortable.YES ).aggregable( Aggregable.YES ) )
 				.multiValued().toReference() );
 
 			add( "nested.integer", Integer.class, nSubInd.field(
 				"additionalIntegerField",
-				f -> f.asInteger().sortable( Sortable.YES ) )
+				f -> f.asInteger().sortable( Sortable.YES ).aggregable( Aggregable.YES ) )
 				.multiValued().toReference() );
 
 			add( "nested", ObjectFieldStorage.NESTED, nSubInd.toReference() );

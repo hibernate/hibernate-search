@@ -10,13 +10,20 @@ import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequ
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.CollectorFactory;
 
 import org.apache.lucene.search.Collector;
+import org.apache.lucene.search.Query;
 
 public final class AggregationRequestContext {
 
 	private final ExtractionRequirements.Builder extractionRequirementsBuilder;
+	private final Query luceneQuery;
 
-	public AggregationRequestContext(ExtractionRequirements.Builder extractionRequirementsBuilder) {
+	public AggregationRequestContext(ExtractionRequirements.Builder extractionRequirementsBuilder, Query luceneQuery) {
 		this.extractionRequirementsBuilder = extractionRequirementsBuilder;
+		this.luceneQuery = luceneQuery;
+	}
+
+	public Query getLuceneQuery() {
+		return luceneQuery;
 	}
 
 	public <C extends Collector> void requireCollector(CollectorFactory<C> collectorFactory) {

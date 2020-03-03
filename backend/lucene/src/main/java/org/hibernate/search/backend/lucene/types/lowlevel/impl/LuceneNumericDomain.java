@@ -36,10 +36,12 @@ public interface LuceneNumericDomain<E extends Number> {
 
 	E fromDocValue(Long longValue);
 
-	LongValueFacetCounts createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector) throws IOException;
+	LongValueFacetCounts createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
+		MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException;
 
 	Facets createRangeFacetCounts(String absoluteFieldPath,
-		FacetsCollector facetsCollector, Collection<? extends Range<? extends E>> ranges) throws IOException;
+		FacetsCollector facetsCollector, Collection<? extends Range<? extends E>> ranges,
+		MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException;
 
 	IndexableField createIndexField(String absoluteFieldPath, E numericValue);
 
@@ -47,5 +49,6 @@ public interface LuceneNumericDomain<E extends Number> {
 
 	IndexableField createSortedDocValuesField(String absoluteFieldPath, E numericValue);
 
-	FieldComparator.NumericComparator<E> createFieldComparator(String absoluteFieldPath, int numHits, MultiValueMode sortMode, E missingValue, NestedDocsProvider nestedDocsProvider);
+	FieldComparator.NumericComparator<E> createFieldComparator(String absoluteFieldPath, int numHits,
+		MultiValueMode multiValueMode, E missingValue, NestedDocsProvider nestedDocsProvider);
 }

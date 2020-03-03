@@ -197,12 +197,12 @@ public class LuceneSearchQueryBuilder<H>
 		);
 
 		ExtractionRequirements.Builder extractionRequirementsBuilder = new ExtractionRequirements.Builder();
-		SearchProjectionRequestContext projectionRequestContext =
-				new SearchProjectionRequestContext( extractionRequirementsBuilder );
+		SearchProjectionRequestContext projectionRequestContext
+			= new SearchProjectionRequestContext( extractionRequirementsBuilder );
 		rootProjection.request( projectionRequestContext );
 		if ( aggregations != null ) {
-			AggregationRequestContext aggregationRequestContext =
-					new AggregationRequestContext( extractionRequirementsBuilder );
+			AggregationRequestContext aggregationRequestContext
+				= new AggregationRequestContext( extractionRequirementsBuilder, definitiveLuceneQuery );
 			for ( LuceneSearchAggregation<?> aggregation : aggregations.values() ) {
 				aggregation.request( aggregationRequestContext );
 			}

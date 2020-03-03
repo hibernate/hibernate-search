@@ -105,23 +105,8 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 	 * @return NumericDocValues
 	 * @throws java.io.IOException
 	 */
-	public NumericDocValues getLongNumericDocValues(LeafReaderContext ctx, DoubleValues scores) throws IOException {
+	public NumericDocValues getRawNumericDocValues(LeafReaderContext ctx, DoubleValues scores) throws IOException {
 		return new RawNumericDocValues( getValues( ctx, scores ) );
-	}
-
-	/**
-	 * Returns a {@link NumericDocValues} instance for the passed-in LeafReaderContext and scores
-	 *
-	 * If scores are not needed to calculate the values (ie {@link #needsScores() returns false}, callers
-	 * may safely pass {@code null} for the {@code scores} parameter.
-	 *
-	 * @param ctx the ctx
-	 * @param scores the scores
-	 * @return NumericDocValues
-	 * @throws java.io.IOException
-	 */
-	public NumericDocValues getIntNumericDocValues(LeafReaderContext ctx, DoubleValues scores) throws IOException {
-		return getLongNumericDocValues( ctx, scores );
 	}
 
 	protected LongValues select(final SortedNumericDocValues values, final DoubleValues scores) {

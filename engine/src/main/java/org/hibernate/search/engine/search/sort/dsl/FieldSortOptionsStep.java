@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.sort.dsl;
 
+import org.hibernate.search.engine.search.common.MultiValue;
+
 /**
  * The initial and final step in a "field" sort definition, where optional parameters can be set.
  *
@@ -29,6 +31,5 @@ public interface FieldSortOptionsStep<S extends FieldSortOptionsStep<?>>
 	 * @param multi The multi.
 	 * @return The next step.
 	 */
-	S multi(SortMultiValue multi);
-
+	S multi(MultiValue multi);
 }

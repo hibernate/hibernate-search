@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.spi.RangeAggregationBuilder;
+import org.hibernate.search.engine.search.common.MultiValue;
 import org.hibernate.search.util.common.data.Range;
 
 class StubRangeAggregationBuilder<K>
@@ -17,6 +18,11 @@ class StubRangeAggregationBuilder<K>
 
 	@Override
 	public void range(Range<? extends K> range) {
+		// No-op
+	}
+
+	@Override
+	public void multi(MultiValue multi) {
 		// No-op
 	}
 
