@@ -22,6 +22,12 @@ import org.hibernate.search.util.common.impl.Futures;
  */
 enum ElasticsearchIndexSchemaManagerValidationOperation {
 
+	CREATE_OR_VALIDATE {
+		@Override
+		protected CompletableFuture<?> apply(IndexSchemaManager schemaManager, ContextualFailureCollector failureCollector) {
+			return schemaManager.createOrValidate( failureCollector );
+		}
+	},
 	VALIDATE {
 		@Override
 		protected CompletableFuture<?> apply(IndexSchemaManager schemaManager, ContextualFailureCollector failureCollector) {

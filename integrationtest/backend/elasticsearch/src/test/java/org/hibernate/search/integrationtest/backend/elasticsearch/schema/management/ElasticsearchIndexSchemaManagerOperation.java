@@ -32,6 +32,12 @@ enum ElasticsearchIndexSchemaManagerOperation {
 			return schemaManager.dropAndCreate();
 		}
 	},
+	CREATE_OR_VALIDATE {
+		@Override
+		public CompletableFuture<?> apply(IndexSchemaManager schemaManager) {
+			return schemaManager.createOrValidate( new StubUnusedContextualFailureCollector() );
+		}
+	},
 	CREATE_OR_UPDATE {
 		@Override
 		public CompletableFuture<?> apply(IndexSchemaManager schemaManager) {
@@ -58,7 +64,7 @@ enum ElasticsearchIndexSchemaManagerOperation {
 	}
 
 	public static EnumSet<ElasticsearchIndexSchemaManagerOperation> creatingOrPreserving() {
-		return EnumSet.of( CREATE_IF_MISSING );
+		return EnumSet.of( CREATE_IF_MISSING, CREATE_OR_VALIDATE );
 	}
 
 	public static EnumSet<ElasticsearchIndexSchemaManagerOperation> dropping() {
