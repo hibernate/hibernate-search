@@ -112,7 +112,7 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	}
 
 	@Override
-	public IndexableField createSortedField(String absoluteFieldPath, Float numericValue) {
+	public IndexableField createSortedDocValuesField(String absoluteFieldPath, Float numericValue) {
 		return new SortedFloatDocValuesField( absoluteFieldPath, numericValue );
 	}
 
@@ -142,7 +142,7 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 			else {
 				final BitSet rootDocs = nested.parentDocs( context );
 				final DocIdSetIterator innerDocs = nested.childDocs( context );
-				return sortMode.select( values, missingValue, rootDocs, innerDocs, context.reader().maxDoc(), Integer.MAX_VALUE ).getRawDoubleValues();
+				return sortMode.select( values, missingValue, rootDocs, innerDocs, context.reader().maxDoc(), Integer.MAX_VALUE ).getRawFloatValues();
 			}
 		}
 	}

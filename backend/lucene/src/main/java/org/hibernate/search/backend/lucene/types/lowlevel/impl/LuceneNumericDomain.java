@@ -45,7 +45,7 @@ public interface LuceneNumericDomain<E extends Number> {
 
 	IndexableField createDocValuesField(String absoluteFieldPath, E numericValue);
 
-	IndexableField createSortedField(String absoluteFieldPath, E numericValue);
+	IndexableField createSortedDocValuesField(String absoluteFieldPath, E numericValue);
 
 	FieldComparator.NumericComparator<E> createFieldComparator(String absoluteFieldPath, int numHits, MultiValueMode sortMode, E missingValue, NestedDocsProvider nestedDocsProvider);
 }

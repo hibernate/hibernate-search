@@ -105,7 +105,7 @@ public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
 	}
 
 	@Override
-	public IndexableField createSortedField(String absoluteFieldPath, Integer numericValue) {
+	public IndexableField createSortedDocValuesField(String absoluteFieldPath, Integer numericValue) {
 		return new SortedNumericDocValuesField( absoluteFieldPath, numericValue.longValue() );
 	}
 

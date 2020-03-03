@@ -20,19 +20,15 @@ import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.facet.LongValueFacetCounts;
 import org.apache.lucene.facet.range.DoubleRangeFacetCounts;
-import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
-import org.apache.lucene.index.SortedNumericDocValues;
-import org.apache.lucene.search.DocIdSetIterator;
+import org.apache.lucene.search.DoubleValues;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.LongValuesSource;
 import org.apache.lucene.search.Query;
-import org.apache.lucene.util.BitSet;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.FieldData;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.SortedNumericDoubleValues;
 
 public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	private static final LuceneNumericDomain<Double> INSTANCE = new LuceneDoubleDomain();
@@ -94,8 +90,12 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	@Override
 	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 		Collection<? extends Range<? extends Double>> ranges) throws IOException {
+
+		DoubleMultiValuesSource source = DoubleMultiValuesSource.fromDoubleField( absoluteFieldPath, MultiValueMode.MIN );
+
 		return new DoubleRangeFacetCounts(
 			absoluteFieldPath,
+			source,
 			facetsCollector, FacetCountsUtils.createDoubleRanges( ranges )
 		);
 	}
@@ -111,38 +111,31 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	}
 
 	@Override
-	public IndexableField createSortedField(String absoluteFieldPath, Double numericValue) {
+	public IndexableField createSortedDocValuesField(String absoluteFieldPath, Double numericValue) {
 		return new SortedDoubleDocValuesField( absoluteFieldPath, numericValue );
 	}
 
 	@Override
 	public FieldComparator.NumericComparator<Double> createFieldComparator(String fieldName, int numHits, MultiValueMode sortMode, Double missingValue, NestedDocsProvider nestedDocsProvider) {
-		return new DoubleFieldComparator( numHits, sortMode, fieldName, missingValue, nestedDocsProvider );
+
+		DoubleMultiValuesSource source = DoubleMultiValuesSource
+			.fromDoubleField( fieldName, sortMode, nestedDocsProvider );
+
+		return new DoubleFieldComparator( numHits, fieldName, missingValue, source );
 	}
 
 	public static class DoubleFieldComparator extends FieldComparator.DoubleComparator {
 
-		private NestedDocsProvider nested;
-		private final MultiValueMode sortMode;
+		private final DoubleMultiValuesSource source;
 
-		public DoubleFieldComparator(int numHits, MultiValueMode sortMode, String field, Double missingValue, NestedDocsProvider nested) {
+		public DoubleFieldComparator(int numHits, String field, Double missingValue, DoubleMultiValuesSource source) {
 			super( numHits, field, missingValue );
-			this.nested = nested;
-			this.sortMode = sortMode;
+			this.source = source;
 		}
 
 		@Override
 		protected NumericDocValues getNumericDocValues(LeafReaderContext context, String field) throws IOException {
-			SortedNumericDocValues numericDocValues = DocValues.getSortedNumeric( context.reader(), field );
-			final SortedNumericDoubleValues values = FieldData.castToDouble( numericDocValues );
-			if ( nested == null ) {
-				return FieldData.replaceMissing( sortMode.select( values ), missingValue ).getRawDoubleValues();
-			}
-			else {
-				final BitSet rootDocs = nested.parentDocs( context );
-				final DocIdSetIterator innerDocs = nested.childDocs( context );
-				return sortMode.select( values, missingValue, rootDocs, innerDocs, context.reader().maxDoc(), Integer.MAX_VALUE ).getRawDoubleValues();
-			}
+			return source.getDoubleNumericDocValues( context, DoubleValues.withDefault( DoubleValues.EMPTY, missingValue ) );
 		}
 	}
 
