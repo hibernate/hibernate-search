@@ -31,6 +31,12 @@ enum LuceneIndexSchemaManagerOperation {
 			return schemaManager.dropAndCreate();
 		}
 	},
+	CREATE_OR_VALIDATE {
+		@Override
+		public CompletableFuture<?> apply(IndexSchemaManager schemaManager) {
+			return schemaManager.createOrValidate( new StubUnusedContextualFailureCollector() );
+		}
+	},
 	CREATE_OR_UPDATE {
 		@Override
 		public CompletableFuture<?> apply(IndexSchemaManager schemaManager) {
@@ -57,7 +63,7 @@ enum LuceneIndexSchemaManagerOperation {
 	}
 
 	public static EnumSet<LuceneIndexSchemaManagerOperation> creatingOrPreserving() {
-		return EnumSet.of( CREATE_IF_MISSING, CREATE_OR_UPDATE );
+		return EnumSet.of( CREATE_IF_MISSING, CREATE_OR_UPDATE, CREATE_OR_VALIDATE );
 	}
 
 }
