@@ -32,6 +32,11 @@ public class PojoScopeSchemaManagerImpl implements PojoScopeSchemaManager {
 	}
 
 	@Override
+	public CompletableFuture<?> createOrValidate(FailureCollector failureCollector) {
+		return doOperationOnTypes( IndexSchemaManager::createOrValidate, failureCollector );
+	}
+
+	@Override
 	public CompletableFuture<?> createOrUpdate(FailureCollector failureCollector) {
 		return doOperationOnTypes( IndexSchemaManager::createOrUpdate, failureCollector );
 	}

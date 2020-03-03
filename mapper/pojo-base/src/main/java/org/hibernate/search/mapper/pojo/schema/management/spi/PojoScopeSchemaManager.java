@@ -20,6 +20,8 @@ public interface PojoScopeSchemaManager {
 
 	CompletableFuture<?> createIfMissing(FailureCollector failureCollector);
 
+	CompletableFuture<?> createOrValidate(FailureCollector failureCollector);
+
 	CompletableFuture<?> createOrUpdate(FailureCollector failureCollector);
 
 	CompletableFuture<?> dropAndCreate(FailureCollector failureCollector);
