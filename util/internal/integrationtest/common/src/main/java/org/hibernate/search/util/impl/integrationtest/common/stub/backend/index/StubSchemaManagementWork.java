@@ -10,6 +10,7 @@ public final class StubSchemaManagementWork {
 
 	public enum Type {
 		CREATE_IF_MISSING,
+		CREATE_OR_VALIDATE,
 		CREATE_OR_UPDATE,
 		DROP_IF_EXISTING,
 		DROP_AND_CREATE,
