@@ -54,6 +54,22 @@ public enum SchemaManagementStrategyName {
 
 	/**
 	 * A strategy that creates missing indexes and their schema on startup,
+	 * and validates the schema of existing indexes.
+	 * <p>
+	 * Note that creating indexes and their schema will not populate the indexed data:
+	 * newly created indexes will always be empty.
+	 * To populate indexes with pre-existing data, use mass indexing.
+	 * <p>
+	 * With Elasticsearch only, an exception will be thrown on startup if some indexes already exist
+	 * but their schema does not match the requirements of the Hibernate Search mapping:
+	 * missing fields, fields with incorrect type, missing analyzer definitions or normalizer definitions, ...
+	 * <p>
+	 * With Lucene, the schema of indexes is not validated.
+	 */
+	CREATE_OR_VALIDATE( "create-or-validate" ),
+
+	/**
+	 * A strategy that creates missing indexes and their schema on startup,
 	 * and updates the schema of existing indexes if possible.
 	 * <p>
 	 * Note that creating indexes or updating their schema will not populate or update the indexed data:

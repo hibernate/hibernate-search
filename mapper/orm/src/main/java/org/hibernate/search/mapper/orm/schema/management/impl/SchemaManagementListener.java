@@ -33,6 +33,8 @@ public class SchemaManagementListener {
 				return manager.dropAndCreate( failureCollector );
 			case CREATE_OR_UPDATE:
 				return manager.createOrUpdate( failureCollector );
+			case CREATE_OR_VALIDATE:
+				return manager.createOrValidate( failureCollector );
 			case VALIDATE:
 				return manager.validate( failureCollector );
 			case NONE:
@@ -51,6 +53,7 @@ public class SchemaManagementListener {
 			case CREATE:
 			case DROP_AND_CREATE:
 			case CREATE_OR_UPDATE:
+			case CREATE_OR_VALIDATE:
 			case VALIDATE:
 			case NONE:
 				// Nothing to do
