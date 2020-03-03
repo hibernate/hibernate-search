@@ -53,7 +53,8 @@ public interface SearchSchemaManager {
 	 * but their schema does not match the requirements of the Hibernate Search mapping:
 	 * missing fields, fields with incorrect type, missing analyzer definitions or normalizer definitions, ...
 	 * <p>
-	 * With Lucene, the schema of indexes is not validated.
+	 * <strong>Warning:</strong> with the Lucene backend, validation is limited to checking that the indexes exist,
+	 * because local Lucene indexes don't have a schema.
 	 */
 	void createOrValidate();
 

@@ -118,6 +118,13 @@ because <<mapper-orm-schema-management-concepts-lucene-schema,local Lucene index
 |Creates missing indexes and their schema,
 but does not touch existing indexes and assumes their schema is correct without validating it.
 |<<mapper-orm-schema-management-concepts-massindexing,Creating a schema does not populate indexed data>>.
+|[[mapper-orm-schema-management-manager-create-or-validate]]`createOrValidate()`
+|Creates missing indexes and their schema,
+and validates the schema of existing indexes.
+|<<mapper-orm-schema-management-concepts-massindexing,Creating a schema does not populate indexed data>>.
+
+With the Lucene backend, validation is limited to checking that the indexes exist,
+because <<mapper-orm-schema-management-concepts-lucene-schema,local Lucene indexes don't have a schema>>.
 |[[mapper-orm-schema-management-manager-create-or-update]]`createOrUpdate()`
 |Creates missing indexes and their schema,
 and updates the schema of existing indexes if possible.
