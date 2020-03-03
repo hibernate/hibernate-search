@@ -86,7 +86,7 @@ public class HibernateOrmIntegrationBooterIT {
 
 		// Actually booting the session factory should lead to a schema creation in the backend.
 		backendMock.expectSchemaManagementWorks( INDEX_NAME )
-				.work( StubSchemaManagementWork.Type.CREATE_IF_MISSING );
+				.work( StubSchemaManagementWork.Type.CREATE_OR_VALIDATE );
 		try ( SessionFactory sessionFactory = builder.build() ) {
 			/*
 			 * Building the session should NOT lead to a second schema creation in the backend:
