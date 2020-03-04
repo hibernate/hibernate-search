@@ -10,20 +10,22 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.common.BooleanOperator;
+import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.OverrideAnalysisDefinitions;
@@ -170,6 +172,69 @@ public class SimpleQueryStringSearchPredicateIT {
 
 		assertThat( createQuery.apply( TERM_1 + " + -" + TERM_2 ) )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3847")
+	public void booleanOperators_flags() {
+		StubMappingScope scope = indexManager.createScope();
+		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+
+		String orQueryString = TERM_1 + " | " + TERM_2;
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( orQueryString )
+				.defaultOperator( BooleanOperator.AND )
+				.flags( SimpleQueryFlag.OR ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( orQueryString )
+				.defaultOperator( BooleanOperator.AND )
+				.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.OR ) ) ) )
+				.toQuery() )
+				// "OR" disabled: "+" is dropped during analysis and we end up with "term1 + term2", since AND is the default operator
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+
+		String andQueryString = TERM_1 + " + " + TERM_2;
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( andQueryString )
+				.defaultOperator( BooleanOperator.OR )
+				.flags( SimpleQueryFlag.AND ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( andQueryString )
+				.defaultOperator( BooleanOperator.OR )
+				.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.AND ) ) ) )
+				.toQuery() )
+				// "AND" disabled: "+" is dropped during analysis and we end up with "term1 | term2", since OR is the default operator
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+
+		String notQueryString = "-" + TERM_1 + " + " + TERM_2;
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( notQueryString )
+				.flags( SimpleQueryFlag.AND, SimpleQueryFlag.NOT ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( notQueryString )
+				.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.NOT ) ) ) )
+				.toQuery() )
+				// "NOT" disabled: "-" is dropped during analysis and we end up with "term1 + term2"
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+
+		String precedenceQueryString = TERM_2 + " + (" + TERM_1 + " | " + TERM_3 + ")";
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( precedenceQueryString )
+				.flags( SimpleQueryFlag.AND, SimpleQueryFlag.OR, SimpleQueryFlag.PRECEDENCE ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( precedenceQueryString )
+				.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.PRECEDENCE ) ) ) )
+				.toQuery() )
+				// "PRECENDENCE" disabled: parentheses are dropped during analysis and we end up with "(term2 + term1) | term3"
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 	}
 
 	@Test
@@ -468,6 +533,42 @@ public class SimpleQueryStringSearchPredicateIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3847")
+	public void phrase_flag() {
+		StubMappingScope scope = indexManager.createScope();
+		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+
+		assertThat( scope.query()
+				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
+						.matching( "\"" + PHRASE_WITH_TERM_2 + "\"" )
+						.flags( SimpleQueryFlag.PHRASE ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+
+		assertThat( scope.query()
+				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
+						.matching( "\"" + PHRASE_WITH_TERM_2 + "\"" )
+						.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.PHRASE ) ) ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
+
+		// Slop
+		assertThat( scope.query()
+				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
+						.matching( "\"" + PHRASE_WITH_TERM_4 + "\"~2" )
+						.flags( SimpleQueryFlag.PHRASE, SimpleQueryFlag.NEAR ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_4 );
+
+		assertThat( scope.query()
+				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
+						.matching( "\"" + PHRASE_WITH_TERM_4 + "\"~2" )
+						.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.NEAR ) ) ) )
+				.toQuery() )
+				.hasNoHits();
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2678")
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.SimpleQueryStringDSLTest.testBoost")
 	public void fieldLevelBoost() {
@@ -600,6 +701,27 @@ public class SimpleQueryStringSearchPredicateIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3847")
+	public void fuzzy_flag() {
+		StubMappingScope scope = indexManager.createScope();
+		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+
+		assertThat( scope.query()
+				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
+						.matching( TERM_1 + "~1" )
+						.flags( SimpleQueryFlag.FUZZY ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_5 );
+
+		assertThat( scope.query()
+				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
+						.matching( TERM_1 + "~1" )
+						.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.FUZZY ) ) ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+	}
+
+	@Test
 	public void prefix() {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
@@ -613,6 +735,27 @@ public class SimpleQueryStringSearchPredicateIT {
 
 		assertThat( createQuery.apply( PREFIX_FOR_TERM_6 + "*" ) )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_5 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3847")
+	public void prefix_flag() {
+		StubMappingScope scope = indexManager.createScope();
+		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+
+		assertThat( scope.query()
+				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
+						.matching( PREFIX_FOR_TERM_1_AND_TERM_6 + "*" )
+						.flags( SimpleQueryFlag.PHRASE, SimpleQueryFlag.PREFIX ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_5 );
+
+		assertThat( scope.query()
+				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
+						.matching( PREFIX_FOR_TERM_1_AND_TERM_6 + "*" )
+						.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.PREFIX ) ) ) )
+				.toQuery() )
+				.hasNoHits();
 	}
 
 	@Test
@@ -863,6 +1006,46 @@ public class SimpleQueryStringSearchPredicateIT {
 						EventContexts.fromIndexNames( INDEX_NAME, UNSEARCHABLE_FIELDS_INDEX_NAME )
 				) )
 		;
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3847")
+	public void whitespace() {
+		StubMappingScope scope = indexManager.createScope();
+		String absoluteFieldPath = indexMapping.nonAnalyzedField.relativeFieldName;
+
+		String whitespaceQueryString = TERM_1 + " " + TERM_2;
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( whitespaceQueryString )
+				.flags( SimpleQueryFlag.WHITESPACE ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( whitespaceQueryString )
+				.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.WHITESPACE ) ) ) )
+				.toQuery() )
+				// "WHITESPACE" disabled: "term1 term2" is interpreted as a single term and cannot be found
+				.hasNoHits();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3847")
+	public void escape() {
+		StubMappingScope scope = indexManager.createScope();
+		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+
+		String escapedPrefixQueryString = TERM_1 + "\\*";
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( escapedPrefixQueryString )
+				.flags( SimpleQueryFlag.AND, SimpleQueryFlag.NOT, SimpleQueryFlag.ESCAPE ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( escapedPrefixQueryString )
+				.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.ESCAPE ) ) ) )
+				.toQuery() )
+				// "ESCAPE" disabled: "\" is interpreted as a literal and the prefix cannot be found
+				.hasNoHits();
 	}
 
 	private void initData() {
