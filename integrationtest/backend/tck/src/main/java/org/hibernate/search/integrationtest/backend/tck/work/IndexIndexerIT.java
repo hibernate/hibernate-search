@@ -13,7 +13,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -60,7 +59,7 @@ public class IndexIndexerIT {
 	public void success() {
 		setup();
 
-		IndexIndexer<? extends DocumentElement> indexer =
+		IndexIndexer indexer =
 				indexManager.createIndexer( DocumentCommitStrategy.NONE );
 		CompletableFuture<?>[] tasks = new CompletableFuture<?>[NUMBER_OF_BOOKS];
 		IndexWorkspace workspace = indexManager.createWorkspace();
@@ -90,7 +89,7 @@ public class IndexIndexerIT {
 	public void failure() {
 		setup();
 
-		IndexIndexer<? extends DocumentElement> indexer =
+		IndexIndexer indexer =
 				indexManager.createIndexer( DocumentCommitStrategy.NONE );
 
 		// Trigger failures in the next operations

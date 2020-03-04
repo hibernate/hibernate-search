@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Aggregable;
@@ -606,7 +605,7 @@ public class TermsAggregationSpecificsIT<F> {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan plan = indexManager.createIndexingPlan();
 		int documentCount = 0;
 		for ( Map.Entry<F, List<String>> entry : documentIdPerTerm.entrySet() ) {
 			F value = entry.getKey();

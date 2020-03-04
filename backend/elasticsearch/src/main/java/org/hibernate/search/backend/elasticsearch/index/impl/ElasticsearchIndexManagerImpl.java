@@ -49,7 +49,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.JsonObject;
 
 
-class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<ElasticsearchDocumentObjectBuilder>,
+class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 		ElasticsearchIndexManager, WorkExecutionIndexManagerContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -165,7 +165,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 
 	@Override
 	public JsonObject createDocument(String tenantId, String id,
-			DocumentContributor<ElasticsearchDocumentObjectBuilder> documentContributor) {
+			DocumentContributor documentContributor) {
 		ElasticsearchDocumentObjectBuilder builder = new ElasticsearchDocumentObjectBuilder();
 		documentContributor.contribute( builder );
 		JsonObject document = builder.build();
@@ -182,7 +182,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	}
 
 	@Override
-	public IndexIndexingPlan<ElasticsearchDocumentObjectBuilder> createIndexingPlan(BackendSessionContext sessionContext,
+	public IndexIndexingPlan createIndexingPlan(BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		// The commit strategy is ignored, because Elasticsearch always commits changes to its transaction log.
 		return backendContext.createIndexingPlan(
@@ -194,7 +194,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor<Elasticse
 	}
 
 	@Override
-	public IndexIndexer<ElasticsearchDocumentObjectBuilder> createIndexer(
+	public IndexIndexer createIndexer(
 			BackendSessionContext sessionContext, DocumentCommitStrategy commitStrategy) {
 		// The commit strategy is ignored, because Elasticsearch always commits changes to its transaction log.
 		return backendContext.createIndexer(

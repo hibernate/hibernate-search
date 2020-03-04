@@ -13,7 +13,7 @@ import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 
 public class StubBackendFactory implements BackendFactory {
 	@Override
-	public BackendImplementor<?> create(String name, BackendBuildContext context, ConfigurationPropertySource propertySource) {
+	public BackendImplementor create(String name, BackendBuildContext context, ConfigurationPropertySource propertySource) {
 		return new StubBackend( name, context );
 	}
 }

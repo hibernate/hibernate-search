@@ -9,14 +9,13 @@ package org.hibernate.search.engine.backend.spi;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.Backend;
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.IndexSettings;
 
 
-public interface BackendImplementor<D extends DocumentElement> {
+public interface BackendImplementor {
 
 	/**
 	 * Start any resource necessary to operate the backend at runtime.
@@ -65,7 +64,7 @@ public interface BackendImplementor<D extends DocumentElement> {
 	 * are reserved for use by the engine.
 	 * @return A builder for index managers targeting this backend.
 	 */
-	IndexManagerBuilder<D> createIndexManagerBuilder(String indexName,
+	IndexManagerBuilder createIndexManagerBuilder(String indexName,
 			String mappedTypeName, boolean multiTenancyEnabled, BackendBuildContext context,
 			ConfigurationPropertySource propertySource);
 

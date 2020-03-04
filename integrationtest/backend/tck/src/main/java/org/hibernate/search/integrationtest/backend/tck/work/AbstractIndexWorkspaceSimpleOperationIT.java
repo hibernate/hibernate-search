@@ -12,7 +12,6 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -115,7 +114,7 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 		// otherwise some assumptions made in the refresh IT won't hold.
 		indexManager.createScope().query().where( f -> f.matchAll() ).fetchTotalHitCount();
 
-		IndexIndexer<? extends DocumentElement> indexer =
+		IndexIndexer indexer =
 				indexManager.createIndexer( DocumentCommitStrategy.NONE );
 		CompletableFuture<?>[] tasks = new CompletableFuture<?>[DOCUMENT_COUNT];
 		for ( int i = 0; i < DOCUMENT_COUNT; i++ ) {

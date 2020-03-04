@@ -21,11 +21,10 @@ import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
-public class StubIndexManager implements IndexManagerImplementor<StubDocumentElement>, IndexManager {
+public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 
 	public static final StaticCounters.Key INSTANCE_COUNTER_KEY = StaticCounters.createKey();
 	public static final StaticCounters.Key STOP_COUNTER_KEY = StaticCounters.createKey();
@@ -75,13 +74,13 @@ public class StubIndexManager implements IndexManagerImplementor<StubDocumentEle
 	}
 
 	@Override
-	public IndexIndexingPlan<StubDocumentElement> createIndexingPlan(BackendSessionContext context,
+	public IndexIndexingPlan createIndexingPlan(BackendSessionContext context,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return new StubIndexIndexingPlan( name, backend.getBehavior(), context, commitStrategy, refreshStrategy );
 	}
 
 	@Override
-	public IndexIndexer<StubDocumentElement> createIndexer(BackendSessionContext context,
+	public IndexIndexer createIndexer(BackendSessionContext context,
 			DocumentCommitStrategy commitStrategy) {
 		return new StubIndexIndexer( name, backend.getBehavior(), context, commitStrategy );
 	}

@@ -24,7 +24,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.docume
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 
-class StubIndexIndexingPlan implements IndexIndexingPlan<StubDocumentElement> {
+class StubIndexIndexingPlan implements IndexIndexingPlan {
 	private final String indexName;
 	private final StubBackendBehavior behavior;
 	private final BackendSessionContext sessionContext;
@@ -46,7 +46,7 @@ class StubIndexIndexingPlan implements IndexIndexingPlan<StubDocumentElement> {
 
 	@Override
 	public void add(DocumentReferenceProvider documentReferenceProvider,
-			DocumentContributor<StubDocumentElement> documentContributor) {
+			DocumentContributor documentContributor) {
 		StubDocumentWork.Builder builder = StubDocumentWork.builder( StubDocumentWork.Type.ADD );
 		populate( builder, documentReferenceProvider );
 		StubDocumentNode.Builder documentBuilder = StubDocumentNode.document();
@@ -60,7 +60,7 @@ class StubIndexIndexingPlan implements IndexIndexingPlan<StubDocumentElement> {
 
 	@Override
 	public void update(DocumentReferenceProvider documentReferenceProvider,
-			DocumentContributor<StubDocumentElement> documentContributor) {
+			DocumentContributor documentContributor) {
 		StubDocumentWork.Builder builder = StubDocumentWork.builder( StubDocumentWork.Type.UPDATE );
 		populate( builder, documentReferenceProvider );
 		StubDocumentNode.Builder documentBuilder = StubDocumentNode.document();

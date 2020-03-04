@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.backend.tck.search;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
@@ -297,7 +296,7 @@ public class SearchMultiIndexIT {
 	private void initData() {
 		// Backend 1 / Index 1
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager_1_1.createIndexingPlan();
+		IndexIndexingPlan plan = indexManager_1_1.createIndexingPlan();
 
 		plan.add( referenceProvider( DOCUMENT_1_1_1 ), document -> {
 			document.addValue( indexMapping_1_1.string, STRING_1 );

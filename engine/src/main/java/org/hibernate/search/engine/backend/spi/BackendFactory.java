@@ -23,6 +23,6 @@ public interface BackendFactory {
 	 * are reserved for use by the engine.
 	 * @return A backend.
 	 */
-	BackendImplementor<?> create(String name, BackendBuildContext context, ConfigurationPropertySource propertySource);
+	BackendImplementor create(String name, BackendBuildContext context, ConfigurationPropertySource propertySource);
 
 }

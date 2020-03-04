@@ -276,7 +276,7 @@ public class AnalysisCustomIT {
 	}
 
 	private void initData(Consumer<AnalysisITDocumentBuilder> valueContributor) {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan plan = indexManager.createIndexingPlan();
 		List<String> documentIds = new ArrayList<>();
 		valueContributor.accept(
 				(String documentId, String ... fieldValues) -> {

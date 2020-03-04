@@ -11,7 +11,6 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -81,7 +80,7 @@ public class LuceneIndexReaderRefreshIT {
 
 		assertThat( query ).hasNoHits();
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan(
+		IndexIndexingPlan plan = indexManager.createIndexingPlan(
 				new StubBackendSessionContext(),
 				commitStrategy, // This is irrelevant
 				DocumentRefreshStrategy.NONE // The refresh should be executed regardless of this parameter
@@ -103,7 +102,7 @@ public class LuceneIndexReaderRefreshIT {
 
 		assertThat( query ).hasNoHits();
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan(
+		IndexIndexingPlan plan = indexManager.createIndexingPlan(
 				new StubBackendSessionContext(),
 				commitStrategy, // This is irrelevant
 				DocumentRefreshStrategy.NONE // The refresh should be executed regardless of this parameter
@@ -125,7 +124,7 @@ public class LuceneIndexReaderRefreshIT {
 
 		assertThat( query ).hasNoHits();
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan(
+		IndexIndexingPlan plan = indexManager.createIndexingPlan(
 				new StubBackendSessionContext(),
 				commitStrategy, // This is irrelevant
 				DocumentRefreshStrategy.NONE // This means no refresh will take place until after the refresh interval
@@ -150,7 +149,7 @@ public class LuceneIndexReaderRefreshIT {
 
 		assertThat( query ).hasNoHits();
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan(
+		IndexIndexingPlan plan = indexManager.createIndexingPlan(
 				new StubBackendSessionContext(),
 				commitStrategy, // This is irrelevant
 				DocumentRefreshStrategy.FORCE // This will force a refresh before the end of the refresh interval
@@ -172,7 +171,7 @@ public class LuceneIndexReaderRefreshIT {
 
 		assertThat( query ).hasNoHits();
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan(
+		IndexIndexingPlan plan = indexManager.createIndexingPlan(
 				new StubBackendSessionContext(),
 				DocumentCommitStrategy.FORCE, // With the debug IO strategy, commit is necessary for changes to be visible
 				DocumentRefreshStrategy.NONE // The refresh should be executed regardless of this parameter

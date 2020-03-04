@@ -21,7 +21,7 @@ import org.hibernate.search.util.common.impl.Throwables;
  * <p>
  * Implementations may not be thread-safe.
  */
-public interface IndexIndexingPlan<D> {
+public interface IndexIndexingPlan {
 
 	/**
 	 * Add a document to the index, assuming that the document is absent from the index.
@@ -29,7 +29,7 @@ public interface IndexIndexingPlan<D> {
 	 * @param documentReferenceProvider A source of information about the identity of the document to add.
 	 * @param documentContributor A contributor to the document, adding fields to the indexed document.
 	 */
-	void add(DocumentReferenceProvider documentReferenceProvider, DocumentContributor<D> documentContributor);
+	void add(DocumentReferenceProvider documentReferenceProvider, DocumentContributor documentContributor);
 
 	/**
 	 * Update a document in the index, or add it if it's absent from the index.
@@ -37,7 +37,7 @@ public interface IndexIndexingPlan<D> {
 	 * @param documentReferenceProvider A source of information about the identity of the document to update.
 	 * @param documentContributor A contributor to the document, adding fields to the indexed document.
 	 */
-	void update(DocumentReferenceProvider documentReferenceProvider, DocumentContributor<D> documentContributor);
+	void update(DocumentReferenceProvider documentReferenceProvider, DocumentContributor documentContributor);
 
 	/**
 	 * Delete a document from the index.

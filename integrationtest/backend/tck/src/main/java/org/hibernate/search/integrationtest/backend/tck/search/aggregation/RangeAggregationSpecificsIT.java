@@ -19,7 +19,6 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Aggregable;
@@ -503,7 +502,7 @@ public class RangeAggregationSpecificsIT<F> {
 	private void initData() {
 		List<F> documentFieldValues = ascendingValues.subList( 0, 7 );
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan plan = indexManager.createIndexingPlan();
 		for ( int i = 0; i < documentFieldValues.size(); i++ ) {
 			F value = documentFieldValues.get( i );
 			plan.add( referenceProvider( "document_" + i ), document -> {

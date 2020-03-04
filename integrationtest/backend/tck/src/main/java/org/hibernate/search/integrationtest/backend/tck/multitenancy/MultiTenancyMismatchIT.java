@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.backend.tck.multitenancy;
 
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Projectable;
@@ -94,7 +93,7 @@ public class MultiTenancyMismatchIT {
 		thrown.expectMessage( "Tenant identifier" );
 		thrown.expectMessage( "is provided, but multi-tenancy is disabled for this backend" );
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( tenant1SessionContext );
+		IndexIndexingPlan plan = indexManager.createIndexingPlan( tenant1SessionContext );
 		plan.update( referenceProvider( "1" ), document -> { } );
 		plan.execute().join();
 	}
@@ -113,7 +112,7 @@ public class MultiTenancyMismatchIT {
 		thrown.expectMessage( "Tenant identifier" );
 		thrown.expectMessage( "is provided, but multi-tenancy is disabled for this backend" );
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( tenant1SessionContext );
+		IndexIndexingPlan plan = indexManager.createIndexingPlan( tenant1SessionContext );
 		plan.update( referenceProvider( "1" ), document -> { } );
 		plan.execute().join();
 	}
@@ -132,7 +131,7 @@ public class MultiTenancyMismatchIT {
 		thrown.expectMessage( "Tenant identifier" );
 		thrown.expectMessage( "is provided, but multi-tenancy is disabled for this backend" );
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( tenant1SessionContext );
+		IndexIndexingPlan plan = indexManager.createIndexingPlan( tenant1SessionContext );
 		plan.delete( referenceProvider( "1" ) );
 		plan.execute().join();
 	}

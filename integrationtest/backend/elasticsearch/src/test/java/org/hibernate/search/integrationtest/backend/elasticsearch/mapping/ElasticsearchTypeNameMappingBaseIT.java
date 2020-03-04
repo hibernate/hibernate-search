@@ -18,7 +18,6 @@ import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -250,7 +249,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<? extends DocumentElement> plan = index1Manager.createIndexingPlan();
+		IndexIndexingPlan plan = index1Manager.createIndexingPlan();
 		plan.add( referenceProvider( ID_1 ), document -> { } );
 		plan.add( referenceProvider( ID_2 ), document -> { } );
 		plan.execute().join();

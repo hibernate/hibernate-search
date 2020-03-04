@@ -48,9 +48,9 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 	private final Map<String, BackendPartialBuildState> partiallyBuiltBackends;
 	private final ConfigurationPropertyChecker partialConfigurationPropertyChecker;
 
-	private final Map<String, BackendImplementor<?>> fullyBuiltBackends = new LinkedHashMap<>();
+	private final Map<String, BackendImplementor> fullyBuiltBackends = new LinkedHashMap<>();
 	private final Map<String, IndexManagerPartialBuildState> partiallyBuiltIndexManagers;
-	private final Map<String, IndexManagerImplementor<?>> fullyBuiltIndexManagers = new LinkedHashMap<>();
+	private final Map<String, IndexManagerImplementor> fullyBuiltIndexManagers = new LinkedHashMap<>();
 
 	SearchIntegrationPartialBuildStateImpl(
 			BeanProvider beanProvider, BeanResolver beanResolver,

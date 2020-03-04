@@ -22,10 +22,10 @@ class IndexManagerPartialBuildState {
 
 	private final String backendName;
 	private final String indexName;
-	private final IndexManagerImplementor<?> partiallyBuiltIndexManager;
+	private final IndexManagerImplementor partiallyBuiltIndexManager;
 
 	IndexManagerPartialBuildState(String backendName,
-			String indexName, IndexManagerImplementor<?> partiallyBuiltIndexManager) {
+			String indexName, IndexManagerImplementor partiallyBuiltIndexManager) {
 		this.backendName = backendName;
 		this.indexName = indexName;
 		this.partiallyBuiltIndexManager = partiallyBuiltIndexManager;
@@ -58,7 +58,7 @@ class IndexManagerPartialBuildState {
 				} ) );
 	}
 
-	public IndexManagerImplementor<?> getIndexManager() {
+	public IndexManagerImplementor getIndexManager() {
 		return partiallyBuiltIndexManager;
 	}
 }
