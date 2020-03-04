@@ -149,7 +149,7 @@ public class SimpleQueryStringSearchPredicateIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2678")
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.SimpleQueryStringDSLTest.testSimpleQueryString")
-	public void simpleQueryString() {
+	public void booleanOperators() {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
@@ -174,7 +174,7 @@ public class SimpleQueryStringSearchPredicateIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3844") // Used to throw NPE
-	public void simpleQueryString_nonAnalyzedField() {
+	public void nonAnalyzedField() {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.nonAnalyzedField.relativeFieldName;
 		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
@@ -198,7 +198,7 @@ public class SimpleQueryStringSearchPredicateIT {
 	}
 
 	@Test
-	public void simpleQueryString_unsearchable() {
+	public void unsearchable() {
 		StubMappingScope scope = unsearchableFieldsIndexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
