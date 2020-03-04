@@ -34,9 +34,9 @@ public interface PojoMappingDelegate extends AutoCloseable {
 			Collection<? extends PojoRawTypeIdentifier<? extends E>> targetedTypes,
 			PojoScopeTypeExtendedContextProvider<E, C> indexedTypeExtendedContextProvider);
 
-	PojoIndexingPlan createIndexingPlan(PojoWorkSessionContext context,
+	PojoIndexingPlan createIndexingPlan(PojoWorkSessionContext<?> context,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
-	PojoIndexer createIndexer(PojoWorkSessionContext context, DocumentCommitStrategy commitStrategy);
+	PojoIndexer createIndexer(PojoWorkSessionContext<?> context, DocumentCommitStrategy commitStrategy);
 
 }

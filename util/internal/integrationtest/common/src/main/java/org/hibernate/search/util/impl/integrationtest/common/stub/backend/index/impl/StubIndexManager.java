@@ -8,6 +8,7 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.index
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
@@ -75,6 +76,7 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 
 	@Override
 	public IndexIndexingPlan createIndexingPlan(BackendSessionContext context,
+			EntityReferenceFactory<?> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return new StubIndexIndexingPlan( name, backend.getBehavior(), context, commitStrategy, refreshStrategy );
 	}

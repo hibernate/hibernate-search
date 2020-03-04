@@ -63,13 +63,13 @@ public class PojoContainedTypeManager<E>
 	}
 
 	@Override
-	public Supplier<E> toEntitySupplier(PojoWorkSessionContext sessionContext, Object entity) {
+	public Supplier<E> toEntitySupplier(PojoWorkSessionContext<?> sessionContext, Object entity) {
 		PojoRuntimeIntrospector introspector = sessionContext.getRuntimeIntrospector();
 		return new CachingCastingEntitySupplier<>( caster, introspector, entity );
 	}
 
 	@Override
-	public void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoWorkSessionContext sessionContext,
+	public void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoWorkSessionContext<?> sessionContext,
 			Supplier<E> entitySupplier, Set<String> dirtyPaths) {
 		PojoRuntimeIntrospector introspector = sessionContext.getRuntimeIntrospector();
 		reindexingResolver.resolveEntitiesToReindex(
@@ -78,7 +78,7 @@ public class PojoContainedTypeManager<E>
 	}
 
 	@Override
-	public PojoContainedTypeIndexingPlan<E> createIndexingPlan(PojoWorkSessionContext sessionContext) {
+	public PojoContainedTypeIndexingPlan<E> createIndexingPlan(PojoWorkSessionContext<?> sessionContext) {
 		return new PojoContainedTypeIndexingPlan<>(
 				this, sessionContext
 		);

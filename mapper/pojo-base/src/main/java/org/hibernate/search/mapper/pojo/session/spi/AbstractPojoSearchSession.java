@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 
-public abstract class AbstractPojoSearchSession implements PojoWorkSessionContext {
+public abstract class AbstractPojoSearchSession<R> implements PojoWorkSessionContext<R> {
 
 	private final PojoSearchSessionMappingContext mappingContext;
 

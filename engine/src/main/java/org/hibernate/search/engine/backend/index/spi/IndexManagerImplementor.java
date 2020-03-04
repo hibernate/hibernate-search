@@ -8,6 +8,7 @@ package org.hibernate.search.engine.backend.index.spi;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
@@ -59,6 +60,7 @@ public interface IndexManagerImplementor {
 	IndexManager toAPI();
 
 	IndexIndexingPlan createIndexingPlan(BackendSessionContext sessionContext,
+			EntityReferenceFactory<?> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
 	IndexIndexer createIndexer(BackendSessionContext sessionContext,
