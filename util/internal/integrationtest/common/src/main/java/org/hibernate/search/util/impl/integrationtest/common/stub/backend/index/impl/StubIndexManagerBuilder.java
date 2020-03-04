@@ -21,14 +21,17 @@ public class StubIndexManagerBuilder implements IndexManagerBuilder {
 
 	private final StubBackend backend;
 	private final String name;
+	private final String mappedTypeName;
 	private final StubIndexSchemaRootNodeBuilder schemaRootNodeBuilder;
 
 	private boolean closed = false;
 
-	public StubIndexManagerBuilder(StubBackend backend, String name, String mappedTypeName) {
+	public StubIndexManagerBuilder(StubBackend backend, String name, String mappedTypeName1,
+			String mappedTypeName) {
 		StaticCounters.get().increment( INSTANCE_COUNTER_KEY );
 		this.backend = backend;
 		this.name = name;
+		this.mappedTypeName = mappedTypeName;
 		this.schemaRootNodeBuilder = new StubIndexSchemaRootNodeBuilder( backend.getBehavior(), name, mappedTypeName );
 	}
 
@@ -57,6 +60,6 @@ public class StubIndexManagerBuilder implements IndexManagerBuilder {
 		}
 		StaticCounters.get().increment( BUILD_COUNTER_KEY );
 		closed = true;
-		return new StubIndexManager( backend, name, schemaRootNodeBuilder.build() );
+		return new StubIndexManager( backend, name, mappedTypeName, schemaRootNodeBuilder.build() );
 	}
 }

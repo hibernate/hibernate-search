@@ -59,8 +59,8 @@ public interface IndexManagerImplementor {
 	 */
 	IndexManager toAPI();
 
-	IndexIndexingPlan createIndexingPlan(BackendSessionContext sessionContext,
-			EntityReferenceFactory<?> entityReferenceFactory,
+	<R> IndexIndexingPlan<R> createIndexingPlan(BackendSessionContext sessionContext,
+			EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
 	IndexIndexer createIndexer(BackendSessionContext sessionContext,

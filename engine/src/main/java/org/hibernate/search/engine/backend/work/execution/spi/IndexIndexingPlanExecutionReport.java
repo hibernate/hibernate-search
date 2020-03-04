@@ -12,24 +12,27 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.util.common.AssertionFailure;
 
-public final class IndexIndexingPlanExecutionReport {
+/**
+ * @param <R> The type of entity references.
+ */
+public final class IndexIndexingPlanExecutionReport<R> {
 
-	public static IndexIndexingPlanExecutionReport.Builder builder() {
-		return new IndexIndexingPlanExecutionReport.Builder();
+	public static <R> IndexIndexingPlanExecutionReport.Builder<R> builder() {
+		return new IndexIndexingPlanExecutionReport.Builder<>();
 	}
 
-	public static CompletableFuture<IndexIndexingPlanExecutionReport> allOf(
-			List<CompletableFuture<IndexIndexingPlanExecutionReport>> reportFutures) {
+	public static <R> CompletableFuture<IndexIndexingPlanExecutionReport<R>> allOf(
+			List<CompletableFuture<IndexIndexingPlanExecutionReport<R>>> reportFutures) {
 		if ( reportFutures.size() == 1 ) {
 			return reportFutures.get( 0 );
 		}
 		else {
-			CompletableFuture<IndexIndexingPlanExecutionReport.Builder> reportBuilderFuture =
+			CompletableFuture<IndexIndexingPlanExecutionReport.Builder<R>> reportBuilderFuture =
 					CompletableFuture.completedFuture( IndexIndexingPlanExecutionReport.builder() );
-			for ( CompletableFuture<IndexIndexingPlanExecutionReport> future : reportFutures ) {
+			for ( CompletableFuture<IndexIndexingPlanExecutionReport<R>> future : reportFutures ) {
 				reportBuilderFuture = reportBuilderFuture.thenCombine(
 						future, IndexIndexingPlanExecutionReport.Builder::add
 				);
@@ -40,12 +43,12 @@ public final class IndexIndexingPlanExecutionReport {
 
 	private final Throwable throwable;
 
-	private final List<DocumentReference> failingDocuments;
+	private final List<R> failingEntityReferences;
 
-	private IndexIndexingPlanExecutionReport(Builder builder) {
-		this.failingDocuments = builder.failingDocuments == null
-				? Collections.emptyList() : Collections.unmodifiableList( builder.failingDocuments );
-		if ( builder.throwable == null && !failingDocuments.isEmpty() ) {
+	private IndexIndexingPlanExecutionReport(Builder<R> builder) {
+		this.failingEntityReferences = builder.failingEntityReferences == null
+				? Collections.emptyList() : Collections.unmodifiableList( builder.failingEntityReferences );
+		if ( builder.throwable == null && !failingEntityReferences.isEmpty() ) {
 			this.throwable = new AssertionFailure(
 					"Unknown throwable: missing throwable when reporting the failure."
 							+ " There is probably a bug in Hibernate Search, please report it."
@@ -60,27 +63,27 @@ public final class IndexIndexingPlanExecutionReport {
 		return Optional.ofNullable( throwable );
 	}
 
-	public List<DocumentReference> getFailingDocuments() {
-		return failingDocuments;
+	public List<R> getFailingEntityReferences() {
+		return failingEntityReferences;
 	}
 
-	public static final class Builder {
+	public static final class Builder<R> {
 
 		private Throwable throwable;
-		private List<DocumentReference> failingDocuments;
+		private List<R> failingEntityReferences;
 
 		private Builder() {
 		}
 
-		public Builder add(IndexIndexingPlanExecutionReport report) {
+		public Builder<R> add(IndexIndexingPlanExecutionReport<R> report) {
 			report.getThrowable().ifPresent( this::throwable );
-			for ( DocumentReference failingDocument : report.getFailingDocuments() ) {
-				failingDocument( failingDocument );
+			for ( R failingEntityReference : report.getFailingEntityReferences() ) {
+				failingEntityReference( failingEntityReference );
 			}
 			return this;
 		}
 
-		public Builder throwable(Throwable throwable) {
+		public Builder<R> throwable(Throwable throwable) {
 			if ( this.throwable == null ) {
 				this.throwable = throwable;
 			}
@@ -90,17 +93,33 @@ public final class IndexIndexingPlanExecutionReport {
 			return this;
 		}
 
-		public Builder failingDocument(DocumentReference reference) {
-			if ( failingDocuments == null ) {
-				failingDocuments = new ArrayList<>();
+		public Builder<R> failingEntityReference(R reference) {
+			if ( failingEntityReferences == null ) {
+				failingEntityReferences = new ArrayList<>();
 			}
-			failingDocuments.add( reference );
+			failingEntityReferences.add( reference );
 			return this;
 		}
 
-		public IndexIndexingPlanExecutionReport build() {
-			return new IndexIndexingPlanExecutionReport( this );
+		public Builder<R> failingEntityReference(EntityReferenceFactory<R> referenceFactory,
+				String typeName, Object entityIdentifier) {
+			try {
+				failingEntityReference(
+						referenceFactory.createEntityReference( typeName, entityIdentifier )
+				);
+			}
+			catch (RuntimeException e) {
+				// We failed to create a reference.
+				// Let's skip it, but report the failure.
+				throwable( e );
+			}
+			return this;
 		}
+
+		public IndexIndexingPlanExecutionReport<R> build() {
+			return new IndexIndexingPlanExecutionReport<>( this );
+		}
+
 	}
 
 }

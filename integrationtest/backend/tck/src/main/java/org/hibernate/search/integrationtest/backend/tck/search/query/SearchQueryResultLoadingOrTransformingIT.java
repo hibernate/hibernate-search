@@ -619,7 +619,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 	}
 
 	private void initData() {
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( MAIN_ID ), document -> {
 			document.addValue( indexMapping.string, STRING_VALUE );
 			document.addValue( indexMapping.string_analyzed, STRING_ANALYZED_VALUE );

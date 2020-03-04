@@ -35,8 +35,8 @@ public class MappedIndexManagerImpl implements MappedIndexManager {
 	}
 
 	@Override
-	public IndexIndexingPlan createIndexingPlan(BackendSessionContext sessionContext,
-			EntityReferenceFactory<?> entityReferenceFactory,
+	public <R> IndexIndexingPlan<R> createIndexingPlan(BackendSessionContext sessionContext,
+			EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return implementor.createIndexingPlan(
 				sessionContext, entityReferenceFactory,

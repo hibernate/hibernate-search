@@ -172,7 +172,7 @@ public class PojoIndexedTypeManager<I, E>
 	}
 
 	@Override
-	public PojoIndexedTypeIndexingPlan<I, E> createIndexingPlan(PojoWorkSessionContext<?> sessionContext,
+	public <R> PojoIndexedTypeIndexingPlan<I, E, R> createIndexingPlan(PojoWorkSessionContext<R> sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return new PojoIndexedTypeIndexingPlan<>(
 				this, sessionContext,

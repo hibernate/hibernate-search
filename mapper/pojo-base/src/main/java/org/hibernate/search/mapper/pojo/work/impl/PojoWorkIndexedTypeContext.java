@@ -46,7 +46,7 @@ public interface PojoWorkIndexedTypeContext<I, E> {
 	void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoRuntimeIntrospector runtimeIntrospector,
 			Supplier<E> entitySupplier, Set<String> dirtyPaths);
 
-	PojoIndexedTypeIndexingPlan<I, E> createIndexingPlan(PojoWorkSessionContext<?> sessionContext,
+	<R> PojoIndexedTypeIndexingPlan<I, E, R> createIndexingPlan(PojoWorkSessionContext<R> sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
 	PojoTypeIndexer<I, E> createIndexer(PojoWorkSessionContext<?> sessionContext,

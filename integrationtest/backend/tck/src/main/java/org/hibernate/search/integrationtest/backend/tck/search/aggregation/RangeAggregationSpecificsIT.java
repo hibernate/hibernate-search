@@ -502,7 +502,7 @@ public class RangeAggregationSpecificsIT<F> {
 	private void initData() {
 		List<F> documentFieldValues = ascendingValues.subList( 0, 7 );
 
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		for ( int i = 0; i < documentFieldValues.size(); i++ ) {
 			F value = documentFieldValues.get( i );
 			plan.add( referenceProvider( "document_" + i ), document -> {

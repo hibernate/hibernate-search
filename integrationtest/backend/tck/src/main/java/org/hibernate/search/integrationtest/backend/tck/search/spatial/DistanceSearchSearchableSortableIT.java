@@ -160,7 +160,7 @@ public class DistanceSearchSearchableSortableIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
 			document.addValue( indexMapping.searchableSortable, OURSON_QUI_BOIT_GEO_POINT );
 			document.addValue( indexMapping.searchableNotSortable, OURSON_QUI_BOIT_GEO_POINT );

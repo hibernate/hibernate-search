@@ -20,40 +20,25 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
 
-public class LuceneDeleteEntryWork extends AbstractLuceneWriteWork<Long>
-		implements LuceneSingleDocumentWriteWork<Long> {
+public class LuceneDeleteEntryWork extends AbstractLuceneSingleDocumentWriteWork<Long> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final String tenantId;
-
-	private final String id;
-
+	private final String documentIdentifier;
 	private final Query filter;
 
-	LuceneDeleteEntryWork(String tenantId, String id, Query filter) {
-		super( "deleteEntry" );
-		this.tenantId = tenantId;
-		this.id = id;
+	LuceneDeleteEntryWork(String tenantId, String entityTypeName, Object entityIdentifier,
+			String documentIdentifier, Query filter) {
+		super( "deleteEntry", tenantId, entityTypeName, entityIdentifier );
+		this.documentIdentifier = documentIdentifier;
 		this.filter = filter;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "type=" ).append( workType )
-				.append( ", tenantId=" ).append( tenantId )
-				.append( ", id=" ).append( id )
-				.append( "]" );
-		return sb.toString();
 	}
 
 	@Override
 	public Long execute(LuceneWriteWorkExecutionContext context) {
 		try {
 			IndexWriterDelegator indexWriterDelegator = context.getIndexWriterDelegator();
-			Term idTerm = new Term( MetadataFields.idFieldName(), id );
+			Term idTerm = new Term( MetadataFields.idFieldName(), documentIdentifier );
 			if ( filter == null ) {
 				// Pass the term directly instead of a query: presumably more efficient.
 				return indexWriterDelegator.deleteDocuments( idTerm );
@@ -63,12 +48,10 @@ public class LuceneDeleteEntryWork extends AbstractLuceneWriteWork<Long>
 			}
 		}
 		catch (IOException e) {
-			throw log.unableToDeleteEntryFromIndex( tenantId, id, context.getEventContext(), e );
+			throw log.unableToDeleteEntryFromIndex(
+					tenantId, entityTypeName, entityIdentifier, context.getEventContext(), e
+			);
 		}
 	}
 
-	@Override
-	public String getDocumentId() {
-		return id;
-	}
 }

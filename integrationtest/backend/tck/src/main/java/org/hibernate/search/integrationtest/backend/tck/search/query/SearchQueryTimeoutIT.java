@@ -159,7 +159,7 @@ public class SearchQueryTimeoutIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		// Use a batch approach for a real application
 		// Here the huge bulk is used to provoke a timeout
 		for ( int i = 0; i < ROUNDS; i++ ) {

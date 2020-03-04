@@ -657,7 +657,7 @@ public class LuceneExtensionIT {
 
 	@Test
 	public void nativeField_invalidFieldPath() {
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 
 		SubTest.expectException(
 				"native field contributing field with invalid field path",
@@ -726,7 +726,7 @@ public class LuceneExtensionIT {
 	}
 
 	private static void indexDataSet(IndexMapping indexMapping, StubMappingIndexManager indexManager) {
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( FIRST_ID ), document -> {
 			document.addValue( indexMapping.string, "text 1" );
 

@@ -120,7 +120,7 @@ public abstract class AbstractOnTheFlyIndexingBenchmarks extends AbstractBackend
 		StubBackendSessionContext sessionContext = new StubBackendSessionContext();
 		PerThreadIndexPartition partition = getIndexPartition();
 		MappedIndex index = partition.getIndex();
-		IndexIndexingPlan indexingPlan = index.getIndexManager()
+		IndexIndexingPlan<?> indexingPlan = index.getIndexManager()
 				.createIndexingPlan( sessionContext, getCommitStrategyParam(), refreshStrategy );
 
 		for ( Long documentIdInThread : idsToAdd ) {

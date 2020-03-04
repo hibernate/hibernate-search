@@ -296,7 +296,7 @@ public class SearchMultiIndexIT {
 	private void initData() {
 		// Backend 1 / Index 1
 
-		IndexIndexingPlan plan = indexManager_1_1.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager_1_1.createIndexingPlan();
 
 		plan.add( referenceProvider( DOCUMENT_1_1_1 ), document -> {
 			document.addValue( indexMapping_1_1.string, STRING_1 );

@@ -1028,7 +1028,7 @@ public class BoolSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			document.addValue( indexMapping.field1, FIELD1_VALUE1 );
 			document.addValue( indexMapping.field2, FIELD2_VALUE1 );

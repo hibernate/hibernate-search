@@ -92,12 +92,13 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexIndexingPlan createIndexingPlan(BackendSessionContext sessionContext,
-			EntityReferenceFactory<?> entityReferenceFactory,
+	public <R> IndexIndexingPlan<R> createIndexingPlan(BackendSessionContext sessionContext,
+			EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return backendContext.createIndexingPlan(
 				shardHolder, indexEntryFactory,
-				sessionContext, commitStrategy, refreshStrategy
+				sessionContext, entityReferenceFactory,
+				commitStrategy, refreshStrategy
 		);
 	}
 

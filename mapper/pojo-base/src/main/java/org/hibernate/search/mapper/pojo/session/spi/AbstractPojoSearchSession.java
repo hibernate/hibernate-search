@@ -60,7 +60,7 @@ public abstract class AbstractPojoSearchSession<R> implements PojoWorkSessionCon
 		return sessionBasedBridgeOperationContext;
 	}
 
-	protected PojoIndexingPlan createIndexingPlan(DocumentCommitStrategy commitStrategy,
+	protected PojoIndexingPlan<R> createIndexingPlan(DocumentCommitStrategy commitStrategy,
 			DocumentRefreshStrategy refreshStrategy) {
 		return mappingContext.createIndexingPlan( this, commitStrategy, refreshStrategy );
 	}

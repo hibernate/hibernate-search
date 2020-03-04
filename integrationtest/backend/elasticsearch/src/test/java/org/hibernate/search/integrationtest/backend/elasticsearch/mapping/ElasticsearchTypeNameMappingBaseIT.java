@@ -249,7 +249,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan plan = index1Manager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index1Manager.createIndexingPlan();
 		plan.add( referenceProvider( ID_1 ), document -> { } );
 		plan.add( referenceProvider( ID_2 ), document -> { } );
 		plan.execute().join();
