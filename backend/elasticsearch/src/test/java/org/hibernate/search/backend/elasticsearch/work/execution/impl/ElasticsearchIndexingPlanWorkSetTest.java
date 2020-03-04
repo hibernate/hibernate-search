@@ -334,6 +334,74 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 		} );
 	}
 
+	@Test
+	public void failure_workAndCreateEntityReference() {
+		CompletableFuture<Void> work0Future = new CompletableFuture<>();
+		CompletableFuture<Void> work1Future = new CompletableFuture<>();
+		CompletableFuture<Void> work2Future = new CompletableFuture<>();
+		CompletableFuture<Void> work3Future = new CompletableFuture<>();
+		CompletableFuture<Void> work4Future = new CompletableFuture<>();
+		CompletableFuture<Void> workSequenceFuture = new CompletableFuture<>();
+		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> workSetFuture =
+				new CompletableFuture<>();
+
+		ElasticsearchIndexingPlanWorkSet<StubEntityReference> workSet = new ElasticsearchIndexingPlanWorkSet<>(
+				createWorkMocks( 5 ), entityReferenceFactoryMock, workSetFuture
+		);
+
+		FutureAssert.assertThat( workSetFuture ).isPending();
+
+		resetAll();
+		processorMock.beforeWorkSet();
+		expect( processorMock.submit( workMocks.get( 0 ) ) ).andReturn( work0Future );
+		expect( processorMock.submit( workMocks.get( 1 ) ) ).andReturn( work1Future );
+		expect( processorMock.submit( workMocks.get( 2 ) ) ).andReturn( work2Future );
+		expect( processorMock.submit( workMocks.get( 3 ) ) ).andReturn( work3Future );
+		expect( processorMock.submit( workMocks.get( 4 ) ) ).andReturn( work4Future );
+		expect( processorMock.afterWorkSet() ).andReturn( workSequenceFuture );
+		replayAll();
+		workSet.submitTo( processorMock );
+		verifyAll();
+
+		FutureAssert.assertThat( workSetFuture ).isPending();
+
+		RuntimeException work1Exception = new RuntimeException( "Some message" );
+		RuntimeException work3Exception = new RuntimeException( "Some message" );
+		RuntimeException entityReferenceFactoryException = new RuntimeException( "EntityReferenceFactory message" );
+		resetAll();
+		expectFailingWorkGetInfo( 1, entityReferenceFactoryException );
+		expectWorkGetInfo( 3 );
+		replayAll();
+		work0Future.complete( null );
+		FutureAssert.assertThat( workSetFuture ).isPending();
+		work1Future.completeExceptionally( work1Exception );
+		FutureAssert.assertThat( workSetFuture ).isPending();
+		work2Future.complete( null );
+		FutureAssert.assertThat( workSetFuture ).isPending();
+		work3Future.completeExceptionally( work3Exception );
+		FutureAssert.assertThat( workSetFuture ).isPending();
+		work4Future.complete( null );
+		FutureAssert.assertThat( workSetFuture ).isPending();
+		// If a work fails, the sequence future will be completed with the same exception
+		workSequenceFuture.completeExceptionally( work1Exception );
+		verifyAll();
+
+		FutureAssert.assertThat( workSetFuture ).isSuccessful( report -> {
+			assertThat( report ).isNotNull();
+			SoftAssertions.assertSoftly( softly -> {
+				softly.assertThat( report.getThrowable() ).containsSame( work1Exception );
+				softly.assertThat( work1Exception ).hasSuppressedException( work3Exception );
+				softly.assertThat( work1Exception ).hasSuppressedException( entityReferenceFactoryException );
+				softly.assertThat( report.getFailingEntityReferences() )
+						.containsExactly(
+								// Only documents whose indexing failed
+								// ... except the one that we could not convert to an entity reference
+								entityReference( 3 )
+						);
+			} );
+		} );
+	}
+
 	private void expectWorkGetInfo(int ... ids) {
 		for ( int id : ids ) {
 			SingleDocumentElasticsearchWork<?> workMock = workMocks.get( id );
@@ -343,6 +411,15 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 			EasyMock.expect( entityReferenceFactoryMock.createEntityReference( TYPE_NAME, id ) )
 					.andReturn( entityReference( id ) );
 		}
+	}
+
+	private void expectFailingWorkGetInfo(int id, Throwable thrown) {
+		SingleDocumentElasticsearchWork<?> workMock = workMocks.get( id );
+		EasyMock.expect( workMock.getInfo() ).andStubReturn( workInfo( id ) );
+		EasyMock.expect( workMock.getEntityTypeName() ).andStubReturn( TYPE_NAME );
+		EasyMock.expect( workMock.getEntityIdentifier() ).andStubReturn( id );
+		EasyMock.expect( entityReferenceFactoryMock.createEntityReference( TYPE_NAME, id ) )
+				.andThrow( thrown );
 	}
 
 	private List<SingleDocumentElasticsearchWork<?>> createWorkMocks(int count) {

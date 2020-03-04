@@ -22,6 +22,7 @@ import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 import org.hibernate.search.util.impl.test.FutureAssert;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Test;
 
@@ -183,6 +184,47 @@ public class LuceneIndexingPlanWriteWorkSetTest extends EasyMockSupport {
 		} );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3851")
+	public void failure_workAndCreateEntityReference() {
+		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> workSetFuture =
+				new CompletableFuture<>();
+
+		LuceneIndexingPlanWriteWorkSet<StubEntityReference> workSet = new LuceneIndexingPlanWriteWorkSet<>(
+				createWorkMocks( 3 ), entityReferenceFactoryMock, workSetFuture,
+				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+		);
+
+		FutureAssert.assertThat( workSetFuture ).isPending();
+
+		RuntimeException workException = new RuntimeException( "Some message" );
+		RuntimeException entityReferenceFactoryException = new RuntimeException( "EntityReferenceFactory message" );
+		resetAll();
+		processorMock.beforeWorkSet( DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
+		expect( processorMock.submit( workMocks.get( 0 ) ) ).andReturn( null );
+		expect( processorMock.submit( workMocks.get( 1 ) ) ).andThrow( workException );
+		expectWorkGetInfo( 0 );
+		expectFailingWorkGetInfo( 1, entityReferenceFactoryException );
+		expectWorkGetInfo( 2 );
+		replayAll();
+		workSet.submitTo( processorMock );
+		verifyAll();
+
+		FutureAssert.assertThat( workSetFuture ).isSuccessful( report -> {
+			assertThat( report ).isNotNull();
+			SoftAssertions.assertSoftly( softly -> {
+				softly.assertThat( report.getThrowable() ).containsSame( workException );
+				softly.assertThat( workException ).hasSuppressedException( entityReferenceFactoryException );
+				softly.assertThat( report.getFailingEntityReferences() )
+						.containsExactly(
+								// All documents from the current workset, even ones from successful works
+								// ... except the one that we could not convert to an entity reference
+								entityReference( 0 ), entityReference( 2 )
+						);
+			} );
+		} );
+	}
+
 	private void expectWorkGetInfo(int ... ids) {
 		for ( int id : ids ) {
 			LuceneSingleDocumentWriteWork<?> workMock = workMocks.get( id );
@@ -192,6 +234,15 @@ public class LuceneIndexingPlanWriteWorkSetTest extends EasyMockSupport {
 			EasyMock.expect( entityReferenceFactoryMock.createEntityReference( TYPE_NAME, id ) )
 					.andReturn( entityReference( id ) );
 		}
+	}
+
+	private void expectFailingWorkGetInfo(int id, Throwable thrown) {
+		LuceneSingleDocumentWriteWork<?> workMock = workMocks.get( id );
+		EasyMock.expect( workMock.getInfo() ).andStubReturn( workInfo( id ) );
+		EasyMock.expect( workMock.getEntityTypeName() ).andStubReturn( TYPE_NAME );
+		EasyMock.expect( workMock.getEntityIdentifier() ).andStubReturn( id );
+		EasyMock.expect( entityReferenceFactoryMock.createEntityReference( TYPE_NAME, id ) )
+				.andThrow( thrown );
 	}
 
 	private List<LuceneSingleDocumentWriteWork<?>> createWorkMocks(int count) {
