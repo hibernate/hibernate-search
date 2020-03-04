@@ -29,14 +29,11 @@ import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.Parameterized;
 
 /**
  * This is an extension of the backend TCK test
  * {@link LuceneMultiValueSearchPredicateIT}.
  */
-@RunWith(Parameterized.class)
 public class LuceneMultiValueSearchPredicateFlattendedIT {
 
 	private final String VALUES = "data/search/multivalues-flattended-data.json";
@@ -54,8 +51,6 @@ public class LuceneMultiValueSearchPredicateFlattendedIT {
 	private static final String DOCUMENT_1_2_1 = "1_2_1";
 	private static final String DOCUMENT_1_2_2 = "1_2_2";
 
-	private final String directoryType;
-
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
@@ -67,19 +62,12 @@ public class LuceneMultiValueSearchPredicateFlattendedIT {
 	private IndexMapping_1_2 indexMapping_1_2;
 	private StubMappingIndexManager indexManager_1_2;
 
-	@Parameterized.Parameters(name = "Lucene directory type {0}")
-	public static Object[] data() {
-		return new Object[]{"local-heap", "local-filesystem"};
-	}
-
-	public LuceneMultiValueSearchPredicateFlattendedIT(String directoryType) {
-		this.directoryType = directoryType;
+	public LuceneMultiValueSearchPredicateFlattendedIT() {
 	}
 
 	@Before
 	public void setup() {
 		setupHelper.start()
-			.withBackendProperty( "directory.type", directoryType )
 			.withIndex(
 				INDEX_NAME_1_1,
 				ctx -> this.indexMapping_1_1 = new IndexMapping_1_1( ctx.getSchemaElement() ),
