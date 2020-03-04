@@ -22,13 +22,15 @@ import org.hibernate.search.mapper.javabean.session.SearchSessionBuilder;
 import org.hibernate.search.mapper.javabean.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.javabean.work.impl.SearchIndexingPlanImpl;
 import org.hibernate.search.mapper.javabean.common.impl.EntityReferenceImpl;
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
 
-public class JavaBeanSearchSession extends AbstractPojoSearchSession
-		implements SearchSession, DocumentReferenceConverter<EntityReference> {
+public class JavaBeanSearchSession extends AbstractPojoSearchSession<EntityReference>
+		implements SearchSession, DocumentReferenceConverter<EntityReference>,
+		EntityReferenceFactory<EntityReference> {
 
 	private final JavaBeanSearchSessionMappingContext mappingContext;
 	private final JavaBeanSearchSessionTypeContextProvider typeContextProvider;
@@ -104,6 +106,23 @@ public class JavaBeanSearchSession extends AbstractPojoSearchSession
 		Object id = typeContext.getIdentifierMapping()
 				.fromDocumentIdentifier( reference.getId(), this );
 		return new EntityReferenceImpl( typeContext.getTypeIdentifier(), typeContext.getEntityName(), id );
+	}
+
+	@Override
+	public EntityReferenceFactory<EntityReference> getEntityReferenceFactory() {
+		return this;
+	}
+
+	@Override
+	public EntityReference createEntityReference(String typeName, Object identifier) {
+		JavaBeanSessionIndexedTypeContext<?> typeContext =
+				typeContextProvider.getIndexedByEntityName( typeName );
+		if ( typeContext == null ) {
+			throw new AssertionFailure(
+					"Type name " + typeName + " refers to an unknown type"
+			);
+		}
+		return new EntityReferenceImpl( typeContext.getTypeIdentifier(), typeContext.getEntityName(), identifier );
 	}
 
 	private SearchQuerySelectStep<?, EntityReference, ?, ?, ?, ?> search(SearchScopeImpl scope) {

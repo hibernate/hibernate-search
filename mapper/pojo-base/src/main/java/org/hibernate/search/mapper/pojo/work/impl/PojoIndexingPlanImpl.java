@@ -31,7 +31,7 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 
 	private final PojoWorkIndexedTypeContextProvider indexedTypeContextProvider;
 	private final PojoWorkContainedTypeContextProvider containedTypeContextProvider;
-	private final PojoWorkSessionContext sessionContext;
+	private final PojoWorkSessionContext<?> sessionContext;
 	private final PojoRuntimeIntrospector introspector;
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
@@ -44,7 +44,7 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 
 	public PojoIndexingPlanImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
 			PojoWorkContainedTypeContextProvider containedTypeContextProvider,
-			PojoWorkSessionContext sessionContext,
+			PojoWorkSessionContext<?> sessionContext,
 			DocumentCommitStrategy commitStrategy,
 			DocumentRefreshStrategy refreshStrategy) {
 		this.indexedTypeContextProvider = indexedTypeContextProvider;

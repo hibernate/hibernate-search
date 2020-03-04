@@ -32,7 +32,7 @@ public class PojoIndexedTypeIndexingPlan<I, E> extends AbstractPojoTypeIndexingP
 	private final Map<I, IndexedEntityIndexingPlan> indexingPlansPerId = new LinkedHashMap<>();
 
 	public PojoIndexedTypeIndexingPlan(PojoWorkIndexedTypeContext<I, E> typeContext,
-			PojoWorkSessionContext sessionContext,
+			PojoWorkSessionContext<?> sessionContext,
 			IndexIndexingPlan delegate) {
 		super( sessionContext );
 		this.typeContext = typeContext;

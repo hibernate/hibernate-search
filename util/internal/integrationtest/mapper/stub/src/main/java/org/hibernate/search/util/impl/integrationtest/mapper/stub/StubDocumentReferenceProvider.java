@@ -27,4 +27,9 @@ class StubDocumentReferenceProvider implements DocumentReferenceProvider {
 	public String getRoutingKey() {
 		return routingKey;
 	}
+
+	@Override
+	public Object getEntityIdentifier() {
+		return identifier;
+	}
 }

@@ -43,6 +43,7 @@ import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanSessionContext;
 import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanImpl;
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
@@ -54,9 +55,9 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 /**
  * The actual implementation of {@link SearchSession}.
  */
-public class HibernateOrmSearchSession extends AbstractPojoSearchSession
+public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityReference>
 		implements SearchSession, HibernateOrmSessionContext, HibernateOrmScopeSessionContext, SearchIndexingPlanSessionContext,
-		DocumentReferenceConverter<EntityReference> {
+		DocumentReferenceConverter<EntityReference>, EntityReferenceFactory<EntityReference> {
 
 	/**
 	 * @param sessionImplementor A Hibernate session
@@ -221,6 +222,23 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		Object id = typeContext.getIdentifierMapping()
 				.fromDocumentIdentifier( reference.getId(), this );
 		return new EntityReferenceImpl( typeContext.getTypeIdentifier(), typeContext.getJpaEntityName(), id );
+	}
+
+	@Override
+	public EntityReferenceFactory<EntityReference> getEntityReferenceFactory() {
+		return this;
+	}
+
+	@Override
+	public EntityReference createEntityReference(String typeName, Object identifier) {
+		HibernateOrmSessionIndexedTypeContext<?> typeContext =
+				typeContextProvider.getIndexedByJpaEntityName( typeName );
+		if ( typeContext == null ) {
+			throw new AssertionFailure(
+					"Type " + typeName + " refers to an unknown type"
+			);
+		}
+		return new EntityReferenceImpl( typeContext.getTypeIdentifier(), typeContext.getJpaEntityName(), identifier );
 	}
 
 	@Override
