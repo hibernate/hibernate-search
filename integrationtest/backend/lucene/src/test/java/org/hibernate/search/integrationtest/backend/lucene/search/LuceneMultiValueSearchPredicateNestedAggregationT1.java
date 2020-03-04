@@ -47,6 +47,7 @@ import org.junit.Test;
  * This is an extension of the backend TCK test
  * {@link LuceneMultiValueSearchPredicateIT}.
  */
+@TestForIssue(jiraKey = "HSEARCH-3839")
 public class LuceneMultiValueSearchPredicateNestedAggregationT1 {
 
 	private static final String STRING_1 = "string_1";
@@ -101,7 +102,6 @@ public class LuceneMultiValueSearchPredicateNestedAggregationT1 {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3839")
 	public void double_searchNestedMultivaluesRangeAggregation() {
 		StubMappingScope scope = indexManager_1_1.createScope();
 		AggregationKey<Map<Range<Double>, Long>> aggregationKey = AggregationKey.of( "someAggregation" );
@@ -145,7 +145,6 @@ public class LuceneMultiValueSearchPredicateNestedAggregationT1 {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3839")
 	public void integer_searchNestedMultivaluesRangeAggregation() {
 		StubMappingScope scope = indexManager_1_1.createScope();
 		AggregationKey<Map<Range<Integer>, Long>> aggregationKey = AggregationKey.of( "someAggregation" );
@@ -189,7 +188,6 @@ public class LuceneMultiValueSearchPredicateNestedAggregationT1 {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3839")
 	public void integer_searchNestedMultivaluesTermAggregation() {
 		StubMappingScope scope = indexManager_1_1.createScope();
 		AggregationKey<Map<Double, Long>> aggregationKey = AggregationKey.of( "someAggregation" );

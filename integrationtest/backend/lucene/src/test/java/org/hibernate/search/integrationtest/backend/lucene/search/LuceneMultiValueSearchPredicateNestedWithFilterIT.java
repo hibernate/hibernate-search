@@ -36,6 +36,7 @@ import org.junit.Test;
  * This is an extension of the backend TCK test
  * {@link LuceneMultiValueSearchPredicateIT}.
  */
+@TestForIssue(jiraKey = "HSEARCH-3839")
 public class LuceneMultiValueSearchPredicateNestedWithFilterIT {
 
 	private static final String STRING_1 = "string_1";
@@ -90,7 +91,6 @@ public class LuceneMultiValueSearchPredicateNestedWithFilterIT {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3839")
 	public void integer_searchNestedMultivaluesWithFilter() {
 		StubMappingScope scope = indexManager_1_1.createScope();
 

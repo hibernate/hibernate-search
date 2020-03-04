@@ -32,6 +32,7 @@ import org.junit.Test;
  * This is an extension of the backend TCK test
  * {@link LuceneMultiValueSearchPredicateIT}.
  */
+@TestForIssue(jiraKey = "HSEARCH-3839")
 public class LuceneMultiValueSearchPredicateMasterIT {
 
 	private final String VALUES = "data/search/multivalues-master-data.json";
@@ -83,7 +84,6 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3839")
 	public void double_searchParentMultivalues() {
 
 		StubMappingScope scope = indexManager_1_1.createScope();
@@ -140,7 +140,6 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3839")
 	public void float_searchParentMultivalues() {
 
 		StubMappingScope scope = indexManager_1_1.createScope();
@@ -197,7 +196,6 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3839")
 	public void long_searchParentMultivalues() {
 
 		StubMappingScope scope = indexManager_1_1.createScope();
@@ -254,7 +252,6 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3839")
 	public void integer_searchParentMultivalues() {
 
 		StubMappingScope scope = indexManager_1_1.createScope();

@@ -34,6 +34,7 @@ import org.junit.Test;
  * This is an extension of the backend TCK test
  * {@link LuceneMultiValueSearchPredicateIT}.
  */
+@TestForIssue(jiraKey = "HSEARCH-3839")
 public class LuceneMultiValueSearchPredicateNestedIT {
 
 	private final String VALUES = "data/search/multivalues-nested-data.json";
@@ -85,7 +86,6 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3839")
 	public void double_searchNestedMultivalues() {
 
 		StubMappingScope scope = indexManager_1_1.createScope();
@@ -133,7 +133,6 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3839")
 	public void float_searchNestedMultivalues() {
 
 		StubMappingScope scope = indexManager_1_1.createScope();
@@ -181,7 +180,6 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3839")
 	public void long_searchNestedMultivalues() {
 
 		StubMappingScope scope = indexManager_1_1.createScope();
@@ -229,7 +227,6 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3839")
 	public void integer_searchNestedMultivalues() {
 
 		StubMappingScope scope = indexManager_1_1.createScope();
