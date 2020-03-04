@@ -103,14 +103,14 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 		Analyzer analyzer = buildAnalyzer();
 
 		Map<String, Float> weights = new LinkedHashMap<>();
-		for ( String fieldName : fields.keySet() ) {
-			LuceneSimpleQueryStringPredicateBuilderFieldState state = fields.get( fieldName );
+		for ( Map.Entry<String, LuceneSimpleQueryStringPredicateBuilderFieldState> entry : fields.entrySet() ) {
+			LuceneSimpleQueryStringPredicateBuilderFieldState state = entry.getValue();
 			Float boost = state.getBoost();
 			if ( boost == null ) {
 				boost = 1f;
 			}
 
-			weights.put( fieldName, boost );
+			weights.put( entry.getKey(), boost );
 		}
 
 		SimpleQueryParser queryParser = new SimpleQueryParser( analyzer, weights, -1 );
