@@ -9,27 +9,19 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchDocumentReference;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.DeleteWorkBuilder;
-import org.hibernate.search.engine.backend.common.DocumentReference;
 
 import com.google.gson.JsonObject;
 
 
-public class DeleteWork extends AbstractSimpleBulkableElasticsearchWork<Void>
-		implements SingleDocumentElasticsearchWork<Void> {
+public class DeleteWork extends AbstractSingleDocumentElasticsearchWork<Void> {
 
 	private static final ElasticsearchRequestSuccessAssessor SUCCESS_ASSESSOR =
 			DefaultElasticsearchRequestSuccessAssessor.builder().ignoreErrorStatuses( 404 ).build();
 
-	private final String mappedTypeName;
-	private final URLEncodedString id;
-
 	private DeleteWork(Builder builder) {
 		super( builder );
-		this.mappedTypeName = builder.mappedTypeName;
-		this.id = builder.id;
 	}
 
 	@Override
@@ -42,34 +34,30 @@ public class DeleteWork extends AbstractSimpleBulkableElasticsearchWork<Void>
 		return null;
 	}
 
-	@Override
-	public DocumentReference getDocumentReference() {
-		return new ElasticsearchDocumentReference( mappedTypeName, id.original );
-	}
-
 	public static class Builder
-			extends AbstractSimpleBulkableElasticsearchWork.AbstractBuilder<Builder>
+			extends AbstractSingleDocumentElasticsearchWork.AbstractBuilder<Builder>
 			implements DeleteWorkBuilder {
-		private final String mappedTypeName;
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;
 		private final URLEncodedString id;
 		private final String routingKey;
 
-		public static Builder forElasticsearch67AndBelow(String mappedTypeName,
+		public static Builder forElasticsearch67AndBelow(String entityTypeName, Object entityIdentifier,
 				URLEncodedString elasticsearchIndexName, URLEncodedString typeName, URLEncodedString id, String routingKey) {
-			return new Builder( mappedTypeName, elasticsearchIndexName, typeName, id, routingKey );
+			return new Builder( entityTypeName, entityIdentifier,
+					elasticsearchIndexName, typeName, id, routingKey );
 		}
 
-		public static Builder forElasticsearch7AndAbove(String mappedTypeName,
+		public static Builder forElasticsearch7AndAbove(String entityTypeName, Object entityIdentifier,
 				URLEncodedString elasticsearchIndexName, URLEncodedString id, String routingKey) {
-			return new Builder( mappedTypeName, elasticsearchIndexName, null, id, routingKey );
+			return new Builder( entityTypeName, entityIdentifier,
+					elasticsearchIndexName, null, id, routingKey );
 		}
 
-		private Builder(String mappedTypeName, URLEncodedString elasticsearchIndexName,
+		private Builder(String entityTypeName, Object entityIdentifier,
+				URLEncodedString elasticsearchIndexName,
 				URLEncodedString typeName, URLEncodedString id, String routingKey) {
-			super( elasticsearchIndexName, SUCCESS_ASSESSOR );
-			this.mappedTypeName = mappedTypeName;
+			super( elasticsearchIndexName, SUCCESS_ASSESSOR, entityTypeName, entityIdentifier );
 			this.indexName = elasticsearchIndexName;
 			this.typeName = typeName;
 			this.id = id;

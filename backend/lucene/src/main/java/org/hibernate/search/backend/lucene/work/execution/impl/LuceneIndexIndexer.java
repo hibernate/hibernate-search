@@ -50,7 +50,10 @@ public class LuceneIndexIndexer implements IndexIndexer {
 		LuceneWriteWorkOrchestrator orchestrator = indexManagerContext.getWriteOrchestrator( id, routingKey );
 
 		return orchestrator.submit(
-				factory.add( tenantId, id, indexEntry ),
+				factory.add(
+						tenantId, indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
+						indexEntry
+				),
 				commitStrategy,
 				DocumentRefreshStrategy.NONE
 		);

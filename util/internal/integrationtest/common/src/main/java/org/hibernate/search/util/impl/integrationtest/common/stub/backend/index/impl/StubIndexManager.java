@@ -32,14 +32,17 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 
 	private final StubBackend backend;
 	private final String name;
+	private final String mappedTypeName;
 	private final StubIndexSchemaNode rootSchemaNode;
 
 	private boolean running = true;
 
-	StubIndexManager(StubBackend backend, String name, StubIndexSchemaNode rootSchemaNode) {
+	StubIndexManager(StubBackend backend, String name, String mappedTypeName,
+			StubIndexSchemaNode rootSchemaNode) {
 		StaticCounters.get().increment( INSTANCE_COUNTER_KEY );
 		this.backend = backend;
 		this.name = name;
+		this.mappedTypeName = mappedTypeName;
 		this.rootSchemaNode = rootSchemaNode;
 		backend.getBehavior().pushSchema( name, rootSchemaNode );
 	}
@@ -75,10 +78,13 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 	}
 
 	@Override
-	public IndexIndexingPlan createIndexingPlan(BackendSessionContext context,
-			EntityReferenceFactory<?> entityReferenceFactory,
+	public <R> IndexIndexingPlan<R> createIndexingPlan(BackendSessionContext context,
+			EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		return new StubIndexIndexingPlan( name, backend.getBehavior(), context, commitStrategy, refreshStrategy );
+		return new StubIndexIndexingPlan<>(
+				name, mappedTypeName, backend.getBehavior(),
+				context, entityReferenceFactory, commitStrategy, refreshStrategy
+		);
 	}
 
 	@Override

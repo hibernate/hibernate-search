@@ -45,7 +45,7 @@ public abstract class AbstractDirectoryIT {
 	protected StubMappingIndexManager indexManager;
 
 	protected final void checkIndexingAndQuerying() {
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			document.addValue( indexMapping.string, "text 1" );
 		} );

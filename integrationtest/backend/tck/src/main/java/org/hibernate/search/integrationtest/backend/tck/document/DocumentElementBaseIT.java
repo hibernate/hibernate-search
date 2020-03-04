@@ -231,7 +231,7 @@ public class DocumentElementBaseIT {
 	}
 
 	private void executeAdd(String id, Consumer<DocumentElement> documentContributor) {
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( id ), documentContributor::accept );
 		plan.execute().join();
 	}

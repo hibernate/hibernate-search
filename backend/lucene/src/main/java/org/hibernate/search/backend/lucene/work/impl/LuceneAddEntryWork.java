@@ -15,21 +15,15 @@ import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDeleg
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
-public class LuceneAddEntryWork extends AbstractLuceneWriteWork<Long>
-		implements LuceneSingleDocumentWriteWork<Long> {
+public class LuceneAddEntryWork extends AbstractLuceneSingleDocumentWriteWork<Long> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final String tenantId;
-
-	private final String id;
-
 	private final LuceneIndexEntry indexEntry;
 
-	LuceneAddEntryWork(String tenantId, String id, LuceneIndexEntry indexEntry) {
-		super( "addEntry" );
-		this.tenantId = tenantId;
-		this.id = id;
+	LuceneAddEntryWork(String tenantId, String entityTypeName, Object entityIdentifier,
+			LuceneIndexEntry indexEntry) {
+		super( "addEntry", tenantId, entityTypeName, entityIdentifier );
 		this.indexEntry = indexEntry;
 	}
 
@@ -40,23 +34,10 @@ public class LuceneAddEntryWork extends AbstractLuceneWriteWork<Long>
 			return indexWriterDelegator.addDocuments( indexEntry );
 		}
 		catch (IOException e) {
-			throw log.unableToIndexEntry( tenantId, id, context.getEventContext(), e );
+			throw log.unableToIndexEntry(
+					tenantId, entityTypeName, entityIdentifier, context.getEventContext(), e
+			);
 		}
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "type=" ).append( workType )
-				.append( ", entry=" ).append( indexEntry )
-				.append( "]" );
-		return sb.toString();
-	}
-
-	@Override
-	public String getDocumentId() {
-		return id;
 	}
 
 }

@@ -896,7 +896,7 @@ public class SimpleQueryStringSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			document.addValue( indexMapping.nonAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2 );
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_1_AND_TERM_2 );

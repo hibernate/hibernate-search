@@ -326,7 +326,7 @@ public class CompositeSearchProjectionIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexMapping.author.document1Value.write( document );
 			indexMapping.title.document1Value.write( document );

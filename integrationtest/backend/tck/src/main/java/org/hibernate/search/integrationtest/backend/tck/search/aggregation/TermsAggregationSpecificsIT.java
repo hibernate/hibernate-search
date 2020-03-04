@@ -605,7 +605,7 @@ public class TermsAggregationSpecificsIT<F> {
 	}
 
 	private void initData() {
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		int documentCount = 0;
 		for ( Map.Entry<F, List<String>> entry : documentIdPerTerm.entrySet() ) {
 			F value = entry.getKey();

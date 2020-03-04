@@ -382,7 +382,7 @@ public class ExistsSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 			indexMapping.supportedFieldWithDocValuesModels.forEach( f -> f.document1Value.write( document ) );

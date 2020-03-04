@@ -80,7 +80,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 	}
 
 	protected void initData() {
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
 			document.addValue( indexMapping.string, OURSON_QUI_BOIT_STRING );
 			document.addValue( indexMapping.geoPoint, OURSON_QUI_BOIT_GEO_POINT );

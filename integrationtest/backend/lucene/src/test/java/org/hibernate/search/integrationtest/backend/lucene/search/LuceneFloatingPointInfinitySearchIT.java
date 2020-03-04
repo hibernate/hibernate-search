@@ -184,7 +184,7 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 	}
 
 	private void initData() {
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "negative-infinity" ), document -> {
 			document.addValue( indexMapping.floatFieldModel.reference, Float.NEGATIVE_INFINITY );
 			document.addValue( indexMapping.doubleFieldModel.reference, Double.NEGATIVE_INFINITY );

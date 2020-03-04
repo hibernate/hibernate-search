@@ -102,7 +102,7 @@ public class LuceneNormalizeWildcardExpressionsIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			document.addValue( indexMapping.analyzed, TEXT_MATCHING_PATTERN_1 );
 		} );

@@ -18,7 +18,7 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
  */
 public interface PojoSearchSessionMappingContext extends PojoWorkMappingContext {
 
-	PojoIndexingPlan createIndexingPlan(PojoWorkSessionContext<?> context,
+	<R> PojoIndexingPlan<R> createIndexingPlan(PojoWorkSessionContext<R> context,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
 	PojoIndexer createIndexer(PojoWorkSessionContext<?> context, DocumentCommitStrategy commitStrategy);

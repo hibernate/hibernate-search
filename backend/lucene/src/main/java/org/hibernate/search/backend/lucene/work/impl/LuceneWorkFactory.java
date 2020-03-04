@@ -16,11 +16,13 @@ import org.apache.lucene.search.Query;
 
 public interface LuceneWorkFactory {
 
-	LuceneSingleDocumentWriteWork<?> add(String tenantId, String id, LuceneIndexEntry indexEntry);
+	LuceneSingleDocumentWriteWork<?> add(String tenantId, String entityTypeName, Object entityIdentifier,
+			LuceneIndexEntry indexEntry);
 
-	LuceneSingleDocumentWriteWork<?> update(String tenantId, String id, LuceneIndexEntry indexEntry);
+	LuceneSingleDocumentWriteWork<?> update(String tenantId, String entityTypeName, Object entityIdentifier,
+			String documentIdentifier, LuceneIndexEntry indexEntry);
 
-	LuceneSingleDocumentWriteWork<?> delete(String tenantId, String id);
+	LuceneSingleDocumentWriteWork<?> delete(String tenantId, String entityTypeName, Object entityIdentifier, String id);
 
 	LuceneWriteWork<?> deleteAll(String tenantId, Set<String> routingKeys);
 

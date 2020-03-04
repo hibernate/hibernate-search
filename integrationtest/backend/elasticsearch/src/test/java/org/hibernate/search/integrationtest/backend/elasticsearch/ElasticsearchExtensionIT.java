@@ -1014,7 +1014,7 @@ public class ElasticsearchExtensionIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( SECOND_ID ), document -> {
 			document.addValue( indexMapping.string, "text 2" );
 

@@ -93,7 +93,7 @@ public class MultiTenancyMismatchIT {
 		thrown.expectMessage( "Tenant identifier" );
 		thrown.expectMessage( "is provided, but multi-tenancy is disabled for this backend" );
 
-		IndexIndexingPlan plan = indexManager.createIndexingPlan( tenant1SessionContext );
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( tenant1SessionContext );
 		plan.update( referenceProvider( "1" ), document -> { } );
 		plan.execute().join();
 	}
@@ -112,7 +112,7 @@ public class MultiTenancyMismatchIT {
 		thrown.expectMessage( "Tenant identifier" );
 		thrown.expectMessage( "is provided, but multi-tenancy is disabled for this backend" );
 
-		IndexIndexingPlan plan = indexManager.createIndexingPlan( tenant1SessionContext );
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( tenant1SessionContext );
 		plan.update( referenceProvider( "1" ), document -> { } );
 		plan.execute().join();
 	}
@@ -131,7 +131,7 @@ public class MultiTenancyMismatchIT {
 		thrown.expectMessage( "Tenant identifier" );
 		thrown.expectMessage( "is provided, but multi-tenancy is disabled for this backend" );
 
-		IndexIndexingPlan plan = indexManager.createIndexingPlan( tenant1SessionContext );
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( tenant1SessionContext );
 		plan.delete( referenceProvider( "1" ) );
 		plan.execute().join();
 	}

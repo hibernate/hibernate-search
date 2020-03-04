@@ -209,7 +209,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public PojoIndexingPlan getCurrentIndexingPlan(SessionImplementor session, boolean createIfDoesNotExist) {
+	public PojoIndexingPlan<EntityReference> getCurrentIndexingPlan(SessionImplementor session,
+			boolean createIfDoesNotExist) {
 		return HibernateOrmSearchSession.get( this, session ).getCurrentIndexingPlan( createIfDoesNotExist );
 	}
 

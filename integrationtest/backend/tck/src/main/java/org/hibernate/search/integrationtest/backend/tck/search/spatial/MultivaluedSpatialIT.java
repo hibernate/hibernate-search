@@ -69,7 +69,7 @@ public class MultivaluedSpatialIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), f -> {
 			f.addValue( indexMapping.geoPoint, NORTH_WEST );
 			f.addValue( indexMapping.geoPoint, SOUTH_EAST );

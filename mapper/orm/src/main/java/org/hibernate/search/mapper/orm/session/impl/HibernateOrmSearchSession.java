@@ -188,9 +188,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	public void setAutomaticIndexingSynchronizationStrategy(
 			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		ConfiguredAutomaticIndexingSynchronizationStrategy.Builder builder =
-				new ConfiguredAutomaticIndexingSynchronizationStrategy.Builder(
-						mappingContext.getFailureHandler(), this
-				);
+				new ConfiguredAutomaticIndexingSynchronizationStrategy.Builder( mappingContext.getFailureHandler() );
 		synchronizationStrategy.apply( builder );
 		this.configuredAutomaticIndexingSynchronizationStrategy = builder.build();
 	}
@@ -248,13 +246,14 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public PojoIndexingPlan getCurrentIndexingPlan(boolean createIfDoesNotExist) {
+	public PojoIndexingPlan<EntityReference> getCurrentIndexingPlan(boolean createIfDoesNotExist) {
 		checkOrmSessionIsOpen();
 		Transaction transactionIdentifier = null;
 
-		TransientReference<Map<Transaction, PojoIndexingPlan>> reference = (TransientReference<Map<Transaction, PojoIndexingPlan>>) sessionImplementor.getProperties()
+		TransientReference<Map<Transaction, PojoIndexingPlan<EntityReference>>> reference =
+				(TransientReference<Map<Transaction, PojoIndexingPlan<EntityReference>>>) sessionImplementor.getProperties()
 				.get( INDEXING_PLAN_PER_TRANSACTION_MAP_KEY );
-		Map<Transaction, PojoIndexingPlan> planPerTransaction = reference == null ? null : reference.get();
+		Map<Transaction, PojoIndexingPlan<EntityReference>> planPerTransaction = reference == null ? null : reference.get();
 		if ( planPerTransaction == null ) {
 			planPerTransaction = new HashMap<>();
 			reference = new TransientReference<>( planPerTransaction );
@@ -266,7 +265,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 		}
 		// For out of transaction case we will use null as transaction identifier
 
-		PojoIndexingPlan plan = planPerTransaction.get( transactionIdentifier );
+		PojoIndexingPlan<EntityReference> plan = planPerTransaction.get( transactionIdentifier );
 		if ( plan != null ) {
 			return plan;
 		}
@@ -298,8 +297,9 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 		return configuredAutomaticIndexingSynchronizationStrategy;
 	}
 
-	private Synchronization createTransactionWorkQueueSynchronization(PojoIndexingPlan indexingPlan,
-			Map<Transaction, PojoIndexingPlan> indexingPlanPerTransaction, Transaction transactionIdentifier,
+	private Synchronization createTransactionWorkQueueSynchronization(PojoIndexingPlan<EntityReference> indexingPlan,
+			Map<Transaction, PojoIndexingPlan<EntityReference>> indexingPlanPerTransaction,
+			Transaction transactionIdentifier,
 			ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		if ( enlistInTransaction ) {
 			return new InTransactionWorkQueueSynchronization(
