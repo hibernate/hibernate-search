@@ -28,6 +28,7 @@ import com.google.gson.JsonPrimitive;
 import java.util.EnumSet;
 import java.util.Set;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
+import org.hibernate.search.util.common.AssertionFailure;
 
 public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
 		implements SimpleQueryStringPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
@@ -37,6 +38,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	private static final JsonAccessor<JsonElement> DEFAULT_OPERATOR_ACCESSOR = JsonAccessor.root().property( "default_operator" );
 	private static final JsonAccessor<JsonArray> FIELDS_ACCESSOR = JsonAccessor.root().property( "fields" ).asArray();
 	private static final JsonAccessor<String> ANALYZER_ACCESSOR = JsonAccessor.root().property( "analyzer" ).asString();
+	private static final JsonAccessor<String> FLAGS_ACCESSOR = JsonAccessor.root().property( "flags" ).asString();
 
 	private static final JsonPrimitive AND_OPERATOR_KEYWORD_JSON = new JsonPrimitive( "and" );
 	private static final JsonPrimitive OR_OPERATOR_KEYWORD_JSON = new JsonPrimitive( "or" );
@@ -119,8 +121,50 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 			ANALYZER_ACCESSOR.set( innerObject, analyzer );
 		}
 
+		if ( flags != null ) {
+			StringBuilder flagsMask = new StringBuilder();
+			for ( SimpleQueryFlag flag : flags ) {
+				if ( flagsMask.length() > 0 ) {
+					flagsMask.append( "|" );
+				}
+				flagsMask.append( getFlagName( flag ) );
+			}
+			FLAGS_ACCESSOR.set( innerObject, flagsMask.toString() );
+		}
+
 		SIMPLE_QUERY_STRING_ACCESSOR.set( outerObject, innerObject );
 		return outerObject;
+	}
+
+	/**
+	 * @param flag The flag as defined in Hibernate Search.
+	 * @return The name of this flag in Elasticsearch (might be different from flag.name()).
+	 */
+	private String getFlagName(SimpleQueryFlag flag) {
+		switch ( flag ) {
+			case AND:
+				return "AND";
+			case NOT:
+				return "NOT";
+			case OR:
+				return "OR";
+			case PREFIX:
+				return "PREFIX";
+			case PHRASE:
+				return "PHRASE";
+			case PRECEDENCE:
+				return "PRECEDENCE";
+			case ESCAPE:
+				return "ESCAPE";
+			case WHITESPACE:
+				return "WHITESPACE";
+			case FUZZY:
+				return "FUZZY";
+			case NEAR:
+				return "SLOP";
+			default:
+				throw new AssertionFailure( "Unexpected flag: " + flag );
+		}
 	}
 
 }
