@@ -27,7 +27,7 @@ public class PojoIndexerImpl implements PojoIndexer {
 	private final PojoWorkSessionContext sessionContext;
 	private final DocumentCommitStrategy commitStrategy;
 
-	private final Map<PojoRawTypeIdentifier<?>, PojoTypeIndexer<?, ?, ?>> typeExecutors = new HashMap<>();
+	private final Map<PojoRawTypeIdentifier<?>, PojoTypeIndexer<?, ?>> typeExecutors = new HashMap<>();
 
 	public PojoIndexerImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
 			PojoWorkSessionContext sessionContext,
@@ -39,7 +39,7 @@ public class PojoIndexerImpl implements PojoIndexer {
 
 	@Override
 	public CompletableFuture<?> add(PojoRawTypeIdentifier<?> typeIdentifier, Object providedId, Object entity) {
-		PojoTypeIndexer<?, ?, ?> typeExecutor = this.typeExecutors.get( typeIdentifier );
+		PojoTypeIndexer<?, ?> typeExecutor = this.typeExecutors.get( typeIdentifier );
 		if ( typeExecutor == null ) {
 			typeExecutor = createTypeIndexer( typeIdentifier );
 			typeExecutors.put( typeIdentifier, typeExecutor );
@@ -48,8 +48,8 @@ public class PojoIndexerImpl implements PojoIndexer {
 		return typeExecutor.add( providedId, entity );
 	}
 
-	private PojoTypeIndexer<?, ?, ?> createTypeIndexer(PojoRawTypeIdentifier<?> typeIdentifier) {
-		Optional<? extends PojoWorkIndexedTypeContext<?, ?, ?>> typeContext =
+	private PojoTypeIndexer<?, ?> createTypeIndexer(PojoRawTypeIdentifier<?> typeIdentifier) {
+		Optional<? extends PojoWorkIndexedTypeContext<?, ?>> typeContext =
 				indexedTypeContextProvider.getByExactType( typeIdentifier );
 		if ( !typeContext.isPresent() ) {
 			throw log.notDirectlyIndexedType( typeIdentifier );

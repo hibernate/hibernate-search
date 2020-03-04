@@ -6,11 +6,10 @@
  */
 package org.hibernate.search.engine.backend.index.spi;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 
 
-public interface IndexManagerBuilder<D extends DocumentElement> {
+public interface IndexManagerBuilder {
 
 	/**
 	 * Close any allocated resource.
@@ -34,6 +33,6 @@ public interface IndexManagerBuilder<D extends DocumentElement> {
 	 *
 	 * @return The index manager.
 	 */
-	IndexManagerImplementor<D> build();
+	IndexManagerImplementor build();
 
 }

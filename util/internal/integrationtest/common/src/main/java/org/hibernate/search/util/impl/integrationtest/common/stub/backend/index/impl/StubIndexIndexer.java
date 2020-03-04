@@ -19,7 +19,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.docume
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 
-public class StubIndexIndexer implements IndexIndexer<StubDocumentElement> {
+public class StubIndexIndexer implements IndexIndexer {
 	private final String indexName;
 	private final StubBackendBehavior behavior;
 	private final BackendSessionContext sessionContext;
@@ -36,7 +36,7 @@ public class StubIndexIndexer implements IndexIndexer<StubDocumentElement> {
 
 	@Override
 	public CompletableFuture<?> add(DocumentReferenceProvider documentReferenceProvider,
-			DocumentContributor<StubDocumentElement> documentContributor) {
+			DocumentContributor documentContributor) {
 		StubDocumentNode.Builder documentBuilder = StubDocumentNode.document();
 		documentContributor.contribute( new StubDocumentElement( documentBuilder ) );
 

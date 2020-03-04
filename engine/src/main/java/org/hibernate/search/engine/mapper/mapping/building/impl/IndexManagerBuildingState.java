@@ -6,17 +6,16 @@
  */
 package org.hibernate.search.engine.mapper.mapping.building.impl;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 
 
-public interface IndexManagerBuildingState<D extends DocumentElement> {
+public interface IndexManagerBuildingState {
 
 	String getIndexName();
 
 	IndexSchemaRootNodeBuilder getSchemaRootNodeBuilder();
 
-	IndexManagerImplementor<D> build();
+	IndexManagerImplementor build();
 
 }

@@ -11,7 +11,6 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 
 import java.util.Arrays;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentifierValueConverter;
 import org.hibernate.search.engine.backend.types.converter.runtime.spi.ToDocumentIdentifierValueConvertContext;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -143,7 +142,7 @@ public class MatchIdWithConverterSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> { } );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> { } );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> { } );

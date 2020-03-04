@@ -15,7 +15,6 @@ import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSp
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -93,7 +92,7 @@ public class ElasticsearchIndexingIT {
 	@Test
 	public void addUpdateDelete_routing() {
 		String routingKey = "someRoutingKey";
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan plan = indexManager.createIndexingPlan();
 
 		plan.add( referenceProvider( "1", routingKey ), document -> {
 			document.addValue( indexMapping.string, "text1" );

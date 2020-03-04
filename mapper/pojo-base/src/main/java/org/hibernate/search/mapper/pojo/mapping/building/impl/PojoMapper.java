@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.reporting.FailureHandler;
@@ -86,7 +85,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 	private final Set<PojoRawTypeModel<?>> entityTypes = new LinkedHashSet<>();
 	private final Set<PojoRawTypeModel<?>> indexedEntityTypes = new LinkedHashSet<>();
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<PojoRawTypeModel<?>,PojoIndexedTypeManagerBuilder<?, ?>> indexedTypeManagerBuilders =
+	private final Map<PojoRawTypeModel<?>,PojoIndexedTypeManagerBuilder<?>> indexedTypeManagerBuilders =
 			new LinkedHashMap<>();
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<IndexedEmbeddedDefinition, IndexedEmbeddedPathTracker> pathTrackers = new LinkedHashMap<>();
@@ -211,7 +210,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		PojoEntityTypeAdditionalMetadata entityTypeMetadata = metadata.getEntityTypeMetadata().get();
 
 		String entityName = entityTypeMetadata.getEntityName();
-		MappedIndexManagerBuilder<?> indexManagerBuilder = indexManagerFactory.createMappedIndexManager(
+		MappedIndexManagerBuilder indexManagerBuilder = indexManagerFactory.createMappedIndexManager(
 				this,
 				indexedTypeMetadata.getBackendName(),
 				indexedTypeMetadata.getIndexName()
@@ -219,7 +218,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 				entityName,
 				multiTenancyEnabled
 		);
-		PojoIndexedTypeManagerBuilder<?, ?> builder = createIndexedTypeManagerBuilder(
+		PojoIndexedTypeManagerBuilder<?> builder = createIndexedTypeManagerBuilder(
 				indexedEntityType, entityTypeMetadata, indexManagerBuilder
 		);
 		// Put the builder in the map before anything else, so it will be closed on error
@@ -248,7 +247,7 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		PojoMappingDelegate mappingDelegate;
 		try {
 			// First step: build the processors and contribute to the reindexing resolvers
-			for ( PojoIndexedTypeManagerBuilder<?, ?> pojoIndexedTypeManagerBuilder : indexedTypeManagerBuilders.values() ) {
+			for ( PojoIndexedTypeManagerBuilder<?> pojoIndexedTypeManagerBuilder : indexedTypeManagerBuilders.values() ) {
 				pojoIndexedTypeManagerBuilder.preBuild( reindexingResolverBuildingHelper );
 			}
 			if ( failureCollector.hasFailure() ) {
@@ -256,10 +255,10 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 			}
 
 			// Second step: build the indexed type managers and their reindexing resolvers
-			for ( Map.Entry<PojoRawTypeModel<?>, PojoIndexedTypeManagerBuilder<?, ?>> entry
+			for ( Map.Entry<PojoRawTypeModel<?>, PojoIndexedTypeManagerBuilder<?>> entry
 					: indexedTypeManagerBuilders.entrySet() ) {
 				PojoRawTypeModel<?> typeModel = entry.getKey();
-				PojoIndexedTypeManagerBuilder<?, ?> pojoIndexedTypeManagerBuilder = entry.getValue();
+				PojoIndexedTypeManagerBuilder<?> pojoIndexedTypeManagerBuilder = entry.getValue();
 				try {
 					pojoIndexedTypeManagerBuilder.buildAndAddTo(
 							indexedTypeManagerContainerBuilder, reindexingResolverBuildingHelper,
@@ -372,9 +371,9 @@ public class PojoMapper<MPBS extends MappingPartialBuildState> implements Mapper
 		}
 	}
 
-	private <E, D extends DocumentElement> PojoIndexedTypeManagerBuilder<E, D> createIndexedTypeManagerBuilder(
+	private <E> PojoIndexedTypeManagerBuilder<E> createIndexedTypeManagerBuilder(
 			PojoRawTypeModel<E> entityTypeModel, PojoEntityTypeAdditionalMetadata entityTypeMetadata,
-			MappedIndexManagerBuilder<D> indexManagerBuilder) {
+			MappedIndexManagerBuilder indexManagerBuilder) {
 		return new PojoIndexedTypeManagerBuilder<>(
 				entityTypeModel,
 				entityTypeMetadata,

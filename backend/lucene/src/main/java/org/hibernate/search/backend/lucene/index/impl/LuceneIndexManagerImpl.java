@@ -24,7 +24,6 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -37,7 +36,7 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class LuceneIndexManagerImpl
-		implements IndexManagerImplementor<LuceneRootDocumentBuilder>, LuceneIndexManager,
+		implements IndexManagerImplementor, LuceneIndexManager,
 		LuceneScopeIndexManagerContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -92,7 +91,7 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexIndexingPlan<LuceneRootDocumentBuilder> createIndexingPlan(BackendSessionContext sessionContext,
+	public IndexIndexingPlan createIndexingPlan(BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return backendContext.createIndexingPlan(
 				shardHolder, indexEntryFactory,
@@ -101,7 +100,7 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexIndexer<LuceneRootDocumentBuilder> createIndexer(
+	public IndexIndexer createIndexer(
 			BackendSessionContext sessionContext, DocumentCommitStrategy commitStrategy) {
 		return backendContext.createIndexer(
 				shardHolder, indexEntryFactory,

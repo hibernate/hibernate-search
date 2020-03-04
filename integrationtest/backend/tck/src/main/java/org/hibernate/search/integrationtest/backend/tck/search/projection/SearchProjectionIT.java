@@ -536,7 +536,7 @@ public class SearchProjectionIT extends EasyMockSupport {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexMapping.string1Field.document1Value.write( document );
 			indexMapping.string2Field.document1Value.write( document );

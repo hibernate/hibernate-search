@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
-import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.LowLevelIndexMetadataBuilder;
 import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexAdministrationClient;
@@ -79,7 +78,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	}
 
 	@Override
-	public IndexIndexingPlan<ElasticsearchDocumentObjectBuilder> createIndexingPlan(
+	public IndexIndexingPlan createIndexingPlan(
 			ElasticsearchWorkOrchestrator orchestrator,
 			WorkExecutionIndexManagerContext indexManagerContext,
 			DocumentRefreshStrategy refreshStrategy,
@@ -95,7 +94,7 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	}
 
 	@Override
-	public IndexIndexer<ElasticsearchDocumentObjectBuilder> createIndexer(
+	public IndexIndexer createIndexer(
 			ElasticsearchWorkOrchestrator orchestrator,
 			WorkExecutionIndexManagerContext indexManagerContext,
 			BackendSessionContext sessionContext) {

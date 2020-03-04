@@ -10,11 +10,10 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRoo
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexSchemaRootNodeBuilder;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
-public class StubIndexManagerBuilder implements IndexManagerBuilder<StubDocumentElement> {
+public class StubIndexManagerBuilder implements IndexManagerBuilder {
 
 	public static final StaticCounters.Key INSTANCE_COUNTER_KEY = StaticCounters.createKey();
 	public static final StaticCounters.Key CLOSE_ON_FAILURE_COUNTER_KEY = StaticCounters.createKey();
@@ -52,7 +51,7 @@ public class StubIndexManagerBuilder implements IndexManagerBuilder<StubDocument
 	}
 
 	@Override
-	public IndexManagerImplementor<StubDocumentElement> build() {
+	public IndexManagerImplementor build() {
 		if ( closed ) {
 			throw new AssertionFailure( "Unexpected call to build after a call to build() or to closeOnFailure()" );
 		}

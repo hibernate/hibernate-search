@@ -20,13 +20,12 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
-import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 
-public class LuceneIndexIndexingPlan implements IndexIndexingPlan<LuceneRootDocumentBuilder> {
+public class LuceneIndexIndexingPlan implements IndexIndexingPlan {
 
 	private final LuceneWorkFactory factory;
 	private final LuceneIndexEntryFactory indexEntryFactory;
@@ -52,7 +51,7 @@ public class LuceneIndexIndexingPlan implements IndexIndexingPlan<LuceneRootDocu
 
 	@Override
 	public void add(DocumentReferenceProvider referenceProvider,
-			DocumentContributor<LuceneRootDocumentBuilder> documentContributor) {
+			DocumentContributor documentContributor) {
 		String id = referenceProvider.getIdentifier();
 		String routingKey = referenceProvider.getRoutingKey();
 
@@ -63,7 +62,7 @@ public class LuceneIndexIndexingPlan implements IndexIndexingPlan<LuceneRootDocu
 
 	@Override
 	public void update(DocumentReferenceProvider referenceProvider,
-			DocumentContributor<LuceneRootDocumentBuilder> documentContributor) {
+			DocumentContributor documentContributor) {
 		String id = referenceProvider.getIdentifier();
 		String routingKey = referenceProvider.getRoutingKey();
 

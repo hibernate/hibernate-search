@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -428,7 +427,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 	protected void initData() {
 		super.initData();
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( ADDITIONAL_POINT_1_ID ), document -> {
 			document.addValue( indexMapping.geoPoint, ADDITIONAL_POINT_1_GEO_POINT );
 		} );

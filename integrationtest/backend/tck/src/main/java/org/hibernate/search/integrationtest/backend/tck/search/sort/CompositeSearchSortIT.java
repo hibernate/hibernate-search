@@ -308,7 +308,7 @@ public class CompositeSearchSortIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexMapping.identicalForFirstTwo.write( document, "aaa" );
 			indexMapping.identicalForLastTwo.write( document, "aaa" );

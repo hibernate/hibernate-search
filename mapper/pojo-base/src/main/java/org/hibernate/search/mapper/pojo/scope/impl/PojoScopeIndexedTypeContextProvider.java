@@ -14,7 +14,7 @@ import org.hibernate.search.mapper.pojo.work.impl.PojoWorkIndexedTypeContextProv
 
 public interface PojoScopeIndexedTypeContextProvider extends PojoWorkIndexedTypeContextProvider {
 
-	<E> Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E, ?>>> getAllBySuperType(
+	<E> Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>>> getAllBySuperType(
 			PojoRawTypeIdentifier<E> typeIdentifier);
 
 }

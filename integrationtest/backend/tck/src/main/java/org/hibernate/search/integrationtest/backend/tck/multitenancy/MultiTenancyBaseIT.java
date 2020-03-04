@@ -175,7 +175,7 @@ public class MultiTenancyBaseIT {
 
 	@Test
 	public void delete_only_deletes_elements_of_the_tenant() {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( tenant2SessionContext );
+		IndexIndexingPlan plan = indexManager.createIndexingPlan( tenant2SessionContext );
 
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> query = scope.query( tenant2SessionContext )
@@ -226,7 +226,7 @@ public class MultiTenancyBaseIT {
 
 	@Test
 	public void update_only_updates_elements_of_the_tenant() {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( tenant2SessionContext );
+		IndexIndexingPlan plan = indexManager.createIndexingPlan( tenant2SessionContext );
 
 		StubMappingScope scope = indexManager.createScope();
 		SearchQuery<DocumentReference> checkQuery = scope.query( tenant2SessionContext )
@@ -347,7 +347,7 @@ public class MultiTenancyBaseIT {
 		thrown.expectMessage( "Backend" );
 		thrown.expectMessage( "has multi-tenancy enabled, but no tenant identifier is provided." );
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( new StubBackendSessionContext() );
+		IndexIndexingPlan plan = indexManager.createIndexingPlan( new StubBackendSessionContext() );
 
 		plan.add( referenceProvider( DOCUMENT_ID_3 ), document -> {
 			document.addValue( indexMapping.string, STRING_VALUE_3 );
@@ -367,7 +367,7 @@ public class MultiTenancyBaseIT {
 		thrown.expectMessage( "Backend" );
 		thrown.expectMessage( "has multi-tenancy enabled, but no tenant identifier is provided." );
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( new StubBackendSessionContext() );
+		IndexIndexingPlan plan = indexManager.createIndexingPlan( new StubBackendSessionContext() );
 
 		plan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
 			document.addValue( indexMapping.string, UPDATED_STRING );
@@ -387,13 +387,13 @@ public class MultiTenancyBaseIT {
 		thrown.expectMessage( "Backend" );
 		thrown.expectMessage( "has multi-tenancy enabled, but no tenant identifier is provided." );
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( new StubBackendSessionContext() );
+		IndexIndexingPlan plan = indexManager.createIndexingPlan( new StubBackendSessionContext() );
 		plan.delete( referenceProvider( DOCUMENT_ID_1 ) );
 		plan.execute().join();
 	}
 
 	private void initData() {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( tenant1SessionContext );
+		IndexIndexingPlan plan = indexManager.createIndexingPlan( tenant1SessionContext );
 		plan.add( referenceProvider( DOCUMENT_ID_1 ), document -> {
 			document.addValue( indexMapping.string, STRING_VALUE_1 );
 			document.addValue( indexMapping.integer, INTEGER_VALUE_1 );

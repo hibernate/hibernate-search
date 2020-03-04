@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.mapper.mapping.impl;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
@@ -21,11 +20,11 @@ import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionCon
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 
-public class MappedIndexManagerImpl<D extends DocumentElement> implements MappedIndexManager<D> {
+public class MappedIndexManagerImpl implements MappedIndexManager {
 
-	private final IndexManagerImplementor<D> implementor;
+	private final IndexManagerImplementor implementor;
 
-	public MappedIndexManagerImpl(IndexManagerImplementor<D> implementor) {
+	public MappedIndexManagerImpl(IndexManagerImplementor implementor) {
 		this.implementor = implementor;
 	}
 
@@ -35,13 +34,13 @@ public class MappedIndexManagerImpl<D extends DocumentElement> implements Mapped
 	}
 
 	@Override
-	public IndexIndexingPlan<D> createIndexingPlan(BackendSessionContext sessionContext,
+	public IndexIndexingPlan createIndexingPlan(BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return implementor.createIndexingPlan( sessionContext, commitStrategy, refreshStrategy );
 	}
 
 	@Override
-	public IndexIndexer<D> createIndexer(BackendSessionContext sessionContext,
+	public IndexIndexer createIndexer(BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy) {
 		return implementor.createIndexer( sessionContext, commitStrategy );
 	}

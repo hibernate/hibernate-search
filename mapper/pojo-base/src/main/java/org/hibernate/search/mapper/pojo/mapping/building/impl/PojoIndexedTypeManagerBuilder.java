@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappedIndexManagerBuilder;
@@ -35,11 +34,11 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
+class PojoIndexedTypeManagerBuilder<E> {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoRawTypeModel<E> typeModel;
-	private final MappedIndexManagerBuilder<D> indexManagerBuilder;
+	private final MappedIndexManagerBuilder indexManagerBuilder;
 	private final PojoIndexedTypeExtendedMappingCollector extendedMappingCollector;
 
 	private final PojoIdentityMappingCollectorImpl<E> identityMappingCollector;
@@ -52,7 +51,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 	PojoIndexedTypeManagerBuilder(PojoRawTypeModel<E> typeModel,
 			PojoEntityTypeAdditionalMetadata entityTypeMetadata,
 			PojoMappingHelper mappingHelper,
-			MappedIndexManagerBuilder<D> indexManagerBuilder,
+			MappedIndexManagerBuilder indexManagerBuilder,
 			PojoIndexedTypeExtendedMappingCollector extendedMappingCollector,
 			BeanReference<? extends IdentifierBridge<Object>> providedIdentifierBridge,
 			BeanResolver beanResolver) {
@@ -129,7 +128,7 @@ class PojoIndexedTypeManagerBuilder<E, D extends DocumentElement> {
 		Optional<PojoImplicitReindexingResolver<E, Set<String>>> reindexingResolverOptional =
 				reindexingResolverBuildingHelper.build( typeModel, pathFilterFactory );
 
-		PojoIndexedTypeManager<?, E, D> typeManager = new PojoIndexedTypeManager<>(
+		PojoIndexedTypeManager<?, E> typeManager = new PojoIndexedTypeManager<>(
 				typeModel.getTypeIdentifier(), typeModel.getCaster(),
 				identityMappingCollector.identifierMapping,
 				identityMappingCollector.routingKeyProvider,

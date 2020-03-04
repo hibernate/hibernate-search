@@ -291,7 +291,7 @@ public class DocumentElementMultiValuedIT {
 	}
 
 	private void executeAdd(String id, Consumer<DocumentElement> documentContributor) {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( id ), documentContributor::accept );
 		plan.execute().join();
 	}

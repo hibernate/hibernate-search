@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentElasticsearchWork;
@@ -26,7 +25,7 @@ import com.google.gson.JsonObject;
 
 
 
-public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan<ElasticsearchDocumentObjectBuilder> {
+public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan {
 
 	private final ElasticsearchWorkBuilderFactory builderFactory;
 	private final ElasticsearchWorkOrchestrator orchestrator;
@@ -50,13 +49,13 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan<Elastic
 
 	@Override
 	public void add(DocumentReferenceProvider referenceProvider,
-			DocumentContributor<ElasticsearchDocumentObjectBuilder> documentContributor) {
+			DocumentContributor documentContributor) {
 		index( referenceProvider, documentContributor );
 	}
 
 	@Override
 	public void update(DocumentReferenceProvider referenceProvider,
-			DocumentContributor<ElasticsearchDocumentObjectBuilder> documentContributor) {
+			DocumentContributor documentContributor) {
 		index( referenceProvider, documentContributor );
 	}
 
@@ -102,7 +101,7 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan<Elastic
 	}
 
 	private void index(DocumentReferenceProvider referenceProvider,
-			DocumentContributor<ElasticsearchDocumentObjectBuilder> documentContributor) {
+			DocumentContributor documentContributor) {
 		String id = referenceProvider.getIdentifier();
 		String elasticsearchId = indexManagerContext.toElasticsearchId( tenantId, id );
 		String routingKey = referenceProvider.getRoutingKey();

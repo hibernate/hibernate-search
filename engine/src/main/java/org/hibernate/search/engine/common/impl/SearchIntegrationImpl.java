@@ -35,15 +35,15 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	private final ThreadPoolProviderImpl threadPoolProvider;
 
 	private final List<MappingImplementor<?>> mappings;
-	private final Map<String, BackendImplementor<?>> backends;
-	private final Map<String, IndexManagerImplementor<?>> indexManagers;
+	private final Map<String, BackendImplementor> backends;
+	private final Map<String, IndexManagerImplementor> indexManagers;
 
 	SearchIntegrationImpl(BeanProvider beanProvider,
 			BeanHolder<? extends FailureHandler> failureHandlerHolder,
 			ThreadPoolProviderImpl threadPoolProvider,
 			List<MappingImplementor<?>> mappings,
-			Map<String, BackendImplementor<?>> backends,
-			Map<String, IndexManagerImplementor<?>> indexManagers) {
+			Map<String, BackendImplementor> backends,
+			Map<String, IndexManagerImplementor> indexManagers) {
 		this.beanProvider = beanProvider;
 		this.failureHandlerHolder = failureHandlerHolder;
 		this.threadPoolProvider = threadPoolProvider;
@@ -54,7 +54,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 
 	@Override
 	public Backend getBackend(String backendName) {
-		BackendImplementor<?> backend = backends.get( backendName );
+		BackendImplementor backend = backends.get( backendName );
 		if ( backend == null ) {
 			throw log.noBackendRegistered( backendName );
 		}
@@ -63,7 +63,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 
 	@Override
 	public IndexManager getIndexManager(String indexManagerName) {
-		IndexManagerImplementor<?> indexManager = indexManagers.get( indexManagerName );
+		IndexManagerImplementor indexManager = indexManagers.get( indexManagerName );
 		if ( indexManager == null ) {
 			throw log.noIndexManagerRegistered( indexManagerName );
 		}
@@ -87,7 +87,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	private void preStopIndexManagers() {
 		CompletableFuture<?>[] futures = new CompletableFuture[indexManagers.size()];
 		int i = 0;
-		for ( IndexManagerImplementor<?> indexManager : indexManagers.values() ) {
+		for ( IndexManagerImplementor indexManager : indexManagers.values() ) {
 			futures[i] = indexManager.preStop();
 			i++;
 		}
@@ -97,7 +97,7 @@ public class SearchIntegrationImpl implements SearchIntegration {
 	private void preStopBackends() {
 		CompletableFuture<?>[] futures = new CompletableFuture[backends.size()];
 		int i = 0;
-		for ( BackendImplementor<?> backend : backends.values() ) {
+		for ( BackendImplementor backend : backends.values() ) {
 			futures[i] = backend.preStop();
 			i++;
 		}

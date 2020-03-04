@@ -103,7 +103,7 @@ public class NestedDocumentDistanceProjectionIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
 			document.addValue( indexMapping.ordinalField, 1 );
 

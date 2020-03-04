@@ -11,7 +11,6 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -122,7 +121,7 @@ public class IndexWorkspaceIT {
 	}
 
 	private void createBookIndexes(StubBackendSessionContext sessionContext) {
-		IndexIndexer<? extends DocumentElement> indexer =
+		IndexIndexer indexer =
 				indexManager.createIndexer( sessionContext, DocumentCommitStrategy.NONE );
 		CompletableFuture<?>[] tasks = new CompletableFuture<?>[NUMBER_OF_BOOKS];
 

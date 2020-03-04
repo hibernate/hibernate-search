@@ -25,7 +25,7 @@ public class LuceneIndexEntryFactory {
 	}
 
 	public LuceneIndexEntry create(String tenantId, String id, String routingKey,
-			DocumentContributor<LuceneRootDocumentBuilder> documentContributor) {
+			DocumentContributor documentContributor) {
 		LuceneRootDocumentBuilder builder = new LuceneRootDocumentBuilder(
 				multiTenancyStrategy, indexName, facetsConfig
 		);

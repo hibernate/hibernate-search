@@ -17,9 +17,9 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 class BackendPartialBuildState {
 
 	private final String backendName;
-	private final BackendImplementor<?> partiallyBuiltBackend;
+	private final BackendImplementor partiallyBuiltBackend;
 
-	BackendPartialBuildState(String backendName, BackendImplementor<?> partiallyBuiltBackend) {
+	BackendPartialBuildState(String backendName, BackendImplementor partiallyBuiltBackend) {
 		this.backendName = backendName;
 		this.partiallyBuiltBackend = partiallyBuiltBackend;
 	}
@@ -28,7 +28,7 @@ class BackendPartialBuildState {
 		partiallyBuiltBackend.stop();
 	}
 
-	BackendImplementor<?> finalizeBuild(RootFailureCollector rootFailureCollector,
+	BackendImplementor finalizeBuild(RootFailureCollector rootFailureCollector,
 			BeanResolver beanResolver,
 			ConfigurationPropertySource rootPropertySource) {
 		ContextualFailureCollector backendFailureCollector =

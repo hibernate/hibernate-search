@@ -16,7 +16,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Searchable;
@@ -790,7 +789,7 @@ public class PhraseSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, PHRASE_1_TEXT_EXACT_MATCH );
 			document.addValue( indexMapping.analyzedStringFieldWithDslConverter.reference, PHRASE_1_TEXT_EXACT_MATCH );

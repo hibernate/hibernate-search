@@ -9,7 +9,6 @@ package org.hibernate.search.integrationtest.backend.tck.search.spatial;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Searchable;
@@ -81,7 +80,7 @@ public abstract class AbstractSpatialWithinSearchPredicateIT {
 	}
 
 	protected void initData() {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( OURSON_QUI_BOIT_ID ), document -> {
 			document.addValue( indexMapping.string, OURSON_QUI_BOIT_STRING );
 			document.addValue( indexMapping.geoPoint, OURSON_QUI_BOIT_GEO_POINT );

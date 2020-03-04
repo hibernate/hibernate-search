@@ -113,7 +113,7 @@ public class IndexNullAsValueIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan plan = indexManager.createIndexingPlan();
 		plan.add(
 				referenceProvider( DOCUMENT_WITH_INDEX_NULL_AS_VALUES ),
 				document -> {

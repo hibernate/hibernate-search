@@ -47,11 +47,11 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 			throw log.invalidEmptyTargetForScope();
 		}
 
-		Set<PojoScopeIndexedTypeContext<?, ? extends E, ?>> targetedTypeContexts = new LinkedHashSet<>();
+		Set<PojoScopeIndexedTypeContext<?, ? extends E>> targetedTypeContexts = new LinkedHashSet<>();
 		Set<PojoRawTypeIdentifier<?>> nonIndexedTypes = new LinkedHashSet<>();
 		Set<PojoRawTypeIdentifier<?>> nonIndexedButContainedTypes = new LinkedHashSet<>();
 		for ( PojoRawTypeIdentifier<? extends E> targetedType : targetedTypes ) {
-			Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E, ?>>> targetedTypeManagersForType =
+			Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>>> targetedTypeManagersForType =
 					indexedTypeContextProvider.getAllBySuperType( targetedType );
 			if ( targetedTypeManagersForType.isPresent() ) {
 				targetedTypeContexts.addAll( targetedTypeManagersForType.get() );
@@ -82,12 +82,12 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 	}
 
 	private final PojoScopeMappingContext mappingContext;
-	private final Set<? extends PojoScopeIndexedTypeContext<?, ? extends E, ?>> targetedTypeContexts;
+	private final Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>> targetedTypeContexts;
 	private final Set<C> targetedTypeExtendedContexts;
 	private MappedIndexScope<R, E2> delegate;
 
 	private PojoScopeDelegateImpl(PojoScopeMappingContext mappingContext,
-			Set<? extends PojoScopeIndexedTypeContext<?, ? extends E, ?>> targetedTypeContexts,
+			Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>> targetedTypeContexts,
 			Set<C> targetedTypeExtendedContexts) {
 		this.mappingContext = mappingContext;
 		this.targetedTypeContexts = targetedTypeContexts;
@@ -135,7 +135,7 @@ public final class PojoScopeDelegateImpl<R, E, E2, C> implements PojoScopeDelega
 
 	private MappedIndexScope<R, E2> getIndexScope() {
 		if ( delegate == null ) {
-			Iterator<? extends PojoScopeIndexedTypeContext<?, ? extends E, ?>> iterator = targetedTypeContexts.iterator();
+			Iterator<? extends PojoScopeIndexedTypeContext<?, ? extends E>> iterator = targetedTypeContexts.iterator();
 			MappedIndexScopeBuilder<R, E2> builder = iterator.next().createScopeBuilder(
 					mappingContext
 			);

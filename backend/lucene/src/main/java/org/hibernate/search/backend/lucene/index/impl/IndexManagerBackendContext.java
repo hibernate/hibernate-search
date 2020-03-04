@@ -11,7 +11,6 @@ import java.util.Optional;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
-import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.index.IOStrategyName;
@@ -100,7 +99,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	}
 
 	@Override
-	public IndexIndexingPlan<LuceneRootDocumentBuilder> createIndexingPlan(
+	public IndexIndexingPlan createIndexingPlan(
 			WorkExecutionIndexManagerContext indexManagerContext,
 			LuceneIndexEntryFactory indexEntryFactory,
 			BackendSessionContext sessionContext,
@@ -117,7 +116,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	}
 
 	@Override
-	public IndexIndexer<LuceneRootDocumentBuilder> createIndexer(
+	public IndexIndexer createIndexer(
 			WorkExecutionIndexManagerContext indexManagerContext,
 			LuceneIndexEntryFactory indexEntryFactory,
 			BackendSessionContext sessionContext,

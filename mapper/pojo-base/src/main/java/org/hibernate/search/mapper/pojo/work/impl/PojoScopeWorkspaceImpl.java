@@ -20,9 +20,9 @@ public class PojoScopeWorkspaceImpl implements PojoScopeWorkspace {
 
 	private final List<IndexWorkspace> delegates = new ArrayList<>();
 
-	public PojoScopeWorkspaceImpl(Set<? extends PojoWorkIndexedTypeContext<?, ?, ?>> targetedTypeContexts,
+	public PojoScopeWorkspaceImpl(Set<? extends PojoWorkIndexedTypeContext<?, ?>> targetedTypeContexts,
 			DetachedBackendSessionContext sessionContext) {
-		for ( PojoWorkIndexedTypeContext<?, ?, ?> targetedTypeContext : targetedTypeContexts ) {
+		for ( PojoWorkIndexedTypeContext<?, ?> targetedTypeContext : targetedTypeContexts ) {
 			delegates.add( targetedTypeContext.createWorkspace( sessionContext ) );
 		}
 	}

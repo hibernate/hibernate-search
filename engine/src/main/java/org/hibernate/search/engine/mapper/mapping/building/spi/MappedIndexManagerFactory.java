@@ -14,7 +14,7 @@ import java.util.Optional;
  */
 public interface MappedIndexManagerFactory {
 
-	MappedIndexManagerBuilder<?> createMappedIndexManager(
+	MappedIndexManagerBuilder createMappedIndexManager(
 			IndexedEntityBindingMapperContext mapperContext,
 			Optional<String> backendName, String indexName,
 			String mappedTypeName, boolean multiTenancyEnabled);

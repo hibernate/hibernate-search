@@ -14,7 +14,6 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.ForkJoinTask;
 import java.util.stream.LongStream;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
@@ -73,7 +72,7 @@ public class IndexInitializer {
 		IndexWorkspace workspace = index.getIndexManager()
 				.createWorkspace( DetachedBackendSessionContext.of( sessionContext ) );
 
-		IndexIndexer<? extends DocumentElement> indexer = index.getIndexManager()
+		IndexIndexer indexer = index.getIndexManager()
 				.createIndexer( new StubBackendSessionContext(), DocumentCommitStrategy.NONE );
 		List<CompletableFuture<?>> futures = new ArrayList<>();
 		idStream.forEach( id -> {

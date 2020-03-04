@@ -14,7 +14,6 @@ import java.io.IOException;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -81,7 +80,7 @@ public class LuceneIndexWriterCommitIT {
 		assertThat( countDocsOnDisk() ).isEqualTo( 0 );
 
 		// Add the document to the index
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan(
+		IndexIndexingPlan plan = indexManager.createIndexingPlan(
 				new StubBackendSessionContext(),
 				DocumentCommitStrategy.NONE, // The commit will happen at some point, but the indexing plan will be considered completed before that
 				DocumentRefreshStrategy.NONE // This is irrelevant
@@ -109,7 +108,7 @@ public class LuceneIndexWriterCommitIT {
 		assertThat( countDocsOnDisk() ).isEqualTo( 0 );
 
 		// Add the document to the index
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan(
+		IndexIndexingPlan plan = indexManager.createIndexingPlan(
 				new StubBackendSessionContext(),
 				DocumentCommitStrategy.FORCE, // The commit will happen before the indexing plan is considered completed
 				DocumentRefreshStrategy.NONE // This is irrelevant
@@ -132,7 +131,7 @@ public class LuceneIndexWriterCommitIT {
 		assertThat( countDocsOnDisk() ).isEqualTo( 0 );
 
 		// Add the document to the index
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan(
+		IndexIndexingPlan plan = indexManager.createIndexingPlan(
 				new StubBackendSessionContext(),
 				DocumentCommitStrategy.NONE, // The commit should not be necessary for changes to be visible
 				DocumentRefreshStrategy.NONE // The refresh should be done regardless of this parameter

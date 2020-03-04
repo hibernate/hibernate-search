@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
@@ -531,7 +530,7 @@ public class WildcardSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_MATCHING_PATTERN_1 );
 			document.addValue( indexMapping.analyzedStringFieldWithDslConverter.reference, TEXT_MATCHING_PATTERN_1 );

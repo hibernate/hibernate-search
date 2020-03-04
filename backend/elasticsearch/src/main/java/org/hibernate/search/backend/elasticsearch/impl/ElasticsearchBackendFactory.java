@@ -100,7 +100,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.build();
 
 	@Override
-	public BackendImplementor<?> create(String name, BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
+	public BackendImplementor create(String name, BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
 		boolean logPrettyPrinting = LOG_JSON_PRETTY_PRINTING.get( propertySource );
 		/*
 		 * The Elasticsearch client only converts JsonObjects to String and
