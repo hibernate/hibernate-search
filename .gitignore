@@ -31,6 +31,8 @@ atlassian-ide-plugin.xml
 
 # NetBeans specific files/directories
 .nbattrs
+licenseheader.txt
+nb-configuration.xml
 
 # Sublime
 *.sublime-*
@@ -45,13 +47,3 @@ atlassian-ide-plugin.xml
 # Maven wrapper files
 .mvn
 mvnw*
-/backend/elasticsearch/licenseheader.txt
-/backend/lucene/licenseheader.txt
-/backend/lucene/nb-configuration.xml
-/engine/licenseheader.txt
-/licenseheader.txt
-/util/internal/integrationtest/common/nb-configuration.xml
-/integrationtest/backend/lucene/nb-configuration.xml
-/integrationtest/backend/lucene/licenseheader.txt
-/integrationtest/backend/tck/nb-configuration.xml
-/integrationtest/backend/tck/licenseheader.txt
