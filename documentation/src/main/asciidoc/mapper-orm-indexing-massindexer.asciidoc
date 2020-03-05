@@ -143,8 +143,8 @@ will attempt to preload everything in memory.
 
 |`purgeAllOnStart(boolean)`
 |`true`
-|Whether the existing index should be purged at the beginning of the job. This operation
-takes place before indexing.
+|Removes all entities from the indexes before indexing.
+
 Only set this to `false` if you know the index is already empty;
 otherwise, you will end up with duplicates in the index.
 
@@ -184,23 +184,24 @@ The parameter is not used by default. It is equivalent to keyword `LIMIT` in SQL
 |A logging monitor.
 |
 The component responsible for monitoring progress of mass indexing.
-+
+
 As a `MassIndexer` can take some time to finish its job,
 it is often necessary to monitor its progress.
 The default, built-in monitor logs progress periodically at the `INFO` level,
 but a custom monitor can be set by implementing the `MassIndexingMonitor` interface
 and passing an instance using the `monitor` method.
-+
-Implementations of `MassIndexingMonitor` must be threadsafe.
+
+Implementations of `MassIndexingMonitor` must be thread-safe.
 
 |`failureHandler(MassIndexingFailureHandler)`
 |A failure handler.
 |
 The component responsible for handling failures occurring during mass indexing.
-+
+
 A `MassIndexer` performs multiple operations in parallel,
 some of which can fail without stopping the whole mass indexing process.
 As a result, it may be necessary to trace individual failures.
+
 The default, built-in failure handler just forwards the failures
 to the global <<configuration-background-failure-handling,background failure handler>>,
 which by default will log them at the `ERROR` level,
@@ -209,8 +210,8 @@ and passing an instance using the `failureHandler` method.
 This can be used to simply log failures in a context specific to the mass indexer,
 e.g. a web interface in a maintenance console from which mass indexing was requested,
 or for more advanced use cases, such as cancelling mass indexing on the first failure.
-+
-Implementations of `MassIndexingFailureHandler` must be threadsafe.
+
+Implementations of `MassIndexingFailureHandler` must be thread-safe.
 
 |===
 
