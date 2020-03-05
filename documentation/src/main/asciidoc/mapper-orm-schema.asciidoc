@@ -148,6 +148,9 @@ because <<mapper-orm-schema-management-concepts-lucene-schema,local Lucene index
 
 Below is an example using a `SearchSchemaManager` to drop and create indexes,
 then using a <<mapper-orm-indexing-massindexer,mass indexer>> to re-populate the indexes.
+The
+<<mapper-orm-indexing-massindexer-parameters-drop-and-create-schema,`dropAndCreateSchemaOnStart` setting of the mass indexer>>
+would be an alternative solution to achieve the same results.
 
 .Reinitializing indexes using a `SearchSchemaManager`
 ====
