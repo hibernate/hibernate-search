@@ -28,7 +28,7 @@ public final class IndexSettings {
 	 * </p>
 	 *
 	 * @param backendName Expect the backendName
-	 * @param elasticsearchIndexSettings Expect one of ElasticsearchIndexSettings constants string
+	 * @param luceneOrElasticsearchBackendSettings Expect one of ElasticsearchIndexSettings constants string
 	 *
 	 * @return the concatenated default index settings key
 	 */
