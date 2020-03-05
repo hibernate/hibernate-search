@@ -29,4 +29,8 @@ public class AdminService {
 	public void dropAndCreateSchema() {
 		Search.session( entityManager ).schemaManager().dropAndCreate();
 	}
+
+	public void dropSchema() {
+		Search.session( entityManager ).schemaManager().dropIfExisting();
+	}
 }

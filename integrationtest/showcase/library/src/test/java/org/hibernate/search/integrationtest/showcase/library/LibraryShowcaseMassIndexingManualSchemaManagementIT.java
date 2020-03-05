@@ -13,10 +13,9 @@ import org.hibernate.search.integrationtest.showcase.library.service.AdminServic
 import org.hibernate.search.integrationtest.showcase.library.service.DocumentService;
 import org.hibernate.search.integrationtest.showcase.library.service.TestDataService;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
-import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
+import org.junit.After;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -30,11 +29,12 @@ import org.springframework.test.context.junit4.SpringRunner;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 @TestPropertySource(properties = {
-		"spring.jpa.properties.hibernate.search.automatic_indexing.strategy=none"
+		"spring.jpa.properties.hibernate.search.automatic_indexing.strategy=none",
+		"spring.jpa.properties.hibernate.search.schema_management.strategy=none"
 })
 @ActiveProfiles(resolver = TestActiveProfilesResolver.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
-public class LibraryShowcaseMassIndexingIT {
+public class LibraryShowcaseMassIndexingManualSchemaManagementIT {
 
 	private static final int NUMBER_OF_BOOKS = 200;
 	private static final int MASS_INDEXING_MONITOR_LOG_PERIOD = 50; // This is the default in the implementation, do not change this value
@@ -52,9 +52,6 @@ public class LibraryShowcaseMassIndexingIT {
 		}
 	}
 
-	@Rule
-	public ExpectedLog4jLog logged = ExpectedLog4jLog.create();
-
 	@Autowired
 	private DocumentService documentService;
 
@@ -69,10 +66,19 @@ public class LibraryShowcaseMassIndexingIT {
 		testDataService.initBooksDataSet( NUMBER_OF_BOOKS );
 	}
 
+	@Before
+	@After
+	public void cleanup() {
+		// Necessary to keep the server (ES) or filesystem (Lucene) clean after the tests,
+		// because the schema management strategy is "none"
+		adminService.dropSchema();
+	}
+
 	@Test
-	public void testMassIndexing() {
-		assertThat( documentService.countIndexed() ).isEqualTo( 0 );
-		MassIndexer indexer = adminService.createMassIndexer();
+	public void testMassIndexingWithAutomaticDropAndCreate() {
+		// The index doesn't exist initially, since we delete it in "cleanup()" the schema management strategy is "none"
+		MassIndexer indexer = adminService.createMassIndexer()
+				.dropAndCreateSchemaOnStart( true );
 		try {
 			indexer.startAndWait();
 		}
@@ -83,28 +89,12 @@ public class LibraryShowcaseMassIndexingIT {
 	}
 
 	@Test
-	public void testMassIndexingMonitor() {
+	public void testMassIndexingWithManualDropAndCreate() {
+		// The index doesn't exist initially, since the schema management strategy is "none"
+		adminService.dropAndCreateSchema();
 		assertThat( documentService.countIndexed() ).isEqualTo( 0 );
 		MassIndexer indexer = adminService.createMassIndexer();
 		try {
-			/*
-			 * The default period for logging in the default mass indexing monitor is 50.
-			 * We set the batch size to 49.
-			 * 50 = 5*5*2
-			 * 49 = 7*7
-			 * Thus a multiple of 49 cannot be a multiple of 50,
-			 * and if we set the batch size to 49, the bug described in HSEARCH-3462
-			 * will prevent any log from ever happening, except at the very end
-			 *
-			 * Regardless of this bug, here we also check that the mass indexing monitor works correctly:
-			 * the number of log events should be equal to NUMBER_OF_BOOKS / 50.
-			 */
-			int batchSize = 49;
-			indexer.batchSizeToLoadObjects( batchSize );
-			int expectedNumberOfLogs = NUMBER_OF_BOOKS / MASS_INDEXING_MONITOR_LOG_PERIOD;
-			logged.expectMessage( "documents indexed in" ).times( expectedNumberOfLogs );
-			logged.expectMessage( "Indexing speed: " ).times( expectedNumberOfLogs );
-
 			indexer.startAndWait();
 		}
 		catch (InterruptedException e) {
