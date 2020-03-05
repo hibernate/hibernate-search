@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.engine.search.sort.dsl;
 
-import org.hibernate.search.engine.search.common.MultiValue;
+import org.hibernate.search.engine.search.common.SortMode;
 
 /**
  * The initial and final step in a "field" sort definition, where optional parameters can be set.
@@ -32,5 +32,5 @@ public interface FieldSortOptionsStep<S extends FieldSortOptionsStep<?>>
 	 * @param mode The mode.
 	 * @return {@code this}, for method chaining.
 	 */
-	S mode(MultiValue mode);
+	S mode(SortMode mode);
 }

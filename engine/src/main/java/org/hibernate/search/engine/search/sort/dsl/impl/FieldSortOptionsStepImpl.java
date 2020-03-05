@@ -12,7 +12,7 @@ import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.dsl.spi.AbstractSortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.common.ValueConvert;
-import org.hibernate.search.engine.search.common.MultiValue;
+import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
 class FieldSortOptionsStepImpl<B>
@@ -35,7 +35,7 @@ class FieldSortOptionsStepImpl<B>
 	}
 
 	@Override
-	public FieldSortOptionsStepImpl<B> mode(MultiValue mode) {
+	public FieldSortOptionsStepImpl<B> mode(SortMode mode) {
 		builder.mode( mode );
 		return this;
 	}

@@ -13,7 +13,7 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import org.hibernate.search.engine.search.common.MultiValue;
+import org.hibernate.search.engine.search.common.SortMode;
 
 abstract class AbstractElasticsearchSearchSortBuilder implements SearchSortBuilder<ElasticsearchSearchSortBuilder>,
 		ElasticsearchSearchSortBuilder {
@@ -29,7 +29,7 @@ abstract class AbstractElasticsearchSearchSortBuilder implements SearchSortBuild
 	private static final JsonPrimitive MEDIAN_KEYWORD_JSON = new JsonPrimitive( "median" );
 
 	private SortOrder order;
-	private MultiValue mode;
+	private SortMode mode;
 
 	@Override
 	public ElasticsearchSearchSortBuilder toImplementation() {
@@ -42,7 +42,7 @@ abstract class AbstractElasticsearchSearchSortBuilder implements SearchSortBuild
 	}
 
 	@Override
-	public void mode(MultiValue mode) {
+	public void mode(SortMode mode) {
 		this.mode = mode;
 	}
 
