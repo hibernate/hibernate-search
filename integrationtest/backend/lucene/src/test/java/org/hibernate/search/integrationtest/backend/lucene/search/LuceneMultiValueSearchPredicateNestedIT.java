@@ -93,7 +93,7 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 		SearchQuery<DocumentReference> query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "nested.additionalDoubleField" )
-			.asc().multi( MultiValue.MIN ) )
+			.asc().mode( MultiValue.MIN ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -103,7 +103,7 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "nested.additionalDoubleField" )
-			.asc().multi( MultiValue.MAX ) )
+			.asc().mode( MultiValue.MAX ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -113,7 +113,7 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "nested.additionalDoubleField" )
-			.asc().multi( MultiValue.AVG ) )
+			.asc().mode( MultiValue.AVG ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -123,7 +123,7 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "nested.additionalDoubleField" )
-			.asc().multi( MultiValue.SUM ) )
+			.asc().mode( MultiValue.SUM ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -140,7 +140,7 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 		SearchQuery<DocumentReference> query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "nested.additionalFloatField" )
-			.asc().multi( MultiValue.MIN ) )
+			.asc().mode( MultiValue.MIN ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -150,7 +150,7 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "nested.additionalFloatField" )
-			.asc().multi( MultiValue.MAX ) )
+			.asc().mode( MultiValue.MAX ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -160,7 +160,7 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "nested.additionalFloatField" )
-			.asc().multi( MultiValue.AVG ) )
+			.asc().mode( MultiValue.AVG ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -170,7 +170,7 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "nested.additionalFloatField" )
-			.asc().multi( MultiValue.SUM ) )
+			.asc().mode( MultiValue.SUM ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -187,7 +187,7 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 		SearchQuery<DocumentReference> query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "nested.additionalLongField" )
-			.asc().multi( MultiValue.MIN ) )
+			.asc().mode( MultiValue.MIN ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -197,7 +197,7 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "nested.additionalLongField" )
-			.asc().multi( MultiValue.MAX ) )
+			.asc().mode( MultiValue.MAX ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -207,7 +207,7 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "nested.additionalLongField" )
-			.asc().multi( MultiValue.AVG ) )
+			.asc().mode( MultiValue.AVG ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -217,7 +217,7 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "nested.additionalLongField" )
-			.asc().multi( MultiValue.SUM ) )
+			.asc().mode( MultiValue.SUM ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -234,7 +234,7 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 		SearchQuery<DocumentReference> query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "nested.additionalIntegerField" )
-			.asc().multi( MultiValue.MIN ) )
+			.asc().mode( MultiValue.MIN ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -244,7 +244,7 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "nested.additionalIntegerField" )
-			.asc().multi( MultiValue.MAX ) )
+			.asc().mode( MultiValue.MAX ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -254,7 +254,7 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "nested.additionalIntegerField" )
-			.asc().multi( MultiValue.AVG ) )
+			.asc().mode( MultiValue.AVG ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -264,7 +264,7 @@ public class LuceneMultiValueSearchPredicateNestedIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "nested.additionalIntegerField" )
-			.asc().multi( MultiValue.SUM ) )
+			.asc().mode( MultiValue.SUM ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {

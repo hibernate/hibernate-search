@@ -15,17 +15,21 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.hibernate.search.engine.search.common.MultiValue;
 
-
-
 abstract class AbstractElasticsearchSearchSortBuilder implements SearchSortBuilder<ElasticsearchSearchSortBuilder>,
-		ElasticsearchSearchSortBuilder {
+	ElasticsearchSearchSortBuilder {
 
 	private static final JsonAccessor<JsonElement> ORDER_ACCESSOR = JsonAccessor.root().property( "order" );
+	private static final JsonAccessor<JsonElement> MODE_ACCESSOR = JsonAccessor.root().property( "mode" );
 	private static final JsonPrimitive ASC_KEYWORD_JSON = new JsonPrimitive( "asc" );
 	private static final JsonPrimitive DESC_KEYWORD_JSON = new JsonPrimitive( "desc" );
+	private static final JsonPrimitive SUM_KEYWORD_JSON = new JsonPrimitive( "sum" );
+	private static final JsonPrimitive AVG_KEYWORD_JSON = new JsonPrimitive( "avg" );
+	private static final JsonPrimitive MIN_KEYWORD_JSON = new JsonPrimitive( "min" );
+	private static final JsonPrimitive MAX_KEYWORD_JSON = new JsonPrimitive( "max" );
+	private static final JsonPrimitive MEDIAN_KEYWORD_JSON = new JsonPrimitive( "median" );
 
 	private SortOrder order;
-	private MultiValue multi;
+	private MultiValue mode;
 
 	@Override
 	public ElasticsearchSearchSortBuilder toImplementation() {
@@ -38,8 +42,8 @@ abstract class AbstractElasticsearchSearchSortBuilder implements SearchSortBuild
 	}
 
 	@Override
-	public void multi(MultiValue multi) {
-		this.multi = multi;
+	public void mode(MultiValue mode) {
+		this.mode = mode;
 	}
 
 	@Override
@@ -52,6 +56,25 @@ abstract class AbstractElasticsearchSearchSortBuilder implements SearchSortBuild
 					break;
 				case DESC:
 					ORDER_ACCESSOR.set( innerObject, DESC_KEYWORD_JSON );
+					break;
+			}
+		}
+		if ( mode != null ) {
+			switch ( mode ) {
+				case SUM:
+					MODE_ACCESSOR.set( innerObject, SUM_KEYWORD_JSON );
+					break;
+				case AVG:
+					MODE_ACCESSOR.set( innerObject, AVG_KEYWORD_JSON );
+					break;
+				case MIN:
+					MODE_ACCESSOR.set( innerObject, MIN_KEYWORD_JSON );
+					break;
+				case MAX:
+					MODE_ACCESSOR.set( innerObject, MAX_KEYWORD_JSON );
+					break;
+				case MEDIAN:
+					MODE_ACCESSOR.set( innerObject, MEDIAN_KEYWORD_JSON );
 					break;
 			}
 		}

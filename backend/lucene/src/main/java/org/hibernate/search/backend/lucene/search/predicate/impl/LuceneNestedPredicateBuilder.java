@@ -14,12 +14,10 @@ import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.join.QueryBitSetProducer;
 import org.apache.lucene.search.join.ScoreMode;
-import org.apache.lucene.search.join.ToParentBlockJoinQuery;
-
-
+import org.hibernate.search.backend.lucene.lowlevel.query.impl.ESToParentBlockJoinQuery;
 
 class LuceneNestedPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
-		implements NestedPredicateBuilder<LuceneSearchPredicateBuilder> {
+	implements NestedPredicateBuilder<LuceneSearchPredicateBuilder> {
 
 	private final String absoluteFieldPath;
 
@@ -51,7 +49,6 @@ class LuceneNestedPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
 			parentQuery = Queries.nestedDocumentPathQuery( context.getNestedPath() );
 		}
 
-		// TODO HSEARCH-3090 at some point we should have a parameter for the score mode
-		return new ToParentBlockJoinQuery( childQueryBuilder.build(), new QueryBitSetProducer( parentQuery ), ScoreMode.Avg );
+		return new ESToParentBlockJoinQuery( childQueryBuilder.build(), new QueryBitSetProducer( parentQuery ), ScoreMode.Avg, absoluteFieldPath );
 	}
 }

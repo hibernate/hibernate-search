@@ -22,8 +22,8 @@ public interface RangeAggregationOptionsStep<S extends RangeAggregationOptionsSt
 	 * Start describing the behavior of this sort when a document do have
 	 * multi values for the targeted field.
 	 *
-	 * @param multi The multi.
+	 * @param mode The renge.
 	 * @return The next step.
 	 */
-	S multi(MultiValue multi);
+	S mode(MultiValue mode);
 }

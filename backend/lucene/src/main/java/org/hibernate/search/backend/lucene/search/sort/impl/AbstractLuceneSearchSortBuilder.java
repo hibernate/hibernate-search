@@ -28,7 +28,7 @@ public abstract class AbstractLuceneSearchSortBuilder implements SearchSortBuild
 	}
 
 	@Override
-	public void multi(MultiValue multi) {
+	public void mode(MultiValue multi) {
 		this.multi = multi;
 	}
 

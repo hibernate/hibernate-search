@@ -122,9 +122,9 @@ public class LuceneMultiValueSearchPredicateNestedAggregationT1 {
 			.range( 2.0, 4.0 )
 			.range( 4.0, 6.0 )
 			.range( 6.0, null )
-			.multi( MultiValue.AVG ) )
+			.mode( MultiValue.AVG ) )
 			.sort( f -> f.field( "nested.additionalDoubleField" )
-			.asc().multi( MultiValue.AVG ) )
+			.asc().mode( MultiValue.AVG ) )
 			.toQuery();
 
 		SearchResult<DocumentReference> result = query.fetchAll();
@@ -165,9 +165,9 @@ public class LuceneMultiValueSearchPredicateNestedAggregationT1 {
 			.range( 2, 4 )
 			.range( 4, 6 )
 			.range( 6, null )
-			.multi( MultiValue.AVG ) )
+			.mode( MultiValue.AVG ) )
 			.sort( f -> f.field( "nested.additionalIntegerField" )
-			.asc().multi( MultiValue.AVG ) )
+			.asc().mode( MultiValue.AVG ) )
 			.toQuery();
 
 		SearchResult<DocumentReference> result = query.fetchAll();
@@ -206,7 +206,7 @@ public class LuceneMultiValueSearchPredicateNestedAggregationT1 {
 			.field( "nested.additionalDoubleField", Double.class )
 			.multi( MultiValue.AVG ) )
 			.sort( f -> f.field( "nested.additionalDoubleField" )
-			.asc().multi( MultiValue.AVG ) )
+			.asc().mode( MultiValue.AVG ) )
 			.toQuery();
 
 		SearchResult<DocumentReference> result = query.fetchAll();

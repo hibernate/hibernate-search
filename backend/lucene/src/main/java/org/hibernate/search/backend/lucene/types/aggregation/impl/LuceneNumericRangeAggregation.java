@@ -62,7 +62,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		this.rangesInOrder = builder.rangesInOrder;
 		this.encodedRangesInOrder = builder.encodedRangesInOrder;
 		this.nestedDocumentPath = builder.nestedDocumentPath;
-		this.multiValueMode = builder.getMultiValueMode( builder.multi );
+		this.multiValueMode = builder.getMultiValueMode( builder.mode );
 	}
 
 	@Override
@@ -106,7 +106,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 
 		private final List<Range<K>> rangesInOrder = new ArrayList<>();
 		private final List<Range<E>> encodedRangesInOrder = new ArrayList<>();
-		private MultiValue multi;
+		private MultiValue mode;
 
 		public Builder(LuceneSearchContext searchContext, String nestedDocumentPath, String absoluteFieldPath,
 			DslConverter<?, ? extends F> toFieldValueConverter,
@@ -125,8 +125,8 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		}
 
 		@Override
-		public void multi(MultiValue multi) {
-			this.multi = multi;
+		public void mode(MultiValue mode) {
+			this.mode = mode;
 		}
 
 		@Override

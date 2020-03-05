@@ -83,7 +83,7 @@ public class ElasticsearchRangeAggregation<F, K>
 
 		private final List<Range<K>> rangesInOrder = new ArrayList<>();
 		private final JsonArray rangesJson = new JsonArray();
-		private MultiValue multi;
+		private MultiValue mode;
 
 		public Builder(ElasticsearchSearchContext searchContext, String absoluteFieldPath,
 				DslConverter<?, ? extends F> toFieldValueConverter,
@@ -119,8 +119,8 @@ public class ElasticsearchRangeAggregation<F, K>
 		}
 
 		@Override
-		public void multi(MultiValue multi) {
-			this.multi = multi;
+		public void mode(MultiValue mode) {
+			this.mode = mode;
 		}
 
 		@Override

@@ -91,7 +91,7 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 		SearchQuery<DocumentReference> query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "additionalDoubleField" )
-			.asc().multi( MultiValue.MIN ) )
+			.asc().mode( MultiValue.MIN ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -101,7 +101,7 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "additionalDoubleField" )
-			.asc().multi( MultiValue.MAX ) )
+			.asc().mode( MultiValue.MAX ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -111,7 +111,7 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "additionalDoubleField" )
-			.asc().multi( MultiValue.AVG ) )
+			.asc().mode( MultiValue.AVG ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -121,7 +121,7 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "additionalDoubleField" )
-			.asc().multi( MultiValue.SUM ) )
+			.asc().mode( MultiValue.SUM ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -131,7 +131,7 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "additionalDoubleField" )
-			.asc().multi( MultiValue.MEDIAN ) )
+			.asc().mode( MultiValue.MEDIAN ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -147,7 +147,7 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 		SearchQuery<DocumentReference> query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "additionalFloatField" )
-			.asc().multi( MultiValue.MIN ) )
+			.asc().mode( MultiValue.MIN ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -157,7 +157,7 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "additionalFloatField" )
-			.asc().multi( MultiValue.MAX ) )
+			.asc().mode( MultiValue.MAX ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -167,7 +167,7 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "additionalFloatField" )
-			.asc().multi( MultiValue.AVG ) )
+			.asc().mode( MultiValue.AVG ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -177,7 +177,7 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "additionalFloatField" )
-			.asc().multi( MultiValue.SUM ) )
+			.asc().mode( MultiValue.SUM ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -187,7 +187,7 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "additionalFloatField" )
-			.asc().multi( MultiValue.MEDIAN ) )
+			.asc().mode( MultiValue.MEDIAN ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -203,7 +203,7 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 		SearchQuery<DocumentReference> query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "additionalLongField" )
-			.asc().multi( MultiValue.MIN ) )
+			.asc().mode( MultiValue.MIN ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -213,7 +213,7 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "additionalLongField" )
-			.asc().multi( MultiValue.MAX ) )
+			.asc().mode( MultiValue.MAX ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -223,7 +223,7 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "additionalLongField" )
-			.asc().multi( MultiValue.AVG ) )
+			.asc().mode( MultiValue.AVG ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -233,7 +233,7 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "additionalLongField" )
-			.asc().multi( MultiValue.SUM ) )
+			.asc().mode( MultiValue.SUM ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -243,7 +243,7 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "additionalLongField" )
-			.asc().multi( MultiValue.MEDIAN ) )
+			.asc().mode( MultiValue.MEDIAN ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -259,7 +259,7 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 		SearchQuery<DocumentReference> query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "additionalIntegerField" )
-			.asc().multi( MultiValue.MIN ) )
+			.asc().mode( MultiValue.MIN ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -269,7 +269,7 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "additionalIntegerField" )
-			.asc().multi( MultiValue.MAX ) )
+			.asc().mode( MultiValue.MAX ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -279,7 +279,7 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "additionalIntegerField" )
-			.asc().multi( MultiValue.AVG ) )
+			.asc().mode( MultiValue.AVG ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -289,7 +289,7 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "additionalIntegerField" )
-			.asc().multi( MultiValue.SUM ) )
+			.asc().mode( MultiValue.SUM ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
@@ -299,7 +299,7 @@ public class LuceneMultiValueSearchPredicateMasterIT {
 		query = scope.query()
 			.where( f -> f.matchAll() )
 			.sort( f -> f.field( "additionalIntegerField" )
-			.asc().multi( MultiValue.MEDIAN ) )
+			.asc().mode( MultiValue.MEDIAN ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {

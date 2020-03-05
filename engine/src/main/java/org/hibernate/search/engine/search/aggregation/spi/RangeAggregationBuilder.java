@@ -15,5 +15,5 @@ public interface RangeAggregationBuilder<K> extends SearchAggregationBuilder<Map
 
 	void range(Range<? extends K> range);
 
-	void multi(MultiValue multi);
+	void mode(MultiValue mode);
 }

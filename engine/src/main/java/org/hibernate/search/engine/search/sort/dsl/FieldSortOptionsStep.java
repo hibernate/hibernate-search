@@ -16,20 +16,22 @@ import org.hibernate.search.engine.search.common.MultiValue;
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
 public interface FieldSortOptionsStep<S extends FieldSortOptionsStep<?>>
-		extends SortFinalStep, SortThenStep, SortOrderStep<S> {
+	extends SortFinalStep, SortThenStep, SortOrderStep<S> {
 
 	/**
-	 * Start describing the behavior of this sort when a document doesn't have any value for the targeted field.
+	 * Start describing the behavior of this sort when a document doesn't
+	 * have any value for the targeted field.
 	 *
 	 * @return The next step.
 	 */
 	FieldSortMissingValueBehaviorStep<S> missing();
 
 	/**
-	 * Start describing the behavior of this sort when a document do have multi values for the targeted field.
+	 * Start describing the behavior of this sort when a document do have
+	 * mode values for the targeted field.
 	 *
-	 * @param multi The multi.
-	 * @return The next step.
+	 * @param mode The mode.
+	 * @return {@code this}, for method chaining.
 	 */
-	S multi(MultiValue multi);
+	S mode(MultiValue mode);
 }

@@ -102,10 +102,10 @@ public class LuceneMultiValueSearchPredicateNestedWithFilterIT {
 		SearchQuery<DocumentReference> query = scope.query()
 			.where( f -> {
 				return f.bool().must( f.matchAll() )
-					.must( filter );
+					.filter( filter );
 			} )
 			.sort( f -> f.field( "nested.additionalIntegerField" )
-			.asc().multi( MultiValue.SUM ) )
+			.asc().mode( MultiValue.SUM ) )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {

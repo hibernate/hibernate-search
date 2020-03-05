@@ -22,7 +22,7 @@ class StubRangeAggregationBuilder<K>
 	}
 
 	@Override
-	public void multi(MultiValue multi) {
+	public void mode(MultiValue multi) {
 		// No-op
 	}
 

@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.engine.search.sort.dsl.impl;
 
-
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortMissingValueBehaviorStep;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
@@ -24,7 +23,7 @@ class FieldSortOptionsStepImpl<B>
 	private final FieldSortBuilder<B> builder;
 
 	FieldSortOptionsStepImpl(SearchSortDslContext<?, B> dslContext,
-				String absoluteFieldPath) {
+		String absoluteFieldPath) {
 		super( dslContext );
 		this.builder = dslContext.getBuilderFactory().field( absoluteFieldPath );
 	}
@@ -36,19 +35,19 @@ class FieldSortOptionsStepImpl<B>
 	}
 
 	@Override
-	public FieldSortMissingValueBehaviorStep<FieldSortOptionsStepImpl<B>> missing() {
-		return this;
-	}
-
-	@Override
-	public FieldSortOptionsStepImpl<B> multi(MultiValue multi) {
-		builder.multi( multi );
+	public FieldSortOptionsStepImpl<B> mode(MultiValue mode) {
+		builder.mode( mode );
 		return this;
 	}
 
 	@Override
 	public FieldSortOptionsStepImpl<B> first() {
 		builder.missingFirst();
+		return this;
+	}
+
+	@Override
+	public FieldSortMissingValueBehaviorStep<FieldSortOptionsStepImpl<B>> missing() {
 		return this;
 	}
 

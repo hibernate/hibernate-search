@@ -46,7 +46,7 @@ public class StubSortBuilder implements ScoreSortBuilder<StubSortBuilder>,
 	}
 
 	@Override
-	public void multi(MultiValue multi) {
+	public void mode(MultiValue mode) {
 		// No-op, just simulates a call on this object
 	}
 }

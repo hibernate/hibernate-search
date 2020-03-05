@@ -43,8 +43,8 @@ class RangeAggregationRangeStepImpl<F>
 	}
 
 	@Override
-	public RangeAggregationRangeStepImpl<F> multi(MultiValue multi) {
-		builder.multi( multi );
+	public RangeAggregationRangeStepImpl<F> mode(MultiValue mode) {
+		builder.mode( mode );
 		return this;
 	}
 
