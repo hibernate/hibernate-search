@@ -76,12 +76,16 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 	}
 
 	@Override
-	protected void expectMassIndexerOperationFailureHandling(String exceptionMessage, String failingOperationAsString) {
+	protected void expectMassIndexerOperationFailureHandling(
+			Class<? extends Throwable> exceptionType, String exceptionMessage,
+			String failingOperationAsString) {
 		// We'll check in the assert*() method, see below.
 	}
 
 	@Override
-	protected void assertMassIndexerOperationFailureHandling(String exceptionMessage, String failingOperationAsString) {
+	protected void assertMassIndexerOperationFailureHandling(
+			Class<? extends Throwable> exceptionType, String exceptionMessage,
+			String failingOperationAsString) {
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );

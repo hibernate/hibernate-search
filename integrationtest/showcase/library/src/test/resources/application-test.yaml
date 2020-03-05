@@ -3,6 +3,7 @@ spring.jpa:
     ddl-auto: create-drop
   properties:
     hibernate.search:
+      # Overridden in some tests
       schema_management.strategy: drop-and-create-and-drop
       automatic_indexing:
         # This really is only for tests:

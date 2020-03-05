@@ -75,10 +75,12 @@ public class MassIndexingFailureDefaultBackgroundFailureHandlerIT extends Abstra
 	}
 
 	@Override
-	protected void expectMassIndexerOperationFailureHandling(String exceptionMessage, String failingOperationAsString) {
+	protected void expectMassIndexerOperationFailureHandling(
+			Class<? extends Throwable> exceptionType, String exceptionMessage,
+			String failingOperationAsString) {
 		logged.expectEvent(
 				Level.ERROR,
-				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
+				ExceptionMatcherBuilder.isException( exceptionType )
 						.withMessage( exceptionMessage )
 						.build(),
 				failingOperationAsString
@@ -87,7 +89,9 @@ public class MassIndexingFailureDefaultBackgroundFailureHandlerIT extends Abstra
 	}
 
 	@Override
-	protected void assertMassIndexerOperationFailureHandling(String exceptionMessage, String failingOperationAsString) {
+	protected void assertMassIndexerOperationFailureHandling(
+			Class<? extends Throwable> exceptionType, String exceptionMessage,
+			String failingOperationAsString) {
 		// If we get there, everything works fine.
 	}
 
