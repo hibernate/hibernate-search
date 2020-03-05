@@ -180,7 +180,9 @@ public class SimpleQueryStringSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		String orQueryString = TERM_1 + " | " + TERM_2;
+		// Don't use a whitespace here: there's a bug in ES6.2 that leads the "|",
+		// when interpreted as an (empty) term, to be turned into a match-no-docs query.
+		String orQueryString = TERM_1 + "|" + TERM_2;
 		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
 				.matching( orQueryString )
 				.defaultOperator( BooleanOperator.AND )
@@ -223,7 +225,9 @@ public class SimpleQueryStringSearchPredicateIT {
 				// "NOT" disabled: "-" is dropped during analysis and we end up with "term1 + term2"
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
 
-		String precedenceQueryString = TERM_2 + " + (" + TERM_1 + " | " + TERM_3 + ")";
+		// Don't use a whitespace here: there's a bug in ES6.2 that leads the "("/")",
+		// when interpreted as an (empty) term, to be turned into a match-no-docs query.
+		String precedenceQueryString = TERM_2 + "+(" + TERM_1 + "|" + TERM_3 + ")";
 		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
 				.matching( precedenceQueryString )
 				.flags( SimpleQueryFlag.AND, SimpleQueryFlag.OR, SimpleQueryFlag.PRECEDENCE ) )
