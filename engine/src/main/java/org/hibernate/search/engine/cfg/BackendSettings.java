@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.cfg;
 
+import static java.lang.String.join;
+
 /**
  * Configuration properties common to all Hibernate Search backends regardless of the underlying technology.
  * <p>
@@ -38,4 +40,17 @@ public final class BackendSettings {
 	 */
 	public static final String INDEXES = "indexes";
 
+	/**
+	 * Build a concatenated version of ElasticSearchBackendSettings or LuceneBackendSettings which contains the prefix and the backendName
+	 *
+	 * @param backendName Expect the backendName
+	 * @param luceneOrElasticsearchBackendSettings Expect one of ElasticsearchBackendSettings or LuceneBackendSettings constants string
+	 *
+	 * @return the concatenated prefix + backend name + radical
+	 */
+	public static String backendKey(String backendName, String luceneOrElasticsearchBackendSettings) {
+		return join( ".",
+				EngineSettings.BACKENDS, backendName, luceneOrElasticsearchBackendSettings
+		);
+	}
 }
