@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.cfg;
 
+import static java.lang.String.join;
+
 /**
  * Configuration properties common to all Hibernate Search backends regardless of the underlying technology.
  * <p>
@@ -38,4 +40,17 @@ public final class BackendSettings {
 	 */
 	public static final String INDEXES = "indexes";
 
+	/**
+	 * Builds a configuration property key for the given backend, with the given radical.
+	 *
+	 * @param backendName Expect the backendName
+	 * @param radical The radical of the configuration property (see constants in
+	 * 	 * {@code ElasticsearchBackendSettings}, {@code ElasticsearchBackendSettings}, etc.)
+	 * @return the concatenated prefix + backend name + radical
+	 */
+	public static String backendKey(String backendName, String radical) {
+		return join( ".",
+				EngineSettings.BACKENDS, backendName, radical
+		);
+	}
 }
