@@ -427,7 +427,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 	protected void initData() {
 		super.initData();
 
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( ADDITIONAL_POINT_1_ID ), document -> {
 			document.addValue( indexMapping.geoPoint, ADDITIONAL_POINT_1_GEO_POINT );
 		} );

@@ -10,9 +10,9 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
 abstract class AbstractPojoTypeIndexingPlan {
 
-	final PojoWorkSessionContext sessionContext;
+	final PojoWorkSessionContext<?> sessionContext;
 
-	AbstractPojoTypeIndexingPlan(PojoWorkSessionContext sessionContext) {
+	AbstractPojoTypeIndexingPlan(PojoWorkSessionContext<?> sessionContext) {
 		this.sessionContext = sessionContext;
 	}
 

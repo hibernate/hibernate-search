@@ -20,11 +20,11 @@ public final class PojoDocumentContributor<E> implements DocumentContributor {
 
 	private final PojoIndexingProcessor<E> processor;
 
-	private final PojoWorkSessionContext sessionContext;
+	private final PojoWorkSessionContext<?> sessionContext;
 
 	private final Supplier<E> entitySupplier;
 
-	public PojoDocumentContributor(PojoIndexingProcessor<E> processor, PojoWorkSessionContext sessionContext,
+	public PojoDocumentContributor(PojoIndexingProcessor<E> processor, PojoWorkSessionContext<?> sessionContext,
 			Supplier<E> entitySupplier) {
 		this.processor = processor;
 		this.sessionContext = sessionContext;

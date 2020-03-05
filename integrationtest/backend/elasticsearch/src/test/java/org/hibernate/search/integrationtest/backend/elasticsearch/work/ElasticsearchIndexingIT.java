@@ -92,7 +92,7 @@ public class ElasticsearchIndexingIT {
 	@Test
 	public void addUpdateDelete_routing() {
 		String routingKey = "someRoutingKey";
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 
 		plan.add( referenceProvider( "1", routingKey ), document -> {
 			document.addValue( indexMapping.string, "text1" );

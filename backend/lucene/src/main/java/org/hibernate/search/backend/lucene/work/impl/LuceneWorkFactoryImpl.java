@@ -28,22 +28,24 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	}
 
 	@Override
-	public LuceneSingleDocumentWriteWork<?> add(String tenantId, String id,
+	public LuceneSingleDocumentWriteWork<?> add(String tenantId, String entityTypeName, Object entityIdentifier,
 			LuceneIndexEntry indexEntry) {
-		return new LuceneAddEntryWork( tenantId, id, indexEntry );
+		return new LuceneAddEntryWork( tenantId, entityTypeName, entityIdentifier, indexEntry );
 	}
 
 	@Override
-	public LuceneSingleDocumentWriteWork<?> update(String tenantId, String id,
-			LuceneIndexEntry indexEntry) {
+	public LuceneSingleDocumentWriteWork<?> update(String tenantId, String entityTypeName, Object entityIdentifier,
+			String documentIdentifier, LuceneIndexEntry indexEntry) {
 		Query filter = multiTenancyStrategy.getFilterOrNull( tenantId );
-		return new LuceneUpdateEntryWork( tenantId, id, filter, indexEntry );
+		return new LuceneUpdateEntryWork( tenantId, entityTypeName, entityIdentifier,
+				documentIdentifier, filter, indexEntry );
 	}
 
 	@Override
-	public LuceneSingleDocumentWriteWork<?> delete(String tenantId, String id) {
+	public LuceneSingleDocumentWriteWork<?> delete(String tenantId, String entityTypeName, Object entityIdentifier,
+			String documentIdentifier) {
 		Query filter = multiTenancyStrategy.getFilterOrNull( tenantId );
-		return new LuceneDeleteEntryWork( tenantId, id, filter );
+		return new LuceneDeleteEntryWork( tenantId, entityTypeName, entityIdentifier, documentIdentifier, filter );
 	}
 
 	@Override

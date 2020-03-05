@@ -20,6 +20,7 @@ import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.ElasticsearchBackendConfiguration;
 import org.hibernate.search.documentation.testsupport.LuceneBackendConfiguration;
 import org.hibernate.search.engine.search.common.BooleanOperator;
+import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -603,6 +604,19 @@ public class PredicateDslIT {
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactlyInAnyOrder( BOOK3_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::simpleQueryString-flags[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.simpleQueryString().field( "title" )
+							.matching( "I want a **robot**" )
+							.flags( SimpleQueryFlag.AND, SimpleQueryFlag.OR, SimpleQueryFlag.NOT ) )
+					.fetchHits( 20 );
+			// end::simpleQueryString-flags[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK3_ID );
 		} );
 	}
 

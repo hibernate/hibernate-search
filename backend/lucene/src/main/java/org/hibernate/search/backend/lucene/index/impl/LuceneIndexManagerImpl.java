@@ -16,6 +16,7 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.DirectoryReaderCollector;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeIndexManagerContext;
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
@@ -91,11 +92,13 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexIndexingPlan createIndexingPlan(BackendSessionContext sessionContext,
+	public <R> IndexIndexingPlan<R> createIndexingPlan(BackendSessionContext sessionContext,
+			EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return backendContext.createIndexingPlan(
 				shardHolder, indexEntryFactory,
-				sessionContext, commitStrategy, refreshStrategy
+				sessionContext, entityReferenceFactory,
+				commitStrategy, refreshStrategy
 		);
 	}
 

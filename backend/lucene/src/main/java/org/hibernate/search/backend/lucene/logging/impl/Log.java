@@ -234,13 +234,13 @@ public interface Log extends BasicLogger {
 	SearchException unableToInitializeIndexDirectory(String causeMessage,
 			@Param EventContext context, @Cause Exception cause);
 
-	@Message(id = ID_OFFSET_2 + 16, value = "Unable to index entry '%2$s' with tenant identifier '%1$s'.")
-	SearchException unableToIndexEntry(String tenantId, String id,
+	@Message(id = ID_OFFSET_2 + 16, value = "Unable to index entity of type '%2$s' with identifier '%3$s' and tenant identifier '%1$s'.")
+	SearchException unableToIndexEntry(String tenantId, String entityTypeName, Object entityIdentifier,
 			@Param EventContext context, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_2 + 17,
-			value = "Unable to delete entry '%2$s' with tenant identifier '%1$s'.")
-	SearchException unableToDeleteEntryFromIndex(String tenantId, String id,
+			value = "Unable to delete entity of type '%2$s' with identifier '%3$s' and tenant identifier '%1$s'.")
+	SearchException unableToDeleteEntryFromIndex(String tenantId, String entityTypeName, Object entityIdentifier,
 			@Param EventContext context, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_2 + 18,

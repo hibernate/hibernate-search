@@ -20,17 +20,32 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.JsonObject;
 
 
-public abstract class AbstractSimpleBulkableElasticsearchWork<R>
+public abstract class AbstractSingleDocumentElasticsearchWork<R>
 		extends AbstractSimpleElasticsearchWork<R>
-		implements BulkableElasticsearchWork<R> {
+		implements BulkableElasticsearchWork<R>, SingleDocumentElasticsearchWork<R> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final JsonObject bulkableActionMetadata;
 
-	protected AbstractSimpleBulkableElasticsearchWork(AbstractBuilder<?> builder) {
+	private final String entityTypeName;
+	private final Object entityIdentifier;
+
+	protected AbstractSingleDocumentElasticsearchWork(AbstractBuilder<?> builder) {
 		super( builder );
 		this.bulkableActionMetadata = builder.buildBulkableActionMetadata();
+		this.entityTypeName = builder.entityTypeName;
+		this.entityIdentifier = builder.entityIdentifier;
+	}
+
+	@Override
+	public String getEntityTypeName() {
+		return entityTypeName;
+	}
+
+	@Override
+	public Object getEntityIdentifier() {
+		return entityIdentifier;
 	}
 
 	@Override
@@ -107,8 +122,14 @@ public abstract class AbstractSimpleBulkableElasticsearchWork<R>
 	protected abstract static class AbstractBuilder<B>
 			extends AbstractSimpleElasticsearchWork.AbstractBuilder<B> {
 
-		public AbstractBuilder(URLEncodedString dirtiedIndexName, ElasticsearchRequestSuccessAssessor resultAssessor) {
+		private final String entityTypeName;
+		private final Object entityIdentifier;
+
+		public AbstractBuilder(URLEncodedString dirtiedIndexName, ElasticsearchRequestSuccessAssessor resultAssessor,
+				String entityTypeName, Object entityIdentifier) {
 			super( dirtiedIndexName, resultAssessor );
+			this.entityTypeName = entityTypeName;
+			this.entityIdentifier = entityIdentifier;
 		}
 
 		protected abstract JsonObject buildBulkableActionMetadata();

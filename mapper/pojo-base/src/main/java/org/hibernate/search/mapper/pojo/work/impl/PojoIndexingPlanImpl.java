@@ -25,26 +25,26 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-public class PojoIndexingPlanImpl implements PojoIndexingPlan {
+public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final PojoWorkIndexedTypeContextProvider indexedTypeContextProvider;
 	private final PojoWorkContainedTypeContextProvider containedTypeContextProvider;
-	private final PojoWorkSessionContext sessionContext;
+	private final PojoWorkSessionContext<R> sessionContext;
 	private final PojoRuntimeIntrospector introspector;
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<PojoRawTypeIdentifier<?>, PojoIndexedTypeIndexingPlan<?, ?>> indexedTypeDelegates = new LinkedHashMap<>();
+	private final Map<PojoRawTypeIdentifier<?>, PojoIndexedTypeIndexingPlan<?, ?, R>> indexedTypeDelegates = new LinkedHashMap<>();
 	private final Map<PojoRawTypeIdentifier<?>, PojoContainedTypeIndexingPlan<?>> containedTypeDelegates = new LinkedHashMap<>();
 
 	private boolean isProcessing = false;
 
 	public PojoIndexingPlanImpl(PojoWorkIndexedTypeContextProvider indexedTypeContextProvider,
 			PojoWorkContainedTypeContextProvider containedTypeContextProvider,
-			PojoWorkSessionContext sessionContext,
+			PojoWorkSessionContext<R> sessionContext,
 			DocumentCommitStrategy commitStrategy,
 			DocumentRefreshStrategy refreshStrategy) {
 		this.indexedTypeContextProvider = indexedTypeContextProvider;
@@ -96,10 +96,10 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 			for ( PojoContainedTypeIndexingPlan<?> delegate : containedTypeDelegates.values() ) {
 				delegate.resolveDirty( this::updateBecauseOfContained );
 			}
-			for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : indexedTypeDelegates.values() ) {
+			for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
 				delegate.resolveDirty( this::updateBecauseOfContained );
 			}
-			for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : indexedTypeDelegates.values() ) {
+			for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
 				delegate.process();
 			}
 		}
@@ -109,11 +109,11 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 	}
 
 	@Override
-	public CompletableFuture<IndexIndexingPlanExecutionReport> executeAndReport() {
+	public CompletableFuture<IndexIndexingPlanExecutionReport<R>> executeAndReport() {
 		try {
 			process();
-			List<CompletableFuture<IndexIndexingPlanExecutionReport>> futures = new ArrayList<>();
-			for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : indexedTypeDelegates.values() ) {
+			List<CompletableFuture<IndexIndexingPlanExecutionReport<R>>> futures = new ArrayList<>();
+			for ( PojoIndexedTypeIndexingPlan<?, ?, R> delegate : indexedTypeDelegates.values() ) {
 				futures.add( delegate.executeAndReport() );
 			}
 			return IndexIndexingPlanExecutionReport.allOf( futures );
@@ -126,7 +126,7 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 	@Override
 	public void discard() {
 		try {
-			for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : indexedTypeDelegates.values() ) {
+			for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
 				delegate.discard();
 			}
 		}
@@ -137,7 +137,7 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 
 	@Override
 	public void discardNotProcessed() {
-		for ( PojoIndexedTypeIndexingPlan<?, ?> delegate : indexedTypeDelegates.values() ) {
+		for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
 			delegate.discardNotProcessed();
 		}
 	}
@@ -161,7 +161,7 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 		Optional<? extends PojoWorkIndexedTypeContext<?, ?>> indexedTypeContextOptional =
 				indexedTypeContextProvider.getByExactType( typeIdentifier );
 		if ( indexedTypeContextOptional.isPresent() ) {
-			PojoIndexedTypeIndexingPlan<?, ?> delegate = indexedTypeContextOptional.get()
+			PojoIndexedTypeIndexingPlan<?, ?, R> delegate = indexedTypeContextOptional.get()
 					.createIndexingPlan( sessionContext, commitStrategy, refreshStrategy );
 			indexedTypeDelegates.put( typeIdentifier, delegate );
 			return delegate;
@@ -179,8 +179,8 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 		throw log.notIndexedTypeNorAsDelegate( typeIdentifier );
 	}
 
-	private PojoIndexedTypeIndexingPlan<?, ?> getOrCreateIndexedDelegateForContainedUpdate(PojoRawTypeIdentifier<?> typeIdentifier) {
-		PojoIndexedTypeIndexingPlan<?, ?> delegate = indexedTypeDelegates.get( typeIdentifier );
+	private PojoIndexedTypeIndexingPlan<?, ?, ?> getOrCreateIndexedDelegateForContainedUpdate(PojoRawTypeIdentifier<?> typeIdentifier) {
+		PojoIndexedTypeIndexingPlan<?, ?, R> delegate = indexedTypeDelegates.get( typeIdentifier );
 		if ( delegate != null ) {
 			return delegate;
 		}
@@ -211,7 +211,7 @@ public class PojoIndexingPlanImpl implements PojoIndexingPlan {
 							+ " There is a bug in Hibernate Search, please report it."
 			);
 		}
-		PojoIndexedTypeIndexingPlan<?, ?> delegate = getOrCreateIndexedDelegateForContainedUpdate( typeIdentifier );
+		PojoIndexedTypeIndexingPlan<?, ?, ?> delegate = getOrCreateIndexedDelegateForContainedUpdate( typeIdentifier );
 		delegate.updateBecauseOfContained( containingEntity );
 	}
 

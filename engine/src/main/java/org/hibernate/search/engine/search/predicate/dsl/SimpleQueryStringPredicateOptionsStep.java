@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.engine.search.predicate.dsl;
 
+import java.util.Arrays;
+import java.util.EnumSet;
+import java.util.Set;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 
 /**
@@ -45,5 +48,23 @@ public interface SimpleQueryStringPredicateOptionsStep<S extends SimpleQueryStri
 	 * @return {@code this}, for method chaining.
 	 */
 	S skipAnalysis();
+
+	/**
+	 * Enable operation in the given flags.
+	 *
+	 * @param flags The operation flags.
+	 * @return {@code this}, for method chaining.
+	 */
+	default S flags(SimpleQueryFlag... flags) {
+		return flags( EnumSet.copyOf( Arrays.asList( flags ) ) );
+	}
+
+	/**
+	 * Enable operation in the given flags.
+	 *
+	 * @param flags The operation flags.
+	 * @return {@code this}, for method chaining.
+	 */
+	S flags(Set<SimpleQueryFlag> flags);
 
 }

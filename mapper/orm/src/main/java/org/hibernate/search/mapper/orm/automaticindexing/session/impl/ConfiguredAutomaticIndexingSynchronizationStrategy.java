@@ -8,15 +8,12 @@ package org.hibernate.search.mapper.orm.automaticindexing.session.impl;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationConfigurationContext;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlanExecutionReport;
 import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanExecutionReportImpl;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
@@ -27,13 +24,11 @@ public final class ConfiguredAutomaticIndexingSynchronizationStrategy {
 	private final DocumentCommitStrategy documentCommitStrategy;
 	private final DocumentRefreshStrategy documentRefreshStrategy;
 	private final Consumer<CompletableFuture<SearchIndexingPlanExecutionReport>> indexingFutureHandler;
-	private final Function<IndexIndexingPlanExecutionReport, SearchIndexingPlanExecutionReport> reportFactory;
 
 	private ConfiguredAutomaticIndexingSynchronizationStrategy(Builder configurationContext) {
 		this.documentCommitStrategy = configurationContext.documentCommitStrategy;
 		this.documentRefreshStrategy = configurationContext.documentRefreshStrategy;
 		this.indexingFutureHandler = configurationContext.indexingFutureHandler;
-		this.reportFactory = configurationContext.reportFactory;
 	}
 
 	public DocumentCommitStrategy getDocumentCommitStrategy() {
@@ -44,9 +39,9 @@ public final class ConfiguredAutomaticIndexingSynchronizationStrategy {
 		return documentRefreshStrategy;
 	}
 
-	public void executeAndSynchronize(PojoIndexingPlan indexingPlan) {
+	public void executeAndSynchronize(PojoIndexingPlan<EntityReference> indexingPlan) {
 		CompletableFuture<SearchIndexingPlanExecutionReport> reportFuture =
-				indexingPlan.executeAndReport().thenApply( reportFactory );
+				indexingPlan.executeAndReport().thenApply( SearchIndexingPlanExecutionReportImpl::from );
 		indexingFutureHandler.accept( reportFuture );
 	}
 
@@ -54,17 +49,14 @@ public final class ConfiguredAutomaticIndexingSynchronizationStrategy {
 			implements AutomaticIndexingSynchronizationConfigurationContext {
 
 		private final FailureHandler failureHandler;
-		private final Function<IndexIndexingPlanExecutionReport, SearchIndexingPlanExecutionReport> reportFactory;
 
 		private DocumentCommitStrategy documentCommitStrategy = DocumentCommitStrategy.NONE;
 		private DocumentRefreshStrategy documentRefreshStrategy = DocumentRefreshStrategy.NONE;
 		private Consumer<CompletableFuture<SearchIndexingPlanExecutionReport>> indexingFutureHandler = future -> {
 		};
 
-		public Builder(FailureHandler failureHandler,
-				DocumentReferenceConverter<EntityReference> documentReferenceConverter) {
+		public Builder(FailureHandler failureHandler) {
 			this.failureHandler = failureHandler;
-			this.reportFactory = SearchIndexingPlanExecutionReportImpl.factory( documentReferenceConverter );
 		}
 
 		@Override

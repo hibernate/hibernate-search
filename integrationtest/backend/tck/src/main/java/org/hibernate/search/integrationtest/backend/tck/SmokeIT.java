@@ -255,7 +255,7 @@ public class SmokeIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), document -> {
 			document.addValue( indexMapping.string, "text 1" );
 			document.addValue( indexMapping.string_analyzed, "text 1" );

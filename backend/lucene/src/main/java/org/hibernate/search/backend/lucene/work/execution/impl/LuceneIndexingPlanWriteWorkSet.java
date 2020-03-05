@@ -12,25 +12,26 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkProcessor;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkSet;
-import org.hibernate.search.backend.lucene.search.impl.LuceneDocumentReference;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSingleDocumentWriteWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 
-class LuceneIndexingPlanWriteWorkSet implements LuceneWriteWorkSet {
-	private final String indexName;
+class LuceneIndexingPlanWriteWorkSet<R> implements LuceneWriteWorkSet {
 	private final List<LuceneSingleDocumentWriteWork<?>> works;
-	private final CompletableFuture<IndexIndexingPlanExecutionReport> indexingPlanFuture;
+	private final EntityReferenceFactory<R> entityReferenceFactory;
+	private final CompletableFuture<IndexIndexingPlanExecutionReport<R>> indexingPlanFuture;
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 
-	LuceneIndexingPlanWriteWorkSet(String indexName, List<LuceneSingleDocumentWriteWork<?>> works,
-			CompletableFuture<IndexIndexingPlanExecutionReport> indexingPlanFuture,
+	LuceneIndexingPlanWriteWorkSet(List<LuceneSingleDocumentWriteWork<?>> works,
+			EntityReferenceFactory<R> entityReferenceFactory,
+			CompletableFuture<IndexIndexingPlanExecutionReport<R>> indexingPlanFuture,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		this.indexName = indexName;
 		this.works = new ArrayList<>( works );
+		this.entityReferenceFactory = entityReferenceFactory;
 		this.indexingPlanFuture = indexingPlanFuture;
 		this.commitStrategy = commitStrategy;
 		this.refreshStrategy = refreshStrategy;
@@ -38,7 +39,7 @@ class LuceneIndexingPlanWriteWorkSet implements LuceneWriteWorkSet {
 
 	@Override
 	public void submitTo(LuceneWriteWorkProcessor processor) {
-		IndexIndexingPlanExecutionReport.Builder reportBuilder = IndexIndexingPlanExecutionReport.builder();
+		IndexIndexingPlanExecutionReport.Builder<R> reportBuilder = IndexIndexingPlanExecutionReport.builder();
 
 		processor.beforeWorkSet( commitStrategy, refreshStrategy );
 
@@ -65,17 +66,19 @@ class LuceneIndexingPlanWriteWorkSet implements LuceneWriteWorkSet {
 			}
 		}
 
-		if ( throwable == null ) {
-			indexingPlanFuture.complete( reportBuilder.build() );
-		}
-		else {
+		if ( throwable != null ) {
 			// Even if some works succeeded, there's no guarantee they were actually committed to the index.
 			// Report all works as uncommitted.
 			for ( LuceneSingleDocumentWriteWork<?> work : works ) {
-				reportBuilder.failingDocument( new LuceneDocumentReference( indexName, work.getDocumentId() ) );
+				reportBuilder.failingEntityReference(
+						entityReferenceFactory,
+						work.getEntityTypeName(),
+						work.getEntityIdentifier()
+				);
 			}
-			indexingPlanFuture.complete( reportBuilder.build() );
 		}
+
+		indexingPlanFuture.complete( reportBuilder.build() );
 	}
 
 	@Override

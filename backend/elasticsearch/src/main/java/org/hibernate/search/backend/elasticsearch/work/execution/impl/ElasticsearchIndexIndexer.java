@@ -46,7 +46,7 @@ public class ElasticsearchIndexIndexer implements IndexIndexer {
 		JsonObject document = indexManagerContext.createDocument( tenantId, id, documentContributor );
 
 		ElasticsearchWork<Void> work = factory.index(
-				indexManagerContext.getMappedTypeName(),
+				indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
 				indexManagerContext.getElasticsearchIndexWriteName(),
 				URLEncodedString.fromString( elasticsearchId ), routingKey, document
 		)

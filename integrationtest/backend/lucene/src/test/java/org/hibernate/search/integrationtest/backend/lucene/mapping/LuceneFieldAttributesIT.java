@@ -121,7 +121,7 @@ public class LuceneFieldAttributesIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "ID:1" ), document -> {
 			document.addValue( indexMapping.string, "keyword" );
 			document.addValue( indexMapping.text, TEXT );

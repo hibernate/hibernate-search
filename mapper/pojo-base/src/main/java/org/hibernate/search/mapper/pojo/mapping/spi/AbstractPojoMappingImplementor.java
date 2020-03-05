@@ -65,13 +65,13 @@ public abstract class AbstractPojoMappingImplementor<M>
 	}
 
 	@Override
-	public PojoIndexingPlan createIndexingPlan(PojoWorkSessionContext context, DocumentCommitStrategy commitStrategy,
-			DocumentRefreshStrategy refreshStrategy) {
+	public <R> PojoIndexingPlan<R> createIndexingPlan(PojoWorkSessionContext<R> context,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return delegate.createIndexingPlan( context, commitStrategy, refreshStrategy );
 	}
 
 	@Override
-	public PojoIndexer createIndexer(PojoWorkSessionContext context, DocumentCommitStrategy commitStrategy) {
+	public PojoIndexer createIndexer(PojoWorkSessionContext<?> context, DocumentCommitStrategy commitStrategy) {
 		return delegate.createIndexer( context, commitStrategy );
 	}
 

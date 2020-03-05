@@ -142,7 +142,7 @@ public class MatchIdWithConverterSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> { } );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> { } );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> { } );

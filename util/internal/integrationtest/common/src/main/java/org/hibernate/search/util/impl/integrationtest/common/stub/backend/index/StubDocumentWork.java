@@ -24,6 +24,7 @@ public final class StubDocumentWork {
 	private final String tenantIdentifier;
 	private final String identifier;
 	private final String routingKey;
+	private final Object entityIdentifier;
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 	private final StubDocumentNode document;
@@ -33,6 +34,7 @@ public final class StubDocumentWork {
 		this.tenantIdentifier = builder.tenantIdentifier;
 		this.identifier = builder.identifier;
 		this.routingKey = builder.routingKey;
+		this.entityIdentifier = builder.entityIdentifier;
 		this.commitStrategy = builder.commitStrategy;
 		this.refreshStrategy = builder.refreshStrategy;
 		this.document = builder.document;
@@ -48,6 +50,10 @@ public final class StubDocumentWork {
 
 	public String getIdentifier() {
 		return identifier;
+	}
+
+	public Object getEntityIdentifier() {
+		return entityIdentifier;
 	}
 
 	public String getRoutingKey() {
@@ -85,6 +91,7 @@ public final class StubDocumentWork {
 		private String tenantIdentifier;
 		private String identifier;
 		private String routingKey;
+		private Object entityIdentifier;
 		private DocumentCommitStrategy commitStrategy;
 		private DocumentRefreshStrategy refreshStrategy;
 		private StubDocumentNode document;
@@ -105,6 +112,11 @@ public final class StubDocumentWork {
 
 		public Builder routingKey(String routingKey) {
 			this.routingKey = routingKey;
+			return this;
+		}
+
+		public Builder entityIdentifier(Object entityIdentifier) {
+			this.entityIdentifier = entityIdentifier;
 			return this;
 		}
 

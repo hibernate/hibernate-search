@@ -590,7 +590,7 @@ public class SearchSortIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		// Important: do not index the documents in the expected order after sorts
 		plan.add( referenceProvider( SECOND_ID ), document -> {
 			GeoPoint geoPoint = GeoPoint.of( 45.7705687, 4.835233 );

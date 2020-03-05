@@ -28,7 +28,7 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
  * <p>
  * Implementations may not be thread-safe.
  */
-public interface PojoIndexingPlan {
+public interface PojoIndexingPlan<R> {
 
 	/**
 	 * Add an entity to the index, assuming that the entity is absent from the index.
@@ -117,7 +117,7 @@ public interface PojoIndexingPlan {
 	 *
 	 * @return A {@link CompletableFuture} that will be completed with an execution report when all the works are complete.
 	 */
-	CompletableFuture<IndexIndexingPlanExecutionReport> executeAndReport();
+	CompletableFuture<IndexIndexingPlanExecutionReport<R>> executeAndReport();
 
 	/**
 	 * Discard all plans of indexing.

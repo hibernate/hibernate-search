@@ -32,6 +32,7 @@ atlassian-ide-plugin.xml
 # NetBeans specific files/directories
 .nbattrs
 nb-configuration.xml
+licenseheader.txt
 
 # Sublime
 *.sublime-*

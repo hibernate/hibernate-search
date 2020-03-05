@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -19,15 +20,16 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubDocumentReference;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.StubDocumentNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 
-class StubIndexIndexingPlan implements IndexIndexingPlan {
+class StubIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	private final String indexName;
+	private final String typeName;
 	private final StubBackendBehavior behavior;
 	private final BackendSessionContext sessionContext;
+	private final EntityReferenceFactory<R> entityReferenceFactory;
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 
@@ -35,11 +37,16 @@ class StubIndexIndexingPlan implements IndexIndexingPlan {
 
 	private int preparedIndex = 0;
 
-	StubIndexIndexingPlan(String indexName, StubBackendBehavior behavior, BackendSessionContext sessionContext,
+	StubIndexIndexingPlan(String indexName, String typeName,
+			StubBackendBehavior behavior,
+			BackendSessionContext sessionContext,
+			EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		this.sessionContext = sessionContext;
 		this.indexName = indexName;
+		this.typeName = typeName;
+		this.sessionContext = sessionContext;
 		this.behavior = behavior;
+		this.entityReferenceFactory = entityReferenceFactory;
 		this.commitStrategy = commitStrategy;
 		this.refreshStrategy = refreshStrategy;
 	}
@@ -90,7 +97,7 @@ class StubIndexIndexingPlan implements IndexIndexingPlan {
 	}
 
 	@Override
-	public CompletableFuture<IndexIndexingPlanExecutionReport> executeAndReport() {
+	public CompletableFuture<IndexIndexingPlanExecutionReport<R>> executeAndReport() {
 		process();
 		List<StubDocumentWork> worksToExecute = new ArrayList<>( works );
 		works.clear();
@@ -105,16 +112,16 @@ class StubIndexIndexingPlan implements IndexIndexingPlan {
 				} ) );
 	}
 
-	private IndexIndexingPlanExecutionReport buildResult(List<StubDocumentWork> worksToExecute,
+	private IndexIndexingPlanExecutionReport<R> buildResult(List<StubDocumentWork> worksToExecute,
 			CompletableFuture<?>[] finishedWorkFutures) {
-		IndexIndexingPlanExecutionReport.Builder builder = IndexIndexingPlanExecutionReport.builder();
+		IndexIndexingPlanExecutionReport.Builder<R> builder = IndexIndexingPlanExecutionReport.builder();
 		for ( int i = 0; i < finishedWorkFutures.length; i++ ) {
 			CompletableFuture<?> future = finishedWorkFutures[i];
 			if ( future.isCompletedExceptionally() ) {
 				builder.throwable( Futures.getThrowableNow( future ) );
 				StubDocumentWork work = worksToExecute.get( i );
-				builder.failingDocument(
-						new StubDocumentReference( indexName, work.getIdentifier() )
+				builder.failingEntityReference(
+						entityReferenceFactory.createEntityReference( typeName, work.getEntityIdentifier() )
 				);
 			}
 		}
@@ -133,6 +140,7 @@ class StubIndexIndexingPlan implements IndexIndexingPlan {
 		builder.tenantIdentifier( sessionContext.getTenantIdentifier() );
 		builder.identifier( documentReferenceProvider.getIdentifier() );
 		builder.routingKey( documentReferenceProvider.getRoutingKey() );
+		builder.entityIdentifier( documentReferenceProvider.getEntityIdentifier() );
 	}
 
 	private void addWork(StubDocumentWork work) {

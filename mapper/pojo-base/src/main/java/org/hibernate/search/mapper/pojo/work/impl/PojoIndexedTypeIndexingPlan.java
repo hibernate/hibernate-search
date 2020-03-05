@@ -22,18 +22,19 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 /**
  * @param <I> The identifier type for the mapped entity type.
  * @param <E> The entity type mapped to the index.
+ * @param <R> The type of entity references returned in the {@link #executeAndReport() failure report}.
  */
-public class PojoIndexedTypeIndexingPlan<I, E> extends AbstractPojoTypeIndexingPlan {
+public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexingPlan {
 
 	private final PojoWorkIndexedTypeContext<I, E> typeContext;
-	private final IndexIndexingPlan delegate;
+	private final IndexIndexingPlan<R> delegate;
 
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<I, IndexedEntityIndexingPlan> indexingPlansPerId = new LinkedHashMap<>();
 
 	public PojoIndexedTypeIndexingPlan(PojoWorkIndexedTypeContext<I, E> typeContext,
-			PojoWorkSessionContext sessionContext,
-			IndexIndexingPlan delegate) {
+			PojoWorkSessionContext<?> sessionContext,
+			IndexIndexingPlan<R> delegate) {
 		super( sessionContext );
 		this.typeContext = typeContext;
 		this.delegate = delegate;
@@ -93,7 +94,7 @@ public class PojoIndexedTypeIndexingPlan<I, E> extends AbstractPojoTypeIndexingP
 		getDelegate().process();
 	}
 
-	CompletableFuture<IndexIndexingPlanExecutionReport> executeAndReport() {
+	CompletableFuture<IndexIndexingPlanExecutionReport<R>> executeAndReport() {
 		sendCommandsToDelegate();
 		/*
 		 * No need to call prepare() here:
@@ -119,7 +120,7 @@ public class PojoIndexedTypeIndexingPlan<I, E> extends AbstractPojoTypeIndexingP
 		return plan;
 	}
 
-	private IndexIndexingPlan getDelegate() {
+	private IndexIndexingPlan<?> getDelegate() {
 		return delegate;
 	}
 

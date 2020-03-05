@@ -76,16 +76,17 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
-	public PojoIndexingPlan createIndexingPlan(PojoWorkSessionContext context, DocumentCommitStrategy commitStrategy,
+	public <R> PojoIndexingPlan<R> createIndexingPlan(PojoWorkSessionContext<R> context,
+			DocumentCommitStrategy commitStrategy,
 			DocumentRefreshStrategy refreshStrategy) {
-		return new PojoIndexingPlanImpl(
+		return new PojoIndexingPlanImpl<>(
 				indexedTypeManagers, containedTypeManagers,
 				context, commitStrategy, refreshStrategy
 		);
 	}
 
 	@Override
-	public PojoIndexer createIndexer(PojoWorkSessionContext context, DocumentCommitStrategy commitStrategy) {
+	public PojoIndexer createIndexer(PojoWorkSessionContext<?> context, DocumentCommitStrategy commitStrategy) {
 		return new PojoIndexerImpl(
 				indexedTypeManagers,
 				context, commitStrategy

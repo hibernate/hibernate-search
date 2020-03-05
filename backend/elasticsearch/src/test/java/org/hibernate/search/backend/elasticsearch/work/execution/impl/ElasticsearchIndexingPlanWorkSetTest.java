@@ -11,12 +11,12 @@ import static org.easymock.EasyMock.expect;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkProcessor;
-import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchDocumentReference;
 import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentElasticsearchWork;
-import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 import org.hibernate.search.util.impl.test.FutureAssert;
 
@@ -31,11 +31,14 @@ import org.easymock.EasyMockSupport;
  */
 public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 
-	private static final String INDEX_NAME = "SomeIndexName";
+	private static final String TYPE_NAME = "SomeTypeName";
 
 	private ElasticsearchWorkProcessor processorMock = createStrictMock( ElasticsearchWorkProcessor.class );
 
 	private List<SingleDocumentElasticsearchWork<Void>> workMocks = new ArrayList<>();
+
+	private EntityReferenceFactory<StubEntityReference> entityReferenceFactoryMock =
+			createStrictMock( EntityReferenceFactory.class );
 
 	@Test
 	public void success() {
@@ -43,10 +46,11 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 		CompletableFuture<Void> work1Future = new CompletableFuture<>();
 		CompletableFuture<Void> work2Future = new CompletableFuture<>();
 		CompletableFuture<Void> workSequenceFuture = new CompletableFuture<>();
-		CompletableFuture<IndexIndexingPlanExecutionReport> workSetFuture = new CompletableFuture<>();
+		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> workSetFuture =
+				new CompletableFuture<>();
 
-		ElasticsearchIndexingPlanWorkSet workSet = new ElasticsearchIndexingPlanWorkSet(
-				createWorkMocks( 3 ), workSetFuture
+		ElasticsearchIndexingPlanWorkSet<StubEntityReference> workSet = new ElasticsearchIndexingPlanWorkSet<>(
+				createWorkMocks( 3 ), entityReferenceFactoryMock, workSetFuture
 		);
 
 		FutureAssert.assertThat( workSetFuture ).isPending();
@@ -79,17 +83,18 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 			assertThat( report ).isNotNull();
 			SoftAssertions.assertSoftly( softly -> {
 				softly.assertThat( report.getThrowable() ).isEmpty();
-				softly.assertThat( report.getFailingDocuments() ).isEmpty();
+				softly.assertThat( report.getFailingEntityReferences() ).isEmpty();
 			} );
 		} );
 	}
 
 	@Test
 	public void markAsFailed() {
-		CompletableFuture<IndexIndexingPlanExecutionReport> workSetFuture = new CompletableFuture<>();
+		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> workSetFuture =
+				new CompletableFuture<>();
 
-		ElasticsearchIndexingPlanWorkSet workSet = new ElasticsearchIndexingPlanWorkSet(
-				createWorkMocks( 3 ), workSetFuture
+		ElasticsearchIndexingPlanWorkSet<StubEntityReference> workSet = new ElasticsearchIndexingPlanWorkSet<>(
+				createWorkMocks( 3 ), entityReferenceFactoryMock, workSetFuture
 		);
 
 		FutureAssert.assertThat( workSetFuture ).isPending();
@@ -110,10 +115,11 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 		CompletableFuture<Void> work1Future = new CompletableFuture<>();
 		CompletableFuture<Void> work2Future = new CompletableFuture<>();
 		CompletableFuture<Void> workSequenceFuture = new CompletableFuture<>();
-		CompletableFuture<IndexIndexingPlanExecutionReport> workSetFuture = new CompletableFuture<>();
+		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> workSetFuture =
+				new CompletableFuture<>();
 
-		ElasticsearchIndexingPlanWorkSet workSet = new ElasticsearchIndexingPlanWorkSet(
-				createWorkMocks( 3 ), workSetFuture
+		ElasticsearchIndexingPlanWorkSet<StubEntityReference> workSet = new ElasticsearchIndexingPlanWorkSet<>(
+				createWorkMocks( 3 ), entityReferenceFactoryMock, workSetFuture
 		);
 
 		FutureAssert.assertThat( workSetFuture ).isPending();
@@ -132,7 +138,7 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 
 		RuntimeException workException = new RuntimeException( "Some message" );
 		resetAll();
-		expectWorkGetInfo( 0, 1, 2 );
+		expectWorkGetInfo( 1 );
 		replayAll();
 		work0Future.complete( null );
 		FutureAssert.assertThat( workSetFuture ).isPending();
@@ -148,10 +154,10 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 			assertThat( report ).isNotNull();
 			SoftAssertions.assertSoftly( softly -> {
 				softly.assertThat( report.getThrowable() ).containsSame( workException );
-				softly.assertThat( report.getFailingDocuments() )
+				softly.assertThat( report.getFailingEntityReferences() )
 						.containsExactly(
 								// Only documents whose indexing failed
-								docReference( 1 )
+								entityReference( 1 )
 						);
 			} );
 		} );
@@ -165,10 +171,11 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 		CompletableFuture<Void> work3Future = new CompletableFuture<>();
 		CompletableFuture<Void> work4Future = new CompletableFuture<>();
 		CompletableFuture<Void> workSequenceFuture = new CompletableFuture<>();
-		CompletableFuture<IndexIndexingPlanExecutionReport> workSetFuture = new CompletableFuture<>();
+		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> workSetFuture =
+				new CompletableFuture<>();
 
-		ElasticsearchIndexingPlanWorkSet workSet = new ElasticsearchIndexingPlanWorkSet(
-				createWorkMocks( 5 ), workSetFuture
+		ElasticsearchIndexingPlanWorkSet<StubEntityReference> workSet = new ElasticsearchIndexingPlanWorkSet<>(
+				createWorkMocks( 5 ), entityReferenceFactoryMock, workSetFuture
 		);
 
 		FutureAssert.assertThat( workSetFuture ).isPending();
@@ -190,7 +197,7 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 		RuntimeException work1Exception = new RuntimeException( "Some message" );
 		RuntimeException work3Exception = new RuntimeException( "Some message" );
 		resetAll();
-		expectWorkGetInfo( 0, 1, 2, 3, 4 );
+		expectWorkGetInfo( 1, 3 );
 		replayAll();
 		work0Future.complete( null );
 		FutureAssert.assertThat( workSetFuture ).isPending();
@@ -211,10 +218,10 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 			SoftAssertions.assertSoftly( softly -> {
 				softly.assertThat( report.getThrowable() ).containsSame( work1Exception );
 				softly.assertThat( work1Exception ).hasSuppressedException( work3Exception );
-				softly.assertThat( report.getFailingDocuments() )
+				softly.assertThat( report.getFailingEntityReferences() )
 						.containsExactly(
 								// Only documents whose indexing failed
-								docReference( 1 ), docReference( 3 )
+								entityReference( 1 ), entityReference( 3 )
 						);
 			} );
 		} );
@@ -226,10 +233,11 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 		CompletableFuture<Void> work1Future = new CompletableFuture<>();
 		CompletableFuture<Void> work2Future = new CompletableFuture<>();
 		CompletableFuture<Void> workSequenceFuture = new CompletableFuture<>();
-		CompletableFuture<IndexIndexingPlanExecutionReport> workSetFuture = new CompletableFuture<>();
+		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> workSetFuture =
+				new CompletableFuture<>();
 
-		ElasticsearchIndexingPlanWorkSet workSet = new ElasticsearchIndexingPlanWorkSet(
-				createWorkMocks( 3 ), workSetFuture
+		ElasticsearchIndexingPlanWorkSet<StubEntityReference> workSet = new ElasticsearchIndexingPlanWorkSet<>(
+				createWorkMocks( 3 ), entityReferenceFactoryMock, workSetFuture
 		);
 
 		FutureAssert.assertThat( workSetFuture ).isPending();
@@ -248,7 +256,6 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 
 		RuntimeException sequenceException = new RuntimeException( "Some other message" );
 		resetAll();
-		expectWorkGetInfo( 0, 1, 2 );
 		replayAll();
 		work0Future.complete( null );
 		FutureAssert.assertThat( workSetFuture ).isPending();
@@ -264,7 +271,7 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 			assertThat( report ).isNotNull();
 			SoftAssertions.assertSoftly( softly -> {
 				softly.assertThat( report.getThrowable() ).containsSame( sequenceException );
-				softly.assertThat( report.getFailingDocuments() )
+				softly.assertThat( report.getFailingEntityReferences() )
 						// No indexing failed. Happens for example when forcing refresh fails.
 						.isEmpty();
 			} );
@@ -277,10 +284,11 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 		CompletableFuture<Void> work1Future = new CompletableFuture<>();
 		CompletableFuture<Void> work2Future = new CompletableFuture<>();
 		CompletableFuture<Void> workSequenceFuture = new CompletableFuture<>();
-		CompletableFuture<IndexIndexingPlanExecutionReport> workSetFuture = new CompletableFuture<>();
+		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> workSetFuture =
+				new CompletableFuture<>();
 
-		ElasticsearchIndexingPlanWorkSet workSet = new ElasticsearchIndexingPlanWorkSet(
-				createWorkMocks( 3 ), workSetFuture
+		ElasticsearchIndexingPlanWorkSet<StubEntityReference> workSet = new ElasticsearchIndexingPlanWorkSet<>(
+				createWorkMocks( 3 ), entityReferenceFactoryMock, workSetFuture
 		);
 
 		FutureAssert.assertThat( workSetFuture ).isPending();
@@ -300,7 +308,7 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 		RuntimeException workException = new RuntimeException( "Some message" );
 		RuntimeException sequenceException = new RuntimeException( "Some other message" );
 		resetAll();
-		expectWorkGetInfo( 0, 1, 2 );
+		expectWorkGetInfo( 1 );
 		replayAll();
 		work0Future.complete( null );
 		FutureAssert.assertThat( workSetFuture ).isPending();
@@ -317,10 +325,78 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 			SoftAssertions.assertSoftly( softly -> {
 				softly.assertThat( report.getThrowable() ).containsSame( workException );
 				softly.assertThat( workException ).hasSuppressedException( sequenceException );
-				softly.assertThat( report.getFailingDocuments() )
+				softly.assertThat( report.getFailingEntityReferences() )
 						.containsExactly(
 								// Only documents whose indexing failed
-								docReference( 1 )
+								entityReference( 1 )
+						);
+			} );
+		} );
+	}
+
+	@Test
+	public void failure_workAndCreateEntityReference() {
+		CompletableFuture<Void> work0Future = new CompletableFuture<>();
+		CompletableFuture<Void> work1Future = new CompletableFuture<>();
+		CompletableFuture<Void> work2Future = new CompletableFuture<>();
+		CompletableFuture<Void> work3Future = new CompletableFuture<>();
+		CompletableFuture<Void> work4Future = new CompletableFuture<>();
+		CompletableFuture<Void> workSequenceFuture = new CompletableFuture<>();
+		CompletableFuture<IndexIndexingPlanExecutionReport<StubEntityReference>> workSetFuture =
+				new CompletableFuture<>();
+
+		ElasticsearchIndexingPlanWorkSet<StubEntityReference> workSet = new ElasticsearchIndexingPlanWorkSet<>(
+				createWorkMocks( 5 ), entityReferenceFactoryMock, workSetFuture
+		);
+
+		FutureAssert.assertThat( workSetFuture ).isPending();
+
+		resetAll();
+		processorMock.beforeWorkSet();
+		expect( processorMock.submit( workMocks.get( 0 ) ) ).andReturn( work0Future );
+		expect( processorMock.submit( workMocks.get( 1 ) ) ).andReturn( work1Future );
+		expect( processorMock.submit( workMocks.get( 2 ) ) ).andReturn( work2Future );
+		expect( processorMock.submit( workMocks.get( 3 ) ) ).andReturn( work3Future );
+		expect( processorMock.submit( workMocks.get( 4 ) ) ).andReturn( work4Future );
+		expect( processorMock.afterWorkSet() ).andReturn( workSequenceFuture );
+		replayAll();
+		workSet.submitTo( processorMock );
+		verifyAll();
+
+		FutureAssert.assertThat( workSetFuture ).isPending();
+
+		RuntimeException work1Exception = new RuntimeException( "Some message" );
+		RuntimeException work3Exception = new RuntimeException( "Some message" );
+		RuntimeException entityReferenceFactoryException = new RuntimeException( "EntityReferenceFactory message" );
+		resetAll();
+		expectFailingWorkGetInfo( 1, entityReferenceFactoryException );
+		expectWorkGetInfo( 3 );
+		replayAll();
+		work0Future.complete( null );
+		FutureAssert.assertThat( workSetFuture ).isPending();
+		work1Future.completeExceptionally( work1Exception );
+		FutureAssert.assertThat( workSetFuture ).isPending();
+		work2Future.complete( null );
+		FutureAssert.assertThat( workSetFuture ).isPending();
+		work3Future.completeExceptionally( work3Exception );
+		FutureAssert.assertThat( workSetFuture ).isPending();
+		work4Future.complete( null );
+		FutureAssert.assertThat( workSetFuture ).isPending();
+		// If a work fails, the sequence future will be completed with the same exception
+		workSequenceFuture.completeExceptionally( work1Exception );
+		verifyAll();
+
+		FutureAssert.assertThat( workSetFuture ).isSuccessful( report -> {
+			assertThat( report ).isNotNull();
+			SoftAssertions.assertSoftly( softly -> {
+				softly.assertThat( report.getThrowable() ).containsSame( work1Exception );
+				softly.assertThat( work1Exception ).hasSuppressedException( work3Exception );
+				softly.assertThat( work1Exception ).hasSuppressedException( entityReferenceFactoryException );
+				softly.assertThat( report.getFailingEntityReferences() )
+						.containsExactly(
+								// Only documents whose indexing failed
+								// ... except the one that we could not convert to an entity reference
+								entityReference( 3 )
 						);
 			} );
 		} );
@@ -330,8 +406,20 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 		for ( int id : ids ) {
 			SingleDocumentElasticsearchWork<?> workMock = workMocks.get( id );
 			EasyMock.expect( workMock.getInfo() ).andStubReturn( workInfo( id ) );
-			EasyMock.expect( workMock.getDocumentReference() ).andStubReturn( docReference( id ) );
+			EasyMock.expect( workMock.getEntityTypeName() ).andStubReturn( TYPE_NAME );
+			EasyMock.expect( workMock.getEntityIdentifier() ).andStubReturn( id );
+			EasyMock.expect( entityReferenceFactoryMock.createEntityReference( TYPE_NAME, id ) )
+					.andReturn( entityReference( id ) );
 		}
+	}
+
+	private void expectFailingWorkGetInfo(int id, Throwable thrown) {
+		SingleDocumentElasticsearchWork<?> workMock = workMocks.get( id );
+		EasyMock.expect( workMock.getInfo() ).andStubReturn( workInfo( id ) );
+		EasyMock.expect( workMock.getEntityTypeName() ).andStubReturn( TYPE_NAME );
+		EasyMock.expect( workMock.getEntityIdentifier() ).andStubReturn( id );
+		EasyMock.expect( entityReferenceFactoryMock.createEntityReference( TYPE_NAME, id ) )
+				.andThrow( thrown );
 	}
 
 	private List<SingleDocumentElasticsearchWork<?>> createWorkMocks(int count) {
@@ -349,12 +437,47 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 		return workMock;
 	}
 
-	private DocumentReference docReference(int id) {
-		return new ElasticsearchDocumentReference( INDEX_NAME, String.valueOf( id ) );
+	private StubEntityReference entityReference(int id) {
+		return new StubEntityReference( TYPE_NAME, id );
 	}
 
 	private String workInfo(int index) {
 		return "work_" + index;
 	}
 
+	private static class StubEntityReference {
+		private final String typeName;
+		private final Object identifier;
+
+		private StubEntityReference(String typeName, Object identifier) {
+			this.typeName = typeName;
+			this.identifier = identifier;
+		}
+
+		@Override
+		public String toString() {
+			return "StubEntityReference{" +
+					"typeName='" + typeName + '\'' +
+					", identifier=" + identifier +
+					'}';
+		}
+
+		@Override
+		public boolean equals(Object o) {
+			if ( this == o ) {
+				return true;
+			}
+			if ( o == null || getClass() != o.getClass() ) {
+				return false;
+			}
+			StubEntityReference that = (StubEntityReference) o;
+			return Objects.equals( typeName, that.typeName ) &&
+					Objects.equals( identifier, that.identifier );
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash( typeName, identifier );
+		}
+	}
 }

@@ -87,7 +87,7 @@ public class IndexingFieldTypesIT<F> {
 		List<IdAndValue<F>> expectedDocuments = new ArrayList<>();
 
 		// Index all values, each in its own document
-		IndexIndexingPlan plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		for ( int i = 0; i < values.size(); i++ ) {
 			String documentId = "document_" + i;
 			F value = values.get( i );

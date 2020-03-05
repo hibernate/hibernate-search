@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.mapper.mapping.spi;
 
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
@@ -26,10 +27,12 @@ public interface MappedIndexManager {
 
 	IndexManager toAPI();
 
-	IndexIndexingPlan createIndexingPlan(BackendSessionContext sessionContext,
+	<R> IndexIndexingPlan<R> createIndexingPlan(BackendSessionContext sessionContext,
+			EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
 	IndexIndexer createIndexer(BackendSessionContext sessionContext,
+			EntityReferenceFactory<?> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy);
 
 	IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext);

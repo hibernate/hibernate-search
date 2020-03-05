@@ -30,26 +30,26 @@ public interface PojoWorkIndexedTypeContext<I, E> {
 
 	IdentifierMappingImplementor<I, E> getIdentifierMapping();
 
-	Supplier<E> toEntitySupplier(PojoWorkSessionContext sessionContext, Object entity);
+	Supplier<E> toEntitySupplier(PojoWorkSessionContext<?> sessionContext, Object entity);
 
-	DocumentReferenceProvider toDocumentReferenceProvider(PojoWorkSessionContext sessionContext,
+	DocumentReferenceProvider toDocumentReferenceProvider(PojoWorkSessionContext<?> sessionContext,
 			I identifier, Supplier<E> entitySupplier);
 
-	DocumentReferenceProvider toDocumentReferenceProvider(PojoWorkSessionContext sessionContext,
+	DocumentReferenceProvider toDocumentReferenceProvider(PojoWorkSessionContext<?> sessionContext,
 			I identifier, String providedRoutingKey);
 
 	PojoDocumentContributor<E> toDocumentContributor(Supplier<E> entitySupplier,
-			PojoWorkSessionContext sessionContext);
+			PojoWorkSessionContext<?> sessionContext);
 
 	boolean requiresSelfReindexing(Set<String> dirtyPaths);
 
 	void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoRuntimeIntrospector runtimeIntrospector,
 			Supplier<E> entitySupplier, Set<String> dirtyPaths);
 
-	PojoIndexedTypeIndexingPlan<I, E> createIndexingPlan(PojoWorkSessionContext sessionContext,
+	<R> PojoIndexedTypeIndexingPlan<I, E, R> createIndexingPlan(PojoWorkSessionContext<R> sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
-	PojoTypeIndexer<I, E> createIndexer(PojoWorkSessionContext sessionContext,
+	PojoTypeIndexer<I, E> createIndexer(PojoWorkSessionContext<?> sessionContext,
 			DocumentCommitStrategy commitStrategy);
 
 	IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext);
