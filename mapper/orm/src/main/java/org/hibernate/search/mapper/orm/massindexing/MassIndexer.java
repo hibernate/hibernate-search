@@ -76,6 +76,25 @@ public interface MassIndexer {
 	MassIndexer mergeSegmentsAfterPurge(boolean enable);
 
 	/**
+	 * Drops the indexes and their schema (if they exist) and re-creates them before indexing.
+	 * <p>
+	 * Indexes will be unavailable for a short time during the dropping and re-creation,
+	 * so this should only be used when failures of concurrent operations on the indexes (automatic indexing, ...)
+	 * are acceptable.
+	 * <p>
+	 * This should be used when the existing schema is known to be obsolete, for example when the Hibernate Search mapping
+	 * changed and some fields now have a different type, a different analyzer, new capabilities (projectable, ...), etc.
+	 * <p>
+	 * This may also be used when the schema is up-to-date,
+	 * since it can be faster than a {@link #purgeAllOnStart(boolean) purge} on large indexes.
+	 * <p>
+	 * Defaults to {@code false}.
+	 * @param dropAndCreateSchema if {@code true} the indexes and their schema will be dropped then re-created before starting the indexing
+	 * @return {@code this} for method chaining
+	 */
+	MassIndexer dropAndCreateSchemaOnStart(boolean dropAndCreateSchema);
+
+	/**
 	 * Removes all entities from the indexes before indexing.
 	 * <p>
 	 * Set this to false only if you know there are no

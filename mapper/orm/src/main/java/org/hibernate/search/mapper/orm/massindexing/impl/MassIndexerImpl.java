@@ -149,6 +149,11 @@ public class MassIndexerImpl implements MassIndexer {
 	}
 
 	@Override
+	public MassIndexer dropAndCreateSchemaOnStart(boolean enable) {
+		throw new UnsupportedOperationException( "Not implemented yet" );
+	}
+
+	@Override
 	public MassIndexer purgeAllOnStart(boolean enable) {
 		this.purgeAtStart = enable;
 		return this;
