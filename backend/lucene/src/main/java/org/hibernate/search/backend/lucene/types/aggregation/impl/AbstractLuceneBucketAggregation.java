@@ -8,12 +8,10 @@ package org.hibernate.search.backend.lucene.types.aggregation.impl;
 
 import java.util.Map;
 import java.util.Set;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilder;
-import org.hibernate.search.engine.search.common.MultiValue;
 
 /**
  * @param <K> The type of keys in the returned map.

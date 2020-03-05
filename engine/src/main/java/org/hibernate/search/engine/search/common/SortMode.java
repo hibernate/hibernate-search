@@ -7,7 +7,7 @@
 package org.hibernate.search.engine.search.common;
 
 
-public enum MultiValue {
+public enum SortMode {
 
 	/**
 	 * Multivalue the sum of all the values.
