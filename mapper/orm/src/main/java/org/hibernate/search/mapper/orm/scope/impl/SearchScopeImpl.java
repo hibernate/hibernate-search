@@ -100,6 +100,7 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 				mappingContext,
 				delegate.getIncludedIndexedTypes(),
 				detachedSessionContext,
+				delegate.schemaManager(),
 				delegate.workspace( detachedSessionContext )
 		);
 	}
