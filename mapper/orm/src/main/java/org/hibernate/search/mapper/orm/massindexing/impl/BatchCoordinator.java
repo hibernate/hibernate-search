@@ -16,6 +16,9 @@ import java.util.concurrent.Future;
 
 import org.hibernate.CacheMode;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
+import org.hibernate.search.mapper.orm.logging.impl.HibernateOrmEventContextMessages;
+import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
@@ -35,6 +38,7 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	private final DetachedBackendSessionContext sessionContext;
 	// Entity types to reindex, guaranteed not to be subtypes of each other.
 	private final Set<HibernateOrmMassIndexingIndexedTypeContext<?>> rootEntityTypes;
+	private final PojoScopeSchemaManager scopeSchemaManager;
 	private final PojoScopeWorkspace scopeWorkspace;
 
 	private final int typesToIndexInParallel;
@@ -42,6 +46,7 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	private final CacheMode cacheMode;
 	private final int objectLoadingBatchSize;
 	private final boolean mergeSegmentsOnFinish;
+	private final boolean dropAndCreateSchemaOnStart;
 	private final boolean purgeAtStart;
 	private final boolean mergeSegmentsAfterPurge;
 	private final long objectsLimit;
@@ -52,15 +57,17 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	BatchCoordinator(HibernateOrmMassIndexingMappingContext mappingContext,
 			DetachedBackendSessionContext sessionContext,
 			MassIndexingNotifier notifier,
-			Set<HibernateOrmMassIndexingIndexedTypeContext<?>> rootEntityTypes, PojoScopeWorkspace scopeWorkspace,
+			Set<HibernateOrmMassIndexingIndexedTypeContext<?>> rootEntityTypes,
+			PojoScopeSchemaManager scopeSchemaManager, PojoScopeWorkspace scopeWorkspace,
 			int typesToIndexInParallel, int documentBuilderThreads, CacheMode cacheMode,
 			int objectLoadingBatchSize, long objectsLimit, boolean mergeSegmentsOnFinish,
-			boolean purgeAtStart, boolean mergeSegmentsAfterPurge,
+			boolean dropAndCreateSchemaOnStart, boolean purgeAtStart, boolean mergeSegmentsAfterPurge,
 			int idFetchSize, Integer transactionTimeout) {
 		super( notifier );
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
 		this.rootEntityTypes = rootEntityTypes;
+		this.scopeSchemaManager = scopeSchemaManager;
 		this.scopeWorkspace = scopeWorkspace;
 
 		this.idFetchSize = idFetchSize;
@@ -70,6 +77,7 @@ public class BatchCoordinator extends FailureHandledRunnable {
 		this.cacheMode = cacheMode;
 		this.objectLoadingBatchSize = objectLoadingBatchSize;
 		this.mergeSegmentsOnFinish = mergeSegmentsOnFinish;
+		this.dropAndCreateSchemaOnStart = dropAndCreateSchemaOnStart;
 		this.purgeAtStart = purgeAtStart;
 		this.mergeSegmentsAfterPurge = mergeSegmentsAfterPurge;
 		this.objectsLimit = objectsLimit;
@@ -178,6 +186,14 @@ public class BatchCoordinator extends FailureHandledRunnable {
 	 * Optional operations to do before the multiple-threads start indexing
 	 */
 	private void beforeBatch() throws InterruptedException {
+		if ( this.dropAndCreateSchemaOnStart ) {
+			RootFailureCollector failureCollector = new RootFailureCollector(
+					HibernateOrmEventContextMessages.INSTANCE.schemaManagement()
+			);
+			Futures.unwrappedExceptionGet( scopeSchemaManager.dropAndCreate( failureCollector ) );
+			failureCollector.checkNoFailure();
+		}
+
 		if ( this.purgeAtStart ) {
 			Futures.unwrappedExceptionGet( scopeWorkspace.purge( Collections.emptySet() ) );
 			if ( this.mergeSegmentsAfterPurge ) {
