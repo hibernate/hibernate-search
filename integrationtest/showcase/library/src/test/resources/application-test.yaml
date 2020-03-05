@@ -5,7 +5,6 @@ spring.jpa:
     hibernate.search:
       schema_management.strategy: drop-and-create-and-drop
       automatic_indexing:
-        strategy: ${automatic_indexing.strategy}
         # This really is only for tests:
         # it makes documents searchable directly upon returning from a transaction,
         # but it also hurts performance.

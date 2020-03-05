@@ -29,7 +29,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@TestPropertySource(properties = { "automatic_indexing.strategy=none" })
+@TestPropertySource(properties = {
+		"spring.jpa.properties.hibernate.search.automatic_indexing.strategy=none"
+})
 @ActiveProfiles(resolver = TestActiveProfilesResolver.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class LibraryShowcaseMassIndexingIT {
