@@ -101,6 +101,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		stopBackendBehaviors.clear();
 		indexFieldAddBehaviors.clear();
 		schemaDefinitionCalls.clear();
+		schemaManagementWorkCall.clear();
 		documentWorkCalls.clear();
 		searchCalls.reset();
 	}
@@ -108,6 +109,7 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	void verifyExpectationsMet() {
 		// We don't check anything for the various behaviors (createBackendBehaviors, ...): they are ignored if they are not executed.
 		schemaDefinitionCalls.values().forEach( CallQueue::verifyExpectationsMet );
+		schemaManagementWorkCall.values().forEach( CallQueue::verifyExpectationsMet );
 		documentWorkCalls.values().forEach( CallQueue::verifyExpectationsMet );
 		searchCalls.verifyExpectationsMet();
 	}
