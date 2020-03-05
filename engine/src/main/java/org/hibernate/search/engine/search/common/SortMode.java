@@ -7,26 +7,29 @@
 package org.hibernate.search.engine.search.common;
 
 
+/**
+ * Defines how to pick the value to sort on for multi-valued fields.
+ */
 public enum SortMode {
 
 	/**
-	 * Multivalue the sum of all the values.
+	 * When a field has multiple values, compute the sum of all the values.
 	 */
 	SUM,
 	/**
-	 * Multivalue the lowest value.
+	 * When a field has multiple values, pick the lowest value.
 	 */
 	MIN,
 	/**
-	 * Multivalue the highest value.
+	 * When a field has multiple values, pick the highest value.
 	 */
 	MAX,
 	/**
-	 * Multivalue the average of all the values.
+	 * When a field has multiple values, compute the average of all the values.
 	 */
 	AVG,
 	/**
-	 * Multivalue the median of the values.
+	 * When a field has multiple values, compute the median of all the values.
 	 */
 	MEDIAN
 
