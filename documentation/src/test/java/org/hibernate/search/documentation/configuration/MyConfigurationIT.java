@@ -6,6 +6,9 @@
  */
 package org.hibernate.search.documentation.configuration;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
+
 import java.util.Properties;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
@@ -18,9 +21,11 @@ import org.hibernate.search.engine.cfg.IndexSettings;
 import org.hibernate.search.mapper.orm.automaticindexing.session.AutomaticIndexingSynchronizationStrategyNames;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 
-public class MyConfiguration {
+import org.junit.Test;
+
+public class MyConfigurationIT {
 	// tag::build-hibernate-configuration[]
-	protected Properties buildHibernateConfiguration() {
+	private Properties buildHibernateConfiguration() {
 		Properties config = new Properties();
 		// add hibernate configuration
 		String myBackend = "myBackend";
@@ -31,7 +36,7 @@ public class MyConfiguration {
 				BackendSettings.backendKey( myBackend, BackendSettings.TYPE ), ElasticsearchBackendSettings.TYPE_NAME );
 		config.put(
 				BackendSettings.backendKey( myBackend, ElasticsearchBackendSettings.MULTI_TENANCY_STRATEGY ),
-				MultiTenancyStrategyName.DISCRIMINATOR
+				MultiTenancyStrategyName.DISCRIMINATOR.getExternalRepresentation()
 		);
 		config.put( BackendSettings.backendKey( myBackend, ElasticsearchBackendSettings.VERSION ), "7.6" );
 		config.put(
@@ -39,7 +44,7 @@ public class MyConfiguration {
 		// index configuration
 		config.put(
 				IndexSettings.indexDefaultsKey( myBackend, ElasticsearchIndexSettings.LIFECYCLE_STRATEGY ),
-				IndexLifecycleStrategyName.NONE
+				IndexLifecycleStrategyName.NONE.getExternalRepresentation()
 		);
 		// orm configuration
 		config.put(
@@ -52,4 +57,21 @@ public class MyConfiguration {
 		return config;
 	}
 	// end::build-hibernate-configuration[]
+
+	@Test
+	public void shouldBuildHibernateConfiguration() {
+		assertThat( buildHibernateConfiguration() )
+				.containsOnly(
+						entry( "hibernate.search.backends.myBackend.hosts", "127.0.0.1:9200" ),
+						entry( "hibernate.search.backends.myBackend.protocol", "http" ),
+						entry( "hibernate.search.backends.myBackend.type", "elasticsearch" ),
+						entry( "hibernate.search.backends.myBackend.multi_tenancy.strategy", "discriminator" ),
+						entry( "hibernate.search.backends.myBackend.version", "7.6" ),
+						entry( "hibernate.search.backends.myBackend.version_check.enabled", "false" ),
+						entry( "hibernate.search.backends.myBackend.index_defaults.lifecycle.strategy", "none" ),
+						entry( "hibernate.search.automatic_indexing.synchronization.strategy", "async" ),
+						entry( "hibernate.search.background_failure_handler", "myFailureHandler" ),
+						entry( "hibernate.search.default_backend", "myBackend" )
+				);
+	}
 }

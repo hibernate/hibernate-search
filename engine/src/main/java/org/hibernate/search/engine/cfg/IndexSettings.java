@@ -22,37 +22,41 @@ public final class IndexSettings {
 	}
 
 	/**
-	 * Build a concatenated version of ElasticSearchIndexSettings which contains the prefix, the backendName and the index_defaults
+	 * Builds a configuration property key for the index defaults of the given backend, with the given radical.
 	 * <p>
-	 * example: "{@code hibernate.search.backends.<backendName>.index_defaults.lifecycle.strategy}"
+	 * See the javadoc of your backend for avalaible radicals.
 	 * </p>
+	 * Example result: "{@code hibernate.search.backends.<backendName>.index_defaults.lifecycle.strategy}"
 	 *
 	 * @param backendName Expect the backendName
-	 * @param luceneOrElasticsearchBackendSettings Expect one of ElasticsearchIndexSettings constants string
+	 * @param radical The radical of the configuration property (see constants in
+	 * {@code ElasticsearchIndexSettings}, {@code LuceneIndexSettings}, etc.)
 	 *
 	 * @return the concatenated default index settings key
 	 */
-	public static String indexDefaultsKey(String backendName, String luceneOrElasticsearchBackendSettings) {
+	public static String indexDefaultsKey(String backendName, String radical) {
 		return join( ".",
-				EngineSettings.BACKENDS, backendName, BackendSettings.INDEX_DEFAULTS, luceneOrElasticsearchBackendSettings
+				EngineSettings.BACKENDS, backendName, BackendSettings.INDEX_DEFAULTS, radical
 		);
 	}
 
 	/**
-	 * Build a concatenated version of ElasticSearchIndexSettings or LuceneBackendSettings which contains the prefix, the backendName and the index_defaults
+	 * Builds a configuration property key for the index of the given backend, with the given radical.
 	 * <p>
-	 * example: "{@code hibernate.search.backends.<backendName>.indexes.<indexName>.lifecycle.strategy}"
+	 * See the javadoc of your backend for avalaible radicals.
 	 * </p>
+	 * Example result: "{@code hibernate.search.backends.<backendName>.indexes.<indexName>.lifecycle.strategy}"
 	 *
 	 * @param backendName Expect the backendName
 	 * @param indexName Expect the specific targeted index name
-	 * @param luceneOrElasticsearchBackendSettings Expect one of ElasticsearchIndexSettings or LuceneBackendSettings constants string
+	 * @param radical The radical of the configuration property (see constants in
+	 * {@code ElasticsearchIndexSettings}, {@code LuceneIndexSettings}, etc.)
 	 *
 	 * @return the concatenated index settings key
 	 */
-	public static String indexKey(String backendName, String indexName, String luceneOrElasticsearchBackendSettings) {
+	public static String indexKey(String backendName, String indexName, String radical) {
 		return join( ".",
-				EngineSettings.BACKENDS, backendName, BackendSettings.INDEXES, indexName, luceneOrElasticsearchBackendSettings
+				EngineSettings.BACKENDS, backendName, BackendSettings.INDEXES, indexName, radical
 		);
 	}
 

@@ -125,12 +125,16 @@ Both `BackendSettings` and `IndexSettings` provide tools to help build the confi
 
 
 BackendSettings::
-`BackendSettings.backendKey("myBackend", ElasticsearchBackendSettings.HOSTS)` is equivalent to `hibernate.search.backends.myBackend.host`
-link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchBackendSettings.html[ElasticsearchBackendSettings]
-link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneBackendSettings.html[LuceneBackendSettings]
++
+`BackendSettings.backendKey("myBackend", ElasticsearchBackendSettings.HOSTS)` is equivalent to `hibernate.search.backends.myBackend.host`.
++
+For a list of available property keys, see link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchBackendSettings.html[ElasticsearchBackendSettings] or link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneBackendSettings.html[LuceneBackendSettings]
 
 IndexSettings::
-`IndexSettings.indexDefaultsKey("myBackend", ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS)` is equivalent to `hibernate.search.backends.signature.index_defaults.lifecycle.minimal_required_status`
++
+`IndexSettings.indexDefaultsKey("myBackend", ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS)` is equivalent to `hibernate.search.backends.signature.index_defaults.lifecycle.minimal_required_status`.
++
+For a list of available property keys, see link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/elasticsearch/cfg/ElasticsearchIndexSettings.html[ElasticsearchIndexSettings] or link:{hibernateSearchJavadocUrl}/org/hibernate/search/backend/lucene/cfg/LuceneIndexSettings.html[LuceneIndexSettings]
 [TIP]
 ====
 You can also use the `IndexSettings.indexKey("myBackend", "myIndex", ElasticsearchIndexSettings.LIFECYCLE_MINIMAL_REQUIRED_STATUS)` to apply a configuration to a specific index.
@@ -140,7 +144,7 @@ You can also use the `IndexSettings.indexKey("myBackend", "myIndex", Elasticsear
 ====
 [source, JAVA, indent=0]
 ----
-include::{sourcedir}/org/hibernate/search/documentation/configuration/MyConfiguration.java[tags=build-hibernate-configuration]
+include::{sourcedir}/org/hibernate/search/documentation/configuration/MyConfigurationIT.java[tags=build-hibernate-configuration]
 ----
 ====
 
