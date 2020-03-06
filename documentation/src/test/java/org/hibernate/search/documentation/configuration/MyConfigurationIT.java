@@ -68,7 +68,7 @@ public class MyConfigurationIT {
 						entry( "hibernate.search.backends.myBackend.multi_tenancy.strategy", "discriminator" ),
 						entry( "hibernate.search.backends.myBackend.version", "7.6" ),
 						entry( "hibernate.search.backends.myBackend.version_check.enabled", "false" ),
-						entry( "hibernate.search.backends.myBackend.index_defaults.lifecycle.strategy", "none" ),
+						entry( "hibernate.search.backends.myBackend.index_defaults.schema_management.minimal_required_status", "yellow" ),
 						entry( "hibernate.search.automatic_indexing.synchronization.strategy", "async" ),
 						entry( "hibernate.search.background_failure_handler", "myFailureHandler" ),
 						entry( "hibernate.search.default_backend", "myBackend" )
