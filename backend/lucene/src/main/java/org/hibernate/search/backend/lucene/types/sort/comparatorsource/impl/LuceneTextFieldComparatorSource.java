@@ -15,14 +15,15 @@ import org.hibernate.search.backend.lucene.types.sort.impl.SortMissingValue;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.SortedDocValues;
 import org.apache.lucene.search.FieldComparator;
+import org.apache.lucene.search.Query;
 import org.apache.lucene.util.BytesRef;
 
 public class LuceneTextFieldComparatorSource extends LuceneFieldComparatorSource {
 
 	private final Object missingValue;
 
-	public LuceneTextFieldComparatorSource(String nestedDocumentPath, Object missingValue) {
-		super( nestedDocumentPath );
+	public LuceneTextFieldComparatorSource(String nestedDocumentPath, Object missingValue, Query luceneFilter) {
+		super( nestedDocumentPath, luceneFilter );
 		this.missingValue = missingValue;
 	}
 

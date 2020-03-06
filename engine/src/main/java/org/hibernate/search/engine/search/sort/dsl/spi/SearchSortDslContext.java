@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.sort.dsl.spi;
 
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.sort.dsl.SortThenStep;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilder;
@@ -26,6 +27,11 @@ public interface SearchSortDslContext<F extends SearchSortBuilderFactory<?, B>, 
 	 * @return The sort builder factory. Will always return the exact same instance.
 	 */
 	F getBuilderFactory();
+
+	/**
+	 * @return The sort builder factory. Will always return the exact same instance.
+	 */
+	SearchPredicateBuilderFactory getPredicateBuilderFactory();
 
 	/**
 	 * Create a new context with a sort builder appended.

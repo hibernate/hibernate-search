@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
+import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortCollector;
@@ -15,10 +16,13 @@ import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 
 import org.apache.lucene.search.SortField;
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class LuceneNumericFieldSortBuilder<F, E extends Number>
 	extends AbstractLuceneStandardFieldSortBuilder<F, E, AbstractLuceneNumericFieldCodec<F, E>> {
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	LuceneNumericFieldSortBuilder(LuceneSearchContext searchContext,
 		String absoluteFieldPath, String nestedDocumentPath,
@@ -34,8 +38,9 @@ public class LuceneNumericFieldSortBuilder<F, E extends Number>
 
 	@Override
 	public void buildAndContribute(LuceneSearchSortCollector collector) {
+
 		LuceneNumericFieldComparatorSource<E> fieldComparatorSource = new LuceneNumericFieldComparatorSource<>(
-			nestedDocumentPath, codec.getDomain(), (E) getEffectiveMissingValue( missingValue, order ), getMultiValueMode() );
+			nestedDocumentPath, codec.getDomain(), (E) getEffectiveMissingValue( missingValue, order ), getMultiValueMode(), getLuceneFilter() );
 		SortField sortField = new SortField( absoluteFieldPath, fieldComparatorSource, order == SortOrder.DESC );
 
 		collector.collectSortField( sortField, (nestedDocumentPath != null) ? fieldComparatorSource : null );

@@ -17,7 +17,7 @@ public enum MultiValueMode {
 	/**
 	 * Pick the sum of all the values.
 	 */
-	SUM, AVG, MIN, MAX, MEDIAN;
+	NONE, SUM, AVG, MIN, MAX, MEDIAN;
 
 	/**
 	 * A case insensitive version of {@link #valueOf(String)}

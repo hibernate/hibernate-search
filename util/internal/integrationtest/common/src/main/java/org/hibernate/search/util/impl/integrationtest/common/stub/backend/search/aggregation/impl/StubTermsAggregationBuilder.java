@@ -11,6 +11,7 @@ import java.util.Map;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.common.MultiValue;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 class StubTermsAggregationBuilder<K>
 		implements StubAggregationBuilder<Map<K, Long>>, TermsAggregationBuilder<K> {
@@ -47,6 +48,11 @@ class StubTermsAggregationBuilder<K>
 
 	@Override
 	public void multi(MultiValue multi) {
+		// No-op
+	}
+
+	@Override
+	public void filter(SearchPredicate filter) {
 		// No-op
 	}
 

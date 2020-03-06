@@ -47,8 +47,10 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 	@Override
 	FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector, int limit)
 		throws IOException {
+		String absoluteFieldPath = getAbsoluteFieldPath();
+
 		LongValueFacetCounts facetCounts = numericDomain.createTermsFacetCounts(
-			absoluteFieldPath, facetsCollector, multiValueMode, nestedDocsProvider );
+			absoluteFieldPath, facetsCollector, getMultiValueMode(), getNestedDocsProvider() );
 		return facetCounts.getTopChildren( limit, absoluteFieldPath );
 	}
 
@@ -57,6 +59,7 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 		throws IOException {
 		// TODO HSEARCH-1927 when we switch to Sorted/SortedSetDocValues, this can be implemented in a much more efficient way
 		//  since docvalues will be sorted. See the same method in LuceneTextTermsAggregation.
+		String absoluteFieldPath = getAbsoluteFieldPath();
 		TreeSet<Long> collectedTerms = new TreeSet<>( descending ? LONG_COMPARATOR.reversed() : LONG_COMPARATOR );
 		for ( LeafReaderContext leaf : reader.leaves() ) {
 			final LeafReader atomicReader = leaf.reader();

@@ -14,6 +14,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 import org.hibernate.search.engine.search.common.MultiValue;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 abstract class AbstractElasticsearchSearchSortBuilder implements SearchSortBuilder<ElasticsearchSearchSortBuilder>,
 	ElasticsearchSearchSortBuilder {
@@ -30,6 +31,7 @@ abstract class AbstractElasticsearchSearchSortBuilder implements SearchSortBuild
 
 	private SortOrder order;
 	private MultiValue mode;
+	private SearchPredicate filter;
 
 	@Override
 	public ElasticsearchSearchSortBuilder toImplementation() {
@@ -44,6 +46,11 @@ abstract class AbstractElasticsearchSearchSortBuilder implements SearchSortBuild
 	@Override
 	public void mode(MultiValue mode) {
 		this.mode = mode;
+	}
+
+	@Override
+	public void filter(SearchPredicate filter) {
+		this.filter = filter;
 	}
 
 	@Override

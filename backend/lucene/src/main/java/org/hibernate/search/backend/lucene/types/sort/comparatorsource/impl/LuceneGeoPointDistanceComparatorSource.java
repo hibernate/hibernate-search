@@ -13,6 +13,7 @@ import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DocValuesJoin
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.search.FieldComparator;
+import org.apache.lucene.search.Query;
 
 public class LuceneGeoPointDistanceComparatorSource extends LuceneFieldComparatorSource {
 
@@ -21,8 +22,8 @@ public class LuceneGeoPointDistanceComparatorSource extends LuceneFieldComparato
 	private final double latitude;
 	private final double longitude;
 
-	public LuceneGeoPointDistanceComparatorSource(String nestedDocumentPath, double latitude, double longitude) {
-		super( nestedDocumentPath );
+	public LuceneGeoPointDistanceComparatorSource(String nestedDocumentPath, double latitude, double longitude, Query filter) {
+		super( nestedDocumentPath, filter );
 		this.latitude = latitude;
 		this.longitude = longitude;
 	}
@@ -34,11 +35,11 @@ public class LuceneGeoPointDistanceComparatorSource extends LuceneFieldComparato
 			@Override
 			protected NumericDocValues getNumericDocValues(LeafReaderContext context, String field) throws IOException {
 				return DocValuesJoin.getJoinedAsSingleValuedDistance(
-						context, field, nestedDocsProvider,
-						latitude, longitude,
-						Double.POSITIVE_INFINITY
+					context, field, nestedDocsProvider,
+					latitude, longitude,
+					Double.POSITIVE_INFINITY
 				)
-						.getRawDoubleValues();
+					.getRawDoubleValues();
 			}
 		};
 	}

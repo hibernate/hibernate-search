@@ -596,4 +596,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 108,
 			value = "Invalid I/O strategy name: '%1$s'. Valid names are: %2$s.")
 	SearchException invalidIOStrategyName(String invalidRepresentation, List<String> validRepresentations);
+
+	@Message(id = ID_OFFSET_2 + 109,
+			value = "Unable to create nested sort filter for name '%1$s'.")
+	SearchException unableToCreateNestedSortFilter(String name);
 }

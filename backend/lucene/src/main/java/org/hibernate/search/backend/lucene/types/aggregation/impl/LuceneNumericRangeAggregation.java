@@ -69,7 +69,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 	public void request(AggregationRequestContext context) {
 		context.requireCollector( FacetsCollectorFactory.INSTANCE );
 		if ( nestedDocumentPath != null ) {
-			this.nestedDocsProvider = new NestedDocsProvider( nestedDocumentPath, context.getLuceneQuery() );
+			this.nestedDocsProvider = new NestedDocsProvider( nestedDocumentPath, context.getLuceneQuery(), null );
 		}
 	}
 

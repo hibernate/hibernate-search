@@ -104,8 +104,12 @@ public class LuceneMultiValueSearchPredicateNestedWithFilterIT {
 				return f.bool().must( f.matchAll() )
 					.filter( filter );
 			} )
-			.sort( f -> f.field( "nested.additionalIntegerField" )
-			.asc().mode( MultiValue.SUM ) )
+			.sort( f -> {
+				return f.field( "nested.additionalIntegerField" )
+					.filter( (c) -> {
+						return c.match().field( "nested.active" ).matching( true );
+					} ).asc().mode( MultiValue.MIN );
+			} )
 			.toQuery();
 
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {

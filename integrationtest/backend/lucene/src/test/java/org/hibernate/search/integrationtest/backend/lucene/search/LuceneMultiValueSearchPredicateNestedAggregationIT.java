@@ -48,7 +48,7 @@ import org.junit.Test;
  * {@link LuceneMultiValueSearchPredicateIT}.
  */
 @TestForIssue(jiraKey = "HSEARCH-3839")
-public class LuceneMultiValueSearchPredicateNestedAggregationT1 {
+public class LuceneMultiValueSearchPredicateNestedAggregationIT {
 
 	private static final String STRING_1 = "string_1";
 	private static final String STRING_2 = "string_2";
@@ -79,7 +79,7 @@ public class LuceneMultiValueSearchPredicateNestedAggregationT1 {
 	private IndexMapping_1_2 indexMapping_1_2;
 	private StubMappingIndexManager indexManager_1_2;
 
-	public LuceneMultiValueSearchPredicateNestedAggregationT1() {
+	public LuceneMultiValueSearchPredicateNestedAggregationIT() {
 
 	}
 
@@ -204,7 +204,7 @@ public class LuceneMultiValueSearchPredicateNestedAggregationT1 {
 			} )
 			.aggregation( aggregationKey, f -> f.terms()
 			.field( "nested.additionalDoubleField", Double.class )
-			.multi( MultiValue.AVG ) )
+			.mode( MultiValue.AVG ) )
 			.sort( f -> f.field( "nested.additionalDoubleField" )
 			.asc().mode( MultiValue.AVG ) )
 			.toQuery();

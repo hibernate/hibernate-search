@@ -7,10 +7,13 @@
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
 import java.lang.invoke.MethodHandles;
+import org.apache.lucene.search.Query;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
@@ -118,4 +121,20 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 		}
 	}
 
+	protected Query getLuceneFilter() {
+		if ( filter == null ) {
+			return null;
+		}
+
+		Query luceneFilter = null;
+		if ( filter instanceof LuceneSearchPredicateBuilder ) {
+			LuceneSearchPredicateContext filterContext = new LuceneSearchPredicateContext( absoluteFieldPath );
+			luceneFilter = ((LuceneSearchPredicateBuilder) filter).build( filterContext );
+		}
+		else {
+			throw log.unableToCreateNestedSortFilter( absoluteFieldPath );
+		}
+
+		return luceneFilter;
+	}
 }

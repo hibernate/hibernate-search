@@ -27,7 +27,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import org.hibernate.search.engine.search.common.MultiValue;
 
 /**
  * @param <F> The type of field values.
@@ -35,7 +34,7 @@ import org.hibernate.search.engine.search.common.MultiValue;
  * or a different type if value converters are used.
  */
 public class ElasticsearchRangeAggregation<F, K>
-		extends AbstractElasticsearchBucketAggregation<Range<K>, Long> {
+	extends AbstractElasticsearchBucketAggregation<Range<K>, Long> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -61,7 +60,7 @@ public class ElasticsearchRangeAggregation<F, K>
 
 	@Override
 	protected Map<Range<K>, Long> doExtract(AggregationExtractContext context, JsonObject outerObject,
-			JsonElement buckets) {
+		JsonElement buckets) {
 		JsonObject bucketMap = buckets.getAsJsonObject();
 		Map<Range<K>, Long> result = CollectionHelper.newLinkedHashMap( rangesJson.size() );
 		for ( int i = 0; i < rangesJson.size(); i++ ) {
@@ -74,7 +73,7 @@ public class ElasticsearchRangeAggregation<F, K>
 	}
 
 	public static class Builder<F, K> extends AbstractBuilder<Range<K>, Long>
-			implements RangeAggregationBuilder<K> {
+		implements RangeAggregationBuilder<K> {
 
 		private final String absoluteFieldPath;
 
@@ -83,11 +82,10 @@ public class ElasticsearchRangeAggregation<F, K>
 
 		private final List<Range<K>> rangesInOrder = new ArrayList<>();
 		private final JsonArray rangesJson = new JsonArray();
-		private MultiValue mode;
 
 		public Builder(ElasticsearchSearchContext searchContext, String absoluteFieldPath,
-				DslConverter<?, ? extends F> toFieldValueConverter,
-				ElasticsearchFieldCodec<F> codec) {
+			DslConverter<?, ? extends F> toFieldValueConverter,
+			ElasticsearchFieldCodec<F> codec) {
 			super( searchContext );
 			this.absoluteFieldPath = absoluteFieldPath;
 			this.toFieldValueConverter = toFieldValueConverter;
@@ -119,11 +117,6 @@ public class ElasticsearchRangeAggregation<F, K>
 		}
 
 		@Override
-		public void mode(MultiValue mode) {
-			this.mode = mode;
-		}
-
-		@Override
 		public ElasticsearchRangeAggregation<F, K> build() {
 			return new ElasticsearchRangeAggregation<>( this );
 		}
@@ -135,7 +128,7 @@ public class ElasticsearchRangeAggregation<F, K>
 			}
 			catch (RuntimeException e) {
 				throw log.cannotConvertDslParameter(
-						e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
+					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 				);
 			}
 		}

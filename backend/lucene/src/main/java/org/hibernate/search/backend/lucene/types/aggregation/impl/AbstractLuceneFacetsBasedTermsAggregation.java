@@ -27,9 +27,6 @@ import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.facet.LabelAndValue;
 import org.apache.lucene.index.IndexReader;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
-import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
-import org.hibernate.search.engine.search.common.MultiValue;
 
 /**
  * @param <F> The type of field values exposed to the mapper.
@@ -40,33 +37,24 @@ import org.hibernate.search.engine.search.common.MultiValue;
 abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		extends AbstractLuceneBucketAggregation<K, Long> {
 
-	protected final String nestedDocumentPath;
-	protected final String absoluteFieldPath;
 	private final ProjectionConverter<? super F, ? extends K> fromFieldValueConverter;
 
 	private final BucketOrder order;
 	private final int maxTermCount;
 	private final int minDocCount;
-	protected final MultiValueMode multiValueMode;
-	protected NestedDocsProvider nestedDocsProvider;
 
 	AbstractLuceneFacetsBasedTermsAggregation(AbstractBuilder<F, T, K> builder) {
 		super( builder );
-		this.nestedDocumentPath = builder.nestedDocumentPath;
-		this.absoluteFieldPath = builder.absoluteFieldPath;
 		this.fromFieldValueConverter = builder.fromFieldValueConverter;
 		this.order = builder.order;
 		this.maxTermCount = builder.maxTermCount;
 		this.minDocCount = builder.minDocCount;
-		this.multiValueMode = builder.getMultiValueMode( builder.multi );
 	}
 
 	@Override
 	public void request(AggregationRequestContext context) {
 		context.requireCollector( FacetsCollectorFactory.INSTANCE );
-		if ( nestedDocumentPath != null ) {
-			this.nestedDocsProvider = new NestedDocsProvider( nestedDocumentPath, context.getLuceneQuery() );
-		}
+		super.request( context );
 	}
 
 	@Override
@@ -177,21 +165,15 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 			extends AbstractLuceneBucketAggregation.AbstractBuilder<K, Long>
 			implements TermsAggregationBuilder<K> {
 
-		private final String nestedDocumentPath;
-		private final String absoluteFieldPath;
-
 		private final ProjectionConverter<? super F, ? extends K> fromFieldValueConverter;
 
 		private BucketOrder order = BucketOrder.COUNT_DESC;
 		private int minDocCount = 1;
 		private int maxTermCount = 100;
-		private MultiValue multi;
 
 		AbstractBuilder(LuceneSearchContext searchContext, String nestedDocumentPath, String absoluteFieldPath,
 				ProjectionConverter<? super F, ? extends K> fromFieldValueConverter) {
-			super( searchContext );
-			this.nestedDocumentPath = nestedDocumentPath;
-			this.absoluteFieldPath = absoluteFieldPath;
+			super( searchContext, absoluteFieldPath, nestedDocumentPath );
 			this.fromFieldValueConverter = fromFieldValueConverter;
 		}
 
@@ -223,11 +205,6 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		@Override
 		public void maxTermCount(int maxTermCount) {
 			this.maxTermCount = maxTermCount;
-		}
-
-		@Override
-		public void multi(MultiValue multi) {
-			this.multi = multi;
 		}
 
 		@Override
