@@ -31,6 +31,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingInd
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -46,6 +47,8 @@ public class ImplicitNestedSearchPredicateIT {
 	private static final String SOME_PHRASE_TEXT = "Once upon a time, there was a quick fox in a big house.";
 
 	private static final String SOME_WILDCARD_PATTERN = "f*x";
+
+	private static final String SOME_SIMPLE_QUERY_STRING = "quick + fox";
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -127,6 +130,12 @@ public class ImplicitNestedSearchPredicateIT {
 	@Test
 	public void predicate_wildcard() {
 		verify_implicit_nest( p -> p.wildcard().field( "nested.text" ).matching( SOME_WILDCARD_PATTERN ) );
+	}
+
+	@Ignore // TODO: support this
+	@Test
+	public void predicate_simpleQueryString() {
+		verify_implicit_nest( p -> p.simpleQueryString().field( "nested.text" ).matching( SOME_SIMPLE_QUERY_STRING ) );
 	}
 
 	private void verify_implicit_nest(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> implicitPredicate) {
