@@ -117,6 +117,11 @@ public class ImplicitNestedSearchPredicateIT {
 		verify_implicit_nest( p -> p.phrase().field( "nested.text" ).matching( SOME_PHRASE_KEY ) );
 	}
 
+	@Test
+	public void predicate_matchAll() {
+		verify_implicit_nest( p -> p.matchAll() );
+	}
+
 	private void verify_implicit_nest(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> implicitPredicate) {
 		StubMappingScope scope = indexManager.createScope();
 		SearchPredicate explicitPredicate = scope.predicate().nested().objectField( "nested" ).nest( implicitPredicate ).toPredicate();
