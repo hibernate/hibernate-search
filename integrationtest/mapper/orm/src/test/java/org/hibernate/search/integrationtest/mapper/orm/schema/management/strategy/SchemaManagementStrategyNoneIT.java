@@ -61,7 +61,7 @@ public class SchemaManagementStrategyNoneIT {
 	@Indexed(index = IndexedEntity1.NAME)
 	private static class IndexedEntity1 {
 
-		private static final String NAME = "indexed1";
+		static final String NAME = "indexed1";
 
 		@Id
 		private Integer id;
@@ -71,7 +71,7 @@ public class SchemaManagementStrategyNoneIT {
 	@Indexed(index = IndexedEntity2.NAME)
 	private static class IndexedEntity2 {
 
-		private static final String NAME = "indexed2";
+		static final String NAME = "indexed2";
 
 		@Id
 		private Integer id;
