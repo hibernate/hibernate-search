@@ -58,9 +58,9 @@ public class ElasticsearchTextFieldPredicateBuilderFactory
 
 	@Override
 	public PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> createPhrasePredicateBuilder(
-			String absoluteFieldPath, ElasticsearchCompatibilityChecker analyzerChecker) {
+			String absoluteFieldPath, List<String> nestedPathHierarchy, ElasticsearchCompatibilityChecker analyzerChecker) {
 		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchTextPhrasePredicateBuilder( absoluteFieldPath, analyzerChecker );
+		return new ElasticsearchTextPhrasePredicateBuilder( absoluteFieldPath, nestedPathHierarchy, analyzerChecker );
 	}
 
 	@Override

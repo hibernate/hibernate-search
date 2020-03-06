@@ -31,7 +31,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingInd
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 

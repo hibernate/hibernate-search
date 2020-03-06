@@ -118,7 +118,8 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	public PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> phrase(String absoluteFieldPath) {
 		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldPredicateBuilderFactory> fieldComponent = scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		return fieldComponent.getComponent().createPhrasePredicateBuilder( absoluteFieldPath, fieldComponent.getAnalyzerCompatibilityChecker() );
+		return fieldComponent.getComponent().createPhrasePredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchy( absoluteFieldPath ),
+				fieldComponent.getAnalyzerCompatibilityChecker() );
 	}
 
 	@Override
