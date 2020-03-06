@@ -53,7 +53,7 @@ public interface ElasticsearchFieldPredicateBuilderFactory {
 			ElasticsearchSearchContext searchContext, String absoluteFieldPath, ElasticsearchCompatibilityChecker converterChecker);
 
 	PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> createPhrasePredicateBuilder(
-			String absoluteFieldPath, ElasticsearchCompatibilityChecker analyzerChecker);
+			String absoluteFieldPath, List<String> nestedPathHierarchy, ElasticsearchCompatibilityChecker analyzerChecker);
 
 	WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> createWildcardPredicateBuilder(
 			String absoluteFieldPath);
