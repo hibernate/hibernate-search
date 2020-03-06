@@ -61,17 +61,6 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 	}
 
 	/**
-	 * Creates a LongMultiValuesSource that wraps a long-valued field
-	 *
-	 * @param field the field
-	 * @param mode the mode
-	 * @return DoubleMultiValuesSource
-	 */
-	public static LongMultiValuesSource fromLongField(String field, MultiValueMode mode) {
-		return fromLongField( field, mode, null );
-	}
-
-	/**
 	 * Creates a LongMultiValuesSource that wraps an int-valued field
 	 *
 	 * @param field the field
@@ -81,17 +70,6 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 	 */
 	public static LongMultiValuesSource fromIntField(String field, MultiValueMode mode, NestedDocsProvider nested) {
 		return fromLongField( field, mode, nested );
-	}
-
-	/**
-	 * Creates a LongMultiValuesSource that wraps an int-valued field
-	 *
-	 * @param field the field
-	 * @param mode the mode
-	 * @return DoubleMultiValuesSource
-	 */
-	public static LongMultiValuesSource fromIntField(String field, MultiValueMode mode) {
-		return fromIntField( field, mode, null );
 	}
 
 	/**
