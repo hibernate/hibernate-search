@@ -68,7 +68,6 @@ public class SimpleQueryStringSearchPredicateIT {
 	private static final String TERM_3 = "room";
 	private static final String TERM_4 = "elephant john";
 	private static final String TERM_5 = "crowd";
-	private static final String TERM_6 = "world";
 	private static final String PHRASE_WITH_TERM_2 = "panda breeding";
 	private static final String PHRASE_WITH_TERM_4 = "elephant john";
 	private static final String PREFIX_FOR_TERM_1_AND_TERM_6 = "wor";
