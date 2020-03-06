@@ -27,9 +27,7 @@ import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.facet.LabelAndValue;
 import org.apache.lucene.index.IndexReader;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
-import org.hibernate.search.engine.search.common.MultiValue;
 
 /**
  * @param <F> The type of field values exposed to the mapper.
@@ -47,7 +45,6 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 	private final BucketOrder order;
 	private final int maxTermCount;
 	private final int minDocCount;
-	protected final MultiValueMode multiValueMode;
 	protected NestedDocsProvider nestedDocsProvider;
 
 	AbstractLuceneFacetsBasedTermsAggregation(AbstractBuilder<F, T, K> builder) {
@@ -58,7 +55,6 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		this.order = builder.order;
 		this.maxTermCount = builder.maxTermCount;
 		this.minDocCount = builder.minDocCount;
-		this.multiValueMode = builder.getMultiValueMode( builder.multi );
 	}
 
 	@Override
@@ -185,7 +181,6 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		private BucketOrder order = BucketOrder.COUNT_DESC;
 		private int minDocCount = 1;
 		private int maxTermCount = 100;
-		private MultiValue multi;
 
 		AbstractBuilder(LuceneSearchContext searchContext, String nestedDocumentPath, String absoluteFieldPath,
 				ProjectionConverter<? super F, ? extends K> fromFieldValueConverter) {
@@ -223,11 +218,6 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		@Override
 		public void maxTermCount(int maxTermCount) {
 			this.maxTermCount = maxTermCount;
-		}
-
-		@Override
-		public void multi(MultiValue multi) {
-			this.multi = multi;
 		}
 
 		@Override

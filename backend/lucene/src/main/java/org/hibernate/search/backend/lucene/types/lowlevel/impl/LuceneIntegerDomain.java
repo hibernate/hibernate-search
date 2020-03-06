@@ -75,9 +75,11 @@ public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
 
 	@Override
 	public LongValueFacetCounts createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-			MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
-
-		LongMultiValuesSource source = LongMultiValuesSource.fromIntField( absoluteFieldPath, multiValueMode, nestedDocsProvider );
+			NestedDocsProvider nestedDocsProvider) throws IOException {
+		// TODO HSEARCH-3856 aggregations on multi-valued fields - currently we just use the minimum value
+		LongMultiValuesSource source = LongMultiValuesSource.fromIntField(
+				absoluteFieldPath, MultiValueMode.MIN, nestedDocsProvider
+		);
 		return new LongValueFacetCounts(
 			absoluteFieldPath, source,
 			facetsCollector
@@ -87,8 +89,11 @@ public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
 	@Override
 	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 			Collection<? extends Range<? extends Integer>> ranges,
-			MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
-		LongMultiValuesSource source = LongMultiValuesSource.fromIntField( absoluteFieldPath, multiValueMode, nestedDocsProvider );
+			NestedDocsProvider nestedDocsProvider) throws IOException {
+		// TODO HSEARCH-3856 aggregations on multi-valued fields - currently we just use the minimum value
+		LongMultiValuesSource source = LongMultiValuesSource.fromIntField(
+				absoluteFieldPath, MultiValueMode.MIN, nestedDocsProvider
+		);
 		return new LongRangeFacetCounts(
 			absoluteFieldPath, source,
 			facetsCollector, FacetCountsUtils.createLongRanges( ranges )

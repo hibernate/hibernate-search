@@ -43,29 +43,5 @@ public abstract class AbstractLuceneBucketAggregation<K, V> implements LuceneSea
 		@Override
 		public abstract LuceneSearchAggregation<Map<K, V>> build();
 
-		protected MultiValueMode getMultiValueMode(MultiValue multi) {
-			MultiValueMode sortMode = MultiValueMode.MIN;
-			if ( multi != null ) {
-				switch ( multi ) {
-					case MIN:
-						sortMode = MultiValueMode.MIN;
-						break;
-					case MAX:
-						sortMode = MultiValueMode.MAX;
-						break;
-					case AVG:
-						sortMode = MultiValueMode.AVG;
-						break;
-					case SUM:
-						sortMode = MultiValueMode.SUM;
-						break;
-					case MEDIAN:
-						sortMode = MultiValueMode.MEDIAN;
-						break;
-				}
-			}
-			return sortMode;
-		}
-
 	}
 }
