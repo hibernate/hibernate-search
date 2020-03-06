@@ -40,7 +40,7 @@ abstract class AbstractElasticsearchFieldPredicateBuilderFactory implements Elas
 
 	@Override
 	public WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> createWildcardPredicateBuilder(
-			String absoluteFieldPath) {
+			String absoluteFieldPath, List<String> nestedPathHierarchy) {
 		throw log.textPredicatesNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);

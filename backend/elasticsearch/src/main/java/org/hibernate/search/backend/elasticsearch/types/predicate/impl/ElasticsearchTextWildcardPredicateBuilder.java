@@ -6,9 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
+import java.util.List;
+
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSearchPredicateBuilder;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSearchNestedPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder;
@@ -17,7 +19,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-public class ElasticsearchTextWildcardPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
+public class ElasticsearchTextWildcardPredicateBuilder extends AbstractElasticsearchSearchNestedPredicateBuilder
 		implements WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final JsonObjectAccessor WILDCARD_ACCESSOR = JsonAccessor.root().property( "wildcard" ).asObject();
@@ -28,7 +30,8 @@ public class ElasticsearchTextWildcardPredicateBuilder extends AbstractElasticse
 
 	private JsonElement pattern;
 
-	public ElasticsearchTextWildcardPredicateBuilder(String absoluteFieldPath) {
+	public ElasticsearchTextWildcardPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
+		super( nestedPathHierarchy );
 		this.absoluteFieldPath = absoluteFieldPath;
 	}
 

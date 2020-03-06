@@ -126,7 +126,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	public WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> wildcard(String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createWildcardPredicateBuilder( absoluteFieldPath );
+				.getComponent().createWildcardPredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchy( absoluteFieldPath ) );
 	}
 
 	@Override
