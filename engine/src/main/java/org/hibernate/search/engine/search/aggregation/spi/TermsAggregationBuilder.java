@@ -7,7 +7,6 @@
 package org.hibernate.search.engine.search.aggregation.spi;
 
 import java.util.Map;
-import org.hibernate.search.engine.search.common.MultiValue;
 
 public interface TermsAggregationBuilder<K> extends SearchAggregationBuilder<Map<K, Long>> {
 
@@ -23,5 +22,4 @@ public interface TermsAggregationBuilder<K> extends SearchAggregationBuilder<Map
 
 	void maxTermCount(int maxTermCount);
 
-	void multi(MultiValue multi);
 }
