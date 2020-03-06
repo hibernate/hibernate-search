@@ -11,7 +11,7 @@ import java.util.List;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 import com.google.gson.JsonElement;
-
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 
 /**
  * A sort collector for Elasticsearch, using JSON to represent sorts.
@@ -22,6 +22,8 @@ import com.google.gson.JsonElement;
  * @see ElasticsearchSearchSortBuilder
  */
 public interface ElasticsearchSearchSortCollector {
+
+	ElasticsearchSearchPredicateContext getRootPredicateContext();
 
 	void collectSort(JsonElement sort);
 

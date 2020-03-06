@@ -14,12 +14,15 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.El
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 
 public abstract class AbstractElasticsearchSearchNestedSortBuilder extends AbstractElasticsearchSearchSortBuilder {
 
 	// new API
 	private static final JsonAccessor<JsonElement> NESTED_ACCESSOR = JsonAccessor.root().property( "nested" );
 	private static final JsonAccessor<JsonElement> PATH_ACCESSOR = JsonAccessor.root().property( "path" );
+	private static final JsonAccessor<JsonElement> FILTER_ACCESSOR = JsonAccessor.root().property( "filter" );
 
 	// old API
 	private static final JsonAccessor<JsonElement> NESTED_PATH_ACCESSOR = JsonAccessor.root().property( "nested_path" );
@@ -33,7 +36,7 @@ public abstract class AbstractElasticsearchSearchNestedSortBuilder extends Abstr
 	}
 
 	@Override
-	protected void enrichInnerObject(JsonObject innerObject) {
+	protected void enrichInnerObject(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
 		if ( nestedPathHierarchy.isEmpty() ) {
 			return;
 		}
@@ -49,6 +52,16 @@ public abstract class AbstractElasticsearchSearchNestedSortBuilder extends Abstr
 		for ( String nestedPath : nestedPathHierarchy ) {
 			JsonObject nestedObject = new JsonObject();
 			PATH_ACCESSOR.set( nestedObject, new JsonPrimitive( nestedPath ) );
+
+			JsonObject jsonFilter = null;
+			if ( filter instanceof ElasticsearchSearchPredicateBuilder ) {
+				ElasticsearchSearchPredicateContext filterContext = collector.getRootPredicateContext();
+				jsonFilter = ((ElasticsearchSearchPredicateBuilder) filter).build( filterContext );
+			}
+
+			if ( jsonFilter != null ) {
+				FILTER_ACCESSOR.set( nestedObject, jsonFilter );
+			}
 			NESTED_ACCESSOR.set( nextNestedObjectTarget, nestedObject );
 
 			// the new api requires a recursion on the path hierarchy

@@ -31,7 +31,7 @@ abstract class AbstractElasticsearchSearchSortBuilder implements SearchSortBuild
 
 	private SortOrder order;
 	private MultiValue mode;
-	private SearchPredicate filter;
+	protected SearchPredicate filter;
 
 	@Override
 	public ElasticsearchSearchSortBuilder toImplementation() {
@@ -56,6 +56,7 @@ abstract class AbstractElasticsearchSearchSortBuilder implements SearchSortBuild
 	@Override
 	public final void buildAndAddTo(ElasticsearchSearchSortCollector collector) {
 		JsonObject innerObject = new JsonObject();
+
 		if ( order != null ) {
 			switch ( order ) {
 				case ASC:
@@ -85,11 +86,11 @@ abstract class AbstractElasticsearchSearchSortBuilder implements SearchSortBuild
 					break;
 			}
 		}
-		enrichInnerObject( innerObject );
+		enrichInnerObject( collector, innerObject );
 		doBuildAndAddTo( collector, innerObject );
 	}
 
-	protected void enrichInnerObject(JsonObject innerObject) {
+	protected void enrichInnerObject(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
 	}
 
 	protected abstract void doBuildAndAddTo(ElasticsearchSearchSortCollector collector, JsonObject innerObject);
