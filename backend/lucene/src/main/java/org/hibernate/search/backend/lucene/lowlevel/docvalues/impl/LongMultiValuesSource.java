@@ -22,32 +22,6 @@ import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider
 
 public abstract class LongMultiValuesSource extends LongValuesSource {
 
-	final String field;
-	final MultiValueMode mode;
-
-	public LongMultiValuesSource(String field, MultiValueMode mode) {
-		this.field = field;
-		this.mode = mode;
-	}
-
-	/**
-	 * Creates a LongMultiValuesSource that wraps a generic NumericDocValues
-	 * field
-	 *
-	 * @param field the field to wrap, must have NumericDocValues
-	 * @param mode the multivalue mode
-	 * @param nested the nested provider
-	 * @return The DoubleMultiValuesSource
-	 */
-	public static LongMultiValuesSource fromField(String field, MultiValueMode mode, NestedDocsProvider nested) {
-		if ( nested == null ) {
-			return new MultiFieldValuesSource( field, mode );
-		}
-		else {
-			return new NestedMultiFieldValuesSource( field, mode, nested );
-		}
-	}
-
 	/**
 	 * Creates a LongMultiValuesSource that wraps a long-valued field
 	 *
@@ -70,6 +44,23 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 	 */
 	public static LongMultiValuesSource fromIntField(String field, MultiValueMode mode, NestedDocsProvider nested) {
 		return fromLongField( field, mode, nested );
+	}
+
+	private static LongMultiValuesSource fromField(String field, MultiValueMode mode, NestedDocsProvider nested) {
+		if ( nested == null ) {
+			return new MultiFieldValuesSource( field, mode );
+		}
+		else {
+			return new NestedMultiFieldValuesSource( field, mode, nested );
+		}
+	}
+
+	final String field;
+	final MultiValueMode mode;
+
+	public LongMultiValuesSource(String field, MultiValueMode mode) {
+		this.field = field;
+		this.mode = mode;
 	}
 
 	/**
