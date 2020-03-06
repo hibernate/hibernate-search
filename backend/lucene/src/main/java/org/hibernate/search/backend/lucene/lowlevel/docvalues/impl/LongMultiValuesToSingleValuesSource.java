@@ -18,6 +18,8 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.LongValues;
 import org.apache.lucene.search.LongValuesSource;
 import org.apache.lucene.util.BitSet;
+
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.JoinFirstChildIdIterator;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 
 /**
@@ -87,16 +89,12 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 		SortedNumericDocValues values = getSortedNumericDocValues( ctx );
 
 		if ( nestedDocsProvider == null ) {
-			return select( values, scores );
-		}
-
-		if ( scores == null ) {
-			scores = DoubleValues.EMPTY;
+			return select( values );
 		}
 
 		final BitSet rootDocs = nestedDocsProvider.parentDocs( ctx );
 		final DocIdSetIterator innerDocs = nestedDocsProvider.childDocs( ctx );
-		return select( values, scores, rootDocs, innerDocs, ctx.reader().maxDoc(), Integer.MAX_VALUE );
+		return select( values, rootDocs, innerDocs, ctx.reader().maxDoc(), Integer.MAX_VALUE );
 	}
 
 	/**
@@ -116,11 +114,10 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 
 	protected abstract SortedNumericDocValues getSortedNumericDocValues(LeafReaderContext ctx) throws IOException;
 
-	protected LongValues select(final SortedNumericDocValues values, final DoubleValues scores) {
+	protected LongValues select(final SortedNumericDocValues values) {
 		final NumericDocValues singleton = DocValues.unwrapSingleton( values );
 		if ( singleton != null ) {
-			return replaceScores( new LongValues() {
-
+			return new LongValues() {
 				@Override
 				public long longValue() throws IOException {
 					return singleton.longValue();
@@ -130,11 +127,10 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 				public boolean advanceExact(int target) throws IOException {
 					return singleton.advanceExact( target );
 				}
-			}, scores );
+			};
 		}
 		else {
 			return new LongValues() {
-
 				private long value;
 
 				@Override
@@ -145,11 +141,8 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 				@Override
 				public boolean advanceExact(int doc) throws IOException {
 					if ( values.advanceExact( doc ) ) {
-						value = pick( values, scores, doc );
+						value = pick( values );
 						return true;
-					}
-					else if ( scores != null && scores.advanceExact( doc ) ) {
-						value = (long) scores.doubleValue();
 					}
 					return false;
 				}
@@ -157,14 +150,15 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 		}
 	}
 
-	protected LongValues select(final SortedNumericDocValues values, final DoubleValues scores, final BitSet parentDocs,
-		final DocIdSetIterator childDocs, int maxDoc, int maxChildren) throws IOException {
+	protected LongValues select(final SortedNumericDocValues values, final BitSet parentDocs,
+			final DocIdSetIterator childDocs, int maxDoc, int maxChildren) throws IOException {
 		if ( parentDocs == null || childDocs == null ) {
-			return replaceScores( DoubleValues.EMPTY, scores );
+			return DocValuesUtils.LONG_VALUES_EMPTY;
 		}
 
-		return new LongValues() {
+		JoinFirstChildIdIterator joinIterator = new JoinFirstChildIdIterator( parentDocs, childDocs, values );
 
+		return new LongValues() {
 			int lastSeenParentDoc = -1;
 			long lastEmittedValue = -1;
 
@@ -179,33 +173,21 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 				if ( parentDoc == lastSeenParentDoc ) {
 					return true;
 				}
-				else if ( parentDoc == 0 ) {
-					if ( scores != null && scores.advanceExact( parentDoc ) ) {
-						lastEmittedValue = (long) scores.doubleValue();
-						return true;
-					}
-					else {
-						return false;
-					}
-				}
-				final int prevParentDoc = parentDocs.prevSetBit( parentDoc - 1 );
-				final int firstChildDoc;
-				if ( childDocs.docID() > prevParentDoc ) {
-					firstChildDoc = childDocs.docID();
-				}
-				else {
-					firstChildDoc = childDocs.advance( prevParentDoc + 1 );
+
+				int nextChildWithValue = joinIterator.advance( parentDoc );
+				if ( nextChildWithValue == JoinFirstChildIdIterator.NO_CHILD_WITH_VALUE ) {
+					// No child of this parent has a value
+					return false;
 				}
 
 				lastSeenParentDoc = parentDoc;
-				lastEmittedValue = pick( values, scores, childDocs, firstChildDoc, parentDoc, maxChildren );
+				lastEmittedValue = pick( values, childDocs, nextChildWithValue, parentDoc, maxChildren );
 				return true;
 			}
-
 		};
 	}
 
-	protected long pick(SortedNumericDocValues values, DoubleValues scores, int doc) throws IOException {
+	protected long pick(SortedNumericDocValues values) throws IOException {
 		final int count = values.docValueCount();
 		long result = 0;
 
@@ -253,16 +235,11 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 				throw new IllegalArgumentException( "Unsupported sort mode: " + mode );
 		}
 
-		if ( count == 0 && scores != null && scores.advanceExact( doc ) ) {
-			result = (long) scores.doubleValue();
-		}
-
 		return result;
 	}
 
-	protected long pick(SortedNumericDocValues values, DoubleValues scores, DocIdSetIterator docItr, int startDoc, int endDoc,
-		int maxChildren) throws IOException {
-		boolean hasValue = false;
+	protected long pick(SortedNumericDocValues values, DocIdSetIterator docItr,
+			int startDoc, int endDoc, int maxChildren) throws IOException {
 		int totalCount = 0;
 		long returnValue = 0;
 
@@ -279,7 +256,6 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 							returnValue += values.nextValue();
 						}
 						totalCount += docCount;
-						hasValue = true;
 					}
 				}
 				break;
@@ -296,7 +272,6 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 							returnValue += values.nextValue();
 						}
 						totalCount += docCount;
-						hasValue = true;
 					}
 				}
 				if ( totalCount > 0 ) {
@@ -316,7 +291,6 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 							break;
 						}
 						returnValue = Math.min( returnValue, values.nextValue() );
-						hasValue = true;
 					}
 				}
 				break;
@@ -330,7 +304,6 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 							break;
 						}
 						returnValue = Math.max( returnValue, values.nextValue() );
-						hasValue = true;
 					}
 				}
 				break;
@@ -339,58 +312,8 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 				throw new IllegalArgumentException( "Unsupported sort mode: " + mode );
 		}
 
-		if ( !hasValue && scores != null && scores.advanceExact( endDoc ) ) {
-			returnValue = (long) scores.doubleValue();
-		}
-
 		return returnValue;
 
-	}
-
-	protected LongValues replaceScores(LongValues values, DoubleValues scores) {
-		return new LongValues() {
-
-			private long value;
-
-			@Override
-			public boolean advanceExact(int target) throws IOException {
-				if ( values.advanceExact( target ) ) {
-					value = values.longValue();
-				}
-				else if ( scores != null && scores.advanceExact( target ) ) {
-					value = (long) scores.doubleValue();
-				}
-				return false;
-			}
-
-			@Override
-			public long longValue() throws IOException {
-				return value;
-			}
-		};
-	}
-
-	protected LongValues replaceScores(DoubleValues values, DoubleValues scores) {
-		return new LongValues() {
-
-			private double value;
-
-			@Override
-			public boolean advanceExact(int target) throws IOException {
-				if ( values.advanceExact( target ) ) {
-					value = values.doubleValue();
-				}
-				else if ( scores != null && scores.advanceExact( target ) ) {
-					value = scores.doubleValue();
-				}
-				return false;
-			}
-
-			@Override
-			public long longValue() throws IOException {
-				return (long) value;
-			}
-		};
 	}
 
 	private static class MultiFieldValuesToSingleValuesSource extends LongMultiValuesToSingleValuesSource {
