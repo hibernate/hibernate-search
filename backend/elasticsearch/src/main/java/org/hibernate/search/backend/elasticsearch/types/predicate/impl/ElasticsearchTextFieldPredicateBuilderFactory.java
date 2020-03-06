@@ -65,9 +65,9 @@ public class ElasticsearchTextFieldPredicateBuilderFactory
 
 	@Override
 	public WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> createWildcardPredicateBuilder(
-			String absoluteFieldPath) {
+			String absoluteFieldPath, List<String> nestedPathHierarchy) {
 		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchTextWildcardPredicateBuilder( absoluteFieldPath );
+		return new ElasticsearchTextWildcardPredicateBuilder( absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override

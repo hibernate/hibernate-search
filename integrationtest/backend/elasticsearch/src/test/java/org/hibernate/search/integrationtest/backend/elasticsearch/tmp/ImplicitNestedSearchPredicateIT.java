@@ -45,6 +45,8 @@ public class ImplicitNestedSearchPredicateIT {
 	private static final String SOME_PHRASE_KEY = "quick fox";
 	private static final String SOME_PHRASE_TEXT = "Once upon a time, there was a quick fox in a big house.";
 
+	private static final String SOME_WILDCARD_PATTERN = "f*x";
+
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
@@ -120,6 +122,11 @@ public class ImplicitNestedSearchPredicateIT {
 	@Test
 	public void predicate_matchAll() {
 		verify_implicit_nest( p -> p.matchAll() );
+	}
+
+	@Test
+	public void predicate_wildcard() {
+		verify_implicit_nest( p -> p.wildcard().field( "nested.text" ).matching( SOME_WILDCARD_PATTERN ) );
 	}
 
 	private void verify_implicit_nest(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> implicitPredicate) {

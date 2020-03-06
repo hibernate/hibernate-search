@@ -56,7 +56,7 @@ public interface ElasticsearchFieldPredicateBuilderFactory {
 			String absoluteFieldPath, List<String> nestedPathHierarchy, ElasticsearchCompatibilityChecker analyzerChecker);
 
 	WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> createWildcardPredicateBuilder(
-			String absoluteFieldPath);
+			String absoluteFieldPath, List<String> nestedPathHierarchy);
 
 	ElasticsearchSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldContext(String absoluteFieldPath);
 
