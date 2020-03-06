@@ -30,9 +30,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
-import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
-import org.hibernate.search.engine.search.common.MultiValue;
 
 /**
  * @param <F> The type of field values.
@@ -45,11 +42,6 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final String nestedDocumentPath;
-	private final String absoluteFieldPath;
-	private final MultiValueMode multiValueMode;
-
-	protected NestedDocsProvider nestedDocsProvider;
 	private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
 	private final List<Range<K>> rangesInOrder;
@@ -57,20 +49,15 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 
 	private LuceneNumericRangeAggregation(Builder<F, E, K> builder) {
 		super( builder );
-		this.absoluteFieldPath = builder.absoluteFieldPath;
 		this.codec = builder.codec;
 		this.rangesInOrder = builder.rangesInOrder;
 		this.encodedRangesInOrder = builder.encodedRangesInOrder;
-		this.nestedDocumentPath = builder.nestedDocumentPath;
-		this.multiValueMode = builder.getMultiValueMode( builder.mode );
 	}
 
 	@Override
 	public void request(AggregationRequestContext context) {
 		context.requireCollector( FacetsCollectorFactory.INSTANCE );
-		if ( nestedDocumentPath != null ) {
-			this.nestedDocsProvider = new NestedDocsProvider( nestedDocumentPath, context.getLuceneQuery(), null );
-		}
+		super.request( context );
 	}
 
 	@Override
@@ -79,9 +66,11 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 
 		FacetsCollector facetsCollector = context.getCollector( FacetsCollectorFactory.KEY );
 
+		String absoluteFieldPath = getAbsoluteFieldPath();
+
 		Facets facetsCount = numericDomain.createRangeFacetCounts(
 			absoluteFieldPath, facetsCollector, encodedRangesInOrder,
-			multiValueMode, nestedDocsProvider
+			getMultiValueMode(), getNestedDocsProvider()
 		);
 
 		FacetResult facetResult = facetsCount.getTopChildren( rangesInOrder.size(), absoluteFieldPath );
@@ -98,22 +87,16 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		extends AbstractLuceneBucketAggregation.AbstractBuilder<Range<K>, Long>
 		implements RangeAggregationBuilder<K> {
 
-		private final String nestedDocumentPath;
-		private final String absoluteFieldPath;
-
 		private final DslConverter<?, ? extends F> toFieldValueConverter;
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
 		private final List<Range<K>> rangesInOrder = new ArrayList<>();
 		private final List<Range<E>> encodedRangesInOrder = new ArrayList<>();
-		private MultiValue mode;
 
 		public Builder(LuceneSearchContext searchContext, String nestedDocumentPath, String absoluteFieldPath,
 			DslConverter<?, ? extends F> toFieldValueConverter,
 			AbstractLuceneNumericFieldCodec<F, E> codec) {
-			super( searchContext );
-			this.nestedDocumentPath = nestedDocumentPath;
-			this.absoluteFieldPath = absoluteFieldPath;
+			super( searchContext, absoluteFieldPath, nestedDocumentPath );
 			this.toFieldValueConverter = toFieldValueConverter;
 			this.codec = codec;
 		}
@@ -122,11 +105,6 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		public void range(Range<? extends K> range) {
 			rangesInOrder.add( range.map( Function.identity() ) );
 			encodedRangesInOrder.add( range.map( this::convertAndEncode ) );
-		}
-
-		@Override
-		public void mode(MultiValue mode) {
-			this.mode = mode;
 		}
 
 		@Override

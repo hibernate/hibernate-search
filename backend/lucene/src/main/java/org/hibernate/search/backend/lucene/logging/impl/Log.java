@@ -600,4 +600,8 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 109,
 			value = "Unable to create nested sort filter for name '%1$s'.")
 	SearchException unableToCreateNestedSortFilter(String name);
+
+	@Message(id = ID_OFFSET_2 + 110,
+			value = "Unable to create nested aggregation filter for name '%1$s'.")
+	SearchException unableToCreateNestedAggregationFilter(String name);
 }

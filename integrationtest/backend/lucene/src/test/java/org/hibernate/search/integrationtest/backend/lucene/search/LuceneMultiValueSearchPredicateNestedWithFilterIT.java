@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene.search;
 
+import java.util.List;
+import java.util.Map;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -14,13 +16,16 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.common.MultiValue;
+import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.JSONTestModelLoader;
 import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.SimpleIndexMapping;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.AssertionFailure;
+import org.hibernate.search.util.common.data.Range;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
@@ -107,7 +112,9 @@ public class LuceneMultiValueSearchPredicateNestedWithFilterIT {
 			.sort( f -> {
 				return f.field( "nested.additionalIntegerField" )
 					.filter( (c) -> {
-						return c.match().field( "nested.active" ).matching( true );
+						return c.match()
+							.field( "nested.active" )
+							.matching( true );
 					} ).asc().mode( MultiValue.MIN );
 			} )
 			.toQuery();
@@ -115,6 +122,95 @@ public class LuceneMultiValueSearchPredicateNestedWithFilterIT {
 		assertThat( query ).hasDocRefHitsExactOrder( c -> {
 			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
 		} );
+	}
+
+	@Test
+	public void integer_searchNestedMultivaluesRangeAggregation() {
+		StubMappingScope scope = indexManager_1_1.createScope();
+		AggregationKey<Map<Range<Integer>, Long>> aggregationKey = AggregationKey.of( "someAggregation" );
+
+		PredicateFinalStep filter = scope.predicate()
+			.nested().objectField( "nested" ).nest( (f) -> {
+			return f.match().field( "nested.active" ).matching( true );
+		} );
+
+		SearchQuery<DocumentReference> query = scope.query()
+			.where( f -> {
+				return f.bool().must( f.matchAll() )
+					.must( filter );
+			} )
+			.aggregation( aggregationKey, f -> f.range()
+			.field( "nested.additionalIntegerField", Integer.class )
+			.range( 0, 2 )
+			.range( 2, 4 )
+			.range( 4, 6 )
+			.range( 6, null )
+			.mode( MultiValue.AVG )
+			.filter( (c) -> {
+				return c.match()
+					.field( "nested.active" )
+					.matching( true );
+			} ) )
+			.sort( f -> f.field( "nested.additionalIntegerField" )
+			.asc().mode( MultiValue.AVG ) )
+			.toQuery();
+
+		SearchResult<DocumentReference> result = query.fetchAll();
+		List<DocumentReference> hits = result.getHits();
+
+		Map<Range<Integer>, Long> aggregation = result.getAggregation( aggregationKey );
+		for ( Range<Integer> key : aggregation.keySet() ) {
+			System.out.println( key + " " + aggregation.get( key ) );
+		}
+//
+//		SearchResultAssert.assertThat( query )
+//			.aggregation( aggregationKey, containsExactly( c -> {
+//				c.accept( Range.between( 0, 2 ), 0L );
+//				c.accept( Range.between( 2, 4 ), 1L );
+//				c.accept( Range.between( 4, 6 ), 1L );
+//				c.accept( Range.between( 6, null ), 0L );
+//			} ) );
+	}
+
+	@Test
+	public void integer_searchNestedMultivaluesTermAggregation() {
+		StubMappingScope scope = indexManager_1_1.createScope();
+		AggregationKey<Map<Integer, Long>> aggregationKey = AggregationKey.of( "someAggregation" );
+
+		PredicateFinalStep filter = scope.predicate()
+			.nested().objectField( "nested" ).nest( (f) -> {
+			return f.match().field( "nested.active" ).matching( true );
+		} );
+
+		SearchQuery<DocumentReference> query = scope.query()
+			.where( f -> {
+				return f.bool().must( f.matchAll() )
+					.must( filter );
+			} )
+			.aggregation( aggregationKey, f -> f.terms()
+			.field( "nested.additionalIntegerField", Integer.class )
+			.mode( MultiValue.AVG )
+			.filter( (c) -> {
+				return c.match()
+					.field( "nested.active" )
+					.matching( true );
+			} ) )
+			.sort( f -> f.field( "nested.additionalIntegerField" )
+			.asc().mode( MultiValue.AVG ) )
+			.toQuery();
+
+		SearchResult<DocumentReference> result = query.fetchAll();
+		List<DocumentReference> hits = result.getHits();
+
+		Map<Integer, Long> aggregation = result.getAggregation( aggregationKey );
+		for ( Integer key : aggregation.keySet() ) {
+			System.out.println( key + " " + aggregation.get( key ) );
+		}
+
+//		SearchResultAssert.assertThat( query )
+//			.aggregation( aggregationKey, containsExactly( c -> {
+//
+//			} ) );
 	}
 
 	private void initData() {
@@ -190,7 +286,7 @@ public class LuceneMultiValueSearchPredicateNestedWithFilterIT {
 
 			add( "nested.integer", Integer.class, nSubInd.field(
 				"additionalIntegerField",
-				f -> f.asInteger().sortable( Sortable.YES ) )
+				f -> f.asInteger().sortable( Sortable.YES ).aggregable( Aggregable.YES ) )
 				.multiValued().toReference() );
 
 			add( "nested", ObjectFieldStorage.NESTED, nSubInd.toReference() );
