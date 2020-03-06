@@ -74,17 +74,6 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 	}
 
 	/**
-	 * Creates a DoubleMultiValuesSource that wraps a double-valued field
-	 *
-	 * @param field the field
-	 * @param mode the mode
-	 * @return DoubleMultiValuesSource
-	 */
-	public static DoubleMultiValuesSource fromDoubleField(String field, MultiValueMode mode) {
-		return fromDoubleField( field, mode, null );
-	}
-
-	/**
 	 * Creates a DoubleMultiValuesSource that wraps a float-valued field
 	 *
 	 * @param field the field
@@ -95,64 +84,6 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 	public static DoubleMultiValuesSource fromFloatField(String field, MultiValueMode mode, NestedDocsProvider nested) {
 		return fromField( field, mode, nested,
 			(v) -> (double) Float.intBitsToFloat( (int) v ), (v) -> (long) Float.floatToRawIntBits( (float) v ) );
-	}
-
-	/**
-	 * Creates a DoubleMultiValuesSource that wraps a float-valued field
-	 *
-	 * @param field the field
-	 * @param mode the mode
-	 * @return DoubleMultiValuesSource
-	 */
-	public static DoubleMultiValuesSource fromFloatField(String field, MultiValueMode mode) {
-		return fromFloatField( field, mode, null );
-	}
-
-	/**
-	 * Creates a DoubleMultiValuesSource that wraps a long-valued field
-	 *
-	 * @param field the field
-	 * @param mode the mode
-	 * @param nested the nested provider
-	 * @return DoubleMultiValuesSource
-	 */
-	public static DoubleMultiValuesSource fromLongField(String field, MultiValueMode mode, NestedDocsProvider nested) {
-		return fromField( field, mode, nested,
-			(v) -> (double) v, (v) -> (long) v );
-	}
-
-	/**
-	 * Creates a DoubleMultiValuesSource that wraps a long-valued field
-	 *
-	 * @param field the field
-	 * @param mode the mode
-	 * @return DoubleMultiValuesSource
-	 */
-	public static DoubleMultiValuesSource fromLongField(String field, MultiValueMode mode) {
-		return fromLongField( field, mode, null );
-	}
-
-	/**
-	 * Creates a DoubleMultiValuesSource that wraps an int-valued field
-	 *
-	 * @param field the field
-	 * @param mode the mode
-	 * @param nested the nested provider
-	 * @return DoubleMultiValuesSource
-	 */
-	public static DoubleMultiValuesSource fromIntField(String field, MultiValueMode mode, NestedDocsProvider nested) {
-		return fromLongField( field, mode, nested );
-	}
-
-	/**
-	 * Creates a DoubleMultiValuesSource that wraps an int-valued field
-	 *
-	 * @param field the field
-	 * @param mode the mode
-	 * @return DoubleMultiValuesSource
-	 */
-	public static DoubleMultiValuesSource fromIntField(String field, MultiValueMode mode) {
-		return fromIntField( field, mode, null );
 	}
 
 	/**
