@@ -26,40 +26,6 @@ import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider
 
 public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 
-	final String field;
-	final MultiValueMode mode;
-	final LongToDoubleFunction decoder;
-	private final DoubleToLongFunction encoder;
-
-	public DoubleMultiValuesSource(String field, MultiValueMode mode,
-		LongToDoubleFunction decoder, DoubleToLongFunction encoder) {
-		this.field = field;
-		this.mode = mode;
-		this.decoder = decoder;
-		this.encoder = encoder;
-	}
-
-	/**
-	 * Creates a DoubleMultiValuesSource that wraps a generic NumericDocValues
-	 * field
-	 *
-	 * @param field the field to wrap, must have NumericDocValues
-	 * @param mode the multivalue mode
-	 * @param nested the nested provider
-	 * @param decoder a function to convert the long-valued doc values to doubles
-	 * @param encoder a function to convert the double-valued doc values to long
-	 * @return The DoubleMultiValuesSource
-	 */
-	public static DoubleMultiValuesSource fromField(String field, MultiValueMode mode, NestedDocsProvider nested,
-		LongToDoubleFunction decoder, DoubleToLongFunction encoder) {
-		if ( nested == null ) {
-			return new MultiFieldValuesSource( field, mode, decoder, encoder );
-		}
-		else {
-			return new NestedMultiFieldValuesSource( field, mode, nested, decoder, encoder );
-		}
-	}
-
 	/**
 	 * Creates a DoubleMultiValuesSource that wraps a double-valued field
 	 *
@@ -70,7 +36,7 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 	 */
 	public static DoubleMultiValuesSource fromDoubleField(String field, MultiValueMode mode, NestedDocsProvider nested) {
 		return fromField( field, mode, nested,
-			Double::longBitsToDouble, Double::doubleToRawLongBits );
+				Double::longBitsToDouble, Double::doubleToRawLongBits );
 	}
 
 	/**
@@ -83,7 +49,30 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 	 */
 	public static DoubleMultiValuesSource fromFloatField(String field, MultiValueMode mode, NestedDocsProvider nested) {
 		return fromField( field, mode, nested,
-			(v) -> (double) Float.intBitsToFloat( (int) v ), (v) -> (long) Float.floatToRawIntBits( (float) v ) );
+				(v) -> (double) Float.intBitsToFloat( (int) v ), (v) -> (long) Float.floatToRawIntBits( (float) v ) );
+	}
+
+	private static DoubleMultiValuesSource fromField(String field, MultiValueMode mode, NestedDocsProvider nested,
+			LongToDoubleFunction decoder, DoubleToLongFunction encoder) {
+		if ( nested == null ) {
+			return new MultiFieldValuesSource( field, mode, decoder, encoder );
+		}
+		else {
+			return new NestedMultiFieldValuesSource( field, mode, nested, decoder, encoder );
+		}
+	}
+
+	final String field;
+	final MultiValueMode mode;
+	final LongToDoubleFunction decoder;
+	private final DoubleToLongFunction encoder;
+
+	public DoubleMultiValuesSource(String field, MultiValueMode mode,
+		LongToDoubleFunction decoder, DoubleToLongFunction encoder) {
+		this.field = field;
+		this.mode = mode;
+		this.decoder = decoder;
+		this.encoder = encoder;
 	}
 
 	/**
