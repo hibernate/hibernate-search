@@ -42,27 +42,27 @@ public class LuceneNumericFieldSortBuilder<F, E extends Number>
 	}
 
 	protected MultiValueMode getMultiValueMode() {
-		MultiValueMode sortMode = MultiValueMode.MIN;
-		if ( multi != null ) {
-			switch ( multi ) {
+		MultiValueMode multiValueMode = MultiValueMode.MIN;
+		if ( mode != null ) {
+			switch ( mode ) {
 				case MIN:
-					sortMode = MultiValueMode.MIN;
+					multiValueMode = MultiValueMode.MIN;
 					break;
 				case MAX:
-					sortMode = MultiValueMode.MAX;
+					multiValueMode = MultiValueMode.MAX;
 					break;
 				case AVG:
-					sortMode = MultiValueMode.AVG;
+					multiValueMode = MultiValueMode.AVG;
 					break;
 				case SUM:
-					sortMode = MultiValueMode.SUM;
+					multiValueMode = MultiValueMode.SUM;
 					break;
 				case MEDIAN:
-					sortMode = MultiValueMode.MEDIAN;
+					multiValueMode = MultiValueMode.MEDIAN;
 					break;
 			}
 		}
-		return sortMode;
+		return multiValueMode;
 	}
 
 }

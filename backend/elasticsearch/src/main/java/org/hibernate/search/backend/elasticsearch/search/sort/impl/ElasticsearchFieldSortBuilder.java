@@ -16,8 +16,10 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonElement;
@@ -33,6 +35,13 @@ public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearc
 	private static final JsonPrimitive MISSING_FIRST_KEYWORD_JSON = new JsonPrimitive( "_first" );
 	private static final JsonPrimitive MISSING_LAST_KEYWORD_JSON = new JsonPrimitive( "_last" );
 
+	private static final JsonAccessor<JsonElement> MODE_ACCESSOR = JsonAccessor.root().property( "mode" );
+	private static final JsonPrimitive SUM_KEYWORD_JSON = new JsonPrimitive( "sum" );
+	private static final JsonPrimitive AVG_KEYWORD_JSON = new JsonPrimitive( "avg" );
+	private static final JsonPrimitive MIN_KEYWORD_JSON = new JsonPrimitive( "min" );
+	private static final JsonPrimitive MAX_KEYWORD_JSON = new JsonPrimitive( "max" );
+	private static final JsonPrimitive MEDIAN_KEYWORD_JSON = new JsonPrimitive( "median" );
+
 	private final ElasticsearchSearchContext searchContext;
 
 	private final String absoluteFieldPath;
@@ -44,6 +53,8 @@ public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearc
 	private final ElasticsearchFieldCodec<F> codec;
 
 	private JsonElement missing;
+
+	private JsonPrimitive mode;
 
 	public ElasticsearchFieldSortBuilder(ElasticsearchSearchContext searchContext,
 			String absoluteFieldPath, List<String> nestedPathHierarchy,
@@ -83,9 +94,37 @@ public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearc
 	}
 
 	@Override
+	public void mode(SortMode mode) {
+		if ( mode != null ) {
+			switch ( mode ) {
+				case SUM:
+					this.mode = SUM_KEYWORD_JSON;
+					break;
+				case AVG:
+					this.mode = AVG_KEYWORD_JSON;
+					break;
+				case MIN:
+					this.mode = MIN_KEYWORD_JSON;
+					break;
+				case MAX:
+					this.mode = MAX_KEYWORD_JSON;
+					break;
+				case MEDIAN:
+					this.mode = MEDIAN_KEYWORD_JSON;
+					break;
+				default:
+					throw new AssertionFailure( "Unexpected sort mode: " + mode );
+			}
+		}
+	}
+
+	@Override
 	public void doBuildAndAddTo(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
 		if ( missing != null ) {
 			MISSING_ACCESSOR.set( innerObject, missing );
+		}
+		if ( mode != null ) {
+			MODE_ACCESSOR.set( innerObject, mode );
 		}
 
 		if ( innerObject.size() == 0 ) {

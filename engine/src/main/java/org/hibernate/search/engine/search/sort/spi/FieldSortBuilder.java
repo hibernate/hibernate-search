@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.sort.spi;
 
+import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.common.ValueConvert;
 
 public interface FieldSortBuilder<B> extends SearchSortBuilder<B> {
@@ -15,5 +16,7 @@ public interface FieldSortBuilder<B> extends SearchSortBuilder<B> {
 	void missingLast();
 
 	void missingAs(Object value, ValueConvert convert);
+
+	void mode(SortMode mode);
 
 }
