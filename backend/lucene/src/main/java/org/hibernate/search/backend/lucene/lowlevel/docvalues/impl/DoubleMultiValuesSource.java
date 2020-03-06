@@ -10,6 +10,9 @@ import java.io.IOException;
 import java.util.Objects;
 import java.util.function.DoubleToLongFunction;
 import java.util.function.LongToDoubleFunction;
+
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
+
 import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
@@ -22,7 +25,6 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.LongValues;
 import org.apache.lucene.search.LongValuesSource;
 import org.apache.lucene.util.BitSet;
-import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 
 public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 
@@ -54,25 +56,57 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 
 	private static DoubleMultiValuesSource fromField(String field, MultiValueMode mode, NestedDocsProvider nested,
 			LongToDoubleFunction decoder, DoubleToLongFunction encoder) {
-		if ( nested == null ) {
-			return new MultiFieldValuesSource( field, mode, decoder, encoder );
-		}
-		else {
-			return new NestedMultiFieldValuesSource( field, mode, nested, decoder, encoder );
-		}
+		return new FieldMultiValuesSource( field, mode, nested, decoder, encoder );
 	}
 
-	final String field;
-	final MultiValueMode mode;
-	final LongToDoubleFunction decoder;
+	protected final MultiValueMode mode;
+	protected final NestedDocsProvider nestedDocsProvider;
 	private final DoubleToLongFunction encoder;
+	private final LongToDoubleFunction decoder;
 
-	public DoubleMultiValuesSource(String field, MultiValueMode mode,
-		LongToDoubleFunction decoder, DoubleToLongFunction encoder) {
-		this.field = field;
+	public DoubleMultiValuesSource(MultiValueMode mode, NestedDocsProvider nestedDocsProvider,
+			LongToDoubleFunction decoder, DoubleToLongFunction encoder) {
 		this.mode = mode;
+		this.nestedDocsProvider = nestedDocsProvider;
 		this.decoder = decoder;
 		this.encoder = encoder;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if ( this == o ) {
+			return true;
+		}
+		if ( o == null || getClass() != o.getClass() ) {
+			return false;
+		}
+		DoubleMultiValuesSource that = (DoubleMultiValuesSource) o;
+		return Objects.equals( mode, that.mode )
+				&& Objects.equals( nestedDocsProvider, that.nestedDocsProvider )
+				&& Objects.equals( encoder, that.encoder )
+				&& Objects.equals( decoder, that.decoder );
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash( mode, nestedDocsProvider, encoder, decoder );
+	}
+
+	@Override
+	public DoubleValues getValues(LeafReaderContext ctx, DoubleValues scores) throws IOException {
+		SortedNumericDocValues values = getSortedNumericDocValues( ctx );
+
+		if ( nestedDocsProvider == null ) {
+			return select( values, scores );
+		}
+
+		if ( scores == null ) {
+			scores = DoubleValues.EMPTY;
+		}
+
+		final BitSet rootDocs = nestedDocsProvider.parentDocs( ctx );
+		final DocIdSetIterator innerDocs = nestedDocsProvider.childDocs( ctx );
+		return select( values, scores, rootDocs, innerDocs, ctx.reader().maxDoc(), Integer.MAX_VALUE );
 	}
 
 	/**
@@ -98,6 +132,8 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 	public LongValuesSource getLongValuesSource() {
 		return new LongDoubleValuesSource( this, encoder );
 	}
+
+	protected abstract SortedNumericDocValues getSortedNumericDocValues(LeafReaderContext ctx) throws IOException;
 
 	private double decode(long value) {
 		return decoder.applyAsDouble( value );
@@ -356,11 +392,19 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 		};
 	}
 
-	private static class MultiFieldValuesSource extends DoubleMultiValuesSource {
+	private static class FieldMultiValuesSource extends DoubleMultiValuesSource {
 
-		private MultiFieldValuesSource(String field, MultiValueMode mode,
-			LongToDoubleFunction decoder, DoubleToLongFunction encoder) {
-			super( field, mode, decoder, encoder );
+		private final String field;
+
+		public FieldMultiValuesSource(String field, MultiValueMode mode, NestedDocsProvider nestedDocsProvider,
+				LongToDoubleFunction decoder, DoubleToLongFunction encoder) {
+			super( mode, nestedDocsProvider, decoder, encoder );
+			this.field = field;
+		}
+
+		@Override
+		public String toString() {
+			return "double(" + field + "," + mode + "," + nestedDocsProvider + ")";
 		}
 
 		@Override
@@ -368,28 +412,16 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 			if ( this == o ) {
 				return true;
 			}
-			if ( o == null || getClass() != o.getClass() ) {
+			if ( !super.equals( o ) ) {
 				return false;
 			}
-			MultiFieldValuesSource that = (MultiFieldValuesSource) o;
-			return Objects.equals( field, that.field )
-				&& Objects.equals( decoder, that.decoder );
-		}
-
-		@Override
-		public String toString() {
-			return "double(" + field + ")";
+			FieldMultiValuesSource that = (FieldMultiValuesSource) o;
+			return Objects.equals( field, that.field );
 		}
 
 		@Override
 		public int hashCode() {
-			return Objects.hash( field, decoder );
-		}
-
-		@Override
-		public DoubleValues getValues(LeafReaderContext ctx, DoubleValues scores) throws IOException {
-			SortedNumericDocValues values = DocValues.getSortedNumeric( ctx.reader(), field );
-			return select( values, scores );
+			return Objects.hash( super.hashCode(), field );
 		}
 
 		@Override
@@ -418,81 +450,10 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 			return this;
 		}
 
-	}
-
-	private static class NestedMultiFieldValuesSource extends DoubleMultiValuesSource {
-
-		private final NestedDocsProvider nested;
-
-		private NestedMultiFieldValuesSource(String field, MultiValueMode mode, NestedDocsProvider nested,
-			LongToDoubleFunction decoder, DoubleToLongFunction encoder) {
-			super( field, mode, decoder, encoder );
-			this.nested = nested;
-		}
-
 		@Override
-		public boolean equals(Object o) {
-			if ( this == o ) {
-				return true;
-			}
-			if ( o == null || getClass() != o.getClass() ) {
-				return false;
-			}
-			MultiFieldValuesSource that = (MultiFieldValuesSource) o;
-			return Objects.equals( field, that.field )
-				&& Objects.equals( decoder, that.decoder );
+		protected SortedNumericDocValues getSortedNumericDocValues(LeafReaderContext ctx) throws IOException {
+			return DocValues.getSortedNumeric( ctx.reader(), field );
 		}
-
-		@Override
-		public String toString() {
-			return "double(" + field + ")";
-		}
-
-		@Override
-		public int hashCode() {
-			return Objects.hash( field, decoder );
-		}
-
-		@Override
-		public DoubleValues getValues(LeafReaderContext ctx, DoubleValues scores) throws IOException {
-			SortedNumericDocValues values = DocValues.getSortedNumeric( ctx.reader(), field );
-
-			if ( scores == null ) {
-				scores = DoubleValues.EMPTY;
-			}
-
-			final BitSet rootDocs = nested.parentDocs( ctx );
-			final DocIdSetIterator innerDocs = nested.childDocs( ctx );
-			return select( values, scores, rootDocs, innerDocs, ctx.reader().maxDoc(), Integer.MAX_VALUE );
-
-		}
-
-		@Override
-		public boolean needsScores() {
-			return false;
-		}
-
-		@Override
-		public boolean isCacheable(LeafReaderContext ctx) {
-			return DocValues.isCacheable( ctx, field );
-		}
-
-		@Override
-		public Explanation explain(LeafReaderContext ctx, int docId, Explanation scoreExplanation) throws IOException {
-			DoubleValues values = getValues( ctx, null );
-			if ( values.advanceExact( docId ) ) {
-				return Explanation.match( values.doubleValue(), this.toString() );
-			}
-			else {
-				return Explanation.noMatch( this.toString() );
-			}
-		}
-
-		@Override
-		public DoubleValuesSource rewrite(IndexSearcher searcher) throws IOException {
-			return this;
-		}
-
 	}
 
 	private static class RawNumericDocValues extends NumericDocValues {
