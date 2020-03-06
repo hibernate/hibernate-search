@@ -13,7 +13,7 @@ import java.util.Properties;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
-import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
+import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.multitenancy.MultiTenancyStrategyName;
 import org.hibernate.search.engine.cfg.BackendSettings;
 import org.hibernate.search.engine.cfg.EngineSettings;
@@ -43,8 +43,8 @@ public class MyConfigurationIT {
 				BackendSettings.backendKey( myBackend, ElasticsearchBackendSettings.VERSION_CHECK_ENABLED ), "false" );
 		// index configuration
 		config.put(
-				IndexSettings.indexDefaultsKey( myBackend, ElasticsearchIndexSettings.LIFECYCLE_STRATEGY ),
-				IndexLifecycleStrategyName.NONE.getExternalRepresentation()
+				IndexSettings.indexDefaultsKey( myBackend, ElasticsearchIndexSettings.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS ),
+				IndexStatus.YELLOW.getElasticsearchString()
 		);
 		// orm configuration
 		config.put(
