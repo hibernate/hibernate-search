@@ -26,7 +26,7 @@ import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.search.DoubleValues;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesSource;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesToSingleValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 
 public class LuceneLongDomain implements LuceneNumericDomain<Long> {
@@ -77,7 +77,7 @@ public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 	public LongValueFacetCounts createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 			NestedDocsProvider nestedDocsProvider) throws IOException {
 		// TODO HSEARCH-3856 aggregations on multi-valued fields - currently we just use the minimum value
-		LongMultiValuesSource source = LongMultiValuesSource.fromLongField(
+		LongMultiValuesToSingleValuesSource source = LongMultiValuesToSingleValuesSource.fromLongField(
 				absoluteFieldPath, MultiValueMode.MIN, nestedDocsProvider
 		);
 		return new LongValueFacetCounts(
@@ -91,7 +91,7 @@ public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 			Collection<? extends Range<? extends Long>> ranges,
 			NestedDocsProvider nestedDocsProvider) throws IOException {
 		// TODO HSEARCH-3856 aggregations on multi-valued fields - currently we just use the minimum value
-		LongMultiValuesSource source = LongMultiValuesSource.fromLongField(
+		LongMultiValuesToSingleValuesSource source = LongMultiValuesToSingleValuesSource.fromLongField(
 				absoluteFieldPath, MultiValueMode.MIN, nestedDocsProvider
 		);
 		return new LongRangeFacetCounts(
@@ -118,15 +118,15 @@ public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 	@Override
 	public FieldComparator.NumericComparator<Long> createFieldComparator(String fieldName, int numHits,
 			MultiValueMode multiValueMode, Long missingValue, NestedDocsProvider nestedDocsProvider) {
-		LongMultiValuesSource source = LongMultiValuesSource.fromLongField( fieldName, multiValueMode, nestedDocsProvider );
+		LongMultiValuesToSingleValuesSource source = LongMultiValuesToSingleValuesSource.fromLongField( fieldName, multiValueMode, nestedDocsProvider );
 		return new LongFieldComparator( numHits, fieldName, missingValue, source );
 	}
 
 	public static class LongFieldComparator extends FieldComparator.LongComparator {
 
-		private final LongMultiValuesSource source;
+		private final LongMultiValuesToSingleValuesSource source;
 
-		public LongFieldComparator(int numHits, String field, Long missingValue, LongMultiValuesSource source) {
+		public LongFieldComparator(int numHits, String field, Long missingValue, LongMultiValuesToSingleValuesSource source) {
 			super( numHits, field, missingValue );
 			this.source = source;
 		}
