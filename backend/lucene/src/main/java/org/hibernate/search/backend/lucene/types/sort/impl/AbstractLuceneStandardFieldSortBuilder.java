@@ -16,6 +16,7 @@ import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuil
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
@@ -47,6 +48,8 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 	private final Object sortMissingValueLastPlaceholder;
 
 	protected Object missingValue;
+
+	protected SortMode mode;
 
 	protected AbstractLuceneStandardFieldSortBuilder(LuceneSearchContext searchContext,
 			String absoluteFieldPath, String nestedDocumentPath,
@@ -87,6 +90,11 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 			);
 		}
+	}
+
+	@Override
+	public void mode(SortMode multi) {
+		this.mode = multi;
 	}
 
 	protected Object encodeMissingAs(F converted) {
