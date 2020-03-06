@@ -26,7 +26,7 @@ import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.search.DoubleValues;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValuesSource;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValuesToSingleValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 
 public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
@@ -79,7 +79,7 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	public LongValueFacetCounts createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 			NestedDocsProvider nestedDocsProvider) throws IOException {
 		// TODO HSEARCH-3856 aggregations on multi-valued fields - currently we just use the minimum value
-		DoubleMultiValuesSource source = DoubleMultiValuesSource.fromDoubleField(
+		DoubleMultiValuesToSingleValuesSource source = DoubleMultiValuesToSingleValuesSource.fromDoubleField(
 				absoluteFieldPath, MultiValueMode.MIN, nestedDocsProvider
 		);
 		return new LongValueFacetCounts(
@@ -97,7 +97,7 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 			Collection<? extends Range<? extends Double>> ranges,
 			NestedDocsProvider nestedDocsProvider) throws IOException {
 		// TODO HSEARCH-3856 aggregations on multi-valued fields - currently we just use the minimum value
-		DoubleMultiValuesSource source = DoubleMultiValuesSource.fromDoubleField(
+		DoubleMultiValuesToSingleValuesSource source = DoubleMultiValuesToSingleValuesSource.fromDoubleField(
 				absoluteFieldPath, MultiValueMode.MIN, nestedDocsProvider
 		);
 		return new DoubleRangeFacetCounts(
@@ -125,7 +125,7 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	@Override
 	public FieldComparator.NumericComparator<Double> createFieldComparator(String fieldName, int numHits,
 			MultiValueMode multiValueMode, Double missingValue, NestedDocsProvider nestedDocsProvider) {
-		DoubleMultiValuesSource source = DoubleMultiValuesSource
+		DoubleMultiValuesToSingleValuesSource source = DoubleMultiValuesToSingleValuesSource
 				.fromDoubleField( fieldName, multiValueMode, nestedDocsProvider );
 
 		return new DoubleFieldComparator( numHits, fieldName, missingValue, source );
@@ -133,9 +133,9 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 
 	public static class DoubleFieldComparator extends FieldComparator.DoubleComparator {
 
-		private final DoubleMultiValuesSource source;
+		private final DoubleMultiValuesToSingleValuesSource source;
 
-		public DoubleFieldComparator(int numHits, String field, Double missingValue, DoubleMultiValuesSource source) {
+		public DoubleFieldComparator(int numHits, String field, Double missingValue, DoubleMultiValuesToSingleValuesSource source) {
 			super( numHits, field, missingValue );
 			this.source = source;
 		}

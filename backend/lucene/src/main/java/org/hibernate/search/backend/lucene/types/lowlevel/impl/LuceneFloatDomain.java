@@ -26,7 +26,7 @@ import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.search.DoubleValues;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValuesSource;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValuesToSingleValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 
 public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
@@ -79,7 +79,7 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	public LongValueFacetCounts createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 			NestedDocsProvider nestedDocsProvider) throws IOException {
 		// TODO HSEARCH-3856 aggregations on multi-valued fields - currently we just use the minimum value
-		DoubleMultiValuesSource source = DoubleMultiValuesSource.fromFloatField(
+		DoubleMultiValuesToSingleValuesSource source = DoubleMultiValuesToSingleValuesSource.fromFloatField(
 				absoluteFieldPath, MultiValueMode.MIN, nestedDocsProvider
 		);
 		return new LongValueFacetCounts(
@@ -97,7 +97,7 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 			Collection<? extends Range<? extends Float>> ranges,
 			NestedDocsProvider nestedDocsProvider) throws IOException {
 		// TODO HSEARCH-3856 aggregations on multi-valued fields - currently we just use the minimum value
-		DoubleMultiValuesSource source = DoubleMultiValuesSource.fromFloatField(
+		DoubleMultiValuesToSingleValuesSource source = DoubleMultiValuesToSingleValuesSource.fromFloatField(
 				absoluteFieldPath, MultiValueMode.MIN, nestedDocsProvider
 		);
 		return new DoubleRangeFacetCounts(
@@ -124,14 +124,14 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	@Override
 	public FieldComparator.NumericComparator<Float> createFieldComparator(String fieldname, int numHits,
 			MultiValueMode multiValueMode, Float missingValue, NestedDocsProvider nestedDocsProvider) {
-		DoubleMultiValuesSource source = DoubleMultiValuesSource.fromFloatField( fieldname, multiValueMode, nestedDocsProvider );
+		DoubleMultiValuesToSingleValuesSource source = DoubleMultiValuesToSingleValuesSource.fromFloatField( fieldname, multiValueMode, nestedDocsProvider );
 		return new FloatFieldComparator( numHits, fieldname, missingValue, source );
 	}
 
 	public static class FloatFieldComparator extends FieldComparator.FloatComparator {
-		private final DoubleMultiValuesSource source;
+		private final DoubleMultiValuesToSingleValuesSource source;
 
-		public FloatFieldComparator(int numHits, String field, Float missingValue, DoubleMultiValuesSource source) {
+		public FloatFieldComparator(int numHits, String field, Float missingValue, DoubleMultiValuesToSingleValuesSource source) {
 			super( numHits, field, missingValue );
 			this.source = source;
 		}

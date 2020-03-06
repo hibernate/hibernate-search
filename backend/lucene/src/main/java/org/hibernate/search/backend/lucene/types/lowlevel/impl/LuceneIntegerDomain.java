@@ -26,7 +26,7 @@ import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.search.DoubleValues;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesSource;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesToSingleValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 
 public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
@@ -77,7 +77,7 @@ public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
 	public LongValueFacetCounts createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 			NestedDocsProvider nestedDocsProvider) throws IOException {
 		// TODO HSEARCH-3856 aggregations on multi-valued fields - currently we just use the minimum value
-		LongMultiValuesSource source = LongMultiValuesSource.fromIntField(
+		LongMultiValuesToSingleValuesSource source = LongMultiValuesToSingleValuesSource.fromIntField(
 				absoluteFieldPath, MultiValueMode.MIN, nestedDocsProvider
 		);
 		return new LongValueFacetCounts(
@@ -91,7 +91,7 @@ public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
 			Collection<? extends Range<? extends Integer>> ranges,
 			NestedDocsProvider nestedDocsProvider) throws IOException {
 		// TODO HSEARCH-3856 aggregations on multi-valued fields - currently we just use the minimum value
-		LongMultiValuesSource source = LongMultiValuesSource.fromIntField(
+		LongMultiValuesToSingleValuesSource source = LongMultiValuesToSingleValuesSource.fromIntField(
 				absoluteFieldPath, MultiValueMode.MIN, nestedDocsProvider
 		);
 		return new LongRangeFacetCounts(
@@ -118,15 +118,15 @@ public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
 	@Override
 	public FieldComparator.NumericComparator<Integer> createFieldComparator(String fieldName, int numHits,
 			MultiValueMode multiValueMode, Integer missingValue, NestedDocsProvider nestedDocsProvider) {
-		LongMultiValuesSource source = LongMultiValuesSource.fromIntField( fieldName, multiValueMode, nestedDocsProvider );
+		LongMultiValuesToSingleValuesSource source = LongMultiValuesToSingleValuesSource.fromIntField( fieldName, multiValueMode, nestedDocsProvider );
 		return new IntegerFieldComparator( numHits, fieldName, missingValue, source );
 	}
 
 	public static class IntegerFieldComparator extends FieldComparator.IntComparator {
 
-		private final LongMultiValuesSource source;
+		private final LongMultiValuesToSingleValuesSource source;
 
-		public IntegerFieldComparator(int numHits, String field, Integer missingValue, LongMultiValuesSource source) {
+		public IntegerFieldComparator(int numHits, String field, Integer missingValue, LongMultiValuesToSingleValuesSource source) {
 			super( numHits, field, missingValue );
 			this.source = source;
 		}
