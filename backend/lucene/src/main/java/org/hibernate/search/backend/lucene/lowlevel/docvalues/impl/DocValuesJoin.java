@@ -109,7 +109,7 @@ public class DocValuesJoin {
 				.getRawFloatValues();
 	}
 
-	public static NumericDoubleValues getJoinedAsSingleValuedDistance(LeafReaderContext context, String field,
+	public static DoubleMultiValues getJoinedAsSingleValuedDistance(LeafReaderContext context, String field,
 			NestedDocsProvider nestedDocsProvider, double centerLatitude, double centerLongitude,
 			double missingValue) throws IOException {
 		SortedNumericDocValues sortedNumericDocValues = context.reader().getSortedNumericDocValues( field );
@@ -258,8 +258,8 @@ public class DocValuesJoin {
 		};
 	}
 
-	private static NumericDoubleValues joinAsSingleValued(SortedNumericDoubleValues values, double missingValue, BitSet parentDocs, DocIdSetIterator childDocs) {
-		return new NumericDoubleValues() {
+	private static DoubleMultiValues joinAsSingleValued(SortedNumericDoubleValues values, double missingValue, BitSet parentDocs, DocIdSetIterator childDocs) {
+		return new DoubleMultiValues() {
 
 			int lastSeenParentDoc = 0;
 			double lastEmittedValue = missingValue;

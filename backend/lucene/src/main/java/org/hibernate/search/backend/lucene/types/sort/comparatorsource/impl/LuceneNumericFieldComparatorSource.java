@@ -10,15 +10,15 @@ import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDoma
 
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
+import org.hibernate.search.backend.lucene.NumericMultiValueMode;
 
 public class LuceneNumericFieldComparatorSource<E extends Number> extends LuceneFieldComparatorSource {
 
 	private final E missingValue;
 	private final LuceneNumericDomain<E> numericDomain;
-	private final MultiValueMode sortMode;
+	private final NumericMultiValueMode sortMode;
 
-	public LuceneNumericFieldComparatorSource(String nestedDocumentPath, LuceneNumericDomain<E> numericDomain, E missingValue, MultiValueMode sortMode, Query filter) {
+	public LuceneNumericFieldComparatorSource(String nestedDocumentPath, LuceneNumericDomain<E> numericDomain, E missingValue, NumericMultiValueMode sortMode, Query filter) {
 		super( nestedDocumentPath, filter );
 		this.numericDomain = numericDomain;
 		this.missingValue = missingValue;

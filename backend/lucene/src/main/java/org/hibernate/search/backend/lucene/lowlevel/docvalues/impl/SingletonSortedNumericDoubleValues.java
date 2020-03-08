@@ -18,16 +18,16 @@ import java.io.IOException;
  * of <a href="https://github.com/elastic/elasticsearch">Elasticsearch project</a>.
  */
 final class SingletonSortedNumericDoubleValues extends SortedNumericDoubleValues {
-	private final NumericDoubleValues in;
+	private final DoubleMultiValues in;
 
-	SingletonSortedNumericDoubleValues(NumericDoubleValues in) {
+	SingletonSortedNumericDoubleValues(DoubleMultiValues in) {
 		this.in = in;
 	}
 
 	/**
-	 * Return the wrapped {@link NumericDoubleValues}
+	 * Return the wrapped {@link DoubleMultiValues}
 	 */
-	public NumericDoubleValues getNumericDoubleValues() {
+	public DoubleMultiValues getNumericDoubleValues() {
 		return in;
 	}
 

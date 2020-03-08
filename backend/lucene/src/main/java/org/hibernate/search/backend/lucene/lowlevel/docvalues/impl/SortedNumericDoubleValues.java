@@ -95,11 +95,11 @@ public abstract class SortedNumericDoubleValues {
 		}
 	}
 
-	public static SortedNumericDoubleValues singleton(NumericDoubleValues values) {
+	public static SortedNumericDoubleValues singleton(DoubleMultiValues values) {
 		return new SingletonSortedNumericDoubleValues( values );
 	}
 
-	private static class SingleNumericDoubleValues extends NumericDoubleValues {
+	private static class SingleNumericDoubleValues extends DoubleMultiValues {
 
 		private final NumericDocValues values;
 		private final LongToDoubleFunction decoder;
@@ -125,7 +125,7 @@ public abstract class SortedNumericDoubleValues {
 
 	}
 
-	private static class DoubleCastedValues extends NumericDoubleValues {
+	private static class DoubleCastedValues extends DoubleMultiValues {
 
 		private final NumericDocValues values;
 

@@ -12,7 +12,7 @@ import org.apache.lucene.geo.GeoEncodingUtils;
 import org.apache.lucene.index.SortedNumericDocValues;
 import org.apache.lucene.util.SloppyMath;
 
-public class GeoPointDistanceDocValues extends NumericDoubleValues {
+public class GeoPointDistanceDocValues extends DoubleMultiValues {
 
 	private final SortedNumericDocValues values;
 	private final double latitude;

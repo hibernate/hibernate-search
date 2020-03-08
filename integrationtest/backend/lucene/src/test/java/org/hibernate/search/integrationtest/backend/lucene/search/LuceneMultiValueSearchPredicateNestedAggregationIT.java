@@ -116,13 +116,14 @@ public class LuceneMultiValueSearchPredicateNestedAggregationIT {
 				return f.bool().must( f.matchAll() )
 					.must( filter );
 			} )
-			.aggregation( aggregationKey, f -> f.range()
-			.field( "nested.additionalDoubleField", Double.class )
-			.range( 0.0, 2.0 )
-			.range( 2.0, 4.0 )
-			.range( 4.0, 6.0 )
-			.range( 6.0, null )
-			.mode( MultiValue.AVG ) )
+			.aggregation( aggregationKey, f -> {
+				return f.range()
+					.field( "nested.additionalDoubleField", Double.class )
+					.range( 0.0, 2.0 )
+					.range( 2.0, 4.0 )
+					.range( 4.0, 6.0 )
+					.range( 6.0, null );
+			} )
 			.sort( f -> f.field( "nested.additionalDoubleField" )
 			.asc().mode( MultiValue.AVG ) )
 			.toQuery();
@@ -131,6 +132,61 @@ public class LuceneMultiValueSearchPredicateNestedAggregationIT {
 		List<DocumentReference> hits = result.getHits();
 
 		Map<Range<Double>, Long> aggregation = result.getAggregation( aggregationKey );
+		for ( Range<Double> key : aggregation.keySet() ) {
+			System.out.println( key + " " + aggregation.get( key ) );
+		}
+
+		//witch avg and filter
+		query = scope.query()
+			.where( f -> {
+				return f.bool().must( f.matchAll() )
+					.must( filter );
+			} )
+			.aggregation( aggregationKey, f -> {
+				return f.range()
+					.field( "nested.additionalDoubleField", Double.class )
+					.range( 0.0, 2.0 )
+					.range( 2.0, 4.0 )
+					.range( 4.0, 6.0 )
+					.range( 6.0, null )
+					.mode( MultiValue.AVG )
+					.filter( c -> c.match().field( "nested.active" ).matching( true ) );
+			} )
+			.sort( f -> f.field( "nested.additionalDoubleField" )
+			.asc().mode( MultiValue.AVG ) )
+			.toQuery();
+
+		result = query.fetchAll();
+		hits = result.getHits();
+
+		aggregation = result.getAggregation( aggregationKey );
+		for ( Range<Double> key : aggregation.keySet() ) {
+			System.out.println( key + " " + aggregation.get( key ) );
+		}
+
+		//witch filter
+		query = scope.query()
+			.where( f -> {
+				return f.bool().must( f.matchAll() )
+					.must( filter );
+			} )
+			.aggregation( aggregationKey, f -> {
+				return f.range()
+					.field( "nested.additionalDoubleField", Double.class )
+					.range( 0.0, 2.0 )
+					.range( 2.0, 4.0 )
+					.range( 4.0, 6.0 )
+					.range( 6.0, null )
+					.filter( c -> c.match().field( "nested.active" ).matching( true ) );
+			} )
+			.sort( f -> f.field( "nested.additionalDoubleField" )
+			.asc().mode( MultiValue.AVG ) )
+			.toQuery();
+
+		result = query.fetchAll();
+		hits = result.getHits();
+
+		aggregation = result.getAggregation( aggregationKey );
 		for ( Range<Double> key : aggregation.keySet() ) {
 			System.out.println( key + " " + aggregation.get( key ) );
 		}
@@ -159,13 +215,14 @@ public class LuceneMultiValueSearchPredicateNestedAggregationIT {
 				return f.bool().must( f.matchAll() )
 					.must( filter );
 			} )
-			.aggregation( aggregationKey, f -> f.range()
-			.field( "nested.additionalIntegerField", Integer.class )
-			.range( 0, 2 )
-			.range( 2, 4 )
-			.range( 4, 6 )
-			.range( 6, null )
-			.mode( MultiValue.AVG ) )
+			.aggregation( aggregationKey, f -> {
+				return f.range()
+					.field( "nested.additionalIntegerField", Integer.class )
+					.range( 0, 2 )
+					.range( 2, 4 )
+					.range( 4, 6 )
+					.range( 6, null );
+			} )
 			.sort( f -> f.field( "nested.additionalIntegerField" )
 			.asc().mode( MultiValue.AVG ) )
 			.toQuery();
@@ -177,6 +234,34 @@ public class LuceneMultiValueSearchPredicateNestedAggregationIT {
 		for ( Range<Integer> key : aggregation.keySet() ) {
 			System.out.println( key + " " + aggregation.get( key ) );
 		}
+
+		//witch filter
+		query = scope.query()
+			.where( f -> {
+				return f.bool().must( f.matchAll() )
+					.must( filter );
+			} )
+			.aggregation( aggregationKey, f -> {
+				return f.range()
+					.field( "nested.additionalIntegerField", Integer.class )
+					.range( 0, 2 )
+					.range( 2, 4 )
+					.range( 4, 6 )
+					.range( 6, null )
+					.filter( c -> c.match().field( "nested.active" ).matching( true ) );
+			} )
+			.sort( f -> f.field( "nested.additionalIntegerField" )
+			.asc().mode( MultiValue.AVG ) )
+			.toQuery();
+
+		result = query.fetchAll();
+		hits = result.getHits();
+
+		aggregation = result.getAggregation( aggregationKey );
+		for ( Range<Integer> key : aggregation.keySet() ) {
+			System.out.println( key + " " + aggregation.get( key ) );
+		}
+
 //
 //		SearchResultAssert.assertThat( query )
 //			.aggregation( aggregationKey, containsExactly( c -> {
@@ -202,9 +287,10 @@ public class LuceneMultiValueSearchPredicateNestedAggregationIT {
 				return f.bool().must( f.matchAll() )
 					.must( filter );
 			} )
-			.aggregation( aggregationKey, f -> f.terms()
-			.field( "nested.additionalDoubleField", Double.class )
-			.mode( MultiValue.AVG ) )
+			.aggregation( aggregationKey, f -> {
+				return f.terms()
+					.field( "nested.additionalDoubleField", Double.class );
+			} )
 			.sort( f -> f.field( "nested.additionalDoubleField" )
 			.asc().mode( MultiValue.AVG ) )
 			.toQuery();
@@ -213,6 +299,29 @@ public class LuceneMultiValueSearchPredicateNestedAggregationIT {
 		List<DocumentReference> hits = result.getHits();
 
 		Map<Double, Long> aggregation = result.getAggregation( aggregationKey );
+		for ( Double key : aggregation.keySet() ) {
+			System.out.println( key + " " + aggregation.get( key ) );
+		}
+
+		//witch filter
+		query = scope.query()
+			.where( f -> {
+				return f.bool().must( f.matchAll() )
+					.must( filter );
+			} )
+			.aggregation( aggregationKey, f -> {
+				return f.terms()
+					.field( "nested.additionalDoubleField", Double.class )
+					.filter( c -> c.match().field( "nested.active" ).matching( true ) );
+			} )
+			.sort( f -> f.field( "nested.additionalDoubleField" )
+			.asc().mode( MultiValue.AVG ) )
+			.toQuery();
+
+		result = query.fetchAll();
+		hits = result.getHits();
+
+		aggregation = result.getAggregation( aggregationKey );
 		for ( Double key : aggregation.keySet() ) {
 			System.out.println( key + " " + aggregation.get( key ) );
 		}

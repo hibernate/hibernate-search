@@ -7,10 +7,9 @@
 package org.hibernate.search.backend.lucene.lowlevel.docvalues.impl;
 
 import java.io.IOException;
-import java.util.function.DoubleToLongFunction;
 
 import org.apache.lucene.index.NumericDocValues;
-import org.apache.lucene.search.DoubleValues;
+import org.apache.lucene.search.LongValues;
 
 /**
  * A per-document numeric value.
@@ -18,41 +17,49 @@ import org.apache.lucene.search.DoubleValues;
  * Copied and adapted from {@code org.elasticsearch.index.fielddata.NumericDoubleValues} class
  * of <a href="https://github.com/elastic/elasticsearch">Elasticsearch project</a>.
  */
-public abstract class NumericDoubleValues extends DoubleValues {
+public abstract class LongMultiValues extends LongValues {
 
 	/**
 	 * Sole constructor. (For invocation by subclass
 	 * constructors, typically implicit.)
 	 */
-	protected NumericDoubleValues() {
-	}
-
-	/**
-	 * Returns numeric docvalues view of raw double bits
-	 * @return numeric
-	 */
-	public NumericDocValues getRawDoubleValues() {
-		return new RawNumericDocValues( Double::doubleToRawLongBits );
-	}
-
-	/**
-	 * Returns numeric docvalues view of raw float bits
-	 * @return numeric
-	 */
-	public NumericDocValues getRawFloatValues() {
-		return new RawNumericDocValues( (v) -> (long) Float.floatToRawIntBits( (float) v ) );
+	protected LongMultiValues() {
 	}
 
 	/**
 	 * Returns numeric docvalues view of raw long bits
+	 *
 	 * @return numeric
 	 */
 	public NumericDocValues getRawLongValues() {
-		return new RawNumericDocValues( (v) -> (long) v );
+		return new RawNumericDocValues();
+	}
+
+	/**
+	 * Iterates to the next value in the current document.Do not call this more than {@link #docValueCount} times
+	 * for the document.
+	 *
+	 * @return the next value
+	 * @throws java.io.IOException
+	 */
+	public long nextValue() throws IOException {
+		return longValue();
+	}
+
+	/**
+	 * Retrieves the number of values for the current document.This must always
+	 * be greater than zero. It is illegal to call this method after {@link #advanceExact(int)}
+	 * returned {@code false}.
+	 *
+	 * @return value count
+	 */
+	public int docValueCount() {
+		return 1;
 	}
 
 	/**
 	 * Returns numeric docvalues view of raw int bits
+	 *
 	 * @return numeric
 	 */
 	public NumericDocValues getRawIntValues() {
@@ -61,21 +68,19 @@ public abstract class NumericDoubleValues extends DoubleValues {
 
 	private class RawNumericDocValues extends NumericDocValues {
 		private int docID = -1;
-		private final DoubleToLongFunction decorator;
 
-		public RawNumericDocValues(DoubleToLongFunction decorator) {
-			this.decorator = decorator;
+		public RawNumericDocValues() {
 		}
 
 		@Override
 		public boolean advanceExact(int target) throws IOException {
 			docID = target;
-			return NumericDoubleValues.this.advanceExact( target );
+			return LongMultiValues.this.advanceExact( target );
 		}
 
 		@Override
 		public long longValue() throws IOException {
-			return decorator.applyAsLong( NumericDoubleValues.this.doubleValue() );
+			return LongMultiValues.this.longValue();
 		}
 
 		@Override

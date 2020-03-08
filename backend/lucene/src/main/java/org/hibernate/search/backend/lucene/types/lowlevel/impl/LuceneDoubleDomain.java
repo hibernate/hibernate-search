@@ -18,8 +18,6 @@ import org.apache.lucene.document.DoublePoint;
 import org.apache.lucene.document.SortedNumericDocValuesField;
 import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
-import org.apache.lucene.facet.LongValueFacetCounts;
-import org.apache.lucene.facet.range.DoubleRangeFacetCounts;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
@@ -27,7 +25,9 @@ import org.apache.lucene.search.DoubleValues;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValuesSource;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
+import org.hibernate.search.backend.lucene.NumericMultiValueMode;
+import org.hibernate.search.backend.lucene.lowlevel.facet.impl.DoubleMultiValueRangeFacetCounts;
+import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueFacetCounts;
 
 public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	private static final LuceneNumericDomain<Double> INSTANCE = new LuceneDoubleDomain();
@@ -76,11 +76,11 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	}
 
 	@Override
-	public LongValueFacetCounts createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-		MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
+	public Facets createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
+		NumericMultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
 
 		DoubleMultiValuesSource source = DoubleMultiValuesSource.fromDoubleField( absoluteFieldPath, multiValueMode, nestedDocsProvider );
-		return new LongValueFacetCounts(
+		return new LongMultiValueFacetCounts(
 			absoluteFieldPath,
 			// We can't use DoubleValueSource here because it drops the decimals...
 			// So we use this to get raw bits, and then apply fromDocValue to get back the original value.
@@ -93,10 +93,10 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	@Override
 	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 		Collection<? extends Range<? extends Double>> ranges,
-		MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
+		NumericMultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
 
 		DoubleMultiValuesSource source = DoubleMultiValuesSource.fromDoubleField( absoluteFieldPath, multiValueMode, nestedDocsProvider );
-		return new DoubleRangeFacetCounts(
+		return new DoubleMultiValueRangeFacetCounts(
 			absoluteFieldPath,
 			source,
 			facetsCollector, FacetCountsUtils.createDoubleRanges( ranges )
@@ -119,7 +119,7 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	}
 
 	@Override
-	public FieldComparator.NumericComparator<Double> createFieldComparator(String fieldName, int numHits, MultiValueMode multiValueMode, Double missingValue, NestedDocsProvider nestedDocsProvider) {
+	public FieldComparator.NumericComparator<Double> createFieldComparator(String fieldName, int numHits, NumericMultiValueMode multiValueMode, Double missingValue, NestedDocsProvider nestedDocsProvider) {
 
 		DoubleMultiValuesSource source = DoubleMultiValuesSource
 			.fromDoubleField( fieldName, multiValueMode, nestedDocsProvider );

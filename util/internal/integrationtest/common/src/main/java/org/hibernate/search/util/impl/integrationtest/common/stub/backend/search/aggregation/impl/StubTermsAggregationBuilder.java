@@ -47,7 +47,7 @@ class StubTermsAggregationBuilder<K>
 	}
 
 	@Override
-	public void multi(MultiValue multi) {
+	public void mode(MultiValue mode) {
 		// No-op
 	}
 

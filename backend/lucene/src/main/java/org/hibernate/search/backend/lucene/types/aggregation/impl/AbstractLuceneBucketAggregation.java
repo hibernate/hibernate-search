@@ -12,7 +12,7 @@ import java.util.Set;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.FacetsCollectorFactory;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
+import org.hibernate.search.backend.lucene.NumericMultiValueMode;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 
@@ -34,7 +34,7 @@ public abstract class AbstractLuceneBucketAggregation<K, V> implements LuceneSea
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Set<String> indexNames;
-	private final MultiValueMode multiValueMode;
+	private final NumericMultiValueMode multiValueMode;
 	private final String absoluteFieldPath;
 	private final String nestedDocumentPath;
 	private final Query luceneFilterQuery;
@@ -53,7 +53,7 @@ public abstract class AbstractLuceneBucketAggregation<K, V> implements LuceneSea
 		return indexNames;
 	}
 
-	public MultiValueMode getMultiValueMode() {
+	public NumericMultiValueMode getMultiValueMode() {
 		return multiValueMode;
 	}
 
@@ -108,28 +108,28 @@ public abstract class AbstractLuceneBucketAggregation<K, V> implements LuceneSea
 		@Override
 		public abstract LuceneSearchAggregation<Map<K, V>> build();
 
-		protected MultiValueMode getMultiValueMode(MultiValue multi) {
-			MultiValueMode sortMode = MultiValueMode.MIN;
+		protected NumericMultiValueMode getMultiValueMode(MultiValue multi) {
+			NumericMultiValueMode valueMode = NumericMultiValueMode.NONE;
 			if ( multi != null ) {
 				switch ( multi ) {
 					case MIN:
-						sortMode = MultiValueMode.MIN;
+						valueMode = NumericMultiValueMode.MIN;
 						break;
 					case MAX:
-						sortMode = MultiValueMode.MAX;
+						valueMode = NumericMultiValueMode.MAX;
 						break;
 					case AVG:
-						sortMode = MultiValueMode.AVG;
+						valueMode = NumericMultiValueMode.AVG;
 						break;
 					case SUM:
-						sortMode = MultiValueMode.SUM;
+						valueMode = NumericMultiValueMode.SUM;
 						break;
 					case MEDIAN:
-						sortMode = MultiValueMode.MEDIAN;
+						valueMode = NumericMultiValueMode.MEDIAN;
 						break;
 				}
 			}
-			return sortMode;
+			return valueMode;
 		}
 
 		protected Query getLuceneFilter() {
