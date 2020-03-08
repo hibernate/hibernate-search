@@ -12,7 +12,7 @@ import java.util.Set;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.FacetsCollectorFactory;
-import org.hibernate.search.backend.lucene.NumericMultiValueMode;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 
@@ -34,7 +34,7 @@ public abstract class AbstractLuceneBucketAggregation<K, V> implements LuceneSea
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Set<String> indexNames;
-	private final NumericMultiValueMode multiValueMode;
+	private final MultiValueMode multiValueMode;
 	private final String absoluteFieldPath;
 	private final String nestedDocumentPath;
 	private final Query luceneFilterQuery;
@@ -53,7 +53,7 @@ public abstract class AbstractLuceneBucketAggregation<K, V> implements LuceneSea
 		return indexNames;
 	}
 
-	public NumericMultiValueMode getMultiValueMode() {
+	public MultiValueMode getMultiValueMode() {
 		return multiValueMode;
 	}
 
@@ -108,24 +108,24 @@ public abstract class AbstractLuceneBucketAggregation<K, V> implements LuceneSea
 		@Override
 		public abstract LuceneSearchAggregation<Map<K, V>> build();
 
-		protected NumericMultiValueMode getMultiValueMode(MultiValue multi) {
-			NumericMultiValueMode valueMode = NumericMultiValueMode.NONE;
+		protected MultiValueMode getMultiValueMode(MultiValue multi) {
+			MultiValueMode valueMode = MultiValueMode.NONE;
 			if ( multi != null ) {
 				switch ( multi ) {
 					case MIN:
-						valueMode = NumericMultiValueMode.MIN;
+						valueMode = MultiValueMode.MIN;
 						break;
 					case MAX:
-						valueMode = NumericMultiValueMode.MAX;
+						valueMode = MultiValueMode.MAX;
 						break;
 					case AVG:
-						valueMode = NumericMultiValueMode.AVG;
+						valueMode = MultiValueMode.AVG;
 						break;
 					case SUM:
-						valueMode = NumericMultiValueMode.SUM;
+						valueMode = MultiValueMode.SUM;
 						break;
 					case MEDIAN:
-						valueMode = NumericMultiValueMode.MEDIAN;
+						valueMode = MultiValueMode.MEDIAN;
 						break;
 				}
 			}

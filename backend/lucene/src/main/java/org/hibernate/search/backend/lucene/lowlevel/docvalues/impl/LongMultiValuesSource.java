@@ -6,13 +6,13 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.docvalues.impl;
 
-import org.hibernate.search.backend.lucene.NumericMultiValueMode;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.OptionalLong;
 import java.util.function.DoubleToLongFunction;
 import java.util.function.LongToDoubleFunction;
 import org.apache.lucene.index.DocValues;
@@ -45,9 +45,9 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 	public abstract LongMultiValues getValues(LeafReaderContext ctx, DoubleValues scores) throws IOException;
 
 	final String field;
-	final NumericMultiValueMode mode;
+	final MultiValueMode mode;
 
-	public LongMultiValuesSource(String field, NumericMultiValueMode mode) {
+	public LongMultiValuesSource(String field, MultiValueMode mode) {
 		this.field = field;
 		this.mode = mode;
 	}
@@ -61,7 +61,7 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 	 * @param nested the nested provider
 	 * @return The DoubleMultiValuesSource
 	 */
-	public static LongMultiValuesSource fromField(String field, NumericMultiValueMode mode, NestedDocsProvider nested) {
+	public static LongMultiValuesSource fromField(String field, MultiValueMode mode, NestedDocsProvider nested) {
 		if ( nested == null ) {
 			return new MultiFieldValuesSource( field, mode );
 		}
@@ -78,7 +78,7 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 	 * @param nested the nested provider
 	 * @return DoubleMultiValuesSource
 	 */
-	public static LongMultiValuesSource fromLongField(String field, NumericMultiValueMode mode, NestedDocsProvider nested) {
+	public static LongMultiValuesSource fromLongField(String field, MultiValueMode mode, NestedDocsProvider nested) {
 		return fromField( field, mode, nested );
 	}
 
@@ -89,7 +89,7 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 	 * @param mode the mode
 	 * @return DoubleMultiValuesSource
 	 */
-	public static LongMultiValuesSource fromLongField(String field, NumericMultiValueMode mode) {
+	public static LongMultiValuesSource fromLongField(String field, MultiValueMode mode) {
 		return fromLongField( field, mode, null );
 	}
 
@@ -101,7 +101,7 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 	 * @param nested the nested provider
 	 * @return DoubleMultiValuesSource
 	 */
-	public static LongMultiValuesSource fromIntField(String field, NumericMultiValueMode mode, NestedDocsProvider nested) {
+	public static LongMultiValuesSource fromIntField(String field, MultiValueMode mode, NestedDocsProvider nested) {
 		return fromLongField( field, mode, nested );
 	}
 
@@ -112,7 +112,7 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 	 * @param mode the mode
 	 * @return DoubleMultiValuesSource
 	 */
-	public static LongMultiValuesSource fromIntField(String field, NumericMultiValueMode mode) {
+	public static LongMultiValuesSource fromIntField(String field, MultiValueMode mode) {
 		return fromIntField( field, mode, null );
 	}
 
@@ -147,42 +147,44 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 				}
 			}, scores );
 		}
-		else {
-			return new LongMultiValues() {
-				private Iterator<Long> value;
-				private List<Long> all;
+		else if ( mode == null || mode == MultiValueMode.NONE ) {
+			return replaceScores( new LongMultiValues() {
 
 				@Override
 				public long longValue() throws IOException {
-					return nextValue();
-				}
-
-				@Override
-				public long nextValue() throws IOException {
-					return value != null ? value.next() : -1;
+					return values.nextValue();
 				}
 
 				@Override
 				public int docValueCount() {
-					return all != null ? all.size() : -1;
+					return values.docValueCount();
 				}
 
 				@Override
 				public boolean advanceExact(int doc) throws IOException {
-					all = null;
-					value = null;
-					if ( values.advanceExact( doc ) ) {
-						all = pick( values, scores, doc );
-					}
-					else if ( scores != null && scores.advanceExact( doc ) ) {
-						all = Collections.singletonList( (long) scores.doubleValue() );
-					}
+					return values.advanceExact( doc );
+				}
+			}, scores );
+		}
+		else {
+			return new LongMultiValues() {
+				private OptionalLong value = OptionalLong.empty();
 
-					if ( all != null && !all.isEmpty() ) {
-						value = all.iterator();
+				@Override
+				public long longValue() throws IOException {
+					return value.getAsLong();
+				}
+
+				@Override
+				public boolean advanceExact(int doc) throws IOException {
+					value = OptionalLong.empty();
+					if ( values.advanceExact( doc ) ) {
+						value = pick( values, scores, doc );
 						return true;
 					}
-
+					else if ( scores != null && scores.advanceExact( doc ) ) {
+						value = OptionalLong.of( (long) scores.doubleValue() );
+					}
 					return false;
 				}
 			};
@@ -197,17 +199,12 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 
 		return new LongMultiValues() {
 			int lastSeenParentDoc = -1;
-			double lastEmittedValue = -1;
+			long lastEmittedValue = -1;
 			private Iterator<Long> value;
 			private List<Long> all;
 
 			@Override
 			public long longValue() throws IOException {
-				return nextValue();
-			}
-
-			@Override
-			public long nextValue() throws IOException {
 				return value != null ? value.next() : -1;
 			}
 
@@ -249,12 +246,21 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 				}
 
 				lastSeenParentDoc = parentDoc;
-				all = pick( values, scores, childDocs, firstChildDoc, parentDoc, maxChildren );
-				if ( all.isEmpty() && scores != null && scores.advanceExact( parentDoc ) ) {
-					all = Collections.singletonList( (long) scores.doubleValue() );
+
+				if ( mode == null || mode == MultiValueMode.NONE ) {
+					all = list( values, scores, childDocs, firstChildDoc, parentDoc, maxChildren );
+				}
+				else {
+					OptionalLong pick = pick( values, scores, childDocs, firstChildDoc, parentDoc, maxChildren );
+					if ( pick.isPresent() ) {
+						all = Collections.singletonList( pick.getAsLong() );
+					}
+					else if ( scores != null && scores.advanceExact( parentDoc ) ) {
+						all = Collections.singletonList( (long) scores.doubleValue() );
+					}
 				}
 
-				if ( !all.isEmpty() ) {
+				if ( all != null && !all.isEmpty() ) {
 					value = all.iterator();
 					return true;
 				}
@@ -264,9 +270,9 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 		};
 	}
 
-	protected List<Long> pick(SortedNumericDocValues values, DoubleValues scores, int doc) throws IOException {
+	protected OptionalLong pick(SortedNumericDocValues values, DoubleValues scores, int doc) throws IOException {
 		final int count = values.docValueCount();
-		List<Long> result = new ArrayList<>();
+		OptionalLong result = OptionalLong.empty();
 
 		switch ( mode ) {
 			case SUM: {
@@ -278,7 +284,7 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 				}
 
 				if ( hasValue ) {
-					result.add( returnValue );
+					result = OptionalLong.of( returnValue );
 				}
 				break;
 			}
@@ -292,7 +298,7 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 				returnValue = returnValue / count;
 
 				if ( hasValue ) {
-					result.add( returnValue );
+					result = OptionalLong.of( returnValue );
 				}
 				break;
 			}
@@ -305,7 +311,7 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 				}
 
 				if ( hasValue ) {
-					result.add( returnValue );
+					result = OptionalLong.of( returnValue );
 				}
 				break;
 			}
@@ -318,7 +324,7 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 				}
 
 				if ( hasValue ) {
-					result.add( returnValue );
+					result = OptionalLong.of( returnValue );
 				}
 				break;
 			}
@@ -341,13 +347,7 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 				}
 
 				if ( hasValue ) {
-					result.add( returnValue );
-				}
-				break;
-			}
-			case NONE: {
-				for ( int index = 0; index < count; ++index ) {
-					result.add( values.nextValue() );
+					result = OptionalLong.of( returnValue );
 				}
 				break;
 			}
@@ -355,17 +355,17 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 				throw new IllegalArgumentException( "Unsupported sort mode: " + mode );
 		}
 
-		if ( result.isEmpty() && scores.advanceExact( doc ) ) {
-			result.add( (long) scores.doubleValue() );
+		if ( !result.isPresent() && scores.advanceExact( doc ) ) {
+			result = OptionalLong.of( (long) scores.doubleValue() );
 		}
 
 		return result;
 	}
 
-	protected List<Long> pick(SortedNumericDocValues values, DoubleValues scores, DocIdSetIterator docItr, int startDoc, int endDoc,
+	protected OptionalLong pick(SortedNumericDocValues values, DoubleValues scores, DocIdSetIterator docItr, int startDoc, int endDoc,
 		int maxChildren) throws IOException {
 
-		List<Long> result = new ArrayList<>();
+		OptionalLong result = OptionalLong.empty();
 
 		switch ( mode ) {
 			case SUM: {
@@ -386,7 +386,7 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 				}
 
 				if ( hasValue ) {
-					result.add( returnValue );
+					result = OptionalLong.of( returnValue );
 				}
 				break;
 			}
@@ -416,7 +416,7 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 				}
 
 				if ( hasValue ) {
-					result.add( returnValue );
+					result = OptionalLong.of( returnValue );
 				}
 				break;
 			}
@@ -435,7 +435,7 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 				}
 
 				if ( hasValue ) {
-					result.add( returnValue );
+					result = OptionalLong.of( returnValue );
 				}
 				break;
 			}
@@ -454,22 +454,13 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 				}
 
 				if ( hasValue ) {
-					result.add( returnValue );
+					result = OptionalLong.of( returnValue );
 				}
 				break;
 			}
 			case MEDIAN: {
 				int count = 0;
-				List<Long> all = new ArrayList<>();
-				for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
-					if ( values.advanceExact( doc ) ) {
-						if ( ++count > maxChildren ) {
-							break;
-						}
-						all.add( values.nextValue() );
-					}
-				}
-
+				List<Long> all = list( values, scores, docItr, startDoc, endDoc, maxChildren );
 				if ( all.isEmpty() ) {
 					break;
 				}
@@ -477,7 +468,6 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 				count = all.size();
 
 				if ( count > 0 ) {
-					Collections.sort( result );
 					long returnValue;
 					if ( count % 2 == 0 ) {
 						int pos = count / 2;
@@ -487,31 +477,40 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 						int pos = count / 2;
 						returnValue = all.get( pos );
 					}
-					result.add( returnValue );
+					result = OptionalLong.of( returnValue );
 				}
 
-				break;
-			}
-			case NONE: {
-				int count = 0;
-				for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
-					if ( values.advanceExact( doc ) ) {
-						if ( ++count > maxChildren ) {
-							break;
-						}
-						result.add( values.nextValue() );
-					}
-				}
-
-				Collections.sort( result );
 				break;
 			}
 			default:
 				throw new IllegalArgumentException( "Unsupported sort mode: " + mode );
 		}
 
-		if ( result.isEmpty() && scores.advanceExact( endDoc ) ) {
-			result.add( (long) scores.doubleValue() );
+		if ( !result.isPresent() && scores.advanceExact( endDoc ) ) {
+			result = OptionalLong.of( (long) scores.doubleValue() );
+		}
+
+		return result;
+	}
+
+	protected List<Long> list(SortedNumericDocValues values, DoubleValues scores, DocIdSetIterator docItr, int startDoc, int endDoc,
+		int maxChildren) throws IOException {
+
+		List<Long> result = new ArrayList<>();
+		int count = 0;
+		for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
+			if ( values.advanceExact( doc ) ) {
+				if ( ++count > maxChildren ) {
+					break;
+				}
+				result.add( values.nextValue() );
+			}
+		}
+
+		Collections.sort( result );
+
+		if ( !result.isEmpty() && scores.advanceExact( endDoc ) ) {
+			result = Collections.singletonList( (long) scores.doubleValue() );
 		}
 
 		return result;
@@ -594,7 +593,7 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 
 		private final LongMultiValuesSource inner;
 
-		private DoubleMultiLongValuesSource(LongMultiValuesSource inner, String field, NumericMultiValueMode mode, LongToDoubleFunction decoder, DoubleToLongFunction encoder) {
+		private DoubleMultiLongValuesSource(LongMultiValuesSource inner, String field, MultiValueMode mode, LongToDoubleFunction decoder, DoubleToLongFunction encoder) {
 			super( field, mode, decoder, encoder );
 			this.inner = inner;
 		}
@@ -665,7 +664,7 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 
 	private static class MultiFieldValuesSource extends LongMultiValuesSource {
 
-		private MultiFieldValuesSource(String field, NumericMultiValueMode mode) {
+		private MultiFieldValuesSource(String field, MultiValueMode mode) {
 			super( field, mode );
 		}
 
@@ -718,7 +717,7 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 
 		private final NestedDocsProvider nested;
 
-		private NestedMultiFieldValuesSource(String field, NumericMultiValueMode mode, NestedDocsProvider nested) {
+		private NestedMultiFieldValuesSource(String field, MultiValueMode mode, NestedDocsProvider nested) {
 			super( field, mode );
 			this.nested = nested;
 		}

@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 
 import java.lang.invoke.MethodHandles;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.backend.lucene.NumericMultiValueMode;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
@@ -139,24 +139,24 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 		return luceneFilter;
 	}
 
-	protected NumericMultiValueMode getMultiValueMode() {
-		NumericMultiValueMode sortMode = NumericMultiValueMode.MIN;
+	protected MultiValueMode getMultiValueMode() {
+		MultiValueMode sortMode = MultiValueMode.MIN;
 		if ( multi != null ) {
 			switch ( multi ) {
 				case MIN:
-					sortMode = NumericMultiValueMode.MIN;
+					sortMode = MultiValueMode.MIN;
 					break;
 				case MAX:
-					sortMode = NumericMultiValueMode.MAX;
+					sortMode = MultiValueMode.MAX;
 					break;
 				case AVG:
-					sortMode = NumericMultiValueMode.AVG;
+					sortMode = MultiValueMode.AVG;
 					break;
 				case SUM:
-					sortMode = NumericMultiValueMode.SUM;
+					sortMode = MultiValueMode.SUM;
 					break;
 				case MEDIAN:
-					sortMode = NumericMultiValueMode.MEDIAN;
+					sortMode = MultiValueMode.MEDIAN;
 					break;
 			}
 		}

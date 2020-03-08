@@ -21,14 +21,14 @@ import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.Weight;
 import org.apache.lucene.util.NumericUtils;
-import org.hibernate.search.backend.lucene.NumericMultiValueMode;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValues;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 
 public class DoubleMultiValueRangeFacetCounts extends MultiValueRangeFacetCounts {
 
-	public DoubleMultiValueRangeFacetCounts(String field, NumericMultiValueMode mode, NestedDocsProvider nested, FacetsCollector hits, DoubleRange... ranges) throws IOException {
+	public DoubleMultiValueRangeFacetCounts(String field, MultiValueMode mode, NestedDocsProvider nested, FacetsCollector hits, DoubleRange... ranges) throws IOException {
 		this( field, DoubleMultiValuesSource.fromDoubleField( field, mode, nested ), hits, ranges );
 	}
 

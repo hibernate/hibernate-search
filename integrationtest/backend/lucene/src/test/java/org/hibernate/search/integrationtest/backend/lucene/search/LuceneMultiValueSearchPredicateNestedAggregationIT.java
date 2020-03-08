@@ -103,6 +103,8 @@ public class LuceneMultiValueSearchPredicateNestedAggregationIT {
 
 	@Test
 	public void double_searchNestedMultivaluesRangeAggregation() {
+		try{
+		
 		StubMappingScope scope = indexManager_1_1.createScope();
 		AggregationKey<Map<Range<Double>, Long>> aggregationKey = AggregationKey.of( "someAggregation" );
 
@@ -189,6 +191,13 @@ public class LuceneMultiValueSearchPredicateNestedAggregationIT {
 		aggregation = result.getAggregation( aggregationKey );
 		for ( Range<Double> key : aggregation.keySet() ) {
 			System.out.println( key + " " + aggregation.get( key ) );
+		}
+		
+		} catch (Throwable th) {
+			
+			th.printStackTrace();
+			
+			throw th;
 		}
 
 //		SearchResultAssert.assertThat( query )

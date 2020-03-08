@@ -17,7 +17,7 @@ import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.backend.lucene.NumericMultiValueMode;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 
 public interface LuceneNumericDomain<E extends Number> {
 
@@ -36,11 +36,11 @@ public interface LuceneNumericDomain<E extends Number> {
 	E fromDocValue(Long longValue);
 
 	Facets createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-		NumericMultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException;
+		MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException;
 
 	Facets createRangeFacetCounts(String absoluteFieldPath,
 		FacetsCollector facetsCollector, Collection<? extends Range<? extends E>> ranges,
-		NumericMultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException;
+		MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException;
 
 	IndexableField createIndexField(String absoluteFieldPath, E numericValue);
 
@@ -49,5 +49,5 @@ public interface LuceneNumericDomain<E extends Number> {
 	IndexableField createSortedDocValuesField(String absoluteFieldPath, E numericValue);
 
 	FieldComparator.NumericComparator<E> createFieldComparator(String absoluteFieldPath, int numHits,
-		NumericMultiValueMode multiValueMode, E missingValue, NestedDocsProvider nestedDocsProvider);
+		MultiValueMode multiValueMode, E missingValue, NestedDocsProvider nestedDocsProvider);
 }

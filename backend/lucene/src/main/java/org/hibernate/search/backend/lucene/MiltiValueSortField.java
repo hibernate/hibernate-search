@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.FieldComparatorSource;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.SortField;
 
 /**
@@ -18,7 +19,7 @@ import org.apache.lucene.search.SortField;
 public class MiltiValueSortField extends SortField {
 
 	private Query filter;
-	private NumericMultiValueMode numericMode;
+	private ScoreMode mode;
 
 	public MiltiValueSortField(String field, Type type) {
 		super( field, type );
@@ -36,14 +37,30 @@ public class MiltiValueSortField extends SortField {
 		super( field, comparator, reverse );
 	}
 
-	public MiltiValueSortField mode(NumericMultiValueMode mode) {
-		this.numericMode = mode;
+	public MiltiValueSortField mode(ScoreMode mode) {
+		this.mode = mode;
 		return this;
 	}
 
 	public MiltiValueSortField filter(Query filter) {
 		this.filter = filter;
 		return this;
+	}
+
+	public Query getFilter() {
+		return filter;
+	}
+
+	public void setFilter(Query filter) {
+		this.filter = filter;
+	}
+
+	public ScoreMode getMode() {
+		return mode;
+	}
+
+	public void setMode(ScoreMode mode) {
+		this.mode = mode;
 	}
 
 	// Used for system sort

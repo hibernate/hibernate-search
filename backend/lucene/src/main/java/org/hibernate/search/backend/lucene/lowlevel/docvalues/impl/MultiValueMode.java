@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.lucene;
+package org.hibernate.search.backend.lucene.lowlevel.docvalues.impl;
 
 import java.util.Locale;
 
@@ -12,7 +12,7 @@ import java.util.Locale;
  * Defines what values to pick in the case a document contains multiple values
  * for a particular field.
  */
-public enum NumericMultiValueMode {
+public enum MultiValueMode {
 
 	/**
 	 * Mode of the multi values.
@@ -27,7 +27,7 @@ public enum NumericMultiValueMode {
 	 * @throws IllegalArgumentException if the given string doesn't match a
 	 * sort mode or is <code>null</code>.
 	 */
-	public static NumericMultiValueMode fromString(String valueMode) {
+	public static MultiValueMode fromString(String valueMode) {
 		try {
 			return valueOf( valueMode.toUpperCase( Locale.ROOT ) );
 		}

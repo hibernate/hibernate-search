@@ -25,7 +25,7 @@ import org.apache.lucene.search.DoubleValues;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesSource;
-import org.hibernate.search.backend.lucene.NumericMultiValueMode;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueRangeFacetCounts;
 
@@ -75,7 +75,7 @@ public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 
 	@Override
 	public Facets createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-		NumericMultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
+		MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
 
 		LongMultiValuesSource source = LongMultiValuesSource.fromLongField( absoluteFieldPath, multiValueMode, nestedDocsProvider );
 		return new LongMultiValueFacetCounts(
@@ -86,7 +86,7 @@ public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 
 	@Override
 	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-		Collection<? extends Range<? extends Long>> ranges, NumericMultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
+		Collection<? extends Range<? extends Long>> ranges, MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
 
 		LongMultiValuesSource source = LongMultiValuesSource.fromLongField( absoluteFieldPath, multiValueMode, nestedDocsProvider );
 		return new LongMultiValueRangeFacetCounts(
@@ -111,7 +111,7 @@ public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 	}
 
 	@Override
-	public FieldComparator.NumericComparator<Long> createFieldComparator(String fieldName, int numHits, NumericMultiValueMode multiValueMode, Long missingValue, NestedDocsProvider nestedDocsProvider) {
+	public FieldComparator.NumericComparator<Long> createFieldComparator(String fieldName, int numHits, MultiValueMode multiValueMode, Long missingValue, NestedDocsProvider nestedDocsProvider) {
 		LongMultiValuesSource source = LongMultiValuesSource.fromLongField( fieldName, multiValueMode, nestedDocsProvider );
 		return new LongFieldComparator( numHits, fieldName, missingValue, source );
 	}

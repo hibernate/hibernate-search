@@ -25,7 +25,7 @@ import org.apache.lucene.search.DoubleValues;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValuesSource;
-import org.hibernate.search.backend.lucene.NumericMultiValueMode;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.DoubleMultiValueRangeFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueFacetCounts;
 
@@ -77,7 +77,7 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 
 	@Override
 	public Facets createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-		NumericMultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
+		MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
 
 		DoubleMultiValuesSource source = DoubleMultiValuesSource.fromFloatField( absoluteFieldPath, multiValueMode, nestedDocsProvider );
 		return new LongMultiValueFacetCounts(
@@ -93,7 +93,7 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	@Override
 	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 		Collection<? extends Range<? extends Float>> ranges,
-		NumericMultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
+		MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
 
 		DoubleMultiValuesSource source = DoubleMultiValuesSource.fromFloatField( absoluteFieldPath, multiValueMode, nestedDocsProvider );
 		return new DoubleMultiValueRangeFacetCounts(
@@ -118,7 +118,7 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	}
 
 	@Override
-	public FieldComparator.NumericComparator<Float> createFieldComparator(String fieldname, int numHits, NumericMultiValueMode multiValueMode, Float missingValue, NestedDocsProvider nestedDocsProvider) {
+	public FieldComparator.NumericComparator<Float> createFieldComparator(String fieldname, int numHits, MultiValueMode multiValueMode, Float missingValue, NestedDocsProvider nestedDocsProvider) {
 
 		DoubleMultiValuesSource source = DoubleMultiValuesSource.fromFloatField( fieldname, multiValueMode, nestedDocsProvider );
 		return new FloatFieldComparator( numHits, fieldname, missingValue, source );

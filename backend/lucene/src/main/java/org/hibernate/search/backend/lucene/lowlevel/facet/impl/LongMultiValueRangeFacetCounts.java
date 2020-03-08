@@ -18,14 +18,14 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.Weight;
-import org.hibernate.search.backend.lucene.NumericMultiValueMode;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValues;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 
 public class LongMultiValueRangeFacetCounts extends MultiValueRangeFacetCounts {
 
-	public LongMultiValueRangeFacetCounts(String field, NumericMultiValueMode mode, NestedDocsProvider nested, FacetsCollector hits, LongRange... ranges) throws IOException {
+	public LongMultiValueRangeFacetCounts(String field, MultiValueMode mode, NestedDocsProvider nested, FacetsCollector hits, LongRange... ranges) throws IOException {
 		this( field, LongMultiValuesSource.fromLongField( field, mode, nested ), hits, ranges );
 	}
 
