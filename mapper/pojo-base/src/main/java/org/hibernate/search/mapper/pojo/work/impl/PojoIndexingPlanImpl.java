@@ -96,7 +96,9 @@ public class PojoIndexingPlanImpl<R> implements PojoIndexingPlan<R> {
 			for ( PojoContainedTypeIndexingPlan<?> delegate : containedTypeDelegates.values() ) {
 				delegate.resolveDirty( this::updateBecauseOfContained );
 			}
-			for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
+			// We need to iterate on a "frozen snapshot" of the indexedTypeDelegates values because of HSEARCH-3857
+			List<PojoIndexedTypeIndexingPlan<?, ?, ?>> frozenIndexedTypeDelegates = new ArrayList<>( indexedTypeDelegates.values() );
+			for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : frozenIndexedTypeDelegates ) {
 				delegate.resolveDirty( this::updateBecauseOfContained );
 			}
 			for ( PojoIndexedTypeIndexingPlan<?, ?, ?> delegate : indexedTypeDelegates.values() ) {
