@@ -23,7 +23,7 @@ import org.apache.lucene.facet.LongValueFacetCounts;
 import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReader;
 import org.apache.lucene.index.LeafReaderContext;
-import org.apache.lucene.index.NumericDocValues;
+import org.apache.lucene.index.SortedNumericDocValues;
 import org.apache.lucene.search.DocIdSetIterator;
 
 /**
@@ -57,21 +57,21 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 	@Override
 	SortedSet<Long> collectFirstTerms(IndexReader reader, boolean descending, int limit)
 			throws IOException {
-		// TODO HSEARCH-1927 when we switch to Sorted/SortedSetDocValues, this can be implemented in a much more efficient way
-		//  since docvalues will be sorted. See the same method in LuceneTextTermsAggregation.
 		TreeSet<Long> collectedTerms = new TreeSet<>( descending ? LONG_COMPARATOR.reversed() : LONG_COMPARATOR );
 		for ( LeafReaderContext leaf : reader.leaves() ) {
 			final LeafReader atomicReader = leaf.reader();
-			NumericDocValues docValues = atomicReader.getNumericDocValues( absoluteFieldPath );
+			SortedNumericDocValues docValues = atomicReader.getSortedNumericDocValues( absoluteFieldPath );
 			if ( docValues == null ) {
 				continue;
 			}
 			while ( docValues.nextDoc() != DocIdSetIterator.NO_MORE_DOCS ) {
-				Long term = docValues.longValue();
-				collectedTerms.add( term );
-				// Try not to keep too many terms in memory
-				if ( collectedTerms.size() > limit ) {
-					collectedTerms.remove( collectedTerms.last() );
+				for ( int i = 0; i < docValues.docValueCount(); i++ ) {
+					Long term = docValues.nextValue();
+					collectedTerms.add( term );
+					// Try not to keep too many terms in memory
+					if ( collectedTerms.size() > limit ) {
+						collectedTerms.remove( collectedTerms.last() );
+					}
 				}
 			}
 		}
