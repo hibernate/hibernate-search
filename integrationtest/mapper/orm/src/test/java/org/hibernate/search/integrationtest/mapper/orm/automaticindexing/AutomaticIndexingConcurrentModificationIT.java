@@ -18,13 +18,9 @@ import org.hibernate.search.mapper.orm.Search;
 import org.hibernate.search.mapper.orm.automaticindexing.AutomaticIndexingStrategyName;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.AssociationInverseSide;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexingDependency;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.ObjectPath;
-import org.hibernate.search.mapper.pojo.mapping.definition.annotation.PropertyValue;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
@@ -64,8 +60,7 @@ public class AutomaticIndexingConcurrentModificationIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3857")
-	public void directPersistUpdateDelete() {
-
+	public void updateTriggeringReindexingOfPreviouslyUnknownEntity() {
 		IndexedEntity entity1 = new IndexedEntity();
 		entity1.setId( 1 );
 		entity1.setName( "edouard" );
@@ -81,23 +76,14 @@ public class AutomaticIndexingConcurrentModificationIT {
 		entity3.setName( "antoine" );
 		entity3.setFirstName( "owl" );
 
-		IndexedEntity entity4 = new IndexedEntity();
-		entity4.setId( 4 );
-		entity4.setName( "princess" );
-		entity4.setFirstName( "yossrage" );
-
-		entity1.setChild( entity2 );
 		entity2.setChild( entity1 );
-
-		entity3.setChild( entity4 );
-		entity4.setChild( entity3 );
+		entity1.setParent( entity2 );
 
 		// First transaction
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			session.persist( entity1 );
 			session.persist( entity2 );
 			session.persist( entity3 );
-			session.persist( entity4 );
 			session.flush();
 			backendMock.verifyExpectationsMet();
 		} );
@@ -105,20 +91,16 @@ public class AutomaticIndexingConcurrentModificationIT {
 		// Second transaction
 		OrmUtils.withinTransaction( sessionFactory, session -> {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
-			indexingPlan.addOrUpdate( session.load( IndexedEntity.class, 3 ) );
 			indexingPlan.addOrUpdate( session.load( IndexedEntity.class, 1 ) );
-			indexingPlan.addOrUpdate( session.load( IndexedEntity.class, 2 ) );
+			// Add another entity to the indexing plan so that we're not done iterating over all entities
+			// when entity2 is added to the indexing plan due to the change in the child.
+			indexingPlan.addOrUpdate( session.load( IndexedEntity.class, 3 ) );
 
 			backendMock.expectWorksAnyOrder(
 					IndexedEntity.INDEX, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE )
-
 					.update( entity1.getId().toString(), b -> b
 							.field( "name", entity1.getName() )
 							.field( "firstName", entity1.getFirstName() )
-							.objectField( "child", b2 -> b2
-									.field( "firstName", entity2.getFirstName() )
-									.field( "name", entity2.getName() )
-							)
 					)
 					.update( entity2.getId().toString(), b -> b
 							.field( "name", entity2.getName() )
@@ -131,18 +113,6 @@ public class AutomaticIndexingConcurrentModificationIT {
 					.update( entity3.getId().toString(), b -> b
 							.field( "name", entity3.getName() )
 							.field( "firstName", entity3.getFirstName() )
-							.objectField( "child", b2 -> b2
-									.field( "firstName", entity4.getFirstName() )
-									.field( "name", entity4.getName() )
-							)
-					)
-					.update( entity4.getId().toString(), b -> b
-							.field( "name", entity4.getName() )
-							.field( "firstName", entity4.getFirstName() )
-							.objectField( "child", b2 -> b2
-									.field( "firstName", entity3.getFirstName() )
-									.field( "name", entity3.getName() )
-							)
 					)
 					.processedThenExecuted();
 		} );
@@ -166,17 +136,11 @@ public class AutomaticIndexingConcurrentModificationIT {
 		@Basic
 		private String name;
 
-		@IndexedEmbedded(includePaths = {
-				"firstName", "name"
-		})
 		@OneToOne
-		@IndexingDependency(
-				derivedFrom = {
-						@ObjectPath({ @PropertyValue(propertyName = "name") }),
-						@ObjectPath({ @PropertyValue(propertyName = "firstName") })
-				}
-		)
-		@AssociationInverseSide(inversePath = @ObjectPath(@PropertyValue(propertyName = "child")))
+		private IndexedEntity parent;
+
+		@IndexedEmbedded(maxDepth = 1)
+		@OneToOne(mappedBy = "parent")
 		private IndexedEntity child;
 
 		public Integer getId() {
@@ -203,12 +167,19 @@ public class AutomaticIndexingConcurrentModificationIT {
 			this.name = name;
 		}
 
+		public IndexedEntity getParent() {
+			return parent;
+		}
+
+		public void setParent(IndexedEntity parent) {
+			this.parent = parent;
+		}
+
 		public IndexedEntity getChild() {
 			return child;
 		}
 
-		public void setChild(
-				IndexedEntity child) {
+		public void setChild(IndexedEntity child) {
 			this.child = child;
 		}
 	}
