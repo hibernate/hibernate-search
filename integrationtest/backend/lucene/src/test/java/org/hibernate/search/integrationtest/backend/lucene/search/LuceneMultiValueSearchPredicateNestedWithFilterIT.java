@@ -8,6 +8,12 @@ package org.hibernate.search.integrationtest.backend.lucene.search;
 
 import java.util.List;
 import java.util.Map;
+import org.apache.lucene.document.IntPoint;
+import org.apache.lucene.search.Sort;
+import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.join.ScoreMode;
+import org.hibernate.search.backend.lucene.LuceneExtension;
+import org.hibernate.search.backend.lucene.ValueSortField;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -211,6 +217,124 @@ public class LuceneMultiValueSearchPredicateNestedWithFilterIT {
 //			.aggregation( aggregationKey, containsExactly( c -> {
 //
 //			} ) );
+	}
+
+	@Test
+	public void integer_searchNestedMultivaluesSortFieldLuceneExtension() {
+		StubMappingScope scope = indexManager_1_1.createScope();
+
+		SortField sortField = new ValueSortField( "nested.additionalIntegerField", SortField.Type.INT )
+			.mode( ScoreMode.Total )
+			.nullAsValue( 0 );
+
+		SearchQuery<DocumentReference> query = scope.query()
+			.where( f -> {
+				return f.matchAll();
+			} )
+			.sort( f -> {
+				return f.extension( LuceneExtension.get() )
+					.fromLuceneSortField( sortField );
+			} )
+			.toQuery();
+
+		SearchResult<DocumentReference> result = query.fetchAll();
+		List<DocumentReference> hits = result.getHits();
+
+		for ( DocumentReference hit : hits ) {
+			System.out.println( hit );
+		}
+
+		assertThat( result ).hasDocRefHitsExactOrder( c -> {
+			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
+		} );
+
+		SortField sortFilteredField = new ValueSortField( "nested.additionalIntegerField", SortField.Type.INT )
+			.mode( ScoreMode.Total )
+			.nullAsValue( 0 )
+			.filter( IntPoint.newExactQuery( "nested.active", 1 ) );
+
+		query = scope.query()
+			.where( f -> {
+				return f.matchAll();
+			} )
+			.sort( f -> {
+				return f.extension( LuceneExtension.get() ).
+					fromLuceneSortField( sortFilteredField );
+			} )
+			.toQuery();
+
+		result = query.fetchAll();
+		hits = result.getHits();
+
+		for ( DocumentReference hit : hits ) {
+			System.out.println( hit );
+		}
+
+		assertThat( result ).hasDocRefHitsExactOrder( c -> {
+			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
+		} );
+
+	}
+
+	@Test
+	public void integer_searchNestedMultivaluesSortLuceneExtension() {
+		StubMappingScope scope = indexManager_1_1.createScope();
+
+		SortField sortField = new ValueSortField( "nested.additionalIntegerField", SortField.Type.INT )
+			.mode( ScoreMode.Total )
+			.nullAsValue( 0 );
+
+		Sort sort = new Sort( sortField );
+
+		SearchQuery<DocumentReference> query = scope.query()
+			.where( f -> {
+				return f.matchAll();
+			} )
+			.sort( f -> {
+				return f.extension( LuceneExtension.get() ).
+					fromLuceneSort( sort );
+			} )
+			.toQuery();
+
+		SearchResult<DocumentReference> result = query.fetchAll();
+		List<DocumentReference> hits = result.getHits();
+
+		for ( DocumentReference hit : hits ) {
+			System.out.println( hit );
+		}
+
+		assertThat( result ).hasDocRefHitsExactOrder( c -> {
+			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_2, DOCUMENT_1_1_1 );
+		} );
+
+		SortField sortFilteredField = new ValueSortField( "nested.additionalIntegerField", SortField.Type.INT )
+			.mode( ScoreMode.Total )
+			.nullAsValue( 0 )
+			.filter( IntPoint.newExactQuery( "nested.active", 1 ) );
+
+		Sort sortFiltered = new Sort( sortFilteredField );
+
+		query = scope.query()
+			.where( f -> {
+				return f.matchAll();
+			} )
+			.sort( f -> {
+				return f.extension( LuceneExtension.get() ).
+					fromLuceneSort( sortFiltered );
+			} )
+			.toQuery();
+
+		result = query.fetchAll();
+		hits = result.getHits();
+
+		for ( DocumentReference hit : hits ) {
+			System.out.println( hit );
+		}
+
+		assertThat( result ).hasDocRefHitsExactOrder( c -> {
+			c.doc( INDEX_NAME_1_1, DOCUMENT_1_1_1, DOCUMENT_1_1_2 );
+		} );
+
 	}
 
 	private void initData() {

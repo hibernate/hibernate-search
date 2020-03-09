@@ -7,18 +7,21 @@
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
 import org.apache.lucene.search.SortField;
+import org.hibernate.search.backend.lucene.types.sort.impl.AbstractUserProvidedLuceneFieldSortBuilder;
 
-
-class LuceneUserProvidedLuceneSortFieldSortBuilder implements LuceneSearchSortBuilder {
+class LuceneUserProvidedLuceneSortFieldSortBuilder extends AbstractUserProvidedLuceneFieldSortBuilder implements LuceneSearchSortBuilder {
 
 	private final SortField luceneSortField;
+	private final String nestedDocumentPath;
 
-	LuceneUserProvidedLuceneSortFieldSortBuilder(SortField luceneSortField) {
+	LuceneUserProvidedLuceneSortFieldSortBuilder(SortField luceneSortField, String nestedDocumentPath) {
+		super();
 		this.luceneSortField = luceneSortField;
+		this.nestedDocumentPath = nestedDocumentPath;
 	}
 
 	@Override
 	public void buildAndContribute(LuceneSearchSortCollector collector) {
-		collector.collectSortField( luceneSortField );
+		collectSortField( collector, luceneSortField, nestedDocumentPath );
 	}
 }
