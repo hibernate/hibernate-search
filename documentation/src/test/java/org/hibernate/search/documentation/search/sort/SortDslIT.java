@@ -288,14 +288,14 @@ public class SortDslIT {
 					.sort( f -> f.fromLuceneSort(
 							new Sort(
 									new SortField( "genre_sort", SortField.Type.STRING ),
-									new SortField( "pageCount", SortField.Type.INT )
+									SortField.FIELD_DOC
 							)
 					) )
 					.fetchHits( 20 );
 			// end::lucene-fromLuceneSort[]
 			assertThat( hits )
 					.extracting( Book::getId )
-					.containsExactly( BOOK4_ID, BOOK2_ID, BOOK1_ID, BOOK3_ID );
+					.containsExactly( BOOK4_ID, BOOK1_ID, BOOK2_ID, BOOK3_ID );
 		} );
 
 		withinSearchSession( searchSession -> {
