@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumericFieldCodec;
 import org.hibernate.search.backend.lucene.types.lowlevel.impl.LuceneNumericDomain;
@@ -45,8 +46,8 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 	}
 
 	@Override
-	FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector, int limit)
-			throws IOException {
+	FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector,
+			NestedDocsProvider nestedDocsProvider, int limit) throws IOException {
 		LongValueFacetCounts facetCounts = numericDomain.createTermsFacetCounts(
 				absoluteFieldPath, facetsCollector, nestedDocsProvider
 		);
