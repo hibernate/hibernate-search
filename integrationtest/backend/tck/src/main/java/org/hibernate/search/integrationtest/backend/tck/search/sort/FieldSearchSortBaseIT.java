@@ -413,7 +413,7 @@ public class FieldSearchSortBaseIT<F> {
 
 		/*
 		 * Not testing the ordering of results here because some documents have the same value.
-		 * It's not what we want tot test anyway: we just want to check that fields are correctly
+		 * It's not what we want to test anyway: we just want to check that fields are correctly
 		 * detected as compatible and that no exception is thrown.
 		 */
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
@@ -458,7 +458,7 @@ public class FieldSearchSortBaseIT<F> {
 
 		/*
 		 * Not testing the ordering of results here because some documents have the same value.
-		 * It's not what we want tot test anyway: we just want to check that fields are correctly
+		 * It's not what we want to test anyway: we just want to check that fields are correctly
 		 * detected as compatible and that no exception is thrown.
 		 */
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
