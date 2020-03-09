@@ -132,7 +132,7 @@ public class ObjectExistsSearchPredicateIT {
 				.where( p -> p.nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) ) )
 				.fetchAllHits();
 
-		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
+		// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
 		// TODO HSEARCH-3762 DOCUMENT_4 won't be matched either, since we use a nested storage for the inner object field
 		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 	}
@@ -156,7 +156,7 @@ public class ObjectExistsSearchPredicateIT {
 				.where( p -> p.nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) ) )
 				.fetchAllHits();
 
-		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
+		// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
 		// TODO HSEARCH-3762 DOCUMENT_4 won't be matched either, since we use a nested storage for the inner object field
 		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 	}
@@ -186,7 +186,7 @@ public class ObjectExistsSearchPredicateIT {
 				.where( p -> p.nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) ) )
 				.fetchAllHits();
 
-		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
+		// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
 		// TODO HSEARCH-3762 DOCUMENT_4 won't be matched either, since we use a nested storage for the inner object field
 		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 	}
@@ -250,7 +250,7 @@ public class ObjectExistsSearchPredicateIT {
 				.where( p -> p.exists().field( "flattened" ) )
 				.fetchAllHits();
 
-		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
+		// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
 		// DOCUMENT_4 will match, even if the matching field is not a direct child of the targeted path
 		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_4 );
 	}
@@ -274,7 +274,7 @@ public class ObjectExistsSearchPredicateIT {
 				.where( p -> p.exists().field( "flattened" ) )
 				.fetchAllHits();
 
-		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
+		// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
 		// DOCUMENT_4 will match, even if the matching field is not a direct child of the targeted path
 		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_4 );
 	}
@@ -304,7 +304,7 @@ public class ObjectExistsSearchPredicateIT {
 				.where( p -> p.exists().field( "flattened" ) )
 				.fetchAllHits();
 
-		// DOCUMENT_2 won't be matched either, since it hasn't any not-null field
+		// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
 		// DOCUMENT_4 will match, even if the matching field is not a direct child of the targeted path
 		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_4 );
 	}
