@@ -21,6 +21,7 @@ import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingFailureHandler;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexingMonitor;
+import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.work.spi.PojoScopeWorkspace;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -43,6 +44,7 @@ public class MassIndexerImpl implements MassIndexer {
 	private final DetachedBackendSessionContext sessionContext;
 
 	private final Set<HibernateOrmMassIndexingIndexedTypeContext<?>> rootEntityTypes;
+	private final PojoScopeSchemaManager scopeSchemaManager;
 	private final PojoScopeWorkspace scopeWorkspace;
 
 	// default settings defined here:
@@ -52,6 +54,7 @@ public class MassIndexerImpl implements MassIndexer {
 	private long objectsLimit = 0; //means no limit at all
 	private CacheMode cacheMode = CacheMode.IGNORE;
 	private boolean mergeSegmentsOnFinish = false;
+	private boolean dropAndCreateSchemaOnStart = false;
 	private boolean purgeAtStart = true;
 	private boolean mergeSegmentsAfterPurge = true;
 	private int idFetchSize = 100; //reasonable default as we only load IDs
@@ -63,10 +66,12 @@ public class MassIndexerImpl implements MassIndexer {
 	public MassIndexerImpl(HibernateOrmMassIndexingMappingContext mappingContext,
 			Set<? extends HibernateOrmMassIndexingIndexedTypeContext<?>> targetedIndexedTypes,
 			DetachedBackendSessionContext sessionContext,
+			PojoScopeSchemaManager scopeSchemaManager,
 			PojoScopeWorkspace scopeWorkspace) {
 		this.mappingContext = mappingContext;
 		this.sessionContext = sessionContext;
 		this.rootEntityTypes = toRootEntityTypes( targetedIndexedTypes );
+		this.scopeSchemaManager = scopeSchemaManager;
 		this.scopeWorkspace = scopeWorkspace;
 	}
 
@@ -149,6 +154,12 @@ public class MassIndexerImpl implements MassIndexer {
 	}
 
 	@Override
+	public MassIndexer dropAndCreateSchemaOnStart(boolean enable) {
+		this.dropAndCreateSchemaOnStart = enable;
+		return this;
+	}
+
+	@Override
 	public MassIndexer purgeAllOnStart(boolean enable) {
 		this.purgeAtStart = enable;
 		return this;
@@ -197,10 +208,10 @@ public class MassIndexerImpl implements MassIndexer {
 		return new BatchCoordinator(
 				mappingContext, sessionContext,
 				notifier,
-				rootEntityTypes, scopeWorkspace,
+				rootEntityTypes, scopeSchemaManager, scopeWorkspace,
 				typesToIndexInParallel, documentBuilderThreads,
 				cacheMode, objectLoadingBatchSize, objectsLimit,
-				mergeSegmentsOnFinish, purgeAtStart, mergeSegmentsAfterPurge,
+				mergeSegmentsOnFinish, dropAndCreateSchemaOnStart, purgeAtStart, mergeSegmentsAfterPurge,
 				idFetchSize, idLoadingTransactionTimeout
 		);
 	}

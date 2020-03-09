@@ -133,6 +133,78 @@ public class IndexedEmbeddedBaseIT {
 		);
 	}
 
+	@Test
+	public void repeatedIndexedEmbedded() {
+		class Embedded {
+			String direct;
+			String flat;
+			String nest;
+			String common;
+
+			@GenericField
+			public String getDirect() {
+				return direct;
+			}
+			@GenericField
+			public String getFlat() {
+				return flat;
+			}
+			@GenericField
+			public String getNest() {
+				return nest;
+			}
+			@GenericField
+			public String getCommon() {
+				return common;
+			}
+		}
+
+		@Indexed(index = INDEX_NAME)
+		class IndexedEntity {
+			Integer id;
+			Embedded embedded;
+			public IndexedEntity(int id, String value) {
+				this.id = id;
+				this.embedded = new Embedded();
+				this.embedded.direct = value;
+				this.embedded.flat = value;
+				this.embedded.nest = value;
+				this.embedded.common = value;
+			}
+			@DocumentId
+			public Integer getId() {
+				return id;
+			}
+			@IndexedEmbedded(prefix = "direct_", includePaths = {"direct", "common"})
+			@IndexedEmbedded(prefix = "flat.", includePaths = {"flat", "common"},
+					storage = ObjectFieldStorage.FLATTENED)
+			@IndexedEmbedded(prefix = "nest.", includePaths = {"nest", "common"},
+					storage = ObjectFieldStorage.NESTED)
+			public Embedded getEmbedded() {
+				return embedded;
+			}
+		}
+
+		backendMock.expectSchema( INDEX_NAME, b -> {
+				b.field( "direct_direct", String.class );
+				b.field( "direct_common", String.class );
+				b.objectField( "flat", ObjectFieldStorage.FLATTENED, b2 -> {
+					b2.field( "flat", String.class );
+					b2.field( "common", String.class );
+				} );
+				b.objectField( "nest", ObjectFieldStorage.NESTED, b2 -> {
+					b2.field( "nest", String.class );
+					b2.field( "common", String.class );
+				} );
+			}
+		);
+		SearchMapping mapping = setupHelper.start()
+				.withAnnotatedEntityTypes( IndexedEntity.class )
+				.withAnnotatedTypes( Embedded.class )
+				.setup();
+		backendMock.verifyExpectationsMet();
+	}
+
 	/**
 	 * Check that setting a dotless prefix in @IndexedEmbedded on a multi-valued property
 	 * results in *direct* children being automatically marked as multi-valued.

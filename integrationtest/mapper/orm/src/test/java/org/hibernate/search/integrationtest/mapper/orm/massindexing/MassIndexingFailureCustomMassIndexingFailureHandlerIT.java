@@ -100,20 +100,24 @@ public class MassIndexingFailureCustomMassIndexingFailureHandlerIT extends Abstr
 	}
 
 	@Override
-	protected void expectMassIndexerOperationFailureHandling(String exceptionMessage, String failingOperationAsString) {
+	protected void expectMassIndexerOperationFailureHandling(
+			Class<? extends Throwable> exceptionType, String exceptionMessage,
+			String failingOperationAsString) {
 		reset( failureHandler );
 		failureHandler.handle( capture( genericFailureContextCapture ) );
 		replay( failureHandler );
 	}
 
 	@Override
-	protected void assertMassIndexerOperationFailureHandling(String exceptionMessage, String failingOperationAsString) {
+	protected void assertMassIndexerOperationFailureHandling(
+			Class<? extends Throwable> exceptionType, String exceptionMessage,
+			String failingOperationAsString) {
 		verify( failureHandler );
 
 		MassIndexingFailureContext context = genericFailureContextCapture.getValue();
 		Assert.assertThat(
 				context.getThrowable(),
-				ExceptionMatcherBuilder.isException( SimulatedFailure.class )
+				ExceptionMatcherBuilder.isException( exceptionType )
 						.withMessage( exceptionMessage )
 						.build()
 		);

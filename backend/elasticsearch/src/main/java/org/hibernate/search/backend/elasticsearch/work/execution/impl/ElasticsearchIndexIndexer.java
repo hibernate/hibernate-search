@@ -8,7 +8,6 @@ package org.hibernate.search.backend.elasticsearch.work.execution.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
@@ -20,7 +19,7 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchIndexIndexer implements IndexIndexer<ElasticsearchDocumentObjectBuilder> {
+public class ElasticsearchIndexIndexer implements IndexIndexer {
 
 	private final ElasticsearchWorkBuilderFactory factory;
 	private final ElasticsearchWorkOrchestrator orchestrator;
@@ -39,7 +38,7 @@ public class ElasticsearchIndexIndexer implements IndexIndexer<ElasticsearchDocu
 
 	@Override
 	public CompletableFuture<?> add(DocumentReferenceProvider referenceProvider,
-			DocumentContributor<ElasticsearchDocumentObjectBuilder> documentContributor) {
+			DocumentContributor documentContributor) {
 		String id = referenceProvider.getIdentifier();
 		String elasticsearchId = indexManagerContext.toElasticsearchId( tenantId, id );
 		String routingKey = referenceProvider.getRoutingKey();
@@ -47,7 +46,7 @@ public class ElasticsearchIndexIndexer implements IndexIndexer<ElasticsearchDocu
 		JsonObject document = indexManagerContext.createDocument( tenantId, id, documentContributor );
 
 		ElasticsearchWork<Void> work = factory.index(
-				indexManagerContext.getMappedTypeName(),
+				indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
 				indexManagerContext.getElasticsearchIndexWriteName(),
 				URLEncodedString.fromString( elasticsearchId ), routingKey, document
 		)

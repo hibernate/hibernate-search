@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.performance.backend.base;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.dataset.Dataset;
@@ -49,7 +48,7 @@ public abstract class AbstractMassIndexingBenchmarks extends AbstractBackendBenc
 	private int batchSize;
 
 	private MappedIndex index;
-	private IndexIndexer<? extends DocumentElement> indexer;
+	private IndexIndexer indexer;
 	private Dataset dataset;
 
 	private long currentDocumentIdInThread = 0L;

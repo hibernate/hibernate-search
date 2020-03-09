@@ -9,13 +9,10 @@ package org.hibernate.search.mapper.orm.mapping.impl;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
 import org.hibernate.search.mapper.orm.logging.impl.HibernateOrmEventContextMessages;
 
-import org.jboss.logging.Messages;
-
 public final class HibernateOrmMappingKey
 		implements MappingKey<HibernateOrmMappingPartialBuildState, HibernateOrmMapping> {
 
-	private static final HibernateOrmEventContextMessages MESSAGES =
-			Messages.getBundle( HibernateOrmEventContextMessages.class );
+	private static final HibernateOrmEventContextMessages MESSAGES = HibernateOrmEventContextMessages.INSTANCE;
 
 	@Override
 	public String render() {

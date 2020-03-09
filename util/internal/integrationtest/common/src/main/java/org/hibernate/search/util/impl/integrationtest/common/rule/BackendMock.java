@@ -28,6 +28,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.docume
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 
 import org.junit.rules.TestRule;
@@ -125,17 +126,25 @@ public class BackendMock implements TestRule {
 
 	public BackendMock expectSchema(String indexName, Consumer<StubIndexSchemaNode.Builder> contributor,
 			Capture<StubIndexSchemaNode> capture) {
-		CallQueue<PushSchemaCall> callQueue = behaviorMock.getPushSchemaCalls( indexName );
+		CallQueue<SchemaDefinitionCall> callQueue = behaviorMock.getSchemaDefinitionCalls( indexName );
 		StubIndexSchemaNode.Builder builder = StubIndexSchemaNode.schema();
 		contributor.accept( builder );
-		callQueue.expectOutOfOrder( new PushSchemaCall( indexName, builder.build(), capture ) );
+		callQueue.expectOutOfOrder( new SchemaDefinitionCall( indexName, builder.build(), capture ) );
 		return this;
 	}
 
 	public BackendMock expectAnySchema(String indexName) {
-		CallQueue<PushSchemaCall> callQueue = behaviorMock.getPushSchemaCalls( indexName );
-		callQueue.expectOutOfOrder( new PushSchemaCall( indexName, null ) );
+		CallQueue<SchemaDefinitionCall> callQueue = behaviorMock.getSchemaDefinitionCalls( indexName );
+		callQueue.expectOutOfOrder( new SchemaDefinitionCall( indexName, null ) );
 		return this;
+	}
+
+	public SchemaManagementWorkCallListContext expectSchemaManagementWorks(String indexName) {
+		CallQueue<SchemaManagementWorkCall> callQueue = behaviorMock.getSchemaManagementWorkCalls( indexName );
+		return new SchemaManagementWorkCallListContext(
+				indexName,
+				callQueue::expectInOrder
+		);
 	}
 
 	public DocumentWorkCallListContext expectWorks(String indexName) {
@@ -170,13 +179,9 @@ public class BackendMock implements TestRule {
 	}
 
 	public IndexScaleWorkCallListContext expectIndexScaleWorks(String indexName, String tenantId) {
-		return expectIndexScaleWorks( Collections.singletonList( indexName ), tenantId );
-	}
-
-	public IndexScaleWorkCallListContext expectIndexScaleWorks(Collection<String> indexNames, String tenantId) {
-		CallQueue<IndexScaleWorkCalls> callQueue = behaviorMock.getIndexScaleWorkCalls();
+		CallQueue<IndexScaleWorkCall> callQueue = behaviorMock.getIndexScaleWorkCalls();
 		return new IndexScaleWorkCallListContext(
-				new LinkedHashSet<>( indexNames ), tenantId,
+				indexName, tenantId,
 				callQueue::expectInOrder
 		);
 	}
@@ -214,6 +219,33 @@ public class BackendMock implements TestRule {
 		CallQueue<CountWorkCall> callQueue = behaviorMock.getCountWorkCalls();
 		callQueue.expectInOrder( new CountWorkCall( new LinkedHashSet<>( indexNames ), expectedResult ) );
 		return this;
+	}
+
+	public static class SchemaManagementWorkCallListContext {
+		private final String indexName;
+		private final Consumer<SchemaManagementWorkCall> expectationConsumer;
+
+		private SchemaManagementWorkCallListContext(String indexName,
+				Consumer<SchemaManagementWorkCall> expectationConsumer) {
+			this.indexName = indexName;
+			this.expectationConsumer = expectationConsumer;
+		}
+
+		public SchemaManagementWorkCallListContext work(StubSchemaManagementWork.Type type) {
+			return work( type, CompletableFuture.completedFuture( null ) );
+		}
+
+		public SchemaManagementWorkCallListContext work(StubSchemaManagementWork.Type type, CompletableFuture<?> future) {
+			return work( type, failureCollector -> future );
+		}
+
+		public SchemaManagementWorkCallListContext work(StubSchemaManagementWork.Type type,
+				SchemaManagementWorkBehavior behavior) {
+			StubSchemaManagementWork work = StubSchemaManagementWork.builder( type )
+					.build();
+			expectationConsumer.accept( new SchemaManagementWorkCall( indexName, work, behavior ) );
+			return this;
+		}
 	}
 
 	public class DocumentWorkCallListContext {
@@ -326,15 +358,15 @@ public class BackendMock implements TestRule {
 		}
 	}
 
-	public class IndexScaleWorkCallListContext {
-		private final Set<String> indexNames;
+	public static class IndexScaleWorkCallListContext {
+		private final String indexName;
 		private final String tenantIdentifier;
-		private final Consumer<IndexScaleWorkCalls> expectationConsumer;
+		private final Consumer<IndexScaleWorkCall> expectationConsumer;
 
-		private IndexScaleWorkCallListContext(Set<String> indexNames,
+		private IndexScaleWorkCallListContext(String indexName,
 				String tenantIdentifier,
-				Consumer<IndexScaleWorkCalls> expectationConsumer) {
-			this.indexNames = indexNames;
+				Consumer<IndexScaleWorkCall> expectationConsumer) {
+			this.indexName = indexName;
 			this.tenantIdentifier = tenantIdentifier;
 			this.expectationConsumer = expectationConsumer;
 		}
@@ -397,7 +429,7 @@ public class BackendMock implements TestRule {
 					.tenantIdentifier( tenantIdentifier )
 					.routingKeys( routingKeys )
 					.build();
-			expectationConsumer.accept( new IndexScaleWorkCalls( indexNames, work, future ) );
+			expectationConsumer.accept( new IndexScaleWorkCall( indexName, work, future ) );
 			return this;
 		}
 	}

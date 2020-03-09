@@ -29,7 +29,6 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 
 /**
  * Test indexing, and more importantly updates and deletions,
@@ -42,9 +41,6 @@ public class LuceneIndexingNestedIT {
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	@Rule
-	public TemporaryFolder temporaryFolder = new TemporaryFolder();
 
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
@@ -63,7 +59,7 @@ public class LuceneIndexingNestedIT {
 		// No multitenancy, which means the backend will use indexWriter.updateDocuments(Term, Iterable) for updates
 		setup( MultiTenancyStrategyName.NONE );
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( sessionContext );
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( sessionContext );
 		plan.update( referenceProvider( "1" ), document -> {
 			DocumentElement nested = document.addObject( indexMapping.nestedObject.self );
 			nested.addValue( indexMapping.nestedObject.field2, "value" );
@@ -81,7 +77,7 @@ public class LuceneIndexingNestedIT {
 		// indexWriter.deleteDocuments(Query) then indexWriter.addDocument for updates
 		setup( MultiTenancyStrategyName.DISCRIMINATOR );
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( sessionContext );
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( sessionContext );
 		plan.update( referenceProvider( "1" ), document -> {
 			DocumentElement nested = document.addObject( indexMapping.nestedObject.self );
 			nested.addValue( indexMapping.nestedObject.field2, "value" );
@@ -98,7 +94,7 @@ public class LuceneIndexingNestedIT {
 		// No multitenancy, which means the backend will use indexWriter.deleteDocuments(Term) for deletion
 		setup( MultiTenancyStrategyName.NONE );
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( sessionContext );
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( sessionContext );
 		plan.delete( referenceProvider( "1" ) );
 		plan.execute().join();
 
@@ -111,7 +107,7 @@ public class LuceneIndexingNestedIT {
 		// Multitenancy enabled, which means the backend will use indexWriter.deleteDocuments(Query) for deletion
 		setup( MultiTenancyStrategyName.DISCRIMINATOR );
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( sessionContext );
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( sessionContext );
 		plan.delete( referenceProvider( "1" ) );
 		plan.execute().join();
 
@@ -148,7 +144,7 @@ public class LuceneIndexingNestedIT {
 			sessionContext = new StubBackendSessionContext( "someTenantId" );
 		}
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan( sessionContext );
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( sessionContext );
 		plan.add( referenceProvider( "1" ), document -> {
 			DocumentElement nested = document.addObject( indexMapping.nestedObject.self );
 			nested.addValue( indexMapping.nestedObject.field1, "value" );
@@ -157,8 +153,8 @@ public class LuceneIndexingNestedIT {
 	}
 
 	private int countWithField(String absoluteFieldPath) throws IOException {
-		return LuceneIndexContentUtils.doOnIndexCopy(
-				setupHelper, temporaryFolder, INDEX_NAME,
+		return LuceneIndexContentUtils.readIndex(
+				setupHelper, INDEX_NAME,
 				reader -> reader.getDocCount( absoluteFieldPath )
 		);
 	}

@@ -99,6 +99,10 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 			this.readAlias = readAlias;
 		}
 
+		public boolean exists() {
+			return TestElasticsearchClient.this.exists( primaryIndexName );
+		}
+
 		public void waitForRequiredIndexStatus() {
 			TestElasticsearchClient.this.waitForRequiredIndexStatus( primaryIndexName );
 		}
@@ -479,6 +483,14 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		createdTemplatesNames.add( templateName );
 	}
 
+	private boolean exists(final URLEncodedString indexName) {
+		ElasticsearchResponse response = performRequestIgnore404( ElasticsearchRequest.get()
+				.pathComponent( indexName )
+				.build() );
+		int code = response.getStatusCode();
+		return 200 <= code && code < 300;
+	}
+
 	private void waitForRequiredIndexStatus(final URLEncodedString indexName) {
 		performRequest( ElasticsearchRequest.get()
 				.pathComponent( Paths._CLUSTER ).pathComponent( Paths.HEALTH ).pathComponent( indexName )
@@ -487,7 +499,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 				 * the indexes to never reach a green status
 				 */
 				.param( "wait_for_status", IndexStatus.YELLOW.getElasticsearchString() )
-				.param( "timeout", ElasticsearchIndexSettings.Defaults.LIFECYCLE_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT + "ms" )
+				.param( "timeout", ElasticsearchIndexSettings.Defaults.SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT + "ms" )
 				.build() );
 	}
 

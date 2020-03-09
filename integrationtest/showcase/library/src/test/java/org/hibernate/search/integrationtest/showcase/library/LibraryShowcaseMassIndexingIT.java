@@ -29,7 +29,9 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-@TestPropertySource(properties = { "automatic_indexing.strategy=none" })
+@TestPropertySource(properties = {
+		"spring.jpa.properties.hibernate.search.automatic_indexing.strategy=none"
+})
 @ActiveProfiles(resolver = TestActiveProfilesResolver.class)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 public class LibraryShowcaseMassIndexingIT {
@@ -57,7 +59,7 @@ public class LibraryShowcaseMassIndexingIT {
 	private DocumentService documentService;
 
 	@Autowired
-	private AdminService massiveIndexer;
+	private AdminService adminService;
 
 	@Autowired
 	private TestDataService testDataService;
@@ -70,20 +72,20 @@ public class LibraryShowcaseMassIndexingIT {
 	@Test
 	public void testMassIndexing() {
 		assertThat( documentService.countIndexed() ).isEqualTo( 0 );
-		MassIndexer indexer = massiveIndexer.createMassIndexer();
+		MassIndexer indexer = adminService.createMassIndexer();
 		try {
 			indexer.startAndWait();
 		}
 		catch (InterruptedException e) {
 			fail( "Unexpected InterruptedException: " + e.getMessage() );
 		}
-		assertThat( documentService.countIndexed() ).isEqualTo( 200 );
+		assertThat( documentService.countIndexed() ).isEqualTo( NUMBER_OF_BOOKS );
 	}
 
 	@Test
 	public void testMassIndexingMonitor() {
 		assertThat( documentService.countIndexed() ).isEqualTo( 0 );
-		MassIndexer indexer = massiveIndexer.createMassIndexer();
+		MassIndexer indexer = adminService.createMassIndexer();
 		try {
 			/*
 			 * The default period for logging in the default mass indexing monitor is 50.
@@ -108,6 +110,6 @@ public class LibraryShowcaseMassIndexingIT {
 		catch (InterruptedException e) {
 			fail( "Unexpected InterruptedException: " + e.getMessage() );
 		}
-		assertThat( documentService.countIndexed() ).isEqualTo( 200 );
+		assertThat( documentService.countIndexed() ).isEqualTo( NUMBER_OF_BOOKS );
 	}
 }

@@ -11,7 +11,6 @@ import java.util.Optional;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
-import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.index.IOStrategyName;
@@ -24,6 +23,8 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneBatchingWrit
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkProcessor;
+import org.hibernate.search.backend.lucene.schema.management.impl.LuceneIndexSchemaManager;
+import org.hibernate.search.backend.lucene.schema.management.impl.SchemaManagementIndexManagerContext;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.projection.impl.LuceneSearchProjection;
@@ -36,6 +37,7 @@ import org.hibernate.search.backend.lucene.work.execution.impl.LuceneIndexWorksp
 import org.hibernate.search.backend.lucene.work.execution.impl.WorkExecutionBackendContext;
 import org.hibernate.search.backend.lucene.work.execution.impl.WorkExecutionIndexManagerContext;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
@@ -100,24 +102,26 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	}
 
 	@Override
-	public IndexIndexingPlan<LuceneRootDocumentBuilder> createIndexingPlan(
+	public <R> IndexIndexingPlan<R> createIndexingPlan(
 			WorkExecutionIndexManagerContext indexManagerContext,
 			LuceneIndexEntryFactory indexEntryFactory,
 			BackendSessionContext sessionContext,
+			EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
-		return new LuceneIndexIndexingPlan(
+		return new LuceneIndexIndexingPlan<>(
 				workFactory,
 				indexManagerContext,
 				indexEntryFactory,
 				sessionContext,
+				entityReferenceFactory,
 				commitStrategy, refreshStrategy
 		);
 	}
 
 	@Override
-	public IndexIndexer<LuceneRootDocumentBuilder> createIndexer(
+	public IndexIndexer createIndexer(
 			WorkExecutionIndexManagerContext indexManagerContext,
 			LuceneIndexEntryFactory indexEntryFactory,
 			BackendSessionContext sessionContext,
@@ -188,6 +192,10 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 						timingSource, threadPoolProvider, failureHandler
 				);
 		}
+	}
+
+	LuceneIndexSchemaManager createSchemaManager(SchemaManagementIndexManagerContext context) {
+		return new LuceneIndexSchemaManager( workFactory, context );
 	}
 
 	Shard createShard(IOStrategy ioStrategy, LuceneIndexModel model, Optional<String> shardId) {

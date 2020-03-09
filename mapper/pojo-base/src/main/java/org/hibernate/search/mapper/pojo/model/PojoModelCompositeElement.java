@@ -8,6 +8,8 @@ package org.hibernate.search.mapper.pojo.model;
 
 import java.util.stream.Stream;
 
+import org.hibernate.search.util.common.annotaion.Incubating;
+
 /**
  * A potentially composite element in the POJO model.
  * <p>
@@ -16,9 +18,8 @@ import java.util.stream.Stream;
  *
  * @see PojoModelType
  * @see PojoModelProperty
- * @hsearch.experimental This type is under active development.
- *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
  */
+@Incubating
 public interface PojoModelCompositeElement extends PojoModelElement {
 
 	/**

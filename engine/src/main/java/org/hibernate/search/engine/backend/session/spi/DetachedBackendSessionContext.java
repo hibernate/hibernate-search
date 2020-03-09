@@ -21,7 +21,7 @@ import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
  * The main downside is that this context cannot be used
  * everywhere {@link BackendSessionContext} can.
  * In particular, it cannot be used when creating document-related
- * {@link org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor#createIndexingPlan(BackendSessionContext, DocumentCommitStrategy, DocumentRefreshStrategy) indexing plans}
+ * {@link org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor#createIndexingPlan(BackendSessionContext, org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory, DocumentCommitStrategy, DocumentRefreshStrategy) indexing plans}
  * or {@link org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor#createIndexer(BackendSessionContext, DocumentCommitStrategy) indexers}
  * because these may need access to the session.
  */

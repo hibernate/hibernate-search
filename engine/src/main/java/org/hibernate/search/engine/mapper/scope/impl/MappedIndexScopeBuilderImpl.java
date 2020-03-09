@@ -15,12 +15,12 @@ import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScopeBuilder;
 public class MappedIndexScopeBuilderImpl<R, E> implements MappedIndexScopeBuilder<R, E> {
 	private final IndexScopeBuilder delegate;
 
-	public MappedIndexScopeBuilderImpl(IndexManagerImplementor<?> firstIndexManager,
+	public MappedIndexScopeBuilderImpl(IndexManagerImplementor firstIndexManager,
 			BackendMappingContext mappingContext) {
 		this.delegate = firstIndexManager.createScopeBuilder( mappingContext );
 	}
 
-	public void add(IndexManagerImplementor<?> indexManager) {
+	public void add(IndexManagerImplementor indexManager) {
 		indexManager.addTo( delegate );
 	}
 

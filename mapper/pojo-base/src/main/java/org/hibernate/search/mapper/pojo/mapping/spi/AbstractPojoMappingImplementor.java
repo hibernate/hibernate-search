@@ -6,12 +6,13 @@
  */
 package org.hibernate.search.mapper.pojo.mapping.spi;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.IdentifierBridgeToDocumentIdentifierContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.impl.IdentifierBridgeToDocumentIdentifierContextImpl;
@@ -28,8 +29,7 @@ public abstract class AbstractPojoMappingImplementor<M>
 
 	private final PojoMappingDelegate delegate;
 
-	private final List<CloseDelegate> closeDelegates = new ArrayList<>();
-	private boolean closed = false;
+	private boolean stopped = false;
 
 	private final IdentifierBridgeToDocumentIdentifierContext toDocumentIdentifierContext;
 	private final ValueBridgeToIndexedValueContext toIndexedValueContext;
@@ -41,15 +41,25 @@ public abstract class AbstractPojoMappingImplementor<M>
 	}
 
 	@Override
-	public final void close() {
-		if ( !closed ) {
-			// Make sure to avoid infinite recursion when one of the delegates calls this.close()
-			closed = true;
+	public CompletableFuture<?> start(MappingStartContext context) {
+		// Nothing to do
+		return CompletableFuture.completedFuture( null );
+	}
+
+	@Override
+	public CompletableFuture<?> preStop(MappingPreStopContext context) {
+		// Nothing to do
+		return CompletableFuture.completedFuture( null );
+	}
+
+	@Override
+	public void stop() {
+		if ( !stopped ) {
+			// Make sure to avoid infinite recursion when one of the delegates calls this.stop()
+			stopped = true;
 			try ( Closer<RuntimeException> closer = new Closer<>() ) {
 				closer.push( PojoMappingDelegate::close, delegate );
-				closer.push( AbstractPojoMappingImplementor::doClose, this );
-				doClose();
-				closer.pushAll( CloseDelegate::close, closeDelegates );
+				closer.push( AbstractPojoMappingImplementor::doStop, this );
 			}
 		}
 	}
@@ -65,29 +75,21 @@ public abstract class AbstractPojoMappingImplementor<M>
 	}
 
 	@Override
-	public PojoIndexingPlan createIndexingPlan(PojoWorkSessionContext context, DocumentCommitStrategy commitStrategy,
-			DocumentRefreshStrategy refreshStrategy) {
+	public <R> PojoIndexingPlan<R> createIndexingPlan(PojoWorkSessionContext<R> context,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return delegate.createIndexingPlan( context, commitStrategy, refreshStrategy );
 	}
 
 	@Override
-	public PojoIndexer createIndexer(PojoWorkSessionContext context, DocumentCommitStrategy commitStrategy) {
+	public PojoIndexer createIndexer(PojoWorkSessionContext<?> context, DocumentCommitStrategy commitStrategy) {
 		return delegate.createIndexer( context, commitStrategy );
-	}
-
-	public void onClose(CloseDelegate closeable) {
-		closeDelegates.add( closeable );
 	}
 
 	protected final PojoMappingDelegate getDelegate() {
 		return delegate;
 	}
 
-	protected void doClose() {
+	protected void doStop() {
 	}
 
-	public interface CloseDelegate extends AutoCloseable {
-		@Override
-		void close();
-	}
 }

@@ -18,8 +18,12 @@ import java.nio.file.attribute.BasicFileAttributes;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.util.common.impl.Throwables;
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneTestIndexesPathConfiguration;
 
 import org.jboss.logging.Logger;
+
+import org.apache.lucene.store.Directory;
+import org.apache.lucene.store.FSDirectory;
 
 public class LuceneTckBackendAccessor implements TckBackendAccessor {
 
@@ -55,24 +59,8 @@ public class LuceneTckBackendAccessor implements TckBackendAccessor {
 		}
 	}
 
-	public void copyIndexContent(Path copyPath, String indexName) throws IOException {
-		Path indexPath = indexesPath.resolve( indexName );
-
-		Files.walkFileTree( indexPath, new SimpleFileVisitor<Path>() {
-			@Override
-			public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-				Path relativePath = indexPath.relativize( dir );
-				Files.createDirectory( copyPath.resolve( relativePath ) );
-				return FileVisitResult.CONTINUE;
-			}
-
-			@Override
-			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-				Path relativePath = indexPath.relativize( file );
-				Files.copy( file, copyPath.resolve( relativePath ) );
-				return FileVisitResult.CONTINUE;
-			}
-		} );
+	public Directory openDirectory(String indexName) throws IOException {
+		return FSDirectory.open( indexesPath.resolve( indexName ) );
 	}
 
 	private void nukeOrLogRecursively(Path path, String indexName) {

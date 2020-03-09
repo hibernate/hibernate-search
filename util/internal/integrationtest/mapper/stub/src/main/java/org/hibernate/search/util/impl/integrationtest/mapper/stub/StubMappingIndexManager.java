@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -24,9 +24,9 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 public class StubMappingIndexManager {
 
 	private final String indexName;
-	private final MappedIndexManager<?> indexManager;
+	private final MappedIndexManager indexManager;
 
-	StubMappingIndexManager(String indexName, MappedIndexManager<?> indexManager) {
+	StubMappingIndexManager(String indexName, MappedIndexManager indexManager) {
 		this.indexName = indexName;
 		this.indexManager = indexManager;
 	}
@@ -39,31 +39,36 @@ public class StubMappingIndexManager {
 		return clazz.cast( indexManager.toAPI() );
 	}
 
-	public IndexIndexingPlan<? extends DocumentElement> createIndexingPlan() {
+	public IndexSchemaManager getSchemaManager() {
+		return indexManager.getSchemaManager();
+	}
+
+	public IndexIndexingPlan<StubEntityReference> createIndexingPlan() {
 		return createIndexingPlan( new StubBackendSessionContext() );
 	}
 
-	public IndexIndexingPlan<? extends DocumentElement> createIndexingPlan(StubBackendSessionContext sessionContext) {
+	public IndexIndexingPlan<StubEntityReference> createIndexingPlan(StubBackendSessionContext sessionContext) {
 		/*
 		 * Use the same defaults as in the ORM mapper for the commit strategy,
 		 * but force refreshes because it's more convenient for tests.
 		 */
-		return indexManager.createIndexingPlan( sessionContext, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE );
+		return indexManager.createIndexingPlan( sessionContext, StubEntityReference.FACTORY,
+				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE );
 	}
 
-	public IndexIndexingPlan<? extends DocumentElement> createIndexingPlan(StubBackendSessionContext sessionContext,
+	public IndexIndexingPlan<StubEntityReference> createIndexingPlan(StubBackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		return indexManager.createIndexingPlan( sessionContext, commitStrategy, refreshStrategy );
+		return indexManager.createIndexingPlan( sessionContext, StubEntityReference.FACTORY,
+				commitStrategy, refreshStrategy );
 	}
 
-	public IndexIndexer<? extends DocumentElement> createIndexer(
-			DocumentCommitStrategy commitStrategy) {
+	public IndexIndexer createIndexer(DocumentCommitStrategy commitStrategy) {
 		return createIndexer( new StubBackendSessionContext(), commitStrategy );
 	}
 
-	public IndexIndexer<? extends DocumentElement> createIndexer(
+	public IndexIndexer createIndexer(
 			StubBackendSessionContext sessionContext, DocumentCommitStrategy commitStrategy) {
-		return indexManager.createIndexer( sessionContext, commitStrategy );
+		return indexManager.createIndexer( sessionContext, StubEntityReference.FACTORY, commitStrategy );
 	}
 
 	public IndexWorkspace createWorkspace() {

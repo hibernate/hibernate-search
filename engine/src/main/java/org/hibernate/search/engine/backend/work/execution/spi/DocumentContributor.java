@@ -7,11 +7,10 @@
 package org.hibernate.search.engine.backend.work.execution.spi;
 
 
-/**
- * @param <D> The expected document type.
- */
-public interface DocumentContributor<D> {
+import org.hibernate.search.engine.backend.document.DocumentElement;
 
-	void contribute(D state);
+public interface DocumentContributor {
+
+	void contribute(DocumentElement state);
 
 }

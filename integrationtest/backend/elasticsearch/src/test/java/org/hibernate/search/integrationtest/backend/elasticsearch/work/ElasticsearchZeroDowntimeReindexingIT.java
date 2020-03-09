@@ -16,7 +16,6 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -65,7 +64,7 @@ public class ElasticsearchZeroDowntimeReindexingIT {
 	@Test
 	public void test() {
 		IndexWorkspace workspace = indexManager.createWorkspace();
-		IndexIndexer<? extends DocumentElement> indexer = indexManager.createIndexer( DocumentCommitStrategy.NONE );
+		IndexIndexer indexer = indexManager.createIndexer( DocumentCommitStrategy.NONE );
 
 		indexer.add( referenceProvider( "1" ), document -> {
 			document.addValue( indexMapping.text, "text1" );

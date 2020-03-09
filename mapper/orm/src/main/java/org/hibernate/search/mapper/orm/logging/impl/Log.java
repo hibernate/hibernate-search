@@ -262,4 +262,8 @@ public interface Log extends BasicLogger {
 			value = "The mass indexing failure handler threw an exception while handling a previous failure."
 					+ " The failure may not have been reported.")
 	void failureInMassIndexingFailureHandler(@Cause Throwable t);
+
+	@Message(id = ID_OFFSET_2 + 32, value = "Invalid schema management strategy name: '%1$s'."
+			+ " Valid names are: %2$s.")
+	SearchException invalidSchemaManagementStrategyName(String invalidRepresentation, List<String> validRepresentations);
 }

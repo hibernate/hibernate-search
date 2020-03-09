@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.engine.mapper.mapping.spi;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
+import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
@@ -23,14 +24,18 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
  * <p>
  * This is the interface provided to mappers to access the index manager.
  */
-public interface MappedIndexManager<D extends DocumentElement> {
+public interface MappedIndexManager {
 
 	IndexManager toAPI();
 
-	IndexIndexingPlan<D> createIndexingPlan(BackendSessionContext sessionContext,
+	IndexSchemaManager getSchemaManager();
+
+	<R> IndexIndexingPlan<R> createIndexingPlan(BackendSessionContext sessionContext,
+			EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
-	IndexIndexer<D> createIndexer(BackendSessionContext sessionContext,
+	IndexIndexer createIndexer(BackendSessionContext sessionContext,
+			EntityReferenceFactory<?> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy);
 
 	IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext);

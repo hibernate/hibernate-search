@@ -6,10 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.impl;
 
-import java.io.IOException;
-import java.lang.invoke.MethodHandles;
-import java.util.Optional;
-
+import com.google.gson.GsonBuilder;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientUtils;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
@@ -31,7 +28,9 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
-import com.google.gson.GsonBuilder;
+import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.util.Optional;
 
 class ElasticsearchLinkImpl implements ElasticsearchLink {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -42,6 +41,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 	private final boolean logPrettyPrinting;
 	private final ElasticsearchDialectFactory dialectFactory;
 	private final Optional<ElasticsearchVersion> configuredVersionOptional;
+	private final boolean versionCheckEnabled;
 
 	private ElasticsearchClientImplementor clientImplementor;
 	private ElasticsearchVersion elasticsearchVersion;
@@ -54,13 +54,15 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 	ElasticsearchLinkImpl(BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder,
 			ThreadPoolProvider threadPoolProvider, GsonProvider defaultGsonProvider, boolean logPrettyPrinting,
 			ElasticsearchDialectFactory dialectFactory,
-			Optional<ElasticsearchVersion> configuredVersionOptional) {
+			Optional<ElasticsearchVersion> configuredVersionOptional,
+			boolean versionCheckEnabled) {
 		this.clientFactoryHolder = clientFactoryHolder;
 		this.threadPoolProvider = threadPoolProvider;
 		this.defaultGsonProvider = defaultGsonProvider;
 		this.logPrettyPrinting = logPrettyPrinting;
 		this.dialectFactory = dialectFactory;
 		this.configuredVersionOptional = configuredVersionOptional;
+		this.versionCheckEnabled = versionCheckEnabled;
 	}
 
 	@Override
@@ -111,12 +113,17 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 			);
 			clientFactoryHolder.close(); // We won't need it anymore
 
-			elasticsearchVersion = ElasticsearchClientUtils.getElasticsearchVersion( clientImplementor );
-			if ( configuredVersionOptional.isPresent() ) {
-				ElasticsearchVersion configuredVersion = configuredVersionOptional.get();
-				if ( !configuredVersion.matches( elasticsearchVersion ) ) {
-					throw log.unexpectedElasticsearchVersion( configuredVersion, elasticsearchVersion );
+			if ( versionCheckEnabled ) {
+				elasticsearchVersion = ElasticsearchClientUtils.getElasticsearchVersion( clientImplementor );
+				if ( configuredVersionOptional.isPresent() ) {
+					ElasticsearchVersion configuredVersion = configuredVersionOptional.get();
+					if ( !configuredVersion.matches( elasticsearchVersion ) ) {
+						throw log.unexpectedElasticsearchVersion( configuredVersion, elasticsearchVersion );
+					}
 				}
+			}
+			else {
+				configuredVersionOptional.ifPresent( version -> elasticsearchVersion = version );
 			}
 
 			ElasticsearchProtocolDialect protocolDialect = dialectFactory.createProtocolDialect( elasticsearchVersion );

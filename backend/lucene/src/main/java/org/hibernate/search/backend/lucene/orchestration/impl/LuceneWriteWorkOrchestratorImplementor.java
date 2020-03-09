@@ -20,14 +20,6 @@ public interface LuceneWriteWorkOrchestratorImplementor extends LuceneWriteWorkO
 	void start();
 
 	/**
-	 * Executes a special asynchronous operation checking that the index actually exists or creating it if necessary.
-	 * <p>
-	 * If the index does not exist, a temporary index writer will be created to create the index.
-	 * If the index already exists, no index writer is created.
-	 */
-	CompletableFuture<?> ensureIndexExists();
-
-	/**
 	 * Stop accepting works and return a future that completes when all works have been completely executed.
 	 * <p>
 	 * Optionally called by the owner of this orchestrator before {@link #stop()},

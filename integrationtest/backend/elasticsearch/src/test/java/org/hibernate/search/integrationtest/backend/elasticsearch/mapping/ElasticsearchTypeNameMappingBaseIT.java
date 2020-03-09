@@ -13,12 +13,9 @@ import static org.hibernate.search.util.impl.integrationtest.backend.elasticsear
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
-import org.hibernate.search.backend.elasticsearch.index.IndexLifecycleStrategyName;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -26,6 +23,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule.TestElasticsearchClient;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Rule;
@@ -85,7 +83,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 
 	@Test
 	public void singleIndexScope() {
-		setup( IndexLifecycleStrategyName.DROP_AND_CREATE_AND_DROP );
+		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP );
 		SearchResultAssert.assertThat(
 				index1Manager.createScope().query().where( f -> f.matchAll() ).toQuery()
 		)
@@ -97,7 +95,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 
 	@Test
 	public void multiIndexScope() {
-		setup( IndexLifecycleStrategyName.DROP_AND_CREATE_AND_DROP );
+		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP );
 
 		SearchResultAssert.assertThat(
 				index1Manager.createScope( index2Manager ).query().where( f -> f.matchAll() ).toQuery()
@@ -113,7 +111,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	@Test
 	public void irregularIndexName_correctNamingSchemeAndIncorrectUniqueKey_singleIndexScope() {
 		createIndexesWithCorrectNamingSchemeIncorrectUniqueKeyAndCorrectAliases();
-		setup( IndexLifecycleStrategyName.NONE );
+		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY );
 
 		SearchQuery<DocumentReference> query = index1Manager.createScope().query()
 				.where( f -> f.matchAll() )
@@ -130,7 +128,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	@Test
 	public void irregularIndexName_correctNamingSchemeAndIncorrectUniqueKey_multiIndexScope() {
 		createIndexesWithCorrectNamingSchemeIncorrectUniqueKeyAndCorrectAliases();
-		setup( IndexLifecycleStrategyName.NONE );
+		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY );
 
 		SearchQuery<DocumentReference> query = index1Manager.createScope( index2Manager ).query()
 				.where( f -> f.matchAll() )
@@ -155,7 +153,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	@Test
 	public void irregularIndexName_incorrectNamingScheme_singleIndexScope() {
 		createIndexesWithIncorrectNamingSchemeAndCorrectAliases();
-		setup( IndexLifecycleStrategyName.NONE );
+		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY );
 
 		SearchQuery<DocumentReference> query = index1Manager.createScope().query()
 				.where( f -> f.matchAll() )
@@ -172,7 +170,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	@Test
 	public void irregularIndexName_incorrectNamingScheme_multiIndexScope() {
 		createIndexesWithIncorrectNamingSchemeAndCorrectAliases();
-		setup( IndexLifecycleStrategyName.NONE );
+		setup( StubMappingSchemaManagementStrategy.DROP_ON_SHUTDOWN_ONLY );
 
 		SearchQuery<DocumentReference> query = index1Manager.createScope( index2Manager ).query()
 				.where( f -> f.matchAll() )
@@ -224,11 +222,9 @@ public class ElasticsearchTypeNameMappingBaseIT {
 				.type().putMapping( expectedMappingContent );
 	}
 
-	private void setup(IndexLifecycleStrategyName lifecycleStrategy) {
+	private void setup(StubMappingSchemaManagementStrategy schemaManagementStrategy) {
 		setupHelper.start()
-				.withIndexDefaultsProperty(
-						ElasticsearchIndexSettings.LIFECYCLE_STRATEGY, lifecycleStrategy
-				)
+				.withSchemaManagement( schemaManagementStrategy )
 				.withBackendProperty(
 						ElasticsearchBackendSettings.MAPPING_TYPE_NAME_STRATEGY, strategyName
 				)
@@ -250,7 +246,7 @@ public class ElasticsearchTypeNameMappingBaseIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<? extends DocumentElement> plan = index1Manager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index1Manager.createIndexingPlan();
 		plan.add( referenceProvider( ID_1 ), document -> { } );
 		plan.add( referenceProvider( ID_2 ), document -> { } );
 		plan.execute().join();

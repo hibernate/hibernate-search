@@ -10,21 +10,22 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.common.BooleanOperator;
+import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.OverrideAnalysisDefinitions;
@@ -67,36 +68,18 @@ public class SimpleQueryStringSearchPredicateIT {
 	private static final String TERM_3 = "room";
 	private static final String TERM_4 = "elephant john";
 	private static final String TERM_5 = "crowd";
+	private static final String TERM_6 = "world";
 	private static final String PHRASE_WITH_TERM_2 = "panda breeding";
 	private static final String PHRASE_WITH_TERM_4 = "elephant john";
+	private static final String PREFIX_FOR_TERM_1_AND_TERM_6 = "wor";
+	private static final String PREFIX_FOR_TERM_6 = "worl";
+	private static final String PREFIX_FOR_TERM_1_AND_TERM_6_DIFFERENT_CASE = "Wor";
+	private static final String PREFIX_FOR_TERM_6_DIFFERENT_CASE = "Worl";
 	private static final String TEXT_TERM_1_AND_TERM_2 = "Here I was, feeding my panda, and the crowd had no word.";
 	private static final String TEXT_TERM_1_AND_TERM_3 = "Without a word, he went out of the room.";
 	private static final String TEXT_TERM_2_IN_PHRASE = "I admired her for her panda breeding expertise.";
 	private static final String TEXT_TERM_4_IN_PHRASE_SLOP_2 = "An elephant ran past John.";
-	private static final String TEXT_TERM_1_EDIT_DISTANCE_1 = "I came to the world in a dumpster.";
-
-	// Taken from William Blake's Only Sonnet
-	private static final String ROW_1 = "Smile on our loves, and while thou drawest the";
-	private static final String ROW_2 = "Blue curtains of the sky, scatter thy silver dew";
-	private static final String ROW_3 = "On every flower that shuts its sweet eyes";
-	private static final String ROW_4 = "In timely sleep.";
-
-	private static final String PREFIX_SEPARATOR = " ";
-
-	private static final String PREFIX_1 = ROW_1;
-	private static final String PREFIX_2 = PREFIX_1 + PREFIX_SEPARATOR + ROW_2;
-	private static final String PREFIX_3 = PREFIX_2 + PREFIX_SEPARATOR + ROW_3;
-	private static final String PREFIX_4 = PREFIX_3 + PREFIX_SEPARATOR + ROW_4;
-
-	private static final String ROW_1_DIFFERENT_CASE = "SmILE on oUr LOves, and while thou dRAWest thE";
-	private static final String ROW_2_DIFFERENT_CASE = "bLUE cURTaiNs of tHE skY, scATTer thY SILver dEw";
-	private static final String ROW_3_DIFFERENT_CASE = "ON eVErY flowEr thAt sHUts ITs sWEeT EyEs";
-	private static final String ROW_4_DIFFERENT_CASE = "in tiMeLy sLEEp.";
-
-	private static final String PREFIX_1_DIFFERENT_CASE = ROW_1_DIFFERENT_CASE;
-	private static final String PREFIX_2_DIFFERENT_CASE = PREFIX_1_DIFFERENT_CASE + PREFIX_SEPARATOR + ROW_2_DIFFERENT_CASE;
-	private static final String PREFIX_3_DIFFERENT_CASE = PREFIX_2_DIFFERENT_CASE + PREFIX_SEPARATOR + ROW_3_DIFFERENT_CASE;
-	private static final String PREFIX_4_DIFFERENT_CASE = PREFIX_3_DIFFERENT_CASE + PREFIX_SEPARATOR + ROW_4_DIFFERENT_CASE;
+	private static final String TEXT_TERM_1_EDIT_DISTANCE_1_OR_TERM_6 = "I came to the world in a dumpster.";
 
 	private static final String COMPATIBLE_INDEX_DOCUMENT_1 = "compatible_1";
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 = "raw_field_compatible_1";
@@ -168,7 +151,7 @@ public class SimpleQueryStringSearchPredicateIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2678")
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.SimpleQueryStringDSLTest.testSimpleQueryString")
-	public void simpleQueryString() {
+	public void booleanOperators() {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
@@ -192,7 +175,99 @@ public class SimpleQueryStringSearchPredicateIT {
 	}
 
 	@Test
-	public void simpleQueryString_unsearchable() {
+	@TestForIssue(jiraKey = "HSEARCH-3847")
+	public void booleanOperators_flags() {
+		StubMappingScope scope = indexManager.createScope();
+		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+
+		// Don't use a whitespace here: there's a bug in ES6.2 that leads the "|",
+		// when interpreted as an (empty) term, to be turned into a match-no-docs query.
+		String orQueryString = TERM_1 + "|" + TERM_2;
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( orQueryString )
+				.defaultOperator( BooleanOperator.AND )
+				.flags( SimpleQueryFlag.OR ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( orQueryString )
+				.defaultOperator( BooleanOperator.AND )
+				.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.OR ) ) ) )
+				.toQuery() )
+				// "OR" disabled: "+" is dropped during analysis and we end up with "term1 + term2", since AND is the default operator
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+
+		String andQueryString = TERM_1 + " + " + TERM_2;
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( andQueryString )
+				.defaultOperator( BooleanOperator.OR )
+				.flags( SimpleQueryFlag.AND ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( andQueryString )
+				.defaultOperator( BooleanOperator.OR )
+				.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.AND ) ) ) )
+				.toQuery() )
+				// "AND" disabled: "+" is dropped during analysis and we end up with "term1 | term2", since OR is the default operator
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+
+		String notQueryString = "-" + TERM_1 + " + " + TERM_2;
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( notQueryString )
+				.flags( SimpleQueryFlag.AND, SimpleQueryFlag.NOT ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( notQueryString )
+				.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.NOT ) ) ) )
+				.toQuery() )
+				// "NOT" disabled: "-" is dropped during analysis and we end up with "term1 + term2"
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+
+		// Don't use a whitespace here: there's a bug in ES6.2 that leads the "("/")",
+		// when interpreted as an (empty) term, to be turned into a match-no-docs query.
+		String precedenceQueryString = TERM_2 + "+(" + TERM_1 + "|" + TERM_3 + ")";
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( precedenceQueryString )
+				.flags( SimpleQueryFlag.AND, SimpleQueryFlag.OR, SimpleQueryFlag.PRECEDENCE ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( precedenceQueryString )
+				.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.PRECEDENCE ) ) ) )
+				.toQuery() )
+				// "PRECENDENCE" disabled: parentheses are dropped during analysis and we end up with "(term2 + term1) | term3"
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3844") // Used to throw NPE
+	public void nonAnalyzedField() {
+		StubMappingScope scope = indexManager.createScope();
+		String absoluteFieldPath = indexMapping.nonAnalyzedField.relativeFieldName;
+		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
+				.where( f -> f.simpleQueryString().field( absoluteFieldPath ).matching( queryString ) )
+				.toQuery();
+
+		assertThat( createQuery.apply( TERM_1 + " " + TERM_2 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+
+		assertThat( createQuery.apply( TERM_1 + " | " + TERM_2 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+
+		assertThat( createQuery.apply( TERM_1 + " + " + TERM_2 ) )
+				.hasNoHits();
+
+		assertThat( createQuery.apply( "-" + TERM_1 + " + " + TERM_2 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+
+		assertThat( createQuery.apply( TERM_1 + " + -" + TERM_2 ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2 );
+	}
+
+	@Test
+	public void unsearchable() {
 		StubMappingScope scope = unsearchableFieldsIndexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
@@ -462,6 +537,42 @@ public class SimpleQueryStringSearchPredicateIT {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3847")
+	public void phrase_flag() {
+		StubMappingScope scope = indexManager.createScope();
+		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+
+		assertThat( scope.query()
+				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
+						.matching( "\"" + PHRASE_WITH_TERM_2 + "\"" )
+						.flags( SimpleQueryFlag.PHRASE ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
+
+		assertThat( scope.query()
+				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
+						.matching( "\"" + PHRASE_WITH_TERM_2 + "\"" )
+						.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.PHRASE ) ) ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_3 );
+
+		// Slop
+		assertThat( scope.query()
+				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
+						.matching( "\"" + PHRASE_WITH_TERM_4 + "\"~2" )
+						.flags( SimpleQueryFlag.PHRASE, SimpleQueryFlag.NEAR ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_4 );
+
+		assertThat( scope.query()
+				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
+						.matching( "\"" + PHRASE_WITH_TERM_4 + "\"~2" )
+						.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.NEAR ) ) ) )
+				.toQuery() )
+				.hasNoHits();
+	}
+
+	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2678")
 	@PortedFromSearch5(original = "org.hibernate.search.test.dsl.SimpleQueryStringDSLTest.testBoost")
 	public void fieldLevelBoost() {
@@ -594,48 +705,78 @@ public class SimpleQueryStringSearchPredicateIT {
 	}
 
 	@Test
-	public void prefix() {
+	@TestForIssue(jiraKey = "HSEARCH-3847")
+	public void fuzzy_flag() {
 		StubMappingScope scope = indexManager.createScope();
-		String absoluteFieldPath = indexMapping.analyzedStringField4.relativeFieldName;
+		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
-				.where( f -> f.simpleQueryString().field( absoluteFieldPath ).matching( queryString ) )
-				.toQuery();
+		assertThat( scope.query()
+				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
+						.matching( TERM_1 + "~1" )
+						.flags( SimpleQueryFlag.FUZZY ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_5 );
 
-		assertThat( createQuery.apply( "\"" + PREFIX_1 + "\"*" ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4 );
-
-		assertThat( createQuery.apply( "\"" + PREFIX_2 + "\"*" ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4 );
-
-		assertThat( createQuery.apply( "\"" + PREFIX_3 + "\"*" ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_4 );
-
-		assertThat( createQuery.apply( "\"" + PREFIX_4 + "\"*" ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_4 );
+		assertThat( scope.query()
+				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
+						.matching( TERM_1 + "~1" )
+						.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.FUZZY ) ) ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 	}
 
 	@Test
-	@TestForIssue( jiraKey = "HSEARCH-3612" )
-	public void prefix_normalizePrefixTerm() {
+	public void prefix() {
 		StubMappingScope scope = indexManager.createScope();
-		String absoluteFieldPath = indexMapping.analyzedStringField4.relativeFieldName;
+		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
 		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
 				.where( f -> f.simpleQueryString().field( absoluteFieldPath ).matching( queryString ) )
 				.toQuery();
 
-		assertThat( createQuery.apply( "\"" + PREFIX_1_DIFFERENT_CASE + "\"*" ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4 );
+		assertThat( createQuery.apply( PREFIX_FOR_TERM_1_AND_TERM_6 + "*" ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_5 );
 
-		assertThat( createQuery.apply( "\"" + PREFIX_2_DIFFERENT_CASE + "\"*" ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3, DOCUMENT_4 );
+		assertThat( createQuery.apply( PREFIX_FOR_TERM_6 + "*" ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_5 );
+	}
 
-		assertThat( createQuery.apply( "\"" + PREFIX_3_DIFFERENT_CASE + "\"*" ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_4 );
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3847")
+	public void prefix_flag() {
+		StubMappingScope scope = indexManager.createScope();
+		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		assertThat( createQuery.apply( "\"" + PREFIX_4_DIFFERENT_CASE + "\"*" ) )
-				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_4 );
+		assertThat( scope.query()
+				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
+						.matching( PREFIX_FOR_TERM_1_AND_TERM_6 + "*" )
+						.flags( SimpleQueryFlag.PHRASE, SimpleQueryFlag.PREFIX ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_5 );
+
+		assertThat( scope.query()
+				.where( f -> f.simpleQueryString().field( absoluteFieldPath )
+						.matching( PREFIX_FOR_TERM_1_AND_TERM_6 + "*" )
+						.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.PREFIX ) ) ) )
+				.toQuery() )
+				.hasNoHits();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = {"HSEARCH-3612", "HSEARCH-3845"})
+	public void prefix_normalizePrefixTerm() {
+		StubMappingScope scope = indexManager.createScope();
+		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+
+		Function<String, SearchQuery<DocumentReference>> createQuery = queryString -> scope.query()
+				.where( f -> f.simpleQueryString().field( absoluteFieldPath ).matching( queryString ) )
+				.toQuery();
+
+		assertThat( createQuery.apply( PREFIX_FOR_TERM_1_AND_TERM_6_DIFFERENT_CASE + "*" ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_5 );
+
+		assertThat( createQuery.apply( PREFIX_FOR_TERM_6_DIFFERENT_CASE + "*" ) )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_5 );
 	}
 
 	@Test
@@ -871,28 +1012,68 @@ public class SimpleQueryStringSearchPredicateIT {
 		;
 	}
 
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3847")
+	public void whitespace() {
+		StubMappingScope scope = indexManager.createScope();
+		String absoluteFieldPath = indexMapping.nonAnalyzedField.relativeFieldName;
+
+		String whitespaceQueryString = TERM_1 + " " + TERM_2;
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( whitespaceQueryString )
+				.flags( SimpleQueryFlag.WHITESPACE ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, DOCUMENT_3 );
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( whitespaceQueryString )
+				.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.WHITESPACE ) ) ) )
+				.toQuery() )
+				// "WHITESPACE" disabled: "term1 term2" is interpreted as a single term and cannot be found
+				.hasNoHits();
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3847")
+	public void escape() {
+		StubMappingScope scope = indexManager.createScope();
+		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
+
+		String escapedPrefixQueryString = TERM_1 + "\\*";
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( escapedPrefixQueryString )
+				.flags( SimpleQueryFlag.AND, SimpleQueryFlag.NOT, SimpleQueryFlag.ESCAPE ) )
+				.toQuery() )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+		assertThat( scope.query().where( f -> f.simpleQueryString().field( absoluteFieldPath )
+				.matching( escapedPrefixQueryString )
+				.flags( EnumSet.complementOf( EnumSet.of( SimpleQueryFlag.ESCAPE ) ) ) )
+				.toQuery() )
+				// "ESCAPE" disabled: "\" is interpreted as a literal and the prefix cannot be found
+				.hasNoHits();
+	}
+
 	private void initData() {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
+			document.addValue( indexMapping.nonAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2 );
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_1_AND_TERM_2 );
 			document.addValue( indexMapping.analyzedStringFieldWithDslConverter.reference, TEXT_TERM_1_AND_TERM_2 );
 			document.addValue( indexMapping.analyzedStringField2.reference, TEXT_TERM_1_AND_TERM_3 );
 			document.addValue( indexMapping.analyzedStringField3.reference, TERM_4 );
-			document.addValue( indexMapping.analyzedStringField4.reference, PREFIX_1 );
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toLowerCase( Locale.ROOT ) );
 			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toLowerCase( Locale.ROOT ) );
 			document.addValue( indexMapping.whitespaceLowercaseSearchAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toLowerCase( Locale.ROOT ) );
 		} );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
+			document.addValue( indexMapping.nonAnalyzedField.reference, TERM_1 );
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_1_AND_TERM_3 );
-			document.addValue( indexMapping.analyzedStringField4.reference, PREFIX_2 );
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toUpperCase( Locale.ROOT ) );
 			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toUpperCase( Locale.ROOT ) );
 			document.addValue( indexMapping.whitespaceLowercaseSearchAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2.toUpperCase( Locale.ROOT ) );
 		} );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
+			document.addValue( indexMapping.nonAnalyzedField.reference, TERM_2 );
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_2_IN_PHRASE );
-			document.addValue( indexMapping.analyzedStringField4.reference, PREFIX_3 );
 			document.addValue( indexMapping.whitespaceAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2 );
 			document.addValue( indexMapping.whitespaceLowercaseAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2 );
 			document.addValue( indexMapping.whitespaceLowercaseSearchAnalyzedField.reference, TEXT_TERM_1_AND_TERM_2 );
@@ -900,10 +1081,9 @@ public class SimpleQueryStringSearchPredicateIT {
 		plan.add( referenceProvider( DOCUMENT_4 ), document -> {
 			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_4_IN_PHRASE_SLOP_2 );
 			document.addValue( indexMapping.analyzedStringField2.reference, TEXT_TERM_2_IN_PHRASE );
-			document.addValue( indexMapping.analyzedStringField4.reference, PREFIX_4 );
 		} );
 		plan.add( referenceProvider( DOCUMENT_5 ), document -> {
-			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_1_EDIT_DISTANCE_1 );
+			document.addValue( indexMapping.analyzedStringField1.reference, TEXT_TERM_1_EDIT_DISTANCE_1_OR_TERM_6 );
 			document.addValue( indexMapping.analyzedStringField3.reference, TEXT_TERM_2_IN_PHRASE );
 			document.addValue( indexMapping.analyzedStringField3.reference, TEXT_TERM_1_AND_TERM_3 );
 		} );
@@ -985,11 +1165,12 @@ public class SimpleQueryStringSearchPredicateIT {
 		final MainFieldModel analyzedStringField1;
 		final MainFieldModel analyzedStringField2;
 		final MainFieldModel analyzedStringField3;
-		final MainFieldModel analyzedStringField4;
 		final MainFieldModel analyzedStringFieldWithDslConverter;
 		final MainFieldModel whitespaceAnalyzedField;
 		final MainFieldModel whitespaceLowercaseAnalyzedField;
 		final MainFieldModel whitespaceLowercaseSearchAnalyzedField;
+
+		final MainFieldModel nonAnalyzedField;
 
 		IndexMapping(IndexSchemaElement root) {
 			mapByTypeFields(
@@ -1012,10 +1193,6 @@ public class SimpleQueryStringSearchPredicateIT {
 					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 			)
 					.mapMultiValued( root, "analyzedString3" );
-			analyzedStringField4 = MainFieldModel.mapper(
-					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
-			)
-					.map( root, "analyzedString4" );
 			analyzedStringFieldWithDslConverter = MainFieldModel.mapper(
 					c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 							.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
@@ -1034,6 +1211,9 @@ public class SimpleQueryStringSearchPredicateIT {
 							.searchAnalyzer( OverrideAnalysisDefinitions.ANALYZER_WHITESPACE_LOWERCASE.name )
 			)
 					.map( root, "whitespaceLowercaseSearchAnalyzed" );
+			// A field without any analyzer or normalizer
+			nonAnalyzedField = MainFieldModel.mapper( c -> c.asString() )
+					.map( root, "nonAnalyzed" );
 		}
 	}
 

@@ -25,6 +25,11 @@
 
         <dependency>
             <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-util-internal-integrationtest-backend-lucene</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
             <artifactId>hibernate-search-integrationtest-backend-tck</artifactId>
             <scope>test</scope>
         </dependency>

@@ -13,16 +13,20 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkProcessor;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkSet;
 import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentElasticsearchWork;
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 import org.hibernate.search.util.common.impl.Futures;
 
-class ElasticsearchIndexingPlanWorkSet implements ElasticsearchWorkSet {
+class ElasticsearchIndexingPlanWorkSet<R> implements ElasticsearchWorkSet {
 	private final List<SingleDocumentElasticsearchWork<?>> works;
-	private final CompletableFuture<IndexIndexingPlanExecutionReport> indexingPlanFuture;
+	private final EntityReferenceFactory<R> entityReferenceFactory;
+	private final CompletableFuture<IndexIndexingPlanExecutionReport<R>> indexingPlanFuture;
 
 	ElasticsearchIndexingPlanWorkSet(List<SingleDocumentElasticsearchWork<?>> works,
-			CompletableFuture<IndexIndexingPlanExecutionReport> indexingPlanFuture) {
+			EntityReferenceFactory<R> entityReferenceFactory,
+			CompletableFuture<IndexIndexingPlanExecutionReport<R>> indexingPlanFuture) {
 		this.works = new ArrayList<>( works );
+		this.entityReferenceFactory = entityReferenceFactory;
 		this.indexingPlanFuture = indexingPlanFuture;
 	}
 
@@ -40,14 +44,22 @@ class ElasticsearchIndexingPlanWorkSet implements ElasticsearchWorkSet {
 				.whenComplete( Futures.copyHandler( indexingPlanFuture ) );
 	}
 
-	private IndexIndexingPlanExecutionReport buildReport(CompletableFuture<?>[] finishedWorkFutures, Throwable throwable) {
-		IndexIndexingPlanExecutionReport.Builder reportBuilder = IndexIndexingPlanExecutionReport.builder();
+	private IndexIndexingPlanExecutionReport<R> buildReport(CompletableFuture<?>[] finishedWorkFutures, Throwable throwable) {
+		IndexIndexingPlanExecutionReport.Builder<R> reportBuilder = IndexIndexingPlanExecutionReport.builder();
 		for ( int i = 0; i < finishedWorkFutures.length; i++ ) {
 			CompletableFuture<?> future = finishedWorkFutures[i];
 			if ( future.isCompletedExceptionally() ) {
 				reportBuilder.throwable( Futures.getThrowableNow( future ) );
 				SingleDocumentElasticsearchWork<?> work = works.get( i );
-				reportBuilder.failingDocument( work.getDocumentReference() );
+				try {
+					reportBuilder.failingEntityReference(
+							entityReferenceFactory,
+							work.getEntityTypeName(), work.getEntityIdentifier()
+					);
+				}
+				catch (RuntimeException e) {
+					reportBuilder.throwable( e );
+				}
 			}
 		}
 		if ( throwable != null ) {

@@ -7,7 +7,6 @@
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.Map;
@@ -29,45 +28,46 @@ public class PojoIndexedTypeManagerContainer
 		return new Builder();
 	}
 
-	private final Map<PojoRawTypeIdentifier<?>, PojoIndexedTypeManager<?, ?, ?>> byExactType;
-	private final Map<PojoRawTypeIdentifier<?>, Set<? extends PojoIndexedTypeManager<?, ?, ?>>> bySuperType;
-	private final Set<PojoIndexedTypeManager<?, ?, ?>> all;
+	private final Map<PojoRawTypeIdentifier<?>, PojoIndexedTypeManager<?, ?>> byExactType;
+	private final Map<PojoRawTypeIdentifier<?>, Set<? extends PojoIndexedTypeManager<?, ?>>> bySuperType;
+	private final Set<PojoIndexedTypeManager<?, ?>> all;
 
 	private PojoIndexedTypeManagerContainer(Builder builder) {
-		this.byExactType = new HashMap<>( builder.byExactType );
-		this.bySuperType = new HashMap<>( builder.bySuperType );
+		// Use a LinkedHashMap for deterministic iteration in the "all" set
+		this.byExactType = new LinkedHashMap<>( builder.byExactType );
+		this.bySuperType = new LinkedHashMap<>( builder.bySuperType );
 		this.bySuperType.replaceAll( (k, v) -> Collections.unmodifiableSet( v ) );
 		this.all = Collections.unmodifiableSet( new LinkedHashSet<>( byExactType.values() ) );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <E> Optional<? extends PojoWorkIndexedTypeContext<?, E, ?>> getByExactType(
+	public <E> Optional<? extends PojoWorkIndexedTypeContext<?, E>> getByExactType(
 			PojoRawTypeIdentifier<E> typeIdentifier) {
-		return Optional.ofNullable( (PojoIndexedTypeManager<?, E, ?>) byExactType.get( typeIdentifier ) );
+		return Optional.ofNullable( (PojoIndexedTypeManager<?, E>) byExactType.get( typeIdentifier ) );
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public <E> Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E, ?>>> getAllBySuperType(
+	public <E> Optional<? extends Set<? extends PojoScopeIndexedTypeContext<?, ? extends E>>> getAllBySuperType(
 			PojoRawTypeIdentifier<E> typeIdentifier) {
-		return Optional.ofNullable( (Set<PojoIndexedTypeManager<?, ? extends E, ?>>) bySuperType.get( typeIdentifier ) );
+		return Optional.ofNullable( (Set<PojoIndexedTypeManager<?, ? extends E>>) bySuperType.get( typeIdentifier ) );
 	}
 
-	Set<PojoIndexedTypeManager<?, ?, ?>> getAll() {
+	Set<PojoIndexedTypeManager<?, ?>> getAll() {
 		return all;
 	}
 
 	public static class Builder {
 
 		// Use a LinkedHashMap for deterministic iteration
-		private final Map<PojoRawTypeIdentifier<?>, PojoIndexedTypeManager<?, ?, ?>> byExactType = new LinkedHashMap<>();
-		private final Map<PojoRawTypeIdentifier<?>, Set<PojoIndexedTypeManager<?, ?, ?>>> bySuperType = new LinkedHashMap<>();
+		private final Map<PojoRawTypeIdentifier<?>, PojoIndexedTypeManager<?, ?>> byExactType = new LinkedHashMap<>();
+		private final Map<PojoRawTypeIdentifier<?>, Set<PojoIndexedTypeManager<?, ?>>> bySuperType = new LinkedHashMap<>();
 
 		private Builder() {
 		}
 
-		public <E> void add(PojoRawTypeModel<E> typeModel, PojoIndexedTypeManager<?, E, ?> typeManager) {
+		public <E> void add(PojoRawTypeModel<E> typeModel, PojoIndexedTypeManager<?, E> typeManager) {
 			byExactType.put( typeModel.getTypeIdentifier(), typeManager );
 			typeModel.getAscendingSuperTypes()
 					.map( PojoRawTypeModel::getTypeIdentifier )

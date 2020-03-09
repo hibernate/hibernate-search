@@ -11,6 +11,7 @@ import java.lang.annotation.Annotation;
 import org.hibernate.search.util.common.logging.impl.ClassFormatter;
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
+import org.jboss.logging.Messages;
 import org.jboss.logging.annotations.FormatWith;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;
@@ -20,6 +21,8 @@ import org.jboss.logging.annotations.MessageBundle;
  */
 @MessageBundle(projectCode = MessageConstants.PROJECT_CODE)
 public interface PojoEventContextMessages {
+
+	PojoEventContextMessages INSTANCE = Messages.getBundle( PojoEventContextMessages.class );
 
 	@Message(value = "path '%1$s'")
 	String path(String pathString);

@@ -12,7 +12,6 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -103,7 +102,7 @@ public class DecimalScaleIT {
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, new BigDecimal( "739.11111" ) ) );
 		plan.execute().join();
 
@@ -121,7 +120,7 @@ public class DecimalScaleIT {
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, new BigDecimal( "739.11111" ) ) );
 		plan.execute().join();
 
@@ -139,7 +138,7 @@ public class DecimalScaleIT {
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, new BigInteger( "739" ) ) );
 		plan.execute().join();
 
@@ -157,7 +156,7 @@ public class DecimalScaleIT {
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, new BigDecimal( "11111.11111" ) ) );
 		plan.execute().join();
 
@@ -175,7 +174,7 @@ public class DecimalScaleIT {
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, new BigInteger( "11111" ) ) );
 		plan.execute().join();
 
@@ -217,7 +216,7 @@ public class DecimalScaleIT {
 		Assertions.assertThat( originalValue )
 				.isBetween( indexedValueLowerBound, indexedValueUpperBound );
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, originalValue ) );
 		plan.execute().join();
 
@@ -257,7 +256,7 @@ public class DecimalScaleIT {
 		Assertions.assertThat( originalValue )
 				.isBetween( indexedValueLowerBound, indexedValueUpperBound );
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, originalValue ) );
 		plan.execute().join();
 
@@ -297,7 +296,7 @@ public class DecimalScaleIT {
 		Assertions.assertThat( originalValue )
 				.isBetween( indexedValueLowerBound, indexedValueUpperBound );
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, originalValue ) );
 		plan.execute().join();
 
@@ -313,7 +312,7 @@ public class DecimalScaleIT {
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, new BigDecimal( "739.114999" ) ) );
 		plan.add( referenceProvider( "2" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, new BigDecimal( "739.115" ) ) );
 		plan.add( referenceProvider( "3" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, new BigDecimal( "739.11" ) ) );
@@ -337,7 +336,7 @@ public class DecimalScaleIT {
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, new BigInteger( "7394999" ) ) );
 		plan.add( referenceProvider( "2" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, new BigInteger( "7395000" ) ) );
 		plan.add( referenceProvider( "3" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, new BigInteger( "7390000" ) ) );
@@ -365,7 +364,7 @@ public class DecimalScaleIT {
 		// If the exponent were 54, the test would fail for Elasticsearch, whereas it would work for Lucene backend.
 		BigDecimal largeDecimal = new BigDecimal( "2" ).pow( 53 );
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, largeDecimal ) );
 		plan.execute().join();
 
@@ -386,7 +385,7 @@ public class DecimalScaleIT {
 		// If the exponent were 54, the test would fail for Elasticsearch, whereas it would work for Lucene backend.
 		BigInteger largeInteger = new BigInteger( "2" ).pow( 53 );
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, largeInteger ) );
 		plan.execute().join();
 
@@ -407,7 +406,7 @@ public class DecimalScaleIT {
 		BigDecimal tooLargeDecimal = BigDecimal.valueOf( Long.MAX_VALUE ).multiply( BigDecimal.TEN );
 
 		SubTest.expectException( () -> {
-			IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 			plan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, tooLargeDecimal ) );
 			plan.execute().join();
 		} )
@@ -428,7 +427,7 @@ public class DecimalScaleIT {
 		// Provide a value that cannot be represented as a long
 		BigDecimal tooLargeDecimal = veryLargeDecimal.multiply( BigDecimal.TEN );
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, veryLargeDecimal ) );
 		plan.execute().join();
 
@@ -454,7 +453,7 @@ public class DecimalScaleIT {
 		BigDecimal tooLargeDecimal = BigDecimal.valueOf( Long.MIN_VALUE ).multiply( BigDecimal.TEN );
 
 		SubTest.expectException( () -> {
-			IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 			plan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, tooLargeDecimal ) );
 			plan.execute().join();
 		} )
@@ -475,7 +474,7 @@ public class DecimalScaleIT {
 		BigInteger tooLargeInteger = BigInteger.valueOf( Long.MAX_VALUE ).multiply( BigInteger.TEN );
 
 		SubTest.expectException( () -> {
-			IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 			plan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, tooLargeInteger ) );
 			plan.execute().join();
 		} )
@@ -496,7 +495,7 @@ public class DecimalScaleIT {
 		BigInteger tooLargeInteger = BigInteger.valueOf( Long.MIN_VALUE ).multiply( BigInteger.TEN );
 
 		SubTest.expectException( () -> {
-			IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 			plan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, tooLargeInteger ) );
 			plan.execute().join();
 		} )
@@ -517,7 +516,7 @@ public class DecimalScaleIT {
 		// Provide a value that cannot be represented as a long
 		BigInteger tooLargeInteger = veryLargeNegativeInteger.multiply( BigInteger.TEN );
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, veryLargeNegativeInteger ) );
 		plan.execute().join();
 
@@ -543,7 +542,7 @@ public class DecimalScaleIT {
 		BigDecimal tooLargeDecimal = BigDecimal.valueOf( Long.MAX_VALUE ).divide( BigDecimal.TEN );
 
 		SubTest.expectException( () -> {
-			IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 			plan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, tooLargeDecimal ) );
 			plan.execute().join();
 		} )
@@ -564,7 +563,7 @@ public class DecimalScaleIT {
 		BigDecimal tooLargeDecimal = BigDecimal.valueOf( Long.MIN_VALUE ).divide( BigDecimal.TEN );
 
 		SubTest.expectException( () -> {
-			IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 			plan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, tooLargeDecimal ) );
 			plan.execute().join();
 		} )
@@ -585,7 +584,7 @@ public class DecimalScaleIT {
 		BigDecimal tooLargeDecimal = BigDecimal.valueOf( Long.MIN_VALUE ).divide( BigDecimal.TEN );
 		BigDecimal veryLargeDecimal = tooLargeDecimal.divide( BigDecimal.TEN );
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, veryLargeDecimal ) );
 		plan.execute().join();
 
@@ -611,7 +610,7 @@ public class DecimalScaleIT {
 		BigInteger tooLargeInteger = BigInteger.valueOf( Long.MAX_VALUE ).multiply( new BigInteger( "1000" ) );
 
 		SubTest.expectException( () -> {
-			IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 			plan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, tooLargeInteger ) );
 			plan.execute().join();
 		} )
@@ -632,7 +631,7 @@ public class DecimalScaleIT {
 		// Provide a value that if it were multiplied by 100, could not be represented as a long, because the scale of -2
 		BigInteger tooLargeInteger = veryLargeInteger.multiply( new BigInteger( "1000" ) );
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, veryLargeInteger ) );
 		plan.execute().join();
 
@@ -658,7 +657,7 @@ public class DecimalScaleIT {
 		BigInteger tooLargeInteger = BigInteger.valueOf( Long.MIN_VALUE ).multiply( new BigInteger( "1000" ) );
 
 		SubTest.expectException( () -> {
-			IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 			plan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, tooLargeInteger ) );
 			plan.execute().join();
 		} )
@@ -675,7 +674,7 @@ public class DecimalScaleIT {
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( defaultDecimalScaleIndexMapping.scaled, new BigDecimal( "739.11111" ) ) );
 		plan.execute().join();
 
@@ -693,7 +692,7 @@ public class DecimalScaleIT {
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( defaultIntegerScaleIndexMapping.scaled, new BigInteger( "7391111" ) ) );
 		plan.execute().join();
 
@@ -711,7 +710,7 @@ public class DecimalScaleIT {
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( bothDecimalScaleIndexMapping.scaled, new BigDecimal( "739.11111" ) ) );
 		plan.execute().join();
 
@@ -730,7 +729,7 @@ public class DecimalScaleIT {
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( bothIntegerScaleIndexMapping.scaled, new BigInteger( "7391111" ) ) );
 		plan.execute().join();
 
@@ -749,7 +748,7 @@ public class DecimalScaleIT {
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, new BigDecimal( "739.11111" ) ) );
 		plan.execute().join();
 
@@ -765,7 +764,7 @@ public class DecimalScaleIT {
 						indexManager -> this.indexManager = indexManager )
 				.setup();
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, new BigInteger( "73911111" ) ) );
 		plan.execute().join();
 

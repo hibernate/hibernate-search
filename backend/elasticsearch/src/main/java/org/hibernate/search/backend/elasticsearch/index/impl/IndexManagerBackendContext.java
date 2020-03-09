@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.index.impl;
 
+import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexLifecycleExecutionOptions;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
-import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.lowlevel.impl.LowLevelIndexMetadataBuilder;
-import org.hibernate.search.backend.elasticsearch.index.admin.impl.ElasticsearchIndexAdministrationClient;
+import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexSchemaManager;
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
@@ -29,6 +29,7 @@ import org.hibernate.search.backend.elasticsearch.work.execution.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.ElasticsearchIndexWorkspace;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.WorkExecutionBackendContext;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.WorkExecutionIndexManagerContext;
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
@@ -79,23 +80,24 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	}
 
 	@Override
-	public IndexIndexingPlan<ElasticsearchDocumentObjectBuilder> createIndexingPlan(
+	public <R> IndexIndexingPlan<R> createIndexingPlan(
 			ElasticsearchWorkOrchestrator orchestrator,
 			WorkExecutionIndexManagerContext indexManagerContext,
-			DocumentRefreshStrategy refreshStrategy,
-			BackendSessionContext sessionContext) {
+			BackendSessionContext sessionContext, EntityReferenceFactory<R> entityReferenceFactory,
+			DocumentRefreshStrategy refreshStrategy) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
-		return new ElasticsearchIndexIndexingPlan(
+		return new ElasticsearchIndexIndexingPlan<>(
 				link.getWorkBuilderFactory(), orchestrator,
 				indexManagerContext,
-				refreshStrategy,
-				sessionContext
+				sessionContext,
+				entityReferenceFactory,
+				refreshStrategy
 		);
 	}
 
 	@Override
-	public IndexIndexer<ElasticsearchDocumentObjectBuilder> createIndexer(
+	public IndexIndexer createIndexer(
 			ElasticsearchWorkOrchestrator orchestrator,
 			WorkExecutionIndexManagerContext indexManagerContext,
 			BackendSessionContext sessionContext) {
@@ -151,16 +153,18 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 		return eventContext;
 	}
 
-	ElasticsearchIndexAdministrationClient createAdministrationClient(ElasticsearchIndexModel model) {
+	ElasticsearchIndexSchemaManager createSchemaManager(ElasticsearchIndexModel model,
+			ElasticsearchIndexLifecycleExecutionOptions lifecycleExecutionOptions) {
 		LowLevelIndexMetadataBuilder builder = new LowLevelIndexMetadataBuilder(
 				link.getIndexMetadataSyntax(),
 				model.getNames()
 		);
 		model.contributeLowLevelMetadata( builder );
 		IndexMetadata expectedMetadata = builder.build();
-		return new ElasticsearchIndexAdministrationClient(
+		return new ElasticsearchIndexSchemaManager(
 				link.getWorkBuilderFactory(), orchestratorProvider.getRootParallelOrchestrator(),
-				indexLayoutStrategy, model.getNames(), expectedMetadata
+				indexLayoutStrategy, model.getNames(), expectedMetadata,
+				lifecycleExecutionOptions
 		);
 	}
 

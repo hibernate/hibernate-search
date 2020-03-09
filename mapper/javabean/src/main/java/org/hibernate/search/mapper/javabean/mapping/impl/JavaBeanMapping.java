@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.mapper.javabean.mapping.CloseableSearchMapping;
 import org.hibernate.search.mapper.javabean.mapping.SearchMapping;
 import org.hibernate.search.mapper.javabean.scope.SearchScope;
@@ -27,9 +28,18 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 
 	private final JavaBeanTypeContextContainer typeContextContainer;
 
+	private SearchIntegration integration;
+
 	JavaBeanMapping(PojoMappingDelegate mappingDelegate, JavaBeanTypeContextContainer typeContextContainer) {
 		super( mappingDelegate );
 		this.typeContextContainer = typeContextContainer;
+	}
+
+	@Override
+	public void close() {
+		if ( integration != null ) {
+			integration.close();
+		}
 	}
 
 	@Override
@@ -67,6 +77,10 @@ public class JavaBeanMapping extends AbstractPojoMappingImplementor<SearchMappin
 						ignored -> null
 				)
 		);
+	}
+
+	public void setIntegration(SearchIntegration integration) {
+		this.integration = integration;
 	}
 
 	private SearchSessionBuilder createSearchManagerBuilder() {

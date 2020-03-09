@@ -6,13 +6,14 @@
  */
 package org.hibernate.search.mapper.pojo.model;
 
+import org.hibernate.search.util.common.annotaion.Incubating;
+
 /**
  * A model element representing a value bound to a bridge.
  *
  * @see org.hibernate.search.mapper.pojo.bridge.ValueBridge
- * @hsearch.experimental This type is under active development.
- *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
  */
+@Incubating
 public interface PojoModelValue<T> extends PojoModelElement {
 
 	/**

@@ -12,7 +12,6 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -46,7 +45,7 @@ public abstract class AbstractDirectoryIT {
 	protected StubMappingIndexManager indexManager;
 
 	protected final void checkIndexingAndQuerying() {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			document.addValue( indexMapping.string, "text 1" );
 		} );

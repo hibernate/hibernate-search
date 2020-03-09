@@ -8,13 +8,14 @@ package org.hibernate.search.mapper.pojo.model;
 
 import java.util.stream.Stream;
 
+import org.hibernate.search.util.common.annotaion.Incubating;
+
 /**
  * A model element representing a property bound to a bridge.
  *
  * @see org.hibernate.search.mapper.pojo.bridge.PropertyBridge
- * @hsearch.experimental This type is under active development.
- *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
  */
+@Incubating
 public interface PojoModelProperty extends PojoModelCompositeElement {
 
 	/**

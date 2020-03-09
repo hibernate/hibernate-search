@@ -36,11 +36,10 @@ public final class Shard {
 		this.writeOrchestrator = writeOrchestrator;
 	}
 
-	CompletableFuture<?> start() {
+	void start() {
 		try {
 			indexAccessor.start();
 			writeOrchestrator.start();
-			return writeOrchestrator.ensureIndexExists();
 		}
 		catch (IOException | RuntimeException e) {
 			new SuppressingCloser( e )

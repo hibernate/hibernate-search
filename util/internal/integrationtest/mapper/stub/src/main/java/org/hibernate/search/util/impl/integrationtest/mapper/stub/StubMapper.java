@@ -33,7 +33,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 
 	private final boolean multiTenancyEnabled;
 
-	private final Map<StubTypeModel, MappedIndexManagerBuilder<?>> indexManagerBuilders = new HashMap<>();
+	private final Map<StubTypeModel, MappedIndexManagerBuilder> indexManagerBuilders = new HashMap<>();
 	private final Map<IndexedEmbeddedDefinition, IndexedEmbeddedPathTracker> pathTrackers = new HashMap<>();
 
 	StubMapper(MappingBuildContext buildContext,
@@ -100,7 +100,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 			}
 		}
 		if ( indexName != null ) {
-			MappedIndexManagerBuilder<?> indexManagerBuilder = indexManagerFactory.createMappedIndexManager(
+			MappedIndexManagerBuilder indexManagerBuilder = indexManagerFactory.createMappedIndexManager(
 					this,
 					Optional.ofNullable( backendName ),
 					indexName,
@@ -115,11 +115,11 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 	@Override
 	public StubMappingPartialBuildState prepareBuild() throws MappingAbortedException {
 		Map<String, StubMappingIndexManager> indexMappingsByTypeIdentifier = new HashMap<>();
-		for ( Map.Entry<StubTypeModel, MappedIndexManagerBuilder<?>> entry : indexManagerBuilders.entrySet() ) {
+		for ( Map.Entry<StubTypeModel, MappedIndexManagerBuilder> entry : indexManagerBuilders.entrySet() ) {
 			StubTypeModel typeModel = entry.getKey();
 			try {
 				String indexName = entry.getValue().getIndexName();
-				MappedIndexManager<?> indexManager = entry.getValue().build();
+				MappedIndexManager indexManager = entry.getValue().build();
 				indexMappingsByTypeIdentifier.put(
 						typeModel.asString(),
 						new StubMappingIndexManager( indexName, indexManager )

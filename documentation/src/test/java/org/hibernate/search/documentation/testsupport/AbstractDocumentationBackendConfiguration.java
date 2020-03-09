@@ -10,13 +10,20 @@ import java.util.Map;
 
 import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
+import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
 
 abstract class AbstractDocumentationBackendConfiguration implements BackendConfiguration {
 
-	static Map<String, Object> getBackendProperties(
-			TestConfigurationProvider configurationProvider, String configurationId) {
-		return configurationProvider.getPropertiesFromFile(
-				"/hibernate-test-" + configurationId + ".properties"
-		);
+	@Override
+	public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setupWithName(C setupContext,
+			String backendName, TestConfigurationProvider configurationProvider) {
+		return setupContext
+				.withBackendProperties(
+						backendName,
+						configurationProvider.interpolateProperties( getBackendProperties() )
+				);
 	}
+
+	protected abstract Map<String, Object> getBackendProperties();
+
 }

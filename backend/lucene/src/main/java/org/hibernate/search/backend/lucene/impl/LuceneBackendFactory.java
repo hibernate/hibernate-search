@@ -64,7 +64,7 @@ public class LuceneBackendFactory implements BackendFactory {
 					.build();
 
 	@Override
-	public BackendImplementor<?> create(String name, BackendBuildContext buildContext,
+	public BackendImplementor create(String name, BackendBuildContext buildContext,
 			ConfigurationPropertySource propertySource) {
 		EventContext backendContext = EventContexts.fromBackendName( name );
 

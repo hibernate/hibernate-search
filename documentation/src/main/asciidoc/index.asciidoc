@@ -27,6 +27,8 @@ include::mapper-orm-mapping.asciidoc[]
 
 include::mapper-orm-bridge.asciidoc[]
 
+include::mapper-orm-schema.asciidoc[]
+
 include::mapper-orm-indexing.asciidoc[]
 
 include::search-dsl.asciidoc[]

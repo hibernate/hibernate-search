@@ -33,6 +33,7 @@ import org.hibernate.event.spi.PostInsertEventListener;
 import org.hibernate.event.spi.PostUpdateEvent;
 import org.hibernate.event.spi.PostUpdateEventListener;
 import org.hibernate.persister.entity.EntityPersister;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -99,7 +100,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		final Object entity = event.getEntity();
 		HibernateOrmListenerTypeContext typeContext = getTypeContext( contextProvider, event.getPersister() );
 		if ( typeContext != null ) {
-			PojoIndexingPlan plan = getCurrentIndexingPlan( contextProvider, event.getSession() );
+			PojoIndexingPlan<?> plan = getCurrentIndexingPlan( contextProvider, event.getSession() );
 			Object providedId = typeContext.toIndexingPlanProvidedId( event.getId() );
 			if ( dirtyCheckingEnabled ) {
 				plan.addOrUpdate( typeContext.getTypeIdentifier(), providedId, entity, getDirtyPropertyNames( event ) );
@@ -134,7 +135,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		HibernateOrmListenerContextProvider contextProvider = state.getContextProvider();
 		EventSource session = event.getSession();
 
-		PojoIndexingPlan plan = getCurrentIndexingPlanIfExisting( contextProvider, session );
+		PojoIndexingPlan<EntityReference> plan = getCurrentIndexingPlanIfExisting( contextProvider, session );
 		if ( plan == null ) {
 			// Nothing to flush
 			return;
@@ -168,7 +169,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 	@Override
 	public void onClear(ClearEvent event) {
 		EventSource session = event.getSession();
-		PojoIndexingPlan plan = getCurrentIndexingPlanIfExisting( state.getContextProvider(), session );
+		PojoIndexingPlan<?> plan = getCurrentIndexingPlanIfExisting( state.getContextProvider(), session );
 
 		// skip the clearNotPrepared operation in case there has been no one to clear
 		if ( plan != null ) {
@@ -184,12 +185,12 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		return contextProvider;
 	}
 
-	private PojoIndexingPlan getCurrentIndexingPlan(HibernateOrmListenerContextProvider contextProvider,
+	private PojoIndexingPlan<EntityReference> getCurrentIndexingPlan(HibernateOrmListenerContextProvider contextProvider,
 			SessionImplementor sessionImplementor) {
 		return contextProvider.getCurrentIndexingPlan( sessionImplementor, true );
 	}
 
-	private PojoIndexingPlan getCurrentIndexingPlanIfExisting(HibernateOrmListenerContextProvider contextProvider,
+	private PojoIndexingPlan<EntityReference> getCurrentIndexingPlanIfExisting(HibernateOrmListenerContextProvider contextProvider,
 			SessionImplementor sessionImplementor) {
 		return contextProvider.getCurrentIndexingPlan( sessionImplementor, false );
 	}
@@ -213,7 +214,7 @@ public final class HibernateSearchEventListener implements PostDeleteEventListen
 		HibernateOrmListenerTypeContext typeContext = contextProvider.getTypeContextProvider()
 				.getByHibernateOrmEntityName( event.getAffectedOwnerEntityName() );
 		if ( typeContext != null ) {
-			PojoIndexingPlan plan = getCurrentIndexingPlan( contextProvider, event.getSession() );
+			PojoIndexingPlan<?> plan = getCurrentIndexingPlan( contextProvider, event.getSession() );
 			Object providedId = typeContext.toIndexingPlanProvidedId( event.getAffectedOwnerIdOrNull() );
 
 			if ( dirtyCheckingEnabled ) {

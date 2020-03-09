@@ -10,7 +10,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
-import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -20,7 +19,7 @@ import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceP
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 
-public class LuceneIndexIndexer implements IndexIndexer<LuceneRootDocumentBuilder> {
+public class LuceneIndexIndexer implements IndexIndexer {
 
 	private final LuceneWorkFactory factory;
 	private final LuceneIndexEntryFactory indexEntryFactory;
@@ -41,7 +40,7 @@ public class LuceneIndexIndexer implements IndexIndexer<LuceneRootDocumentBuilde
 	}
 
 	@Override
-	public CompletableFuture<?> add(DocumentReferenceProvider referenceProvider, DocumentContributor<LuceneRootDocumentBuilder> documentContributor) {
+	public CompletableFuture<?> add(DocumentReferenceProvider referenceProvider, DocumentContributor documentContributor) {
 		String id = referenceProvider.getIdentifier();
 		String routingKey = referenceProvider.getRoutingKey();
 
@@ -51,7 +50,10 @@ public class LuceneIndexIndexer implements IndexIndexer<LuceneRootDocumentBuilde
 		LuceneWriteWorkOrchestrator orchestrator = indexManagerContext.getWriteOrchestrator( id, routingKey );
 
 		return orchestrator.submit(
-				factory.add( tenantId, id, indexEntry ),
+				factory.add(
+						tenantId, indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
+						indexEntry
+				),
 				commitStrategy,
 				DocumentRefreshStrategy.NONE
 		);

@@ -20,8 +20,10 @@ import org.hibernate.search.util.common.impl.Throwables;
  * Relative ordering of works within a plan will be preserved.
  * <p>
  * Implementations may not be thread-safe.
+ *
+ * @param <R> The type of entity references in the {@link #executeAndReport() execution report}.
  */
-public interface IndexIndexingPlan<D> {
+public interface IndexIndexingPlan<R> {
 
 	/**
 	 * Add a document to the index, assuming that the document is absent from the index.
@@ -29,7 +31,7 @@ public interface IndexIndexingPlan<D> {
 	 * @param documentReferenceProvider A source of information about the identity of the document to add.
 	 * @param documentContributor A contributor to the document, adding fields to the indexed document.
 	 */
-	void add(DocumentReferenceProvider documentReferenceProvider, DocumentContributor<D> documentContributor);
+	void add(DocumentReferenceProvider documentReferenceProvider, DocumentContributor documentContributor);
 
 	/**
 	 * Update a document in the index, or add it if it's absent from the index.
@@ -37,7 +39,7 @@ public interface IndexIndexingPlan<D> {
 	 * @param documentReferenceProvider A source of information about the identity of the document to update.
 	 * @param documentContributor A contributor to the document, adding fields to the indexed document.
 	 */
-	void update(DocumentReferenceProvider documentReferenceProvider, DocumentContributor<D> documentContributor);
+	void update(DocumentReferenceProvider documentReferenceProvider, DocumentContributor documentContributor);
 
 	/**
 	 * Delete a document from the index.
@@ -76,7 +78,7 @@ public interface IndexIndexingPlan<D> {
 	 * The future will be completed normally even if a work failed,
 	 * but the report will contain an exception.
 	 */
-	CompletableFuture<IndexIndexingPlanExecutionReport> executeAndReport();
+	CompletableFuture<IndexIndexingPlanExecutionReport<R>> executeAndReport();
 
 	/**
 	 * Discard all works that are present in this plan.

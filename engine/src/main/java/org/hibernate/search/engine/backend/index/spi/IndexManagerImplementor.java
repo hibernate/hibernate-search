@@ -8,7 +8,8 @@ package org.hibernate.search.engine.backend.index.spi;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
+import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
@@ -26,7 +27,7 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
  * <p>
  * This is the interface implemented by backends and provided to the engine.
  */
-public interface IndexManagerImplementor<D extends DocumentElement> {
+public interface IndexManagerImplementor {
 
 	/**
 	 * Start any resource necessary to operate the index manager at runtime.
@@ -36,9 +37,8 @@ public interface IndexManagerImplementor<D extends DocumentElement> {
 	 * was called on the corresponding backend.
 	 *
 	 * @param context The start context.
-	 * @return A future that completes when the index manager is completely started.
 	 */
-	CompletableFuture<?> start(IndexManagerStartContext context);
+	void start(IndexManagerStartContext context);
 
 	/**
 	 * Prepare for {@link #stop()}.
@@ -59,10 +59,13 @@ public interface IndexManagerImplementor<D extends DocumentElement> {
 	 */
 	IndexManager toAPI();
 
-	IndexIndexingPlan<D> createIndexingPlan(BackendSessionContext sessionContext,
+	IndexSchemaManager getSchemaManager();
+
+	<R> IndexIndexingPlan<R> createIndexingPlan(BackendSessionContext sessionContext,
+			EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
-	IndexIndexer<D> createIndexer(BackendSessionContext sessionContext,
+	IndexIndexer createIndexer(BackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy);
 
 	IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext);

@@ -34,6 +34,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingInitiator;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingKey;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
@@ -136,6 +137,7 @@ public class SearchSetupHelper implements TestRule {
 		private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
 		private final List<IndexDefinition> indexDefinitions = new ArrayList<>();
 		private boolean multiTenancyEnabled = false;
+		private StubMappingSchemaManagementStrategy schemaManagementStrategy = StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP;
 
 		SetupContext(String defaultBackendName, ConfigurationPropertySource basePropertySource) {
 			this.defaultBackendName = defaultBackendName;
@@ -196,6 +198,11 @@ public class SearchSetupHelper implements TestRule {
 			return this;
 		}
 
+		public SetupContext withSchemaManagement(StubMappingSchemaManagementStrategy schemaManagementStrategy) {
+			this.schemaManagementStrategy = schemaManagementStrategy;
+			return this;
+		}
+
 		public PartialSetup setupFirstPhaseOnly() {
 			SearchIntegrationBuilder integrationBuilder =
 					SearchIntegration.builder( propertySource, unusedPropertyChecker );
@@ -212,7 +219,8 @@ public class SearchSetupHelper implements TestRule {
 				SearchIntegrationFinalizer finalizer =
 						integrationPartialBuildState.finalizer( propertySource, unusedPropertyChecker );
 				StubMapping mapping = finalizer.finalizeMapping(
-						mappingKey, (context, partialMapping) -> partialMapping.finalizeMapping()
+						mappingKey,
+						(context, partialMapping) -> partialMapping.finalizeMapping( schemaManagementStrategy )
 				);
 
 				SearchIntegration integration = finalizer.finalizeIntegration();

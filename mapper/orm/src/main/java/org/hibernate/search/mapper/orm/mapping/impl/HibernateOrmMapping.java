@@ -10,6 +10,8 @@ import java.lang.invoke.MethodHandles;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
@@ -28,6 +30,8 @@ import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.mapper.mapping.spi.MappingImplementor;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingPreStopContext;
+import org.hibernate.search.engine.mapper.mapping.spi.MappingStartContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.common.EntityReference;
@@ -36,6 +40,8 @@ import org.hibernate.search.mapper.orm.event.impl.HibernateOrmListenerContextPro
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.SearchMapping;
 import org.hibernate.search.mapper.orm.mapping.context.HibernateOrmMappingContext;
+import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
+import org.hibernate.search.mapper.orm.schema.management.impl.SchemaManagementListener;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeIndexedTypeContext;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeMappingContext;
@@ -49,6 +55,7 @@ import org.hibernate.search.mapper.orm.session.impl.HibernateOrmSearchSessionMap
 import org.hibernate.search.mapper.pojo.mapping.spi.AbstractPojoMappingImplementor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingDelegate;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
+import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
@@ -80,6 +87,12 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 					.withDefault( HibernateOrmMapperSettings.Defaults.QUERY_LOADING_FETCH_SIZE )
 					.build();
 
+	private static final ConfigurationProperty<SchemaManagementStrategyName> SCHEMA_MANAGEMENT_STRATEGY =
+			ConfigurationProperty.forKey( HibernateOrmMapperSettings.Radicals.SCHEMA_MANAGEMENT_STRATEGY )
+					.as( SchemaManagementStrategyName.class, SchemaManagementStrategyName::of )
+					.withDefault( HibernateOrmMapperSettings.Defaults.SCHEMA_MANAGEMENT_STRATEGY )
+					.build();
+
 	public static MappingImplementor<HibernateOrmMapping> create(
 			PojoMappingDelegate mappingDelegate, HibernateOrmTypeContextContainer typeContextContainer,
 			SessionFactoryImplementor sessionFactory, ConfigurationPropertySource propertySource,
@@ -95,10 +108,14 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 
 			int fetchSize = QUERY_LOADING_FETCH_SIZE.get( propertySource );
 
+			SchemaManagementStrategyName schemaManagementStrategyName = SCHEMA_MANAGEMENT_STRATEGY.get( propertySource );
+			SchemaManagementListener schemaManagementListener = new SchemaManagementListener( schemaManagementStrategyName );
+
 			return new HibernateOrmMapping(
 					mappingDelegate, typeContextContainer, sessionFactory,
 					synchronizationStrategyHolder,
-					cacheLookupStrategy, fetchSize
+					cacheLookupStrategy, fetchSize,
+					schemaManagementListener
 			);
 		}
 		catch (RuntimeException e) {
@@ -114,22 +131,48 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	private final EntityLoadingCacheLookupStrategy cacheLookupStrategy;
 	private final int fetchSize;
 
+	private final SchemaManagementListener schemaManagementListener;
+
 	private HibernateOrmMapping(PojoMappingDelegate mappingDelegate,
 			HibernateOrmTypeContextContainer typeContextContainer,
 			SessionFactoryImplementor sessionFactory,
 			BeanHolder<? extends AutomaticIndexingSynchronizationStrategy> defaultSynchronizationStrategyHolder,
 			EntityLoadingCacheLookupStrategy cacheLookupStrategy,
-			int fetchSize) {
+			int fetchSize,
+			SchemaManagementListener schemaManagementListener) {
 		super( mappingDelegate );
 		this.typeContextContainer = typeContextContainer;
 		this.sessionFactory = sessionFactory;
 		this.defaultSynchronizationStrategyHolder = defaultSynchronizationStrategyHolder;
 		this.cacheLookupStrategy = cacheLookupStrategy;
 		this.fetchSize = fetchSize;
+		this.schemaManagementListener = schemaManagementListener;
 	}
 
 	@Override
-	protected void doClose() {
+	public CompletableFuture<?> start(MappingStartContext context) {
+		Optional<SearchScopeImpl<Object>> scope = createAllScope();
+		if ( !scope.isPresent() ) {
+			// No indexed type
+			return CompletableFuture.completedFuture( null );
+		}
+		PojoScopeSchemaManager schemaManager = scope.get().schemaManagerDelegate();
+		return schemaManagementListener.onStart( context, schemaManager );
+	}
+
+	@Override
+	public CompletableFuture<?> preStop(MappingPreStopContext context) {
+		Optional<SearchScopeImpl<Object>> scope = createAllScope();
+		if ( !scope.isPresent() ) {
+			// No indexed type
+			return CompletableFuture.completedFuture( null );
+		}
+		PojoScopeSchemaManager schemaManager = scope.get().schemaManagerDelegate();
+		return schemaManagementListener.onStop( context, schemaManager );
+	}
+
+	@Override
+	protected void doStop() {
 		defaultSynchronizationStrategyHolder.close();
 	}
 
@@ -209,7 +252,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public PojoIndexingPlan getCurrentIndexingPlan(SessionImplementor session, boolean createIfDoesNotExist) {
+	public PojoIndexingPlan<EntityReference> getCurrentIndexingPlan(SessionImplementor session,
+			boolean createIfDoesNotExist) {
 		return HibernateOrmSearchSession.get( this, session ).getCurrentIndexingPlan( createIfDoesNotExist );
 	}
 
@@ -275,6 +319,15 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 		@SuppressWarnings("unchecked")
 		PojoRawTypeIdentifier<? extends T> castedTypeIdentifier = (PojoRawTypeIdentifier<? extends T>) typeIdentifier;
 		return castedTypeIdentifier;
+	}
+
+	private Optional<SearchScopeImpl<Object>> createAllScope() {
+		return getDelegate()
+				.<EntityReference, HibernateOrmScopeIndexedTypeContext<?>>createPojoAllScope(
+						this,
+						typeContextContainer::getIndexedByExactType
+				)
+				.map( scopeDelegate -> new SearchScopeImpl<>( this, scopeDelegate ) );
 	}
 
 	private <T> SearchScopeImpl<T> doCreateScope(Collection<PojoRawTypeIdentifier<? extends T>> typeIdentifiers) {

@@ -13,10 +13,14 @@ public final class PojoDocumentReferenceProvider implements DocumentReferencePro
 	private final String documentIdentifier;
 	private final String routingKey;
 
+	private final Object entityIdentifier;
+
 	public PojoDocumentReferenceProvider(String documentIdentifier,
-			String routingKey) {
+			String routingKey,
+			Object entityIdentifier) {
 		this.documentIdentifier = documentIdentifier;
 		this.routingKey = routingKey;
+		this.entityIdentifier = entityIdentifier;
 	}
 
 	@Override
@@ -29,4 +33,8 @@ public final class PojoDocumentReferenceProvider implements DocumentReferencePro
 		return routingKey;
 	}
 
+	@Override
+	public Object getEntityIdentifier() {
+		return entityIdentifier;
+	}
 }

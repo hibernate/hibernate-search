@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.engine.search.predicate.spi;
 
+import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
+import java.util.Set;
 import org.hibernate.search.engine.search.common.BooleanOperator;
 
 public interface SimpleQueryStringPredicateBuilder<B> extends SearchPredicateBuilder<B> {
@@ -19,6 +21,8 @@ public interface SimpleQueryStringPredicateBuilder<B> extends SearchPredicateBui
 	void analyzer(String analyzerName);
 
 	void skipAnalysis();
+
+	void flags(Set<SimpleQueryFlag> flags);
 
 	interface FieldState {
 

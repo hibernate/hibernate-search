@@ -21,43 +21,28 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
 
-public class LuceneUpdateEntryWork extends AbstractLuceneWriteWork<Long>
-		implements LuceneSingleDocumentWriteWork<Long> {
+public class LuceneUpdateEntryWork extends AbstractLuceneSingleDocumentWriteWork<Long> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final String tenantId;
-
-	private final String id;
-
+	private final String documentIdentifier;
 	private final Query filter;
 
 	private final LuceneIndexEntry indexEntry;
 
-	LuceneUpdateEntryWork(String tenantId, String id, Query filter, LuceneIndexEntry indexEntry) {
-		super( "updateEntry" );
-		this.tenantId = tenantId;
-		this.id = id;
+	LuceneUpdateEntryWork(String tenantId, String entityTypeName, Object entityIdentifier,
+			String documentIdentifier, Query filter, LuceneIndexEntry indexEntry) {
+		super( "updateEntry", tenantId, entityTypeName, entityIdentifier );
+		this.documentIdentifier = documentIdentifier;
 		this.filter = filter;
 		this.indexEntry = indexEntry;
-	}
-
-	@Override
-	public String toString() {
-		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "type=" ).append( workType )
-				.append( ", tenantId=" ).append( tenantId )
-				.append( ", entry=" ).append( indexEntry )
-				.append( "]" );
-		return sb.toString();
 	}
 
 	@Override
 	public Long execute(LuceneWriteWorkExecutionContext context) {
 		try {
 			IndexWriterDelegator indexWriterDelegator = context.getIndexWriterDelegator();
-			Term idTerm = new Term( MetadataFields.idFieldName(), id );
+			Term idTerm = new Term( MetadataFields.idFieldName(), documentIdentifier );
 			if ( filter == null ) {
 				// Atomic update: presumably more efficient.
 				return indexWriterDelegator.updateDocuments( idTerm, indexEntry );
@@ -68,12 +53,8 @@ public class LuceneUpdateEntryWork extends AbstractLuceneWriteWork<Long>
 			}
 		}
 		catch (IOException e) {
-			throw log.unableToIndexEntry( tenantId, id, context.getEventContext(), e );
+			throw log.unableToIndexEntry( tenantId, entityTypeName, entityIdentifier, context.getEventContext(), e );
 		}
 	}
 
-	@Override
-	public String getDocumentId() {
-		return id;
-	}
 }

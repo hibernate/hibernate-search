@@ -6,14 +6,15 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
@@ -23,19 +24,19 @@ import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 /**
  * @param <I> The identifier type for the mapped entity type.
  * @param <E> The entity type mapped to the index.
- * @param <D> The document type for the index.
+ * @param <R> The type of entity references returned in the {@link #executeAndReport() failure report}.
  */
-public class PojoIndexedTypeIndexingPlan<I, E, D extends DocumentElement> extends AbstractPojoTypeIndexingPlan {
+public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexingPlan {
 
-	private final PojoWorkIndexedTypeContext<I, E, D> typeContext;
-	private final IndexIndexingPlan<D> delegate;
+	private final PojoWorkIndexedTypeContext<I, E> typeContext;
+	private final IndexIndexingPlan<R> delegate;
 
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<I, IndexedEntityIndexingPlan> indexingPlansPerId = new LinkedHashMap<>();
 
-	public PojoIndexedTypeIndexingPlan(PojoWorkIndexedTypeContext<I, E, D> typeContext,
-			PojoWorkSessionContext sessionContext,
-			IndexIndexingPlan<D> delegate) {
+	public PojoIndexedTypeIndexingPlan(PojoWorkIndexedTypeContext<I, E> typeContext,
+			PojoWorkSessionContext<?> sessionContext,
+			IndexIndexingPlan<R> delegate) {
 		super( sessionContext );
 		this.typeContext = typeContext;
 		this.delegate = delegate;
@@ -85,7 +86,10 @@ public class PojoIndexedTypeIndexingPlan<I, E, D extends DocumentElement> extend
 	}
 
 	void resolveDirty(PojoReindexingCollector containingEntityCollector) {
-		for ( IndexedEntityIndexingPlan plan : indexingPlansPerId.values() ) {
+		// We need to iterate on a "frozen snapshot" of the indexingPlansPerId values
+		// because of HSEARCH-3857
+		List<IndexedEntityIndexingPlan> frozenIndexingPlansPerId = new ArrayList<>( indexingPlansPerId.values() );
+		for ( IndexedEntityIndexingPlan plan : frozenIndexingPlansPerId ) {
 			plan.resolveDirty( containingEntityCollector );
 		}
 	}
@@ -95,7 +99,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, D extends DocumentElement> extend
 		getDelegate().process();
 	}
 
-	CompletableFuture<IndexIndexingPlanExecutionReport> executeAndReport() {
+	CompletableFuture<IndexIndexingPlanExecutionReport<R>> executeAndReport() {
 		sendCommandsToDelegate();
 		/*
 		 * No need to call prepare() here:
@@ -121,7 +125,7 @@ public class PojoIndexedTypeIndexingPlan<I, E, D extends DocumentElement> extend
 		return plan;
 	}
 
-	private IndexIndexingPlan<D> getDelegate() {
+	private IndexIndexingPlan<?> getDelegate() {
 		return delegate;
 	}
 
@@ -231,7 +235,8 @@ public class PojoIndexedTypeIndexingPlan<I, E, D extends DocumentElement> extend
 		void sendCommandsToDelegate() {
 			if ( add ) {
 				if ( delete ) {
-					if ( considerAllDirty || updatedBecauseOfContained || typeContext.requiresSelfReindexing( dirtyPaths ) ) {
+					if ( considerAllDirty || updatedBecauseOfContained || typeContext.requiresSelfReindexing(
+							dirtyPaths ) ) {
 						delegate.update(
 								typeContext.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier ),
 								typeContext.toDocumentContributor( entitySupplier, sessionContext )
@@ -248,7 +253,8 @@ public class PojoIndexedTypeIndexingPlan<I, E, D extends DocumentElement> extend
 			else if ( delete ) {
 				DocumentReferenceProvider referenceProvider =
 						entitySupplier == null
-								? typeContext.toDocumentReferenceProvider( sessionContext, identifier, providedRoutingKey )
+								? typeContext.toDocumentReferenceProvider(
+								sessionContext, identifier, providedRoutingKey )
 								: typeContext.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier );
 				delegate.delete( referenceProvider );
 			}

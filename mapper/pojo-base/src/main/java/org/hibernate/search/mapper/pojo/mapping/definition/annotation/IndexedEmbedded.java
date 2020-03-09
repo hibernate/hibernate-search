@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -93,6 +94,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing
  * See the reference documentation for more information.
  */
 @Documented
+@Repeatable(IndexedEmbedded.List.class)
 @Target({ ElementType.METHOD, ElementType.FIELD })
 @Retention(RetentionPolicy.RUNTIME)
 @PropertyMapping(processor = @PropertyMappingAnnotationProcessorRef(type = IndexedEmbeddedProcessor.class))
@@ -161,6 +163,13 @@ public @interface IndexedEmbedded {
 	 * @see ContainerExtraction
 	 */
 	ContainerExtraction extraction() default @ContainerExtraction;
+
+	@Documented
+	@Target({ ElementType.METHOD, ElementType.FIELD })
+	@Retention(RetentionPolicy.RUNTIME)
+	@interface List {
+		IndexedEmbedded[] value();
+	}
 
 	// TODO HSEARCH-3071 includeEmbeddedObjectId
 	// TODO HSEARCH-3072 targetElement

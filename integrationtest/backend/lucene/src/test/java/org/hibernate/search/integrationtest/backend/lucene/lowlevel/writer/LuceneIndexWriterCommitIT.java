@@ -14,7 +14,6 @@ import java.io.IOException;
 
 import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -23,10 +22,10 @@ import org.hibernate.search.integrationtest.backend.lucene.testsupport.util.Luce
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -60,9 +59,6 @@ public class LuceneIndexWriterCommitIT {
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	@Rule
-	public TemporaryFolder temporaryFolder = new TemporaryFolder();
-
 	private final String ioStrategyName;
 	private final Integer commitInterval;
 
@@ -75,13 +71,13 @@ public class LuceneIndexWriterCommitIT {
 
 	@Test
 	public void commitStrategyNone() throws IOException {
-		setup();
+		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP );
 
 		// Initially our document is not in the index
 		assertThat( countDocsOnDisk() ).isEqualTo( 0 );
 
 		// Add the document to the index
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan(
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan(
 				new StubBackendSessionContext(),
 				DocumentCommitStrategy.NONE, // The commit will happen at some point, but the indexing plan will be considered completed before that
 				DocumentRefreshStrategy.NONE // This is irrelevant
@@ -103,13 +99,13 @@ public class LuceneIndexWriterCommitIT {
 
 	@Test
 	public void commitStrategyForce() throws IOException {
-		setup();
+		setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP );
 
 		// Initially our document is not in the index
 		assertThat( countDocsOnDisk() ).isEqualTo( 0 );
 
 		// Add the document to the index
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan(
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan(
 				new StubBackendSessionContext(),
 				DocumentCommitStrategy.FORCE, // The commit will happen before the indexing plan is considered completed
 				DocumentRefreshStrategy.NONE // This is irrelevant
@@ -126,13 +122,13 @@ public class LuceneIndexWriterCommitIT {
 	 */
 	@Test
 	public void integrationClose() throws IOException {
-		SearchIntegration integration = setup();
+		SearchIntegration integration = setup( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_ON_STARTUP_ONLY );
 
 		// Initially our document is not in the index
 		assertThat( countDocsOnDisk() ).isEqualTo( 0 );
 
 		// Add the document to the index
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan(
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan(
 				new StubBackendSessionContext(),
 				DocumentCommitStrategy.NONE, // The commit should not be necessary for changes to be visible
 				DocumentRefreshStrategy.NONE // The refresh should be done regardless of this parameter
@@ -154,14 +150,15 @@ public class LuceneIndexWriterCommitIT {
 	 * @throws IOException If an I/O failure occurs.
 	 */
 	private int countDocsOnDisk() throws IOException {
-		return LuceneIndexContentUtils.doOnIndexCopy(
-				setupHelper, temporaryFolder, INDEX_NAME,
+		return LuceneIndexContentUtils.readIndex(
+				setupHelper, INDEX_NAME,
 				reader -> reader.getDocCount( MetadataFields.idFieldName() )
 		);
 	}
 
-	private SearchIntegration setup() {
+	private SearchIntegration setup(StubMappingSchemaManagementStrategy schemaManagementStrategy) {
 		return setupHelper.start()
+				.withSchemaManagement( schemaManagementStrategy )
 				.withIndex(
 						INDEX_NAME,
 						ctx -> { },

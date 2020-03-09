@@ -45,18 +45,19 @@ public class Elasticsearch67WorkBuilderFactory extends Elasticsearch7WorkBuilder
 		super( gsonProvider );
 	}
 
+
 	@Override
-	public IndexWorkBuilder index(String mappedTypeName, URLEncodedString elasticsearchIndexName,
-			URLEncodedString id, String routingKey, JsonObject document) {
-		return IndexWork.Builder.forElasticsearch67AndBelow( mappedTypeName, elasticsearchIndexName,
-				Paths.DOC, id, routingKey, document );
+	public IndexWorkBuilder index(String entityTypeName, Object entityIdentifier,
+			URLEncodedString elasticsearchIndexName, URLEncodedString id, String routingKey, JsonObject document) {
+		return IndexWork.Builder.forElasticsearch67AndBelow( entityTypeName, entityIdentifier,
+				elasticsearchIndexName, Paths.DOC, id, routingKey, document );
 	}
 
 	@Override
-	public DeleteWorkBuilder delete(String mappedTypeName, URLEncodedString elasticsearchIndexName,
-			URLEncodedString id, String routingKey) {
-		return DeleteWork.Builder.forElasticsearch67AndBelow( mappedTypeName, elasticsearchIndexName,
-				Paths.DOC, id, routingKey );
+	public DeleteWorkBuilder delete(String entityTypeName, Object entityIdentifier,
+			URLEncodedString elasticsearchIndexName, URLEncodedString id, String routingKey) {
+		return DeleteWork.Builder.forElasticsearch67AndBelow( entityTypeName, entityIdentifier,
+				elasticsearchIndexName, Paths.DOC, id, routingKey );
 	}
 
 	@Override

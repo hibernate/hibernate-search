@@ -9,22 +9,25 @@ package org.hibernate.search.mapper.pojo.reporting.impl;
 import java.lang.annotation.Annotation;
 
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
 import org.hibernate.search.util.common.reporting.impl.AbstractSimpleEventContextElement;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 
-import org.jboss.logging.Messages;
-
 public final class PojoEventContexts {
 
-	private static final PojoEventContextMessages MESSAGES = Messages.getBundle( PojoEventContextMessages.class );
+	private static final PojoEventContextMessages MESSAGES = PojoEventContextMessages.INSTANCE;
 
 	private PojoEventContexts() {
 	}
 
 	public static EventContext fromType(PojoRawTypeModel<?> typeModel) {
 		return EventContexts.fromType( typeModel );
+	}
+
+	public static EventContext fromType(PojoRawTypeIdentifier<?> typeIdentifier) {
+		return EventContexts.fromType( typeIdentifier );
 	}
 
 	public static EventContext fromPath(PojoModelPath unboundPath) {

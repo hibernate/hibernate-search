@@ -89,21 +89,18 @@ class LuceneTextPhrasePredicateBuilder extends AbstractLuceneSearchPredicateBuil
 			analyzerChecker.failIfNotCompatible();
 		}
 
-		if ( analyzer != null ) {
-			Query analyzed = new QueryBuilder( analyzer ).createPhraseQuery( absoluteFieldPath, phrase, slop );
-			if ( analyzed == null ) {
-				// Either the value was an empty string
-				// or the analysis removed all tokens (that can happen if the value contained only stopwords, for example)
-				// In any case, use the same behavior as Elasticsearch: don't match anything
-				analyzed = new MatchNoDocsQuery( "No tokens after analysis of the phrase to match" );
-			}
-			return analyzed;
+		if ( analyzer == AnalyzerConstants.KEYWORD_ANALYZER ) {
+			// Optimization when analysis is disabled
+			return new TermQuery( new Term( absoluteFieldPath, phrase ) );
 		}
-		else {
-			// we are in the case where we a have a normalizer here as the analyzer case has already been treated by
-			// the queryBuilder case above
 
-			return new TermQuery( new Term( absoluteFieldPath, codec.normalize( absoluteFieldPath, phrase ) ) );
+		Query analyzed = new QueryBuilder( analyzer ).createPhraseQuery( absoluteFieldPath, phrase, slop );
+		if ( analyzed == null ) {
+			// Either the value was an empty string
+			// or the analysis removed all tokens (that can happen if the value contained only stopwords, for example)
+			// In any case, use the same behavior as Elasticsearch: don't match anything
+			analyzed = new MatchNoDocsQuery( "No tokens after analysis of the phrase to match" );
 		}
+		return analyzed;
 	}
 }

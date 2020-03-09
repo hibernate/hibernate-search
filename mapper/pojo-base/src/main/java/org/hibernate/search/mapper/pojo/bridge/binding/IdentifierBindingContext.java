@@ -10,6 +10,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
+import org.hibernate.search.util.common.annotaion.Incubating;
 
 /**
  * The context provided to the {@link IdentifierBinder#bind(IdentifierBindingContext)} method.
@@ -42,9 +43,8 @@ public interface IdentifierBindingContext<I> extends BindingContext {
 
 	/**
 	 * @return An entry point allowing to inspect the type of values that will be passed to this bridge.
-	 * @hsearch.experimental This feature is under active development.
-	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
+	@Incubating
 	PojoModelValue<I> getBridgedElement();
 
 }

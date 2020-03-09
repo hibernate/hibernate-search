@@ -9,20 +9,19 @@ package org.hibernate.search.mapper.pojo.work.impl;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.mapper.pojo.work.spi.PojoWorkSessionContext;
 
-public class PojoTypeIndexer<I, E, D extends DocumentElement> {
+public class PojoTypeIndexer<I, E> {
 
-	private final PojoWorkSessionContext sessionContext;
-	private final PojoWorkIndexedTypeContext<I, E, D> typeContext;
-	private final IndexIndexer<D> delegate;
+	private final PojoWorkSessionContext<?> sessionContext;
+	private final PojoWorkIndexedTypeContext<I, E> typeContext;
+	private final IndexIndexer delegate;
 
-	public PojoTypeIndexer(PojoWorkIndexedTypeContext<I, E, D> typeContext,
-			PojoWorkSessionContext sessionContext,
-			IndexIndexer<D> delegate) {
+	public PojoTypeIndexer(PojoWorkIndexedTypeContext<I, E> typeContext,
+			PojoWorkSessionContext<?> sessionContext,
+			IndexIndexer delegate) {
 		this.sessionContext = sessionContext;
 		this.typeContext = typeContext;
 		this.delegate = delegate;
@@ -31,7 +30,10 @@ public class PojoTypeIndexer<I, E, D extends DocumentElement> {
 	CompletableFuture<?> add(Object providedId, Object entity) {
 		Supplier<E> entitySupplier = typeContext.toEntitySupplier( sessionContext, entity );
 		I identifier = typeContext.getIdentifierMapping().getIdentifier( providedId, entitySupplier );
-		DocumentReferenceProvider referenceProvider = typeContext.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier );
+		DocumentReferenceProvider referenceProvider = typeContext.toDocumentReferenceProvider(
+				sessionContext,
+				identifier, entitySupplier
+		);
 		return delegate.add( referenceProvider, typeContext.toDocumentContributor( entitySupplier, sessionContext ) );
 	}
 }

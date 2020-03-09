@@ -13,14 +13,12 @@ import java.util.StringJoiner;
 
 import org.hibernate.search.util.common.reporting.impl.CommonEventContextMessages;
 
-import org.jboss.logging.Messages;
-
 /**
  * A sequence of {@link EventContextElement}.
  */
 public final class EventContext {
 
-	private static final CommonEventContextMessages MESSAGES = Messages.getBundle( CommonEventContextMessages.class );
+	private static final CommonEventContextMessages MESSAGES = CommonEventContextMessages.INSTANCE;
 
 	public static EventContext create(EventContextElement firstElement, EventContextElement... otherElements) {
 		EventContext result = new EventContext( null, firstElement );

@@ -99,6 +99,11 @@
             <artifactId>hibernate-search-integrationtest-showcase-library</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.hibernate.search</groupId>
+            <artifactId>hibernate-search-documentation</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <build>
