@@ -72,9 +72,10 @@ public class ElasticsearchStandardFieldPredicateBuilderFactory<F>
 
 	@Override
 	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath, ElasticsearchCompatibilityChecker converterChecker) {
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy
+			, ElasticsearchCompatibilityChecker converterChecker) {
 		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchRangePredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
+		return new ElasticsearchRangePredicateBuilder<>( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec );
 	}
 
 	protected void checkSearchable(String absoluteFieldPath) {

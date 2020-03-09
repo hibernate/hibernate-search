@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
@@ -27,7 +28,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 
-public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearchSearchPredicateBuilder
+public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearchSearchNestedPredicateBuilder
 		implements RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -51,9 +52,10 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 	private Range<JsonElement> range;
 
 	public ElasticsearchRangePredicateBuilder(ElasticsearchSearchContext searchContext,
-			String absoluteFieldPath,
+			String absoluteFieldPath, List<String> nestedPathHierarchy,
 			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchFieldCodec<F> codec) {
+		super( nestedPathHierarchy );
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;

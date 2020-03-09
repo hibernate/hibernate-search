@@ -111,7 +111,9 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> range(String absoluteFieldPath) {
 		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldPredicateBuilderFactory> fieldComponent = scopeModel.getSchemaNodeComponent(
 				absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		return fieldComponent.getComponent().createRangePredicateBuilder( searchContext, absoluteFieldPath, fieldComponent.getConverterCompatibilityChecker() );
+		return fieldComponent.getComponent().createRangePredicateBuilder(
+				searchContext, absoluteFieldPath, scopeModel.getNestedPathHierarchy( absoluteFieldPath ),
+				fieldComponent.getConverterCompatibilityChecker() );
 	}
 
 	@Override

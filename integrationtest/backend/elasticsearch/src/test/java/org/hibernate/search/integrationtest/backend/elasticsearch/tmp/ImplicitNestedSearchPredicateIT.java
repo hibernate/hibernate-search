@@ -139,6 +139,11 @@ public class ImplicitNestedSearchPredicateIT {
 	}
 
 	@Test
+	public void predicate_range() {
+		verify_implicit_nest( p -> p.range().field( "nested.numeric" ).atMost( ANY_INTEGER ) );
+	}
+
+	@Test
 	public void predicate_simpleQueryString_multipleNestedPaths() {
 		SubTest.expectException( () -> indexManager.createScope()
 				.predicate().simpleQueryString().field( "nested.text" ).field( "text" )

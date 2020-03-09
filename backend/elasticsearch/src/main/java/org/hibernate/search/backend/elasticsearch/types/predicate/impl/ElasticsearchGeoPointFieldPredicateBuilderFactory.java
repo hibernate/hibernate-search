@@ -61,7 +61,8 @@ public class ElasticsearchGeoPointFieldPredicateBuilderFactory
 
 	@Override
 	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath, ElasticsearchCompatibilityChecker converterChecker) {
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy,
+			ElasticsearchCompatibilityChecker converterChecker) {
 		throw log.rangesNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
