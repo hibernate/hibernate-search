@@ -10,6 +10,7 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -76,12 +77,10 @@ public class FieldSearchSortBaseIT<F> {
 	private static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
 	private static final String RAW_FIELD_COMPATIBLE_INDEX_NAME = "IndexWithCompatibleRawFields";
 	private static final String INCOMPATIBLE_INDEX_NAME = "IndexWithIncompatibleFields";
-	private static final String MULTIPLE_EMPTY_INDEX_NAME = "MultipleEmptyIndexName";
 
 	private static final String DOCUMENT_1 = "1";
 	private static final String DOCUMENT_2 = "2";
 	private static final String DOCUMENT_3 = "3";
-	private static final String EMPTY = "empty";
 
 	private static final String EMPTY_1 = "empty1";
 	private static final String EMPTY_2 = "empty2";
@@ -113,9 +112,6 @@ public class FieldSearchSortBaseIT<F> {
 
 	private static StubMappingIndexManager incompatibleIndexManager;
 
-	private static IndexMapping multipleEmptyIndexMapping;
-	private static StubMappingIndexManager multipleEmptyIndexManager;
-
 	@BeforeClass
 	public static void setup() {
 		setupHelper.start()
@@ -138,11 +134,6 @@ public class FieldSearchSortBaseIT<F> {
 						INCOMPATIBLE_INDEX_NAME,
 						ctx -> new IncompatibleIndexMapping( ctx.getSchemaElement() ),
 						indexManager -> incompatibleIndexManager = indexManager
-				)
-				.withIndex(
-						MULTIPLE_EMPTY_INDEX_NAME,
-						ctx -> multipleEmptyIndexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> multipleEmptyIndexManager = indexManager
 				)
 				.setup();
 
@@ -182,98 +173,94 @@ public class FieldSearchSortBaseIT<F> {
 		String fieldPath = getFieldPath();
 
 		// Default order
-		query = matchAllQuery( f -> f.field( fieldPath ).missing().last() );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).missing().last() );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1 );
 
 		// Explicit order with missing().last()
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing().last() );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing().last() );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
-		query = matchAllQuery( f -> f.field( fieldPath ).desc().missing().last() );
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1 );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).desc().missing().last() );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1, EMPTY );
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1, EMPTY_1 );
 
 		// Explicit order with missing().first()
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing().first() );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing().first() );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-		query = matchAllQuery( f -> f.field( fieldPath ).desc().missing().first() );
+				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_1, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).desc().missing().first() );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
+				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_1, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 
 		// Explicit order with missing().use( ... )
-		query = matchAllQuery( f -> f.field( fieldPath ).asc()
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc()
 				.missing().use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-		query = matchAllQuery( f -> f.field( fieldPath ).asc()
+				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_1, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc()
 				.missing().use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL ) ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
-		query = matchAllQuery( f -> f.field( fieldPath ).asc()
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY_1, DOCUMENT_2, DOCUMENT_3 );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc()
 				.missing().use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL ) ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
-		query = matchAllQuery( f -> f.field( fieldPath ).asc()
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY_1, DOCUMENT_3 );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc()
 				.missing().use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL ) ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1 );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3254")
-	public void multipleEmpty_missingValue() {
-		StubMappingScope scope = multipleEmptyIndexManager.createScope();
-
+	public void missingValue_multipleEmpty() {
 		List<DocumentReference> docRefHits;
 		String fieldPath = getFieldPath();
 
 		// using before 1 value
 		docRefHits = matchAllQuery( f -> f.field( fieldPath ).asc()
-				.missing().use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ), scope )
+				.missing().use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ) )
 				.fetchAllHits();
 		assertThat( docRefHits ).ordinals( 0, 1, 2, 3 )
-				.hasDocRefHitsAnyOrder( MULTIPLE_EMPTY_INDEX_NAME, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
-		assertThat( docRefHits ).ordinal( 4 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_1 );
-		assertThat( docRefHits ).ordinal( 5 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_2 );
-		assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
+		assertThat( docRefHits ).ordinal( 4 ).isDocRefHit( INDEX_NAME, DOCUMENT_1 );
+		assertThat( docRefHits ).ordinal( 5 ).isDocRefHit( INDEX_NAME, DOCUMENT_2 );
+		assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( INDEX_NAME, DOCUMENT_3 );
 
 		// using between 1 and 2 value
 		docRefHits = matchAllQuery( f -> f.field( fieldPath ).asc()
-				.missing().use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL ) ), scope )
+				.missing().use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL ) ) )
 				.fetchAllHits();
-		assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_1 );
+		assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( INDEX_NAME, DOCUMENT_1 );
 		assertThat( docRefHits ).ordinals( 1, 2, 3, 4 )
-				.hasDocRefHitsAnyOrder( MULTIPLE_EMPTY_INDEX_NAME, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
-		assertThat( docRefHits ).ordinal( 5 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_2 );
-		assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
+		assertThat( docRefHits ).ordinal( 5 ).isDocRefHit( INDEX_NAME, DOCUMENT_2 );
+		assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( INDEX_NAME, DOCUMENT_3 );
 
 		// using between 2 and 3 value
 		docRefHits = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL ) ), scope )
+				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL ) ) )
 				.fetchAllHits();
-		assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_1 );
-		assertThat( docRefHits ).ordinal( 1 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_2 );
+		assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( INDEX_NAME, DOCUMENT_1 );
+		assertThat( docRefHits ).ordinal( 1 ).isDocRefHit( INDEX_NAME, DOCUMENT_2 );
 		assertThat( docRefHits ).ordinals( 2, 3, 4, 5 )
-				.hasDocRefHitsAnyOrder( MULTIPLE_EMPTY_INDEX_NAME, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
-		assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
+		assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( INDEX_NAME, DOCUMENT_3 );
 
 		// using after 3 value
 		docRefHits = matchAllQuery( f -> f.field( fieldPath ).asc()
-				.missing().use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL ) ), scope ).fetchAllHits();
-		assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_1 );
-		assertThat( docRefHits ).ordinal( 1 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_2 );
-		assertThat( docRefHits ).ordinal( 2 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_3 );
+				.missing().use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL ) ) ).fetchAllHits();
+		assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( INDEX_NAME, DOCUMENT_1 );
+		assertThat( docRefHits ).ordinal( 1 ).isDocRefHit( INDEX_NAME, DOCUMENT_2 );
+		assertThat( docRefHits ).ordinal( 2 ).isDocRefHit( INDEX_NAME, DOCUMENT_3 );
 		assertThat( docRefHits ).ordinals( 3, 4, 5, 6 )
-				.hasDocRefHitsAnyOrder( MULTIPLE_EMPTY_INDEX_NAME, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3254")
-	public void multipleEmpty_alreadyExists_missingValue() {
-		StubMappingScope scope = multipleEmptyIndexManager.createScope();
-
+	public void missingValue_multipleEmpty_useExistingDocumentValue() {
 		List<DocumentReference> docRefHits;
 		String fieldPath = getFieldPath();
 
@@ -283,27 +270,27 @@ public class FieldSearchSortBaseIT<F> {
 
 		// using doc 1 value
 		docRefHits = matchAllQuery( f -> f.field( fieldPath ).asc()
-				.missing().use( docValue1 ), scope ).fetchAllHits();
+				.missing().use( docValue1 ) ).fetchAllHits();
 		assertThat( docRefHits ).ordinals( 0, 1, 2, 3, 4 )
-				.hasDocRefHitsAnyOrder( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_1, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
-		assertThat( docRefHits ).ordinal( 5 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_2 );
-		assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
+		assertThat( docRefHits ).ordinal( 5 ).isDocRefHit( INDEX_NAME, DOCUMENT_2 );
+		assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( INDEX_NAME, DOCUMENT_3 );
 
 		// using doc 2 value
 		docRefHits = matchAllQuery( f -> f.field( fieldPath ).asc()
-				.missing().use( docValue2 ), scope ).fetchAllHits();
-		assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_1 );
+				.missing().use( docValue2 ) ).fetchAllHits();
+		assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( INDEX_NAME, DOCUMENT_1 );
 		assertThat( docRefHits ).ordinals( 1, 2, 3, 4, 5 )
-				.hasDocRefHitsAnyOrder( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_2, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
-		assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_3 );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_2, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
+		assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( INDEX_NAME, DOCUMENT_3 );
 
 		// using doc 3 value
 		docRefHits = matchAllQuery( f -> f.field( fieldPath ).asc()
-				.missing().use( docValue3 ), scope ).fetchAllHits();
-		assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_1 );
-		assertThat( docRefHits ).ordinal( 1 ).isDocRefHit( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_2 );
+				.missing().use( docValue3 ) ).fetchAllHits();
+		assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( INDEX_NAME, DOCUMENT_1 );
+		assertThat( docRefHits ).ordinal( 1 ).isDocRefHit( INDEX_NAME, DOCUMENT_2 );
 		assertThat( docRefHits ).ordinals( 2, 3, 4, 5, 6 )
-				.hasDocRefHitsAnyOrder( MULTIPLE_EMPTY_INDEX_NAME, DOCUMENT_3, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
 	}
 
 	@Test
@@ -311,22 +298,22 @@ public class FieldSearchSortBaseIT<F> {
 		SearchQuery<DocumentReference> query;
 		String fieldPath = getFieldWithDslConverterPath();
 
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing()
 				.use( new ValueWrapper<>( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ) ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_1, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing()
 				.use( new ValueWrapper<>( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL ) ) ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY_1, DOCUMENT_2, DOCUMENT_3 );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing()
 				.use( new ValueWrapper<>( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL ) ) ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY_1, DOCUMENT_3 );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing()
 				.use( new ValueWrapper<>( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL ) ) ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1 );
 	}
 
 	@Test
@@ -334,22 +321,22 @@ public class FieldSearchSortBaseIT<F> {
 		SearchQuery<DocumentReference> query;
 		String fieldPath = getFieldWithDslConverterPath();
 
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing()
 				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ), ValueConvert.NO ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_1, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing()
 				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL ), ValueConvert.NO ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY_1, DOCUMENT_2, DOCUMENT_3 );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing()
 				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL ), ValueConvert.NO ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY_1, DOCUMENT_3 );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing()
 				.use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL ), ValueConvert.NO ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1 );
 	}
 
 	@Test
@@ -376,25 +363,25 @@ public class FieldSearchSortBaseIT<F> {
 		SearchQuery<DocumentReference> query;
 		String fieldPath = getFieldPathInObject( indexMapping.flattenedObject );
 
-		query = matchAllQuery( f -> f.field( fieldPath ).missing().last() );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).missing().last() );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1 );
 
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing().last() );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing().last() );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1 );
 
-		query = matchAllQuery( f -> f.field( fieldPath ).desc().missing().last() );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).desc().missing().last() );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1, EMPTY );
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1, EMPTY_1 );
 
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing().first() );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing().first() );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_1, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
-		query = matchAllQuery( f -> f.field( fieldPath ).desc().missing().first() );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).desc().missing().first() );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
+				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_1, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 	}
 
 	@Test
@@ -422,43 +409,43 @@ public class FieldSearchSortBaseIT<F> {
 		SearchQuery<DocumentReference> query;
 		String fieldPath = getFieldPathInObject( indexMapping.nestedObject );
 
-		query = matchAllQuery( f -> f.field( fieldPath ).missing().last() );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).missing().last() );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1 );
 
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing().last() );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing().last() );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1 );
 
-		query = matchAllQuery( f -> f.field( fieldPath ).desc().missing().last() );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).desc().missing().last() );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1, EMPTY );
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1, EMPTY_1 );
 
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing().first() );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing().first() );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_1, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
-		query = matchAllQuery( f -> f.field( fieldPath ).desc().missing().first() );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).desc().missing().first() );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
+				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_1, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 
 		// Explicit order with onMissingValue().use( ... )
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing()
 				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_1, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing()
 				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL ) ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY, DOCUMENT_2, DOCUMENT_3 );
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY_1, DOCUMENT_2, DOCUMENT_3 );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing()
 				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL ) ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY, DOCUMENT_3 );
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY_1, DOCUMENT_3 );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing()
 				.use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL ) ) );
 		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1 );
 	}
 
 	@Test
@@ -525,7 +512,7 @@ public class FieldSearchSortBaseIT<F> {
 		SearchQuery<DocumentReference> query;
 		String fieldPath = getFieldPath();
 
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing()
 				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ), scope );
 
 		/*
@@ -534,7 +521,7 @@ public class FieldSearchSortBaseIT<F> {
 		 * detected as compatible and that no exception is thrown.
 		 */
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
-			b.doc( INDEX_NAME, EMPTY );
+			b.doc( INDEX_NAME, EMPTY_1 );
 			b.doc( INDEX_NAME, DOCUMENT_1 );
 			b.doc( INDEX_NAME, DOCUMENT_2 );
 			b.doc( INDEX_NAME, DOCUMENT_3 );
@@ -550,7 +537,7 @@ public class FieldSearchSortBaseIT<F> {
 
 		SubTest.expectException(
 				() -> {
-					matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+					matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing()
 							.use( new ValueWrapper<>( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ) ), scope );
 				}
 		)
@@ -570,7 +557,7 @@ public class FieldSearchSortBaseIT<F> {
 		SearchQuery<DocumentReference> query;
 		String fieldPath = getFieldPath();
 
-		query = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing()
 				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ), ValueConvert.NO ), scope );
 
 		/*
@@ -579,7 +566,7 @@ public class FieldSearchSortBaseIT<F> {
 		 * detected as compatible and that no exception is thrown.
 		 */
 		assertThat( query ).hasDocRefHitsAnyOrder( b -> {
-			b.doc( INDEX_NAME, EMPTY );
+			b.doc( INDEX_NAME, EMPTY_1 );
 			b.doc( INDEX_NAME, DOCUMENT_1 );
 			b.doc( INDEX_NAME, DOCUMENT_2 );
 			b.doc( INDEX_NAME, DOCUMENT_3 );
@@ -595,7 +582,7 @@ public class FieldSearchSortBaseIT<F> {
 
 		SubTest.expectException(
 				() -> {
-					matchAllQuery( f -> f.field( fieldPath ), scope );
+					matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ), scope );
 				}
 		)
 				.assertThrown()
@@ -615,7 +602,7 @@ public class FieldSearchSortBaseIT<F> {
 
 		SubTest.expectException(
 				() -> {
-					matchAllQuery( f -> f.field( fieldPath ), scope );
+					matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ), scope );
 				}
 		)
 				.assertThrown()
@@ -635,7 +622,21 @@ public class FieldSearchSortBaseIT<F> {
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(
 			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
 		return scope.query()
-				.where( f -> f.matchAll().except( f.id().matching( EMPTY ) ) )
+				.where( f -> f.matchAll()
+						.except( f.id().matchingAny( Arrays.asList( EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 ) ) ) )
+				.sort( sortContributor )
+				.toQuery();
+	}
+
+	private SearchQuery<DocumentReference> matchNonEmptyAndEmpty1Query(
+			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
+		return matchNonEmptyAndEmpty1Query( sortContributor, indexManager.createScope() );
+	}
+
+	private SearchQuery<DocumentReference> matchNonEmptyAndEmpty1Query(
+			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
+		return scope.query()
+				.where( f -> f.matchAll().except( f.id().matchingAny( Arrays.asList( EMPTY_2, EMPTY_3, EMPTY_4 ) ) ) )
 				.sort( sortContributor )
 				.toQuery();
 	}
@@ -710,10 +711,13 @@ public class FieldSearchSortBaseIT<F> {
 	private static void initData() {
 		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		// Important: do not index the documents in the expected order after sorts (1, 2, 3)
+		plan.add( referenceProvider( EMPTY_4 ), document -> { } );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> initDocument( document, DOCUMENT_2_ORDINAL ) );
+		plan.add( referenceProvider( EMPTY_1 ), document -> { } );
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> initDocument( document, DOCUMENT_1_ORDINAL ) );
+		plan.add( referenceProvider( EMPTY_2 ), document -> { } );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> initDocument( document, DOCUMENT_3_ORDINAL ) );
-		plan.add( referenceProvider( EMPTY ), document -> { } );
+		plan.add( referenceProvider( EMPTY_3 ), document -> { } );
 		plan.execute().join();
 
 		plan = compatibleIndexManager.createIndexingPlan();
@@ -734,33 +738,12 @@ public class FieldSearchSortBaseIT<F> {
 		} );
 		plan.execute().join();
 
-		plan = multipleEmptyIndexManager.createIndexingPlan();
-		plan.add( referenceProvider( EMPTY_1 ), document -> { } );
-		plan.add( referenceProvider( DOCUMENT_2 ), document ->
-				forEachSupportedTypeDescriptor( typeDescriptor -> {
-					addValue( document, multipleEmptyIndexMapping.fieldModels, typeDescriptor, DOCUMENT_2_ORDINAL );
-				} )
-		);
-		plan.add( referenceProvider( EMPTY_2 ), document -> { } );
-		plan.add( referenceProvider( DOCUMENT_3 ), document ->
-				forEachSupportedTypeDescriptor( typeDescriptor -> {
-					addValue( document, multipleEmptyIndexMapping.fieldModels, typeDescriptor, DOCUMENT_3_ORDINAL );
-				} )
-		);
-		plan.add( referenceProvider( EMPTY_3 ), document -> { } );
-		plan.add( referenceProvider( DOCUMENT_1 ), document ->
-				forEachSupportedTypeDescriptor( typeDescriptor -> {
-					addValue( document, multipleEmptyIndexMapping.fieldModels, typeDescriptor, DOCUMENT_1_ORDINAL );
-				} )
-		);
-		plan.add( referenceProvider( EMPTY_4 ), document -> { } );
-		plan.execute().join();
-
 		// Check that all documents are searchable
 		SearchQuery<DocumentReference> query = indexManager.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
 		query = compatibleIndexManager.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery();
