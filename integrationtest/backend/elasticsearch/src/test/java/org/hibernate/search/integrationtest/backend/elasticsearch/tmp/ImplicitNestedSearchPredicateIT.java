@@ -25,6 +25,9 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.spatial.GeoBoundingBox;
+import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.engine.spatial.GeoPolygon;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -50,6 +53,12 @@ public class ImplicitNestedSearchPredicateIT {
 	private static final String SOME_WILDCARD_PATTERN = "f*x";
 
 	private static final String SOME_SIMPLE_QUERY_STRING = "quick + fox";
+
+	private static final GeoPoint G00 = GeoPoint.of( 0, 0 );
+	private static final GeoPoint G20 = GeoPoint.of( 2, 0 );
+	private static final GeoPoint G02 = GeoPoint.of( 0, 2 );
+	private static final GeoPoint G22 = GeoPoint.of( 2, 2 );
+	private static final GeoPoint G11 = GeoPoint.of( 1, 1 );
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -144,6 +153,21 @@ public class ImplicitNestedSearchPredicateIT {
 	}
 
 	@Test
+	public void predicate_geoPoly() {
+		verify_implicit_nest( p -> p.spatial().within().field( "nested.geo" ).polygon( GeoPolygon.of( G00, G02, G22, G20, G00 ) ) );
+	}
+
+	@Test
+	public void predicate_geoBox() {
+		verify_implicit_nest( p -> p.spatial().within().field( "nested.geo" ).boundingBox( GeoBoundingBox.of( G20, G02 ) ) );
+	}
+
+	@Test
+	public void predicate_geoCircle() {
+		verify_implicit_nest( p -> p.spatial().within().field( "nested.geo" ).circle( G11, 1 ) );
+	}
+
+	@Test
 	public void predicate_simpleQueryString_multipleNestedPaths() {
 		SubTest.expectException( () -> indexManager.createScope()
 				.predicate().simpleQueryString().field( "nested.text" ).field( "text" )
@@ -181,6 +205,7 @@ public class ImplicitNestedSearchPredicateIT {
 			nestedDocument.addValue( indexMapping.nestedString, ANY_STRING );
 			nestedDocument.addValue( indexMapping.nestedNumeric, ANY_INTEGER );
 			nestedDocument.addValue( indexMapping.nestedText, SOME_PHRASE_TEXT );
+			nestedDocument.addValue( indexMapping.nestedGeo, G11 );
 
 			DocumentElement nestedDocumentX2 = nestedDocument.addObject( indexMapping.nestedX2 );
 			nestedDocumentX2.addValue( indexMapping.nestedX2Numeric, ANY_INTEGER );
@@ -195,6 +220,7 @@ public class ImplicitNestedSearchPredicateIT {
 		final IndexFieldReference<String> nestedString;
 		final IndexFieldReference<Integer> nestedNumeric;
 		final IndexFieldReference<String> nestedText;
+		final IndexFieldReference<GeoPoint> nestedGeo;
 
 		final IndexObjectFieldReference nestedX2;
 		final IndexFieldReference<Integer> nestedX2Numeric;
@@ -207,6 +233,7 @@ public class ImplicitNestedSearchPredicateIT {
 			this.nestedString = nestedObject.field( "string", f -> f.asString().projectable( Projectable.YES ).sortable( Sortable.YES ) ).toReference();
 			this.nestedNumeric = nestedObject.field( "numeric", f -> f.asInteger() ).toReference();
 			this.nestedText = nestedObject.field( "text", f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ) ).toReference();
+			this.nestedGeo = nestedObject.field( "geo", f -> f.asGeoPoint() ).toReference();
 
 			IndexSchemaObjectField nestedObjectX2 = nestedObject.objectField( "nested", ObjectFieldStorage.NESTED );
 			this.nestedX2 = nestedObjectX2.toReference();

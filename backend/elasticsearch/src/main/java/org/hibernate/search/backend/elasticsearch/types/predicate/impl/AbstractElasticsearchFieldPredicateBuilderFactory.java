@@ -56,7 +56,7 @@ abstract class AbstractElasticsearchFieldPredicateBuilderFactory implements Elas
 
 	@Override
 	public SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
-			String absoluteFieldPath) {
+			String absoluteFieldPath, List<String> nestedPathHierarchy) {
 		throw log.spatialPredicatesNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
@@ -64,7 +64,7 @@ abstract class AbstractElasticsearchFieldPredicateBuilderFactory implements Elas
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
-			String absoluteFieldPath) {
+			String absoluteFieldPath, List<String> nestedPathHierarchy) {
 		throw log.spatialPredicatesNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
@@ -72,7 +72,7 @@ abstract class AbstractElasticsearchFieldPredicateBuilderFactory implements Elas
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
-			String absoluteFieldPath) {
+			String absoluteFieldPath, List<String> nestedPathHierarchy) {
 		throw log.spatialPredicatesNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
