@@ -30,7 +30,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-public class AutomaticIndexingConcurrentModificationIT {
+public class AutomaticIndexingConcurrentModificationInSameTypeIT {
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
