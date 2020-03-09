@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.mapper.pojo.work.impl;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -84,7 +86,10 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 	}
 
 	void resolveDirty(PojoReindexingCollector containingEntityCollector) {
-		for ( IndexedEntityIndexingPlan plan : indexingPlansPerId.values() ) {
+		// We need to iterate on a "frozen snapshot" of the indexingPlansPerId values
+		// because of HSEARCH-3857
+		List<IndexedEntityIndexingPlan> frozenIndexingPlansPerId = new ArrayList<>( indexingPlansPerId.values() );
+		for ( IndexedEntityIndexingPlan plan : frozenIndexingPlansPerId ) {
 			plan.resolveDirty( containingEntityCollector );
 		}
 	}
@@ -230,7 +235,8 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 		void sendCommandsToDelegate() {
 			if ( add ) {
 				if ( delete ) {
-					if ( considerAllDirty || updatedBecauseOfContained || typeContext.requiresSelfReindexing( dirtyPaths ) ) {
+					if ( considerAllDirty || updatedBecauseOfContained || typeContext.requiresSelfReindexing(
+							dirtyPaths ) ) {
 						delegate.update(
 								typeContext.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier ),
 								typeContext.toDocumentContributor( entitySupplier, sessionContext )
@@ -247,7 +253,8 @@ public class PojoIndexedTypeIndexingPlan<I, E, R> extends AbstractPojoTypeIndexi
 			else if ( delete ) {
 				DocumentReferenceProvider referenceProvider =
 						entitySupplier == null
-								? typeContext.toDocumentReferenceProvider( sessionContext, identifier, providedRoutingKey )
+								? typeContext.toDocumentReferenceProvider(
+								sessionContext, identifier, providedRoutingKey )
 								: typeContext.toDocumentReferenceProvider( sessionContext, identifier, entitySupplier );
 				delegate.delete( referenceProvider );
 			}
