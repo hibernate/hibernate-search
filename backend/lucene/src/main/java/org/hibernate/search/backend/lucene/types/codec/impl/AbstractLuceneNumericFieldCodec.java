@@ -51,10 +51,7 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> imple
 
 		LuceneNumericDomain<E> domain = getDomain();
 
-		if ( sortable ) {
-			documentBuilder.addField( domain.createSortedDocValuesField( absoluteFieldPath, encodedValue ) );
-		}
-		else if ( aggregable ) {
+		if ( sortable || aggregable ) {
 			documentBuilder.addField( domain.createSortedDocValuesField( absoluteFieldPath, encodedValue ) );
 		}
 		else {
