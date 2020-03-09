@@ -7,12 +7,12 @@
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchDifferentNestedObjectCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopedIndexFieldComponent;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchSucceedingCompatibilityChecker;
@@ -52,9 +52,11 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	private String analyzer;
 	private EnumSet<SimpleQueryFlag> flags;
 	private ElasticsearchCompatibilityChecker analyzerChecker = new ElasticsearchSucceedingCompatibilityChecker();
+	private ElasticsearchDifferentNestedObjectCompatibilityChecker nestedCompatibilityChecker;
 
 	ElasticsearchSimpleQueryStringPredicateBuilder(ElasticsearchScopeModel scopeModel) {
 		this.scopeModel = scopeModel;
+		this.nestedCompatibilityChecker = new ElasticsearchDifferentNestedObjectCompatibilityChecker( scopeModel );
 	}
 
 	@Override
@@ -82,6 +84,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 					absoluteFieldPath, ElasticsearchSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 			field = fieldComponent.getComponent().createSimpleQueryStringFieldContext( absoluteFieldPath );
 			analyzerChecker = analyzerChecker.combine( fieldComponent.getAnalyzerCompatibilityChecker() );
+			nestedCompatibilityChecker.combineAndCheck( absoluteFieldPath );
 			fields.put( absoluteFieldPath, field );
 		}
 		return field;
@@ -112,11 +115,8 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 		QUERY_ACCESSOR.set( innerObject, simpleQueryString );
 		DEFAULT_OPERATOR_ACCESSOR.set( innerObject, defaultOperator );
 
-		List<String> nestedPathHierarchy = null;
 		JsonArray fieldArray = new JsonArray();
 		for ( ElasticsearchSimpleQueryStringPredicateBuilderFieldState fieldContext : fields.values() ) {
-			// TODO: check if the fields belong **all** to the same nested object or to the root object.
-			nestedPathHierarchy = fieldContext.getNestedPathHierarchy( scopeModel );
 			fieldArray.add( fieldContext.build() );
 		}
 		FIELDS_ACCESSOR.set( innerObject, fieldArray );
@@ -138,8 +138,8 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 
 		SIMPLE_QUERY_STRING_ACCESSOR.set( outerObject, innerObject );
 
-		return ( nestedPathHierarchy == null || nestedPathHierarchy.isEmpty() ) ? outerObject :
-				AbstractElasticsearchSearchNestedPredicateBuilder.applyImplicitNested( outerObject, nestedPathHierarchy, context );
+		return ( nestedCompatibilityChecker.getNestedObjectPath().isEmpty() ) ? outerObject :
+				AbstractElasticsearchSearchNestedPredicateBuilder.applyImplicitNested( outerObject, nestedCompatibilityChecker.getNestedObjectPath(), context );
 	}
 
 	/**

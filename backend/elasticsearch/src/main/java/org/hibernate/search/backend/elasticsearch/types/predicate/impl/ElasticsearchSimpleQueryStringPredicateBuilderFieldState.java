@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
-import java.util.List;
-
-import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 
 import com.google.gson.JsonPrimitive;
@@ -35,9 +32,5 @@ public final class ElasticsearchSimpleQueryStringPredicateBuilderFieldState
 			sb.append( BOOST_OPERATOR ).append( boost );
 		}
 		return new JsonPrimitive( sb.toString() );
-	}
-
-	public List<String> getNestedPathHierarchy(ElasticsearchScopeModel scopeModel) {
-		return scopeModel.getNestedPathHierarchy( absoluteFieldPath );
 	}
 }
