@@ -31,7 +31,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingInd
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -132,7 +131,6 @@ public class ImplicitNestedSearchPredicateIT {
 		verify_implicit_nest( p -> p.wildcard().field( "nested.text" ).matching( SOME_WILDCARD_PATTERN ) );
 	}
 
-	@Ignore // TODO: support this
 	@Test
 	public void predicate_simpleQueryString() {
 		verify_implicit_nest( p -> p.simpleQueryString().field( "nested.text" ).matching( SOME_SIMPLE_QUERY_STRING ) );

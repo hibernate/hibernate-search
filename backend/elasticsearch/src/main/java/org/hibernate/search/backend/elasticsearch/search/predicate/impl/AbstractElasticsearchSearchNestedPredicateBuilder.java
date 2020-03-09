@@ -28,13 +28,16 @@ public abstract class AbstractElasticsearchSearchNestedPredicateBuilder extends 
 	public final JsonObject build(ElasticsearchSearchPredicateContext context) {
 		JsonObject result = super.build( context );
 		if ( nestedPathHierarchy != null && !nestedPathHierarchy.isEmpty() ) {
-			result = applyImplicitNested( result, new LinkedList<>( nestedPathHierarchy ), context );
+			result = applyImplicitNested( result, nestedPathHierarchy, context );
 		}
 		return result;
 	}
 
-	private JsonObject applyImplicitNested(JsonObject partialResult, List<String> nestedPathHierarchy,
-			ElasticsearchSearchPredicateContext context) {
+	public static JsonObject applyImplicitNested(JsonObject partialResult, List<String> nestedPathHierarchy, ElasticsearchSearchPredicateContext context) {
+		return applyImplicitNestedStep( partialResult, new LinkedList<>( nestedPathHierarchy ), context );
+	}
+
+	private static JsonObject applyImplicitNestedStep(JsonObject partialResult, List<String> nestedPathHierarchy, ElasticsearchSearchPredicateContext context) {
 		if ( nestedPathHierarchy.isEmpty() ) {
 			return partialResult;
 		}
@@ -48,7 +51,7 @@ public abstract class AbstractElasticsearchSearchNestedPredicateBuilder extends 
 		JsonObject innerObject = new JsonObject();
 
 		PATH_ACCESSOR.set( innerObject, lastPath );
-		QUERY_ACCESSOR.set( innerObject, applyImplicitNested( partialResult, nestedPathHierarchy, context ) );
+		QUERY_ACCESSOR.set( innerObject, applyImplicitNestedStep( partialResult, nestedPathHierarchy, context ) );
 
 		JsonObject outerObject = new JsonObject();
 		outerObject.add( "nested", innerObject );

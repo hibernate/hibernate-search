@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
@@ -111,8 +112,11 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 		QUERY_ACCESSOR.set( innerObject, simpleQueryString );
 		DEFAULT_OPERATOR_ACCESSOR.set( innerObject, defaultOperator );
 
+		List<String> nestedPathHierarchy = null;
 		JsonArray fieldArray = new JsonArray();
 		for ( ElasticsearchSimpleQueryStringPredicateBuilderFieldState fieldContext : fields.values() ) {
+			// TODO: check if the fields belong **all** to the same nested object or to the root object.
+			nestedPathHierarchy = fieldContext.getNestedPathHierarchy( scopeModel );
 			fieldArray.add( fieldContext.build() );
 		}
 		FIELDS_ACCESSOR.set( innerObject, fieldArray );
@@ -133,7 +137,9 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 		}
 
 		SIMPLE_QUERY_STRING_ACCESSOR.set( outerObject, innerObject );
-		return outerObject;
+
+		return ( nestedPathHierarchy == null || nestedPathHierarchy.isEmpty() ) ? outerObject :
+				AbstractElasticsearchSearchNestedPredicateBuilder.applyImplicitNested( outerObject, nestedPathHierarchy, context );
 	}
 
 	/**
