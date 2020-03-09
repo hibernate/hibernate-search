@@ -38,7 +38,6 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.SubTest;
-import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -120,100 +119,6 @@ public class SearchSortIT {
 			query = simpleQuery( b -> b.indexOrder() );
 			assertThat( query ).hasHitsExactOrder( firstCallHits );
 		}
-	}
-
-	@Test
-	public void byField_flattened() {
-		SearchQuery<DocumentReference> query;
-		query = simpleQuery( b -> b.field( "flattenedObject.string" )
-				.asc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.field( "flattenedObject.string" )
-				.desc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.field( "flattenedObject.integer" )
-				.asc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.field( "flattenedObject.integer" )
-				.desc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
-	}
-
-	@Test
-	@TestForIssue( jiraKey = "HSEARCH-2254" )
-	public void byField_nested() {
-		SearchQuery<DocumentReference> query;
-		query = simpleQuery( b -> b.field( "nestedObject.string" )
-				.asc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.string" )
-				.desc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.string" )
-				.asc().missing().first() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, FIRST_ID, SECOND_ID, THIRD_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.string" )
-				.desc().missing().first() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, THIRD_ID, SECOND_ID, FIRST_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.integer" )
-				.asc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.integer" )
-				.desc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.integer" )
-				.asc().missing().first() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, FIRST_ID, SECOND_ID, THIRD_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.integer" )
-				.desc().missing().first() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, THIRD_ID, SECOND_ID, FIRST_ID );
-	}
-
-	@Test
-	@TestForIssue( jiraKey = "HSEARCH-2254" )
-	public void byField_nested_x2() {
-		SearchQuery<DocumentReference> query;
-		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.string" )
-				.asc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.string" )
-				.desc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.string" )
-				.asc().missing().first() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, FIRST_ID, SECOND_ID, THIRD_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.string" )
-				.desc().missing().first() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, THIRD_ID, SECOND_ID, FIRST_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.integer" )
-				.asc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.integer" )
-				.desc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.integer" )
-				.asc().missing().first() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, FIRST_ID, SECOND_ID, THIRD_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.integer" )
-				.desc().missing().first() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, THIRD_ID, SECOND_ID, FIRST_ID );
 	}
 
 	@Test
