@@ -639,4 +639,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 98, value = "The lifecycle strategy cannot be set at the index level anymore."
 			+ " Set the schema management strategy via the property 'hibernate.search.schema_management.strategy' instead.")
 	SearchException lifecycleStrategyMovedToMapper();
+
+	@Message(id = ID_OFFSET_3 + 99, value = "Simple query string targets fields [%1$s, %3$s] spanning multiple nested paths: %2$s, %4$s.")
+	SearchException simpleQueryStringSpanningMultipleNestedPaths(String fieldPath1, String nestedPath1, String fieldPath2, String nestedPath2);
 }

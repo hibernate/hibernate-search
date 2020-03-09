@@ -27,8 +27,10 @@ import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -136,6 +138,18 @@ public class ImplicitNestedSearchPredicateIT {
 		verify_implicit_nest( p -> p.simpleQueryString().field( "nested.text" ).matching( SOME_SIMPLE_QUERY_STRING ) );
 	}
 
+	@Test
+	public void predicate_simpleQueryString_multipleNestedPaths() {
+		SubTest.expectException( () -> indexManager.createScope()
+				.predicate().simpleQueryString().field( "nested.text" ).field( "text" )
+		)
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining( "Simple query string targets fields" )
+				.hasMessageContaining( "spanning multiple nested paths" )
+				.hasMessageContaining( "nested.text" );
+	}
+
 	private void verify_implicit_nest(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> implicitPredicate) {
 		StubMappingScope scope = indexManager.createScope();
 		SearchPredicate explicitPredicate = scope.predicate().nested().objectField( "nested" ).nest( implicitPredicate ).toPredicate();
@@ -170,6 +184,8 @@ public class ImplicitNestedSearchPredicateIT {
 	}
 
 	private static class IndexMapping {
+		final IndexFieldReference<String> text;
+
 		final IndexObjectFieldReference nested;
 		final IndexFieldReference<String> nestedString;
 		final IndexFieldReference<Integer> nestedNumeric;
@@ -179,6 +195,8 @@ public class ImplicitNestedSearchPredicateIT {
 		final IndexFieldReference<Integer> nestedX2Numeric;
 
 		IndexMapping(IndexSchemaElement root) {
+			text = root.field( "text", f -> f.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ) ).toReference();
+
 			IndexSchemaObjectField nestedObject = root.objectField( "nested", ObjectFieldStorage.NESTED );
 			this.nested = nestedObject.toReference();
 			this.nestedString = nestedObject.field( "string", f -> f.asString().projectable( Projectable.YES ).sortable( Sortable.YES ) ).toReference();
