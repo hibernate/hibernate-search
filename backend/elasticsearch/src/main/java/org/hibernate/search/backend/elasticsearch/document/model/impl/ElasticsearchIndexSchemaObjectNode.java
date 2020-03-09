@@ -37,7 +37,7 @@ public class ElasticsearchIndexSchemaObjectNode {
 			boolean multiValued) {
 		this.parent = parent;
 		this.absolutePath = absolutePath;
-		this.nestedPathHierarchy = nestedPathHierarchy;
+		this.nestedPathHierarchy = Collections.unmodifiableList( nestedPathHierarchy );
 		this.storage = ObjectFieldStorage.DEFAULT.equals( storage ) ? ObjectFieldStorage.FLATTENED : storage;
 		this.multiValued = multiValued;
 	}
