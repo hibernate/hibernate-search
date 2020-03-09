@@ -7,10 +7,8 @@
 package org.hibernate.search.mapper.pojo.work.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Supplier;
@@ -68,10 +66,7 @@ public class PojoContainedTypeIndexingPlan<E> extends AbstractPojoTypeIndexingPl
 	}
 
 	void resolveDirty(PojoReindexingCollector containingEntityCollector) {
-		// We need to iterate on a "frozen snapshot" of the indexingPlansPerId values
-		// because of HSEARCH-3857
-		List<ContainedEntityIndexingPlan> frozenIndexingPlansPerId = new ArrayList<>( indexingPlansPerId.values() );
-		for ( ContainedEntityIndexingPlan plan : frozenIndexingPlansPerId ) {
+		for ( ContainedEntityIndexingPlan plan : indexingPlansPerId.values() ) {
 			plan.resolveDirty( containingEntityCollector );
 		}
 	}
