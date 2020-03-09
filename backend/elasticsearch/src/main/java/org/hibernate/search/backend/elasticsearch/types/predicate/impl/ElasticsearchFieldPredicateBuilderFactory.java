@@ -62,11 +62,11 @@ public interface ElasticsearchFieldPredicateBuilderFactory {
 	ElasticsearchSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldContext(String absoluteFieldPath);
 
 	SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
-			String absoluteFieldPath);
+			String absoluteFieldPath, List<String> nestedPathHierarchy);
 
 	SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
-			String absoluteFieldPath);
+			String absoluteFieldPath, List<String> nestedPathHierarchy);
 
 	SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
-			String absoluteFieldPath);
+			String absoluteFieldPath, List<String> nestedPathHierarchy);
 }

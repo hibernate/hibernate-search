@@ -70,23 +70,23 @@ public class ElasticsearchGeoPointFieldPredicateBuilderFactory
 
 	@Override
 	public SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
-			String absoluteFieldPath) {
+			String absoluteFieldPath, List<String> nestedPathHierarchy) {
 		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder( absoluteFieldPath, CODEC );
+		return new ElasticsearchGeoPointSpatialWithinCirclePredicateBuilder( absoluteFieldPath, nestedPathHierarchy, CODEC );
 	}
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
-			String absoluteFieldPath) {
+			String absoluteFieldPath, List<String> nestedPathHierarchy) {
 		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder( absoluteFieldPath );
+		return new ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder( absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
-			String absoluteFieldPath) {
+			String absoluteFieldPath, List<String> nestedPathHierarchy) {
 		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath, CODEC );
+		return new ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath, nestedPathHierarchy, CODEC );
 	}
 
 	private void checkSearchable(String absoluteFieldPath) {

@@ -151,7 +151,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 			String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createSpatialWithinCirclePredicateBuilder( absoluteFieldPath );
+				.getComponent().createSpatialWithinCirclePredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchy( absoluteFieldPath ) );
 	}
 
 	@Override
@@ -159,7 +159,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 			String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createSpatialWithinPolygonPredicateBuilder( absoluteFieldPath );
+				.getComponent().createSpatialWithinPolygonPredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchy( absoluteFieldPath ) );
 	}
 
 	@Override
@@ -167,7 +167,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 			String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath );
+				.getComponent().createSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchy( absoluteFieldPath ) );
 	}
 
 	@Override
