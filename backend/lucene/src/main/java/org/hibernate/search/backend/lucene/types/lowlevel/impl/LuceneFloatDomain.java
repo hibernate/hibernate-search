@@ -37,7 +37,7 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 
 	@Override
 	public Float getMinValue() {
-		return Float.MIN_VALUE;
+		return -Float.MAX_VALUE;
 	}
 
 	@Override

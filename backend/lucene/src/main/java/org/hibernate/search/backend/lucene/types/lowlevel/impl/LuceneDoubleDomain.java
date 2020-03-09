@@ -36,7 +36,7 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 
 	@Override
 	public Double getMinValue() {
-		return Double.MIN_VALUE;
+		return -Double.MAX_VALUE;
 	}
 
 	@Override
