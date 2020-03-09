@@ -40,6 +40,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.Expecta
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.InvalidType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
@@ -61,13 +62,15 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class FieldSearchSortBaseIT<F> {
 
-	@Parameterized.Parameters(name = "{0}")
+	@Parameterized.Parameters(name = "{0} - {1}")
 	public static Object[][] parameters() {
 		List<Object[]> parameters = new ArrayList<>();
 		for ( FieldTypeDescriptor<?> fieldTypeDescriptor : FieldTypeDescriptor.getAll() ) {
 			ExpectationsAlternative<?, ?> expectations = fieldTypeDescriptor.getFieldSortExpectations();
 			if ( expectations.isSupported() ) {
-				parameters.add( new Object[] { fieldTypeDescriptor } );
+				for ( IndexFieldStructure indexFieldStructure : IndexFieldStructure.values() ) {
+					parameters.add( new Object[] { indexFieldStructure, fieldTypeDescriptor } );
+				}
 			}
 		}
 		return parameters.toArray( new Object[0][] );
@@ -140,14 +143,16 @@ public class FieldSearchSortBaseIT<F> {
 		initData();
 	}
 
+	private final IndexFieldStructure indexFieldStructure;
 	private final FieldTypeDescriptor<F> fieldTypeDescriptor;
 
-	public FieldSearchSortBaseIT(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	public FieldSearchSortBaseIT(IndexFieldStructure indexFieldStructure, FieldTypeDescriptor<F> fieldTypeDescriptor) {
+		this.indexFieldStructure = indexFieldStructure;
 		this.fieldTypeDescriptor = fieldTypeDescriptor;
 	}
 
 	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3798")
+	@TestForIssue(jiraKey = { "HSEARCH-3798", "HSEARCH-2252", "HSEARCH-2254" })
 	public void simple() {
 		SearchQuery<DocumentReference> query;
 		String absoluteFieldPath = getFieldPath();
@@ -335,115 +340,6 @@ public class FieldSearchSortBaseIT<F> {
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY_1, DOCUMENT_3 );
 		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing()
 				.use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL ), ValueConvert.NO ) );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1 );
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3798")
-	public void inFlattenedObject() {
-		SearchQuery<DocumentReference> query;
-		String fieldPath = getFieldPathInObject( indexMapping.flattenedObject );
-
-		query = matchNonEmptyQuery( f -> f.field( fieldPath ) );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-
-		query = matchNonEmptyQuery( f -> f.field( fieldPath ).asc() );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-
-		query = matchNonEmptyQuery( f -> f.field( fieldPath ).desc() );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
-	}
-
-	@Test
-	public void inFlattenedObject_missingValue() {
-		SearchQuery<DocumentReference> query;
-		String fieldPath = getFieldPathInObject( indexMapping.flattenedObject );
-
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).missing().last() );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1 );
-
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing().last() );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1 );
-
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).desc().missing().last() );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1, EMPTY_1 );
-
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing().first() );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_1, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).desc().missing().first() );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_1, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-3798")
-	public void inNestedObject() {
-		SearchQuery<DocumentReference> query;
-		String fieldPath = getFieldPathInObject( indexMapping.nestedObject );
-
-		query = matchNonEmptyQuery( f -> f.field( fieldPath ) );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-
-		query = matchNonEmptyQuery( f -> f.field( fieldPath ).asc() );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-
-		query = matchNonEmptyQuery( f -> f.field( fieldPath ).desc() );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
-	}
-
-	@Test
-	@TestForIssue(jiraKey = "HSEARCH-2254")
-	public void inNestedObject_missingValue() {
-		SearchQuery<DocumentReference> query;
-		String fieldPath = getFieldPathInObject( indexMapping.nestedObject );
-
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).missing().last() );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1 );
-
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing().last() );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1 );
-
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).desc().missing().last() );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1, EMPTY_1 );
-
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing().first() );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_1, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).desc().missing().first() );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_1, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
-
-		// Explicit order with onMissingValue().use( ... )
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ) );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_1, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL ) ) );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY_1, DOCUMENT_2, DOCUMENT_3 );
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL ) ) );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY_1, DOCUMENT_3 );
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing()
-				.use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL ) ) );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1 );
 	}
@@ -655,22 +551,40 @@ public class FieldSearchSortBaseIT<F> {
 	}
 
 	private String getFieldPath() {
-		return indexMapping.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
+		return getAbsoluteFieldPath( objectMapping -> objectMapping.fieldModels );
 	}
 
 	private String getFieldWithDslConverterPath() {
-		return indexMapping.fieldWithDslConverterModels.get( fieldTypeDescriptor ).relativeFieldName;
+		return getAbsoluteFieldPath( objectMapping -> objectMapping.fieldWithDslConverterModels );
 	}
 
 	private String getNonSortableFieldPath() {
-		return indexMapping.nonSortableFieldModels.get( fieldTypeDescriptor ).relativeFieldName;
+		return getAbsoluteFieldPath( objectMapping -> objectMapping.nonSortableFieldModels );
 	}
 
-	private String getFieldPathInObject(ObjectMapping objectMapping) {
-		return objectMapping.relativeFieldName + "." + objectMapping.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
+	private String getAbsoluteFieldPath(Function<AbstractObjectMapping, FieldModelsByType> fieldModels) {
+		switch ( indexFieldStructure ) {
+			case ROOT:
+				return fieldModels.apply( indexMapping ).get( fieldTypeDescriptor ).relativeFieldName;
+			case IN_FLATTENED:
+				return indexMapping.flattenedObject.relativeFieldName
+						+ "." + fieldModels.apply( indexMapping.flattenedObject )
+								.get( fieldTypeDescriptor ).relativeFieldName;
+			case IN_NESTED:
+				return indexMapping.nestedObject.relativeFieldName
+						+ "." + fieldModels.apply( indexMapping.nestedObject )
+								.get( fieldTypeDescriptor ).relativeFieldName;
+			case IN_NESTED_TWICE:
+				return indexMapping.nestedObject.relativeFieldName
+						+ "." + indexMapping.nestedObject.nestedObject.relativeFieldName
+						+ "." + fieldModels.apply( indexMapping.nestedObject.nestedObject )
+								.get( fieldTypeDescriptor ).relativeFieldName;
+			default:
+				throw new IllegalStateException( "Unexpected value: " + indexFieldStructure );
+		}
 	}
 
-	private static void initDocument(DocumentElement document, int ordinal) {
+	private static void initDocument(IndexMapping indexMapping, DocumentElement document, Integer ordinal) {
 		forEachSupportedTypeDescriptor( typeDescriptor -> {
 			addValue( document, indexMapping.fieldModels, typeDescriptor, ordinal );
 			addValue( document, indexMapping.fieldWithDslConverterModels, typeDescriptor, ordinal );
@@ -679,10 +593,15 @@ public class FieldSearchSortBaseIT<F> {
 		// Note: these objects must be single-valued for these tests
 		DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
 		DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
+		DocumentElement nestedObjectInNestedObject = nestedObject.addObject( indexMapping.nestedObject.nestedObject.self );
 
 		forEachSupportedTypeDescriptor( typeDescriptor -> {
 			addValue( flattenedObject, indexMapping.flattenedObject.fieldModels, typeDescriptor, ordinal );
+			addValue( flattenedObject, indexMapping.flattenedObject.fieldWithDslConverterModels, typeDescriptor, ordinal );
 			addValue( nestedObject, indexMapping.nestedObject.fieldModels, typeDescriptor, ordinal );
+			addValue( nestedObject, indexMapping.nestedObject.fieldWithDslConverterModels, typeDescriptor, ordinal );
+			addValue( nestedObjectInNestedObject, indexMapping.nestedObject.nestedObject.fieldModels, typeDescriptor, ordinal );
+			addValue( nestedObjectInNestedObject, indexMapping.nestedObject.nestedObject.fieldWithDslConverterModels, typeDescriptor, ordinal );
 		} );
 	}
 
@@ -701,7 +620,10 @@ public class FieldSearchSortBaseIT<F> {
 	}
 
 	private static <F> void addValue(DocumentElement documentElement,
-			FieldModelsByType fieldModels, FieldTypeDescriptor<F> typeDescriptor, int ordinal) {
+			FieldModelsByType fieldModels, FieldTypeDescriptor<F> typeDescriptor, Integer ordinal) {
+		if ( ordinal == null ) {
+			return;
+		}
 		documentElement.addValue(
 				fieldModels.get( typeDescriptor ).reference,
 				typeDescriptor.getAscendingUniqueTermValues().get( ordinal )
@@ -711,31 +633,30 @@ public class FieldSearchSortBaseIT<F> {
 	private static void initData() {
 		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		// Important: do not index the documents in the expected order after sorts (1, 2, 3)
-		plan.add( referenceProvider( EMPTY_4 ), document -> { } );
-		plan.add( referenceProvider( DOCUMENT_2 ), document -> initDocument( document, DOCUMENT_2_ORDINAL ) );
-		plan.add( referenceProvider( EMPTY_1 ), document -> { } );
-		plan.add( referenceProvider( DOCUMENT_1 ), document -> initDocument( document, DOCUMENT_1_ORDINAL ) );
-		plan.add( referenceProvider( EMPTY_2 ), document -> { } );
-		plan.add( referenceProvider( DOCUMENT_3 ), document -> initDocument( document, DOCUMENT_3_ORDINAL ) );
-		plan.add( referenceProvider( EMPTY_3 ), document -> { } );
+		plan.add( referenceProvider( EMPTY_4 ),
+				document -> initDocument( indexMapping, document, null ) );
+		plan.add( referenceProvider( DOCUMENT_2 ),
+				document -> initDocument( indexMapping, document, DOCUMENT_2_ORDINAL ) );
+		plan.add( referenceProvider( EMPTY_1 ),
+				document -> initDocument( indexMapping, document, null ) );
+		plan.add( referenceProvider( DOCUMENT_1 ),
+				document -> initDocument( indexMapping, document, DOCUMENT_1_ORDINAL ) );
+		plan.add( referenceProvider( EMPTY_2 ),
+				document -> initDocument( indexMapping, document, null ) );
+		plan.add( referenceProvider( DOCUMENT_3 ),
+				document -> initDocument( indexMapping, document, DOCUMENT_3_ORDINAL ) );
+		plan.add( referenceProvider( EMPTY_3 ),
+				document -> initDocument( indexMapping, document, null ) );
 		plan.execute().join();
 
 		plan = compatibleIndexManager.createIndexingPlan();
-		plan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			forEachSupportedTypeDescriptor( typeDescriptor -> {
-				addValue( document, compatibleIndexMapping.fieldModels, typeDescriptor, DOCUMENT_1_ORDINAL );
-				addValue( document, compatibleIndexMapping.fieldWithDslConverterModels, typeDescriptor, DOCUMENT_1_ORDINAL );
-			} );
-		} );
+		plan.add( referenceProvider( COMPATIBLE_INDEX_DOCUMENT_1 ),
+				document -> initDocument( compatibleIndexMapping, document, DOCUMENT_1_ORDINAL ) );
 		plan.execute().join();
 
 		plan = rawFieldCompatibleIndexManager.createIndexingPlan();
-		plan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ), document -> {
-			forEachSupportedTypeDescriptor( typeDescriptor -> {
-				addValue( document, rawFieldCompatibleIndexMapping.fieldModels, typeDescriptor, DOCUMENT_1_ORDINAL );
-				addValue( document, compatibleIndexMapping.fieldWithDslConverterModels, typeDescriptor, DOCUMENT_1_ORDINAL );
-			} );
-		} );
+		plan.add( referenceProvider( RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 ),
+				document -> initDocument( rawFieldCompatibleIndexMapping, document, DOCUMENT_1_ORDINAL ) );
 		plan.execute().join();
 
 		// Check that all documents are searchable
@@ -760,54 +681,96 @@ public class FieldSearchSortBaseIT<F> {
 				.forEach( action );
 	}
 
-	private static class IndexMapping {
+	private static class AbstractObjectMapping {
 		final FieldModelsByType fieldModels;
 		final FieldModelsByType fieldWithDslConverterModels;
 		final FieldModelsByType nonSortableFieldModels;
 
-		final ObjectMapping flattenedObject;
-		final ObjectMapping nestedObject;
-
-		IndexMapping(IndexSchemaElement root) {
-			fieldModels = FieldModelsByType.mapSupported( root, "", ignored -> { } );
+		AbstractObjectMapping(IndexSchemaElement self,
+				Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
+			fieldModels = FieldModelsByType.mapSupported( self, "", additionalConfiguration );
 			fieldWithDslConverterModels = FieldModelsByType.mapSupported(
-					root, "converted_", c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
+					self, "converted_",
+					additionalConfiguration.andThen(
+							c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
+					)
 			);
 			nonSortableFieldModels = FieldModelsByType.mapSupported(
-					root, "nonSortable_", c -> c.sortable( Sortable.NO )
+					self, "nonSortable_",
+					additionalConfiguration.andThen( c -> c.sortable( Sortable.NO ) )
 			);
-
-			flattenedObject = new ObjectMapping( root, "flattenedObject", ObjectFieldStorage.FLATTENED );
-			nestedObject = new ObjectMapping( root, "nestedObject", ObjectFieldStorage.NESTED );
 		}
 	}
 
-	private static class ObjectMapping {
+	private static class IndexMapping extends AbstractObjectMapping {
+		final FirstLevelObjectMapping flattenedObject;
+		final FirstLevelObjectMapping nestedObject;
+
+		IndexMapping(IndexSchemaElement root) {
+			this( root, ignored -> { } );
+		}
+
+		IndexMapping(IndexSchemaElement root,
+				Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
+			super( root, additionalConfiguration );
+
+			flattenedObject = FirstLevelObjectMapping.create( root, "flattenedObject",
+					ObjectFieldStorage.FLATTENED, additionalConfiguration );
+			nestedObject = FirstLevelObjectMapping.create( root, "nestedObject",
+					ObjectFieldStorage.NESTED, additionalConfiguration );
+		}
+	}
+
+	private static class FirstLevelObjectMapping extends AbstractObjectMapping {
 		final String relativeFieldName;
 		final IndexObjectFieldReference self;
-		final FieldModelsByType fieldModels;
 
-		ObjectMapping(IndexSchemaElement parent, String relativeFieldName, ObjectFieldStorage storage) {
-			this.relativeFieldName = relativeFieldName;
+		final SecondLevelObjectMapping nestedObject;
+
+		public static FirstLevelObjectMapping create(IndexSchemaElement parent, String relativeFieldName,
+				ObjectFieldStorage storage,
+				Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
+			return new FirstLevelObjectMapping( relativeFieldName, objectField, additionalConfiguration );
+		}
+
+		private FirstLevelObjectMapping(String relativeFieldName, IndexSchemaObjectField objectField,
+				Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
+			super( objectField, additionalConfiguration );
+			this.relativeFieldName = relativeFieldName;
 			self = objectField.toReference();
-			fieldModels = FieldModelsByType.mapSupported(
-					objectField, "", ignored -> { }
-			);
+
+			nestedObject = SecondLevelObjectMapping.create( objectField, "nestedObject",
+					ObjectFieldStorage.NESTED, additionalConfiguration );
 		}
 	}
 
-	private static class RawFieldCompatibleIndexMapping {
-		FieldModelsByType fieldModels;
+	private static class SecondLevelObjectMapping extends AbstractObjectMapping {
+		final String relativeFieldName;
+		final IndexObjectFieldReference self;
 
+		public static SecondLevelObjectMapping create(IndexSchemaElement parent, String relativeFieldName,
+				ObjectFieldStorage storage,
+				Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
+			return new SecondLevelObjectMapping( relativeFieldName, objectField, additionalConfiguration );
+		}
+
+		private SecondLevelObjectMapping(String relativeFieldName, IndexSchemaObjectField objectField,
+				Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
+			super( objectField, additionalConfiguration );
+			this.relativeFieldName = relativeFieldName;
+			self = objectField.toReference();
+		}
+	}
+
+	private static class RawFieldCompatibleIndexMapping extends IndexMapping {
 		RawFieldCompatibleIndexMapping(IndexSchemaElement root) {
 			/*
 			 * Add fields with the same name as the fieldModels from IndexMapping,
 			 * but with an incompatible DSL converter.
 			 */
-			fieldModels = FieldModelsByType.mapSupported(
-					root, "", c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
-			);
+			super( root, c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() ) );
 		}
 	}
 
@@ -817,6 +780,25 @@ public class FieldSearchSortBaseIT<F> {
 			 * Add fields with the same name as the supportedFieldModels from IndexMapping,
 			 * but with an incompatible type.
 			 */
+			mapFieldsWithIncompatibleType( root );
+
+			IndexSchemaObjectField nestedObject =
+					root.objectField( "nestedObject", ObjectFieldStorage.NESTED );
+			nestedObject.toReference();
+			mapFieldsWithIncompatibleType( nestedObject );
+
+			IndexSchemaObjectField flattenedObject =
+					root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED );
+			flattenedObject.toReference();
+			mapFieldsWithIncompatibleType( flattenedObject );
+
+			IndexSchemaObjectField nestedObjectInNestedObject =
+					nestedObject.objectField( "nestedObject", ObjectFieldStorage.NESTED );
+			nestedObjectInNestedObject.toReference();
+			mapFieldsWithIncompatibleType( nestedObjectInNestedObject );
+		}
+
+		private static void mapFieldsWithIncompatibleType(IndexSchemaElement parent) {
 			forEachSupportedTypeDescriptor( typeDescriptor -> {
 				StandardFieldMapper<?, IncompatibleFieldModel> mapper;
 				if ( Integer.class.equals( typeDescriptor.getJavaType() ) ) {
@@ -825,7 +807,7 @@ public class FieldSearchSortBaseIT<F> {
 				else {
 					mapper = IncompatibleFieldModel.mapper( context -> context.asInteger() );
 				}
-				mapper.map( root, "" + typeDescriptor.getUniqueName() );
+				mapper.map( parent, "" + typeDescriptor.getUniqueName() );
 			} );
 		}
 	}
@@ -885,4 +867,5 @@ public class FieldSearchSortBaseIT<F> {
 			this.relativeFieldName = relativeFieldName;
 		}
 	}
+
 }
