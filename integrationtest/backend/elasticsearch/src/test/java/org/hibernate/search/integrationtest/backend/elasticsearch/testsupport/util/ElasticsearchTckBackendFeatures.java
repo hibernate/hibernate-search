@@ -29,7 +29,7 @@ class ElasticsearchTckBackendFeatures extends TckBackendFeatures {
 	}
 
 	@Override
-	public boolean normalizeStringMissingValues() {
+	public boolean normalizesStringMissingValues() {
 		// TODO HSEARCH-3387 Elasticsearch does not apply the normalizer defined on the field
 		//   to the String provided as replacement for missing values on sorting
 		return false;

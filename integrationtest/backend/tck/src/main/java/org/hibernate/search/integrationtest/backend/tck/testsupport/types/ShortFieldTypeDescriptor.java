@@ -12,7 +12,6 @@ import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -66,14 +65,6 @@ public class ShortFieldTypeDescriptor extends FieldTypeDescriptor<Short> {
 		return new ExistsPredicateExpectations<>(
 				(short) 0, (short) 67
 		);
-	}
-
-	@Override
-	public Optional<FieldSortExpectations<Short>> getFieldSortExpectations() {
-		return Optional.of( new FieldSortExpectations<>(
-				(short) 1, (short) 3, (short) 5,
-				Short.MIN_VALUE, (short) 2, (short) 4, Short.MAX_VALUE
-		) );
 	}
 
 	@Override
