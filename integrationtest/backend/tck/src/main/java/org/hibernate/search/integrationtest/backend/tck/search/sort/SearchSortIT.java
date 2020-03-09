@@ -48,7 +48,7 @@ import org.junit.rules.ExpectedException;
 import org.assertj.core.api.Assertions;
 
 /**
- * Generic tests for sorts. More specific tests can be found in other classes, such as {@link FieldSearchSortIT}.
+ * Generic tests for sorts. More specific tests can be found in other classes, such as {@link FieldSearchSortBaseIT}.
  */
 public class SearchSortIT {
 

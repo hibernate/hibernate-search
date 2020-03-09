@@ -15,7 +15,6 @@ import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -78,21 +77,6 @@ public class InstantFieldTypeDescriptor extends FieldTypeDescriptor<Instant> {
 		return new ExistsPredicateExpectations<>(
 				Instant.EPOCH, Instant.parse( "2018-02-01T10:15:30.00Z" )
 		);
-	}
-
-	@Override
-	public Optional<FieldSortExpectations<Instant>> getFieldSortExpectations() {
-		return Optional.of( new FieldSortExpectations<>(
-				// Indexed
-				Instant.parse( "2018-02-01T10:15:30.00Z" ),
-				Instant.parse( "2018-03-01T10:15:30.00Z" ),
-				Instant.parse( "2018-04-01T10:15:30.00Z" ),
-				// Values around what is indexed
-				Instant.parse( "2018-01-01T10:15:30.00Z" ),
-				Instant.parse( "2018-02-15T10:15:30.00Z" ),
-				Instant.parse( "2018-03-15T10:15:30.00Z" ),
-				Instant.parse( "2018-05-01T10:15:30.00Z" )
-		) );
 	}
 
 	@Override

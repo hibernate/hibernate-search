@@ -13,7 +13,6 @@ import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -95,21 +94,6 @@ public class LocalDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalD
 				LocalDateTime.of( 1970, 1, 1, 0, 0, 0 ),
 				LocalDateTime.of( 1984, 10, 7, 12, 14, 52 )
 		);
-	}
-
-	@Override
-	public Optional<FieldSortExpectations<LocalDateTime>> getFieldSortExpectations() {
-		return Optional.of( new FieldSortExpectations<>(
-				// Indexed
-				LocalDateTime.of( 2018, 2, 1, 14, 0 ),
-				LocalDateTime.of( 2018, 3, 1, 3, 0, 3 ),
-				LocalDateTime.of( 2018, 4, 1, 0, 0 ),
-				// Values around what is indexed
-				LocalDateTime.of( 2018, 1, 1, 16, 2, 2 ),
-				LocalDateTime.of( 2018, 2, 1, 14, 0, 1 ),
-				LocalDateTime.of( 2018, 3, 15, 14, 10, 10 ),
-				LocalDateTime.of( 2018, 5, 1, 9, 18 )
-		) );
 	}
 
 	@Override

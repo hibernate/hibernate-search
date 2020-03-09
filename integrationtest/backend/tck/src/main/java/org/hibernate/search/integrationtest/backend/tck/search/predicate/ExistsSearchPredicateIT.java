@@ -488,7 +488,7 @@ public class ExistsSearchPredicateIT {
 			// Safe, see forEachTypeDescriptor
 			MatchPredicateExpectations<?> expectations = typeDescriptor.getMatchPredicateExpectations().get();
 			// Ignore non-sortable fields
-			if ( typeDescriptor.getFieldSortExpectations().isPresent() ) {
+			if ( typeDescriptor.getFieldSortExpectations().isSupported() ) {
 				ByTypeFieldModel<?> fieldModel = ByTypeFieldModel.mapper( typeDescriptor )
 						.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration );
 				consumer.accept( typeDescriptor, expectations, fieldModel );

@@ -12,7 +12,6 @@ import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -66,14 +65,6 @@ public class IntegerFieldTypeDescriptor extends FieldTypeDescriptor<Integer> {
 		return new ExistsPredicateExpectations<>(
 				0, 12
 		);
-	}
-
-	@Override
-	public Optional<FieldSortExpectations<Integer>> getFieldSortExpectations() {
-		return Optional.of( new FieldSortExpectations<>(
-				1, 3, 5,
-				Integer.MIN_VALUE, 2, 4, Integer.MAX_VALUE
-		) );
 	}
 
 	@Override

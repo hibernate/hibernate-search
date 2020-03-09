@@ -13,7 +13,6 @@ import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -86,16 +85,6 @@ public class YearFieldTypeDescriptor extends FieldTypeDescriptor<Year> {
 		return new ExistsPredicateExpectations<>(
 				Year.of( 1980 ), Year.of( 4302 )
 		);
-	}
-
-	@Override
-	public Optional<FieldSortExpectations<Year>> getFieldSortExpectations() {
-		return Optional.of( new FieldSortExpectations<>(
-				// Indexed
-				Year.of( 1980 ), Year.of( 1982 ), Year.of( 1984 ),
-				// Values around what is indexed
-				Year.of( -340 ), Year.of( 1981 ), Year.of( 1983 ), Year.of( 3000 )
-		) );
 	}
 
 	@Override
