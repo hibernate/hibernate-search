@@ -16,6 +16,7 @@ import java.util.function.Function;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.collector.impl.FacetsCollectorFactory;
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationExtractContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
@@ -30,7 +31,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
-import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 
 /**
  * @param <F> The type of field values.
@@ -46,7 +46,6 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 	private final String nestedDocumentPath;
 	private final String absoluteFieldPath;
 
-	protected NestedDocsProvider nestedDocsProvider;
 	private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
 	private final List<Range<K>> rangesInOrder;
@@ -64,9 +63,6 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 	@Override
 	public void request(AggregationRequestContext context) {
 		context.requireCollector( FacetsCollectorFactory.INSTANCE );
-		if ( nestedDocumentPath != null ) {
-			this.nestedDocsProvider = new NestedDocsProvider( nestedDocumentPath, context.getLuceneQuery() );
-		}
 	}
 
 	@Override
@@ -74,6 +70,11 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		LuceneNumericDomain<E> numericDomain = codec.getDomain();
 
 		FacetsCollector facetsCollector = context.getCollector( FacetsCollectorFactory.KEY );
+
+		NestedDocsProvider nestedDocsProvider = null;
+		if ( nestedDocumentPath != null ) {
+			nestedDocsProvider = context.createNestedDocsProvider( nestedDocumentPath );
+		}
 
 		Facets facetsCount = numericDomain.createRangeFacetCounts(
 				absoluteFieldPath, facetsCollector, encodedRangesInOrder,

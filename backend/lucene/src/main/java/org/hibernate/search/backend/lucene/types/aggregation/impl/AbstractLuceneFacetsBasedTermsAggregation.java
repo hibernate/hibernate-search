@@ -45,7 +45,6 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 	private final BucketOrder order;
 	private final int maxTermCount;
 	private final int minDocCount;
-	protected NestedDocsProvider nestedDocsProvider;
 
 	AbstractLuceneFacetsBasedTermsAggregation(AbstractBuilder<F, T, K> builder) {
 		super( builder );
@@ -60,9 +59,6 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 	@Override
 	public void request(AggregationRequestContext context) {
 		context.requireCollector( FacetsCollectorFactory.INSTANCE );
-		if ( nestedDocumentPath != null ) {
-			this.nestedDocsProvider = new NestedDocsProvider( nestedDocumentPath, context.getLuceneQuery() );
-		}
 	}
 
 	@Override
@@ -116,8 +112,8 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		return toMap( convertContext, buckets );
 	}
 
-	abstract FacetResult getTopChildren(IndexReader reader,
-			FacetsCollector facetsCollector, int limit) throws IOException;
+	abstract FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector,
+			NestedDocsProvider nestedDocsProvider, int limit) throws IOException;
 
 	abstract Set<T> collectFirstTerms(IndexReader reader, boolean descending, int limit)
 			throws IOException;
@@ -131,6 +127,11 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 	private List<Bucket<T>> getTopBuckets(AggregationExtractContext context) throws IOException {
 		FacetsCollector facetsCollector = context.getCollector( FacetsCollectorFactory.KEY );
 
+		NestedDocsProvider nestedDocsProvider = null;
+		if ( nestedDocumentPath != null ) {
+			nestedDocsProvider = context.createNestedDocsProvider( nestedDocumentPath );
+		}
+
 		/*
 		 * TODO HSEARCH-3666 What if the sort order is by term value?
 		 *  Lucene returns facets in descending count order.
@@ -142,7 +143,7 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		 *  To improve on this, we would need to re-implement the facet collections.
 		 */
 		int limit = maxTermCount;
-		FacetResult facetResult = getTopChildren( context.getIndexReader(), facetsCollector, limit );
+		FacetResult facetResult = getTopChildren( context.getIndexReader(), facetsCollector, nestedDocsProvider, limit );
 
 		List<Bucket<T>> buckets = new ArrayList<>();
 
