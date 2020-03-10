@@ -16,6 +16,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 
 public class ShortFieldTypeDescriptor extends FieldTypeDescriptor<Short> {
 
@@ -24,17 +25,39 @@ public class ShortFieldTypeDescriptor extends FieldTypeDescriptor<Short> {
 	}
 
 	@Override
-	public List<Short> getAscendingUniqueTermValues() {
-		return Arrays.asList(
-				Short.MIN_VALUE,
-				(short) -25435,
-				(short) 0,
-				(short) 42,
-				(short) 55,
-				(short) 2500,
-				(short) 18353,
-				Short.MAX_VALUE
-		);
+	protected AscendingUniqueTermValues<Short> createAscendingUniqueTermValues() {
+		return new AscendingUniqueTermValues<Short>() {
+			@Override
+			protected List<Short> createSingle() {
+				return Arrays.asList(
+						(short) ( Short.MIN_VALUE + 50 ),
+						(short) -25435,
+						(short) 0,
+						(short) 42,
+						(short) 55,
+						(short) 2500,
+						(short) 18353,
+						(short) ( Short.MAX_VALUE - 50 )
+				);
+			}
+
+			@Override
+			protected Short delta(int multiplierForDelta) {
+				return toShortExact( 10 * multiplierForDelta );
+			}
+
+			@Override
+			protected Short applyDelta(Short value, int multiplierForDelta) {
+				return toShortExact( value + delta( multiplierForDelta ) );
+			}
+
+			private short toShortExact(int value) {
+				if ( value < Short.MIN_VALUE || Short.MAX_VALUE < value ) {
+					throw new IllegalStateException( "Test dataset contains an out-of-bound value for short: " + value );
+				}
+				return (short) value;
+			}
+		};
 	}
 
 	@Override

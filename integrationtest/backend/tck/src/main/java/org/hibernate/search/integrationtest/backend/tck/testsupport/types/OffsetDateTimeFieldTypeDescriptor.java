@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 
 public class OffsetDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<OffsetDateTime> {
 
@@ -46,19 +48,34 @@ public class OffsetDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<Offse
 	}
 
 	@Override
-	public List<OffsetDateTime> getAscendingUniqueTermValues() {
+	protected AscendingUniqueTermValues<OffsetDateTime> createAscendingUniqueTermValues() {
 		// Remember: we only get millisecond precision for predicates/sorts/aggregations/etc.
-		return Arrays.asList(
-				LocalDateTime.of( 2018, 1, 1, 12, 58, 30, 0 ).atOffset( ZoneOffset.ofHours( 2 ) ),
-				LocalDateTime.of( 2018, 2, 1, 8, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( -2 ) ),
-				LocalDateTime.of( 2018, 2, 1, 2, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( -10 ) ),
-				LocalDateTime.of( 2018, 2, 15, 20, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( 10 ) ),
-				LocalDateTime.of( 2018, 3, 1, 8, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( 0 ) ),
-				LocalDateTime.of( 2018, 3, 1, 12, 15, 32, 0 ).atOffset( ZoneOffset.ofHours( 4 ) ),
-				LocalDateTime.of( 2018, 3, 15, 9, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( 0 ) ),
-				LocalDateTime.of( 2018, 3, 15, 11, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( 1 ) ),
-				LocalDateTime.of( 2018, 4, 1, 10, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( 0 ) )
-		);
+		return new AscendingUniqueTermValues<OffsetDateTime>() {
+			@Override
+			protected List<OffsetDateTime> createSingle() {
+				return Arrays.asList(
+						LocalDateTime.of( 2018, 1, 1, 12, 58, 30, 0 ).atOffset( ZoneOffset.ofHours( 2 ) ),
+						LocalDateTime.of( 2018, 2, 1, 8, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( -2 ) ),
+						LocalDateTime.of( 2018, 2, 1, 2, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( -10 ) ),
+						LocalDateTime.of( 2018, 2, 15, 20, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( 10 ) ),
+						LocalDateTime.of( 2018, 3, 1, 8, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( 0 ) ),
+						LocalDateTime.of( 2018, 3, 1, 12, 15, 32, 0 ).atOffset( ZoneOffset.ofHours( 4 ) ),
+						LocalDateTime.of( 2018, 3, 15, 9, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( 0 ) ),
+						LocalDateTime.of( 2018, 3, 15, 11, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( 1 ) ),
+						LocalDateTime.of( 2018, 4, 1, 10, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( 0 ) )
+				);
+			}
+
+			@Override
+			protected List<List<OffsetDateTime>> createMultiResultingInSingleAfterSum() {
+				return valuesThatWontBeUsed();
+			}
+
+			@Override
+			protected OffsetDateTime applyDelta(OffsetDateTime value, int multiplierForDelta) {
+				return value.plus( multiplierForDelta, ChronoUnit.DAYS );
+			}
+		};
 	}
 
 	@Override

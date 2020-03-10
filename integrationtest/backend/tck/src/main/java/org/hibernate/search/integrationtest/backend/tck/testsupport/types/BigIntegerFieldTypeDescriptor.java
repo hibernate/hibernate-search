@@ -19,6 +19,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 
 public class BigIntegerFieldTypeDescriptor extends FieldTypeDescriptor<BigInteger> {
 
@@ -34,18 +35,33 @@ public class BigIntegerFieldTypeDescriptor extends FieldTypeDescriptor<BigIntege
 	}
 
 	@Override
-	public List<BigInteger> getAscendingUniqueTermValues() {
-		// Remember: scale is -2, so the last two digits are dropped for predicates/sorts/aggregations/etc.
-		return Arrays.asList(
-				new BigInteger( "-4200" ),
-				new BigInteger( "-200" ),
-				BigInteger.ZERO,
-				BigInteger.valueOf( 4200 ),
-				BigInteger.valueOf( 7800 ),
-				BigInteger.valueOf( 154800 ),
-				BigInteger.valueOf( 151_484_200L ),
-				BigInteger.valueOf( 151_484_254_000L )
-		);
+	protected AscendingUniqueTermValues<BigInteger> createAscendingUniqueTermValues() {
+		return new AscendingUniqueTermValues<BigInteger>() {
+			@Override
+			public List<BigInteger> createSingle() {
+				// Remember: scale is -2, so the last two digits are dropped for predicates/sorts/aggregations/etc.
+				return Arrays.asList(
+						new BigInteger( "-4200" ),
+						new BigInteger( "-200" ),
+						BigInteger.ZERO,
+						BigInteger.valueOf( 4200 ),
+						BigInteger.valueOf( 7800 ),
+						BigInteger.valueOf( 154800 ),
+						BigInteger.valueOf( 151_484_200L ),
+						BigInteger.valueOf( 151_484_254_000L )
+				);
+			}
+
+			@Override
+			protected BigInteger delta(int multiplierForDelta) {
+				return new BigInteger( "4242" ).multiply( BigInteger.valueOf( multiplierForDelta ) );
+			}
+
+			@Override
+			protected BigInteger applyDelta(BigInteger value, int multiplierForDelta) {
+				return value.add( delta( multiplierForDelta ) );
+			}
+		};
 	}
 
 	@Override

@@ -16,6 +16,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 
 public class IntegerFieldTypeDescriptor extends FieldTypeDescriptor<Integer> {
 
@@ -24,17 +25,32 @@ public class IntegerFieldTypeDescriptor extends FieldTypeDescriptor<Integer> {
 	}
 
 	@Override
-	public List<Integer> getAscendingUniqueTermValues() {
-		return Arrays.asList(
-				Integer.MIN_VALUE,
-				-251_484_254,
-				0,
-				42,
-				55,
-				2500,
-				151_484_254,
-				Integer.MAX_VALUE
-		);
+	protected AscendingUniqueTermValues<Integer> createAscendingUniqueTermValues() {
+		return new AscendingUniqueTermValues<Integer>() {
+			@Override
+			protected List<Integer> createSingle() {
+				return Arrays.asList(
+						Integer.MIN_VALUE,
+						-251_484_254,
+						0,
+						42,
+						55,
+						2500,
+						151_484_254,
+						Integer.MAX_VALUE
+				);
+			}
+
+			@Override
+			protected Integer delta(int multiplierForDelta) {
+				return 4245 * multiplierForDelta;
+			}
+
+			@Override
+			protected Integer applyDelta(Integer value, int multiplierForDelta) {
+				return value + delta( multiplierForDelta );
+			}
+		};
 	}
 
 	@Override

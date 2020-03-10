@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
-import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.engine.spatial.GeoPoint;
@@ -16,6 +15,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
 
 public class GeoPointFieldTypeDescriptor extends FieldTypeDescriptor<GeoPoint> {
@@ -25,8 +25,8 @@ public class GeoPointFieldTypeDescriptor extends FieldTypeDescriptor<GeoPoint> {
 	}
 
 	@Override
-	public List<GeoPoint> getAscendingUniqueTermValues() {
-		throw new UnsupportedOperationException( "Value lookup isn't supported for GeoPoint." );
+	protected AscendingUniqueTermValues<GeoPoint> createAscendingUniqueTermValues() {
+		return null; // Value lookup is not supported
 	}
 
 	@Override

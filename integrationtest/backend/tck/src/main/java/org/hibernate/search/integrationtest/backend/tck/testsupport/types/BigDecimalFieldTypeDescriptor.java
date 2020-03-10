@@ -20,6 +20,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 
 public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecimal> {
 
@@ -35,18 +36,33 @@ public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecima
 	}
 
 	@Override
-	public List<BigDecimal> getAscendingUniqueTermValues() {
-		// Remember: scale is 2, so only two decimal digits are kept for predicates/sorts/aggregations/etc.
-		return Arrays.asList(
-				new BigDecimal( "-42" ),
-				new BigDecimal( "-2.12" ),
-				BigDecimal.ZERO,
-				BigDecimal.ONE,
-				BigDecimal.TEN,
-				BigDecimal.valueOf( 42.42 ),
-				BigDecimal.valueOf( 1548.00 ),
-				BigDecimal.valueOf( 1584514514.18 )
-		);
+	protected AscendingUniqueTermValues<BigDecimal> createAscendingUniqueTermValues() {
+		return new AscendingUniqueTermValues<BigDecimal>() {
+			@Override
+			protected List<BigDecimal> createSingle() {
+				// Remember: scale is 2, so only two decimal digits are kept for predicates/sorts/aggregations/etc.
+				return Arrays.asList(
+						new BigDecimal( "-42" ),
+						new BigDecimal( "-2.12" ),
+						BigDecimal.ZERO,
+						BigDecimal.ONE,
+						BigDecimal.TEN,
+						BigDecimal.valueOf( 42.42 ),
+						BigDecimal.valueOf( 1548.00 ),
+						BigDecimal.valueOf( 1584514514.18 )
+				);
+			}
+
+			@Override
+			protected BigDecimal delta(int multiplierForDelta) {
+				return new BigDecimal( "4000.23" ).multiply( BigDecimal.valueOf( multiplierForDelta ) );
+			}
+
+			@Override
+			protected BigDecimal applyDelta(BigDecimal value, int multiplierForDelta) {
+				return value.add( delta( multiplierForDelta ) );
+			}
+		};
 	}
 
 	@Override

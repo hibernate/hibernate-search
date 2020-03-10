@@ -19,6 +19,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
 
 public abstract class FieldTypeDescriptor<F> {
@@ -68,6 +69,8 @@ public abstract class FieldTypeDescriptor<F> {
 	private final Class<F> javaType;
 	private final String uniqueName;
 
+	private final AscendingUniqueTermValues<F> ascendingUniqueTermValues = createAscendingUniqueTermValues();
+
 	protected FieldTypeDescriptor(Class<F> javaType) {
 		this( javaType, javaType.getSimpleName() );
 	}
@@ -105,12 +108,19 @@ public abstract class FieldTypeDescriptor<F> {
 	}
 
 	/**
-	 * @return A list of "term" (single-token) values, in strictly ascending order,
+	 * @return A sequence of "term" (single-token) values, in strictly ascending order,
 	 * that are guaranteed to have a unique indexed value (after analysis/normalization).
 	 * @throws UnsupportedOperationException If value lookup is not supported for this field type
 	 * (hence this method should never be called).
 	 */
-	public abstract List<F> getAscendingUniqueTermValues();
+	public final AscendingUniqueTermValues<F> getAscendingUniqueTermValues() {
+		if ( ascendingUniqueTermValues == null ) {
+			throw new UnsupportedOperationException( "Value lookup isn't supported for " + this + "." );
+		}
+		return ascendingUniqueTermValues;
+	}
+
+	protected abstract AscendingUniqueTermValues<F> createAscendingUniqueTermValues();
 
 	public abstract Optional<IndexingExpectations<F>> getIndexingExpectations();
 

@@ -93,7 +93,7 @@ public class TermsAggregationSpecificsIT<F> {
 		this.typeDescriptor = typeDescriptor;
 		this.documentIdPerTerm = new LinkedHashMap<>();
 
-		this.valuesInAscendingOrder = typeDescriptor.getAscendingUniqueTermValues();
+		this.valuesInAscendingOrder = typeDescriptor.getAscendingUniqueTermValues().getSingle();
 
 		this.valuesInDescendingOrder = new ArrayList<>( valuesInAscendingOrder );
 		Collections.reverse( valuesInDescendingOrder );

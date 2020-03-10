@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.time.Instant;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 
 public class InstantFieldTypeDescriptor extends FieldTypeDescriptor<Instant> {
 
@@ -27,18 +29,33 @@ public class InstantFieldTypeDescriptor extends FieldTypeDescriptor<Instant> {
 	}
 
 	@Override
-	public List<Instant> getAscendingUniqueTermValues() {
-		return Arrays.asList(
-				Instant.parse( "2018-01-01T10:58:30.00Z" ),
-				Instant.parse( "2018-02-01T10:15:30.00Z" ),
-				Instant.parse( "2018-02-01T12:15:30.00Z" ),
-				Instant.parse( "2018-02-15T10:15:30.00Z" ),
-				Instant.parse( "2018-03-01T08:15:30.00Z" ),
-				Instant.parse( "2018-03-01T08:15:32.00Z" ),
-				Instant.parse( "2018-03-15T09:15:30.00Z" ),
-				Instant.parse( "2018-03-15T10:15:30.00Z" ),
-				Instant.parse( "2018-04-01T10:15:30.00Z" )
-		);
+	protected AscendingUniqueTermValues<Instant> createAscendingUniqueTermValues() {
+		return new AscendingUniqueTermValues<Instant>() {
+			@Override
+			protected List<Instant> createSingle() {
+				return Arrays.asList(
+						Instant.parse( "2018-01-01T10:58:30.00Z" ),
+						Instant.parse( "2018-02-01T10:15:30.00Z" ),
+						Instant.parse( "2018-02-01T12:15:30.00Z" ),
+						Instant.parse( "2018-02-15T10:15:30.00Z" ),
+						Instant.parse( "2018-03-01T08:15:30.00Z" ),
+						Instant.parse( "2018-03-01T08:15:32.00Z" ),
+						Instant.parse( "2018-03-15T09:15:30.00Z" ),
+						Instant.parse( "2018-03-15T10:15:30.00Z" ),
+						Instant.parse( "2018-04-01T10:15:30.00Z" )
+				);
+			}
+
+			@Override
+			protected List<List<Instant>> createMultiResultingInSingleAfterSum() {
+				return valuesThatWontBeUsed();
+			}
+
+			@Override
+			protected Instant applyDelta(Instant value, int multiplierForDelta) {
+				return value.plus( multiplierForDelta, ChronoUnit.DAYS );
+			}
+		};
 	}
 
 	@Override
