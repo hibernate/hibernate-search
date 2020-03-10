@@ -173,6 +173,11 @@ public class ImplicitNestedSearchPredicateIT {
 	}
 
 	@Test
+	public void predicate_exists_object() {
+		verify_implicit_nest( p -> p.exists().field( "nested" ) );
+	}
+
+	@Test
 	public void predicate_simpleQueryString_multipleNestedPaths() {
 		SubTest.expectException( () -> indexManager.createScope()
 				.predicate().simpleQueryString().field( "nested.text" ).field( "text" )

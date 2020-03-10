@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -143,7 +144,11 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 			// We may be able to relax this constraint, but that would require more extensive testing
 			scopeModel.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 		}
-		return new ElasticsearchExistsPredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchy( absoluteFieldPath ) );
+		List<String> nestedPathHierarchy = scopeModel.getNestedPathHierarchy( absoluteFieldPath );
+		if ( nestedPathHierarchy == null ) {
+			nestedPathHierarchy = scopeModel.getNestedPathHierarchyForObject( absoluteFieldPath );
+		}
+		return new ElasticsearchExistsPredicateBuilder( absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override
