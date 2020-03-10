@@ -4,7 +4,7 @@
  * License: GNU Lesser General Public License (LGPL), version 2.1 or later
  * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
  */
-package org.hibernate.search.backend.elasticsearch.search.sort.impl;
+package org.hibernate.search.backend.elasticsearch.types.sort.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.List;
@@ -13,6 +13,9 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
+import org.hibernate.search.backend.elasticsearch.search.sort.impl.AbstractElasticsearchSearchNestedSortBuilder;
+import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
+import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -21,12 +24,13 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearchNestedSortBuilder
+public class ElasticsearchStandardFieldSortBuilder<F> extends AbstractElasticsearchSearchNestedSortBuilder
 		implements FieldSortBuilder<ElasticsearchSearchSortBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -56,7 +60,7 @@ public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearc
 
 	private JsonPrimitive mode;
 
-	public ElasticsearchFieldSortBuilder(ElasticsearchSearchContext searchContext,
+	public ElasticsearchStandardFieldSortBuilder(ElasticsearchSearchContext searchContext,
 			String absoluteFieldPath, List<String> nestedPathHierarchy,
 			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchFieldCodec<F> codec) {
@@ -87,14 +91,15 @@ public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearc
 			this.missing = codec.encodeForMissing( converted );
 		}
 		catch (RuntimeException e) {
-			throw log.cannotConvertDslParameter(
-					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-			);
+			throw log.cannotConvertDslParameter( e.getMessage(), e, getEventContext() );
 		}
 	}
 
 	@Override
 	public void mode(SortMode mode) {
+		if ( !nestedPathHierarchy.isEmpty() && SortMode.MEDIAN.equals( mode ) ) {
+			throw log.cannotComputeMedianAcrossNested( getEventContext() );
+		}
 		if ( mode != null ) {
 			switch ( mode ) {
 				case SUM:
@@ -135,6 +140,10 @@ public class ElasticsearchFieldSortBuilder<F> extends AbstractElasticsearchSearc
 			outerObject.add( absoluteFieldPath, innerObject );
 			collector.collectSort( outerObject );
 		}
+	}
+
+	protected final EventContext getEventContext() {
+		return EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath );
 	}
 
 	private DslConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {

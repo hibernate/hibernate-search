@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumeri
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneLocalTimeFieldCodec;
 
 class LuceneLocalTimeIndexFieldTypeOptionsStep
-		extends AbstractLuceneNumericIndexFieldTypeOptionsStep<LuceneLocalTimeIndexFieldTypeOptionsStep, LocalTime> {
+		extends AbstractLuceneTemporalIndexFieldTypeOptionsStep<LuceneLocalTimeIndexFieldTypeOptionsStep, LocalTime> {
 
 	LuceneLocalTimeIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, LocalTime.class );

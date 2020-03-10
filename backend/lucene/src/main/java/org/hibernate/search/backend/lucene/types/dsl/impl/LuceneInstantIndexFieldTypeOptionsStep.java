@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumeri
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneInstantFieldCodec;
 
 class LuceneInstantIndexFieldTypeOptionsStep
-		extends AbstractLuceneNumericIndexFieldTypeOptionsStep<LuceneInstantIndexFieldTypeOptionsStep, Instant> {
+		extends AbstractLuceneTemporalIndexFieldTypeOptionsStep<LuceneInstantIndexFieldTypeOptionsStep, Instant> {
 
 	LuceneInstantIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, Instant.class );

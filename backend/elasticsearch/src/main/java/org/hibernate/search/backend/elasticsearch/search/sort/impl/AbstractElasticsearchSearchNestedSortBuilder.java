@@ -24,7 +24,7 @@ public abstract class AbstractElasticsearchSearchNestedSortBuilder extends Abstr
 	// old API
 	private static final JsonAccessor<JsonElement> NESTED_PATH_ACCESSOR = JsonAccessor.root().property( "nested_path" );
 
-	private final List<String> nestedPathHierarchy;
+	protected final List<String> nestedPathHierarchy;
 	private final ElasticsearchSearchSyntax searchSyntax;
 
 	public AbstractElasticsearchSearchNestedSortBuilder(List<String> nestedPathHierarchy, ElasticsearchSearchSyntax searchSyntax) {

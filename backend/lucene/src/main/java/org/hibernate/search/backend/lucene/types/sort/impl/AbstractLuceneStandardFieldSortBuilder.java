@@ -21,6 +21,7 @@ import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 /**
  * @param <F> The field type exposed to the mapper.
@@ -86,15 +87,16 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 			missingValue = encodeMissingAs( converted );
 		}
 		catch (RuntimeException e) {
-			throw log.cannotConvertDslParameter(
-					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-			);
+			throw log.cannotConvertDslParameter( e.getMessage(), e, getEventContext() );
 		}
 	}
 
 	@Override
-	public void mode(SortMode multi) {
-		this.mode = multi;
+	public void mode(SortMode mode) {
+		if ( nestedDocumentPath != null && SortMode.MEDIAN.equals( mode ) ) {
+			throw log.cannotComputeMedianAcrossNested( getEventContext() );
+		}
+		this.mode = mode;
 	}
 
 	protected Object encodeMissingAs(F converted) {
@@ -113,6 +115,10 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 			effectiveMissingValue = missingValue;
 		}
 		return effectiveMissingValue;
+	}
+
+	protected final EventContext getEventContext() {
+		return EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath );
 	}
 
 	private DslConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {
