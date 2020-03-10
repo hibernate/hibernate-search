@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.types.lowlevel.impl;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Comparator;
 
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.util.common.data.Range;
@@ -30,11 +31,15 @@ public interface LuceneNumericDomain<E extends Number> {
 
 	E getNextValue(E value);
 
+	Comparator<E> createComparator();
+
 	Query createExactQuery(String absoluteFieldPath, E value);
 
 	Query createRangeQuery(String absoluteFieldPath, E lowerLimit, E upperLimit);
 
-	E fromDocValue(Long longValue);
+	E rawFacetTermToTerm(long longValue);
+
+	E sortedDocValueToTerm(long longValue);
 
 	LongValueFacetCounts createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 			NestedDocsProvider nestedDocsProvider) throws IOException;

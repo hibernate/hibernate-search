@@ -206,17 +206,16 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 				break;
 			}
 			case MIN: {
-				result = Long.MAX_VALUE;
-				for ( int index = 0; index < count; ++index ) {
-					result = Math.min( result, values.nextValue() );
-				}
+				// Values are sorted; the first value is the min.
+				result = values.nextValue();
 				break;
 			}
 			case MAX: {
-				result = Long.MIN_VALUE;
-				for ( int index = 0; index < count; ++index ) {
-					result = Math.max( result, values.nextValue() );
+				// Values are sorted; the last value is the max.
+				for ( int index = 0; index < count - 1; ++index ) {
+					values.nextValue();
 				}
+				result = values.nextValue();
 				break;
 			}
 			case MEDIAN: {
@@ -290,6 +289,7 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 						if ( ++count > maxChildren ) {
 							break;
 						}
+						// Values are sorted; the first value is the min for this document.
 						returnValue = Math.min( returnValue, values.nextValue() );
 					}
 				}
@@ -302,6 +302,11 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 					if ( values.advanceExact( doc ) ) {
 						if ( ++count > maxChildren ) {
 							break;
+						}
+						final int docCount = values.docValueCount();
+						// Values are sorted; the last value is the max for this document.
+						for ( int index = 0; index < docCount - 1; ++index ) {
+							values.nextValue();
 						}
 						returnValue = Math.max( returnValue, values.nextValue() );
 					}

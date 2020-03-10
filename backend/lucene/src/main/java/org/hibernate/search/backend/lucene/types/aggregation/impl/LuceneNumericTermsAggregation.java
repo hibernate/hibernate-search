@@ -32,17 +32,18 @@ import org.apache.lucene.search.DocIdSetIterator;
  * or a different type if value converters are used.
  */
 public class LuceneNumericTermsAggregation<F, E extends Number, K>
-		extends AbstractLuceneFacetsBasedTermsAggregation<F, Long, K> {
-
-	private static final Comparator<Long> LONG_COMPARATOR = Comparator.naturalOrder();
+		extends AbstractLuceneFacetsBasedTermsAggregation<F, E, K> {
 
 	private final AbstractLuceneNumericFieldCodec<F, E> codec;
 	private final LuceneNumericDomain<E> numericDomain;
+
+	private final Comparator<E> termComparator;
 
 	private LuceneNumericTermsAggregation(Builder<F, E, K> builder) {
 		super( builder );
 		this.codec = builder.codec;
 		this.numericDomain = codec.getDomain();
+		this.termComparator = numericDomain.createComparator();
 	}
 
 	@Override
@@ -55,9 +56,9 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 	}
 
 	@Override
-	SortedSet<Long> collectFirstTerms(IndexReader reader, boolean descending, int limit)
+	SortedSet<E> collectFirstTerms(IndexReader reader, boolean descending, int limit)
 			throws IOException {
-		TreeSet<Long> collectedTerms = new TreeSet<>( descending ? LONG_COMPARATOR.reversed() : LONG_COMPARATOR );
+		TreeSet<E> collectedTerms = new TreeSet<>( descending ? termComparator.reversed() : termComparator );
 		for ( LeafReaderContext leaf : reader.leaves() ) {
 			final LeafReader atomicReader = leaf.reader();
 			SortedNumericDocValues docValues = atomicReader.getSortedNumericDocValues( absoluteFieldPath );
@@ -66,7 +67,7 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 			}
 			while ( docValues.nextDoc() != DocIdSetIterator.NO_MORE_DOCS ) {
 				for ( int i = 0; i < docValues.docValueCount(); i++ ) {
-					Long term = docValues.nextValue();
+					E term = numericDomain.sortedDocValueToTerm( docValues.nextValue() );
 					collectedTerms.add( term );
 					// Try not to keep too many terms in memory
 					if ( collectedTerms.size() > limit ) {
@@ -79,22 +80,22 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 	}
 
 	@Override
-	Comparator<Long> getAscendingTermComparator() {
-		return LONG_COMPARATOR;
+	Comparator<E> getAscendingTermComparator() {
+		return termComparator;
 	}
 
 	@Override
-	Long labelToTerm(String termAsString) {
-		return Long.valueOf( termAsString );
+	E labelToTerm(String termAsString) {
+		return numericDomain.rawFacetTermToTerm( Long.parseLong( termAsString ) );
 	}
 
 	@Override
-	F termToFieldValue(Long term) {
-		return codec.decode( numericDomain.fromDocValue( term ) );
+	F termToFieldValue(E term) {
+		return codec.decode( term );
 	}
 
 	public static class Builder<F, E extends Number, K>
-			extends AbstractBuilder<F, Long, K> {
+			extends AbstractBuilder<F, E, K> {
 
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
 

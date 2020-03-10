@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.types.lowlevel.impl;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Comparator;
 
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
@@ -24,6 +25,8 @@ import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.util.NumericUtils;
+
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValuesToSingleValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 
@@ -55,6 +58,11 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	}
 
 	@Override
+	public Comparator<Float> createComparator() {
+		return Comparator.naturalOrder();
+	}
+
+	@Override
 	public Query createExactQuery(String absoluteFieldPath, Float value) {
 		return FloatPoint.newExactQuery( absoluteFieldPath, value );
 	}
@@ -67,10 +75,15 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	}
 
 	@Override
-	public Float fromDocValue(Long longValue) {
+	public Float rawFacetTermToTerm(long longValue) {
 		// See createTermsFacetCounts: it's the reason we need this method
 		// Using the reverse operation from Double.doubleToRawLongBits, which is used in DoubleDocValues.
-		return Float.intBitsToFloat( longValue.intValue() );
+		return Float.intBitsToFloat( (int) longValue );
+	}
+
+	@Override
+	public Float sortedDocValueToTerm(long longValue) {
+		return NumericUtils.sortableIntToFloat( (int) longValue );
 	}
 
 	@Override
@@ -111,7 +124,7 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 
 	@Override
 	public IndexableField createSortedDocValuesField(String absoluteFieldPath, Float numericValue) {
-		return new SortedFloatDocValuesField( absoluteFieldPath, numericValue );
+		return new SortedNumericDocValuesField( absoluteFieldPath, NumericUtils.floatToSortableInt( numericValue ) );
 	}
 
 	@Override
@@ -132,23 +145,6 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 		@Override
 		protected NumericDocValues getNumericDocValues(LeafReaderContext context, String field) throws IOException {
 			return source.getRawNumericDocValues( context, null );
-		}
-	}
-
-	public static class SortedFloatDocValuesField extends SortedNumericDocValuesField {
-
-		public SortedFloatDocValuesField(String name, float value) {
-			super( name, Float.floatToRawIntBits( value ) );
-		}
-
-		@Override
-		public void setFloatValue(float value) {
-			super.setLongValue( Float.floatToRawIntBits( value ) );
-		}
-
-		@Override
-		public void setLongValue(long value) {
-			throw new IllegalArgumentException( "cannot change value type from Float to Long" );
 		}
 	}
 

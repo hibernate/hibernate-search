@@ -15,7 +15,8 @@ import org.apache.lucene.search.DocValuesFieldExistsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
-public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> implements LuceneStandardFieldCodec<F, E> {
+public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number>
+		implements LuceneStandardFieldCodec<F, E> {
 
 	private final boolean projectable;
 	private final boolean searchable;

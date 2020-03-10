@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.types.lowlevel.impl;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Comparator;
 
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
@@ -24,6 +25,8 @@ import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Query;
+import org.apache.lucene.util.NumericUtils;
+
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValuesToSingleValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 
@@ -55,6 +58,11 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	}
 
 	@Override
+	public Comparator<Double> createComparator() {
+		return Comparator.naturalOrder();
+	}
+
+	@Override
 	public Query createExactQuery(String absoluteFieldPath, Double value) {
 		return DoublePoint.newExactQuery( absoluteFieldPath, value );
 	}
@@ -67,10 +75,15 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	}
 
 	@Override
-	public Double fromDocValue(Long longValue) {
+	public Double rawFacetTermToTerm(long longValue) {
 		// See createTermsFacetCounts: it's the reason we need this method
 		// Using the reverse operation from Double.doubleToRawLongBits, which is used in DoubleDocValues.
 		return Double.longBitsToDouble( longValue );
+	}
+
+	@Override
+	public Double sortedDocValueToTerm(long longValue) {
+		return NumericUtils.sortableLongToDouble( longValue );
 	}
 
 	@Override
@@ -112,7 +125,7 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 
 	@Override
 	public IndexableField createSortedDocValuesField(String absoluteFieldPath, Double numericValue) {
-		return new SortedDoubleDocValuesField( absoluteFieldPath, numericValue );
+		return new SortedNumericDocValuesField( absoluteFieldPath, NumericUtils.doubleToSortableLong( numericValue ) );
 	}
 
 	@Override
@@ -136,23 +149,6 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 		@Override
 		protected NumericDocValues getNumericDocValues(LeafReaderContext context, String field) throws IOException {
 			return source.getRawNumericDocValues( context, null );
-		}
-	}
-
-	public static class SortedDoubleDocValuesField extends SortedNumericDocValuesField {
-
-		public SortedDoubleDocValuesField(String name, double value) {
-			super( name, Double.doubleToRawLongBits( value ) );
-		}
-
-		@Override
-		public void setDoubleValue(double value) {
-			super.setLongValue( Double.doubleToRawLongBits( value ) );
-		}
-
-		@Override
-		public void setLongValue(long value) {
-			throw new IllegalArgumentException( "cannot change value type from Double to Long" );
 		}
 	}
 
