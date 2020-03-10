@@ -6,13 +6,15 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
+import java.util.List;
+
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchExistsPredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
+public class ElasticsearchExistsPredicateBuilder extends AbstractElasticsearchSearchNestedPredicateBuilder
 		implements ExistsPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final JsonObjectAccessor EXISTS_ACCESSOR = JsonAccessor.root().property( "exists" ).asObject();
@@ -20,7 +22,8 @@ public class ElasticsearchExistsPredicateBuilder extends AbstractElasticsearchSe
 
 	private final String absoluteFieldPath;
 
-	ElasticsearchExistsPredicateBuilder(String absoluteFieldPath) {
+	ElasticsearchExistsPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
+		super( nestedPathHierarchy );
 		this.absoluteFieldPath = absoluteFieldPath;
 	}
 

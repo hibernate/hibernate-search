@@ -41,6 +41,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -224,6 +225,7 @@ public class ExistsSearchPredicateIT {
 	 * Querying fields of a nested object without a nested predicate should result in no result at all.
 	 */
 	@Test
+	@Ignore // TODO HSEARCH-3752 restore the test with the new assumptions
 	public void inNestedObject() {
 		StubMappingScope scope = indexManager.createScope();
 
