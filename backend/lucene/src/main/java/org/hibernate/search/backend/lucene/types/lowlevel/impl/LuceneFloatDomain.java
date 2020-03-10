@@ -13,7 +13,6 @@ import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.util.common.data.Range;
 
-import org.apache.lucene.document.FloatDocValuesField;
 import org.apache.lucene.document.FloatPoint;
 import org.apache.lucene.document.SortedNumericDocValuesField;
 import org.apache.lucene.facet.Facets;
@@ -108,11 +107,6 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	@Override
 	public IndexableField createIndexField(String absoluteFieldPath, Float numericValue) {
 		return new FloatPoint( absoluteFieldPath, numericValue );
-	}
-
-	@Override
-	public IndexableField createDocValuesField(String absoluteFieldPath, Float numericValue) {
-		return new FloatDocValuesField( absoluteFieldPath, numericValue );
 	}
 
 	@Override
