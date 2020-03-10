@@ -11,16 +11,14 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
@@ -35,7 +33,8 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.NormalizedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldStructure;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
@@ -54,17 +53,22 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class FieldSearchSortBaseIT<F> {
 
+	private static Stream<FieldTypeDescriptor<?>> supportedTypeDescriptors() {
+		return FieldTypeDescriptor.getAll().stream()
+				.filter( typeDescriptor -> typeDescriptor.getFieldSortExpectations().isSupported() );
+	}
+
 	@Parameterized.Parameters(name = "{0} - {1}")
 	public static Object[][] parameters() {
 		List<Object[]> parameters = new ArrayList<>();
-		for ( FieldTypeDescriptor<?> fieldTypeDescriptor : FieldTypeDescriptor.getAll() ) {
+		supportedTypeDescriptors().forEach( fieldTypeDescriptor -> {
 			ExpectationsAlternative<?, ?> expectations = fieldTypeDescriptor.getFieldSortExpectations();
 			if ( expectations.isSupported() ) {
 				for ( IndexFieldStructure indexFieldStructure : IndexFieldStructure.values() ) {
 					parameters.add( new Object[] { indexFieldStructure, fieldTypeDescriptor } );
 				}
 			}
-		}
+		} );
 		return parameters.toArray( new Object[0][] );
 	}
 
@@ -321,20 +325,24 @@ public class FieldSearchSortBaseIT<F> {
 	}
 
 	private static void initDocument(IndexMapping indexMapping, DocumentElement document, Integer ordinal) {
-		forEachSupportedTypeDescriptor( typeDescriptor -> {
-			addValue( document, indexMapping.fieldModels, typeDescriptor, ordinal );
-		} );
+		indexMapping.fieldModels.forEach(
+				fieldModel -> addValue( fieldModel, document, ordinal )
+		);
 
 		// Note: these objects must be single-valued for these tests
 		DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
 		DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
 		DocumentElement nestedObjectInNestedObject = nestedObject.addObject( indexMapping.nestedObject.nestedObject.self );
 
-		forEachSupportedTypeDescriptor( typeDescriptor -> {
-			addValue( flattenedObject, indexMapping.flattenedObject.fieldModels, typeDescriptor, ordinal );
-			addValue( nestedObject, indexMapping.nestedObject.fieldModels, typeDescriptor, ordinal );
-			addValue( nestedObjectInNestedObject, indexMapping.nestedObject.nestedObject.fieldModels, typeDescriptor, ordinal );
-		} );
+		indexMapping.flattenedObject.fieldModels.forEach(
+				fieldModel -> addValue( fieldModel, flattenedObject, ordinal )
+		);
+		indexMapping.nestedObject.fieldModels.forEach(
+				fieldModel -> addValue( fieldModel, nestedObject, ordinal )
+		);
+		indexMapping.nestedObject.nestedObject.fieldModels.forEach(
+				fieldModel -> addValue( fieldModel, nestedObjectInNestedObject, ordinal )
+		);
 	}
 
 	@SuppressWarnings("unchecked")
@@ -351,14 +359,13 @@ public class FieldSearchSortBaseIT<F> {
 		return value;
 	}
 
-	private static <F> void addValue(DocumentElement documentElement,
-			FieldModelsByType fieldModels, FieldTypeDescriptor<F> typeDescriptor, Integer ordinal) {
+	private static <F> void addValue(SimpleFieldModel<F> fieldModel, DocumentElement documentElement, Integer ordinal) {
 		if ( ordinal == null ) {
 			return;
 		}
 		documentElement.addValue(
-				fieldModels.get( typeDescriptor ).reference,
-				typeDescriptor.getAscendingUniqueTermValues().get( ordinal )
+				fieldModel.reference,
+				fieldModel.typeDescriptor.getAscendingUniqueTermValues().get( ordinal )
 		);
 	}
 
@@ -389,18 +396,13 @@ public class FieldSearchSortBaseIT<F> {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
 	}
 
-	private static void forEachSupportedTypeDescriptor(Consumer<FieldTypeDescriptor<?>> action) {
-		FieldTypeDescriptor.getAll().stream()
-				.filter( typeDescriptor -> typeDescriptor.getFieldSortExpectations().isSupported() )
-				.forEach( action );
-	}
-
 	private static class AbstractObjectMapping {
-		final FieldModelsByType fieldModels;
+		final SimpleFieldModelsByType fieldModels;
 
 		AbstractObjectMapping(IndexSchemaElement self,
 				Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
-			fieldModels = FieldModelsByType.mapSupported( self, "", additionalConfiguration );
+			fieldModels = SimpleFieldModelsByType.mapAll( supportedTypeDescriptors(), self, "",
+					c -> c.sortable( Sortable.YES ), additionalConfiguration );
 		}
 	}
 
@@ -463,46 +465,6 @@ public class FieldSearchSortBaseIT<F> {
 			super( objectField, additionalConfiguration );
 			this.relativeFieldName = relativeFieldName;
 			self = objectField.toReference();
-		}
-	}
-
-	private static class FieldModelsByType {
-		public static FieldModelsByType mapSupported(IndexSchemaElement parent, String prefix,
-				Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
-			FieldModelsByType result = new FieldModelsByType();
-			forEachSupportedTypeDescriptor( typeDescriptor -> {
-				result.content.put(
-						typeDescriptor,
-						FieldModel.mapper( typeDescriptor )
-								.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration )
-				);
-			} );
-			return result;
-		}
-
-		private final Map<FieldTypeDescriptor<?>, FieldModel<?>> content = new LinkedHashMap<>();
-
-		@SuppressWarnings("unchecked")
-		private <F> FieldModel<F> get(FieldTypeDescriptor<F> typeDescriptor) {
-			return (FieldModel<F>) content.get( typeDescriptor );
-		}
-	}
-
-	private static class FieldModel<F> {
-		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(FieldTypeDescriptor<F> typeDescriptor) {
-			return StandardFieldMapper.of(
-					typeDescriptor::configure,
-					c -> c.sortable( Sortable.YES ),
-					FieldModel::new
-			);
-		}
-
-		final IndexFieldReference<F> reference;
-		final String relativeFieldName;
-
-		private FieldModel(IndexFieldReference<F> reference, String relativeFieldName) {
-			this.reference = reference;
-			this.relativeFieldName = relativeFieldName;
 		}
 	}
 

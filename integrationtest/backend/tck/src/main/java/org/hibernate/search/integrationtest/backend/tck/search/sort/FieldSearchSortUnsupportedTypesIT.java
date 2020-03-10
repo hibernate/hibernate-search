@@ -7,18 +7,13 @@
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
 import java.util.stream.Stream;
 
-import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
@@ -97,53 +92,12 @@ public class FieldSearchSortUnsupportedTypesIT<F> {
 	}
 
 	private static class IndexMapping {
-		final FieldModelsByType fieldModels;
+		final SimpleFieldModelsByType fieldModels;
 
 		IndexMapping(IndexSchemaElement root) {
-			fieldModels = FieldModelsByType.mapUnsupported( root, "", ignored -> { } );
+			fieldModels = SimpleFieldModelsByType.mapAll( unsupportedTypeDescriptors(), root, "",
+					c -> c.sortable( Sortable.NO ) );
 		}
 	}
 
-	private static class FieldModelsByType {
-		public static FieldModelsByType mapUnsupported(IndexSchemaElement parent, String prefix,
-				Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
-			FieldModelsByType result = new FieldModelsByType();
-			unsupportedTypeDescriptors().forEach( typeDescriptor -> {
-				result.content.put(
-						typeDescriptor,
-						FieldModel.mapper( typeDescriptor )
-								.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration )
-				);
-			} );
-			return result;
-		}
-
-		private final Map<FieldTypeDescriptor<?>, FieldModel<?>> content = new LinkedHashMap<>();
-
-		@SuppressWarnings("unchecked")
-		private <F> FieldModel<F> get(FieldTypeDescriptor<F> typeDescriptor) {
-			return (FieldModel<F>) content.get( typeDescriptor );
-		}
-	}
-
-	private static class FieldModel<F> {
-		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(FieldTypeDescriptor<F> typeDescriptor) {
-			return StandardFieldMapper.of(
-					typeDescriptor::configure,
-					c -> c.sortable( Sortable.NO ),
-					(reference, name) -> new FieldModel<>( reference, name, typeDescriptor.getJavaType() )
-			);
-		}
-
-		final IndexFieldReference<F> reference;
-		final String relativeFieldName;
-		final Class<F> type;
-
-		private FieldModel(IndexFieldReference<F> reference, String relativeFieldName,
-				Class<F> type) {
-			this.reference = reference;
-			this.relativeFieldName = relativeFieldName;
-			this.type = type;
-		}
-	}
 }
