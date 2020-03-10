@@ -14,7 +14,6 @@ import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider
 import org.hibernate.search.util.common.data.Range;
 
 import org.apache.lucene.document.LongPoint;
-import org.apache.lucene.document.NumericDocValuesField;
 import org.apache.lucene.document.SortedNumericDocValuesField;
 import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
@@ -102,11 +101,6 @@ public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 	@Override
 	public IndexableField createIndexField(String absoluteFieldPath, Long numericValue) {
 		return new LongPoint( absoluteFieldPath, numericValue );
-	}
-
-	@Override
-	public IndexableField createDocValuesField(String absoluteFieldPath, Long numericValue) {
-		return new NumericDocValuesField( absoluteFieldPath, numericValue );
 	}
 
 	@Override

@@ -8,7 +8,6 @@ package org.hibernate.search.backend.lucene.types.lowlevel.impl;
 
 import java.io.IOException;
 import java.util.Collection;
-import org.apache.lucene.document.DoubleDocValuesField;
 
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
@@ -109,11 +108,6 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	@Override
 	public IndexableField createIndexField(String absoluteFieldPath, Double numericValue) {
 		return new DoublePoint( absoluteFieldPath, numericValue );
-	}
-
-	@Override
-	public IndexableField createDocValuesField(String absoluteFieldPath, Double numericValue) {
-		return new DoubleDocValuesField( absoluteFieldPath, numericValue );
 	}
 
 	@Override
