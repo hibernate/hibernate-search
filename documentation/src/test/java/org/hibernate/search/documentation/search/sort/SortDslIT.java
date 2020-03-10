@@ -40,6 +40,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.SortedSetSortField;
 
 @RunWith(Parameterized.class)
 public class SortDslIT {
@@ -287,7 +288,7 @@ public class SortDslIT {
 					.where( f -> f.matchAll() )
 					.sort( f -> f.fromLuceneSort(
 							new Sort(
-									new SortField( "genre_sort", SortField.Type.STRING ),
+									new SortedSetSortField( "genre_sort", false ),
 									SortField.FIELD_DOC
 							)
 					) )
@@ -304,7 +305,7 @@ public class SortDslIT {
 					.extension( LuceneExtension.get() )
 					.where( f -> f.matchAll() )
 					.sort( f -> f.fromLuceneSortField(
-							new SortField( "title_sort", SortField.Type.STRING )
+							new SortedSetSortField( "title_sort", false )
 					) )
 					.fetchHits( 20 );
 			// end::lucene-fromLuceneSortField[]

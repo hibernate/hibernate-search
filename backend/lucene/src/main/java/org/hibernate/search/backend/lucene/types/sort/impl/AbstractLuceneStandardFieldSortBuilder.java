@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneSearchSortBuilder;
@@ -119,6 +120,30 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 
 	protected final EventContext getEventContext() {
 		return EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath );
+	}
+
+	protected final MultiValueMode getMultiValueMode() {
+		MultiValueMode multiValueMode = MultiValueMode.MIN;
+		if ( mode != null ) {
+			switch ( mode ) {
+				case MIN:
+					multiValueMode = MultiValueMode.MIN;
+					break;
+				case MAX:
+					multiValueMode = MultiValueMode.MAX;
+					break;
+				case AVG:
+					multiValueMode = MultiValueMode.AVG;
+					break;
+				case SUM:
+					multiValueMode = MultiValueMode.SUM;
+					break;
+				case MEDIAN:
+					multiValueMode = MultiValueMode.MEDIAN;
+					break;
+			}
+		}
+		return multiValueMode;
 	}
 
 	private DslConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {
