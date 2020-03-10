@@ -618,4 +618,17 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 113, value = "Simple query string targets fields [%1$s, %3$s] spanning multiple nested paths: %2$s, %4$s.")
 	SearchException simpleQueryStringSpanningMultipleNestedPaths(String fieldPath1, String nestedPath1, String fieldPath2, String nestedPath2);
+
+	@Message(id = ID_OFFSET_2 + 114,
+			value = "Cannot compute the median across nested documents.")
+	SearchException cannotComputeMedianAcrossNested(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 115,
+			value = "Cannot compute the sum, average or median of a text field. Only min and max are supported.")
+	SearchException cannotComputeSumOrAvgOrMedianForStringField(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 116,
+			value = "Cannot compute the sum of a temporal field. Only min, max, avg and median are supported.")
+	SearchException cannotComputeSumForTemporalField(@Param EventContext context);
+
 }

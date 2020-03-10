@@ -12,7 +12,6 @@ import java.util.List;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchFieldSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
@@ -28,10 +27,10 @@ public class ElasticsearchStandardFieldSortBuilderFactory<F> implements Elastics
 
 	private final boolean sortable;
 
-	private final DslConverter<?, ? extends F> converter;
-	private final DslConverter<F, ? extends F> rawConverter;
+	protected final DslConverter<?, ? extends F> converter;
+	protected final DslConverter<F, ? extends F> rawConverter;
 
-	private final ElasticsearchFieldCodec<F> codec;
+	protected final ElasticsearchFieldCodec<F> codec;
 
 	public ElasticsearchStandardFieldSortBuilderFactory(boolean sortable,
 			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
@@ -46,9 +45,9 @@ public class ElasticsearchStandardFieldSortBuilderFactory<F> implements Elastics
 	public FieldSortBuilder<ElasticsearchSearchSortBuilder> createFieldSortBuilder(
 			ElasticsearchSearchContext searchContext,
 			String absoluteFieldPath, List<String> nestedPathHierarchy, ElasticsearchCompatibilityChecker converterChecker) {
-		checkSortable( absoluteFieldPath, sortable );
+		checkSortable( absoluteFieldPath );
 
-		return new ElasticsearchFieldSortBuilder<>( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec );
+		return new ElasticsearchStandardFieldSortBuilder<>( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec );
 	}
 
 	@Override
@@ -64,7 +63,7 @@ public class ElasticsearchStandardFieldSortBuilderFactory<F> implements Elastics
 		if ( this == obj ) {
 			return true;
 		}
-		if ( obj.getClass() != ElasticsearchStandardFieldSortBuilderFactory.class ) {
+		if ( obj.getClass() != getClass() ) {
 			return false;
 		}
 
@@ -77,7 +76,7 @@ public class ElasticsearchStandardFieldSortBuilderFactory<F> implements Elastics
 		if ( this == obj ) {
 			return true;
 		}
-		if ( obj.getClass() != ElasticsearchStandardFieldSortBuilderFactory.class ) {
+		if ( obj.getClass() != getClass() ) {
 			return false;
 		}
 
@@ -85,7 +84,7 @@ public class ElasticsearchStandardFieldSortBuilderFactory<F> implements Elastics
 		return converter.isCompatibleWith( other.converter );
 	}
 
-	private static void checkSortable(String absoluteFieldPath, boolean sortable) {
+	protected final void checkSortable(String absoluteFieldPath) {
 		if ( !sortable ) {
 			throw log.unsortableField( absoluteFieldPath,
 					EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath ) );

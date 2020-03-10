@@ -55,7 +55,7 @@ abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends Abstract
 				new LuceneNumericFieldPredicateBuilderFactory<>(
 						resolvedSearchable, dslToIndexConverter, rawDslToIndexConverter, codec
 				),
-				new LuceneNumericFieldSortBuilderFactory<>(
+				createFieldSortBuilderFactory(
 						resolvedSortable, dslToIndexConverter, rawDslToIndexConverter, codec
 				),
 				new LuceneStandardFieldProjectionBuilderFactory<>(
@@ -74,6 +74,14 @@ abstract class AbstractLuceneNumericIndexFieldTypeOptionsStep<S extends Abstract
 	protected abstract AbstractLuceneNumericFieldCodec<F, ?> createCodec(boolean resolvedProjectable,
 			boolean resolvedSearchable, boolean resolvedSortable, boolean resolvedAggregable,
 			F indexNullAsValue);
+
+	protected LuceneNumericFieldSortBuilderFactory<F, ?> createFieldSortBuilderFactory(boolean resolvedSortable,
+			DslConverter<?, ? extends F> dslToIndexConverter, DslConverter<F, ? extends F> rawDslToIndexConverter,
+			AbstractLuceneNumericFieldCodec<F, ?> codec) {
+		return new LuceneNumericFieldSortBuilderFactory<>(
+				resolvedSortable, dslToIndexConverter, rawDslToIndexConverter, codec
+		);
+	}
 
 	protected LuceneNumericFieldAggregationBuilderFactory<F> createAggregationBuilderFactory(
 			boolean resolvedAggregable,

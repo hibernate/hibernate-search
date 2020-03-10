@@ -39,7 +39,7 @@ abstract class AbstractElasticsearchScalarFieldTypeOptionsStep<S extends Abstrac
 				new ElasticsearchStandardFieldPredicateBuilderFactory<>(
 						resolvedSearchable, dslConverter, rawDslConverter, codec
 				),
-				new ElasticsearchStandardFieldSortBuilderFactory<>(
+				createFieldSortBuilderFactory(
 						resolvedSortable, dslConverter, rawDslConverter, codec
 				),
 				new ElasticsearchStandardFieldProjectionBuilderFactory<>(
@@ -52,6 +52,19 @@ abstract class AbstractElasticsearchScalarFieldTypeOptionsStep<S extends Abstrac
 						codec
 				),
 				mapping
+		);
+	}
+
+	protected ElasticsearchStandardFieldSortBuilderFactory<F> createFieldSortBuilderFactory(
+			boolean resolvedAggregable,
+			DslConverter<?,? extends F> dslToIndexConverter,
+			DslConverter<F,? extends F> rawDslToIndexConverter,
+			ElasticsearchFieldCodec<F> codec) {
+		return new ElasticsearchStandardFieldSortBuilderFactory<>(
+				resolvedAggregable,
+				dslToIndexConverter,
+				rawDslToIndexConverter,
+				codec
 		);
 	}
 
