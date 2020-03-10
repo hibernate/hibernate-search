@@ -26,6 +26,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.LongValues;
 import org.apache.lucene.search.LongValuesSource;
 import org.apache.lucene.util.BitSet;
+import org.apache.lucene.util.NumericUtils;
 
 /**
  * An implementation of {@link DoubleValuesSource} for docvalues with multiple values per document,
@@ -44,7 +45,7 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 	 */
 	public static DoubleMultiValuesToSingleValuesSource fromDoubleField(String field, MultiValueMode mode, NestedDocsProvider nested) {
 		return fromField( field, mode, nested,
-				Double::longBitsToDouble, Double::doubleToRawLongBits );
+				NumericUtils::sortableLongToDouble, Double::doubleToRawLongBits );
 	}
 
 	/**
@@ -57,7 +58,7 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 	 */
 	public static DoubleMultiValuesToSingleValuesSource fromFloatField(String field, MultiValueMode mode, NestedDocsProvider nested) {
 		return fromField( field, mode, nested,
-				(v) -> (double) Float.intBitsToFloat( (int) v ), (v) -> (long) Float.floatToRawIntBits( (float) v ) );
+				(v) -> (double) NumericUtils.sortableIntToFloat( (int) v ), (v) -> (long) Float.floatToRawIntBits( (float) v ) );
 	}
 
 	private static DoubleMultiValuesToSingleValuesSource fromField(String field, MultiValueMode mode, NestedDocsProvider nested,
@@ -236,17 +237,16 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 				break;
 			}
 			case MIN: {
-				result = Double.POSITIVE_INFINITY;
-				for ( int index = 0; index < count; ++index ) {
-					result = Math.min( result, decode( values.nextValue() ) );
-				}
+				// Values are sorted; the first value is the min.
+				result = decode( values.nextValue() );
 				break;
 			}
 			case MAX: {
-				result = Double.NEGATIVE_INFINITY;
-				for ( int index = 0; index < count; ++index ) {
-					result = Math.max( result, decode( values.nextValue() ) );
+				// Values are sorted; the last value is the max.
+				for ( int index = 0; index < count - 1; ++index ) {
+					values.nextValue();
 				}
+				result = decode( values.nextValue() );
 				break;
 			}
 			case MEDIAN: {
@@ -320,6 +320,7 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 						if ( ++count > maxChildren ) {
 							break;
 						}
+						// Values are sorted; the first value is the min for this document.
 						returnValue = Math.min( returnValue, decode( values.nextValue() ) );
 					}
 				}
@@ -332,6 +333,11 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 					if ( values.advanceExact( doc ) ) {
 						if ( ++count > maxChildren ) {
 							break;
+						}
+						final int docCount = values.docValueCount();
+						// Values are sorted; the last value is the max for this document.
+						for ( int index = 0; index < docCount - 1; ++index ) {
+							values.nextValue();
 						}
 						returnValue = Math.max( returnValue, decode( values.nextValue() ) );
 					}

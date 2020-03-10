@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.types.lowlevel.impl;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.Comparator;
 
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
@@ -55,6 +56,11 @@ public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 	}
 
 	@Override
+	public Comparator<Long> createComparator() {
+		return Comparator.naturalOrder();
+	}
+
+	@Override
 	public Query createExactQuery(String absoluteFieldPath, Long value) {
 		return LongPoint.newExactQuery( absoluteFieldPath, value );
 	}
@@ -67,7 +73,12 @@ public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 	}
 
 	@Override
-	public Long fromDocValue(Long longValue) {
+	public Long rawFacetTermToTerm(long longValue) {
+		return longValue;
+	}
+
+	@Override
+	public Long sortedDocValueToTerm(long longValue) {
 		return longValue;
 	}
 
