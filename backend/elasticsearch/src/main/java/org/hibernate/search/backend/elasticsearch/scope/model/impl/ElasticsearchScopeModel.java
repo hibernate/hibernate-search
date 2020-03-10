@@ -222,4 +222,22 @@ public class ElasticsearchScopeModel {
 
 		return nestedDocumentPath.orElse( null );
 	}
+
+	public List<String> getNestedPathHierarchyForObject(String absoluteObjectPath) {
+		Optional<List<String>> nestedDocumentPath = indexModels.stream()
+				.map( indexModel -> indexModel.getObjectNode( absoluteObjectPath ) )
+				.filter( Objects::nonNull )
+				.map( fieldNode -> Optional.ofNullable( fieldNode.getNestedPathHierarchy() ) )
+				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
+					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
+						return nestedDocumentPath1;
+					}
+
+					throw log.conflictingNestedDocumentPathHierarchyForProjection(
+							absoluteObjectPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
+				} )
+				.orElse( Optional.empty() );
+
+		return nestedDocumentPath.orElse( null );
+	}
 }
