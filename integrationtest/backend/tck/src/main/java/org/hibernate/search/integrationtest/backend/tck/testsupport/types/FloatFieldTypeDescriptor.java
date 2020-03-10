@@ -16,6 +16,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 
 public class FloatFieldTypeDescriptor extends FieldTypeDescriptor<Float> {
 
@@ -24,17 +25,32 @@ public class FloatFieldTypeDescriptor extends FieldTypeDescriptor<Float> {
 	}
 
 	@Override
-	public List<Float> getAscendingUniqueTermValues() {
-		return Arrays.asList(
-				-251_484_254.849f,
-				-42.42f,
-				0.0f,
-				Float.MIN_VALUE,
-				55f,
-				2500.5100000045f,
-				1584514514.000000184f,
-				Float.MAX_VALUE
-		);
+	protected AscendingUniqueTermValues<Float> createAscendingUniqueTermValues() {
+		return new AscendingUniqueTermValues<Float>() {
+			@Override
+			protected List<Float> createSingle() {
+				return Arrays.asList(
+						-251_484_254.849f,
+						-42.42f,
+						0.0f,
+						22.0f,
+						55f,
+						2500.5100000045f,
+						1584514514.000000184f,
+						Float.MAX_VALUE
+				);
+			}
+
+			@Override
+			protected Float delta(int multiplierForDelta) {
+				return 52.0f * multiplierForDelta;
+			}
+
+			@Override
+			protected Float applyDelta(Float value, int multiplierForDelta) {
+				return value + delta( multiplierForDelta );
+			}
+		};
 	}
 
 	@Override

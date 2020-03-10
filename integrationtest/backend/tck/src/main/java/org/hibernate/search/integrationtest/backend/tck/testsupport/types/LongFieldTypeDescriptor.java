@@ -16,6 +16,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 
 public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 
@@ -24,17 +25,32 @@ public class LongFieldTypeDescriptor extends FieldTypeDescriptor<Long> {
 	}
 
 	@Override
-	public List<Long> getAscendingUniqueTermValues() {
-		return Arrays.asList(
-				Long.MIN_VALUE,
-				-251_484_254L,
-				0L,
-				42L,
-				55L,
-				2500L,
-				151_484_254L,
-				Long.MAX_VALUE
-		);
+	protected AscendingUniqueTermValues<Long> createAscendingUniqueTermValues() {
+		return new AscendingUniqueTermValues<Long>() {
+			@Override
+			protected List<Long> createSingle() {
+				return Arrays.asList(
+						Long.MIN_VALUE,
+						-251_484_254L,
+						0L,
+						42L,
+						55L,
+						2500L,
+						151_484_254L,
+						Long.MAX_VALUE
+				);
+			}
+
+			@Override
+			protected Long delta(int multiplierForDelta) {
+				return 4245L * multiplierForDelta;
+			}
+
+			@Override
+			protected Long applyDelta(Long value, int multiplierForDelta) {
+				return value + delta( multiplierForDelta );
+			}
+		};
 	}
 
 	@Override

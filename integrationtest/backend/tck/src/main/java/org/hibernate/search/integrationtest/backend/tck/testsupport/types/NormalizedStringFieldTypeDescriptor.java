@@ -20,6 +20,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 
 public class NormalizedStringFieldTypeDescriptor extends FieldTypeDescriptor<String> {
 
@@ -38,17 +39,37 @@ public class NormalizedStringFieldTypeDescriptor extends FieldTypeDescriptor<Str
 	}
 
 	@Override
-	public List<String> getAscendingUniqueTermValues() {
-		return Arrays.asList(
-				"amaretto y croutons",
-				"Auster",
-				"Irving",
-				"irving and company",
-				"none the wiser",
-				"per the captain's log",
-				"platypus",
-				"Zach"
-		);
+	protected AscendingUniqueTermValues<String> createAscendingUniqueTermValues() {
+		return new AscendingUniqueTermValues<String>() {
+			@Override
+			protected List<String> createSingle() {
+				return Arrays.asList(
+						"amaretto y croutons",
+						"Auster",
+						"Irving",
+						"irving and company",
+						"none the wiser",
+						"per the captain's log",
+						"platypus",
+						"Zach"
+				);
+			}
+
+			@Override
+			protected List<List<String>> createMultiResultingInSingleAfterSum() {
+				return valuesThatWontBeUsed();
+			}
+
+			@Override
+			protected List<List<String>> createMultiResultingInSingleAfterAvg() {
+				return valuesThatWontBeUsed();
+			}
+
+			@Override
+			protected List<List<String>> createMultiResultingInSingleAfterMedian() {
+				return valuesThatWontBeUsed();
+			}
+		};
 	}
 
 	@Override

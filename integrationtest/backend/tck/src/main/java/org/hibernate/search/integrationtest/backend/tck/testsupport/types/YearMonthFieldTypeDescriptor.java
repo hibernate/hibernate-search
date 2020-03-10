@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.time.Month;
 import java.time.YearMonth;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -19,6 +20,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 
 public class YearMonthFieldTypeDescriptor extends FieldTypeDescriptor<YearMonth> {
 
@@ -27,17 +29,32 @@ public class YearMonthFieldTypeDescriptor extends FieldTypeDescriptor<YearMonth>
 	}
 
 	@Override
-	public List<YearMonth> getAscendingUniqueTermValues() {
-		return Arrays.asList(
-				YearMonth.of( -25435, Month.MAY ),
-				YearMonth.of( 0, Month.JUNE ),
-				YearMonth.of( 0, Month.OCTOBER ),
-				YearMonth.of( 1989, Month.MARCH ),
-				YearMonth.of( 1989, Month.JULY ),
-				YearMonth.of( 2019, Month.JANUARY ),
-				YearMonth.of( 2019, Month.NOVEMBER ),
-				YearMonth.of( 2019, Month.DECEMBER )
-		);
+	protected AscendingUniqueTermValues<YearMonth> createAscendingUniqueTermValues() {
+		return new AscendingUniqueTermValues<YearMonth>() {
+			@Override
+			protected List<YearMonth> createSingle() {
+				return Arrays.asList(
+						YearMonth.of( -25435, Month.MAY ),
+						YearMonth.of( 0, Month.JUNE ),
+						YearMonth.of( 0, Month.OCTOBER ),
+						YearMonth.of( 1989, Month.MARCH ),
+						YearMonth.of( 1989, Month.JULY ),
+						YearMonth.of( 2019, Month.JANUARY ),
+						YearMonth.of( 2019, Month.NOVEMBER ),
+						YearMonth.of( 2019, Month.DECEMBER )
+				);
+			}
+
+			@Override
+			protected List<List<YearMonth>> createMultiResultingInSingleAfterSum() {
+				return valuesThatWontBeUsed();
+			}
+
+			@Override
+			protected YearMonth applyDelta(YearMonth value, int multiplierForDelta) {
+				return value.plus( multiplierForDelta, ChronoUnit.YEARS );
+			}
+		};
 	}
 
 	@Override

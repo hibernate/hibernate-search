@@ -16,6 +16,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 
 public class ByteFieldTypeDescriptor extends FieldTypeDescriptor<Byte> {
 
@@ -24,17 +25,39 @@ public class ByteFieldTypeDescriptor extends FieldTypeDescriptor<Byte> {
 	}
 
 	@Override
-	public List<Byte> getAscendingUniqueTermValues() {
-		return Arrays.asList(
-				Byte.MIN_VALUE,
-				(byte) -58,
-				(byte) 0,
-				(byte) 42,
-				(byte) 55,
-				(byte) 70,
-				(byte) 101,
-				Byte.MAX_VALUE
-		);
+	protected AscendingUniqueTermValues<Byte> createAscendingUniqueTermValues() {
+		return new AscendingUniqueTermValues<Byte>() {
+			@Override
+			protected List<Byte> createSingle() {
+				return Arrays.asList(
+						(byte) ( Byte.MIN_VALUE + 2 ),
+						(byte) -58,
+						(byte) 0,
+						(byte) 42,
+						(byte) 55,
+						(byte) 70,
+						(byte) 101,
+						(byte) (Byte.MAX_VALUE - 10 )
+				);
+			}
+
+			@Override
+			protected Byte delta(int multiplierForDelta) {
+				return toByteExact( multiplierForDelta );
+			}
+
+			@Override
+			protected Byte applyDelta(Byte value, int multiplierForDelta) {
+				return toByteExact( value + delta( multiplierForDelta ) );
+			}
+
+			private byte toByteExact(int value) {
+				if ( value < Byte.MIN_VALUE || Byte.MAX_VALUE < value ) {
+					throw new IllegalStateException( "Test dataset contains an out-of-bound value for byte: " + value );
+				}
+				return (byte) value;
+			}
+		};
 	}
 
 	@Override
