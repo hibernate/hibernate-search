@@ -32,6 +32,21 @@ public class SimpleFieldModelsByType {
 		return result;
 	}
 
+	public static SimpleFieldModelsByType mapAllMultiValued(Stream<FieldTypeDescriptor<?>> typeDescriptors,
+			IndexSchemaElement parent, String prefix,
+			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration1,
+			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration2) {
+		SimpleFieldModelsByType result = new SimpleFieldModelsByType();
+		typeDescriptors.forEach( typeDescriptor -> {
+			result.content.put(
+					typeDescriptor,
+					SimpleFieldModel.mapper( typeDescriptor, additionalConfiguration1 )
+							.mapMultiValued( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration2 )
+			);
+		} );
+		return result;
+	}
+
 	private final Map<FieldTypeDescriptor<?>, SimpleFieldModel<?>> content = new LinkedHashMap<>();
 
 	@Override

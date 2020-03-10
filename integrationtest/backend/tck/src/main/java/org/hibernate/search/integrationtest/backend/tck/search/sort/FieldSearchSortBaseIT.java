@@ -9,8 +9,11 @@ package org.hibernate.search.integrationtest.backend.tck.search.sort;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
+import java.time.MonthDay;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
@@ -26,9 +29,12 @@ import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.search.common.SortMode;
+import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
-import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.NormalizedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
@@ -37,10 +43,13 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleF
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -58,14 +67,17 @@ public class FieldSearchSortBaseIT<F> {
 				.filter( typeDescriptor -> typeDescriptor.getFieldSortExpectations().isSupported() );
 	}
 
-	@Parameterized.Parameters(name = "{0} - {1}")
+	@Parameterized.Parameters(name = "{0} - {2} - {1}")
 	public static Object[][] parameters() {
 		List<Object[]> parameters = new ArrayList<>();
 		supportedTypeDescriptors().forEach( fieldTypeDescriptor -> {
 			ExpectationsAlternative<?, ?> expectations = fieldTypeDescriptor.getFieldSortExpectations();
 			if ( expectations.isSupported() ) {
 				for ( IndexFieldStructure indexFieldStructure : IndexFieldStructure.values() ) {
-					parameters.add( new Object[] { indexFieldStructure, fieldTypeDescriptor } );
+					parameters.add( new Object[] { indexFieldStructure, fieldTypeDescriptor, null } );
+					for ( SortMode sortMode : SortMode.values() ) {
+						parameters.add( new Object[] { indexFieldStructure, fieldTypeDescriptor, sortMode } );
+					}
 				}
 			}
 		} );
@@ -112,15 +124,20 @@ public class FieldSearchSortBaseIT<F> {
 
 	private final IndexFieldStructure indexFieldStructure;
 	private final FieldTypeDescriptor<F> fieldTypeDescriptor;
+	private final SortMode sortMode;
 
-	public FieldSearchSortBaseIT(IndexFieldStructure indexFieldStructure, FieldTypeDescriptor<F> fieldTypeDescriptor) {
+	public FieldSearchSortBaseIT(IndexFieldStructure indexFieldStructure, FieldTypeDescriptor<F> fieldTypeDescriptor,
+			SortMode sortMode) {
 		this.indexFieldStructure = indexFieldStructure;
 		this.fieldTypeDescriptor = fieldTypeDescriptor;
+		this.sortMode = sortMode;
 	}
 
 	@Test
-	@TestForIssue(jiraKey = { "HSEARCH-3798", "HSEARCH-2252", "HSEARCH-2254" })
+	@TestForIssue(jiraKey = { "HSEARCH-3798", "HSEARCH-2252", "HSEARCH-2254", "HSEARCH-3103" })
 	public void simple() {
+		assumeTestParametersWork();
+
 		SearchQuery<DocumentReference> query;
 		String absoluteFieldPath = getFieldPath();
 
@@ -139,7 +156,63 @@ public class FieldSearchSortBaseIT<F> {
 	}
 
 	@Test
+	@TestForIssue(jiraKey = { "HSEARCH-3103" })
+	public void medianWithNestedField() {
+		Assume.assumeTrue(
+				"This test is only relevant when using SortMode.MEDIAN in nested fields",
+				isMedianWithNestedField() && !isSumOrAvgOrMedianWithStringField()
+		);
+
+		SubTest.expectException( () -> matchNonEmptyQuery( b -> b.field( getFieldPath() ) ) )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						getFieldPath(),
+						"Cannot compute the median across nested documents",
+						getFieldPath()
+				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = { "HSEARCH-3103" })
+	public void sumOrAvgOrMedianWithStringField() {
+		Assume.assumeTrue(
+				"This test is only relevant when using SortMode.SUM/AVG/MEDIAN on String fields",
+				isSumOrAvgOrMedianWithStringField()
+		);
+
+		SubTest.expectException( () -> matchNonEmptyQuery( b -> b.field( getFieldPath() ) ) )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Cannot compute the sum, average or median of a text field",
+						"Only min and max are supported",
+						getFieldPath()
+				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = { "HSEARCH-3103" })
+	public void sumWithTemporalField() {
+		Assume.assumeTrue(
+				"This test is only relevant when using SortMode.SUM on Temporal fields",
+				isSumWithTemporalField()
+		);
+
+		SubTest.expectException( () -> matchNonEmptyQuery( b -> b.field( getFieldPath() ) ) )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Cannot compute the sum of a temporal field",
+						"Only min, max, avg and median are supported",
+						getFieldPath()
+				);
+	}
+
+	@Test
 	public void missingValue() {
+		assumeTestParametersWork();
+
 		SearchQuery<DocumentReference> query;
 
 		String fieldPath = getFieldPath();
@@ -187,6 +260,8 @@ public class FieldSearchSortBaseIT<F> {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3254")
 	public void missingValue_multipleEmpty() {
+		assumeTestParametersWork();
+
 		List<DocumentReference> docRefHits;
 		String fieldPath = getFieldPath();
 
@@ -233,6 +308,8 @@ public class FieldSearchSortBaseIT<F> {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3254")
 	public void missingValue_multipleEmpty_useExistingDocumentValue() {
+		assumeTestParametersWork();
+
 		List<DocumentReference> docRefHits;
 		String fieldPath = getFieldPath();
 
@@ -266,82 +343,162 @@ public class FieldSearchSortBaseIT<F> {
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(
-			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
+			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?>> sortContributor) {
 		return matchNonEmptyQuery( sortContributor, indexManager.createScope() );
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(
-			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
-		return scope.query()
-				.where( f -> f.matchAll()
-						.except( f.id().matchingAny( Arrays.asList( EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 ) ) ) )
-				.sort( sortContributor )
-				.toQuery();
+			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?>> sortContributor, StubMappingScope scope) {
+		return query(
+				f -> f.matchAll().except( f.id().matchingAny( Arrays.asList( EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 ) ) ),
+				sortContributor,
+				scope
+		);
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyAndEmpty1Query(
-			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
+			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?>> sortContributor) {
 		return matchNonEmptyAndEmpty1Query( sortContributor, indexManager.createScope() );
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyAndEmpty1Query(
-			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
-		return scope.query()
-				.where( f -> f.matchAll().except( f.id().matchingAny( Arrays.asList( EMPTY_2, EMPTY_3, EMPTY_4 ) ) ) )
-				.sort( sortContributor )
-				.toQuery();
+			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?>> sortContributor, StubMappingScope scope) {
+		return query(
+				f -> f.matchAll().except( f.id().matchingAny( Arrays.asList( EMPTY_2, EMPTY_3, EMPTY_4 ) ) ),
+				sortContributor,
+				scope
+		);
 	}
 
 	private SearchQuery<DocumentReference> matchAllQuery(
-			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
+			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?>> sortContributor) {
 		return matchAllQuery( sortContributor, indexManager.createScope() );
 	}
 
 	private SearchQuery<DocumentReference> matchAllQuery(
-			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
+			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?>> sortContributor, StubMappingScope scope) {
+		return query( f -> f.matchAll(), sortContributor, scope );
+	}
+
+	private SearchQuery<DocumentReference> query(
+			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor,
+			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?>> sortContributor,
+			StubMappingScope scope) {
 		return scope.query()
-				.where( f -> f.matchAll() )
-				.sort( sortContributor )
+				.where( predicateContributor )
+				.sort( sortContributor.andThen( this::applySortMode ) )
 				.toQuery();
+	}
+
+	private FieldSortOptionsStep<?> applySortMode(FieldSortOptionsStep<?> optionsStep) {
+		if ( sortMode != null ) {
+			return optionsStep.mode( sortMode );
+		}
+		else {
+			return optionsStep;
+		}
+	}
+
+	private void assumeTestParametersWork() {
+		Assume.assumeFalse(
+				"This combination is not expected to work",
+				isMedianWithNestedField() || isSumOrAvgOrMedianWithStringField() || isSumWithTemporalField()
+		);
+	}
+
+	private boolean isSumOrAvgOrMedianWithStringField() {
+		return EnumSet.of( SortMode.SUM, SortMode.AVG, SortMode.MEDIAN ).contains( sortMode )
+				&& String.class.equals( fieldTypeDescriptor.getJavaType() );
+	}
+
+	private boolean isSumWithTemporalField() {
+		return SortMode.SUM.equals( sortMode )
+				&& (
+						Temporal.class.isAssignableFrom( fieldTypeDescriptor.getJavaType() )
+						|| MonthDay.class.equals( fieldTypeDescriptor.getJavaType() )
+				);
+	}
+
+	private boolean isMedianWithNestedField() {
+		return SortMode.MEDIAN.equals( sortMode )
+				&& EnumSet.of( IndexFieldStructure.IN_NESTED, IndexFieldStructure.IN_NESTED_TWICE )
+				.contains( indexFieldStructure );
 	}
 
 	private String getFieldPath() {
 		switch ( indexFieldStructure ) {
 			case ROOT:
-				return indexMapping.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
+				return getRelativeFieldName( indexMapping );
 			case IN_FLATTENED:
 				return indexMapping.flattenedObject.relativeFieldName
-						+ "." + indexMapping.flattenedObject.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
+						+ "." + getRelativeFieldName( indexMapping.flattenedObject );
 			case IN_NESTED:
 				return indexMapping.nestedObject.relativeFieldName
-						+ "." + indexMapping.nestedObject.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
+						+ "." + getRelativeFieldName( indexMapping.nestedObject );
 			case IN_NESTED_TWICE:
 				return indexMapping.nestedObject.relativeFieldName
 						+ "." + indexMapping.nestedObject.nestedObject.relativeFieldName
-						+ "." + indexMapping.nestedObject.nestedObject.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
+						+ "." + getRelativeFieldName( indexMapping.nestedObject.nestedObject );
 			default:
 				throw new IllegalStateException( "Unexpected value: " + indexFieldStructure );
 		}
 	}
 
+	private String getRelativeFieldName(AbstractObjectMapping mapping) {
+		return getFieldModelsByType( mapping ).get( fieldTypeDescriptor ).relativeFieldName;
+	}
+
+	private SimpleFieldModelsByType getFieldModelsByType(AbstractObjectMapping mapping) {
+		if ( sortMode == null ) {
+			return mapping.fieldWithSingleValueModels;
+		}
+		switch ( sortMode ) {
+			case SUM:
+				return mapping.fieldWithAscendingSumModels;
+			case MIN:
+				return mapping.fieldWithAscendingMinModels;
+			case MAX:
+				return mapping.fieldWithAscendingMaxModels;
+			case AVG:
+				return mapping.fieldWithAscendingAvgModels;
+			case MEDIAN:
+				return mapping.fieldWithAscendingMedianModels;
+			default:
+				throw new IllegalStateException( "Unexpected sort mode: " + sortMode );
+		}
+	}
+
 	private static void initDocument(IndexMapping indexMapping, DocumentElement document, Integer ordinal) {
-		indexMapping.fieldModels.forEach(
-				fieldModel -> addValue( fieldModel, document, ordinal )
-		);
+		initAllFields( indexMapping, document, ordinal );
 
 		// Note: these objects must be single-valued for these tests
 		DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
 		DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
 		DocumentElement nestedObjectInNestedObject = nestedObject.addObject( indexMapping.nestedObject.nestedObject.self );
 
-		indexMapping.flattenedObject.fieldModels.forEach(
-				fieldModel -> addValue( fieldModel, flattenedObject, ordinal )
+		initAllFields( indexMapping.flattenedObject, flattenedObject, ordinal );
+		initAllFields( indexMapping.nestedObject, nestedObject, ordinal );
+		initAllFields( indexMapping.nestedObject.nestedObject, nestedObjectInNestedObject, ordinal );
+	}
+
+	private static void initAllFields(AbstractObjectMapping mapping, DocumentElement document, Integer ordinal) {
+		mapping.fieldWithSingleValueModels.forEach(
+				fieldModel -> addSingleValue( fieldModel, document, ordinal )
 		);
-		indexMapping.nestedObject.fieldModels.forEach(
-				fieldModel -> addValue( fieldModel, nestedObject, ordinal )
+		mapping.fieldWithAscendingMinModels.forEach(
+				fieldModel -> addMultipleValues( fieldModel, document, SortMode.MIN, ordinal )
 		);
-		indexMapping.nestedObject.nestedObject.fieldModels.forEach(
-				fieldModel -> addValue( fieldModel, nestedObjectInNestedObject, ordinal )
+		mapping.fieldWithAscendingMaxModels.forEach(
+				fieldModel -> addMultipleValues( fieldModel, document, SortMode.MAX, ordinal )
+		);
+		mapping.fieldWithAscendingSumModels.forEach(
+				fieldModel -> addMultipleValues( fieldModel, document, SortMode.SUM, ordinal )
+		);
+		mapping.fieldWithAscendingAvgModels.forEach(
+				fieldModel -> addMultipleValues( fieldModel, document, SortMode.AVG, ordinal )
+		);
+		mapping.fieldWithAscendingMedianModels.forEach(
+				fieldModel -> addMultipleValues( fieldModel, document, SortMode.MEDIAN, ordinal )
 		);
 	}
 
@@ -359,7 +516,7 @@ public class FieldSearchSortBaseIT<F> {
 		return value;
 	}
 
-	private static <F> void addValue(SimpleFieldModel<F> fieldModel, DocumentElement documentElement, Integer ordinal) {
+	private static <F> void addSingleValue(SimpleFieldModel<F> fieldModel, DocumentElement documentElement, Integer ordinal) {
 		if ( ordinal == null ) {
 			return;
 		}
@@ -367,6 +524,15 @@ public class FieldSearchSortBaseIT<F> {
 				fieldModel.reference,
 				fieldModel.typeDescriptor.getAscendingUniqueTermValues().getSingle().get( ordinal )
 		);
+	}
+
+	private static <F> void addMultipleValues(SimpleFieldModel<F> fieldModel, DocumentElement documentElement,
+			SortMode sortMode, Integer ordinal) {
+		if ( ordinal == null ) {
+			return;
+		}
+		fieldModel.typeDescriptor.getAscendingUniqueTermValues().getMultiResultingInSingle( sortMode ).get( ordinal )
+				.forEach( value -> documentElement.addValue( fieldModel.reference, value ) );
 	}
 
 	private static void initData() {
@@ -397,12 +563,27 @@ public class FieldSearchSortBaseIT<F> {
 	}
 
 	private static class AbstractObjectMapping {
-		final SimpleFieldModelsByType fieldModels;
+		final SimpleFieldModelsByType fieldWithSingleValueModels;
+		final SimpleFieldModelsByType fieldWithAscendingSumModels;
+		final SimpleFieldModelsByType fieldWithAscendingMinModels;
+		final SimpleFieldModelsByType fieldWithAscendingMaxModels;
+		final SimpleFieldModelsByType fieldWithAscendingAvgModels;
+		final SimpleFieldModelsByType fieldWithAscendingMedianModels;
 
 		AbstractObjectMapping(IndexSchemaElement self,
 				Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
-			fieldModels = SimpleFieldModelsByType.mapAll( supportedTypeDescriptors(), self, "",
-					c -> c.sortable( Sortable.YES ), additionalConfiguration );
+			fieldWithSingleValueModels = SimpleFieldModelsByType.mapAll( supportedTypeDescriptors(), self,
+					"single_", c -> c.sortable( Sortable.YES ), additionalConfiguration );
+			fieldWithAscendingSumModels = SimpleFieldModelsByType.mapAllMultiValued( supportedTypeDescriptors(), self,
+					"multi_ascendingsum_", c -> c.sortable( Sortable.YES ), additionalConfiguration );
+			fieldWithAscendingMinModels = SimpleFieldModelsByType.mapAllMultiValued( supportedTypeDescriptors(), self,
+					"multi_ascendingmin_", c -> c.sortable( Sortable.YES ), additionalConfiguration );
+			fieldWithAscendingMaxModels = SimpleFieldModelsByType.mapAllMultiValued( supportedTypeDescriptors(), self,
+					"multi_ascendingmax_", c -> c.sortable( Sortable.YES ), additionalConfiguration );
+			fieldWithAscendingAvgModels = SimpleFieldModelsByType.mapAllMultiValued( supportedTypeDescriptors(), self,
+					"multi_ascendingavg_", c -> c.sortable( Sortable.YES ), additionalConfiguration );
+			fieldWithAscendingMedianModels = SimpleFieldModelsByType.mapAllMultiValued( supportedTypeDescriptors(), self,
+					"multi_ascendingmedian_", c -> c.sortable( Sortable.YES ), additionalConfiguration );
 		}
 	}
 
