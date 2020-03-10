@@ -10,16 +10,14 @@ import static org.hibernate.search.util.impl.integrationtest.common.assertion.Se
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
-import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
@@ -34,6 +32,8 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.NormalizedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.InvalidType;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
@@ -57,15 +57,20 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 
+	private static Stream<FieldTypeDescriptor<?>> supportedTypeDescriptors() {
+		return FieldTypeDescriptor.getAll().stream()
+				.filter( typeDescriptor -> typeDescriptor.getFieldSortExpectations().isSupported() );
+	}
+
 	@Parameterized.Parameters(name = "{0} - {1}")
 	public static Object[][] parameters() {
 		List<Object[]> parameters = new ArrayList<>();
-		for ( FieldTypeDescriptor<?> fieldTypeDescriptor : FieldTypeDescriptor.getAll() ) {
+		supportedTypeDescriptors().forEach( fieldTypeDescriptor -> {
 			ExpectationsAlternative<?, ?> expectations = fieldTypeDescriptor.getFieldSortExpectations();
 			if ( expectations.isSupported() ) {
 				parameters.add( new Object[] { fieldTypeDescriptor } );
 			}
-		}
+		} );
 		return parameters.toArray( new Object[0][] );
 	}
 
@@ -377,10 +382,8 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 	}
 
 	private static void initDocument(IndexMapping indexMapping, DocumentElement document, Integer ordinal) {
-		forEachSupportedTypeDescriptor( typeDescriptor -> {
-			addValue( document, indexMapping.fieldModels, typeDescriptor, ordinal );
-			addValue( document, indexMapping.fieldWithDslConverterModels, typeDescriptor, ordinal );
-		} );
+		indexMapping.fieldModels.forEach( fieldModel -> addValue( fieldModel, document, ordinal ) );
+		indexMapping.fieldWithDslConverterModels.forEach( fieldModel -> addValue( fieldModel, document, ordinal ) );
 	}
 
 	@SuppressWarnings("unchecked")
@@ -397,14 +400,13 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 		return value;
 	}
 
-	private static <F> void addValue(DocumentElement documentElement,
-			FieldModelsByType fieldModels, FieldTypeDescriptor<F> typeDescriptor, Integer ordinal) {
+	private static <F> void addValue(SimpleFieldModel<F> fieldModel, DocumentElement documentElement, Integer ordinal) {
 		if ( ordinal == null ) {
 			return;
 		}
 		documentElement.addValue(
-				fieldModels.get( typeDescriptor ).reference,
-				typeDescriptor.getAscendingUniqueTermValues().get( ordinal )
+				fieldModel.reference,
+				fieldModel.typeDescriptor.getAscendingUniqueTermValues().get( ordinal )
 		);
 	}
 
@@ -447,16 +449,10 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 		assertThat( query ).hasDocRefHitsAnyOrder( RAW_FIELD_COMPATIBLE_INDEX_NAME, RAW_FIELD_COMPATIBLE_INDEX_DOCUMENT_1 );
 	}
 
-	private static void forEachSupportedTypeDescriptor(Consumer<FieldTypeDescriptor<?>> action) {
-		FieldTypeDescriptor.getAll().stream()
-				.filter( typeDescriptor -> typeDescriptor.getFieldSortExpectations().isSupported() )
-				.forEach( action );
-	}
-
 	private static class IndexMapping {
-		final FieldModelsByType fieldModels;
-		final FieldModelsByType fieldWithDslConverterModels;
-		final FieldModelsByType nonSortableFieldModels;
+		final SimpleFieldModelsByType fieldModels;
+		final SimpleFieldModelsByType fieldWithDslConverterModels;
+		final SimpleFieldModelsByType nonSortableFieldModels;
 
 		IndexMapping(IndexSchemaElement root) {
 			this( root, ignored -> { } );
@@ -464,15 +460,20 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 
 		IndexMapping(IndexSchemaElement root,
 				Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
-			fieldModels = FieldModelsByType.mapSupported( root, "", additionalConfiguration );
-			fieldWithDslConverterModels = FieldModelsByType.mapSupported(
-					root, "converted_",
+			fieldModels = SimpleFieldModelsByType.mapAll(
+					supportedTypeDescriptors(),
+					root, "", c -> c.sortable( Sortable.YES ), additionalConfiguration
+			);
+			fieldWithDslConverterModels = SimpleFieldModelsByType.mapAll(
+					supportedTypeDescriptors(), root, "converted_",
+					c -> c.sortable( Sortable.YES ),
 					additionalConfiguration.andThen(
 							c -> c.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
 					)
 			);
-			nonSortableFieldModels = FieldModelsByType.mapSupported(
-					root, "nonSortable_",
+			nonSortableFieldModels = SimpleFieldModelsByType.mapAll(
+					supportedTypeDescriptors(), root, "nonSortable_",
+					c -> c.sortable( Sortable.YES ),
 					additionalConfiguration.andThen( c -> c.sortable( Sortable.NO ) )
 			);
 		}
@@ -498,7 +499,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 		}
 
 		private static void mapFieldsWithIncompatibleType(IndexSchemaElement parent) {
-			forEachSupportedTypeDescriptor( typeDescriptor -> {
+			supportedTypeDescriptors().forEach( typeDescriptor -> {
 				StandardFieldMapper<?, IncompatibleFieldModel> mapper;
 				if ( Integer.class.equals( typeDescriptor.getJavaType() ) ) {
 					mapper = IncompatibleFieldModel.mapper( context -> context.asLong() );
@@ -508,46 +509,6 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 				}
 				mapper.map( parent, "" + typeDescriptor.getUniqueName() );
 			} );
-		}
-	}
-
-	private static class FieldModelsByType {
-		public static FieldModelsByType mapSupported(IndexSchemaElement parent, String prefix,
-				Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration) {
-			FieldModelsByType result = new FieldModelsByType();
-			forEachSupportedTypeDescriptor( typeDescriptor -> {
-				result.content.put(
-						typeDescriptor,
-						FieldModel.mapper( typeDescriptor )
-								.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration )
-				);
-			} );
-			return result;
-		}
-
-		private final Map<FieldTypeDescriptor<?>, FieldModel<?>> content = new LinkedHashMap<>();
-
-		@SuppressWarnings("unchecked")
-		private <F> FieldModel<F> get(FieldTypeDescriptor<F> typeDescriptor) {
-			return (FieldModel<F>) content.get( typeDescriptor );
-		}
-	}
-
-	private static class FieldModel<F> {
-		static <F> StandardFieldMapper<F, FieldModel<F>> mapper(FieldTypeDescriptor<F> typeDescriptor) {
-			return StandardFieldMapper.of(
-					typeDescriptor::configure,
-					c -> c.sortable( Sortable.YES ),
-					FieldModel::new
-			);
-		}
-
-		final IndexFieldReference<F> reference;
-		final String relativeFieldName;
-
-		private FieldModel(IndexFieldReference<F> reference, String relativeFieldName) {
-			this.reference = reference;
-			this.relativeFieldName = relativeFieldName;
 		}
 	}
 
