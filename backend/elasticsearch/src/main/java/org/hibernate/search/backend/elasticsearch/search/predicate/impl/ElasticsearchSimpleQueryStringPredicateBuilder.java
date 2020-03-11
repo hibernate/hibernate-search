@@ -56,7 +56,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 
 	ElasticsearchSimpleQueryStringPredicateBuilder(ElasticsearchScopeModel scopeModel) {
 		this.scopeModel = scopeModel;
-		this.nestedCompatibilityChecker = new ElasticsearchDifferentNestedObjectCompatibilityChecker( scopeModel );
+		this.nestedCompatibilityChecker = ElasticsearchDifferentNestedObjectCompatibilityChecker.empty( scopeModel );
 	}
 
 	@Override
@@ -84,7 +84,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 					absoluteFieldPath, ElasticsearchSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 			field = fieldComponent.getComponent().createSimpleQueryStringFieldContext( absoluteFieldPath );
 			analyzerChecker = analyzerChecker.combine( fieldComponent.getAnalyzerCompatibilityChecker() );
-			nestedCompatibilityChecker.combineAndCheck( absoluteFieldPath );
+			nestedCompatibilityChecker = nestedCompatibilityChecker.combineAndCheck( absoluteFieldPath );
 			fields.put( absoluteFieldPath, field );
 		}
 		return field;
@@ -138,8 +138,8 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 
 		SIMPLE_QUERY_STRING_ACCESSOR.set( outerObject, innerObject );
 
-		return ( nestedCompatibilityChecker.getNestedObjectPath().isEmpty() ) ? outerObject :
-				AbstractElasticsearchSearchNestedPredicateBuilder.applyImplicitNested( outerObject, nestedCompatibilityChecker.getNestedObjectPath(), context );
+		return ( nestedCompatibilityChecker.getNestedPathHierarchy().isEmpty() ) ? outerObject :
+				AbstractElasticsearchSearchNestedPredicateBuilder.applyImplicitNested( outerObject, nestedCompatibilityChecker.getNestedPathHierarchy(), context );
 	}
 
 	/**
