@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
@@ -44,12 +45,11 @@ class LuceneTextMatchPredicateBuilder<F>
 	private boolean analyzerOverridden = false;
 
 	LuceneTextMatchPredicateBuilder(
-			LuceneSearchContext searchContext,
-			String absoluteFieldPath, String nestedDocumentPath,
+			LuceneSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy,
 			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			LuceneCompatibilityChecker converterChecker, LuceneTextFieldCodec<F> codec,
 			Analyzer analyzerOrNormalizer, LuceneCompatibilityChecker analyzerChecker) {
-		super( searchContext, absoluteFieldPath, nestedDocumentPath, converter, rawConverter, converterChecker, codec );
+		super( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec );
 		this.analyzerOrNormalizer = analyzerOrNormalizer;
 		this.analyzerChecker = analyzerChecker;
 		this.analysisDefinitionRegistry = searchContext.getAnalysisDefinitionRegistry();

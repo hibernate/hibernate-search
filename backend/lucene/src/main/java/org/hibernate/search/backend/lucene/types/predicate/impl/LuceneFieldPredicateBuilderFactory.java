@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import java.util.List;
+
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
@@ -43,7 +45,7 @@ public interface LuceneFieldPredicateBuilderFactory {
 
 	boolean hasCompatibleAnalyzer(LuceneFieldPredicateBuilderFactory other);
 
-	MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder( LuceneSearchContext searchContext, String absoluteFieldPath, String nestedDocumentPath,
+	MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder( LuceneSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy,
 			LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker);
 
 	RangePredicateBuilder<LuceneSearchPredicateBuilder> createRangePredicateBuilder(
