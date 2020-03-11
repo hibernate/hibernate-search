@@ -611,4 +611,8 @@ public interface Log extends BasicLogger {
 			value = "Unable to drop index directory: %1$s")
 	SearchException unableToDropIndexDirectory(String causeMessage,
 			@Param EventContext context, @Cause Exception cause);
+
+	@Message(id = ID_OFFSET_2 + 112, value = "Multiple index conflicting models on nested document paths targeting '%1$s'. '%2$s' vs. '%3$s'.")
+	SearchException conflictingNestedDocumentPathHierarchy(String absoluteFieldPath, List<String> nestedDocumentPathHierarchy1, List<String> nestedDocumentPathHierarchy2,
+			@Param EventContext context);
 }

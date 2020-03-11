@@ -205,11 +205,11 @@ public class ElasticsearchScopeModel {
 		return nestedDocumentPath.orElse( null );
 	}
 
-	public List<String> getNestedPathHierarchy(String absoluteFieldPath) {
+	public List<String> getNestedPathHierarchyForField(String absoluteFieldPath) {
 		Optional<List<String>> nestedDocumentPath = indexModels.stream()
 				.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath ) )
 				.filter( Objects::nonNull )
-				.map( fieldNode -> Optional.ofNullable( fieldNode.getNestedPathHierarchy() ) )
+				.map( node -> Optional.ofNullable( node.getNestedPathHierarchy() ) )
 				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
 					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
 						return nestedDocumentPath1;
@@ -227,7 +227,7 @@ public class ElasticsearchScopeModel {
 		Optional<List<String>> nestedDocumentPath = indexModels.stream()
 				.map( indexModel -> indexModel.getObjectNode( absoluteObjectPath ) )
 				.filter( Objects::nonNull )
-				.map( fieldNode -> Optional.ofNullable( fieldNode.getNestedPathHierarchy() ) )
+				.map( node -> Optional.ofNullable( node.getNestedPathHierarchy() ) )
 				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
 					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
 						return nestedDocumentPath1;

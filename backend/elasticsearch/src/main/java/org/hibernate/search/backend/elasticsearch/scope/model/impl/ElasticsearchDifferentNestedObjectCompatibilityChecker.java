@@ -14,38 +14,40 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class ElasticsearchDifferentNestedObjectCompatibilityChecker {
 
+	public static ElasticsearchDifferentNestedObjectCompatibilityChecker empty(ElasticsearchScopeModel scopeModel) {
+		return new ElasticsearchDifferentNestedObjectCompatibilityChecker( scopeModel, null, null );
+	}
+
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final ElasticsearchScopeModel scopeModel;
+	private final String fieldPath;
+	private final List<String> nestedPathHierarchy;
 
-	private String absoluteFieldPath;
-	private List<String> nestedObjectPath;
-
-	public ElasticsearchDifferentNestedObjectCompatibilityChecker(ElasticsearchScopeModel scopeModel) {
+	private ElasticsearchDifferentNestedObjectCompatibilityChecker(ElasticsearchScopeModel scopeModel, String fieldPath, List<String> nestedPathHierarchy) {
 		this.scopeModel = scopeModel;
+		this.fieldPath = fieldPath;
+		this.nestedPathHierarchy = nestedPathHierarchy;
 	}
 
-	public void combineAndCheck(String anotherAbsoluteFieldPath) {
-		if ( absoluteFieldPath == null ) {
-			absoluteFieldPath = anotherAbsoluteFieldPath;
-			nestedObjectPath = scopeModel.getNestedPathHierarchy( absoluteFieldPath );
-			return;
+	public ElasticsearchDifferentNestedObjectCompatibilityChecker combineAndCheck(String incomingFieldPath) {
+		List<String> incomingNestedPathHierarchy = scopeModel.getNestedPathHierarchyForField( incomingFieldPath );
+		if ( fieldPath == null ) {
+			return new ElasticsearchDifferentNestedObjectCompatibilityChecker( scopeModel, incomingFieldPath, incomingNestedPathHierarchy );
 		}
 
-		List<String> anotherNestedObjectPath = scopeModel.getNestedPathHierarchy( anotherAbsoluteFieldPath );
-		if ( !nestedObjectPath.equals( anotherNestedObjectPath ) ) {
-			throw log.simpleQueryStringSpanningMultipleNestedPaths( absoluteFieldPath, getLastPath( nestedObjectPath ), anotherAbsoluteFieldPath,
-					getLastPath( anotherNestedObjectPath )
-			);
+		if ( !nestedPathHierarchy.equals( incomingNestedPathHierarchy ) ) {
+			throw log.simpleQueryStringSpanningMultipleNestedPaths( fieldPath, getLastPath( nestedPathHierarchy ), incomingFieldPath, getLastPath( incomingNestedPathHierarchy ) );
 		}
+		return this;
 	}
 
-	public List<String> getNestedObjectPath() {
-		return nestedObjectPath;
+	public List<String> getNestedPathHierarchy() {
+		return nestedPathHierarchy;
 	}
 
 	public boolean isEmpty() {
-		return nestedObjectPath == null || nestedObjectPath.isEmpty();
+		return nestedPathHierarchy == null || nestedPathHierarchy.isEmpty();
 	}
 
 	private static String getLastPath(List<String> hierarchy) {

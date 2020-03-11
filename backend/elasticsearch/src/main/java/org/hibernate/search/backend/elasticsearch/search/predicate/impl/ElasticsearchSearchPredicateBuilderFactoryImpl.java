@@ -103,7 +103,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 				absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 
 		return fieldComponent.getComponent().createMatchPredicateBuilder(
-				searchContext, absoluteFieldPath, scopeModel.getNestedPathHierarchy( absoluteFieldPath ),
+				searchContext, absoluteFieldPath, scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ),
 				fieldComponent.getConverterCompatibilityChecker(), fieldComponent.getAnalyzerCompatibilityChecker()
 		);
 	}
@@ -113,7 +113,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldPredicateBuilderFactory> fieldComponent = scopeModel.getSchemaNodeComponent(
 				absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 		return fieldComponent.getComponent().createRangePredicateBuilder(
-				searchContext, absoluteFieldPath, scopeModel.getNestedPathHierarchy( absoluteFieldPath ),
+				searchContext, absoluteFieldPath, scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ),
 				fieldComponent.getConverterCompatibilityChecker() );
 	}
 
@@ -121,7 +121,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	public PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> phrase(String absoluteFieldPath) {
 		ElasticsearchScopedIndexFieldComponent<ElasticsearchFieldPredicateBuilderFactory> fieldComponent = scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		return fieldComponent.getComponent().createPhrasePredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchy( absoluteFieldPath ),
+		return fieldComponent.getComponent().createPhrasePredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ),
 				fieldComponent.getAnalyzerCompatibilityChecker() );
 	}
 
@@ -129,7 +129,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	public WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> wildcard(String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createWildcardPredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchy( absoluteFieldPath ) );
+				.getComponent().createWildcardPredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ) );
 	}
 
 	@Override
@@ -144,7 +144,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 			// We may be able to relax this constraint, but that would require more extensive testing
 			scopeModel.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 		}
-		List<String> nestedPathHierarchy = scopeModel.getNestedPathHierarchy( absoluteFieldPath );
+		List<String> nestedPathHierarchy = scopeModel.getNestedPathHierarchyForField( absoluteFieldPath );
 		if ( nestedPathHierarchy == null ) {
 			nestedPathHierarchy = scopeModel.getNestedPathHierarchyForObject( absoluteFieldPath );
 		}
@@ -156,7 +156,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 			String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createSpatialWithinCirclePredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchy( absoluteFieldPath ) );
+				.getComponent().createSpatialWithinCirclePredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ) );
 	}
 
 	@Override
@@ -164,7 +164,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 			String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createSpatialWithinPolygonPredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchy( absoluteFieldPath ) );
+				.getComponent().createSpatialWithinPolygonPredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ) );
 	}
 
 	@Override
@@ -172,7 +172,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 			String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
-				.getComponent().createSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchy( absoluteFieldPath ) );
+				.getComponent().createSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ) );
 	}
 
 	@Override
