@@ -681,6 +681,25 @@ public class PredicateDslIT {
 	}
 
 	@Test
+	public void nested_implicit() {
+		withinSearchSession( searchSession -> {
+			// tag::nested-implicit-form[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.bool()
+							.must( f.match().field( "authors.firstName" ) // <1>
+									.matching( "isaac" ) ) // <2>
+							.must( f.match().field( "authors.lastName" )
+									.matching( "asimov" ) ) // <3>
+							)
+					.fetchHits( 20 ); // <4>
+			// end::nested-implicit-form[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactlyInAnyOrder( BOOK1_ID, BOOK2_ID, BOOK3_ID );
+		} );
+	}
+
+	@Test
 	public void within() {
 		withinSearchSession( searchSession -> {
 			// tag::within-circle[]
