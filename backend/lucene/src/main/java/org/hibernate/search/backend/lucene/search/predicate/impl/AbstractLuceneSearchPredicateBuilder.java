@@ -6,12 +6,14 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import java.util.List;
+import java.util.function.Function;
+
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 
 import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.ConstantScoreQuery;
 import org.apache.lucene.search.Query;
-
 
 
 public abstract class AbstractLuceneSearchPredicateBuilder implements SearchPredicateBuilder<LuceneSearchPredicateBuilder>,
@@ -52,4 +54,22 @@ public abstract class AbstractLuceneSearchPredicateBuilder implements SearchPred
 	}
 
 	protected abstract Query doBuild(LuceneSearchPredicateContext context);
+
+	protected Query applyImplicitNestedSteps(List<String> furtherImplicitNestedSteps, LuceneSearchPredicateContext context,
+			Function<LuceneSearchPredicateContext, Query> baseBuild) {
+		if ( furtherImplicitNestedSteps.isEmpty() ) {
+			return baseBuild.apply( context );
+		}
+
+		if ( furtherImplicitNestedSteps.size() == 1 ) {
+			String lastStep = furtherImplicitNestedSteps.get( 0 );
+			// baseBuild.apply( context ) must be called only at the very end of the recursion.
+			// Note that there is no reason here to update the context, because we already reached the target field.
+			return LuceneNestedPredicateBuilder.doBuild( context, lastStep, baseBuild.apply( context ) );
+		}
+
+		String step = furtherImplicitNestedSteps.remove( 0 );
+		LuceneSearchPredicateContext childContext = new LuceneSearchPredicateContext( step );
+		return LuceneNestedPredicateBuilder.doBuild( context, step, applyImplicitNestedSteps( furtherImplicitNestedSteps, childContext, baseBuild ) );
+	}
 }

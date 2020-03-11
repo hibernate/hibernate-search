@@ -9,6 +9,7 @@ package org.hibernate.search.backend.lucene.search.predicate.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -44,18 +45,18 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
 	private final Map<String, LuceneSimpleQueryStringPredicateBuilderFieldState> fields = new LinkedHashMap<>();
-	private final LuceneDifferentNestedObjectCompatibilityChecker nestedCompatibilityChecker;
 	private Occur defaultOperator = Occur.SHOULD;
 	private String simpleQueryString;
 	private Analyzer overrideAnalyzer;
 	private boolean ignoreAnalyzer = false;
 	private EnumSet<SimpleQueryFlag> flags;
 	private LuceneCompatibilityChecker analyzerChecker = new LuceneSucceedingCompatibilityChecker();
+	private LuceneDifferentNestedObjectCompatibilityChecker nestedCompatibilityChecker;
 
 	LuceneSimpleQueryStringPredicateBuilder(LuceneSearchContext searchContext, LuceneScopeModel scopeModel) {
 		this.scopeModel = scopeModel;
 		this.analysisDefinitionRegistry = searchContext.getAnalysisDefinitionRegistry();
-		this.nestedCompatibilityChecker = new LuceneDifferentNestedObjectCompatibilityChecker( scopeModel );
+		this.nestedCompatibilityChecker = LuceneDifferentNestedObjectCompatibilityChecker.empty( scopeModel );
 	}
 
 	@Override
@@ -83,7 +84,7 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 				absoluteFieldPath, LuceneSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 			field = fieldComponent.getComponent().createSimpleQueryStringFieldContext( absoluteFieldPath );
 			analyzerChecker = analyzerChecker.combine( fieldComponent.getAnalyzerCompatibilityChecker() );
-			nestedCompatibilityChecker.combineAndCheck( absoluteFieldPath );
+			nestedCompatibilityChecker = nestedCompatibilityChecker.combineAndCheck( absoluteFieldPath );
 			fields.put( absoluteFieldPath, field );
 		}
 		return field;
@@ -169,6 +170,13 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 		queryParser.setDefaultOperator( defaultOperator );
 
 		return queryParser.parse( simpleQueryString );
+
+	}
+
+	@Override
+	public Query build(LuceneSearchPredicateContext context) {
+		List<String> nestedObjectPath = nestedCompatibilityChecker.getNestedObjectPath( context );
+		return applyImplicitNestedSteps( nestedObjectPath, context, super::build );
 	}
 
 	private Analyzer buildAnalyzer() {

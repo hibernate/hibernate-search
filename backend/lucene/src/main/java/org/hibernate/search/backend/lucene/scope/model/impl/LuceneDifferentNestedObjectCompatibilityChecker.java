@@ -10,42 +10,46 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSearchNestedPredicateBuilder;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class LuceneDifferentNestedObjectCompatibilityChecker {
 
+	public static LuceneDifferentNestedObjectCompatibilityChecker empty(LuceneScopeModel scopeModel) {
+		return new LuceneDifferentNestedObjectCompatibilityChecker( scopeModel, null, null );
+	}
+
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneScopeModel scopeModel;
+	private final String fieldPath;
+	private final List<String> nestedPathHierarchy;
 
-	private String absoluteFieldPath;
-	private List<String> nestedObjectPath;
-
-	public LuceneDifferentNestedObjectCompatibilityChecker(LuceneScopeModel scopeModel) {
+	private LuceneDifferentNestedObjectCompatibilityChecker(LuceneScopeModel scopeModel, String fieldPath, List<String> nestedPathHierarchy) {
 		this.scopeModel = scopeModel;
+		this.fieldPath = fieldPath;
+		this.nestedPathHierarchy = nestedPathHierarchy;
 	}
 
-	public void combineAndCheck(String anotherAbsoluteFieldPath) {
-		if ( absoluteFieldPath == null ) {
-			absoluteFieldPath = anotherAbsoluteFieldPath;
-			nestedObjectPath = scopeModel.getNestedPathHierarchyForField( absoluteFieldPath );
-			return;
+	public LuceneDifferentNestedObjectCompatibilityChecker combineAndCheck(String incomingFieldPath) {
+		List<String> incomingNestedPathHierarchy = scopeModel.getNestedPathHierarchyForField( incomingFieldPath );
+		if ( fieldPath == null ) {
+			return new LuceneDifferentNestedObjectCompatibilityChecker( scopeModel, incomingFieldPath, incomingNestedPathHierarchy );
 		}
 
-		List<String> anotherNestedObjectPath = scopeModel.getNestedPathHierarchyForField( anotherAbsoluteFieldPath );
-		if ( !nestedObjectPath.equals( anotherNestedObjectPath ) ) {
-			throw log.simpleQueryStringSpanningMultipleNestedPaths( absoluteFieldPath, getLastPath( nestedObjectPath ), anotherAbsoluteFieldPath,
-					getLastPath( anotherNestedObjectPath )
-			);
+		if ( !nestedPathHierarchy.equals( incomingNestedPathHierarchy ) ) {
+			throw log.simpleQueryStringSpanningMultipleNestedPaths( fieldPath, getLastPath( nestedPathHierarchy ), incomingFieldPath, getLastPath( incomingNestedPathHierarchy ) );
 		}
+		return this;
 	}
 
-	public List<String> getNestedObjectPath() {
-		return nestedObjectPath;
+	public List<String> getNestedObjectPath(LuceneSearchPredicateContext context) {
+		return AbstractLuceneSearchNestedPredicateBuilder.implicitNestedSteps( context, nestedPathHierarchy );
 	}
 
 	public boolean isEmpty() {
-		return nestedObjectPath == null || nestedObjectPath.isEmpty();
+		return nestedPathHierarchy == null || nestedPathHierarchy.isEmpty();
 	}
 
 	private static String getLastPath(List<String> hierarchy) {
