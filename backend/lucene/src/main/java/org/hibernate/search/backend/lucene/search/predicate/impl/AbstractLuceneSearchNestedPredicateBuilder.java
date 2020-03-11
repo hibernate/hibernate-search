@@ -23,11 +23,11 @@ public abstract class AbstractLuceneSearchNestedPredicateBuilder extends Abstrac
 
 	@Override
 	public final Query build(LuceneSearchPredicateContext context) {
-		List<String> nestedSteps = implicitNestedSteps( context );
-		return applyImplicitNestedSteps( nestedSteps, context );
+		List<String> nestedSteps = implicitNestedSteps( context, nestedPathHierarchy );
+		return applyImplicitNestedSteps( nestedSteps, context, super::build );
 	}
 
-	private List<String> implicitNestedSteps(LuceneSearchPredicateContext context) {
+	public static List<String> implicitNestedSteps(LuceneSearchPredicateContext context, List<String> nestedPathHierarchy) {
 		String contextNestedPath = context.getNestedPath();
 
 		if ( contextNestedPath == null ) {
@@ -43,22 +43,5 @@ public abstract class AbstractLuceneSearchNestedPredicateBuilder extends Abstrac
 		// we need to handle just the last part of the nestedPathHierarchy belong to the target,
 		// the one that hasn't been handled by the context
 		return new LinkedList<>( nestedPathHierarchy.subList( contextNestedPathIndex + 1, nestedPathHierarchy.size() ) );
-	}
-
-	private Query applyImplicitNestedSteps(List<String> furtherImplicitNestedSteps, LuceneSearchPredicateContext context) {
-		if ( furtherImplicitNestedSteps.isEmpty() ) {
-			return super.build( context );
-		}
-
-		if ( furtherImplicitNestedSteps.size() == 1 ) {
-			String lastStep = furtherImplicitNestedSteps.get( 0 );
-			LuceneSearchPredicateContext childContext = new LuceneSearchPredicateContext( lastStep );
-			// super.build( childContext ) must be called only from the very last nest step
-			return LuceneNestedPredicateBuilder.doBuild( context, lastStep, super.build( childContext ) );
-		}
-
-		String step = furtherImplicitNestedSteps.remove( 0 );
-		LuceneSearchPredicateContext childContext = new LuceneSearchPredicateContext( step );
-		return LuceneNestedPredicateBuilder.doBuild( context, step, applyImplicitNestedSteps( furtherImplicitNestedSteps, childContext ) );
 	}
 }
