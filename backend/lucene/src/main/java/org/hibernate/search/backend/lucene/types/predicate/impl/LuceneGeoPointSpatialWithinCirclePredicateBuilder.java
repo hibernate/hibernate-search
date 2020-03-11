@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import java.util.List;
+
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSpatialWithinCirclePredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 
@@ -14,8 +16,8 @@ import org.apache.lucene.search.Query;
 
 class LuceneGeoPointSpatialWithinCirclePredicateBuilder extends AbstractLuceneSpatialWithinCirclePredicateBuilder {
 
-	LuceneGeoPointSpatialWithinCirclePredicateBuilder(String absoluteFieldPath) {
-		super( absoluteFieldPath );
+	LuceneGeoPointSpatialWithinCirclePredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
+		super( absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override

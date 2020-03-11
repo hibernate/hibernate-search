@@ -51,7 +51,7 @@ public final class LuceneGeoPointFieldPredicateBuilderFactory
 
 	@Override
 	public RangePredicateBuilder<LuceneSearchPredicateBuilder> createRangePredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneCompatibilityChecker converterChecker) {
+			LuceneSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy, LuceneCompatibilityChecker converterChecker) {
 		throw log.rangesNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
@@ -59,23 +59,23 @@ public final class LuceneGeoPointFieldPredicateBuilderFactory
 
 	@Override
 	public SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
-			String absoluteFieldPath) {
+			String absoluteFieldPath, List<String> nestedPathHierarchy) {
 		checkSearchable( absoluteFieldPath );
-		return new LuceneGeoPointSpatialWithinCirclePredicateBuilder( absoluteFieldPath );
+		return new LuceneGeoPointSpatialWithinCirclePredicateBuilder( absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
-			String absoluteFieldPath) {
+			String absoluteFieldPath, List<String> nestedPathHierarchy) {
 		checkSearchable( absoluteFieldPath );
-		return new LuceneGeoPointSpatialWithinPolygonPredicateBuilder( absoluteFieldPath );
+		return new LuceneGeoPointSpatialWithinPolygonPredicateBuilder( absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
-			String absoluteFieldPath) {
+			String absoluteFieldPath, List<String> nestedPathHierarchy) {
 		checkSearchable( absoluteFieldPath );
-		return new LuceneGeoPointSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath );
+		return new LuceneGeoPointSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override

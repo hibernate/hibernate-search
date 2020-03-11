@@ -39,8 +39,8 @@ public final class LuceneNumericFieldPredicateBuilderFactory<F, E extends Number
 
 	@Override
 	public LuceneNumericRangePredicateBuilder<F, E> createRangePredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneCompatibilityChecker converterChecker) {
+			LuceneSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy, LuceneCompatibilityChecker converterChecker) {
 		checkSearchable( absoluteFieldPath );
-		return new LuceneNumericRangePredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
+		return new LuceneNumericRangePredicateBuilder<>( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec );
 	}
 }

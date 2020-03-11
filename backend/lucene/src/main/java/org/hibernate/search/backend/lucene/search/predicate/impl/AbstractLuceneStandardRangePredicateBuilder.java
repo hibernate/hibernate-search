@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 import java.util.Optional;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
@@ -27,7 +28,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @see LuceneStandardFieldCodec
  */
 public abstract class AbstractLuceneStandardRangePredicateBuilder<F, E, C extends LuceneStandardFieldCodec<F, E>>
-		extends AbstractLuceneSearchPredicateBuilder
+		extends AbstractLuceneSearchNestedPredicateBuilder
 		implements RangePredicateBuilder<LuceneSearchPredicateBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -46,9 +47,10 @@ public abstract class AbstractLuceneStandardRangePredicateBuilder<F, E, C extend
 
 	protected AbstractLuceneStandardRangePredicateBuilder(
 			LuceneSearchContext searchContext,
-			String absoluteFieldPath,
+			String absoluteFieldPath, List<String> nestedPathHierarchy,
 			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			LuceneCompatibilityChecker converterChecker, C codec) {
+		super( nestedPathHierarchy );
 		this.searchContext = searchContext;
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;
