@@ -20,10 +20,10 @@ class LuceneNumericMatchPredicateBuilder<F, E extends Number>
 
 	LuceneNumericMatchPredicateBuilder(
 			LuceneSearchContext searchContext,
-			String absoluteFieldPath,
+			String absoluteFieldPath, String nestedDocumentPath,
 			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			LuceneCompatibilityChecker converterChecker, AbstractLuceneNumericFieldCodec<F, E> codec) {
-		super( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
+		super( searchContext, absoluteFieldPath, nestedDocumentPath, converter, rawConverter, converterChecker, codec );
 	}
 
 	@Override

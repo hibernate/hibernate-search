@@ -31,11 +31,11 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 	}
 
 	@Override
-	public LuceneTextMatchPredicateBuilder<?> createMatchPredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker) {
+	public LuceneTextMatchPredicateBuilder<?> createMatchPredicateBuilder(LuceneSearchContext searchContext, String absoluteFieldPath, String nestedDocumentPath,
+			LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker) {
 		checkSearchable( absoluteFieldPath );
 		return new LuceneTextMatchPredicateBuilder<>(
-				searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec, analyzerOrNormalizer, analyzerChecker
+				searchContext, absoluteFieldPath, nestedDocumentPath, converter, rawConverter, converterChecker, codec, analyzerOrNormalizer, analyzerChecker
 		);
 	}
 

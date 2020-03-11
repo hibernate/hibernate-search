@@ -36,7 +36,7 @@ public abstract class AbstractLuceneSearchPredicateBuilder implements SearchPred
 	}
 
 	@Override
-	public final Query build(LuceneSearchPredicateContext context) {
+	public Query build(LuceneSearchPredicateContext context) {
 		Query query = doBuild( context );
 
 		// the boost should be applied on top of the constant score,

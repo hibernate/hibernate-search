@@ -45,11 +45,11 @@ class LuceneTextMatchPredicateBuilder<F>
 
 	LuceneTextMatchPredicateBuilder(
 			LuceneSearchContext searchContext,
-			String absoluteFieldPath,
+			String absoluteFieldPath, String nestedDocumentPath,
 			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			LuceneCompatibilityChecker converterChecker, LuceneTextFieldCodec<F> codec,
 			Analyzer analyzerOrNormalizer, LuceneCompatibilityChecker analyzerChecker) {
-		super( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
+		super( searchContext, absoluteFieldPath, nestedDocumentPath, converter, rawConverter, converterChecker, codec );
 		this.analyzerOrNormalizer = analyzerOrNormalizer;
 		this.analyzerChecker = analyzerChecker;
 		this.analysisDefinitionRegistry = searchContext.getAnalysisDefinitionRegistry();
