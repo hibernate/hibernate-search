@@ -110,8 +110,8 @@ abstract class AbstractLuceneFieldPredicateBuilderFactory
 	}
 
 	@Override
-	public ExistsPredicateBuilder<LuceneSearchPredicateBuilder> createExistsPredicateBuilder(String absoluteFieldPath) {
-		return new LuceneExistsPredicateBuilder( absoluteFieldPath, getCodec() );
+	public ExistsPredicateBuilder<LuceneSearchPredicateBuilder> createExistsPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
+		return new LuceneExistsPredicateBuilder( absoluteFieldPath, getCodec(), nestedPathHierarchy );
 	}
 
 	protected abstract LuceneFieldCodec<?> getCodec();
