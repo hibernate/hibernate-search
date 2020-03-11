@@ -18,8 +18,8 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 class LuceneGeoPointSpatialWithinPolygonPredicateBuilder extends
 		AbstractLuceneSpatialWithinPolygonPredicateBuilder {
 
-	LuceneGeoPointSpatialWithinPolygonPredicateBuilder(String absoluteFieldPath) {
-		super( absoluteFieldPath );
+	LuceneGeoPointSpatialWithinPolygonPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
+		super( absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override

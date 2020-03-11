@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.apache.lucene.search.Query;
@@ -24,10 +25,10 @@ class LuceneNumericRangePredicateBuilder<F, E extends Number>
 
 	LuceneNumericRangePredicateBuilder(
 			LuceneSearchContext searchContext,
-			String absoluteFieldPath,
+			String absoluteFieldPath, List<String> nestedPathHierarchy,
 			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			LuceneCompatibilityChecker converterChecker, AbstractLuceneNumericFieldCodec<F, E> codec) {
-		super( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
+		super( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec );
 	}
 
 	@Override

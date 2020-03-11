@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import java.util.List;
+
 import org.apache.lucene.document.LatLonPoint;
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSpatialWithinBoundingBoxPredicateBuilder;
@@ -14,8 +16,8 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPre
 class LuceneGeoPointSpatialWithinBoundingBoxPredicateBuilder extends
 		AbstractLuceneSpatialWithinBoundingBoxPredicateBuilder {
 
-	LuceneGeoPointSpatialWithinBoundingBoxPredicateBuilder(String absoluteFieldPath) {
-		super( absoluteFieldPath );
+	LuceneGeoPointSpatialWithinBoundingBoxPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
+		super( absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override
