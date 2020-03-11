@@ -29,10 +29,10 @@ public final class LuceneNumericFieldPredicateBuilderFactory<F, E extends Number
 	}
 
 	@Override
-	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(LuceneSearchContext searchContext, String absoluteFieldPath,
+	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(LuceneSearchContext searchContext, String absoluteFieldPath, String nestedDocumentPath,
 			LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker) {
 		checkSearchable( absoluteFieldPath );
-		return new LuceneNumericMatchPredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
+		return new LuceneNumericMatchPredicateBuilder<>( searchContext, absoluteFieldPath, nestedDocumentPath, converter, rawConverter, converterChecker, codec );
 	}
 
 	@Override

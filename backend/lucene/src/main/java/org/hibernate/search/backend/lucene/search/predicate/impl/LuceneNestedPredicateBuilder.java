@@ -37,7 +37,7 @@ class LuceneNestedPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
 	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
 		LuceneSearchPredicateContext childContext = new LuceneSearchPredicateContext( absoluteFieldPath );
-		return doBuild(context, absoluteFieldPath, nestedBuilder.build( childContext ));
+		return doBuild( context, absoluteFieldPath, nestedBuilder.build( childContext ) );
 	}
 
 	public static Query doBuild(LuceneSearchPredicateContext parentContext, String nestedDocumentPath, Query nestedQuery) {
