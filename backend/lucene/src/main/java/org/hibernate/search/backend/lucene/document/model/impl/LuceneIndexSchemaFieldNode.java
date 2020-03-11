@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.document.model.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneFieldAggregationBuilderFactory;
@@ -29,7 +30,7 @@ public class LuceneIndexSchemaFieldNode<F> {
 
 	private final String absoluteFieldPath;
 
-	private final String nestedDocumentPath;
+	private final List<String> nestedPathHierarchy;
 
 	private final boolean multiValued;
 
@@ -53,7 +54,7 @@ public class LuceneIndexSchemaFieldNode<F> {
 		this.parent = parent;
 		this.relativeFieldName = relativeFieldName;
 		this.absoluteFieldPath = parent.getAbsolutePath( relativeFieldName );
-		this.nestedDocumentPath = parent.getNestedDocumentPath();
+		this.nestedPathHierarchy = parent.getNestedPathHierarchy();
 		this.multiValued = multiValued;
 		this.codec = codec;
 		this.predicateBuilderFactory = predicateBuilderFactory;
@@ -71,7 +72,9 @@ public class LuceneIndexSchemaFieldNode<F> {
 	}
 
 	public String getNestedDocumentPath() {
-		return nestedDocumentPath;
+		return ( nestedPathHierarchy.isEmpty() ) ? null :
+				// nested path is the LAST element on the path hierarchy
+				nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 );
 	}
 
 	/**

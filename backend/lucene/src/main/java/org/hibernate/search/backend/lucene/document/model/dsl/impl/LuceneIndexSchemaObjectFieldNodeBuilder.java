@@ -7,6 +7,8 @@
 package org.hibernate.search.backend.lucene.document.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
@@ -65,9 +67,14 @@ class LuceneIndexSchemaObjectFieldNodeBuilder extends AbstractLuceneIndexSchemaO
 			throw log.incompleteFieldDefinition( getEventContext() );
 		}
 
-		String nestedDocumentPath = ( ObjectFieldStorage.NESTED.equals( storage ) ) ? absoluteFieldPath : parentNode.getNestedDocumentPath();
+		List<String> nestedPathHierarchy = parentNode.getNestedPathHierarchy();
+		if ( ObjectFieldStorage.NESTED.equals( storage ) ) {
+			// if we found a nested object, we add it to the nestedPathHierarchy
+			nestedPathHierarchy = new ArrayList<>( nestedPathHierarchy );
+			nestedPathHierarchy.add( absoluteFieldPath );
+		}
 		LuceneIndexSchemaObjectNode node = new LuceneIndexSchemaObjectNode(
-				parentNode, absoluteFieldPath, nestedDocumentPath, getChildrenNames(), storage, multiValued
+				parentNode, absoluteFieldPath, nestedPathHierarchy, getChildrenNames(), storage, multiValued
 		);
 		collector.collectObjectNode( absoluteFieldPath, node );
 
