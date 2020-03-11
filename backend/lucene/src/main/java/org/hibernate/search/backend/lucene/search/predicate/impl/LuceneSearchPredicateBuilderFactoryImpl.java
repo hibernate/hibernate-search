@@ -99,7 +99,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> match(String absoluteFieldPath) {
 		LuceneScopedIndexFieldComponent<LuceneFieldPredicateBuilderFactory> fieldComponent = scopeModel.getSchemaNodeComponent(
 				absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
-		return fieldComponent.getComponent().createMatchPredicateBuilder( searchContext, absoluteFieldPath, scopeModel.getNestedDocumentPath( absoluteFieldPath ),
+		return fieldComponent.getComponent().createMatchPredicateBuilder( searchContext, absoluteFieldPath, scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ),
 				fieldComponent.getConverterCompatibilityChecker(), fieldComponent.getAnalyzerCompatibilityChecker() );
 	}
 

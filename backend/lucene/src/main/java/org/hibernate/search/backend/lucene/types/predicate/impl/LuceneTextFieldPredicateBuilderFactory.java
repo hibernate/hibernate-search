@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
@@ -31,11 +32,11 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 	}
 
 	@Override
-	public LuceneTextMatchPredicateBuilder<?> createMatchPredicateBuilder(LuceneSearchContext searchContext, String absoluteFieldPath, String nestedDocumentPath,
+	public LuceneTextMatchPredicateBuilder<?> createMatchPredicateBuilder(LuceneSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy,
 			LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker) {
 		checkSearchable( absoluteFieldPath );
 		return new LuceneTextMatchPredicateBuilder<>(
-				searchContext, absoluteFieldPath, nestedDocumentPath, converter, rawConverter, converterChecker, codec, analyzerOrNormalizer, analyzerChecker
+				searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec, analyzerOrNormalizer, analyzerChecker
 		);
 	}
 

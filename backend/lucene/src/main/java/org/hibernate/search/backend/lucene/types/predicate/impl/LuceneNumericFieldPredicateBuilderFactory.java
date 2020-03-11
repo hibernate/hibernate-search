@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import java.util.List;
+
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
@@ -29,10 +31,10 @@ public final class LuceneNumericFieldPredicateBuilderFactory<F, E extends Number
 	}
 
 	@Override
-	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(LuceneSearchContext searchContext, String absoluteFieldPath, String nestedDocumentPath,
-			LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker) {
+	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(LuceneSearchContext searchContext, String absoluteFieldPath,
+			List<String> nestedPathHierarchy, LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker) {
 		checkSearchable( absoluteFieldPath );
-		return new LuceneNumericMatchPredicateBuilder<>( searchContext, absoluteFieldPath, nestedDocumentPath, converter, rawConverter, converterChecker, codec );
+		return new LuceneNumericMatchPredicateBuilder<>( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec );
 	}
 
 	@Override
