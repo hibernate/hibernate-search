@@ -531,8 +531,8 @@ public interface Log extends BasicLogger {
 			+ " Projection is targeting: '%2$s'. Current scope is targeting: '%3$s'.")
 	SearchException projectionDefinedOnDifferentIndexes(SearchProjection<?> predicate, Set<String> predicateIndexes, Set<String> scopeIndexes);
 
-	@Message(id = ID_OFFSET_3 + 75, value = "Multiple conflicting nested document paths to build a projection for field '%1$s'. '%2$s' vs. '%3$s'.")
-	SearchException conflictingNestedDocumentPathsForProjection(String absoluteFieldPath, String nestedDocumentPath1, String nestedDocumentPath2, @Param EventContext context);
+	@Message(id = ID_OFFSET_3 + 75, value = "Multiple index conflicting models on nested document paths targeting '%1$s'. '%2$s' vs. '%3$s'.")
+	SearchException conflictingNestedDocumentPaths(String absoluteFieldPath, String nestedDocumentPath1, String nestedDocumentPath2, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 76,
 			value = "Cannot apply an analyzer on an aggregable field. Use a normalizer instead. Analyzer: '%1$s'."
@@ -584,8 +584,8 @@ public interface Log extends BasicLogger {
 			value = "Multiple aggregations with the same key: '%1$s'")
 	SearchException duplicateAggregationKey(@FormatWith(AggregationKeyFormatter.class) AggregationKey key);
 
-	@Message(id = ID_OFFSET_3 + 86, value = "Multiple conflicting nested document paths to build a projection for field '%1$s'. '%2$s' vs. '%3$s'.")
-	SearchException conflictingNestedDocumentPathHierarchyForProjection(String absoluteFieldPath,
+	@Message(id = ID_OFFSET_3 + 86, value = "Multiple index conflicting models on nested document paths targeting '%1$s'. '%2$s' vs. '%3$s'.")
+	SearchException conflictingNestedDocumentPathHierarchy(String absoluteFieldPath,
 			List<String> nestedDocumentPathHierarchy1, List<String> nestedDocumentPathHierarchy2, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 87, value = "Cannot apply a search analyzer if an analyzer has not been defined on the same field." +

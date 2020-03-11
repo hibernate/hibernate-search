@@ -226,7 +226,7 @@ public class LuceneScopeModel {
 						return nestedDocumentPath1;
 					}
 
-					throw log.conflictingNestedDocumentPathsForProjection(
+					throw log.conflictingNestedDocumentPaths(
 							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
 				} )
 				.orElse( Optional.empty() );

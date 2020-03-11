@@ -197,7 +197,7 @@ public class ElasticsearchScopeModel {
 						return nestedDocumentPath1;
 					}
 
-					throw log.conflictingNestedDocumentPathsForProjection(
+					throw log.conflictingNestedDocumentPaths(
 							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
 				} )
 				.orElse( Optional.empty() );
@@ -215,7 +215,7 @@ public class ElasticsearchScopeModel {
 						return nestedDocumentPath1;
 					}
 
-					throw log.conflictingNestedDocumentPathHierarchyForProjection(
+					throw log.conflictingNestedDocumentPathHierarchy(
 							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
 				} )
 				.orElse( Optional.empty() );
@@ -233,7 +233,7 @@ public class ElasticsearchScopeModel {
 						return nestedDocumentPath1;
 					}
 
-					throw log.conflictingNestedDocumentPathHierarchyForProjection(
+					throw log.conflictingNestedDocumentPathHierarchy(
 							absoluteObjectPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
 				} )
 				.orElse( Optional.empty() );
