@@ -29,7 +29,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -58,9 +57,6 @@ public class ElasticsearchSearchQueryIT {
 	@Rule
 	public ElasticsearchClientSpy clientSpy = new ElasticsearchClientSpy();
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
 	private final IndexLayoutStrategy layoutStrategy;
 	private final URLEncodedString readAlias;
 
@@ -86,6 +82,26 @@ public class ElasticsearchSearchQueryIT {
 						indexManager -> this.indexManager = indexManager
 				)
 				.setup();
+	}
+
+	@Test
+	public void defaultSourceFiltering() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<?> query = scope.query()
+				.where( f -> f.matchAll() )
+				.toQuery();
+
+		clientSpy.expectNext(
+				ElasticsearchRequest.post()
+						.pathComponent( readAlias )
+						.pathComponent( Paths._SEARCH )
+						.body( new Gson().fromJson( "{'_source':false}", JsonObject.class ) )
+						.build(),
+				ElasticsearchRequestAssertionMode.EXTENSIBLE
+		);
+
+		query.fetchAll();
 	}
 
 	@Test
