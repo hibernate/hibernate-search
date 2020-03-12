@@ -14,6 +14,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -40,12 +41,15 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 public class ElasticsearchSearchQueryBuilder<H>
 		implements SearchQueryBuilder<H, ElasticsearchSearchQueryElementCollector>,
 		ElasticsearchSearchQueryElementCollector {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
+	private static final JsonAccessor<JsonElement> REQUEST_SOURCE_ACCESSOR = JsonAccessor.root().property( "_source" );
 
 	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory;
@@ -199,6 +203,10 @@ public class ElasticsearchSearchQueryBuilder<H>
 			}
 
 			payload.add( "aggregations", jsonAggregations );
+		}
+
+		if ( !REQUEST_SOURCE_ACCESSOR.get( payload ).isPresent() ) {
+			REQUEST_SOURCE_ACCESSOR.set( payload, new JsonPrimitive( Boolean.FALSE ) );
 		}
 
 		ElasticsearchSearchResultExtractor<ElasticsearchLoadableSearchResult<H>> searchResultExtractor =
