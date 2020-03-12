@@ -365,6 +365,8 @@ public class SearchSortIT {
 								c -> c.field( "string" ).desc().missing().last()
 						)
 		);
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 	}
 
 	private void initData() {
