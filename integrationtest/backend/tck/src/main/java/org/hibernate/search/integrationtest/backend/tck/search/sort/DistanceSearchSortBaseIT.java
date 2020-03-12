@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.sort;
 
+import static java.util.Arrays.asList;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Function;
 
@@ -22,15 +24,21 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectF
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
+import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.sort.dsl.DistanceSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
-import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.engine.spatial.GeoPoint;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldStructure;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+import org.hibernate.search.util.impl.test.SubTest;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
+import org.junit.Assume;
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
 import org.junit.Test;
@@ -43,11 +51,14 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class DistanceSearchSortBaseIT {
 
-	@Parameterized.Parameters(name = "{0}")
+	@Parameterized.Parameters(name = "{0} - {1}")
 	public static Object[][] parameters() {
 		List<Object[]> parameters = new ArrayList<>();
 		for ( IndexFieldStructure indexFieldStructure : IndexFieldStructure.values() ) {
-			parameters.add( new Object[] { indexFieldStructure } );
+			parameters.add( new Object[] { indexFieldStructure, null } );
+			for ( SortMode sortMode : SortMode.values() ) {
+				parameters.add( new Object[] { indexFieldStructure, sortMode } );
+			}
 		}
 		return parameters.toArray( new Object[0][] );
 	}
@@ -59,10 +70,16 @@ public class DistanceSearchSortBaseIT {
 	private static final String DOCUMENT_3 = "3";
 	private static final String EMPTY_ID = "empty";
 
-	private static final GeoPoint CENTER_POINT = GeoPoint.of( 45.757864, 4.834496 );
-	private static final GeoPoint DISTANCE_1_POINT = GeoPoint.of( 45.7541719, 4.8386221 );
-	private static final GeoPoint DISTANCE_2_POINT = GeoPoint.of( 45.7530374, 4.8510299 );
-	private static final GeoPoint DISTANCE_3_POINT = GeoPoint.of( 45.7705687, 4.835233 );
+	private static final GeoPoint CENTER_POINT = GeoPoint.of( 46.038673, 3.978563 );
+
+	// TODO HSEARCH-3863 use the other ordinals when we implement.missing().use/last/first for distance sorts
+	private static final int BEFORE_DOCUMENT_1_ORDINAL = 0;
+	private static final int DOCUMENT_1_ORDINAL = 1;
+	private static final int BETWEEN_DOCUMENT_1_AND_2_ORDINAL = 2;
+	private static final int DOCUMENT_2_ORDINAL = 3;
+	private static final int BETWEEN_DOCUMENT_2_AND_3_ORDINAL = 4;
+	private static final int DOCUMENT_3_ORDINAL = 5;
+	private static final int AFTER_DOCUMENT_3_ORDINAL = 6;
 
 	@ClassRule
 	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -84,13 +101,17 @@ public class DistanceSearchSortBaseIT {
 	}
 
 	private final IndexFieldStructure indexFieldStructure;
+	private final SortMode sortMode;
 
-	public DistanceSearchSortBaseIT(IndexFieldStructure indexFieldStructure) {
+	public DistanceSearchSortBaseIT(IndexFieldStructure indexFieldStructure, SortMode sortMode) {
 		this.indexFieldStructure = indexFieldStructure;
+		this.sortMode = sortMode;
 	}
 
 	@Test
 	public void simple() {
+		assumeTestParametersWork();
+
 		String fieldPath = getFieldPath();
 
 		SearchQuery<DocumentReference> query = simpleQuery(
@@ -118,59 +139,154 @@ public class DistanceSearchSortBaseIT {
 				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 	}
 
+	@Test
+	@TestForIssue(jiraKey = { "HSEARCH-3103" })
+	public void medianWithNestedField() {
+		Assume.assumeTrue(
+				"This test is only relevant when using SortMode.MEDIAN in nested fields",
+				isMedianWithNestedField()
+		);
+
+		SubTest.expectException( () -> simpleQuery( b -> b.distance( getFieldPath(), CENTER_POINT ) ) )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						getFieldPath(),
+						"Cannot compute the median across nested documents",
+						getFieldPath()
+				);
+	}
+
+	@Test
+	@TestForIssue(jiraKey = { "HSEARCH-3103" })
+	public void sumWithTemporalField() {
+		Assume.assumeTrue(
+				"This test is only relevant when using SortMode.SUM",
+				isSum()
+		);
+
+		SubTest.expectException( () -> simpleQuery( b -> b.distance( getFieldPath(), CENTER_POINT ) ) )
+				.assertThrown()
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Cannot compute the sum for a distance sort",
+						"Only min, max, avg and median are supported",
+						getFieldPath()
+				);
+	}
+
+	private void assumeTestParametersWork() {
+		Assume.assumeFalse(
+				"This combination is not expected to work",
+				isMedianWithNestedField() || isSum()
+		);
+	}
+
+	private boolean isMedianWithNestedField() {
+		return SortMode.MEDIAN.equals( sortMode )
+				&& EnumSet.of( IndexFieldStructure.IN_NESTED, IndexFieldStructure.IN_NESTED_TWICE )
+				.contains( indexFieldStructure );
+	}
+
+	private boolean isSum() {
+		return SortMode.SUM.equals( sortMode );
+	}
+
 	private SearchQuery<DocumentReference> simpleQuery(
-			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
+			Function<? super SearchSortFactory, ? extends DistanceSortOptionsStep<?>> sortContributor) {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.where( f -> f.matchAll() )
-				.sort( sortContributor )
+				.sort( sortContributor.andThen( o -> {
+					if ( sortMode != null ) {
+						return o.mode( sortMode );
+					}
+					else {
+						return o;
+					}
+				} ) )
 				.toQuery();
 	}
 
 	private String getFieldPath() {
 		switch ( indexFieldStructure ) {
 			case ROOT:
-				return "geoPoint";
+				return getRelativeFieldName();
 			case IN_FLATTENED:
-				return "flattenedObject.geoPoint";
+				return "flattenedObject." + getRelativeFieldName();
 			case IN_NESTED:
-				return "nestedObject.geoPoint";
+				return "nestedObject." + getRelativeFieldName();
 			case IN_NESTED_TWICE:
-				return "nestedObject.nestedObject.geoPoint";
+				return "nestedObject.nestedObject." + getRelativeFieldName();
 			default:
 				throw new IllegalStateException( "Unexpected value: " + indexFieldStructure );
 		}
 	}
 
-	private static void initDocument(DocumentElement document, GeoPoint geoPoint) {
-		addValue( indexMapping.geoPoint, document, geoPoint );
-
-		// Note: this object must be single-valued for these tests
-		DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
-		addValue( indexMapping.flattenedObject.geoPoint, flattenedObject, geoPoint );
-
-		// Note: this object must be single-valued for these tests
-		DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
-		addValue( indexMapping.nestedObject.geoPoint, nestedObject, geoPoint );
-
-		// Note: this object must be single-valued for these tests
-		DocumentElement nestedObjectInNestedObject =
-				nestedObject.addObject( indexMapping.nestedObject.nestedObject.self );
-		addValue( indexMapping.nestedObject.nestedObject.geoPoint, nestedObjectInNestedObject, geoPoint );
+	private String getRelativeFieldName() {
+		if ( sortMode == null ) {
+			return "geoPoint";
+		}
+		switch ( sortMode ) {
+			case SUM:
+				return "geoPoint_ascendingSum";
+			case MIN:
+				return "geoPoint_ascendingMin";
+			case MAX:
+				return "geoPoint_ascendingMax";
+			case AVG:
+				return "geoPoint_ascendingAvg";
+			case MEDIAN:
+				return "geoPoint_ascendingMedian";
+			default:
+				throw new IllegalStateException( "Unexpected sort mode: " + sortMode );
+		}
 	}
 
-	private static void addValue(IndexFieldReference<GeoPoint> reference, DocumentElement document, GeoPoint geoPoint) {
-		if ( geoPoint != null ) {
-			document.addValue( reference, geoPoint );
+	private static void initDocument(DocumentElement document, Integer ordinal) {
+		initAllFields( indexMapping, document, ordinal );
+
+		DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
+		initAllFields( indexMapping.flattenedObject, flattenedObject, ordinal );
+
+		DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
+		initAllFields( indexMapping.nestedObject, nestedObject, ordinal );
+
+		DocumentElement nestedObjectInNestedObject =
+				nestedObject.addObject( indexMapping.nestedObject.nestedObject.self );
+		initAllFields( indexMapping.nestedObject.nestedObject, nestedObjectInNestedObject, ordinal );
+	}
+
+	private static void initAllFields(AbstractObjectMapping mapping, DocumentElement document, Integer ordinal) {
+		addSingleValue( mapping.geoPoint, document, ordinal );
+		addMultipleValues( mapping.geoPointAscendingSum, document, SortMode.SUM, ordinal );
+		addMultipleValues( mapping.geoPointAscendingMin, document, SortMode.MIN, ordinal );
+		addMultipleValues( mapping.geoPointAscendingMax, document, SortMode.MAX, ordinal );
+		addMultipleValues( mapping.geoPointAscendingAvg, document, SortMode.AVG, ordinal );
+		addMultipleValues( mapping.geoPointAscendingMedian, document, SortMode.MEDIAN, ordinal );
+	}
+
+	private static void addSingleValue(IndexFieldReference<GeoPoint> reference, DocumentElement document, Integer ordinal) {
+		if ( ordinal != null ) {
+			document.addValue( reference, AscendingUniqueDistanceFromCenterValues.INSTANCE.getSingle().get( ordinal ) );
 		}
+	}
+
+	private static <F> void addMultipleValues(IndexFieldReference<GeoPoint> reference, DocumentElement documentElement,
+			SortMode sortMode, Integer ordinal) {
+		if ( ordinal == null ) {
+			return;
+		}
+		AscendingUniqueDistanceFromCenterValues.INSTANCE.getMultiResultingInSingle( sortMode ).get( ordinal )
+				.forEach( value -> documentElement.addValue( reference, value ) );
 	}
 
 	private static void initData() {
 		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		// Important: do not index the documents in the expected order after sorts
-		plan.add( referenceProvider( DOCUMENT_3 ), document -> initDocument( document, DISTANCE_3_POINT ) );
-		plan.add( referenceProvider( DOCUMENT_1 ), document -> initDocument( document, DISTANCE_1_POINT ) );
-		plan.add( referenceProvider( DOCUMENT_2 ), document -> initDocument( document, DISTANCE_2_POINT ) );
+		plan.add( referenceProvider( DOCUMENT_3 ), document -> initDocument( document, DOCUMENT_3_ORDINAL ) );
+		plan.add( referenceProvider( DOCUMENT_1 ), document -> initDocument( document, DOCUMENT_1_ORDINAL ) );
+		plan.add( referenceProvider( DOCUMENT_2 ), document -> initDocument( document, DOCUMENT_2_ORDINAL ) );
 		plan.add( referenceProvider( EMPTY_ID ), document -> initDocument( document, null ) );
 
 		plan.execute().join();
@@ -185,9 +301,34 @@ public class DistanceSearchSortBaseIT {
 
 	private static class AbstractObjectMapping {
 		final IndexFieldReference<GeoPoint> geoPoint;
+		final IndexFieldReference<GeoPoint> geoPointAscendingSum;
+		final IndexFieldReference<GeoPoint> geoPointAscendingMin;
+		final IndexFieldReference<GeoPoint> geoPointAscendingMax;
+		final IndexFieldReference<GeoPoint> geoPointAscendingAvg;
+		final IndexFieldReference<GeoPoint> geoPointAscendingMedian;
 
 		AbstractObjectMapping(IndexSchemaElement self) {
 			geoPoint = self.field( "geoPoint", f -> f.asGeoPoint().sortable( Sortable.YES ) )
+					.toReference();
+			geoPointAscendingSum = self.field( "geoPoint_ascendingSum",
+					f -> f.asGeoPoint().sortable( Sortable.YES ) )
+					.multiValued()
+					.toReference();
+			geoPointAscendingMin = self.field( "geoPoint_ascendingMin",
+					f -> f.asGeoPoint().sortable( Sortable.YES ) )
+					.multiValued()
+					.toReference();
+			geoPointAscendingMax = self.field( "geoPoint_ascendingMax",
+					f -> f.asGeoPoint().sortable( Sortable.YES ) )
+					.multiValued()
+					.toReference();
+			geoPointAscendingAvg = self.field( "geoPoint_ascendingAvg",
+					f -> f.asGeoPoint().sortable( Sortable.YES ) )
+					.multiValued()
+					.toReference();
+			geoPointAscendingMedian = self.field( "geoPoint_ascendingMedian",
+					f -> f.asGeoPoint().sortable( Sortable.YES ) )
+					.multiValued()
 					.toReference();
 		}
 	}
@@ -237,6 +378,43 @@ public class DistanceSearchSortBaseIT {
 		private SecondLevelObjectMapping(IndexSchemaObjectField objectField) {
 			super( objectField );
 			self = objectField.toReference();
+		}
+	}
+
+	private static class AscendingUniqueDistanceFromCenterValues extends AscendingUniqueTermValues<GeoPoint> {
+		private static AscendingUniqueDistanceFromCenterValues INSTANCE = new AscendingUniqueDistanceFromCenterValues();
+
+		@Override
+		protected List<GeoPoint> createSingle() {
+			return asList(
+					CENTER_POINT, // ~0km
+					GeoPoint.of( 46.038683, 3.964652 ), // ~1km
+					GeoPoint.of( 46.059852, 3.978235 ), // ~2km
+					GeoPoint.of( 46.039763, 3.914977 ), // ~4km
+					GeoPoint.of( 46.000833, 3.931265 ), // ~6km
+					GeoPoint.of( 46.094712, 4.044507 ), // ~8km
+					GeoPoint.of( 46.018378, 4.196792 ), // ~10km
+					GeoPoint.of( 46.123025, 3.845305 ) // ~14km
+			);
+		}
+
+		@Override
+		protected List<List<GeoPoint>> createMultiResultingInSingleAfterSum() {
+			return valuesThatWontBeUsed();
+		}
+
+		@Override
+		protected List<List<GeoPoint>> createMultiResultingInSingleAfterAvg() {
+			return asList(
+					asList( CENTER_POINT, CENTER_POINT ), // ~0km
+					asList( getSingle().get( 0 ), getSingle().get( 2 ) ), // ~1km
+					asList( getSingle().get( 1 ), getSingle().get( 1 ), getSingle().get( 4 ) ), // ~2km
+					asList( getSingle().get( 2 ), getSingle().get( 4 ) ), // ~4km
+					asList( getSingle().get( 3 ), getSingle().get( 5 ) ), // ~6km
+					asList( getSingle().get( 4 ), getSingle().get( 6 ) ), // ~8km
+					asList( getSingle().get( 4 ), getSingle().get( 7 ) ), // ~10km
+					asList( getSingle().get( 7 ),getSingle().get( 7 ), getSingle().get( 7 ) ) // ~14km
+			);
 		}
 	}
 
