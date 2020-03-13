@@ -13,6 +13,8 @@ import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMod
 import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneSearchSortBuilder;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.SortMode;
+import org.hibernate.search.engine.search.sort.dsl.SortOrder;
+import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -38,8 +40,11 @@ public abstract class AbstractLuceneDocumentValueSortBuilder
 	}
 
 	protected final MultiValueMode getMultiValueMode() {
-		MultiValueMode multiValueMode = MultiValueMode.MIN;
-		if ( mode != null ) {
+		MultiValueMode multiValueMode;
+		if ( mode == null ) {
+			multiValueMode = order == SortOrder.DESC ? MultiValueMode.MAX : MultiValueMode.MIN;
+		}
+		else {
 			switch ( mode ) {
 				case MIN:
 					multiValueMode = MultiValueMode.MIN;
@@ -56,6 +61,8 @@ public abstract class AbstractLuceneDocumentValueSortBuilder
 				case MEDIAN:
 					multiValueMode = MultiValueMode.MEDIAN;
 					break;
+				default:
+					throw new AssertionFailure( "Unexpected sort mode: " + mode );
 			}
 		}
 		return multiValueMode;
