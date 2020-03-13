@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.lowlevel.docvalues.impl;
 
 import java.io.IOException;
+import java.util.Arrays;
 
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -20,6 +21,9 @@ public class GeoPointDistanceDocValues extends SortedNumericDoubleDocValues {
 	private final double latitude;
 	private final double longitude;
 
+	private double[] distances = new double[1];
+	private int distanceIndex;
+
 	public GeoPointDistanceDocValues(SortedNumericDocValues values, GeoPoint center) {
 		this.values = values;
 		this.latitude = center.getLatitude();
@@ -28,11 +32,8 @@ public class GeoPointDistanceDocValues extends SortedNumericDoubleDocValues {
 
 	@Override
 	public double nextValue() throws IOException {
-		long encoded = values.nextValue();
-		double valueLatitude = GeoEncodingUtils.decodeLatitude( (int) ( encoded >>> 32 ) );
-		double valueLongitude = GeoEncodingUtils.decodeLongitude( (int) ( encoded ) );
-
-		return SloppyMath.haversinMeters( latitude, longitude, valueLatitude, valueLongitude );
+		setDistancesIfNecessary();
+		return distances[distanceIndex++];
 	}
 
 	@Override
@@ -42,8 +43,7 @@ public class GeoPointDistanceDocValues extends SortedNumericDoubleDocValues {
 
 	@Override
 	public boolean advanceExact(int doc) throws IOException {
-		// TODO HSEARCH-3103 in order to support multi-values here,
-		//  we must sort the distances before returning them through nextValue().
+		distanceIndex = -1;
 		return values.advanceExact( doc );
 	}
 
@@ -54,16 +54,39 @@ public class GeoPointDistanceDocValues extends SortedNumericDoubleDocValues {
 
 	@Override
 	public int nextDoc() throws IOException {
+		distanceIndex = -1;
 		return values.nextDoc();
 	}
 
 	@Override
 	public int advance(int target) throws IOException {
+		distanceIndex = -1;
 		return values.advance( target );
 	}
 
 	@Override
 	public long cost() {
 		return values.cost();
+	}
+
+	private void setDistancesIfNecessary() throws IOException {
+		if ( distanceIndex >= 0 ) {
+			return;
+		}
+
+		int count = values.docValueCount();
+		if ( distances.length < count ) {
+			distances = new double[count];
+		}
+		for ( int i = 0; i < count; i++ ) {
+			long encodedPoint = values.nextValue();
+			double pointLatitude = GeoEncodingUtils.decodeLatitude( (int) ( encodedPoint >>> 32 ) );
+			double pointLongitude = GeoEncodingUtils.decodeLongitude( (int) ( encodedPoint ) );
+			distances[i] = SloppyMath.haversinMeters( latitude, longitude, pointLatitude, pointLongitude );
+		}
+		// By contract, values must be returned in ascending order.
+		Arrays.sort( distances, 0, count );
+
+		distanceIndex = 0;
 	}
 }

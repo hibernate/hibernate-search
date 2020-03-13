@@ -21,17 +21,18 @@ public class LuceneGeoPointDistanceComparatorSource extends LuceneFieldComparato
 	private static final double MISSING_VALUE_IMPLICIT_DISTANCE_VALUE = Double.POSITIVE_INFINITY;
 
 	private final GeoPoint center;
+	private final MultiValueMode mode;
 
-	public LuceneGeoPointDistanceComparatorSource(String nestedDocumentPath, GeoPoint center) {
+	public LuceneGeoPointDistanceComparatorSource(String nestedDocumentPath, GeoPoint center, MultiValueMode mode) {
 		super( nestedDocumentPath );
 		this.center = center;
+		this.mode = mode;
 	}
 
 	@Override
 	public FieldComparator<?> newComparator(String fieldname, int numHits, int sortPos, boolean reversed) {
-		// TODO HSEARCH-3103 enable multi-value mode for distance
 		GeoPointDistanceMultiValuesToSingleValuesSource source = new GeoPointDistanceMultiValuesToSingleValuesSource(
-				fieldname, MultiValueMode.MIN, nestedDocsProvider, center
+				fieldname, mode, nestedDocsProvider, center
 		);
 
 		return new FieldComparator.DoubleComparator( numHits, fieldname, MISSING_VALUE_IMPLICIT_DISTANCE_VALUE ) {

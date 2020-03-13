@@ -12,7 +12,6 @@ import java.util.List;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchDistanceSortBuilder;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortBuilder;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;

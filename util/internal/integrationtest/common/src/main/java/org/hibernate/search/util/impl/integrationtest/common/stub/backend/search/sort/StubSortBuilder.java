@@ -41,12 +41,12 @@ public class StubSortBuilder implements ScoreSortBuilder<StubSortBuilder>,
 		// No-op
 	}
 
-	void simulateBuild() {
-		// No-op, just simulates a call on this object
-	}
-
 	@Override
 	public void mode(SortMode mode) {
+		// No-op
+	}
+
+	void simulateBuild() {
 		// No-op, just simulates a call on this object
 	}
 }
