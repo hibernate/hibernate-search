@@ -201,7 +201,7 @@ public class DistanceSearchSortBaseIT {
 			flattenedObject = FirstLevelObjectMapping.create( root, "flattenedObject",
 					ObjectFieldStorage.FLATTENED );
 			nestedObject = FirstLevelObjectMapping.create( root, "nestedObject",
-					ObjectFieldStorage.FLATTENED );
+					ObjectFieldStorage.NESTED );
 		}
 	}
 
