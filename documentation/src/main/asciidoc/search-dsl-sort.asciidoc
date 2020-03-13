@@ -45,13 +45,6 @@ The sort DSL offers more sort types, and multiple options for each type of sort.
 To learn more about the field sort, and all the other types of sort,
 refer to the following sections.
 
-[[search-dsl-sort-common]]
-== Options common to multiple sort types
-
-include::todo-placeholder.asciidoc[]
-
-// TODO asc(), desc(), order(SortOrder), ...
-
 [[search-dsl-sort-score]]
 == `score`: sort by matching score (relevance)
 
@@ -77,6 +70,8 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 [[search-dsl-sort-field]]
 == `field`: sort by field values
 
+`field` will sort documents according to the value of a given field.
+
 .Sorting by field values
 ====
 [source, JAVA, indent=0, subs="+callouts"]
@@ -85,35 +80,18 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 ----
 ====
 
-// Search 5 anchors backward compatibility
-[[_handling_missing_values]]
+Several options are available:
 
-.Sorting by field values, with missing values in first position
-====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=field-missing-first]
-----
-====
-
-.Sorting by field values, with missing values in last position
-====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=field-missing-last]
-----
-====
-
-.Sorting by field values, with missing values replaced by a given value
-====
-[source, JAVA, indent=0, subs="+callouts"]
-----
-include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=field-missing-use]
-----
-====
+* The sort order is ascending by default,
+but can be <<search-dsl-sort-common-order,controlled explicitly with `.asc()`/`.desc()`>>.
+* The behavior on missing values
+can be <<search-dsl-sort-common-missing,controlled explicitly with `.missing()`>>.
 
 [[search-dsl-sort-distance]]
 == `distance`: sort by distance to a point
+
+`distance` will sort documents according to the distance between a given center
+and the point specified by a given field document field.
 
 .Sorting by distance to a point
 ====
@@ -123,7 +101,8 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 ----
 ====
 
-// TODO alternative syntaxes?
+The sort order is ascending by default,
+but can be <<search-dsl-sort-common-order,controlled explicitly with `.asc()`/`.desc()`>>.
 
 [[search-dsl-sort-composite]]
 == `composite`: combine sorts
@@ -206,5 +185,85 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 [source, JAVA, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=elasticsearch-fromJson-string]
+----
+====
+
+[[search-dsl-sort-common]]
+== Options common to multiple sort types
+
+[[search-dsl-sort-common-order]]
+=== Sort order
+
+Most sorts use the ascending order by default, with the notable exception of the <<search-dsl-sort-score,score sort>>.
+
+The order controlled explicitly through the following options:
+
+* `.asc()` for an ascending order.
+* `.desc()` for a descending order.
+* `.order(...)` for an order defined by the given argument: `SortOrder.ASC`/`SortOrder.DESC`.
+
+Below are a few examples with the <<search-dsl-sort-field,field sort>>.
+
+.Sorting by field values in explicitly ascending order with `asc()`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=order-asc]
+----
+====
+
+.Sorting by field values in explicitly descending order with `desc()`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=order-desc]
+----
+====
+
+.Sorting by field values in explicitly descending order with `order(...)`
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=order-order]
+----
+====
+
+[[search-dsl-sort-common-missing]]
+=== Missing values
+// Search 5 anchors backward compatibility
+[[_handling_missing_values]]
+
+Documents that do not have any value for a sort field will be assigned a default value
+depending on the sort and field type (`0`, an empty string, ...).
+
+The behavior for missing values can be controlled explicitly through the `.missing()` option:
+
+* `.missing().first()` puts documents with no value in first position (regardless of the sort order).
+* `.missing().last()` puts documents with no value in last position (regardless of the sort order).
+* `.missing().use(...)` uses the given value as a default for documents with no value.
+
+Below are a few examples with the <<search-dsl-sort-field,field sort>>.
+
+.Sorting by field values, documents with no value in first position
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=missing-first]
+----
+====
+
+.Sorting by field values, documents with no value in last position
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=missing-last]
+----
+====
+
+.Sorting by field values, documents with no value using a given default value
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=missing-use]
 ----
 ====

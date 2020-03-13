@@ -163,38 +163,80 @@ public class SortDslIT {
 					.extracting( Book::getId )
 					.containsExactly( BOOK1_ID, BOOK4_ID, BOOK2_ID, BOOK3_ID );
 		} );
+	}
+
+	@Test
+	public void order() {
+		withinSearchSession( searchSession -> {
+			// tag::order-asc[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.sort( f -> f.field( "title_sort" ).asc() )
+					.fetchHits( 20 );
+			// end::order-asc[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactly( BOOK1_ID, BOOK4_ID, BOOK2_ID, BOOK3_ID );
+		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::field-missing-first[]
+			// tag::order-desc[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.sort( f -> f.field( "title_sort" ).desc() )
+					.fetchHits( 20 );
+			// end::order-desc[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactly( BOOK3_ID, BOOK2_ID, BOOK4_ID, BOOK1_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::order-order[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.sort( f -> f.field( "title_sort" ).order( SortOrder.DESC ) )
+					.fetchHits( 20 );
+			// end::order-order[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactly( BOOK3_ID, BOOK2_ID, BOOK4_ID, BOOK1_ID );
+		} );
+	}
+
+	@Test
+	public void missing() {
+		withinSearchSession( searchSession -> {
+			// tag::missing-first[]
 			List<Book> hits = searchSession.search( Book.class )
 					.where( f -> f.matchAll() )
 					.sort( f -> f.field( "pageCount" ).missing().first() )
 					.fetchHits( 20 );
-			// end::field-missing-first[]
+			// end::missing-first[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactly( BOOK4_ID, BOOK2_ID, BOOK1_ID, BOOK3_ID );
 		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::field-missing-last[]
+			// tag::missing-last[]
 			List<Book> hits = searchSession.search( Book.class )
 					.where( f -> f.matchAll() )
 					.sort( f -> f.field( "pageCount" ).missing().last() )
 					.fetchHits( 20 );
-			// end::field-missing-last[]
+			// end::missing-last[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactly( BOOK2_ID, BOOK1_ID, BOOK3_ID, BOOK4_ID );
 		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::field-missing-use[]
+			// tag::missing-use[]
 			List<Book> hits = searchSession.search( Book.class )
 					.where( f -> f.matchAll() )
 					.sort( f -> f.field( "pageCount" ).missing().use( 300 ) )
 					.fetchHits( 20 );
-			// end::field-missing-use[]
+			// end::missing-use[]
 			assertThat( hits )
 					.extracting( Book::getId )
 					.containsExactly( BOOK2_ID, BOOK1_ID, BOOK4_ID, BOOK3_ID );
