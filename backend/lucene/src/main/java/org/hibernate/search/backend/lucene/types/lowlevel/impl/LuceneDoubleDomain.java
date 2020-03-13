@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
 
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.NumericDoubleValues;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.util.common.data.Range;
@@ -95,10 +96,9 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 		);
 		return new LongValueFacetCounts(
 				absoluteFieldPath,
-				// We can't use DoubleValueSource here because it drops the decimals...
+				// We can't use DoubleValueSource.toLongValuesSource() here because it drops the decimals...
 				// So we use this to get raw bits, and then apply fromDocValue to get back the original value.
-				// must be getLongValuesSource().
-				source.getLongValuesSource(),
+				source.toRawValuesSource( NumericDoubleValues::getRawDoubleValues ),
 				facetsCollector
 		);
 	}
@@ -148,7 +148,7 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 
 		@Override
 		protected NumericDocValues getNumericDocValues(LeafReaderContext context, String field) throws IOException {
-			return source.getRawNumericDocValues( context, null );
+			return source.getValues( context, null ).getRawDoubleValues();
 		}
 	}
 

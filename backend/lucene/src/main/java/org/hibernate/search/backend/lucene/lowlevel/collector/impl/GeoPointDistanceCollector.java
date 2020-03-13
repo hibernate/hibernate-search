@@ -18,7 +18,8 @@ import org.apache.lucene.search.Scorable;
 import org.apache.lucene.search.ScoreMode;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DocValuesJoin;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.GeoPointDistanceMultiValuesToSingleValuesSource;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -35,17 +36,16 @@ public class GeoPointDistanceCollector implements Collector {
 
 	private static final double MISSING_VALUE_MARKER = Double.NEGATIVE_INFINITY;
 
-	private final String absoluteFieldPath;
-	private final NestedDocsProvider nestedDocsProvider;
-	private final GeoPoint center;
+	private final GeoPointDistanceMultiValuesToSingleValuesSource valuesSource;
 
 	private final SpatialResultsCollector distances;
 
 	public GeoPointDistanceCollector(String absoluteFieldPath, NestedDocsProvider nestedDocsProvider,
 			GeoPoint center, int hitsCount) {
-		this.absoluteFieldPath = absoluteFieldPath;
-		this.nestedDocsProvider = nestedDocsProvider;
-		this.center = center;
+		// TODO HSEARCH-3391 project to multiple values instead of using the min
+		this.valuesSource = new GeoPointDistanceMultiValuesToSingleValuesSource(
+				absoluteFieldPath, MultiValueMode.MIN, nestedDocsProvider, center
+		);
 		this.distances = new SpatialResultsCollector( hitsCount );
 	}
 
@@ -64,11 +64,7 @@ public class GeoPointDistanceCollector implements Collector {
 	}
 
 	private DoubleValues createDistanceDocValues(LeafReaderContext context) throws IOException {
-		return DocValuesJoin.getJoinedAsSingleValuedDistance(
-				context, absoluteFieldPath, nestedDocsProvider,
-				center.getLatitude(), center.getLongitude(),
-				MISSING_VALUE_MARKER
-		);
+		return valuesSource.getValues( context, null );
 	}
 
 	/**

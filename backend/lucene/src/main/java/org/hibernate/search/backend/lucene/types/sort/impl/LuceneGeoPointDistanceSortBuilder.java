@@ -32,7 +32,7 @@ public class LuceneGeoPointDistanceSortBuilder extends AbstractLuceneSearchSortB
 	@Override
 	public void buildAndContribute(LuceneSearchSortCollector collector) {
 		LuceneGeoPointDistanceComparatorSource fieldComparatorSource = new LuceneGeoPointDistanceComparatorSource(
-				nestedDocumentPath, location.getLatitude(), location.getLongitude() );
+				nestedDocumentPath, location );
 		SortField sortField = new SortField( absoluteFieldPath, fieldComparatorSource, order == SortOrder.DESC );
 		collector.collectSortField( sortField, ( nestedDocumentPath == null ) ? null : fieldComparatorSource );
 	}
