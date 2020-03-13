@@ -8,7 +8,9 @@ package org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl;
 
 import java.io.IOException;
 
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DocValuesJoin;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.GeoPointDistanceMultiValuesToSingleValuesSource;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
+import org.hibernate.search.engine.spatial.GeoPoint;
 
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
@@ -18,27 +20,24 @@ public class LuceneGeoPointDistanceComparatorSource extends LuceneFieldComparato
 
 	private static final double MISSING_VALUE_IMPLICIT_DISTANCE_VALUE = Double.POSITIVE_INFINITY;
 
-	private final double latitude;
-	private final double longitude;
+	private final GeoPoint center;
 
-	public LuceneGeoPointDistanceComparatorSource(String nestedDocumentPath, double latitude, double longitude) {
+	public LuceneGeoPointDistanceComparatorSource(String nestedDocumentPath, GeoPoint center) {
 		super( nestedDocumentPath );
-		this.latitude = latitude;
-		this.longitude = longitude;
+		this.center = center;
 	}
 
 	@Override
 	public FieldComparator<?> newComparator(String fieldname, int numHits, int sortPos, boolean reversed) {
-		return new FieldComparator.DoubleComparator( numHits, fieldname, MISSING_VALUE_IMPLICIT_DISTANCE_VALUE ) {
+		// TODO HSEARCH-3103 enable multi-value mode for distance
+		GeoPointDistanceMultiValuesToSingleValuesSource source = new GeoPointDistanceMultiValuesToSingleValuesSource(
+				fieldname, MultiValueMode.MIN, nestedDocsProvider, center
+		);
 
+		return new FieldComparator.DoubleComparator( numHits, fieldname, MISSING_VALUE_IMPLICIT_DISTANCE_VALUE ) {
 			@Override
 			protected NumericDocValues getNumericDocValues(LeafReaderContext context, String field) throws IOException {
-				return DocValuesJoin.getJoinedAsSingleValuedDistance(
-						context, field, nestedDocsProvider,
-						latitude, longitude,
-						Double.POSITIVE_INFINITY
-				)
-						.getRawDoubleValues();
+				return source.getValues( context, null ).getRawDoubleValues();
 			}
 		};
 	}
