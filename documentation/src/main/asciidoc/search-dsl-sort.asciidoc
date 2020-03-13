@@ -86,6 +86,8 @@ Several options are available:
 but can be <<search-dsl-sort-common-order,controlled explicitly with `.asc()`/`.desc()`>>.
 * The behavior on missing values
 can be <<search-dsl-sort-common-missing,controlled explicitly with `.missing()`>>.
+* The behavior on multi-valued fields
+can be <<search-dsl-sort-common-multi-value-mode,controlled explicitly with `.mode(...)`>>.
 
 [[search-dsl-sort-distance]]
 == `distance`: sort by distance to a point
@@ -101,8 +103,12 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 ----
 ====
 
-The sort order is ascending by default,
+Several options are available:
+
+* The sort order is ascending by default,
 but can be <<search-dsl-sort-common-order,controlled explicitly with `.asc()`/`.desc()`>>.
+* The behavior on multi-valued fields
+can be <<search-dsl-sort-common-multi-value-mode,controlled explicitly with `.mode(...)`>>.
 
 [[search-dsl-sort-composite]]
 == `composite`: combine sorts
@@ -265,5 +271,54 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 [source, JAVA, indent=0, subs="+callouts"]
 ----
 include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=missing-use]
+----
+====
+
+[[search-dsl-sort-common-multi-value-mode]]
+=== Sort mode for multi-valued fields
+
+Documents that have multiple values for a sort field can be sorted too.
+A single value is picked for each document in order to compare it with order documents.
+How the value is picked is called the *sort mode*, specified using the `.mode(...)` option.
+The following sort modes are available:
+
+|====
+|Mode|Description|Supported value types|Unsupported value types
+|`SortMode.MIN`
+|Picks the lowest value for field sorts, the lowest distance for distance sorts.
+
+This is default for ascending sorts.
+|All.
+|-
+|`SortMode.MAX`
+|Picks the highest value for field sorts, the highest distance for distance sorts.
+
+This is default for descending sorts.
+|All.
+|-
+|`SortMode.SUM`
+|Computes the sum of all values for each document,
+and picks that sum for comparison with other documents.
+|Numeric fields (`long`, ...).
+|Text and temporal fields (`String`, `LocalDate`, ...), <<search-dsl-sort-distance,distance>>.
+|`SortMode.AVG`
+|Computes the https://en.wikipedia.org/wiki/Arithmetic_mean[arithmetic mean] of all values for each document
+and picks that average for comparison with other documents.
+|Numeric and temporal fields (`long`, `LocalDate`, ...), <<search-dsl-sort-distance,distance>>.
+|Text fields (`String`, ...).
+|`SortMode.MEDIAN`
+|Computes the https://en.wikipedia.org/wiki/Median[median] of all values for each document,
+and picks that median for comparison with other documents.
+|Numeric and temporal fields (`long`, `LocalDate`, ...), <<search-dsl-sort-distance,distance>>.
+|Text fields (`String`, ...).
+|====
+
+Below is an example with the <<search-dsl-sort-field,field sort>>.
+
+.Sorting by field values using the average value for each document
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.java[tags=mode-avg]
 ----
 ====
