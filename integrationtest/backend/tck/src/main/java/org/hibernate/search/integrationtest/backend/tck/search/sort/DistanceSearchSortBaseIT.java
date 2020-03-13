@@ -55,8 +55,8 @@ public class DistanceSearchSortBaseIT {
 	private static final String INDEX_NAME = "IndexName";
 
 	private static final String DOCUMENT_1 = "1";
-	private static final String DOCUMENT_3 = "2";
-	private static final String DOCUMENT_2 = "3";
+	private static final String DOCUMENT_2 = "2";
+	private static final String DOCUMENT_3 = "3";
 	private static final String EMPTY_ID = "empty";
 
 	private static final GeoPoint CENTER_POINT = GeoPoint.of( 45.757864, 4.834496 );
