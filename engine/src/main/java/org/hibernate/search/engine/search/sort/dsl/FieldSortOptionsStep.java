@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.engine.search.sort.dsl;
 
-import org.hibernate.search.engine.search.common.SortMode;
-
 /**
  * The initial and final step in a "field" sort definition, where optional parameters can be set.
  *
@@ -16,7 +14,7 @@ import org.hibernate.search.engine.search.common.SortMode;
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
 public interface FieldSortOptionsStep<S extends FieldSortOptionsStep<?>>
-		extends SortFinalStep, SortThenStep, SortOrderStep<S> {
+		extends SortFinalStep, SortThenStep, SortOrderStep<S>, SortModeStep<S> {
 
 	/**
 	 * Start describing the behavior of this sort when a document doesn't have any value for the targeted field.
@@ -25,12 +23,4 @@ public interface FieldSortOptionsStep<S extends FieldSortOptionsStep<?>>
 	 */
 	FieldSortMissingValueBehaviorStep<S> missing();
 
-	/**
-	 * Start describing the behavior of this sort when a document do have
-	 * mode values for the targeted field.
-	 *
-	 * @param mode The mode.
-	 * @return {@code this}, for method chaining.
-	 */
-	S mode(SortMode mode);
 }

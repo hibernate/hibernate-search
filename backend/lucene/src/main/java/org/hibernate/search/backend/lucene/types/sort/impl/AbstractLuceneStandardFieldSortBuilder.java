@@ -9,20 +9,15 @@ package org.hibernate.search.backend.lucene.types.sort.impl;
 import java.lang.invoke.MethodHandles;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-import org.hibernate.search.util.common.reporting.EventContext;
 
 /**
  * @param <F> The field type exposed to the mapper.
@@ -31,15 +26,12 @@ import org.hibernate.search.util.common.reporting.EventContext;
  * @see LuceneStandardFieldCodec
  */
 abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStandardFieldCodec<F, E>>
-	extends AbstractLuceneSearchSortBuilder
+	extends AbstractLuceneDocumentValueSortBuilder
 	implements FieldSortBuilder<LuceneSearchSortBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneSearchContext searchContext;
-
-	protected final String absoluteFieldPath;
-	protected final String nestedDocumentPath;
 
 	protected final DslConverter<?, ? extends F> converter;
 	private final DslConverter<F, ? extends F> rawConverter;
@@ -51,17 +43,13 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 
 	protected Object missingValue;
 
-	protected SortMode mode;
-
 	protected AbstractLuceneStandardFieldSortBuilder(LuceneSearchContext searchContext,
 			String absoluteFieldPath, String nestedDocumentPath,
 			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			LuceneCompatibilityChecker converterChecker, C codec,
 			Object sortMissingValueFirstPlaceholder, Object sortMissingValueLastPlaceholder) {
-
+		super( absoluteFieldPath, nestedDocumentPath );
 		this.searchContext = searchContext;
-		this.absoluteFieldPath = absoluteFieldPath;
-		this.nestedDocumentPath = nestedDocumentPath;
 		this.converter = converter;
 		this.rawConverter = rawConverter;
 		this.converterChecker = converterChecker;
@@ -92,14 +80,6 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 		}
 	}
 
-	@Override
-	public void mode(SortMode mode) {
-		if ( nestedDocumentPath != null && SortMode.MEDIAN.equals( mode ) ) {
-			throw log.cannotComputeMedianAcrossNested( getEventContext() );
-		}
-		this.mode = mode;
-	}
-
 	protected Object encodeMissingAs(F converted) {
 		return codec.encode( converted );
 	}
@@ -116,34 +96,6 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 			effectiveMissingValue = missingValue;
 		}
 		return effectiveMissingValue;
-	}
-
-	protected final EventContext getEventContext() {
-		return EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath );
-	}
-
-	protected final MultiValueMode getMultiValueMode() {
-		MultiValueMode multiValueMode = MultiValueMode.MIN;
-		if ( mode != null ) {
-			switch ( mode ) {
-				case MIN:
-					multiValueMode = MultiValueMode.MIN;
-					break;
-				case MAX:
-					multiValueMode = MultiValueMode.MAX;
-					break;
-				case AVG:
-					multiValueMode = MultiValueMode.AVG;
-					break;
-				case SUM:
-					multiValueMode = MultiValueMode.SUM;
-					break;
-				case MEDIAN:
-					multiValueMode = MultiValueMode.MEDIAN;
-					break;
-			}
-		}
-		return multiValueMode;
 	}
 
 	private DslConverter<?, ? extends F> getDslToIndexConverter(ValueConvert convert) {

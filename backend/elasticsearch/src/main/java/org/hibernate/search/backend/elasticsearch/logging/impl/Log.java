@@ -655,4 +655,7 @@ public interface Log extends BasicLogger {
 			value = "Cannot compute the sum of a temporal field. Only min, max, avg and median are supported.")
 	SearchException cannotComputeSumForTemporalField(@Param EventContext context);
 
+	@Message(id = ID_OFFSET_3 + 103,
+			value = "Cannot compute the sum for a distance sort. Only min, max, avg and median are supported.")
+	SearchException cannotComputeSumForDistanceSort(@Param EventContext context);
 }
