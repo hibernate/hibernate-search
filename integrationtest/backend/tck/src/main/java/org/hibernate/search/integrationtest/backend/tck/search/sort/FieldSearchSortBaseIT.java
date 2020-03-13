@@ -35,10 +35,12 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.NormalizedStringFieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldStructure;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldValueCardinality;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
@@ -67,16 +69,18 @@ public class FieldSearchSortBaseIT<F> {
 				.filter( typeDescriptor -> typeDescriptor.getFieldSortExpectations().isSupported() );
 	}
 
-	@Parameterized.Parameters(name = "{0} - {2} - {1}")
+	@Parameterized.Parameters(name = "{0} - {1} - {3} - {2}")
 	public static Object[][] parameters() {
 		List<Object[]> parameters = new ArrayList<>();
 		supportedTypeDescriptors().forEach( fieldTypeDescriptor -> {
 			ExpectationsAlternative<?, ?> expectations = fieldTypeDescriptor.getFieldSortExpectations();
 			if ( expectations.isSupported() ) {
 				for ( IndexFieldStructure indexFieldStructure : IndexFieldStructure.values() ) {
-					parameters.add( new Object[] { indexFieldStructure, fieldTypeDescriptor, null } );
-					for ( SortMode sortMode : SortMode.values() ) {
-						parameters.add( new Object[] { indexFieldStructure, fieldTypeDescriptor, sortMode } );
+					for ( IndexFieldValueCardinality indexFieldValueCardinality : IndexFieldValueCardinality.values() ) {
+						parameters.add( new Object[] { indexFieldStructure, indexFieldValueCardinality, fieldTypeDescriptor, null } );
+						for ( SortMode sortMode : SortMode.values() ) {
+							parameters.add( new Object[] { indexFieldStructure, indexFieldValueCardinality, fieldTypeDescriptor, sortMode } );
+						}
 					}
 				}
 			}
@@ -123,12 +127,14 @@ public class FieldSearchSortBaseIT<F> {
 	}
 
 	private final IndexFieldStructure indexFieldStructure;
+	private final IndexFieldValueCardinality indexFieldValueCardinality;
 	private final FieldTypeDescriptor<F> fieldTypeDescriptor;
 	private final SortMode sortMode;
 
-	public FieldSearchSortBaseIT(IndexFieldStructure indexFieldStructure, FieldTypeDescriptor<F> fieldTypeDescriptor,
-			SortMode sortMode) {
+	public FieldSearchSortBaseIT(IndexFieldStructure indexFieldStructure, IndexFieldValueCardinality indexFieldValueCardinality,
+			FieldTypeDescriptor<F> fieldTypeDescriptor, SortMode sortMode) {
 		this.indexFieldStructure = indexFieldStructure;
+		this.indexFieldValueCardinality = indexFieldValueCardinality;
 		this.fieldTypeDescriptor = fieldTypeDescriptor;
 		this.sortMode = sortMode;
 	}
@@ -139,18 +145,19 @@ public class FieldSearchSortBaseIT<F> {
 		assumeTestParametersWork();
 
 		SearchQuery<DocumentReference> query;
-		String absoluteFieldPath = getFieldPath();
+		String fieldPathForAscendingOrderTests = getFieldPath( SortOrder.ASC );
+		String fieldPathForDescendingOrderTests = getFieldPath( SortOrder.DESC );
 
 		// Default order
-		query = matchNonEmptyQuery( b -> b.field( absoluteFieldPath ) );
+		query = matchNonEmptyQuery( b -> b.field( fieldPathForAscendingOrderTests ) );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
 
 		// Explicit order
-		query = matchNonEmptyQuery( b -> b.field( absoluteFieldPath ).asc() );
+		query = matchNonEmptyQuery( b -> b.field( fieldPathForAscendingOrderTests ).asc() );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-		query = matchNonEmptyQuery( b -> b.field( absoluteFieldPath ).desc() );
+		query = matchNonEmptyQuery( b -> b.field( fieldPathForDescendingOrderTests ).desc() );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 	}
@@ -163,13 +170,14 @@ public class FieldSearchSortBaseIT<F> {
 				isMedianWithNestedField() && !isSumOrAvgOrMedianWithStringField()
 		);
 
-		SubTest.expectException( () -> matchNonEmptyQuery( b -> b.field( getFieldPath() ) ) )
+		String fieldPath = getFieldPath( SortOrder.ASC );
+
+		SubTest.expectException( () -> matchNonEmptyQuery( b -> b.field( fieldPath ) ) )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						getFieldPath(),
 						"Cannot compute the median across nested documents",
-						getFieldPath()
+						fieldPath
 				);
 	}
 
@@ -181,13 +189,15 @@ public class FieldSearchSortBaseIT<F> {
 				isSumOrAvgOrMedianWithStringField()
 		);
 
-		SubTest.expectException( () -> matchNonEmptyQuery( b -> b.field( getFieldPath() ) ) )
+		String fieldPath = getFieldPath( SortOrder.ASC );
+
+		SubTest.expectException( () -> matchNonEmptyQuery( b -> b.field( fieldPath ) ) )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot compute the sum, average or median of a text field",
 						"Only min and max are supported",
-						getFieldPath()
+						fieldPath
 				);
 	}
 
@@ -199,13 +209,15 @@ public class FieldSearchSortBaseIT<F> {
 				isSumWithTemporalField()
 		);
 
-		SubTest.expectException( () -> matchNonEmptyQuery( b -> b.field( getFieldPath() ) ) )
+		String fieldPath = getFieldPath( SortOrder.ASC );
+
+		SubTest.expectException( () -> matchNonEmptyQuery( b -> b.field( fieldPath ) ) )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot compute the sum of a temporal field",
 						"Only min, max, avg and median are supported",
-						getFieldPath()
+						fieldPath
 				);
 	}
 
@@ -215,43 +227,44 @@ public class FieldSearchSortBaseIT<F> {
 
 		SearchQuery<DocumentReference> query;
 
-		String fieldPath = getFieldPath();
+		String fieldPathForAscendingOrderTests = getFieldPath( SortOrder.ASC );
+		String fieldPathForDescendingOrderTests = getFieldPath( SortOrder.DESC );
 
 		// Default order
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).missing().last() );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPathForAscendingOrderTests ).missing().last() );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1 );
 
 		// Explicit order with missing().last()
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing().last() );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPathForAscendingOrderTests ).asc().missing().last() );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1 );
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).desc().missing().last() );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPathForDescendingOrderTests ).desc().missing().last() );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1, EMPTY_1 );
 
 		// Explicit order with missing().first()
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc().missing().first() );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPathForAscendingOrderTests ).asc().missing().first() );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_1, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).desc().missing().first() );
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPathForDescendingOrderTests ).desc().missing().first() );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_1, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 
 		// Explicit order with missing().use( ... )
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc()
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPathForAscendingOrderTests ).asc()
 				.missing().use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ) );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_1, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3 );
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc()
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPathForAscendingOrderTests ).asc()
 				.missing().use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL ) ) );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, EMPTY_1, DOCUMENT_2, DOCUMENT_3 );
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc()
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPathForAscendingOrderTests ).asc()
 				.missing().use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL ) ) );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, EMPTY_1, DOCUMENT_3 );
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPath ).asc()
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPathForAscendingOrderTests ).asc()
 				.missing().use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL ) ) );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1 );
@@ -263,10 +276,10 @@ public class FieldSearchSortBaseIT<F> {
 		assumeTestParametersWork();
 
 		List<DocumentReference> docRefHits;
-		String fieldPath = getFieldPath();
+		String fieldPathForAscendingOrderTests = getFieldPath( SortOrder.ASC );
 
 		// using before 1 value
-		docRefHits = matchAllQuery( f -> f.field( fieldPath ).asc()
+		docRefHits = matchAllQuery( f -> f.field( fieldPathForAscendingOrderTests ).asc()
 				.missing().use( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ) )
 				.fetchAllHits();
 		assertThat( docRefHits ).ordinals( 0, 1, 2, 3 )
@@ -276,7 +289,7 @@ public class FieldSearchSortBaseIT<F> {
 		assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( INDEX_NAME, DOCUMENT_3 );
 
 		// using between 1 and 2 value
-		docRefHits = matchAllQuery( f -> f.field( fieldPath ).asc()
+		docRefHits = matchAllQuery( f -> f.field( fieldPathForAscendingOrderTests ).asc()
 				.missing().use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_1_AND_2_ORDINAL ) ) )
 				.fetchAllHits();
 		assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( INDEX_NAME, DOCUMENT_1 );
@@ -286,7 +299,7 @@ public class FieldSearchSortBaseIT<F> {
 		assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( INDEX_NAME, DOCUMENT_3 );
 
 		// using between 2 and 3 value
-		docRefHits = matchAllQuery( f -> f.field( fieldPath ).asc().missing()
+		docRefHits = matchAllQuery( f -> f.field( fieldPathForAscendingOrderTests ).asc().missing()
 				.use( getSingleValueForMissingUse( BETWEEN_DOCUMENT_2_AND_3_ORDINAL ) ) )
 				.fetchAllHits();
 		assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( INDEX_NAME, DOCUMENT_1 );
@@ -296,7 +309,7 @@ public class FieldSearchSortBaseIT<F> {
 		assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( INDEX_NAME, DOCUMENT_3 );
 
 		// using after 3 value
-		docRefHits = matchAllQuery( f -> f.field( fieldPath ).asc()
+		docRefHits = matchAllQuery( f -> f.field( fieldPathForAscendingOrderTests ).asc()
 				.missing().use( getSingleValueForMissingUse( AFTER_DOCUMENT_3_ORDINAL ) ) ).fetchAllHits();
 		assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( INDEX_NAME, DOCUMENT_1 );
 		assertThat( docRefHits ).ordinal( 1 ).isDocRefHit( INDEX_NAME, DOCUMENT_2 );
@@ -311,14 +324,14 @@ public class FieldSearchSortBaseIT<F> {
 		assumeTestParametersWork();
 
 		List<DocumentReference> docRefHits;
-		String fieldPath = getFieldPath();
+		String fieldPathForAscendingOrderTests = getFieldPath( SortOrder.ASC );
 
 		Object docValue1 = getSingleValueForMissingUse( DOCUMENT_1_ORDINAL );
 		Object docValue2 = getSingleValueForMissingUse( DOCUMENT_2_ORDINAL );
 		Object docValue3 = getSingleValueForMissingUse( DOCUMENT_3_ORDINAL );
 
 		// using doc 1 value
-		docRefHits = matchAllQuery( f -> f.field( fieldPath ).asc()
+		docRefHits = matchAllQuery( f -> f.field( fieldPathForAscendingOrderTests ).asc()
 				.missing().use( docValue1 ) ).fetchAllHits();
 		assertThat( docRefHits ).ordinals( 0, 1, 2, 3, 4 )
 				.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 );
@@ -326,7 +339,7 @@ public class FieldSearchSortBaseIT<F> {
 		assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( INDEX_NAME, DOCUMENT_3 );
 
 		// using doc 2 value
-		docRefHits = matchAllQuery( f -> f.field( fieldPath ).asc()
+		docRefHits = matchAllQuery( f -> f.field( fieldPathForAscendingOrderTests ).asc()
 				.missing().use( docValue2 ) ).fetchAllHits();
 		assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( INDEX_NAME, DOCUMENT_1 );
 		assertThat( docRefHits ).ordinals( 1, 2, 3, 4, 5 )
@@ -334,7 +347,7 @@ public class FieldSearchSortBaseIT<F> {
 		assertThat( docRefHits ).ordinal( 6 ).isDocRefHit( INDEX_NAME, DOCUMENT_3 );
 
 		// using doc 3 value
-		docRefHits = matchAllQuery( f -> f.field( fieldPath ).asc()
+		docRefHits = matchAllQuery( f -> f.field( fieldPathForAscendingOrderTests ).asc()
 				.missing().use( docValue3 ) ).fetchAllHits();
 		assertThat( docRefHits ).ordinal( 0 ).isDocRefHit( INDEX_NAME, DOCUMENT_1 );
 		assertThat( docRefHits ).ordinal( 1 ).isDocRefHit( INDEX_NAME, DOCUMENT_2 );
@@ -425,46 +438,66 @@ public class FieldSearchSortBaseIT<F> {
 				.contains( indexFieldStructure );
 	}
 
-	private String getFieldPath() {
+	private String getFieldPath(SortOrder expectedOrder) {
 		switch ( indexFieldStructure ) {
 			case ROOT:
-				return getRelativeFieldName( indexMapping );
+				return getRelativeFieldName( indexMapping, expectedOrder );
 			case IN_FLATTENED:
 				return indexMapping.flattenedObject.relativeFieldName
-						+ "." + getRelativeFieldName( indexMapping.flattenedObject );
+						+ "." + getRelativeFieldName( indexMapping.flattenedObject, expectedOrder );
 			case IN_NESTED:
 				return indexMapping.nestedObject.relativeFieldName
-						+ "." + getRelativeFieldName( indexMapping.nestedObject );
+						+ "." + getRelativeFieldName( indexMapping.nestedObject, expectedOrder );
 			case IN_NESTED_TWICE:
 				return indexMapping.nestedObject.relativeFieldName
 						+ "." + indexMapping.nestedObject.nestedObject.relativeFieldName
-						+ "." + getRelativeFieldName( indexMapping.nestedObject.nestedObject );
+						+ "." + getRelativeFieldName( indexMapping.nestedObject.nestedObject, expectedOrder );
 			default:
 				throw new IllegalStateException( "Unexpected value: " + indexFieldStructure );
 		}
 	}
 
-	private String getRelativeFieldName(AbstractObjectMapping mapping) {
-		return getFieldModelsByType( mapping ).get( fieldTypeDescriptor ).relativeFieldName;
+	private String getRelativeFieldName(AbstractObjectMapping mapping, SortOrder expectedOrder) {
+		return getFieldModelsByType( mapping, expectedOrder ).get( fieldTypeDescriptor ).relativeFieldName;
 	}
 
-	private SimpleFieldModelsByType getFieldModelsByType(AbstractObjectMapping mapping) {
-		if ( sortMode == null ) {
-			return mapping.fieldWithSingleValueModels;
-		}
-		switch ( sortMode ) {
-			case SUM:
-				return mapping.fieldWithAscendingSumModels;
-			case MIN:
-				return mapping.fieldWithAscendingMinModels;
-			case MAX:
-				return mapping.fieldWithAscendingMaxModels;
-			case AVG:
-				return mapping.fieldWithAscendingAvgModels;
-			case MEDIAN:
-				return mapping.fieldWithAscendingMedianModels;
+	private SimpleFieldModelsByType getFieldModelsByType(AbstractObjectMapping mapping, SortOrder expectedOrder) {
+		switch ( indexFieldValueCardinality ) {
+			case SINGLE_VALUED:
+				// Sort on a single-valued field.
+				return mapping.fieldWithSingleValueModels;
+			case MULTI_VALUED:
+				// Sort on a multi-valued field.
+				// We must chose the field carefuly so that documents are in the expected order for the configured sort mode.
+				if ( sortMode == null ) {
+					// Default sort mode: min in ascending order, max in descending order
+					switch ( expectedOrder ) {
+						case ASC:
+							return mapping.fieldWithAscendingMinModels;
+						case DESC:
+							return mapping.fieldWithAscendingMaxModels;
+						default:
+							throw new IllegalStateException( "Unexpected sort order: " + expectedOrder );
+					}
+				}
+				else {
+					switch ( sortMode ) {
+						case SUM:
+							return mapping.fieldWithAscendingSumModels;
+						case MIN:
+							return mapping.fieldWithAscendingMinModels;
+						case MAX:
+							return mapping.fieldWithAscendingMaxModels;
+						case AVG:
+							return mapping.fieldWithAscendingAvgModels;
+						case MEDIAN:
+							return mapping.fieldWithAscendingMedianModels;
+						default:
+							throw new IllegalStateException( "Unexpected sort mode: " + sortMode );
+					}
+				}
 			default:
-				throw new IllegalStateException( "Unexpected sort mode: " + sortMode );
+				throw new IllegalStateException( "Unexpected field value cardinality: " + indexFieldValueCardinality );
 		}
 	}
 

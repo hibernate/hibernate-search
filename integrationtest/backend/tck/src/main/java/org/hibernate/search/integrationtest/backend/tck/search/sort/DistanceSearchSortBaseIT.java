@@ -28,9 +28,11 @@ import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.sort.dsl.DistanceSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldStructure;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.IndexFieldValueCardinality;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
@@ -51,13 +53,15 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 public class DistanceSearchSortBaseIT {
 
-	@Parameterized.Parameters(name = "{0} - {1}")
+	@Parameterized.Parameters(name = "{0} - {1} - {2}")
 	public static Object[][] parameters() {
 		List<Object[]> parameters = new ArrayList<>();
 		for ( IndexFieldStructure indexFieldStructure : IndexFieldStructure.values() ) {
-			parameters.add( new Object[] { indexFieldStructure, null } );
-			for ( SortMode sortMode : SortMode.values() ) {
-				parameters.add( new Object[] { indexFieldStructure, sortMode } );
+			for ( IndexFieldValueCardinality indexFieldValueCardinality : IndexFieldValueCardinality.values() ) {
+				parameters.add( new Object[] { indexFieldStructure, indexFieldValueCardinality, null } );
+				for ( SortMode sortMode : SortMode.values() ) {
+					parameters.add( new Object[] { indexFieldStructure, indexFieldValueCardinality, sortMode } );
+				}
 			}
 		}
 		return parameters.toArray( new Object[0][] );
@@ -101,10 +105,13 @@ public class DistanceSearchSortBaseIT {
 	}
 
 	private final IndexFieldStructure indexFieldStructure;
+	private final IndexFieldValueCardinality indexFieldValueCardinality;
 	private final SortMode sortMode;
 
-	public DistanceSearchSortBaseIT(IndexFieldStructure indexFieldStructure, SortMode sortMode) {
+	public DistanceSearchSortBaseIT(IndexFieldStructure indexFieldStructure,
+			IndexFieldValueCardinality indexFieldValueCardinality, SortMode sortMode) {
 		this.indexFieldStructure = indexFieldStructure;
+		this.indexFieldValueCardinality = indexFieldValueCardinality;
 		this.sortMode = sortMode;
 	}
 
@@ -112,29 +119,38 @@ public class DistanceSearchSortBaseIT {
 	public void simple() {
 		assumeTestParametersWork();
 
-		String fieldPath = getFieldPath();
+		String fieldPathForAscendingOrderTests = getFieldPath( SortOrder.ASC );
+		String fieldPathForDescendingOrderTests = getFieldPath( SortOrder.DESC );
 
 		SearchQuery<DocumentReference> query = simpleQuery(
-				b -> b.distance( fieldPath, CENTER_POINT )
+				b -> b.distance( fieldPathForAscendingOrderTests, CENTER_POINT )
 		);
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
-
-		query = simpleQuery( b -> b.distance( fieldPath, CENTER_POINT.getLatitude(), CENTER_POINT.getLongitude() ) );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
-
-		query = simpleQuery( b -> b.distance( fieldPath, CENTER_POINT.getLatitude(), CENTER_POINT.getLongitude() ).asc() );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
 
 		query = simpleQuery(
-				b -> b.distance( fieldPath, CENTER_POINT ).desc()
+				b -> b.distance( fieldPathForAscendingOrderTests, CENTER_POINT.getLatitude(), CENTER_POINT.getLongitude() )
+		);
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
+
+		query = simpleQuery(
+				b -> b.distance( fieldPathForAscendingOrderTests, CENTER_POINT.getLatitude(), CENTER_POINT.getLongitude() )
+						.asc()
+		);
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_ID );
+
+		query = simpleQuery(
+				b -> b.distance( fieldPathForDescendingOrderTests, CENTER_POINT ).desc()
 		);
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 
-		query = simpleQuery( b -> b.distance( fieldPath, CENTER_POINT.getLatitude(), CENTER_POINT.getLongitude() ).desc() );
+		query = simpleQuery(
+				b -> b.distance( fieldPathForDescendingOrderTests, CENTER_POINT.getLatitude(), CENTER_POINT.getLongitude() )
+						.desc()
+		);
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1 );
 	}
@@ -147,13 +163,14 @@ public class DistanceSearchSortBaseIT {
 				isMedianWithNestedField()
 		);
 
-		SubTest.expectException( () -> simpleQuery( b -> b.distance( getFieldPath(), CENTER_POINT ) ) )
+		String fieldPath = getFieldPath( SortOrder.ASC );
+
+		SubTest.expectException( () -> simpleQuery( b -> b.distance( fieldPath, CENTER_POINT ) ) )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
-						getFieldPath(),
 						"Cannot compute the median across nested documents",
-						getFieldPath()
+						fieldPath
 				);
 	}
 
@@ -165,13 +182,15 @@ public class DistanceSearchSortBaseIT {
 				isSum()
 		);
 
-		SubTest.expectException( () -> simpleQuery( b -> b.distance( getFieldPath(), CENTER_POINT ) ) )
+		String fieldPath = getFieldPath( SortOrder.ASC );
+
+		SubTest.expectException( () -> simpleQuery( b -> b.distance( fieldPath, CENTER_POINT ) ) )
 				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot compute the sum for a distance sort",
 						"Only min, max, avg and median are supported",
-						getFieldPath()
+						fieldPath
 				);
 	}
 
@@ -208,38 +227,56 @@ public class DistanceSearchSortBaseIT {
 				.toQuery();
 	}
 
-	private String getFieldPath() {
+	private String getFieldPath(SortOrder expectedOrder) {
 		switch ( indexFieldStructure ) {
 			case ROOT:
-				return getRelativeFieldName();
+				return getRelativeFieldName( expectedOrder );
 			case IN_FLATTENED:
-				return "flattenedObject." + getRelativeFieldName();
+				return "flattenedObject." + getRelativeFieldName( expectedOrder );
 			case IN_NESTED:
-				return "nestedObject." + getRelativeFieldName();
+				return "nestedObject." + getRelativeFieldName( expectedOrder );
 			case IN_NESTED_TWICE:
-				return "nestedObject.nestedObject." + getRelativeFieldName();
+				return "nestedObject.nestedObject." + getRelativeFieldName( expectedOrder );
 			default:
 				throw new IllegalStateException( "Unexpected value: " + indexFieldStructure );
 		}
 	}
 
-	private String getRelativeFieldName() {
-		if ( sortMode == null ) {
-			return "geoPoint";
-		}
-		switch ( sortMode ) {
-			case SUM:
-				return "geoPoint_ascendingSum";
-			case MIN:
-				return "geoPoint_ascendingMin";
-			case MAX:
-				return "geoPoint_ascendingMax";
-			case AVG:
-				return "geoPoint_ascendingAvg";
-			case MEDIAN:
-				return "geoPoint_ascendingMedian";
+	private String getRelativeFieldName(SortOrder expectedOrder) {
+		switch ( indexFieldValueCardinality ) {
+			case SINGLE_VALUED:
+				// Sort on a single-valued field.
+				return "geoPoint";
+			case MULTI_VALUED:
+				if ( sortMode == null ) {
+					// Default sort mode: min in ascending order, max in descending order
+					switch ( expectedOrder ) {
+						case ASC:
+							return "geoPoint_ascendingMin";
+						case DESC:
+							return "geoPoint_ascendingMax";
+						default:
+							throw new IllegalStateException( "Unexpected sort order: " + expectedOrder );
+					}
+				}
+				else {
+					switch ( sortMode ) {
+						case SUM:
+							return "geoPoint_ascendingSum";
+						case MIN:
+							return "geoPoint_ascendingMin";
+						case MAX:
+							return "geoPoint_ascendingMax";
+						case AVG:
+							return "geoPoint_ascendingAvg";
+						case MEDIAN:
+							return "geoPoint_ascendingMedian";
+						default:
+							throw new IllegalStateException( "Unexpected sort mode: " + sortMode );
+					}
+				}
 			default:
-				throw new IllegalStateException( "Unexpected sort mode: " + sortMode );
+				throw new IllegalStateException( "Unexpected field value cardinality: " + indexFieldValueCardinality );
 		}
 	}
 
