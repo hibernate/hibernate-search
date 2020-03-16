@@ -74,7 +74,7 @@ public abstract class TextMultiValuesToSingleValuesSource {
 
 		final BitSet rootDocs = nestedDocsProvider.parentDocs( ctx );
 		final DocIdSetIterator innerDocs = nestedDocsProvider.childDocs( ctx );
-		return select( values, rootDocs, innerDocs, Integer.MAX_VALUE );
+		return select( values, rootDocs, innerDocs );
 	}
 
 	protected abstract SortedSetDocValues getSortedSetDocValues(LeafReaderContext ctx) throws IOException;
@@ -113,7 +113,7 @@ public abstract class TextMultiValuesToSingleValuesSource {
 	}
 
 	protected SortedDocValues select(final SortedSetDocValues values, final BitSet parentDocs,
-			final DocIdSetIterator childDocs, int maxChildren) {
+			final DocIdSetIterator childDocs) {
 		if ( parentDocs == null || childDocs == null ) {
 			return DocValues.emptySorted();
 		}
@@ -149,7 +149,7 @@ public abstract class TextMultiValuesToSingleValuesSource {
 				}
 
 				docID = lastSeenParentDoc = parentDoc;
-				lastEmittedOrd = (int) pick( values, childDocs, nextChildWithValue, parentDoc, maxChildren );
+				lastEmittedOrd = (int) pick( values, childDocs, nextChildWithValue, parentDoc );
 				return true;
 			}
 		};
@@ -180,19 +180,14 @@ public abstract class TextMultiValuesToSingleValuesSource {
 		return result;
 	}
 
-	protected long pick(SortedSetDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc,
-		int maxChildren) throws IOException {
+	protected long pick(SortedSetDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc) throws IOException {
 		long returnValue;
 
 		switch ( mode ) {
 			case MIN: {
 				returnValue = Long.MAX_VALUE;
-				int count = 0;
 				for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
 					if ( values.advanceExact( doc ) ) {
-						if ( ++count > maxChildren ) {
-							break;
-						}
 						for ( long ord; ( ord = values.nextOrd() ) != SortedSetDocValues.NO_MORE_ORDS; ) {
 							returnValue = Math.min( returnValue, ord );
 						}
@@ -202,12 +197,8 @@ public abstract class TextMultiValuesToSingleValuesSource {
 			}
 			case MAX: {
 				returnValue = Long.MIN_VALUE;
-				int count = 0;
 				for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
 					if ( values.advanceExact( doc ) ) {
-						if ( ++count > maxChildren ) {
-							break;
-						}
 						for ( long ord; ( ord = values.nextOrd() ) != SortedSetDocValues.NO_MORE_ORDS; ) {
 							returnValue = Math.max( returnValue, ord );
 						}
