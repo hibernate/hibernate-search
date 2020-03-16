@@ -134,7 +134,7 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 				private long value;
 
 				@Override
-				public long longValue() throws IOException {
+				public long longValue() {
 					return value;
 				}
 
@@ -151,7 +151,7 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 	}
 
 	protected LongValues select(final SortedNumericDocValues values, final BitSet parentDocs,
-			final DocIdSetIterator childDocs) throws IOException {
+			final DocIdSetIterator childDocs) {
 		if ( parentDocs == null || childDocs == null ) {
 			return DocValuesUtils.LONG_VALUES_EMPTY;
 		}
@@ -163,7 +163,7 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 			long lastEmittedValue = -1;
 
 			@Override
-			public long longValue() throws IOException {
+			public long longValue() {
 				return lastEmittedValue;
 			}
 
@@ -345,7 +345,7 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 		}
 
 		@Override
-		public LongValuesSource rewrite(IndexSearcher searcher) throws IOException {
+		public LongValuesSource rewrite(IndexSearcher searcher) {
 			return this;
 		}
 
