@@ -13,7 +13,6 @@ import java.util.Random;
 import java.util.stream.Stream;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -121,7 +120,7 @@ public abstract class AbstractOnTheFlyIndexingBenchmarks extends AbstractBackend
 		StubBackendSessionContext sessionContext = new StubBackendSessionContext();
 		PerThreadIndexPartition partition = getIndexPartition();
 		MappedIndex index = partition.getIndex();
-		IndexIndexingPlan<? extends DocumentElement> indexingPlan = index.getIndexManager()
+		IndexIndexingPlan<?> indexingPlan = index.getIndexManager()
 				.createIndexingPlan( sessionContext, getCommitStrategyParam(), refreshStrategy );
 
 		for ( Long documentIdInThread : idsToAdd ) {

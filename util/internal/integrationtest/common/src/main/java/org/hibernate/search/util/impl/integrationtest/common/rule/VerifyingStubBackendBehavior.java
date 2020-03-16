@@ -19,6 +19,7 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
+import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
@@ -26,6 +27,7 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBa
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubIndexScaleWork;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.StubSearchWork;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjection;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.projection.impl.StubSearchProjectionContext;
@@ -40,11 +42,13 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 
 	private final List<CallBehavior<Void>> stopBackendBehaviors = new ArrayList<>();
 
-	private final Map<String, CallQueue<PushSchemaCall>> pushSchemaCalls = new HashMap<>();
+	private final Map<String, CallQueue<SchemaDefinitionCall>> schemaDefinitionCalls = new HashMap<>();
+
+	private final Map<String, CallQueue<SchemaManagementWorkCall>> schemaManagementWorkCall = new HashMap<>();
 
 	private final Map<String, CallQueue<DocumentWorkCall>> documentWorkCalls = new HashMap<>();
 
-	private final CallQueue<IndexScaleWorkCalls> indexScaleWorkCalls = new CallQueue<>();
+	private final CallQueue<IndexScaleWorkCall> indexScaleWorkCalls = new CallQueue<>();
 
 	private final CallQueue<SearchWorkCall<?>> searchCalls = new CallQueue<>();
 
@@ -68,15 +72,19 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		indexFieldAddBehaviors.put( new IndexFieldKey( indexName, absoluteFieldPath ), behavior );
 	}
 
-	CallQueue<PushSchemaCall> getPushSchemaCalls(String indexName) {
-		return pushSchemaCalls.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
+	CallQueue<SchemaDefinitionCall> getSchemaDefinitionCalls(String indexName) {
+		return schemaDefinitionCalls.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
+	}
+
+	CallQueue<SchemaManagementWorkCall> getSchemaManagementWorkCalls(String indexName) {
+		return schemaManagementWorkCall.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
 	}
 
 	CallQueue<DocumentWorkCall> getDocumentWorkCalls(String indexName) {
 		return documentWorkCalls.computeIfAbsent( indexName, ignored -> new CallQueue<>() );
 	}
 
-	CallQueue<IndexScaleWorkCalls> getIndexScaleWorkCalls() {
+	CallQueue<IndexScaleWorkCall> getIndexScaleWorkCalls() {
 		return indexScaleWorkCalls;
 	}
 
@@ -92,14 +100,16 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 		createBackendBehaviors.clear();
 		stopBackendBehaviors.clear();
 		indexFieldAddBehaviors.clear();
-		pushSchemaCalls.clear();
+		schemaDefinitionCalls.clear();
+		schemaManagementWorkCall.clear();
 		documentWorkCalls.clear();
 		searchCalls.reset();
 	}
 
 	void verifyExpectationsMet() {
 		// We don't check anything for the various behaviors (createBackendBehaviors, ...): they are ignored if they are not executed.
-		pushSchemaCalls.values().forEach( CallQueue::verifyExpectationsMet );
+		schemaDefinitionCalls.values().forEach( CallQueue::verifyExpectationsMet );
+		schemaManagementWorkCall.values().forEach( CallQueue::verifyExpectationsMet );
 		documentWorkCalls.values().forEach( CallQueue::verifyExpectationsMet );
 		searchCalls.verifyExpectationsMet();
 	}
@@ -127,12 +137,23 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	}
 
 	@Override
-	public void pushSchema(String indexName, StubIndexSchemaNode rootSchemaNode) {
-		getPushSchemaCalls( indexName )
+	public void defineSchema(String indexName, StubIndexSchemaNode rootSchemaNode) {
+		getSchemaDefinitionCalls( indexName )
 				.verify(
-						new PushSchemaCall( indexName, rootSchemaNode ),
-						PushSchemaCall::verify,
+						new SchemaDefinitionCall( indexName, rootSchemaNode ),
+						SchemaDefinitionCall::verify,
 						noExpectationsBehavior( () -> null )
+				);
+	}
+
+	@Override
+	public CompletableFuture<?> executeSchemaManagementWork(String indexName, StubSchemaManagementWork work,
+			ContextualFailureCollector failureCollector) {
+		return getSchemaManagementWorkCalls( indexName )
+				.verify(
+						new SchemaManagementWorkCall( indexName, work, failureCollector ),
+						SchemaManagementWorkCall::verify,
+						noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
 				);
 	}
 
@@ -195,10 +216,10 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	}
 
 	@Override
-	public CompletableFuture<?> executeIndexScaleWork(Set<String> indexNames, StubIndexScaleWork work) {
+	public CompletableFuture<?> executeIndexScaleWork(String indexName, StubIndexScaleWork work) {
 		return indexScaleWorkCalls.verify(
-				new IndexScaleWorkCalls( indexNames, work ),
-				IndexScaleWorkCalls::verify,
+				new IndexScaleWorkCall( indexName, work ),
+				IndexScaleWorkCall::verify,
 				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
 		);
 	}

@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.impl;
 import java.util.Set;
 import java.util.function.Supplier;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
@@ -41,25 +41,24 @@ import org.hibernate.search.util.common.impl.ToStringTreeBuilder;
 /**
  * @param <I> The identifier type for the mapped entity type.
  * @param <E> The entity type mapped to the index.
- * @param <D> The document type for the index.
  */
-public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
+public class PojoIndexedTypeManager<I, E>
 		implements AutoCloseable, ToStringTreeAppendable,
-		PojoWorkIndexedTypeContext<I, E, D>, PojoScopeIndexedTypeContext<I, E, D> {
+		PojoWorkIndexedTypeContext<I, E>, PojoScopeIndexedTypeContext<I, E> {
 
 	private final PojoRawTypeIdentifier<E> typeIdentifier;
 	private final PojoCaster<E> caster;
 	private final IdentifierMappingImplementor<I, E> identifierMapping;
 	private final RoutingKeyProvider<E> routingKeyProvider;
 	private final PojoIndexingProcessor<E> processor;
-	private final MappedIndexManager<D> indexManager;
+	private final MappedIndexManager indexManager;
 	private final PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver;
 
 	public PojoIndexedTypeManager(PojoRawTypeIdentifier<E> typeIdentifier,
 			PojoCaster<E> caster,
 			IdentifierMappingImplementor<I, E> identifierMapping,
 			RoutingKeyProvider<E> routingKeyProvider,
-			PojoIndexingProcessor<E> processor, MappedIndexManager<D> indexManager,
+			PojoIndexingProcessor<E> processor, MappedIndexManager indexManager,
 			PojoImplicitReindexingResolver<E, Set<String>> reindexingResolver) {
 		this.typeIdentifier = typeIdentifier;
 		this.caster = caster;
@@ -106,13 +105,13 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 	}
 
 	@Override
-	public Supplier<E> toEntitySupplier(PojoWorkSessionContext sessionContext, Object entity) {
+	public Supplier<E> toEntitySupplier(PojoWorkSessionContext<?> sessionContext, Object entity) {
 		PojoRuntimeIntrospector introspector = sessionContext.getRuntimeIntrospector();
 		return new CachingCastingEntitySupplier<>( caster, introspector, entity );
 	}
 
 	@Override
-	public DocumentReferenceProvider toDocumentReferenceProvider(PojoWorkSessionContext sessionContext,
+	public DocumentReferenceProvider toDocumentReferenceProvider(PojoWorkSessionContext<?> sessionContext,
 			I identifier, Supplier<E> entitySupplier) {
 		String documentIdentifier = identifierMapping.toDocumentIdentifier(
 				identifier, sessionContext.getMappingContext()
@@ -122,20 +121,24 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 				entitySupplier,
 				sessionContext
 		);
-		return new PojoDocumentReferenceProvider( documentIdentifier, routingKey );
+		return new PojoDocumentReferenceProvider(
+				documentIdentifier, routingKey, identifier
+		);
 	}
 
 	@Override
-	public DocumentReferenceProvider toDocumentReferenceProvider(PojoWorkSessionContext sessionContext, I identifier,
-			String providedRoutingKey) {
+	public DocumentReferenceProvider toDocumentReferenceProvider(PojoWorkSessionContext<?> sessionContext,
+			I identifier, String providedRoutingKey) {
 		String documentIdentifier = identifierMapping.toDocumentIdentifier(
 				identifier, sessionContext.getMappingContext()
 		);
-		return new PojoDocumentReferenceProvider( documentIdentifier, providedRoutingKey );
+		return new PojoDocumentReferenceProvider(
+				documentIdentifier, providedRoutingKey, identifier
+		);
 	}
 
 	@Override
-	public PojoDocumentContributor<D, E> toDocumentContributor(Supplier<E> entitySupplier, PojoWorkSessionContext sessionContext) {
+	public PojoDocumentContributor<E> toDocumentContributor(Supplier<E> entitySupplier, PojoWorkSessionContext<?> sessionContext) {
 		return new PojoDocumentContributor<>( processor, sessionContext, entitySupplier );
 	}
 
@@ -153,11 +156,19 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 	}
 
 	@Override
-	public PojoTypeIndexer<I, E, D> createIndexer(PojoWorkSessionContext sessionContext,
+	public IndexSchemaManager getSchemaManager() {
+		return indexManager.getSchemaManager();
+	}
+
+	@Override
+	public PojoTypeIndexer<I, E> createIndexer(PojoWorkSessionContext<?> sessionContext,
 			DocumentCommitStrategy commitStrategy) {
 		return new PojoTypeIndexer<>(
 				this, sessionContext,
-				indexManager.createIndexer( sessionContext, commitStrategy )
+				indexManager.createIndexer(
+						sessionContext, sessionContext.getEntityReferenceFactory(),
+						commitStrategy
+				)
 		);
 	}
 
@@ -167,11 +178,14 @@ public class PojoIndexedTypeManager<I, E, D extends DocumentElement>
 	}
 
 	@Override
-	public PojoIndexedTypeIndexingPlan<I, E, D> createIndexingPlan(PojoWorkSessionContext sessionContext,
+	public <R> PojoIndexedTypeIndexingPlan<I, E, R> createIndexingPlan(PojoWorkSessionContext<R> sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return new PojoIndexedTypeIndexingPlan<>(
 				this, sessionContext,
-				indexManager.createIndexingPlan( sessionContext, commitStrategy, refreshStrategy )
+				indexManager.createIndexingPlan(
+						sessionContext, sessionContext.getEntityReferenceFactory(),
+						commitStrategy, refreshStrategy
+				)
 		);
 	}
 

@@ -73,9 +73,7 @@ public class LuceneIndexFieldType<F> implements IndexFieldType<F> {
 			collector.collectFacetConfig( schemaNode.getAbsoluteFieldPath(), multiValued );
 		}
 
-		if ( analyzerOrNormalizer != null ) {
-			collector.collectAnalyzer( schemaNode.getAbsoluteFieldPath(), analyzerOrNormalizer );
-		}
+		collector.collectAnalyzer( schemaNode.getAbsoluteFieldPath(), analyzerOrNormalizer );
 
 		return schemaNode;
 	}

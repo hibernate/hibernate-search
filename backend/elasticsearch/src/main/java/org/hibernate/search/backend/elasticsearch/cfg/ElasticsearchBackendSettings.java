@@ -68,6 +68,16 @@ public final class ElasticsearchBackendSettings {
 	public static final String VERSION = "version";
 
 	/**
+	 * Whether check version of the Elasticsearch cluster is enabled.
+	 * <p>
+	 * Expects a Boolean value such as {@code true} or {@code false},
+	 * or a string that can be parsed to such Boolean value.
+	 * <p>
+	 * Defaults to {@link Defaults#VERSION_CHECK_ENABLED}.
+	 */
+	public static final String VERSION_CHECK_ENABLED = "version_check.enabled";
+
+	/**
 	 * The username to send when connecting to the Elasticsearch servers (HTTP authentication).
 	 * <p>
 	 * Expects a String.
@@ -234,6 +244,7 @@ public final class ElasticsearchBackendSettings {
 		public static final boolean DISCOVERY_ENABLED = false;
 		public static final int DISCOVERY_REFRESH_INTERVAL = 10;
 		public static final boolean LOG_JSON_PRETTY_PRINTING = false;
+		public static final boolean VERSION_CHECK_ENABLED = true;
 		public static final MultiTenancyStrategyName MULTI_TENANCY_STRATEGY = MultiTenancyStrategyName.NONE;
 		public static final TypeNameMappingStrategyName MAPPING_TYPE_NAME_STRATEGY = TypeNameMappingStrategyName.DISCRIMINATOR;
 	}

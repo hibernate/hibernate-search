@@ -16,7 +16,7 @@ public class TckBackendFeatures {
 		return true;
 	}
 
-	public boolean normalizeStringMissingValues() {
+	public boolean normalizesStringMissingValues() {
 		return true;
 	}
 

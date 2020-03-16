@@ -16,7 +16,6 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -87,14 +86,6 @@ public class BigDecimalFieldTypeDescriptor extends FieldTypeDescriptor<BigDecima
 		return new ExistsPredicateExpectations<>(
 				BigDecimal.ZERO, new BigDecimal( 42.1 )
 		);
-	}
-
-	@Override
-	public Optional<FieldSortExpectations<BigDecimal>> getFieldSortExpectations() {
-		return Optional.of( new FieldSortExpectations<>(
-				BigDecimal.valueOf( 1.01 ), BigDecimal.valueOf( 3.2 ), BigDecimal.valueOf( 5.1 ),
-				BigDecimal.valueOf( -1000000.11 ), BigDecimal.valueOf( 2.0 ), BigDecimal.valueOf( 4.01 ), BigDecimal.valueOf( 10000000000.09 )
-		) );
 	}
 
 	@Override

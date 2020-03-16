@@ -382,7 +382,7 @@ public class ExistsSearchPredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			indexMapping.supportedFieldModels.forEach( f -> f.document1Value.write( document ) );
 			indexMapping.supportedFieldWithDocValuesModels.forEach( f -> f.document1Value.write( document ) );
@@ -488,7 +488,7 @@ public class ExistsSearchPredicateIT {
 			// Safe, see forEachTypeDescriptor
 			MatchPredicateExpectations<?> expectations = typeDescriptor.getMatchPredicateExpectations().get();
 			// Ignore non-sortable fields
-			if ( typeDescriptor.getFieldSortExpectations().isPresent() ) {
+			if ( typeDescriptor.getFieldSortExpectations().isSupported() ) {
 				ByTypeFieldModel<?> fieldModel = ByTypeFieldModel.mapper( typeDescriptor )
 						.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration );
 				consumer.accept( typeDescriptor, expectations, fieldModel );

@@ -748,7 +748,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		List<F> otherIndexDocumentFieldValues = expectations.getOtherIndexDocumentFieldValues();
 		List<List<F>> multiValuedIndexDocumentFieldValues = expectations.getMultiValuedIndexDocumentFieldValues();
 
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		for ( int i = 0; i < mainIndexDocumentFieldValues.size(); i++ ) {
 			F value = mainIndexDocumentFieldValues.get( i );
 			plan.add( referenceProvider( "document_" + i ), document -> {

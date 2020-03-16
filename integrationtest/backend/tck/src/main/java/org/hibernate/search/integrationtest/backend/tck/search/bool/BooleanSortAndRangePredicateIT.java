@@ -14,7 +14,6 @@ import static org.junit.Assert.assertTrue;
 import java.util.List;
 import java.util.function.Function;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
@@ -27,7 +26,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.integrationtest.backend.tck.search.predicate.RangeSearchPredicateIT;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
-import org.hibernate.search.integrationtest.backend.tck.search.sort.FieldSearchSortIT;
+import org.hibernate.search.integrationtest.backend.tck.search.sort.FieldSearchSortBaseIT;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
@@ -39,7 +38,7 @@ import org.junit.rules.ExpectedException;
 /**
  * Tests sorting and ranging behaviour querying a boolean type field
  *
- * @see FieldSearchSortIT
+ * @see FieldSearchSortBaseIT
  * @see RangeSearchPredicateIT
  */
 public class BooleanSortAndRangePredicateIT {
@@ -175,7 +174,7 @@ public class BooleanSortAndRangePredicateIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
 			document.addValue( indexMapping.bool, true );
 		} );

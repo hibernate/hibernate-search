@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.engine.mapper.mapping.impl;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
+import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
@@ -21,11 +22,11 @@ import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionCon
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 
-public class MappedIndexManagerImpl<D extends DocumentElement> implements MappedIndexManager<D> {
+public class MappedIndexManagerImpl implements MappedIndexManager {
 
-	private final IndexManagerImplementor<D> implementor;
+	private final IndexManagerImplementor implementor;
 
-	public MappedIndexManagerImpl(IndexManagerImplementor<D> implementor) {
+	public MappedIndexManagerImpl(IndexManagerImplementor implementor) {
 		this.implementor = implementor;
 	}
 
@@ -35,13 +36,23 @@ public class MappedIndexManagerImpl<D extends DocumentElement> implements Mapped
 	}
 
 	@Override
-	public IndexIndexingPlan<D> createIndexingPlan(BackendSessionContext sessionContext,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		return implementor.createIndexingPlan( sessionContext, commitStrategy, refreshStrategy );
+	public IndexSchemaManager getSchemaManager() {
+		return implementor.getSchemaManager();
 	}
 
 	@Override
-	public IndexIndexer<D> createIndexer(BackendSessionContext sessionContext,
+	public <R> IndexIndexingPlan<R> createIndexingPlan(BackendSessionContext sessionContext,
+			EntityReferenceFactory<R> entityReferenceFactory,
+			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+		return implementor.createIndexingPlan(
+				sessionContext, entityReferenceFactory,
+				commitStrategy, refreshStrategy
+		);
+	}
+
+	@Override
+	public IndexIndexer createIndexer(BackendSessionContext sessionContext,
+			EntityReferenceFactory<?> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy) {
 		return implementor.createIndexer( sessionContext, commitStrategy );
 	}

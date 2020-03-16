@@ -10,7 +10,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.util.Optional;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
@@ -53,8 +52,8 @@ public class IndexManagerBuildingStateHolderTest extends EasyMockSupport {
 	@Test
 	public void success() {
 		BackendFactory backendFactoryMock = createMock( BackendFactory.class );
-		BackendImplementor<DocumentElement> backendMock = createMock( BackendImplementor.class );
-		IndexManagerBuilder<DocumentElement> indexManagerBuilderMock = createMock( IndexManagerBuilder.class );
+		BackendImplementor backendMock = createMock( BackendImplementor.class );
+		IndexManagerBuilder indexManagerBuilderMock = createMock( IndexManagerBuilder.class );
 		IndexSchemaRootNodeBuilder indexSchemaRootNodeBuilderMock = createMock( IndexSchemaRootNodeBuilder.class );
 
 		Capture<ConfigurationPropertySource> backendPropertySourceCapture = Capture.newInstance();

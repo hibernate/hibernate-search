@@ -26,11 +26,11 @@ import org.apache.log4j.Level;
 
 public class FailureReportIT {
 
-	private static final String FAILURE_LOG_INTRODUCTION = "Hibernate Search bootstrap encountered a non-fatal failure;"
-			+ " continuing bootstrap for now to list all mapping problems,"
-			+ " but the bootstrap process will ultimately be aborted.\n"
+	private static final String FAILURE_LOG_INTRODUCTION = "Hibernate Search encountered a failure during bootstrap;"
+			+ " continuing for now to list all problems,"
+			+ " but the process will ultimately be aborted.\n"
 			+ "Context: ";
-	private static final String FAILURE_REPORT_INTRODUCTION = "HSEARCH000520: Hibernate Search bootstrap failed."
+	private static final String FAILURE_REPORT_INTRODUCTION = "HSEARCH000520: Hibernate Search encountered failures during bootstrap."
 			+ " Failures:\n"
 			+ "\n"
 			+ "    JavaBean mapping: \n";

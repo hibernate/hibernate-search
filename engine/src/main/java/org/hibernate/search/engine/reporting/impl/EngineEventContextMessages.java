@@ -11,6 +11,7 @@ import java.util.Set;
 
 import org.hibernate.search.util.common.logging.impl.MessageConstants;
 
+import org.jboss.logging.Messages;
 import org.jboss.logging.annotations.Message;
 import org.jboss.logging.annotations.MessageBundle;
 
@@ -19,6 +20,14 @@ import org.jboss.logging.annotations.MessageBundle;
  */
 @MessageBundle(projectCode = MessageConstants.PROJECT_CODE)
 public interface EngineEventContextMessages {
+
+	EngineEventContextMessages INSTANCE = Messages.getBundle( EngineEventContextMessages.class );
+
+	@Message(value = "bootstrap")
+	String bootstrap();
+
+	@Message(value = "shutdown")
+	String shutdown();
 
 	@Message(value = "    ")
 	String failureReportContextIndent();
@@ -59,6 +68,9 @@ public interface EngineEventContextMessages {
 
 	@Message(value = "shard '%1$s'")
 	String shard(String shardId);
+
+	@Message(value = "schema validation")
+	String schemaValidation();
 
 	@Message(value = "index schema root")
 	String indexSchemaRoot();

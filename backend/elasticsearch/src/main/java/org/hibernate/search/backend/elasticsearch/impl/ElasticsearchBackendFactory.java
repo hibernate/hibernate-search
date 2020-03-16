@@ -10,44 +10,43 @@ import java.lang.invoke.MethodHandles;
 import java.util.Locale;
 import java.util.Optional;
 
+import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.analysis.ElasticsearchAnalysisConfigurer;
 import org.hibernate.search.backend.elasticsearch.analysis.model.dsl.impl.ElasticsearchAnalysisConfigurationContextImpl;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
-import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
+import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
+import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
+import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
+import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
+import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.DefaultIndexLayoutStrategy;
+import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.mapping.TypeNameMappingStrategyName;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.DiscriminatorTypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.IndexNameTypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.multitenancy.MultiTenancyStrategyName;
-import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
-import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClientFactory;
-import org.hibernate.search.backend.elasticsearch.dialect.model.impl.ElasticsearchModelDialect;
-import org.hibernate.search.backend.elasticsearch.dialect.impl.ElasticsearchDialectFactory;
-import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.DiscriminatorMultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.NoMultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
-import org.hibernate.search.engine.backend.spi.BackendImplementor;
-import org.hibernate.search.engine.backend.spi.BackendFactory;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
+import org.hibernate.search.engine.backend.spi.BackendFactory;
+import org.hibernate.search.engine.backend.spi.BackendImplementor;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.bean.BeanReference;
+import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-
 
 
 public class ElasticsearchBackendFactory implements BackendFactory {
@@ -57,6 +56,12 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 	private static final OptionalConfigurationProperty<ElasticsearchVersion> VERSION =
 			ConfigurationProperty.forKey( ElasticsearchBackendSettings.VERSION )
 					.as( ElasticsearchVersion.class, ElasticsearchVersion::of )
+					.build();
+
+	private static final ConfigurationProperty<Boolean> VERSION_CHECK_ENABLED =
+			ConfigurationProperty.forKey( ElasticsearchBackendSettings.VERSION_CHECK_ENABLED )
+					.asBoolean()
+					.withDefault( ElasticsearchBackendSettings.Defaults.VERSION_CHECK_ENABLED )
 					.build();
 
 	private static final ConfigurationProperty<MultiTenancyStrategyName> MULTI_TENANCY_STRATEGY =
@@ -95,7 +100,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.build();
 
 	@Override
-	public BackendImplementor<?> create(String name, BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
+	public BackendImplementor create(String name, BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
 		boolean logPrettyPrinting = LOG_JSON_PRETTY_PRINTING.get( propertySource );
 		/*
 		 * The Elasticsearch client only converts JsonObjects to String and
@@ -105,6 +110,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		GsonProvider defaultGsonProvider = GsonProvider.create( GsonBuilder::new, logPrettyPrinting );
 
 		Optional<ElasticsearchVersion> configuredVersion = VERSION.get( propertySource );
+		boolean versionCheckEnabled = getVersionCheckEnabled( propertySource );
 
 		BeanResolver beanResolver = buildContext.getBeanResolver();
 		BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder = null;
@@ -116,7 +122,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();
 			link = new ElasticsearchLinkImpl(
 					clientFactoryHolder, buildContext.getThreadPoolProvider(), defaultGsonProvider, logPrettyPrinting,
-					dialectFactory, configuredVersion
+					dialectFactory, configuredVersion, versionCheckEnabled
 			);
 
 			ElasticsearchModelDialect dialect;
@@ -163,6 +169,20 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 					.push( ElasticsearchLinkImpl::onStop, link );
 			throw e;
 		}
+	}
+
+	private boolean getVersionCheckEnabled(ConfigurationPropertySource propertySource) {
+		Optional<ElasticsearchVersion> configuredVersionOptional = VERSION.get( propertySource );
+		boolean versionCheckEnabled = VERSION_CHECK_ENABLED.get( propertySource );
+		if ( !versionCheckEnabled ) {
+			if ( configuredVersionOptional.isPresent() && !configuredVersionOptional.get().getMinor().isPresent() ) {
+				throw log.invalidElasticsearchVersionCheckConfiguration( configuredVersionOptional.get().toString() );
+			}
+			else if ( !configuredVersionOptional.isPresent() ) {
+				throw log.invalidElasticsearchVersionCheckConfiguration( null );
+			}
+		}
+		return versionCheckEnabled;
 	}
 
 	private MultiTenancyStrategy getMultiTenancyStrategy(String backendName, ConfigurationPropertySource propertySource) {

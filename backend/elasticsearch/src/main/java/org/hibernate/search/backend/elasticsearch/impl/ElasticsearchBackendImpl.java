@@ -15,7 +15,6 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.backend.elasticsearch.ElasticsearchBackend;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
-import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.dsl.impl.ElasticsearchIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
@@ -46,7 +45,7 @@ import com.google.gson.Gson;
 
 
 
-class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocumentObjectBuilder>,
+class ElasticsearchBackendImpl implements BackendImplementor,
 		ElasticsearchBackend {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -167,7 +166,7 @@ class ElasticsearchBackendImpl implements BackendImplementor<ElasticsearchDocume
 	}
 
 	@Override
-	public IndexManagerBuilder<ElasticsearchDocumentObjectBuilder> createIndexManagerBuilder(
+	public IndexManagerBuilder createIndexManagerBuilder(
 			String hibernateSearchIndexName,
 			String mappedTypeName, boolean multiTenancyEnabled, BackendBuildContext buildContext,
 			ConfigurationPropertySource propertySource) {

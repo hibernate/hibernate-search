@@ -24,8 +24,8 @@ public class StubMappingPartialBuildState implements MappingPartialBuildState {
 		// Nothing to do
 	}
 
-	public MappingImplementor<StubMapping> finalizeMapping() {
-		return new StubMapping( indexMappingsByTypeIdentifier );
+	public MappingImplementor<StubMapping> finalizeMapping(StubMappingSchemaManagementStrategy schemaManagementStrategy) {
+		return new StubMapping( indexMappingsByTypeIdentifier, schemaManagementStrategy );
 	}
 
 }

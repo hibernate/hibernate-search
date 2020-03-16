@@ -14,12 +14,8 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
-import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
-import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
-import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -31,14 +27,12 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
 import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
 import org.hibernate.search.engine.search.sort.dsl.spi.DelegatingSearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
-import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.configuration.DefaultAnalysisDefinitions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.SubTest;
-import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -48,7 +42,8 @@ import org.junit.rules.ExpectedException;
 import org.assertj.core.api.Assertions;
 
 /**
- * Generic tests for sorts. More specific tests can be found in other classes, such as {@link FieldSearchSortIT}.
+ * Generic tests for sorts. More specific tests can be found in other classes,
+ * such as {@link FieldSearchSortBaseIT} or {@link DistanceSearchSortBaseIT}.
  */
 public class SearchSortIT {
 
@@ -120,100 +115,6 @@ public class SearchSortIT {
 			query = simpleQuery( b -> b.indexOrder() );
 			assertThat( query ).hasHitsExactOrder( firstCallHits );
 		}
-	}
-
-	@Test
-	public void byField_flattened() {
-		SearchQuery<DocumentReference> query;
-		query = simpleQuery( b -> b.field( "flattenedObject.string" )
-				.asc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.field( "flattenedObject.string" )
-				.desc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.field( "flattenedObject.integer" )
-				.asc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.field( "flattenedObject.integer" )
-				.desc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
-	}
-
-	@Test
-	@TestForIssue( jiraKey = "HSEARCH-2254" )
-	public void byField_nested() {
-		SearchQuery<DocumentReference> query;
-		query = simpleQuery( b -> b.field( "nestedObject.string" )
-				.asc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.string" )
-				.desc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.string" )
-				.asc().missing().first() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, FIRST_ID, SECOND_ID, THIRD_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.string" )
-				.desc().missing().first() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, THIRD_ID, SECOND_ID, FIRST_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.integer" )
-				.asc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.integer" )
-				.desc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.integer" )
-				.asc().missing().first() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, FIRST_ID, SECOND_ID, THIRD_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.integer" )
-				.desc().missing().first() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, THIRD_ID, SECOND_ID, FIRST_ID );
-	}
-
-	@Test
-	@TestForIssue( jiraKey = "HSEARCH-2254" )
-	public void byField_nested_x2() {
-		SearchQuery<DocumentReference> query;
-		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.string" )
-				.asc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.string" )
-				.desc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.string" )
-				.asc().missing().first() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, FIRST_ID, SECOND_ID, THIRD_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.string" )
-				.desc().missing().first() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, THIRD_ID, SECOND_ID, FIRST_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.integer" )
-				.asc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, SECOND_ID, THIRD_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.integer" )
-				.desc().missing().last() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.integer" )
-				.asc().missing().first() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, FIRST_ID, SECOND_ID, THIRD_ID );
-
-		query = simpleQuery( b -> b.field( "nestedObject.nestedObject.integer" )
-				.desc().missing().first() );
-		assertThat( query ).hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, THIRD_ID, SECOND_ID, FIRST_ID );
 	}
 
 	@Test
@@ -351,129 +252,6 @@ public class SearchSortIT {
 	}
 
 	@Test
-	public void byDistance_asc() {
-		SearchQuery<DocumentReference> query = simpleQuery( b -> b.distance( "geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ) );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.distance( "geoPoint", 45.757864, 4.834496 ) );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.distance( "geoPoint", 45.757864, 4.834496 ).asc() );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
-	}
-
-	@Test
-	public void byDistance_desc() {
-		SearchQuery<DocumentReference> query = simpleQuery(
-				b -> b.distance( "geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ).desc()
-		);
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
-
-		query = simpleQuery( b -> b.distance( "geoPoint", 45.757864, 4.834496 ).desc() );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
-	}
-
-	@Test
-	public void distanceSort_invalidType() {
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Distance related operations are not supported" );
-		thrown.expectMessage( "string" );
-
-		simpleQuery(
-				b -> b.distance( "string", GeoPoint.of( 45.757864, 4.834496 ) ).desc()
-		);
-	}
-
-	@Test
-	public void byDistance_asc_flattened() {
-		SearchQuery<DocumentReference> query = simpleQuery( b -> b.distance( "flattenedObject.geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ) );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.distance( "flattenedObject.geoPoint", 45.757864, 4.834496 ) );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.distance( "flattenedObject.geoPoint", 45.757864, 4.834496 ).asc() );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
-	}
-
-	@Test
-	public void byDistance_desc_flattened() {
-		SearchQuery<DocumentReference> query = simpleQuery(
-				b -> b.distance( "flattenedObject.geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ).desc()
-		);
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
-
-		query = simpleQuery( b -> b.distance( "flattenedObject.geoPoint", 45.757864, 4.834496 ).desc() );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
-	}
-
-	@Test
-	public void byDistance_asc_nested() {
-		SearchQuery<DocumentReference> query = simpleQuery( b -> b.distance( "nestedObject.geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ) );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.distance( "nestedObject.geoPoint", 45.757864, 4.834496 ) );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.distance( "nestedObject.geoPoint", 45.757864, 4.834496 ).asc() );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
-	}
-
-	@Test
-	public void byDistance_desc_nested() {
-		SearchQuery<DocumentReference> query = simpleQuery(
-				b -> b.distance( "nestedObject.geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ).desc()
-		);
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
-
-		query = simpleQuery( b -> b.distance( "nestedObject.geoPoint", 45.757864, 4.834496 ).desc() );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
-	}
-
-	@Test
-	public void byDistance_asc_nested_x2() {
-		SearchQuery<DocumentReference> query = simpleQuery( b -> b.distance( "nestedObject.nestedObject.geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ) );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.distance( "nestedObject.nestedObject.geoPoint", 45.757864, 4.834496 ) );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
-
-		query = simpleQuery( b -> b.distance( "nestedObject.nestedObject.geoPoint", 45.757864, 4.834496 ).asc() );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, FIRST_ID, THIRD_ID, SECOND_ID, EMPTY_ID );
-	}
-
-	@Test
-	public void byDistance_desc_nested_x2() {
-		SearchQuery<DocumentReference> query = simpleQuery(
-				b -> b.distance( "nestedObject.nestedObject.geoPoint", GeoPoint.of( 45.757864, 4.834496 ) ).desc()
-		);
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
-
-		query = simpleQuery( b -> b.distance( "nestedObject.nestedObject.geoPoint", 45.757864, 4.834496 ).desc() );
-		assertThat( query )
-				.hasDocRefHitsExactOrder( INDEX_NAME, EMPTY_ID, SECOND_ID, THIRD_ID, FIRST_ID );
-	}
-
-	@Test
 	public void extension() {
 		SearchQuery<DocumentReference> query;
 
@@ -587,91 +365,27 @@ public class SearchSortIT {
 								c -> c.field( "string" ).desc().missing().last()
 						)
 		);
+		assertThat( query )
+				.hasDocRefHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 	}
 
 	private void initData() {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		// Important: do not index the documents in the expected order after sorts
 		plan.add( referenceProvider( SECOND_ID ), document -> {
-			GeoPoint geoPoint = GeoPoint.of( 45.7705687, 4.835233 );
-
 			document.addValue( indexMapping.string, "george" );
-			document.addValue( indexMapping.geoPoint, geoPoint );
-
 			document.addValue( indexMapping.string_analyzed_forScore, "Hooray Hooray" );
 			document.addValue( indexMapping.unsortable, "george" );
-
-			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
-			flattenedObject.addValue( indexMapping.flattenedObject.string, "george" );
-			flattenedObject.addValue( indexMapping.flattenedObject.integer, 2 );
-			flattenedObject.addValue( indexMapping.flattenedObject.geoPoint, geoPoint );
-
-			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
-			nestedObject.addValue( indexMapping.nestedObject.string, "george" );
-			nestedObject.addValue( indexMapping.nestedObject.integer, 2 );
-			nestedObject.addValue( indexMapping.nestedObject.geoPoint, geoPoint );
-
-			// Note: this object must be single-valued for these tests
-			DocumentElement nestedX2Object = nestedObject.addObject( indexMapping.nestedX2Object.self );
-			nestedX2Object.addValue( indexMapping.nestedX2Object.string, "george" );
-			nestedX2Object.addValue( indexMapping.nestedX2Object.integer, 2 );
-			nestedX2Object.addValue( indexMapping.nestedX2Object.geoPoint, geoPoint );
 		} );
 		plan.add( referenceProvider( FIRST_ID ), document -> {
-			GeoPoint geoPoint = GeoPoint.of( 45.7541719, 4.8386221 );
-
 			document.addValue( indexMapping.string, "aaron" );
-			document.addValue( indexMapping.geoPoint, geoPoint );
-
 			document.addValue( indexMapping.string_analyzed_forScore, "Hooray Hooray Hooray" );
 			document.addValue( indexMapping.unsortable, "aaron" );
-
-			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
-			flattenedObject.addValue( indexMapping.flattenedObject.string, "aaron" );
-			flattenedObject.addValue( indexMapping.flattenedObject.integer, 1 );
-			flattenedObject.addValue( indexMapping.flattenedObject.geoPoint, geoPoint );
-
-			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
-			nestedObject.addValue( indexMapping.nestedObject.string, "aaron" );
-			nestedObject.addValue( indexMapping.nestedObject.integer, 1 );
-			nestedObject.addValue( indexMapping.nestedObject.geoPoint, geoPoint );
-
-			// Note: this object must be single-valued for these tests
-			DocumentElement nestedX2Object = nestedObject.addObject( indexMapping.nestedX2Object.self );
-			nestedX2Object.addValue( indexMapping.nestedX2Object.string, "aaron" );
-			nestedX2Object.addValue( indexMapping.nestedX2Object.integer, 1 );
-			nestedX2Object.addValue( indexMapping.nestedX2Object.geoPoint, geoPoint );
 		} );
 		plan.add( referenceProvider( THIRD_ID ), document -> {
-			GeoPoint geoPoint = GeoPoint.of( 45.7530374, 4.8510299 );
-
 			document.addValue( indexMapping.string, "zach" );
-			document.addValue( indexMapping.geoPoint, geoPoint );
-
 			document.addValue( indexMapping.string_analyzed_forScore, "Hooray" );
 			document.addValue( indexMapping.unsortable, "zach" );
-
-			// Note: this object must be single-valued for these tests
-			DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
-			flattenedObject.addValue( indexMapping.flattenedObject.string, "zach" );
-			flattenedObject.addValue( indexMapping.flattenedObject.integer, 3 );
-			flattenedObject.addValue( indexMapping.flattenedObject.geoPoint, geoPoint );
-
-			// Note: this object must be single-valued for these tests
-			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
-			nestedObject.addValue( indexMapping.nestedObject.string, "zach" );
-			nestedObject.addValue( indexMapping.nestedObject.integer, 3 );
-			nestedObject.addValue( indexMapping.nestedObject.geoPoint, geoPoint );
-
-			// Note: this object must be single-valued for these tests
-			DocumentElement nestedX2Object = nestedObject.addObject( indexMapping.nestedX2Object.self );
-			nestedX2Object.addValue( indexMapping.nestedX2Object.string, "zach" );
-			nestedX2Object.addValue( indexMapping.nestedX2Object.integer, 3 );
-			nestedX2Object.addValue( indexMapping.nestedX2Object.geoPoint, geoPoint );
 		} );
 		plan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
@@ -687,18 +401,11 @@ public class SearchSortIT {
 
 	private static class IndexMapping {
 		final IndexFieldReference<String> string;
-		final IndexFieldReference<GeoPoint> geoPoint;
 		final IndexFieldReference<String> string_analyzed_forScore;
 		final IndexFieldReference<String> unsortable;
 
-		final ObjectMapping flattenedObject;
-		final ObjectMapping nestedObject;
-		final ObjectMapping nestedX2Object;
-
 		IndexMapping(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString().sortable( Sortable.YES ) )
-					.toReference();
-			geoPoint = root.field( "geoPoint", f -> f.asGeoPoint().sortable( Sortable.YES ) )
 					.toReference();
 			string_analyzed_forScore = root.field(
 					"string_analyzed_forScore" ,
@@ -707,32 +414,6 @@ public class SearchSortIT {
 			)
 					.toReference();
 			unsortable = root.field( "unsortable", f -> f.asString().sortable( Sortable.NO ) )
-					.toReference();
-
-			IndexSchemaObjectField flattenedObjectField = root.objectField( "flattenedObject", ObjectFieldStorage.FLATTENED );
-			flattenedObject = new ObjectMapping( flattenedObjectField );
-
-			IndexSchemaObjectField nestedObjectField = root.objectField( "nestedObject", ObjectFieldStorage.NESTED );
-			nestedObject = new ObjectMapping( nestedObjectField );
-
-			IndexSchemaObjectField nestedX2ObjectField = nestedObjectField.objectField( "nestedObject", ObjectFieldStorage.NESTED );
-			nestedX2Object = new ObjectMapping( nestedX2ObjectField );
-		}
-	}
-
-	private static class ObjectMapping {
-		final IndexObjectFieldReference self;
-		final IndexFieldReference<Integer> integer;
-		final IndexFieldReference<String> string;
-		final IndexFieldReference<GeoPoint> geoPoint;
-
-		ObjectMapping(IndexSchemaObjectField objectField) {
-			self = objectField.toReference();
-			string = objectField.field( "string", f -> f.asString().sortable( Sortable.YES ) )
-					.toReference();
-			integer = objectField.field( "integer", f -> f.asInteger().sortable( Sortable.YES ) )
-					.toReference();
-			geoPoint = objectField.field( "geoPoint", f -> f.asGeoPoint().sortable( Sortable.YES ) )
 					.toReference();
 		}
 	}

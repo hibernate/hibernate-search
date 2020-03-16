@@ -7,6 +7,9 @@
 package org.hibernate.search.mapper.pojo.mapping.impl;
 
 import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.Optional;
+import java.util.Set;
 
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -76,16 +79,36 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
-	public PojoIndexingPlan createIndexingPlan(PojoWorkSessionContext context, DocumentCommitStrategy commitStrategy,
+	public <R, C> Optional<PojoScopeDelegate<R, Object, C>> createPojoAllScope(PojoScopeMappingContext mappingContext,
+			PojoScopeTypeExtendedContextProvider<Object, C> indexedTypeExtendedContextProvider) {
+		if ( indexedTypeManagers.getAll().isEmpty() ) {
+			return Optional.empty();
+		}
+		Set<PojoRawTypeIdentifier<?>> typeIdentifiers = new LinkedHashSet<>();
+		for ( PojoIndexedTypeManager<?, ?> typeManager : indexedTypeManagers.getAll() ) {
+			typeIdentifiers.add( typeManager.getTypeIdentifier() );
+		}
+		return Optional.of( PojoScopeDelegateImpl.create(
+				mappingContext,
+				indexedTypeManagers,
+				containedTypeManagers,
+				typeIdentifiers,
+				indexedTypeExtendedContextProvider
+		) );
+	}
+
+	@Override
+	public <R> PojoIndexingPlan<R> createIndexingPlan(PojoWorkSessionContext<R> context,
+			DocumentCommitStrategy commitStrategy,
 			DocumentRefreshStrategy refreshStrategy) {
-		return new PojoIndexingPlanImpl(
+		return new PojoIndexingPlanImpl<>(
 				indexedTypeManagers, containedTypeManagers,
 				context, commitStrategy, refreshStrategy
 		);
 	}
 
 	@Override
-	public PojoIndexer createIndexer(PojoWorkSessionContext context, DocumentCommitStrategy commitStrategy) {
+	public PojoIndexer createIndexer(PojoWorkSessionContext<?> context, DocumentCommitStrategy commitStrategy) {
 		return new PojoIndexerImpl(
 				indexedTypeManagers,
 				context, commitStrategy

@@ -3,8 +3,9 @@ spring.jpa:
     ddl-auto: create-drop
   properties:
     hibernate.search:
+      # Overridden in some tests
+      schema_management.strategy: drop-and-create-and-drop
       automatic_indexing:
-        strategy: ${automatic_indexing.strategy}
         # This really is only for tests:
         # it makes documents searchable directly upon returning from a transaction,
         # but it also hurts performance.
@@ -12,8 +13,7 @@ spring.jpa:
       backends:
         elasticsearch1:
           index_defaults:
-            lifecycle.strategy: drop-and-create-and-drop
-            lifecycle.minimal_required_status: yellow
+            schema_management.minimal_required_status: yellow
           log.json_pretty_printing: true
         lucene1:
           # Hack to use a different directory for each test

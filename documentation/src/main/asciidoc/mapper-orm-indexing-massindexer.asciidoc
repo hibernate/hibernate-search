@@ -141,10 +141,30 @@ will attempt to preload everything in memory.
 accept special values, for example MySQL might benefit from using `Integer#MIN_VALUE`, otherwise it
 will attempt to preload everything in memory.
 
+|[[mapper-orm-indexing-massindexer-parameters-drop-and-create-schema]]`dropAndCreateSchemaOnStart(boolean)`
+|`false`
+|Drops the indexes and their schema (if they exist) and re-creates them before indexing.
+
+Indexes will be unavailable for a short time during the dropping and re-creation,
+so this should only be used when failures of concurrent operations on the indexes (automatic indexing, ...)
+are acceptable.
+
+This should be used when the existing schema is known to be obsolete,
+for example when <<mapper-orm-mapping-changes,the Hibernate Search mapping changed>>
+and some fields now have a different type, a different analyzer, new capabilities (projectable, ...), etc.
+
+This may also be used when the schema is up-to-date,
+since it can be faster than a purge (`purgeAllOnStart`) on large indexes,
+especially with the Elasticsearch backend.
+
+As an alternative to this parameter,
+you can also use a schema manager to manage schemas manually at the time of your choosing:
+<<mapper-orm-schema-management-manager>>.
+
 |`purgeAllOnStart(boolean)`
 |`true`
-|Whether the existing index should be purged at the beginning of the job. This operation
-takes place before indexing.
+|Removes all entities from the indexes before indexing.
+
 Only set this to `false` if you know the index is already empty;
 otherwise, you will end up with duplicates in the index.
 
@@ -184,23 +204,24 @@ The parameter is not used by default. It is equivalent to keyword `LIMIT` in SQL
 |A logging monitor.
 |
 The component responsible for monitoring progress of mass indexing.
-+
+
 As a `MassIndexer` can take some time to finish its job,
 it is often necessary to monitor its progress.
 The default, built-in monitor logs progress periodically at the `INFO` level,
 but a custom monitor can be set by implementing the `MassIndexingMonitor` interface
 and passing an instance using the `monitor` method.
-+
-Implementations of `MassIndexingMonitor` must be threadsafe.
+
+Implementations of `MassIndexingMonitor` must be thread-safe.
 
 |`failureHandler(MassIndexingFailureHandler)`
 |A failure handler.
 |
 The component responsible for handling failures occurring during mass indexing.
-+
+
 A `MassIndexer` performs multiple operations in parallel,
 some of which can fail without stopping the whole mass indexing process.
 As a result, it may be necessary to trace individual failures.
+
 The default, built-in failure handler just forwards the failures
 to the global <<configuration-background-failure-handling,background failure handler>>,
 which by default will log them at the `ERROR` level,
@@ -209,8 +230,8 @@ and passing an instance using the `failureHandler` method.
 This can be used to simply log failures in a context specific to the mass indexer,
 e.g. a web interface in a maintenance console from which mass indexing was requested,
 or for more advanced use cases, such as cancelling mass indexing on the first failure.
-+
-Implementations of `MassIndexingFailureHandler` must be threadsafe.
+
+Implementations of `MassIndexingFailureHandler` must be thread-safe.
 
 |===
 

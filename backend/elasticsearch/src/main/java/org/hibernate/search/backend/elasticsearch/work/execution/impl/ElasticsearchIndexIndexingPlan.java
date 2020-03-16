@@ -11,10 +11,10 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentElasticsearchWork;
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
@@ -26,37 +26,40 @@ import com.google.gson.JsonObject;
 
 
 
-public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan<ElasticsearchDocumentObjectBuilder> {
+public class ElasticsearchIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 
 	private final ElasticsearchWorkBuilderFactory builderFactory;
 	private final ElasticsearchWorkOrchestrator orchestrator;
 	private final WorkExecutionIndexManagerContext indexManagerContext;
-	private final DocumentRefreshStrategy refreshStrategy;
 	private final String tenantId;
+	private final EntityReferenceFactory<R> entityReferenceFactory;
+	private final DocumentRefreshStrategy refreshStrategy;
 
 	private final List<SingleDocumentElasticsearchWork<?>> works = new ArrayList<>();
 
 	public ElasticsearchIndexIndexingPlan(ElasticsearchWorkBuilderFactory builderFactory,
 			ElasticsearchWorkOrchestrator orchestrator,
 			WorkExecutionIndexManagerContext indexManagerContext,
-			DocumentRefreshStrategy refreshStrategy,
-			BackendSessionContext sessionContext) {
+			BackendSessionContext sessionContext,
+			EntityReferenceFactory<R> entityReferenceFactory,
+			DocumentRefreshStrategy refreshStrategy) {
 		this.builderFactory = builderFactory;
 		this.orchestrator = orchestrator;
 		this.indexManagerContext = indexManagerContext;
-		this.refreshStrategy = refreshStrategy;
 		this.tenantId = sessionContext.getTenantIdentifier();
+		this.entityReferenceFactory = entityReferenceFactory;
+		this.refreshStrategy = refreshStrategy;
 	}
 
 	@Override
 	public void add(DocumentReferenceProvider referenceProvider,
-			DocumentContributor<ElasticsearchDocumentObjectBuilder> documentContributor) {
+			DocumentContributor documentContributor) {
 		index( referenceProvider, documentContributor );
 	}
 
 	@Override
 	public void update(DocumentReferenceProvider referenceProvider,
-			DocumentContributor<ElasticsearchDocumentObjectBuilder> documentContributor) {
+			DocumentContributor documentContributor) {
 		index( referenceProvider, documentContributor );
 	}
 
@@ -67,7 +70,7 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan<Elastic
 
 		collect(
 				builderFactory.delete(
-						indexManagerContext.getMappedTypeName(),
+						indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
 						indexManagerContext.getElasticsearchIndexWriteName(),
 						URLEncodedString.fromString( elasticsearchId ), routingKey
 				)
@@ -85,10 +88,10 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan<Elastic
 	}
 
 	@Override
-	public CompletableFuture<IndexIndexingPlanExecutionReport> executeAndReport() {
+	public CompletableFuture<IndexIndexingPlanExecutionReport<R>> executeAndReport() {
 		try {
-			CompletableFuture<IndexIndexingPlanExecutionReport> future = new CompletableFuture<>();
-			orchestrator.submit( new ElasticsearchIndexingPlanWorkSet( works, future ) );
+			CompletableFuture<IndexIndexingPlanExecutionReport<R>> future = new CompletableFuture<>();
+			orchestrator.submit( new ElasticsearchIndexingPlanWorkSet<>( works, entityReferenceFactory, future ) );
 			return future;
 		}
 		finally {
@@ -102,7 +105,7 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan<Elastic
 	}
 
 	private void index(DocumentReferenceProvider referenceProvider,
-			DocumentContributor<ElasticsearchDocumentObjectBuilder> documentContributor) {
+			DocumentContributor documentContributor) {
 		String id = referenceProvider.getIdentifier();
 		String elasticsearchId = indexManagerContext.toElasticsearchId( tenantId, id );
 		String routingKey = referenceProvider.getRoutingKey();
@@ -111,7 +114,7 @@ public class ElasticsearchIndexIndexingPlan implements IndexIndexingPlan<Elastic
 
 		collect(
 				builderFactory.index(
-						indexManagerContext.getMappedTypeName(),
+						indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
 						indexManagerContext.getElasticsearchIndexWriteName(),
 						URLEncodedString.fromString( elasticsearchId ), routingKey, document
 				)

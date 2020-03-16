@@ -42,7 +42,7 @@ public enum MultiTenancyStrategyName {
 		this.externalRepresentation = externalRepresentation;
 	}
 
-	private String getExternalRepresentation() {
+	public String getExternalRepresentation() {
 		return externalRepresentation;
 	}
 }

@@ -32,6 +32,7 @@ import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.orm.mapping.impl.HibernateOrmMapping;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmRuntimeIntrospector;
+import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.scope.impl.HibernateOrmScopeSessionContext;
 import org.hibernate.search.mapper.orm.scope.impl.SearchScopeImpl;
@@ -43,6 +44,7 @@ import org.hibernate.search.mapper.orm.work.SearchIndexingPlan;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanSessionContext;
 import org.hibernate.search.mapper.orm.work.impl.SearchIndexingPlanImpl;
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRuntimeIntrospector;
 import org.hibernate.search.mapper.pojo.session.spi.AbstractPojoSearchSession;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
@@ -54,9 +56,9 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 /**
  * The actual implementation of {@link SearchSession}.
  */
-public class HibernateOrmSearchSession extends AbstractPojoSearchSession
+public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityReference>
 		implements SearchSession, HibernateOrmSessionContext, HibernateOrmScopeSessionContext, SearchIndexingPlanSessionContext,
-		DocumentReferenceConverter<EntityReference> {
+		DocumentReferenceConverter<EntityReference>, EntityReferenceFactory<EntityReference> {
 
 	/**
 	 * @param sessionImplementor A Hibernate session
@@ -144,6 +146,11 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
+	public SearchSchemaManager schemaManager(Collection<? extends Class<?>> types) {
+		return scope( types ).schemaManager();
+	}
+
+	@Override
 	public SearchWorkspace workspace(Collection<? extends Class<?>> types) {
 		return scope( types ).workspace( DetachedBackendSessionContext.of( this ) );
 	}
@@ -187,9 +194,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	public void setAutomaticIndexingSynchronizationStrategy(
 			AutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		ConfiguredAutomaticIndexingSynchronizationStrategy.Builder builder =
-				new ConfiguredAutomaticIndexingSynchronizationStrategy.Builder(
-						mappingContext.getFailureHandler(), this
-				);
+				new ConfiguredAutomaticIndexingSynchronizationStrategy.Builder( mappingContext.getFailureHandler() );
 		synchronizationStrategy.apply( builder );
 		this.configuredAutomaticIndexingSynchronizationStrategy = builder.build();
 	}
@@ -224,19 +229,37 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 	}
 
 	@Override
+	public EntityReferenceFactory<EntityReference> getEntityReferenceFactory() {
+		return this;
+	}
+
+	@Override
+	public EntityReference createEntityReference(String typeName, Object identifier) {
+		HibernateOrmSessionIndexedTypeContext<?> typeContext =
+				typeContextProvider.getIndexedByJpaEntityName( typeName );
+		if ( typeContext == null ) {
+			throw new AssertionFailure(
+					"Type " + typeName + " refers to an unknown type"
+			);
+		}
+		return new EntityReferenceImpl( typeContext.getTypeIdentifier(), typeContext.getJpaEntityName(), identifier );
+	}
+
+	@Override
 	public PojoRuntimeIntrospector getRuntimeIntrospector() {
 		return runtimeIntrospector;
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public PojoIndexingPlan getCurrentIndexingPlan(boolean createIfDoesNotExist) {
+	public PojoIndexingPlan<EntityReference> getCurrentIndexingPlan(boolean createIfDoesNotExist) {
 		checkOrmSessionIsOpen();
 		Transaction transactionIdentifier = null;
 
-		TransientReference<Map<Transaction, PojoIndexingPlan>> reference = (TransientReference<Map<Transaction, PojoIndexingPlan>>) sessionImplementor.getProperties()
+		TransientReference<Map<Transaction, PojoIndexingPlan<EntityReference>>> reference =
+				(TransientReference<Map<Transaction, PojoIndexingPlan<EntityReference>>>) sessionImplementor.getProperties()
 				.get( INDEXING_PLAN_PER_TRANSACTION_MAP_KEY );
-		Map<Transaction, PojoIndexingPlan> planPerTransaction = reference == null ? null : reference.get();
+		Map<Transaction, PojoIndexingPlan<EntityReference>> planPerTransaction = reference == null ? null : reference.get();
 		if ( planPerTransaction == null ) {
 			planPerTransaction = new HashMap<>();
 			reference = new TransientReference<>( planPerTransaction );
@@ -248,7 +271,7 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		}
 		// For out of transaction case we will use null as transaction identifier
 
-		PojoIndexingPlan plan = planPerTransaction.get( transactionIdentifier );
+		PojoIndexingPlan<EntityReference> plan = planPerTransaction.get( transactionIdentifier );
 		if ( plan != null ) {
 			return plan;
 		}
@@ -280,8 +303,9 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession
 		return configuredAutomaticIndexingSynchronizationStrategy;
 	}
 
-	private Synchronization createTransactionWorkQueueSynchronization(PojoIndexingPlan indexingPlan,
-			Map<Transaction, PojoIndexingPlan> indexingPlanPerTransaction, Transaction transactionIdentifier,
+	private Synchronization createTransactionWorkQueueSynchronization(PojoIndexingPlan<EntityReference> indexingPlan,
+			Map<Transaction, PojoIndexingPlan<EntityReference>> indexingPlanPerTransaction,
+			Transaction transactionIdentifier,
 			ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		if ( enlistInTransaction ) {
 			return new InTransactionWorkQueueSynchronization(

@@ -68,7 +68,8 @@ You can find a full reference of available properties in the Hibernate Search ja
 
 Most of the time, Hibernate Search does not require any specific configuration
 to be applied by hand to the Elasticsearch cluster,
-beyond the index mapping which <<backend-elasticsearch-index-lifecycle,can be automatically generated>>.
+beyond the index mapping (schema)
+which <<mapper-orm-schema-management,can be automatically generated>>.
 
 The only exception is <<backend-elasticsearch-configuration-sharding>>,
 which needs to be enabled explicitly.
@@ -243,20 +244,26 @@ in order to generate correct HTTP requests.
 By default, Hibernate Search will query the Elasticsearch cluster at boot time to know its version,
 and will infer the correct behavior to adopt.
 
-Alternatively, you can tell Hibernate Search the Elasticsearch version to target.
-Hibernate Search will still query the Elasticsearch cluster to check that the configured version matches the actual version,
-but only after most of the metadata has been validated.
-This can be helpful when developing, in particular.
-
-To configure the version, set the `hibernate.search.backends.<backend name>.version` property
+If necessary, you can disable the call to the Elasticsearch cluster for version checks on startup.
+To do that, set `hibernate.search.backends.<backend name>.version_check.enabled` to `false`,
+and set the property `hibernate.search.backends.<backend name>.version`
 to a string following the format `x.y.z-qualifier`,
 where `x`, `y` and `z` are integers
 and `qualifier` is an optional string of word characters (alphanumeric or `_`).
 
-Incomplete versions are allowed in some cases, for example `7.0` or just `7`.
-This is not possible for all versions, however.
-For example, Elasticsearch 5 is only supported from 5.6.0 onwards,
-so `5` is not an acceptable value and will trigger an exception: `5.6` must be used instead.
+The major and minor version numbers (`x` and `y` in the format above) are mandatory,
+but other numbers are optional.
+
+[TIP]
+====
+The property `hibernate.search.backends.<backend name>.version` can also be set
+when `hibernate.search.backends.<backend name>.version_check.enabled` is `true` (the default).
+
+In that case,
+Hibernate Search will still query the Elasticsearch cluster to know the actual version of the cluster,
+and will check that the configured version matches the actual version.
+This can be helpful while developing, in particular.
+====
 
 [[backend-elasticsearch-configuration-logging]]
 === Logging
@@ -281,86 +288,26 @@ link:{elasticsearchDocUrl}/index-modules.html#_static_index_settings[set the pro
 // Search 5 anchors backward compatibility
 [[elasticsearch-schema-management-strategy]]
 
-Hibernate Search includes a feature named "index lifecycle management",
-where it will automatically create, validate, update, or drop an index on startup or shutdown.
+Elasticsearch indexes need to be created before they can be used for indexing and searching;
+see <<mapper-orm-schema-management>> for more information about how to create indexes and their schema
+in Hibernate Search.
 
-The following strategies are available:
-
-[options="header"]
-|====
-|Value|Definition
-|`none`|The index, its mappings and the analyzer definitions will not be created, deleted nor altered.
-Hibernate Search will **not even check** that the index already exists.
-|`validate`|The index, its existing mappings and analyzer definitions will be checked to be compatible with the mapping defined in your application.
-The index, its mappings and analyzer definitions will not be created, deleted nor altered.
-|`update`|The index, its mappings and analyzer definitions will be created, existing mappings will be updated if there are no conflicts.
-Caution: if analyzer definitions have to be updated, the index will be closed automatically during the update.
-|`create`|**The default**: an existing index will not be altered, a missing index will be created along with their mappings and analyzer definitions.
-|`drop-and-create`|Indexes will be deleted if existing and then created along with their mappings and analyzer definitions to match the mapping defined in your application.
-This will delete all content from the indexes! Useful during development.
-|`drop-and-create-and-drop`|Similar to `drop-and-create` but will also delete the index at shutdown. Commonly used for tests.
-|====
-
-[NOTE]
-====
-Mapping validation is as permissive as possible.
-Fields or mappings that are unknown to Hibernate Search will be ignored,
-and settings that are more powerful than required will be deemed valid.
-For example, a field that is not marked as sortable in Hibernate Search
-but marked as `"docvalues": true` in Elasticsearch will be deemed valid.
-
-One exception: date formats must match exactly the formats specified by Hibernate Search, due to implementation constraints.
-====
-
-You can fine-tune the strategy using the following properties:
+For Elasticsearch specifically, some fine-tuning is available through the following options:
 
 [source]
 ----
-hibernate.search.backends.<backend name>.indexes.<index name>.lifecycle.strategy create (default)
-hibernate.search.backends.<backend name>.indexes.<index name>.lifecycle.minimal_required_status green (default)
-hibernate.search.backends.<backend name>.indexes.<index name>.lifecycle.minimal_required_status_wait_timeout 10000 (default)
+hibernate.search.backends.<backend name>.indexes.<index name>.schema_management.minimal_required_status green (default)
+hibernate.search.backends.<backend name>.indexes.<index name>.schema_management.minimal_required_status_wait_timeout 10000 (default)
 # OR
-hibernate.search.backends.<backend name>.index_defaults.lifecycle.strategy create (default)
-hibernate.search.backends.<backend name>.index_defaults.lifecycle.minimal_required_status green (default)
-hibernate.search.backends.<backend name>.index_defaults.lifecycle.minimal_required_status_wait_timeout 10000 (default)
+hibernate.search.backends.<backend name>.index_defaults.schema_management.minimal_required_status green (default)
+hibernate.search.backends.<backend name>.index_defaults.schema_management.minimal_required_status_wait_timeout 10000 (default)
 ----
 
-The properties `minimal_required_status` and `minimal_required_status_wait_timeout` define
-the minimal required status of the index on startup, before Hibernate Search can start using it,
-and the maximum time to wait for this status, as an <<configuration-property-types,integer value>> in milliseconds.
-These properties are ignored when the `none` strategy is selected,
-because the index will not be checked on startup (see above).
+* `minimal_required_status` defines the minimal required status of an index before creation is considered complete.
+* `minimal_required_status_wait_timeout` defines the maximum time to wait for this status,
+as an <<configuration-property-types,integer value>> in milliseconds.
 
-[WARNING]
-====
-Since Elasticsearch on Amazon Web Services (AWS)
-https://docs.aws.amazon.com/elasticsearch-service/latest/developerguide/aes-supported-es-operations.html[does not support the `_close`/`_open` operations],
-the `update` strategy will fail when trying to update analyzer definitions
-on an AWS Elasticsearch cluster.
-
-The only workaround is to avoid the `update` strategy on AWS.
-====
-
-[WARNING]
-.Strategies in production environments
-====
-It is strongly recommended to use either `none` or `validate` in a production environment.
-
-The alternatives `drop-and-create` and `drop-and-create-and-drop` are obviously unsuitable in this context
-unless you want to reindex everything upon every startup,
-and `update` may leave your mapping half-updated in case of conflict.
-
-To be precise, if your mapping changed in an incompatible way, such as a field having its type changed,
-updating the mapping may be impossible without manual intervention.
-In this case, the `update` strategy will prevent Hibernate Search from starting,
-but it may already have successfully updated the mappings for another index, making a rollback difficult.
-
-When updating analyzer definitions Hibernate Search will temporarily stop the affected indexes during the update.
-This means the `update` strategy should be used with caution when multiple clients use Elasticsearch indexes managed by Hibernate Search:
-those clients should be synchronized in such a way that while Hibernate Search is starting, no other client needs to access the index.
-
-For these reasons, migrating your mapping on a live cluster should be carefully planned as part of the deployment process.
-====
+These properties are only effective when creating or validating an index as part of schema management.
 
 [[backend-elasticsearch-indexlayout]]
 == Index layout

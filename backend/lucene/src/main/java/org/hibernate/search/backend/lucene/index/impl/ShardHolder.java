@@ -22,16 +22,16 @@ import org.hibernate.search.backend.lucene.lowlevel.index.impl.IOStrategy;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.DirectoryReaderCollector;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
+import org.hibernate.search.backend.lucene.schema.management.impl.SchemaManagementIndexManagerContext;
 import org.hibernate.search.backend.lucene.work.execution.impl.WorkExecutionIndexManagerContext;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.impl.Throwables;
 
-class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerContext {
+class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerContext,
+		SchemaManagementIndexManagerContext {
 
 	private final IndexManagerBackendContext backendContext;
 	private final LuceneIndexModel model;
@@ -50,7 +50,7 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 		return getClass().getSimpleName() + "[indexName=" + model.getIndexName() + "]";
 	}
 
-	CompletableFuture<?> start(IndexManagerStartContext startContext) {
+	void start(IndexManagerStartContext startContext) {
 		ConfigurationPropertySource propertySource = startContext.getConfigurationPropertySource();
 
 		try {
@@ -67,22 +67,13 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 
 			if ( startContext.getFailureCollector().hasFailure() ) {
 				// At least one shard creation failed; abort and don't even try to start shards.
-				return CompletableFuture.completedFuture( null );
+				return;
 			}
 
-			CompletableFuture<?>[] futures = new CompletableFuture[shards.size()];
-			int i = 0;
 			for ( Shard shard : shards.values() ) {
 				writeOrchestrators.add( shard.getWriteOrchestrator() );
-				futures[i] = shard.start()
-						.exceptionally( Futures.handler( e -> {
-							startContext.getFailureCollector().add( Throwables.expectException( e ) );
-							return null;
-						} ) );
-				i++;
+				shard.start();
 			}
-
-			return CompletableFuture.allOf( futures );
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
@@ -123,6 +114,11 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 	@Override
 	public String getIndexName() {
 		return model.getIndexName();
+	}
+
+	@Override
+	public String getMappedTypeName() {
+		return model.getMappedTypeName();
 	}
 
 	@Override

@@ -20,11 +20,11 @@ public interface PojoWorkContainedTypeContext<E> {
 
 	PojoRawTypeIdentifier<E> getTypeIdentifier();
 
-	Supplier<E> toEntitySupplier(PojoWorkSessionContext sessionContext, Object entity);
+	Supplier<E> toEntitySupplier(PojoWorkSessionContext<?> sessionContext, Object entity);
 
-	void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoWorkSessionContext sessionContext,
+	void resolveEntitiesToReindex(PojoReindexingCollector collector, PojoWorkSessionContext<?> sessionContext,
 			Supplier<E> entitySupplier, Set<String> dirtyPaths);
 
-	PojoContainedTypeIndexingPlan<E> createIndexingPlan(PojoWorkSessionContext sessionContext);
+	PojoContainedTypeIndexingPlan<E> createIndexingPlan(PojoWorkSessionContext<?> sessionContext);
 
 }

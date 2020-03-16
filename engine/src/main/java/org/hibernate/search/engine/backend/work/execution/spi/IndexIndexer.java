@@ -10,11 +10,9 @@ import java.util.concurrent.CompletableFuture;
 
 /**
  * An indexer scoped to a single index.
- *
- * @param <D> The expected document type.
  */
-public interface IndexIndexer<D> {
+public interface IndexIndexer {
 
-	CompletableFuture<?> add(DocumentReferenceProvider documentReferenceProvider, DocumentContributor<D> documentContributor);
+	CompletableFuture<?> add(DocumentReferenceProvider documentReferenceProvider, DocumentContributor documentContributor);
 
 }

@@ -13,12 +13,15 @@ import org.hibernate.search.engine.search.projection.dsl.SearchProjectionFactory
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
 import org.hibernate.search.mapper.orm.massindexing.impl.MassIndexerImpl;
+import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
+import org.hibernate.search.mapper.orm.schema.management.impl.SearchSchemaManagerImpl;
 import org.hibernate.search.mapper.orm.scope.SearchScope;
 import org.hibernate.search.mapper.orm.search.query.dsl.HibernateOrmSearchQuerySelectStep;
 import org.hibernate.search.mapper.orm.search.query.dsl.impl.HibernateOrmSearchQuerySelectStepImpl;
 import org.hibernate.search.mapper.orm.search.loading.context.impl.HibernateOrmLoadingContext;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.work.impl.SearchWorkspaceImpl;
+import org.hibernate.search.mapper.pojo.schema.management.spi.PojoScopeSchemaManager;
 import org.hibernate.search.mapper.pojo.scope.spi.PojoScopeDelegate;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 
@@ -64,6 +67,11 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 	}
 
 	@Override
+	public SearchSchemaManager schemaManager() {
+		return new SearchSchemaManagerImpl( schemaManagerDelegate() );
+	}
+
+	@Override
 	public SearchWorkspace workspace() {
 		return workspace( (String) null );
 	}
@@ -92,7 +100,12 @@ public class SearchScopeImpl<E> implements SearchScope<E> {
 				mappingContext,
 				delegate.getIncludedIndexedTypes(),
 				detachedSessionContext,
+				delegate.schemaManager(),
 				delegate.workspace( detachedSessionContext )
 		);
+	}
+
+	public PojoScopeSchemaManager schemaManagerDelegate() {
+		return delegate.schemaManager();
 	}
 }

@@ -17,10 +17,10 @@ import org.hibernate.search.util.common.impl.Throwables;
 public class SearchIndexingPlanImpl implements SearchIndexingPlan {
 
 	private final PojoRuntimeIntrospector introspector;
-	private final PojoIndexingPlan delegate;
+	private final PojoIndexingPlan<?> delegate;
 
 	public SearchIndexingPlanImpl(PojoRuntimeIntrospector introspector,
-			PojoIndexingPlan delegate) {
+			PojoIndexingPlan<?> delegate) {
 		this.introspector = introspector;
 		this.delegate = delegate;
 	}

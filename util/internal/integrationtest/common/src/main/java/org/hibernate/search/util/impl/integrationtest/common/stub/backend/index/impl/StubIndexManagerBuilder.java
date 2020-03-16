@@ -10,11 +10,10 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRoo
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.impl.StubDocumentElement;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.impl.StubIndexSchemaRootNodeBuilder;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
-public class StubIndexManagerBuilder implements IndexManagerBuilder<StubDocumentElement> {
+public class StubIndexManagerBuilder implements IndexManagerBuilder {
 
 	public static final StaticCounters.Key INSTANCE_COUNTER_KEY = StaticCounters.createKey();
 	public static final StaticCounters.Key CLOSE_ON_FAILURE_COUNTER_KEY = StaticCounters.createKey();
@@ -22,14 +21,17 @@ public class StubIndexManagerBuilder implements IndexManagerBuilder<StubDocument
 
 	private final StubBackend backend;
 	private final String name;
+	private final String mappedTypeName;
 	private final StubIndexSchemaRootNodeBuilder schemaRootNodeBuilder;
 
 	private boolean closed = false;
 
-	public StubIndexManagerBuilder(StubBackend backend, String name, String mappedTypeName) {
+	public StubIndexManagerBuilder(StubBackend backend, String name, String mappedTypeName1,
+			String mappedTypeName) {
 		StaticCounters.get().increment( INSTANCE_COUNTER_KEY );
 		this.backend = backend;
 		this.name = name;
+		this.mappedTypeName = mappedTypeName;
 		this.schemaRootNodeBuilder = new StubIndexSchemaRootNodeBuilder( backend.getBehavior(), name, mappedTypeName );
 	}
 
@@ -52,12 +54,12 @@ public class StubIndexManagerBuilder implements IndexManagerBuilder<StubDocument
 	}
 
 	@Override
-	public IndexManagerImplementor<StubDocumentElement> build() {
+	public IndexManagerImplementor build() {
 		if ( closed ) {
 			throw new AssertionFailure( "Unexpected call to build after a call to build() or to closeOnFailure()" );
 		}
 		StaticCounters.get().increment( BUILD_COUNTER_KEY );
 		closed = true;
-		return new StubIndexManager( backend, name, schemaRootNodeBuilder.build() );
+		return new StubIndexManager( backend, name, mappedTypeName, schemaRootNodeBuilder.build() );
 	}
 }

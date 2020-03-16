@@ -53,8 +53,9 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildConte
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingKey;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBuildState;
 import org.hibernate.search.engine.mapper.model.spi.MappableTypeModel;
+import org.hibernate.search.engine.reporting.impl.EngineEventContextMessages;
 import org.hibernate.search.engine.reporting.impl.FailSafeFailureHandlerWrapper;
-import org.hibernate.search.engine.reporting.impl.RootFailureCollector;
+import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
@@ -74,8 +75,6 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 					.asBeanReference( ThreadProvider.class )
 					.withDefault( EngineSpiSettings.Defaults.THREAD_PROVIDER )
 					.build();
-
-	private static final int FAILURE_LIMIT = 100;
 
 	private final ConfigurationPropertyChecker propertyChecker;
 	private final ConfigurationPropertySource propertySource;
@@ -154,7 +153,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 		// Use a LinkedHashMap for deterministic iteration
 		List<MappingBuildingState<?, ?>> mappingBuildingStates = new ArrayList<>();
 		Map<MappingKey<?, ?>, MappingPartialBuildState> partiallyBuiltMappings = new HashMap<>();
-		RootFailureCollector failureCollector = new RootFailureCollector( FAILURE_LIMIT );
+		RootFailureCollector failureCollector = new RootFailureCollector( EngineEventContextMessages.INSTANCE.bootstrap() );
 		boolean checkingRootFailures = false;
 
 		try {
@@ -265,8 +264,8 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 					failureHandlerHolder,
 					threadPoolProvider,
 					partiallyBuiltMappings,
-					indexManagerBuildingStateHolder.getBackendPartialBuildStates(),
-					indexManagerBuildingStateHolder.getIndexManagersByName(),
+					indexManagerBuildingStateHolder.getBackendNonStartedStates(),
+					indexManagerBuildingStateHolder.getIndexManagersNonStartedStates(),
 					propertyChecker
 			);
 		}

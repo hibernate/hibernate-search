@@ -15,7 +15,6 @@ import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -89,14 +88,6 @@ public class BigIntegerFieldTypeDescriptor extends FieldTypeDescriptor<BigIntege
 		return new ExistsPredicateExpectations<>(
 				BigInteger.ZERO, BigInteger.valueOf( 6700L )
 		);
-	}
-
-	@Override
-	public Optional<FieldSortExpectations<BigInteger>> getFieldSortExpectations() {
-		return Optional.of( new FieldSortExpectations<>(
-				BigInteger.ONE, BigInteger.valueOf( 300 ), BigInteger.valueOf( 500L ), // keeping *L* on the last on purpose. It should be the same
-				BigInteger.valueOf( Long.MIN_VALUE ), BigInteger.valueOf( 200 ), BigInteger.valueOf( 400 ), BigInteger.valueOf( Long.MAX_VALUE )
-		) );
 	}
 
 	@Override

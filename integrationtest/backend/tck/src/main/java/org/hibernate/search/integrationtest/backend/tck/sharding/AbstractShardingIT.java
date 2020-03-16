@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
@@ -56,7 +55,7 @@ public abstract class AbstractShardingIT {
 	}
 
 	protected final void initData(Map<String, List<String>> docIdByRoutingKey) {
-		IndexIndexer<? extends DocumentElement> indexer =
+		IndexIndexer indexer =
 				indexManager.createIndexer( DocumentCommitStrategy.NONE );
 		List<CompletableFuture<?>> tasks = new ArrayList<>();
 

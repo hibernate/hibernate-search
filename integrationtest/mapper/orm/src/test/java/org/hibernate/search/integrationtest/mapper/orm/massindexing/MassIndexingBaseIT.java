@@ -26,6 +26,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericFie
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubSchemaManagementWork;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.SubTest;
@@ -94,6 +95,54 @@ public class MassIndexingBaseIT {
 
 			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
 			// so we expect 1 purge, 1 mergeSegments and 1 flush calls in this order:
+			backendMock.expectIndexScaleWorks( Book.INDEX, session.getTenantIdentifier() )
+					.purge()
+					.mergeSegments()
+					.flush()
+					.refresh();
+
+			try {
+				indexer.startAndWait();
+			}
+			catch (InterruptedException e) {
+				fail( "Unexpected InterruptedException: " + e.getMessage() );
+			}
+
+		} );
+
+		backendMock.verifyExpectationsMet();
+	}
+
+	@Test
+	public void dropAndCreateSchemaOnStart() {
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+			MassIndexer indexer = searchSession.massIndexer().dropAndCreateSchemaOnStart( true );
+
+			// add operations on indexes can follow any random order,
+			// since they are executed by different threads
+			backendMock.expectWorksAnyOrder(
+					Book.INDEX, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE
+			)
+					.add( "1", b -> b
+							.field( "title", TITLE_1 )
+							.field( "author", AUTHOR_1 )
+					)
+					.add( "2", b -> b
+							.field( "title", TITLE_2 )
+							.field( "author", AUTHOR_2 )
+					)
+					.add( "3", b -> b
+							.field( "title", TITLE_3 )
+							.field( "author", AUTHOR_3 )
+					)
+					.processedThenExecuted();
+
+			backendMock.expectSchemaManagementWorks( Book.INDEX )
+					.work( StubSchemaManagementWork.Type.DROP_AND_CREATE );
+
+			// purgeAtStart and mergeSegmentsAfterPurge are enabled by default,
+			// so we expect 1 purge, 1 optimize and 1 flush calls in this order:
 			backendMock.expectIndexScaleWorks( Book.INDEX, session.getTenantIdentifier() )
 					.purge()
 					.mergeSegments()

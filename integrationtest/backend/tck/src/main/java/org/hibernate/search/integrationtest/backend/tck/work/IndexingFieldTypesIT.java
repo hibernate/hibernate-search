@@ -14,7 +14,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -88,7 +87,7 @@ public class IndexingFieldTypesIT<F> {
 		List<IdAndValue<F>> expectedDocuments = new ArrayList<>();
 
 		// Index all values, each in its own document
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		for ( int i = 0; i < values.size(); i++ ) {
 			String documentId = "document_" + i;
 			F value = values.get( i );

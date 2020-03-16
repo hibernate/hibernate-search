@@ -17,11 +17,9 @@ import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.reporting.EventContextElement;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 
-import org.jboss.logging.Messages;
-
 public class EventContexts {
 
-	private static final EngineEventContextMessages MESSAGES = Messages.getBundle( EngineEventContextMessages.class );
+	private static final EngineEventContextMessages MESSAGES = EngineEventContextMessages.INSTANCE;
 
 	private static final EventContext DEFAULT = EventContext.create(
 			new EventContextElement() {
@@ -51,6 +49,20 @@ public class EventContexts {
 			}
 	);
 
+	private static final EventContext SCHEMA_VALIDATION = EventContext.create(
+			new EventContextElement() {
+				@Override
+				public String toString() {
+					return "EventContextElement[" + render() + "]";
+				}
+
+				@Override
+				public String render() {
+					return MESSAGES.schemaValidation();
+				}
+			}
+	);
+
 	private EventContexts() {
 	}
 
@@ -58,11 +70,29 @@ public class EventContexts {
 		return DEFAULT;
 	}
 
+	public static EventContext indexSchemaRoot() {
+		return INDEX_SCHEMA_ROOT;
+	}
+
+	public static EventContext schemaValidation() {
+		return SCHEMA_VALIDATION;
+	}
+
 	public static EventContext fromType(MappableTypeModel typeModel) {
 		return EventContext.create( new AbstractSimpleEventContextElement<MappableTypeModel>( typeModel ) {
 			@Override
 			public String render(MappableTypeModel param) {
 				String typeName = param.getName();
+				return MESSAGES.type( typeName );
+			}
+		} );
+	}
+
+	public static EventContext fromType(Object typeIdentifier) {
+		return EventContext.create( new AbstractSimpleEventContextElement<Object>( typeIdentifier ) {
+			@Override
+			public String render(Object param) {
+				String typeName = param.toString();
 				return MESSAGES.type( typeName );
 			}
 		} );
@@ -119,10 +149,6 @@ public class EventContexts {
 				return MESSAGES.shard( param );
 			}
 		} );
-	}
-
-	public static EventContext indexSchemaRoot() {
-		return INDEX_SCHEMA_ROOT;
 	}
 
 	public static EventContext fromIndexFieldAbsolutePath(String absolutePath) {

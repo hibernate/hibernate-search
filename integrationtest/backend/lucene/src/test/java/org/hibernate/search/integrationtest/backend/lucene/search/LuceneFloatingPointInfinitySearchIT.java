@@ -14,7 +14,6 @@ import java.util.Map;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.common.DocumentReference;
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Aggregable;
@@ -185,7 +184,7 @@ public class LuceneFloatingPointInfinitySearchIT<F> {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( "negative-infinity" ), document -> {
 			document.addValue( indexMapping.floatFieldModel.reference, Float.NEGATIVE_INFINITY );
 			document.addValue( indexMapping.doubleFieldModel.reference, Double.NEGATIVE_INFINITY );

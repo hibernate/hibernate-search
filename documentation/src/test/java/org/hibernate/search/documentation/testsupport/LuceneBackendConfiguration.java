@@ -6,9 +6,10 @@
  */
 package org.hibernate.search.documentation.testsupport;
 
-import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
-import org.hibernate.search.util.impl.integrationtest.common.TestConfigurationProvider;
-import org.hibernate.search.util.impl.integrationtest.common.rule.MappingSetupHelper;
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+import org.hibernate.search.util.impl.integrationtest.backend.lucene.LuceneTestIndexesPathConfiguration;
 
 public class LuceneBackendConfiguration extends AbstractDocumentationBackendConfiguration {
 	@Override
@@ -17,17 +18,19 @@ public class LuceneBackendConfiguration extends AbstractDocumentationBackendConf
 	}
 
 	@Override
-	public <C extends MappingSetupHelper<C, ?, ?>.AbstractSetupContext> C setupWithName(C setupContext,
-			String backendName, TestConfigurationProvider configurationProvider) {
-		return setupContext
-				.withBackendProperties(
-						backendName,
-						getBackendProperties( configurationProvider, "backend-lucene" )
-				)
-				.withBackendProperty(
-						backendName,
-						LuceneBackendSettings.ANALYSIS_CONFIGURER,
-						new LuceneSimpleMappingAnalysisConfigurer()
-				);
+	protected Map<String, Object> getBackendProperties() {
+		Map<String, Object> properties = new LinkedHashMap<>();
+		properties.put( "type", "lucene" );
+		properties.put(
+				"directory.root",
+				LuceneTestIndexesPathConfiguration.get().getPath()
+						+ "/test-indexes/#{tck.startup.timestamp}/#{tck.test.id}/"
+		);
+		properties.put(
+				"analysis.configurer",
+				new LuceneSimpleMappingAnalysisConfigurer()
+		);
+		return properties;
 	}
+
 }

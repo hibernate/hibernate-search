@@ -72,7 +72,7 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void index_error_invalidFieldForDocumentElement_root() {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Invalid field reference for this document element" );
@@ -88,7 +88,7 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void index_error_invalidFieldForDocumentElement_flattened() {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Invalid field reference for this document element" );
@@ -103,7 +103,7 @@ public class ObjectFieldStorageIT {
 
 	@Test
 	public void index_error_invalidFieldForDocumentElement_nested() {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 
 		thrown.expect( SearchException.class );
 		thrown.expectMessage( "Invalid field reference for this document element" );
@@ -219,7 +219,7 @@ public class ObjectFieldStorageIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<? extends DocumentElement> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 		plan.add( referenceProvider( EXPECTED_NESTED_MATCH_ID ), document -> {
 			ObjectMapping objectMapping;
 			DocumentElement object;

@@ -9,6 +9,8 @@ package org.hibernate.search.backend.lucene.types.predicate.parse.impl;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.util.BytesRef;
 import org.apache.lucene.util.BytesRefBuilder;
@@ -27,6 +29,11 @@ public class LuceneWildcardExpressionHelper {
 	}
 
 	public static BytesRef analyzeWildcard(Analyzer analyzer, String field, String termStr) {
+		if ( analyzer == AnalyzerConstants.KEYWORD_ANALYZER ) {
+			// Optimization when analysis is disabled
+			return new BytesRef( termStr );
+		}
+
 		// best effort to not pass the wildcard characters and escaped characters through #normalize
 		Matcher wildcardMatcher = WILDCARD_PATTERN.matcher( termStr );
 		BytesRefBuilder sb = new BytesRefBuilder();

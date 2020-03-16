@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.transaction.Synchronization;
 
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
+import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexingPlan;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -25,12 +26,12 @@ class InTransactionWorkQueueSynchronization implements Synchronization {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final PojoIndexingPlan indexingPlan;
+	private final PojoIndexingPlan<EntityReference> indexingPlan;
 	private final Map<?, ?> indexingPlanPerTransaction;
 	private final Object transactionIdentifier;
 	private final ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy;
 
-	InTransactionWorkQueueSynchronization(PojoIndexingPlan indexingPlan,
+	InTransactionWorkQueueSynchronization(PojoIndexingPlan<EntityReference> indexingPlan,
 			Map<?, ?> indexingPlanPerTransaction, Object transactionIdentifier,
 			ConfiguredAutomaticIndexingSynchronizationStrategy synchronizationStrategy) {
 		this.indexingPlan = indexingPlan;

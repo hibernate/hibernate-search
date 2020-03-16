@@ -12,11 +12,11 @@ import java.util.Optional;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
 
 public class GeoPointFieldTypeDescriptor extends FieldTypeDescriptor<GeoPoint> {
 
@@ -86,22 +86,8 @@ public class GeoPointFieldTypeDescriptor extends FieldTypeDescriptor<GeoPoint> {
 	}
 
 	@Override
-	public Optional<FieldSortExpectations<GeoPoint>> getFieldSortExpectations() {
-		return Optional.of( new FieldSortExpectations<GeoPoint>(
-				// The values are meaningless, we expect the sort to fail
-				GeoPoint.of( 40, 70 ),
-				GeoPoint.of( 40, 75 ),
-				GeoPoint.of( 40, 80 ),
-				GeoPoint.of( 0, 0 ),
-				GeoPoint.of( 40, 72 ),
-				GeoPoint.of( 40, 77 ),
-				GeoPoint.of( 89, 89 )
-		) {
-			@Override
-			public boolean isFieldSortSupported() {
-				return false;
-			}
-		} );
+	public ExpectationsAlternative<?, ?> getFieldSortExpectations() {
+		return ExpectationsAlternative.unsupported( this );
 	}
 
 	@Override

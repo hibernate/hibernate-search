@@ -18,6 +18,7 @@ import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryWhereStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.mapper.orm.massindexing.MassIndexer;
+import org.hibernate.search.mapper.orm.schema.management.SearchSchemaManager;
 import org.hibernate.search.mapper.orm.work.SearchWorkspace;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 
@@ -94,6 +95,13 @@ public interface SearchScope<E> {
 	 * @see SearchAggregationFactory
 	 */
 	SearchAggregationFactory aggregation();
+
+	/**
+	 * Create a {@link SearchSchemaManager} for the indexes mapped to types in this scope, or to any of their sub-types.
+	 *
+	 * @return A {@link SearchSchemaManager}.
+	 */
+	SearchSchemaManager schemaManager();
 
 	/**
 	 * Create a {@link SearchWorkspace} for the indexes mapped to types in this scope, or to any of their sub-types.

@@ -11,6 +11,8 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hibernate.SessionFactory;
+import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
+import org.hibernate.search.mapper.orm.schema.management.SchemaManagementStrategyName;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendSetupStrategy;
@@ -22,11 +24,19 @@ public final class OrmSetupHelper
 	private static final String DEFAULT_BACKEND_NAME = "backendName";
 
 	public static OrmSetupHelper withBackendMock(BackendMock backendMock) {
-		return new OrmSetupHelper( BackendSetupStrategy.withBackendMocks( backendMock ) );
+		return new OrmSetupHelper(
+				BackendSetupStrategy.withBackendMocks( backendMock ),
+				// Mock backend => avoid schema management unless we want to test it
+				SchemaManagementStrategyName.NONE
+		);
 	}
 
 	public static OrmSetupHelper withBackendMocks(BackendMock defaultBackendMock, BackendMock ... otherBackendMocks) {
-		return new OrmSetupHelper( BackendSetupStrategy.withBackendMocks( defaultBackendMock, otherBackendMocks ) );
+		return new OrmSetupHelper(
+				BackendSetupStrategy.withBackendMocks( defaultBackendMock, otherBackendMocks ),
+				// Mock backend => avoid schema management unless we want to test it
+				SchemaManagementStrategyName.NONE
+		);
 	}
 
 	public static OrmSetupHelper withSingleBackend(BackendConfiguration backendConfiguration) {
@@ -34,23 +44,33 @@ public final class OrmSetupHelper
 	}
 
 	public static OrmSetupHelper withSingleBackend(String backendName, BackendConfiguration backendConfiguration) {
-		return new OrmSetupHelper( BackendSetupStrategy.withSingleBackend( backendName, backendConfiguration ) );
+		return new OrmSetupHelper(
+				BackendSetupStrategy.withSingleBackend( backendName, backendConfiguration ),
+				// Real backend => ensure we clean up everything before and after the tests
+				SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP
+		);
 	}
 
 	public static OrmSetupHelper withMultipleBackends(String defaultBackendName,
 			Map<String, BackendConfiguration> backendConfigurations) {
-		return new OrmSetupHelper( BackendSetupStrategy.withMultipleBackends(
-				defaultBackendName, backendConfigurations
-		) );
+		return new OrmSetupHelper(
+				BackendSetupStrategy.withMultipleBackends( defaultBackendName, backendConfigurations ),
+				// Real backend => ensure to clean up everything
+				SchemaManagementStrategyName.DROP_AND_CREATE_AND_DROP
+		);
 	}
 
-	private OrmSetupHelper(BackendSetupStrategy backendSetupStrategy) {
+	private final SchemaManagementStrategyName schemaManagementStrategyName;
+
+	private OrmSetupHelper(BackendSetupStrategy backendSetupStrategy,
+			SchemaManagementStrategyName schemaManagementStrategyName) {
 		super( backendSetupStrategy );
+		this.schemaManagementStrategyName = schemaManagementStrategyName;
 	}
 
 	@Override
 	protected SetupContext createSetupContext() {
-		return new SetupContext();
+		return new SetupContext( schemaManagementStrategyName );
 	}
 
 	@Override
@@ -64,7 +84,9 @@ public final class OrmSetupHelper
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
 
-		SetupContext() {
+		SetupContext(SchemaManagementStrategyName schemaManagementStrategyName) {
+			// Override the schema management strategy according to our needs for testing
+			withProperty( HibernateOrmMapperSettings.SCHEMA_MANAGEMENT_STRATEGY, schemaManagementStrategyName );
 			// Ensure overridden properties will be applied
 			withConfiguration( builder -> overriddenProperties.forEach( builder::setProperty ) );
 		}

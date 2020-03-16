@@ -15,7 +15,10 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.backend.lucene.index.LuceneIndexManager;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.DirectoryReaderCollector;
+import org.hibernate.search.backend.lucene.schema.management.impl.LuceneIndexSchemaManager;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeIndexManagerContext;
+import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
+import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
@@ -24,7 +27,6 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.backend.lucene.document.impl.LuceneRootDocumentBuilder;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -37,7 +39,7 @@ import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class LuceneIndexManagerImpl
-		implements IndexManagerImplementor<LuceneRootDocumentBuilder>, LuceneIndexManager,
+		implements IndexManagerImplementor, LuceneIndexManager,
 		LuceneScopeIndexManagerContext {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -50,6 +52,8 @@ public class LuceneIndexManagerImpl
 
 	private final ShardHolder shardHolder;
 
+	private final LuceneIndexSchemaManager schemaManager;
+
 	LuceneIndexManagerImpl(IndexManagerBackendContext backendContext,
 			String indexName, LuceneIndexModel model, LuceneIndexEntryFactory indexEntryFactory) {
 		this.backendContext = backendContext;
@@ -59,6 +63,7 @@ public class LuceneIndexManagerImpl
 		this.indexEntryFactory = indexEntryFactory;
 
 		this.shardHolder = new ShardHolder( backendContext, model );
+		this.schemaManager = backendContext.createSchemaManager( shardHolder );
 	}
 
 	@Override
@@ -71,8 +76,8 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public CompletableFuture<?> start(IndexManagerStartContext context) {
-		return shardHolder.start( context );
+	public void start(IndexManagerStartContext context) {
+		shardHolder.start( context );
 	}
 
 	@Override
@@ -92,16 +97,23 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexIndexingPlan<LuceneRootDocumentBuilder> createIndexingPlan(BackendSessionContext sessionContext,
+	public IndexSchemaManager getSchemaManager() {
+		return schemaManager;
+	}
+
+	@Override
+	public <R> IndexIndexingPlan<R> createIndexingPlan(BackendSessionContext sessionContext,
+			EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		return backendContext.createIndexingPlan(
 				shardHolder, indexEntryFactory,
-				sessionContext, commitStrategy, refreshStrategy
+				sessionContext, entityReferenceFactory,
+				commitStrategy, refreshStrategy
 		);
 	}
 
 	@Override
-	public IndexIndexer<LuceneRootDocumentBuilder> createIndexer(
+	public IndexIndexer createIndexer(
 			BackendSessionContext sessionContext, DocumentCommitStrategy commitStrategy) {
 		return backendContext.createIndexer(
 				shardHolder, indexEntryFactory,

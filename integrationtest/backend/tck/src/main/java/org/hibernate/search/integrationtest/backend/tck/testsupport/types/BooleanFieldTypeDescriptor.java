@@ -12,11 +12,11 @@ import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
 
 public class BooleanFieldTypeDescriptor extends FieldTypeDescriptor<Boolean> {
 
@@ -58,9 +58,8 @@ public class BooleanFieldTypeDescriptor extends FieldTypeDescriptor<Boolean> {
 	}
 
 	@Override
-	public Optional<FieldSortExpectations<Boolean>> getFieldSortExpectations() {
-		// Tested separately in BooleanSortAndRangePredicateIT, because we can only use two values
-		return Optional.empty();
+	public ExpectationsAlternative<?, ?> getFieldSortExpectations() {
+		return ExpectationsAlternative.unsupported( this );
 	}
 
 	@Override

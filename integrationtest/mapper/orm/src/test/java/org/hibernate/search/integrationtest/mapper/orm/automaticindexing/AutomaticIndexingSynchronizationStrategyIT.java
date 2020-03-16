@@ -61,6 +61,9 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 	private static final long SMALL_DURATION_VALUE = 100L;
 	private static final TimeUnit SMALL_DURATION_UNIT = TimeUnit.MILLISECONDS;
 
+	private static final int ENTITY_1_ID = 1;
+	private static final int ENTITY_2_ID = 2;
+
 	@Rule
 	public BackendMock backendMock = new BackendMock( "stubBackend" );
 
@@ -247,7 +250,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 				"Failing operation:",
 				"Automatic indexing of Hibernate ORM entities",
 				"Entities that could not be indexed correctly:",
-				IndexedEntity.NAME + "#" + 1
+				IndexedEntity.NAME + "#" + ENTITY_1_ID + " " + IndexedEntity.NAME + "#" + ENTITY_2_ID
 		);
 
 		// This should be ignored by the transaction (see below)
@@ -284,7 +287,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		// The transaction thread should proceed but throw an exception,
 		// because the indexing work failed.
 		assertThat( transactionThreadFuture ).isFailed(
-				transactionSynchronizationExceptionMatcher( indexingWorkException )
+				transactionSynchronizationExceptionMatcher( indexingWorkException, ENTITY_1_ID, ENTITY_2_ID )
 		);
 	}
 
@@ -309,7 +312,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		// The transaction thread should proceed but throw an exception,
 		// because the indexing work failed.
 		assertThat( transactionThreadFuture ).isFailed(
-				transactionSynchronizationExceptionMatcher( indexingWorkException )
+				transactionSynchronizationExceptionMatcher( indexingWorkException, ENTITY_1_ID, ENTITY_2_ID )
 		);
 	}
 
@@ -334,7 +337,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		// The transaction thread should proceed but throw an exception,
 		// because the indexing work failed.
 		assertThat( transactionThreadFuture ).isFailed(
-				transactionSynchronizationExceptionMatcher( indexingWorkException )
+				transactionSynchronizationExceptionMatcher( indexingWorkException, ENTITY_1_ID, ENTITY_2_ID )
 		);
 	}
 
@@ -359,7 +362,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		// The transaction thread should proceed but throw an exception,
 		// because the indexing work failed.
 		assertThat( transactionThreadFuture ).isFailed(
-				transactionSynchronizationExceptionMatcher( indexingWorkException )
+				transactionSynchronizationExceptionMatcher( indexingWorkException, ENTITY_1_ID, ENTITY_2_ID )
 		);
 	}
 
@@ -384,7 +387,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		// The transaction thread should proceed but throw an exception,
 		// because the indexing work failed.
 		assertThat( transactionThreadFuture ).isFailed(
-				transactionSynchronizationExceptionMatcher( indexingWorkException )
+				transactionSynchronizationExceptionMatcher( indexingWorkException, ENTITY_1_ID, ENTITY_2_ID )
 		);
 	}
 
@@ -408,7 +411,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		// because the indexing work failed before the timeout
 		// (this is how the custom automatic indexing strategy is implemented)
 		assertThat( transactionThreadFuture ).isFailed(
-				transactionSynchronizationExceptionMatcher( indexingWorkException )
+				transactionSynchronizationExceptionMatcher( indexingWorkException, ENTITY_1_ID, ENTITY_2_ID )
 		);
 
 		// There was no timeout, so the strategy should not have set this reference
@@ -435,7 +438,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		// because the indexing work failed before the timeout
 		// (this is how the custom automatic indexing strategy is implemented)
 		assertThat( transactionThreadFuture ).isFailed(
-				transactionSynchronizationExceptionMatcher( indexingWorkException )
+				transactionSynchronizationExceptionMatcher( indexingWorkException, ENTITY_1_ID, ENTITY_2_ID )
 		);
 
 		// There was no timeout, so the strategy should not have set this reference
@@ -514,14 +517,21 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 					Search.session( session ).setAutomaticIndexingSynchronizationStrategy( overriddenStrategy );
 				}
 				IndexedEntity entity1 = new IndexedEntity();
-				entity1.setId( 1 );
+				entity1.setId( ENTITY_1_ID );
 				entity1.setIndexedField( "initialValue" );
+				IndexedEntity entity2 = new IndexedEntity();
+				entity2.setId( ENTITY_2_ID );
+				entity2.setIndexedField( "initialValue" );
 
 				session.persist( entity1 );
+				session.persist( entity2 );
 
 				backendMock.expectWorks( IndexedEntity.NAME, expectedCommitStrategy, expectedRefreshStrategy )
 						.add( "1", b -> b
 								.field( "indexedField", entity1.getIndexedField() )
+						)
+						.add( "2", b -> b
+								.field( "indexedField", entity2.getIndexedField() )
 						)
 						.processedThenExecuted( indexingWorkFuture );
 				justBeforeTransactionCommitFuture.complete( null );
@@ -553,20 +563,31 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 		return sessionFactory;
 	}
 
-	private static Consumer<Throwable> transactionSynchronizationExceptionMatcher(Throwable indexingWorkException) {
+	private static Consumer<Throwable> transactionSynchronizationExceptionMatcher(Throwable indexingWorkException, int ... entityIds) {
+		StringBuilder entityReferences = new StringBuilder();
+		for ( int entityId : entityIds ) {
+			if ( entityReferences.length() > 0 ) {
+				entityReferences.append( ", " );
+			}
+			entityReferences.append( IndexedEntity.NAME ).append( "#" ).append( entityId );
+		}
+		return transactionSynchronizationExceptionMatcher( indexingWorkException, entityReferences.toString() );
+	}
+
+	private static Consumer<Throwable> transactionSynchronizationExceptionMatcher(Throwable indexingWorkException, String entityReferences) {
 		return throwable -> Assertions.assertThat( throwable ).isInstanceOf( HibernateException.class )
 				.extracting( Throwable::getCause ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
 						.isInstanceOf( SearchException.class )
 						.hasMessageContainingAll(
 								"Automatic indexing failed after transaction completion: ",
 								"Indexing failure: " + indexingWorkException.getMessage(),
-								"The following entities may not have been updated correctly in the index: [" + IndexedEntity.NAME + "#" + 1 + "]"
+								"The following entities may not have been updated correctly in the index: [" + entityReferences + "]"
 						)
 				.extracting( Throwable::getCause ).asInstanceOf( InstanceOfAssertFactories.THROWABLE )
 						.isInstanceOf( SearchException.class )
 						.hasMessageContainingAll(
 								"Indexing failure: " + indexingWorkException.getMessage(),
-								"The following entities may not have been updated correctly in the index: [" + IndexedEntity.NAME + "#" + 1 + "]"
+								"The following entities may not have been updated correctly in the index: [" + entityReferences + "]"
 						)
 				.extracting( Throwable::getCause ).isSameAs( indexingWorkException );
 	}

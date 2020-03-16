@@ -16,7 +16,6 @@ import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -100,21 +99,6 @@ public class OffsetDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<Offse
 				LocalDateTime.of( 1970, 1, 1, 0, 0 ).atOffset( ZoneOffset.UTC ),
 				LocalDateTime.of( 2018, 3, 1, 12, 14, 52 ).atOffset( ZoneOffset.ofHours( 1 ) )
 		);
-	}
-
-	@Override
-	public Optional<FieldSortExpectations<OffsetDateTime>> getFieldSortExpectations() {
-		return Optional.of( new FieldSortExpectations<>(
-				// Indexed
-				LocalDateTime.of( 2018, 2, 1, 13, 0 ).atOffset( ZoneOffset.ofHours( -6 ) ),
-				LocalDateTime.of( 2018, 3, 21, 0, 0 ).atOffset( ZoneOffset.ofHours( -6 ) ),
-				LocalDateTime.of( 2018, 4, 10, 23, 30 ).atOffset( ZoneOffset.ofHours( -6 ) ),
-				// Values around what is indexed
-				LocalDateTime.of( 2018, 2, 1, 12, 0 ).atOffset( ZoneOffset.ofHours( -6 ) ),
-				LocalDateTime.of( 2018, 2, 15, 0, 0 ).atOffset( ZoneOffset.ofHours( -6 ) ),
-				LocalDateTime.of( 2018, 3, 21, 0, 0 ).atOffset( ZoneOffset.ofHours( -9 ) ),
-				LocalDateTime.of( 2018, 5, 3, 0, 3 ).atOffset( ZoneOffset.ofHours( -6 ) )
-		) );
 	}
 
 	@Override

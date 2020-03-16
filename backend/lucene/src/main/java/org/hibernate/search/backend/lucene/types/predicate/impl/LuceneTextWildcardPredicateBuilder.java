@@ -23,13 +23,13 @@ class LuceneTextWildcardPredicateBuilder extends AbstractLuceneSearchPredicateBu
 
 	protected final String absoluteFieldPath;
 
-	private final Analyzer analyzer;
+	private final Analyzer analyzerOrNormalizer;
 
 	private String pattern;
 
-	LuceneTextWildcardPredicateBuilder(String absoluteFieldPath, Analyzer analyzer) {
+	LuceneTextWildcardPredicateBuilder(String absoluteFieldPath, Analyzer analyzerOrNormalizer) {
 		this.absoluteFieldPath = absoluteFieldPath;
-		this.analyzer = analyzer;
+		this.analyzerOrNormalizer = analyzerOrNormalizer;
 	}
 
 	@Override
@@ -39,7 +39,7 @@ class LuceneTextWildcardPredicateBuilder extends AbstractLuceneSearchPredicateBu
 
 	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
-		BytesRef analyzedWildcard = LuceneWildcardExpressionHelper.analyzeWildcard( analyzer, absoluteFieldPath, pattern );
+		BytesRef analyzedWildcard = LuceneWildcardExpressionHelper.analyzeWildcard( analyzerOrNormalizer, absoluteFieldPath, pattern );
 		return new WildcardQuery( new Term( absoluteFieldPath, analyzedWildcard ) );
 	}
 }

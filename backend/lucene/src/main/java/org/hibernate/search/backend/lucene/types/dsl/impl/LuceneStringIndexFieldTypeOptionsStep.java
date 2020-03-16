@@ -13,6 +13,7 @@ import org.apache.lucene.document.FieldType;
 import org.apache.lucene.index.IndexOptions;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.types.aggregation.impl.LuceneTextFieldAggregationBuilderFactory;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStringFieldCodec;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
@@ -132,6 +133,9 @@ class LuceneStringIndexFieldTypeOptionsStep
 		}
 
 		Analyzer analyzerOrNormalizer = analyzer != null ? analyzer : normalizer;
+		if ( analyzerOrNormalizer == null ) {
+			analyzerOrNormalizer = AnalyzerConstants.KEYWORD_ANALYZER;
+		}
 
 		DslConverter<?, ? extends String> dslConverter = createDslConverter();
 		DslConverter<String, ? extends String> rawDslConverter = createRawDslConverter();
@@ -139,7 +143,8 @@ class LuceneStringIndexFieldTypeOptionsStep
 		ProjectionConverter<? super String, String> rawProjectionConverter = createRawProjectionConverter();
 		LuceneStringFieldCodec codec = new LuceneStringFieldCodec(
 				resolvedSearchable, resolvedSortable, resolvedAggregable,
-				getFieldType( resolvedProjectable, resolvedSearchable, analyzer != null, resolvedNorms, resolvedTermVector ), indexNullAsValue,
+				getFieldType( resolvedProjectable, resolvedSearchable, analyzer != null, resolvedNorms, resolvedTermVector ),
+				indexNullAsValue,
 				analyzerOrNormalizer
 		);
 

@@ -13,6 +13,7 @@ import org.hibernate.search.mapper.pojo.bridge.TypeBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.model.PojoModelType;
 import org.hibernate.search.mapper.pojo.model.dependency.PojoTypeIndexingDependencyConfigurationContext;
+import org.hibernate.search.util.common.annotaion.Incubating;
 
 /**
  * The context provided to the {@link TypeBinder#bind(TypeBindingContext)} method.
@@ -41,9 +42,8 @@ public interface TypeBindingContext extends BindingContext {
 
 	/**
 	 * @return An entry point allowing to declare expectations and retrieve accessors to the bridged POJO type.
-	 * @hsearch.experimental This feature is under active development.
-	 *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
 	 */
+	@Incubating
 	PojoModelType getBridgedElement();
 
 	/**

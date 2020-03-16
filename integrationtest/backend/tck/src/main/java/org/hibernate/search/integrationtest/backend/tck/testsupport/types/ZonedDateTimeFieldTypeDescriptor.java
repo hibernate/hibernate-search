@@ -18,7 +18,6 @@ import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -132,21 +131,6 @@ public class ZonedDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<ZonedD
 				LocalDateTime.of( 1970, 1, 1, 0, 0 ).atZone( ZoneId.of( "UTC" ) ),
 				LocalDateTime.of( 2018, 3, 1, 12, 14, 52 ).atZone( ZoneId.of( "Europe/Paris" ) )
 		);
-	}
-
-	@Override
-	public Optional<FieldSortExpectations<ZonedDateTime>> getFieldSortExpectations() {
-		return Optional.of( new FieldSortExpectations<>(
-				// Indexed
-				LocalDateTime.of( 2018, 2, 1, 18, 12, 12 ).atZone( ZoneId.of( "America/Chicago" ) ),
-				LocalDateTime.of( 2018, 3, 1, 10, 0 ).atZone( ZoneId.of( "America/Chicago" ) ),
-				LocalDateTime.of( 2018, 4, 1, 7, 0 ).atZone( ZoneId.of( "America/Chicago" ) ),
-				// Values around what is indexed
-				LocalDateTime.of( 2018, 1, 1, 23, 59, 59 ).atZone( ZoneId.of( "America/Chicago" ) ),
-				LocalDateTime.of( 2018, 2, 1, 18, 12, 13 ).atZone( ZoneId.of( "America/Chicago" ) ),
-				LocalDateTime.of( 2018, 3, 1, 10, 0 ).atZone( ZoneId.of( "US/Alaska" ) ),
-				LocalDateTime.of( 2018, 5, 1, 3, 10 ).atZone( ZoneId.of( "America/Chicago" ) )
-		) );
 	}
 
 	@Override

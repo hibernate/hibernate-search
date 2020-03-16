@@ -12,7 +12,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaRootNodeBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
@@ -53,9 +52,9 @@ class IndexManagerBuildingStateHolder {
 	private final RootBuildContext rootBuildContext;
 
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<String, BackendInitialBuildState<?>> backendBuildStateByName = new LinkedHashMap<>();
+	private final Map<String, BackendInitialBuildState> backendBuildStateByName = new LinkedHashMap<>();
 	// Use a LinkedHashMap for deterministic iteration
-	private final Map<String, IndexManagerInitialBuildState<?>> indexManagerBuildStateByName = new LinkedHashMap<>();
+	private final Map<String, IndexManagerInitialBuildState> indexManagerBuildStateByName = new LinkedHashMap<>();
 
 	IndexManagerBuildingStateHolder(BeanResolver beanResolver, ConfigurationPropertySource propertySource,
 			RootBuildContext rootBuildContext) {
@@ -70,7 +69,7 @@ class IndexManagerBuildingStateHolder {
 		}
 		for ( Optional<String> backendNameOptional : backendNames ) {
 			String backendName = backendNameOptional.get(); // Never empty, see above
-			BackendInitialBuildState<?> backendBuildState;
+			BackendInitialBuildState backendBuildState;
 			try {
 				backendBuildState = createBackend( backendName );
 			}
@@ -84,14 +83,14 @@ class IndexManagerBuildingStateHolder {
 		}
 	}
 
-	IndexManagerBuildingState<?> getIndexManagerBuildingState(Optional<String> backendName, String indexName,
+	IndexManagerBuildingState getIndexManagerBuildingState(Optional<String> backendName, String indexName,
 			String mappedTypeName, boolean multiTenancyEnabled) {
 		return getBackend( backendName.orElseGet( this::getDefaultBackendName ) )
 				.getIndexManagerBuildingState( indexName, mappedTypeName, multiTenancyEnabled );
 	}
 
-	private BackendInitialBuildState<?> getBackend(String backendName) {
-		BackendInitialBuildState<?> backendBuildState = backendBuildStateByName.get( backendName );
+	private BackendInitialBuildState getBackend(String backendName) {
+		BackendInitialBuildState backendBuildState = backendBuildStateByName.get( backendName );
 		if ( backendBuildState == null ) {
 			throw new AssertionFailure(
 					"Mapper asking for a reference to backend '" + backendName + "', which was not declared in advance."
@@ -114,20 +113,20 @@ class IndexManagerBuildingStateHolder {
 		}
 	}
 
-	Map<String, BackendPartialBuildState> getBackendPartialBuildStates() {
+	Map<String, BackendNonStartedState> getBackendNonStartedStates() {
 		// Use a LinkedHashMap for deterministic iteration
-		Map<String, BackendPartialBuildState> backendsByName = new LinkedHashMap<>();
-		for ( Map.Entry<String, BackendInitialBuildState<?>> entry : backendBuildStateByName.entrySet() ) {
-			backendsByName.put( entry.getKey(), entry.getValue().getPartiallyBuilt() );
+		Map<String, BackendNonStartedState> backendsByName = new LinkedHashMap<>();
+		for ( Map.Entry<String, BackendInitialBuildState> entry : backendBuildStateByName.entrySet() ) {
+			backendsByName.put( entry.getKey(), entry.getValue().getNonStartedState() );
 		}
 		return backendsByName;
 	}
 
-	Map<String, IndexManagerPartialBuildState> getIndexManagersByName() {
+	Map<String, IndexManagerNonStartedState> getIndexManagersNonStartedStates() {
 		// Use a LinkedHashMap for deterministic iteration
-		Map<String, IndexManagerPartialBuildState> indexManagersByName = new LinkedHashMap<>();
-		for ( Map.Entry<String, IndexManagerInitialBuildState<?>> entry : indexManagerBuildStateByName.entrySet() ) {
-			indexManagersByName.put( entry.getKey(), entry.getValue().getPartialBuildState() );
+		Map<String, IndexManagerNonStartedState> indexManagersByName = new LinkedHashMap<>();
+		for ( Map.Entry<String, IndexManagerInitialBuildState> entry : indexManagerBuildStateByName.entrySet() ) {
+			indexManagersByName.put( entry.getKey(), entry.getValue().getNonStartedState() );
 		}
 		return indexManagersByName;
 	}
@@ -137,7 +136,7 @@ class IndexManagerBuildingStateHolder {
 		closer.pushAll( BackendInitialBuildState::closeOnFailure, backendBuildStateByName.values() );
 	}
 
-	private BackendInitialBuildState<?> createBackend(String backendName) {
+	private BackendInitialBuildState createBackend(String backendName) {
 		ConfigurationPropertySource backendPropertySource =
 				EngineConfigurationUtils.getBackend( propertySource, backendName );
 		try ( BeanHolder<? extends BackendFactory> backendFactoryHolder =
@@ -148,24 +147,24 @@ class IndexManagerBuildingStateHolder {
 				) ) {
 			BackendBuildContext backendBuildContext = new BackendBuildContextImpl( rootBuildContext );
 
-			BackendImplementor<?> backend = backendFactoryHolder.get()
+			BackendImplementor backend = backendFactoryHolder.get()
 					.create( backendName, backendBuildContext, backendPropertySource );
-			return new BackendInitialBuildState<>( backendName, backendBuildContext, backendPropertySource, backend );
+			return new BackendInitialBuildState( backendName, backendBuildContext, backendPropertySource, backend );
 		}
 	}
 
-	class BackendInitialBuildState<D extends DocumentElement> {
+	class BackendInitialBuildState {
 		private final String backendName;
 		private final BackendBuildContext backendBuildContext;
 		private final ConfigurationPropertySource backendPropertySource;
 		private final ConfigurationPropertySource defaultIndexPropertySource;
-		private final BackendImplementor<D> backend;
+		private final BackendImplementor backend;
 
 		private BackendInitialBuildState(
 				String backendName,
 				BackendBuildContext backendBuildContext,
 				ConfigurationPropertySource backendPropertySource,
-				BackendImplementor<D> backend) {
+				BackendImplementor backend) {
 			this.backendName = backendName;
 			this.backendBuildContext = backendBuildContext;
 			this.backendPropertySource = backendPropertySource;
@@ -174,19 +173,19 @@ class IndexManagerBuildingStateHolder {
 			this.backend = backend;
 		}
 
-		IndexManagerInitialBuildState<?> getIndexManagerBuildingState(
+		IndexManagerInitialBuildState getIndexManagerBuildingState(
 				String indexName, String mappedTypeName, boolean multiTenancyEnabled) {
-			IndexManagerInitialBuildState<?> state = indexManagerBuildStateByName.get( indexName );
+			IndexManagerInitialBuildState state = indexManagerBuildStateByName.get( indexName );
 			if ( state == null ) {
 				ConfigurationPropertySource indexPropertySource =
 						EngineConfigurationUtils.getIndex( backendPropertySource, defaultIndexPropertySource, indexName );
 
-				IndexManagerBuilder<D> builder = backend.createIndexManagerBuilder(
+				IndexManagerBuilder builder = backend.createIndexManagerBuilder(
 						indexName, mappedTypeName, multiTenancyEnabled, backendBuildContext, indexPropertySource
 				);
 				IndexSchemaRootNodeBuilder schemaRootNodeBuilder = builder.getSchemaRootNodeBuilder();
 
-				state = new IndexManagerInitialBuildState<>( backendName, indexName, builder, schemaRootNodeBuilder );
+				state = new IndexManagerInitialBuildState( backendName, indexName, builder, schemaRootNodeBuilder );
 				indexManagerBuildStateByName.put( indexName, state );
 			}
 			return state;
@@ -197,22 +196,22 @@ class IndexManagerBuildingStateHolder {
 			backend.stop();
 		}
 
-		BackendPartialBuildState getPartiallyBuilt() {
-			return new BackendPartialBuildState( backendName, backend );
+		BackendNonStartedState getNonStartedState() {
+			return new BackendNonStartedState( backendName, backend );
 		}
 	}
 
-	private class IndexManagerInitialBuildState<D extends DocumentElement> implements IndexManagerBuildingState<D> {
+	private static class IndexManagerInitialBuildState implements IndexManagerBuildingState {
 
 		private final String backendName;
 		private final String indexName;
-		private final IndexManagerBuilder<D> builder;
+		private final IndexManagerBuilder builder;
 		private final IndexSchemaRootNodeBuilder schemaRootNodeBuilder;
 
-		private IndexManagerImplementor<D> indexManager;
+		private IndexManagerImplementor indexManager;
 
 		IndexManagerInitialBuildState(String backendName, String indexName,
-				IndexManagerBuilder<D> builder,
+				IndexManagerBuilder builder,
 				IndexSchemaRootNodeBuilder schemaRootNodeBuilder) {
 			this.backendName = backendName;
 			this.indexName = indexName;
@@ -240,7 +239,7 @@ class IndexManagerBuildingStateHolder {
 		}
 
 		@Override
-		public IndexManagerImplementor<D> build() {
+		public IndexManagerImplementor build() {
 			if ( indexManager != null ) {
 				throw new AssertionFailure(
 						"Trying to build index manager " + indexName + " twice."
@@ -251,14 +250,14 @@ class IndexManagerBuildingStateHolder {
 			return indexManager;
 		}
 
-		IndexManagerPartialBuildState getPartialBuildState() {
+		IndexManagerNonStartedState getNonStartedState() {
 			if ( indexManager == null ) {
 				throw new AssertionFailure(
 						"Index manager " + indexName + " was not built by the mapper as expected."
 						+ " There is probably a bug in the mapper implementation."
 				);
 			}
-			return new IndexManagerPartialBuildState( backendName, indexName, indexManager );
+			return new IndexManagerNonStartedState( backendName, indexName, indexManager );
 		}
 	}
 

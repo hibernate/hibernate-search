@@ -12,7 +12,6 @@ import java.util.Optional;
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.ExistsPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldProjectionExpectations;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.FieldSortExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexNullAsMatchPredicateExpectactions;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
@@ -71,14 +70,6 @@ public class KeywordStringFieldTypeDescriptor extends FieldTypeDescriptor<String
 				"", // No token, but still non-null: should be considered as existing
 				"Aaron"
 		);
-	}
-
-	@Override
-	public Optional<FieldSortExpectations<String>> getFieldSortExpectations() {
-		return Optional.of( new FieldSortExpectations<>(
-				"aaron", "george", "zach",
-				"aaaa", "bastian", "marc", "zzzz"
-		) );
 	}
 
 	@Override

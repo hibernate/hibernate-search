@@ -28,10 +28,18 @@ public interface IndexAccessor {
 
 	/**
 	 * Checks whether the index exists (on disk, ...), and creates it if necessary.
-	 * <p>
-	 * Should only be used when starting an index.
 	 */
-	void ensureIndexExists();
+	void createIndexIfMissing();
+
+	/**
+	 * Checks whether the index exists (on disk, ...), and throws an exception if it doesn't.
+	 */
+	void validateIndexExists();
+
+	/**
+	 * Checks whether the index exists (on disk, ...), and drops it if it exists.
+	 */
+	void dropIndexIfExisting();
 
 	/**
 	 * Commits the underlying index writer, if any.
@@ -63,5 +71,4 @@ public interface IndexAccessor {
 	 * @return The most up-to-date index reader available.
 	 */
 	DirectoryReader getIndexReader() throws IOException;
-
 }

@@ -8,8 +8,19 @@ package org.hibernate.search.engine.backend.work.execution.spi;
 
 public interface DocumentReferenceProvider {
 
+	/**
+	 * @return The document identifier.
+	 */
 	String getIdentifier();
 
+	/**
+	 * @return The routing key.
+	 */
 	String getRoutingKey();
+
+	/**
+	 * @return The entity identifier. Used when reporting failures.
+	 */
+	Object getEntityIdentifier();
 
 }

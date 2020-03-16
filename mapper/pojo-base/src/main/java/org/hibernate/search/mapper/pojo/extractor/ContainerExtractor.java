@@ -10,6 +10,7 @@ import java.util.stream.Stream;
 
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
+import org.hibernate.search.util.common.annotaion.Incubating;
 
 /**
  * An extractor of values from a container.
@@ -25,10 +26,8 @@ import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.Container
  * @param <V> The type of values extracted by this extractor.
  * @see ContainerExtractorPath
  * @see BuiltinContainerExtractors
- *
- * @hsearch.experimental This type is under active development.
- *    Usual compatibility policies do not apply: incompatible changes may be introduced in any future release.
  */
+@Incubating
 public interface ContainerExtractor<C, V> {
 
 	/**

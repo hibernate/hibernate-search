@@ -227,6 +227,58 @@ You can find out more about `@*Field` annotations in <<mapper-orm-directfieldmap
 * Properties, or even types, can be mapped with finer-grained control using "bridges".
 See <<mapper-orm-bridge>> for more information.
 
+[[getting-started-initialization]]
+== Initialization
+
+Before the application is started for the first time,
+some initialization may be required:
+
+* The indexes and their schema need to be created.
+* Data already present in the database (if any) needs to be indexed.
+
+=== Schema management
+
+Before indexing can take place, indexes and their schema need to be created,
+either on disk (Lucene) or through REST API calls (Elasticsearch).
+
+Fortunately, by default, Hibernate Search will take care of creating indexes on the first startup:
+you don't have to do anything.
+
+The next time the application is started, existing indexes will be re-used.
+
+[NOTE]
+====
+Any change to your mapping (adding new fields, changing the type of existing fields, ...)
+between two restarts of the application
+will require an update to the index schema.
+
+This will require some special handling, though it can easily be solved by dropping and re-creating the index.
+See <<mapper-orm-mapping-changes>> for more information.
+====
+
+=== Initial indexing
+
+As we'll see later, Hibernate Search takes care of triggering indexing
+every time an entity changes in the application.
+
+However, data already present in the database when you add the Hibernate Search integration
+is unknown to Hibernate Search, and thus has to be indexed through a batch process.
+To that end, you can use the mass indexer API, as shown in the following code:
+
+.Using Hibernate Search MassIndexer API to manually (re)index the already persisted data
+====
+[source, JAVA, indent=0]
+----
+include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=manual-index]
+----
+<1> Get a Hibernate Search session, called `SearchSession`, from the `EntityManager`.
+<2> Create an "indexer", passing the entity types you want to index. Pass no type to index all of them.
+<3> It is possible to set the number of threads to be used. For the complete option list see <<mapper-orm-indexing-massindexer>>.
+<4> Invoke the batch indexing process.
+====
+
+TIP: If no data is initially present in the database, mass indexing is not necessary.
+
 [[getting-started-indexing]]
 == Indexing
 
@@ -253,22 +305,6 @@ and then a execute search query right after that transaction,
 the search results may not be consistent with the changes you just performed.
 
 See <<mapper-orm-indexing-automatic-synchronization>> for more information about this behavior and how to tune it.
-====
-
-However, keep in mind that data already present in your database when you add the Hibernate Search integration
-is unknown to Hibernate Search, and thus has to be indexed through a batch process.
-To that end, you can use the mass indexer API, as shown in the following code:
-
-.Using Hibernate Search MassIndexer API to manually (re)index the already persisted data
-====
-[source, JAVA, indent=0]
-----
-include::{sourcedir}/org/hibernate/search/documentation/gettingstarted/withhsearch/withoutanalysis/GettingStartedWithoutAnalysisIT.java[tags=manual-index]
-----
-<1> Get a Hibernate Search session, called `SearchSession`, from the `EntityManager`.
-<2> Create an "indexer", passing the entity types you want to index. Pass no type to index all of them.
-<3> It is possible to set the number of threads to be used. For the complete option list see <<mapper-orm-indexing-massindexer>>.
-<4> Invoke the batch indexing process.
 ====
 
 [[getting-started-searching]]
@@ -469,8 +505,9 @@ were analysis configuration (<<concepts-analysis>>) and bridges (<<mapper-orm-br
 Both are important features required for more fine-grained indexing.
 
 Other features that you will probably want to use include
-<<search-dsl-sort,sorts>>, <<search-dsl-projection,projections>>
-and <<search-dsl-aggregation,aggregations>>.
+<<search-dsl-sort,sorts>>, <<search-dsl-projection,projections>>,
+<<search-dsl-aggregation,aggregations>>,
+and <<mapper-orm-schema-management,schema management>>.
 
 If you want to see an example project using Hibernate Search,
 you can also have a look at the link:https://github.com/hibernate/hibernate-search/tree/master/integrationtest/showcase/library["Library" showcase],

@@ -150,7 +150,7 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 17,
 			value = "Created POJO indexed type manager: %1$s")
 	void createdPojoIndexedTypeManager(
-			@FormatWith(ToStringTreeAppendableMultilineFormatter.class) PojoIndexedTypeManager<?, ?, ?> typeManager);
+			@FormatWith(ToStringTreeAppendableMultilineFormatter.class) PojoIndexedTypeManager<?, ?> typeManager);
 
 	@LogMessage(level = Logger.Level.DEBUG)
 	@Message(id = ID_OFFSET_2 + 18,

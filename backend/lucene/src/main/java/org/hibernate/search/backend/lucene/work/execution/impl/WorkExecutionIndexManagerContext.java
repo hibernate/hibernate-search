@@ -26,6 +26,8 @@ public interface WorkExecutionIndexManagerContext {
 
 	String getIndexName();
 
+	String getMappedTypeName();
+
 	LuceneWriteWorkOrchestrator getWriteOrchestrator(String documentId, String routingKey);
 
 	Collection<LuceneWriteWorkOrchestrator> getWriteOrchestrators(Set<String> routingKeys);

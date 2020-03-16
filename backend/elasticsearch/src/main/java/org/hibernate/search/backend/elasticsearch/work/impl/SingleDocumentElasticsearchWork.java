@@ -6,11 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
-import org.hibernate.search.engine.backend.common.DocumentReference;
-
-
 public interface SingleDocumentElasticsearchWork<T> extends ElasticsearchWork<T> {
 
-	DocumentReference getDocumentReference();
+	String getEntityTypeName();
+
+	Object getEntityIdentifier();
 
 }
