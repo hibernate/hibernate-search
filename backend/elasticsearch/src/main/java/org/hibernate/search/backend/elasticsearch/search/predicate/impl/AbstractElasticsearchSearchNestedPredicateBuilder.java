@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.predicate.impl;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
@@ -34,28 +33,26 @@ public abstract class AbstractElasticsearchSearchNestedPredicateBuilder extends 
 	}
 
 	public static JsonObject applyImplicitNested(JsonObject partialResult, List<String> nestedPathHierarchy, ElasticsearchSearchPredicateContext context) {
-		return applyImplicitNestedStep( partialResult, new LinkedList<>( nestedPathHierarchy ), context );
-	}
+		JsonObject result = partialResult;
 
-	private static JsonObject applyImplicitNestedStep(JsonObject partialResult, List<String> nestedPathHierarchy, ElasticsearchSearchPredicateContext context) {
-		if ( nestedPathHierarchy.isEmpty() ) {
-			return partialResult;
+		// traversing the nestedPathHierarchy in the inverted order
+		for ( int i = 0; i < nestedPathHierarchy.size(); i++ ) {
+			String path = nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 - i );
+			if ( path.equals( context.getNestedPath() ) ) {
+				// skip all from this point
+				break;
+			}
+
+			JsonObject innerObject = new JsonObject();
+
+			PATH_ACCESSOR.set( innerObject, path );
+			QUERY_ACCESSOR.set( innerObject, result );
+
+			JsonObject outerObject = new JsonObject();
+			outerObject.add( "nested", innerObject );
+			result = outerObject;
 		}
 
-		String lastPath = nestedPathHierarchy.remove( 0 );
-		if ( context.isExplicitNested( lastPath ) ) {
-			// skip this implicit nested
-			return applyImplicitNested( partialResult, nestedPathHierarchy, context );
-		}
-
-		JsonObject innerObject = new JsonObject();
-
-		PATH_ACCESSOR.set( innerObject, lastPath );
-		QUERY_ACCESSOR.set( innerObject, applyImplicitNestedStep( partialResult, nestedPathHierarchy, context ) );
-
-		JsonObject outerObject = new JsonObject();
-		outerObject.add( "nested", innerObject );
-
-		return outerObject;
+		return result;
 	}
 }
