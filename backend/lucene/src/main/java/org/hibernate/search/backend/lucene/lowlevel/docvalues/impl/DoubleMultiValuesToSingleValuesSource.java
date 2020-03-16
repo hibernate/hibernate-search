@@ -124,7 +124,7 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 				private double value;
 
 				@Override
-				public double doubleValue() throws IOException {
+				public double doubleValue() {
 					return value;
 				}
 
@@ -141,7 +141,7 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 	}
 
 	protected NumericDoubleValues select(SortedNumericDoubleDocValues values, final BitSet parentDocs,
-			final DocIdSetIterator childDocs) throws IOException {
+			final DocIdSetIterator childDocs) {
 		if ( parentDocs == null || childDocs == null ) {
 			return NumericDoubleValues.EMPTY;
 		}
@@ -154,7 +154,7 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 			double lastEmittedValue = -1;
 
 			@Override
-			public double doubleValue() throws IOException {
+			public double doubleValue() {
 				return lastEmittedValue;
 			}
 
@@ -351,7 +351,7 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 		}
 
 		@Override
-		public DoubleValuesSource rewrite(IndexSearcher searcher) throws IOException {
+		public DoubleValuesSource rewrite(IndexSearcher searcher) {
 			return this;
 		}
 
