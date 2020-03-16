@@ -67,7 +67,7 @@ public abstract class SortedNumericDoubleDocValues extends DocIdSetIterator {
 	}
 
 	public static SortedNumericDoubleDocValues fromFloatField(SortedNumericDocValues values) {
-		return create( values, (v) -> (double) NumericUtils.sortableIntToFloat( (int) v ) );
+		return create( values, v -> (double) NumericUtils.sortableIntToFloat( (int) v ) );
 	}
 
 	public static NumericDoubleValues unwrapSingleton(SortedNumericDoubleDocValues values) {
