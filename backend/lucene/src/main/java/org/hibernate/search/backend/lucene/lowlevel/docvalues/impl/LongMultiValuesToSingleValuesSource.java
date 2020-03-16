@@ -94,7 +94,7 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 
 		final BitSet rootDocs = nestedDocsProvider.parentDocs( ctx );
 		final DocIdSetIterator innerDocs = nestedDocsProvider.childDocs( ctx );
-		return select( values, rootDocs, innerDocs, ctx.reader().maxDoc(), Integer.MAX_VALUE );
+		return select( values, rootDocs, innerDocs );
 	}
 
 	/**
@@ -151,7 +151,7 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 	}
 
 	protected LongValues select(final SortedNumericDocValues values, final BitSet parentDocs,
-			final DocIdSetIterator childDocs, int maxDoc, int maxChildren) throws IOException {
+			final DocIdSetIterator childDocs) throws IOException {
 		if ( parentDocs == null || childDocs == null ) {
 			return DocValuesUtils.LONG_VALUES_EMPTY;
 		}
@@ -181,28 +181,28 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 				}
 
 				lastSeenParentDoc = parentDoc;
-				lastEmittedValue = pick( values, childDocs, nextChildWithValue, parentDoc, maxChildren );
+				lastEmittedValue = pick( values, childDocs, nextChildWithValue, parentDoc );
 				return true;
 			}
 		};
 	}
 
 	protected long pick(SortedNumericDocValues values) throws IOException {
-		final int count = values.docValueCount();
+		final int valueCount = values.docValueCount();
 		long result = 0;
 
 		switch ( mode ) {
 			case SUM: {
-				for ( int index = 0; index < count; ++index ) {
+				for ( int index = 0; index < valueCount; ++index ) {
 					result += values.nextValue();
 				}
 				break;
 			}
 			case AVG: {
-				for ( int index = 0; index < count; ++index ) {
+				for ( int index = 0; index < valueCount; ++index ) {
 					result += values.nextValue();
 				}
-				result = result / count;
+				result = result / valueCount;
 				break;
 			}
 			case MIN: {
@@ -212,17 +212,17 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 			}
 			case MAX: {
 				// Values are sorted; the last value is the max.
-				for ( int index = 0; index < count - 1; ++index ) {
+				for ( int index = 0; index < valueCount - 1; ++index ) {
 					values.nextValue();
 				}
 				result = values.nextValue();
 				break;
 			}
 			case MEDIAN: {
-				for ( int i = 0; i < (count - 1) / 2; ++i ) {
+				for ( int i = 0; i < (valueCount - 1) / 2; ++i ) {
 					values.nextValue();
 				}
-				if ( count % 2 == 0 ) {
+				if ( valueCount % 2 == 0 ) {
 					result = (values.nextValue() + values.nextValue()) / 2;
 				}
 				else {
@@ -238,43 +238,34 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 	}
 
 	protected long pick(SortedNumericDocValues values, DocIdSetIterator docItr,
-			int startDoc, int endDoc, int maxChildren) throws IOException {
-		int totalCount = 0;
+			int startDoc, int endDoc) throws IOException {
 		long returnValue = 0;
 
 		switch ( mode ) {
 			case SUM: {
-				int count = 0;
 				for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
 					if ( values.advanceExact( doc ) ) {
-						if ( ++count > maxChildren ) {
-							break;
-						}
-						final int docCount = values.docValueCount();
-						for ( int index = 0; index < docCount; ++index ) {
+						final int valueCountForChild = values.docValueCount();
+						for ( int index = 0; index < valueCountForChild; ++index ) {
 							returnValue += values.nextValue();
 						}
-						totalCount += docCount;
 					}
 				}
 				break;
 			}
 			case AVG: {
-				int count = 0;
+				int valueCount = 0;
 				for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
 					if ( values.advanceExact( doc ) ) {
-						if ( ++count > maxChildren ) {
-							break;
-						}
-						final int docCount = values.docValueCount();
-						for ( int index = 0; index < docCount; ++index ) {
+						final int valueCountForChild = values.docValueCount();
+						for ( int index = 0; index < valueCountForChild; ++index ) {
 							returnValue += values.nextValue();
 						}
-						totalCount += docCount;
+						valueCount += valueCountForChild;
 					}
 				}
-				if ( totalCount > 0 ) {
-					returnValue = returnValue / totalCount;
+				if ( valueCount > 0 ) {
+					returnValue = returnValue / valueCount;
 				}
 				else {
 					returnValue = 0;
@@ -283,12 +274,8 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 			}
 			case MIN: {
 				returnValue = Long.MAX_VALUE;
-				int count = 0;
 				for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
 					if ( values.advanceExact( doc ) ) {
-						if ( ++count > maxChildren ) {
-							break;
-						}
 						// Values are sorted; the first value is the min for this document.
 						returnValue = Math.min( returnValue, values.nextValue() );
 					}
@@ -297,15 +284,11 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 			}
 			case MAX: {
 				returnValue = Long.MIN_VALUE;
-				int count = 0;
 				for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
 					if ( values.advanceExact( doc ) ) {
-						if ( ++count > maxChildren ) {
-							break;
-						}
-						final int docCount = values.docValueCount();
+						final int valueCountForChild = values.docValueCount();
 						// Values are sorted; the last value is the max for this document.
-						for ( int index = 0; index < docCount - 1; ++index ) {
+						for ( int index = 0; index < valueCountForChild - 1; ++index ) {
 							values.nextValue();
 						}
 						returnValue = Math.max( returnValue, values.nextValue() );
@@ -318,7 +301,6 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 		}
 
 		return returnValue;
-
 	}
 
 	private static class MultiFieldValuesToSingleValuesSource extends LongMultiValuesToSingleValuesSource {
