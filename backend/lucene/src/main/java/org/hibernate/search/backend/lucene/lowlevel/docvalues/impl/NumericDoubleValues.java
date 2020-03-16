@@ -41,7 +41,7 @@ public abstract class NumericDoubleValues extends DoubleValues {
 	 * @return numeric
 	 */
 	public NumericDocValues getRawFloatValues() {
-		return new RawNumericDocValues( (v) -> (long) Float.floatToRawIntBits( (float) v ) );
+		return new RawNumericDocValues( v -> (long) Float.floatToRawIntBits( (float) v ) );
 	}
 
 	/**
@@ -49,7 +49,7 @@ public abstract class NumericDoubleValues extends DoubleValues {
 	 * @return numeric
 	 */
 	public NumericDocValues getRawLongValues() {
-		return new RawNumericDocValues( (v) -> (long) v );
+		return new RawNumericDocValues( v -> (long) v );
 	}
 
 	public static NumericDoubleValues fromField(NumericDocValues values, LongToDoubleFunction decoder) {
