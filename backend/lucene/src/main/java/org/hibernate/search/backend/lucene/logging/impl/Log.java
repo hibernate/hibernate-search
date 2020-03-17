@@ -113,8 +113,8 @@ public interface Log extends BasicLogger {
 	SearchException unableToLoadResource(String fileName);
 
 	@Message(id = ID_OFFSET_1 + 118,
-			value = "Index Merge operation")
-	String indexMergeOperation();
+			value = "Index Merge operation on index '%1$s'")
+	String indexMergeOperation(String indexName);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ID_OFFSET_1 + 225,
@@ -634,5 +634,11 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 117,
 			value = "Cannot compute the sum for a distance sort. Only min, max, avg and median are supported.")
 	SearchException cannotComputeSumForDistanceSort(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 118,
+			value = "A failure occurred during a low-level write operation on index '%1$s', "
+					+ " and the index writer had to be reset."
+					+ " Some write operations may have been lost as a result.")
+	SearchException uncommittedOperationsBecauseOfFailure(String indexName, @Cause Throwable cause);
 
 }
