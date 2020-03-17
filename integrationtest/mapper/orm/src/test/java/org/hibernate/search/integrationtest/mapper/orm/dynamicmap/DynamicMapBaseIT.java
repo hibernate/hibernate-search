@@ -36,6 +36,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWork
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.hibernate.search.util.impl.test.SubTest;
+import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -123,6 +124,67 @@ public class DynamicMapBaseIT {
 
 			Assertions.assertThat( query.fetchAllHits() ).containsExactly(
 					(Map) session.load( entityTypeName, 1 )
+			);
+		} );
+	}
+
+	@Test
+	@TestForIssue(jiraKey = "HSEARCH-3848")
+	public void searchObject() {
+		String hbmPath = "/DynamicMapBaseIT/simple.hbm.xml";
+		String entityTypeName = "Book";
+
+		backendMock.expectSchema( INDEX1_NAME, b -> b
+				.field( "title", String.class )
+		);
+		SessionFactory sessionFactory = ormSetupHelper.start()
+				.withConfiguration( builder -> builder.addHbmFromClassPath( hbmPath ) )
+				.withProperty(
+						HibernateOrmMapperSettings.MAPPING_CONFIGURER,
+						(HibernateOrmSearchMappingConfigurer) context -> {
+							TypeMappingStep typeMapping = context.programmaticMapping().type( entityTypeName );
+							typeMapping.indexed( INDEX1_NAME );
+							typeMapping.property( "title" ).keywordField();
+						}
+				)
+				.setup();
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinTransaction( sessionFactory, session -> {
+			Map<String, Object> entity1 = new HashMap<>();
+			entity1.put( "id", 1 );
+			entity1.put( "title", "Hyperion" );
+
+			session.persist( entityTypeName, entity1 );
+
+			backendMock.expectWorks( INDEX1_NAME )
+					.add( "1", b -> b
+							.field( "title", entity1.get( "title" ) )
+					)
+					.processedThenExecuted();
+		} );
+		backendMock.verifyExpectationsMet();
+
+		OrmUtils.withinSession( sessionFactory, session -> {
+			SearchSession searchSession = Search.session( session );
+
+			SearchQuery<Object> query = searchSession.search(
+					searchSession.scope( Object.class )
+			)
+					.where( f -> f.matchAll() )
+					.toQuery();
+
+			backendMock.expectSearchObjects(
+					Arrays.asList( INDEX1_NAME ),
+					b -> { },
+					StubSearchWorkBehavior.of(
+							1L,
+							reference( entityTypeName, "1" )
+					)
+			);
+
+			Assertions.assertThat( query.fetchAllHits() ).containsExactly(
+					session.load( entityTypeName, 1 )
 			);
 		} );
 	}
