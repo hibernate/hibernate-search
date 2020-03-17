@@ -133,7 +133,7 @@ public class ObjectExistsSearchPredicateIT {
 				.fetchAllHits();
 
 		// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
-		// TODO HSEARCH-3762 DOCUMENT_4 won't be matched either, since we use a nested storage for the inner object field
+		// DOCUMENT_4 won't be matched either, since we use a nested storage for the inner object field
 		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 	}
 
@@ -157,7 +157,7 @@ public class ObjectExistsSearchPredicateIT {
 				.fetchAllHits();
 
 		// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
-		// TODO HSEARCH-3762 DOCUMENT_4 won't be matched either, since we use a nested storage for the inner object field
+		// DOCUMENT_4 won't be matched either, since we use a nested storage for the inner object field
 		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 	}
 
@@ -187,7 +187,7 @@ public class ObjectExistsSearchPredicateIT {
 				.fetchAllHits();
 
 		// DOCUMENT_2 won't be matched either, since it hasn't got any not-null field
-		// TODO HSEARCH-3762 DOCUMENT_4 won't be matched either, since we use a nested storage for the inner object field
+		// DOCUMENT_4 won't be matched either, since we use a nested storage for the inner object field
 		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_3 );
 	}
 
