@@ -108,10 +108,10 @@ public class PojoMappingDelegateImpl implements PojoMappingDelegate {
 	}
 
 	@Override
-	public PojoIndexer createIndexer(PojoWorkSessionContext<?> context, DocumentCommitStrategy commitStrategy) {
+	public PojoIndexer createIndexer(PojoWorkSessionContext<?> context) {
 		return new PojoIndexerImpl(
 				indexedTypeManagers,
-				context, commitStrategy
+				context
 		);
 	}
 }

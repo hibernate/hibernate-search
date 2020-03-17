@@ -23,15 +23,12 @@ public class StubIndexIndexer implements IndexIndexer {
 	private final String indexName;
 	private final StubBackendBehavior behavior;
 	private final BackendSessionContext sessionContext;
-	private final DocumentCommitStrategy commitStrategy;
 
 	StubIndexIndexer(String indexName, StubBackendBehavior behavior,
-			BackendSessionContext sessionContext,
-			DocumentCommitStrategy commitStrategy) {
+			BackendSessionContext sessionContext) {
 		this.indexName = indexName;
 		this.behavior = behavior;
 		this.sessionContext = sessionContext;
-		this.commitStrategy = commitStrategy;
 	}
 
 	@Override
@@ -45,7 +42,7 @@ public class StubIndexIndexer implements IndexIndexer {
 				.identifier( documentReferenceProvider.getIdentifier() )
 				.routingKey( documentReferenceProvider.getRoutingKey() )
 				.document( documentBuilder.build() )
-				.commit( commitStrategy )
+				.commit( DocumentCommitStrategy.NONE )
 				.refresh( DocumentRefreshStrategy.NONE )
 				.build();
 

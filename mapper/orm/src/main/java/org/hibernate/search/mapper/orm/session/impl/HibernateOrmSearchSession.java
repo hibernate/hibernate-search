@@ -24,7 +24,6 @@ import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.common.spi.DocumentReferenceConverter;
-import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.mapper.orm.automaticindexing.session.impl.ConfiguredAutomaticIndexingSynchronizationStrategy;
 import org.hibernate.search.mapper.orm.common.EntityReference;
 import org.hibernate.search.mapper.orm.common.impl.EntityReferenceImpl;
@@ -127,8 +126,8 @@ public class HibernateOrmSearchSession extends AbstractPojoSearchSession<EntityR
 	}
 
 	@Override
-	public PojoIndexer createIndexer(DocumentCommitStrategy commitStrategy) {
-		return super.createIndexer( commitStrategy );
+	public PojoIndexer createIndexer() {
+		return super.createIndexer();
 	}
 
 	@Override

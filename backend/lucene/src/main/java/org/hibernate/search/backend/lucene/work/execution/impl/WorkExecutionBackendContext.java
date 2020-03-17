@@ -38,8 +38,7 @@ public interface WorkExecutionBackendContext {
 	IndexIndexer createIndexer(
 			WorkExecutionIndexManagerContext indexManagerContext,
 			LuceneIndexEntryFactory indexEntryFactory,
-			BackendSessionContext sessionContext,
-			DocumentCommitStrategy commitStrategy);
+			BackendSessionContext sessionContext);
 
 	IndexWorkspace createWorkspace(WorkExecutionIndexManagerContext indexManagerContext,
 			DetachedBackendSessionContext sessionContext);

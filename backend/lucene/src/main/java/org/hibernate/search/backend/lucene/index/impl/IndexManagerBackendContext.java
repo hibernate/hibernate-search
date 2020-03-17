@@ -124,16 +124,14 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	public IndexIndexer createIndexer(
 			WorkExecutionIndexManagerContext indexManagerContext,
 			LuceneIndexEntryFactory indexEntryFactory,
-			BackendSessionContext sessionContext,
-			DocumentCommitStrategy commitStrategy) {
+			BackendSessionContext sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		return new LuceneIndexIndexer(
 				workFactory,
 				indexEntryFactory,
 				indexManagerContext,
-				sessionContext,
-				commitStrategy
+				sessionContext
 		);
 	}
 

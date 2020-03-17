@@ -113,11 +113,10 @@ public class LuceneIndexManagerImpl
 	}
 
 	@Override
-	public IndexIndexer createIndexer(
-			BackendSessionContext sessionContext, DocumentCommitStrategy commitStrategy) {
+	public IndexIndexer createIndexer(BackendSessionContext sessionContext) {
 		return backendContext.createIndexer(
 				shardHolder, indexEntryFactory,
-				sessionContext, commitStrategy
+				sessionContext
 		);
 	}
 

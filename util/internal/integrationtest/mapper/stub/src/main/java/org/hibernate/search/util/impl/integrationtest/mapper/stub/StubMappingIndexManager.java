@@ -68,7 +68,7 @@ public class StubMappingIndexManager {
 
 	public IndexIndexer createIndexer(
 			StubBackendSessionContext sessionContext, DocumentCommitStrategy commitStrategy) {
-		return indexManager.createIndexer( sessionContext, StubEntityReference.FACTORY, commitStrategy );
+		return indexManager.createIndexer( sessionContext, StubEntityReference.FACTORY );
 	}
 
 	public IndexWorkspace createWorkspace() {

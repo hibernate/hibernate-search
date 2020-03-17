@@ -206,9 +206,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 	}
 
 	@Override
-	public IndexIndexer createIndexer(
-			BackendSessionContext sessionContext, DocumentCommitStrategy commitStrategy) {
-		// The commit strategy is ignored, because Elasticsearch always commits changes to its transaction log.
+	public IndexIndexer createIndexer(BackendSessionContext sessionContext) {
 		return backendContext.createIndexer(
 				parallelOrchestrator, this, sessionContext
 		);

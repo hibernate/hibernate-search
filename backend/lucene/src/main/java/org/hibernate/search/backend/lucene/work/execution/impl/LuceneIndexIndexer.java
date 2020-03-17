@@ -25,18 +25,15 @@ public class LuceneIndexIndexer implements IndexIndexer {
 	private final LuceneIndexEntryFactory indexEntryFactory;
 	private final WorkExecutionIndexManagerContext indexManagerContext;
 	private final String tenantId;
-	private final DocumentCommitStrategy commitStrategy;
 
 	public LuceneIndexIndexer(LuceneWorkFactory factory,
 			LuceneIndexEntryFactory indexEntryFactory,
 			WorkExecutionIndexManagerContext indexManagerContext,
-			BackendSessionContext sessionContext,
-			DocumentCommitStrategy commitStrategy) {
+			BackendSessionContext sessionContext) {
 		this.factory = factory;
 		this.indexEntryFactory = indexEntryFactory;
 		this.indexManagerContext = indexManagerContext;
 		this.tenantId = sessionContext.getTenantIdentifier();
-		this.commitStrategy = commitStrategy;
 	}
 
 	@Override
@@ -54,7 +51,7 @@ public class LuceneIndexIndexer implements IndexIndexer {
 						tenantId, indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
 						indexEntry
 				),
-				commitStrategy,
+				DocumentCommitStrategy.NONE,
 				DocumentRefreshStrategy.NONE
 		);
 	}

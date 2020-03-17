@@ -52,9 +52,8 @@ public class MappedIndexManagerImpl implements MappedIndexManager {
 
 	@Override
 	public IndexIndexer createIndexer(BackendSessionContext sessionContext,
-			EntityReferenceFactory<?> entityReferenceFactory,
-			DocumentCommitStrategy commitStrategy) {
-		return implementor.createIndexer( sessionContext, commitStrategy );
+			EntityReferenceFactory<?> entityReferenceFactory) {
+		return implementor.createIndexer( sessionContext );
 	}
 
 	@Override
