@@ -6,10 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import java.util.LinkedList;
 import java.util.List;
-
-import org.hibernate.search.util.common.AssertionFailure;
 
 import org.apache.lucene.search.Query;
 
@@ -23,25 +20,6 @@ public abstract class AbstractLuceneSearchNestedPredicateBuilder extends Abstrac
 
 	@Override
 	public final Query build(LuceneSearchPredicateContext context) {
-		List<String> nestedSteps = implicitNestedSteps( context, nestedPathHierarchy );
-		return applyImplicitNestedSteps( nestedSteps, context, super::build );
-	}
-
-	public static List<String> implicitNestedSteps(LuceneSearchPredicateContext context, List<String> nestedPathHierarchy) {
-		String contextNestedPath = context.getNestedPath();
-
-		if ( contextNestedPath == null ) {
-			// we need to handle all the nestedPathHierarchy belong to the target
-			return new LinkedList<>( nestedPathHierarchy );
-		}
-
-		int contextNestedPathIndex = nestedPathHierarchy.indexOf( contextNestedPath );
-		if ( contextNestedPathIndex < 0 ) {
-			throw new AssertionFailure( "The nested path must belong to the nested path hierarchy: there's an Hibernate Search bug." );
-		}
-
-		// we need to handle just the last part of the nestedPathHierarchy belong to the target,
-		// the one that hasn't been handled by the context
-		return new LinkedList<>( nestedPathHierarchy.subList( contextNestedPathIndex + 1, nestedPathHierarchy.size() ) );
+		return applyImplicitNestedSteps( nestedPathHierarchy, context, super.build( context ) );
 	}
 }
