@@ -10,8 +10,6 @@ import java.lang.invoke.MethodHandles;
 import java.util.List;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSearchNestedPredicateBuilder;
-import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class LuceneDifferentNestedObjectCompatibilityChecker {
@@ -44,8 +42,8 @@ public class LuceneDifferentNestedObjectCompatibilityChecker {
 		return this;
 	}
 
-	public List<String> getNestedObjectPath(LuceneSearchPredicateContext context) {
-		return AbstractLuceneSearchNestedPredicateBuilder.implicitNestedSteps( context, nestedPathHierarchy );
+	public List<String> getNestedPathHierarchy() {
+		return nestedPathHierarchy;
 	}
 
 	public boolean isEmpty() {

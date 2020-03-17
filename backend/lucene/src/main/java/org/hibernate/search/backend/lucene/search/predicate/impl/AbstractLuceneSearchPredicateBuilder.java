@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import java.util.List;
-import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 
@@ -55,21 +54,22 @@ public abstract class AbstractLuceneSearchPredicateBuilder implements SearchPred
 
 	protected abstract Query doBuild(LuceneSearchPredicateContext context);
 
-	protected Query applyImplicitNestedSteps(List<String> furtherImplicitNestedSteps, LuceneSearchPredicateContext context,
-			Function<LuceneSearchPredicateContext, Query> baseBuild) {
-		if ( furtherImplicitNestedSteps.isEmpty() ) {
-			return baseBuild.apply( context );
+	protected Query applyImplicitNestedSteps(List<String> nestedPathHierarchy, LuceneSearchPredicateContext context, Query baseQuery) {
+		Query result = baseQuery;
+
+		// traversing the furtherImplicitNestedSteps in the inverted order
+		for ( int i = 0; i < nestedPathHierarchy.size(); i++ ) {
+			int index = nestedPathHierarchy.size() - 1 - i;
+			String path = nestedPathHierarchy.get( index );
+			if ( path.equals( context.getNestedPath() ) ) {
+				// the upper levels have been handled by the explicit predicate/s
+				break;
+			}
+
+			LuceneSearchPredicateContext childContext = ( index == 0 ) ? context : new LuceneSearchPredicateContext( nestedPathHierarchy.get( index - 1 ) );
+			result = LuceneNestedPredicateBuilder.doBuild( childContext, path, result );
 		}
 
-		if ( furtherImplicitNestedSteps.size() == 1 ) {
-			String lastStep = furtherImplicitNestedSteps.get( 0 );
-			// baseBuild.apply( context ) must be called only at the very end of the recursion.
-			// Note that there is no reason here to update the context, because we already reached the target field.
-			return LuceneNestedPredicateBuilder.doBuild( context, lastStep, baseBuild.apply( context ) );
-		}
-
-		String step = furtherImplicitNestedSteps.remove( 0 );
-		LuceneSearchPredicateContext childContext = new LuceneSearchPredicateContext( step );
-		return LuceneNestedPredicateBuilder.doBuild( context, step, applyImplicitNestedSteps( furtherImplicitNestedSteps, childContext, baseBuild ) );
+		return result;
 	}
 }
