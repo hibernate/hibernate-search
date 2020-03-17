@@ -52,15 +52,15 @@ public abstract class AbstractPojoHCAnnBootstrapIntrospector implements PojoBoot
 				.collect( xPropertiesByNameNoDuplicate() );
 	}
 
-	protected <T> Stream<? extends Class<T>> getAscendingSuperClasses(XClass xClass) {
+	protected Stream<Class<?>> getAscendingSuperClasses(XClass xClass) {
 		return typeOrdering.getAscendingSuperTypes( xClass ).map( this::toClass );
 	}
 
-	protected <T> Stream<? extends Class<T>> getDescendingSuperClasses(XClass xClass) {
+	protected Stream<Class<?>> getDescendingSuperClasses(XClass xClass) {
 		return typeOrdering.getDescendingSuperTypes( xClass ).map( this::toClass );
 	}
 
-	private <T> Class<T> toClass(XClass xClass) {
+	private Class<?> toClass(XClass xClass) {
 		return reflectionManager.toClass( xClass );
 	}
 

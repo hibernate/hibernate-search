@@ -16,15 +16,15 @@ import org.hibernate.annotations.common.reflection.XClass;
 import org.hibernate.annotations.common.reflection.java.JavaReflectionManager;
 import org.hibernate.search.mapper.javabean.log.impl.Log;
 import org.hibernate.search.mapper.pojo.model.hcann.spi.AbstractPojoHCAnnBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.GenericContextAwarePojoGenericTypeModel.RawTypeDeclaringContext;
 import org.hibernate.search.mapper.pojo.model.spi.PojoBootstrapIntrospector;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeIdentifier;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
-import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
 import org.hibernate.search.util.common.impl.ReflectionHelper;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
+import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
 
 /**
  * A very simple introspector roughly following Java Beans conventions.
@@ -84,11 +84,11 @@ public class JavaBeanBootstrapIntrospector extends AbstractPojoHCAnnBootstrapInt
 		return valueReadHandleFactory;
 	}
 
-	<T> Stream<JavaBeanTypeModel<? super T>> getAscendingSuperTypes(XClass xClass) {
+	Stream<? extends JavaBeanTypeModel<?>> getAscendingSuperTypes(XClass xClass) {
 		return getAscendingSuperClasses( xClass ).map( this::getTypeModel );
 	}
 
-	<T> Stream<JavaBeanTypeModel<? super T>> getDescendingSuperTypes(XClass xClass) {
+	Stream<? extends JavaBeanTypeModel<?>> getDescendingSuperTypes(XClass xClass) {
 		return getDescendingSuperClasses( xClass ).map( this::getTypeModel );
 	}
 

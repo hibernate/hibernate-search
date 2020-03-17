@@ -146,11 +146,11 @@ public class HibernateOrmBootstrapIntrospector extends AbstractPojoHCAnnBootstra
 		return valueReadHandleFactory;
 	}
 
-	<T> Stream<HibernateOrmClassRawTypeModel<? super T>> getAscendingSuperTypes(XClass xClass) {
+	Stream<? extends HibernateOrmClassRawTypeModel<?>> getAscendingSuperTypes(XClass xClass) {
 		return getAscendingSuperClasses( xClass ).map( this::getTypeModel );
 	}
 
-	<T> Stream<HibernateOrmClassRawTypeModel<? super T>> getDescendingSuperTypes(XClass xClass) {
+	Stream<? extends HibernateOrmClassRawTypeModel<?>> getDescendingSuperTypes(XClass xClass) {
 		return getDescendingSuperClasses( xClass ).map( this::getTypeModel );
 	}
 

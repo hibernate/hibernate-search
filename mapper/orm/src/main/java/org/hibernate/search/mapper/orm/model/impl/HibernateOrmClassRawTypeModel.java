@@ -57,18 +57,22 @@ public class HibernateOrmClassRawTypeModel<T> extends AbstractHibernateOrmRawTyp
 	}
 
 	@Override
+	@SuppressWarnings("unchecked") // xClass represents T, so its supertypes represent ? super T
 	public Stream<HibernateOrmClassRawTypeModel<? super T>> getAscendingSuperTypes() {
 		if ( ascendingSuperTypesCache == null ) {
-			ascendingSuperTypesCache = introspector.getAscendingSuperTypes( xClass )
+			ascendingSuperTypesCache =
+					( (Stream<HibernateOrmClassRawTypeModel<? super T>>) introspector.getAscendingSuperTypes( xClass ) )
 					.collect( Collectors.toList() );
 		}
 		return ascendingSuperTypesCache.stream();
 	}
 
 	@Override
+	@SuppressWarnings("unchecked") // xClass represents T, so its supertypes represent ? super T
 	public Stream<HibernateOrmClassRawTypeModel<? super T>> getDescendingSuperTypes() {
 		if ( descendingSuperTypesCache == null ) {
-			descendingSuperTypesCache = introspector.getDescendingSuperTypes( xClass )
+			descendingSuperTypesCache =
+					( (Stream<HibernateOrmClassRawTypeModel<? super T>>) introspector.getDescendingSuperTypes( xClass ) )
 					.collect( Collectors.toList() );
 		}
 		return descendingSuperTypesCache.stream();
