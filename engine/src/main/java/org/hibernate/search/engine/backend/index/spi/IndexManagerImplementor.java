@@ -65,8 +65,7 @@ public interface IndexManagerImplementor {
 			EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
-	IndexIndexer createIndexer(BackendSessionContext sessionContext,
-			DocumentCommitStrategy commitStrategy);
+	IndexIndexer createIndexer(BackendSessionContext sessionContext);
 
 	IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext);
 

@@ -161,13 +161,11 @@ public class PojoIndexedTypeManager<I, E>
 	}
 
 	@Override
-	public PojoTypeIndexer<I, E> createIndexer(PojoWorkSessionContext<?> sessionContext,
-			DocumentCommitStrategy commitStrategy) {
+	public PojoTypeIndexer<I, E> createIndexer(PojoWorkSessionContext<?> sessionContext) {
 		return new PojoTypeIndexer<>(
 				this, sessionContext,
 				indexManager.createIndexer(
-						sessionContext, sessionContext.getEntityReferenceFactory(),
-						commitStrategy
+						sessionContext, sessionContext.getEntityReferenceFactory()
 				)
 		);
 	}

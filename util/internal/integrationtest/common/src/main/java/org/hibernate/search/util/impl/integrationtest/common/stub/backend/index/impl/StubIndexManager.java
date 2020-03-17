@@ -99,10 +99,9 @@ public class StubIndexManager implements IndexManagerImplementor, IndexManager {
 	}
 
 	@Override
-	public IndexIndexer createIndexer(BackendSessionContext context,
-			DocumentCommitStrategy commitStrategy) {
+	public IndexIndexer createIndexer(BackendSessionContext context) {
 		checkStarted();
-		return new StubIndexIndexer( name, backend.getBehavior(), context, commitStrategy );
+		return new StubIndexIndexer( name, backend.getBehavior(), context );
 	}
 
 	@Override

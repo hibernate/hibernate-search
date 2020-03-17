@@ -49,8 +49,7 @@ public interface PojoWorkIndexedTypeContext<I, E> {
 	<R> PojoIndexedTypeIndexingPlan<I, E, R> createIndexingPlan(PojoWorkSessionContext<R> sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
-	PojoTypeIndexer<I, E> createIndexer(PojoWorkSessionContext<?> sessionContext,
-			DocumentCommitStrategy commitStrategy);
+	PojoTypeIndexer<I, E> createIndexer(PojoWorkSessionContext<?> sessionContext);
 
 	IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext);
 

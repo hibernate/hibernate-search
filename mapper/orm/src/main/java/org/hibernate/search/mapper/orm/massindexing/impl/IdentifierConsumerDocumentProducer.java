@@ -24,7 +24,6 @@ import org.hibernate.Session;
 import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.engine.transaction.jta.platform.spi.JtaPlatform;
 import org.hibernate.query.Query;
-import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.mapper.pojo.work.spi.PojoIndexer;
 import org.hibernate.search.util.common.impl.Futures;
@@ -109,9 +108,7 @@ public class IdentifierConsumerDocumentProducer<E, I> implements Runnable {
 
 	private void loadAllFromQueue(SessionImplementor session) throws SystemException, NotSupportedException {
 		// The search session will be closed automatically with the ORM session
-		PojoIndexer indexer = mappingContext.createIndexer(
-				session, DocumentCommitStrategy.NONE
-		);
+		PojoIndexer indexer = mappingContext.createIndexer( session );
 		try {
 			List<I> idList;
 			do {
