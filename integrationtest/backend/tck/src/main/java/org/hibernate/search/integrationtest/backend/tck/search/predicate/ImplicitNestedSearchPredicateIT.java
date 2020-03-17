@@ -42,16 +42,21 @@ import org.junit.Test;
 public class ImplicitNestedSearchPredicateIT {
 
 	private static final String INDEX_NAME = "IndexName";
+
 	private static final String DOCUMENT_1 = "1";
+	private static final String DOCUMENT_2 = "2";
 
 	private static final String ANY_STRING = "Any String";
+	private static final String OTHER_STRING = "Other String";
+
 	private static final int ANY_INTEGER = 173173;
+	private static final int OTHER_INTEGER = 739379;
+
+	private static final String SOME_PHRASE_TEXT = "Once upon a time, there was a quick fox in a big house.";
+	private static final String OTHER_PHRASE_TEXT = "The cat is on the table.";
 
 	private static final String SOME_PHRASE_KEY = "quick fox";
-	private static final String SOME_PHRASE_TEXT = "Once upon a time, there was a quick fox in a big house.";
-
 	private static final String SOME_WILDCARD_PATTERN = "f*x";
-
 	private static final String SOME_SIMPLE_QUERY_STRING = "quick + fox";
 
 	private static final GeoPoint G00 = GeoPoint.of( 0, 0 );
@@ -59,6 +64,7 @@ public class ImplicitNestedSearchPredicateIT {
 	private static final GeoPoint G02 = GeoPoint.of( 0, 2 );
 	private static final GeoPoint G22 = GeoPoint.of( 2, 2 );
 	private static final GeoPoint G11 = GeoPoint.of( 1, 1 );
+	private static final GeoPoint G33 = GeoPoint.of( 3, 3 );
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
@@ -134,7 +140,7 @@ public class ImplicitNestedSearchPredicateIT {
 
 	@Test
 	public void predicate_matchAll() {
-		verify_implicit_nest( p -> p.matchAll() );
+		verify_implicit_nest( p -> p.matchAll(), true );
 	}
 
 	@Test
@@ -169,12 +175,12 @@ public class ImplicitNestedSearchPredicateIT {
 
 	@Test
 	public void predicate_exists_field() {
-		verify_implicit_nest( p -> p.exists().field( "nested.geo" ) );
+		verify_implicit_nest( p -> p.exists().field( "nested.geo" ), true );
 	}
 
 	@Test
 	public void predicate_exists_object() {
-		verify_implicit_nest( p -> p.exists().field( "nested" ) );
+		verify_implicit_nest( p -> p.exists().field( "nested" ), true );
 	}
 
 	@Test
@@ -190,6 +196,10 @@ public class ImplicitNestedSearchPredicateIT {
 	}
 
 	private void verify_implicit_nest(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> implicitPredicate) {
+		verify_implicit_nest( implicitPredicate, false );
+	}
+
+	private void verify_implicit_nest(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> implicitPredicate, boolean allMatch) {
 		StubMappingScope scope = indexManager.createScope();
 		SearchPredicate explicitPredicate = scope.predicate().nested().objectField( "nested" ).nest( implicitPredicate ).toPredicate();
 
@@ -198,14 +208,24 @@ public class ImplicitNestedSearchPredicateIT {
 				.where( explicitPredicate )
 				.fetchAllHits();
 
-		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		if ( allMatch ) {
+			assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+		}
+		else {
+			assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		}
 
 		// test the implicit form
 		docs = scope.query().selectEntityReference()
 				.where( implicitPredicate )
 				.fetchAllHits();
 
-		assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		if ( allMatch ) {
+			assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
+		}
+		else {
+			assertThat( docs ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1 );
+		}
 	}
 
 	private void initData() {
@@ -219,6 +239,16 @@ public class ImplicitNestedSearchPredicateIT {
 
 			DocumentElement nestedDocumentX2 = nestedDocument.addObject( indexMapping.nestedX2 );
 			nestedDocumentX2.addValue( indexMapping.nestedX2Numeric, ANY_INTEGER );
+		} );
+		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
+			DocumentElement nestedDocument = document.addObject( indexMapping.nested );
+			nestedDocument.addValue( indexMapping.nestedString, OTHER_STRING );
+			nestedDocument.addValue( indexMapping.nestedNumeric, OTHER_INTEGER );
+			nestedDocument.addValue( indexMapping.nestedText, OTHER_PHRASE_TEXT );
+			nestedDocument.addValue( indexMapping.nestedGeo, G33 );
+
+			DocumentElement nestedDocumentX2 = nestedDocument.addObject( indexMapping.nestedX2 );
+			nestedDocumentX2.addValue( indexMapping.nestedX2Numeric, OTHER_INTEGER );
 		} );
 		plan.execute().join();
 	}
@@ -250,5 +280,4 @@ public class ImplicitNestedSearchPredicateIT {
 			this.nestedX2Numeric = nestedObjectX2.field( "numeric", f -> f.asInteger() ).toReference();
 		}
 	}
-
 }
