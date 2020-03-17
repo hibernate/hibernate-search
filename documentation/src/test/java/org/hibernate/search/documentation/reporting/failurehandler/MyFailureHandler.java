@@ -13,7 +13,6 @@ import java.util.List;
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.engine.reporting.IndexFailureContext;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 public class MyFailureHandler implements FailureHandler {
@@ -45,16 +44,5 @@ public class MyFailureHandler implements FailureHandler {
 		// ... report the failure ... // <7>
 	}
 
-	@Override
-	public void handle(IndexFailureContext context) { // <8>
-		String failingOperationDescription = context.getFailingOperation().toString();
-		Throwable throwable = context.getThrowable();
-		List<String> uncommittedOperationsDescriptions = new ArrayList<>();
-		for ( Object uncommittedOperation : context.getUncommittedOperations() ) { // <9>
-			uncommittedOperationsDescriptions.add( uncommittedOperation.toString() );
-		}
-
-		// ... report the failure ... // <10>
-	}
 }
 // end::include[]

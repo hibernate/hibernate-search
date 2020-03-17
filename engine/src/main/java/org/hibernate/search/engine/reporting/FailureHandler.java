@@ -47,17 +47,4 @@ public interface FailureHandler {
 	 */
 	void handle(EntityIndexingFailureContext context);
 
-	/**
-	 * Handle the failure of an index operation.
-	 * <p>
-	 * This method is expected to report the failure somewhere (logs, ...),
-	 * then return as quickly as possible.
-	 * Heavy error processing (sending emails, ...), if any, should be done asynchronously.
-	 * <p>
-	 * Any error or exception thrown by this method will be caught by Hibernate Search and logged.
-	 *
-	 * @param context Contextual information about the failure (throwable, operation, ...)
-	 */
-	void handle(IndexFailureContext context);
-
 }

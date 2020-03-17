@@ -64,6 +64,11 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 	}
 
 	public long commitOrDelay() throws IOException {
+		if ( !delegate.hasUncommittedChanges() ) {
+			// No need to either commit or plan a delayed commit: there's nothing to commit.
+			return 0L;
+		}
+
 		long timeToCommit = commitInterval == 0 ? 0L : commitExpiration - timingSource.getMonotonicTimeEstimate();
 
 		if ( timeToCommit > 0L ) {

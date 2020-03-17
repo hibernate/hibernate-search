@@ -12,7 +12,6 @@ import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.engine.reporting.IndexFailureContext;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class FailSafeFailureHandlerWrapper implements FailureHandler {
@@ -37,16 +36,6 @@ public class FailSafeFailureHandlerWrapper implements FailureHandler {
 
 	@Override
 	public void handle(EntityIndexingFailureContext context) {
-		try {
-			delegate.handle( context );
-		}
-		catch (Throwable t) {
-			log.failureInFailureHandler( t );
-		}
-	}
-
-	@Override
-	public void handle(IndexFailureContext context) {
 		try {
 			delegate.handle( context );
 		}

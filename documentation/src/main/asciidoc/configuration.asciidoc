@@ -304,12 +304,6 @@ include::{sourcedir}/org/hibernate/search/documentation/reporting/failurehandler
 <6> On top of the failing operation and throwable,
 the context also lists references to entities that could not be indexed correctly because of the failure.
 <7> Use the context-provided information to report the failure in any relevant way.
-<8> `handle(IndexFailureContext)` is called for failures that are related to one index in particular.
-<9> On top of the failing operation and throwable,
-the index context also lists operations that could not be committed because of the failure.
-These are operations that were applied before the failure, but weren't committed yet.
-<10> Use the context-provided information to report the failure in any relevant way.
-
 
 [source, XML, indent=0, subs="+callouts"]
 ----
