@@ -14,18 +14,18 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldModelConsumer;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
@@ -41,7 +41,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -221,12 +220,8 @@ public class ExistsSearchPredicateIT {
 		}
 	}
 
-	/**
-	 * Querying fields of a nested object without a nested predicate should result in no result at all.
-	 */
 	@Test
-	@Ignore // TODO HSEARCH-3752 restore the test with the new assumptions
-	public void inNestedObject() {
+	public void inNestedPredicate_implicit() {
 		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.nestedObject.supportedFieldModels ) {
@@ -236,12 +231,13 @@ public class ExistsSearchPredicateIT {
 					.where( f -> f.exists().field( absoluteFieldPath ) )
 					.toQuery();
 
-			assertThat( query ).hasNoHits();
+			assertThat( query )
+					.hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2 );
 		}
 	}
 
 	@Test
-	public void inNestedPredicate() {
+	public void inNestedPredicate_explicit() {
 		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.nestedObject.supportedFieldModels ) {
