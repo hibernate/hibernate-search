@@ -18,7 +18,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 
-public class PutIndexSettingsWork extends AbstractSimpleElasticsearchWork<Void> {
+public class PutIndexSettingsWork extends AbstractNonBulkableElasticsearchWork<Void> {
 
 	protected PutIndexSettingsWork(Builder builder) {
 		super( builder );
@@ -38,7 +38,7 @@ public class PutIndexSettingsWork extends AbstractSimpleElasticsearchWork<Void> 
 		public Builder(
 				GsonProvider gsonProvider,
 				URLEncodedString indexName, IndexSettings settings) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexName = indexName;
 			/*
 			 * Serializing nulls is really not a good idea here, it triggers NPEs in Elasticsearch

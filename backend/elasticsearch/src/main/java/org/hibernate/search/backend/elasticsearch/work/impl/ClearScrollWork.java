@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.ClearScrollW
 import com.google.gson.JsonObject;
 
 
-public class ClearScrollWork extends AbstractSimpleElasticsearchWork<Void> {
+public class ClearScrollWork extends AbstractNonBulkableElasticsearchWork<Void> {
 
 	protected ClearScrollWork(Builder builder) {
 		super( builder );
@@ -31,7 +31,7 @@ public class ClearScrollWork extends AbstractSimpleElasticsearchWork<Void> {
 		private final String scrollId;
 
 		public Builder(String scrollId) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.scrollId = scrollId;
 		}
 

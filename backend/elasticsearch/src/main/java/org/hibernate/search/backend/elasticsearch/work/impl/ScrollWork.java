@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.ScrollWorkBu
 import com.google.gson.JsonObject;
 
 
-public class ScrollWork<R> extends AbstractSimpleElasticsearchWork<R> {
+public class ScrollWork<R> extends AbstractNonBulkableElasticsearchWork<R> {
 
 	private final ElasticsearchSearchResultExtractor<R> resultExtractor;
 
@@ -37,7 +37,7 @@ public class ScrollWork<R> extends AbstractSimpleElasticsearchWork<R> {
 		private final ElasticsearchSearchResultExtractor<R> resultExtractor;
 
 		public Builder(String scrollId, String scrollTimeout, ElasticsearchSearchResultExtractor<R> resultExtractor) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.scrollId = scrollId;
 			this.scrollTimeout = scrollTimeout;
 			this.resultExtractor = resultExtractor;

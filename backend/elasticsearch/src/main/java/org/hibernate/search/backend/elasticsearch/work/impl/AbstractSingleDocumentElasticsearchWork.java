@@ -7,35 +7,36 @@
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import com.google.gson.JsonObject;
 
 
 public abstract class AbstractSingleDocumentElasticsearchWork<R>
-		extends AbstractSimpleElasticsearchWork<R>
 		implements BulkableElasticsearchWork<R>, SingleDocumentElasticsearchWork<R> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final JsonObject bulkableActionMetadata;
+	private final JsonObject bulkableActionBody;
+	protected final ElasticsearchRequestSuccessAssessor resultAssessor;
 
 	private final String entityTypeName;
 	private final Object entityIdentifier;
 
+	private final DocumentRefreshStrategy refreshStrategy;
+
 	protected AbstractSingleDocumentElasticsearchWork(AbstractBuilder<?> builder) {
-		super( builder );
 		this.bulkableActionMetadata = builder.buildBulkableActionMetadata();
+		this.bulkableActionBody = builder.buildBulkableActionBody();
+		this.resultAssessor = builder.resultAssessor;
 		this.entityTypeName = builder.entityTypeName;
 		this.entityIdentifier = builder.entityIdentifier;
+		this.refreshStrategy = builder.refreshStrategy;
 	}
 
 	@Override
@@ -60,30 +61,12 @@ public abstract class AbstractSingleDocumentElasticsearchWork<R>
 
 	@Override
 	public JsonObject getBulkableActionBody() {
-		List<JsonObject> bodyParts = request.getBodyParts();
-		if ( !bodyParts.isEmpty() ) {
-			if ( bodyParts.size() > 1 ) {
-				throw new AssertionFailure( "Found a bulkable action with multiple body parts: " + bodyParts );
-			}
-			return bodyParts.get( 0 );
-		}
-		else {
-			return null;
-		}
+		return bulkableActionBody;
 	}
 
 	@Override
 	public R handleBulkResult(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem) {
 		return handleResult( context, bulkResponseItem );
-	}
-
-	@Override
-	protected final CompletableFuture<?> beforeExecute(ElasticsearchWorkExecutionContext executionContext, ElasticsearchRequest request) {
-		/*
-		 * Making this method final so that it won't be overridden:
-		 * this method is not used when the work is bulked
-		 */
-		return super.beforeExecute( executionContext, request );
 	}
 
 	@Override
@@ -99,14 +82,6 @@ public abstract class AbstractSingleDocumentElasticsearchWork<R>
 			resultAssessor.checkSuccess( bulkResponseItem );
 
 			result = generateResult( executionContext, bulkResponseItem );
-
-			switch ( refreshStrategy ) {
-				case FORCE:
-					executionContext.registerIndexToRefresh( refreshedIndexName );
-					break;
-				case NONE:
-					break;
-			}
 		}
 		catch (RuntimeException e) {
 			throw log.elasticsearchBulkedRequestFailed(
@@ -119,20 +94,29 @@ public abstract class AbstractSingleDocumentElasticsearchWork<R>
 		return result;
 	}
 
-	protected abstract static class AbstractBuilder<B>
-			extends AbstractSimpleElasticsearchWork.AbstractBuilder<B> {
+	protected abstract static class AbstractBuilder<B> {
+		private final ElasticsearchRequestSuccessAssessor resultAssessor;
 
 		private final String entityTypeName;
 		private final Object entityIdentifier;
 
-		public AbstractBuilder(URLEncodedString dirtiedIndexName, ElasticsearchRequestSuccessAssessor resultAssessor,
+		private DocumentRefreshStrategy refreshStrategy = DocumentRefreshStrategy.NONE;
+
+		public AbstractBuilder(ElasticsearchRequestSuccessAssessor resultAssessor,
 				String entityTypeName, Object entityIdentifier) {
-			super( dirtiedIndexName, resultAssessor );
+			this.resultAssessor = resultAssessor;
 			this.entityTypeName = entityTypeName;
 			this.entityIdentifier = entityIdentifier;
 		}
 
+		public B refresh(DocumentRefreshStrategy refreshStrategy) {
+			this.refreshStrategy = refreshStrategy;
+			return (B) this;
+		}
+
 		protected abstract JsonObject buildBulkableActionMetadata();
+
+		protected abstract JsonObject buildBulkableActionBody();
 
 	}
 }

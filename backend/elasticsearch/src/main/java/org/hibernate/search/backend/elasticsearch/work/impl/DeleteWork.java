@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
-import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.DeleteWorkBuilder;
 
@@ -22,11 +19,6 @@ public class DeleteWork extends AbstractSingleDocumentElasticsearchWork<Void> {
 
 	private DeleteWork(Builder builder) {
 		super( builder );
-	}
-
-	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
-		return null;
 	}
 
 	@Override
@@ -57,26 +49,11 @@ public class DeleteWork extends AbstractSingleDocumentElasticsearchWork<Void> {
 		private Builder(String entityTypeName, Object entityIdentifier,
 				URLEncodedString elasticsearchIndexName,
 				URLEncodedString typeName, URLEncodedString id, String routingKey) {
-			super( elasticsearchIndexName, SUCCESS_ASSESSOR, entityTypeName, entityIdentifier );
+			super( SUCCESS_ASSESSOR, entityTypeName, entityIdentifier );
 			this.indexName = elasticsearchIndexName;
 			this.typeName = typeName;
 			this.id = id;
 			this.routingKey = routingKey;
-		}
-
-		@Override
-		protected ElasticsearchRequest buildRequest() {
-			ElasticsearchRequest.Builder builder =
-					ElasticsearchRequest.delete()
-					.pathComponent( indexName )
-					.pathComponent( typeName != null ? typeName : Paths._DOC ) // _doc for ES7+
-					.pathComponent( id );
-
-			if ( routingKey != null ) {
-				builder.param( "routing", routingKey );
-			}
-
-			return builder.build();
 		}
 
 		@Override
@@ -97,6 +74,11 @@ public class DeleteWork extends AbstractSingleDocumentElasticsearchWork<Void> {
 			result.add( "delete", delete );
 
 			return result;
+		}
+
+		@Override
+		protected JsonObject buildBulkableActionBody() {
+			return null;
 		}
 
 		@Override

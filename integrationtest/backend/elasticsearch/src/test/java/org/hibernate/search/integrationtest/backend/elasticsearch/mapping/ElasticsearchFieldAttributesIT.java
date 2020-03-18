@@ -123,7 +123,7 @@ public class ElasticsearchFieldAttributesIT {
 		JsonObject mappings = new JsonObject();
 		payload.add( "mappings", mappings );
 
-		JsonObject mapping = dialect.getTypeNameForMappingApi()
+		JsonObject mapping = dialect.getTypeNameForMappingAndBulkApi()
 				// ES6 and below: the mapping has its own object node, child of "mappings"
 				.map( name -> {
 					JsonObject doc = new JsonObject();

@@ -21,7 +21,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.JsonObject;
 
 
-public class ExplainWork extends AbstractSimpleElasticsearchWork<ExplainResult> {
+public class ExplainWork extends AbstractNonBulkableElasticsearchWork<ExplainResult> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -66,7 +66,7 @@ public class ExplainWork extends AbstractSimpleElasticsearchWork<ExplainResult> 
 		}
 
 		private Builder(URLEncodedString indexName, URLEncodedString typeName, URLEncodedString id, JsonObject payload) {
-			super( null, SUCCESS_ASSESSOR );
+			super( SUCCESS_ASSESSOR );
 			this.indexName = indexName;
 			this.typeName = typeName;
 			this.id = id;

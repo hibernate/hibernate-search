@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableElasticsearchWork;
 
 
-public interface PutIndexAliasesWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<Void>> {
+public interface PutIndexAliasesWorkBuilder extends ElasticsearchWorkBuilder<NonBulkableElasticsearchWork<Void>> {
 
 }

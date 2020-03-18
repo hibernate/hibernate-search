@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
+import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 
@@ -166,21 +167,19 @@ public class ElasticsearchWorkOrchestratorProvider {
 	}
 
 	private ElasticsearchWorkProcessor createSerialWorkProcessor() {
-		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder( this::createRefreshingWorkExecutionContext );
+		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder( this::createWorkExecutionContext );
 		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder );
 		return new ElasticsearchSerialWorkProcessor( sequenceBuilder, bulker );
 	}
 
 	private ElasticsearchWorkProcessor createParallelWorkProcessor() {
-		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder( this::createRefreshingWorkExecutionContext );
+		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder( this::createWorkExecutionContext );
 		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder );
 		return new ElasticsearchParallelWorkProcessor( sequenceBuilder, bulker );
 	}
 
-	private ElasticsearchWorkSequenceBuilder createSequenceBuilder(Supplier<ElasticsearchRefreshableWorkExecutionContext> contextSupplier) {
-		return new ElasticsearchDefaultWorkSequenceBuilder(
-				contextSupplier
-		);
+	private ElasticsearchWorkSequenceBuilder createSequenceBuilder(Supplier<ElasticsearchWorkExecutionContext> contextSupplier) {
+		return new ElasticsearchDefaultWorkSequenceBuilder( contextSupplier );
 	}
 
 	private ElasticsearchWorkBulker createBulker(ElasticsearchWorkSequenceBuilder sequenceBuilder) {
@@ -192,10 +191,8 @@ public class ElasticsearchWorkOrchestratorProvider {
 				);
 	}
 
-	private ElasticsearchRefreshableWorkExecutionContext createRefreshingWorkExecutionContext() {
-		return new ElasticsearchDefaultWorkExecutionContext(
-				link.getClient(), link.getGsonProvider(), link.getWorkBuilderFactory(), failureHandler
-		);
+	private ElasticsearchWorkExecutionContext createWorkExecutionContext() {
+		return new ElasticsearchWorkExecutionContextImpl( link.getClient(), link.getGsonProvider() );
 	}
 
 }

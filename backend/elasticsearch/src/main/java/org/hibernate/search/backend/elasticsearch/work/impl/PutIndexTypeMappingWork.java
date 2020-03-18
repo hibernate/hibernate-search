@@ -18,7 +18,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 
-public class PutIndexTypeMappingWork extends AbstractSimpleElasticsearchWork<Void> {
+public class PutIndexTypeMappingWork extends AbstractNonBulkableElasticsearchWork<Void> {
 
 	protected PutIndexTypeMappingWork(Builder builder) {
 		super( builder );
@@ -62,7 +62,7 @@ public class PutIndexTypeMappingWork extends AbstractSimpleElasticsearchWork<Voi
 				GsonProvider gsonProvider,
 				URLEncodedString indexName, URLEncodedString typeName, Boolean includeTypeName,
 				RootTypeMapping typeMapping) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexName = indexName;
 			this.typeName = typeName;
 			this.includeTypeName = includeTypeName;

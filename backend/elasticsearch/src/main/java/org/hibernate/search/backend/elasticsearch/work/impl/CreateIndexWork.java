@@ -23,7 +23,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 
-public class CreateIndexWork extends AbstractSimpleElasticsearchWork<CreateIndexResult> {
+public class CreateIndexWork extends AbstractNonBulkableElasticsearchWork<CreateIndexResult> {
 
 	private static final String MAPPINGS_PROPERTY = "mappings";
 
@@ -69,7 +69,7 @@ public class CreateIndexWork extends AbstractSimpleElasticsearchWork<CreateIndex
 
 		private Builder(GsonProvider gsonProvider, URLEncodedString indexName, URLEncodedString typeName,
 				Boolean includeTypeName) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.gsonProvider = gsonProvider;
 			this.indexName = indexName;
 			this.typeName = typeName;
