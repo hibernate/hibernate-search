@@ -6,9 +6,9 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
-import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 
 
-public interface ScrollWorkBuilder<R> extends ElasticsearchWorkBuilder<NonBulkableElasticsearchWork<R>> {
+public interface ScrollWorkBuilder<R> extends ElasticsearchWorkBuilder<NonBulkableWork<R>> {
 
 }

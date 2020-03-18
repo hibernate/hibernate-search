@@ -11,11 +11,11 @@ import java.util.Map;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
-import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.CreateIndexResult;
 
 
-public interface CreateIndexWorkBuilder extends ElasticsearchWorkBuilder<NonBulkableElasticsearchWork<CreateIndexResult>> {
+public interface CreateIndexWorkBuilder extends ElasticsearchWorkBuilder<NonBulkableWork<CreateIndexResult>> {
 
 	CreateIndexWorkBuilder ignoreExisting();
 

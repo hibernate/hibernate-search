@@ -21,7 +21,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 
-public class PutIndexAliasesWork extends AbstractNonBulkableElasticsearchWork<Void> {
+public class PutIndexAliasesWork extends AbstractNonBulkableWork<Void> {
 
 	protected PutIndexAliasesWork(Builder builder) {
 		super( builder );

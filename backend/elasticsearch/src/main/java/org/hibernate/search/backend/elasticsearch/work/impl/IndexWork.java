@@ -12,8 +12,8 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexWorkBui
 import com.google.gson.JsonObject;
 
 
-public class IndexWork extends AbstractSingleDocumentElasticsearchWork<Void>
-		implements SingleDocumentElasticsearchWork<Void> {
+public class IndexWork extends AbstractSingleDocumentWork<Void>
+		implements SingleDocumentWork<Void> {
 
 	private IndexWork(Builder builder) {
 		super( builder );
@@ -25,7 +25,7 @@ public class IndexWork extends AbstractSingleDocumentElasticsearchWork<Void>
 	}
 
 	public static class Builder
-			extends AbstractSingleDocumentElasticsearchWork.AbstractBuilder<Builder>
+			extends AbstractSingleDocumentWork.AbstractBuilder<Builder>
 			implements IndexWorkBuilder {
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;

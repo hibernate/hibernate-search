@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
 
 /**
  * Aggregates bulkable works into bulks and adds all resulting works
@@ -23,7 +23,7 @@ public interface ElasticsearchWorkBulker {
 	 * @param work A work to add to the current bulk
 	 * @return A future that will ultimately contain the result of executing the work, or an exception.
 	 */
-	<T> CompletableFuture<T> add(BulkableElasticsearchWork<T> work);
+	<T> CompletableFuture<T> add(BulkableWork<T> work);
 
 	/**
 	 * Ensure that all bulked works that haven't been added to a sequence yet
@@ -44,7 +44,7 @@ public interface ElasticsearchWorkBulker {
 	 * This method expects that all works have been added to the sequence builder
 	 * using {@link #addWorksToSequence()} beforehand.
 	 * <p>
-	 * After this method is called, any new work added through {@link #add(BulkableElasticsearchWork)}
+	 * After this method is called, any new work added through {@link #add(BulkableWork)}
 	 * will be added to a new bulk.
 	 */
 	void finalizeBulkWork();

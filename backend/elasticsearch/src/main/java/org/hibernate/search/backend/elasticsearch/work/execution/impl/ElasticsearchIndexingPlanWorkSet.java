@@ -12,17 +12,17 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkProcessor;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkSet;
-import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentWork;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 import org.hibernate.search.util.common.impl.Futures;
 
 class ElasticsearchIndexingPlanWorkSet<R> implements ElasticsearchWorkSet {
-	private final List<SingleDocumentElasticsearchWork<?>> works;
+	private final List<SingleDocumentWork<?>> works;
 	private final EntityReferenceFactory<R> entityReferenceFactory;
 	private final CompletableFuture<IndexIndexingPlanExecutionReport<R>> indexingPlanFuture;
 
-	ElasticsearchIndexingPlanWorkSet(List<SingleDocumentElasticsearchWork<?>> works,
+	ElasticsearchIndexingPlanWorkSet(List<SingleDocumentWork<?>> works,
 			EntityReferenceFactory<R> entityReferenceFactory,
 			CompletableFuture<IndexIndexingPlanExecutionReport<R>> indexingPlanFuture) {
 		this.works = new ArrayList<>( works );
@@ -50,7 +50,7 @@ class ElasticsearchIndexingPlanWorkSet<R> implements ElasticsearchWorkSet {
 			CompletableFuture<?> future = finishedWorkFutures[i];
 			if ( future.isCompletedExceptionally() ) {
 				reportBuilder.throwable( Futures.getThrowableNow( future ) );
-				SingleDocumentElasticsearchWork<?> work = works.get( i );
+				SingleDocumentWork<?> work = works.get( i );
 				try {
 					reportBuilder.failingEntityReference(
 							entityReferenceFactory,

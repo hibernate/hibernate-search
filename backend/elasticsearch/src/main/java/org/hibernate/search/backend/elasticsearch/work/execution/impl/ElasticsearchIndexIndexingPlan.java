@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentWork;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -34,7 +34,7 @@ public class ElasticsearchIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	private final EntityReferenceFactory<R> entityReferenceFactory;
 	private final DocumentRefreshStrategy refreshStrategy;
 
-	private final List<SingleDocumentElasticsearchWork<?>> works = new ArrayList<>();
+	private final List<SingleDocumentWork<?>> works = new ArrayList<>();
 
 	public ElasticsearchIndexIndexingPlan(ElasticsearchWorkBuilderFactory builderFactory,
 			ElasticsearchWorkOrchestrator orchestrator,
@@ -122,7 +122,7 @@ public class ElasticsearchIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 		);
 	}
 
-	private void collect(SingleDocumentElasticsearchWork<?> work) {
+	private void collect(SingleDocumentWork<?> work) {
 		works.add( work );
 	}
 

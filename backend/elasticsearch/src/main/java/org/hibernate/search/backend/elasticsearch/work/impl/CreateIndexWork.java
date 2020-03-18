@@ -23,7 +23,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 
-public class CreateIndexWork extends AbstractNonBulkableElasticsearchWork<CreateIndexResult> {
+public class CreateIndexWork extends AbstractNonBulkableWork<CreateIndexResult> {
 
 	private static final String MAPPINGS_PROPERTY = "mappings";
 

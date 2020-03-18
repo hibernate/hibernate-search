@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.ScrollWorkBu
 import com.google.gson.JsonObject;
 
 
-public class ScrollWork<R> extends AbstractNonBulkableElasticsearchWork<R> {
+public class ScrollWork<R> extends AbstractNonBulkableWork<R> {
 
 	private final ElasticsearchSearchResultExtractor<R> resultExtractor;
 

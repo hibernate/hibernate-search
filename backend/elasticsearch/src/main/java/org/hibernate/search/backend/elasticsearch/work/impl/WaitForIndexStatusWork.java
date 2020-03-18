@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.WaitForIndexStatusWorkBuilder;
 
 
-public class WaitForIndexStatusWork extends AbstractNonBulkableElasticsearchWork<Void> {
+public class WaitForIndexStatusWork extends AbstractNonBulkableWork<Void> {
 
 	protected WaitForIndexStatusWork(Builder builder) {
 		super( builder );

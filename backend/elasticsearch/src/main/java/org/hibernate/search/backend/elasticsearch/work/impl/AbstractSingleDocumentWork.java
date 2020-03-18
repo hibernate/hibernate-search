@@ -16,8 +16,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.JsonObject;
 
 
-public abstract class AbstractSingleDocumentElasticsearchWork<R>
-		implements BulkableElasticsearchWork<R>, SingleDocumentElasticsearchWork<R> {
+public abstract class AbstractSingleDocumentWork<R>
+		implements BulkableWork<R>, SingleDocumentWork<R> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -30,7 +30,7 @@ public abstract class AbstractSingleDocumentElasticsearchWork<R>
 
 	private final DocumentRefreshStrategy refreshStrategy;
 
-	protected AbstractSingleDocumentElasticsearchWork(AbstractBuilder<?> builder) {
+	protected AbstractSingleDocumentWork(AbstractBuilder<?> builder) {
 		this.bulkableActionMetadata = builder.buildBulkableActionMetadata();
 		this.bulkableActionBody = builder.buildBulkableActionBody();
 		this.resultAssessor = builder.resultAssessor;

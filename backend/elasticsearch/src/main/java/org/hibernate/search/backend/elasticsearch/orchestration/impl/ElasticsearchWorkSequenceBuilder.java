@@ -9,8 +9,8 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
-import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 
 /**
  * Organizes the execution of works in a sequence,
@@ -50,7 +50,7 @@ interface ElasticsearchWorkSequenceBuilder {
 	 * @param work The work to be executed
 	 * @return A future that will ultimately contain the result of executing the work, or an exception.
 	 */
-	<T> CompletableFuture<T> addNonBulkExecution(NonBulkableElasticsearchWork<T> work);
+	<T> CompletableFuture<T> addNonBulkExecution(NonBulkableWork<T> work);
 
 	/**
 	 * Add a step to execute a bulk work.
@@ -61,7 +61,7 @@ interface ElasticsearchWorkSequenceBuilder {
 	 * @param workFuture The work to be executed
 	 * @return A future for the result the bulk execution
 	 */
-	CompletableFuture<BulkResult> addBulkExecution(CompletableFuture<? extends NonBulkableElasticsearchWork<BulkResult>> workFuture);
+	CompletableFuture<BulkResult> addBulkExecution(CompletableFuture<? extends NonBulkableWork<BulkResult>> workFuture);
 
 	/**
 	 * Add a step to extract the result of bulked works from the result of their bulk work.
@@ -96,7 +96,7 @@ interface ElasticsearchWorkSequenceBuilder {
 		 * @param index The index of the bulked work in the bulk.
 		 * @return A future that will ultimately contain the result of extracting the work result, or an exception.
 		 */
-		<T> CompletableFuture<T> add(BulkableElasticsearchWork<T> bulkedWork, int index);
+		<T> CompletableFuture<T> add(BulkableWork<T> bulkedWork, int index);
 
 	}
 
