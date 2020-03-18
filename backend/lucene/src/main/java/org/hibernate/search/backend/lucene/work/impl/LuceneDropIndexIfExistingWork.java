@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.work.impl;
 
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 
-public class LuceneDropIndexIfExistingWork implements LuceneSchemaManagementWork<Void> {
+public class LuceneDropIndexIfExistingWork implements LuceneIndexManagementWork<Void> {
 
 	@Override
 	public String toString() {

@@ -11,6 +11,7 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
+import org.hibernate.search.backend.lucene.work.impl.LuceneIndexManagementWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
@@ -34,10 +35,7 @@ public class LuceneIndexWorkspace implements IndexWorkspace {
 
 	@Override
 	public CompletableFuture<?> mergeSegments() {
-		return doSubmit(
-				indexManagerContext.getAllWriteOrchestrators(), factory.mergeSegments(),
-				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE
-		);
+		return doSubmit( indexManagerContext.getAllWriteOrchestrators(), factory.mergeSegments() );
 	}
 
 	@Override
@@ -51,18 +49,12 @@ public class LuceneIndexWorkspace implements IndexWorkspace {
 
 	@Override
 	public CompletableFuture<?> flush() {
-		return doSubmit(
-				indexManagerContext.getAllWriteOrchestrators(), factory.noOp(),
-				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE
-		);
+		return doSubmit( indexManagerContext.getAllWriteOrchestrators(), factory.flush() );
 	}
 
 	@Override
 	public CompletableFuture<?> refresh() {
-		return doSubmit(
-				indexManagerContext.getAllWriteOrchestrators(), factory.noOp(),
-				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.FORCE
-		);
+		return doSubmit( indexManagerContext.getAllWriteOrchestrators(), factory.refresh() );
 	}
 
 	private CompletableFuture<?> doSubmit(Collection<LuceneWriteWorkOrchestrator> orchestrators,
@@ -76,6 +68,17 @@ public class LuceneIndexWorkspace implements IndexWorkspace {
 					commitStrategy,
 					refreshStrategy
 			);
+			++i;
+		}
+		return CompletableFuture.allOf( futures );
+	}
+
+	private CompletableFuture<?> doSubmit(Collection<LuceneWriteWorkOrchestrator> orchestrators,
+			LuceneIndexManagementWork<?> work) {
+		CompletableFuture<?>[] futures = new CompletableFuture[orchestrators.size()];
+		int i = 0;
+		for ( LuceneWriteWorkOrchestrator orchestrator : orchestrators ) {
+			futures[i] = orchestrator.submit( work );
 			++i;
 		}
 		return CompletableFuture.allOf( futures );

@@ -10,7 +10,7 @@ import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
-import org.hibernate.search.backend.lucene.work.impl.LuceneSchemaManagementWork;
+import org.hibernate.search.backend.lucene.work.impl.LuceneIndexManagementWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
@@ -60,7 +60,7 @@ public class LuceneIndexSchemaManager implements IndexSchemaManager {
 		return doSubmit( luceneWorkFactory.validateIndexExists() );
 	}
 
-	private CompletableFuture<?> doSubmit(LuceneSchemaManagementWork<?> work) {
+	private CompletableFuture<?> doSubmit(LuceneIndexManagementWork<?> work) {
 		Collection<LuceneWriteWorkOrchestrator> orchestrators = indexManagerContext.getAllWriteOrchestrators();
 		CompletableFuture<?>[] futures = new CompletableFuture[orchestrators.size()];
 		int i = 0;

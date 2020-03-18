@@ -163,6 +163,16 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 	}
 
 	@Override
+	public void mergeSegments() {
+		try {
+			indexWriterProvider.getOrCreate().mergeSegments();
+		}
+		catch (IOException e) {
+			throw log.unableToMergeSegments( eventContext, e );
+		}
+	}
+
+	@Override
 	public IndexWriterDelegator getIndexWriterDelegator() throws IOException {
 		return indexWriterProvider.getOrCreate();
 	}

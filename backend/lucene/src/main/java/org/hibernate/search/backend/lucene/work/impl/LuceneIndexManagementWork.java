@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.work.impl;
 
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 
-public interface LuceneSchemaManagementWork<T> {
+public interface LuceneIndexManagementWork<T> {
 
 	T execute(IndexAccessor indexAccessor);
 

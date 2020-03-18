@@ -55,7 +55,6 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 		return delegate.deleteDocuments( query );
 	}
 
-	@Override
 	public void mergeSegments() throws IOException {
 		delegate.forceMerge( 1 );
 	}

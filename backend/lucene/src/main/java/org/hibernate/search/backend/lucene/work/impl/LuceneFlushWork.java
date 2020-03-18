@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.work.impl;
 
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 
-public class LuceneValidateIndexExistsWork implements LuceneIndexManagementWork<Void> {
+public class LuceneFlushWork implements LuceneIndexManagementWork<Void> {
 
 	@Override
 	public String toString() {
@@ -17,7 +17,7 @@ public class LuceneValidateIndexExistsWork implements LuceneIndexManagementWork<
 
 	@Override
 	public Void execute(IndexAccessor indexAccessor) {
-		indexAccessor.validateIndexExists();
+		indexAccessor.commit();
 		return null;
 	}
 

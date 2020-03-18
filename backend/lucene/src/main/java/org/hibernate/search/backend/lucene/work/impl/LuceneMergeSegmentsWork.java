@@ -6,40 +6,23 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
-import java.io.IOException;
-import java.lang.invoke.MethodHandles;
-
-import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 
 
-public class LuceneMergeSegmentsWork extends AbstractLuceneWriteWork<Void> {
-
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	LuceneMergeSegmentsWork() {
-		super( "mergeSegmentsIndexSegments" );
-	}
-
-	@Override
-	public Void execute(LuceneWriteWorkExecutionContext context) {
-		try {
-			IndexWriterDelegator indexWriterDelegator = context.getIndexWriterDelegator();
-			indexWriterDelegator.mergeSegments();
-			return null;
-		}
-		catch (IOException e) {
-			throw log.unableToMergeSegments( context.getEventContext(), e );
-		}
-	}
-
+public class LuceneMergeSegmentsWork implements LuceneIndexManagementWork<Void> {
 	@Override
 	public String toString() {
-		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "type=" ).append( workType )
-				.append( "]" );
-		return sb.toString();
+		return getClass().getSimpleName();
+	}
+
+	@Override
+	public Void execute(IndexAccessor indexAccessor) {
+		indexAccessor.mergeSegments();
+		return null;
+	}
+
+	@Override
+	public Object getInfo() {
+		return this;
 	}
 }
