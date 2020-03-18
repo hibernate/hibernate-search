@@ -30,6 +30,10 @@ import org.apache.lucene.util.BitSet;
  * An implementation of {@link DoubleValuesSource} for docvalues with multiple values per document,
  * where multiple values are "aggregated" into a single value
  * according to a given {@link MultiValueMode}.
+ * <p>
+ * Some of this code was copied and adapted from
+ * {@code org.elasticsearch.search.MultiValueMode}
+ * from the <a href="https://github.com/elastic/elasticsearch">Elasticsearch project</a>.
  */
 public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValuesSource {
 
