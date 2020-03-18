@@ -405,7 +405,6 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 	private void expectWorkGetInfo(int ... ids) {
 		for ( int id : ids ) {
 			SingleDocumentElasticsearchWork<?> workMock = workMocks.get( id );
-			EasyMock.expect( workMock.getInfo() ).andStubReturn( workInfo( id ) );
 			EasyMock.expect( workMock.getEntityTypeName() ).andStubReturn( TYPE_NAME );
 			EasyMock.expect( workMock.getEntityIdentifier() ).andStubReturn( id );
 			EasyMock.expect( entityReferenceFactoryMock.createEntityReference( TYPE_NAME, id ) )
@@ -415,7 +414,6 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 
 	private void expectFailingWorkGetInfo(int id, Throwable thrown) {
 		SingleDocumentElasticsearchWork<?> workMock = workMocks.get( id );
-		EasyMock.expect( workMock.getInfo() ).andStubReturn( workInfo( id ) );
 		EasyMock.expect( workMock.getEntityTypeName() ).andStubReturn( TYPE_NAME );
 		EasyMock.expect( workMock.getEntityIdentifier() ).andStubReturn( id );
 		EasyMock.expect( entityReferenceFactoryMock.createEntityReference( TYPE_NAME, id ) )

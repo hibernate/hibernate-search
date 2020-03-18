@@ -8,14 +8,11 @@ package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient;
 import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 
 
 public interface ElasticsearchWorkExecutionContext {
 
 	ElasticsearchClient getClient();
-
-	void registerIndexToRefresh(URLEncodedString indexName);
 
 	GsonProvider getGsonProvider();
 

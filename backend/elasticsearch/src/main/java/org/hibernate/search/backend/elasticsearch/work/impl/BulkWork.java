@@ -12,18 +12,16 @@ import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.BulkWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResultItemExtractor;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
-import org.hibernate.search.util.common.AssertionFailure;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 
-public class BulkWork extends AbstractSimpleElasticsearchWork<BulkResult> {
+public class BulkWork extends AbstractNonBulkableElasticsearchWork<BulkResult> {
 
 	private static final JsonAccessor<JsonArray> BULK_ITEMS = JsonAccessor.root().property( "items" ).asArray();
 
@@ -35,28 +33,24 @@ public class BulkWork extends AbstractSimpleElasticsearchWork<BulkResult> {
 	protected BulkResult generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
 		JsonObject parsedResponseBody = response.getBody();
 		JsonArray resultItems = BULK_ITEMS.get( parsedResponseBody ).orElseGet( JsonArray::new );
-		return new BulkResultImpl( resultItems, refreshStrategy );
+		return new BulkResultImpl( resultItems );
 	}
 
-	private static class NoIndexDirtyBulkExecutionContext extends ElasticsearchForwardingWorkExecutionContext {
-
-		public NoIndexDirtyBulkExecutionContext(ElasticsearchWorkExecutionContext delegate) {
-			super( delegate );
-		}
-
-		@Override
-		public void registerIndexToRefresh(URLEncodedString indexName) {
-			// Don't delegate
-		}
-	}
-
-	public static class Builder extends AbstractSimpleElasticsearchWork.AbstractBuilder<Builder>
+	public static class Builder extends AbstractNonBulkableElasticsearchWork.AbstractBuilder<Builder>
 			implements BulkWorkBuilder {
 		private final List<? extends BulkableElasticsearchWork<?>> bulkableWorks;
 
+		private DocumentRefreshStrategy refreshStrategy = DocumentRefreshStrategy.NONE;
+
 		public Builder(List<? extends BulkableElasticsearchWork<?>> bulkableWorks) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.bulkableWorks = bulkableWorks;
+		}
+
+		@Override
+		public Builder refresh(DocumentRefreshStrategy refreshStrategy) {
+			this.refreshStrategy = refreshStrategy;
+			return this;
 		}
 
 		@Override
@@ -91,32 +85,14 @@ public class BulkWork extends AbstractSimpleElasticsearchWork<BulkResult> {
 
 	private static class BulkResultImpl implements BulkResult {
 		private final JsonArray results;
-		private final DocumentRefreshStrategy refreshStrategy;
 
-		public BulkResultImpl(JsonArray results, DocumentRefreshStrategy refreshStrategy) {
-			super();
+		public BulkResultImpl(JsonArray results) {
 			this.results = results;
-			this.refreshStrategy = refreshStrategy;
 		}
 
 		@Override
 		public BulkResultItemExtractor withContext(ElasticsearchWorkExecutionContext context) {
-			ElasticsearchWorkExecutionContext actualContext;
-			switch ( refreshStrategy ) {
-				case FORCE:
-					/*
-					 * Prevent bulked works to mark indexes as dirty,
-					 * since we refresh all indexes as part of the Bulk API call.
-					 */
-					actualContext = new NoIndexDirtyBulkExecutionContext( context );
-					break;
-				case NONE:
-					actualContext = context;
-					break;
-				default:
-					throw new AssertionFailure( "Unexpected refresh strategy: " + refreshStrategy );
-			}
-			return new BulkResultItemExtractorImpl( results, actualContext );
+			return new BulkResultItemExtractorImpl( results, context );
 		}
 	}
 

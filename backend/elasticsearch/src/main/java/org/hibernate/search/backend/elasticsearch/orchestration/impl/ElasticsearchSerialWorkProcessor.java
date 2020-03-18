@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkAggregator;
 
@@ -94,7 +95,7 @@ class ElasticsearchSerialWorkProcessor implements ElasticsearchWorkProcessor {
 		}
 
 		@Override
-		public <T> CompletableFuture<T> addNonBulkable(ElasticsearchWork<T> work) {
+		public <T> CompletableFuture<T> addNonBulkable(NonBulkableElasticsearchWork<T> work) {
 			if ( bulker.addWorksToSequence() ) {
 				/*
 				 * We want to execute works in the exact order they were received,

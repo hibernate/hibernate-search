@@ -13,7 +13,7 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.OpenIndexWorkBuilder;
 
 
-public class OpenIndexWork extends AbstractSimpleElasticsearchWork<Void> {
+public class OpenIndexWork extends AbstractNonBulkableElasticsearchWork<Void> {
 
 	protected OpenIndexWork(Builder builder) {
 		super( builder );
@@ -30,7 +30,7 @@ public class OpenIndexWork extends AbstractSimpleElasticsearchWork<Void> {
 		private final URLEncodedString indexName;
 
 		public Builder(URLEncodedString indexName) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexName = indexName;
 		}
 

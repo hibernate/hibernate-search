@@ -6,9 +6,6 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
-import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexWorkBuilder;
 
@@ -20,11 +17,6 @@ public class IndexWork extends AbstractSingleDocumentElasticsearchWork<Void>
 
 	private IndexWork(Builder builder) {
 		super( builder );
-	}
-
-	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
-		return null;
 	}
 
 	@Override
@@ -57,29 +49,12 @@ public class IndexWork extends AbstractSingleDocumentElasticsearchWork<Void>
 
 		private Builder(String entityTypeName, Object entityIdentifier, URLEncodedString elasticsearchIndexName,
 					URLEncodedString typeName, URLEncodedString id, String routingKey, JsonObject document) {
-			super( elasticsearchIndexName, DefaultElasticsearchRequestSuccessAssessor.INSTANCE,
-					entityTypeName, entityIdentifier );
+			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE, entityTypeName, entityIdentifier );
 			this.indexName = elasticsearchIndexName;
 			this.typeName = typeName;
 			this.id = id;
 			this.routingKey = routingKey;
 			this.document = document;
-		}
-
-		@Override
-		protected ElasticsearchRequest buildRequest() {
-			ElasticsearchRequest.Builder builder =
-					ElasticsearchRequest.put()
-					.pathComponent( indexName )
-					.pathComponent( typeName != null ? typeName : Paths._DOC ) // _doc for ES7+
-					.pathComponent( id )
-					.body( document );
-
-			if ( routingKey != null ) {
-				builder.param( "routing", routingKey );
-			}
-
-			return builder.build();
 		}
 
 		@Override
@@ -100,6 +75,11 @@ public class IndexWork extends AbstractSingleDocumentElasticsearchWork<Void>
 			result.add( "index", index );
 
 			return result;
+		}
+
+		@Override
+		protected JsonObject buildBulkableActionBody() {
+			return document;
 		}
 
 		@Override

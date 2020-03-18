@@ -21,7 +21,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.CountWorkBui
 
 import com.google.gson.JsonObject;
 
-public class CountWork extends AbstractSimpleElasticsearchWork<Long> {
+public class CountWork extends AbstractNonBulkableElasticsearchWork<Long> {
 
 	private static final JsonAccessor<Long> COUNT_ACCESSOR = JsonAccessor.root().property( "count" ).asLong();
 
@@ -45,7 +45,7 @@ public class CountWork extends AbstractSimpleElasticsearchWork<Long> {
 		private boolean exceptionOnTimeout;
 
 		public Builder(Collection<URLEncodedString> indexNames) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexNames.addAll( indexNames );
 		}
 

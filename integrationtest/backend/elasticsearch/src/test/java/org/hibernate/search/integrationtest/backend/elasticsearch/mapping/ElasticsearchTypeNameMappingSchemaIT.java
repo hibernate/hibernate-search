@@ -122,7 +122,7 @@ public class ElasticsearchTypeNameMappingSchemaIT {
 
 		payload.add( "aliases", defaultAliasDefinitions( INDEX_NAME ) );
 
-		JsonObject mappings = ElasticsearchTestDialect.get().getTypeNameForMappingApi()
+		JsonObject mappings = ElasticsearchTestDialect.get().getTypeNameForMappingAndBulkApi()
 				// ES6 and below: the mapping has its own object node, child of "mappings"
 				.map( name -> {
 					JsonObject doc = new JsonObject();

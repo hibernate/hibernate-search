@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableElasticsearchWork;
 
 /**
  * Organizes the execution of works in a sequence,
@@ -50,7 +50,7 @@ interface ElasticsearchWorkSequenceBuilder {
 	 * @param work The work to be executed
 	 * @return A future that will ultimately contain the result of executing the work, or an exception.
 	 */
-	<T> CompletableFuture<T> addNonBulkExecution(ElasticsearchWork<T> work);
+	<T> CompletableFuture<T> addNonBulkExecution(NonBulkableElasticsearchWork<T> work);
 
 	/**
 	 * Add a step to execute a bulk work.
@@ -61,7 +61,7 @@ interface ElasticsearchWorkSequenceBuilder {
 	 * @param workFuture The work to be executed
 	 * @return A future for the result the bulk execution
 	 */
-	CompletableFuture<BulkResult> addBulkExecution(CompletableFuture<? extends ElasticsearchWork<BulkResult>> workFuture);
+	CompletableFuture<BulkResult> addBulkExecution(CompletableFuture<? extends NonBulkableElasticsearchWork<BulkResult>> workFuture);
 
 	/**
 	 * Add a step to extract the result of bulked works from the result of their bulk work.

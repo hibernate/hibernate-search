@@ -30,7 +30,7 @@ public class Elasticsearch60TestDialect implements ElasticsearchTestDialect {
 	}
 
 	@Override
-	public Optional<URLEncodedString> getTypeNameForMappingApi() {
+	public Optional<URLEncodedString> getTypeNameForMappingAndBulkApi() {
 		return Optional.of( Paths.DOC );
 	}
 

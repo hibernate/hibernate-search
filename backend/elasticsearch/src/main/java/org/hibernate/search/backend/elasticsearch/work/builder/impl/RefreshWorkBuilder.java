@@ -7,10 +7,10 @@
 package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableElasticsearchWork;
 
 
-public interface RefreshWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<Void>> {
+public interface RefreshWorkBuilder extends ElasticsearchWorkBuilder<NonBulkableElasticsearchWork<Void>> {
 
 	RefreshWorkBuilder index(URLEncodedString indexName);
 

@@ -506,7 +506,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 	private void putMapping(URLEncodedString indexName, JsonObject mappingJsonObject) {
 		ElasticsearchRequest.Builder builder = ElasticsearchRequest.put()
 				.pathComponent( indexName ).pathComponent( Paths._MAPPING );
-		dialect.getTypeNameForMappingApi().ifPresent( builder::pathComponent );
+		dialect.getTypeNameForMappingAndBulkApi().ifPresent( builder::pathComponent );
 		builder.body( mappingJsonObject );
 
 		Boolean includeTypeName = dialect.getIncludeTypeNameParameterForMappingApi();
@@ -521,7 +521,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 
 		ElasticsearchRequest.Builder builder = ElasticsearchRequest.get()
 				.pathComponent( indexName ).pathComponent( Paths._MAPPING );
-		dialect.getTypeNameForMappingApi().ifPresent( builder::pathComponent );
+		dialect.getTypeNameForMappingAndBulkApi().ifPresent( builder::pathComponent );
 
 		Boolean includeTypeName = dialect.getIncludeTypeNameParameterForMappingApi();
 		if ( includeTypeName != null ) {
@@ -543,7 +543,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		if ( mappings == null ) {
 			return new JsonObject().toString();
 		}
-		Optional<URLEncodedString> typeName = dialect.getTypeNameForMappingApi();
+		Optional<URLEncodedString> typeName = dialect.getTypeNameForMappingAndBulkApi();
 		if ( typeName.isPresent() ) {
 			JsonElement mapping = mappings.getAsJsonObject().get( typeName.get().original );
 			if ( mapping == null ) {

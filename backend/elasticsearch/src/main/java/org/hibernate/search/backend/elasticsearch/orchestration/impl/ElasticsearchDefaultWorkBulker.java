@@ -12,9 +12,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkSequenceBuilder.BulkResultExtractionStep;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
@@ -22,14 +22,14 @@ import org.hibernate.search.util.common.impl.Futures;
 class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 
 	private final ElasticsearchWorkSequenceBuilder sequenceBuilder;
-	private final BiFunction<List<? extends BulkableElasticsearchWork<?>>, DocumentRefreshStrategy, ElasticsearchWork<BulkResult>> bulkWorkFactory;
+	private final BiFunction<List<? extends BulkableElasticsearchWork<?>>, DocumentRefreshStrategy, NonBulkableElasticsearchWork<BulkResult>> bulkWorkFactory;
 	private final int maxBulkSize;
 
 	private final List<BulkableElasticsearchWork<?>> currentBulkItems;
 	private final List<CompletableFuture<?>> currentBulkItemsFutures;
 	private int currentBulkFirstNonAddedItem;
 	private DocumentRefreshStrategy currentBulkRefreshStrategy;
-	private CompletableFuture<ElasticsearchWork<BulkResult>> currentBulkWorkFuture;
+	private CompletableFuture<NonBulkableElasticsearchWork<BulkResult>> currentBulkWorkFuture;
 	private CompletableFuture<BulkResult> currentBulkResultFuture;
 
 	/**
@@ -42,7 +42,7 @@ class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 	 * to the underlying sequence builder.
 	 */
 	public ElasticsearchDefaultWorkBulker(ElasticsearchWorkSequenceBuilder sequenceBuilder,
-			BiFunction<List<? extends BulkableElasticsearchWork<?>>, DocumentRefreshStrategy, ElasticsearchWork<BulkResult>> bulkWorkFactory,
+			BiFunction<List<? extends BulkableElasticsearchWork<?>>, DocumentRefreshStrategy, NonBulkableElasticsearchWork<BulkResult>> bulkWorkFactory,
 			int maxBulkSize) {
 		this.sequenceBuilder = sequenceBuilder;
 		this.bulkWorkFactory = bulkWorkFactory;
@@ -112,7 +112,7 @@ class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 			return;
 		}
 
-		ElasticsearchWork<BulkResult> bulkWork = bulkWorkFactory.apply( currentBulkItems, currentBulkRefreshStrategy );
+		NonBulkableElasticsearchWork<BulkResult> bulkWork = bulkWorkFactory.apply( currentBulkItems, currentBulkRefreshStrategy );
 		currentBulkWorkFuture.complete( bulkWork );
 		reset();
 	}

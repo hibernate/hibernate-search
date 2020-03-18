@@ -10,9 +10,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkAggregator;
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableElasticsearchWork;
 
 
 /**
@@ -105,7 +106,7 @@ class ElasticsearchParallelWorkProcessor implements ElasticsearchWorkProcessor {
 		}
 
 		@Override
-		public <T> CompletableFuture<T> addNonBulkable(ElasticsearchWork<T> work) {
+		public <T> CompletableFuture<T> addNonBulkable(NonBulkableElasticsearchWork<T> work) {
 			if ( bulker.addWorksToSequence() ) {
 				/*
 				 * A non-bulkable work follows bulked works,

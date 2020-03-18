@@ -105,7 +105,7 @@ public class ElasticsearchIndexingIT {
 				ElasticsearchRequest.post()
 						.pathComponent( Paths._BULK )
 						.body( gson.fromJson( "{'index':{'_index': '" + writeAlias + "',"
-								+ dialect.getTypeNameForMappingApi().map( name -> "'_type': '" + name + "'," ).orElse( "" )
+								+ dialect.getTypeNameForMappingAndBulkApi().map( name -> "'_type': '" + name + "'," ).orElse( "" )
 								+ "'routing': '" + routingKey + "',"
 								+ "'_id': '1'}}", JsonObject.class ) )
 						.body( new JsonObject() ) // We don't care about the document
@@ -122,7 +122,7 @@ public class ElasticsearchIndexingIT {
 				ElasticsearchRequest.post()
 						.pathComponent( Paths._BULK )
 						.body( gson.fromJson( "{'index':{'_index': '" + writeAlias + "',"
-								+ dialect.getTypeNameForMappingApi().map( name -> "'_type': '" + name + "'," ).orElse( "" )
+								+ dialect.getTypeNameForMappingAndBulkApi().map( name -> "'_type': '" + name + "'," ).orElse( "" )
 								+ "'routing': '" + routingKey + "',"
 								+ "'_id': '1'}}", JsonObject.class ) )
 						.body( new JsonObject() ) // We don't care about the document
@@ -137,7 +137,7 @@ public class ElasticsearchIndexingIT {
 				ElasticsearchRequest.post()
 						.pathComponent( Paths._BULK )
 						.body( gson.fromJson( "{'delete':{'_index': '" + writeAlias + "',"
-								+ dialect.getTypeNameForMappingApi().map( name -> "'_type': '" + name + "'," ).orElse( "" )
+								+ dialect.getTypeNameForMappingAndBulkApi().map( name -> "'_type': '" + name + "'," ).orElse( "" )
 								+ "'routing': '" + routingKey + "',"
 								+ "'_id': '1'}}", JsonObject.class ) )
 						.build(),

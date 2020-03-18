@@ -40,7 +40,7 @@ public interface ElasticsearchTestDialect {
 
 	URLEncodedString getTypeKeywordForNonMappingApi();
 
-	Optional<URLEncodedString> getTypeNameForMappingApi();
+	Optional<URLEncodedString> getTypeNameForMappingAndBulkApi();
 
 	Boolean getIncludeTypeNameParameterForMappingApi();
 

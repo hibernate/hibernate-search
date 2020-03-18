@@ -9,10 +9,13 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
+import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResultItemExtractor;
@@ -22,21 +25,18 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
  * A simple implementation of {@link ElasticsearchWorkSequenceBuilder}.
- * <p>
- * Works will be executed inside a sequence-scoped context (a {@link ElasticsearchRefreshableWorkExecutionContext}),
- * ultimately leading to a {@link ElasticsearchRefreshableWorkExecutionContext#executePendingRefreshes()}.
  */
 class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequenceBuilder {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final Supplier<ElasticsearchRefreshableWorkExecutionContext> contextSupplier;
+	private final Supplier<ElasticsearchWorkExecutionContext> contextSupplier;
 	private final BulkResultExtractionStepImpl bulkResultExtractionStep = new BulkResultExtractionStepImpl();
 
 	private CompletableFuture<?> currentlyBuildingSequenceTail;
 	private SequenceContext currentlyBuildingSequenceContext;
 
-	ElasticsearchDefaultWorkSequenceBuilder(Supplier<ElasticsearchRefreshableWorkExecutionContext> contextSupplier) {
+	ElasticsearchDefaultWorkSequenceBuilder(Supplier<ElasticsearchWorkExecutionContext> contextSupplier) {
 		this.contextSupplier = contextSupplier;
 	}
 
@@ -59,7 +59,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 	 * @param work The work to be executed
 	 */
 	@Override
-	public <T> CompletableFuture<T> addNonBulkExecution(ElasticsearchWork<T> work) {
+	public <T> CompletableFuture<T> addNonBulkExecution(NonBulkableElasticsearchWork<T> work) {
 		// Use a local variable to make sure lambdas (if any) won't be affected by a reset()
 		final SequenceContext sequenceContext = this.currentlyBuildingSequenceContext;
 
@@ -91,7 +91,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 	 * @param workFuture The work to be executed
 	 */
 	@Override
-	public CompletableFuture<BulkResult> addBulkExecution(CompletableFuture<? extends ElasticsearchWork<BulkResult>> workFuture) {
+	public CompletableFuture<BulkResult> addBulkExecution(CompletableFuture<? extends NonBulkableElasticsearchWork<BulkResult>> workFuture) {
 		// Use a local variable to make sure lambdas (if any) won't be affected by a reset()
 		final SequenceContext currentSequenceContext = this.currentlyBuildingSequenceContext;
 
@@ -124,8 +124,9 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		// Use a local variable to make sure lambdas (if any) won't be affected by a reset()
 		final SequenceContext sequenceContext = currentlyBuildingSequenceContext;
 
-		return Futures.whenCompleteExecute( currentlyBuildingSequenceTail, sequenceContext::onSequenceComplete )
-				.exceptionally( Futures.handler( sequenceContext::onSequenceFailed ) );
+		return currentlyBuildingSequenceTail.handle( Futures.handler(
+				(BiFunction<Object, Throwable, Void>) sequenceContext::onSequenceFinished
+		) );
 	}
 
 	private final class BulkResultExtractionStepImpl implements BulkResultExtractionStep {
@@ -182,15 +183,13 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 	 * for an example of what can go wrong if we don't take care to avoid that.
 	 */
 	private static final class SequenceContext {
-		private final ElasticsearchRefreshableWorkExecutionContext executionContext;
-		private final CompletableFuture<Void> refreshFuture;
+		private final ElasticsearchWorkExecutionContext executionContext;
 
-		SequenceContext(ElasticsearchRefreshableWorkExecutionContext executionContext) {
+		SequenceContext(ElasticsearchWorkExecutionContext executionContext) {
 			this.executionContext = executionContext;
-			this.refreshFuture = new CompletableFuture<>();
 		}
 
-		<T> CompletionStage<T> execute(ElasticsearchWork<T> work) {
+		<T> CompletionStage<T> execute(NonBulkableElasticsearchWork<T> work) {
 			return work.execute( executionContext );
 		}
 
@@ -198,24 +197,19 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 			return bulkResult.withContext( executionContext );
 		}
 
-		CompletionStage<Void> onSequenceComplete() {
-			return executionContext.executePendingRefreshes()
-					.whenComplete( Futures.copyHandler( refreshFuture ) );
-		}
-
-		<T> T onSequenceFailed(Throwable throwable) {
-			if ( !(throwable instanceof PreviousWorkException) ) {
+		<T> T onSequenceFinished(Object ignored, Throwable throwable) {
+			if ( throwable != null && !(throwable instanceof PreviousWorkException) ) {
 				throw Throwables.toRuntimeException( throwable );
 			}
 			return null;
 		}
 	}
 
-	private abstract static class AbstractWorkExecutionState<T> {
+	private abstract static class AbstractWorkExecutionState<T, W extends ElasticsearchWork<T>> {
 
 		protected final SequenceContext sequenceContext;
 
-		protected final ElasticsearchWork<T> work;
+		protected final W work;
 
 		/*
 		 * Use a different future for the caller than the one used in the sequence,
@@ -224,22 +218,16 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		 */
 		final CompletableFuture<T> workFutureForCaller = new CompletableFuture<>();
 
-		private AbstractWorkExecutionState(SequenceContext sequenceContext, ElasticsearchWork<T> work) {
+		private AbstractWorkExecutionState(SequenceContext sequenceContext, W work) {
 			this.sequenceContext = sequenceContext;
 			this.work = work;
 		}
 
 		protected CompletableFuture<T> addPostExecutionHandlers(CompletableFuture<T> workExecutionFuture) {
 			/*
-			 * In case of success, wait for the refresh and propagate the result to the client.
-			 * We ABSOLUTELY DO NOT WANT the resulting future to be included in the sequence,
-			 * because it would create a deadlock:
-			 * future A will only complete when the refresh future (B) is executed,
-			 * which will only happen when the sequence ends,
-			 * which will only happen after A completes...
+			 * In case of success, propagate the result to the client.
 			 */
-			workExecutionFuture.thenCombine( sequenceContext.refreshFuture, (workResult, refreshResult) -> workResult )
-					.whenComplete( Futures.copyHandler( workFutureForCaller ) );
+			workExecutionFuture.whenComplete( Futures.copyHandler( workFutureForCaller ) );
 			/*
 			 * In case of error, propagate the exception immediately to both the failure handler and the client.
 			 *
@@ -266,9 +254,9 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		}
 	}
 
-	private static final class NonBulkedWorkExecutionState<R> extends AbstractWorkExecutionState<R> {
+	private static final class NonBulkedWorkExecutionState<R> extends AbstractWorkExecutionState<R, NonBulkableElasticsearchWork<R>> {
 
-		private NonBulkedWorkExecutionState(SequenceContext sequenceContext, ElasticsearchWork<R> work) {
+		private NonBulkedWorkExecutionState(SequenceContext sequenceContext, NonBulkableElasticsearchWork<R> work) {
 			super( sequenceContext, work );
 		}
 
@@ -284,7 +272,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		}
 	}
 
-	private static final class BulkedWorkExecutionState<R> extends AbstractWorkExecutionState<R> {
+	private static final class BulkedWorkExecutionState<R> extends AbstractWorkExecutionState<R, BulkableElasticsearchWork<R>> {
 
 		private final BulkableElasticsearchWork<R> bulkedWork;
 
