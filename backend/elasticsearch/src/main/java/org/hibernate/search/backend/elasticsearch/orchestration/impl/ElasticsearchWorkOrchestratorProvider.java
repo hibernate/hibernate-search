@@ -68,18 +68,6 @@ import org.hibernate.search.engine.reporting.FailureHandler;
  */
 public class ElasticsearchWorkOrchestratorProvider {
 
-	private static final int SERIAL_MIN_BULK_SIZE = 2;
-	/*
-	 * For parallel orchestrators, we use a minimum bulk size of 1,
-	 * and thus allow bulks with only one work.
-	 * The reason is, for parallel orchestrators, we generally only submit single-work worksets,
-	 * which means the decision on whether to bulk the work or not will always happen
-	 * immediately after each work, when we only have one work to bulk.
-	 * Thus if we set the minimum to a value higher than 1, we would always
-	 * decide not to start a bulk (because there would always be only one
-	 * work to bulk), which would result in terrible performance.
-	 */
-	private static final int PARALLEL_MIN_BULK_SIZE = 1;
 	private static final int MAX_BULK_SIZE = 250;
 
 	/*
@@ -179,13 +167,13 @@ public class ElasticsearchWorkOrchestratorProvider {
 
 	private ElasticsearchWorkProcessor createSerialWorkProcessor() {
 		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder( this::createRefreshingWorkExecutionContext );
-		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, SERIAL_MIN_BULK_SIZE );
+		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder );
 		return new ElasticsearchSerialWorkProcessor( sequenceBuilder, bulker );
 	}
 
 	private ElasticsearchWorkProcessor createParallelWorkProcessor() {
 		ElasticsearchWorkSequenceBuilder sequenceBuilder = createSequenceBuilder( this::createRefreshingWorkExecutionContext );
-		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder, PARALLEL_MIN_BULK_SIZE );
+		ElasticsearchWorkBulker bulker = createBulker( sequenceBuilder );
 		return new ElasticsearchParallelWorkProcessor( sequenceBuilder, bulker );
 	}
 
@@ -195,12 +183,12 @@ public class ElasticsearchWorkOrchestratorProvider {
 		);
 	}
 
-	private ElasticsearchWorkBulker createBulker(ElasticsearchWorkSequenceBuilder sequenceBuilder, int minBulkSize) {
+	private ElasticsearchWorkBulker createBulker(ElasticsearchWorkSequenceBuilder sequenceBuilder) {
 		return new ElasticsearchDefaultWorkBulker(
 				sequenceBuilder,
 				(worksToBulk, refreshStrategy) ->
 						link.getWorkBuilderFactory().bulk( worksToBulk ).refresh( refreshStrategy ).build(),
-				minBulkSize, MAX_BULK_SIZE
+				MAX_BULK_SIZE
 				);
 	}
 

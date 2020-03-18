@@ -32,8 +32,6 @@ import org.easymock.EasyMockSupport;
 
 public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 
-	private static final int DEFAULT_MIN_BULK_SIZE = 1;
-
 	private static final int DEFAULT_MAX_BULK_SIZE = 10;
 
 	private static final DocumentRefreshStrategy DEFAULT_REFRESH = DocumentRefreshStrategy.NONE;
@@ -65,8 +63,7 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 
 		replayAll();
 		ElasticsearchDefaultWorkBulker bulker =
-				new ElasticsearchDefaultWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock,
-						DEFAULT_MIN_BULK_SIZE, DEFAULT_MAX_BULK_SIZE );
+				new ElasticsearchDefaultWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock, DEFAULT_MAX_BULK_SIZE );
 		verifyAll();
 
 		resetAll();
@@ -115,51 +112,9 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		verifyAll();
 	}
 
-	@Test
-	public void noBulkIfBelowThreshold() {
-		BulkableElasticsearchWork<Void> work1 = bulkableWork( 1 );
-
-		CompletableFuture<Void> work1Future;
-		CompletableFuture<Void> work1FutureFromSequenceBuilder = new CompletableFuture<>();
-
-		replayAll();
-		ElasticsearchDefaultWorkBulker bulker =
-				new ElasticsearchDefaultWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock,
-						2 /* Mandate minimum 2 works per bulk */,
-						DEFAULT_MAX_BULK_SIZE );
-		verifyAll();
-
-		resetAll();
-		expect( work1.getRefreshStrategy() ).andReturn( DEFAULT_REFRESH );
-		replayAll();
-		work1Future = bulker.add( work1 );
-		verifyAll();
-		assertThat( work1Future ).isPending();
-
-		resetAll();
-		expect( sequenceBuilderMock.addNonBulkExecution( work1 ) ).andReturn( work1FutureFromSequenceBuilder );
-		replayAll();
-		bulker.addWorksToSequence();
-		verifyAll();
-		assertThat( work1Future ).isPending();
-
-		resetAll();
-		replayAll();
-		bulker.finalizeBulkWork();
-		verifyAll();
-		assertThat( work1Future ).isPending();
-
-		// Check that per-work futures are correctly bound to the futures returned by the sequence builder
-		resetAll();
-		replayAll();
-		work1FutureFromSequenceBuilder.complete( null );
-		assertThat( work1Future ).isSuccessful( (Void) null );
-		verifyAll();
-	}
-
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Test
-	public void alwaysBulkIfAboveThreshold() {
+	public void alwaysBulk() {
 		BulkableElasticsearchWork<Void> work1 = bulkableWork( 1 );
 		ElasticsearchWork<BulkResult> bulkWork = work( 2 );
 
@@ -169,9 +124,7 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 
 		replayAll();
 		ElasticsearchDefaultWorkBulker bulker =
-				new ElasticsearchDefaultWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock,
-						1 /* No threshold, even 1 work per bulk is okay */,
-						DEFAULT_MAX_BULK_SIZE );
+				new ElasticsearchDefaultWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock, DEFAULT_MAX_BULK_SIZE );
 		verifyAll();
 
 		resetAll();
@@ -216,8 +169,7 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 
 		replayAll();
 		ElasticsearchDefaultWorkBulker bulker =
-				new ElasticsearchDefaultWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock,
-						DEFAULT_MIN_BULK_SIZE, DEFAULT_MAX_BULK_SIZE );
+				new ElasticsearchDefaultWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock, DEFAULT_MAX_BULK_SIZE );
 		verifyAll();
 
 		resetAll();
@@ -285,8 +237,7 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 
 		replayAll();
 		ElasticsearchDefaultWorkBulker bulker =
-				new ElasticsearchDefaultWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock,
-						DEFAULT_MIN_BULK_SIZE, DEFAULT_MAX_BULK_SIZE );
+				new ElasticsearchDefaultWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock, DEFAULT_MAX_BULK_SIZE );
 		verifyAll();
 
 		resetAll();
@@ -365,8 +316,7 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 
 		replayAll();
 		ElasticsearchDefaultWorkBulker bulker =
-				new ElasticsearchDefaultWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock,
-						DEFAULT_MIN_BULK_SIZE, DEFAULT_MAX_BULK_SIZE );
+				new ElasticsearchDefaultWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock, DEFAULT_MAX_BULK_SIZE );
 		verifyAll();
 
 		resetAll();
@@ -422,6 +372,7 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		BulkableElasticsearchWork<Void> work5 = bulkableWork( 5 );
 		ElasticsearchWork<BulkResult> bulkWork1 = work( 7 );
 		ElasticsearchWork<BulkResult> bulkWork2 = work( 8 );
+		ElasticsearchWork<BulkResult> bulkWork3 = work( 9 );
 
 		CompletableFuture<Void> work1FutureFromSequenceBuilder = new CompletableFuture<>();
 		CompletableFuture<Void> work2FutureFromSequenceBuilder = new CompletableFuture<>();
@@ -430,12 +381,14 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		CompletableFuture<Void> work5FutureFromSequenceBuilder = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkWork1ResultFuture = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkWork2ResultFuture = new CompletableFuture<>();
+		CompletableFuture<BulkResult> bulkWork3ResultFuture = new CompletableFuture<>();
 		Capture<CompletableFuture<ElasticsearchWork<BulkResult>>> bulkWork1FutureCapture = newCapture();
 		Capture<CompletableFuture<ElasticsearchWork<BulkResult>>> bulkWork2FutureCapture = newCapture();
+		Capture<CompletableFuture<ElasticsearchWork<BulkResult>>> bulkWork3FutureCapture = newCapture();
 
 		replayAll();
 		ElasticsearchDefaultWorkBulker bulker =
-				new ElasticsearchDefaultWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock, 2, 10 );
+				new ElasticsearchDefaultWorkBulker( sequenceBuilderMock, bulkWorkFactoryMock, 10 );
 		verifyAll();
 
 		resetAll();
@@ -479,12 +432,15 @@ public class ElasticsearchDefaultWorkBulkerTest extends EasyMockSupport {
 		assertThat( bulkWork2FutureCapture.getValue() ).isSuccessful( bulkWork2 );
 
 		resetAll();
-		expect( sequenceBuilderMock.addNonBulkExecution( work5 ) ).andReturn( work5FutureFromSequenceBuilder );
+		expect( sequenceBuilderMock.addBulkExecution( capture( bulkWork3FutureCapture ) ) ).andReturn( bulkWork3ResultFuture );
+		expect( sequenceBuilderMock.addBulkResultExtraction( bulkWork3ResultFuture ) ).andReturn( bulkResultExtractionStepMock );
+		expect( bulkResultExtractionStepMock.add( work5, 0 ) ).andReturn( work5FutureFromSequenceBuilder );
 		replayAll();
 		bulker.addWorksToSequence();
 		verifyAll();
 
 		resetAll();
+		expect( bulkWorkFactoryMock.apply( Arrays.asList( work5 ), DocumentRefreshStrategy.NONE ) ).andReturn( (ElasticsearchWork) bulkWork3 );
 		replayAll();
 		bulker.finalizeBulkWork();
 		verifyAll();
