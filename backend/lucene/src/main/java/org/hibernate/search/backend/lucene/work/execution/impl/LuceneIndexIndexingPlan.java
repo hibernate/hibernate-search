@@ -104,13 +104,12 @@ public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 			for ( Map.Entry<LuceneWriteWorkOrchestrator, List<LuceneSingleDocumentWriteWork>> entry : worksByOrchestrator.entrySet() ) {
 				LuceneWriteWorkOrchestrator orchestrator = entry.getKey();
 				List<LuceneSingleDocumentWriteWork> works = entry.getValue();
-				CompletableFuture<IndexIndexingPlanExecutionReport<R>> shardReportFuture = new CompletableFuture<>();
-				orchestrator.submit( new LuceneIndexingPlanWriteWorkSet<>(
-						works,
-						entityReferenceFactory,
-						shardReportFuture, commitStrategy, refreshStrategy
-				) );
-				shardReportFutures.add( shardReportFuture );
+				LuceneIndexIndexingPlanExecution<R> execution = new LuceneIndexIndexingPlanExecution<>(
+						orchestrator, entityReferenceFactory,
+						commitStrategy, refreshStrategy,
+						works
+				);
+				shardReportFutures.add( execution.execute() );
 			}
 			return IndexIndexingPlanExecutionReport.allOf( shardReportFutures );
 		}

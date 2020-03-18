@@ -28,13 +28,14 @@ public class LuceneBatchingWriteWorkOrchestrator
 	// TODO HSEARCH‌-3575 allow to configure this value
 	private static final int MAX_WORKSETS_PER_BATCH = 1000;
 
+	private final LuceneWriteWorkProcessor processor;
 	private final ThreadPoolProvider threadPoolProvider;
 	private final BatchingExecutor<LuceneWriteWorkSet, LuceneWriteWorkProcessor> executor;
 
 	/**
 	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)
-	 * @param threadPoolProvider A provider of thread pools.
 	 * @param processor A processor to use in the background thread.
+	 * @param threadPoolProvider A provider of thread pools.
 	 * @param failureHandler A failure handler to report failures of the background thread.
 	 */
 	public LuceneBatchingWriteWorkOrchestrator(
@@ -42,6 +43,7 @@ public class LuceneBatchingWriteWorkOrchestrator
 			ThreadPoolProvider threadPoolProvider,
 			FailureHandler failureHandler) {
 		super( name );
+		this.processor = processor;
 		this.threadPoolProvider = threadPoolProvider;
 		this.executor = new BatchingExecutor<>(
 				name,
@@ -50,6 +52,16 @@ public class LuceneBatchingWriteWorkOrchestrator
 				true,
 				failureHandler
 		);
+	}
+
+	@Override
+	public void forceCommitInCurrentThread() {
+		processor.forceCommit();
+	}
+
+	@Override
+	public void forceRefreshInCurrentThread() {
+		processor.forceRefresh();
 	}
 
 	@Override

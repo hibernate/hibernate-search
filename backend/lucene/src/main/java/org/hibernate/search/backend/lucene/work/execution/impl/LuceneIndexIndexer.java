@@ -12,8 +12,6 @@ import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
-import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
@@ -46,13 +44,14 @@ public class LuceneIndexIndexer implements IndexIndexer {
 		// Route the work to the appropriate shard
 		LuceneWriteWorkOrchestrator orchestrator = indexManagerContext.getWriteOrchestrator( id, routingKey );
 
-		return orchestrator.submit(
+		CompletableFuture<Long> future = new CompletableFuture<>();
+		orchestrator.submit(
+				future,
 				factory.add(
 						tenantId, indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
 						indexEntry
-				),
-				DocumentCommitStrategy.NONE,
-				DocumentRefreshStrategy.NONE
+				)
 		);
+		return future;
 	}
 }

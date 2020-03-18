@@ -10,8 +10,6 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.work.impl.LuceneIndexManagementWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
-import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 
 
 public interface LuceneWriteWorkOrchestrator {
@@ -22,13 +20,30 @@ public interface LuceneWriteWorkOrchestrator {
 		return future;
 	}
 
-	default <T> CompletableFuture<T> submit(LuceneWriteWork<T> work,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+	default <T> CompletableFuture<T> submit(LuceneWriteWork<T> work) {
 		CompletableFuture<T> future = new CompletableFuture<>();
-		submit( new LuceneSingleWriteWorkSet<>( work, future, commitStrategy, refreshStrategy ) );
+		submit( new LuceneSingleWriteWorkSet<>( work, future ) );
 		return future;
 	}
 
+	default <T> void submit(CompletableFuture<T> future, LuceneWriteWork<T> work) {
+		submit( new LuceneSingleWriteWorkSet<>( work, future ) );
+	}
+
 	void submit(LuceneWriteWorkSet workSet);
+
+	/**
+	 * Force a commit immediately.
+	 * <p>
+	 * The commit will be executed <strong>in the current thread</strong>.
+	 */
+	void forceCommitInCurrentThread();
+
+	/**
+	 * Force a refresh immediately.
+	 * <p>
+	 * The refresh will be executed <strong>in the current thread</strong>.
+	 */
+	void forceRefreshInCurrentThread();
 
 }

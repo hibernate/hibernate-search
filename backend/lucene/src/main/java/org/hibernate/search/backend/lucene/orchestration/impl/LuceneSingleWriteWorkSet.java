@@ -9,29 +9,20 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
-import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 
-class LuceneSingleWriteWorkSet<T> implements LuceneWriteWorkSet {
-	private final LuceneWriteWork<T> work;
-	private final CompletableFuture<T> future;
-	private final DocumentCommitStrategy commitStrategy;
-	private final DocumentRefreshStrategy refreshStrategy;
+public class LuceneSingleWriteWorkSet<T> implements LuceneWriteWorkSet {
+	public final LuceneWriteWork<T> work;
+	public final CompletableFuture<T> future;
 
-	LuceneSingleWriteWorkSet(LuceneWriteWork<T> work, CompletableFuture<T> future,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
+	LuceneSingleWriteWorkSet(LuceneWriteWork<T> work, CompletableFuture<T> future) {
 		this.work = work;
 		this.future = future;
-		this.commitStrategy = commitStrategy;
-		this.refreshStrategy = refreshStrategy;
 	}
 
 	@Override
 	public void submitTo(LuceneWriteWorkProcessor processor) {
-		processor.beforeWorkSet( commitStrategy, refreshStrategy );
 		try {
 			T result = processor.submit( work );
-			processor.afterSuccessfulWorkSet();
 			future.complete( result );
 		}
 		catch (RuntimeException e) {

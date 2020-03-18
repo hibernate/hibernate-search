@@ -14,17 +14,14 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 import org.hibernate.search.backend.lucene.work.impl.LuceneIndexManagementWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
-import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 /**
- * A thread-unsafe component responsible for applying write works to an index writer.
+ * A thread-safe component responsible for applying write works to an index writer.
  * <p>
  * Ported from Search 5's LuceneBackendQueueTask, in particular.
  */
@@ -37,10 +34,6 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 	private final IndexAccessor indexAccessor;
 	private final LuceneWriteWorkExecutionContextImpl context;
 	private final FailureHandler failureHandler;
-
-	private boolean workSetForcesCommit;
-	private boolean workSetForcesRefresh;
-	private boolean workSetHasFailure;
 
 	public LuceneWriteWorkProcessor(String indexName, EventContext eventContext,
 			IndexAccessor indexAccessor, FailureHandler failureHandler) {
@@ -59,7 +52,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 	@Override
 	public CompletableFuture<?> endBatch() {
 		try {
-			tryCommitOrDelay();
+			indexAccessor.commitOrDelay();
 		}
 		catch (RuntimeException e) {
 			cleanUpAfterFailure( e, "Commit after a batch of index works" );
@@ -72,7 +65,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 	@Override
 	public long completeOrDelay() {
 		try {
-			return tryCommitOrDelay();
+			return indexAccessor.commitOrDelay();
 		}
 		catch (RuntimeException e) {
 			cleanUpAfterFailure( e, "Commit after completion of all remaining index works" );
@@ -81,12 +74,6 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 			// Tell the executor there's no need to call us again later: the index writer was lost anyway.
 			return 0;
 		}
-	}
-
-	public void beforeWorkSet(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		workSetForcesCommit = DocumentCommitStrategy.FORCE.equals( commitStrategy );
-		workSetForcesRefresh = DocumentRefreshStrategy.FORCE.equals( refreshStrategy );
-		workSetHasFailure = false;
 	}
 
 	public <T> T submit(LuceneIndexManagementWork<T> work) {
@@ -100,12 +87,6 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 	}
 
 	public <T> T submit(LuceneWriteWork<T> work) {
-		if ( workSetHasFailure ) {
-			throw new AssertionFailure(
-					"A work was submitted to the processor after a failure occurred in the current workset."
-							+ " There is a bug in Hibernate Search, please report it."
-			);
-		}
 		try {
 			return work.execute( context );
 		}
@@ -115,27 +96,22 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 		}
 	}
 
-	public void afterSuccessfulWorkSet() {
-		if ( workSetForcesCommit ) {
-			try {
-				indexAccessor.commit();
-			}
-			catch (RuntimeException e) {
-				cleanUpAfterFailure( e, "Commit after a set of index works" );
-				// We'll skip the refresh, but that's okay: we just reset the writer/reader anyway.
-				throw e;
-			}
+	// Note this may be called outside of a batch
+	public void forceCommit() {
+		try {
+			indexAccessor.commit();
 		}
-
-		if ( workSetForcesRefresh ) {
-			// In case of failure, just propagate the exception:
-			// we don't expect a refresh failure to affect the writer.
-			indexAccessor.refresh();
+		catch (RuntimeException e) {
+			cleanUpAfterFailure( e, "Commit after a set of index works" );
+			throw e;
 		}
 	}
 
-	private long tryCommitOrDelay() {
-		return indexAccessor.commitOrDelay();
+	// Note this may be called outside of a batch
+	public void forceRefresh() {
+		// In case of failure, just propagate the exception:
+		// we don't expect a refresh failure to affect the writer and require a cleanup.
+		indexAccessor.refresh();
 	}
 
 	private void cleanUpAfterFailure(Throwable throwable, Object failingOperation) {
