@@ -20,13 +20,13 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 
 class LuceneIndexingPlanWriteWorkSet<R> implements LuceneWriteWorkSet {
-	private final List<LuceneSingleDocumentWriteWork<?>> works;
+	private final List<LuceneSingleDocumentWriteWork> works;
 	private final EntityReferenceFactory<R> entityReferenceFactory;
 	private final CompletableFuture<IndexIndexingPlanExecutionReport<R>> indexingPlanFuture;
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 
-	LuceneIndexingPlanWriteWorkSet(List<LuceneSingleDocumentWriteWork<?>> works,
+	LuceneIndexingPlanWriteWorkSet(List<LuceneSingleDocumentWriteWork> works,
 			EntityReferenceFactory<R> entityReferenceFactory,
 			CompletableFuture<IndexIndexingPlanExecutionReport<R>> indexingPlanFuture,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
@@ -69,7 +69,7 @@ class LuceneIndexingPlanWriteWorkSet<R> implements LuceneWriteWorkSet {
 		if ( throwable != null ) {
 			// Even if some works succeeded, there's no guarantee they were actually committed to the index.
 			// Report all works as uncommitted.
-			for ( LuceneSingleDocumentWriteWork<?> work : works ) {
+			for ( LuceneSingleDocumentWriteWork work : works ) {
 				reportBuilder.failingEntityReference(
 						entityReferenceFactory,
 						work.getEntityTypeName(),

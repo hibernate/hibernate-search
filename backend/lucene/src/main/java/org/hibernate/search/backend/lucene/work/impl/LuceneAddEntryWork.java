@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDeleg
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
-public class LuceneAddEntryWork extends AbstractLuceneSingleDocumentWriteWork<Long> {
+public class LuceneAddEntryWork extends AbstractLuceneSingleDocumentWriteWork {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

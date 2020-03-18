@@ -20,7 +20,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
 
-public class LuceneDeleteEntryWork extends AbstractLuceneSingleDocumentWriteWork<Long> {
+public class LuceneDeleteEntryWork extends AbstractLuceneSingleDocumentWriteWork {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
