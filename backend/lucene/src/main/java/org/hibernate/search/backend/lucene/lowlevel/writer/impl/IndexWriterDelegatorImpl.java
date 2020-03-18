@@ -24,6 +24,7 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 	private final IndexWriter delegate;
 	private final TimingSource timingSource;
 	private final int commitInterval;
+	private final Object commitOrDelayLock = new Object();
 
 	private long commitExpiration;
 
@@ -69,12 +70,22 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 			return 0L;
 		}
 
-		long timeToCommit = commitInterval == 0 ? 0L : commitExpiration - timingSource.getMonotonicTimeEstimate();
-
+		long timeToCommit = getTimeToCommit();
 		if ( timeToCommit > 0L ) {
 			return timeToCommit;
 		}
-		else {
+
+		// Synchronize in order to prevent a scenario where two threads call commitOrDelay() concurrently,
+		// and both notice the last commit has expired,
+		// resulting in two commits where one would have been enough.
+		// Concurrent commits may still happen if a thread calls commit() concurrently:
+		// this is fine and actually desired behavior.
+		// We only care about concurrent calls to commitOrDelay() here.
+		synchronized (commitOrDelayLock) {
+			timeToCommit = getTimeToCommit();
+			if ( timeToCommit > 0L ) {
+				return timeToCommit;
+			}
 			doCommit();
 			return 0L;
 		}
@@ -99,5 +110,9 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 
 	private void updateCommitExpiration() {
 		commitExpiration = commitInterval == 0 ? 0L : timingSource.getMonotonicTimeEstimate() + commitInterval;
+	}
+
+	private long getTimeToCommit() {
+		return commitInterval == 0 ? 0L : commitExpiration - timingSource.getMonotonicTimeEstimate();
 	}
 }
