@@ -19,8 +19,6 @@ import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWorkExecutionContext;
-import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -58,16 +56,9 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		processor.beginBatch();
 		verifyAll();
 
-		testSuccessfulWorkSet( 3, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
-		testSuccessfulWorkSet( 4, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE, true, false );
-		testSuccessfulWorkSet( 2, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
-		testSuccessfulWorkSet( 5, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.FORCE, false, true );
-		testSuccessfulWorkSet( 1, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
-		testSuccessfulWorkSet( 3, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, true, true );
-		testSuccessfulWorkSet( 5, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
+		testSuccessfulWriteWorks( 200 );
 
 		resetAll();
-		// There was no commit in the last workset, there must be one here
 		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
 		replayAll();
 		processor.endBatch();
@@ -78,16 +69,9 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		processor.beginBatch();
 		verifyAll();
 
-		testSuccessfulWorkSet( 3, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
-		testSuccessfulWorkSet( 4, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE, true, false );
-		testSuccessfulWorkSet( 2, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
-		testSuccessfulWorkSet( 5, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.FORCE, false, true );
-		testSuccessfulWorkSet( 1, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
-		testSuccessfulWorkSet( 3, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, true, true );
+		testSuccessfulWriteWorks( 100 );
 
 		resetAll();
-		// The last workset triggered a commit: no need for a commit here
-		// but we rely on the index accessor or index writer to detect that
 		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
 		replayAll();
 		processor.endBatch();
@@ -97,19 +81,15 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 	}
 
 	@Test
-	public void delayedCommitStrategy_endBatchCommitNotNecessary() throws IOException {
+	public void delayedCommitStrategy_noDelay() throws IOException {
 		resetAll();
 		replayAll();
 		processor.beginBatch();
 		verifyAll();
 
-		testSuccessfulWorkSet( 3, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
-		testSuccessfulWorkSet( 5, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.FORCE, false, true );
-		testSuccessfulWorkSet( 3, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE, true, false );
+		testSuccessfulWriteWorks( 200 );
 
 		resetAll();
-		// The last workset triggered a commit: no need for a commit here
-		// but we rely on the index accessor or index writer to detect that
 		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
 		replayAll();
 		processor.endBatch();
@@ -117,8 +97,6 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 		// The executor does not have any additional work, so it calls completeOrDelay() just after endBatch().
 		resetAll();
-		// The last workset triggered a commit: no need for a commit here
-		// but we rely on the index accessor or index writer to detect that
 		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
 		replayAll();
 		assertThat( processor.completeOrDelay() ).isEqualTo( 0L );
@@ -126,18 +104,15 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 	}
 
 	@Test
-	public void delayedCommitStrategy_endBatchCommitNecessary_noAdditionalWorkDuringDelay() throws IOException {
+	public void delayedCommitStrategy_delay_noAdditionalWorkDuringDelay() throws IOException {
 		resetAll();
 		replayAll();
 		processor.beginBatch();
 		verifyAll();
 
-		testSuccessfulWorkSet( 3, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
-		testSuccessfulWorkSet( 3, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, true, true );
-		testSuccessfulWorkSet( 5, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
+		testSuccessfulWriteWorks( 200 );
 
 		resetAll();
-		// There was no commit in the last workset, there must be one here
 		expect( indexAccessorMock.commitOrDelay() )
 				// The I/O strategy decides that it's too early for a commit.
 				.andReturn( 1000L );
@@ -147,7 +122,6 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 		// The executor does not have any additional work, so it calls completeOrDelay() just after endBatch().
 		resetAll();
-		// There was no commit in the last batch, there must be one here
 		expect( indexAccessorMock.commitOrDelay() )
 				// Almost no time passed since the call to endBatch(),
 				// so the I/O strategy decides that it's still too early for a commit.
@@ -160,7 +134,6 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 		// The executor didn't receive any additional work, so it calls completeOrDelay() again some time later.
 		resetAll();
-		// There was no commit in the last batch, there must be one here
 		expect( indexAccessorMock.commitOrDelay() )
 				// The I/O strategy decides that it's now time for a commit.
 				.andReturn( 0L );
@@ -170,72 +143,14 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 	}
 
 	@Test
-	public void delayedCommitStrategy_endBatchCommitNecessary_someAdditionalWorkDuringDelay_endBatchCommitNotNecessary() throws IOException {
+	public void delayedCommitStrategy_delay_someAdditionalWorkDuringDelay() throws IOException {
 		resetAll();
 		replayAll();
 		processor.beginBatch();
 		verifyAll();
 
-		testSuccessfulWorkSet( 3, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
-		testSuccessfulWorkSet( 3, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, true, true );
-		testSuccessfulWorkSet( 5, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
-
-		resetAll();
-		// There was no commit in the last workset, there must be one here
-		expect( indexAccessorMock.commitOrDelay() )
-				// The I/O strategy decides that it's too early for a commit.
-				.andReturn( 1000L );
-		replayAll();
-		processor.endBatch();
-		verifyAll();
-
-		// The executor does not have any additional work, so it calls completeOrDelay() just after endBatch().
-		resetAll();
-		// There was no commit in the last batch, there must be one here
-		expect( indexAccessorMock.commitOrDelay() )
-				// Almost no time passed since the call to endBatch(),
-				// so the I/O strategy decides that it's still too early for a commit.
-				.andReturn( 999L );
-		replayAll();
-		assertThat( processor.completeOrDelay() ).isEqualTo( 999L );
-		verifyAll();
-
-		// 500 ms pass...
-
-		// Some work is submitted to the executor!
-		resetAll();
-		replayAll();
-		processor.beginBatch();
-		verifyAll();
-		testSuccessfulWorkSet( 3, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE, true, false );
-		resetAll();
-		// The last workset triggered a commit: no need for a commit here
-		// but we rely on the index accessor or index writer to detect that
-		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
-		replayAll();
-		processor.endBatch();
-		verifyAll();
-
-		// The executor does not have any additional work, so it calls completeOrDelay() just after endBatch().
-		resetAll();
-		// The last workset triggered a commit: no need for a commit here
-		// but we rely on the index accessor or index writer to detect that
-		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
-		replayAll();
-		assertThat( processor.completeOrDelay() ).isEqualTo( 0L );
-		verifyAll();
-	}
-
-	@Test
-	public void delayedCommitStrategy_endBatchCommitNecessary_someAdditionalWorkDuringDelay_endBatchCommitNecessary() throws IOException {
-		resetAll();
-		replayAll();
-		processor.beginBatch();
-		verifyAll();
-
-		testSuccessfulWorkSet( 3, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
-		testSuccessfulWorkSet( 3, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE, true, true );
-		testSuccessfulWorkSet( 5, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
+		// Execute a few successful works
+		testSuccessfulWriteWorks( 50 );
 
 		resetAll();
 		expect( indexAccessorMock.commitOrDelay() )
@@ -262,7 +177,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		replayAll();
 		processor.beginBatch();
 		verifyAll();
-		testSuccessfulWorkSet( 3, DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE, false, false );
+		testSuccessfulWriteWorks( 10 );
 		resetAll();
 		expect( indexAccessorMock.commitOrDelay() )
 				// The I/O strategy decides that it's too early for a commit.
@@ -294,53 +209,14 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 	}
 
 	@Test
-	public void error_workExecute_commitNone_refreshNone() throws IOException {
-		doTestErrorWorkExecute( DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE );
-	}
-
-	@Test
-	public void error_workExecute_commitNone_refreshForce() throws IOException {
-		doTestErrorWorkExecute( DocumentCommitStrategy.NONE, DocumentRefreshStrategy.FORCE );
-	}
-
-	@Test
-	public void error_workExecute_commitForce_refreshNone() throws IOException {
-		doTestErrorWorkExecute( DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE );
-	}
-
-	@Test
-	public void error_workExecute_commitForce_refreshForce() throws IOException {
-		doTestErrorWorkExecute( DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE );
-	}
-
-	/**
-	 * Test that there is no workset commit/refresh after a failure,
-	 * regardless of the commit/refresh strategy passed in parameter.
-	 */
-	private void doTestErrorWorkExecute(DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) throws IOException {
+	public void error_workExecute() throws IOException {
 		resetAll();
 		replayAll();
 		processor.beginBatch();
 		verifyAll();
 
-		// Execute a successful, committed workset
-		testSuccessfulWorkSet(
-				2,
-				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE,
-				true,
-				false
-		);
-
-		// Execute a successful, uncommitted workset
-		testSuccessfulWorkSet(
-				2,
-				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
-				false,
-				false
-		);
-
-		// Start a workset with a few successful works
-		testWorkSetBeginning( 3, commitStrategy, refreshStrategy );
+		// Execute a few successful works
+		testSuccessfulWriteWorks( 50 );
 
 		// ... and suddenly a failing work
 		Capture<FailureContext> failureContextCapture = Capture.newInstance();
@@ -349,14 +225,12 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		resetAll();
 		expect( failingWork.execute( EasyMock.anyObject() ) ).andThrow( workException );
 		indexAccessorMock.reset();
-		expectWorkGetInfo( 7 );
+		expectWorkGetInfo( 50 );
 		failureHandlerMock.handle( capture( failureContextCapture ) );
 		replayAll();
 		SubTest.expectException( () -> processor.submit( failingWork ) )
 				.assertThrown().isSameAs( workException );
 		verifyAll();
-
-		// Note that callers are not supposed to call any method on the processor after a failure in a workset
 
 		FailureContext failureContext = failureContextCapture.getValue();
 		assertThat( failureContext.getThrowable() )
@@ -367,15 +241,10 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 				)
 				.hasCause( workException );
 		assertThat( failureContext.getFailingOperation() )
-				.isEqualTo( workInfo( 7 ) );
+				.isEqualTo( workInfo( 50 ) );
 
-		// Subsequent worksets must be executed regardless of previous failures in the same batch
-		testSuccessfulWorkSet(
-				3,
-				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
-				false,
-				false
-		);
+		// Subsequent works must be executed regardless of previous failures in the same batch
+		testSuccessfulWriteWorks( 10 );
 
 		resetAll();
 		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
@@ -387,49 +256,31 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 	}
 
 	@Test
-	public void error_workExecuteAndForceLockRelease() throws IOException {
+	public void error_workExecuteAndReset() throws IOException {
 		resetAll();
 		replayAll();
 		processor.beginBatch();
 		verifyAll();
 
-		// Execute a successful, committed workset
-		testSuccessfulWorkSet(
-				2,
-				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE,
-				true,
-				false
-		);
-
-		// Execute a successful, uncommitted workset
-		testSuccessfulWorkSet(
-				2,
-				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
-				false,
-				false
-		);
-
-		// Start a workset with a few successful works
-		testWorkSetBeginning( 2, DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE );
+		// Execute a few successful works
+		testSuccessfulWriteWorks( 50 );
 
 		// ... and suddenly a failing work
 		Capture<FailureContext> failureContextCapture = Capture.newInstance();
 		RuntimeException workException = new RuntimeException( "Some message" );
 		LuceneWriteWork<Object> failingWork = createWorkMock();
-		RuntimeException forceLockReleaseException = new RuntimeException( "Some other message" );
+		RuntimeException resetException = new RuntimeException( "Some other message" );
 		resetAll();
 		expect( failingWork.execute( EasyMock.anyObject() ) ).andThrow( workException );
-		// ... and forceLockRelease fails too
+		// ... and reset fails too
 		indexAccessorMock.reset();
-		expectLastCall().andThrow( forceLockReleaseException );
-		expectWorkGetInfo( 6 );
+		expectLastCall().andThrow( resetException );
+		expectWorkGetInfo( 50 );
 		failureHandlerMock.handle( capture( failureContextCapture ) );
 		replayAll();
 		SubTest.expectException( () -> processor.submit( failingWork ) )
 				.assertThrown().isSameAs( workException );
 		verifyAll();
-
-		// Note that callers are not supposed to call any method on the processor after a failure in a workset
 
 		FailureContext failureContext = failureContextCapture.getValue();
 		assertThat( failureContext.getThrowable() )
@@ -440,7 +291,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 				)
 				.hasCause( workException );
 		assertThat( failureContext.getFailingOperation() )
-				.isEqualTo( workInfo( 6 ) );
+				.isEqualTo( workInfo( 50 ) );
 
 		assertThat( failureContext.getThrowable().getCause().getSuppressed() )
 				.hasSize( 1 )
@@ -448,16 +299,11 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 						suppressed -> assertThat( suppressed[0] )
 								.hasMessageContaining( "Unable to clean up" )
 								.hasMessageContaining( INDEX_NAME )
-								.hasCause( forceLockReleaseException )
+								.hasCause( resetException )
 				);
 
-		// Subsequent worksets must be executed regardless of previous failures in the same batch
-		testSuccessfulWorkSet(
-				3,
-				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
-				false,
-				false
-		);
+		// Subsequent works must be executed regardless of previous failures in the same batch
+		testSuccessfulWriteWorks( 20 );
 
 		resetAll();
 		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
@@ -469,47 +315,16 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 	}
 
 	@Test
-	public void error_workSetCommit_refreshNone() throws IOException {
-		doTestErrorWorkSetCommit( DocumentRefreshStrategy.NONE );
-	}
-
-	/**
-	 * Test that the refresh strategy is ignored when an error occurs during the workset commit.
-	 */
-	@Test
-	public void error_workSetCommit_refreshForce() throws IOException {
-		doTestErrorWorkSetCommit( DocumentRefreshStrategy.FORCE );
-	}
-
-	private void doTestErrorWorkSetCommit(DocumentRefreshStrategy refreshStrategy) throws IOException {
+	public void forceCommit() {
 		resetAll();
+		indexAccessorMock.commit();
 		replayAll();
-		processor.beginBatch();
+		processor.forceCommit();
 		verifyAll();
+	}
 
-		// Execute a successful, committed workset
-		testSuccessfulWorkSet(
-				2,
-				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE,
-				true,
-				false
-		);
-
-		// Execute a successful, uncommitted workset
-		testSuccessfulWorkSet(
-				2,
-				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
-				false,
-				false
-		);
-
-		// Start a workset with a few successful works
-		testWorkSetBeginning(
-				6,
-				DocumentCommitStrategy.FORCE, refreshStrategy
-		);
-
-		// ... but fail upon workset commit
+	@Test
+	public void error_forceCommit() throws IOException {
 		Capture<FailureContext> failureContextCapture = Capture.newInstance();
 		RuntimeException commitException = new RuntimeException( "Some message" );
 		resetAll();
@@ -518,7 +333,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		indexAccessorMock.reset();
 		failureHandlerMock.handle( capture( failureContextCapture ) );
 		replayAll();
-		SubTest.expectException( () -> processor.afterSuccessfulWorkSet() )
+		SubTest.expectException( () -> processor.forceCommit() )
 				.assertThrown()
 				.isSameAs( commitException );
 		verifyAll();
@@ -544,111 +359,42 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 	}
 
 	@Test
-	public void error_workSetRefresh_commitNone() throws IOException {
-		doTestErrorWorkSetRefresh( DocumentCommitStrategy.NONE, false );
+	public void forceRefresh() {
+		resetAll();
+		indexAccessorMock.refresh();
+		replayAll();
+		processor.forceRefresh();
+		verifyAll();
 	}
 
 	@Test
-	public void error_workSetRefresh_commitForce() throws IOException {
-		doTestErrorWorkSetRefresh( DocumentCommitStrategy.FORCE, true );
-	}
-
-	private void doTestErrorWorkSetRefresh(DocumentCommitStrategy commitStrategy, boolean expectWorkSetCommit) throws IOException {
-		resetAll();
-		replayAll();
-		processor.beginBatch();
-		verifyAll();
-
-		// Execute a successful, committed workset
-		testSuccessfulWorkSet(
-				2,
-				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE,
-				true,
-				false
-		);
-
-		// Execute a successful, uncommitted workset
-		testSuccessfulWorkSet(
-				2,
-				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
-				false,
-				false
-		);
-
-		// Start a workset with a few successful works
-		testWorkSetBeginning(
-				6,
-				commitStrategy, DocumentRefreshStrategy.FORCE
-		);
-
-		// ... but fail upon workset refresh
+	public void error_forceRefresh() {
 		RuntimeException refreshException = new RuntimeException( "Some message" );
 		resetAll();
-		if ( expectWorkSetCommit ) {
-			indexAccessorMock.commit();
-		}
 		indexAccessorMock.refresh();
 		expectLastCall().andThrow( refreshException );
 		replayAll();
-		SubTest.expectException( () -> processor.afterSuccessfulWorkSet() )
+		SubTest.expectException( () -> processor.forceRefresh() )
 				.assertThrown()
 				.isSameAs( refreshException );
 		verifyAll();
-
-		resetAll();
-		// If there a commit in the last workset, we don't really need one here
-		// but we rely on the index accessor or index writer to detect that
-		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
-		replayAll();
-		processor.endBatch();
-		verifyAll();
-
-		checkCompleteOrDelayWithNothingToCommit();
 	}
 
 	@Test
-	public void error_workSetCommitAndForceLockRelease() throws IOException {
-		resetAll();
-		replayAll();
-		processor.beginBatch();
-		verifyAll();
-
-		// Execute a successful, committed workset
-		testSuccessfulWorkSet(
-				2,
-				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE,
-				true,
-				false
-		);
-
-		// Execute a successful, uncommitted workset
-		testSuccessfulWorkSet(
-				2,
-				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
-				false,
-				false
-		);
-
-		// Start a new workset
-		testWorkSetBeginning(
-				6,
-				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE
-		);
-
-		// ... but fail upon workset commit
+	public void error_forceCommitAndReset() throws IOException {
 		Capture<FailureContext> failureContextCapture = Capture.newInstance();
 		RuntimeException commitException = new RuntimeException( "Some message" );
-		RuntimeException forceLockReleaseException = new RuntimeException( "Some other message" );
+		RuntimeException resetException = new RuntimeException( "Some other message" );
 		resetAll();
+		// The commit fails...
 		indexAccessorMock.commit();
 		expectLastCall().andThrow( commitException );
-		// ... and forceLockRelease fails too
+		// ... and reset fails too
 		indexAccessorMock.reset();
-		expectLastCall().andThrow( forceLockReleaseException );
+		expectLastCall().andThrow( resetException );
 		failureHandlerMock.handle( capture( failureContextCapture ) );
-		// We don't expect any commit when a workset fails
 		replayAll();
-		SubTest.expectException( () -> processor.afterSuccessfulWorkSet() )
+		SubTest.expectException( () -> processor.forceCommit() )
 				.assertThrown()
 				.isSameAs( commitException );
 		verifyAll();
@@ -670,16 +416,8 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 						suppressed -> assertThat( suppressed[0] )
 								.hasMessageContaining( "Unable to clean up" )
 								.hasMessageContaining( INDEX_NAME )
-								.hasCause( forceLockReleaseException )
+								.hasCause( resetException )
 				);
-
-		resetAll();
-		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
-		replayAll();
-		processor.endBatch();
-		verifyAll();
-
-		checkCompleteOrDelayWithNothingToCommit();
 	}
 
 	@Test
@@ -691,28 +429,10 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		processor.beginBatch();
 		verifyAll();
 
-		// Execute worksets
-		testSuccessfulWorkSet(
-				2,
-				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE,
-				true,
-				false
-		);
-		testSuccessfulWorkSet(
-				4,
-				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
-				false,
-				false
-		);
-		testSuccessfulWorkSet(
-				6,
-				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
-				false,
-				false
-		);
+		// Execute a few successful works
+		testSuccessfulWriteWorks( 200 );
 
 		// Fail upon batch commit
-
 		Capture<FailureContext> failureContextCapture = Capture.newInstance();
 		resetAll();
 		expect( indexAccessorMock.commitOrDelay() ).andThrow( commitException );
@@ -737,42 +457,25 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 	}
 
 	@Test
-	public void error_batchCommitAndForceLockRelease() throws IOException {
+	public void error_batchCommitAndReset() throws IOException {
 		RuntimeException commitException = new RuntimeException( "Some message" );
-		RuntimeException forceLockReleaseException = new RuntimeException( "Some other message" );
+		RuntimeException resetException = new RuntimeException( "Some other message" );
 
 		resetAll();
 		replayAll();
 		processor.beginBatch();
 		verifyAll();
 
-		// Execute worksets
-		testSuccessfulWorkSet(
-				2,
-				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.NONE,
-				true,
-				false
-		);
-		testSuccessfulWorkSet(
-				4,
-				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
-				false,
-				false
-		);
-		testSuccessfulWorkSet(
-				6,
-				DocumentCommitStrategy.NONE, DocumentRefreshStrategy.NONE,
-				false,
-				false
-		);
+		// Execute a few successful works
+		testSuccessfulWriteWorks( 200 );
 
-		// Fail upon batch commit AND forceLockRelease...
+		// Fail upon batch commit AND reset...
 
 		Capture<FailureContext> failureContextCapture = Capture.newInstance();
 		resetAll();
 		expect( indexAccessorMock.commitOrDelay() ).andThrow( commitException );
 		indexAccessorMock.reset();
-		expectLastCall().andThrow( forceLockReleaseException );
+		expectLastCall().andThrow( resetException );
 		failureHandlerMock.handle( capture( failureContextCapture ) );
 		replayAll();
 		processor.endBatch();
@@ -795,7 +498,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 						suppressed -> assertThat( suppressed[0] )
 								.hasMessageContaining( "Unable to clean up" )
 								.hasMessageContaining( INDEX_NAME )
-								.hasCause( forceLockReleaseException )
+								.hasCause( resetException )
 				);
 
 		assertThat( failureContext.getFailingOperation() ).asString()
@@ -804,31 +507,8 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		checkCompleteOrDelayWithNothingToCommit();
 	}
 
-	private void testSuccessfulWorkSet(int workCount,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy,
-			boolean expectCommit, boolean expectRefresh) throws IOException {
-		testWorkSetBeginning( workCount, commitStrategy, refreshStrategy );
-
-		resetAll();
-		if ( expectCommit ) {
-			indexAccessorMock.commit();
-		}
-		if ( expectRefresh ) {
-			indexAccessorMock.refresh();
-		}
-		replayAll();
-		processor.afterSuccessfulWorkSet();
-		verifyAll();
-	}
-
-	private void testWorkSetBeginning(int workCount,
-			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) throws IOException {
+	private void testSuccessfulWriteWorks(int workCount) throws IOException {
 		Capture<LuceneWriteWorkExecutionContext> contextCapture = Capture.newInstance();
-
-		resetAll();
-		replayAll();
-		processor.beforeWorkSet( commitStrategy, refreshStrategy );
-		verifyAll();
 
 		for ( int i = 0; i < workCount; ++i ) {
 			LuceneWriteWork<Object> work = createWorkMock();

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.work.execution.impl;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
@@ -30,7 +30,7 @@ public interface WorkExecutionIndexManagerContext {
 
 	LuceneWriteWorkOrchestrator getWriteOrchestrator(String documentId, String routingKey);
 
-	Collection<LuceneWriteWorkOrchestrator> getWriteOrchestrators(Set<String> routingKeys);
+	List<LuceneWriteWorkOrchestrator> getWriteOrchestrators(Set<String> routingKeys);
 
-	Collection<LuceneWriteWorkOrchestrator> getAllWriteOrchestrators();
+	List<LuceneWriteWorkOrchestrator> getAllWriteOrchestrators();
 }

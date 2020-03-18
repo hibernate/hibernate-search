@@ -127,9 +127,9 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 	}
 
 	@Override
-	public Collection<LuceneWriteWorkOrchestrator> getWriteOrchestrators(Set<String> routingKeys) {
+	public List<LuceneWriteWorkOrchestrator> getWriteOrchestrators(Set<String> routingKeys) {
 		Collection<Shard> enabledShards = toShards( routingKeys );
-		Collection<LuceneWriteWorkOrchestrator> orchestrators = new ArrayList<>();
+		List<LuceneWriteWorkOrchestrator> orchestrators = new ArrayList<>();
 		for ( Shard shard : enabledShards ) {
 			orchestrators.add( shard.getWriteOrchestrator() );
 		}
@@ -137,7 +137,7 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 	}
 
 	@Override
-	public Collection<LuceneWriteWorkOrchestrator> getAllWriteOrchestrators() {
+	public List<LuceneWriteWorkOrchestrator> getAllWriteOrchestrators() {
 		return writeOrchestrators;
 	}
 
