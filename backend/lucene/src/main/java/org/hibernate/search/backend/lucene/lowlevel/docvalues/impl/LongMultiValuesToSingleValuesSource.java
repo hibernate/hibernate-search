@@ -26,6 +26,10 @@ import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider
  * An implementation of {@link LongValuesSource} for docvalues with multiple values per document,
  * where multiple values are "aggregated" into a single value
  * according to a given {@link MultiValueMode}.
+ * <p>
+ * Some of this code was copied and adapted from
+ * {@code org.elasticsearch.search.MultiValueMode}
+ * from the <a href="https://github.com/elastic/elasticsearch">Elasticsearch project</a>.
  */
 public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSource {
 
