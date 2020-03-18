@@ -22,13 +22,13 @@ public interface LuceneWorkFactory {
 
 	LuceneSchemaManagementWork<Void> validateIndexExists();
 
-	LuceneSingleDocumentWriteWork<?> add(String tenantId, String entityTypeName, Object entityIdentifier,
+	LuceneSingleDocumentWriteWork add(String tenantId, String entityTypeName, Object entityIdentifier,
 			LuceneIndexEntry indexEntry);
 
-	LuceneSingleDocumentWriteWork<?> update(String tenantId, String entityTypeName, Object entityIdentifier,
+	LuceneSingleDocumentWriteWork update(String tenantId, String entityTypeName, Object entityIdentifier,
 			String documentIdentifier, LuceneIndexEntry indexEntry);
 
-	LuceneSingleDocumentWriteWork<?> delete(String tenantId, String entityTypeName, Object entityIdentifier, String id);
+	LuceneSingleDocumentWriteWork delete(String tenantId, String entityTypeName, Object entityIdentifier, String id);
 
 	LuceneWriteWork<?> deleteAll(String tenantId, Set<String> routingKeys);
 

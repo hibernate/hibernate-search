@@ -36,7 +36,7 @@ public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 
-	private final Map<LuceneWriteWorkOrchestrator, List<LuceneSingleDocumentWriteWork<?>>> worksByOrchestrator = new HashMap<>();
+	private final Map<LuceneWriteWorkOrchestrator, List<LuceneSingleDocumentWriteWork>> worksByOrchestrator = new HashMap<>();
 
 	public LuceneIndexIndexingPlan(LuceneWorkFactory factory,
 			WorkExecutionIndexManagerContext indexManagerContext,
@@ -101,9 +101,9 @@ public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	public CompletableFuture<IndexIndexingPlanExecutionReport<R>> executeAndReport() {
 		try {
 			List<CompletableFuture<IndexIndexingPlanExecutionReport<R>>> shardReportFutures = new ArrayList<>();
-			for ( Map.Entry<LuceneWriteWorkOrchestrator, List<LuceneSingleDocumentWriteWork<?>>> entry : worksByOrchestrator.entrySet() ) {
+			for ( Map.Entry<LuceneWriteWorkOrchestrator, List<LuceneSingleDocumentWriteWork>> entry : worksByOrchestrator.entrySet() ) {
 				LuceneWriteWorkOrchestrator orchestrator = entry.getKey();
-				List<LuceneSingleDocumentWriteWork<?>> works = entry.getValue();
+				List<LuceneSingleDocumentWriteWork> works = entry.getValue();
 				CompletableFuture<IndexIndexingPlanExecutionReport<R>> shardReportFuture = new CompletableFuture<>();
 				orchestrator.submit( new LuceneIndexingPlanWriteWorkSet<>(
 						works,
@@ -124,11 +124,11 @@ public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 		worksByOrchestrator.clear();
 	}
 
-	private void collect(String documentId, String routingKey, LuceneSingleDocumentWriteWork<?> work) {
+	private void collect(String documentId, String routingKey, LuceneSingleDocumentWriteWork work) {
 		// Route the work to the appropriate shard
 		LuceneWriteWorkOrchestrator orchestrator = indexManagerContext.getWriteOrchestrator( documentId, routingKey );
 
-		List<LuceneSingleDocumentWriteWork<?>> works = worksByOrchestrator.get( orchestrator );
+		List<LuceneSingleDocumentWriteWork> works = worksByOrchestrator.get( orchestrator );
 		if ( works == null ) {
 			works = new ArrayList<>();
 			worksByOrchestrator.put( orchestrator, works );

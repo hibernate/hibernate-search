@@ -42,7 +42,7 @@ public class LuceneIndexingPlanWriteWorkSetTest extends EasyMockSupport {
 	private EntityReferenceFactory<StubEntityReference> entityReferenceFactoryMock =
 			createStrictMock( EntityReferenceFactory.class );
 
-	private List<LuceneSingleDocumentWriteWork<?>> workMocks = new ArrayList<>();
+	private List<LuceneSingleDocumentWriteWork> workMocks = new ArrayList<>();
 
 	@Test
 	public void success_commitNone_refreshNone() {
@@ -227,7 +227,7 @@ public class LuceneIndexingPlanWriteWorkSetTest extends EasyMockSupport {
 
 	private void expectWorkGetInfo(int ... ids) {
 		for ( int id : ids ) {
-			LuceneSingleDocumentWriteWork<?> workMock = workMocks.get( id );
+			LuceneSingleDocumentWriteWork workMock = workMocks.get( id );
 			EasyMock.expect( workMock.getInfo() ).andStubReturn( workInfo( id ) );
 			EasyMock.expect( workMock.getEntityTypeName() ).andStubReturn( TYPE_NAME );
 			EasyMock.expect( workMock.getEntityIdentifier() ).andStubReturn( id );
@@ -237,7 +237,7 @@ public class LuceneIndexingPlanWriteWorkSetTest extends EasyMockSupport {
 	}
 
 	private void expectFailingWorkGetInfo(int id, Throwable thrown) {
-		LuceneSingleDocumentWriteWork<?> workMock = workMocks.get( id );
+		LuceneSingleDocumentWriteWork workMock = workMocks.get( id );
 		EasyMock.expect( workMock.getInfo() ).andStubReturn( workInfo( id ) );
 		EasyMock.expect( workMock.getEntityTypeName() ).andStubReturn( TYPE_NAME );
 		EasyMock.expect( workMock.getEntityIdentifier() ).andStubReturn( id );
@@ -245,17 +245,17 @@ public class LuceneIndexingPlanWriteWorkSetTest extends EasyMockSupport {
 				.andThrow( thrown );
 	}
 
-	private List<LuceneSingleDocumentWriteWork<?>> createWorkMocks(int count) {
-		List<LuceneSingleDocumentWriteWork<?>> result = new ArrayList<>();
+	private List<LuceneSingleDocumentWriteWork> createWorkMocks(int count) {
+		List<LuceneSingleDocumentWriteWork> result = new ArrayList<>();
 		for ( int i = 0; i < count; i++ ) {
 			result.add( createWorkMock() );
 		}
 		return result;
 	}
 
-	private <T> LuceneSingleDocumentWriteWork<T> createWorkMock() {
+	private <T> LuceneSingleDocumentWriteWork createWorkMock() {
 		String workName = workInfo( workMocks.size() );
-		LuceneSingleDocumentWriteWork<T> workMock = createStrictMock( workName, LuceneSingleDocumentWriteWork.class );
+		LuceneSingleDocumentWriteWork workMock = createStrictMock( workName, LuceneSingleDocumentWriteWork.class );
 		workMocks.add( workMock );
 		return workMock;
 	}
