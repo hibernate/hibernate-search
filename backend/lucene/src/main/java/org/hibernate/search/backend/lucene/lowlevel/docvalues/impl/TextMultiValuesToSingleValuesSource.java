@@ -106,7 +106,7 @@ public abstract class TextMultiValuesToSingleValuesSource {
 				@Override
 				public boolean advanceExact(int doc) throws IOException {
 					if ( values.advanceExact( doc ) ) {
-						lastEmittedOrd = (int) pick( values );
+						lastEmittedOrd = (int) mode.pick( values );
 						docID = doc;
 						return true;
 					}
@@ -153,68 +153,10 @@ public abstract class TextMultiValuesToSingleValuesSource {
 				}
 
 				docID = lastSeenParentDoc = parentDoc;
-				lastEmittedOrd = (int) pick( values, childDocs, nextChildWithValue, parentDoc );
+				lastEmittedOrd = (int) mode.pick( values, childDocs, nextChildWithValue, parentDoc );
 				return true;
 			}
 		};
-	}
-
-	protected long pick(SortedSetDocValues values) throws IOException {
-		long result;
-
-		switch ( mode ) {
-			case MIN: {
-				result = Long.MAX_VALUE;
-				for ( long ord; ( ord = values.nextOrd() ) != SortedSetDocValues.NO_MORE_ORDS; ) {
-					result = Math.min( result, ord );
-				}
-				break;
-			}
-			case MAX: {
-				result = Long.MIN_VALUE;
-				for ( long ord; ( ord = values.nextOrd() ) != SortedSetDocValues.NO_MORE_ORDS; ) {
-					result = Math.max( result, ord );
-				}
-				break;
-			}
-			default:
-				throw new IllegalArgumentException( "Unsupported sort mode: " + mode );
-		}
-
-		return result;
-	}
-
-	protected long pick(SortedSetDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc) throws IOException {
-		long returnValue;
-
-		switch ( mode ) {
-			case MIN: {
-				returnValue = Long.MAX_VALUE;
-				for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
-					if ( values.advanceExact( doc ) ) {
-						for ( long ord; ( ord = values.nextOrd() ) != SortedSetDocValues.NO_MORE_ORDS; ) {
-							returnValue = Math.min( returnValue, ord );
-						}
-					}
-				}
-				break;
-			}
-			case MAX: {
-				returnValue = Long.MIN_VALUE;
-				for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
-					if ( values.advanceExact( doc ) ) {
-						for ( long ord; ( ord = values.nextOrd() ) != SortedSetDocValues.NO_MORE_ORDS; ) {
-							returnValue = Math.max( returnValue, ord );
-						}
-					}
-				}
-				break;
-			}
-			default:
-				throw new IllegalArgumentException( "Unsupported sort mode: " + mode );
-		}
-
-		return returnValue;
 	}
 
 	private static class FieldMultiValuesToSingleValuesSource extends TextMultiValuesToSingleValuesSource {

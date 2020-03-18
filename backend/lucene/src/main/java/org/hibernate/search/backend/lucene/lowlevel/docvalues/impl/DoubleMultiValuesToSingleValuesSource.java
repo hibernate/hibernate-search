@@ -135,7 +135,7 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 				@Override
 				public boolean advanceExact(int doc) throws IOException {
 					if ( values.advanceExact( doc ) ) {
-						value = pick( values );
+						value = mode.pick( values );
 						return true;
 					}
 					return false;
@@ -176,126 +176,11 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 				}
 
 				lastSeenParentDoc = parentDoc;
-				lastEmittedValue = pick( values, childDocs, nextChildWithValue, parentDoc );
+				lastEmittedValue = mode.pick( values, childDocs, nextChildWithValue, parentDoc );
 				return true;
 			}
 
 		};
-	}
-
-	protected double pick(SortedNumericDoubleDocValues values) throws IOException {
-		final int valueCount = values.docValueCount();
-		double result = 0;
-
-		switch ( mode ) {
-			case SUM: {
-				for ( int index = 0; index < valueCount; ++index ) {
-					result += values.nextValue();
-				}
-				break;
-			}
-			case AVG: {
-				for ( int index = 0; index < valueCount; ++index ) {
-					result += values.nextValue();
-				}
-				result = result / valueCount;
-				break;
-			}
-			case MIN: {
-				// Values are sorted; the first value is the min.
-				result = values.nextValue();
-				break;
-			}
-			case MAX: {
-				// Values are sorted; the last value is the max.
-				for ( int index = 0; index < valueCount - 1; ++index ) {
-					values.nextValue();
-				}
-				result = values.nextValue();
-				break;
-			}
-			case MEDIAN: {
-				for ( int i = 0; i < (valueCount - 1) / 2; ++i ) {
-					values.nextValue();
-				}
-				if ( valueCount % 2 == 0 ) {
-					result = (values.nextValue() + values.nextValue()) / 2;
-				}
-				else {
-					result = values.nextValue();
-				}
-				break;
-			}
-			default:
-				throw new IllegalArgumentException( "Unsupported sort mode: " + mode );
-		}
-
-		return result;
-	}
-
-	protected double pick(SortedNumericDoubleDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc) throws IOException {
-		double returnValue = 0;
-
-		switch ( mode ) {
-			case SUM: {
-				for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
-					if ( values.advanceExact( doc ) ) {
-						final int valueCountForChild = values.docValueCount();
-						for ( int index = 0; index < valueCountForChild; ++index ) {
-							returnValue += values.nextValue();
-						}
-					}
-				}
-				break;
-			}
-			case AVG: {
-				int valueCount = 0;
-				for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
-					if ( values.advanceExact( doc ) ) {
-						final int valueCountForChild = values.docValueCount();
-						for ( int index = 0; index < valueCountForChild; ++index ) {
-							returnValue += values.nextValue();
-						}
-						valueCount += valueCountForChild;
-					}
-				}
-				if ( valueCount > 0 ) {
-					returnValue = returnValue / valueCount;
-				}
-				else {
-					returnValue = 0;
-				}
-				break;
-			}
-			case MIN: {
-				returnValue = Double.POSITIVE_INFINITY;
-				for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
-					if ( values.advanceExact( doc ) ) {
-						// Values are sorted; the first value is the min for this document.
-						returnValue = Math.min( returnValue, values.nextValue() );
-					}
-				}
-				break;
-			}
-			case MAX: {
-				returnValue = Double.NEGATIVE_INFINITY;
-				for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
-					if ( values.advanceExact( doc ) ) {
-						final int valueCountForChild = values.docValueCount();
-						// Values are sorted; the last value is the max for this document.
-						for ( int index = 0; index < valueCountForChild - 1; ++index ) {
-							values.nextValue();
-						}
-						returnValue = Math.max( returnValue, values.nextValue() );
-					}
-				}
-				break;
-			}
-			default:
-				throw new IllegalArgumentException( "Unsupported sort mode: " + mode );
-		}
-
-		return returnValue;
 	}
 
 	private static class FieldMultiValuesToSingleValuesSource extends DoubleMultiValuesToSingleValuesSource {
