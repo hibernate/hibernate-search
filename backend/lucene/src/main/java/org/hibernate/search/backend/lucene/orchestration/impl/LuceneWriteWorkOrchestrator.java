@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.lucene.work.impl.LuceneSchemaManagementWork;
+import org.hibernate.search.backend.lucene.work.impl.LuceneIndexManagementWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -16,9 +16,9 @@ import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrateg
 
 public interface LuceneWriteWorkOrchestrator {
 
-	default <T> CompletableFuture<T> submit(LuceneSchemaManagementWork<T> work) {
+	default <T> CompletableFuture<T> submit(LuceneIndexManagementWork<T> work) {
 		CompletableFuture<T> future = new CompletableFuture<>();
-		submit( new LuceneSchemaManagementWorkSet<>( work, future ) );
+		submit( new LuceneManagementWorkSet<>( work, future ) );
 		return future;
 	}
 

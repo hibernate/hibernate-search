@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
-import org.hibernate.search.backend.lucene.work.impl.LuceneSchemaManagementWork;
+import org.hibernate.search.backend.lucene.work.impl.LuceneIndexManagementWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -89,7 +89,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 		workSetHasFailure = false;
 	}
 
-	public <T> T submit(LuceneSchemaManagementWork<T> work) {
+	public <T> T submit(LuceneIndexManagementWork<T> work) {
 		try {
 			return work.execute( indexAccessor );
 		}

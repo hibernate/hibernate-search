@@ -16,11 +16,17 @@ import org.apache.lucene.search.Query;
 
 public interface LuceneWorkFactory {
 
-	LuceneSchemaManagementWork<Void> createIndexIfMissing();
+	LuceneIndexManagementWork<Void> createIndexIfMissing();
 
-	LuceneSchemaManagementWork<Void> dropIndexIfExisting();
+	LuceneIndexManagementWork<Void> dropIndexIfExisting();
 
-	LuceneSchemaManagementWork<Void> validateIndexExists();
+	LuceneIndexManagementWork<Void> validateIndexExists();
+
+	LuceneIndexManagementWork<?> flush();
+
+	LuceneIndexManagementWork<?> refresh();
+
+	LuceneIndexManagementWork<?> mergeSegments();
 
 	LuceneSingleDocumentWriteWork add(String tenantId, String entityTypeName, Object entityIdentifier,
 			LuceneIndexEntry indexEntry);
@@ -31,10 +37,6 @@ public interface LuceneWorkFactory {
 	LuceneSingleDocumentWriteWork delete(String tenantId, String entityTypeName, Object entityIdentifier, String id);
 
 	LuceneWriteWork<?> deleteAll(String tenantId, Set<String> routingKeys);
-
-	LuceneWriteWork<?> noOp();
-
-	LuceneWriteWork<?> mergeSegments();
 
 	<R> LuceneReadWork<R> search(LuceneSearcher<R> searcher, Integer offset, Integer limit);
 

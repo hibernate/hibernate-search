@@ -28,18 +28,33 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	}
 
 	@Override
-	public LuceneSchemaManagementWork<Void> createIndexIfMissing() {
+	public LuceneIndexManagementWork<Void> createIndexIfMissing() {
 		return new LuceneCreateIndexIfMissingWork();
 	}
 
 	@Override
-	public LuceneSchemaManagementWork<Void> dropIndexIfExisting() {
+	public LuceneIndexManagementWork<Void> dropIndexIfExisting() {
 		return new LuceneDropIndexIfExistingWork();
 	}
 
 	@Override
-	public LuceneSchemaManagementWork<Void> validateIndexExists() {
+	public LuceneIndexManagementWork<Void> validateIndexExists() {
 		return new LuceneValidateIndexExistsWork();
+	}
+
+	@Override
+	public LuceneIndexManagementWork<?> flush() {
+		return new LuceneFlushWork();
+	}
+
+	@Override
+	public LuceneIndexManagementWork<?> refresh() {
+		return new LuceneRefreshWork();
+	}
+
+	@Override
+	public LuceneIndexManagementWork<?> mergeSegments() {
+		return new LuceneMergeSegmentsWork();
 	}
 
 	@Override
@@ -75,16 +90,6 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 		}
 
 		return new LuceneDeleteEntriesByQueryWork( Queries.boolFilter( new MatchAllDocsQuery(), filters ) );
-	}
-
-	@Override
-	public LuceneWriteWork<?> noOp() {
-		return new LuceneNoOpWriteWork();
-	}
-
-	@Override
-	public LuceneWriteWork<?> mergeSegments() {
-		return new LuceneMergeSegmentsWork();
 	}
 
 	@Override

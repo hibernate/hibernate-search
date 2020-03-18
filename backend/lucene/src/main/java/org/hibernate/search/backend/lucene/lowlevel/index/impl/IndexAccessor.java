@@ -63,6 +63,11 @@ public interface IndexAccessor {
 	void refresh();
 
 	/**
+	 * Merge segments files.
+	 */
+	void mergeSegments();
+
+	/**
 	 * @return The index writer delegator.
 	 */
 	IndexWriterDelegator getIndexWriterDelegator() throws IOException;
