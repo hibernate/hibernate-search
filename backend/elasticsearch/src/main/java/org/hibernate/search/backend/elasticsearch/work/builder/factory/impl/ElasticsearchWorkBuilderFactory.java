@@ -36,7 +36,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.RefreshWorkB
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.ScrollWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.WaitForIndexStatusWorkBuilder;
-import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
 
 import com.google.gson.JsonObject;
@@ -60,7 +60,7 @@ public interface ElasticsearchWorkBuilderFactory {
 
 	MergeSegmentsWorkBuilder mergeSegments();
 
-	BulkWorkBuilder bulk(List<? extends BulkableElasticsearchWork<?>> bulkableWorks);
+	BulkWorkBuilder bulk(List<? extends BulkableWork<?>> bulkableWorks);
 
 	<T> SearchWorkBuilder<T> search(JsonObject payload, ElasticsearchSearchResultExtractor<T> searchResultExtractor);
 

@@ -13,9 +13,9 @@ import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
-import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResultItemExtractor;
@@ -59,7 +59,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 	 * @param work The work to be executed
 	 */
 	@Override
-	public <T> CompletableFuture<T> addNonBulkExecution(NonBulkableElasticsearchWork<T> work) {
+	public <T> CompletableFuture<T> addNonBulkExecution(NonBulkableWork<T> work) {
 		// Use a local variable to make sure lambdas (if any) won't be affected by a reset()
 		final SequenceContext sequenceContext = this.currentlyBuildingSequenceContext;
 
@@ -91,7 +91,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 	 * @param workFuture The work to be executed
 	 */
 	@Override
-	public CompletableFuture<BulkResult> addBulkExecution(CompletableFuture<? extends NonBulkableElasticsearchWork<BulkResult>> workFuture) {
+	public CompletableFuture<BulkResult> addBulkExecution(CompletableFuture<? extends NonBulkableWork<BulkResult>> workFuture) {
 		// Use a local variable to make sure lambdas (if any) won't be affected by a reset()
 		final SequenceContext currentSequenceContext = this.currentlyBuildingSequenceContext;
 
@@ -138,7 +138,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		}
 
 		@Override
-		public <T> CompletableFuture<T> add(BulkableElasticsearchWork<T> bulkedWork, int index) {
+		public <T> CompletableFuture<T> add(BulkableWork<T> bulkedWork, int index) {
 			// Use local variables to make sure the lambdas won't be affected by a reset()
 			final SequenceContext sequenceContext = ElasticsearchDefaultWorkSequenceBuilder.this.currentlyBuildingSequenceContext;
 
@@ -189,7 +189,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 			this.executionContext = executionContext;
 		}
 
-		<T> CompletionStage<T> execute(NonBulkableElasticsearchWork<T> work) {
+		<T> CompletionStage<T> execute(NonBulkableWork<T> work) {
 			return work.execute( executionContext );
 		}
 
@@ -254,9 +254,9 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		}
 	}
 
-	private static final class NonBulkedWorkExecutionState<R> extends AbstractWorkExecutionState<R, NonBulkableElasticsearchWork<R>> {
+	private static final class NonBulkedWorkExecutionState<R> extends AbstractWorkExecutionState<R, NonBulkableWork<R>> {
 
-		private NonBulkedWorkExecutionState(SequenceContext sequenceContext, NonBulkableElasticsearchWork<R> work) {
+		private NonBulkedWorkExecutionState(SequenceContext sequenceContext, NonBulkableWork<R> work) {
 			super( sequenceContext, work );
 		}
 
@@ -272,16 +272,16 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		}
 	}
 
-	private static final class BulkedWorkExecutionState<R> extends AbstractWorkExecutionState<R, BulkableElasticsearchWork<R>> {
+	private static final class BulkedWorkExecutionState<R> extends AbstractWorkExecutionState<R, BulkableWork<R>> {
 
-		private final BulkableElasticsearchWork<R> bulkedWork;
+		private final BulkableWork<R> bulkedWork;
 
 		private final int index;
 
 		private BulkResultItemExtractor extractor;
 
 		private BulkedWorkExecutionState(SequenceContext sequenceContext,
-				BulkableElasticsearchWork<R> bulkedWork, int index) {
+				BulkableWork<R> bulkedWork, int index) {
 			super( sequenceContext, bulkedWork );
 			this.bulkedWork = bulkedWork;
 			this.index = index;

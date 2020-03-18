@@ -6,10 +6,10 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
-import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 
 
-public interface DropIndexWorkBuilder extends ElasticsearchWorkBuilder<NonBulkableElasticsearchWork<Void>> {
+public interface DropIndexWorkBuilder extends ElasticsearchWorkBuilder<NonBulkableWork<Void>> {
 
 	DropIndexWorkBuilder ignoreIndexNotFound();
 

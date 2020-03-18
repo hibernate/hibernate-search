@@ -13,8 +13,8 @@ import static org.hibernate.search.util.impl.test.FutureAssert.assertThat;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkAggregator;
 
 import org.junit.Before;
@@ -44,7 +44,7 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 
 	@Test
 	public void simple_singleWorkInWorkSet() {
-		NonBulkableElasticsearchWork<Object> work = work( 1 );
+		NonBulkableWork<Object> work = work( 1 );
 
 		CompletableFuture<Void> sequenceFuture = new CompletableFuture<>();
 
@@ -82,8 +82,8 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 
 	@Test
 	public void simple_multipleWorksInWorkSet() {
-		NonBulkableElasticsearchWork<Object> work1 = work( 1 );
-		BulkableElasticsearchWork<Object> work2 = bulkableWork( 2 );
+		NonBulkableWork<Object> work1 = work( 1 );
+		BulkableWork<Object> work2 = bulkableWork( 2 );
 
 		CompletableFuture<Void> sequenceFuture = new CompletableFuture<>();
 
@@ -123,7 +123,7 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 
 	@Test
 	public void simple_sequenceFailure() {
-		NonBulkableElasticsearchWork<Object> work = work( 1 );
+		NonBulkableWork<Object> work = work( 1 );
 
 		CompletableFuture<Void> sequenceFuture = new CompletableFuture<>();
 
@@ -166,9 +166,9 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 
 	@Test
 	public void parallelSequenceBetweenWorkset() {
-		NonBulkableElasticsearchWork<Object> work1 = work( 1 );
+		NonBulkableWork<Object> work1 = work( 1 );
 
-		BulkableElasticsearchWork<Object> work2 = bulkableWork( 2 );
+		BulkableWork<Object> work2 = bulkableWork( 2 );
 
 		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
 		CompletableFuture<Void> sequence2Future = new CompletableFuture<>();
@@ -221,9 +221,9 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 
 	@Test
 	public void reuseBulkAcrossSequences() {
-		BulkableElasticsearchWork<Object> work1 = bulkableWork( 1 );
+		BulkableWork<Object> work1 = bulkableWork( 1 );
 
-		BulkableElasticsearchWork<Object> work2 = bulkableWork( 2 );
+		BulkableWork<Object> work2 = bulkableWork( 2 );
 
 		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
 		CompletableFuture<Void> sequence2Future = new CompletableFuture<>();
@@ -283,9 +283,9 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 
 	@Test
 	public void newBulkIfNonBulkable_sameWorkset() {
-		BulkableElasticsearchWork<Object> work1 = bulkableWork( 1 );
-		NonBulkableElasticsearchWork<Object> work2 = work( 2 );
-		BulkableElasticsearchWork<Object> work3 = bulkableWork( 3 );
+		BulkableWork<Object> work1 = bulkableWork( 1 );
+		NonBulkableWork<Object> work2 = work( 2 );
+		BulkableWork<Object> work3 = bulkableWork( 3 );
 
 		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
 
@@ -333,9 +333,9 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 
 	@Test
 	public void newBulkIfNonBulkable_differentWorksets() {
-		BulkableElasticsearchWork<Object> work1 = bulkableWork( 1 );
-		NonBulkableElasticsearchWork<Object> work2 = work( 2 );
-		BulkableElasticsearchWork<Object> work3 = bulkableWork( 3 );
+		BulkableWork<Object> work1 = bulkableWork( 1 );
+		NonBulkableWork<Object> work2 = work( 2 );
+		BulkableWork<Object> work3 = bulkableWork( 3 );
 
 		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
 		CompletableFuture<Void> sequence2Future = new CompletableFuture<>();
@@ -405,22 +405,22 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 		verifyAll();
 	}
 
-	private <T> NonBulkableElasticsearchWork<T> work(int index) {
-		return createStrictMock( "work" + index, NonBulkableElasticsearchWork.class );
+	private <T> NonBulkableWork<T> work(int index) {
+		return createStrictMock( "work" + index, NonBulkableWork.class );
 	}
 
-	private <T> BulkableElasticsearchWork<T> bulkableWork(int index) {
-		return createStrictMock( "bulkableWork" + index, BulkableElasticsearchWork.class );
+	private <T> BulkableWork<T> bulkableWork(int index) {
+		return createStrictMock( "bulkableWork" + index, BulkableWork.class );
 	}
 
-	private <T> IAnswer<CompletableFuture<T>> nonBulkableAggregateAnswer(NonBulkableElasticsearchWork<T> mock) {
+	private <T> IAnswer<CompletableFuture<T>> nonBulkableAggregateAnswer(NonBulkableWork<T> mock) {
 		return () -> {
 			ElasticsearchWorkAggregator aggregator = (ElasticsearchWorkAggregator) getCurrentArguments()[0];
 			return aggregator.addNonBulkable( mock );
 		};
 	}
 
-	private <T> IAnswer<CompletableFuture<T>> bulkableAggregateAnswer(BulkableElasticsearchWork<T> mock) {
+	private <T> IAnswer<CompletableFuture<T>> bulkableAggregateAnswer(BulkableWork<T> mock) {
 		return () -> {
 			ElasticsearchWorkAggregator aggregator = (ElasticsearchWorkAggregator) getCurrentArguments()[0];
 			return aggregator.addBulkable( mock );

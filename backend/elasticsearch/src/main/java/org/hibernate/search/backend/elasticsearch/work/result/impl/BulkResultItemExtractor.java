@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.result.impl;
 
-import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
 
 
 public interface BulkResultItemExtractor {
 
-	<T> T extract(BulkableElasticsearchWork<T> work, int index);
+	<T> T extract(BulkableWork<T> work, int index);
 
 }

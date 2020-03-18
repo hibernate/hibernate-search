@@ -20,7 +20,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.MergeSegment
  * <p>
  * The ForceMerge API replaced the removed Optimize API in ES5.
  */
-public class ForceMergeWork extends AbstractNonBulkableElasticsearchWork<Void> {
+public class ForceMergeWork extends AbstractNonBulkableWork<Void> {
 
 	protected ForceMergeWork(Builder builder) {
 		super( builder );

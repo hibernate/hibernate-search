@@ -14,9 +14,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.Supplier;
 
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkSequenceBuilder.BulkResultExtractionStep;
-import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
-import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResultItemExtractor;
 import org.hibernate.search.util.common.SearchException;
@@ -41,8 +41,8 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 	@Test
 	public void simple() {
-		NonBulkableElasticsearchWork<Object> work1 = work( 1 );
-		NonBulkableElasticsearchWork<Object> work2 = work( 2 );
+		NonBulkableWork<Object> work1 = work( 1 );
+		NonBulkableWork<Object> work2 = work( 2 );
 
 		Object work1Result = new Object();
 		Object work2Result = new Object();
@@ -115,11 +115,11 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 	@Test
 	public void bulk() {
-		NonBulkableElasticsearchWork<Object> work1 = work( 1 );
-		BulkableElasticsearchWork<Object> work2 = bulkableWork( 2 );
-		BulkableElasticsearchWork<Object> work3 = bulkableWork( 3 );
-		NonBulkableElasticsearchWork<Object> work4 = work( 4 );
-		NonBulkableElasticsearchWork<BulkResult> bulkWork = work( 5 );
+		NonBulkableWork<Object> work1 = work( 1 );
+		BulkableWork<Object> work2 = bulkableWork( 2 );
+		BulkableWork<Object> work3 = bulkableWork( 3 );
+		NonBulkableWork<Object> work4 = work( 4 );
+		NonBulkableWork<BulkResult> bulkWork = work( 5 );
 
 		Object work1Result = new Object();
 		Object work2Result = new Object();
@@ -130,7 +130,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
-		CompletableFuture<NonBulkableElasticsearchWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
+		CompletableFuture<NonBulkableWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkResultFuture = new CompletableFuture<>();
 		CompletableFuture<Object> work1Future = new CompletableFuture<>();
 		CompletableFuture<Object> work4Future = new CompletableFuture<>();
@@ -235,8 +235,8 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 	@Test
 	public void newSequenceOnReset() {
-		NonBulkableElasticsearchWork<Void> work1 = work( 1 );
-		NonBulkableElasticsearchWork<Void> work2 = work( 2 );
+		NonBulkableWork<Void> work1 = work( 1 );
+		NonBulkableWork<Void> work2 = work( 2 );
 
 		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture1 = new CompletableFuture<>();
@@ -311,9 +311,9 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 	@Test
 	public void error_work() {
-		NonBulkableElasticsearchWork<Object> work0 = work( 0 );
-		NonBulkableElasticsearchWork<Void> work1 = work( 1 );
-		NonBulkableElasticsearchWork<Void> work2 = work( 2 );
+		NonBulkableWork<Object> work0 = work( 0 );
+		NonBulkableWork<Void> work1 = work( 1 );
+		NonBulkableWork<Void> work2 = work( 2 );
 
 		Object work0Result = new Object();
 
@@ -374,14 +374,14 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 	@Test
 	public void error_bulk_work() {
-		BulkableElasticsearchWork<Void> work1 = bulkableWork( 1 );
-		BulkableElasticsearchWork<Void> work2 = bulkableWork( 2 );
-		BulkableElasticsearchWork<Void> work3 = bulkableWork( 3 );
-		NonBulkableElasticsearchWork<Void> work4 = work( 4 );
+		BulkableWork<Void> work1 = bulkableWork( 1 );
+		BulkableWork<Void> work2 = bulkableWork( 2 );
+		BulkableWork<Void> work3 = bulkableWork( 3 );
+		NonBulkableWork<Void> work4 = work( 4 );
 
 		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
-		CompletableFuture<NonBulkableElasticsearchWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
+		CompletableFuture<NonBulkableWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
 
 		// Futures returned by the sequence builder: we will test them
 		CompletableFuture<Void> work1FutureFromSequenceBuilder;
@@ -443,15 +443,15 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 	@Test
 	public void error_bulk_result() {
-		BulkableElasticsearchWork<Void> work1 = bulkableWork( 1 );
-		BulkableElasticsearchWork<Void> work2 = bulkableWork( 2 );
-		BulkableElasticsearchWork<Void> work3 = bulkableWork( 3 );
-		NonBulkableElasticsearchWork<BulkResult> bulkWork = work( 4 );
-		NonBulkableElasticsearchWork<Void> work4 = work( 5 );
+		BulkableWork<Void> work1 = bulkableWork( 1 );
+		BulkableWork<Void> work2 = bulkableWork( 2 );
+		BulkableWork<Void> work3 = bulkableWork( 3 );
+		NonBulkableWork<BulkResult> bulkWork = work( 4 );
+		NonBulkableWork<Void> work4 = work( 5 );
 
 		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
-		CompletableFuture<NonBulkableElasticsearchWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
+		CompletableFuture<NonBulkableWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkResultFuture = new CompletableFuture<>();
 
 		// Futures returned by the sequence builder: we will test them
@@ -525,11 +525,11 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 	@Test
 	public void error_bulk_resultExtraction_singleFailure() {
-		BulkableElasticsearchWork<Object> work1 = bulkableWork( 1 );
-		BulkableElasticsearchWork<Void> work2 = bulkableWork( 2 );
-		BulkableElasticsearchWork<Object> work3 = bulkableWork( 3 );
-		NonBulkableElasticsearchWork<Void> work4 = work( 4 );
-		NonBulkableElasticsearchWork<BulkResult> bulkWork = work( 5 );
+		BulkableWork<Object> work1 = bulkableWork( 1 );
+		BulkableWork<Void> work2 = bulkableWork( 2 );
+		BulkableWork<Object> work3 = bulkableWork( 3 );
+		NonBulkableWork<Void> work4 = work( 4 );
+		NonBulkableWork<BulkResult> bulkWork = work( 5 );
 
 		Object work1Result = new Object();
 		Object work3Result = new Object();
@@ -538,7 +538,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
-		CompletableFuture<NonBulkableElasticsearchWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
+		CompletableFuture<NonBulkableWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkResultFuture = new CompletableFuture<>();
 
 		// Futures returned by the sequence builder: we will test them
@@ -612,17 +612,17 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 	@Test
 	public void error_bulk_resultExtraction_multipleFailures() {
-		BulkableElasticsearchWork<Object> work1 = bulkableWork( 1 );
-		BulkableElasticsearchWork<Object> work2 = bulkableWork( 2 );
-		NonBulkableElasticsearchWork<Object> work3 = work( 3 );
-		NonBulkableElasticsearchWork<BulkResult> bulkWork = work( 4 );
+		BulkableWork<Object> work1 = bulkableWork( 1 );
+		BulkableWork<Object> work2 = bulkableWork( 2 );
+		NonBulkableWork<Object> work3 = work( 3 );
+		NonBulkableWork<BulkResult> bulkWork = work( 4 );
 
 		BulkResult bulkResultMock = createStrictMock( BulkResult.class );
 		BulkResultItemExtractor bulkItemResultExtractorMock = createStrictMock( BulkResultItemExtractor.class );
 
 		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
-		CompletableFuture<NonBulkableElasticsearchWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
+		CompletableFuture<NonBulkableWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkResultFuture = new CompletableFuture<>();
 
 		// Futures returned by the sequence builder: we will test them
@@ -692,11 +692,11 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 	@Test
 	public void error_bulk_resultExtraction_future_singleFailure() {
-		BulkableElasticsearchWork<Object> work1 = bulkableWork( 1 );
-		BulkableElasticsearchWork<Void> work2 = bulkableWork( 2 );
-		BulkableElasticsearchWork<Object> work3 = bulkableWork( 3 );
-		NonBulkableElasticsearchWork<Void> work4 = work( 4 );
-		NonBulkableElasticsearchWork<BulkResult> bulkWork = work( 5 );
+		BulkableWork<Object> work1 = bulkableWork( 1 );
+		BulkableWork<Void> work2 = bulkableWork( 2 );
+		BulkableWork<Object> work3 = bulkableWork( 3 );
+		NonBulkableWork<Void> work4 = work( 4 );
+		NonBulkableWork<BulkResult> bulkWork = work( 5 );
 
 		Object work1Result = new Object();
 		Object work3Result = new Object();
@@ -705,7 +705,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
-		CompletableFuture<NonBulkableElasticsearchWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
+		CompletableFuture<NonBulkableWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkResultFuture = new CompletableFuture<>();
 
 		// Futures returned by the sequence builder: we will test them
@@ -779,17 +779,17 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 	@Test
 	public void error_bulk_resultExtraction_future_multipleFailures() {
-		BulkableElasticsearchWork<Object> work1 = bulkableWork( 1 );
-		BulkableElasticsearchWork<Object> work2 = bulkableWork( 2 );
-		NonBulkableElasticsearchWork<Object> work3 = work( 3 );
-		NonBulkableElasticsearchWork<BulkResult> bulkWork = work( 4 );
+		BulkableWork<Object> work1 = bulkableWork( 1 );
+		BulkableWork<Object> work2 = bulkableWork( 2 );
+		NonBulkableWork<Object> work3 = work( 3 );
+		NonBulkableWork<BulkResult> bulkWork = work( 4 );
 
 		BulkResult bulkResultMock = createStrictMock( BulkResult.class );
 		BulkResultItemExtractor bulkResultItemExtractorMock = createStrictMock( BulkResultItemExtractor.class );
 
 		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
-		CompletableFuture<NonBulkableElasticsearchWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
+		CompletableFuture<NonBulkableWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkResultFuture = new CompletableFuture<>();
 
 		// Futures returned by the sequence builder: we will test them
@@ -868,9 +868,9 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 	 */
 	@Test
 	public void intertwinedSequenceExecution() {
-		NonBulkableElasticsearchWork<Object> work1 = work( 1 );
-		NonBulkableElasticsearchWork<Object> work2 = work( 2 );
-		NonBulkableElasticsearchWork<Object> work3 = work( 3 );
+		NonBulkableWork<Object> work1 = work( 1 );
+		NonBulkableWork<Object> work2 = work( 2 );
+		NonBulkableWork<Object> work3 = work( 3 );
 
 		Object work1Result = new Object();
 		Object work2Result = new Object();
@@ -947,12 +947,12 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( sequence2Future ).isSuccessful( (Void) null );
 	}
 
-	private <T> NonBulkableElasticsearchWork<T> work(int index) {
-		return createStrictMock( "work" + index, NonBulkableElasticsearchWork.class );
+	private <T> NonBulkableWork<T> work(int index) {
+		return createStrictMock( "work" + index, NonBulkableWork.class );
 	}
 
-	private <T> BulkableElasticsearchWork<T> bulkableWork(int index) {
-		return createStrictMock( "bulkableWork" + index, BulkableElasticsearchWork.class );
+	private <T> BulkableWork<T> bulkableWork(int index) {
+		return createStrictMock( "bulkableWork" + index, BulkableWork.class );
 	}
 
 	private static class MyException extends Exception {

@@ -24,7 +24,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.JsonObject;
 
 
-public class SearchWork<R> extends AbstractNonBulkableElasticsearchWork<R> {
+public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 
 	private static final Log queryLog = LoggerFactory.make( Log.class, DefaultLogCategories.QUERY );
 

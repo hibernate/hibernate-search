@@ -25,9 +25,9 @@ import com.google.gson.JsonObject;
  * A delete by query work for ES5, using the core delete-by-query API.
  *
  */
-public class DeleteByQueryWork extends AbstractNonBulkableElasticsearchWork<Void> {
+public class DeleteByQueryWork extends AbstractNonBulkableWork<Void> {
 
-	private final NonBulkableElasticsearchWork<?> refreshWork;
+	private final NonBulkableWork<?> refreshWork;
 
 	protected DeleteByQueryWork(Builder builder) {
 		super( builder );
@@ -96,7 +96,7 @@ public class DeleteByQueryWork extends AbstractNonBulkableElasticsearchWork<Void
 			return builder.build();
 		}
 
-		protected NonBulkableElasticsearchWork<?> buildRefreshWork() {
+		protected NonBulkableWork<?> buildRefreshWork() {
 			return refreshWorkBuilder.build();
 		}
 

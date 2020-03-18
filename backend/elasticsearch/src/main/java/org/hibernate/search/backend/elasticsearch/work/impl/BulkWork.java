@@ -21,7 +21,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 
-public class BulkWork extends AbstractNonBulkableElasticsearchWork<BulkResult> {
+public class BulkWork extends AbstractNonBulkableWork<BulkResult> {
 
 	private static final JsonAccessor<JsonArray> BULK_ITEMS = JsonAccessor.root().property( "items" ).asArray();
 
@@ -36,13 +36,13 @@ public class BulkWork extends AbstractNonBulkableElasticsearchWork<BulkResult> {
 		return new BulkResultImpl( resultItems );
 	}
 
-	public static class Builder extends AbstractNonBulkableElasticsearchWork.AbstractBuilder<Builder>
+	public static class Builder extends AbstractNonBulkableWork.AbstractBuilder<Builder>
 			implements BulkWorkBuilder {
-		private final List<? extends BulkableElasticsearchWork<?>> bulkableWorks;
+		private final List<? extends BulkableWork<?>> bulkableWorks;
 
 		private DocumentRefreshStrategy refreshStrategy = DocumentRefreshStrategy.NONE;
 
-		public Builder(List<? extends BulkableElasticsearchWork<?>> bulkableWorks) {
+		public Builder(List<? extends BulkableWork<?>> bulkableWorks) {
 			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.bulkableWorks = bulkableWorks;
 		}
@@ -66,7 +66,7 @@ public class BulkWork extends AbstractNonBulkableElasticsearchWork<BulkResult> {
 					break;
 			}
 
-			for ( BulkableElasticsearchWork<?> work : bulkableWorks ) {
+			for ( BulkableWork<?> work : bulkableWorks ) {
 				builder.body( work.getBulkableActionMetadata() );
 				JsonObject actionBody = work.getBulkableActionBody();
 				if ( actionBody != null ) {
@@ -109,7 +109,7 @@ public class BulkWork extends AbstractNonBulkableElasticsearchWork<BulkResult> {
 		}
 
 		@Override
-		public <T> T extract(BulkableElasticsearchWork<T> work, int index) {
+		public <T> T extract(BulkableWork<T> work, int index) {
 			JsonObject bulkItemResponse = results.get( index ).getAsJsonObject();
 			return work.handleBulkResult( context, bulkItemResponse );
 		}

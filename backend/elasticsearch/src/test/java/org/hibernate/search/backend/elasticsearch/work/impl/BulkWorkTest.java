@@ -40,8 +40,8 @@ public class BulkWorkTest extends EasyMockSupport {
 
 	@Test
 	public void execute_success() {
-		BulkableElasticsearchWork<Object> bulkableWork0 = bulkableWork( 0 );
-		BulkableElasticsearchWork<Object> bulkableWork1 = bulkableWork( 1 );
+		BulkableWork<Object> bulkableWork0 = bulkableWork( 0 );
+		BulkableWork<Object> bulkableWork1 = bulkableWork( 1 );
 
 		resetAll();
 		expect( bulkableWork0.getBulkableActionMetadata() ).andReturn( bulkableWorkMetadata( 0 ) );
@@ -102,8 +102,8 @@ public class BulkWorkTest extends EasyMockSupport {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3869")
 	public void execute_http500() {
-		BulkableElasticsearchWork<Object> bulkableWork0 = bulkableWork( 0 );
-		BulkableElasticsearchWork<Object> bulkableWork1 = bulkableWork( 1 );
+		BulkableWork<Object> bulkableWork0 = bulkableWork( 0 );
+		BulkableWork<Object> bulkableWork1 = bulkableWork( 1 );
 
 		resetAll();
 		expect( bulkableWork0.getBulkableActionMetadata() ).andReturn( bulkableWorkMetadata( 0 ) );
@@ -158,8 +158,8 @@ public class BulkWorkTest extends EasyMockSupport {
 		} );
 	}
 
-	private <T> BulkableElasticsearchWork<T> bulkableWork(int index) {
-		return createStrictMock( "bulkableWork" + index, BulkableElasticsearchWork.class );
+	private <T> BulkableWork<T> bulkableWork(int index) {
+		return createStrictMock( "bulkableWork" + index, BulkableWork.class );
 	}
 
 	private static JsonObject bulkableWorkMetadata(int index) {

@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.CloseIndexWorkBuilder;
 
-public class CloseIndexWork extends AbstractNonBulkableElasticsearchWork<Void> {
+public class CloseIndexWork extends AbstractNonBulkableWork<Void> {
 
 	protected CloseIndexWork(Builder builder) {
 		super( builder );

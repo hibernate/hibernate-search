@@ -6,10 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
-public interface SingleDocumentElasticsearchWork<T> extends ElasticsearchWork<T> {
+import java.util.concurrent.CompletableFuture;
 
-	String getEntityTypeName();
 
-	Object getEntityIdentifier();
+public interface NonBulkableWork<T> extends ElasticsearchWork<T> {
+
+	CompletableFuture<T> execute(ElasticsearchWorkExecutionContext context);
 
 }

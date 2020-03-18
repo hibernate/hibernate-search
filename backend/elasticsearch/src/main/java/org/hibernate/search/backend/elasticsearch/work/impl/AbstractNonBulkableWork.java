@@ -22,7 +22,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 /**
  * @author Gunnar Morling
  */
-public abstract class AbstractNonBulkableElasticsearchWork<R> implements NonBulkableElasticsearchWork<R> {
+public abstract class AbstractNonBulkableWork<R> implements NonBulkableWork<R> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -31,7 +31,7 @@ public abstract class AbstractNonBulkableElasticsearchWork<R> implements NonBulk
 	protected final ElasticsearchRequest request;
 	protected final ElasticsearchRequestSuccessAssessor resultAssessor;
 
-	protected AbstractNonBulkableElasticsearchWork(AbstractBuilder<?> builder) {
+	protected AbstractNonBulkableWork(AbstractBuilder<?> builder) {
 		this.request = builder.buildRequestAndTransformIfNecessary();
 		this.resultAssessor = builder.resultAssessor;
 	}

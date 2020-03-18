@@ -11,8 +11,8 @@ import java.util.concurrent.CompletableFuture;
 
 public interface ElasticsearchWorkAggregator {
 
-	<T> CompletableFuture<T> addBulkable(BulkableElasticsearchWork<T> work);
+	<T> CompletableFuture<T> addBulkable(BulkableWork<T> work);
 
-	<T> CompletableFuture<T> addNonBulkable(NonBulkableElasticsearchWork<T> work);
+	<T> CompletableFuture<T> addNonBulkable(NonBulkableWork<T> work);
 
 }

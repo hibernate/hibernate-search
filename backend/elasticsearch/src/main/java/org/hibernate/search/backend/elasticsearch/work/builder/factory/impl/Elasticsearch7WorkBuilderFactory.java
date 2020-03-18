@@ -38,7 +38,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.ScrollWorkBu
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.WaitForIndexStatusWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ClearScrollWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.CloseIndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.CountWork;
@@ -110,7 +110,7 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 	}
 
 	@Override
-	public BulkWorkBuilder bulk(List<? extends BulkableElasticsearchWork<?>> bulkableWorks) {
+	public BulkWorkBuilder bulk(List<? extends BulkableWork<?>> bulkableWorks) {
 		return new BulkWork.Builder( bulkableWorks );
 	}
 

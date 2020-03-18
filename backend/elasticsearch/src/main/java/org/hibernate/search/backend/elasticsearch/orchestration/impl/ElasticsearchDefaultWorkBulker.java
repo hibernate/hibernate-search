@@ -12,9 +12,9 @@ import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkSequenceBuilder.BulkResultExtractionStep;
-import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
-import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Futures;
@@ -22,14 +22,14 @@ import org.hibernate.search.util.common.impl.Futures;
 class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 
 	private final ElasticsearchWorkSequenceBuilder sequenceBuilder;
-	private final BiFunction<List<? extends BulkableElasticsearchWork<?>>, DocumentRefreshStrategy, NonBulkableElasticsearchWork<BulkResult>> bulkWorkFactory;
+	private final BiFunction<List<? extends BulkableWork<?>>, DocumentRefreshStrategy, NonBulkableWork<BulkResult>> bulkWorkFactory;
 	private final int maxBulkSize;
 
-	private final List<BulkableElasticsearchWork<?>> currentBulkItems;
+	private final List<BulkableWork<?>> currentBulkItems;
 	private final List<CompletableFuture<?>> currentBulkItemsFutures;
 	private int currentBulkFirstNonAddedItem;
 	private DocumentRefreshStrategy currentBulkRefreshStrategy;
-	private CompletableFuture<NonBulkableElasticsearchWork<BulkResult>> currentBulkWorkFuture;
+	private CompletableFuture<NonBulkableWork<BulkResult>> currentBulkWorkFuture;
 	private CompletableFuture<BulkResult> currentBulkResultFuture;
 
 	/**
@@ -42,7 +42,7 @@ class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 	 * to the underlying sequence builder.
 	 */
 	public ElasticsearchDefaultWorkBulker(ElasticsearchWorkSequenceBuilder sequenceBuilder,
-			BiFunction<List<? extends BulkableElasticsearchWork<?>>, DocumentRefreshStrategy, NonBulkableElasticsearchWork<BulkResult>> bulkWorkFactory,
+			BiFunction<List<? extends BulkableWork<?>>, DocumentRefreshStrategy, NonBulkableWork<BulkResult>> bulkWorkFactory,
 			int maxBulkSize) {
 		this.sequenceBuilder = sequenceBuilder;
 		this.bulkWorkFactory = bulkWorkFactory;
@@ -56,7 +56,7 @@ class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 	}
 
 	@Override
-	public <T> CompletableFuture<T> add(BulkableElasticsearchWork<T> work) {
+	public <T> CompletableFuture<T> add(BulkableWork<T> work) {
 		DocumentRefreshStrategy workRefreshStrategy = work.getRefreshStrategy();
 		if ( currentBulkItems.isEmpty() ) {
 			currentBulkRefreshStrategy = workRefreshStrategy;
@@ -93,7 +93,7 @@ class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 
 		BulkResultExtractionStep extractionStep = sequenceBuilder.addBulkResultExtraction( currentBulkResultFuture );
 		for ( int i = currentBulkFirstNonAddedItem; i < currentBulkWorksSize ; ++i ) {
-			BulkableElasticsearchWork<?> work = currentBulkItems.get( i );
+			BulkableWork<?> work = currentBulkItems.get( i );
 			addAndConnectBulkedWorkExtraction( extractionStep, work, i );
 		}
 		currentBulkFirstNonAddedItem = currentBulkWorksSize;
@@ -112,7 +112,7 @@ class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 			return;
 		}
 
-		NonBulkableElasticsearchWork<BulkResult> bulkWork = bulkWorkFactory.apply( currentBulkItems, currentBulkRefreshStrategy );
+		NonBulkableWork<BulkResult> bulkWork = bulkWorkFactory.apply( currentBulkItems, currentBulkRefreshStrategy );
 		currentBulkWorkFuture.complete( bulkWork );
 		reset();
 	}
@@ -128,7 +128,7 @@ class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 	}
 
 	private <T> void addAndConnectBulkedWorkExtraction(BulkResultExtractionStep extractionStep,
-			BulkableElasticsearchWork<T> work, int index) {
+			BulkableWork<T> work, int index) {
 		@SuppressWarnings("unchecked") // The type T of the future matches the one of the work with the same index; see add()
 		CompletableFuture<T> future = (CompletableFuture<T>) currentBulkItemsFutures.get( index );
 		extractionStep.add( work, index )

@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkProcessor;
-import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentWork;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 import org.hibernate.search.util.impl.test.FutureAssert;
@@ -35,7 +35,7 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 
 	private ElasticsearchWorkProcessor processorMock = createStrictMock( ElasticsearchWorkProcessor.class );
 
-	private List<SingleDocumentElasticsearchWork<Void>> workMocks = new ArrayList<>();
+	private List<SingleDocumentWork<Void>> workMocks = new ArrayList<>();
 
 	private EntityReferenceFactory<StubEntityReference> entityReferenceFactoryMock =
 			createStrictMock( EntityReferenceFactory.class );
@@ -404,7 +404,7 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 
 	private void expectWorkGetInfo(int ... ids) {
 		for ( int id : ids ) {
-			SingleDocumentElasticsearchWork<?> workMock = workMocks.get( id );
+			SingleDocumentWork<?> workMock = workMocks.get( id );
 			EasyMock.expect( workMock.getEntityTypeName() ).andStubReturn( TYPE_NAME );
 			EasyMock.expect( workMock.getEntityIdentifier() ).andStubReturn( id );
 			EasyMock.expect( entityReferenceFactoryMock.createEntityReference( TYPE_NAME, id ) )
@@ -413,24 +413,24 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 	}
 
 	private void expectFailingWorkGetInfo(int id, Throwable thrown) {
-		SingleDocumentElasticsearchWork<?> workMock = workMocks.get( id );
+		SingleDocumentWork<?> workMock = workMocks.get( id );
 		EasyMock.expect( workMock.getEntityTypeName() ).andStubReturn( TYPE_NAME );
 		EasyMock.expect( workMock.getEntityIdentifier() ).andStubReturn( id );
 		EasyMock.expect( entityReferenceFactoryMock.createEntityReference( TYPE_NAME, id ) )
 				.andThrow( thrown );
 	}
 
-	private List<SingleDocumentElasticsearchWork<?>> createWorkMocks(int count) {
-		List<SingleDocumentElasticsearchWork<?>> result = new ArrayList<>();
+	private List<SingleDocumentWork<?>> createWorkMocks(int count) {
+		List<SingleDocumentWork<?>> result = new ArrayList<>();
 		for ( int i = 0; i < count; i++ ) {
 			result.add( createWorkMock() );
 		}
 		return result;
 	}
 
-	private SingleDocumentElasticsearchWork<Void> createWorkMock() {
+	private SingleDocumentWork<Void> createWorkMock() {
 		String workName = workInfo( workMocks.size() );
-		SingleDocumentElasticsearchWork<Void> workMock = createStrictMock( workName, SingleDocumentElasticsearchWork.class );
+		SingleDocumentWork<Void> workMock = createStrictMock( workName, SingleDocumentWork.class );
 		workMocks.add( workMock );
 		return workMock;
 	}

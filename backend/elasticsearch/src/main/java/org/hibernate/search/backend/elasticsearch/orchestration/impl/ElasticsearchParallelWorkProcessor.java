@@ -12,8 +12,8 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkAggregator;
-import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 
 
 /**
@@ -97,7 +97,7 @@ class ElasticsearchParallelWorkProcessor implements ElasticsearchWorkProcessor {
 		}
 
 		@Override
-		public <T> CompletableFuture<T> addBulkable(BulkableElasticsearchWork<T> work) {
+		public <T> CompletableFuture<T> addBulkable(BulkableWork<T> work) {
 			if ( !currentBulkIsUsableInSameSequence ) {
 				bulker.finalizeBulkWork();
 				currentBulkIsUsableInSameSequence = true;
@@ -106,7 +106,7 @@ class ElasticsearchParallelWorkProcessor implements ElasticsearchWorkProcessor {
 		}
 
 		@Override
-		public <T> CompletableFuture<T> addNonBulkable(NonBulkableElasticsearchWork<T> work) {
+		public <T> CompletableFuture<T> addNonBulkable(NonBulkableWork<T> work) {
 			if ( bulker.addWorksToSequence() ) {
 				/*
 				 * A non-bulkable work follows bulked works,

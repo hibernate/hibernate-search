@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.ClearScrollW
 import com.google.gson.JsonObject;
 
 
-public class ClearScrollWork extends AbstractNonBulkableElasticsearchWork<Void> {
+public class ClearScrollWork extends AbstractNonBulkableWork<Void> {
 
 	protected ClearScrollWork(Builder builder) {
 		super( builder );
