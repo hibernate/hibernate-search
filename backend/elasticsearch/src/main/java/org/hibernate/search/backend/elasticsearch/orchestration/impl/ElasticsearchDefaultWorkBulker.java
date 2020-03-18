@@ -23,7 +23,6 @@ class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 
 	private final ElasticsearchWorkSequenceBuilder sequenceBuilder;
 	private final BiFunction<List<? extends BulkableElasticsearchWork<?>>, DocumentRefreshStrategy, ElasticsearchWork<BulkResult>> bulkWorkFactory;
-	private final int minBulkSize;
 	private final int maxBulkSize;
 
 	private final List<BulkableElasticsearchWork<?>> currentBulkItems;
@@ -36,9 +35,6 @@ class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 	/**
 	 * @param sequenceBuilder The sequence builder to add works to
 	 * @param bulkWorkFactory The factory for bulk works
-	 * @param minBulkSize Minimum number of works in a single bulk.
-	 * If {@link #addWorksToSequence() adding works to the sequence} is requested before
-	 * this threshold has been reached, works will not be bulked.
 	 * @param maxBulkSize Maximum number of works in a single bulk.
 	 * If a bulk reaches this size, it will be automatically
 	 * {@link #addWorksToSequence() add the bulk work and work extractions to the sequence}
@@ -47,10 +43,9 @@ class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 	 */
 	public ElasticsearchDefaultWorkBulker(ElasticsearchWorkSequenceBuilder sequenceBuilder,
 			BiFunction<List<? extends BulkableElasticsearchWork<?>>, DocumentRefreshStrategy, ElasticsearchWork<BulkResult>> bulkWorkFactory,
-			int minBulkSize, int maxBulkSize) {
+			int maxBulkSize) {
 		this.sequenceBuilder = sequenceBuilder;
 		this.bulkWorkFactory = bulkWorkFactory;
-		this.minBulkSize = minBulkSize;
 		this.maxBulkSize = maxBulkSize;
 
 		this.currentBulkItems = new ArrayList<>();
@@ -88,19 +83,6 @@ class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 		int currentBulkWorksSize = currentBulkItems.size();
 		if ( currentBulkWorksSize <= currentBulkFirstNonAddedItem ) {
 			// No work to add
-			return false;
-		}
-		else if ( currentBulkWorksSize < minBulkSize && currentBulkFirstNonAddedItem == 0 ) {
-			/*
-			 * Not enough works in the bulk, and no work has been added to the sequence yet.
-			 * We'll just add the works to the sequence without bulking them,
-			 * and start a new bulk.
-			 */
-			for ( int i = 0; i < currentBulkWorksSize ; ++i ) {
-				BulkableElasticsearchWork<?> work = currentBulkItems.get( i );
-				addAndConnectNonBulkedWorkExecution( work, i );
-			}
-			reset();
 			return false;
 		}
 
@@ -143,13 +125,6 @@ class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 		this.currentBulkRefreshStrategy = null;
 		this.currentBulkWorkFuture = null;
 		this.currentBulkResultFuture = null;
-	}
-
-	private <T> void addAndConnectNonBulkedWorkExecution(BulkableElasticsearchWork<T> work, int index) {
-		@SuppressWarnings("unchecked") // The type T of the future matches the one of the work with the same index; see add()
-		CompletableFuture<T> future = (CompletableFuture<T>) currentBulkItemsFutures.get( index );
-		sequenceBuilder.addNonBulkExecution( work )
-				.whenComplete( Futures.copyHandler( future ) );
 	}
 
 	private <T> void addAndConnectBulkedWorkExtraction(BulkResultExtractionStep extractionStep,

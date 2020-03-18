@@ -33,11 +33,8 @@ public interface ElasticsearchWorkBulker {
 	 * safely be used to build a new sequence, but the execution of bulked works
 	 * in this sequence will block until {@link #finalizeBulkWork()} has been called.
 	 *
-	 * @return {@code true} if works have been added to the sequence builder
-	 * <strong>as part of the current bulk</strong>,
-	 * {@code false} if they have been added as non-bulked works
-	 * (for instance if there was only one work) or if no work
-	 * was added to the sequence builder.
+	 * @return {@code true} if works have been added to the sequence builder,
+	 * {@code false} otherwise.
 	 */
 	boolean addWorksToSequence();
 

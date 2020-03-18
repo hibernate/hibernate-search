@@ -12,6 +12,7 @@ import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMap
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.cfg.spi.ElasticsearchBackendSpiSettings;
+import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -32,6 +33,7 @@ import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 
 /**
@@ -91,6 +93,8 @@ public class ElasticsearchIndexingIT {
 
 	@Test
 	public void addUpdateDelete_routing() {
+		Gson gson = new Gson();
+
 		String routingKey = "someRoutingKey";
 		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 
@@ -98,12 +102,13 @@ public class ElasticsearchIndexingIT {
 			document.addValue( indexMapping.string, "text1" );
 		} );
 		clientSpy.expectNext(
-				ElasticsearchRequest.put()
-						.pathComponent( writeAlias )
-						.pathComponent( dialect.getTypeKeywordForNonMappingApi() )
-						.pathComponent( URLEncodedString.fromString( "1" ) )
-						.body( new JsonObject() ) // We don't care about the payload
-						.param( "routing", routingKey )
+				ElasticsearchRequest.post()
+						.pathComponent( Paths._BULK )
+						.body( gson.fromJson( "{'index':{'_index': '" + writeAlias + "',"
+								+ dialect.getTypeNameForMappingApi().map( name -> "'_type': '" + name + "'," ).orElse( "" )
+								+ "'routing': '" + routingKey + "',"
+								+ "'_id': '1'}}", JsonObject.class ) )
+						.body( new JsonObject() ) // We don't care about the document
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
@@ -114,12 +119,13 @@ public class ElasticsearchIndexingIT {
 			document.addValue( indexMapping.string, "text2" );
 		} );
 		clientSpy.expectNext(
-				ElasticsearchRequest.put()
-						.pathComponent( writeAlias )
-						.pathComponent( dialect.getTypeKeywordForNonMappingApi() )
-						.pathComponent( URLEncodedString.fromString( "1" ) )
-						.body( new JsonObject() ) // We don't care about the payload
-						.param( "routing", routingKey )
+				ElasticsearchRequest.post()
+						.pathComponent( Paths._BULK )
+						.body( gson.fromJson( "{'index':{'_index': '" + writeAlias + "',"
+								+ dialect.getTypeNameForMappingApi().map( name -> "'_type': '" + name + "'," ).orElse( "" )
+								+ "'routing': '" + routingKey + "',"
+								+ "'_id': '1'}}", JsonObject.class ) )
+						.body( new JsonObject() ) // We don't care about the document
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
@@ -128,11 +134,12 @@ public class ElasticsearchIndexingIT {
 
 		plan.delete( referenceProvider( "1", routingKey ) );
 		clientSpy.expectNext(
-				ElasticsearchRequest.delete()
-						.pathComponent( writeAlias )
-						.pathComponent( dialect.getTypeKeywordForNonMappingApi() )
-						.pathComponent( URLEncodedString.fromString( "1" ) )
-						.param( "routing", routingKey )
+				ElasticsearchRequest.post()
+						.pathComponent( Paths._BULK )
+						.body( gson.fromJson( "{'delete':{'_index': '" + writeAlias + "',"
+								+ dialect.getTypeNameForMappingApi().map( name -> "'_type': '" + name + "'," ).orElse( "" )
+								+ "'routing': '" + routingKey + "',"
+								+ "'_id': '1'}}", JsonObject.class ) )
 						.build(),
 				ElasticsearchRequestAssertionMode.EXTENSIBLE
 		);
