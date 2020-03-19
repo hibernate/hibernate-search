@@ -77,21 +77,18 @@ class ElasticsearchSerialWorkProcessor implements ElasticsearchWorkProcessor {
 
 		@Override
 		public <T> CompletableFuture<T> addNonBulkable(NonBulkableWork<T> work) {
-			if ( bulker.addWorksToSequence() ) {
-				/*
-				 * We want to execute works in the exact order they were received,
-				 * so if a non-bulkable work is about to be added,
-				 * we can't add any more works to the current bulk
-				 * (otherwise the next bulked works may be executed
-				 * before the current non-bulkable work).
-				 */
-				bulker.finalizeBulkWork();
-			}
+			/*
+			 * We want to execute works in the exact order they were received,
+			 * so if a non-bulkable work is about to be added,
+			 * we can't add any more works to the current bulk
+			 * (otherwise the next bulked works may be executed
+			 * before the current non-bulkable work).
+			 */
+			bulker.finalizeBulkWork();
 			return sequenceBuilder.addNonBulkExecution( work );
 		}
 
 		public CompletableFuture<Void> buildSequence() {
-			bulker.addWorksToSequence();
 			CompletableFuture<Void> future = sequenceBuilder.build();
 			bulker.finalizeBulkWork();
 			return future;

@@ -95,7 +95,6 @@ class ElasticsearchParallelWorkProcessor implements ElasticsearchWorkProcessor {
 		}
 
 		public CompletableFuture<Void> buildSequence() {
-			bulker.addWorksToSequence();
 			return sequenceBuilder.build();
 		}
 
