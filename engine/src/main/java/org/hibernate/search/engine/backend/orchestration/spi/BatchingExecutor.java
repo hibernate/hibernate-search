@@ -296,12 +296,13 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 	public interface WorkProcessor {
 
 		/**
-		 * Initializes internal state before works are {@link WorkSet#submit(WorkSet) submitted}.
+		 * Initializes internal state before works are submitted.
 		 */
 		void beginBatch();
 
 		/**
-		 * Ensures all works {@link WorkSet#submit(WorkSet) submitted} since the last call to {@link #beginBatch()}
+		 * Ensures all works submitted
+		 * since the last call to {@link #beginBatch()}
 		 * will actually be executed, along with any finishing task (commit, ...).
 		 *
 		 * @return A future completing when the executor is allowed to start another batch.
