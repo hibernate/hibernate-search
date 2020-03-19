@@ -16,8 +16,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.JsonObject;
 
 
-public abstract class AbstractSingleDocumentWork<R>
-		implements BulkableWork<R>, SingleDocumentWork<R> {
+public abstract class AbstractSingleDocumentWork
+		implements BulkableWork<Void>, SingleDocumentWork {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -37,6 +37,11 @@ public abstract class AbstractSingleDocumentWork<R>
 		this.entityTypeName = builder.entityTypeName;
 		this.entityIdentifier = builder.entityIdentifier;
 		this.refreshStrategy = builder.refreshStrategy;
+	}
+
+	@Override
+	public CompletableFuture<Void> aggregate(ElasticsearchWorkAggregator aggregator) {
+		return aggregator.addBulkable( this );
 	}
 
 	@Override
@@ -65,23 +70,9 @@ public abstract class AbstractSingleDocumentWork<R>
 	}
 
 	@Override
-	public R handleBulkResult(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem) {
-		return handleResult( context, bulkResponseItem );
-	}
-
-	@Override
-	public CompletableFuture<R> aggregate(ElasticsearchWorkAggregator aggregator) {
-		return aggregator.addBulkable( this );
-	}
-
-	protected abstract R generateResult(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem);
-
-	private R handleResult(ElasticsearchWorkExecutionContext executionContext, JsonObject bulkResponseItem) {
-		R result;
+	public Void handleBulkResult(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem) {
 		try {
 			resultAssessor.checkSuccess( bulkResponseItem );
-
-			result = generateResult( executionContext, bulkResponseItem );
 		}
 		catch (RuntimeException e) {
 			throw log.elasticsearchBulkedRequestFailed(
@@ -91,7 +82,7 @@ public abstract class AbstractSingleDocumentWork<R>
 			);
 		}
 
-		return result;
+		return null;
 	}
 
 	protected abstract static class AbstractBuilder<B> {

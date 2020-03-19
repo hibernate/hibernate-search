@@ -18,11 +18,11 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanE
 import org.hibernate.search.util.common.impl.Futures;
 
 class ElasticsearchIndexingPlanWorkSet<R> implements ElasticsearchWorkSet {
-	private final List<SingleDocumentWork<?>> works;
+	private final List<SingleDocumentWork> works;
 	private final EntityReferenceFactory<R> entityReferenceFactory;
 	private final CompletableFuture<IndexIndexingPlanExecutionReport<R>> indexingPlanFuture;
 
-	ElasticsearchIndexingPlanWorkSet(List<SingleDocumentWork<?>> works,
+	ElasticsearchIndexingPlanWorkSet(List<SingleDocumentWork> works,
 			EntityReferenceFactory<R> entityReferenceFactory,
 			CompletableFuture<IndexIndexingPlanExecutionReport<R>> indexingPlanFuture) {
 		this.works = new ArrayList<>( works );
@@ -50,7 +50,7 @@ class ElasticsearchIndexingPlanWorkSet<R> implements ElasticsearchWorkSet {
 			CompletableFuture<?> future = finishedWorkFutures[i];
 			if ( future.isCompletedExceptionally() ) {
 				reportBuilder.throwable( Futures.getThrowableNow( future ) );
-				SingleDocumentWork<?> work = works.get( i );
+				SingleDocumentWork work = works.get( i );
 				try {
 					reportBuilder.failingEntityReference(
 							entityReferenceFactory,
