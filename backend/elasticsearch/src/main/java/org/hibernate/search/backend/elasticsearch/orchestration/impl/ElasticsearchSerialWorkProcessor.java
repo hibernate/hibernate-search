@@ -52,13 +52,9 @@ class ElasticsearchSerialWorkProcessor implements ElasticsearchWorkProcessor {
 	@Override
 	public CompletableFuture<Void> afterWorkSet() {
 		CompletableFuture<Void> sequenceFuture = aggregator.buildSequence();
-		/*
-		 * The sequence gets its failures reported independently:
-		 * there's no need to propagate the failure to the executor.
-		 * Also, we don't want later works to be cancelled just because this workset
-		 * failed.
-		 */
-		future = sequenceFuture.exceptionally( e -> null );
+		// Sequence futures are not expected to fail even if one work fails,
+		// so we can safely use this future directly.
+		future = sequenceFuture;
 		return sequenceFuture;
 	}
 

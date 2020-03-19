@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
-import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -20,7 +19,6 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResultItemExtractor;
 import org.hibernate.search.util.common.impl.Futures;
-import org.hibernate.search.util.common.impl.Throwables;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -33,7 +31,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 	private final Supplier<ElasticsearchWorkExecutionContext> contextSupplier;
 	private final BulkResultExtractionStepImpl bulkResultExtractionStep = new BulkResultExtractionStepImpl();
 
-	private CompletableFuture<?> currentlyBuildingSequenceTail;
+	private CompletableFuture<Void> currentlyBuildingSequenceTail;
 	private SequenceContext currentlyBuildingSequenceContext;
 
 	ElasticsearchDefaultWorkSequenceBuilder(Supplier<ElasticsearchWorkExecutionContext> contextSupplier) {
@@ -66,18 +64,11 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		NonBulkedWorkExecutionState<T> workExecutionState =
 				new NonBulkedWorkExecutionState<>( sequenceContext, work );
 
-		// If the previous work failed, then skip the new work and notify the caller and failure handler as necessary.
 		CompletableFuture<T> handledWorkExecutionFuture = currentlyBuildingSequenceTail
-				.whenComplete( Futures.handler( workExecutionState::onPreviousWorkComplete ) )
-				// If the previous work completed normally, then execute the new work
-				.thenCompose( Futures.safeComposer( workExecutionState::onPreviousWorkSuccess ) );
+				// When the previous work completes, execute the new work and notify as necessary.
+				.thenCompose( Futures.safeComposer( workExecutionState::onPreviousWorkComplete ) );
 
-		/*
-		 * Make sure that the sequence will only advance to the next work
-		 * after both the work and *all* the handlers are executed,
-		 * because otherwise failureHandler.handle() could be called before all failed/skipped works are reported.
-		 */
-		currentlyBuildingSequenceTail = handledWorkExecutionFuture;
+		updateTail( handledWorkExecutionFuture );
 
 		return workExecutionState.workFutureForCaller;
 	}
@@ -96,15 +87,13 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		final SequenceContext currentSequenceContext = this.currentlyBuildingSequenceContext;
 
 		CompletableFuture<BulkResult> bulkWorkResultFuture =
-				// When the previous work completes successfully *and* the bulk work is available...
+				// When the previous work completes *and* the bulk work is available...
 				currentlyBuildingSequenceTail.thenCombine( workFuture, (ignored, work) -> work )
 				// ... execute the bulk work
 				.thenCompose( currentSequenceContext::execute );
-		// Do not propagate the exception as is: we expect the exception to be handled by each bulked work separately.
-		// ... but still propagate *something*, in case a *previous* work failed.
-		currentlyBuildingSequenceTail = bulkWorkResultFuture.exceptionally( Futures.handler( throwable -> {
-			throw new PreviousWorkException( throwable );
-		} ) );
+
+		updateTail( bulkWorkResultFuture );
+
 		return bulkWorkResultFuture;
 	}
 
@@ -114,19 +103,26 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		final SequenceContext currentSequenceContext = this.currentlyBuildingSequenceContext;
 
 		CompletableFuture<BulkResultItemExtractor> extractorFuture =
-				bulkResultFuture.thenApply( currentSequenceContext::addContext );
+				// Only start extraction after the previous work is complete, so as to comply with the sequence order.
+				currentlyBuildingSequenceTail.thenCombine( bulkResultFuture, (ignored, bulkResult) -> bulkResult )
+				.thenApply( currentSequenceContext::addContext );
+
 		bulkResultExtractionStep.init( extractorFuture );
 		return bulkResultExtractionStep;
 	}
 
 	@Override
 	public CompletableFuture<Void> build() {
-		// Use a local variable to make sure lambdas (if any) won't be affected by a reset()
-		final SequenceContext sequenceContext = currentlyBuildingSequenceContext;
+		return currentlyBuildingSequenceTail;
+	}
 
-		return currentlyBuildingSequenceTail.handle( Futures.handler(
-				(BiFunction<Object, Throwable, Void>) sequenceContext::onSequenceFinished
-		) );
+	private void updateTail(CompletableFuture<?> workFuture) {
+		// The result of the work is expected to be already reported when "workFuture" completes,
+		// successfully or not.
+		// Ignore any exception in following works in this sequence,
+		// to make sure the following works will execute regardless of the failures in previous works
+		// (but will still execute *after* previous works).
+		currentlyBuildingSequenceTail = workFuture.handle( (ignoredResult, ignoredThrowable) -> null );
 	}
 
 	private final class BulkResultExtractionStepImpl implements BulkResultExtractionStep {
@@ -145,21 +141,14 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 			BulkedWorkExecutionState<T> workExecutionState =
 					new BulkedWorkExecutionState<>( sequenceContext, bulkedWork, index );
 
-			// If the bulk work fails, make sure to notify the caller and failure handler as necessary.
 			CompletableFuture<T> handledWorkExecutionFuture = extractorFuture
+					// If the bulk work fails, make sure to notify the caller as necessary.
 					.whenComplete( Futures.handler( workExecutionState::onBulkWorkComplete ) )
-					// If the bulk work succeeds, then extract the bulked work result and notify as necessary
+					// If the bulk work succeeds, then extract the bulked work result and notify as necessary.
 					.thenCompose( workExecutionState::onBulkWorkSuccess );
 
-			/*
-			 * Make sure that the sequence will only advance to the next work
-			 * after both the work and *all* the handlers are executed,
-			 * because otherwise failureHandler.handle(...) could be called before all failed/skipped works are reported.
-			 */
-			currentlyBuildingSequenceTail = CompletableFuture.allOf(
-					currentlyBuildingSequenceTail,
-					handledWorkExecutionFuture
-			);
+			// Note the bulk
+			updateTail( CompletableFuture.allOf( currentlyBuildingSequenceTail, handledWorkExecutionFuture ) );
 
 			return workExecutionState.workFutureForCaller;
 		}
@@ -195,13 +184,6 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 
 		public BulkResultItemExtractor addContext(BulkResult bulkResult) {
 			return bulkResult.withContext( executionContext );
-		}
-
-		<T> T onSequenceFinished(Object ignored, Throwable throwable) {
-			if ( throwable != null && !(throwable instanceof PreviousWorkException) ) {
-				throw Throwables.toRuntimeException( throwable );
-			}
-			return null;
 		}
 	}
 
@@ -241,13 +223,6 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 			return workExecutionFuture.exceptionally( Futures.handler( this::fail ) );
 		}
 
-		protected void skip(Throwable throwable) {
-			Throwable skippingCause = throwable instanceof PreviousWorkException ? throwable.getCause() : throwable;
-			workFutureForCaller.completeExceptionally(
-					log.elasticsearchSkippedBecauseOfPreviousWork( skippingCause )
-			);
-		}
-
 		protected T fail(Throwable throwable) {
 			workFutureForCaller.completeExceptionally( throwable );
 			throw new PreviousWorkException( throwable );
@@ -260,13 +235,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 			super( sequenceContext, work );
 		}
 
-		void onPreviousWorkComplete(Object ignored, Throwable throwable) {
-			if ( throwable != null ) {
-				skip( throwable );
-			}
-		}
-
-		CompletableFuture<R> onPreviousWorkSuccess(Object ignored) {
+		CompletableFuture<R> onPreviousWorkComplete(Object ignored) {
 			CompletableFuture<R> workExecutionFuture = work.execute( sequenceContext.executionContext );
 			return addPostExecutionHandlers( workExecutionFuture );
 		}
@@ -287,18 +256,10 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 			this.index = index;
 		}
 
-		void onBulkWorkComplete(BulkResultItemExtractor ignored, Throwable throwable) {
-			if ( throwable == null ) {
-				// No failure: nothing to handle.
-				return;
-			}
-			else if ( throwable instanceof PreviousWorkException ) {
-				// The bulk work itself was skipped; mark the bulked work as skipped too
-				skip( throwable );
-			}
-			else {
+		void onBulkWorkComplete(Object ignored, Throwable throwable) {
+			if ( throwable != null ) {
 				// The bulk work failed; mark the bulked work as failed too
-				failBecauseBulkFailed( throwable );
+				fail( log.elasticsearchFailedBecauseOfBulkFailure( throwable ) );
 			}
 		}
 
@@ -311,10 +272,6 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 
 		private CompletableFuture<R> extract() {
 			return CompletableFuture.completedFuture( extractor.extract( bulkedWork, index ) );
-		}
-
-		private void failBecauseBulkFailed(Throwable throwable) {
-			fail( log.elasticsearchFailedBecauseOfBulkFailure( throwable ) );
 		}
 	}
 }
