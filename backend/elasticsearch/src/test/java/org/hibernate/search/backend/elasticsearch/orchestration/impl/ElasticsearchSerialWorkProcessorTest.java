@@ -20,7 +20,6 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkAgg
 import org.junit.Before;
 import org.junit.Test;
 
-import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 import org.easymock.IAnswer;
 
@@ -44,7 +43,7 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 	}
 
 	@Test
-	public void simple_singleWorkInWorkSet() {
+	public void simple_singleWork() {
 		NonBulkableWork<Object> work = work( 1 );
 
 		CompletableFuture<Void> sequenceFuture = new CompletableFuture<>();
@@ -54,35 +53,43 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 				new ElasticsearchSerialWorkProcessor( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
+		resetAll();
+		bulkerMock.reset();
+		sequenceBuilderMock.init( anyObject() );
+		replayAll();
+		processor.beginBatch();
+		verifyAll();
+
 		CompletableFuture<Object> workFuture = new CompletableFuture<>();
 		resetAll();
-		sequenceBuilderMock.init( anyObject() );
 		expect( work.aggregate( anyObject() ) ).andAnswer( nonBulkableAggregateAnswer( work ) );
-		expect( bulkerMock.addWorksToSequence() ).andReturn( false );
 		expect( sequenceBuilderMock.addNonBulkExecution( work ) ).andReturn( workFuture );
 		expect( bulkerMock.addWorksToSequence() ).andReturn( false );
-		expect( sequenceBuilderMock.build() ).andReturn( sequenceFuture );
 		replayAll();
-		processor.beforeWorkSet();
-		CompletableFuture<Object> returnedWork2Future = processor.submit( work );
-		processor.afterWorkSet();
+		CompletableFuture<Object> returnedWorkFuture = processor.submit( work );
 		verifyAll();
-		assertThat( returnedWork2Future ).isSameAs( workFuture );
+		assertThat( returnedWorkFuture ).isSameAs( workFuture );
 
 		resetAll();
+		expect( bulkerMock.addWorksToSequence() ).andReturn( false );
+		expect( sequenceBuilderMock.build() ).andReturn( sequenceFuture );
 		bulkerMock.finalizeBulkWork();
 		replayAll();
-		CompletableFuture<Void> futureAll = processor.endBatch();
+		CompletableFuture<Void> batchFuture = processor.endBatch();
 		verifyAll();
-		assertThat( futureAll ).isPending();
+		assertThat( batchFuture ).isPending();
+
+		resetAll();
 		sequenceFuture.complete( null );
-		assertThat( futureAll ).isSuccessful( (Void) null );
+		replayAll();
+		assertThat( batchFuture ).isSuccessful();
+		verifyAll();
 
 		checkComplete( processor );
 	}
 
 	@Test
-	public void simple_multipleWorksInWorkSet() {
+	public void simple_multipleWorks() {
 		NonBulkableWork<Object> work1 = work( 1 );
 		BulkableWork<Object> work2 = bulkableWork( 2 );
 
@@ -94,39 +101,46 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
+		bulkerMock.reset();
 		sequenceBuilderMock.init( anyObject() );
+		replayAll();
+		processor.beginBatch();
+		verifyAll();
+
+		CompletableFuture<Object> work1Future = new CompletableFuture<>();
+		CompletableFuture<Object> work2Future = new CompletableFuture<>();
+		resetAll();
 		expect( work1.aggregate( anyObject() ) ).andAnswer( nonBulkableAggregateAnswer( work1 ) );
 		expect( bulkerMock.addWorksToSequence() ).andReturn( false );
-		expect( sequenceBuilderMock.addNonBulkExecution( work1 ) ).andReturn( unusedReturnValue() );
+		expect( sequenceBuilderMock.addNonBulkExecution( work1 ) ).andReturn( work1Future );
 		expect( work2.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work2 ) );
-		expect( bulkerMock.add( work2 ) ).andReturn( unusedReturnValue() );
-		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
-		expect( sequenceBuilderMock.build() ).andReturn( sequenceFuture );
+		expect( bulkerMock.add( work2 ) ).andReturn( work2Future );
 		replayAll();
-		processor.beforeWorkSet();
-		processor.submit( work1 );
-		processor.submit( work2 );
-		CompletableFuture<Void> returnedSequenceFuture = processor.afterWorkSet();
+		CompletableFuture<Object> returnedWork1Future = processor.submit( work1 );
+		CompletableFuture<Object> returnedWork2Future = processor.submit( work2 );
 		verifyAll();
-		assertThat( returnedSequenceFuture ).isSameAs( sequenceFuture );
+		assertThat( returnedWork1Future ).isSameAs( work1Future );
+		assertThat( returnedWork2Future ).isSameAs( work2Future );
 
 		resetAll();
+		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
+		expect( sequenceBuilderMock.build() ).andReturn( sequenceFuture );
 		bulkerMock.finalizeBulkWork();
 		replayAll();
-		CompletableFuture<Void> futureAll = processor.endBatch();
+		CompletableFuture<Void> batchFuture = processor.endBatch();
 		verifyAll();
-		assertThat( futureAll ).isPending();
+		assertThat( batchFuture ).isPending();
 
 		resetAll();
 		sequenceFuture.complete( null );
 		replayAll();
-		assertThat( futureAll ).isSuccessful();
+		assertThat( batchFuture ).isSuccessful();
 
 		checkComplete( processor );
 	}
 
 	@Test
-	public void newSequenceBetweenWorkset() {
+	public void newSequenceBetweenBatches() {
 		NonBulkableWork<Object> work1 = work( 1 );
 
 		BulkableWork<Object> work2 = bulkableWork( 2 );
@@ -140,159 +154,72 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
+		bulkerMock.reset();
 		sequenceBuilderMock.init( anyObject() );
+		replayAll();
+		processor.beginBatch();
+		verifyAll();
+
+		resetAll();
 		expect( work1.aggregate( anyObject() ) ).andAnswer( nonBulkableAggregateAnswer( work1 ) );
 		expect( bulkerMock.addWorksToSequence() ).andReturn( false );
 		expect( sequenceBuilderMock.addNonBulkExecution( work1 ) ).andReturn( unusedReturnValue() );
+		replayAll();
+		processor.submit( work1 );
+		verifyAll();
+
+		resetAll();
 		expect( bulkerMock.addWorksToSequence() ).andReturn( false );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
-		replayAll();
-		processor.beforeWorkSet();
-		processor.submit( work1 );
-		CompletableFuture<Void> returnedSequence1Future = processor.afterWorkSet();
-		verifyAll();
-		assertThat( returnedSequence1Future ).isSameAs( sequence1Future );
-
-		resetAll();
-		sequenceBuilderMock.init( EasyMock.anyObject() );
-		expect( work2.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work2 ) );
-		expect( bulkerMock.add( work2 ) ).andReturn( unusedReturnValue() );
-		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
-		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
-		replayAll();
-		processor.beforeWorkSet();
-		processor.submit( work2 );
-		CompletableFuture<Void> returnedSequence2Future = processor.afterWorkSet();
-		verifyAll();
-		assertThat( returnedSequence2Future ).isSameAs( sequence2Future );
-
-		resetAll();
 		bulkerMock.finalizeBulkWork();
 		replayAll();
-		CompletableFuture<Void> futureAll = processor.endBatch();
+		CompletableFuture<Void> batch1Future = processor.endBatch();
 		verifyAll();
-		assertThat( futureAll ).isPending();
-
-		resetAll();
-		sequence2Future.complete( null );
-		replayAll();
-		assertThat( futureAll ).isSuccessful();
-
-		checkComplete( processor );
-	}
-
-	@Test
-	public void reuseBulkAcrossSequences() {
-		BulkableWork<Object> work1 = bulkableWork( 1 );
-
-		BulkableWork<Object> work2 = bulkableWork( 2 );
-
-		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
-		CompletableFuture<Void> sequence2Future = new CompletableFuture<>();
-
-		replayAll();
-		ElasticsearchSerialWorkProcessor processor =
-				new ElasticsearchSerialWorkProcessor( sequenceBuilderMock, bulkerMock );
-		verifyAll();
-
-		resetAll();
-		sequenceBuilderMock.init( anyObject() );
-		expect( work1.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work1 ) );
-		expect( bulkerMock.add( work1 ) ).andReturn( unusedReturnValue() );
-		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
-		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
-		replayAll();
-		processor.beforeWorkSet();
-		processor.submit( work1 );
-		CompletableFuture<Void> returnedSequence1Future = processor.afterWorkSet();
-		verifyAll();
-		assertThat( returnedSequence1Future ).isSameAs( sequence1Future );
-
-		resetAll();
-		sequenceBuilderMock.init( EasyMock.anyObject() );
-		expect( work2.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work2 ) );
-		expect( bulkerMock.add( work2 ) ).andReturn( unusedReturnValue() );
-		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
-		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
-		replayAll();
-		processor.beforeWorkSet();
-		processor.submit( work2 );
-		CompletableFuture<Void> returnedSequence2Future = processor.afterWorkSet();
-		verifyAll();
-		assertThat( returnedSequence2Future ).isSameAs( sequence2Future );
-
-		resetAll();
-		bulkerMock.finalizeBulkWork();
-		replayAll();
-		CompletableFuture<Void> futureAll = processor.endBatch();
-		verifyAll();
-		assertThat( futureAll ).isPending();
-
-		resetAll();
-		sequence2Future.complete( null );
-		replayAll();
-		assertThat( futureAll ).isSuccessful();
-
-		checkComplete( processor );
-	}
-
-	@Test
-	public void newBulkIfNonBulkable_sameWorkset() {
-		BulkableWork<Object> work1 = bulkableWork( 1 );
-		NonBulkableWork<Object> work2 = work( 2 );
-		BulkableWork<Object> work3 = bulkableWork( 3 );
-
-		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
-
-		replayAll();
-		ElasticsearchSerialWorkProcessor processor =
-				new ElasticsearchSerialWorkProcessor( sequenceBuilderMock, bulkerMock );
-		verifyAll();
-
-		resetAll();
-		sequenceBuilderMock.init( anyObject() );
-		expect( work1.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work1 ) );
-		expect( bulkerMock.add( work1 ) ).andReturn( unusedReturnValue() );
-		expect( work2.aggregate( anyObject() ) ).andAnswer( nonBulkableAggregateAnswer( work2 ) );
-		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
-		expect( sequenceBuilderMock.addNonBulkExecution( work2 ) ).andReturn( unusedReturnValue() );
-		expect( work3.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work3 ) );
-		bulkerMock.finalizeBulkWork();
-		expect( bulkerMock.add( work3 ) ).andReturn( unusedReturnValue() );
-		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
-		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
-		replayAll();
-		processor.beforeWorkSet();
-		processor.submit( work1 );
-		processor.submit( work2 );
-		processor.submit( work3 );
-		CompletableFuture<Void> returnedSequence1Future = processor.afterWorkSet();
-		verifyAll();
-		assertThat( returnedSequence1Future ).isSameAs( sequence1Future );
-
-		resetAll();
-		bulkerMock.finalizeBulkWork();
-		replayAll();
-		CompletableFuture<Void> futureAll = processor.endBatch();
-		verifyAll();
-		assertThat( futureAll ).isPending();
+		assertThat( batch1Future ).isPending();
 
 		resetAll();
 		sequence1Future.complete( null );
 		replayAll();
-		assertThat( futureAll ).isSuccessful();
+		assertThat( batch1Future ).isSuccessful();
+
+		resetAll();
+		bulkerMock.reset();
+		sequenceBuilderMock.init( anyObject() );
+		replayAll();
+		processor.beginBatch();
+		verifyAll();
+
+		resetAll();
+		expect( work2.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work2 ) );
+		expect( bulkerMock.add( work2 ) ).andReturn( unusedReturnValue() );
+		replayAll();
+		processor.submit( work2 );
+		verifyAll();
+
+		resetAll();
+		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
+		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
+		bulkerMock.finalizeBulkWork();
+		replayAll();
+		CompletableFuture<Void> batch2Future = processor.endBatch();
+		verifyAll();
+		assertThat( batch2Future ).isPending();
+
+		resetAll();
+		sequence2Future.complete( null );
+		replayAll();
+		assertThat( batch2Future ).isSuccessful();
 
 		checkComplete( processor );
 	}
 
 	@Test
-	public void newBulkIfNonBulkable_differentWorksets() {
+	public void newBulkIfNonBulkable() {
 		BulkableWork<Object> work1 = bulkableWork( 1 );
 		NonBulkableWork<Object> work2 = work( 2 );
 		BulkableWork<Object> work3 = bulkableWork( 3 );
 
-		CompletableFuture<Void> sequence1Future = new CompletableFuture<>();
-		CompletableFuture<Void> sequence2Future = new CompletableFuture<>();
+		CompletableFuture<Void> sequenceFuture = new CompletableFuture<>();
 
 		replayAll();
 		ElasticsearchSerialWorkProcessor processor =
@@ -300,47 +227,41 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
+		bulkerMock.reset();
 		sequenceBuilderMock.init( anyObject() );
+		replayAll();
+		processor.beginBatch();
+		verifyAll();
+
+		resetAll();
 		expect( work1.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work1 ) );
 		expect( bulkerMock.add( work1 ) ).andReturn( unusedReturnValue() );
-		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
-		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
-		replayAll();
-		processor.beforeWorkSet();
-		processor.submit( work1 );
-		CompletableFuture<Void> returnedSequence1Future = processor.afterWorkSet();
-		verifyAll();
-		assertThat( returnedSequence1Future ).isSameAs( sequence1Future );
-
-		resetAll();
-		sequenceBuilderMock.init( anyObject() );
 		expect( work2.aggregate( anyObject() ) ).andAnswer( nonBulkableAggregateAnswer( work2 ) );
 		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
+		// New bulk because a non-bulkable work was encountered
+		bulkerMock.finalizeBulkWork();
 		expect( sequenceBuilderMock.addNonBulkExecution( work2 ) ).andReturn( unusedReturnValue() );
 		expect( work3.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work3 ) );
-		bulkerMock.finalizeBulkWork();
 		expect( bulkerMock.add( work3 ) ).andReturn( unusedReturnValue() );
-		expect( bulkerMock.addWorksToSequence() ).andReturn( false );
-		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
 		replayAll();
-		processor.beforeWorkSet();
+		processor.submit( work1 );
 		processor.submit( work2 );
 		processor.submit( work3 );
-		CompletableFuture<Void> returnedSequence2Future = processor.afterWorkSet();
 		verifyAll();
-		assertThat( returnedSequence2Future ).isSameAs( sequence2Future );
 
 		resetAll();
+		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
+		expect( sequenceBuilderMock.build() ).andReturn( sequenceFuture );
 		bulkerMock.finalizeBulkWork();
 		replayAll();
-		CompletableFuture<Void> futureAll = processor.endBatch();
+		CompletableFuture<Void> batchFuture = processor.endBatch();
 		verifyAll();
-		assertThat( futureAll ).isPending();
+		assertThat( batchFuture ).isPending();
 
 		resetAll();
-		sequence2Future.complete( null );
+		sequenceFuture.complete( null );
 		replayAll();
-		assertThat( futureAll ).isSuccessful();
+		assertThat( batchFuture ).isSuccessful();
 
 		checkComplete( processor );
 	}

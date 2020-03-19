@@ -15,19 +15,14 @@ import org.hibernate.search.engine.backend.orchestration.spi.BatchedWorkProcesso
  * An thread-unsafe component responsible for accumulating works to be executed,
  * then executing them according to an implementation-specific orchestration scheme.
  * <p>
- * Works are added by calling {@link #beforeWorkSet()},
- * then submitting as many works as necessary through {@link #submit(ElasticsearchWork)},
- * then calling {@link #afterWorkSet()}.
- * Execution starts upon calling the {@link #endBatch()} method.
+ * Works are added by submitting as many works as necessary through {@link #submit(ElasticsearchWork)}.
+ * Execution starts as soon as possible,
+ * which may be as late as when {@link #endBatch()} is called.
  * <p>
  * Depending on the implementation, works may be executed serially, or in parallel.
  */
 public interface ElasticsearchWorkProcessor extends BatchedWorkProcessor {
 
-	void beforeWorkSet();
-
 	<T> CompletableFuture<T> submit(ElasticsearchWork<T> work);
-
-	CompletableFuture<Void> afterWorkSet();
 
 }

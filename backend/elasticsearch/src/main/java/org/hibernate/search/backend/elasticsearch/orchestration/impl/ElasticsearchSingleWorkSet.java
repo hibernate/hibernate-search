@@ -22,9 +22,7 @@ class ElasticsearchSingleWorkSet<T> implements ElasticsearchWorkSet {
 
 	@Override
 	public void submitTo(ElasticsearchWorkProcessor delegate) {
-		delegate.beforeWorkSet();
 		delegate.submit( work ).whenComplete( Futures.copyHandler( future ) );
-		delegate.afterWorkSet();
 	}
 
 	@Override
