@@ -441,10 +441,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 51, value = "The operation was skipped due to the failure of a previous work in the same workset.")
 	SearchException elasticsearchSkippedBecauseOfPreviousWork(@Cause Throwable skippingCause);
 
-	@Message(id = ID_OFFSET_3 + 52, value = "Invalid index lifecycle strategy name: '%1$s'."
-			+ " Valid names are: %2$s.")
-	SearchException invalidIndexLifecycleStrategyName(String invalidRepresentation, List<String> validRepresentations);
-
 	@Message(id = ID_OFFSET_3 + 53,
 			value = "Text predicates (phrase, fuzzy, wildcard, simple query string) are not supported by this field's type.")
 	SearchException textPredicatesNotSupportedByFieldType(@Param EventContext context);
