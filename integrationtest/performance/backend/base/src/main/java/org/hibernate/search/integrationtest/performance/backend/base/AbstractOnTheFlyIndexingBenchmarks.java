@@ -44,11 +44,11 @@ import org.openjdk.jmh.infra.Blackhole;
  * which is primarily used when doing CRUD operations on the database
  * in the ORM integration.
  * <p>
- * This benchmark generates and executes worksets on the index from a single thread,
+ * This benchmark generates and executes indexing plans from a single thread,
  * guaranteeing not to conflict with any other thread in the same trial.
  * <p>
  * Internally, this object keeps tab of documents currently present in the index
- * and generates worksets accordingly.
+ * and generates works accordingly.
  */
 @Fork(1)
 @State(Scope.Thread)
@@ -59,10 +59,10 @@ public abstract class AbstractOnTheFlyIndexingBenchmarks extends AbstractBackend
 
 	/**
 	 * The number of works of each type (add/update/delete)
-	 * to put in each workset.
+	 * to put in each write plan.
 	 */
 	@Param({ "20" })
-	private int worksPerTypePerWorkset;
+	private int worksPerTypePerWritePlan;
 
 	/*
 	 * We just want a sequence of numbers that spreads uniformly over a large interval,
@@ -87,7 +87,7 @@ public abstract class AbstractOnTheFlyIndexingBenchmarks extends AbstractBackend
 		this.dataset = datasetHolder.getDataset();
 		this.invocationCount = 0L;
 
-		int threadIdIntervalSize = 3 * worksPerTypePerWorkset;
+		int threadIdIntervalSize = 3 * worksPerTypePerWritePlan;
 
 		// Initialize the ID lists
 		idsToAdd = new ArrayList<>();
@@ -95,15 +95,15 @@ public abstract class AbstractOnTheFlyIndexingBenchmarks extends AbstractBackend
 		idsToDelete = new ArrayList<>();
 		List<Long> shuffledIds = createShuffledIndexList( threadIdIntervalSize );
 		int offset = 0;
-		for ( int i = 0; i < worksPerTypePerWorkset; ++i ) {
+		for ( int i = 0; i < worksPerTypePerWritePlan; ++i ) {
 			idsToAdd.add( shuffledIds.get( i ) );
 		}
-		offset += worksPerTypePerWorkset;
-		for ( int i = 0; i < worksPerTypePerWorkset; ++i ) {
+		offset += worksPerTypePerWritePlan;
+		for ( int i = 0; i < worksPerTypePerWritePlan; ++i ) {
 			idsToDelete.add( shuffledIds.get( offset + i ) );
 		}
-		offset += worksPerTypePerWorkset;
-		for ( int i = 0; i < worksPerTypePerWorkset; ++i ) {
+		offset += worksPerTypePerWritePlan;
+		for ( int i = 0; i < worksPerTypePerWritePlan; ++i ) {
 			idsToUpdate.add( shuffledIds.get( offset + i ) );
 		}
 
@@ -116,7 +116,7 @@ public abstract class AbstractOnTheFlyIndexingBenchmarks extends AbstractBackend
 
 	@Benchmark
 	@Threads(10 * AbstractBackendHolder.INDEX_COUNT)
-	public void workset(WriteCounters counters) {
+	public void indexingPlan(WriteCounters counters) {
 		StubBackendSessionContext sessionContext = new StubBackendSessionContext();
 		PerThreadIndexPartition partition = getIndexPartition();
 		MappedIndex index = partition.getIndex();
@@ -147,7 +147,7 @@ public abstract class AbstractOnTheFlyIndexingBenchmarks extends AbstractBackend
 		// Do not return until works are *actually* executed
 		Futures.unwrappedExceptionJoin( indexingPlan.execute() );
 
-		counters.write += 3 * worksPerTypePerWorkset;
+		counters.write += 3 * worksPerTypePerWritePlan;
 
 		++invocationCount;
 
@@ -160,8 +160,8 @@ public abstract class AbstractOnTheFlyIndexingBenchmarks extends AbstractBackend
 	@Benchmark
 	@GroupThreads(10 * AbstractBackendHolder.INDEX_COUNT)
 	@Group("concurrentReadWrite")
-	public void concurrentWorkset(WriteCounters counters) {
-		workset( counters );
+	public void concurrentIndexingPlan(WriteCounters counters) {
+		indexingPlan( counters );
 	}
 
 	@Benchmark

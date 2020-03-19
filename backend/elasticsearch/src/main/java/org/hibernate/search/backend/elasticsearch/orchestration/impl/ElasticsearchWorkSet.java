@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
-import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
+import org.hibernate.search.engine.backend.orchestration.spi.BatchedWork;
 
-public interface ElasticsearchWorkSet extends BatchingExecutor.WorkSet<ElasticsearchWorkProcessor> {
+public interface ElasticsearchWorkSet extends BatchedWork<ElasticsearchWorkProcessor> {
 }

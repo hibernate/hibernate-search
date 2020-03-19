@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
-import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
+import org.hibernate.search.engine.backend.orchestration.spi.BatchedWorkProcessor;
 
 /**
  * An thread-unsafe component responsible for accumulating works to be executed,
@@ -22,7 +22,7 @@ import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
  * <p>
  * Depending on the implementation, works may be executed serially, or in parallel.
  */
-public interface ElasticsearchWorkProcessor extends BatchingExecutor.WorkProcessor {
+public interface ElasticsearchWorkProcessor extends BatchedWorkProcessor {
 
 	void beforeWorkSet();
 

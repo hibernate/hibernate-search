@@ -18,7 +18,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * An abstract base for orchestrator implementations,
  * implementing a thread-safe shutdown.
  *
- * @param <W> The type of submitted worksets.
+ * @param <W> The type of batched works.
  */
 public abstract class AbstractWorkOrchestrator<W> {
 
@@ -94,13 +94,13 @@ public abstract class AbstractWorkOrchestrator<W> {
 
 	protected abstract void doStart();
 
-	protected abstract void doSubmit(W workSet) throws InterruptedException;
+	protected abstract void doSubmit(W work) throws InterruptedException;
 
 	protected abstract CompletableFuture<?> getCompletion();
 
 	protected abstract void doStop();
 
-	public final void submit(W workSet) {
+	public final void submit(W work) {
 		if ( !lifecycleLock.readLock().tryLock() ) {
 			// The orchestrator is starting, pre-stopping or stopping: abort.
 			throw log.submittedWorkToStoppedOrchestrator( name );
@@ -110,11 +110,11 @@ public abstract class AbstractWorkOrchestrator<W> {
 				// The orchestrator is stopping or stopped: abort.
 				throw log.submittedWorkToStoppedOrchestrator( name );
 			}
-			doSubmit( workSet );
+			doSubmit( work );
 		}
 		catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
-			throw log.threadInterruptedWhileSubmittingWorkset( name );
+			throw log.threadInterruptedWhileSubmittingWork( name );
 		}
 		finally {
 			lifecycleLock.readLock().unlock();
