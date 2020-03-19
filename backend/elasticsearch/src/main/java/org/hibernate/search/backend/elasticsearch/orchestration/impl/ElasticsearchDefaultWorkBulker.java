@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.BiFunction;
 
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkSequenceBuilder.BulkResultExtractionStep;
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
@@ -67,8 +66,9 @@ class ElasticsearchDefaultWorkBulker implements ElasticsearchWorkBulker {
 		int currentBulkWorkIndex = currentBulkItems.size();
 		currentBulkItems.add( work );
 
-		BulkResultExtractionStep extractionStep = sequenceBuilder.addBulkResultExtraction( currentBulkResultFuture );
-		CompletableFuture<T> future = extractionStep.add( work, currentBulkWorkIndex );
+		CompletableFuture<T> future = sequenceBuilder.addBulkResultExtraction(
+				currentBulkResultFuture, work, currentBulkWorkIndex
+		);
 
 		if ( currentBulkItems.size() >= maxBulkSize ) {
 			finalizeBulkWork();

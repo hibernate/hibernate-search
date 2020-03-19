@@ -14,7 +14,6 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRespon
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.BulkWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
-import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResultItemExtractor;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 
 import com.google.gson.JsonArray;
@@ -87,33 +86,15 @@ public class BulkWork extends AbstractNonBulkableWork<BulkResult> {
 		private final JsonArray results;
 
 		public BulkResultImpl(JsonArray results) {
-			this.results = results;
-		}
-
-		@Override
-		public BulkResultItemExtractor withContext(ElasticsearchWorkExecutionContext context) {
-			return new BulkResultItemExtractorImpl( results, context );
-		}
-	}
-
-	private static class BulkResultItemExtractorImpl implements BulkResultItemExtractor {
-		private final JsonArray results;
-
-		private final ElasticsearchWorkExecutionContext context;
-
-
-		public BulkResultItemExtractorImpl(JsonArray results, ElasticsearchWorkExecutionContext context) {
 			super();
 			this.results = results;
-			this.context = context;
 		}
 
 		@Override
-		public <T> T extract(BulkableWork<T> work, int index) {
+		public <T> T extract(ElasticsearchWorkExecutionContext context, BulkableWork<T> work, int index) {
 			JsonObject bulkItemResponse = results.get( index ).getAsJsonObject();
 			return work.handleBulkResult( context, bulkItemResponse );
 		}
-
 	}
 
 }

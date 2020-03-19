@@ -21,7 +21,6 @@ import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchClient
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
-import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResultItemExtractor;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.test.FutureAssert;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -78,24 +77,19 @@ public class BulkWorkTest extends EasyMockSupport {
 		FutureAssert.assertThat( returnedFuture ).isSuccessful();
 		BulkResult result = returnedFuture.join();
 
-		resetAll();
-		replayAll();
-		BulkResultItemExtractor extractor = result.withContext( contextMock );
-		verifyAll();
-
 		Object bulkableResult = new Object();
 		resetAll();
 		expect( bulkableWork0.handleBulkResult( same( contextMock ), same( items.get( 0 ).getAsJsonObject() ) ) )
 				.andReturn( bulkableResult );
 		replayAll();
-		assertThat( extractor.extract( bulkableWork0, 0 ) ).isSameAs( bulkableResult );
+		assertThat( result.extract( contextMock, bulkableWork0, 0 ) ).isSameAs( bulkableResult );
 		verifyAll();
 
 		resetAll();
 		expect( bulkableWork1.handleBulkResult( same( contextMock ), same( items.get( 1 ).getAsJsonObject() ) ) )
 				.andReturn( bulkableResult );
 		replayAll();
-		assertThat( extractor.extract( bulkableWork1, 1 ) ).isSameAs( bulkableResult );
+		assertThat( result.extract( contextMock, bulkableWork1, 1 ) ).isSameAs( bulkableResult );
 		verifyAll();
 	}
 

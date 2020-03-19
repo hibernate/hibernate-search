@@ -17,7 +17,6 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExe
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
-import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResultItemExtractor;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -29,7 +28,6 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Supplier<ElasticsearchWorkExecutionContext> contextSupplier;
-	private final BulkResultExtractionStepImpl bulkResultExtractionStep = new BulkResultExtractionStepImpl();
 
 	private CompletableFuture<Void> currentlyBuildingSequenceTail;
 	private SequenceContext currentlyBuildingSequenceContext;
@@ -98,17 +96,28 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 	}
 
 	@Override
-	public BulkResultExtractionStep addBulkResultExtraction(CompletableFuture<BulkResult> bulkResultFuture) {
+	public <T> CompletableFuture<T> addBulkResultExtraction(CompletableFuture<BulkResult> bulkResultFuture,
+			BulkableWork<T> bulkedWork, int index) {
 		// Use a local variable to make sure lambdas (if any) won't be affected by a reset()
 		final SequenceContext currentSequenceContext = this.currentlyBuildingSequenceContext;
 
-		CompletableFuture<BulkResultItemExtractor> extractorFuture =
+		CompletableFuture<BulkResult> delayedBulkResultFuture =
 				// Only start extraction after the previous work is complete, so as to comply with the sequence order.
-				currentlyBuildingSequenceTail.thenCombine( bulkResultFuture, (ignored, bulkResult) -> bulkResult )
-				.thenApply( currentSequenceContext::addContext );
+				currentlyBuildingSequenceTail.thenCombine( bulkResultFuture, (ignored, bulkResult) -> bulkResult );
 
-		bulkResultExtractionStep.init( extractorFuture );
-		return bulkResultExtractionStep;
+		BulkedWorkExecutionState<T> workExecutionState =
+				new BulkedWorkExecutionState<>( currentSequenceContext, bulkedWork, index );
+
+		CompletableFuture<T> handledWorkExecutionFuture = delayedBulkResultFuture
+				// If the bulk work fails, make sure to notify the caller as necessary.
+				.whenComplete( Futures.handler( workExecutionState::onBulkWorkComplete ) )
+				// If the bulk work succeeds, then extract the bulked work result and notify as necessary.
+				.thenCompose( workExecutionState::onBulkWorkSuccess );
+
+		// Note the bulk
+		updateTail( CompletableFuture.allOf( currentlyBuildingSequenceTail, handledWorkExecutionFuture ) );
+
+		return workExecutionState.workFutureForCaller;
 	}
 
 	@Override
@@ -123,36 +132,6 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 		// to make sure the following works will execute regardless of the failures in previous works
 		// (but will still execute *after* previous works).
 		currentlyBuildingSequenceTail = workFuture.handle( (ignoredResult, ignoredThrowable) -> null );
-	}
-
-	private final class BulkResultExtractionStepImpl implements BulkResultExtractionStep {
-
-		private CompletableFuture<BulkResultItemExtractor> extractorFuture;
-
-		void init(CompletableFuture<BulkResultItemExtractor> extractorFuture) {
-			this.extractorFuture = extractorFuture;
-		}
-
-		@Override
-		public <T> CompletableFuture<T> add(BulkableWork<T> bulkedWork, int index) {
-			// Use local variables to make sure the lambdas won't be affected by a reset()
-			final SequenceContext sequenceContext = ElasticsearchDefaultWorkSequenceBuilder.this.currentlyBuildingSequenceContext;
-
-			BulkedWorkExecutionState<T> workExecutionState =
-					new BulkedWorkExecutionState<>( sequenceContext, bulkedWork, index );
-
-			CompletableFuture<T> handledWorkExecutionFuture = extractorFuture
-					// If the bulk work fails, make sure to notify the caller as necessary.
-					.whenComplete( Futures.handler( workExecutionState::onBulkWorkComplete ) )
-					// If the bulk work succeeds, then extract the bulked work result and notify as necessary.
-					.thenCompose( workExecutionState::onBulkWorkSuccess );
-
-			// Note the bulk
-			updateTail( CompletableFuture.allOf( currentlyBuildingSequenceTail, handledWorkExecutionFuture ) );
-
-			return workExecutionState.workFutureForCaller;
-		}
-
 	}
 
 	private static final class PreviousWorkException extends RuntimeException {
@@ -180,10 +159,6 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 
 		<T> CompletionStage<T> execute(NonBulkableWork<T> work) {
 			return work.execute( executionContext );
-		}
-
-		public BulkResultItemExtractor addContext(BulkResult bulkResult) {
-			return bulkResult.withContext( executionContext );
 		}
 	}
 
@@ -247,7 +222,7 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 
 		private final int index;
 
-		private BulkResultItemExtractor extractor;
+		private BulkResult bulkResult;
 
 		private BulkedWorkExecutionState(SequenceContext sequenceContext,
 				BulkableWork<R> bulkedWork, int index) {
@@ -263,15 +238,17 @@ class ElasticsearchDefaultWorkSequenceBuilder implements ElasticsearchWorkSequen
 			}
 		}
 
-		CompletableFuture<R> onBulkWorkSuccess(BulkResultItemExtractor extractor) {
-			this.extractor = extractor;
+		CompletableFuture<R> onBulkWorkSuccess(BulkResult bulkResult) {
+			this.bulkResult = bulkResult;
 			// Use Futures.create to catch any exception thrown by extractor.extract
 			CompletableFuture<R> workExecutionFuture = Futures.create( this::extract );
 			return addPostExecutionHandlers( workExecutionFuture );
 		}
 
 		private CompletableFuture<R> extract() {
-			return CompletableFuture.completedFuture( extractor.extract( bulkedWork, index ) );
+			return CompletableFuture.completedFuture(
+					bulkResult.extract( sequenceContext.executionContext, bulkedWork, index )
+			);
 		}
 	}
 }
