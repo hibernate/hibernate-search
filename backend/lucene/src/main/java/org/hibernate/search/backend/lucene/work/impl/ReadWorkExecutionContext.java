@@ -12,7 +12,7 @@ import org.hibernate.search.util.common.reporting.EventContext;
 import org.apache.lucene.index.IndexReader;
 
 
-public interface LuceneReadWorkExecutionContext {
+public interface ReadWorkExecutionContext {
 
 	IndexReader getIndexReader();
 

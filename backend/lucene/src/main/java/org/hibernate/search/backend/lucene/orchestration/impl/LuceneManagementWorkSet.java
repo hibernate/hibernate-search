@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.lucene.work.impl.LuceneIndexManagementWork;
+import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
 
 /**
  * A special write workset that won't trigger the creation of the index writer.
@@ -17,11 +17,11 @@ import org.hibernate.search.backend.lucene.work.impl.LuceneIndexManagementWork;
  */
 class LuceneManagementWorkSet<T> implements LuceneWriteWorkSet {
 
-	private final LuceneIndexManagementWork<T> work;
+	private final IndexManagementWork<T> work;
 
 	private final CompletableFuture<T> future;
 
-	LuceneManagementWorkSet(LuceneIndexManagementWork<T> work, CompletableFuture<T> future) {
+	LuceneManagementWorkSet(IndexManagementWork<T> work, CompletableFuture<T> future) {
 		this.work = work;
 		this.future = future;
 	}

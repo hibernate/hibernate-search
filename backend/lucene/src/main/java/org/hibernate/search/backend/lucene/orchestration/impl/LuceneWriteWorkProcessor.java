@@ -12,8 +12,8 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
-import org.hibernate.search.backend.lucene.work.impl.LuceneIndexManagementWork;
-import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
+import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
+import org.hibernate.search.backend.lucene.work.impl.WriteWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
@@ -32,7 +32,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 	private final String indexName;
 	private final EventContext eventContext;
 	private final IndexAccessor indexAccessor;
-	private final LuceneWriteWorkExecutionContextImpl context;
+	private final WriteWorkExecutionContextImpl context;
 	private final FailureHandler failureHandler;
 
 	public LuceneWriteWorkProcessor(String indexName, EventContext eventContext,
@@ -40,7 +40,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 		this.indexName = indexName;
 		this.eventContext = eventContext;
 		this.indexAccessor = indexAccessor;
-		this.context = new LuceneWriteWorkExecutionContextImpl( eventContext, indexAccessor );
+		this.context = new WriteWorkExecutionContextImpl( eventContext, indexAccessor );
 		this.failureHandler = failureHandler;
 	}
 
@@ -76,7 +76,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 		}
 	}
 
-	public <T> T submit(LuceneIndexManagementWork<T> work) {
+	public <T> T submit(IndexManagementWork<T> work) {
 		try {
 			return work.execute( context );
 		}
@@ -86,7 +86,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 		}
 	}
 
-	public <T> T submit(LuceneWriteWork<T> work) {
+	public <T> T submit(WriteWork<T> work) {
 		try {
 			return work.execute( context );
 		}

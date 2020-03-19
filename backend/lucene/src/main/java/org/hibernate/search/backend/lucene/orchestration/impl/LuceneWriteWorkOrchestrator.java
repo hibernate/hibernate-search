@@ -8,29 +8,29 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.lucene.work.impl.LuceneIndexManagementWork;
-import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
+import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
+import org.hibernate.search.backend.lucene.work.impl.WriteWork;
 
 
 public interface LuceneWriteWorkOrchestrator {
 
-	default <T> CompletableFuture<T> submit(LuceneIndexManagementWork<T> work) {
+	default <T> CompletableFuture<T> submit(IndexManagementWork<T> work) {
 		CompletableFuture<T> future = new CompletableFuture<>();
 		submit( future, work );
 		return future;
 	}
 
-	default <T> void submit(CompletableFuture<T> future, LuceneIndexManagementWork<T> work) {
+	default <T> void submit(CompletableFuture<T> future, IndexManagementWork<T> work) {
 		submit( new LuceneManagementWorkSet<>( work, future ) );
 	}
 
-	default <T> CompletableFuture<T> submit(LuceneWriteWork<T> work) {
+	default <T> CompletableFuture<T> submit(WriteWork<T> work) {
 		CompletableFuture<T> future = new CompletableFuture<>();
 		submit( new LuceneSingleWriteWorkSet<>( work, future ) );
 		return future;
 	}
 
-	default <T> void submit(CompletableFuture<T> future, LuceneWriteWork<T> work) {
+	default <T> void submit(CompletableFuture<T> future, WriteWork<T> work) {
 		submit( new LuceneSingleWriteWorkSet<>( work, future ) );
 	}
 

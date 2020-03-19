@@ -23,7 +23,7 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TopDocs;
 
-class LuceneExplainWork implements LuceneReadWork<Explanation> {
+class ExplainWork implements ReadWork<Explanation> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -33,7 +33,7 @@ class LuceneExplainWork implements LuceneReadWork<Explanation> {
 	private final String explainedDocumentId;
 	private final Query explainedDocumentFilter;
 
-	LuceneExplainWork(LuceneSearcher<?> searcher,
+	ExplainWork(LuceneSearcher<?> searcher,
 			String explainedDocumentIndexName, String explainedDocumentId, Query explainedDocumentFilter) {
 		this.searcher = searcher;
 		this.explainedDocumentIndexName = explainedDocumentIndexName;
@@ -42,7 +42,7 @@ class LuceneExplainWork implements LuceneReadWork<Explanation> {
 	}
 
 	@Override
-	public Explanation execute(LuceneReadWorkExecutionContext context) {
+	public Explanation execute(ReadWorkExecutionContext context) {
 		try {
 			IndexSearcher indexSearcher = new IndexSearcher( context.getIndexReader() );
 
@@ -60,7 +60,7 @@ class LuceneExplainWork implements LuceneReadWork<Explanation> {
 	 * From what I understand, the Lucene docId might change from one search to another,
 	 * it's more or less an address in an array (?).
 	 */
-	private int getLuceneDocId(LuceneReadWorkExecutionContext context, IndexSearcher indexSearcher) throws IOException {
+	private int getLuceneDocId(ReadWorkExecutionContext context, IndexSearcher indexSearcher) throws IOException {
 		Query explainedDocumentQuery = createExplainedDocumentQuery( context );
 
 		TopDocs topDocs = indexSearcher.search( explainedDocumentQuery, 2 );
@@ -76,7 +76,7 @@ class LuceneExplainWork implements LuceneReadWork<Explanation> {
 		return topDocs.scoreDocs[0].doc;
 	}
 
-	private Query createExplainedDocumentQuery(LuceneReadWorkExecutionContext context) {
+	private Query createExplainedDocumentQuery(ReadWorkExecutionContext context) {
 		BooleanQuery.Builder builder = new BooleanQuery.Builder()
 				.add( Queries.mainDocumentQuery(), BooleanClause.Occur.FILTER )
 				.add( Queries.term( MetadataFields.idFieldName(), explainedDocumentId ), BooleanClause.Occur.FILTER )

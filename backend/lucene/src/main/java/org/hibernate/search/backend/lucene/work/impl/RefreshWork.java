@@ -6,17 +6,21 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
-public abstract class AbstractLuceneWriteWork<T> implements LuceneWriteWork<T> {
+public class RefreshWork implements IndexManagementWork<Void> {
 
-	protected final String workType;
+	@Override
+	public String toString() {
+		return getClass().getSimpleName();
+	}
 
-	AbstractLuceneWriteWork(String workType) {
-		this.workType = workType;
+	@Override
+	public Void execute(IndexManagementWorkExecutionContext context) {
+		context.getIndexAccessor().refresh();
+		return null;
 	}
 
 	@Override
 	public Object getInfo() {
-		// TODO extract immutable work relevant info. We need to think about it. See HSEARCH-3110.
 		return this;
 	}
 }

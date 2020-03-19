@@ -7,10 +7,14 @@
 package org.hibernate.search.backend.lucene.work.impl;
 
 
-public interface LuceneWriteWork<T> {
+import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
+import org.hibernate.search.util.common.reporting.EventContext;
 
-	T execute(LuceneWriteWorkExecutionContext context);
 
-	Object getInfo();
+public interface IndexManagementWorkExecutionContext {
+
+	EventContext getEventContext();
+
+	IndexAccessor getIndexAccessor();
 
 }

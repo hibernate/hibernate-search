@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
-import org.hibernate.search.backend.lucene.work.impl.LuceneSingleDocumentWriteWork;
+import org.hibernate.search.backend.lucene.work.impl.SingleDocumentWriteWork;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -29,14 +29,14 @@ class LuceneIndexIndexingPlanExecution<R> {
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 
-	private final List<LuceneSingleDocumentWriteWork> works;
+	private final List<SingleDocumentWriteWork> works;
 	private final CompletableFuture<Long>[] futures;
 
 	LuceneIndexIndexingPlanExecution(LuceneWriteWorkOrchestrator orchestrator,
 			EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy,
 			DocumentRefreshStrategy refreshStrategy,
-			List<LuceneSingleDocumentWriteWork> works) {
+			List<SingleDocumentWriteWork> works) {
 		this.orchestrator = orchestrator;
 		this.entityReferenceFactory = entityReferenceFactory;
 		this.commitStrategy = commitStrategy;
@@ -69,7 +69,7 @@ class LuceneIndexIndexingPlanExecution<R> {
 
 		for ( int i = 0; i < works.size(); i++ ) {
 			CompletableFuture<Long> future = futures[i];
-			LuceneSingleDocumentWriteWork work = works.get( i );
+			SingleDocumentWriteWork work = works.get( i );
 			orchestrator.submit( future, work );
 		}
 
@@ -108,7 +108,7 @@ class LuceneIndexIndexingPlanExecution<R> {
 				reportBuilder.throwable( Futures.getThrowableNow( future ) );
 			}
 			if ( commitOrRefreshThrowable != null || future.isCompletedExceptionally() ) {
-				LuceneSingleDocumentWriteWork work = works.get( i );
+				SingleDocumentWriteWork work = works.get( i );
 				try {
 					reportBuilder.failingEntityReference(
 							entityReferenceFactory,

@@ -10,17 +10,17 @@ import java.io.IOException;
 
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
-import org.hibernate.search.backend.lucene.work.impl.LuceneIndexManagementWorkExecutionContext;
-import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWorkExecutionContext;
+import org.hibernate.search.backend.lucene.work.impl.IndexManagementWorkExecutionContext;
+import org.hibernate.search.backend.lucene.work.impl.WriteWorkExecutionContext;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-class LuceneWriteWorkExecutionContextImpl
-		implements LuceneWriteWorkExecutionContext, LuceneIndexManagementWorkExecutionContext {
+class WriteWorkExecutionContextImpl
+		implements WriteWorkExecutionContext, IndexManagementWorkExecutionContext {
 
 	private final EventContext eventContext;
 	private final IndexAccessor indexAccessor;
 
-	LuceneWriteWorkExecutionContextImpl(EventContext eventContext, IndexAccessor indexAccessor) {
+	WriteWorkExecutionContextImpl(EventContext eventContext, IndexAccessor indexAccessor) {
 		this.eventContext = eventContext;
 		this.indexAccessor = indexAccessor;
 	}

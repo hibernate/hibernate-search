@@ -7,16 +7,15 @@
 package org.hibernate.search.backend.lucene.work.impl;
 
 
-public class LuceneCreateIndexIfMissingWork implements LuceneIndexManagementWork<Void> {
-
+public class MergeSegmentsWork implements IndexManagementWork<Void> {
 	@Override
 	public String toString() {
 		return getClass().getSimpleName();
 	}
 
 	@Override
-	public Void execute(LuceneIndexManagementWorkExecutionContext context) {
-		context.getIndexAccessor().createIndexIfMissing();
+	public Void execute(IndexManagementWorkExecutionContext context) {
+		context.getIndexAccessor().mergeSegments();
 		return null;
 	}
 

@@ -15,18 +15,18 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.apache.lucene.search.IndexSearcher;
 
 
-public class LuceneCountWork implements LuceneReadWork<Integer> {
+public class CountWork implements ReadWork<Integer> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneSearcher<?> searcher;
 
-	LuceneCountWork(LuceneSearcher<?> searcher) {
+	CountWork(LuceneSearcher<?> searcher) {
 		this.searcher = searcher;
 	}
 
 	@Override
-	public Integer execute(LuceneReadWorkExecutionContext context) {
+	public Integer execute(ReadWorkExecutionContext context) {
 		try {
 			IndexSearcher indexSearcher = new IndexSearcher( context.getIndexReader() );
 

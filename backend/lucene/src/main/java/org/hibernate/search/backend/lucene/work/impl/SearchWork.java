@@ -15,7 +15,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.apache.lucene.search.IndexSearcher;
 
 
-public class LuceneSearchWork<R> implements LuceneReadWork<R> {
+public class SearchWork<R> implements ReadWork<R> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -24,7 +24,7 @@ public class LuceneSearchWork<R> implements LuceneReadWork<R> {
 	private final int offset;
 	private final Integer limit;
 
-	LuceneSearchWork(LuceneSearcher<R> searcher,
+	SearchWork(LuceneSearcher<R> searcher,
 			Integer offset,
 			Integer limit) {
 		this.offset = offset == null ? 0 : offset;
@@ -33,7 +33,7 @@ public class LuceneSearchWork<R> implements LuceneReadWork<R> {
 	}
 
 	@Override
-	public R execute(LuceneReadWorkExecutionContext context) {
+	public R execute(ReadWorkExecutionContext context) {
 		try {
 			IndexSearcher indexSearcher = new IndexSearcher( context.getIndexReader() );
 

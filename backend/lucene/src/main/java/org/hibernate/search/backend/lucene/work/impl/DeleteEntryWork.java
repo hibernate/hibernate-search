@@ -9,7 +9,6 @@ package org.hibernate.search.backend.lucene.work.impl;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 
-import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
@@ -21,39 +20,37 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
 
-public class LuceneUpdateEntryWork extends AbstractLuceneSingleDocumentWriteWork {
+public class DeleteEntryWork extends AbstractSingleDocumentWriteWork {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String documentIdentifier;
 	private final Query filter;
 
-	private final LuceneIndexEntry indexEntry;
-
-	LuceneUpdateEntryWork(String tenantId, String entityTypeName, Object entityIdentifier,
-			String documentIdentifier, Query filter, LuceneIndexEntry indexEntry) {
-		super( "updateEntry", tenantId, entityTypeName, entityIdentifier );
+	DeleteEntryWork(String tenantId, String entityTypeName, Object entityIdentifier,
+			String documentIdentifier, Query filter) {
+		super( "deleteEntry", tenantId, entityTypeName, entityIdentifier );
 		this.documentIdentifier = documentIdentifier;
 		this.filter = filter;
-		this.indexEntry = indexEntry;
 	}
 
 	@Override
-	public Long execute(LuceneWriteWorkExecutionContext context) {
+	public Long execute(WriteWorkExecutionContext context) {
 		try {
 			IndexWriterDelegator indexWriterDelegator = context.getIndexWriterDelegator();
 			Term idTerm = new Term( MetadataFields.idFieldName(), documentIdentifier );
 			if ( filter == null ) {
-				// Atomic update: presumably more efficient.
-				return indexWriterDelegator.updateDocuments( idTerm, indexEntry );
+				// Pass the term directly instead of a query: presumably more efficient.
+				return indexWriterDelegator.deleteDocuments( idTerm );
 			}
 			else {
-				indexWriterDelegator.deleteDocuments( Queries.boolFilter( new TermQuery( idTerm ), filter ) );
-				return indexWriterDelegator.addDocuments( indexEntry );
+				return indexWriterDelegator.deleteDocuments( Queries.boolFilter( new TermQuery( idTerm ), filter ) );
 			}
 		}
 		catch (IOException e) {
-			throw log.unableToIndexEntry( tenantId, entityTypeName, entityIdentifier, context.getEventContext(), e );
+			throw log.unableToDeleteEntryFromIndex(
+					tenantId, entityTypeName, entityIdentifier, context.getEventContext(), e
+			);
 		}
 	}
 

@@ -17,7 +17,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
-import org.hibernate.search.backend.lucene.work.impl.LuceneSingleDocumentWriteWork;
+import org.hibernate.search.backend.lucene.work.impl.SingleDocumentWriteWork;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -59,7 +59,7 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 	private final EntityReferenceFactory<StubEntityReference> entityReferenceFactoryMock =
 			createStrictMock( EntityReferenceFactory.class );
 
-	private final List<LuceneSingleDocumentWriteWork> workMocks = new ArrayList<>();
+	private final List<SingleDocumentWriteWork> workMocks = new ArrayList<>();
 
 	public LuceneIndexIndexingPlanExecutionTest(DocumentCommitStrategy commitStrategy,
 			DocumentRefreshStrategy refreshStrategy) {
@@ -641,7 +641,7 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 
 	private void expectWorkGetInfo(int ... ids) {
 		for ( int id : ids ) {
-			LuceneSingleDocumentWriteWork workMock = workMocks.get( id );
+			SingleDocumentWriteWork workMock = workMocks.get( id );
 			EasyMock.expect( workMock.getInfo() ).andStubReturn( workInfo( id ) );
 			EasyMock.expect( workMock.getEntityTypeName() ).andStubReturn( TYPE_NAME );
 			EasyMock.expect( workMock.getEntityIdentifier() ).andStubReturn( id );
@@ -651,7 +651,7 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 	}
 
 	private void expectFailingWorkGetInfo(int id, Throwable thrown) {
-		LuceneSingleDocumentWriteWork workMock = workMocks.get( id );
+		SingleDocumentWriteWork workMock = workMocks.get( id );
 		EasyMock.expect( workMock.getInfo() ).andStubReturn( workInfo( id ) );
 		EasyMock.expect( workMock.getEntityTypeName() ).andStubReturn( TYPE_NAME );
 		EasyMock.expect( workMock.getEntityIdentifier() ).andStubReturn( id );
@@ -659,17 +659,17 @@ public class LuceneIndexIndexingPlanExecutionTest extends EasyMockSupport {
 				.andThrow( thrown );
 	}
 
-	private List<LuceneSingleDocumentWriteWork> createWorkMocks(int count) {
-		List<LuceneSingleDocumentWriteWork> result = new ArrayList<>();
+	private List<SingleDocumentWriteWork> createWorkMocks(int count) {
+		List<SingleDocumentWriteWork> result = new ArrayList<>();
 		for ( int i = 0; i < count; i++ ) {
 			result.add( createWorkMock() );
 		}
 		return result;
 	}
 
-	private <T> LuceneSingleDocumentWriteWork createWorkMock() {
+	private <T> SingleDocumentWriteWork createWorkMock() {
 		String workName = workInfo( workMocks.size() );
-		LuceneSingleDocumentWriteWork workMock = createStrictMock( workName, LuceneSingleDocumentWriteWork.class );
+		SingleDocumentWriteWork workMock = createStrictMock( workName, SingleDocumentWriteWork.class );
 		workMocks.add( workMock );
 		return workMock;
 	}
