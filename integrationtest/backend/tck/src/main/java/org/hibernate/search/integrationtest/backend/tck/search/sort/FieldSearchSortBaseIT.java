@@ -417,6 +417,11 @@ public class FieldSearchSortBaseIT<F> {
 				"This combination is not expected to work",
 				isMedianWithNestedField() || isSumOrAvgOrMedianWithStringField() || isSumWithTemporalField()
 		);
+		Assume.assumeTrue(
+				"This combination is buggy with this backend",
+				TckConfiguration.get().getBackendFeatures()
+						.sortByFieldValue( indexFieldStructure, fieldTypeDescriptor.getJavaType(), sortMode )
+		);
 	}
 
 	private boolean isSumOrAvgOrMedianWithStringField() {

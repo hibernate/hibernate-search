@@ -64,4 +64,7 @@ public interface ElasticsearchTestDialect {
 
 	boolean supportsIsWriteIndex();
 
+	default boolean hasBugForSortMaxOnNegativeFloats() {
+		return false;
+	}
 }

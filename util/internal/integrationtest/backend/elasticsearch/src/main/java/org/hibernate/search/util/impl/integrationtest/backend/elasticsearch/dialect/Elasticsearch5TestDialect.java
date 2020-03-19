@@ -67,4 +67,9 @@ public class Elasticsearch5TestDialect implements ElasticsearchTestDialect {
 	public boolean supportsIsWriteIndex() {
 		return false;
 	}
+
+	@Override
+	public boolean hasBugForSortMaxOnNegativeFloats() {
+		return true;
+	}
 }

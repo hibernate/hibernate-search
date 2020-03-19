@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
+import org.hibernate.search.engine.search.common.SortMode;
+
 public class TckBackendFeatures {
 
 	public boolean geoPointIndexNullAs() {
@@ -54,6 +56,10 @@ public class TckBackendFeatures {
 	}
 
 	public boolean fastTimeoutResolution() {
+		return true;
+	}
+
+	public boolean sortByFieldValue(IndexFieldStructure indexFieldStructure, Class<?> fieldType, SortMode sortMode) {
 		return true;
 	}
 }
