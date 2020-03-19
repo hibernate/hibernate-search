@@ -10,6 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
 import org.hibernate.search.backend.lucene.work.impl.WriteWork;
+import org.hibernate.search.engine.backend.orchestration.spi.BatchedWork;
 
 
 public interface LuceneWriteWorkOrchestrator {
@@ -21,20 +22,20 @@ public interface LuceneWriteWorkOrchestrator {
 	}
 
 	default <T> void submit(CompletableFuture<T> future, IndexManagementWork<T> work) {
-		submit( new LuceneManagementWorkSet<>( work, future ) );
+		submit( new LuceneManagementBatchedWork<>( work, future ) );
 	}
 
 	default <T> CompletableFuture<T> submit(WriteWork<T> work) {
 		CompletableFuture<T> future = new CompletableFuture<>();
-		submit( new LuceneSingleWriteWorkSet<>( work, future ) );
+		submit( new LuceneWriteBatchedWork<>( work, future ) );
 		return future;
 	}
 
 	default <T> void submit(CompletableFuture<T> future, WriteWork<T> work) {
-		submit( new LuceneSingleWriteWorkSet<>( work, future ) );
+		submit( new LuceneWriteBatchedWork<>( work, future ) );
 	}
 
-	void submit(LuceneWriteWorkSet workSet);
+	void submit(BatchedWork<LuceneWriteWorkProcessor> work);
 
 	/**
 	 * Force a commit immediately.

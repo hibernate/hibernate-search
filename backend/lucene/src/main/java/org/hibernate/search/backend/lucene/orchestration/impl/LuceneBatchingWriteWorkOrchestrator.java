@@ -9,28 +9,29 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.engine.backend.orchestration.spi.AbstractWorkOrchestrator;
+import org.hibernate.search.engine.backend.orchestration.spi.BatchedWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 
 /**
- * An orchestrator that batches together worksets sent from other threads.
+ * An orchestrator that batches together works sent from other threads.
  * <p>
  * More precisely, the submitted works are sent to a queue which is processed periodically
  * in a separate thread.
- * This allows to process multiple worksets and only commit once,
+ * This allows processing multiple works and only committing once,
  * potentially reducing the frequency of commits.
  */
 public class LuceneBatchingWriteWorkOrchestrator
-		extends AbstractWorkOrchestrator<LuceneWriteWorkSet>
+		extends AbstractWorkOrchestrator<BatchedWork<LuceneWriteWorkProcessor>>
 		implements LuceneWriteWorkOrchestratorImplementor {
 
 	// TODO HSEARCH‌-3575 allow to configure this value
-	private static final int MAX_WORKSETS_PER_BATCH = 1000;
+	private static final int MAX_WORKS_PER_BATCH = 1000;
 
 	private final LuceneWriteWorkProcessor processor;
 	private final ThreadPoolProvider threadPoolProvider;
-	private final BatchingExecutor<LuceneWriteWorkSet, LuceneWriteWorkProcessor> executor;
+	private final BatchingExecutor<LuceneWriteWorkProcessor> executor;
 
 	/**
 	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)
@@ -48,7 +49,7 @@ public class LuceneBatchingWriteWorkOrchestrator
 		this.executor = new BatchingExecutor<>(
 				name,
 				processor,
-				MAX_WORKSETS_PER_BATCH,
+				MAX_WORKS_PER_BATCH,
 				true,
 				failureHandler
 		);
@@ -70,8 +71,8 @@ public class LuceneBatchingWriteWorkOrchestrator
 	}
 
 	@Override
-	protected void doSubmit(LuceneWriteWorkSet workSet) throws InterruptedException {
-		executor.submit( workSet );
+	protected void doSubmit(BatchedWork<LuceneWriteWorkProcessor> work) throws InterruptedException {
+		executor.submit( work );
 	}
 
 	@Override

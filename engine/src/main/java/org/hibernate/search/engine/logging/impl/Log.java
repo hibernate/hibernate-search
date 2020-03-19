@@ -271,13 +271,13 @@ public interface Log extends BasicLogger {
 	SearchException nonSingleHit(long totalHitCount);
 
 	@Message(id = ID_OFFSET_2 + 62,
-			value = "The thread was interrupted while a workset was being submitted to '%1$s'."
-					+ " The workset has been discarded." )
-	SearchException threadInterruptedWhileSubmittingWorkset(String orchestratorName);
+			value = "The thread was interrupted while a work was being submitted to '%1$s'."
+					+ " The work has been discarded." )
+	SearchException threadInterruptedWhileSubmittingWork(String orchestratorName);
 
 	@Message(id = ID_OFFSET_2 + 63,
-			value = "A workset was submitted to '%1$s', but this orchestrator was stopped."
-					+ " The workset has been discarded." )
+			value = "A work was submitted to '%1$s', but this orchestrator was stopped."
+					+ " The work has been discarded." )
 	SearchException submittedWorkToStoppedOrchestrator(String orchestratorName);
 
 	@Message(id = ID_OFFSET_2 + 64, value = "Unable to parse the provided geo-point value: '%1$s'. The expected format is latitude, longitude.")

@@ -48,7 +48,7 @@ public class BatchingExecutorTest extends EasyMockSupport {
 	// To execute code asynchronously. Just use more threads than we'll ever need, we don't care about performance.
 	private final ForkJoinPool asyncExecutor = new ForkJoinPool( 12 );
 
-	private BatchingExecutor<StubWorkSet, StubWorkProcessor> executor;
+	private BatchingExecutor<StubWorkProcessor> executor;
 
 	@After
 	public void cleanup() {
@@ -61,20 +61,20 @@ public class BatchingExecutorTest extends EasyMockSupport {
 	public void simple_batchEndsImmediately_completeReturnsZero() throws InterruptedException {
 		createAndStartExecutor( 2, true );
 
-		StubWorkSet workSet1Mock = createMock( StubWorkSet.class );
+		StubWork work1Mock = createMock( StubWork.class );
 		// The batch is already completed when the endBatch() method returns,
 		// allowing the executor to handle the next batch immediately.
 		CompletableFuture<Object> batch1Future = CompletableFuture.completedFuture( null );
 		resetAll();
 		processorMock.beginBatch();
-		workSet1Mock.submitTo( processorMock );
+		work1Mock.submitTo( processorMock );
 		expect( processorMock.endBatch() ).andReturn( (CompletableFuture) batch1Future );
 		// Since the queue is empty, expect a call to processor.completeOrDelay().
 		expect( processorMock.completeOrDelay() )
 				// The processor returns 0 to indicate that all outstanding operations have actually completed.
 				.andReturn( 0L );
 		replayAll();
-		executor.submit( workSet1Mock );
+		executor.submit( work1Mock );
 		verifyAllAsynchronously();
 
 		// Submitting other works should start the executor/processor again
@@ -85,13 +85,13 @@ public class BatchingExecutorTest extends EasyMockSupport {
 	public void simple_batchEndsImmediately_completeReturnsPositive_noAdditionalWork() throws InterruptedException {
 		createAndStartExecutor( 2, true );
 
-		StubWorkSet workSet1Mock = createMock( StubWorkSet.class );
+		StubWork work1Mock = createMock( StubWork.class );
 		// The batch is already completed when the endBatch() method returns,
 		// allowing the executor to handle the next batch immediately.
 		CompletableFuture<Object> batch1Future = CompletableFuture.completedFuture( null );
 		resetAll();
 		processorMock.beginBatch();
-		workSet1Mock.submitTo( processorMock );
+		work1Mock.submitTo( processorMock );
 		expect( processorMock.endBatch() ).andReturn( (CompletableFuture) batch1Future );
 		// Since the queue is empty, expect a call to processor.completeOrDelay().
 		expect( processorMock.completeOrDelay() )
@@ -99,7 +99,7 @@ public class BatchingExecutorTest extends EasyMockSupport {
 				// and should be executed after that many milliseconds
 				.andReturn( NON_ZERO_DELAY );
 		replayAll();
-		executor.submit( workSet1Mock );
+		executor.submit( work1Mock );
 		verifyAllAsynchronously();
 
 		StubCompletionListener completionListenerAfterSubmit = addPendingCompletionListener();
@@ -120,13 +120,13 @@ public class BatchingExecutorTest extends EasyMockSupport {
 	public void simple_batchEndsImmediately_completeReturnsPositive_someAdditionalWork() throws InterruptedException {
 		createAndStartExecutor( 2, true );
 
-		StubWorkSet workSet1Mock = createMock( StubWorkSet.class );
+		StubWork work1Mock = createMock( StubWork.class );
 		// The batch is already completed when the endBatch() method returns,
 		// allowing the executor to handle the next batch immediately.
 		CompletableFuture<Object> batch1Future = CompletableFuture.completedFuture( null );
 		resetAll();
 		processorMock.beginBatch();
-		workSet1Mock.submitTo( processorMock );
+		work1Mock.submitTo( processorMock );
 		expect( processorMock.endBatch() ).andReturn( (CompletableFuture) batch1Future );
 		// Since the queue is empty, expect a call to processor.completeOrDelay().
 		expect( processorMock.completeOrDelay() )
@@ -134,24 +134,24 @@ public class BatchingExecutorTest extends EasyMockSupport {
 				// and should be executed after that many milliseconds
 				.andReturn( NON_ZERO_DELAY );
 		replayAll();
-		executor.submit( workSet1Mock );
+		executor.submit( work1Mock );
 		verifyAllAsynchronously();
 
 		StubCompletionListener completionListenerAfterSubmit = addPendingCompletionListener();
 
-		StubWorkSet workSet2Mock = createMock( StubWorkSet.class );
+		StubWork work2Mock = createMock( StubWork.class );
 		CompletableFuture<Object> batch2Future = CompletableFuture.completedFuture( null );
 		resetAll();
-		// Since another workset was submitted before the completion delay expired, completeOrDelay() should not be called right away
+		// Since another work was submitted before the completion delay expired, completeOrDelay() should not be called right away
 		processorMock.beginBatch();
-		workSet2Mock.submitTo( processorMock );
+		work2Mock.submitTo( processorMock );
 		expect( processorMock.endBatch() ).andReturn( (CompletableFuture) batch2Future );
 		// Since the queue is empty, expect a call to processor.completeOrDelay().
 		expect( processorMock.completeOrDelay() ).andReturn( 0L );
 		// Since the processor acknowledged completion by returning 0, works should be considered complete.
 		completionListenerAfterSubmit.onComplete();
 		replayAll();
-		executor.submit( workSet2Mock );
+		executor.submit( work2Mock );
 		verifyAllAsynchronously();
 
 		// Submitting other works should start the executor/processor again
@@ -162,38 +162,38 @@ public class BatchingExecutorTest extends EasyMockSupport {
 	public void simple_batchEndsLater_someAdditionalWorkBeforeCompleteOrDelay() throws InterruptedException {
 		createAndStartExecutor( 2, true );
 
-		StubWorkSet workSet1Mock = createMock( StubWorkSet.class );
+		StubWork work1Mock = createMock( StubWork.class );
 		// The batch is not yet completed when the endBatch() method returns,
 		// forcing the executor to wait before it handles the next batch.
 		CompletableFuture<Object> batch1Future = new CompletableFuture<>();
 		resetAll();
 		processorMock.beginBatch();
-		workSet1Mock.submitTo( processorMock );
+		work1Mock.submitTo( processorMock );
 		expect( processorMock.endBatch() ).andReturn( (CompletableFuture) batch1Future );
 		// Since the batch didn't end yet, completeOrDelay() should not be called right away
 		replayAll();
-		executor.submit( workSet1Mock );
+		executor.submit( work1Mock );
 		verifyAllAsynchronously();
 
 		StubCompletionListener completionListenerAfterSubmit1 = addPendingCompletionListener();
 
-		// Submit other worksets before the first batch ends
-		StubWorkSet workSet2Mock = createMock( StubWorkSet.class );
-		StubWorkSet workSet3Mock = createMock( StubWorkSet.class );
+		// Submit other works before the first batch ends
+		StubWork work2Mock = createMock( StubWork.class );
+		StubWork work3Mock = createMock( StubWork.class );
 		resetAll();
 		replayAll();
-		executor.submit( workSet2Mock );
-		executor.submit( workSet3Mock );
+		executor.submit( work2Mock );
+		executor.submit( work3Mock );
 		verifyAll();
 
 		StubCompletionListener completionListenerAfterSubmit2 = addPendingCompletionListener();
 
 		CompletableFuture<Object> batch2Future = CompletableFuture.completedFuture( null );
 		resetAll();
-		// Since another workset was submitted before the batch ended, completeOrDelay() should not be called right away
+		// Since another work was submitted before the batch ended, completeOrDelay() should not be called right away
 		processorMock.beginBatch();
-		workSet2Mock.submitTo( processorMock );
-		workSet3Mock.submitTo( processorMock );
+		work2Mock.submitTo( processorMock );
+		work3Mock.submitTo( processorMock );
 		expect( processorMock.endBatch() ).andReturn( (CompletableFuture) batch2Future );
 		// Since the queue is empty, expect a call to processor.completeOrDelay().
 		expect( processorMock.completeOrDelay() ).andReturn( 0L );
@@ -213,16 +213,16 @@ public class BatchingExecutorTest extends EasyMockSupport {
 	public void simple_batchEndsLater_completeReturns0_noAdditionalWork() throws InterruptedException {
 		createAndStartExecutor( 2, true );
 
-		StubWorkSet workSet1Mock = createMock( StubWorkSet.class );
+		StubWork work1Mock = createMock( StubWork.class );
 		// The batch is not yet completed when the endBatch() method returns,
 		// forcing the executor to wait before it handles the next batch.
 		CompletableFuture<Object> batch1Future = new CompletableFuture<>();
 		resetAll();
 		processorMock.beginBatch();
-		workSet1Mock.submitTo( processorMock );
+		work1Mock.submitTo( processorMock );
 		expect( processorMock.endBatch() ).andReturn( (CompletableFuture) batch1Future );
 		replayAll();
-		executor.submit( workSet1Mock );
+		executor.submit( work1Mock );
 		verifyAllAsynchronously();
 
 		StubCompletionListener completionListenerAfterSubmit = addPendingCompletionListener();
@@ -254,16 +254,16 @@ public class BatchingExecutorTest extends EasyMockSupport {
 	public void simple_batchEndsLater_completeReturnsPositive_noAdditionalWork() throws InterruptedException {
 		createAndStartExecutor( 2, true );
 
-		StubWorkSet workSet1Mock = createMock( StubWorkSet.class );
+		StubWork work1Mock = createMock( StubWork.class );
 		// The batch is not yet completed when the endBatch() method returns,
 		// forcing the executor to wait before it handles the next batch.
 		CompletableFuture<Object> batch1Future = new CompletableFuture<>();
 		resetAll();
 		processorMock.beginBatch();
-		workSet1Mock.submitTo( processorMock );
+		work1Mock.submitTo( processorMock );
 		expect( processorMock.endBatch() ).andReturn( (CompletableFuture) batch1Future );
 		replayAll();
-		executor.submit( workSet1Mock );
+		executor.submit( work1Mock );
 		verifyAllAsynchronously();
 
 		StubCompletionListener completionListenerAfterSubmit = addPendingCompletionListener();
@@ -298,16 +298,16 @@ public class BatchingExecutorTest extends EasyMockSupport {
 	public void simple_batchEndsLater_completeReturnsPositive_someAdditionalWork() throws InterruptedException {
 		createAndStartExecutor( 2, true );
 
-		StubWorkSet workSet1Mock = createMock( StubWorkSet.class );
+		StubWork work1Mock = createMock( StubWork.class );
 		// The batch is not yet completed when the endBatch() method returns,
 		// forcing the executor to wait before it handles the next batch.
 		CompletableFuture<Object> batch1Future = new CompletableFuture<>();
 		resetAll();
 		processorMock.beginBatch();
-		workSet1Mock.submitTo( processorMock );
+		work1Mock.submitTo( processorMock );
 		expect( processorMock.endBatch() ).andReturn( (CompletableFuture) batch1Future );
 		replayAll();
-		executor.submit( workSet1Mock );
+		executor.submit( work1Mock );
 		verifyAllAsynchronously();
 
 		StubCompletionListener completionListenerAfterSubmit1 = addPendingCompletionListener();
@@ -323,22 +323,22 @@ public class BatchingExecutorTest extends EasyMockSupport {
 		batch1Future.complete( null );
 		verifyAllAsynchronously();
 
-		StubWorkSet workSet2Mock = createMock( StubWorkSet.class );
-		StubWorkSet workSet3Mock = createMock( StubWorkSet.class );
+		StubWork work2Mock = createMock( StubWork.class );
+		StubWork work3Mock = createMock( StubWork.class );
 		CompletableFuture<Object> batch2Future = CompletableFuture.completedFuture( null );
 		resetAll();
-		// Since another workset was submitted before the completion delay expired, completeOrDelay() should not be called right away
+		// Since another work was submitted before the completion delay expired, completeOrDelay() should not be called right away
 		processorMock.beginBatch();
-		workSet2Mock.submitTo( processorMock );
-		workSet3Mock.submitTo( processorMock );
+		work2Mock.submitTo( processorMock );
+		work3Mock.submitTo( processorMock );
 		expect( processorMock.endBatch() ).andReturn( (CompletableFuture) batch2Future );
 		// Since the queue is empty, expect a call to processor.completeOrDelay().
 		expect( processorMock.completeOrDelay() ).andReturn( 0L );
 		// Since the processor acknowledged completion by returning 0, works should be considered complete.
 		completionListenerAfterSubmit1.onComplete();
 		replayAll();
-		executor.submit( workSet2Mock );
-		executor.submit( workSet3Mock );
+		executor.submit( work2Mock );
+		executor.submit( work3Mock );
 		verifyAllAsynchronously();
 
 		// Submitting other works should start the executor/processor again
@@ -353,10 +353,10 @@ public class BatchingExecutorTest extends EasyMockSupport {
 
 		Runnable unblockExecutorSwitch = blockExecutor();
 
-		StubWorkSet workSet1Mock = createMock( StubWorkSet.class );
+		StubWork work1Mock = createMock( StubWork.class );
 		resetAll();
 		replayAll();
-		executor.submit( workSet1Mock );
+		executor.submit( work1Mock );
 		verifyAll();
 
 		StubCompletionListener completionListenerAfterSubmit = addPendingCompletionListener();
@@ -366,7 +366,7 @@ public class BatchingExecutorTest extends EasyMockSupport {
 		processorMock.beginBatch();
 		expectLastCall().andThrow( simulatedFailure );
 		failureHandlerMock.handle( capture( failureContextCapture ) );
-		// The next worksets should not be submitted to the processor: something is very wrong
+		// The next works should not be submitted to the processor: something is very wrong
 		// Since the queue is empty, expect a call to processor.completeOrDelay().
 		expect( processorMock.completeOrDelay() ).andReturn( 0L );
 		// Since the processor acknowledged completion by returning 0, works should be considered complete.
@@ -381,7 +381,7 @@ public class BatchingExecutorTest extends EasyMockSupport {
 		assertThat( failureContext.getFailingOperation() ).asString()
 				.contains( "Work processing in executor '" + NAME + "'" );
 
-		// The executor should still try to process submitted worksets, even after a failure
+		// The executor should still try to process submitted works, even after a failure
 		checkPostExecution();
 	}
 
@@ -393,14 +393,14 @@ public class BatchingExecutorTest extends EasyMockSupport {
 
 		Runnable unblockExecutorSwitch = blockExecutor();
 
-		StubWorkSet workSet1Mock = createMock( StubWorkSet.class );
-		StubWorkSet workSet2Mock = createMock( StubWorkSet.class );
-		StubWorkSet workSet3Mock = createMock( StubWorkSet.class );
+		StubWork work1Mock = createMock( StubWork.class );
+		StubWork work2Mock = createMock( StubWork.class );
+		StubWork work3Mock = createMock( StubWork.class );
 		resetAll();
 		replayAll();
-		executor.submit( workSet1Mock );
-		executor.submit( workSet2Mock );
-		executor.submit( workSet3Mock );
+		executor.submit( work1Mock );
+		executor.submit( work2Mock );
+		executor.submit( work3Mock );
 		verifyAll();
 
 		StubCompletionListener completionListenerAfterSubmit = addPendingCompletionListener();
@@ -408,12 +408,12 @@ public class BatchingExecutorTest extends EasyMockSupport {
 		CompletableFuture<Object> batch1Future = CompletableFuture.completedFuture( null );
 		resetAll();
 		processorMock.beginBatch();
-		workSet1Mock.submitTo( processorMock );
-		workSet2Mock.submitTo( processorMock );
+		work1Mock.submitTo( processorMock );
+		work2Mock.submitTo( processorMock );
 		expectLastCall().andThrow( simulatedFailure );
-		workSet2Mock.markAsFailed( simulatedFailure );
-		// The next worksets should still be submitted to the processor
-		workSet3Mock.submitTo( processorMock );
+		work2Mock.markAsFailed( simulatedFailure );
+		// The next works should still be submitted to the processor
+		work3Mock.submitTo( processorMock );
 		expect( processorMock.endBatch() ).andReturn( (CompletableFuture) batch1Future );
 		// Since the queue is empty, expect a call to processor.completeOrDelay().
 		expect( processorMock.completeOrDelay() ).andReturn( 0L );
@@ -423,7 +423,7 @@ public class BatchingExecutorTest extends EasyMockSupport {
 		unblockExecutorSwitch.run();
 		verifyAllAsynchronously();
 
-		// The executor should still try to process submitted worksets, even after a failure
+		// The executor should still try to process submitted works, even after a failure
 		checkPostExecution();
 	}
 
@@ -435,12 +435,12 @@ public class BatchingExecutorTest extends EasyMockSupport {
 
 		Runnable unblockExecutorSwitch = blockExecutor();
 
-		StubWorkSet workSet1Mock = createMock( StubWorkSet.class );
-		StubWorkSet workSet2Mock = createMock( StubWorkSet.class );
+		StubWork work1Mock = createMock( StubWork.class );
+		StubWork work2Mock = createMock( StubWork.class );
 		resetAll();
 		replayAll();
-		executor.submit( workSet1Mock );
-		executor.submit( workSet2Mock );
+		executor.submit( work1Mock );
+		executor.submit( work2Mock );
 		verifyAll();
 
 		StubCompletionListener completionListenerAfterSubmit = addPendingCompletionListener();
@@ -448,8 +448,8 @@ public class BatchingExecutorTest extends EasyMockSupport {
 		Capture<FailureContext> failureContextCapture = Capture.newInstance();
 		resetAll();
 		processorMock.beginBatch();
-		workSet1Mock.submitTo( processorMock );
-		workSet2Mock.submitTo( processorMock );
+		work1Mock.submitTo( processorMock );
+		work2Mock.submitTo( processorMock );
 		expect( processorMock.endBatch() ).andThrow( simulatedFailure );
 		failureHandlerMock.handle( capture( failureContextCapture ) );
 		// Since the queue is empty, expect a call to processor.completeOrDelay().
@@ -466,7 +466,7 @@ public class BatchingExecutorTest extends EasyMockSupport {
 		assertThat( failureContext.getFailingOperation() ).asString()
 				.contains( "Work processing in executor '" + NAME + "'" );
 
-		// The executor should still try to process submitted worksets, even after a failure
+		// The executor should still try to process submitted works, even after a failure
 		checkPostExecution();
 	}
 
@@ -482,18 +482,18 @@ public class BatchingExecutorTest extends EasyMockSupport {
 
 	/*
 	 * Block the executor by submitting a batch that will only complete when the returned runnable is executed.
-	 * Used to give us the time to carefully craft the next batch with a specific sequence of worksets.
+	 * Used to give us the time to carefully craft the next batch with a specific sequence of works.
 	 */
 	private Runnable blockExecutor()
 			throws InterruptedException {
-		StubWorkSet blockingWorkSetMock = createMock( StubWorkSet.class );
+		StubWork blockingWorkMock = createMock( StubWork.class );
 		CompletableFuture<Object> blockingBatchFuture = new CompletableFuture<>();
 		resetAll();
 		processorMock.beginBatch();
-		blockingWorkSetMock.submitTo( processorMock );
+		blockingWorkMock.submitTo( processorMock );
 		expect( processorMock.endBatch() ).andReturn( (CompletableFuture) blockingBatchFuture );
 		replayAll();
-		executor.submit( blockingWorkSetMock );
+		executor.submit( blockingWorkMock );
 		verifyAllAsynchronously();
 		// Return a runnable that will unblock the executor
 		return () -> blockingBatchFuture.complete( null );
@@ -509,7 +509,7 @@ public class BatchingExecutorTest extends EasyMockSupport {
 		executor.start( threadPoolProvider );
 		verifyAll();
 
-		// Initially, there are no worksets, so works are considered completed.
+		// Initially, there are no works, so works are considered completed.
 		resetAll();
 		// This should not trigger any call to the mocks
 		replayAll();
@@ -544,24 +544,24 @@ public class BatchingExecutorTest extends EasyMockSupport {
 		verifyAll();
 		FutureAssert.assertThat( completion ).isSuccessful();
 
-		// The executor still accepts and processes new worksets.
-		StubWorkSet workSetMock = createMock( StubWorkSet.class );
+		// The executor still accepts and processes new works.
+		StubWork workMock = createMock( StubWork.class );
 		CompletableFuture<Object> batchFuture = CompletableFuture.completedFuture( null );
 		resetAll();
 		processorMock.beginBatch();
-		workSetMock.submitTo( processorMock );
+		workMock.submitTo( processorMock );
 		expect( processorMock.endBatch() ).andReturn( (CompletableFuture) batchFuture );
 		// Since the queue is empty, expect a call to processor.completeOrDelay().
 		expect( processorMock.completeOrDelay() ).andReturn( 0L );
 		replayAll();
-		executor.submit( workSetMock );
+		executor.submit( workMock );
 		verifyAllAsynchronously();
 	}
 
-	private interface StubWorkSet extends BatchingExecutor.WorkSet<StubWorkProcessor> {
+	private interface StubWork extends BatchedWork<StubWorkProcessor> {
 	}
 
-	private interface StubWorkProcessor extends BatchingExecutor.WorkProcessor {
+	private interface StubWorkProcessor extends BatchedWorkProcessor {
 	}
 
 	private interface StubCompletionListener {

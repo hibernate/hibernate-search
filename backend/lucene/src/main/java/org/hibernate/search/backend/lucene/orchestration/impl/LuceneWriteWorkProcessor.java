@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
 import org.hibernate.search.backend.lucene.work.impl.WriteWork;
-import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
+import org.hibernate.search.engine.backend.orchestration.spi.BatchedWorkProcessor;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -25,7 +25,7 @@ import org.hibernate.search.util.common.reporting.EventContext;
  * <p>
  * Ported from Search 5's LuceneBackendQueueTask, in particular.
  */
-public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor {
+public class LuceneWriteWorkProcessor implements BatchedWorkProcessor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -128,8 +128,8 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 
 		/*
 		 * The failure will be reported elsewhere,
-		 * but that report will not mention that some works from previous worksets may have been affected too.
-		 * Report the failure again, just to warn about previous worksets potentially being affected.
+		 * but that report will not mention that some previously executed, but uncommitted works may have been affected too.
+		 * Report the failure again, just to warn about previous works potentially being affected.
 		 */
 		FailureContext.Builder failureContextBuilder = FailureContext.builder();
 		failureContextBuilder.throwable( log.uncommittedOperationsBecauseOfFailure( indexName, throwable ) );

@@ -33,7 +33,7 @@ import org.apache.lucene.index.IndexReader;
  * in which case thing will get slightly more complex.
  */
 public class LuceneReadWorkOrchestratorImpl
-		extends AbstractWorkOrchestrator<LuceneReadWorkOrchestratorImpl.ReadTask<?>>
+		extends AbstractWorkOrchestrator<LuceneReadWorkOrchestratorImpl.WorkExecution<?>>
 		implements LuceneReadWorkOrchestratorImplementor {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -46,12 +46,12 @@ public class LuceneReadWorkOrchestratorImpl
 	@Override
 	public <T> T submit(Set<String> indexNames, Set<? extends ReadIndexManagerContext> indexManagerContexts,
 			Set<String> routingKeys, ReadWork<T> work) {
-		ReadTask<T> task = new ReadTask<>( indexNames, indexManagerContexts, routingKeys, work );
+		WorkExecution<T> workExecution = new WorkExecution<>( indexNames, indexManagerContexts, routingKeys, work );
 		Throwable throwable = null;
 		try {
-			submit( task );
+			submit( workExecution );
 			// If we get there, the task succeeded and we are sure there is a result.
-			return task.getResult();
+			return workExecution.getResult();
 		}
 		catch (Throwable t) {
 			// Just remember something went wrong
@@ -60,12 +60,12 @@ public class LuceneReadWorkOrchestratorImpl
 		}
 		finally {
 			if ( throwable == null ) {
-				task.close();
+				workExecution.close();
 			}
 			else {
 				// Take care not to erase the main error if closing the context fails: use addSuppressed() instead
 				new SuppressingCloser( throwable )
-						.push( task );
+						.push( workExecution );
 			}
 		}
 	}
@@ -76,8 +76,8 @@ public class LuceneReadWorkOrchestratorImpl
 	}
 
 	@Override
-	protected void doSubmit(ReadTask<?> task) {
-		task.execute();
+	protected void doSubmit(WorkExecution<?> work) {
+		work.execute();
 	}
 
 	@Override
@@ -91,14 +91,14 @@ public class LuceneReadWorkOrchestratorImpl
 		// Nothing to do
 	}
 
-	static class ReadTask<T> implements AutoCloseable, ReadWorkExecutionContext {
+	static class WorkExecution<T> implements AutoCloseable, ReadWorkExecutionContext {
 		private final Set<String> indexNames;
 		private final HibernateSearchMultiReader indexReader;
 		private final ReadWork<T> work;
 
 		private T result;
 
-		ReadTask(Set<String> indexNames, Set<? extends ReadIndexManagerContext> indexManagerContexts,
+		WorkExecution(Set<String> indexNames, Set<? extends ReadIndexManagerContext> indexManagerContexts,
 				Set<String> routingKeys, ReadWork<T> work) {
 			this.indexNames = indexNames;
 			this.indexReader = HibernateSearchMultiReader.open( indexNames, indexManagerContexts, routingKeys );

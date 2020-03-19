@@ -34,7 +34,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * Useful when works can be merged together for optimization purposes (bulking in Elasticsearch),
  * or when they should never be executed in parallel (writes to a Lucene index).
  */
-public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P>, P extends BatchingExecutor.WorkProcessor> {
+public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 
 	private final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -44,8 +44,8 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 	private final FailureHandler failureHandler;
 	private final int maxTasksPerBatch;
 
-	private final BlockingQueue<W> workQueue;
-	private final List<W> workBuffer;
+	private final BlockingQueue<BatchedWork<? super P>> workQueue;
+	private final List<BatchedWork<? super P>> workBuffer;
 	private final AtomicReference<ProcessingStatus> processingStatus;
 
 	private ExecutorService executorService;
@@ -77,7 +77,7 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 
 	/**
 	 * Start the executor, allowing works to be submitted
-	 * through {@link #submit(WorkSet)}.
+	 * through {@link #submit(BatchedWork)}.
 	 *
 	 * @param threadPoolProvider A provider of thread pools.
 	 */
@@ -89,7 +89,7 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 
 	/**
 	 * Stop the executor, no longer allowing works to be submitted
-	 * through {@link #submit(WorkSet)}.
+	 * through {@link #submit(BatchedWork)}.
 	 * <p>
 	 * This will attempt to forcibly terminate currently executing works,
 	 * and will remove pending works from the queue.
@@ -111,20 +111,20 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 	}
 
 	/**
-	 * Submit a set of works for execution.
+	 * Submit a work for execution.
 	 * <p>
 	 * Must not be called when the executor is stopped.
-	 * @param workset A set of works to execute.
-	 * @throws InterruptedException If the current thread is interrupted while enqueuing the workset.
+	 * @param work A work to execute.
+	 * @throws InterruptedException If the current thread is interrupted while enqueuing the work.
 	 */
-	public void submit(W workset) throws InterruptedException {
+	public void submit(BatchedWork<? super P> work) throws InterruptedException {
 		if ( executorService == null ) {
 			throw new AssertionFailure(
-					"Attempt to submit a workset to executor '" + name + "', which is stopped"
+					"Attempt to submit a work to executor '" + name + "', which is stopped"
 					+ " There is probably a bug in Hibernate Search, please report it."
 			);
 		}
-		workQueue.put( workset );
+		workQueue.put( work );
 		ensureProcessingRunning();
 	}
 
@@ -194,7 +194,7 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 	}
 
 	/**
-	 * Takes a batch of worksets from the queue and processes them.
+	 * Takes a batch of works from the queue and processes them.
 	 */
 	private void process() {
 		try {
@@ -224,7 +224,7 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 				processingStatus.set( ProcessingStatus.IDLE );
 				// Call workQueue.isEmpty() again, since its content may have changed since the last call a few lines above.
 				if ( !workQueue.isEmpty() ) {
-					// There are still worksets in the queue.
+					// There are still works in the queue.
 					// Make sure they will be processed.
 					ensureProcessingRunning();
 				}
@@ -239,15 +239,15 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 		}
 	}
 
-	private void processBatch(List<W> works) {
+	private void processBatch(List<BatchedWork<? super P>> works) {
 		processor.beginBatch();
 
-		for ( W workset : works ) {
+		for ( BatchedWork<? super P> work : works ) {
 			try {
-				workset.submitTo( processor );
+				work.submitTo( processor );
 			}
 			catch (Throwable e) {
-				workset.markAsFailed( e );
+				work.markAsFailed( e );
 			}
 		}
 
@@ -291,44 +291,6 @@ public final class BatchingExecutor<W extends BatchingExecutor.WorkSet<? super P
 					this::ensureProcessingRunning, delay, TimeUnit.MILLISECONDS
 			);
 		}
-	}
-
-	public interface WorkProcessor {
-
-		/**
-		 * Initializes internal state before works are submitted.
-		 */
-		void beginBatch();
-
-		/**
-		 * Ensures all works submitted
-		 * since the last call to {@link #beginBatch()}
-		 * will actually be executed, along with any finishing task (commit, ...).
-		 *
-		 * @return A future completing when the executor is allowed to start another batch.
-		 */
-		CompletableFuture<?> endBatch();
-
-		/**
-		 * Executes any outstanding operation if possible, or return an estimation of when they can be executed.
-		 * <p>
-		 * Called when the executor considers the work queue complete
-		 * and does not plan on submitting another batch due to work starvation.
-		 *
-		 * @return {@code 0} if there is no outstanding operation, or a positive number of milliseconds
-		 * if there are outstanding operations and {@link #completeOrDelay()}
-		 * must be called again that many milliseconds later.
-		 */
-		long completeOrDelay();
-
-	}
-
-	public interface WorkSet<P extends WorkProcessor> {
-
-		void submitTo(P processor);
-
-		void markAsFailed(Throwable t);
-
 	}
 
 	public enum ProcessingStatus {

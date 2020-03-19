@@ -27,7 +27,7 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 		implements ElasticsearchWorkOrchestratorImplementor {
 
 	private final ThreadPoolProvider threadPoolProvider;
-	private final BatchingExecutor<ElasticsearchWorkSet, ElasticsearchWorkProcessor> executor;
+	private final BatchingExecutor<ElasticsearchWorkProcessor> executor;
 
 	/**
 	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)

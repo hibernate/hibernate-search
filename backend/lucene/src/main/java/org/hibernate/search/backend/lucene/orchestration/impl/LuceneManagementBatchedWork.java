@@ -9,19 +9,20 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
+import org.hibernate.search.engine.backend.orchestration.spi.BatchedWork;
 
 /**
- * A special write workset that won't trigger the creation of the index writer.
+ * A batched {@link LuceneIndexManagementWork}.
  * <p>
  * Useful to make sure that read-only applications never create any index writer.
  */
-class LuceneManagementWorkSet<T> implements LuceneWriteWorkSet {
+class LuceneManagementBatchedWork<T> implements BatchedWork<LuceneWriteWorkProcessor> {
 
 	private final IndexManagementWork<T> work;
 
 	private final CompletableFuture<T> future;
 
-	LuceneManagementWorkSet(IndexManagementWork<T> work, CompletableFuture<T> future) {
+	LuceneManagementBatchedWork(IndexManagementWork<T> work, CompletableFuture<T> future) {
 		this.work = work;
 		this.future = future;
 	}
