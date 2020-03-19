@@ -12,18 +12,13 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.DeleteWorkBu
 import com.google.gson.JsonObject;
 
 
-public class DeleteWork extends AbstractSingleDocumentWork<Void> {
+public class DeleteWork extends AbstractSingleDocumentWork {
 
 	private static final ElasticsearchRequestSuccessAssessor SUCCESS_ASSESSOR =
 			DefaultElasticsearchRequestSuccessAssessor.builder().ignoreErrorStatuses( 404 ).build();
 
 	private DeleteWork(Builder builder) {
 		super( builder );
-	}
-
-	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem) {
-		return null;
 	}
 
 	public static class Builder

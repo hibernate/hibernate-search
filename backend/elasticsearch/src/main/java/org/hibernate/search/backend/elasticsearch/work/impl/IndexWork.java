@@ -12,16 +12,11 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexWorkBui
 import com.google.gson.JsonObject;
 
 
-public class IndexWork extends AbstractSingleDocumentWork<Void>
-		implements SingleDocumentWork<Void> {
+public class IndexWork extends AbstractSingleDocumentWork
+		implements SingleDocumentWork {
 
 	private IndexWork(Builder builder) {
 		super( builder );
-	}
-
-	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem) {
-		return null;
 	}
 
 	public static class Builder

@@ -35,7 +35,7 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 
 	private ElasticsearchWorkProcessor processorMock = createStrictMock( ElasticsearchWorkProcessor.class );
 
-	private List<SingleDocumentWork<Void>> workMocks = new ArrayList<>();
+	private List<SingleDocumentWork> workMocks = new ArrayList<>();
 
 	private EntityReferenceFactory<StubEntityReference> entityReferenceFactoryMock =
 			createStrictMock( EntityReferenceFactory.class );
@@ -404,7 +404,7 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 
 	private void expectWorkGetInfo(int ... ids) {
 		for ( int id : ids ) {
-			SingleDocumentWork<?> workMock = workMocks.get( id );
+			SingleDocumentWork workMock = workMocks.get( id );
 			EasyMock.expect( workMock.getEntityTypeName() ).andStubReturn( TYPE_NAME );
 			EasyMock.expect( workMock.getEntityIdentifier() ).andStubReturn( id );
 			EasyMock.expect( entityReferenceFactoryMock.createEntityReference( TYPE_NAME, id ) )
@@ -413,24 +413,24 @@ public class ElasticsearchIndexingPlanWorkSetTest extends EasyMockSupport {
 	}
 
 	private void expectFailingWorkGetInfo(int id, Throwable thrown) {
-		SingleDocumentWork<?> workMock = workMocks.get( id );
+		SingleDocumentWork workMock = workMocks.get( id );
 		EasyMock.expect( workMock.getEntityTypeName() ).andStubReturn( TYPE_NAME );
 		EasyMock.expect( workMock.getEntityIdentifier() ).andStubReturn( id );
 		EasyMock.expect( entityReferenceFactoryMock.createEntityReference( TYPE_NAME, id ) )
 				.andThrow( thrown );
 	}
 
-	private List<SingleDocumentWork<?>> createWorkMocks(int count) {
-		List<SingleDocumentWork<?>> result = new ArrayList<>();
+	private List<SingleDocumentWork> createWorkMocks(int count) {
+		List<SingleDocumentWork> result = new ArrayList<>();
 		for ( int i = 0; i < count; i++ ) {
 			result.add( createWorkMock() );
 		}
 		return result;
 	}
 
-	private SingleDocumentWork<Void> createWorkMock() {
+	private SingleDocumentWork createWorkMock() {
 		String workName = workInfo( workMocks.size() );
-		SingleDocumentWork<Void> workMock = createStrictMock( workName, SingleDocumentWork.class );
+		SingleDocumentWork workMock = createStrictMock( workName, SingleDocumentWork.class );
 		workMocks.add( workMock );
 		return workMock;
 	}

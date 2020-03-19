@@ -34,7 +34,7 @@ public class ElasticsearchIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	private final EntityReferenceFactory<R> entityReferenceFactory;
 	private final DocumentRefreshStrategy refreshStrategy;
 
-	private final List<SingleDocumentWork<?>> works = new ArrayList<>();
+	private final List<SingleDocumentWork> works = new ArrayList<>();
 
 	public ElasticsearchIndexIndexingPlan(ElasticsearchWorkBuilderFactory builderFactory,
 			ElasticsearchWorkOrchestrator orchestrator,
@@ -122,7 +122,7 @@ public class ElasticsearchIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 		);
 	}
 
-	private void collect(SingleDocumentWork<?> work) {
+	private void collect(SingleDocumentWork work) {
 		works.add( work );
 	}
 
