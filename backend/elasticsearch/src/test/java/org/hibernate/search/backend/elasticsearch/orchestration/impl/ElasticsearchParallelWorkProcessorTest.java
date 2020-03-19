@@ -122,49 +122,6 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 	}
 
 	@Test
-	public void simple_sequenceFailure() {
-		NonBulkableWork<Object> work = work( 1 );
-
-		CompletableFuture<Void> sequenceFuture = new CompletableFuture<>();
-
-		replayAll();
-		ElasticsearchParallelWorkProcessor processor =
-				new ElasticsearchParallelWorkProcessor( sequenceBuilderMock, bulkerMock );
-		verifyAll();
-
-		CompletableFuture<Object> workFuture = new CompletableFuture<>();
-		resetAll();
-		sequenceBuilderMock.init( anyObject() );
-		expect( work.aggregate( anyObject() ) ).andAnswer( nonBulkableAggregateAnswer( work ) );
-		expect( bulkerMock.addWorksToSequence() ).andReturn( false );
-		expect( sequenceBuilderMock.addNonBulkExecution( work ) ).andReturn( workFuture );
-		expect( bulkerMock.addWorksToSequence() ).andReturn( false );
-		expect( sequenceBuilderMock.build() ).andReturn( sequenceFuture );
-		replayAll();
-		processor.beforeWorkSet();
-		CompletableFuture<Object> returnedWork2Future = processor.submit( work );
-		processor.afterWorkSet();
-		verifyAll();
-		assertThat( returnedWork2Future ).isSameAs( workFuture );
-
-		resetAll();
-		bulkerMock.finalizeBulkWork();
-		replayAll();
-		CompletableFuture<Void> futureAll = processor.endBatch();
-		verifyAll();
-		assertThat( futureAll ).isPending();
-
-		resetAll();
-		replayAll();
-		sequenceFuture.completeExceptionally( new RuntimeException() );
-		verifyAll();
-		// Failures in a sequence should be ignored
-		assertThat( futureAll ).isSuccessful( (Void) null );
-
-		checkComplete( processor );
-	}
-
-	@Test
 	public void parallelSequenceBetweenWorkset() {
 		NonBulkableWork<Object> work1 = work( 1 );
 

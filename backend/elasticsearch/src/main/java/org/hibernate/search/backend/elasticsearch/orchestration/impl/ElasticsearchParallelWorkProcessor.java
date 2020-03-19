@@ -54,11 +54,7 @@ class ElasticsearchParallelWorkProcessor implements ElasticsearchWorkProcessor {
 	@Override
 	public CompletableFuture<Void> afterWorkSet() {
 		CompletableFuture<Void> sequenceFuture = aggregator.buildSequence();
-		/*
-		 * The sequence gets its failures reported independently:
-		 * there's no need to propagate the failure to the executor.
-		 */
-		sequenceFutures.add( sequenceFuture.exceptionally( e -> null ) );
+		sequenceFutures.add( sequenceFuture );
 		return sequenceFuture;
 	}
 
@@ -68,6 +64,8 @@ class ElasticsearchParallelWorkProcessor implements ElasticsearchWorkProcessor {
 				CompletableFuture.allOf( sequenceFutures.toArray( new CompletableFuture<?>[0] ) );
 		sequenceFutures.clear();
 		aggregator.startSequences();
+		// Sequence futures are not expected to fail even if one work fails,
+		// so we can safely return this future directly.
 		return future;
 	}
 

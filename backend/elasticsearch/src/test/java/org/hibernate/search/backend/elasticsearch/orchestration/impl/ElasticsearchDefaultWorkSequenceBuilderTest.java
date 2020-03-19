@@ -313,19 +313,21 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 	public void error_work() {
 		NonBulkableWork<Object> work0 = work( 0 );
 		NonBulkableWork<Void> work1 = work( 1 );
-		NonBulkableWork<Void> work2 = work( 2 );
+		NonBulkableWork<Object> work2 = work( 2 );
 
 		Object work0Result = new Object();
+		Object work2Result = new Object();
 
 		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
 		CompletableFuture<Object> work0Future = new CompletableFuture<>();
 		CompletableFuture<Void> work1Future = new CompletableFuture<>();
+		CompletableFuture<Object> work2Future = new CompletableFuture<>();
 
 		// Futures returned by the sequence builder: we will test them
 		CompletableFuture<Object> work0FutureFromSequenceBuilder;
 		CompletableFuture<Void> work1FutureFromSequenceBuilder;
-		CompletableFuture<Void> work2FutureFromSequenceBuilder;
+		CompletableFuture<Object> work2FutureFromSequenceBuilder;
 
 		MyException exception = new MyException();
 
@@ -357,17 +359,21 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( sequenceFuture ).isPending();
 
 		resetAll();
+		// Subsequent works should be executed even if previous works failed
+		expect( work2.execute( contextMock ) ).andReturn( work2Future );
 		replayAll();
 		work1Future.completeExceptionally( exception );
 		verifyAll();
 		// Errors must be propagated to the individual work futures ASAP
 		assertThat( work1FutureFromSequenceBuilder ).isFailed( exception );
-		// Subsequent works that haven't been executed must get a specific exception
-		assertThat( work2FutureFromSequenceBuilder ).isFailed(
-				isException( SearchException.class )
-						.withMessage( "operation was skipped due to the failure of a previous work in the same workset" )
-						.causedBy( exception ).build()
-		);
+		assertThat( work2FutureFromSequenceBuilder ).isPending();
+		assertThat( sequenceFuture ).isPending();
+
+		resetAll();
+		replayAll();
+		work2Future.complete( work2Result );
+		verifyAll();
+		assertThat( work2FutureFromSequenceBuilder ).isSuccessful( work2Result );
 		// Work failures should not be propagated to the sequence future
 		assertThat( sequenceFuture ).isSuccessful();
 	}
@@ -377,16 +383,20 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		BulkableWork<Void> work1 = bulkableWork( 1 );
 		BulkableWork<Void> work2 = bulkableWork( 2 );
 		BulkableWork<Void> work3 = bulkableWork( 3 );
-		NonBulkableWork<Void> work4 = work( 4 );
+		NonBulkableWork<Object> work4 = work( 4 );
+
+		Object work4Result = new Object();
 
 		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
 		CompletableFuture<NonBulkableWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
+		CompletableFuture<Object> work4Future = new CompletableFuture<>();
 
 		// Futures returned by the sequence builder: we will test them
 		CompletableFuture<Void> work1FutureFromSequenceBuilder;
 		CompletableFuture<Void> work2FutureFromSequenceBuilder;
 		CompletableFuture<Void> work3FutureFromSequenceBuilder;
+		CompletableFuture<Object> work4FutureFromSequenceBuilder;
 
 		MyException exception = new MyException();
 
@@ -407,7 +417,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		work1FutureFromSequenceBuilder = extractionStep.add( work1, 0 );
 		work2FutureFromSequenceBuilder = extractionStep.add( work2, 1 );
 		work3FutureFromSequenceBuilder = extractionStep.add( work3, 2 );
-		builder.addNonBulkExecution( work4 );
+		work4FutureFromSequenceBuilder = builder.addNonBulkExecution( work4 );
 		CompletableFuture<Void> sequenceFuture = builder.build();
 		previousFuture.complete( null );
 		verifyAll();
@@ -415,9 +425,12 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( work1FutureFromSequenceBuilder ).isPending();
 		assertThat( work2FutureFromSequenceBuilder ).isPending();
 		assertThat( work3FutureFromSequenceBuilder ).isPending();
+		assertThat( work4FutureFromSequenceBuilder ).isPending();
 		assertThat( sequenceFuture ).isPending();
 
 		resetAll();
+		// Subsequent works should be executed even if previous works failed
+		expect( work4.execute( contextMock ) ).andReturn( work4Future );
 		replayAll();
 		bulkWorkFuture.completeExceptionally( exception );
 		verifyAll();
@@ -437,6 +450,14 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
 						.causedBy( exception ).build()
 		);
+		assertThat( work4FutureFromSequenceBuilder ).isPending();
+		assertThat( sequenceFuture ).isPending();
+
+		resetAll();
+		replayAll();
+		work4Future.complete( work4Result );
+		verifyAll();
+		assertThat( work4FutureFromSequenceBuilder ).isSuccessful( work4Result );
 		// Work failures should not be propagated to the sequence future
 		assertThat( sequenceFuture ).isSuccessful();
 	}
@@ -447,17 +468,21 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		BulkableWork<Void> work2 = bulkableWork( 2 );
 		BulkableWork<Void> work3 = bulkableWork( 3 );
 		NonBulkableWork<BulkResult> bulkWork = work( 4 );
-		NonBulkableWork<Void> work4 = work( 5 );
+		NonBulkableWork<Object> work4 = work( 5 );
+
+		Object work4Result = new Object();
 
 		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
 		CompletableFuture<NonBulkableWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkResultFuture = new CompletableFuture<>();
+		CompletableFuture<Object> work4Future = new CompletableFuture<>();
 
 		// Futures returned by the sequence builder: we will test them
 		CompletableFuture<Void> work1FutureFromSequenceBuilder;
 		CompletableFuture<Void> work2FutureFromSequenceBuilder;
 		CompletableFuture<Void> work3FutureFromSequenceBuilder;
+		CompletableFuture<Object> work4FutureFromSequenceBuilder;
 
 		MyException exception = new MyException();
 
@@ -478,7 +503,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		work1FutureFromSequenceBuilder = extractionStep.add( work1, 0 );
 		work2FutureFromSequenceBuilder = extractionStep.add( work2, 1 );
 		work3FutureFromSequenceBuilder = extractionStep.add( work3, 2 );
-		builder.addNonBulkExecution( work4 );
+		work4FutureFromSequenceBuilder = builder.addNonBulkExecution( work4 );
 		CompletableFuture<Void> sequenceFuture = builder.build();
 		previousFuture.complete( null );
 		verifyAll();
@@ -486,6 +511,7 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( work1FutureFromSequenceBuilder ).isPending();
 		assertThat( work2FutureFromSequenceBuilder ).isPending();
 		assertThat( work3FutureFromSequenceBuilder ).isPending();
+		assertThat( work4FutureFromSequenceBuilder ).isPending();
 		assertThat( sequenceFuture ).isPending();
 
 		resetAll();
@@ -497,9 +523,12 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( work1FutureFromSequenceBuilder ).isPending();
 		assertThat( work2FutureFromSequenceBuilder ).isPending();
 		assertThat( work3FutureFromSequenceBuilder ).isPending();
+		assertThat( work4FutureFromSequenceBuilder ).isPending();
 		assertThat( sequenceFuture ).isPending();
 
 		resetAll();
+		// Subsequent works should be executed even if previous works failed
+		expect( work4.execute( contextMock ) ).andReturn( work4Future );
 		replayAll();
 		bulkResultFuture.completeExceptionally( exception );
 		verifyAll();
@@ -519,6 +548,14 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 						.withMessage( "operation failed due to the failure of the call to the bulk REST API" )
 						.causedBy( exception ).build()
 		);
+		assertThat( work4FutureFromSequenceBuilder ).isPending();
+		assertThat( sequenceFuture ).isPending();
+
+		resetAll();
+		replayAll();
+		work4Future.complete( work4Result );
+		verifyAll();
+		assertThat( work4FutureFromSequenceBuilder ).isSuccessful( work4Result );
 		// Work failures should not be propagated to the sequence future
 		assertThat( sequenceFuture ).isSuccessful();
 	}
@@ -528,24 +565,26 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		BulkableWork<Object> work1 = bulkableWork( 1 );
 		BulkableWork<Void> work2 = bulkableWork( 2 );
 		BulkableWork<Object> work3 = bulkableWork( 3 );
-		NonBulkableWork<Void> work4 = work( 4 );
+		NonBulkableWork<Object> work4 = work( 4 );
 		NonBulkableWork<BulkResult> bulkWork = work( 5 );
 
 		Object work1Result = new Object();
 		Object work3Result = new Object();
 		BulkResult bulkResultMock = createStrictMock( BulkResult.class );
 		BulkResultItemExtractor bulkResultItemExtractorMock = createStrictMock( BulkResultItemExtractor.class );
+		Object work4Result = new Object();
 
 		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
 		CompletableFuture<NonBulkableWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkResultFuture = new CompletableFuture<>();
+		CompletableFuture<Object> work4Future = new CompletableFuture<>();
 
 		// Futures returned by the sequence builder: we will test them
 		CompletableFuture<Object> work1FutureFromSequenceBuilder;
 		CompletableFuture<Void> work2FutureFromSequenceBuilder;
 		CompletableFuture<Object> work3FutureFromSequenceBuilder;
-		CompletableFuture<Void> work4FutureFromSequenceBuilder;
+		CompletableFuture<Object> work4FutureFromSequenceBuilder;
 
 		MyRuntimeException exception = new MyRuntimeException();
 
@@ -594,6 +633,8 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		expect( bulkResultItemExtractorMock.extract( work1, 0 ) ).andReturn( work1Result );
 		expect( bulkResultItemExtractorMock.extract( work2, 1 ) ).andThrow( exception );
 		expect( bulkResultItemExtractorMock.extract( work3, 2 ) ).andReturn( work3Result );
+		// Subsequent works should be executed even if previous works failed
+		expect( work4.execute( contextMock ) ).andReturn( work4Future );
 		replayAll();
 		bulkResultFuture.complete( bulkResultMock );
 		verifyAll();
@@ -601,11 +642,14 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( work1FutureFromSequenceBuilder ).isSuccessful( work1Result );
 		assertThat( work2FutureFromSequenceBuilder ).isFailed( exception );
 		assertThat( work3FutureFromSequenceBuilder ).isSuccessful( work3Result );
-		assertThat( work4FutureFromSequenceBuilder ).isFailed(
-				isException( SearchException.class )
-						.withMessage( "operation was skipped due to the failure of a previous work in the same workset" )
-						.causedBy( exception ).build()
-		);
+		assertThat( work4FutureFromSequenceBuilder ).isPending();
+		assertThat( sequenceFuture ).isPending();
+
+		resetAll();
+		replayAll();
+		work4Future.complete( work4Result );
+		verifyAll();
+		assertThat( work4FutureFromSequenceBuilder ).isSuccessful( work4Result );
 		// Work failures should not be propagated to the sequence future
 		assertThat( sequenceFuture ).isSuccessful();
 	}
@@ -619,11 +663,13 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 		BulkResult bulkResultMock = createStrictMock( BulkResult.class );
 		BulkResultItemExtractor bulkItemResultExtractorMock = createStrictMock( BulkResultItemExtractor.class );
+		Object work3Result = new Object();
 
 		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
 		CompletableFuture<NonBulkableWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkResultFuture = new CompletableFuture<>();
+		CompletableFuture<Object> work3Future = new CompletableFuture<>();
 
 		// Futures returned by the sequence builder: we will test them
 		CompletableFuture<Object> work1FutureFromSequenceBuilder;
@@ -674,17 +720,22 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		expect( bulkResultMock.withContext( contextMock ) ).andReturn( bulkItemResultExtractorMock );
 		expect( bulkItemResultExtractorMock.extract( work1, 0 ) ).andThrow( exception1 );
 		expect( bulkItemResultExtractorMock.extract( work2, 1 ) ).andThrow( exception2 );
+		// Subsequent works should be executed even if previous works failed
+		expect( work3.execute( contextMock ) ).andReturn( work3Future );
 		replayAll();
 		bulkResultFuture.complete( bulkResultMock );
 		verifyAll();
 		assertThat( sequenceBuilderBulkResultFuture ).isSuccessful( bulkResultMock );
 		assertThat( work1FutureFromSequenceBuilder ).isFailed( exception1 );
 		assertThat( work2FutureFromSequenceBuilder ).isFailed( exception2 );
-		assertThat( work3FutureFromSequenceBuilder ).isFailed(
-				isException( SearchException.class )
-						.withMessage( "operation was skipped due to the failure of a previous work in the same workset" )
-						.causedBy( exception1 ).build()
-		);
+		assertThat( work3FutureFromSequenceBuilder ).isPending();
+		assertThat( sequenceFuture ).isPending();
+
+		resetAll();
+		replayAll();
+		work3Future.complete( work3Result );
+		verifyAll();
+		assertThat( work3FutureFromSequenceBuilder ).isSuccessful( work3Result );
 		// Work failures should not be propagated to the sequence future
 		assertThat( sequenceFuture ).isSuccessful();
 	}
@@ -695,11 +746,12 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		BulkableWork<Object> work1 = bulkableWork( 1 );
 		BulkableWork<Void> work2 = bulkableWork( 2 );
 		BulkableWork<Object> work3 = bulkableWork( 3 );
-		NonBulkableWork<Void> work4 = work( 4 );
+		NonBulkableWork<Object> work4 = work( 4 );
 		NonBulkableWork<BulkResult> bulkWork = work( 5 );
 
 		Object work1Result = new Object();
 		Object work3Result = new Object();
+		Object work4Result = new Object();
 		BulkResult bulkResultMock = createStrictMock( BulkResult.class );
 		BulkResultItemExtractor bulkResultItemExtractorMock = createStrictMock( BulkResultItemExtractor.class );
 
@@ -707,12 +759,13 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
 		CompletableFuture<NonBulkableWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkResultFuture = new CompletableFuture<>();
+		CompletableFuture<Object> work4Future = new CompletableFuture<>();
 
 		// Futures returned by the sequence builder: we will test them
 		CompletableFuture<Object> work1FutureFromSequenceBuilder;
 		CompletableFuture<Void> work2FutureFromSequenceBuilder;
 		CompletableFuture<Object> work3FutureFromSequenceBuilder;
-		CompletableFuture<Void> work4FutureFromSequenceBuilder;
+		CompletableFuture<Object> work4FutureFromSequenceBuilder;
 
 		MyRuntimeException exception = new MyRuntimeException();
 
@@ -761,6 +814,8 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		expect( bulkResultItemExtractorMock.extract( work1, 0 ) ).andReturn( work1Result );
 		expect( bulkResultItemExtractorMock.extract( work2, 1 ) ).andThrow( exception );
 		expect( bulkResultItemExtractorMock.extract( work3, 2 ) ).andReturn( work3Result );
+		// Subsequent works should be executed even if previous works failed
+		expect( work4.execute( contextMock ) ).andReturn( work4Future );
 		replayAll();
 		bulkResultFuture.complete( bulkResultMock );
 		verifyAll();
@@ -768,11 +823,14 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( work1FutureFromSequenceBuilder ).isSuccessful( work1Result );
 		assertThat( work2FutureFromSequenceBuilder ).isFailed( exception );
 		assertThat( work3FutureFromSequenceBuilder ).isSuccessful( work3Result );
-		assertThat( work4FutureFromSequenceBuilder ).isFailed(
-				isException( SearchException.class )
-						.withMessage( "operation was skipped due to the failure of a previous work in the same workset" )
-						.causedBy( exception ).build()
-		);
+		assertThat( work4FutureFromSequenceBuilder ).isPending();
+		assertThat( sequenceFuture ).isPending();
+
+		resetAll();
+		replayAll();
+		work4Future.complete( work4Result );
+		verifyAll();
+		assertThat( work4FutureFromSequenceBuilder ).isSuccessful( work4Result );
 		// Work failures should not be propagated to the sequence future
 		assertThat( sequenceFuture ).isSuccessful();
 	}
@@ -786,11 +844,13 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 		BulkResult bulkResultMock = createStrictMock( BulkResult.class );
 		BulkResultItemExtractor bulkResultItemExtractorMock = createStrictMock( BulkResultItemExtractor.class );
+		Object work3Result = new Object();
 
 		// Futures returned by mocks: we will complete them
 		CompletableFuture<?> previousFuture = new CompletableFuture<>();
 		CompletableFuture<NonBulkableWork<BulkResult>> bulkWorkFuture = new CompletableFuture<>();
 		CompletableFuture<BulkResult> bulkResultFuture = new CompletableFuture<>();
+		CompletableFuture<Object> work3Future = new CompletableFuture<>();
 
 		// Futures returned by the sequence builder: we will test them
 		CompletableFuture<Object> work1FutureFromSequenceBuilder;
@@ -841,17 +901,22 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		expect( bulkResultMock.withContext( contextMock ) ).andReturn( bulkResultItemExtractorMock );
 		expect( bulkResultItemExtractorMock.extract( work1, 0 ) ).andThrow( exception1 );
 		expect( bulkResultItemExtractorMock.extract( work2, 1 ) ).andThrow( exception2 );
+		// Subsequent works should be executed even if previous works failed
+		expect( work3.execute( contextMock ) ).andReturn( work3Future );
 		replayAll();
 		bulkResultFuture.complete( bulkResultMock );
 		verifyAll();
 		assertThat( sequenceBuilderBulkResultFuture ).isSuccessful( bulkResultMock );
 		assertThat( work1FutureFromSequenceBuilder ).isFailed( exception1 );
 		assertThat( work2FutureFromSequenceBuilder ).isFailed( exception2 );
-		assertThat( work3FutureFromSequenceBuilder ).isFailed(
-				isException( SearchException.class )
-						.withMessage( "operation was skipped due to the failure of a previous work in the same workset" )
-						.causedBy( exception1 ).build()
-		);
+		assertThat( work3FutureFromSequenceBuilder ).isPending();
+		assertThat( sequenceFuture ).isPending();
+
+		resetAll();
+		replayAll();
+		work3Future.complete( work3Result );
+		verifyAll();
+		assertThat( work3FutureFromSequenceBuilder ).isSuccessful( work3Result );
 		// Work failures should not be propagated to the sequence future
 		assertThat( sequenceFuture ).isSuccessful();
 	}
