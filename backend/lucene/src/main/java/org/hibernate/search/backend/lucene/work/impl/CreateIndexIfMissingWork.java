@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.work.impl;
 
 
-public class LuceneValidateIndexExistsWork implements LuceneIndexManagementWork<Void> {
+public class CreateIndexIfMissingWork implements IndexManagementWork<Void> {
 
 	@Override
 	public String toString() {
@@ -15,8 +15,8 @@ public class LuceneValidateIndexExistsWork implements LuceneIndexManagementWork<
 	}
 
 	@Override
-	public Void execute(LuceneIndexManagementWorkExecutionContext context) {
-		context.getIndexAccessor().validateIndexExists();
+	public Void execute(IndexManagementWorkExecutionContext context) {
+		context.getIndexAccessor().createIndexIfMissing();
 		return null;
 	}
 

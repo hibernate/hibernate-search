@@ -16,7 +16,7 @@ import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.search.timeout.impl.TimeoutManager;
-import org.hibernate.search.backend.lucene.work.impl.LuceneReadWork;
+import org.hibernate.search.backend.lucene.work.impl.ReadWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneSearcher;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
@@ -89,7 +89,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	@Override
 	public LuceneSearchResult<H> fetch(Integer offset, Integer limit) {
 		timeoutManager.start();
-		LuceneReadWork<LuceneLoadableSearchResult<H>> work = workFactory.search( searcher, offset, limit );
+		ReadWork<LuceneLoadableSearchResult<H>> work = workFactory.search( searcher, offset, limit );
 		LuceneSearchResult<H> result = doSubmit( work )
 				/*
 				 * WARNING: the following call must run in the user thread.
@@ -106,7 +106,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	@Override
 	public long fetchTotalHitCount() {
 		timeoutManager.start();
-		LuceneReadWork<Integer> work = workFactory.count( searcher );
+		ReadWork<Integer> work = workFactory.count( searcher );
 		Integer result = doSubmit( work );
 		timeoutManager.stop();
 		return result;
@@ -137,7 +137,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 		return doExplain( indexName, id );
 	}
 
-	private <T> T doSubmit(LuceneReadWork<T> work) {
+	private <T> T doSubmit(ReadWork<T> work) {
 		return queryOrchestrator.submit(
 				searchContext.getIndexNames(),
 				searchContext.getIndexManagerContexts(),
@@ -149,7 +149,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 	private Explanation doExplain(String indexName, String id) {
 		timeoutManager.start();
 		Query filter = searchContext.getFilterOrNull( sessionContext.getTenantIdentifier() );
-		LuceneReadWork<Explanation> work = workFactory.explain(
+		ReadWork<Explanation> work = workFactory.explain(
 				searcher, indexName, id, filter
 		);
 		Explanation explanation = doSubmit( work );

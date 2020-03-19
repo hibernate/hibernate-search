@@ -8,13 +8,13 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
+import org.hibernate.search.backend.lucene.work.impl.WriteWork;
 
 public class LuceneSingleWriteWorkSet<T> implements LuceneWriteWorkSet {
-	public final LuceneWriteWork<T> work;
+	public final WriteWork<T> work;
 	public final CompletableFuture<T> future;
 
-	LuceneSingleWriteWorkSet(LuceneWriteWork<T> work, CompletableFuture<T> future) {
+	LuceneSingleWriteWorkSet(WriteWork<T> work, CompletableFuture<T> future) {
 		this.work = work;
 		this.future = future;
 	}

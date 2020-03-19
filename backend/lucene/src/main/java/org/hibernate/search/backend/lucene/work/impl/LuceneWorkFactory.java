@@ -16,32 +16,32 @@ import org.apache.lucene.search.Query;
 
 public interface LuceneWorkFactory {
 
-	LuceneIndexManagementWork<Void> createIndexIfMissing();
+	IndexManagementWork<Void> createIndexIfMissing();
 
-	LuceneIndexManagementWork<Void> dropIndexIfExisting();
+	IndexManagementWork<Void> dropIndexIfExisting();
 
-	LuceneIndexManagementWork<Void> validateIndexExists();
+	IndexManagementWork<Void> validateIndexExists();
 
-	LuceneIndexManagementWork<?> flush();
+	IndexManagementWork<?> flush();
 
-	LuceneIndexManagementWork<?> refresh();
+	IndexManagementWork<?> refresh();
 
-	LuceneIndexManagementWork<?> mergeSegments();
+	IndexManagementWork<?> mergeSegments();
 
-	LuceneSingleDocumentWriteWork add(String tenantId, String entityTypeName, Object entityIdentifier,
+	SingleDocumentWriteWork add(String tenantId, String entityTypeName, Object entityIdentifier,
 			LuceneIndexEntry indexEntry);
 
-	LuceneSingleDocumentWriteWork update(String tenantId, String entityTypeName, Object entityIdentifier,
+	SingleDocumentWriteWork update(String tenantId, String entityTypeName, Object entityIdentifier,
 			String documentIdentifier, LuceneIndexEntry indexEntry);
 
-	LuceneSingleDocumentWriteWork delete(String tenantId, String entityTypeName, Object entityIdentifier, String id);
+	SingleDocumentWriteWork delete(String tenantId, String entityTypeName, Object entityIdentifier, String id);
 
-	LuceneIndexManagementWork<?> deleteAll(String tenantId, Set<String> routingKeys);
+	IndexManagementWork<?> deleteAll(String tenantId, Set<String> routingKeys);
 
-	<R> LuceneReadWork<R> search(LuceneSearcher<R> searcher, Integer offset, Integer limit);
+	<R> ReadWork<R> search(LuceneSearcher<R> searcher, Integer offset, Integer limit);
 
-	LuceneReadWork<Integer> count(LuceneSearcher<?> searcher);
+	ReadWork<Integer> count(LuceneSearcher<?> searcher);
 
-	LuceneReadWork<Explanation> explain(LuceneSearcher<?> searcher,
+	ReadWork<Explanation> explain(LuceneSearcher<?> searcher,
 			String explainedDocumentIndexName, String explainedDocumentId, Query explainedDocumentFilter);
 }

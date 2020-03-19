@@ -6,14 +6,14 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
-public abstract class AbstractLuceneSingleDocumentWriteWork extends AbstractLuceneWriteWork<Long>
-		implements LuceneSingleDocumentWriteWork {
+public abstract class AbstractSingleDocumentWriteWork extends AbstractWriteWork<Long>
+		implements SingleDocumentWriteWork {
 
 	protected final String tenantId;
 	protected final String entityTypeName;
 	protected final Object entityIdentifier;
 
-	AbstractLuceneSingleDocumentWriteWork(String workType, String tenantId,
+	AbstractSingleDocumentWriteWork(String workType, String tenantId,
 			String entityTypeName, Object entityIdentifier) {
 		super( workType );
 		this.tenantId = tenantId;

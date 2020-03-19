@@ -11,9 +11,8 @@ import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
-import org.hibernate.search.backend.lucene.work.impl.LuceneIndexManagementWork;
+import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
-import org.hibernate.search.backend.lucene.work.impl.LuceneWriteWork;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
 
@@ -56,7 +55,7 @@ public class LuceneIndexWorkspace implements IndexWorkspace {
 	}
 
 	private <T> CompletableFuture<?> doSubmit(List<LuceneWriteWorkOrchestrator> orchestrators,
-			LuceneIndexManagementWork<T> work, boolean commit) {
+			IndexManagementWork<T> work, boolean commit) {
 		CompletableFuture<?>[] writeFutures = new CompletableFuture[orchestrators.size()];
 		CompletableFuture<?>[] writeAndCommitFutures = new CompletableFuture[orchestrators.size()];
 		for ( int i = 0; i < writeFutures.length; i++ ) {

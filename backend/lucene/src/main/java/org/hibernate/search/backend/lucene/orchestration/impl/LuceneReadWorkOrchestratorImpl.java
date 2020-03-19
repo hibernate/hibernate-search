@@ -15,8 +15,8 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.HibernateSearchMultiReader;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetadataResolver;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
-import org.hibernate.search.backend.lucene.work.impl.LuceneReadWork;
-import org.hibernate.search.backend.lucene.work.impl.LuceneReadWorkExecutionContext;
+import org.hibernate.search.backend.lucene.work.impl.ReadWork;
+import org.hibernate.search.backend.lucene.work.impl.ReadWorkExecutionContext;
 import org.hibernate.search.engine.backend.orchestration.spi.AbstractWorkOrchestrator;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
@@ -45,7 +45,7 @@ public class LuceneReadWorkOrchestratorImpl
 
 	@Override
 	public <T> T submit(Set<String> indexNames, Set<? extends ReadIndexManagerContext> indexManagerContexts,
-			Set<String> routingKeys, LuceneReadWork<T> work) {
+			Set<String> routingKeys, ReadWork<T> work) {
 		ReadTask<T> task = new ReadTask<>( indexNames, indexManagerContexts, routingKeys, work );
 		Throwable throwable = null;
 		try {
@@ -91,15 +91,15 @@ public class LuceneReadWorkOrchestratorImpl
 		// Nothing to do
 	}
 
-	static class ReadTask<T> implements AutoCloseable, LuceneReadWorkExecutionContext {
+	static class ReadTask<T> implements AutoCloseable, ReadWorkExecutionContext {
 		private final Set<String> indexNames;
 		private final HibernateSearchMultiReader indexReader;
-		private final LuceneReadWork<T> work;
+		private final ReadWork<T> work;
 
 		private T result;
 
 		ReadTask(Set<String> indexNames, Set<? extends ReadIndexManagerContext> indexManagerContexts,
-				Set<String> routingKeys, LuceneReadWork<T> work) {
+				Set<String> routingKeys, ReadWork<T> work) {
 			this.indexNames = indexNames;
 			this.indexReader = HibernateSearchMultiReader.open( indexNames, indexManagerContexts, routingKeys );
 			this.work = work;

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
-public class LuceneRefreshWork implements LuceneIndexManagementWork<Void> {
+public class FlushWork implements IndexManagementWork<Void> {
 
 	@Override
 	public String toString() {
@@ -14,8 +14,8 @@ public class LuceneRefreshWork implements LuceneIndexManagementWork<Void> {
 	}
 
 	@Override
-	public Void execute(LuceneIndexManagementWorkExecutionContext context) {
-		context.getIndexAccessor().refresh();
+	public Void execute(IndexManagementWorkExecutionContext context) {
+		context.getIndexAccessor().commit();
 		return null;
 	}
 

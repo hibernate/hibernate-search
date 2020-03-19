@@ -7,10 +7,8 @@
 package org.hibernate.search.backend.lucene.work.impl;
 
 
-public interface LuceneIndexManagementWork<T> {
+public interface ReadWork<T> {
 
-	T execute(LuceneIndexManagementWorkExecutionContext context);
-
-	Object getInfo();
+	T execute(ReadWorkExecutionContext context);
 
 }

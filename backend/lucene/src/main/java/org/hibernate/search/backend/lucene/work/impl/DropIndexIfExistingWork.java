@@ -7,7 +7,7 @@
 package org.hibernate.search.backend.lucene.work.impl;
 
 
-public class LuceneDropIndexIfExistingWork implements LuceneIndexManagementWork<Void> {
+public class DropIndexIfExistingWork implements IndexManagementWork<Void> {
 
 	@Override
 	public String toString() {
@@ -15,7 +15,7 @@ public class LuceneDropIndexIfExistingWork implements LuceneIndexManagementWork<
 	}
 
 	@Override
-	public Void execute(LuceneIndexManagementWorkExecutionContext context) {
+	public Void execute(IndexManagementWorkExecutionContext context) {
 		context.getIndexAccessor().dropIndexIfExisting();
 		return null;
 	}

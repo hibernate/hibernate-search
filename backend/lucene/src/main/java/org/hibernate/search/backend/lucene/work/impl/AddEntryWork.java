@@ -15,20 +15,20 @@ import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDeleg
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
-public class LuceneAddEntryWork extends AbstractLuceneSingleDocumentWriteWork {
+public class AddEntryWork extends AbstractSingleDocumentWriteWork {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneIndexEntry indexEntry;
 
-	LuceneAddEntryWork(String tenantId, String entityTypeName, Object entityIdentifier,
+	AddEntryWork(String tenantId, String entityTypeName, Object entityIdentifier,
 			LuceneIndexEntry indexEntry) {
 		super( "addEntry", tenantId, entityTypeName, entityIdentifier );
 		this.indexEntry = indexEntry;
 	}
 
 	@Override
-	public Long execute(LuceneWriteWorkExecutionContext context) {
+	public Long execute(WriteWorkExecutionContext context) {
 		try {
 			IndexWriterDelegator indexWriterDelegator = context.getIndexWriterDelegator();
 			return indexWriterDelegator.addDocuments( indexEntry );

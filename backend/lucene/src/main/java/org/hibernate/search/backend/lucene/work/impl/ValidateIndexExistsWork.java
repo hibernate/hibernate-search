@@ -6,7 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
-public class LuceneFlushWork implements LuceneIndexManagementWork<Void> {
+
+public class ValidateIndexExistsWork implements IndexManagementWork<Void> {
 
 	@Override
 	public String toString() {
@@ -14,8 +15,8 @@ public class LuceneFlushWork implements LuceneIndexManagementWork<Void> {
 	}
 
 	@Override
-	public Void execute(LuceneIndexManagementWorkExecutionContext context) {
-		context.getIndexAccessor().commit();
+	public Void execute(IndexManagementWorkExecutionContext context) {
+		context.getIndexAccessor().validateIndexExists();
 		return null;
 	}
 

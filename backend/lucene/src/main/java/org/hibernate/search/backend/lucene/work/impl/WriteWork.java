@@ -7,8 +7,10 @@
 package org.hibernate.search.backend.lucene.work.impl;
 
 
-public interface LuceneReadWork<T> {
+public interface WriteWork<T> {
 
-	T execute(LuceneReadWorkExecutionContext context);
+	T execute(WriteWorkExecutionContext context);
+
+	Object getInfo();
 
 }

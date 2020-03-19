@@ -7,10 +7,10 @@
 package org.hibernate.search.backend.lucene.work.impl;
 
 
-public interface LuceneSingleDocumentWriteWork extends LuceneWriteWork<Long> {
+public interface IndexManagementWork<T> {
 
-	String getEntityTypeName();
+	T execute(IndexManagementWorkExecutionContext context);
 
-	Object getEntityIdentifier();
+	Object getInfo();
 
 }
