@@ -75,15 +75,16 @@ public class ElasticsearchWorkOrchestratorProvider {
 	 * Setting the following constants involves a bit of guesswork.
 	 * Basically we want the number to be large enough for the orchestrator
 	 * to create bulks of the maximum size defined above most of the time,
-	 * but we also want to keep the number as low as possible to avoid
-	 * consuming too much memory with pending worksets.
+	 * and to avoid cases where the queue is full as much as possible,
+	 * because threads submitting works will block when that happens.
+	 * But we also want to keep the number as low as possible to avoid
+	 * consuming too much memory with pending works.
 	 * Here we set the number for parallel orchestrators higher than the number
-	 * for serial orchestrators, because parallel orchestrators will generally only handle
-	 * single-work worksets, and also because the parallel orchestrators rely on a single
+	 * for serial orchestrators, because the parallel orchestrators rely on a single
 	 * consumer thread shared between all index managers.
 	 */
-	private static final int SERIAL_MAX_WORKSETS_PER_BATCH = 10 * MAX_BULK_SIZE;
-	private static final int PARALLEL_MAX_WORKSETS_PER_BATCH = 20 * MAX_BULK_SIZE;
+	private static final int SERIAL_MAX_WORKS_PER_BATCH = 10 * MAX_BULK_SIZE;
+	private static final int PARALLEL_MAX_WORKS_PER_BATCH = 20 * MAX_BULK_SIZE;
 
 	private final ElasticsearchLink link;
 	private final ThreadPoolProvider threadPoolProvider;
@@ -108,8 +109,8 @@ public class ElasticsearchWorkOrchestratorProvider {
 		this.rootParallelOrchestrator = createBatchingSharedOrchestrator(
 				rootParallelOrchestratorName,
 				createParallelWorkProcessor(),
-				PARALLEL_MAX_WORKSETS_PER_BATCH,
-				false // Do not care about ordering when queuing worksets
+				PARALLEL_MAX_WORKS_PER_BATCH,
+				false // Do not care about ordering when queuing works
 		);
 	}
 
@@ -143,8 +144,8 @@ public class ElasticsearchWorkOrchestratorProvider {
 		return createBatchingSharedOrchestrator(
 				name,
 				processor,
-				SERIAL_MAX_WORKSETS_PER_BATCH,
-				true /* enqueue worksets in the exact order they were submitted */
+				SERIAL_MAX_WORKS_PER_BATCH,
+				true /* enqueue works in the exact order they were submitted */
 		);
 	}
 

@@ -21,6 +21,10 @@ public interface ElasticsearchWorkOrchestrator {
 		return future;
 	}
 
+	default <T> void submit(CompletableFuture<T> future, ElasticsearchWork<T> work) {
+		submit( new ElasticsearchSingleWorkSet<>( work, future ) );
+	}
+
 	void submit(ElasticsearchWorkSet workSet);
 
 }

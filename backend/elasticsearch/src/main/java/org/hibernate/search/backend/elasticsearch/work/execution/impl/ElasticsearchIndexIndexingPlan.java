@@ -89,9 +89,11 @@ public class ElasticsearchIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	@Override
 	public CompletableFuture<IndexIndexingPlanExecutionReport<R>> executeAndReport() {
 		try {
-			CompletableFuture<IndexIndexingPlanExecutionReport<R>> future = new CompletableFuture<>();
-			orchestrator.submit( new ElasticsearchIndexingPlanWorkSet<>( works, entityReferenceFactory, future ) );
-			return future;
+			ElasticsearchIndexIndexingPlanExecution<R> execution = new ElasticsearchIndexIndexingPlanExecution<>(
+					orchestrator, entityReferenceFactory,
+					new ArrayList<>( works ) // Copy the list, as we're going to clear it below
+			);
+			return execution.execute();
 		}
 		finally {
 			works.clear();

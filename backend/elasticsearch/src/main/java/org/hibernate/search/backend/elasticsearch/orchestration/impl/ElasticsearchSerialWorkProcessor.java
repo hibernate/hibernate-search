@@ -14,20 +14,17 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkAggregator;
 
 /**
- * Aggregates works from worksets into a single sequence,
- * respecting the order they were submitted.
+ * Aggregates works into a single sequence,
+ * respecting the order they were submitted in.
  * <p>
- * Two worksets or works submitted to this orchestrator will never run in parallel,
- * even if a reset() occurred between the two submissions.
+ * Two works submitted to this orchestrator in the same batch will always be executed
+ * one after the other, never in parallel.
  * <p>
  * This class is mutable and not thread-safe.
- *
  */
 class ElasticsearchSerialWorkProcessor implements ElasticsearchWorkProcessor {
 
 	private final BulkAndSequenceAggregator aggregator;
-
-	private CompletableFuture<Void> future = CompletableFuture.completedFuture( null );
 
 	public ElasticsearchSerialWorkProcessor(ElasticsearchWorkSequenceBuilder sequenceBuilder,
 			ElasticsearchWorkBulker bulker) {
@@ -40,28 +37,15 @@ class ElasticsearchSerialWorkProcessor implements ElasticsearchWorkProcessor {
 	}
 
 	@Override
-	public void beforeWorkSet() {
-		aggregator.initSequence( future );
-	}
-
-	@Override
 	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
 		return work.aggregate( aggregator );
 	}
 
 	@Override
-	public CompletableFuture<Void> afterWorkSet() {
-		CompletableFuture<Void> sequenceFuture = aggregator.buildSequence();
-		// Sequence futures are not expected to fail even if one work fails,
-		// so we can safely use this future directly.
-		future = sequenceFuture;
-		return sequenceFuture;
-	}
-
-	@Override
 	public CompletableFuture<Void> endBatch() {
-		aggregator.finalizeBulkWork();
-		return future;
+		// Sequence futures are not expected to fail even if one work fails,
+		// so we can safely return this future directly.
+		return aggregator.buildSequence();
 	}
 
 	@Override
@@ -81,8 +65,9 @@ class ElasticsearchSerialWorkProcessor implements ElasticsearchWorkProcessor {
 			this.bulker = bulker;
 		}
 
-		public void initSequence(CompletableFuture<?> previous) {
-			sequenceBuilder.init( previous );
+		public void reset() {
+			bulker.reset();
+			sequenceBuilder.init( CompletableFuture.completedFuture( null ) );
 		}
 
 		@Override
@@ -107,15 +92,9 @@ class ElasticsearchSerialWorkProcessor implements ElasticsearchWorkProcessor {
 
 		public CompletableFuture<Void> buildSequence() {
 			bulker.addWorksToSequence();
-			return sequenceBuilder.build();
-		}
-
-		public void finalizeBulkWork() {
+			CompletableFuture<Void> future = sequenceBuilder.build();
 			bulker.finalizeBulkWork();
-		}
-
-		public void reset() {
-			bulker.reset();
+			return future;
 		}
 	}
 }

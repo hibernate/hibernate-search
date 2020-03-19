@@ -17,13 +17,13 @@ import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 
 
 /**
- * Aggregates works from worksets into multiple sequences.
+ * Executes works in parallel,
+ * without any consideration for the order they were submitted in.
  * <p>
- * Two works will be executed sequentially if they are part of the same workset.
- * Two works from different worksets will be executed in parallel.
+ * Two works submitted to this processor in the same batch will be executed
+ * in the same bulk if possible, or in parallel if they can't be bulked.
  * <p>
  * This class is mutable and not thread-safe.
- *
  */
 class ElasticsearchParallelWorkProcessor implements ElasticsearchWorkProcessor {
 
@@ -42,20 +42,11 @@ class ElasticsearchParallelWorkProcessor implements ElasticsearchWorkProcessor {
 	}
 
 	@Override
-	public void beforeWorkSet() {
-		aggregator.initSequence();
-	}
-
-	@Override
 	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
-		return work.aggregate( aggregator );
-	}
-
-	@Override
-	public CompletableFuture<Void> afterWorkSet() {
-		CompletableFuture<Void> sequenceFuture = aggregator.buildSequence();
-		sequenceFutures.add( sequenceFuture );
-		return sequenceFuture;
+		aggregator.initSequence();
+		CompletableFuture<T> future = work.aggregate( aggregator );
+		sequenceFutures.add( aggregator.buildSequence() );
+		return future;
 	}
 
 	@Override
@@ -79,58 +70,38 @@ class ElasticsearchParallelWorkProcessor implements ElasticsearchWorkProcessor {
 		private final ElasticsearchWorkSequenceBuilder sequenceBuilder;
 		private final ElasticsearchWorkBulker bulker;
 
-		private CompletableFuture<Void> rootFuture;
-		private boolean currentBulkIsUsableInSameSequence = true;
-
 		public BulkAndSequenceAggregator(ElasticsearchWorkSequenceBuilder sequenceBuilder,
 				ElasticsearchWorkBulker bulker) {
-			super();
-			this.rootFuture = CompletableFuture.completedFuture( null );
 			this.sequenceBuilder = sequenceBuilder;
 			this.bulker = bulker;
 		}
 
+		public void reset() {
+			bulker.reset();
+		}
+
 		public void initSequence() {
-			sequenceBuilder.init( rootFuture );
+			sequenceBuilder.init( CompletableFuture.completedFuture( null ) );
 		}
 
 		@Override
 		public <T> CompletableFuture<T> addBulkable(BulkableWork<T> work) {
-			if ( !currentBulkIsUsableInSameSequence ) {
-				bulker.finalizeBulkWork();
-				currentBulkIsUsableInSameSequence = true;
-			}
 			return bulker.add( work );
 		}
 
 		@Override
 		public <T> CompletableFuture<T> addNonBulkable(NonBulkableWork<T> work) {
-			if ( bulker.addWorksToSequence() ) {
-				/*
-				 * A non-bulkable work follows bulked works,
-				 * so we won't be able to re-use the same bulk in the same sequence
-				 * (otherwise the relative order of works would be altered).
-				 */
-				currentBulkIsUsableInSameSequence = false;
-			}
 			return sequenceBuilder.addNonBulkExecution( work );
 		}
 
 		public CompletableFuture<Void> buildSequence() {
 			bulker.addWorksToSequence();
-			CompletableFuture<Void> future = sequenceBuilder.build();
-			currentBulkIsUsableInSameSequence = true;
-			return future;
+			return sequenceBuilder.build();
 		}
 
 		public void startSequences() {
 			bulker.finalizeBulkWork();
 		}
 
-		public void reset() {
-			bulker.reset();
-			rootFuture = CompletableFuture.completedFuture( null );
-			sequenceBuilder.init( rootFuture );
-		}
 	}
 }
