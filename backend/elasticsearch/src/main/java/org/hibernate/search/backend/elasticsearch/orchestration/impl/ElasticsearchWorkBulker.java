@@ -20,29 +20,18 @@ import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
 public interface ElasticsearchWorkBulker {
 
 	/**
+	 * Add a bulkable work to the current bulk.
+	 * <p>
+	 * This method also takes care of adding the bulk work execution to the current sequence if not already done,
+	 * and to add the extraction of the bulkable work result to the current sequence.
+	 *
 	 * @param work A work to add to the current bulk
 	 * @return A future that will ultimately contain the result of executing the work, or an exception.
 	 */
 	<T> CompletableFuture<T> add(BulkableWork<T> work);
 
 	/**
-	 * Ensure that all bulked works that haven't been added to a sequence yet
-	 * are added to the underlying sequence builder.
-	 * <p>
-	 * After this method is called, the underlying sequence builder can
-	 * safely be used to build a new sequence, but the execution of bulked works
-	 * in this sequence will block until {@link #finalizeBulkWork()} has been called.
-	 *
-	 * @return {@code true} if works have been added to the sequence builder,
-	 * {@code false} otherwise.
-	 */
-	boolean addWorksToSequence();
-
-	/**
 	 * Ensure that the bulk work (if any) is created.
-	 * <p>
-	 * This method expects that all works have been added to the sequence builder
-	 * using {@link #addWorksToSequence()} beforehand.
 	 * <p>
 	 * After this method is called, any new work added through {@link #add(BulkableWork)}
 	 * will be added to a new bulk.

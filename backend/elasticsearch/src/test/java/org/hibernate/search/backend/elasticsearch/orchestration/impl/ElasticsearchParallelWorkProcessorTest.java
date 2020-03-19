@@ -64,7 +64,6 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 		sequenceBuilderMock.init( anyObject() );
 		expect( work.aggregate( anyObject() ) ).andAnswer( nonBulkableAggregateAnswer( work ) );
 		expect( sequenceBuilderMock.addNonBulkExecution( work ) ).andReturn( workFuture );
-		expect( bulkerMock.addWorksToSequence() ).andReturn( false );
 		expect( sequenceBuilderMock.build() ).andReturn( sequenceFuture );
 		replayAll();
 		CompletableFuture<Object> returnedWorkFuture = processor.submit( work );
@@ -112,12 +111,10 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 		sequenceBuilderMock.init( anyObject() );
 		expect( work1.aggregate( anyObject() ) ).andAnswer( nonBulkableAggregateAnswer( work1 ) );
 		expect( sequenceBuilderMock.addNonBulkExecution( work1 ) ).andReturn( work1Future );
-		expect( bulkerMock.addWorksToSequence() ).andReturn( false );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
 		sequenceBuilderMock.init( anyObject() );
 		expect( work2.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work2 ) );
 		expect( bulkerMock.add( work2 ) ).andReturn( work2Future );
-		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
 		replayAll();
 		CompletableFuture<Object> returnedWork1Future = processor.submit( work1 );
@@ -172,7 +169,6 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 		sequenceBuilderMock.init( anyObject() );
 		expect( work1.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work1 ) );
 		expect( bulkerMock.add( work1 ) ).andReturn( unusedReturnValue() );
-		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence1Future );
 		replayAll();
 		processor.submit( work1 );
@@ -182,7 +178,6 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 		sequenceBuilderMock.init( anyObject() );
 		expect( work2.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work2 ) );
 		expect( bulkerMock.add( work2 ) ).andReturn( unusedReturnValue() );
-		expect( bulkerMock.addWorksToSequence() ).andReturn( true );
 		expect( sequenceBuilderMock.build() ).andReturn( sequence2Future );
 		replayAll();
 		processor.submit( work2 );
