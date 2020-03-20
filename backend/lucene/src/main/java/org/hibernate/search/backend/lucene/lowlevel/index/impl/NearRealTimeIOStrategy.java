@@ -69,7 +69,7 @@ public class NearRealTimeIOStrategy extends IOStrategy {
 		return new IndexWriterProvider(
 				indexName, eventContext,
 				directoryHolder, analyzer,
-				timingSource, commitInterval, threadPoolProvider.getThreadProvider(),
+				timingSource, commitInterval, threadPoolProvider,
 				failureHandler
 		);
 	}

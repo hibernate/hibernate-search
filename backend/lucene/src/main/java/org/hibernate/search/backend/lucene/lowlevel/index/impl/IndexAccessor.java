@@ -43,12 +43,8 @@ public interface IndexAccessor {
 	 * Commits the underlying index writer, if any,
 	 * or delay the commit if a commit happened recently
 	 * and configuration requires to wait longer between two commits.
-	 *
-	 * @return {@code 0} if the commit occurred or is not necessary (all changes have already been committed).
-	 * If a commit is necessary but needs to be delayed,
-	 * returns the number of milliseconds until the moment a commit can be executed.
 	 */
-	long commitOrDelay();
+	void commitOrDelay();
 
 	/**
 	 * Refreshes the underlying index readers.

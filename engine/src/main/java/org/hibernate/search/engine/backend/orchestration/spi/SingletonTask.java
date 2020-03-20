@@ -7,11 +7,7 @@
 package org.hibernate.search.engine.backend.orchestration.spi;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.hibernate.search.engine.reporting.FailureContext;
@@ -25,23 +21,18 @@ public final class SingletonTask {
 
 	private final String name;
 	private final Runnable runnable;
-	private final ExecutorService executorService;
-	private final ScheduledExecutorService scheduledExecutorService;
+	private final Scheduler scheduler;
 	private final FailureHandler failureHandler;
 
 	private final AtomicReference<Status> status = new AtomicReference<>( Status.IDLE );
 	private volatile boolean needsRun;
 	private volatile Future<?> nextExecutionFuture;
-	private volatile ScheduledFuture<?> delayedExecutionFuture;
 	private volatile CompletableFuture<?> completionFuture;
 
-	public SingletonTask(String name, Worker worker,
-			ExecutorService executorService, ScheduledExecutorService scheduledExecutorService,
-			FailureHandler failureHandler) {
+	public SingletonTask(String name, Worker worker, Scheduler scheduler, FailureHandler failureHandler) {
 		this.name = name;
 		this.runnable = new RunnableWrapper( worker );
-		this.executorService = executorService;
-		this.scheduledExecutorService = scheduledExecutorService;
+		this.scheduler = scheduler;
 		this.failureHandler = failureHandler;
 	}
 
@@ -70,14 +61,6 @@ public final class SingletonTask {
 		 * the task wasn't in progress, and we're now responsible for scheduling it.
 		 */
 		try {
-			if ( delayedExecutionFuture != null ) {
-				/*
-				 * We scheduled processing at a later time.
-				 * Since we're going to execute processing right now,
-				 * we can cancel this scheduling.
-				 */
-				cancelDelayed();
-			}
 			if ( completionFuture == null ) {
 				/*
 				 * The task was previously not running:
@@ -86,7 +69,7 @@ public final class SingletonTask {
 				 */
 				completionFuture = new CompletableFuture<>();
 			}
-			nextExecutionFuture = executorService.submit( runnable );
+			nextExecutionFuture = scheduler.schedule( runnable );
 		}
 		catch (Throwable e) {
 			/*
@@ -131,18 +114,11 @@ public final class SingletonTask {
 	 * any concurrent call may lead to unpredictable results.
 	 */
 	public void stop() {
-		cancelDelayed();
-
 		cancelIfNotNull( nextExecutionFuture );
 		nextExecutionFuture = null;
 
 		cancelIfNotNull( completionFuture );
 		completionFuture = null;
-	}
-
-	private void cancelDelayed() {
-		cancelIfNotNull( delayedExecutionFuture );
-		delayedExecutionFuture = null;
 	}
 
 	private void cancelIfNotNull(Future<?> futureToCancel) {
@@ -160,15 +136,17 @@ public final class SingletonTask {
 		void work();
 
 		/**
-		 * Executes any outstanding operation if possible, or return an estimation of when they can be executed.
+		 * Executes any outstanding operation, or schedule their execution.
 		 * <p>
 		 * Called when the worker is not expected to work in the foreseeable future.
-		 *
-		 * @return {@code 0} if there is no outstanding operation, or a positive number of milliseconds
-		 * if there are outstanding operations and {@link #complete()}
-		 * must be called again that many milliseconds later.
 		 */
-		long complete();
+		void complete();
+	}
+
+	public interface Scheduler {
+
+		Future<?> schedule(Runnable runnable);
+
 	}
 
 	private enum Status {
@@ -223,10 +201,10 @@ public final class SingletonTask {
 		private void afterRun() {
 			if ( !needsRun ) {
 				// We're done running this task.
+
 				// First, tell the worker that we're done.
-				long delay = 0;
 				try {
-					delay = worker.complete();
+					worker.complete();
 				}
 				catch (Throwable e) {
 					// This will only happen if there is a bug in the worker, but we don't want to fail silently
@@ -236,20 +214,10 @@ public final class SingletonTask {
 					failureHandler.handle( contextBuilder.build() );
 				}
 
-				if ( delay <= 0 ) {
-					// The worker acknowledged that all outstanding operations (commit, ...) have completed.
-					// Tell callers of getCompletion()
-					CompletableFuture<?> justFinishedExecutionFuture = completionFuture;
-					completionFuture = null;
-					justFinishedExecutionFuture.complete( null );
-				}
-				else {
-					// The worker requested that we wait because some outstanding operations (commit, ...)
-					// need to be performed later.
-					delayedExecutionFuture = scheduledExecutorService.schedule(
-							SingletonTask.this::ensureScheduled, delay, TimeUnit.MILLISECONDS
-					);
-				}
+				// Tell callers of getCompletion()
+				CompletableFuture<?> justFinishedExecutionFuture = completionFuture;
+				completionFuture = null;
+				justFinishedExecutionFuture.complete( null );
 			}
 
 			// Allow this thread (or others) to run processing again.

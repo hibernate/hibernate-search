@@ -25,7 +25,6 @@ import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Test;
 
-import org.assertj.core.api.Assertions;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
@@ -45,7 +44,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 	private List<WriteWork<?>> workMocks = new ArrayList<>();
 
 	@Test
-	public void immediateCommitStrategy() throws IOException {
+	public void batch() throws IOException {
 		resetAll();
 		replayAll();
 		processor.beginBatch();
@@ -54,7 +53,8 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		testSuccessfulWriteWorks( 200 );
 
 		resetAll();
-		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
+		// Give a chance to the I/O strategy to schedule a delayed commit.
+		indexAccessorMock.commitOrDelay();
 		replayAll();
 		processor.endBatch();
 		verifyAll();
@@ -67,140 +67,13 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		testSuccessfulWriteWorks( 100 );
 
 		resetAll();
-		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
+		// Give a chance to the I/O strategy to schedule a delayed commit.
+		indexAccessorMock.commitOrDelay();
 		replayAll();
 		processor.endBatch();
 		verifyAll();
 
-		checkCompleteOrDelayWithNothingToCommit();
-	}
-
-	@Test
-	public void delayedCommitStrategy_noDelay() throws IOException {
-		resetAll();
-		replayAll();
-		processor.beginBatch();
-		verifyAll();
-
-		testSuccessfulWriteWorks( 200 );
-
-		resetAll();
-		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
-		replayAll();
-		processor.endBatch();
-		verifyAll();
-
-		// The executor does not have any additional work, so it calls completeOrDelay() just after endBatch().
-		resetAll();
-		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
-		replayAll();
-		assertThat( processor.completeOrDelay() ).isEqualTo( 0L );
-		verifyAll();
-	}
-
-	@Test
-	public void delayedCommitStrategy_delay_noAdditionalWorkDuringDelay() throws IOException {
-		resetAll();
-		replayAll();
-		processor.beginBatch();
-		verifyAll();
-
-		testSuccessfulWriteWorks( 200 );
-
-		resetAll();
-		expect( indexAccessorMock.commitOrDelay() )
-				// The I/O strategy decides that it's too early for a commit.
-				.andReturn( 1000L );
-		replayAll();
-		processor.endBatch();
-		verifyAll();
-
-		// The executor does not have any additional work, so it calls completeOrDelay() just after endBatch().
-		resetAll();
-		expect( indexAccessorMock.commitOrDelay() )
-				// Almost no time passed since the call to endBatch(),
-				// so the I/O strategy decides that it's still too early for a commit.
-				.andReturn( 999L );
-		replayAll();
-		assertThat( processor.completeOrDelay() ).isEqualTo( 999L );
-		verifyAll();
-
-		// 999 ms pass...
-
-		// The executor didn't receive any additional work, so it calls completeOrDelay() again some time later.
-		resetAll();
-		expect( indexAccessorMock.commitOrDelay() )
-				// The I/O strategy decides that it's now time for a commit.
-				.andReturn( 0L );
-		replayAll();
-		assertThat( processor.completeOrDelay() ).isEqualTo( 0L );
-		verifyAll();
-	}
-
-	@Test
-	public void delayedCommitStrategy_delay_someAdditionalWorkDuringDelay() throws IOException {
-		resetAll();
-		replayAll();
-		processor.beginBatch();
-		verifyAll();
-
-		// Execute a few successful works
-		testSuccessfulWriteWorks( 50 );
-
-		resetAll();
-		expect( indexAccessorMock.commitOrDelay() )
-				// The I/O strategy decides that it's too early for a commit.
-				.andReturn( 1000L );
-		replayAll();
-		processor.endBatch();
-		verifyAll();
-
-		// The executor does not have any additional work, so it calls completeOrDelay() just after endBatch().
-		resetAll();
-		expect( indexAccessorMock.commitOrDelay() )
-				// Almost no time passed since the call to endBatch(),
-				// so the I/O strategy decides that it's still too early for a commit.
-				.andReturn( 999L );
-		replayAll();
-		assertThat( processor.completeOrDelay() ).isEqualTo( 999L );
-		verifyAll();
-
-		// 500 ms pass...
-
-		// Some work is submitted to the executor!
-		resetAll();
-		replayAll();
-		processor.beginBatch();
-		verifyAll();
-		testSuccessfulWriteWorks( 10 );
-		resetAll();
-		expect( indexAccessorMock.commitOrDelay() )
-				// The I/O strategy decides that it's too early for a commit.
-				.andReturn( 499L );
-		replayAll();
-		processor.endBatch();
-		verifyAll();
-
-		// The executor does not have any additional work, so it calls completeOrDelay() just after endBatch().
-		resetAll();
-		expect( indexAccessorMock.commitOrDelay() )
-				// Almost no time passed since the call to endBatch(),
-				// so the I/O strategy decides that it's still too early for a commit.
-				.andReturn( 498L );
-		replayAll();
-		assertThat( processor.completeOrDelay() ).isEqualTo( 498L );
-		verifyAll();
-
-		// 498 ms pass...
-
-		// The executor didn't receive any additional work, so it calls completeOrDelay() again some time later.
-		resetAll();
-		expect( indexAccessorMock.commitOrDelay() )
-				// The I/O strategy decides that it's now time for a commit.
-				.andReturn( 0L );
-		replayAll();
-		assertThat( processor.completeOrDelay() ).isEqualTo( 0L );
-		verifyAll();
+		checkCompleteWithNothingToCommit();
 	}
 
 	@Test
@@ -229,12 +102,12 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		testSuccessfulWriteWorks( 10 );
 
 		resetAll();
-		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
+		indexAccessorMock.commitOrDelay();
 		replayAll();
 		processor.endBatch();
 		verifyAll();
 
-		checkCompleteOrDelayWithNothingToCommit();
+		checkCompleteWithNothingToCommit();
 	}
 
 	@Test
@@ -260,12 +133,12 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
-		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
+		indexAccessorMock.commitOrDelay();
 		replayAll();
 		processor.endBatch();
 		verifyAll();
 
-		checkCompleteOrDelayWithNothingToCommit();
+		checkCompleteWithNothingToCommit();
 	}
 
 	@Test
@@ -304,13 +177,14 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 		// Fail upon batch commit
 		resetAll();
-		expect( indexAccessorMock.commitOrDelay() ).andThrow( commitException );
+		indexAccessorMock.commitOrDelay();
+		expectLastCall().andThrow( commitException );
 		indexAccessorMock.cleanUpAfterFailure( commitException, "Commit after a batch of index works" );
 		replayAll();
 		processor.endBatch();
 		verifyAll();
 
-		checkCompleteOrDelayWithNothingToCommit();
+		checkCompleteWithNothingToCommit();
 	}
 
 	private void testSuccessfulWriteWorks(int workCount) throws IOException {
@@ -330,12 +204,12 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		}
 	}
 
-	private void checkCompleteOrDelayWithNothingToCommit() {
+	private void checkCompleteWithNothingToCommit() {
 		resetAll();
 		// The index accessor (or the underlying writer) is responsible for detecting there is nothing to commit.
-		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
+		indexAccessorMock.commitOrDelay();
 		replayAll();
-		Assertions.assertThat( processor.completeOrDelay() ).isEqualTo( 0L );
+		processor.complete();
 		verifyAll();
 	}
 
@@ -364,10 +238,6 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		WriteWork<T> workMock = createStrictMock( workName, WriteWork.class );
 		workMocks.add( workMock );
 		return workMock;
-	}
-
-	private String workInfo(WriteWork<?> work) {
-		return workInfo( workMocks.indexOf( work ) );
 	}
 
 	private String workInfo(int index) {
