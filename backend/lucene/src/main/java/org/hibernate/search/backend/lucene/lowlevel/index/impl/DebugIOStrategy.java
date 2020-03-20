@@ -36,7 +36,7 @@ public class DebugIOStrategy extends IOStrategy {
 				indexName, eventContext,
 				directoryHolder, analyzer,
 				null, 0,
-				threadPoolProvider.getThreadProvider(),
+				threadPoolProvider,
 				failureHandler
 		);
 	}

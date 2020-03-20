@@ -14,8 +14,7 @@ import java.util.concurrent.locks.ReentrantLock;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
 import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
-import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
-import org.hibernate.search.engine.reporting.FailureContext;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -39,7 +38,7 @@ public class IndexWriterProvider {
 	private final Analyzer analyzer;
 	private final TimingSource timingSource;
 	private final int commitInterval;
-	private final ThreadProvider threadProvider;
+	private final ThreadPoolProvider threadPoolProvider;
 	private final FailureHandler failureHandler;
 
 	/* TODO HSEARCH-3776 re-allow configuring index writers
@@ -61,7 +60,7 @@ public class IndexWriterProvider {
 	public IndexWriterProvider(String indexName, EventContext eventContext,
 			DirectoryHolder directoryHolder, Analyzer analyzer,
 			TimingSource timingSource, int commitInterval,
-			ThreadProvider threadProvider,
+			ThreadPoolProvider threadPoolProvider,
 			FailureHandler failureHandler) {
 		this.indexName = indexName;
 		this.eventContext = eventContext;
@@ -69,7 +68,7 @@ public class IndexWriterProvider {
 		this.analyzer = analyzer;
 		this.timingSource = timingSource;
 		this.commitInterval = commitInterval;
-		this.threadProvider = threadProvider;
+		this.threadPoolProvider = threadPoolProvider;
 		this.failureHandler = failureHandler;
 		/* TODO HSEARCH-3776 re-allow configuring index writers
 		this.luceneParameters = indexManager.getIndexingParameters();
@@ -130,8 +129,10 @@ public class IndexWriterProvider {
 					IndexWriter indexWriter = createNewIndexWriter();
 					indexWriterDelegator = new IndexWriterDelegatorImpl(
 							indexWriter, eventContext,
+							threadPoolProvider,
 							timingSource, commitInterval,
-							failureHandler
+							failureHandler,
+							this::clearAfterFailure
 					);
 					log.trace( "IndexWriter opened" );
 					currentWriter.set( indexWriterDelegator );
@@ -162,7 +163,7 @@ public class IndexWriterProvider {
 		 */
 		MergeScheduler mergeScheduler = new HibernateSearchConcurrentMergeScheduler(
 				indexName, eventContext.render(),
-				threadProvider, failureHandler
+				threadPoolProvider.getThreadProvider(), failureHandler
 		);
 		writerConfig.setMergeScheduler( mergeScheduler );
 		writerConfig.setOpenMode( OpenMode.CREATE_OR_APPEND );

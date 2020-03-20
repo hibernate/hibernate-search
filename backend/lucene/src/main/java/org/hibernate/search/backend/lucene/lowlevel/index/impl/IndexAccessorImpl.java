@@ -38,7 +38,8 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 	private final IndexWriterProvider indexWriterProvider;
 	private final IndexReaderProvider indexReaderProvider;
 
-	public IndexAccessorImpl(EventContext eventContext, DirectoryHolder directoryHolder,
+	public IndexAccessorImpl(EventContext eventContext,
+			DirectoryHolder directoryHolder,
 			IndexWriterProvider indexWriterProvider, IndexReaderProvider indexReaderProvider) {
 		this.eventContext = eventContext;
 		this.directoryHolder = directoryHolder;
@@ -53,8 +54,8 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 	@Override
 	public void close() throws IOException {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( IndexReaderProvider::clear, indexReaderProvider );
 			closer.push( IndexWriterProvider::clear, indexWriterProvider );
+			closer.push( IndexReaderProvider::clear, indexReaderProvider );
 			closer.push( DirectoryHolder::close, directoryHolder );
 		}
 	}
@@ -97,8 +98,7 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 	public void dropIndexIfExisting() {
 		try {
 			// Ensure no one is using the directory
-			indexWriterProvider.clear();
-			indexReaderProvider.clear();
+			clear();
 
 			Directory directory = directoryHolder.get();
 
@@ -116,6 +116,13 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 		}
 	}
 
+	private synchronized void clear() throws IOException {
+		try ( Closer<IOException> closer = new Closer<>() ) {
+			closer.push( IndexWriterProvider::clear, indexWriterProvider );
+			closer.push( IndexReaderProvider::clear, indexReaderProvider );
+		}
+	}
+
 	@Override
 	public void commit() {
 		IndexWriterDelegatorImpl delegator = indexWriterProvider.getOrNull();
@@ -125,13 +132,10 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 	}
 
 	@Override
-	public long commitOrDelay() {
+	public void commitOrDelay() {
 		IndexWriterDelegatorImpl delegator = indexWriterProvider.getOrNull();
 		if ( delegator != null ) {
-			return delegator.commitOrDelay();
-		}
-		else {
-			return 0L;
+			delegator.commitOrDelay();
 		}
 	}
 
@@ -193,5 +197,4 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 			log.lockingFailureDuringInitialization( directory.toString(), eventContext );
 		}
 	}
-
 }

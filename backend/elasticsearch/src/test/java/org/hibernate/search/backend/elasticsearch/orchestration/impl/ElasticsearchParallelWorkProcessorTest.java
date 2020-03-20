@@ -20,7 +20,6 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkAgg
 import org.junit.Before;
 import org.junit.Test;
 
-import org.assertj.core.api.Assertions;
 import org.easymock.EasyMockSupport;
 import org.easymock.IAnswer;
 
@@ -78,7 +77,7 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 		sequenceFuture.complete( null );
 		assertThat( futureAll ).isSuccessful( (Void) null );
 
-		checkCompleteOrDelay( processor );
+		checkComplete( processor );
 	}
 
 	@Test
@@ -119,7 +118,7 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 		sequenceFuture.complete( null );
 		assertThat( futureAll ).isSuccessful( (Void) null );
 
-		checkCompleteOrDelay( processor );
+		checkComplete( processor );
 	}
 
 	@Test
@@ -162,7 +161,7 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 		// Failures in a sequence should be ignored
 		assertThat( futureAll ).isSuccessful( (Void) null );
 
-		checkCompleteOrDelay( processor );
+		checkComplete( processor );
 	}
 
 	@Test
@@ -217,7 +216,7 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 		sequence1Future.complete( null );
 		assertThat( futureAll ).isSuccessful( (Void) null );
 
-		checkCompleteOrDelay( processor );
+		checkComplete( processor );
 	}
 
 	@Test
@@ -279,7 +278,7 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 		verifyAll();
 		assertThat( futureAll ).isSuccessful( (Void) null );
 
-		checkCompleteOrDelay( processor );
+		checkComplete( processor );
 	}
 
 	@Test
@@ -329,7 +328,7 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 		verifyAll();
 		assertThat( futureAll ).isSuccessful( (Void) null );
 
-		checkCompleteOrDelay( processor );
+		checkComplete( processor );
 	}
 
 	@Test
@@ -396,13 +395,13 @@ public class ElasticsearchParallelWorkProcessorTest extends EasyMockSupport {
 		verifyAll();
 		assertThat( futureAll ).isSuccessful( (Void) null );
 
-		checkCompleteOrDelay( processor );
+		checkComplete( processor );
 	}
 
-	private void checkCompleteOrDelay(ElasticsearchParallelWorkProcessor processor) {
+	private void checkComplete(ElasticsearchParallelWorkProcessor processor) {
 		resetAll();
 		replayAll();
-		Assertions.assertThat( processor.completeOrDelay() ).isEqualTo( 0 );
+		processor.complete();
 		verifyAll();
 	}
 

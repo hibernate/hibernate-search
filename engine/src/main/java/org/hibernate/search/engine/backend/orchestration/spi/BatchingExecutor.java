@@ -13,6 +13,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.FailureHandler;
@@ -73,7 +74,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 		executorService = threadPoolProvider.newFixedThreadPool( 1, name );
 		processingTask = new SingletonTask(
 				name, worker,
-				executorService, threadPoolProvider.getSharedScheduledThreadPool(),
+				new BatchScheduler( executorService ),
 				failureHandler
 		);
 	}
@@ -179,8 +180,22 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 		}
 
 		@Override
-		public long complete() {
-			return processor.completeOrDelay();
+		public void complete() {
+			processor.complete();
+		}
+	}
+
+	private static final class BatchScheduler implements SingletonTask.Scheduler {
+		private final ExecutorService delegate;
+
+		public BatchScheduler(ExecutorService delegate) {
+			this.delegate = delegate;
+		}
+
+		@Override
+		public Future<?> schedule(Runnable runnable) {
+			// Schedule the task for execution as soon as possible.
+			return delegate.submit( runnable );
 		}
 	}
 

@@ -99,22 +99,12 @@ public class IndexAccessorTest extends EasyMockSupport {
 	}
 
 	@Test
-	public void commitOrDelay_noDelay() {
+	public void commitOrDelay() {
 		resetAll();
 		expect( indexWriterProviderMock.getOrNull() ).andReturn( indexWriterDelegatorMock );
-		expect( indexWriterDelegatorMock.commitOrDelay() ).andReturn( 0L );
+		indexWriterDelegatorMock.commitOrDelay();
 		replayAll();
-		assertThat( accessor.commitOrDelay() ).isEqualTo( 0L );
-		verifyAll();
-	}
-
-	@Test
-	public void commitOrDelay_delay() {
-		resetAll();
-		expect( indexWriterProviderMock.getOrNull() ).andReturn( indexWriterDelegatorMock );
-		expect( indexWriterDelegatorMock.commitOrDelay() ).andReturn( 4242L );
-		replayAll();
-		assertThat( accessor.commitOrDelay() ).isEqualTo( 4242L );
+		accessor.commitOrDelay();
 		verifyAll();
 	}
 
@@ -124,7 +114,7 @@ public class IndexAccessorTest extends EasyMockSupport {
 		// No writer => nothing to commit
 		expect( indexWriterProviderMock.getOrNull() ).andReturn( null );
 		replayAll();
-		assertThat( accessor.commitOrDelay() ).isEqualTo( 0L );
+		accessor.commitOrDelay();
 		verifyAll();
 	}
 

@@ -49,16 +49,13 @@ public class LuceneWriteWorkProcessor implements BatchedWorkProcessor {
 	}
 
 	@Override
-	public long completeOrDelay() {
+	public void complete() {
 		try {
-			return indexAccessor.commitOrDelay();
+			indexAccessor.commitOrDelay();
 		}
 		catch (RuntimeException e) {
 			indexAccessor.cleanUpAfterFailure( e, "Commit after completion of all remaining index works" );
 			// The exception was reported to the failure handler, no need to propagate it.
-
-			// Tell the executor there's no need to call us again later: the index writer was lost anyway.
-			return 0;
 		}
 	}
 
@@ -99,4 +96,5 @@ public class LuceneWriteWorkProcessor implements BatchedWorkProcessor {
 		// we don't expect a refresh failure to affect the writer and require a cleanup.
 		indexAccessor.refresh();
 	}
+
 }

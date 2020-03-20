@@ -30,15 +30,11 @@ public interface BatchedWorkProcessor {
 	CompletableFuture<?> endBatch();
 
 	/**
-	 * Executes any outstanding operation if possible, or return an estimation of when they can be executed.
+	 * Executes any outstanding operation, or schedule their execution.
 	 * <p>
 	 * Called when the executor considers the work queue complete
 	 * and does not plan on submitting another batch due to work starvation.
-	 *
-	 * @return {@code 0} if there is no outstanding operation, or a positive number of milliseconds
-	 * if there are outstanding operations and {@link #completeOrDelay()}
-	 * must be called again that many milliseconds later.
 	 */
-	long completeOrDelay();
+	void complete();
 
 }
