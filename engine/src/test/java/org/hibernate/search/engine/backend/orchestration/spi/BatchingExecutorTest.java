@@ -379,7 +379,7 @@ public class BatchingExecutorTest extends EasyMockSupport {
 		assertThat( failureContext.getThrowable() )
 				.isSameAs( simulatedFailure );
 		assertThat( failureContext.getFailingOperation() ).asString()
-				.contains( "Work processing in executor '" + NAME + "'" );
+				.contains( "Executing task '" + NAME + "'" );
 
 		// The executor should still try to process submitted works, even after a failure
 		checkPostExecution();
@@ -464,7 +464,7 @@ public class BatchingExecutorTest extends EasyMockSupport {
 		assertThat( failureContext.getThrowable() )
 				.isSameAs( simulatedFailure );
 		assertThat( failureContext.getFailingOperation() ).asString()
-				.contains( "Work processing in executor '" + NAME + "'" );
+				.contains( "Executing task '" + NAME + "'" );
 
 		// The executor should still try to process submitted works, even after a failure
 		checkPostExecution();
