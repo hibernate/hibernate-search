@@ -9,9 +9,11 @@ package org.hibernate.search.engine.backend.orchestration.spi;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.BiFunction;
 
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.util.common.impl.Futures;
 
 /**
  * A task that can be scheduled for a run and is guaranteed to never run concurrently,
@@ -141,8 +143,10 @@ public final class SingletonTask {
 		 * Executes a unit of work.
 		 * <p>
 		 * If there is no work to do, this shouldn't do anything.
+		 *
+		 * @return A future completing when the executor is allowed to call this method again.
 		 */
-		void work();
+		CompletableFuture<?> work();
 
 		/**
 		 * Executes any outstanding operation, or schedule their execution.
@@ -172,6 +176,7 @@ public final class SingletonTask {
 	 */
 	private class RunnableWrapper implements Runnable {
 		private final Worker worker;
+		private final BiFunction<Object, Throwable, Object> workFinishedHandler = Futures.handler( this::onWorkFinished );
 
 		public RunnableWrapper(Worker worker) {
 			this.worker = worker;
@@ -184,27 +189,26 @@ public final class SingletonTask {
 			needsRun = false;
 			nextExecutionFuture = null;
 			try {
-				worker.work();
+				worker.work().handle( workFinishedHandler );
 			}
 			catch (Throwable e) {
-				// This will only happen if there is a bug in the task, but we don't want to fail silently.
-				FailureContext.Builder contextBuilder = FailureContext.builder();
-				contextBuilder.throwable( e );
-				contextBuilder.failingOperation( "Executing task '" + name + "'" );
-				failureHandler.handle( contextBuilder.build() );
+				onWorkFinished( null, e );
 			}
-			finally {
-				try {
-					afterRun();
-				}
-				catch (Throwable e) {
-					// This will only happen if there is a bug in this class, but we don't want to fail silently.
-					FailureContext.Builder contextBuilder = FailureContext.builder();
-					contextBuilder.throwable( e );
-					contextBuilder.failingOperation( "Handling post-execution in task '" + name + "'" );
-					failureHandler.handle( contextBuilder.build() );
-				}
+		}
+
+		private Void onWorkFinished(Object ignored, Throwable throwable) {
+			if ( throwable != null ) {
+				handleUnexpectedFailure( throwable, "Executing task '" + name + "'" );
 			}
+
+			try {
+				afterRun();
+			}
+			catch (Throwable e) {
+				handleUnexpectedFailure( e, "Handling post-execution in task '" + name + "'" );
+			}
+
+			return null;
 		}
 
 		private void afterRun() {
@@ -216,11 +220,7 @@ public final class SingletonTask {
 					worker.complete();
 				}
 				catch (Throwable e) {
-					// This will only happen if there is a bug in the worker, but we don't want to fail silently
-					FailureContext.Builder contextBuilder = FailureContext.builder();
-					contextBuilder.throwable( e );
-					contextBuilder.failingOperation( "Calling worker.complete() in task '" + name + "'" );
-					failureHandler.handle( contextBuilder.build() );
+					handleUnexpectedFailure( e, "Calling worker.complete() in task '" + name + "'" );
 				}
 
 				// Tell callers of getCompletion()
@@ -239,6 +239,14 @@ public final class SingletonTask {
 			if ( needsRun ) {
 				ensureScheduled();
 			}
+		}
+
+		// This will only be called if there is a bug in the task, but we don't want to fail silently.
+		private void handleUnexpectedFailure(Throwable throwable, String failingOperation) {
+			FailureContext.Builder contextBuilder = FailureContext.builder();
+			contextBuilder.throwable( throwable );
+			contextBuilder.failingOperation( failingOperation );
+			failureHandler.handle( contextBuilder.build() );
 		}
 	}
 }

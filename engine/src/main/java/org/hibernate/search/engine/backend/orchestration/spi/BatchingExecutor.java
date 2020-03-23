@@ -18,7 +18,6 @@ import java.util.concurrent.Future;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 /**
@@ -135,6 +134,8 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	 * Takes a batch of works from the queue and submits them to the processor.
 	 */
 	private static final class BatchWorker<P extends BatchedWorkProcessor> implements SingletonTask.Worker {
+		private final CompletableFuture<?> completedFuture = CompletableFuture.completedFuture( null );
+
 		private final P processor;
 		private final BlockingQueue<BatchedWork<? super P>> workQueue;
 		private final int maxTasksPerBatch;
@@ -149,13 +150,13 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 		}
 
 		@Override
-		public void work() {
+		public CompletableFuture<?> work() {
 			workBuffer.clear();
 			workQueue.drainTo( workBuffer, maxTasksPerBatch );
 
 			if ( workBuffer.isEmpty() ) {
 				// Nothing to do
-				return;
+				return completedFuture;
 			}
 
 			processor.beginBatch();
@@ -170,15 +171,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 			}
 
 			// Nothing more to do, end the batch and terminate
-			CompletableFuture<?> batchFuture = processor.endBatch();
-
-			/*
-			 * Wait for works to complete before trying to handle the next batch.
-			 * Note: timeout is expected to be handled by the processor
-			 * (the Elasticsearch client adds per-request timeouts, in particular),
-			 * so this "join" will not last forever
-			 */
-			Futures.unwrappedExceptionJoin( batchFuture );
+			return processor.endBatch();
 		}
 
 		@Override
