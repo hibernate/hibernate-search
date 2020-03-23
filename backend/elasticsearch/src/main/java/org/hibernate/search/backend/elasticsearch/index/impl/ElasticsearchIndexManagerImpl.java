@@ -208,7 +208,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 	@Override
 	public IndexIndexer createIndexer(BackendSessionContext sessionContext) {
 		return backendContext.createIndexer(
-				parallelOrchestrator, this, sessionContext
+				serialOrchestrator, this, sessionContext
 		);
 	}
 
