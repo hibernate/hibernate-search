@@ -118,41 +118,26 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 
 	@Override
 	public void commit() {
-		try {
-			IndexWriterDelegatorImpl delegator = indexWriterProvider.getOrNull();
-			if ( delegator != null ) {
-				delegator.commit();
-			}
-		}
-		catch (RuntimeException | IOException e) {
-			throw log.unableToCommitIndex( eventContext, e );
+		IndexWriterDelegatorImpl delegator = indexWriterProvider.getOrNull();
+		if ( delegator != null ) {
+			delegator.commit();
 		}
 	}
 
 	@Override
 	public long commitOrDelay() {
-		try {
-			IndexWriterDelegatorImpl delegator = indexWriterProvider.getOrNull();
-			if ( delegator != null ) {
-				return delegator.commitOrDelay();
-			}
-			else {
-				return 0L;
-			}
+		IndexWriterDelegatorImpl delegator = indexWriterProvider.getOrNull();
+		if ( delegator != null ) {
+			return delegator.commitOrDelay();
 		}
-		catch (RuntimeException | IOException e) {
-			throw log.unableToCommitIndex( eventContext, e );
+		else {
+			return 0L;
 		}
 	}
 
 	@Override
 	public void refresh() {
-		try {
-			indexReaderProvider.refresh();
-		}
-		catch (RuntimeException | IOException e) {
-			throw log.unableToRefreshIndex( eventContext, e );
-		}
+		indexReaderProvider.refresh();
 	}
 
 	@Override
