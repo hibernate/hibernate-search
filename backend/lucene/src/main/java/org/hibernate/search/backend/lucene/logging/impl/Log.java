@@ -96,7 +96,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET_1 + 52,
 			value = "Going to reset the index writer and force release of the IndexWriter lock. %1$s")
-	void indexAccessorReset(@FormatWith(EventContextFormatter.class) EventContext context);
+	void indexWriterReset(@FormatWith(EventContextFormatter.class) EventContext context);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ID_OFFSET_1 + 55,
@@ -477,8 +477,8 @@ public interface Log extends BasicLogger {
 	SearchException unableToMergeSegments(@Param EventContext context, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_2 + 79,
-			value = "Unable to clean up after write errors.")
-	SearchException unableToCleanUpAfterError(@Param EventContext context, @Cause Exception e);
+			value = "Unable to close the index writer after write failures.")
+	SearchException unableToCloseIndexWriterAfterFailures(@Param EventContext context, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_2 + 80, value = "Impossible to detect a decimal scale to use for this field."
 			+ " If the value is bridged, set '.asBigDecimal().decimalScale( int )' in the bind, else verify your mapping.")
@@ -636,9 +636,11 @@ public interface Log extends BasicLogger {
 	SearchException cannotComputeSumForDistanceSort(@Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 118,
-			value = "A failure occurred during a low-level write operation on index '%1$s', "
+			value = "A failure occurred during a low-level write operation"
 					+ " and the index writer had to be reset."
-					+ " Some write operations may have been lost as a result.")
-	SearchException uncommittedOperationsBecauseOfFailure(String indexName, @Cause Throwable cause);
+					+ " Some write operations may have been lost as a result."
+					+ " Failure: %1$s")
+	SearchException uncommittedOperationsBecauseOfFailure(String causeMessage,
+			@Param EventContext context, @Cause Throwable cause);
 
 }

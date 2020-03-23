@@ -6,18 +6,12 @@
  */
 package org.hibernate.search.backend.lucene.orchestration.impl;
 
-import java.io.IOException;
-import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
 import org.hibernate.search.backend.lucene.work.impl.WriteWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchedWorkProcessor;
-import org.hibernate.search.engine.reporting.FailureContext;
-import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 /**
@@ -27,21 +21,13 @@ import org.hibernate.search.util.common.reporting.EventContext;
  */
 public class LuceneWriteWorkProcessor implements BatchedWorkProcessor {
 
-	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
-
-	private final String indexName;
-	private final EventContext eventContext;
 	private final IndexAccessor indexAccessor;
 	private final WriteWorkExecutionContextImpl context;
-	private final FailureHandler failureHandler;
 
-	public LuceneWriteWorkProcessor(String indexName, EventContext eventContext,
-			IndexAccessor indexAccessor, FailureHandler failureHandler) {
-		this.indexName = indexName;
-		this.eventContext = eventContext;
+	public LuceneWriteWorkProcessor(EventContext eventContext,
+			IndexAccessor indexAccessor) {
 		this.indexAccessor = indexAccessor;
 		this.context = new WriteWorkExecutionContextImpl( eventContext, indexAccessor );
-		this.failureHandler = failureHandler;
 	}
 
 	@Override
@@ -55,7 +41,7 @@ public class LuceneWriteWorkProcessor implements BatchedWorkProcessor {
 			indexAccessor.commitOrDelay();
 		}
 		catch (RuntimeException e) {
-			cleanUpAfterFailure( e, "Commit after a batch of index works" );
+			indexAccessor.cleanUpAfterFailure( e, "Commit after a batch of index works" );
 			// The exception was reported to the failure handler, no need to propagate it.
 		}
 		// Everything was already executed, so just return a completed future.
@@ -68,7 +54,7 @@ public class LuceneWriteWorkProcessor implements BatchedWorkProcessor {
 			return indexAccessor.commitOrDelay();
 		}
 		catch (RuntimeException e) {
-			cleanUpAfterFailure( e, "Commit after completion of all remaining index works" );
+			indexAccessor.cleanUpAfterFailure( e, "Commit after completion of all remaining index works" );
 			// The exception was reported to the failure handler, no need to propagate it.
 
 			// Tell the executor there's no need to call us again later: the index writer was lost anyway.
@@ -81,7 +67,7 @@ public class LuceneWriteWorkProcessor implements BatchedWorkProcessor {
 			return work.execute( context );
 		}
 		catch (RuntimeException e) {
-			cleanUpAfterFailure( e, work.getInfo() );
+			indexAccessor.cleanUpAfterFailure( e, work.getInfo() );
 			throw e;
 		}
 	}
@@ -91,7 +77,7 @@ public class LuceneWriteWorkProcessor implements BatchedWorkProcessor {
 			return work.execute( context );
 		}
 		catch (RuntimeException e) {
-			cleanUpAfterFailure( e, work.getInfo() );
+			indexAccessor.cleanUpAfterFailure( e, work.getInfo() );
 			throw e;
 		}
 	}
@@ -102,7 +88,7 @@ public class LuceneWriteWorkProcessor implements BatchedWorkProcessor {
 			indexAccessor.commit();
 		}
 		catch (RuntimeException e) {
-			cleanUpAfterFailure( e, "Commit after a set of index works" );
+			indexAccessor.cleanUpAfterFailure( e, "Commit after a set of index works" );
 			throw e;
 		}
 	}
@@ -112,29 +98,5 @@ public class LuceneWriteWorkProcessor implements BatchedWorkProcessor {
 		// In case of failure, just propagate the exception:
 		// we don't expect a refresh failure to affect the writer and require a cleanup.
 		indexAccessor.refresh();
-	}
-
-	private void cleanUpAfterFailure(Throwable throwable, Object failingOperation) {
-		try {
-			/*
-			 * Note this will close the index writer,
-			 * which with the default settings will trigger a commit.
-			 */
-			indexAccessor.reset();
-		}
-		catch (RuntimeException | IOException e) {
-			throwable.addSuppressed( log.unableToCleanUpAfterError( eventContext, e ) );
-		}
-
-		/*
-		 * The failure will be reported elsewhere,
-		 * but that report will not mention that some previously executed, but uncommitted works may have been affected too.
-		 * Report the failure again, just to warn about previous works potentially being affected.
-		 */
-		FailureContext.Builder failureContextBuilder = FailureContext.builder();
-		failureContextBuilder.throwable( log.uncommittedOperationsBecauseOfFailure( indexName, throwable ) );
-		failureContextBuilder.failingOperation( failingOperation );
-		FailureContext failureContext = failureContextBuilder.build();
-		failureHandler.handle( failureContext );
 	}
 }

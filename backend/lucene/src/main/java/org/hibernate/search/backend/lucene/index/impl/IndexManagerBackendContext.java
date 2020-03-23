@@ -207,7 +207,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 					indexName, shardEventContext,
 					shardId, model.getScopedAnalyzer()
 			);
-			writeOrchestrator = createWriteOrchestrator( indexName, shardEventContext, indexAccessor );
+			writeOrchestrator = createWriteOrchestrator( shardEventContext, indexAccessor );
 
 			return new Shard( shardEventContext, indexAccessor, writeOrchestrator );
 		}
@@ -219,13 +219,12 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		}
 	}
 
-	private LuceneWriteWorkOrchestratorImplementor createWriteOrchestrator(String indexName,
-			EventContext eventContext, IndexAccessorImpl indexAccessor) {
+	private LuceneWriteWorkOrchestratorImplementor createWriteOrchestrator(EventContext eventContext,
+			IndexAccessorImpl indexAccessor) {
 		return new LuceneBatchingWriteWorkOrchestrator(
 				"Lucene write work orchestrator for " + eventContext.render(),
 				new LuceneWriteWorkProcessor(
-						indexName, eventContext,
-						indexAccessor, failureHandler
+						eventContext, indexAccessor
 				),
 				threadPoolProvider,
 				failureHandler

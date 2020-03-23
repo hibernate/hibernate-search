@@ -60,13 +60,6 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 	}
 
 	@Override
-	public void reset() throws IOException {
-		log.indexAccessorReset( eventContext );
-		indexWriterProvider.clear();
-		indexReaderProvider.clear();
-	}
-
-	@Override
 	public void createIndexIfMissing() {
 		try {
 			Directory directory = directoryHolder.get();
@@ -180,6 +173,21 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 	@Override
 	public DirectoryReader getIndexReader() throws IOException {
 		return indexReaderProvider.getOrCreate();
+	}
+
+	@Override
+	public void cleanUpAfterFailure(Throwable throwable, Object failingOperation) {
+		try {
+			/*
+			 * Note this will close the index writer,
+			 * which with the default settings will trigger a commit.
+			 */
+			indexWriterProvider.clearAfterFailure( throwable, failingOperation );
+			indexReaderProvider.clear();
+		}
+		catch (RuntimeException | IOException e) {
+			throwable.addSuppressed( e );
+		}
 	}
 
 	public Directory getDirectoryForTests() {
