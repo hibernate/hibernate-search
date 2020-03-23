@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -209,6 +210,7 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 	}
 
 	private class LuceneDelayedCommitWorker implements SingletonTask.Worker {
+		private final CompletableFuture<?> completedFuture = CompletableFuture.completedFuture( null );
 		private final DelayedCommitFailureHandler delayedCommitFailureHandler;
 
 		public LuceneDelayedCommitWorker(DelayedCommitFailureHandler delayedCommitFailureHandler) {
@@ -216,7 +218,7 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 		}
 
 		@Override
-		public void work() {
+		public CompletableFuture<?> work() {
 			try {
 				// This will re-schedule the task if it's still not time for a commit.
 				commitOrDelay();
@@ -224,6 +226,7 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 			catch (Throwable t) {
 				delayedCommitFailureHandler.handle( t, "Delayed commit" );
 			}
+			return completedFuture;
 		}
 
 		@Override
