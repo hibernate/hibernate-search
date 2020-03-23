@@ -19,10 +19,7 @@ import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
 import org.hibernate.search.backend.lucene.work.impl.WriteWork;
 import org.hibernate.search.backend.lucene.work.impl.WriteWorkExecutionContext;
-import org.hibernate.search.engine.reporting.FailureContext;
-import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.test.SubTest;
 
@@ -40,11 +37,9 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 	private EventContext indexEventContext = EventContexts.fromIndexName( INDEX_NAME );
 	private IndexAccessor indexAccessorMock = createStrictMock( IndexAccessor.class );
 	private IndexWriterDelegator indexWriterDelegatorMock = createStrictMock( IndexWriterDelegator.class );
-	private FailureHandler failureHandlerMock = createStrictMock( FailureHandler.class );
 
 	private LuceneWriteWorkProcessor processor = new LuceneWriteWorkProcessor(
-			INDEX_NAME, indexEventContext,
-			indexAccessorMock, failureHandlerMock
+			indexEventContext, indexAccessorMock
 	);
 
 	private List<WriteWork<?>> workMocks = new ArrayList<>();
@@ -219,91 +214,19 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		testSuccessfulWriteWorks( 50 );
 
 		// ... and suddenly a failing work
-		Capture<FailureContext> failureContextCapture = Capture.newInstance();
 		RuntimeException workException = new RuntimeException( "Some message" );
 		WriteWork<Object> failingWork = createWorkMock();
 		resetAll();
 		expect( failingWork.execute( EasyMock.anyObject() ) ).andThrow( workException );
-		indexAccessorMock.reset();
 		expectWorkGetInfo( 50 );
-		failureHandlerMock.handle( capture( failureContextCapture ) );
+		indexAccessorMock.cleanUpAfterFailure( workException, workInfo( 50 ) );
 		replayAll();
 		SubTest.expectException( () -> processor.submit( failingWork ) )
 				.assertThrown().isSameAs( workException );
 		verifyAll();
-
-		FailureContext failureContext = failureContextCapture.getValue();
-		assertThat( failureContext.getThrowable() )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"A failure occurred during a low-level write operation on index '" + INDEX_NAME + "'",
-						"Some write operations may have been lost as a result"
-				)
-				.hasCause( workException );
-		assertThat( failureContext.getFailingOperation() )
-				.isEqualTo( workInfo( 50 ) );
 
 		// Subsequent works must be executed regardless of previous failures in the same batch
 		testSuccessfulWriteWorks( 10 );
-
-		resetAll();
-		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
-		replayAll();
-		processor.endBatch();
-		verifyAll();
-
-		checkCompleteOrDelayWithNothingToCommit();
-	}
-
-	@Test
-	public void error_workExecuteAndReset() throws IOException {
-		resetAll();
-		replayAll();
-		processor.beginBatch();
-		verifyAll();
-
-		// Execute a few successful works
-		testSuccessfulWriteWorks( 50 );
-
-		// ... and suddenly a failing work
-		Capture<FailureContext> failureContextCapture = Capture.newInstance();
-		RuntimeException workException = new RuntimeException( "Some message" );
-		WriteWork<Object> failingWork = createWorkMock();
-		RuntimeException resetException = new RuntimeException( "Some other message" );
-		resetAll();
-		expect( failingWork.execute( EasyMock.anyObject() ) ).andThrow( workException );
-		// ... and reset fails too
-		indexAccessorMock.reset();
-		expectLastCall().andThrow( resetException );
-		expectWorkGetInfo( 50 );
-		failureHandlerMock.handle( capture( failureContextCapture ) );
-		replayAll();
-		SubTest.expectException( () -> processor.submit( failingWork ) )
-				.assertThrown().isSameAs( workException );
-		verifyAll();
-
-		FailureContext failureContext = failureContextCapture.getValue();
-		assertThat( failureContext.getThrowable() )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"A failure occurred during a low-level write operation on index '" + INDEX_NAME + "'",
-						"Some write operations may have been lost as a result"
-				)
-				.hasCause( workException );
-		assertThat( failureContext.getFailingOperation() )
-				.isEqualTo( workInfo( 50 ) );
-
-		assertThat( failureContext.getThrowable().getCause().getSuppressed() )
-				.hasSize( 1 )
-				.satisfies(
-						suppressed -> assertThat( suppressed[0] )
-								.hasMessageContaining( "Unable to clean up" )
-								.hasMessageContaining( INDEX_NAME )
-								.hasCause( resetException )
-				);
-
-		// Subsequent works must be executed regardless of previous failures in the same batch
-		testSuccessfulWriteWorks( 20 );
 
 		resetAll();
 		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
@@ -325,29 +248,16 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 	@Test
 	public void error_forceCommit() throws IOException {
-		Capture<FailureContext> failureContextCapture = Capture.newInstance();
 		RuntimeException commitException = new RuntimeException( "Some message" );
 		resetAll();
 		indexAccessorMock.commit();
 		expectLastCall().andThrow( commitException );
-		indexAccessorMock.reset();
-		failureHandlerMock.handle( capture( failureContextCapture ) );
+		indexAccessorMock.cleanUpAfterFailure( commitException, "Commit after a set of index works" );
 		replayAll();
 		SubTest.expectException( () -> processor.forceCommit() )
 				.assertThrown()
 				.isSameAs( commitException );
 		verifyAll();
-
-		FailureContext failureContext = failureContextCapture.getValue();
-		assertThat( failureContext.getThrowable() )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"A failure occurred during a low-level write operation on index '" + INDEX_NAME + "'",
-						"Some write operations may have been lost as a result"
-				)
-				.hasCause( commitException );
-		assertThat( failureContext.getFailingOperation() ).asString()
-				.contains( "Commit after a set of index works" );
 
 		resetAll();
 		expect( indexAccessorMock.commitOrDelay() ).andReturn( 0L );
@@ -381,46 +291,6 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 	}
 
 	@Test
-	public void error_forceCommitAndReset() throws IOException {
-		Capture<FailureContext> failureContextCapture = Capture.newInstance();
-		RuntimeException commitException = new RuntimeException( "Some message" );
-		RuntimeException resetException = new RuntimeException( "Some other message" );
-		resetAll();
-		// The commit fails...
-		indexAccessorMock.commit();
-		expectLastCall().andThrow( commitException );
-		// ... and reset fails too
-		indexAccessorMock.reset();
-		expectLastCall().andThrow( resetException );
-		failureHandlerMock.handle( capture( failureContextCapture ) );
-		replayAll();
-		SubTest.expectException( () -> processor.forceCommit() )
-				.assertThrown()
-				.isSameAs( commitException );
-		verifyAll();
-
-		FailureContext failureContext = failureContextCapture.getValue();
-		assertThat( failureContext.getThrowable() )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"A failure occurred during a low-level write operation on index '" + INDEX_NAME + "'",
-						"Some write operations may have been lost as a result"
-				)
-				.hasCause( commitException );
-		assertThat( failureContext.getFailingOperation() ).asString()
-				.contains( "Commit after a set of index works" );
-
-		assertThat( failureContext.getThrowable().getCause().getSuppressed() )
-				.hasSize( 1 )
-				.satisfies(
-						suppressed -> assertThat( suppressed[0] )
-								.hasMessageContaining( "Unable to clean up" )
-								.hasMessageContaining( INDEX_NAME )
-								.hasCause( resetException )
-				);
-	}
-
-	@Test
 	public void error_batchCommit() throws IOException {
 		RuntimeException commitException = new RuntimeException( "Some message" );
 
@@ -433,76 +303,12 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		testSuccessfulWriteWorks( 200 );
 
 		// Fail upon batch commit
-		Capture<FailureContext> failureContextCapture = Capture.newInstance();
 		resetAll();
 		expect( indexAccessorMock.commitOrDelay() ).andThrow( commitException );
-		indexAccessorMock.reset();
-		failureHandlerMock.handle( capture( failureContextCapture ) );
+		indexAccessorMock.cleanUpAfterFailure( commitException, "Commit after a batch of index works" );
 		replayAll();
 		processor.endBatch();
 		verifyAll();
-
-		FailureContext failureContext = failureContextCapture.getValue();
-		assertThat( failureContext.getThrowable() )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"A failure occurred during a low-level write operation on index '" + INDEX_NAME + "'",
-						"Some write operations may have been lost as a result"
-				)
-				.hasCause( commitException );
-		assertThat( failureContext.getFailingOperation() ).asString()
-				.contains( "Commit after a batch of index works" );
-
-		checkCompleteOrDelayWithNothingToCommit();
-	}
-
-	@Test
-	public void error_batchCommitAndReset() throws IOException {
-		RuntimeException commitException = new RuntimeException( "Some message" );
-		RuntimeException resetException = new RuntimeException( "Some other message" );
-
-		resetAll();
-		replayAll();
-		processor.beginBatch();
-		verifyAll();
-
-		// Execute a few successful works
-		testSuccessfulWriteWorks( 200 );
-
-		// Fail upon batch commit AND reset...
-
-		Capture<FailureContext> failureContextCapture = Capture.newInstance();
-		resetAll();
-		expect( indexAccessorMock.commitOrDelay() ).andThrow( commitException );
-		indexAccessorMock.reset();
-		expectLastCall().andThrow( resetException );
-		failureHandlerMock.handle( capture( failureContextCapture ) );
-		replayAll();
-		processor.endBatch();
-		verifyAll();
-
-		FailureContext failureContext = failureContextCapture.getValue();
-		assertThat( failureContext.getThrowable() )
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll(
-						"A failure occurred during a low-level write operation on index '" + INDEX_NAME + "'",
-						"Some write operations may have been lost as a result"
-				)
-				.hasCause( commitException );
-		assertThat( failureContext.getFailingOperation() ).asString()
-				.contains( "Commit after a batch of index works" );
-
-		assertThat( failureContext.getThrowable().getCause().getSuppressed() )
-				.hasSize( 1 )
-				.satisfies(
-						suppressed -> assertThat( suppressed[0] )
-								.hasMessageContaining( "Unable to clean up" )
-								.hasMessageContaining( INDEX_NAME )
-								.hasCause( resetException )
-				);
-
-		assertThat( failureContext.getFailingOperation() ).asString()
-				.contains( "Commit after a batch of index works" );
 
 		checkCompleteOrDelayWithNothingToCommit();
 	}

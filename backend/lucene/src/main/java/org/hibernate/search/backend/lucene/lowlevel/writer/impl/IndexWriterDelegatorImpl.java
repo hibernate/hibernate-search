@@ -7,8 +7,14 @@
 package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
+import org.hibernate.search.engine.reporting.FailureContext;
+import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
@@ -21,17 +27,26 @@ import org.apache.lucene.search.Query;
  */
 public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private final IndexWriter delegate;
+	private final EventContext eventContext;
 	private final TimingSource timingSource;
 	private final int commitInterval;
+	private final FailureHandler failureHandler;
+
 	private final Object commitOrDelayLock = new Object();
 
 	private long commitExpiration;
 
-	public IndexWriterDelegatorImpl(IndexWriter delegate, TimingSource timingSource, int commitInterval) {
+	public IndexWriterDelegatorImpl(IndexWriter delegate, EventContext eventContext,
+			TimingSource timingSource, int commitInterval,
+			FailureHandler failureHandler) {
 		this.delegate = delegate;
+		this.eventContext = eventContext;
 		this.timingSource = timingSource;
 		this.commitInterval = commitInterval;
+		this.failureHandler = failureHandler;
 		updateCommitExpiration();
 	}
 
@@ -100,6 +115,29 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 
 	void close() throws IOException {
 		delegate.close();
+		log.trace( "IndexWriter closed" );
+	}
+
+	public void closeAfterFailure(Throwable throwable, Object failingOperation) {
+		Exception exceptionToReport = log.uncommittedOperationsBecauseOfFailure( throwable.getMessage(), eventContext, throwable );
+		try {
+			close();
+		}
+		catch (RuntimeException | IOException e) {
+			exceptionToReport.addSuppressed( log.unableToCloseIndexWriterAfterFailures( eventContext, e ) );
+		}
+
+		/*
+		 * The failing operation will be reported elsewhere,
+		 * but that report will not mention that some previously executed,
+		 * but uncommitted operations may have been affected too.
+		 * Report the failure again, just to warn about previous operations potentially being affected.
+		 */
+		FailureContext.Builder failureContextBuilder = FailureContext.builder();
+		failureContextBuilder.throwable( exceptionToReport );
+		failureContextBuilder.failingOperation( failingOperation );
+		FailureContext failureContext = failureContextBuilder.build();
+		failureHandler.handle( failureContext );
 	}
 
 	private void doCommit() throws IOException {

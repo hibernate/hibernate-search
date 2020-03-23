@@ -251,4 +251,33 @@ public class IndexAccessorTest extends EasyMockSupport {
 		verifyAll();
 	}
 
+	@Test
+	public void cleanUpAfterFailure() throws IOException {
+		Throwable exception = new RuntimeException( "Some message" );
+		Object failingOperation = "Some operation description";
+
+		resetAll();
+		indexWriterProviderMock.clearAfterFailure( exception, failingOperation );
+		indexReaderProviderMock.clear();
+		replayAll();
+		accessor.cleanUpAfterFailure( exception, failingOperation );
+		verifyAll();
+	}
+
+	@Test
+	public void cleanUpAfterFailure_closeFailure() {
+		Throwable exception = new RuntimeException( "Some message" );
+		Object failingOperation = "Some operation description";
+		RuntimeException closeException = new RuntimeException( "Some other message" );
+
+		resetAll();
+		indexWriterProviderMock.clearAfterFailure( exception, failingOperation );
+		expectLastCall().andThrow( closeException );
+		replayAll();
+		accessor.cleanUpAfterFailure( exception, failingOperation );
+		verifyAll();
+
+		assertThat( exception ).hasSuppressedException( closeException );
+	}
+
 }
