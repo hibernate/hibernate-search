@@ -23,7 +23,7 @@ public interface IndexReaderProvider {
 	 * Make sure the index reader returned by the next call to {@link #getOrCreate()}
 	 * will return an up-to-date view of the index.
 	 */
-	void refresh() throws IOException;
+	void refresh();
 
 	/**
 	 * @return A ready-to-use index reader, with its reference count already increased.

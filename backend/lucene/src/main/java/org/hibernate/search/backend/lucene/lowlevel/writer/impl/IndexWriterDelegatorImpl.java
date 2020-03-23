@@ -74,11 +74,11 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 		delegate.forceMerge( 1 );
 	}
 
-	public void commit() throws IOException {
+	public void commit() {
 		doCommit();
 	}
 
-	public long commitOrDelay() throws IOException {
+	public long commitOrDelay() {
 		if ( !delegate.hasUncommittedChanges() ) {
 			// No need to either commit or plan a delayed commit: there's nothing to commit.
 			return 0L;
@@ -140,9 +140,14 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 		failureHandler.handle( failureContext );
 	}
 
-	private void doCommit() throws IOException {
-		delegate.commit();
-		updateCommitExpiration();
+	private void doCommit() {
+		try {
+			delegate.commit();
+			updateCommitExpiration();
+		}
+		catch (RuntimeException | IOException e) {
+			throw log.unableToCommitIndex( eventContext, e );
+		}
 	}
 
 	private void updateCommitExpiration() {

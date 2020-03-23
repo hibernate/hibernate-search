@@ -17,7 +17,6 @@ import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderProvi
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegatorImpl;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterProvider;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.test.SubTest;
 
@@ -65,7 +64,7 @@ public class IndexAccessorTest extends EasyMockSupport {
 	}
 
 	@Test
-	public void commit() throws IOException {
+	public void commit() {
 		resetAll();
 		expect( indexWriterProviderMock.getOrNull() ).andReturn( indexWriterDelegatorMock );
 		indexWriterDelegatorMock.commit();
@@ -85,24 +84,7 @@ public class IndexAccessorTest extends EasyMockSupport {
 	}
 
 	@Test
-	public void commit_ioException() throws IOException {
-		IOException exception = new IOException( "Some message" );
-
-		resetAll();
-		expect( indexWriterProviderMock.getOrNull() ).andReturn( indexWriterDelegatorMock );
-		indexWriterDelegatorMock.commit();
-		expectLastCall().andThrow( exception );
-		replayAll();
-		SubTest.expectException( () -> accessor.commit() )
-				.assertThrown()
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Unable to commit", indexEventContext.render() )
-				.hasCause( exception );
-		verifyAll();
-	}
-
-	@Test
-	public void commit_runtimeException() throws IOException {
+	public void commit_runtimeException() {
 		RuntimeException exception = new RuntimeException( "Some message" );
 
 		resetAll();
@@ -112,14 +94,12 @@ public class IndexAccessorTest extends EasyMockSupport {
 		replayAll();
 		SubTest.expectException( () -> accessor.commit() )
 				.assertThrown()
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Unable to commit", indexEventContext.render() )
-				.hasCause( exception );
+				.isSameAs( exception );
 		verifyAll();
 	}
 
 	@Test
-	public void commitOrDelay_noDelay() throws IOException {
+	public void commitOrDelay_noDelay() {
 		resetAll();
 		expect( indexWriterProviderMock.getOrNull() ).andReturn( indexWriterDelegatorMock );
 		expect( indexWriterDelegatorMock.commitOrDelay() ).andReturn( 0L );
@@ -129,7 +109,7 @@ public class IndexAccessorTest extends EasyMockSupport {
 	}
 
 	@Test
-	public void commitOrDelay_delay() throws IOException {
+	public void commitOrDelay_delay() {
 		resetAll();
 		expect( indexWriterProviderMock.getOrNull() ).andReturn( indexWriterDelegatorMock );
 		expect( indexWriterDelegatorMock.commitOrDelay() ).andReturn( 4242L );
@@ -149,24 +129,7 @@ public class IndexAccessorTest extends EasyMockSupport {
 	}
 
 	@Test
-	public void commitOrDelay_ioException() throws IOException {
-		IOException exception = new IOException( "Some message" );
-
-		resetAll();
-		expect( indexWriterProviderMock.getOrNull() ).andReturn( indexWriterDelegatorMock );
-		indexWriterDelegatorMock.commitOrDelay();
-		expectLastCall().andThrow( exception );
-		replayAll();
-		SubTest.expectException( () -> accessor.commitOrDelay() )
-				.assertThrown()
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Unable to commit", indexEventContext.render() )
-				.hasCause( exception );
-		verifyAll();
-	}
-
-	@Test
-	public void commitOrDelay_runtimeException() throws IOException {
+	public void commitOrDelay_runtimeException() {
 		RuntimeException exception = new RuntimeException( "Some message" );
 
 		resetAll();
@@ -176,14 +139,12 @@ public class IndexAccessorTest extends EasyMockSupport {
 		replayAll();
 		SubTest.expectException( () -> accessor.commitOrDelay() )
 				.assertThrown()
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Unable to commit", indexEventContext.render() )
-				.hasCause( exception );
+				.isSameAs( exception );
 		verifyAll();
 	}
 
 	@Test
-	public void refresh() throws IOException {
+	public void refresh() {
 		resetAll();
 		indexReaderProviderMock.refresh();
 		replayAll();
@@ -192,23 +153,7 @@ public class IndexAccessorTest extends EasyMockSupport {
 	}
 
 	@Test
-	public void refresh_ioException() throws IOException {
-		IOException exception = new IOException( "Some message" );
-
-		resetAll();
-		indexReaderProviderMock.refresh();
-		expectLastCall().andThrow( exception );
-		replayAll();
-		SubTest.expectException( () -> accessor.refresh() )
-				.assertThrown()
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Unable to refresh", indexEventContext.render() )
-				.hasCause( exception );
-		verifyAll();
-	}
-
-	@Test
-	public void refresh_runtimeException() throws IOException {
+	public void refresh_runtimeException() {
 		RuntimeException exception = new RuntimeException( "Some message" );
 
 		resetAll();
@@ -217,9 +162,7 @@ public class IndexAccessorTest extends EasyMockSupport {
 		replayAll();
 		SubTest.expectException( () -> accessor.refresh() )
 				.assertThrown()
-				.isInstanceOf( SearchException.class )
-				.hasMessageContainingAll( "Unable to refresh", indexEventContext.render() )
-				.hasCause( exception );
+				.isSameAs( exception );
 		verifyAll();
 	}
 

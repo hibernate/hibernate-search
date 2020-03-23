@@ -49,12 +49,14 @@ public class NearRealTimeIndexReaderProvider implements IndexReaderProvider {
 	}
 
 	@Override
-	public void refresh() throws IOException {
+	public void refresh() {
 		IndexReaderEntry entry = currentReaderEntry;
 
-		if ( entry != null ) {
-			entry.forceRefresh();
+		if ( entry == null ) {
+			return;
 		}
+
+		entry.forceRefresh();
 	}
 
 	@Override
