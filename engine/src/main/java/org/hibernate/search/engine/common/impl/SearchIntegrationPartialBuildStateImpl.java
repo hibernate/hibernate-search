@@ -145,7 +145,7 @@ class SearchIntegrationPartialBuildStateImpl implements SearchIntegrationPartial
 			for ( Map.Entry<String, BackendNonStartedState> entry : nonStartedBackends.entrySet() ) {
 				startedBackends.put(
 						entry.getKey(),
-						entry.getValue().start( failureCollector, beanResolver, propertySource )
+						entry.getValue().start( failureCollector, beanResolver, propertySource, threadPoolProvider )
 				);
 			}
 			failureCollector.checkNoFailure();

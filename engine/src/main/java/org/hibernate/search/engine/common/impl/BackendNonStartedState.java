@@ -10,6 +10,7 @@ import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.impl.EngineConfigurationUtils;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.spi.RootFailureCollector;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -30,7 +31,8 @@ class BackendNonStartedState {
 
 	BackendImplementor start(RootFailureCollector rootFailureCollector,
 			BeanResolver beanResolver,
-			ConfigurationPropertySource rootPropertySource) {
+			ConfigurationPropertySource rootPropertySource,
+			ThreadPoolProvider threadPoolProvider) {
 		ContextualFailureCollector backendFailureCollector =
 				rootFailureCollector.withContext( EventContexts.fromBackendName( backendName ) );
 		ConfigurationPropertySource backendPropertySource =
@@ -38,7 +40,8 @@ class BackendNonStartedState {
 		BackendStartContextImpl startContext = new BackendStartContextImpl(
 				backendFailureCollector,
 				beanResolver,
-				backendPropertySource
+				backendPropertySource,
+				threadPoolProvider
 		);
 		try {
 			backend.start( startContext );

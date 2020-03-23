@@ -11,7 +11,7 @@ import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvi
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderProvider;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.NotSharedIndexReaderProvider;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterProvider;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
+import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -19,14 +19,14 @@ import org.apache.lucene.analysis.Analyzer;
 
 public class DebugIOStrategy extends IOStrategy {
 
-	public static DebugIOStrategy create(DirectoryProvider directoryProvider, ThreadPoolProvider threadPoolProvider,
+	public static DebugIOStrategy create(DirectoryProvider directoryProvider, BackendThreads threads,
 			FailureHandler failureHandler) {
-		return new DebugIOStrategy( directoryProvider, threadPoolProvider, failureHandler );
+		return new DebugIOStrategy( directoryProvider, threads, failureHandler );
 	}
 
-	private DebugIOStrategy(DirectoryProvider directoryProvider, ThreadPoolProvider threadPoolProvider,
+	private DebugIOStrategy(DirectoryProvider directoryProvider, BackendThreads threads,
 			FailureHandler failureHandler) {
-		super( directoryProvider, threadPoolProvider, failureHandler );
+		super( directoryProvider, threads, failureHandler );
 	}
 
 	@Override
@@ -36,7 +36,7 @@ public class DebugIOStrategy extends IOStrategy {
 				indexName, eventContext,
 				directoryHolder, analyzer,
 				null, 0,
-				threadPoolProvider,
+				threads,
 				failureHandler
 		);
 	}

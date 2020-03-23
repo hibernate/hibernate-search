@@ -14,7 +14,6 @@ import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.backend.orchestration.spi.SingletonTask;
@@ -47,7 +46,7 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 	private long commitExpiration;
 
 	public IndexWriterDelegatorImpl(IndexWriter delegate, EventContext eventContext,
-			ThreadPoolProvider threadPoolProvider,
+			ScheduledExecutorService delayedCommitExecutor,
 			TimingSource timingSource, int commitInterval,
 			FailureHandler failureHandler,
 			DelayedCommitFailureHandler delayedCommitFailureHandler) {
@@ -64,7 +63,7 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 			delayedCommitTask = new SingletonTask(
 					"Delayed commit for " + eventContext.render(),
 					new LuceneDelayedCommitWorker( delayedCommitFailureHandler ),
-					new LuceneDelayedCommitScheduler( threadPoolProvider.getSharedScheduledThreadPool() ),
+					new LuceneDelayedCommitScheduler( delayedCommitExecutor ),
 					failureHandler
 			);
 		}

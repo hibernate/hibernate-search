@@ -23,6 +23,7 @@ import org.hibernate.search.backend.lucene.orchestration.impl.LuceneBatchingWrit
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkProcessor;
+import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.backend.lucene.schema.management.impl.LuceneIndexSchemaManager;
 import org.hibernate.search.backend.lucene.schema.management.impl.SchemaManagementIndexManagerContext;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
@@ -48,7 +49,6 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
@@ -67,31 +67,31 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 
 	private final EventContext eventContext;
 
+	private final BackendThreads threads;
 	private final DirectoryProvider directoryProvider;
 	private final LuceneWorkFactory workFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final TimingSource timingSource;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
-	private final ThreadPoolProvider threadPoolProvider;
 	private final FailureHandler failureHandler;
 	private final LuceneReadWorkOrchestrator readOrchestrator;
 
 	public IndexManagerBackendContext(EventContext eventContext,
+			BackendThreads threads,
 			DirectoryProvider directoryProvider,
 			LuceneWorkFactory workFactory,
 			MultiTenancyStrategy multiTenancyStrategy,
 			TimingSource timingSource,
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
-			ThreadPoolProvider threadPoolProvider,
 			FailureHandler failureHandler,
 			LuceneReadWorkOrchestrator readOrchestrator) {
 		this.eventContext = eventContext;
+		this.threads = threads;
 		this.directoryProvider = directoryProvider;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.timingSource = timingSource;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.workFactory = workFactory;
-		this.threadPoolProvider = threadPoolProvider;
 		this.failureHandler = failureHandler;
 		this.readOrchestrator = readOrchestrator;
 	}
@@ -182,12 +182,12 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	IOStrategy createIOStrategy(ConfigurationPropertySource propertySource) {
 		switch ( IO_STRATEGY.get( propertySource ) ) {
 			case DEBUG:
-				return DebugIOStrategy.create( directoryProvider, threadPoolProvider, failureHandler );
+				return DebugIOStrategy.create( directoryProvider, threads, failureHandler );
 			case NEAR_REAL_TIME:
 			default:
 				return NearRealTimeIOStrategy.create(
 						propertySource, directoryProvider,
-						timingSource, threadPoolProvider, failureHandler
+						timingSource, threads, failureHandler
 				);
 		}
 	}
@@ -209,7 +209,9 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 			);
 			writeOrchestrator = createWriteOrchestrator( shardEventContext, indexAccessor );
 
-			return new Shard( shardEventContext, indexAccessor, writeOrchestrator );
+			Shard shard = new Shard( shardEventContext, indexAccessor, writeOrchestrator );
+			shard.start();
+			return shard;
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
@@ -226,7 +228,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 				new LuceneWriteWorkProcessor(
 						eventContext, indexAccessor
 				),
-				threadPoolProvider,
+				threads,
 				failureHandler
 		);
 	}

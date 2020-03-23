@@ -18,8 +18,6 @@ import java.util.concurrent.Future;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.AssertionFailure;
-import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -41,7 +39,6 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	private final BlockingQueue<BatchedWork<? super P>> workQueue;
 	private final BatchWorker<P> worker;
 
-	private ExecutorService executorService;
 	private SingletonTask processingTask;
 
 	/**
@@ -67,11 +64,10 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	 * Start the executor, allowing works to be submitted
 	 * through {@link #submit(BatchedWork)}.
 	 *
-	 * @param threadPoolProvider A provider of thread pools.
+	 * @param executorService An executor service with at least one thread.
 	 */
-	public synchronized void start(ThreadPoolProvider threadPoolProvider) {
+	public synchronized void start(ExecutorService executorService) {
 		log.startingExecutor( name );
-		executorService = threadPoolProvider.newFixedThreadPool( 1, name );
 		processingTask = new SingletonTask(
 				name, worker,
 				new BatchScheduler( executorService ),
@@ -83,20 +79,17 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	 * Stop the executor, no longer allowing works to be submitted
 	 * through {@link #submit(BatchedWork)}.
 	 * <p>
-	 * This will attempt to forcibly terminate currently executing works,
-	 * and will remove pending works from the queue.
+	 * This will remove pending works from the queue.
 	 */
 	public synchronized void stop() {
 		log.stoppingExecutor( name );
-		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			// scheduledExecutorService is not ours to close: it's shared
-			closer.push( ExecutorService::shutdownNow, executorService );
-			executorService = null;
-			workQueue.clear();
-			// It's possible that processing was successfully scheduled in the executor service but had no chance to run,
-			// so we need to release waiting threads:
-			processingTask.stop();
-		}
+
+		workQueue.clear();
+
+		// It's possible that processing was successfully scheduled in the executor service but had no chance to run,
+		// so we need to release waiting threads:
+		processingTask.stop();
+		processingTask = null;
 	}
 
 	/**
@@ -107,7 +100,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	 * @throws InterruptedException If the current thread is interrupted while enqueuing the work.
 	 */
 	public void submit(BatchedWork<? super P> work) throws InterruptedException {
-		if ( executorService == null ) {
+		if ( processingTask == null ) {
 			throw new AssertionFailure(
 					"Attempt to submit a work to executor '" + name + "', which is stopped"
 					+ " There is probably a bug in Hibernate Search, please report it."

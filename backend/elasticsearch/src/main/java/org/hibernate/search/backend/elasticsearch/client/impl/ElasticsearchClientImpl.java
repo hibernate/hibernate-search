@@ -68,7 +68,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 			Gson gson, JsonLogHelper jsonLogHelper) {
 		this.restClient = restClient;
 		this.sniffer = sniffer;
-		this.timeoutExecutorService = threadPoolProvider.getSharedScheduledThreadPool();
+		this.timeoutExecutorService = threadPoolProvider.newScheduledExecutor( 1, "Timeout executor" );
 		this.globalTimeoutValue = globalTimeoutValue;
 		this.globalTimeoutUnit = globalTimeoutUnit;
 		this.gson = gson;
@@ -231,6 +231,7 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 			 */
 			closer.push( Sniffer::close, this.sniffer );
 			closer.push( RestClient::close, this.restClient );
+			closer.push( ScheduledExecutorService::shutdownNow, timeoutExecutorService );
 		}
 	}
 

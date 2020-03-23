@@ -8,10 +8,10 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.engine.backend.orchestration.spi.AbstractWorkOrchestrator;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchedWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 
 /**
@@ -30,22 +30,22 @@ public class LuceneBatchingWriteWorkOrchestrator
 	private static final int MAX_WORKS_PER_BATCH = 1000;
 
 	private final LuceneWriteWorkProcessor processor;
-	private final ThreadPoolProvider threadPoolProvider;
+	private final BackendThreads threads;
 	private final BatchingExecutor<LuceneWriteWorkProcessor> executor;
 
 	/**
 	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)
 	 * @param processor A processor to use in the background thread.
-	 * @param threadPoolProvider A provider of thread pools.
+	 * @param threads The threads for this backend.
 	 * @param failureHandler A failure handler to report failures of the background thread.
 	 */
 	public LuceneBatchingWriteWorkOrchestrator(
 			String name, LuceneWriteWorkProcessor processor,
-			ThreadPoolProvider threadPoolProvider,
+			BackendThreads threads,
 			FailureHandler failureHandler) {
 		super( name );
 		this.processor = processor;
-		this.threadPoolProvider = threadPoolProvider;
+		this.threads = threads;
 		this.executor = new BatchingExecutor<>(
 				name,
 				processor,
@@ -67,7 +67,7 @@ public class LuceneBatchingWriteWorkOrchestrator
 
 	@Override
 	protected void doStart() {
-		executor.start( threadPoolProvider );
+		executor.start( threads.getWriteExecutor() );
 	}
 
 	@Override

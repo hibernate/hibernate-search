@@ -7,10 +7,12 @@
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
 
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.util.common.impl.Closer;
 
 /**
  * An orchestrator sharing context across multiple threads,
@@ -27,6 +29,7 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 		implements ElasticsearchWorkOrchestratorImplementor {
 
 	private final ThreadPoolProvider threadPoolProvider;
+	private ExecutorService executorService;
 	private final BatchingExecutor<ElasticsearchWorkProcessor> executor;
 
 	/**
@@ -71,7 +74,8 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 
 	@Override
 	protected void doStart() {
-		executor.start( threadPoolProvider );
+		executorService = threadPoolProvider.newFixedThreadPool( 1, getName() );
+		executor.start( executorService );
 	}
 
 	@Override
@@ -86,7 +90,10 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 
 	@Override
 	protected void doStop() {
-		executor.stop();
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.push( BatchingExecutor::stop, executor );
+			closer.push( ExecutorService::shutdownNow, executorService );
+		}
 	}
 
 	private class ElasticsearchChildBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrchestrator
