@@ -34,16 +34,12 @@ public final class ThreadPoolProviderImpl implements ThreadPoolProvider {
 
 	private final BeanHolder<? extends ThreadProvider> threadProviderHolder;
 
-	private volatile ScheduledExecutorService scheduledExecutorService;
-
 	public ThreadPoolProviderImpl(BeanHolder<? extends ThreadProvider> threadProviderHolder) {
 		this.threadProviderHolder = threadProviderHolder;
 	}
 
 	public void close() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( ScheduledExecutorService::shutdownNow, scheduledExecutorService );
-			scheduledExecutorService = null;
 			closer.push( BeanHolder::close, threadProviderHolder );
 		}
 	}
@@ -72,17 +68,18 @@ public final class ThreadPoolProviderImpl implements ThreadPoolProvider {
 	}
 
 	@Override
-	public ScheduledExecutorService getSharedScheduledThreadPool() {
-		if ( scheduledExecutorService == null ) {
-			synchronized ( this ) {
-				if ( scheduledExecutorService == null ) {
-					scheduledExecutorService = new ScheduledThreadPoolExecutor(
-							1, threadProviderHolder.get().createThreadFactory( "Scheduled task executor" )
-					);
-				}
-			}
-		}
-		return scheduledExecutorService;
+	public ScheduledExecutorService newScheduledExecutor(int threads, String threadNamePrefix) {
+		ScheduledThreadPoolExecutor result = new ScheduledThreadPoolExecutor(
+				threads,
+				threadProviderHolder.get().createThreadFactory( threadNamePrefix ),
+				new BlockPolicy()
+		);
+		// Prevents cancelled tasks from piling up in the execution queue.
+		// This means cancellation will be in O(log(n) instead of O(1),
+		// but it's preferable if we have lots of cancelled tasks,
+		// which is the case when we use the thread pool for timeouts in particular.
+		result.setRemoveOnCancelPolicy( true );
+		return result;
 	}
 
 	/**

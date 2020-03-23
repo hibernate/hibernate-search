@@ -14,6 +14,7 @@ import static org.easymock.EasyMock.expectLastCall;
 
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.thread.impl.DefaultThreadProvider;
@@ -41,10 +42,14 @@ public class BatchingExecutorTest extends EasyMockSupport {
 	// To execute code asynchronously. Just use more threads than we'll ever need, we don't care about performance.
 	private final ForkJoinPool asyncExecutor = new ForkJoinPool( 12 );
 
+	private ScheduledExecutorService executorService;
 	private BatchingExecutor<StubWorkProcessor> executor;
 
 	@After
 	public void cleanup() {
+		if ( executorService != null ) {
+			executorService.shutdownNow();
+		}
 		threadPoolProvider.close();
 		asyncExecutor.shutdownNow();
 		executor.stop();
@@ -317,9 +322,13 @@ public class BatchingExecutorTest extends EasyMockSupport {
 				NAME, processorMock, maxTasksPerBatch, fair, failureHandlerMock
 		);
 
+		// Having multiple threads should not matter:
+		// the batching executor takes care of executing in only one thread at a time.
+		this.executorService = threadPoolProvider.newScheduledExecutor( 4, "BatchingExecutorTest" );
+
 		resetAll();
 		replayAll();
-		executor.start( threadPoolProvider );
+		executor.start( executorService );
 		verifyAll();
 
 		// Initially, there are no works, so works are considered completed.

@@ -23,6 +23,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.DiscriminatorMultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.NoMultiTenancyStrategy;
+import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.backend.lucene.search.timeout.impl.DefaultTimingSource;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactoryImpl;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
@@ -68,6 +69,8 @@ public class LuceneBackendFactory implements BackendFactory {
 			ConfigurationPropertySource propertySource) {
 		EventContext backendContext = EventContexts.fromBackendName( name );
 
+		BackendThreads backendThreads = new BackendThreads( "Backend " + name );
+
 		Version luceneVersion = getLuceneVersion( backendContext, propertySource );
 
 		BeanHolder<? extends DirectoryProvider> directoryProviderHolder =
@@ -81,8 +84,8 @@ public class LuceneBackendFactory implements BackendFactory {
 
 		return new LuceneBackendImpl(
 				name,
+				backendThreads,
 				directoryProviderHolder,
-				buildContext.getThreadPoolProvider(),
 				new LuceneWorkFactoryImpl( multiTenancyStrategy ),
 				analysisDefinitionRegistry,
 				multiTenancyStrategy,
