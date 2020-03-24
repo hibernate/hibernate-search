@@ -9,7 +9,6 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.work.impl.IndexingWork;
-import org.hibernate.search.engine.backend.orchestration.spi.BatchedWork;
 
 /**
  * An orchestrator that batches together works sent from other threads.
@@ -31,7 +30,7 @@ public interface LuceneSerialWorkOrchestrator {
 		submit( new LuceneBatchedWork<>( work, future ) );
 	}
 
-	void submit(BatchedWork<LuceneBatchedWorkProcessor> work);
+	void submit(LuceneBatchedWork<?> work);
 
 	/**
 	 * Force a commit immediately.

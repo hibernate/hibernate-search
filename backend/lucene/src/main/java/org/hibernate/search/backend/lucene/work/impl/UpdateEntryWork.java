@@ -25,15 +25,13 @@ public class UpdateEntryWork extends AbstractSingleDocumentIndexingWork {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final String documentIdentifier;
 	private final Query filter;
 
 	private final LuceneIndexEntry indexEntry;
 
 	UpdateEntryWork(String tenantId, String entityTypeName, Object entityIdentifier,
 			String documentIdentifier, Query filter, LuceneIndexEntry indexEntry) {
-		super( "updateEntry", tenantId, entityTypeName, entityIdentifier );
-		this.documentIdentifier = documentIdentifier;
+		super( "updateEntry", tenantId, entityTypeName, entityIdentifier, documentIdentifier );
 		this.filter = filter;
 		this.indexEntry = indexEntry;
 	}

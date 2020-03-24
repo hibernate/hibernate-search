@@ -10,20 +10,23 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.engine.backend.orchestration.spi.AbstractWorkOrchestrator;
-import org.hibernate.search.engine.backend.orchestration.spi.BatchedWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.util.common.data.impl.SimpleHashFunction;
+import org.hibernate.search.util.common.impl.Closer;
 
 public class LuceneSerialWorkOrchestratorImpl
-		extends AbstractWorkOrchestrator<BatchedWork<LuceneBatchedWorkProcessor>>
+		extends AbstractWorkOrchestrator<LuceneBatchedWork<?>>
 		implements LuceneSerialWorkOrchestrator {
 
 	// TODO HSEARCH‌-3575 allow to configure this value
 	private static final int MAX_WORKS_PER_BATCH = 1000;
+	// TODO HSEARCH‌-3575 allow to configure this value
+	private static final int PARALLELISM = 10;
 
 	private final LuceneBatchedWorkProcessor processor;
 	private final BackendThreads threads;
-	private final BatchingExecutor<LuceneBatchedWorkProcessor> executor;
+	private final BatchingExecutor<LuceneBatchedWorkProcessor>[] executors;
 
 	/**
 	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)
@@ -38,13 +41,16 @@ public class LuceneSerialWorkOrchestratorImpl
 		super( name );
 		this.processor = processor;
 		this.threads = threads;
-		this.executor = new BatchingExecutor<>(
-				name,
-				processor,
-				MAX_WORKS_PER_BATCH,
-				true,
-				failureHandler
-		);
+		this.executors = new BatchingExecutor[PARALLELISM];
+		for ( int i = 0; i < executors.length; i++ ) {
+			executors[i] = new BatchingExecutor<>(
+					name + " - " + i,
+					processor,
+					MAX_WORKS_PER_BATCH,
+					true,
+					failureHandler
+			);
+		}
 	}
 
 	@Override
@@ -59,22 +65,31 @@ public class LuceneSerialWorkOrchestratorImpl
 
 	@Override
 	protected void doStart() {
-		executor.start( threads.getWriteExecutor() );
+		for ( BatchingExecutor<?> executor : executors ) {
+			executor.start( threads.getWriteExecutor() );
+		}
 	}
 
 	@Override
-	protected void doSubmit(BatchedWork<LuceneBatchedWorkProcessor> work) throws InterruptedException {
-		executor.submit( work );
+	protected void doSubmit(LuceneBatchedWork<?> work) throws InterruptedException {
+		SimpleHashFunction.pick( executors, work.getQueuingKey() )
+				.submit( work );
 	}
 
 	@Override
 	protected CompletableFuture<?> getCompletion() {
-		return executor.getCompletion();
+		CompletableFuture<?>[] completions = new CompletableFuture[executors.length];
+		for ( int i = 0; i < executors.length; i++ ) {
+			completions[i] = executors[i].getCompletion();
+		}
+		return CompletableFuture.allOf( completions );
 	}
 
 	@Override
 	protected void doStop() {
-		executor.stop();
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( BatchingExecutor::stop, executors );
+		}
 	}
 
 }

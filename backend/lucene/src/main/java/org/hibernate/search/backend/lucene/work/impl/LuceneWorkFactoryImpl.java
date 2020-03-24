@@ -59,8 +59,9 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 
 	@Override
 	public SingleDocumentIndexingWork add(String tenantId, String entityTypeName, Object entityIdentifier,
-			LuceneIndexEntry indexEntry) {
-		return new AddEntryWork( tenantId, entityTypeName, entityIdentifier, indexEntry );
+			String documentIdentifier, LuceneIndexEntry indexEntry) {
+		return new AddEntryWork( tenantId, entityTypeName, entityIdentifier,
+				documentIdentifier, indexEntry );
 	}
 
 	@Override

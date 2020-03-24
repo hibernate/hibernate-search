@@ -49,7 +49,7 @@ public class LuceneIndexIndexer implements IndexIndexer {
 				future,
 				factory.add(
 						tenantId, indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
-						indexEntry
+						id, indexEntry
 				)
 		);
 		return future;
