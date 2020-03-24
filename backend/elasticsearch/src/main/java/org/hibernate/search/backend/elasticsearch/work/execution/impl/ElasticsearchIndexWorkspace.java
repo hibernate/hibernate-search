@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.query.impl.Queries;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
@@ -24,12 +24,12 @@ public class ElasticsearchIndexWorkspace implements IndexWorkspace {
 
 	private final ElasticsearchWorkBuilderFactory builderFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
-	private final ElasticsearchWorkOrchestrator orchestrator;
+	private final ElasticsearchParallelWorkOrchestrator orchestrator;
 	private final URLEncodedString indexName;
 	private final DetachedBackendSessionContext sessionContext;
 
 	public ElasticsearchIndexWorkspace(ElasticsearchWorkBuilderFactory builderFactory,
-			MultiTenancyStrategy multiTenancyStrategy, ElasticsearchWorkOrchestrator orchestrator,
+			MultiTenancyStrategy multiTenancyStrategy, ElasticsearchParallelWorkOrchestrator orchestrator,
 			WorkExecutionIndexManagerContext indexManagerContext,
 			DetachedBackendSessionContext sessionContext) {
 		this.builderFactory = builderFactory;

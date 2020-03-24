@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchedWork;
 import org.hibernate.search.util.common.impl.Futures;
 
-class ElasticsearchBatchedWork<T> implements BatchedWork<ElasticsearchWorkProcessor> {
+class ElasticsearchBatchedWork<T> implements BatchedWork<ElasticsearchBatchedWorkProcessor> {
 	private final ElasticsearchWork<T> work;
 	private final CompletableFuture<T> future;
 
@@ -22,7 +22,7 @@ class ElasticsearchBatchedWork<T> implements BatchedWork<ElasticsearchWorkProces
 	}
 
 	@Override
-	public void submitTo(ElasticsearchWorkProcessor delegate) {
+	public void submitTo(ElasticsearchBatchedWorkProcessor delegate) {
 		delegate.submit( work ).whenComplete( Futures.copyHandler( future ) );
 	}
 

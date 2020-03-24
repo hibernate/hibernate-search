@@ -16,9 +16,9 @@ import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.lowlevel.query.impl.Queries;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.aggregation.impl.ElasticsearchSearchAggregation;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchQueryElementCollector;
@@ -53,7 +53,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 
 	private final ElasticsearchWorkBuilderFactory workFactory;
 	private final ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory;
-	private final ElasticsearchWorkOrchestrator queryOrchestrator;
+	private final ElasticsearchParallelWorkOrchestrator queryOrchestrator;
 
 	private final ElasticsearchSearchContext searchContext;
 	private final BackendSessionContext sessionContext;
@@ -75,7 +75,7 @@ public class ElasticsearchSearchQueryBuilder<H>
 	public ElasticsearchSearchQueryBuilder(
 			ElasticsearchWorkBuilderFactory workFactory,
 			ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory,
-			ElasticsearchWorkOrchestrator queryOrchestrator,
+			ElasticsearchParallelWorkOrchestrator queryOrchestrator,
 			ElasticsearchSearchContext searchContext,
 			BackendSessionContext sessionContext,
 			LoadingContextBuilder<?, ?, ?> loadingContextBuilder,

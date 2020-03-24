@@ -9,9 +9,9 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 import java.util.concurrent.CompletableFuture;
 
 /**
- * An extension of {@link ElasticsearchWorkOrchestrator} exposing methods to control its lifecycle.
+ * An orchestrator implementor, exposing methods to control its lifecycle.
  */
-public interface ElasticsearchWorkOrchestratorImplementor extends ElasticsearchWorkOrchestrator {
+public interface ElasticsearchWorkOrchestratorImplementor {
 
 	/**
 	 * Start any resource necessary to operate the orchestrator at runtime.

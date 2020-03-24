@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.work.execution.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSerialWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
@@ -21,12 +21,12 @@ import com.google.gson.JsonObject;
 public class ElasticsearchIndexIndexer implements IndexIndexer {
 
 	private final ElasticsearchWorkBuilderFactory factory;
-	private final ElasticsearchWorkOrchestrator orchestrator;
+	private final ElasticsearchSerialWorkOrchestrator orchestrator;
 	private final WorkExecutionIndexManagerContext indexManagerContext;
 	private final String tenantId;
 
 	public ElasticsearchIndexIndexer(ElasticsearchWorkBuilderFactory factory,
-			ElasticsearchWorkOrchestrator orchestrator,
+			ElasticsearchSerialWorkOrchestrator orchestrator,
 			WorkExecutionIndexManagerContext indexManagerContext,
 			BackendSessionContext sessionContext) {
 		this.factory = factory;

@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSerialWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentWork;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
@@ -28,7 +28,7 @@ import com.google.gson.JsonObject;
 public class ElasticsearchIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 
 	private final ElasticsearchWorkBuilderFactory builderFactory;
-	private final ElasticsearchWorkOrchestrator orchestrator;
+	private final ElasticsearchSerialWorkOrchestrator orchestrator;
 	private final WorkExecutionIndexManagerContext indexManagerContext;
 	private final String tenantId;
 	private final EntityReferenceFactory<R> entityReferenceFactory;
@@ -37,7 +37,7 @@ public class ElasticsearchIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	private final List<SingleDocumentWork> works = new ArrayList<>();
 
 	public ElasticsearchIndexIndexingPlan(ElasticsearchWorkBuilderFactory builderFactory,
-			ElasticsearchWorkOrchestrator orchestrator,
+			ElasticsearchSerialWorkOrchestrator orchestrator,
 			WorkExecutionIndexManagerContext indexManagerContext,
 			BackendSessionContext sessionContext,
 			EntityReferenceFactory<R> entityReferenceFactory,

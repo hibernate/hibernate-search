@@ -9,7 +9,7 @@ package org.hibernate.search.backend.elasticsearch.work.execution.impl;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSerialWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentWork;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
@@ -22,13 +22,13 @@ import org.hibernate.search.util.common.impl.Futures;
  */
 class ElasticsearchIndexIndexingPlanExecution<R> {
 
-	private final ElasticsearchWorkOrchestrator orchestrator;
+	private final ElasticsearchSerialWorkOrchestrator orchestrator;
 	private final EntityReferenceFactory<R> entityReferenceFactory;
 
 	private final List<SingleDocumentWork> works;
 	private final CompletableFuture<Void>[] futures;
 
-	ElasticsearchIndexIndexingPlanExecution(ElasticsearchWorkOrchestrator orchestrator,
+	ElasticsearchIndexIndexingPlanExecution(ElasticsearchSerialWorkOrchestrator orchestrator,
 			EntityReferenceFactory<R> entityReferenceFactory,
 			List<SingleDocumentWork> works) {
 		this.orchestrator = orchestrator;

@@ -17,6 +17,7 @@ import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchBatchingWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexSchemaManager;
 import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexLifecycleExecutionOptions;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -77,8 +78,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 	private final ElasticsearchIndexModel model;
 	private final List<DocumentMetadataContributor> documentMetadataContributors;
 
-	private final ElasticsearchWorkOrchestratorImplementor serialOrchestrator;
-	private final ElasticsearchWorkOrchestratorImplementor parallelOrchestrator;
+	private final ElasticsearchBatchingWorkOrchestrator indexingOrchestrator;
 
 	private ElasticsearchIndexSchemaManager schemaManager;
 
@@ -88,8 +88,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 		this.backendContext = backendContext;
 		this.model = model;
 		this.documentMetadataContributors = documentMetadataContributors;
-		this.parallelOrchestrator = backendContext.createParallelOrchestrator( model.getHibernateSearchIndexName() );
-		this.serialOrchestrator = backendContext.createSerialOrchestrator( model.getHibernateSearchIndexName() );
+		this.indexingOrchestrator = backendContext.createIndexingOrchestrator( model.getHibernateSearchIndexName() );
 	}
 
 	@Override
@@ -122,30 +121,24 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 					}
 			);
 
-			serialOrchestrator.start();
-			parallelOrchestrator.start();
+			indexingOrchestrator.start();
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
-					.push( ElasticsearchWorkOrchestratorImplementor::stop, parallelOrchestrator )
-					.push( ElasticsearchWorkOrchestratorImplementor::stop, serialOrchestrator );
+					.push( ElasticsearchWorkOrchestratorImplementor::stop, indexingOrchestrator );
 			throw e;
 		}
 	}
 
 	@Override
 	public CompletableFuture<?> preStop() {
-		return CompletableFuture.allOf(
-				serialOrchestrator.preStop(),
-				parallelOrchestrator.preStop()
-		);
+		return indexingOrchestrator.preStop();
 	}
 
 	@Override
 	public void stop() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( ElasticsearchWorkOrchestratorImplementor::stop, serialOrchestrator );
-			closer.push( ElasticsearchWorkOrchestratorImplementor::stop, parallelOrchestrator );
+			closer.push( ElasticsearchWorkOrchestratorImplementor::stop, indexingOrchestrator );
 			schemaManager = null;
 		}
 		catch (IOException e) {
@@ -197,7 +190,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		// The commit strategy is ignored, because Elasticsearch always commits changes to its transaction log.
 		return backendContext.createIndexingPlan(
-				serialOrchestrator,
+				indexingOrchestrator,
 				this,
 				sessionContext,
 				entityReferenceFactory,
@@ -208,14 +201,14 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 	@Override
 	public IndexIndexer createIndexer(BackendSessionContext sessionContext) {
 		return backendContext.createIndexer(
-				serialOrchestrator, this, sessionContext
+				indexingOrchestrator, this, sessionContext
 		);
 	}
 
 	@Override
 	public IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext) {
 		return backendContext.createWorkspace(
-				parallelOrchestrator, this, sessionContext
+				this, sessionContext
 		);
 	}
 

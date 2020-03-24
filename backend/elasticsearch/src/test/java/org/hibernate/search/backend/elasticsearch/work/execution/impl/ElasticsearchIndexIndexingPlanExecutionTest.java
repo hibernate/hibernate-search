@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSerialWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentWork;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
@@ -33,7 +33,7 @@ public class ElasticsearchIndexIndexingPlanExecutionTest extends EasyMockSupport
 
 	private static final String TYPE_NAME = "SomeTypeName";
 
-	private final ElasticsearchWorkOrchestrator orchestratorMock = createStrictMock( ElasticsearchWorkOrchestrator.class );
+	private final ElasticsearchSerialWorkOrchestrator orchestratorMock = createStrictMock( ElasticsearchSerialWorkOrchestrator.class );
 
 	private final EntityReferenceFactory<StubEntityReference> entityReferenceFactoryMock =
 			createStrictMock( EntityReferenceFactory.class );
