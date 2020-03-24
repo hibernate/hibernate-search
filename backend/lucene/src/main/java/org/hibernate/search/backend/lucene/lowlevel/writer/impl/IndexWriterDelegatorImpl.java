@@ -42,7 +42,7 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 	private final FailureHandler failureHandler;
 
 	private final SingletonTask delayedCommitTask;
-	private final Object commitOrDelayLock = new Object();
+	private final Object commitLock = new Object();
 
 	private long commitExpiration;
 
@@ -114,10 +114,7 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 		// Synchronize in order to prevent a scenario where two threads call commitOrDelay() concurrently,
 		// both notice the previous commit has expired, and both trigger a commit,
 		// resulting in two commits where one would have been enough.
-		// Concurrent commits may still happen if a thread calls commit() concurrently:
-		// this is fine and actually desired behavior as Lucene is supposed to handle that just fine.
-		// We only care about concurrent calls to commitOrDelay() here.
-		synchronized (commitOrDelayLock) {
+		synchronized (commitLock) {
 			if ( delayCommit() ) {
 				// The commit was delayed
 				return;
@@ -139,7 +136,11 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 	void close() throws IOException {
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			closer.push( SingletonTask::stop, delayedCommitTask );
-			closer.push( IndexWriter::close, delegate );
+			// Avoid problems with closing while a (delayed) commit is in progress:
+			// Lucene throws an exception in that case.
+			synchronized (commitLock) {
+				closer.push( IndexWriter::close, delegate );
+			}
 			log.trace( "IndexWriter closed" );
 		}
 	}
@@ -168,8 +169,10 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 
 	private void doCommit() {
 		try {
-			delegate.commit();
-			updateCommitExpiration();
+			synchronized (commitLock) {
+				delegate.commit();
+				updateCommitExpiration();
+			}
 		}
 		catch (RuntimeException | IOException e) {
 			throw log.unableToCommitIndex( eventContext, e );
