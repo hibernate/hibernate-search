@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
-import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
-
 public class LuceneFlushWork implements LuceneIndexManagementWork<Void> {
 
 	@Override
@@ -16,8 +14,8 @@ public class LuceneFlushWork implements LuceneIndexManagementWork<Void> {
 	}
 
 	@Override
-	public Void execute(IndexAccessor indexAccessor) {
-		indexAccessor.commit();
+	public Void execute(LuceneIndexManagementWorkExecutionContext context) {
+		context.getIndexAccessor().commit();
 		return null;
 	}
 

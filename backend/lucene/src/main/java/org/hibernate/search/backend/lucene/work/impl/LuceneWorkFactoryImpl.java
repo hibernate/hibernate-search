@@ -79,7 +79,7 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	}
 
 	@Override
-	public LuceneWriteWork<?> deleteAll(String tenantId, Set<String> routingKeys) {
+	public LuceneIndexManagementWork<?> deleteAll(String tenantId, Set<String> routingKeys) {
 		List<Query> filters = new ArrayList<>();
 		Query filter = multiTenancyStrategy.getFilterOrNull( tenantId );
 		if ( filter != null ) {

@@ -33,29 +33,30 @@ public class LuceneIndexWorkspace implements IndexWorkspace {
 
 	@Override
 	public CompletableFuture<?> mergeSegments() {
-		return doSubmit( indexManagerContext.getAllWriteOrchestrators(), factory.mergeSegments() );
+		return doSubmit( indexManagerContext.getAllWriteOrchestrators(), factory.mergeSegments(), false );
 	}
 
 	@Override
 	public CompletableFuture<?> purge(Set<String> routingKeys) {
 		return doSubmit(
 				indexManagerContext.getWriteOrchestrators( routingKeys ),
-				factory.deleteAll( sessionContext.getTenantIdentifier(), routingKeys )
+				factory.deleteAll( sessionContext.getTenantIdentifier(), routingKeys ),
+				true
 		);
 	}
 
 	@Override
 	public CompletableFuture<?> flush() {
-		return doSubmit( indexManagerContext.getAllWriteOrchestrators(), factory.flush() );
+		return doSubmit( indexManagerContext.getAllWriteOrchestrators(), factory.flush(), false );
 	}
 
 	@Override
 	public CompletableFuture<?> refresh() {
-		return doSubmit( indexManagerContext.getAllWriteOrchestrators(), factory.refresh() );
+		return doSubmit( indexManagerContext.getAllWriteOrchestrators(), factory.refresh(), false );
 	}
 
 	private <T> CompletableFuture<?> doSubmit(List<LuceneWriteWorkOrchestrator> orchestrators,
-			LuceneWriteWork<T> work) {
+			LuceneIndexManagementWork<T> work, boolean commit) {
 		CompletableFuture<?>[] writeFutures = new CompletableFuture[orchestrators.size()];
 		CompletableFuture<?>[] writeAndCommitFutures = new CompletableFuture[orchestrators.size()];
 		for ( int i = 0; i < writeFutures.length; i++ ) {
@@ -63,25 +64,19 @@ public class LuceneIndexWorkspace implements IndexWorkspace {
 
 			CompletableFuture<T> writeFuture = new CompletableFuture<>();
 			writeFutures[i] = writeFuture;
-			// Add the post-execution action to the future *before* submitting the work,
-			// so as to be sure that the commit is executed in the background,
-			// not in the current thread.
-			// It's important because we don't want to block the current thread.
-			writeAndCommitFutures[i] = writeFutures[i].thenRun( orchestrator::forceCommitInCurrentThread );
+			if ( commit ) {
+				// Add the post-execution action to the future *before* submitting the work,
+				// so as to be sure that the commit is executed in the background,
+				// not in the current thread.
+				// It's important because we don't want to block the current thread.
+				writeAndCommitFutures[i] = writeFutures[i].thenRun( orchestrator::forceCommitInCurrentThread );
+			}
+			else {
+				writeAndCommitFutures[i] = writeFuture;
+			}
 
 			orchestrator.submit( writeFuture, work );
 		}
 		return CompletableFuture.allOf( writeAndCommitFutures );
-	}
-
-	private CompletableFuture<?> doSubmit(List<LuceneWriteWorkOrchestrator> orchestrators,
-			LuceneIndexManagementWork<?> work) {
-		CompletableFuture<?>[] futures = new CompletableFuture[orchestrators.size()];
-		int i = 0;
-		for ( LuceneWriteWorkOrchestrator orchestrator : orchestrators ) {
-			futures[i] = orchestrator.submit( work );
-			++i;
-		}
-		return CompletableFuture.allOf( futures );
 	}
 }
