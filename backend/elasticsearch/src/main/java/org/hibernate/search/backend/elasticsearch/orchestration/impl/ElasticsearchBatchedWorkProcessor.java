@@ -12,21 +12,26 @@ import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkAggregator;
+import org.hibernate.search.engine.backend.orchestration.spi.BatchedWorkProcessor;
 
 /**
- * Aggregates works into a single sequence,
- * respecting the order they were submitted in.
+ * A processor for batched works that triggers work execution
+ * in the order they are submitted in.
+ * <p>
+ * Works are added by submitting as many works as necessary through {@link #submit(ElasticsearchWork)}.
+ * Execution starts as soon as possible,
+ * which may be as late as when {@link #endBatch()} is called.
  * <p>
  * Two works submitted to this orchestrator in the same batch will always be executed
  * one after the other, never in parallel.
  * <p>
  * This class is mutable and not thread-safe.
  */
-class ElasticsearchSerialWorkProcessor implements ElasticsearchWorkProcessor {
+class ElasticsearchBatchedWorkProcessor implements BatchedWorkProcessor {
 
 	private final BulkAndSequenceAggregator aggregator;
 
-	public ElasticsearchSerialWorkProcessor(ElasticsearchWorkSequenceBuilder sequenceBuilder,
+	public ElasticsearchBatchedWorkProcessor(ElasticsearchWorkSequenceBuilder sequenceBuilder,
 			ElasticsearchWorkBulker bulker) {
 		this.aggregator = new BulkAndSequenceAggregator( sequenceBuilder, bulker );
 	}
@@ -36,7 +41,6 @@ class ElasticsearchSerialWorkProcessor implements ElasticsearchWorkProcessor {
 		aggregator.reset();
 	}
 
-	@Override
 	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
 		return work.aggregate( aggregator );
 	}

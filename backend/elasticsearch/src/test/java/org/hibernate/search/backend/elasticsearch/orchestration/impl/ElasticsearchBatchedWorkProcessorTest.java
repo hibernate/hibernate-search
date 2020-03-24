@@ -24,7 +24,7 @@ import org.easymock.EasyMockSupport;
 import org.easymock.IAnswer;
 
 
-public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
+public class ElasticsearchBatchedWorkProcessorTest extends EasyMockSupport {
 
 	/**
 	 * @return A value that should not matter, because it should not be used.
@@ -49,8 +49,8 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 		CompletableFuture<Void> sequenceFuture = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchSerialWorkProcessor processor =
-				new ElasticsearchSerialWorkProcessor( sequenceBuilderMock, bulkerMock );
+		ElasticsearchBatchedWorkProcessor processor =
+				new ElasticsearchBatchedWorkProcessor( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
 		resetAll();
@@ -95,8 +95,8 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 		CompletableFuture<Void> sequenceFuture = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchSerialWorkProcessor processor =
-				new ElasticsearchSerialWorkProcessor( sequenceBuilderMock, bulkerMock );
+		ElasticsearchBatchedWorkProcessor processor =
+				new ElasticsearchBatchedWorkProcessor( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
 		resetAll();
@@ -147,8 +147,8 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 		CompletableFuture<Void> sequence2Future = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchSerialWorkProcessor processor =
-				new ElasticsearchSerialWorkProcessor( sequenceBuilderMock, bulkerMock );
+		ElasticsearchBatchedWorkProcessor processor =
+				new ElasticsearchBatchedWorkProcessor( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
 		resetAll();
@@ -218,8 +218,8 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 		CompletableFuture<Void> sequenceFuture = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchSerialWorkProcessor processor =
-				new ElasticsearchSerialWorkProcessor( sequenceBuilderMock, bulkerMock );
+		ElasticsearchBatchedWorkProcessor processor =
+				new ElasticsearchBatchedWorkProcessor( sequenceBuilderMock, bulkerMock );
 		verifyAll();
 
 		resetAll();
@@ -259,7 +259,7 @@ public class ElasticsearchSerialWorkProcessorTest extends EasyMockSupport {
 		checkComplete( processor );
 	}
 
-	private void checkComplete(ElasticsearchSerialWorkProcessor processor) {
+	private void checkComplete(ElasticsearchBatchedWorkProcessor processor) {
 		resetAll();
 		replayAll();
 		processor.complete();

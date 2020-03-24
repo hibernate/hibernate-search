@@ -18,10 +18,10 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.RootTypeMapping;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.settings.impl.IndexSettings;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.aliases.impl.IndexAliasDefinition;
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.CreateIndexResult;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.ExistingIndexMetadata;
 import org.hibernate.search.util.common.impl.Futures;
@@ -38,17 +38,17 @@ public class ElasticsearchSchemaAccessor {
 
 	private final ElasticsearchWorkBuilderFactory workBuilderFactory;
 
-	private final ElasticsearchWorkOrchestrator orchestrator;
+	private final ElasticsearchParallelWorkOrchestrator orchestrator;
 
 	public ElasticsearchSchemaAccessor(ElasticsearchWorkBuilderFactory workBuilderFactory,
-			ElasticsearchWorkOrchestrator orchestrator) {
+			ElasticsearchParallelWorkOrchestrator orchestrator) {
 		this.workBuilderFactory = workBuilderFactory;
 		this.orchestrator = orchestrator;
 	}
 
 	public CompletableFuture<?> createIndexAssumeNonExisting(URLEncodedString primaryIndexName,
 			Map<String, IndexAliasDefinition> aliases, IndexSettings settings, RootTypeMapping mapping) {
-		ElasticsearchWork<?> work = getWorkFactory().createIndex( primaryIndexName )
+		NonBulkableWork<?> work = getWorkFactory().createIndex( primaryIndexName )
 				.aliases( aliases )
 				.settings( settings )
 				.mapping( mapping )
@@ -65,7 +65,7 @@ public class ElasticsearchSchemaAccessor {
 	 */
 	public CompletableFuture<Boolean> createIndexIgnoreExisting(URLEncodedString primaryIndexName,
 			Map<String, IndexAliasDefinition> aliases, IndexSettings settings, RootTypeMapping mapping) {
-		ElasticsearchWork<CreateIndexResult> work = getWorkFactory().createIndex( primaryIndexName )
+		NonBulkableWork<CreateIndexResult> work = getWorkFactory().createIndex( primaryIndexName )
 				.aliases( aliases )
 				.settings( settings )
 				.mapping( mapping )
@@ -83,7 +83,7 @@ public class ElasticsearchSchemaAccessor {
 	}
 
 	private CompletableFuture<ExistingIndexMetadata> getCurrentIndexMetadata(IndexNames indexNames, boolean allowNull) {
-		ElasticsearchWork<List<ExistingIndexMetadata>> work = getWorkFactory().getIndexMetadata()
+		NonBulkableWork<List<ExistingIndexMetadata>> work = getWorkFactory().getIndexMetadata()
 				.index( indexNames.getWrite() )
 				.index( indexNames.getRead() )
 				.build();
@@ -113,7 +113,7 @@ public class ElasticsearchSchemaAccessor {
 	}
 
 	public CompletableFuture<?> putAliases(URLEncodedString indexName, Map<String, IndexAliasDefinition> aliases) {
-		ElasticsearchWork<?> work = getWorkFactory().putIndexAliases( indexName, aliases ).build();
+		NonBulkableWork<?> work = getWorkFactory().putIndexAliases( indexName, aliases ).build();
 		return execute( work )
 				.exceptionally( Futures.handler( e -> {
 					throw log.elasticsearchSettingsUpdateFailed(
@@ -123,7 +123,7 @@ public class ElasticsearchSchemaAccessor {
 	}
 
 	public CompletableFuture<?> updateSettings(URLEncodedString indexName, IndexSettings settings) {
-		ElasticsearchWork<?> work = getWorkFactory().putIndexSettings( indexName, settings ).build();
+		NonBulkableWork<?> work = getWorkFactory().putIndexSettings( indexName, settings ).build();
 		return execute( work )
 				.exceptionally( Futures.handler( e -> {
 					throw log.elasticsearchSettingsUpdateFailed(
@@ -133,7 +133,7 @@ public class ElasticsearchSchemaAccessor {
 	}
 
 	public CompletableFuture<?> putMapping(URLEncodedString indexName, RootTypeMapping mapping) {
-		ElasticsearchWork<?> work = getWorkFactory().putIndexTypeMapping( indexName, mapping ).build();
+		NonBulkableWork<?> work = getWorkFactory().putIndexTypeMapping( indexName, mapping ).build();
 		return execute( work )
 				.exceptionally( Futures.handler( e -> {
 					throw log.elasticsearchMappingCreationFailed(
@@ -148,7 +148,7 @@ public class ElasticsearchSchemaAccessor {
 
 		URLEncodedString alias = indexNames.getWrite();
 
-		ElasticsearchWork<?> work =
+		NonBulkableWork<?> work =
 				getWorkFactory().waitForIndexStatusWork( alias, requiredIndexStatus, timeoutAndUnit )
 						.build();
 		return execute( work )
@@ -161,18 +161,18 @@ public class ElasticsearchSchemaAccessor {
 	}
 
 	public CompletableFuture<?> dropIndexIfExisting(URLEncodedString indexName) {
-		ElasticsearchWork<?> work = getWorkFactory().dropIndex( indexName ).ignoreIndexNotFound().build();
+		NonBulkableWork<?> work = getWorkFactory().dropIndex( indexName ).ignoreIndexNotFound().build();
 		return execute( work );
 	}
 
 	public CompletableFuture<?> closeIndex(URLEncodedString indexName) {
-		ElasticsearchWork<?> work = getWorkFactory().closeIndex( indexName ).build();
+		NonBulkableWork<?> work = getWorkFactory().closeIndex( indexName ).build();
 		return execute( work )
 				.thenRun( () -> log.closedIndex( indexName ) );
 	}
 
 	public CompletableFuture<?> openIndex(URLEncodedString indexName) {
-		ElasticsearchWork<?> work = getWorkFactory().openIndex( indexName ).build();
+		NonBulkableWork<?> work = getWorkFactory().openIndex( indexName ).build();
 		return execute( work )
 				.thenRun( () -> log.openedIndex( indexName ) );
 	}
@@ -181,7 +181,7 @@ public class ElasticsearchSchemaAccessor {
 		return workBuilderFactory;
 	}
 
-	private <T> CompletableFuture<T> execute(ElasticsearchWork<T> work) {
+	private <T> CompletableFuture<T> execute(NonBulkableWork<T> work) {
 		return orchestrator.submit( work );
 	}
 }

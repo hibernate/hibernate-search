@@ -23,8 +23,8 @@ import org.hibernate.search.backend.elasticsearch.index.impl.IndexManagerBackend
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSimpleWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorImplementor;
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorProvider;
 import org.hibernate.search.backend.elasticsearch.resources.impl.BackendThreads;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -55,14 +55,13 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 	private final BackendThreads threads;
 	private final ElasticsearchLinkImpl link;
 
-	private final ElasticsearchWorkOrchestratorProvider orchestratorProvider;
+	private final ElasticsearchSimpleWorkOrchestrator generalPurposeOrchestrator;
+
 	private final ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider;
 	private final ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final BeanHolder<? extends IndexLayoutStrategy> indexLayoutStrategyHolder;
 	private final TypeNameMapping typeNameMapping;
-
-	private final ElasticsearchWorkOrchestratorImplementor queryOrchestrator;
 
 	private final EventContext eventContext;
 
@@ -83,10 +82,9 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 		this.threads = threads;
 		this.link = link;
 
-		this.orchestratorProvider = new ElasticsearchWorkOrchestratorProvider(
-				"Elasticsearch parallel work orchestrator for backend " + name,
-				threads, link,
-				failureHandler
+		this.generalPurposeOrchestrator = new ElasticsearchSimpleWorkOrchestrator(
+				"Elasticsearch general purpose orchestrator for backend " + name,
+				link
 		);
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.multiTenancyStrategy = multiTenancyStrategy;
@@ -94,17 +92,15 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 		this.indexLayoutStrategyHolder = indexLayoutStrategyHolder;
 		this.typeNameMapping = typeNameMapping;
 
-		this.queryOrchestrator = orchestratorProvider.createParallelOrchestrator( "Elasticsearch query orchestrator for backend " + name );
-
 		this.eventContext = EventContexts.fromBackendName( name );
 		this.indexManagerBackendContext = new IndexManagerBackendContext(
-				eventContext, link,
+				eventContext, threads, link,
 				userFacingGson,
 				multiTenancyStrategy,
 				indexLayoutStrategyHolder.get(),
 				typeNameMapping,
-				orchestratorProvider,
-				queryOrchestrator
+				failureHandler,
+				generalPurposeOrchestrator
 		);
 		this.indexNamesRegistry = new IndexNamesRegistry();
 	}
@@ -122,24 +118,18 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 	public void start(BackendStartContext context) {
 		threads.onStart( context.getThreadPoolProvider() );
 		link.onStart( context.getConfigurationPropertySource() );
-		orchestratorProvider.start();
-		queryOrchestrator.start();
+		generalPurposeOrchestrator.start();
 	}
 
 	@Override
 	public CompletableFuture<?> preStop() {
-		return CompletableFuture.allOf(
-				queryOrchestrator.preStop(),
-				orchestratorProvider.preStop()
-		);
+		return generalPurposeOrchestrator.preStop();
 	}
 
 	@Override
 	public void stop() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( ElasticsearchWorkOrchestratorImplementor::stop, queryOrchestrator );
-			closer.push( ElasticsearchWorkOrchestratorProvider::stop, orchestratorProvider );
-			// Close the client after the orchestrators, when we're sure all works have been performed
+			closer.push( ElasticsearchWorkOrchestratorImplementor::stop, generalPurposeOrchestrator );
 			closer.push( ElasticsearchLinkImpl::onStop, link );
 			closer.push( BeanHolder::close, indexLayoutStrategyHolder );
 			closer.push( BackendThreads::onStop, threads );
