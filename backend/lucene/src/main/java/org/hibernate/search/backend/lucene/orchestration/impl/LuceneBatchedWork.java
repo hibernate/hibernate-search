@@ -8,27 +8,20 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
+import org.hibernate.search.backend.lucene.work.impl.IndexingWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchedWork;
 
-/**
- * A batched {@link LuceneIndexManagementWork}.
- * <p>
- * Useful to make sure that read-only applications never create any index writer.
- */
-class LuceneManagementBatchedWork<T> implements BatchedWork<LuceneWriteWorkProcessor> {
+public class LuceneBatchedWork<T> implements BatchedWork<LuceneBatchedWorkProcessor> {
+	public final IndexingWork<T> work;
+	public final CompletableFuture<T> future;
 
-	private final IndexManagementWork<T> work;
-
-	private final CompletableFuture<T> future;
-
-	LuceneManagementBatchedWork(IndexManagementWork<T> work, CompletableFuture<T> future) {
+	LuceneBatchedWork(IndexingWork<T> work, CompletableFuture<T> future) {
 		this.work = work;
 		this.future = future;
 	}
 
 	@Override
-	public void submitTo(LuceneWriteWorkProcessor processor) {
+	public void submitTo(LuceneBatchedWorkProcessor processor) {
 		try {
 			T result = processor.submit( work );
 			future.complete( result );

@@ -9,8 +9,8 @@ package org.hibernate.search.backend.lucene.work.execution.impl;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
-import org.hibernate.search.backend.lucene.work.impl.SingleDocumentWriteWork;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSerialWorkOrchestrator;
+import org.hibernate.search.backend.lucene.work.impl.SingleDocumentIndexingWork;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -24,19 +24,19 @@ import org.hibernate.search.util.common.impl.Futures;
  */
 class LuceneIndexIndexingPlanExecution<R> {
 
-	private final LuceneWriteWorkOrchestrator orchestrator;
+	private final LuceneSerialWorkOrchestrator orchestrator;
 	private final EntityReferenceFactory<R> entityReferenceFactory;
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 
-	private final List<SingleDocumentWriteWork> works;
+	private final List<SingleDocumentIndexingWork> works;
 	private final CompletableFuture<Long>[] futures;
 
-	LuceneIndexIndexingPlanExecution(LuceneWriteWorkOrchestrator orchestrator,
+	LuceneIndexIndexingPlanExecution(LuceneSerialWorkOrchestrator orchestrator,
 			EntityReferenceFactory<R> entityReferenceFactory,
 			DocumentCommitStrategy commitStrategy,
 			DocumentRefreshStrategy refreshStrategy,
-			List<SingleDocumentWriteWork> works) {
+			List<SingleDocumentIndexingWork> works) {
 		this.orchestrator = orchestrator;
 		this.entityReferenceFactory = entityReferenceFactory;
 		this.commitStrategy = commitStrategy;
@@ -69,7 +69,7 @@ class LuceneIndexIndexingPlanExecution<R> {
 
 		for ( int i = 0; i < works.size(); i++ ) {
 			CompletableFuture<Long> future = futures[i];
-			SingleDocumentWriteWork work = works.get( i );
+			SingleDocumentIndexingWork work = works.get( i );
 			orchestrator.submit( future, work );
 		}
 
@@ -108,7 +108,7 @@ class LuceneIndexIndexingPlanExecution<R> {
 				reportBuilder.throwable( Futures.getThrowableNow( future ) );
 			}
 			if ( commitOrRefreshThrowable != null || future.isCompletedExceptionally() ) {
-				SingleDocumentWriteWork work = works.get( i );
+				SingleDocumentIndexingWork work = works.get( i );
 				try {
 					reportBuilder.failingEntityReference(
 							entityReferenceFactory,

@@ -8,10 +8,10 @@ package org.hibernate.search.backend.lucene.schema.management.impl;
 
 import java.util.Collection;
 
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneParallelWorkOrchestrator;
 
 public interface SchemaManagementIndexManagerContext {
 
-	Collection<LuceneWriteWorkOrchestrator> getAllWriteOrchestrators();
+	Collection<LuceneParallelWorkOrchestrator> getAllManagementOrchestrators();
 
 }

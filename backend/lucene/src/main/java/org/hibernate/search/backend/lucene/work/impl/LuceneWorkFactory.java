@@ -28,13 +28,13 @@ public interface LuceneWorkFactory {
 
 	IndexManagementWork<?> mergeSegments();
 
-	SingleDocumentWriteWork add(String tenantId, String entityTypeName, Object entityIdentifier,
+	SingleDocumentIndexingWork add(String tenantId, String entityTypeName, Object entityIdentifier,
 			LuceneIndexEntry indexEntry);
 
-	SingleDocumentWriteWork update(String tenantId, String entityTypeName, Object entityIdentifier,
+	SingleDocumentIndexingWork update(String tenantId, String entityTypeName, Object entityIdentifier,
 			String documentIdentifier, LuceneIndexEntry indexEntry);
 
-	SingleDocumentWriteWork delete(String tenantId, String entityTypeName, Object entityIdentifier, String id);
+	SingleDocumentIndexingWork delete(String tenantId, String entityTypeName, Object entityIdentifier, String id);
 
 	IndexManagementWork<?> deleteAll(String tenantId, Set<String> routingKeys);
 

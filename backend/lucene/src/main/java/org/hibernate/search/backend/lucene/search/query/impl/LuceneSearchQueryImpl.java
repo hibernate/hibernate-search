@@ -11,7 +11,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
@@ -37,7 +37,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final LuceneReadWorkOrchestrator queryOrchestrator;
+	private final LuceneSyncWorkOrchestrator queryOrchestrator;
 	private final LuceneWorkFactory workFactory;
 	private final LuceneSearchContext searchContext;
 	private final BackendSessionContext sessionContext;
@@ -49,7 +49,7 @@ public class LuceneSearchQueryImpl<H> extends AbstractSearchQuery<H, LuceneSearc
 
 	private TimeoutManager timeoutManager;
 
-	LuceneSearchQueryImpl(LuceneReadWorkOrchestrator queryOrchestrator,
+	LuceneSearchQueryImpl(LuceneSyncWorkOrchestrator queryOrchestrator,
 			LuceneWorkFactory workFactory, LuceneSearchContext searchContext,
 			BackendSessionContext sessionContext,
 			LoadingContext<?, ?> loadingContext,

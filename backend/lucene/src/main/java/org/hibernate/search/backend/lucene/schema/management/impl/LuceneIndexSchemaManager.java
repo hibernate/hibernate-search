@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.schema.management.impl;
 import java.util.Collection;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneParallelWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
@@ -61,10 +61,11 @@ public class LuceneIndexSchemaManager implements IndexSchemaManager {
 	}
 
 	private CompletableFuture<?> doSubmit(IndexManagementWork<?> work) {
-		Collection<LuceneWriteWorkOrchestrator> orchestrators = indexManagerContext.getAllWriteOrchestrators();
+		Collection<LuceneParallelWorkOrchestrator> orchestrators =
+				indexManagerContext.getAllManagementOrchestrators();
 		CompletableFuture<?>[] futures = new CompletableFuture[orchestrators.size()];
 		int i = 0;
-		for ( LuceneWriteWorkOrchestrator orchestrator : orchestrators ) {
+		for ( LuceneParallelWorkOrchestrator orchestrator : orchestrators ) {
 			futures[i] = orchestrator.submit( work );
 			++i;
 		}

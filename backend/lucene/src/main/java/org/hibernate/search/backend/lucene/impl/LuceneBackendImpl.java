@@ -21,7 +21,7 @@ import org.hibernate.search.backend.lucene.index.impl.IndexManagerBackendContext
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerBuilder;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestratorImpl;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestratorImpl;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendStartContext;
@@ -46,7 +46,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
-	private final LuceneReadWorkOrchestratorImpl readOrchestrator;
+	private final LuceneSyncWorkOrchestratorImpl readOrchestrator;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final TimingSource timingSource;
 
@@ -67,7 +67,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 
-		this.readOrchestrator = new LuceneReadWorkOrchestratorImpl(
+		this.readOrchestrator = new LuceneSyncWorkOrchestratorImpl(
 				"Lucene read work orchestrator for backend " + name
 		);
 		this.multiTenancyStrategy = multiTenancyStrategy;
@@ -107,7 +107,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 	@Override
 	public void stop() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( LuceneReadWorkOrchestratorImpl::stop, readOrchestrator );
+			closer.push( LuceneSyncWorkOrchestratorImpl::stop, readOrchestrator );
 			closer.push( holder -> holder.get().close(), directoryProviderHolder );
 			closer.push( BeanHolder::close, directoryProviderHolder );
 			closer.push( TimingSource::stop, timingSource );

@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDeleg
 import org.hibernate.search.util.common.reporting.EventContext;
 
 
-public interface WriteWorkExecutionContext {
+public interface IndexingWorkExecutionContext {
 
 	EventContext getEventContext();
 

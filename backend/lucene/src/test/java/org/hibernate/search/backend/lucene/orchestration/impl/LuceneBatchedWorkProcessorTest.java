@@ -17,8 +17,8 @@ import java.util.List;
 
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDelegator;
-import org.hibernate.search.backend.lucene.work.impl.WriteWork;
-import org.hibernate.search.backend.lucene.work.impl.WriteWorkExecutionContext;
+import org.hibernate.search.backend.lucene.work.impl.IndexingWork;
+import org.hibernate.search.backend.lucene.work.impl.IndexingWorkExecutionContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.test.SubTest;
@@ -29,7 +29,7 @@ import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 
-public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
+public class LuceneBatchedWorkProcessorTest extends EasyMockSupport {
 
 	private static final String INDEX_NAME = "SomeIndexName";
 
@@ -37,11 +37,11 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 	private IndexAccessor indexAccessorMock = createStrictMock( IndexAccessor.class );
 	private IndexWriterDelegator indexWriterDelegatorMock = createStrictMock( IndexWriterDelegator.class );
 
-	private LuceneWriteWorkProcessor processor = new LuceneWriteWorkProcessor(
+	private LuceneBatchedWorkProcessor processor = new LuceneBatchedWorkProcessor(
 			indexEventContext, indexAccessorMock
 	);
 
-	private List<WriteWork<?>> workMocks = new ArrayList<>();
+	private List<IndexingWork<?>> workMocks = new ArrayList<>();
 
 	@Test
 	public void batch() throws IOException {
@@ -88,7 +88,7 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 		// ... and suddenly a failing work
 		RuntimeException workException = new RuntimeException( "Some message" );
-		WriteWork<Object> failingWork = createWorkMock();
+		IndexingWork<Object> failingWork = createWorkMock();
 		resetAll();
 		expect( failingWork.execute( EasyMock.anyObject() ) ).andThrow( workException );
 		expectWorkGetInfo( 50 );
@@ -188,10 +188,10 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 	}
 
 	private void testSuccessfulWriteWorks(int workCount) throws IOException {
-		Capture<WriteWorkExecutionContext> contextCapture = Capture.newInstance();
+		Capture<IndexingWorkExecutionContext> contextCapture = Capture.newInstance();
 
 		for ( int i = 0; i < workCount; ++i ) {
-			WriteWork<Object> work = createWorkMock();
+			IndexingWork<Object> work = createWorkMock();
 			Object workResult = new Object();
 
 			resetAll();
@@ -215,12 +215,12 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 
 	private void expectWorkGetInfo(int ... ids) {
 		for ( int id : ids ) {
-			WriteWork<?> workMock = workMocks.get( id );
+			IndexingWork<?> workMock = workMocks.get( id );
 			EasyMock.expect( workMock.getInfo() ).andReturn( workInfo( id ) );
 		}
 	}
 
-	private void testContext(WriteWorkExecutionContext context) throws IOException {
+	private void testContext(IndexingWorkExecutionContext context) throws IOException {
 		resetAll();
 		replayAll();
 		assertThat( context.getEventContext() ).isSameAs( indexEventContext );
@@ -233,9 +233,9 @@ public class LuceneWriteWorkProcessorTest extends EasyMockSupport {
 		verifyAll();
 	}
 
-	private <T> WriteWork<T> createWorkMock() {
+	private <T> IndexingWork<T> createWorkMock() {
 		String workName = workInfo( workMocks.size() );
-		WriteWork<T> workMock = createStrictMock( workName, WriteWork.class );
+		IndexingWork<T> workMock = createStrictMock( workName, IndexingWork.class );
 		workMocks.add( workMock );
 		return workMock;
 	}

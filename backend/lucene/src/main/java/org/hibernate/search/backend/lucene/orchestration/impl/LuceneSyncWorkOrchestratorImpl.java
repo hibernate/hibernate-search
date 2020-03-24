@@ -25,13 +25,13 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.index.IndexReader;
 
-public class LuceneReadWorkOrchestratorImpl
-		extends AbstractWorkOrchestrator<LuceneReadWorkOrchestratorImpl.WorkExecution<?>>
-		implements LuceneReadWorkOrchestrator {
+public class LuceneSyncWorkOrchestratorImpl
+		extends AbstractWorkOrchestrator<LuceneSyncWorkOrchestratorImpl.WorkExecution<?>>
+		implements LuceneSyncWorkOrchestrator {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	public LuceneReadWorkOrchestratorImpl(String name) {
+	public LuceneSyncWorkOrchestratorImpl(String name) {
 		super( name );
 		start(); // Nothing to start, just force the superclass to go to the right state.
 	}

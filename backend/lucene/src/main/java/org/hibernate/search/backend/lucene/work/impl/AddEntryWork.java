@@ -15,7 +15,7 @@ import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterDeleg
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 
-public class AddEntryWork extends AbstractSingleDocumentWriteWork {
+public class AddEntryWork extends AbstractSingleDocumentIndexingWork {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -28,7 +28,7 @@ public class AddEntryWork extends AbstractSingleDocumentWriteWork {
 	}
 
 	@Override
-	public Long execute(WriteWorkExecutionContext context) {
+	public Long execute(IndexingWorkExecutionContext context) {
 		try {
 			IndexWriterDelegator indexWriterDelegator = context.getIndexWriterDelegator();
 			return indexWriterDelegator.addDocuments( indexEntry );

@@ -8,8 +8,7 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
-import org.hibernate.search.backend.lucene.work.impl.WriteWork;
+import org.hibernate.search.backend.lucene.work.impl.IndexingWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchedWork;
 
 /**
@@ -20,29 +19,19 @@ import org.hibernate.search.engine.backend.orchestration.spi.BatchedWork;
  * This allows processing multiple works in the order they were submitted and only committing once,
  * potentially reducing the frequency of commits.
  */
-public interface LuceneWriteWorkOrchestrator {
+public interface LuceneSerialWorkOrchestrator {
 
-	default <T> CompletableFuture<T> submit(IndexManagementWork<T> work) {
+	default <T> CompletableFuture<T> submit(IndexingWork<T> work) {
 		CompletableFuture<T> future = new CompletableFuture<>();
-		submit( future, work );
+		submit( new LuceneBatchedWork<>( work, future ) );
 		return future;
 	}
 
-	default <T> void submit(CompletableFuture<T> future, IndexManagementWork<T> work) {
-		submit( new LuceneManagementBatchedWork<>( work, future ) );
+	default <T> void submit(CompletableFuture<T> future, IndexingWork<T> work) {
+		submit( new LuceneBatchedWork<>( work, future ) );
 	}
 
-	default <T> CompletableFuture<T> submit(WriteWork<T> work) {
-		CompletableFuture<T> future = new CompletableFuture<>();
-		submit( new LuceneWriteBatchedWork<>( work, future ) );
-		return future;
-	}
-
-	default <T> void submit(CompletableFuture<T> future, WriteWork<T> work) {
-		submit( new LuceneWriteBatchedWork<>( work, future ) );
-	}
-
-	void submit(BatchedWork<LuceneWriteWorkProcessor> work);
+	void submit(BatchedWork<LuceneBatchedWorkProcessor> work);
 
 	/**
 	 * Force a commit immediately.

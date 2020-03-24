@@ -12,8 +12,10 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImpl;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneParallelWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneParallelWorkOrchestratorImpl;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSerialWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSerialWorkOrchestratorImpl;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -27,24 +29,29 @@ public final class Shard {
 
 	private final EventContext eventContext;
 	private final IndexAccessorImpl indexAccessor;
-	private final LuceneWriteWorkOrchestratorImpl writeOrchestrator;
+	private final LuceneParallelWorkOrchestratorImpl managementOrchestrator;
+	private final LuceneSerialWorkOrchestratorImpl indexingOrchestrator;
 
 	Shard(EventContext eventContext, IndexAccessorImpl indexAccessor,
-			LuceneWriteWorkOrchestratorImpl writeOrchestrator) {
+			LuceneParallelWorkOrchestratorImpl managementOrchestrator,
+			LuceneSerialWorkOrchestratorImpl indexingOrchestrator) {
 		this.eventContext = eventContext;
 		this.indexAccessor = indexAccessor;
-		this.writeOrchestrator = writeOrchestrator;
+		this.managementOrchestrator = managementOrchestrator;
+		this.indexingOrchestrator = indexingOrchestrator;
 	}
 
 	void start() {
 		try {
 			indexAccessor.start();
-			writeOrchestrator.start();
+			managementOrchestrator.start();
+			indexingOrchestrator.start();
 		}
 		catch (IOException | RuntimeException e) {
 			new SuppressingCloser( e )
 					.push( indexAccessor )
-					.push( LuceneWriteWorkOrchestratorImpl::stop, writeOrchestrator );
+					.push( LuceneSerialWorkOrchestratorImpl::stop, indexingOrchestrator )
+					.push( LuceneParallelWorkOrchestratorImpl::stop, managementOrchestrator );
 			throw log.unableToInitializeIndexDirectory(
 					e.getMessage(),
 					eventContext,
@@ -54,12 +61,13 @@ public final class Shard {
 	}
 
 	CompletableFuture<?> preStop() {
-		return writeOrchestrator.preStop();
+		return indexingOrchestrator.preStop();
 	}
 
 	void stop() throws IOException {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( LuceneWriteWorkOrchestratorImpl::stop, writeOrchestrator );
+			closer.push( LuceneSerialWorkOrchestratorImpl::stop, indexingOrchestrator );
+			closer.push( LuceneParallelWorkOrchestratorImpl::stop, managementOrchestrator );
 			// Close the index writer after the orchestrators, when we're sure all works have been performed
 			closer.push( IndexAccessorImpl::close, indexAccessor );
 		}
@@ -69,8 +77,12 @@ public final class Shard {
 		return indexAccessor.getIndexReader();
 	}
 
-	LuceneWriteWorkOrchestrator getWriteOrchestrator() {
-		return writeOrchestrator;
+	LuceneSerialWorkOrchestrator getIndexingOrchestrator() {
+		return indexingOrchestrator;
+	}
+
+	LuceneParallelWorkOrchestrator getManagementOrchestrator() {
+		return managementOrchestrator;
 	}
 
 	public IndexAccessorImpl getIndexAccessorForTests() {
