@@ -10,10 +10,11 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.resources.impl.BackendThreads;
-import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
-import org.hibernate.search.engine.backend.orchestration.spi.BatchedWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.IndexingWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.util.common.data.impl.SimpleHashFunction;
+import org.hibernate.search.util.common.impl.Closer;
 
 /**
  * An orchestrator sending works to a queue which is processed periodically
@@ -24,7 +25,8 @@ import org.hibernate.search.engine.reporting.FailureHandler;
  * Processing works in a single thread means more works can be processed at a time,
  * which is a good thing when using bulk works.
  */
-public class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrchestrator<BatchedWork<ElasticsearchBatchedWorkProcessor>>
+public class ElasticsearchBatchingWorkOrchestrator
+		extends AbstractElasticsearchWorkOrchestrator<ElasticsearchBatchedWork<?>>
 		implements ElasticsearchSerialWorkOrchestrator {
 
 	// TODO HSEARCH-3575 make this configurable
@@ -40,9 +42,11 @@ public class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearch
 	 */
 	// TODO HSEARCH-3575 make this configurable
 	private static final int QUEUE_SIZE = 10 * MAX_BULK_SIZE;
+	// TODO HSEARCH-3575 make this configurable
+	private static final int PARALLELISM = 10;
 
 	private final BackendThreads threads;
-	private final BatchingExecutor<ElasticsearchBatchedWorkProcessor> executor;
+	private final BatchingExecutor<ElasticsearchBatchedWorkProcessor>[] executors;
 
 	/**
 	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)
@@ -55,16 +59,22 @@ public class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearch
 			FailureHandler failureHandler) {
 		super( name, link );
 		this.threads = threads;
-		ElasticsearchBatchedWorkProcessor processor = createProcessor();
-		this.executor = new BatchingExecutor<>(
-				name, processor, QUEUE_SIZE,
-				true, /* enqueue works in the exact order they were submitted */
-				failureHandler
-		);
+		this.executors = new BatchingExecutor[PARALLELISM];
+		for ( int i = 0; i < executors.length; i++ ) {
+			// Processors are not thread-safe: create one per executor.
+			ElasticsearchBatchedWorkProcessor processor = createProcessor();
+			executors[i] = new BatchingExecutor<>(
+					name + " - " + i,
+					processor,
+					QUEUE_SIZE,
+					true,
+					failureHandler
+			);
+		}
 	}
 
 	@Override
-	public <T> CompletableFuture<T> submit(BulkableWork<T> work) {
+	public <T> CompletableFuture<T> submit(IndexingWork<T> work) {
 		CompletableFuture<T> future = new CompletableFuture<>();
 		submit( new ElasticsearchBatchedWork<>( work, future ) );
 		return future;
@@ -72,22 +82,31 @@ public class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearch
 
 	@Override
 	protected void doStart() {
-		executor.start( threads.getWorkExecutor() );
+		for ( BatchingExecutor<?> executor : executors ) {
+			executor.start( threads.getWorkExecutor() );
+		}
 	}
 
 	@Override
-	protected void doSubmit(BatchedWork<ElasticsearchBatchedWorkProcessor> work) throws InterruptedException {
-		executor.submit( work );
+	protected void doSubmit(ElasticsearchBatchedWork<?> work) throws InterruptedException {
+		SimpleHashFunction.pick( executors, work.getQueuingKey() )
+				.submit( work );
 	}
 
 	@Override
 	protected CompletableFuture<?> getCompletion() {
-		return executor.getCompletion();
+		CompletableFuture<?>[] completions = new CompletableFuture[executors.length];
+		for ( int i = 0; i < executors.length; i++ ) {
+			completions[i] = executors[i].getCompletion();
+		}
+		return CompletableFuture.allOf( completions );
 	}
 
 	@Override
 	protected void doStop() {
-		executor.stop();
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( BatchingExecutor::stop, executors );
+		}
 	}
 
 	private ElasticsearchBatchedWorkProcessor createProcessor() {

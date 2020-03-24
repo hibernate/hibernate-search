@@ -8,8 +8,7 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
-import org.hibernate.search.engine.backend.orchestration.spi.BatchedWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.IndexingWork;
 
 /**
  * A thread-safe component ordering and planning the execution of works
@@ -37,16 +36,16 @@ import org.hibernate.search.engine.backend.orchestration.spi.BatchedWork;
  */
 public interface ElasticsearchSerialWorkOrchestrator {
 
-	default <T> CompletableFuture<T> submit(BulkableWork<T> work) {
+	default <T> CompletableFuture<T> submit(IndexingWork<T> work) {
 		CompletableFuture<T> future = new CompletableFuture<>();
 		submit( new ElasticsearchBatchedWork<>( work, future ) );
 		return future;
 	}
 
-	default <T> void submit(CompletableFuture<T> future, BulkableWork<T> work) {
+	default <T> void submit(CompletableFuture<T> future, IndexingWork<T> work) {
 		submit( new ElasticsearchBatchedWork<>( work, future ) );
 	}
 
-	void submit(BatchedWork<ElasticsearchBatchedWorkProcessor> work);
+	void submit(ElasticsearchBatchedWork<?> work);
 
 }
