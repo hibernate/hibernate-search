@@ -45,10 +45,12 @@ import com.google.gson.JsonObject;
 public interface ElasticsearchWorkBuilderFactory {
 
 	IndexWorkBuilder index(String entityTypeName, Object entityIdentifier,
-			URLEncodedString elasticsearchIndexName, URLEncodedString id, String routingKey, JsonObject document);
+			URLEncodedString elasticsearchIndexName,
+			String documentIdentifier, String routingKey, JsonObject document);
 
 	DeleteWorkBuilder delete(String entityTypeName, Object entityIdentifier,
-			URLEncodedString elasticsearchIndexName, URLEncodedString id, String routingKey);
+			URLEncodedString elasticsearchIndexName,
+			String documentIdentifier, String routingKey);
 
 	DeleteByQueryWorkBuilder deleteByQuery(URLEncodedString indexName, JsonObject payload);
 

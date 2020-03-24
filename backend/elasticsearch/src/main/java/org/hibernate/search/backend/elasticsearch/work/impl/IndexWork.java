@@ -29,30 +29,31 @@ public class IndexWork extends AbstractSingleDocumentElasticsearchWork<Void>
 			implements IndexWorkBuilder {
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;
-		private final URLEncodedString id;
+		private final String documentIdentifier;
 		private final String routingKey;
 		private final JsonObject document;
 
 		public static Builder forElasticsearch67AndBelow(String entityTypeName, Object entityIdentifier,
-				URLEncodedString elasticsearchIndexName, URLEncodedString typeName, URLEncodedString id, String routingKey,
+				URLEncodedString elasticsearchIndexName, URLEncodedString typeName,
+				String documentIdentifier, String routingKey,
 				JsonObject document) {
 			return new Builder( entityTypeName, entityIdentifier,
-					elasticsearchIndexName, typeName, id, routingKey, document );
+					elasticsearchIndexName, typeName, documentIdentifier, routingKey, document );
 		}
 
 		public static Builder forElasticsearch7AndAbove(String entityTypeName, Object entityIdentifier,
-				URLEncodedString elasticsearchIndexName, URLEncodedString id, String routingKey,
+				URLEncodedString elasticsearchIndexName, String documentIdentifier, String routingKey,
 				JsonObject document) {
 			return new Builder( entityTypeName, entityIdentifier,
-					elasticsearchIndexName, null, id, routingKey, document );
+					elasticsearchIndexName, null, documentIdentifier, routingKey, document );
 		}
 
 		private Builder(String entityTypeName, Object entityIdentifier, URLEncodedString elasticsearchIndexName,
-					URLEncodedString typeName, URLEncodedString id, String routingKey, JsonObject document) {
+					URLEncodedString typeName, String documentIdentifier, String routingKey, JsonObject document) {
 			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE, entityTypeName, entityIdentifier );
 			this.indexName = elasticsearchIndexName;
 			this.typeName = typeName;
-			this.id = id;
+			this.documentIdentifier = documentIdentifier;
 			this.routingKey = routingKey;
 			this.document = document;
 		}
@@ -65,7 +66,7 @@ public class IndexWork extends AbstractSingleDocumentElasticsearchWork<Void>
 				index.addProperty( "_type", typeName.original );
 			}
 
-			index.addProperty( "_id", id.original );
+			index.addProperty( "_id", documentIdentifier );
 
 			if ( routingKey != null ) {
 				index.addProperty( "routing", routingKey );
