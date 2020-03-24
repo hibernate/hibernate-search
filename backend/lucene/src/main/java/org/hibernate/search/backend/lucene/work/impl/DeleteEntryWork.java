@@ -24,13 +24,11 @@ public class DeleteEntryWork extends AbstractSingleDocumentIndexingWork {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final String documentIdentifier;
 	private final Query filter;
 
 	DeleteEntryWork(String tenantId, String entityTypeName, Object entityIdentifier,
 			String documentIdentifier, Query filter) {
-		super( "deleteEntry", tenantId, entityTypeName, entityIdentifier );
-		this.documentIdentifier = documentIdentifier;
+		super( "deleteEntry", tenantId, entityTypeName, entityIdentifier, documentIdentifier );
 		this.filter = filter;
 	}
 

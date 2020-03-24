@@ -22,8 +22,8 @@ public class AddEntryWork extends AbstractSingleDocumentIndexingWork {
 	private final LuceneIndexEntry indexEntry;
 
 	AddEntryWork(String tenantId, String entityTypeName, Object entityIdentifier,
-			LuceneIndexEntry indexEntry) {
-		super( "addEntry", tenantId, entityTypeName, entityIdentifier );
+			String documentIdentifier, LuceneIndexEntry indexEntry) {
+		super( "addEntry", tenantId, entityTypeName, entityIdentifier, documentIdentifier );
 		this.indexEntry = indexEntry;
 	}
 

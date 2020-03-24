@@ -63,7 +63,7 @@ public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 
 		collect( id, routingKey, factory.add(
 				tenantId, indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
-				indexEntry
+				id, indexEntry
 		) );
 	}
 

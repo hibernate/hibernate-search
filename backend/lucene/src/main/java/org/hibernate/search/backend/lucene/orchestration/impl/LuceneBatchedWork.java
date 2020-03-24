@@ -35,4 +35,8 @@ public class LuceneBatchedWork<T> implements BatchedWork<LuceneBatchedWorkProces
 	public void markAsFailed(Throwable t) {
 		future.completeExceptionally( t );
 	}
+
+	String getQueuingKey() {
+		return work.getQueuingKey();
+	}
 }

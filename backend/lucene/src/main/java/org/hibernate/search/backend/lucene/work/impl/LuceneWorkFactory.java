@@ -29,7 +29,7 @@ public interface LuceneWorkFactory {
 	IndexManagementWork<?> mergeSegments();
 
 	SingleDocumentIndexingWork add(String tenantId, String entityTypeName, Object entityIdentifier,
-			LuceneIndexEntry indexEntry);
+			String documentIdentifier, LuceneIndexEntry indexEntry);
 
 	SingleDocumentIndexingWork update(String tenantId, String entityTypeName, Object entityIdentifier,
 			String documentIdentifier, LuceneIndexEntry indexEntry);
