@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSerialWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentIndexingWork;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 import org.hibernate.search.util.common.impl.Futures;
@@ -25,12 +25,12 @@ class ElasticsearchIndexIndexingPlanExecution<R> {
 	private final ElasticsearchSerialWorkOrchestrator orchestrator;
 	private final EntityReferenceFactory<R> entityReferenceFactory;
 
-	private final List<SingleDocumentWork> works;
+	private final List<SingleDocumentIndexingWork> works;
 	private final CompletableFuture<Void>[] futures;
 
 	ElasticsearchIndexIndexingPlanExecution(ElasticsearchSerialWorkOrchestrator orchestrator,
 			EntityReferenceFactory<R> entityReferenceFactory,
-			List<SingleDocumentWork> works) {
+			List<SingleDocumentIndexingWork> works) {
 		this.orchestrator = orchestrator;
 		this.entityReferenceFactory = entityReferenceFactory;
 		this.works = works;
@@ -60,7 +60,7 @@ class ElasticsearchIndexIndexingPlanExecution<R> {
 
 		for ( int i = 0; i < works.size(); i++ ) {
 			CompletableFuture<Void> future = futures[i];
-			SingleDocumentWork work = works.get( i );
+			SingleDocumentIndexingWork work = works.get( i );
 			orchestrator.submit( future, work );
 		}
 
@@ -77,7 +77,7 @@ class ElasticsearchIndexIndexingPlanExecution<R> {
 			CompletableFuture<?> future = futures[i];
 			if ( future.isCompletedExceptionally() ) {
 				reportBuilder.throwable( Futures.getThrowableNow( future ) );
-				SingleDocumentWork work = works.get( i );
+				SingleDocumentIndexingWork work = works.get( i );
 				try {
 					reportBuilder.failingEntityReference(
 							entityReferenceFactory,

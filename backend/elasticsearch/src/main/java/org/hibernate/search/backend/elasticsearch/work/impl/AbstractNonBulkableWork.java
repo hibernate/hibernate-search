@@ -74,12 +74,6 @@ public abstract class AbstractNonBulkableWork<R> implements NonBulkableWork<R> {
 
 	protected abstract R generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response);
 
-	@Override
-	public CompletableFuture<R> aggregate(ElasticsearchWorkAggregator aggregator) {
-		// May be overridden by subclasses
-		return aggregator.addNonBulkable( this );
-	}
-
 	private R handleResult(ElasticsearchWorkExecutionContext executionContext, ElasticsearchResponse response) {
 		R result;
 		try {

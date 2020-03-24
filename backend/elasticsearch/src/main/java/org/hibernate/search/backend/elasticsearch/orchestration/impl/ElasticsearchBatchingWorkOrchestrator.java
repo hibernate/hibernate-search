@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.resources.impl.BackendThreads;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchedWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.reporting.FailureHandler;
@@ -64,7 +64,7 @@ public class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearch
 	}
 
 	@Override
-	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
+	public <T> CompletableFuture<T> submit(BulkableWork<T> work) {
 		CompletableFuture<T> future = new CompletableFuture<>();
 		submit( new ElasticsearchBatchedWork<>( work, future ) );
 		return future;

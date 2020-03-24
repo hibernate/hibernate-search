@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
-public interface SingleDocumentWork extends ElasticsearchWork<Void> {
+public interface SingleDocumentIndexingWork extends BulkableWork<Void> {
 
 	String getEntityTypeName();
 
