@@ -25,16 +25,9 @@ import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.index.IndexReader;
 
-/**
- * An orchestrator that executes read works synchronously in the current thread.
- * <p>
- * For now this implementation is very simple,
- * but we might one day need to execute queries asynchronously,
- * in which case thing will get slightly more complex.
- */
 public class LuceneReadWorkOrchestratorImpl
 		extends AbstractWorkOrchestrator<LuceneReadWorkOrchestratorImpl.WorkExecution<?>>
-		implements LuceneReadWorkOrchestratorImplementor {
+		implements LuceneReadWorkOrchestrator {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 

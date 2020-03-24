@@ -12,7 +12,14 @@ import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
 import org.hibernate.search.backend.lucene.work.impl.WriteWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchedWork;
 
-
+/**
+ * An orchestrator that batches together works sent from other threads.
+ * <p>
+ * More precisely, the submitted works are sent to a queue which is processed periodically
+ * in a separate thread.
+ * This allows processing multiple works in the order they were submitted and only committing once,
+ * potentially reducing the frequency of commits.
+ */
 public interface LuceneWriteWorkOrchestrator {
 
 	default <T> CompletableFuture<T> submit(IndexManagementWork<T> work) {

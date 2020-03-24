@@ -13,7 +13,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImpl;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -27,10 +27,10 @@ public final class Shard {
 
 	private final EventContext eventContext;
 	private final IndexAccessorImpl indexAccessor;
-	private final LuceneWriteWorkOrchestratorImplementor writeOrchestrator;
+	private final LuceneWriteWorkOrchestratorImpl writeOrchestrator;
 
 	Shard(EventContext eventContext, IndexAccessorImpl indexAccessor,
-			LuceneWriteWorkOrchestratorImplementor writeOrchestrator) {
+			LuceneWriteWorkOrchestratorImpl writeOrchestrator) {
 		this.eventContext = eventContext;
 		this.indexAccessor = indexAccessor;
 		this.writeOrchestrator = writeOrchestrator;
@@ -44,7 +44,7 @@ public final class Shard {
 		catch (IOException | RuntimeException e) {
 			new SuppressingCloser( e )
 					.push( indexAccessor )
-					.push( LuceneWriteWorkOrchestratorImplementor::stop, writeOrchestrator );
+					.push( LuceneWriteWorkOrchestratorImpl::stop, writeOrchestrator );
 			throw log.unableToInitializeIndexDirectory(
 					e.getMessage(),
 					eventContext,
@@ -59,7 +59,7 @@ public final class Shard {
 
 	void stop() throws IOException {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( LuceneWriteWorkOrchestratorImplementor::stop, writeOrchestrator );
+			closer.push( LuceneWriteWorkOrchestratorImpl::stop, writeOrchestrator );
 			// Close the index writer after the orchestrators, when we're sure all works have been performed
 			closer.push( IndexAccessorImpl::close, indexAccessor );
 		}

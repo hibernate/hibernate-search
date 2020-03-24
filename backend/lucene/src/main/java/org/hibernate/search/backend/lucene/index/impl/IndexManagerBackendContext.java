@@ -19,9 +19,8 @@ import org.hibernate.search.backend.lucene.lowlevel.index.impl.IOStrategy;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.NearRealTimeIOStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneBatchingWriteWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImpl;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
 import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkProcessor;
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.backend.lucene.schema.management.impl.LuceneIndexSchemaManager;
@@ -197,7 +196,7 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	}
 
 	Shard createShard(IOStrategy ioStrategy, LuceneIndexModel model, Optional<String> shardId) {
-		LuceneWriteWorkOrchestratorImplementor writeOrchestrator;
+		LuceneWriteWorkOrchestratorImpl writeOrchestrator;
 		IndexAccessorImpl indexAccessor = null;
 		String indexName = model.getIndexName();
 		EventContext shardEventContext = EventContexts.fromIndexNameAndShardId( model.getIndexName(), shardId );
@@ -221,9 +220,9 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 		}
 	}
 
-	private LuceneWriteWorkOrchestratorImplementor createWriteOrchestrator(EventContext eventContext,
+	private LuceneWriteWorkOrchestratorImpl createWriteOrchestrator(EventContext eventContext,
 			IndexAccessorImpl indexAccessor) {
-		return new LuceneBatchingWriteWorkOrchestrator(
+		return new LuceneWriteWorkOrchestratorImpl(
 				"Lucene write work orchestrator for " + eventContext.render(),
 				new LuceneWriteWorkProcessor(
 						eventContext, indexAccessor

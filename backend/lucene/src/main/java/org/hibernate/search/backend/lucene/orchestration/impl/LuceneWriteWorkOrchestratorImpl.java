@@ -14,17 +14,9 @@ import org.hibernate.search.engine.backend.orchestration.spi.BatchedWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.reporting.FailureHandler;
 
-/**
- * An orchestrator that batches together works sent from other threads.
- * <p>
- * More precisely, the submitted works are sent to a queue which is processed periodically
- * in a separate thread.
- * This allows processing multiple works and only committing once,
- * potentially reducing the frequency of commits.
- */
-public class LuceneBatchingWriteWorkOrchestrator
+public class LuceneWriteWorkOrchestratorImpl
 		extends AbstractWorkOrchestrator<BatchedWork<LuceneWriteWorkProcessor>>
-		implements LuceneWriteWorkOrchestratorImplementor {
+		implements LuceneWriteWorkOrchestrator {
 
 	// TODO HSEARCH‌-3575 allow to configure this value
 	private static final int MAX_WORKS_PER_BATCH = 1000;
@@ -39,7 +31,7 @@ public class LuceneBatchingWriteWorkOrchestrator
 	 * @param threads The threads for this backend.
 	 * @param failureHandler A failure handler to report failures of the background thread.
 	 */
-	public LuceneBatchingWriteWorkOrchestrator(
+	public LuceneWriteWorkOrchestratorImpl(
 			String name, LuceneWriteWorkProcessor processor,
 			BackendThreads threads,
 			FailureHandler failureHandler) {

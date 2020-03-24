@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.work.impl.IndexManagementWorkExecutio
 import org.hibernate.search.backend.lucene.work.impl.WriteWorkExecutionContext;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-class WriteWorkExecutionContextImpl
+public class WriteWorkExecutionContextImpl
 		implements WriteWorkExecutionContext, IndexManagementWorkExecutionContext {
 
 	private final EventContext eventContext;
