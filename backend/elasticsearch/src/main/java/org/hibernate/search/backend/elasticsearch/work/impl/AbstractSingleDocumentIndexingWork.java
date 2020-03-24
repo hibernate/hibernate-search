@@ -26,6 +26,7 @@ public abstract class AbstractSingleDocumentIndexingWork
 
 	private final String entityTypeName;
 	private final Object entityIdentifier;
+	private final String documentIdentifier;
 
 	private final DocumentRefreshStrategy refreshStrategy;
 
@@ -35,7 +36,13 @@ public abstract class AbstractSingleDocumentIndexingWork
 		this.resultAssessor = builder.resultAssessor;
 		this.entityTypeName = builder.entityTypeName;
 		this.entityIdentifier = builder.entityIdentifier;
+		this.documentIdentifier = builder.documentIdentifier;
 		this.refreshStrategy = builder.refreshStrategy;
+	}
+
+	@Override
+	public String getQueuingKey() {
+		return documentIdentifier;
 	}
 
 	@Override
@@ -84,14 +91,16 @@ public abstract class AbstractSingleDocumentIndexingWork
 
 		private final String entityTypeName;
 		private final Object entityIdentifier;
+		protected final String documentIdentifier;
 
 		private DocumentRefreshStrategy refreshStrategy = DocumentRefreshStrategy.NONE;
 
 		public AbstractBuilder(ElasticsearchRequestSuccessAssessor resultAssessor,
-				String entityTypeName, Object entityIdentifier) {
+				String entityTypeName, Object entityIdentifier, String documentIdentifier) {
 			this.resultAssessor = resultAssessor;
 			this.entityTypeName = entityTypeName;
 			this.entityIdentifier = entityIdentifier;
+			this.documentIdentifier = documentIdentifier;
 		}
 
 		public B refresh(DocumentRefreshStrategy refreshStrategy) {

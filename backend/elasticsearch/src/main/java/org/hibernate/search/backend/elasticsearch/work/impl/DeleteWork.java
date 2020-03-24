@@ -26,7 +26,6 @@ public class DeleteWork extends AbstractSingleDocumentIndexingWork {
 			implements DeleteWorkBuilder {
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;
-		private final String documentIdentifier;
 		private final String routingKey;
 
 		public static Builder forElasticsearch67AndBelow(String entityTypeName, Object entityIdentifier,
@@ -45,10 +44,9 @@ public class DeleteWork extends AbstractSingleDocumentIndexingWork {
 		private Builder(String entityTypeName, Object entityIdentifier,
 				URLEncodedString elasticsearchIndexName,
 				URLEncodedString typeName, String documentIdentifier, String routingKey) {
-			super( SUCCESS_ASSESSOR, entityTypeName, entityIdentifier );
+			super( SUCCESS_ASSESSOR, entityTypeName, entityIdentifier, documentIdentifier );
 			this.indexName = elasticsearchIndexName;
 			this.typeName = typeName;
-			this.documentIdentifier = documentIdentifier;
 			this.routingKey = routingKey;
 		}
 
