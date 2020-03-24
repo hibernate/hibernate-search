@@ -7,7 +7,7 @@
 package org.hibernate.search.mapper.pojo.model;
 
 
-import org.hibernate.search.util.common.annotaion.Incubating;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * An accessor allowing the retrieval of an element, for example a property, from a POJO.

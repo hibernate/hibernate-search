@@ -10,7 +10,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.mapper.pojo.bridge.IdentifierBridge;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.IdentifierBinder;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
-import org.hibernate.search.util.common.annotaion.Incubating;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * The context provided to the {@link IdentifierBinder#bind(IdentifierBindingContext)} method.

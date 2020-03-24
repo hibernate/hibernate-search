@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.search.query;
 
 import java.util.Map;
 
-import org.hibernate.search.util.common.annotaion.Incubating;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 import com.google.gson.JsonObject;
 

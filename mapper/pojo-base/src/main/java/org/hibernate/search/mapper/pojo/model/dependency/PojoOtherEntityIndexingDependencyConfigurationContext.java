@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.model.dependency;
 
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPath;
 import org.hibernate.search.mapper.pojo.model.path.PojoModelPathValueNode;
-import org.hibernate.search.util.common.annotaion.Incubating;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 @Incubating
 public interface PojoOtherEntityIndexingDependencyConfigurationContext {

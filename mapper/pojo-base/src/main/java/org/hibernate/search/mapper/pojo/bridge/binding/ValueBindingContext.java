@@ -17,7 +17,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.ValueBinder;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeFromIndexedValueContext;
 import org.hibernate.search.mapper.pojo.bridge.runtime.ValueBridgeToIndexedValueContext;
 import org.hibernate.search.mapper.pojo.model.PojoModelValue;
-import org.hibernate.search.util.common.annotaion.Incubating;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * The context provided to the {@link ValueBinder#bind(ValueBindingContext)} method.

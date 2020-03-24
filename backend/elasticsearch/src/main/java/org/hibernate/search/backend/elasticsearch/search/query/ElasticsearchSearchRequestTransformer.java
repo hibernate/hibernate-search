@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.search.query;
 
-import org.hibernate.search.util.common.annotaion.Incubating;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A pluggable component that gets the chance to transform search requests (path, body, ...)

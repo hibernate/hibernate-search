@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.orm.massindexing;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.CacheMode;
-import org.hibernate.search.util.common.annotaion.Incubating;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A MassIndexer is useful to rebuild the indexes from the

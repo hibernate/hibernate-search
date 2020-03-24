@@ -19,7 +19,7 @@ import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBi
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMapping;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.TypeMappingAnnotationProcessorRef;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.processing.impl.RoutingKeyBindingProcessor;
-import org.hibernate.search.util.common.annotaion.Incubating;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * Maps an indexed type to its routing keys using a {@link RoutingKeyBinder},
