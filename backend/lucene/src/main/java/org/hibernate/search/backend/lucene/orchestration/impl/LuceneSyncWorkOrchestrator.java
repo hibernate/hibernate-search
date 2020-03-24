@@ -13,13 +13,13 @@ import org.hibernate.search.backend.lucene.work.impl.ReadWork;
 
 
 /**
- * An orchestrator that executes read works synchronously in the current thread.
+ * An orchestrator that executes works synchronously in the current thread.
  * <p>
  * For now this implementation is very simple,
  * but we might one day need to execute queries asynchronously,
  * in which case thing will get slightly more complex.
  */
-public interface LuceneReadWorkOrchestrator {
+public interface LuceneSyncWorkOrchestrator {
 
 	<T> T submit(Set<String> indexNames, Set<? extends ReadIndexManagerContext> indexManagerContexts,
 			Set<String> routingKeys, ReadWork<T> work);

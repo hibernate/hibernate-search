@@ -58,13 +58,13 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	}
 
 	@Override
-	public SingleDocumentWriteWork add(String tenantId, String entityTypeName, Object entityIdentifier,
+	public SingleDocumentIndexingWork add(String tenantId, String entityTypeName, Object entityIdentifier,
 			LuceneIndexEntry indexEntry) {
 		return new AddEntryWork( tenantId, entityTypeName, entityIdentifier, indexEntry );
 	}
 
 	@Override
-	public SingleDocumentWriteWork update(String tenantId, String entityTypeName, Object entityIdentifier,
+	public SingleDocumentIndexingWork update(String tenantId, String entityTypeName, Object entityIdentifier,
 			String documentIdentifier, LuceneIndexEntry indexEntry) {
 		Query filter = multiTenancyStrategy.getFilterOrNull( tenantId );
 		return new UpdateEntryWork( tenantId, entityTypeName, entityIdentifier,
@@ -72,7 +72,7 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	}
 
 	@Override
-	public SingleDocumentWriteWork delete(String tenantId, String entityTypeName, Object entityIdentifier,
+	public SingleDocumentIndexingWork delete(String tenantId, String entityTypeName, Object entityIdentifier,
 			String documentIdentifier) {
 		Query filter = multiTenancyStrategy.getFilterOrNull( tenantId );
 		return new DeleteEntryWork( tenantId, entityTypeName, entityIdentifier, documentIdentifier, filter );

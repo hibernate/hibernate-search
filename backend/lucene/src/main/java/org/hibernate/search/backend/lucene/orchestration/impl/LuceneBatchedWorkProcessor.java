@@ -10,7 +10,7 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
-import org.hibernate.search.backend.lucene.work.impl.WriteWork;
+import org.hibernate.search.backend.lucene.work.impl.IndexingWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchedWorkProcessor;
 import org.hibernate.search.util.common.reporting.EventContext;
 
@@ -19,15 +19,15 @@ import org.hibernate.search.util.common.reporting.EventContext;
  * <p>
  * Ported from Search 5's LuceneBackendQueueTask, in particular.
  */
-public class LuceneWriteWorkProcessor implements BatchedWorkProcessor {
+public class LuceneBatchedWorkProcessor implements BatchedWorkProcessor {
 
 	private final IndexAccessor indexAccessor;
-	private final WriteWorkExecutionContextImpl context;
+	private final IndexAccessorWorkExecutionContext context;
 
-	public LuceneWriteWorkProcessor(EventContext eventContext,
+	public LuceneBatchedWorkProcessor(EventContext eventContext,
 			IndexAccessor indexAccessor) {
 		this.indexAccessor = indexAccessor;
-		this.context = new WriteWorkExecutionContextImpl( eventContext, indexAccessor );
+		this.context = new IndexAccessorWorkExecutionContext( eventContext, indexAccessor );
 	}
 
 	@Override
@@ -69,7 +69,7 @@ public class LuceneWriteWorkProcessor implements BatchedWorkProcessor {
 		}
 	}
 
-	public <T> T submit(WriteWork<T> work) {
+	public <T> T submit(IndexingWork<T> work) {
 		try {
 			return work.execute( context );
 		}

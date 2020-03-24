@@ -21,7 +21,8 @@ import org.hibernate.search.backend.lucene.index.spi.ShardingStrategy;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IOStrategy;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.DirectoryReaderCollector;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManagerContext;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneParallelWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSerialWorkOrchestrator;
 import org.hibernate.search.backend.lucene.schema.management.impl.SchemaManagementIndexManagerContext;
 import org.hibernate.search.backend.lucene.work.execution.impl.WorkExecutionIndexManagerContext;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
@@ -38,7 +39,7 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 
 	private BeanHolder<? extends ShardingStrategy> shardingStrategyHolder;
 	private final Map<String, Shard> shards = new LinkedHashMap<>();
-	private final List<LuceneWriteWorkOrchestrator> writeOrchestrators = new ArrayList<>();
+	private final List<LuceneParallelWorkOrchestrator> managementOrchestrators = new ArrayList<>();
 
 	ShardHolder(IndexManagerBackendContext backendContext, LuceneIndexModel model) {
 		this.backendContext = backendContext;
@@ -71,14 +72,14 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 			}
 
 			for ( Shard shard : shards.values() ) {
-				writeOrchestrators.add( shard.getWriteOrchestrator() );
+				managementOrchestrators.add( shard.getManagementOrchestrator() );
 			}
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
 					.pushAll( Shard::stop, shards.values() );
 			shards.clear();
-			writeOrchestrators.clear();
+			managementOrchestrators.clear();
 			throw e;
 		}
 	}
@@ -97,7 +98,7 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 		try ( Closer<IOException> closer = new Closer<>() ) {
 			closer.pushAll( Shard::stop, shards.values() );
 			shards.clear();
-			writeOrchestrators.clear();
+			managementOrchestrators.clear();
 		}
 	}
 
@@ -121,23 +122,23 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 	}
 
 	@Override
-	public LuceneWriteWorkOrchestrator getWriteOrchestrator(String documentId, String routingKey) {
-		return toShard( documentId, routingKey ).getWriteOrchestrator();
+	public LuceneSerialWorkOrchestrator getIndexingOrchestrator(String documentId, String routingKey) {
+		return toShard( documentId, routingKey ).getIndexingOrchestrator();
 	}
 
 	@Override
-	public List<LuceneWriteWorkOrchestrator> getWriteOrchestrators(Set<String> routingKeys) {
+	public List<LuceneParallelWorkOrchestrator> getManagementOrchestrators(Set<String> routingKeys) {
 		Collection<Shard> enabledShards = toShards( routingKeys );
-		List<LuceneWriteWorkOrchestrator> orchestrators = new ArrayList<>();
+		List<LuceneParallelWorkOrchestrator> orchestrators = new ArrayList<>();
 		for ( Shard shard : enabledShards ) {
-			orchestrators.add( shard.getWriteOrchestrator() );
+			orchestrators.add( shard.getManagementOrchestrator() );
 		}
 		return orchestrators;
 	}
 
 	@Override
-	public List<LuceneWriteWorkOrchestrator> getAllWriteOrchestrators() {
-		return writeOrchestrators;
+	public List<LuceneParallelWorkOrchestrator> getAllManagementOrchestrators() {
+		return managementOrchestrators;
 	}
 
 	public List<Shard> getShardsForTests() {

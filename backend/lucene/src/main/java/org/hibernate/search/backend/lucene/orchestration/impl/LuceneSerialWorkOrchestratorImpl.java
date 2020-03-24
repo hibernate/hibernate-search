@@ -14,16 +14,16 @@ import org.hibernate.search.engine.backend.orchestration.spi.BatchedWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.reporting.FailureHandler;
 
-public class LuceneWriteWorkOrchestratorImpl
-		extends AbstractWorkOrchestrator<BatchedWork<LuceneWriteWorkProcessor>>
-		implements LuceneWriteWorkOrchestrator {
+public class LuceneSerialWorkOrchestratorImpl
+		extends AbstractWorkOrchestrator<BatchedWork<LuceneBatchedWorkProcessor>>
+		implements LuceneSerialWorkOrchestrator {
 
 	// TODO HSEARCH‌-3575 allow to configure this value
 	private static final int MAX_WORKS_PER_BATCH = 1000;
 
-	private final LuceneWriteWorkProcessor processor;
+	private final LuceneBatchedWorkProcessor processor;
 	private final BackendThreads threads;
-	private final BatchingExecutor<LuceneWriteWorkProcessor> executor;
+	private final BatchingExecutor<LuceneBatchedWorkProcessor> executor;
 
 	/**
 	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)
@@ -31,8 +31,8 @@ public class LuceneWriteWorkOrchestratorImpl
 	 * @param threads The threads for this backend.
 	 * @param failureHandler A failure handler to report failures of the background thread.
 	 */
-	public LuceneWriteWorkOrchestratorImpl(
-			String name, LuceneWriteWorkProcessor processor,
+	public LuceneSerialWorkOrchestratorImpl(
+			String name, LuceneBatchedWorkProcessor processor,
 			BackendThreads threads,
 			FailureHandler failureHandler) {
 		super( name );
@@ -63,7 +63,7 @@ public class LuceneWriteWorkOrchestratorImpl
 	}
 
 	@Override
-	protected void doSubmit(BatchedWork<LuceneWriteWorkProcessor> work) throws InterruptedException {
+	protected void doSubmit(BatchedWork<LuceneBatchedWorkProcessor> work) throws InterruptedException {
 		executor.submit( work );
 	}
 

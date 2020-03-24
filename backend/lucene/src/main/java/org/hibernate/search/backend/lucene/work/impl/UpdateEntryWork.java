@@ -21,7 +21,7 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
 
-public class UpdateEntryWork extends AbstractSingleDocumentWriteWork {
+public class UpdateEntryWork extends AbstractSingleDocumentIndexingWork {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -39,7 +39,7 @@ public class UpdateEntryWork extends AbstractSingleDocumentWriteWork {
 	}
 
 	@Override
-	public Long execute(WriteWorkExecutionContext context) {
+	public Long execute(IndexingWorkExecutionContext context) {
 		try {
 			IndexWriterDelegator indexWriterDelegator = context.getIndexWriterDelegator();
 			Term idTerm = new Term( MetadataFields.idFieldName(), documentIdentifier );

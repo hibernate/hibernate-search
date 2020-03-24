@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestrator;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.AggregationRequestContext;
 import org.hibernate.search.backend.lucene.search.aggregation.impl.LuceneSearchAggregation;
 import org.hibernate.search.backend.lucene.search.extraction.impl.ExtractionRequirements;
@@ -51,7 +51,7 @@ public class LuceneSearchQueryBuilder<H>
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneWorkFactory workFactory;
-	private final LuceneReadWorkOrchestrator queryOrchestrator;
+	private final LuceneSyncWorkOrchestrator queryOrchestrator;
 
 	private final LuceneSearchContext searchContext;
 	private final BackendSessionContext sessionContext;
@@ -71,7 +71,7 @@ public class LuceneSearchQueryBuilder<H>
 
 	public LuceneSearchQueryBuilder(
 			LuceneWorkFactory workFactory,
-			LuceneReadWorkOrchestrator queryOrchestrator,
+			LuceneSyncWorkOrchestrator queryOrchestrator,
 			LuceneSearchContext searchContext,
 			BackendSessionContext sessionContext,
 			LoadingContextBuilder<?, ?, ?> loadingContextBuilder,

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneParallelWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.IndexManagementWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
@@ -32,13 +32,13 @@ public class LuceneIndexWorkspace implements IndexWorkspace {
 
 	@Override
 	public CompletableFuture<?> mergeSegments() {
-		return doSubmit( indexManagerContext.getAllWriteOrchestrators(), factory.mergeSegments(), false );
+		return doSubmit( indexManagerContext.getAllManagementOrchestrators(), factory.mergeSegments(), false );
 	}
 
 	@Override
 	public CompletableFuture<?> purge(Set<String> routingKeys) {
 		return doSubmit(
-				indexManagerContext.getWriteOrchestrators( routingKeys ),
+				indexManagerContext.getManagementOrchestrators( routingKeys ),
 				factory.deleteAll( sessionContext.getTenantIdentifier(), routingKeys ),
 				true
 		);
@@ -46,20 +46,20 @@ public class LuceneIndexWorkspace implements IndexWorkspace {
 
 	@Override
 	public CompletableFuture<?> flush() {
-		return doSubmit( indexManagerContext.getAllWriteOrchestrators(), factory.flush(), false );
+		return doSubmit( indexManagerContext.getAllManagementOrchestrators(), factory.flush(), false );
 	}
 
 	@Override
 	public CompletableFuture<?> refresh() {
-		return doSubmit( indexManagerContext.getAllWriteOrchestrators(), factory.refresh(), false );
+		return doSubmit( indexManagerContext.getAllManagementOrchestrators(), factory.refresh(), false );
 	}
 
-	private <T> CompletableFuture<?> doSubmit(List<LuceneWriteWorkOrchestrator> orchestrators,
+	private <T> CompletableFuture<?> doSubmit(List<LuceneParallelWorkOrchestrator> orchestrators,
 			IndexManagementWork<T> work, boolean commit) {
 		CompletableFuture<?>[] writeFutures = new CompletableFuture[orchestrators.size()];
 		CompletableFuture<?>[] writeAndCommitFutures = new CompletableFuture[orchestrators.size()];
 		for ( int i = 0; i < writeFutures.length; i++ ) {
-			LuceneWriteWorkOrchestrator orchestrator = orchestrators.get( i );
+			LuceneParallelWorkOrchestrator orchestrator = orchestrators.get( i );
 
 			CompletableFuture<T> writeFuture = new CompletableFuture<>();
 			writeFutures[i] = writeFuture;

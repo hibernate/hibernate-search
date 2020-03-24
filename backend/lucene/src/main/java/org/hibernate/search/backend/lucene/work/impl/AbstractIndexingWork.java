@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
-public abstract class AbstractWriteWork<T> implements WriteWork<T> {
+public abstract class AbstractIndexingWork<T> implements IndexingWork<T> {
 
 	protected final String workType;
 
-	AbstractWriteWork(String workType) {
+	AbstractIndexingWork(String workType) {
 		this.workType = workType;
 	}
 
