@@ -31,28 +31,29 @@ public class DeleteWork extends AbstractSingleDocumentElasticsearchWork<Void> {
 			implements DeleteWorkBuilder {
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;
-		private final URLEncodedString id;
+		private final String documentIdentifier;
 		private final String routingKey;
 
 		public static Builder forElasticsearch67AndBelow(String entityTypeName, Object entityIdentifier,
-				URLEncodedString elasticsearchIndexName, URLEncodedString typeName, URLEncodedString id, String routingKey) {
+				URLEncodedString elasticsearchIndexName, URLEncodedString typeName,
+				String documentIdentifier, String routingKey) {
 			return new Builder( entityTypeName, entityIdentifier,
-					elasticsearchIndexName, typeName, id, routingKey );
+					elasticsearchIndexName, typeName, documentIdentifier, routingKey );
 		}
 
 		public static Builder forElasticsearch7AndAbove(String entityTypeName, Object entityIdentifier,
-				URLEncodedString elasticsearchIndexName, URLEncodedString id, String routingKey) {
+				URLEncodedString elasticsearchIndexName, String documentIdentifier, String routingKey) {
 			return new Builder( entityTypeName, entityIdentifier,
-					elasticsearchIndexName, null, id, routingKey );
+					elasticsearchIndexName, null, documentIdentifier, routingKey );
 		}
 
 		private Builder(String entityTypeName, Object entityIdentifier,
 				URLEncodedString elasticsearchIndexName,
-				URLEncodedString typeName, URLEncodedString id, String routingKey) {
+				URLEncodedString typeName, String documentIdentifier, String routingKey) {
 			super( SUCCESS_ASSESSOR, entityTypeName, entityIdentifier );
 			this.indexName = elasticsearchIndexName;
 			this.typeName = typeName;
-			this.id = id;
+			this.documentIdentifier = documentIdentifier;
 			this.routingKey = routingKey;
 		}
 
@@ -64,7 +65,7 @@ public class DeleteWork extends AbstractSingleDocumentElasticsearchWork<Void> {
 				delete.addProperty( "_type", typeName.original );
 			}
 
-			delete.addProperty( "_id", id.original );
+			delete.addProperty( "_id", documentIdentifier );
 
 			if ( routingKey != null ) {
 				delete.addProperty( "routing", routingKey );

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentElasticsearchWork;
@@ -72,7 +71,7 @@ public class ElasticsearchIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 				builderFactory.delete(
 						indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
 						indexManagerContext.getElasticsearchIndexWriteName(),
-						URLEncodedString.fromString( elasticsearchId ), routingKey
+						elasticsearchId, routingKey
 				)
 						.refresh( refreshStrategy )
 						.build()
@@ -116,7 +115,7 @@ public class ElasticsearchIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 				builderFactory.index(
 						indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
 						indexManagerContext.getElasticsearchIndexWriteName(),
-						URLEncodedString.fromString( elasticsearchId ), routingKey, document
+						elasticsearchId, routingKey, document
 				)
 						.refresh( refreshStrategy )
 						.build()

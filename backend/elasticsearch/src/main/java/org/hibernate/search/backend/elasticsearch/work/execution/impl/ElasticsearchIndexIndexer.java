@@ -9,7 +9,6 @@ package org.hibernate.search.backend.elasticsearch.work.execution.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
@@ -48,7 +47,7 @@ public class ElasticsearchIndexIndexer implements IndexIndexer {
 		ElasticsearchWork<Void> work = factory.index(
 				indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
 				indexManagerContext.getElasticsearchIndexWriteName(),
-				URLEncodedString.fromString( elasticsearchId ), routingKey, document
+				elasticsearchId, routingKey, document
 		)
 				.build();
 		return orchestrator.submit( work );
