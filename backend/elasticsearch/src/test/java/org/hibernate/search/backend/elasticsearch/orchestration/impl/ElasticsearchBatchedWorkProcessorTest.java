@@ -8,20 +8,16 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.getCurrentArguments;
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThat;
 
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkAggregator;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import org.easymock.EasyMockSupport;
-import org.easymock.IAnswer;
 
 
 public class ElasticsearchBatchedWorkProcessorTest extends EasyMockSupport {
@@ -44,7 +40,7 @@ public class ElasticsearchBatchedWorkProcessorTest extends EasyMockSupport {
 
 	@Test
 	public void simple_singleWork() {
-		NonBulkableWork<Object> work = work( 1 );
+		BulkableWork<Object> work = bulkableWork( 1 );
 
 		CompletableFuture<Void> sequenceFuture = new CompletableFuture<>();
 
@@ -62,9 +58,7 @@ public class ElasticsearchBatchedWorkProcessorTest extends EasyMockSupport {
 
 		CompletableFuture<Object> workFuture = new CompletableFuture<>();
 		resetAll();
-		expect( work.aggregate( anyObject() ) ).andAnswer( nonBulkableAggregateAnswer( work ) );
-		expect( sequenceBuilderMock.addNonBulkExecution( work ) ).andReturn( workFuture );
-		bulkerMock.finalizeBulkWork(); // Non-bulkable work => finalize any pending bulk
+		expect( bulkerMock.add( work ) ).andReturn( workFuture );
 		replayAll();
 		CompletableFuture<Object> returnedWorkFuture = processor.submit( work );
 		verifyAll();
@@ -89,7 +83,7 @@ public class ElasticsearchBatchedWorkProcessorTest extends EasyMockSupport {
 
 	@Test
 	public void simple_multipleWorks() {
-		NonBulkableWork<Object> work1 = work( 1 );
+		BulkableWork<Object> work1 = bulkableWork( 1 );
 		BulkableWork<Object> work2 = bulkableWork( 2 );
 
 		CompletableFuture<Void> sequenceFuture = new CompletableFuture<>();
@@ -109,10 +103,7 @@ public class ElasticsearchBatchedWorkProcessorTest extends EasyMockSupport {
 		CompletableFuture<Object> work1Future = new CompletableFuture<>();
 		CompletableFuture<Object> work2Future = new CompletableFuture<>();
 		resetAll();
-		expect( work1.aggregate( anyObject() ) ).andAnswer( nonBulkableAggregateAnswer( work1 ) );
-		bulkerMock.finalizeBulkWork(); // Non-bulkable work => finalize any pending bulk
-		expect( sequenceBuilderMock.addNonBulkExecution( work1 ) ).andReturn( work1Future );
-		expect( work2.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work2 ) );
+		expect( bulkerMock.add( work1 ) ).andReturn( work1Future );
 		expect( bulkerMock.add( work2 ) ).andReturn( work2Future );
 		replayAll();
 		CompletableFuture<Object> returnedWork1Future = processor.submit( work1 );
@@ -139,7 +130,7 @@ public class ElasticsearchBatchedWorkProcessorTest extends EasyMockSupport {
 
 	@Test
 	public void newSequenceBetweenBatches() {
-		NonBulkableWork<Object> work1 = work( 1 );
+		BulkableWork<Object> work1 = bulkableWork( 1 );
 
 		BulkableWork<Object> work2 = bulkableWork( 2 );
 
@@ -159,9 +150,7 @@ public class ElasticsearchBatchedWorkProcessorTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
-		expect( work1.aggregate( anyObject() ) ).andAnswer( nonBulkableAggregateAnswer( work1 ) );
-		bulkerMock.finalizeBulkWork(); // Non-bulkable work => finalize any pending bulk
-		expect( sequenceBuilderMock.addNonBulkExecution( work1 ) ).andReturn( unusedReturnValue() );
+		expect( bulkerMock.add( work1 ) ).andReturn( unusedReturnValue() );
 		replayAll();
 		processor.submit( work1 );
 		verifyAll();
@@ -187,7 +176,6 @@ public class ElasticsearchBatchedWorkProcessorTest extends EasyMockSupport {
 		verifyAll();
 
 		resetAll();
-		expect( work2.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work2 ) );
 		expect( bulkerMock.add( work2 ) ).andReturn( unusedReturnValue() );
 		replayAll();
 		processor.submit( work2 );
@@ -209,56 +197,6 @@ public class ElasticsearchBatchedWorkProcessorTest extends EasyMockSupport {
 		checkComplete( processor );
 	}
 
-	@Test
-	public void newBulkIfNonBulkable() {
-		BulkableWork<Object> work1 = bulkableWork( 1 );
-		NonBulkableWork<Object> work2 = work( 2 );
-		BulkableWork<Object> work3 = bulkableWork( 3 );
-
-		CompletableFuture<Void> sequenceFuture = new CompletableFuture<>();
-
-		replayAll();
-		ElasticsearchBatchedWorkProcessor processor =
-				new ElasticsearchBatchedWorkProcessor( sequenceBuilderMock, bulkerMock );
-		verifyAll();
-
-		resetAll();
-		bulkerMock.reset();
-		sequenceBuilderMock.init( anyObject() );
-		replayAll();
-		processor.beginBatch();
-		verifyAll();
-
-		resetAll();
-		expect( work1.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work1 ) );
-		expect( bulkerMock.add( work1 ) ).andReturn( unusedReturnValue() );
-		expect( work2.aggregate( anyObject() ) ).andAnswer( nonBulkableAggregateAnswer( work2 ) );
-		bulkerMock.finalizeBulkWork(); // Non-bulkable work => finalize any pending bulk
-		expect( sequenceBuilderMock.addNonBulkExecution( work2 ) ).andReturn( unusedReturnValue() );
-		expect( work3.aggregate( anyObject() ) ).andAnswer( bulkableAggregateAnswer( work3 ) );
-		expect( bulkerMock.add( work3 ) ).andReturn( unusedReturnValue() );
-		replayAll();
-		processor.submit( work1 );
-		processor.submit( work2 );
-		processor.submit( work3 );
-		verifyAll();
-
-		resetAll();
-		expect( sequenceBuilderMock.build() ).andReturn( sequenceFuture );
-		bulkerMock.finalizeBulkWork();
-		replayAll();
-		CompletableFuture<Void> batchFuture = processor.endBatch();
-		verifyAll();
-		assertThat( batchFuture ).isPending();
-
-		resetAll();
-		sequenceFuture.complete( null );
-		replayAll();
-		assertThat( batchFuture ).isSuccessful();
-
-		checkComplete( processor );
-	}
-
 	private void checkComplete(ElasticsearchBatchedWorkProcessor processor) {
 		resetAll();
 		replayAll();
@@ -266,25 +204,7 @@ public class ElasticsearchBatchedWorkProcessorTest extends EasyMockSupport {
 		verifyAll();
 	}
 
-	private <T> NonBulkableWork<T> work(int index) {
-		return createStrictMock( "work" + index, NonBulkableWork.class );
-	}
-
 	private <T> BulkableWork<T> bulkableWork(int index) {
 		return createStrictMock( "bulkableWork" + index, BulkableWork.class );
-	}
-
-	private <T> IAnswer<CompletableFuture<T>> nonBulkableAggregateAnswer(NonBulkableWork<T> mock) {
-		return () -> {
-			ElasticsearchWorkAggregator aggregator = (ElasticsearchWorkAggregator) getCurrentArguments()[0];
-			return aggregator.addNonBulkable( mock );
-		};
-	}
-
-	private <T> IAnswer<CompletableFuture<T>> bulkableAggregateAnswer(BulkableWork<T> mock) {
-		return () -> {
-			ElasticsearchWorkAggregator aggregator = (ElasticsearchWorkAggregator) getCurrentArguments()[0];
-			return aggregator.addBulkable( mock );
-		};
 	}
 }

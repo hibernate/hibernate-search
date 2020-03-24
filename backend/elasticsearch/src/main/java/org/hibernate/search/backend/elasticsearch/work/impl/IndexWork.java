@@ -12,15 +12,15 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.IndexWorkBui
 import com.google.gson.JsonObject;
 
 
-public class IndexWork extends AbstractSingleDocumentWork
-		implements SingleDocumentWork {
+public class IndexWork extends AbstractSingleDocumentIndexingWork
+		implements SingleDocumentIndexingWork {
 
 	private IndexWork(Builder builder) {
 		super( builder );
 	}
 
 	public static class Builder
-			extends AbstractSingleDocumentWork.AbstractBuilder<Builder>
+			extends AbstractSingleDocumentIndexingWork.AbstractBuilder<Builder>
 			implements IndexWorkBuilder {
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;

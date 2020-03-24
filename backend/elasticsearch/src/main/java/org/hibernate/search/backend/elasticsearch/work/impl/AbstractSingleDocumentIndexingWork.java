@@ -7,7 +7,6 @@
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
 import java.lang.invoke.MethodHandles;
-import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
@@ -16,8 +15,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.JsonObject;
 
 
-public abstract class AbstractSingleDocumentWork
-		implements BulkableWork<Void>, SingleDocumentWork {
+public abstract class AbstractSingleDocumentIndexingWork
+		implements BulkableWork<Void>, SingleDocumentIndexingWork {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -30,18 +29,13 @@ public abstract class AbstractSingleDocumentWork
 
 	private final DocumentRefreshStrategy refreshStrategy;
 
-	protected AbstractSingleDocumentWork(AbstractBuilder<?> builder) {
+	protected AbstractSingleDocumentIndexingWork(AbstractBuilder<?> builder) {
 		this.bulkableActionMetadata = builder.buildBulkableActionMetadata();
 		this.bulkableActionBody = builder.buildBulkableActionBody();
 		this.resultAssessor = builder.resultAssessor;
 		this.entityTypeName = builder.entityTypeName;
 		this.entityIdentifier = builder.entityIdentifier;
 		this.refreshStrategy = builder.refreshStrategy;
-	}
-
-	@Override
-	public CompletableFuture<Void> aggregate(ElasticsearchWorkAggregator aggregator) {
-		return aggregator.addBulkable( this );
 	}
 
 	@Override

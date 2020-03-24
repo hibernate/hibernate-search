@@ -16,7 +16,7 @@ import java.util.Objects;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSerialWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentIndexingWork;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlanExecutionReport;
 import org.hibernate.search.util.impl.test.FutureAssert;
@@ -38,7 +38,7 @@ public class ElasticsearchIndexIndexingPlanExecutionTest extends EasyMockSupport
 	private final EntityReferenceFactory<StubEntityReference> entityReferenceFactoryMock =
 			createStrictMock( EntityReferenceFactory.class );
 
-	private final List<SingleDocumentWork> workMocks = new ArrayList<>();
+	private final List<SingleDocumentIndexingWork> workMocks = new ArrayList<>();
 
 	@Test
 	public void success() {
@@ -297,7 +297,7 @@ public class ElasticsearchIndexIndexingPlanExecutionTest extends EasyMockSupport
 
 	private void expectWorkGetInfo(int ... ids) {
 		for ( int id : ids ) {
-			SingleDocumentWork workMock = workMocks.get( id );
+			SingleDocumentIndexingWork workMock = workMocks.get( id );
 			EasyMock.expect( workMock.getEntityTypeName() ).andStubReturn( TYPE_NAME );
 			EasyMock.expect( workMock.getEntityIdentifier() ).andStubReturn( id );
 			EasyMock.expect( entityReferenceFactoryMock.createEntityReference( TYPE_NAME, id ) )
@@ -306,24 +306,24 @@ public class ElasticsearchIndexIndexingPlanExecutionTest extends EasyMockSupport
 	}
 
 	private void expectFailingWorkGetInfo(int id, Throwable thrown) {
-		SingleDocumentWork workMock = workMocks.get( id );
+		SingleDocumentIndexingWork workMock = workMocks.get( id );
 		EasyMock.expect( workMock.getEntityTypeName() ).andStubReturn( TYPE_NAME );
 		EasyMock.expect( workMock.getEntityIdentifier() ).andStubReturn( id );
 		EasyMock.expect( entityReferenceFactoryMock.createEntityReference( TYPE_NAME, id ) )
 				.andThrow( thrown );
 	}
 
-	private List<SingleDocumentWork> createWorkMocks(int count) {
-		List<SingleDocumentWork> result = new ArrayList<>();
+	private List<SingleDocumentIndexingWork> createWorkMocks(int count) {
+		List<SingleDocumentIndexingWork> result = new ArrayList<>();
 		for ( int i = 0; i < count; i++ ) {
 			result.add( createWorkMock() );
 		}
 		return result;
 	}
 
-	private <T> SingleDocumentWork createWorkMock() {
+	private <T> SingleDocumentIndexingWork createWorkMock() {
 		String workName = workInfo( workMocks.size() );
-		SingleDocumentWork workMock = createStrictMock( workName, SingleDocumentWork.class );
+		SingleDocumentIndexingWork workMock = createStrictMock( workName, SingleDocumentIndexingWork.class );
 		workMocks.add( workMock );
 		return workMock;
 	}
