@@ -37,6 +37,12 @@ public abstract class AbstractWorkOrchestrator<W> {
 		return name;
 	}
 
+	/**
+	 * Start any resource necessary to operate the orchestrator at runtime.
+	 * <p>
+	 * Called by the owner of this orchestrator once after bootstrap,
+	 * before any other method is called.
+	 */
 	public final void start() {
 		lifecycleLock.writeLock().lock();
 		try {
@@ -56,6 +62,14 @@ public abstract class AbstractWorkOrchestrator<W> {
 		}
 	}
 
+	/**
+	 * Stop accepting works and return a future that completes when all works have been completely executed.
+	 * <p>
+	 * Optionally called by the owner of this orchestrator before {@link #stop()},
+	 * if it needs to wait for work completion.
+	 *
+	 * @return A future that completes when all ongoing works have been completely executed.
+	 */
 	public final CompletableFuture<?> preStop() {
 		lifecycleLock.writeLock().lock();
 		try {
@@ -74,6 +88,11 @@ public abstract class AbstractWorkOrchestrator<W> {
 		}
 	}
 
+	/**
+	 * Forcibly shut down ongoing work and release any resource necessary to operate the orchestrator at runtime.
+	 * <p>
+	 * Called by the owner of this orchestrator on shutdown.
+	 */
 	public final void stop() {
 		lifecycleLock.writeLock().lock();
 		try {

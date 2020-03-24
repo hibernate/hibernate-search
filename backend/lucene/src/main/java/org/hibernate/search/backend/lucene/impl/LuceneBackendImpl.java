@@ -12,7 +12,6 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestratorImplementor;
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
 import org.hibernate.search.engine.backend.Backend;
@@ -47,7 +46,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
-	private final LuceneReadWorkOrchestratorImplementor readOrchestrator;
+	private final LuceneReadWorkOrchestratorImpl readOrchestrator;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final TimingSource timingSource;
 
@@ -108,7 +107,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 	@Override
 	public void stop() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( LuceneReadWorkOrchestratorImplementor::stop, readOrchestrator );
+			closer.push( LuceneReadWorkOrchestratorImpl::stop, readOrchestrator );
 			closer.push( holder -> holder.get().close(), directoryProviderHolder );
 			closer.push( BeanHolder::close, directoryProviderHolder );
 			closer.push( TimingSource::stop, timingSource );
