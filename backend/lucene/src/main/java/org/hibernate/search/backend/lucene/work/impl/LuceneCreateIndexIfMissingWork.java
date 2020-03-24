@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
-import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 
 public class LuceneCreateIndexIfMissingWork implements LuceneIndexManagementWork<Void> {
 
@@ -16,8 +15,8 @@ public class LuceneCreateIndexIfMissingWork implements LuceneIndexManagementWork
 	}
 
 	@Override
-	public Void execute(IndexAccessor indexAccessor) {
-		indexAccessor.createIndexIfMissing();
+	public Void execute(LuceneIndexManagementWorkExecutionContext context) {
+		context.getIndexAccessor().createIndexIfMissing();
 		return null;
 	}
 

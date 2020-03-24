@@ -36,7 +36,7 @@ public interface LuceneWorkFactory {
 
 	LuceneSingleDocumentWriteWork delete(String tenantId, String entityTypeName, Object entityIdentifier, String id);
 
-	LuceneWriteWork<?> deleteAll(String tenantId, Set<String> routingKeys);
+	LuceneIndexManagementWork<?> deleteAll(String tenantId, Set<String> routingKeys);
 
 	<R> LuceneReadWork<R> search(LuceneSearcher<R> searcher, Integer offset, Integer limit);
 

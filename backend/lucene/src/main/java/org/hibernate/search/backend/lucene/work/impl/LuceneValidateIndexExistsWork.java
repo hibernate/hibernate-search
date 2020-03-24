@@ -6,7 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
-import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
 
 public class LuceneValidateIndexExistsWork implements LuceneIndexManagementWork<Void> {
 
@@ -16,8 +15,8 @@ public class LuceneValidateIndexExistsWork implements LuceneIndexManagementWork<
 	}
 
 	@Override
-	public Void execute(IndexAccessor indexAccessor) {
-		indexAccessor.validateIndexExists();
+	public Void execute(LuceneIndexManagementWorkExecutionContext context) {
+		context.getIndexAccessor().validateIndexExists();
 		return null;
 	}
 

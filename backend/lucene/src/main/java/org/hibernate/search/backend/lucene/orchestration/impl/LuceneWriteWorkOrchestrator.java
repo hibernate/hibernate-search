@@ -16,8 +16,12 @@ public interface LuceneWriteWorkOrchestrator {
 
 	default <T> CompletableFuture<T> submit(LuceneIndexManagementWork<T> work) {
 		CompletableFuture<T> future = new CompletableFuture<>();
-		submit( new LuceneManagementWorkSet<>( work, future ) );
+		submit( future, work );
 		return future;
+	}
+
+	default <T> void submit(CompletableFuture<T> future, LuceneIndexManagementWork<T> work) {
+		submit( new LuceneManagementWorkSet<>( work, future ) );
 	}
 
 	default <T> CompletableFuture<T> submit(LuceneWriteWork<T> work) {

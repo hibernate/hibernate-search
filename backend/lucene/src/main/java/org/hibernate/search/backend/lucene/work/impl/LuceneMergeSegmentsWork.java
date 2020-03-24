@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.work.impl;
 
-import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessor;
-
 
 public class LuceneMergeSegmentsWork implements LuceneIndexManagementWork<Void> {
 	@Override
@@ -16,8 +14,8 @@ public class LuceneMergeSegmentsWork implements LuceneIndexManagementWork<Void> 
 	}
 
 	@Override
-	public Void execute(IndexAccessor indexAccessor) {
-		indexAccessor.mergeSegments();
+	public Void execute(LuceneIndexManagementWorkExecutionContext context) {
+		context.getIndexAccessor().mergeSegments();
 		return null;
 	}
 

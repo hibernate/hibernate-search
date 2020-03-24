@@ -78,7 +78,7 @@ public class LuceneWriteWorkProcessor implements BatchingExecutor.WorkProcessor 
 
 	public <T> T submit(LuceneIndexManagementWork<T> work) {
 		try {
-			return work.execute( indexAccessor );
+			return work.execute( context );
 		}
 		catch (RuntimeException e) {
 			cleanUpAfterFailure( e, work.getInfo() );

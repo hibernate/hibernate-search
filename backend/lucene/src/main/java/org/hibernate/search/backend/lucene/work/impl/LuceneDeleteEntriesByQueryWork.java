@@ -15,14 +15,13 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.Query;
 
-public class LuceneDeleteEntriesByQueryWork extends AbstractLuceneWriteWork<Long> {
+public class LuceneDeleteEntriesByQueryWork implements LuceneIndexManagementWork<Long> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final Query query;
 
 	LuceneDeleteEntriesByQueryWork(Query query) {
-		super( "deleteByQuery" );
 		this.query = query;
 	}
 
@@ -30,16 +29,15 @@ public class LuceneDeleteEntriesByQueryWork extends AbstractLuceneWriteWork<Long
 	public String toString() {
 		StringBuilder sb = new StringBuilder( getClass().getSimpleName() )
 				.append( "[" )
-				.append( "type=" ).append( workType )
 				.append( "query=" ).append( query )
 				.append( "]" );
 		return sb.toString();
 	}
 
 	@Override
-	public Long execute(LuceneWriteWorkExecutionContext context) {
+	public Long execute(LuceneIndexManagementWorkExecutionContext context) {
 		try {
-			IndexWriterDelegator indexWriterDelegator = context.getIndexWriterDelegator();
+			IndexWriterDelegator indexWriterDelegator = context.getIndexAccessor().getIndexWriterDelegator();
 			return indexWriterDelegator.deleteDocuments( query );
 		}
 		catch (IOException e) {
@@ -47,4 +45,8 @@ public class LuceneDeleteEntriesByQueryWork extends AbstractLuceneWriteWork<Long
 		}
 	}
 
+	@Override
+	public Object getInfo() {
+		return this;
+	}
 }
