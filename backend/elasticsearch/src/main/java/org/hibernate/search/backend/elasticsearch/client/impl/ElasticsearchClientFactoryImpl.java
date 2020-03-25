@@ -126,13 +126,14 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 	@Override
 	public ElasticsearchClientImplementor create(ConfigurationPropertySource propertySource,
-			ThreadProvider threadProvider, ScheduledExecutorService timeoutExecutorService,
+			ThreadProvider threadProvider, String threadNamePrefix,
+			ScheduledExecutorService timeoutExecutorService,
 			GsonProvider gsonProvider) {
 		int requestTimeoutMs = REQUEST_TIMEOUT.get( propertySource );
 
 		ServerUris hosts = ServerUris.fromStrings( PROTOCOL.get( propertySource ), HOSTS.get( propertySource ) );
-		RestClient restClient = createClient( hosts, propertySource, threadProvider );
-		Sniffer sniffer = createSniffer( hosts, restClient, propertySource );
+		RestClient restClient = createClient( propertySource, threadProvider, threadNamePrefix, hosts );
+		Sniffer sniffer = createSniffer( propertySource, restClient, hosts );
 
 		return new ElasticsearchClientImpl(
 				restClient, sniffer, timeoutExecutorService,
@@ -141,18 +142,24 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 		);
 	}
 
-	private RestClient createClient(ServerUris hosts,
-			ConfigurationPropertySource propertySource,
-			ThreadProvider threadProvider) {
+	private RestClient createClient(ConfigurationPropertySource propertySource,
+			ThreadProvider threadProvider, String threadNamePrefix,
+			ServerUris hosts) {
 		return RestClient.builder( hosts.asHostsArray() )
 				.setRequestConfigCallback( b -> customizeRequestConfig( b, propertySource ) )
 				.setHttpClientConfigCallback(
-						b -> customizeHttpClientConfig( b, httpClientConfigurers, propertySource, hosts, threadProvider )
+						b -> customizeHttpClientConfig(
+								b,
+								propertySource,
+								threadProvider, threadNamePrefix,
+								hosts,
+								httpClientConfigurers
+						)
 				)
 				.build();
 	}
 
-	private Sniffer createSniffer(ServerUris hosts, RestClient client, ConfigurationPropertySource propertySource) {
+	private Sniffer createSniffer(ConfigurationPropertySource propertySource, RestClient client, ServerUris hosts) {
 		boolean discoveryEnabled = DISCOVERY_ENABLED.get( propertySource );
 		if ( discoveryEnabled ) {
 			SnifferBuilder builder = Sniffer.builder( client )
@@ -177,12 +184,13 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 	}
 
 	private HttpAsyncClientBuilder customizeHttpClientConfig(HttpAsyncClientBuilder builder,
-			Iterable<ElasticsearchHttpClientConfigurer> configurers,
-			ConfigurationPropertySource propertySource, ServerUris hosts,
-			ThreadProvider threadProvider) {
+			ConfigurationPropertySource propertySource,
+			ThreadProvider threadProvider, String threadNamePrefix,
+			ServerUris hosts,
+			Iterable<ElasticsearchHttpClientConfigurer> configurers) {
 		builder.setMaxConnTotal( MAX_TOTAL_CONNECTION.get( propertySource ) )
 				.setMaxConnPerRoute( MAX_TOTAL_CONNECTION_PER_ROUTE.get( propertySource ) )
-				.setThreadFactory( threadProvider.createThreadFactory( "Elasticsearch transport thread" ) );
+				.setThreadFactory( threadProvider.createThreadFactory( threadNamePrefix + " - Transport thread" ) );
 		if ( !hosts.isSslEnabled() ) {
 			// In this case disable the SSL capability as it might have an impact on
 			// bootstrap time, for example consuming entropy for no reason

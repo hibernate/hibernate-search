@@ -32,12 +32,16 @@ public class BackendThreads {
 		// We use a scheduled executor so that we can also schedule client timeouts in the same thread pool.
 		// TODO HSEARCH-3575 make the thread pool size configurable
 		this.workExecutor = threadPoolProvider.newScheduledExecutor(
-				Runtime.getRuntime().availableProcessors(), prefix
+				Runtime.getRuntime().availableProcessors(), prefix + " - Worker thread"
 		);
 	}
 
 	public void onStop() {
 		workExecutor.shutdownNow();
+	}
+
+	public String getPrefix() {
+		return prefix;
 	}
 
 	public ThreadProvider getThreadProvider() {

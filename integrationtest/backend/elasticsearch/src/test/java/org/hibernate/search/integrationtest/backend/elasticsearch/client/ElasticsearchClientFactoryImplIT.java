@@ -660,7 +660,8 @@ public class ElasticsearchClientFactoryImplIT {
 		try ( BeanHolder<ElasticsearchClientFactory> factoryHolder =
 				beanResolver.resolve( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
 			return factoryHolder.get().create(
-					backendProperties, threadPoolProvider.getThreadProvider(),
+					backendProperties,
+					threadPoolProvider.getThreadProvider(), "Client",
 					timeoutExecutorService,
 					GsonProvider.create( GsonBuilder::new, true )
 			);

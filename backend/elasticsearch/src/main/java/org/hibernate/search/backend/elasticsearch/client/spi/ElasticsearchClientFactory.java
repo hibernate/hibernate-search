@@ -19,7 +19,8 @@ import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 public interface ElasticsearchClientFactory {
 
 	ElasticsearchClientImplementor create(ConfigurationPropertySource propertySource,
-			ThreadProvider threadProvider, ScheduledExecutorService timeoutExecutorService,
+			ThreadProvider threadProvider, String threadNamePrefix,
+			ScheduledExecutorService timeoutExecutorService,
 			GsonProvider gsonProvider);
 
 }

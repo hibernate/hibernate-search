@@ -95,12 +95,13 @@ public class ElasticsearchClientSpy implements TestRule {
 
 		@Override
 		public ElasticsearchClientImplementor create(ConfigurationPropertySource propertySource,
-				ThreadProvider threadProvider, ScheduledExecutorService timeoutExecutorService,
+				ThreadProvider threadProvider, String threadNamePrefix, ScheduledExecutorService timeoutExecutorService,
 				GsonProvider gsonProvider) {
 			createdClientCount.incrementAndGet();
-			return new SpyingElasticsearchClient(
-					delegate.create( propertySource, threadProvider, timeoutExecutorService, gsonProvider )
-			);
+			return new SpyingElasticsearchClient( delegate.create(
+					propertySource, threadProvider, threadNamePrefix,
+					timeoutExecutorService, gsonProvider
+			) );
 		}
 	}
 
