@@ -36,6 +36,15 @@ public final class SingletonTask {
 		this.failureHandler = failureHandler;
 	}
 
+	@Override
+	public String toString() {
+		return getClass().getSimpleName() + "["
+				+ "status=" + status
+				+ ", needsRun=" + needsRun
+				+ ", nextExecutionFuture=" + nextExecutionFuture
+				+ "]";
+	}
+
 	/**
 	 * Ensures the task will run in the future.
 	 * <ul>

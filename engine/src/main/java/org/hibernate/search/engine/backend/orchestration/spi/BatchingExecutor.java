@@ -60,6 +60,15 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 		this.worker = new BatchWorker<>( processor, workQueue, maxTasksPerBatch );
 	}
 
+	@Override
+	public String toString() {
+		return "BatchingExecutor["
+				+ "name=" + name
+				+ ", queue size=" + workQueue.size()
+				+ ", processing=" + processingTask
+				+ "]";
+	}
+
 	/**
 	 * Start the executor, allowing works to be submitted
 	 * through {@link #submit(BatchedWork)}.
