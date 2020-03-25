@@ -109,7 +109,8 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 	void onStart(ConfigurationPropertySource propertySource) {
 		if ( clientImplementor == null ) {
 			clientImplementor = clientFactoryHolder.get().create(
-					propertySource, threads.getThreadProvider(), threads.getWorkExecutor(), defaultGsonProvider
+					propertySource, threads.getThreadProvider(), threads.getPrefix(),
+					threads.getWorkExecutor(), defaultGsonProvider
 			);
 			clientFactoryHolder.close(); // We won't need it anymore
 
