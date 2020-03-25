@@ -111,7 +111,9 @@ public abstract class AbstractSimpleElasticsearchWork<R> implements Elasticsearc
 
 			switch ( refreshStrategy ) {
 				case FORCE:
-					executionContext.registerIndexToRefresh( refreshedIndexName );
+					if ( refreshedIndexName != null ) { // May be null for BulkWork
+						executionContext.registerIndexToRefresh( refreshedIndexName );
+					}
 					break;
 				case NONE:
 					break;
