@@ -6,8 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.query.impl;
 
+import static org.apache.lucene.search.BoostAttribute.DEFAULT_BOOST;
+
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.index.Term;
+import org.apache.lucene.search.BoostQuery;
 import org.apache.lucene.search.FuzzyQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.QueryBuilder;
@@ -23,7 +26,12 @@ public final class FuzzyQueryBuilder extends QueryBuilder {
 	}
 
 	@Override
-	protected Query newTermQuery(Term term) {
-		return new FuzzyQuery( term, maxEditDistance, prefixLength );
+	protected Query newTermQuery(Term term, float boost) {
+		Query q = new FuzzyQuery( term, maxEditDistance, prefixLength );
+		if ( boost == DEFAULT_BOOST ) {
+			return q;
+		}
+		return new BoostQuery( q, boost );
 	}
+
 }
