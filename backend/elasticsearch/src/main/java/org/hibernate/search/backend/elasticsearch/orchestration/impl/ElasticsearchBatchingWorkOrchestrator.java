@@ -30,7 +30,7 @@ public class ElasticsearchBatchingWorkOrchestrator
 		implements ElasticsearchSerialWorkOrchestrator {
 
 	// TODO HSEARCH-3575 make this configurable
-	private static final int MAX_BULK_SIZE = 250;
+	private static final int MAX_BULK_SIZE = 100;
 	/*
 	 * Setting the following constant involves a bit of guesswork.
 	 * Basically we want the number to be large enough for the orchestrator
