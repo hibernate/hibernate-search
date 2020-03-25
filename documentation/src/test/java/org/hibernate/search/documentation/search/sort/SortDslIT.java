@@ -40,7 +40,6 @@ import org.junit.runners.Parameterized;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortedSetSortField;
 
 @RunWith(Parameterized.class)
@@ -347,13 +346,13 @@ public class SortDslIT {
 					.sort( f -> f.fromLuceneSort(
 							new Sort(
 									new SortedSetSortField( "genre_sort", false ),
-									SortField.FIELD_DOC
+									new SortedSetSortField( "title_sort", false )
 							)
 					) )
 					.fetchHits( 20 );
 			// end::lucene-fromLuceneSort[]
-			assertThat( hits )
-					.extracting( Book::getId )
+
+			assertThat( hits ).extracting( Book::getId )
 					.containsExactly( BOOK4_ID, BOOK1_ID, BOOK2_ID, BOOK3_ID );
 		} );
 
