@@ -33,7 +33,7 @@ public class BackendThreads {
 		// scheduled or not, in the *same* thread pool.
 		// TODO HSEARCH-3575 make the thread pool size configurable
 		this.writeExecutor = threadPoolProvider.newScheduledExecutor(
-				Runtime.getRuntime().availableProcessors(), prefix
+				Runtime.getRuntime().availableProcessors(), prefix + " - Worker thread"
 		);
 	}
 
