@@ -163,7 +163,7 @@ public final class LuceneIndexSettings {
 
 		public static final String SHARDING_STRATEGY = "none";
 		public static final IOStrategyName IO_STRATEGY = IOStrategyName.NEAR_REAL_TIME;
-		public static final int IO_COMMIT_INTERVAL = 0;
+		public static final int IO_COMMIT_INTERVAL = 1000;
 		public static final int IO_REFRESH_INTERVAL = 0;
 	}
 }
