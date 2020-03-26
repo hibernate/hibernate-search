@@ -24,20 +24,16 @@ import org.hibernate.search.engine.reporting.FailureHandler;
  *
  * <h3 id="parallel-orchestrators">Parallel orchestrators</h3>
  *
- * Parallel orchestrators execute worksets in no particular order.
+ * Parallel orchestrators execute works in no particular order.
  * <p>
  * They are suitable when the client takes the responsibility
  * of submitting works as needed to implement ordering: if work #2 must be executed after work #1,
- * the client will submit #1 and #2 in that order in the same workset,
- * or will take care to wait until #1 is done before he submits #2 in a different workset.
+ * the client will take care of waiting until #1 is done before he submits #2.
  * <p>
  * With a parallel orchestrator:
  * <ul>
- *     <li>Works submitted in the same workset will be executed in the given order.
- *     <li>Relative execution order between worksets is undefined.
- *     <li>Two works from the same workset may be sent together in a single bulk request,
- *     but only if all the works between them are bulked too.
- *     <li>Two works from different worksets may be sent together in a single bulk request.
+ *     <li>Works are executed in unpredictable order, irrespective of the order they were submitted in.
+ *     <li>Two submitted works may be sent together in a single bulk request.
  * </ul>
  * <p>
  * Parallel orchestrators from a single {@link ElasticsearchWorkOrchestratorProvider} (i.e. from a single backend)
@@ -45,19 +41,17 @@ import org.hibernate.search.engine.reporting.FailureHandler;
  *
  * <h3 id="serial-orchestrators">Serial orchestrators</h3>
  *
- * Serial orchestrators execute worksets in the order they were submitted.
+ * Serial orchestrators execute works in the order they were submitted.
  * <p>
- * They are best used as index-scoped orchestrators, when many worksets are submitted from different threads:
- * they allow to easily implement a reasonably safe (though imperfect) concurrency control by expecting
- * the most recent workset to hold the most recent data to be indexed.
+ * They are best used as index-scoped orchestrators, when many works are submitted from different threads:
+ * they allow easy implementation of a reasonably safe (though imperfect) concurrency control by expecting
+ * the most recent work to hold the most recent data to be indexed.
  * <p>
- * With serial orchestrator:
+ * With a serial orchestrator:
  * <ul>
- *     <li>Works submitted in the same workset will be executed in the given order.
- *     <li>Worksets will be executed in the order they were submitted.
- *     <li>Two works from the same workset may be sent together in a single bulk request,
+ *     <li>Works are executed in the order they were submitted in.
+ *     <li>Two submitted works from the may be sent together in a single bulk request,
  *     but only if all the works between them are bulked too.
- *     <li>Two works from different worksets may be sent together in a single bulk request.
  * </ul>
  * <p>
  * Serial orchestrators from a single {@link ElasticsearchWorkOrchestratorProvider} (i.e. from a single backend)
@@ -159,10 +153,10 @@ public class ElasticsearchWorkOrchestratorProvider {
 
 	private ElasticsearchBatchingWorkOrchestrator createBatchingSharedOrchestrator(
 			String name, ElasticsearchWorkProcessor processor,
-			int maxWorksetsPerBatch, boolean fair) {
+			int maxWorksPerBatch, boolean fair) {
 		return new ElasticsearchBatchingWorkOrchestrator(
 				name, processor, threadPoolProvider,
-				maxWorksetsPerBatch, fair,
+				maxWorksPerBatch, fair,
 				failureHandler
 		);
 	}

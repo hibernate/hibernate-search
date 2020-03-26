@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 
+import org.hibernate.search.engine.backend.orchestration.spi.BatchedWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
@@ -16,14 +17,13 @@ import org.hibernate.search.util.common.impl.Closer;
 
 /**
  * An orchestrator sharing context across multiple threads,
- * allowing to batch together worksets from different threads,
- * and thus to produce bigger bulk works.
+ * allowing works from different threads to be executed in a single thread,
+ * thus producing bigger bulk works.
  * <p>
  * More precisely, the submitted works are sent to a queue which is processed periodically
  * in a separate thread.
- * This allows to process more works when orchestrating, which allows to use bulk works
+ * This allows processing more works when orchestrating, which allows using bulk works
  * more extensively.
- *
  */
 class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrchestrator
 		implements ElasticsearchWorkOrchestratorImplementor {
@@ -36,22 +36,22 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)
 	 * @param processor A work processor to use in the background thread.
 	 * @param threadPoolProvider A provider of thread pools.
-	 * @param maxWorksetsPerBatch The maximum number of worksets to
+	 * @param maxWorksPerBatch The maximum number of works to
 	 * process in a single batch. Higher values mean lesser chance of transport
 	 * thread starvation, but higher heap consumption.
-	 * @param fair if {@code true} worksets are always submitted to the
-	 * delegate in FIFO order, if {@code false} worksets submitted
+	 * @param fair if {@code true} works are always submitted to the
+	 * delegate in FIFO order, if {@code false} works submitted
 	 * when the internal queue is full may be submitted out of order.
 	 * @param failureHandler A failure handler to report failures of the background thread.
 	 */
 	ElasticsearchBatchingWorkOrchestrator(
 			String name, ElasticsearchWorkProcessor processor, ThreadPoolProvider threadPoolProvider,
-			int maxWorksetsPerBatch, boolean fair,
+			int maxWorksPerBatch, boolean fair,
 			FailureHandler failureHandler) {
 		super( name );
 		this.threadPoolProvider = threadPoolProvider;
 		this.executor = new BatchingExecutor<>(
-				name, processor, maxWorksetsPerBatch, fair,
+				name, processor, maxWorksPerBatch, fair,
 				failureHandler
 		);
 	}
@@ -79,8 +79,8 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 	}
 
 	@Override
-	protected void doSubmit(ElasticsearchWorkSet workSet) throws InterruptedException {
-		executor.submit( workSet );
+	protected void doSubmit(BatchedWork<ElasticsearchWorkProcessor> work) throws InterruptedException {
+		executor.submit( work );
 	}
 
 	@Override
@@ -109,8 +109,8 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 		}
 
 		@Override
-		protected void doSubmit(ElasticsearchWorkSet workSet) {
-			ElasticsearchBatchingWorkOrchestrator.this.submit( workSet );
+		protected void doSubmit(BatchedWork<ElasticsearchWorkProcessor> work) {
+			ElasticsearchBatchingWorkOrchestrator.this.submit( work );
 		}
 
 		@Override

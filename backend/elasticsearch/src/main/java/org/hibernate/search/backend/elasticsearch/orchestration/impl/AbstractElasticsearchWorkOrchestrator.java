@@ -10,12 +10,13 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.engine.backend.orchestration.spi.AbstractWorkOrchestrator;
+import org.hibernate.search.engine.backend.orchestration.spi.BatchedWork;
 
 /**
  * An abstract base for {@link ElasticsearchWorkOrchestratorImplementor} implementations.
  */
 abstract class AbstractElasticsearchWorkOrchestrator
-		extends AbstractWorkOrchestrator<ElasticsearchWorkSet>
+		extends AbstractWorkOrchestrator<BatchedWork<ElasticsearchWorkProcessor>>
 		implements ElasticsearchWorkOrchestratorImplementor {
 
 	AbstractElasticsearchWorkOrchestrator(String name) {
@@ -25,7 +26,7 @@ abstract class AbstractElasticsearchWorkOrchestrator
 	@Override
 	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
 		CompletableFuture<T> future = new CompletableFuture<>();
-		submit( new ElasticsearchSingleWorkSet<>( work, future ) );
+		submit( new ElasticsearchBatchedWork<>( work, future ) );
 		return future;
 	}
 
