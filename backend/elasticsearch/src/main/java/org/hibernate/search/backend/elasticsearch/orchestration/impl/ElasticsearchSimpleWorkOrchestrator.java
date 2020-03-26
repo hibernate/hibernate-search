@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 
 public class ElasticsearchSimpleWorkOrchestrator
 		extends AbstractElasticsearchWorkOrchestrator<ElasticsearchSimpleWorkOrchestrator.WorkExecution<?>>
-		implements ElasticsearchParallelWorkOrchestrator, ElasticsearchWorkOrchestratorImplementor {
+		implements ElasticsearchParallelWorkOrchestrator {
 
 	private ElasticsearchWorkExecutionContext executionContext;
 

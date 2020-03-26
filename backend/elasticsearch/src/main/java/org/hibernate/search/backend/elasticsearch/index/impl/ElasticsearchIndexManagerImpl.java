@@ -21,7 +21,6 @@ import org.hibernate.search.backend.elasticsearch.orchestration.impl.Elasticsear
 import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexSchemaManager;
 import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexLifecycleExecutionOptions;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorImplementor;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.WorkExecutionIndexManagerContext;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
@@ -125,7 +124,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
-					.push( ElasticsearchWorkOrchestratorImplementor::stop, indexingOrchestrator );
+					.push( ElasticsearchBatchingWorkOrchestrator::stop, indexingOrchestrator );
 			throw e;
 		}
 	}
@@ -138,7 +137,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 	@Override
 	public void stop() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( ElasticsearchWorkOrchestratorImplementor::stop, indexingOrchestrator );
+			closer.push( ElasticsearchBatchingWorkOrchestrator::stop, indexingOrchestrator );
 			schemaManager = null;
 		}
 		catch (IOException e) {

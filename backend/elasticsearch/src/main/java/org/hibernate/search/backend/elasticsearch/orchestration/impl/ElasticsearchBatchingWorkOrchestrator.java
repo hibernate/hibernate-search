@@ -25,7 +25,7 @@ import org.hibernate.search.engine.reporting.FailureHandler;
  * which is a good thing when using bulk works.
  */
 public class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrchestrator<BatchedWork<ElasticsearchBatchedWorkProcessor>>
-		implements ElasticsearchSerialWorkOrchestrator, ElasticsearchWorkOrchestratorImplementor {
+		implements ElasticsearchSerialWorkOrchestrator {
 
 	// TODO HSEARCH-3575 make this configurable
 	private static final int MAX_BULK_SIZE = 250;

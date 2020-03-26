@@ -10,12 +10,8 @@ import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 import org.hibernate.search.engine.backend.orchestration.spi.AbstractWorkOrchestrator;
 
-/**
- * An abstract base for {@link ElasticsearchWorkOrchestratorImplementor} implementations.
- */
 abstract class AbstractElasticsearchWorkOrchestrator<W>
-		extends AbstractWorkOrchestrator<W>
-		implements ElasticsearchWorkOrchestratorImplementor {
+		extends AbstractWorkOrchestrator<W> {
 
 	protected final ElasticsearchLink link;
 
