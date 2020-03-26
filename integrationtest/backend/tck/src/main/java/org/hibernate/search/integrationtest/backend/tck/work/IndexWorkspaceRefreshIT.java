@@ -33,6 +33,13 @@ public class IndexWorkspaceRefreshIT extends AbstractIndexWorkspaceSimpleOperati
 	}
 
 	@Override
+	protected void beforeInitData(StubMappingIndexManager indexManager) {
+		// Make sure index readers are initialized before writing,
+		// otherwise the preconditions won't be met.
+		indexManager.createScope().query().where( f -> f.matchAll() ).fetchTotalHitCount();
+	}
+
+	@Override
 	protected void assertPreconditions(StubMappingIndexManager indexManager) {
 		long count = indexManager.createScope().query().where( f -> f.matchAll() )
 				.fetchTotalHitCount();
