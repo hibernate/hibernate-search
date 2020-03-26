@@ -20,12 +20,6 @@ import org.hibernate.search.backend.lucene.work.impl.IndexingWork;
  */
 public interface LuceneSerialWorkOrchestrator {
 
-	default <T> CompletableFuture<T> submit(IndexingWork<T> work) {
-		CompletableFuture<T> future = new CompletableFuture<>();
-		submit( new LuceneBatchedWork<>( work, future ) );
-		return future;
-	}
-
 	default <T> void submit(CompletableFuture<T> future, IndexingWork<T> work) {
 		submit( new LuceneBatchedWork<>( work, future ) );
 	}
