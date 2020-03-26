@@ -24,7 +24,6 @@ import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSimpleWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorImplementor;
 import org.hibernate.search.backend.elasticsearch.resources.impl.BackendThreads;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -129,7 +128,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 	@Override
 	public void stop() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( ElasticsearchWorkOrchestratorImplementor::stop, generalPurposeOrchestrator );
+			closer.push( ElasticsearchSimpleWorkOrchestrator::stop, generalPurposeOrchestrator );
 			closer.push( ElasticsearchLinkImpl::onStop, link );
 			closer.push( BeanHolder::close, indexLayoutStrategyHolder );
 			closer.push( BackendThreads::onStop, threads );
