@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.client.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
@@ -23,7 +24,6 @@ import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -126,15 +126,16 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 	@Override
 	public ElasticsearchClientImplementor create(ConfigurationPropertySource propertySource,
-			ThreadPoolProvider threadPoolProvider, GsonProvider gsonProvider) {
+			ThreadProvider threadProvider, ScheduledExecutorService timeoutExecutorService,
+			GsonProvider gsonProvider) {
 		int requestTimeoutMs = REQUEST_TIMEOUT.get( propertySource );
 
 		ServerUris hosts = ServerUris.fromStrings( PROTOCOL.get( propertySource ), HOSTS.get( propertySource ) );
-		RestClient restClient = createClient( hosts, propertySource, threadPoolProvider.getThreadProvider() );
+		RestClient restClient = createClient( hosts, propertySource, threadProvider );
 		Sniffer sniffer = createSniffer( hosts, restClient, propertySource );
 
 		return new ElasticsearchClientImpl(
-				restClient, sniffer, threadPoolProvider,
+				restClient, sniffer, timeoutExecutorService,
 				requestTimeoutMs, TimeUnit.MILLISECONDS,
 				gsonProvider.getGson(), gsonProvider.getLogHelper()
 		);

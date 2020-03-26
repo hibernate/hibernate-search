@@ -25,6 +25,7 @@ import org.hibernate.search.backend.elasticsearch.mapping.impl.TypeNameMapping;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorImplementor;
 import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorProvider;
+import org.hibernate.search.backend.elasticsearch.resources.impl.BackendThreads;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.engine.backend.Backend;
@@ -34,7 +35,6 @@ import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.Closer;
@@ -50,9 +50,10 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final ElasticsearchLinkImpl link;
-
 	private final String name;
+
+	private final BackendThreads threads;
+	private final ElasticsearchLinkImpl link;
 
 	private final ElasticsearchWorkOrchestratorProvider orchestratorProvider;
 	private final ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider;
@@ -69,8 +70,8 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 	private final IndexNamesRegistry indexNamesRegistry;
 
 	ElasticsearchBackendImpl(String name,
+			BackendThreads threads,
 			ElasticsearchLinkImpl link,
-			ThreadPoolProvider threadPoolProvider,
 			ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
 			Gson userFacingGson,
 			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
@@ -78,13 +79,13 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 			BeanHolder<? extends IndexLayoutStrategy> indexLayoutStrategyHolder,
 			TypeNameMapping typeNameMapping,
 			FailureHandler failureHandler) {
-		this.link = link;
 		this.name = name;
+		this.threads = threads;
+		this.link = link;
 
 		this.orchestratorProvider = new ElasticsearchWorkOrchestratorProvider(
 				"Elasticsearch parallel work orchestrator for backend " + name,
-				link,
-				threadPoolProvider,
+				threads, link,
 				failureHandler
 		);
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
@@ -119,6 +120,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 
 	@Override
 	public void start(BackendStartContext context) {
+		threads.onStart( context.getThreadPoolProvider() );
 		link.onStart( context.getConfigurationPropertySource() );
 		orchestratorProvider.start();
 		queryOrchestrator.start();
@@ -140,6 +142,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 			// Close the client after the orchestrators, when we're sure all works have been performed
 			closer.push( ElasticsearchLinkImpl::onStop, link );
 			closer.push( BeanHolder::close, indexLayoutStrategyHolder );
+			closer.push( BackendThreads::onStop, threads );
 		}
 		catch (IOException | RuntimeException e) {
 			throw log.failedToShutdownBackend( e, eventContext );

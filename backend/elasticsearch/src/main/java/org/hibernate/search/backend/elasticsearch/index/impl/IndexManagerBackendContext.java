@@ -183,4 +183,5 @@ public class IndexManagerBackendContext implements SearchBackendContext, WorkExe
 	String toElasticsearchId(String tenantId, String id) {
 		return multiTenancyStrategy.toElasticsearchId( tenantId, id );
 	}
+
 }

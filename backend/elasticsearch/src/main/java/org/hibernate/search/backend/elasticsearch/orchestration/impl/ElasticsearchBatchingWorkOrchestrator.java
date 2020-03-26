@@ -7,13 +7,11 @@
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
 
+import org.hibernate.search.backend.elasticsearch.resources.impl.BackendThreads;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchedWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
-import org.hibernate.search.util.common.impl.Closer;
 
 /**
  * An orchestrator sharing context across multiple threads,
@@ -28,14 +26,13 @@ import org.hibernate.search.util.common.impl.Closer;
 class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrchestrator
 		implements ElasticsearchWorkOrchestratorImplementor {
 
-	private final ThreadPoolProvider threadPoolProvider;
-	private ExecutorService executorService;
+	private final BackendThreads threads;
 	private final BatchingExecutor<ElasticsearchWorkProcessor> executor;
 
 	/**
 	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)
 	 * @param processor A work processor to use in the background thread.
-	 * @param threadPoolProvider A provider of thread pools.
+	 * @param threads The threads for this backend.
 	 * @param maxWorksPerBatch The maximum number of works to
 	 * process in a single batch. Higher values mean lesser chance of transport
 	 * thread starvation, but higher heap consumption.
@@ -45,11 +42,11 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 	 * @param failureHandler A failure handler to report failures of the background thread.
 	 */
 	ElasticsearchBatchingWorkOrchestrator(
-			String name, ElasticsearchWorkProcessor processor, ThreadPoolProvider threadPoolProvider,
+			String name, ElasticsearchWorkProcessor processor, BackendThreads threads,
 			int maxWorksPerBatch, boolean fair,
 			FailureHandler failureHandler) {
 		super( name );
-		this.threadPoolProvider = threadPoolProvider;
+		this.threads = threads;
 		this.executor = new BatchingExecutor<>(
 				name, processor, maxWorksPerBatch, fair,
 				failureHandler
@@ -74,8 +71,7 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 
 	@Override
 	protected void doStart() {
-		executorService = threadPoolProvider.newFixedThreadPool( 1, getName() );
-		executor.start( executorService );
+		executor.start( threads.getWorkExecutor() );
 	}
 
 	@Override
@@ -90,10 +86,7 @@ class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrc
 
 	@Override
 	protected void doStop() {
-		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( BatchingExecutor::stop, executor );
-			closer.push( ExecutorService::shutdownNow, executorService );
-		}
+		executor.stop();
 	}
 
 	private class ElasticsearchChildBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrchestrator
