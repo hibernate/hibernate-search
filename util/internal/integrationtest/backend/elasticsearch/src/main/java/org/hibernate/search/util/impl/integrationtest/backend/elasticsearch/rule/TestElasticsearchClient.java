@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactoryImpl;
@@ -61,6 +62,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 	private final ElasticsearchTestDialect dialect = ElasticsearchTestDialect.get();
 
 	private ThreadPoolProviderImpl threadPoolProvider;
+	private ScheduledExecutorService timeoutExecutorService;
 	private ElasticsearchClientImplementor client;
 
 	private final List<URLEncodedString> createdIndicesNames = new ArrayList<>();
@@ -706,6 +708,7 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		threadPoolProvider = new ThreadPoolProviderImpl(
 				BeanHolder.of( new DefaultThreadProvider( "Test Elasticsearch client: " ) )
 		);
+		timeoutExecutorService = threadPoolProvider.newScheduledExecutor( 1, "Timeout - " );
 
 		BeanResolver beanResolver = configurationProvider.createBeanResolverForTest();
 		/*
@@ -718,7 +721,9 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		try ( BeanHolder<ElasticsearchClientFactory> factoryHolder =
 				beanResolver.resolve( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
 			client = factoryHolder.get().create(
-					backendProperties, threadPoolProvider, GsonProvider.create( GsonBuilder::new, true )
+					backendProperties, threadPoolProvider.getThreadProvider(),
+					timeoutExecutorService,
+					GsonProvider.create( GsonBuilder::new, true )
 			);
 		}
 	}
@@ -738,6 +743,9 @@ public class TestElasticsearchClient implements TestRule, Closeable {
 		closer.push( this::tryCloseClient, client );
 		client = null;
 		closer.push( ThreadPoolProviderImpl::close, threadPoolProvider );
+		threadPoolProvider = null;
+		closer.push( ScheduledExecutorService::shutdownNow, timeoutExecutorService );
+		timeoutExecutorService = null;
 		client = null;
 	}
 

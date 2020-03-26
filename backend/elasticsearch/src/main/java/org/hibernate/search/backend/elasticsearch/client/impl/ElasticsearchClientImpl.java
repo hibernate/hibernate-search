@@ -36,7 +36,6 @@ import org.hibernate.search.backend.elasticsearch.gson.spi.JsonLogHelper;
 import org.hibernate.search.backend.elasticsearch.logging.impl.ElasticsearchLogCategories;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.util.common.impl.Closer;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -63,12 +62,12 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 	private final JsonLogHelper jsonLogHelper;
 
 	ElasticsearchClientImpl(RestClient restClient, Sniffer sniffer,
-			ThreadPoolProvider threadPoolProvider,
+			ScheduledExecutorService timeoutExecutorService,
 			int globalTimeoutValue, TimeUnit globalTimeoutUnit,
 			Gson gson, JsonLogHelper jsonLogHelper) {
 		this.restClient = restClient;
 		this.sniffer = sniffer;
-		this.timeoutExecutorService = threadPoolProvider.newScheduledExecutor( 1, "Timeout executor" );
+		this.timeoutExecutorService = timeoutExecutorService;
 		this.globalTimeoutValue = globalTimeoutValue;
 		this.globalTimeoutUnit = globalTimeoutUnit;
 		this.gson = gson;
@@ -231,7 +230,6 @@ public class ElasticsearchClientImpl implements ElasticsearchClientImplementor {
 			 */
 			closer.push( Sniffer::close, this.sniffer );
 			closer.push( RestClient::close, this.restClient );
-			closer.push( ScheduledExecutorService::shutdownNow, timeoutExecutorService );
 		}
 	}
 

@@ -19,11 +19,11 @@ import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.metadata.impl.ElasticsearchIndexMetadataSyntax;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
+import org.hibernate.search.backend.elasticsearch.resources.impl.BackendThreads;
 import org.hibernate.search.backend.elasticsearch.search.query.impl.ElasticsearchSearchResultExtractorFactory;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -36,7 +36,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder;
-	private final ThreadPoolProvider threadPoolProvider;
+	private final BackendThreads threads;
 	private final GsonProvider defaultGsonProvider;
 	private final boolean logPrettyPrinting;
 	private final ElasticsearchDialectFactory dialectFactory;
@@ -52,12 +52,12 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 	private ElasticsearchSearchResultExtractorFactory searchResultExtractorFactory;
 
 	ElasticsearchLinkImpl(BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder,
-			ThreadPoolProvider threadPoolProvider, GsonProvider defaultGsonProvider, boolean logPrettyPrinting,
+			BackendThreads threads, GsonProvider defaultGsonProvider, boolean logPrettyPrinting,
 			ElasticsearchDialectFactory dialectFactory,
 			Optional<ElasticsearchVersion> configuredVersionOptional,
 			boolean versionCheckEnabled) {
 		this.clientFactoryHolder = clientFactoryHolder;
-		this.threadPoolProvider = threadPoolProvider;
+		this.threads = threads;
 		this.defaultGsonProvider = defaultGsonProvider;
 		this.logPrettyPrinting = logPrettyPrinting;
 		this.dialectFactory = dialectFactory;
@@ -109,7 +109,7 @@ class ElasticsearchLinkImpl implements ElasticsearchLink {
 	void onStart(ConfigurationPropertySource propertySource) {
 		if ( clientImplementor == null ) {
 			clientImplementor = clientFactoryHolder.get().create(
-					propertySource, threadPoolProvider, defaultGsonProvider
+					propertySource, threads.getThreadProvider(), threads.getWorkExecutor(), defaultGsonProvider
 			);
 			clientFactoryHolder.close(); // We won't need it anymore
 
