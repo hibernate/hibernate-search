@@ -41,7 +41,13 @@ public class IdClassIT {
 	public void idClass_indexed() {
 		SubTest.expectException( () -> ormSetupHelper.start().setup( IdClassIndexed.class ) )
 				.assertThrown()
-				.isInstanceOf( SearchException.class );
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"There isn't any explicit document ID mapping for indexed type '"
+								+ IdClassIndexed.class.getName() + "'",
+						"the entity ID cannot be used as a default because"
+								+ " the property representing the entity ID cannot be found"
+				);
 	}
 
 	// This used to fail with an NPE at bootstrap
