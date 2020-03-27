@@ -237,8 +237,9 @@ public class DocumentIdBaseIT {
 						.typeContext( IndexedEntity.class.getName() )
 						.failure(
 								"There isn't any explicit document ID mapping for indexed type '"
-										+ IndexedEntity.class.getName() + "',"
-										+ " and the entity ID cannot be used as a default because it is unknown"
+										+ IndexedEntity.class.getName() + "'",
+								"the entity ID cannot be used as a default because"
+										+ " the property representing the entity ID cannot be found"
 						)
 						.build()
 				);

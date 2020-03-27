@@ -214,7 +214,8 @@ public interface Log extends BasicLogger {
 
 	@Message(id = ID_OFFSET_2 + 28,
 			value = "There isn't any explicit document ID mapping for indexed type '%1$s',"
-					+ " and the entity ID cannot be used as a default because it is unknown.")
+					+ " and the entity ID cannot be used as a default because"
+					+ " the property representing the entity ID cannot be found.")
 	SearchException missingIdentifierMapping(@FormatWith(PojoTypeModelFormatter.class) PojoRawTypeModel<?> typeModel);
 
 	@Message(id = ID_OFFSET_2 + 29,
