@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.mapper.orm.mapping.impl;
 
+import java.util.Optional;
+
 import org.hibernate.mapping.PersistentClass;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmPathFilterFactory;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoMappingCollectorTypeNode;
@@ -17,13 +19,13 @@ final class HibernateOrmEntityTypeMetadataContributor implements PojoTypeMetadat
 
 	private final PojoRawTypeIdentifier<?> typeIdentifier;
 	private final PersistentClass persistentClass;
-	private final String idPropertyName;
+	private final Optional<String> identifierPropertyNameOptional;
 
 	HibernateOrmEntityTypeMetadataContributor(PojoRawTypeIdentifier<?> typeIdentifier,
-			PersistentClass persistentClass, String idPropertyName) {
+			PersistentClass persistentClass, Optional<String> identifierPropertyNameOptional) {
 		this.typeIdentifier = typeIdentifier;
 		this.persistentClass = persistentClass;
-		this.idPropertyName = idPropertyName;
+		this.identifierPropertyNameOptional = identifierPropertyNameOptional;
 	}
 
 	@Override
@@ -36,7 +38,7 @@ final class HibernateOrmEntityTypeMetadataContributor implements PojoTypeMetadat
 				persistentClass.getJpaEntityName(),
 				new HibernateOrmPathFilterFactory( persistentClass )
 		)
-				.entityIdPropertyName( idPropertyName );
+				.entityIdPropertyName( identifierPropertyNameOptional.orElse( null ) );
 	}
 
 	@Override
