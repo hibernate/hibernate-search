@@ -30,7 +30,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  */
 public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 
-	private final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final String name;
 
