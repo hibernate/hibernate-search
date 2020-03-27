@@ -11,6 +11,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.StringTokenizer;
 
 import org.hibernate.mapping.Column;
@@ -27,8 +28,8 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurat
 import org.hibernate.search.mapper.orm.common.impl.PropertyComparator;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBasicTypeMetadataProvider;
 import org.hibernate.search.mapper.orm.model.impl.HibernateOrmBootstrapIntrospector;
-import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.builtin.BuiltinContainerExtractors;
+import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.ErrorCollectingPojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.building.spi.PojoTypeMetadataContributor;
 import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationContributor;
@@ -63,14 +64,16 @@ public final class HibernateOrmMetatadaContributor implements PojoMappingConfigu
 			}
 			collectPropertyDelegates( delegatesCollector, typeModel, persistentClass.getPropertyIterator() );
 
-			String identifierPropertyName = persistentClass.getIdentifierProperty().getName();
+			Property identifierProperty = persistentClass.getIdentifierProperty();
+			Optional<String> identifierPropertyNameOptional =
+					Optional.ofNullable( identifierProperty ).map( Property::getName );
 			List<PojoTypeMetadataContributor> delegates = delegatesCollector.buildAndRemove( typeModel );
 
 			configurationCollector.collectContributor(
 					typeModel,
 					new ErrorCollectingPojoTypeMetadataContributor()
 							.add( new HibernateOrmEntityTypeMetadataContributor(
-									typeModel.getTypeIdentifier(), persistentClass, identifierPropertyName
+									typeModel.getTypeIdentifier(), persistentClass, identifierPropertyNameOptional
 							) )
 							.addAll( delegates )
 			);
