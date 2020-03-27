@@ -56,7 +56,7 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 		this.name = name;
 		this.failureHandler = failureHandler;
 		this.workQueue = new ArrayBlockingQueue<>( maxTasksPerBatch, fair );
-		this.worker = new BatchWorker<>( processor, workQueue, maxTasksPerBatch );
+		this.worker = new BatchWorker<>( name, processor, workQueue, maxTasksPerBatch );
 	}
 
 	@Override
@@ -136,13 +136,15 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 	private static final class BatchWorker<P extends BatchedWorkProcessor> implements SingletonTask.Worker {
 		private final CompletableFuture<?> completedFuture = CompletableFuture.completedFuture( null );
 
+		private final String name;
 		private final P processor;
 		private final BlockingQueue<BatchedWork<? super P>> workQueue;
 		private final int maxTasksPerBatch;
 		private final List<BatchedWork<? super P>> workBuffer;
 
-		private BatchWorker(P processor, BlockingQueue<BatchedWork<? super P>> workQueue,
+		private BatchWorker(String name, P processor, BlockingQueue<BatchedWork<? super P>> workQueue,
 				int maxTasksPerBatch) {
+			this.name = name;
 			this.processor = processor;
 			this.workQueue = workQueue;
 			this.maxTasksPerBatch = maxTasksPerBatch;
@@ -159,6 +161,12 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 				return completedFuture;
 			}
 
+			int workCount = workBuffer.size();
+			boolean debugEnabled = log.isDebugEnabled();
+			if ( debugEnabled ) {
+				log.debugf( "Processing %d works in executor '%s'", workCount, name );
+			}
+
 			processor.beginBatch();
 
 			for ( BatchedWork<? super P> work : workBuffer ) {
@@ -171,7 +179,14 @@ public final class BatchingExecutor<P extends BatchedWorkProcessor> {
 			}
 
 			// Nothing more to do, end the batch and terminate
-			return processor.endBatch();
+			CompletableFuture<?> future = processor.endBatch();
+			if ( debugEnabled ) {
+				future.whenComplete( (result, throwable) -> {
+					log.debugf( "Processed %d works in executor '%s'", workCount, name );
+				} );
+			}
+
+			return future;
 		}
 
 		@Override
