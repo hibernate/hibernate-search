@@ -543,6 +543,19 @@ link:http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters[Solr Wiki]
 it's just that there is no documentation page for Lucene proper).
 ====
 
+[[backend-lucene-threads]]
+== Threads
+
+The Lucene backend relies on an internal thread pool to execute write operations on the index.
+
+By default, the pool contains exactly as many threads as the number of processors available to the JVM on bootstrap.
+That can be changed using a configuration property:
+
+[source]
+----
+hibernate.search.backends.<backend-name>.thread_pool.size = 4
+----
+
 [[backend-lucene-io]]
 == Writing and reading
 

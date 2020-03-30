@@ -136,7 +136,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			}
 			else {
 				// We must determine the Elasticsearch version, and thus instantiate the client, right now.
-				threads.onStart( buildContext.getThreadPoolProvider() );
+				threads.onStart( propertySource, buildContext.getThreadPoolProvider() );
 				link.onStart( propertySource );
 
 				version = link.getElasticsearchVersion();
