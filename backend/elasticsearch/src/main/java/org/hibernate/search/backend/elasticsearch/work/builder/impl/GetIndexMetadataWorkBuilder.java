@@ -9,11 +9,11 @@ package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.ExistingIndexMetadata;
 
 
-public interface GetIndexMetadataWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<List<ExistingIndexMetadata>>> {
+public interface GetIndexMetadataWorkBuilder extends ElasticsearchWorkBuilder<NonBulkableWork<List<ExistingIndexMetadata>>> {
 
 	GetIndexMetadataWorkBuilder index(URLEncodedString indexName);
 

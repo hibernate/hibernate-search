@@ -26,6 +26,13 @@ public class IndexWorkspacePurgeIT extends AbstractIndexWorkspaceSimpleOperation
 	}
 
 	@Override
+	protected void afterInitData(StubMappingIndexManager indexManager) {
+		// Make sure to flush the index, otherwise the test won't fail as expected with Lucene,
+		// probably because the index writer optimizes purges when changes are not committed yet.
+		indexManager.createWorkspace().flush();
+	}
+
+	@Override
 	protected void assertPreconditions(StubMappingIndexManager indexManager) {
 		indexManager.createWorkspace().refresh().join();
 		long count = indexManager.createScope().query().where( f -> f.matchAll() )

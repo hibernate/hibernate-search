@@ -7,8 +7,20 @@
 package org.hibernate.search.backend.lucene.lowlevel.writer.impl;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
+import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
+import org.hibernate.search.engine.reporting.FailureContext;
+import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.engine.backend.orchestration.spi.SingletonTask;
+import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.index.DirectoryReader;
 import org.apache.lucene.index.IndexWriter;
@@ -21,16 +33,42 @@ import org.apache.lucene.search.Query;
  */
 public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 
+	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+
 	private final IndexWriter delegate;
+	private final EventContext eventContext;
 	private final TimingSource timingSource;
 	private final int commitInterval;
+	private final FailureHandler failureHandler;
+
+	private final SingletonTask delayedCommitTask;
+	private final Object commitLock = new Object();
 
 	private long commitExpiration;
 
-	public IndexWriterDelegatorImpl(IndexWriter delegate, TimingSource timingSource, int commitInterval) {
+	public IndexWriterDelegatorImpl(IndexWriter delegate, EventContext eventContext,
+			ScheduledExecutorService delayedCommitExecutor,
+			TimingSource timingSource, int commitInterval,
+			FailureHandler failureHandler,
+			DelayedCommitFailureHandler delayedCommitFailureHandler) {
 		this.delegate = delegate;
+		this.eventContext = eventContext;
 		this.timingSource = timingSource;
 		this.commitInterval = commitInterval;
+		this.failureHandler = failureHandler;
+
+		if ( commitInterval == 0L ) {
+			delayedCommitTask = null;
+		}
+		else {
+			delayedCommitTask = new SingletonTask(
+					"Delayed commit for " + eventContext.render(),
+					new LuceneDelayedCommitWorker( delayedCommitFailureHandler ),
+					new LuceneDelayedCommitScheduler( delayedCommitExecutor ),
+					failureHandler
+			);
+		}
+
 		updateCommitExpiration();
 	}
 
@@ -54,24 +92,36 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 		return delegate.deleteDocuments( query );
 	}
 
-	@Override
 	public void mergeSegments() throws IOException {
 		delegate.forceMerge( 1 );
 	}
 
-	public void commit() throws IOException {
+	public void commit() {
 		doCommit();
 	}
 
-	public long commitOrDelay() throws IOException {
-		long timeToCommit = commitInterval == 0 ? 0L : commitExpiration - timingSource.getMonotonicTimeEstimate();
-
-		if ( timeToCommit > 0L ) {
-			return timeToCommit;
+	public void commitOrDelay() {
+		if ( !delegate.hasUncommittedChanges() ) {
+			// No need to either commit or plan a delayed commit: there's nothing to commit.
+			return;
 		}
-		else {
+
+		if ( delayCommit() ) {
+			// The commit was delayed
+			return;
+		}
+
+		// Synchronize in order to prevent a scenario where two threads call commitOrDelay() concurrently,
+		// both notice the previous commit has expired, and both trigger a commit,
+		// resulting in two commits where one would have been enough.
+		synchronized (commitLock) {
+			if ( delayCommit() ) {
+				// The commit was delayed
+				return;
+			}
+
+			// The previous commit has expired
 			doCommit();
-			return 0L;
 		}
 	}
 
@@ -84,15 +134,124 @@ public class IndexWriterDelegatorImpl implements IndexWriterDelegator {
 	}
 
 	void close() throws IOException {
-		delegate.close();
+		try ( Closer<IOException> closer = new Closer<>() ) {
+			closer.push( SingletonTask::stop, delayedCommitTask );
+			// Avoid problems with closing while a (delayed) commit is in progress:
+			// Lucene throws an exception in that case.
+			synchronized (commitLock) {
+				closer.push( IndexWriter::close, delegate );
+			}
+			log.trace( "IndexWriter closed" );
+		}
 	}
 
-	private void doCommit() throws IOException {
-		delegate.commit();
-		updateCommitExpiration();
+	public void closeAfterFailure(Throwable throwable, Object failingOperation) {
+		Exception exceptionToReport = log.uncommittedOperationsBecauseOfFailure( throwable.getMessage(), eventContext, throwable );
+		try {
+			close();
+		}
+		catch (RuntimeException | IOException e) {
+			exceptionToReport.addSuppressed( log.unableToCloseIndexWriterAfterFailures( eventContext, e ) );
+		}
+
+		/*
+		 * The failing operation will be reported elsewhere,
+		 * but that report will not mention that some previously executed,
+		 * but uncommitted operations may have been affected too.
+		 * Report the failure again, just to warn about previous operations potentially being affected.
+		 */
+		FailureContext.Builder failureContextBuilder = FailureContext.builder();
+		failureContextBuilder.throwable( exceptionToReport );
+		failureContextBuilder.failingOperation( failingOperation );
+		FailureContext failureContext = failureContextBuilder.build();
+		failureHandler.handle( failureContext );
+	}
+
+	private void doCommit() {
+		try {
+			synchronized (commitLock) {
+				delegate.commit();
+				updateCommitExpiration();
+			}
+		}
+		catch (RuntimeException | IOException e) {
+			throw log.unableToCommitIndex( eventContext, e );
+		}
+	}
+
+	/**
+	 * @return {@code true} if the commit was delayed, {@code false} if it wasn't and must happen now.
+	 */
+	private boolean delayCommit() {
+		long timeToCommit = getTimeToCommit();
+		if ( timeToCommit <= 0L ) {
+			// The commit must happen now.
+			return false;
+		}
+
+		// There's still time before we must commit.
+		// Just make sure the commit will happen eventually.
+		delayedCommitTask.ensureScheduled();
+		return true;
+	}
+
+	private long getTimeToCommit() {
+		if ( commitInterval == 0L ) {
+			// We never delay anything in this case,
+			// so there's no need to query the timing source (which is probably null in this case).
+			return 0L;
+		}
+
+		return commitExpiration - timingSource.getMonotonicTimeEstimate();
 	}
 
 	private void updateCommitExpiration() {
 		commitExpiration = commitInterval == 0 ? 0L : timingSource.getMonotonicTimeEstimate() + commitInterval;
+	}
+
+	private class LuceneDelayedCommitWorker implements SingletonTask.Worker {
+		private final CompletableFuture<?> completedFuture = CompletableFuture.completedFuture( null );
+		private final DelayedCommitFailureHandler delayedCommitFailureHandler;
+
+		public LuceneDelayedCommitWorker(DelayedCommitFailureHandler delayedCommitFailureHandler) {
+			this.delayedCommitFailureHandler = delayedCommitFailureHandler;
+		}
+
+		@Override
+		public CompletableFuture<?> work() {
+			try {
+				// This will re-schedule the task if it's still not time for a commit.
+				commitOrDelay();
+			}
+			catch (Throwable t) {
+				delayedCommitFailureHandler.handle( t, "Delayed commit" );
+			}
+			return completedFuture;
+		}
+
+		@Override
+		public void complete() {
+			// Called when commitOrDelay() returns 0: nothing to do.
+		}
+	}
+
+	private class LuceneDelayedCommitScheduler implements SingletonTask.Scheduler {
+		private final ScheduledExecutorService delegate;
+
+		private LuceneDelayedCommitScheduler(ScheduledExecutorService delegate) {
+			this.delegate = delegate;
+		}
+
+		@Override
+		public Future<?> schedule(Runnable runnable) {
+			// Schedule the task for execution as soon as the last commit expires.
+			return delegate.schedule( runnable, getTimeToCommit(), TimeUnit.MILLISECONDS );
+		}
+	}
+
+	interface DelayedCommitFailureHandler {
+
+		void handle(Throwable throwable, Object failingOperation);
+
 	}
 }

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
@@ -31,33 +32,33 @@ public final class LuceneTextFieldPredicateBuilderFactory<F>
 	}
 
 	@Override
-	public LuceneTextMatchPredicateBuilder<?> createMatchPredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker) {
+	public LuceneTextMatchPredicateBuilder<?> createMatchPredicateBuilder(LuceneSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy,
+			LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker) {
 		checkSearchable( absoluteFieldPath );
 		return new LuceneTextMatchPredicateBuilder<>(
-				searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec, analyzerOrNormalizer, analyzerChecker
+				searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec, analyzerOrNormalizer, analyzerChecker
 		);
 	}
 
 	@Override
 	public LuceneTextRangePredicateBuilder<?> createRangePredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneCompatibilityChecker converterChecker) {
+			LuceneSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy, LuceneCompatibilityChecker converterChecker) {
 		checkSearchable( absoluteFieldPath );
-		return new LuceneTextRangePredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
+		return new LuceneTextRangePredicateBuilder<>( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec );
 	}
 
 	@Override
 	public PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(LuceneSearchContext searchContext,
-			String absoluteFieldPath, LuceneCompatibilityChecker analyzerChecker) {
+			String absoluteFieldPath, List<String> nestedPathHierarchy, LuceneCompatibilityChecker analyzerChecker) {
 		checkSearchable( absoluteFieldPath );
-		return new LuceneTextPhrasePredicateBuilder( searchContext, absoluteFieldPath, codec, analyzerOrNormalizer, analyzerChecker );
+		return new LuceneTextPhrasePredicateBuilder( searchContext, absoluteFieldPath, nestedPathHierarchy, codec, analyzerOrNormalizer, analyzerChecker );
 	}
 
 	@Override
 	public WildcardPredicateBuilder<LuceneSearchPredicateBuilder> createWildcardPredicateBuilder(
-			String absoluteFieldPath) {
+			String absoluteFieldPath, List<String> nestedPathHierarchy) {
 		checkSearchable( absoluteFieldPath );
-		return new LuceneTextWildcardPredicateBuilder( absoluteFieldPath, analyzerOrNormalizer );
+		return new LuceneTextWildcardPredicateBuilder( absoluteFieldPath, nestedPathHierarchy, analyzerOrNormalizer );
 	}
 
 	@Override

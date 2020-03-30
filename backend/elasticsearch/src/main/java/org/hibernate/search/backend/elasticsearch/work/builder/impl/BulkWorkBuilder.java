@@ -6,12 +6,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 
 
-public interface BulkWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<BulkResult>> {
+public interface BulkWorkBuilder extends ElasticsearchWorkBuilder<NonBulkableWork<BulkResult>> {
 
 	BulkWorkBuilder refresh(DocumentRefreshStrategy refreshStrategy);
 

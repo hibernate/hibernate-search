@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletionException;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -106,8 +107,12 @@ public class ElasticsearchClientFactoryImplIT {
 			BeanHolder.of( new DefaultThreadProvider( ElasticsearchClientFactoryImplIT.class.getName() + ": " ) )
 	);
 
+	private ScheduledExecutorService timeoutExecutorService =
+			threadPoolProvider.newScheduledExecutor( 1, "Timeout - " );
+
 	@After
 	public void cleanup() {
+		timeoutExecutorService.shutdownNow();
 		threadPoolProvider.close();
 	}
 
@@ -655,7 +660,9 @@ public class ElasticsearchClientFactoryImplIT {
 		try ( BeanHolder<ElasticsearchClientFactory> factoryHolder =
 				beanResolver.resolve( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
 			return factoryHolder.get().create(
-					backendProperties, threadPoolProvider,
+					backendProperties,
+					threadPoolProvider.getThreadProvider(), "Client",
+					timeoutExecutorService,
 					GsonProvider.create( GsonBuilder::new, true )
 			);
 		}

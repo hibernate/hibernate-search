@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactoryImpl;
@@ -97,8 +98,12 @@ public class ElasticsearchContentLengthIT {
 			BeanHolder.of( new DefaultThreadProvider( ElasticsearchContentLengthIT.class.getName() + ": " ) )
 	);
 
+	private ScheduledExecutorService timeoutExecutorService =
+			threadPoolProvider.newScheduledExecutor( 1, "Timeout - " );
+
 	@After
 	public void cleanup() {
+		timeoutExecutorService.shutdownNow();
 		threadPoolProvider.close();
 	}
 
@@ -196,7 +201,9 @@ public class ElasticsearchContentLengthIT {
 		try ( BeanHolder<ElasticsearchClientFactory> factoryHolder =
 				beanResolver.resolve( ElasticsearchClientFactoryImpl.REFERENCE ) ) {
 			return factoryHolder.get().create(
-					backendProperties, threadPoolProvider,
+					backendProperties,
+					threadPoolProvider.getThreadProvider(), "Client",
+					timeoutExecutorService,
 					GsonProvider.create( GsonBuilder::new, true )
 			);
 		}

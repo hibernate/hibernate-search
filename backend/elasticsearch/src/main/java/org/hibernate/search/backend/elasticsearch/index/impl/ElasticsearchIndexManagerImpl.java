@@ -13,39 +13,39 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.document.impl.DocumentMetadataContributor;
-import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.document.impl.ElasticsearchDocumentObjectBuilder;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.index.ElasticsearchIndexManager;
-import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexSchemaManager;
-import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexLifecycleExecutionOptions;
+import org.hibernate.search.backend.elasticsearch.index.IndexStatus;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestratorImplementor;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchBatchingWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexLifecycleExecutionOptions;
+import org.hibernate.search.backend.elasticsearch.schema.management.impl.ElasticsearchIndexSchemaManager;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.execution.impl.WorkExecutionIndexManagerContext;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
-import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
-import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.index.IndexManager;
+import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerStartContext;
+import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
+import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
+import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
+import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
+import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
-import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
-import org.hibernate.search.engine.backend.index.spi.IndexManagerImplementor;
-import org.hibernate.search.engine.backend.scope.spi.IndexScopeBuilder;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
+import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
-import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
-import org.hibernate.search.engine.backend.mapping.spi.BackendMappingContext;
-import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
-import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.impl.Closer;
+import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
+import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.JsonObject;
 
@@ -77,8 +77,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 	private final ElasticsearchIndexModel model;
 	private final List<DocumentMetadataContributor> documentMetadataContributors;
 
-	private final ElasticsearchWorkOrchestratorImplementor serialOrchestrator;
-	private final ElasticsearchWorkOrchestratorImplementor parallelOrchestrator;
+	private final ElasticsearchBatchingWorkOrchestrator indexingOrchestrator;
 
 	private ElasticsearchIndexSchemaManager schemaManager;
 
@@ -88,8 +87,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 		this.backendContext = backendContext;
 		this.model = model;
 		this.documentMetadataContributors = documentMetadataContributors;
-		this.parallelOrchestrator = backendContext.createParallelOrchestrator( model.getHibernateSearchIndexName() );
-		this.serialOrchestrator = backendContext.createSerialOrchestrator( model.getHibernateSearchIndexName() );
+		this.indexingOrchestrator = backendContext.createIndexingOrchestrator( model.getHibernateSearchIndexName() );
 	}
 
 	@Override
@@ -122,30 +120,24 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 					}
 			);
 
-			serialOrchestrator.start();
-			parallelOrchestrator.start();
+			indexingOrchestrator.start( context.getConfigurationPropertySource() );
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
-					.push( ElasticsearchWorkOrchestratorImplementor::stop, parallelOrchestrator )
-					.push( ElasticsearchWorkOrchestratorImplementor::stop, serialOrchestrator );
+					.push( ElasticsearchBatchingWorkOrchestrator::stop, indexingOrchestrator );
 			throw e;
 		}
 	}
 
 	@Override
 	public CompletableFuture<?> preStop() {
-		return CompletableFuture.allOf(
-				serialOrchestrator.preStop(),
-				parallelOrchestrator.preStop()
-		);
+		return indexingOrchestrator.preStop();
 	}
 
 	@Override
 	public void stop() {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( ElasticsearchWorkOrchestratorImplementor::stop, serialOrchestrator );
-			closer.push( ElasticsearchWorkOrchestratorImplementor::stop, parallelOrchestrator );
+			closer.push( ElasticsearchBatchingWorkOrchestrator::stop, indexingOrchestrator );
 			schemaManager = null;
 		}
 		catch (IOException e) {
@@ -197,7 +189,7 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
 		// The commit strategy is ignored, because Elasticsearch always commits changes to its transaction log.
 		return backendContext.createIndexingPlan(
-				serialOrchestrator,
+				indexingOrchestrator,
 				this,
 				sessionContext,
 				entityReferenceFactory,
@@ -206,18 +198,16 @@ class ElasticsearchIndexManagerImpl implements IndexManagerImplementor,
 	}
 
 	@Override
-	public IndexIndexer createIndexer(
-			BackendSessionContext sessionContext, DocumentCommitStrategy commitStrategy) {
-		// The commit strategy is ignored, because Elasticsearch always commits changes to its transaction log.
+	public IndexIndexer createIndexer(BackendSessionContext sessionContext) {
 		return backendContext.createIndexer(
-				parallelOrchestrator, this, sessionContext
+				indexingOrchestrator, this, sessionContext
 		);
 	}
 
 	@Override
 	public IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext) {
 		return backendContext.createWorkspace(
-				parallelOrchestrator, this, sessionContext
+				this, sessionContext
 		);
 	}
 

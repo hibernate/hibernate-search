@@ -16,6 +16,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 
 public class DoubleFieldTypeDescriptor extends FieldTypeDescriptor<Double> {
 
@@ -24,17 +25,32 @@ public class DoubleFieldTypeDescriptor extends FieldTypeDescriptor<Double> {
 	}
 
 	@Override
-	public List<Double> getAscendingUniqueTermValues() {
-		return Arrays.asList(
-				-251_484_254.849,
-				-42.42,
-				0.0,
-				Double.MIN_VALUE,
-				55.0,
-				2500.5100000045,
-				1584514514.000000184,
-				Double.MAX_VALUE
-		);
+	protected AscendingUniqueTermValues<Double> createAscendingUniqueTermValues() {
+		return new AscendingUniqueTermValues<Double>() {
+			@Override
+			protected List<Double> createSingle() {
+				return Arrays.asList(
+						-251_484_254.849,
+						-42.42,
+						0.0,
+						22.0,
+						55.0,
+						2500.5100000045,
+						1584514514.000000184,
+						Double.MAX_VALUE
+				);
+			}
+
+			@Override
+			protected Double delta(int multiplierForDelta) {
+				return 52.0 * multiplierForDelta;
+			}
+
+			@Override
+			protected Double applyDelta(Double value, int multiplierForDelta) {
+				return value + delta( multiplierForDelta );
+			}
+		};
 	}
 
 	@Override

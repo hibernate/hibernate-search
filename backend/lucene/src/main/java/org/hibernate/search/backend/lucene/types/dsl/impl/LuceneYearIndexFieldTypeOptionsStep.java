@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumeri
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneYearFieldCodec;
 
 class LuceneYearIndexFieldTypeOptionsStep
-		extends AbstractLuceneNumericIndexFieldTypeOptionsStep<LuceneYearIndexFieldTypeOptionsStep, Year> {
+		extends AbstractLuceneTemporalIndexFieldTypeOptionsStep<LuceneYearIndexFieldTypeOptionsStep, Year> {
 
 	LuceneYearIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, Year.class );

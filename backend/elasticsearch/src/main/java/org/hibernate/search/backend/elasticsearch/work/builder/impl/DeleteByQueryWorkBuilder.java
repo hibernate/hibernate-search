@@ -8,11 +8,11 @@ package org.hibernate.search.backend.elasticsearch.work.builder.impl;
 
 import java.util.Collection;
 
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 
 
 public interface DeleteByQueryWorkBuilder
-		extends ElasticsearchWorkBuilder<ElasticsearchWork<Void>>, IndexWriteWorkBuilder<DeleteByQueryWorkBuilder> {
+		extends ElasticsearchWorkBuilder<NonBulkableWork<Void>> {
 
 	DeleteByQueryWorkBuilder routingKeys(Collection<String> routingKeys);
 

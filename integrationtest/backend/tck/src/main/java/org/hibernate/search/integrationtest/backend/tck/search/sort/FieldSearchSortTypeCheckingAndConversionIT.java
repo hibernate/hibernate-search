@@ -388,7 +388,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 
 	@SuppressWarnings("unchecked")
 	private F getSingleValueForMissingUse(int ordinal) {
-		F value = fieldTypeDescriptor.getAscendingUniqueTermValues().get( ordinal );
+		F value = fieldTypeDescriptor.getAscendingUniqueTermValues().getSingle().get( ordinal );
 
 		if ( fieldTypeDescriptor instanceof NormalizedStringFieldTypeDescriptor
 				&& !TckConfiguration.get().getBackendFeatures().normalizesStringMissingValues() ) {
@@ -406,7 +406,7 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 		}
 		documentElement.addValue(
 				fieldModel.reference,
-				fieldModel.typeDescriptor.getAscendingUniqueTermValues().get( ordinal )
+				fieldModel.typeDescriptor.getAscendingUniqueTermValues().getSingle().get( ordinal )
 		);
 	}
 

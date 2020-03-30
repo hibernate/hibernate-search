@@ -12,6 +12,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchRequestTransformer;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
@@ -19,10 +20,9 @@ import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearc
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchSearchResultExtractor;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.ExplainResult;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
@@ -49,7 +49,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	private static final int MAX_RESULT_WINDOW_SIZE = 10000;
 
 	private final ElasticsearchWorkBuilderFactory workFactory;
-	private final ElasticsearchWorkOrchestrator queryOrchestrator;
+	private final ElasticsearchParallelWorkOrchestrator queryOrchestrator;
 	private final ElasticsearchSearchContext searchContext;
 	private final BackendSessionContext sessionContext;
 	private final LoadingContext<?, ?> loadingContext;
@@ -63,7 +63,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	private boolean exceptionOnTimeout;
 
 	ElasticsearchSearchQueryImpl(ElasticsearchWorkBuilderFactory workFactory,
-			ElasticsearchWorkOrchestrator queryOrchestrator,
+			ElasticsearchParallelWorkOrchestrator queryOrchestrator,
 			ElasticsearchSearchContext searchContext,
 			BackendSessionContext sessionContext,
 			LoadingContext<?, ?> loadingContext,
@@ -106,7 +106,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 	@Override
 	public ElasticsearchSearchResult<H> fetch(Integer offset, Integer limit) {
 		// TODO restore scrolling support. See HSEARCH-3323
-		ElasticsearchWork<ElasticsearchLoadableSearchResult<H>> work = workFactory.search( payload, searchResultExtractor )
+		NonBulkableWork<ElasticsearchLoadableSearchResult<H>> work = workFactory.search( payload, searchResultExtractor )
 				.indexes( searchContext.getHibernateSearchIndexNamesToIndexReadNames().values() )
 				.paging( defaultedLimit( limit, offset ), offset )
 				.routingKeys( routingKeys )
@@ -135,7 +135,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			filteredPayload.add( "query", querySubTree.get() );
 		}
 
-		ElasticsearchWork<Long> work = workFactory.count( searchContext.getHibernateSearchIndexNamesToIndexReadNames().values() )
+		NonBulkableWork<Long> work = workFactory.count( searchContext.getHibernateSearchIndexNamesToIndexReadNames().values() )
 				.query( filteredPayload )
 				.routingKeys( routingKeys )
 				.timeout( timeoutValue, timeoutUnit, exceptionOnTimeout )
@@ -201,7 +201,7 @@ public class ElasticsearchSearchQueryImpl<H> extends AbstractSearchQuery<H, Elas
 			queryOnlyPayload.add( "query", query );
 		}
 
-		ElasticsearchWork<ExplainResult> work = workFactory.explain( encodedIndexName, elasticsearchId, queryOnlyPayload )
+		NonBulkableWork<ExplainResult> work = workFactory.explain( encodedIndexName, elasticsearchId, queryOnlyPayload )
 				.routingKeys( routingKeys )
 				.requestTransformer(
 						ElasticsearchSearchRequestTransformerContextImpl.createTransformerFunction( requestTransformer )

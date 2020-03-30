@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.sort.dsl.impl;
 
+import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.sort.dsl.DistanceSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.dsl.spi.AbstractSortThenStep;
@@ -28,6 +29,12 @@ class DistanceSortOptionsStepImpl<B>
 	@Override
 	public DistanceSortOptionsStepImpl<B> order(SortOrder order) {
 		builder.order( order );
+		return this;
+	}
+
+	@Override
+	public DistanceSortOptionsStepImpl<B> mode(SortMode mode) {
+		builder.mode( mode );
 		return this;
 	}
 

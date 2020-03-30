@@ -132,7 +132,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
 		replayAll();
-		assertThat( objectsQuery ).hasHitsExactOrder( mainLoadedObject, emptyLoadedObject );
+		assertThat( objectsQuery ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
 		verifyAll();
 	}
 
@@ -242,7 +242,7 @@ public class SearchQueryResultLoadingOrTransformingIT extends EasyMockSupport {
 						.load( emptyReference, emptyTransformedReference, emptyLoadedObject )
 		);
 		replayAll();
-		assertThat( objectsQuery ).hasHitsExactOrder( mainLoadedObject, emptyLoadedObject );
+		assertThat( objectsQuery ).hasHitsAnyOrder( mainLoadedObject, emptyLoadedObject );
 		verifyAll();
 	}
 

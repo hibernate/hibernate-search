@@ -543,6 +543,91 @@ link:http://wiki.apache.org/solr/AnalyzersTokenizersTokenFilters[Solr Wiki]
 it's just that there is no documentation page for Lucene proper).
 ====
 
+[[backend-lucene-threads]]
+== Threads
+
+The Lucene backend relies on an internal thread pool to execute write operations on the index.
+
+By default, the pool contains exactly as many threads as the number of processors available to the JVM on bootstrap.
+That can be changed using a configuration property:
+
+[source]
+----
+hibernate.search.backends.<backend-name>.thread_pool.size = 4
+----
+
+[[backend-lucene-indexing-queues]]
+== Indexing queues
+
+Among all the write operations performed by Hibernate Search on the indexes,
+it is expected that there will be a lot of "indexing" operations to create/update/delete a specific document.
+We generally want to preserve the relative order of these requests
+when they are about the same documents.
+
+For this reasons, Hibernate Search pushes these operations to internal queues and applies them in batches.
+Each index maintains 10 queues holding at most 1000 elements each.
+Queues operate independently (in parallel), but each queue applies one operation after the other,
+so at any given time there can be at most 10 batches of indexing requests being applied for each index.
+
+[NOTE]
+====
+Indexing operations relative to the same document ID are always pushed to the same queue.
+====
+
+It is possible to customize the queues in order to reduce resource consumption,
+or on the contrary to improve throughput.
+This is done through the following configuration properties, at the index level:
+
+[source]
+----
+hibernate.search.backends.<backend name>.indexes.<index name>.indexing.queue_count 10 (default)
+hibernate.search.backends.<backend name>.indexes.<index name>.indexing.queue_size 1000 (default)
+# OR
+hibernate.search.backends.<backend name>.index_defaults.indexing.queue_count 10 (default)
+hibernate.search.backends.<backend name>.index_defaults.indexing.queue_size 1000 (default)
+----
+
+* `indexing.queue_count` defines the number of queues.
+Expects a strictly positive integer value.
++
+Higher values may lead to higher indexing throughput if CPU is the bottleneck when indexing.
++
+Note that raising this number above the <<backend-lucene-threads,number of threads>> is never useful,
+as the number of threads limits how many queues can be processed in parallel.
+* `indexing.queue_size` defines the maximum number of elements each queue can hold.
+Expects a strictly positive integer value.
++
+Lower values may lead to lower memory usage, especially if there are many queues,
+but values that are too low will increase the likeliness of
+<<backend-lucene-indexing-queues-blocking,application threads blocking>>
+
+[TIP]
+[[backend-lucene-indexing-queues-blocking]]
+====
+When a queue is full, any attempt to request indexing will block until the request can be put into the queue.
+
+In order to achieve a reasonable level of performance,
+be sure to set the size of queues to a high enough number that this kind of blocking only happens
+when the application is under very high load.
+====
+
+[TIP]
+====
+When <<backend-lucene-configuration-sharding,sharding>> is enabled,
+each shard will be assigned its own set of queues.
+
+If you use the `hash` sharding strategy *based on the document ID* (and not based on a provided routing key),
+make sure to set the number of queues to a number with no common denominator with the number of shards;
+otherwise, some queues may be used much less than others.
+
+For example, if you set the number of shards to 8 and the number of queues to 4,
+documents ending up in the shard #0 will always end up in queue #0 of that shard.
+That's because both the routing to a shard and the routing to a queue take the hash of the document ID
+then apply a modulo operation to that hash,
+and `<some hash> % 8 == 0` (routed to shard #0) implies `<some hash> % 4 == 0` (routed to queue #0 of shard #0).
+Again, this is only true if you rely on the document ID and not on a provided routing key for sharding.
+====
+
 [[backend-lucene-io]]
 == Writing and reading
 
@@ -552,10 +637,11 @@ include::components/writing-reading-intro-note.asciidoc[]
 
 The default configuration of the Lucene backend focuses on safety and freshness:
 
-* Changes are committed as soon as possible (at the end of each batch of changes).
+* Critical changes (automatic indexing) are only considered completed
+when they are committed.
 * Indexes are refreshed as soon as a change happens.
 
-Custom configuration, explained in the following sections,
+Some techniques and custom configuration, explained in the following sections,
 can provide performance boosts in some situations at the cost of lower write safety
 and/or occasional out-of-date reads.
 
@@ -566,56 +652,50 @@ In Lucene terminology, a _commit_ is when changes buffered in an index writer
 are pushed to the index itself,
 so that a crash or power loss will no longer result in data loss.
 
-Performance-wise, committing may be an expensive operation,
-which is why Hibernate Search tries not to commit too often.
-Changes are processed in batches of a few hundred writes,
-and unless required otherwise,
-they are committed at the end of the batch, without delay.
-
-Some operations are critical and must be committed before they can be considered complete,
-which is why writes can be explicitly marked for commit.
+Some operations are critical and are always committed before they are considered complete.
 This is the case for changes triggered by <<mapper-orm-indexing-automatic,automatic indexing>>
 (unless <<mapper-orm-indexing-automatic-synchronization,configured otherwise>>),
 and also for large-scale operations such as a <<mapper-orm-indexing-manual-largescale,purge>>.
 When such an operation is encountered, a commit will be performed immediately,
 guaranteeing that the operation is only considered complete after all changes are safely stored on disk.
 
-Changes contributed by the <<mapper-orm-indexing-massindexer,mass indexer>>,
+Other operations, however, are not expected to be committed immediately.
+This is the case for changes contributed by the <<mapper-orm-indexing-massindexer,mass indexer>>,
 or by automatic indexing when using the
-<<mapper-orm-indexing-automatic-synchronization,`async` synchronization strategy>>
-are *not* marked for commit,
-leading to less frequent commits and thus higher write throughput.
+<<mapper-orm-indexing-automatic-synchronization,`async` synchronization strategy>>.
 
-In write-intensive scenarios where a commit at the end of the batch is still too frequent,
-it is possible to commit less frequently
-and thus improve write throughput by setting a commit interval in milliseconds.
-When set to a value higher than 0, Hibernate Search will no longer commit at the end of each batch:
-if, at the end of a batch, it notices that a commit occurred less than X milliseconds ago,
-it will schedule a commit for later, when at least X milliseconds have elapsed.
+Performance-wise, committing may be an expensive operation,
+which is why Hibernate Search tries not to commit too often.
+By default, when changes that do not require an immediate commit are applied to the index,
+Hibernate Search will delay the commit by one second.
+If other changes are applied during that second,
+they will be included in the same commit.
+This dramatically reduces the amount of commits in write-intensive scenarios
+(e.g. <<mapper-orm-indexing-massindexer,mass indexing>>),
+leading to much better performance.
 
-[WARNING]
-====
-Setting a commit interval is inherently unsafe:
-waiting 1 second before committing means that for 1 second,
-should the application crash or the server suffer a power loss,
-the changes will be lost.
-
-However, the performance boost might be worth the risk in some scenarios.
-====
-
-The commit interval is set at the index level:
+It is possible to control exactly how often Hibernate Search will commit
+by setting the commit interval (in milliseconds) at the index level:
 
 [source]
 ----
-hibernate.search.backends.<backend name>.indexes.<index name>.io.commit_interval = 0 (default)
+hibernate.search.backends.<backend name>.indexes.<index name>.io.commit_interval = 1000 (default)
 # OR
-hibernate.search.backends.<backend name>.index_defaults.io.commit_interval = 0 (default)
+hibernate.search.backends.<backend name>.index_defaults.io.commit_interval = 1000 (default)
 ----
+
+[WARNING]
+====
+Setting the commit interval to 0 will force Hibernate Search to commit after every batch of changes,
+which may result in a much lower throughput,
+both for <<mapper-orm-indexing-automatic,automatic indexing>>
+and <<mapper-orm-indexing-massindexer,mass indexing>>.
+====
 
 [NOTE]
 ====
 Remember that individual write operations may force a commit,
-which may cancel out the potential performance gains from setting a commit interval.
+which may cancel out the potential performance gains from setting a higher commit interval.
 
 By default, the commit interval may only improve throughput
 of the <<mapper-orm-indexing-massindexer,mass indexer>>.

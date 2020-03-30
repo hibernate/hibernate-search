@@ -28,6 +28,7 @@ import org.apache.lucene.search.MatchAllDocsQuery;
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
 import org.apache.lucene.search.SortField.Type;
+import org.apache.lucene.search.SortedSetSortField;
 import org.apache.lucene.search.TermQuery;
 import org.assertj.core.api.Assertions;
 
@@ -134,7 +135,7 @@ public class LuceneExtensionIT {
 				context2.where( f -> f.fromLuceneQuery( new MatchAllDocsQuery() ) );
 		// Note we can use Lucene-specific sorts immediately
 		LuceneSearchQueryOptionsStep<DocumentReference, StubLoadingOptionsStep> context4 =
-				context3.sort( f -> f.fromLuceneSortField( new SortField( "sort1", Type.STRING ) ) );
+				context3.sort( f -> f.fromLuceneSortField( new SortedSetSortField( "sort1", false ) ) );
 
 		// Put the query and result into variables to check they have the right type
 		LuceneSearchQuery<DocumentReference> query = context4.toQuery();
@@ -331,11 +332,11 @@ public class LuceneExtensionIT {
 				.where( f -> f.matchAll() )
 				.sort( f -> f
 						.extension( LuceneExtension.get() )
-								.fromLuceneSortField( new SortField( "sort1", Type.STRING ) )
+								.fromLuceneSortField( new SortedSetSortField( "sort1", false ) )
 						.then().extension( LuceneExtension.get() )
-								.fromLuceneSortField( new SortField( "sort2", Type.STRING ) )
+								.fromLuceneSortField( new SortedSetSortField( "sort2", false ) )
 						.then().extension( LuceneExtension.get() )
-								.fromLuceneSortField( new SortField( "sort3", Type.STRING ) )
+								.fromLuceneSortField( new SortedSetSortField( "sort3", false ) )
 				)
 				.toQuery();
 		assertThat( query ).hasDocRefHitsExactOrder(
@@ -349,9 +350,9 @@ public class LuceneExtensionIT {
 						.extension().ifSupported(
 								LuceneExtension.get(),
 								c2 -> c2.fromLuceneSort( new Sort(
-										new SortField( "sort3", Type.STRING ),
-										new SortField( "sort2", Type.STRING ),
-										new SortField( "sort1", Type.STRING )
+										new SortedSetSortField( "sort3", false ),
+										new SortedSetSortField( "sort2", false ),
+										new SortedSetSortField( "sort1", false )
 									)
 								)
 						)
@@ -371,17 +372,17 @@ public class LuceneExtensionIT {
 		SearchSort sort1 = scope.sort().extension()
 						.ifSupported(
 								LuceneExtension.get(),
-								c2 -> c2.fromLuceneSortField( new SortField( "sort1", Type.STRING ) )
+								c2 -> c2.fromLuceneSortField( new SortedSetSortField( "sort1", false ) )
 						)
 						.orElseFail()
 				.toSort();
 		SearchSort sort2 = scope.sort().extension( LuceneExtension.get() )
-				.fromLuceneSortField( new SortField( "sort2", Type.STRING ) )
+				.fromLuceneSortField( new SortedSetSortField( "sort2", false ) )
 				.toSort();
 		SearchSort sort3 = scope.sort().extension()
 				.ifSupported(
 						LuceneExtension.get(),
-						c2 -> c2.fromLuceneSortField( new SortField( "sort3", Type.STRING ) )
+						c2 -> c2.fromLuceneSortField( new SortedSetSortField( "sort3", false ) )
 				)
 				.orElseFail()
 				.toSort();
@@ -395,9 +396,9 @@ public class LuceneExtensionIT {
 
 		SearchSort sort = scope.sort()
 				.extension( LuceneExtension.get() ).fromLuceneSort( new Sort(
-						new SortField( "sort3", Type.STRING ),
-						new SortField( "sort2", Type.STRING ),
-						new SortField( "sort1", Type.STRING )
+						new SortedSetSortField( "sort3", false ),
+						new SortedSetSortField( "sort2", false ),
+						new SortedSetSortField( "sort1", false )
 					)
 				)
 				.toSort();

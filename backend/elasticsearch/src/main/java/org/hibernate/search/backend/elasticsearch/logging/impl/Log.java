@@ -438,13 +438,6 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 50, value = "Failed to shut down the Elasticsearch index manager with name '%1$s'.")
 	SearchException failedToShutdownIndexManager(String indexName, @Cause Exception cause, @Param EventContext context);
 
-	@Message(id = ID_OFFSET_3 + 51, value = "The operation was skipped due to the failure of a previous work in the same workset.")
-	SearchException elasticsearchSkippedBecauseOfPreviousWork(@Cause Throwable skippingCause);
-
-	@Message(id = ID_OFFSET_3 + 52, value = "Invalid index lifecycle strategy name: '%1$s'."
-			+ " Valid names are: %2$s.")
-	SearchException invalidIndexLifecycleStrategyName(String invalidRepresentation, List<String> validRepresentations);
-
 	@Message(id = ID_OFFSET_3 + 53,
 			value = "Text predicates (phrase, fuzzy, wildcard, simple query string) are not supported by this field's type.")
 	SearchException textPredicatesNotSupportedByFieldType(@Param EventContext context);
@@ -531,8 +524,8 @@ public interface Log extends BasicLogger {
 			+ " Projection is targeting: '%2$s'. Current scope is targeting: '%3$s'.")
 	SearchException projectionDefinedOnDifferentIndexes(SearchProjection<?> predicate, Set<String> predicateIndexes, Set<String> scopeIndexes);
 
-	@Message(id = ID_OFFSET_3 + 75, value = "Multiple conflicting nested document paths to build a projection for field '%1$s'. '%2$s' vs. '%3$s'.")
-	SearchException conflictingNestedDocumentPathsForProjection(String absoluteFieldPath, String nestedDocumentPath1, String nestedDocumentPath2, @Param EventContext context);
+	@Message(id = ID_OFFSET_3 + 75, value = "Multiple index conflicting models on nested document paths targeting '%1$s'. '%2$s' vs. '%3$s'.")
+	SearchException conflictingNestedDocumentPaths(String absoluteFieldPath, String nestedDocumentPath1, String nestedDocumentPath2, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 76,
 			value = "Cannot apply an analyzer on an aggregable field. Use a normalizer instead. Analyzer: '%1$s'."
@@ -584,8 +577,8 @@ public interface Log extends BasicLogger {
 			value = "Multiple aggregations with the same key: '%1$s'")
 	SearchException duplicateAggregationKey(@FormatWith(AggregationKeyFormatter.class) AggregationKey key);
 
-	@Message(id = ID_OFFSET_3 + 86, value = "Multiple conflicting nested document paths to build a projection for field '%1$s'. '%2$s' vs. '%3$s'.")
-	SearchException conflictingNestedDocumentPathHierarchyForProjection(String absoluteFieldPath,
+	@Message(id = ID_OFFSET_3 + 86, value = "Multiple index conflicting models on nested document paths targeting '%1$s'. '%2$s' vs. '%3$s'.")
+	SearchException conflictingNestedDocumentPathHierarchy(String absoluteFieldPath,
 			List<String> nestedDocumentPathHierarchy1, List<String> nestedDocumentPathHierarchy2, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_3 + 87, value = "Cannot apply a search analyzer if an analyzer has not been defined on the same field." +
@@ -639,4 +632,23 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 98, value = "The lifecycle strategy cannot be set at the index level anymore."
 			+ " Set the schema management strategy via the property 'hibernate.search.schema_management.strategy' instead.")
 	SearchException lifecycleStrategyMovedToMapper();
+
+	@Message(id = ID_OFFSET_3 + 99, value = "Simple query string targets fields [%1$s, %3$s] spanning multiple nested paths: %2$s, %4$s.")
+	SearchException simpleQueryStringSpanningMultipleNestedPaths(String fieldPath1, String nestedPath1, String fieldPath2, String nestedPath2);
+
+	@Message(id = ID_OFFSET_3 + 100,
+			value = "Cannot compute the median across nested documents.")
+	SearchException cannotComputeMedianAcrossNested(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 101,
+			value = "Cannot compute the sum, average or median of a text field. Only min and max are supported.")
+	SearchException cannotComputeSumOrAvgOrMedianForStringField(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 102,
+			value = "Cannot compute the sum of a temporal field. Only min, max, avg and median are supported.")
+	SearchException cannotComputeSumForTemporalField(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 103,
+			value = "Cannot compute the sum for a distance sort. Only min, max, avg and median are supported.")
+	SearchException cannotComputeSumForDistanceSort(@Param EventContext context);
 }

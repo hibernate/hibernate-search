@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.WaitForIndexStatusWorkBuilder;
 
 
-public class WaitForIndexStatusWork extends AbstractSimpleElasticsearchWork<Void> {
+public class WaitForIndexStatusWork extends AbstractNonBulkableWork<Void> {
 
 	protected WaitForIndexStatusWork(Builder builder) {
 		super( builder );
@@ -33,7 +33,7 @@ public class WaitForIndexStatusWork extends AbstractSimpleElasticsearchWork<Void
 		private final String timeout;
 
 		public Builder(URLEncodedString indexName, IndexStatus requiredStatus, String timeout) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexName = indexName;
 			this.requiredStatus = requiredStatus;
 			this.timeout = timeout;

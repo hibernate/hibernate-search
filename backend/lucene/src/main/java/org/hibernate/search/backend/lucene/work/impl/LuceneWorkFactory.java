@@ -16,30 +16,32 @@ import org.apache.lucene.search.Query;
 
 public interface LuceneWorkFactory {
 
-	LuceneSchemaManagementWork<Void> createIndexIfMissing();
+	IndexManagementWork<Void> createIndexIfMissing();
 
-	LuceneSchemaManagementWork<Void> dropIndexIfExisting();
+	IndexManagementWork<Void> dropIndexIfExisting();
 
-	LuceneSchemaManagementWork<Void> validateIndexExists();
+	IndexManagementWork<Void> validateIndexExists();
 
-	LuceneSingleDocumentWriteWork<?> add(String tenantId, String entityTypeName, Object entityIdentifier,
-			LuceneIndexEntry indexEntry);
+	IndexManagementWork<?> flush();
 
-	LuceneSingleDocumentWriteWork<?> update(String tenantId, String entityTypeName, Object entityIdentifier,
+	IndexManagementWork<?> refresh();
+
+	IndexManagementWork<?> mergeSegments();
+
+	SingleDocumentIndexingWork add(String tenantId, String entityTypeName, Object entityIdentifier,
 			String documentIdentifier, LuceneIndexEntry indexEntry);
 
-	LuceneSingleDocumentWriteWork<?> delete(String tenantId, String entityTypeName, Object entityIdentifier, String id);
+	SingleDocumentIndexingWork update(String tenantId, String entityTypeName, Object entityIdentifier,
+			String documentIdentifier, LuceneIndexEntry indexEntry);
 
-	LuceneWriteWork<?> deleteAll(String tenantId, Set<String> routingKeys);
+	SingleDocumentIndexingWork delete(String tenantId, String entityTypeName, Object entityIdentifier, String id);
 
-	LuceneWriteWork<?> noOp();
+	IndexManagementWork<?> deleteAll(String tenantId, Set<String> routingKeys);
 
-	LuceneWriteWork<?> mergeSegments();
+	<R> ReadWork<R> search(LuceneSearcher<R> searcher, Integer offset, Integer limit);
 
-	<R> LuceneReadWork<R> search(LuceneSearcher<R> searcher, Integer offset, Integer limit);
+	ReadWork<Integer> count(LuceneSearcher<?> searcher);
 
-	LuceneReadWork<Integer> count(LuceneSearcher<?> searcher);
-
-	LuceneReadWork<Explanation> explain(LuceneSearcher<?> searcher,
+	ReadWork<Explanation> explain(LuceneSearcher<?> searcher,
 			String explainedDocumentIndexName, String explainedDocumentId, Query explainedDocumentFilter);
 }

@@ -15,7 +15,8 @@ import org.apache.lucene.search.DocValuesFieldExistsQuery;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 
-public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> implements LuceneStandardFieldCodec<F, E> {
+public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number>
+		implements LuceneStandardFieldCodec<F, E> {
 
 	private final boolean projectable;
 	private final boolean searchable;
@@ -52,7 +53,7 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> imple
 		LuceneNumericDomain<E> domain = getDomain();
 
 		if ( sortable || aggregable ) {
-			documentBuilder.addField( domain.createDocValuesField( absoluteFieldPath, encodedValue ) );
+			documentBuilder.addField( domain.createSortedDocValuesField( absoluteFieldPath, encodedValue ) );
 		}
 		else {
 			// For createExistsQuery()
@@ -85,8 +86,8 @@ public abstract class AbstractLuceneNumericFieldCodec<F, E extends Number> imple
 
 		AbstractLuceneNumericFieldCodec<?, ?> other = (AbstractLuceneNumericFieldCodec<?, ?>) obj;
 
-		return ( projectable == other.projectable ) && ( searchable == other.searchable )
-				&& ( sortable == other.sortable ) && ( aggregable == other.aggregable );
+		return (projectable == other.projectable) && (searchable == other.searchable)
+			&& (sortable == other.sortable) && (aggregable == other.aggregable);
 	}
 
 	public abstract F decode(E encoded);

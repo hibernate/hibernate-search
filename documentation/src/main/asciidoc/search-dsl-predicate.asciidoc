@@ -284,12 +284,6 @@ Because of this, it is preferable to use the `exists` predicate
 on object fields that are known to have at least one sub-field that is never null: an identifier, a name, ...
 ====
 
-[IMPORTANT]
-====
-For object fields with <<mapper-orm-indexedembedded-storage-nested,`NESTED` storage>>,
-the `exists` predicate needs to be wrapped in a <<search-dsl-predicate-nested,`nested` predicate>>.
-====
-
 [[search-dsl-predicate-wildcard]]
 == `wildcard`: match a simple pattern
 // Search 5 anchors backward compatibility
@@ -547,6 +541,24 @@ Books that happen to have multiple authors,
 one of which has a first name matching `isaac`
 and *another* of which has a last name matching `asimov`,
 will *not* match.
+====
+
+[[search-dsl-predicate-nested-implicit]]
+.Use the implicit nested form
+====
+[source, JAVA, indent=0, subs="+callouts"]
+----
+include::{sourcedir}/org/hibernate/search/documentation/search/predicate/PredicateDslIT.java[tags=nested-implicit-form]
+----
+<1> The nested predicate is created implicitly, since target fields here belong to a nested object.
+<2> The author must have a first name matching `isaac`.
+<3> The author must have a last name matching `asimov`.
+<4> All returned hits will be books for which at least one author
+has a first name matching `isaac` and a last name matching `asimov`.
+Books that happen to have multiple authors,
+one of which has a first name matching `isaac`
+and *another* of which has a last name matching `asimov`,
+will match, because we apply the nested predicate *separately* to *each match* predicate.
 ====
 
 [[search-dsl-predicate-spatial-within]]

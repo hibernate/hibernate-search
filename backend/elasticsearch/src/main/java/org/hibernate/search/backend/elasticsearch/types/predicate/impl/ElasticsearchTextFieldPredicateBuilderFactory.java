@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
+import java.util.List;
 import java.util.Objects;
 
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.PropertyMapping;
@@ -48,24 +49,25 @@ public class ElasticsearchTextFieldPredicateBuilderFactory
 
 	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath, ElasticsearchCompatibilityChecker converterChecker,
-			ElasticsearchCompatibilityChecker analyzerChecker) {
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy,
+			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchCompatibilityChecker analyzerChecker) {
 		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchTextMatchPredicateBuilder( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec, type, analyzerChecker );
+		return new ElasticsearchTextMatchPredicateBuilder( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter,
+				converterChecker, codec, type, analyzerChecker );
 	}
 
 	@Override
 	public PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> createPhrasePredicateBuilder(
-			String absoluteFieldPath, ElasticsearchCompatibilityChecker analyzerChecker) {
+			String absoluteFieldPath, List<String> nestedPathHierarchy, ElasticsearchCompatibilityChecker analyzerChecker) {
 		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchTextPhrasePredicateBuilder( absoluteFieldPath, analyzerChecker );
+		return new ElasticsearchTextPhrasePredicateBuilder( absoluteFieldPath, nestedPathHierarchy, analyzerChecker );
 	}
 
 	@Override
 	public WildcardPredicateBuilder<ElasticsearchSearchPredicateBuilder> createWildcardPredicateBuilder(
-			String absoluteFieldPath) {
+			String absoluteFieldPath, List<String> nestedPathHierarchy) {
 		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchTextWildcardPredicateBuilder( absoluteFieldPath );
+		return new ElasticsearchTextWildcardPredicateBuilder( absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override

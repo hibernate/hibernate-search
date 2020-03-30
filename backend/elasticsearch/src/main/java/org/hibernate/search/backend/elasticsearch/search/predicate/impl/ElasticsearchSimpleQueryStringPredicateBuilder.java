@@ -12,6 +12,7 @@ import java.util.Map;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
+import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchDifferentNestedObjectCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopedIndexFieldComponent;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchScopeModel;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchSucceedingCompatibilityChecker;
@@ -51,9 +52,11 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 	private String analyzer;
 	private EnumSet<SimpleQueryFlag> flags;
 	private ElasticsearchCompatibilityChecker analyzerChecker = new ElasticsearchSucceedingCompatibilityChecker();
+	private ElasticsearchDifferentNestedObjectCompatibilityChecker nestedCompatibilityChecker;
 
 	ElasticsearchSimpleQueryStringPredicateBuilder(ElasticsearchScopeModel scopeModel) {
 		this.scopeModel = scopeModel;
+		this.nestedCompatibilityChecker = ElasticsearchDifferentNestedObjectCompatibilityChecker.empty( scopeModel );
 	}
 
 	@Override
@@ -81,6 +84,7 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 					absoluteFieldPath, ElasticsearchSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 			field = fieldComponent.getComponent().createSimpleQueryStringFieldContext( absoluteFieldPath );
 			analyzerChecker = analyzerChecker.combine( fieldComponent.getAnalyzerCompatibilityChecker() );
+			nestedCompatibilityChecker = nestedCompatibilityChecker.combineAndCheck( absoluteFieldPath );
 			fields.put( absoluteFieldPath, field );
 		}
 		return field;
@@ -133,7 +137,9 @@ public class ElasticsearchSimpleQueryStringPredicateBuilder extends AbstractElas
 		}
 
 		SIMPLE_QUERY_STRING_ACCESSOR.set( outerObject, innerObject );
-		return outerObject;
+
+		return ( nestedCompatibilityChecker.getNestedPathHierarchy().isEmpty() ) ? outerObject :
+				AbstractElasticsearchSearchNestedPredicateBuilder.applyImplicitNested( outerObject, nestedCompatibilityChecker.getNestedPathHierarchy(), context );
 	}
 
 	/**

@@ -40,5 +40,6 @@ public abstract class AbstractLuceneBucketAggregation<K, V> implements LuceneSea
 
 		@Override
 		public abstract LuceneSearchAggregation<Map<K, V>> build();
+
 	}
 }

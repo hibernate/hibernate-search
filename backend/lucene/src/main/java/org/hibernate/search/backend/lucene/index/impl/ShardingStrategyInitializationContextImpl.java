@@ -113,7 +113,9 @@ class ShardingStrategyInitializationContextImpl implements ShardingStrategyIniti
 
 	private void contributeShardWithSilentFailure(Map<String, Shard> shardCollector, Optional<String> shardId) {
 		try {
-			Shard shard = backendContext.createShard( ioStrategy, model, shardId );
+			Shard shard = backendContext.createShard(
+					ioStrategy, model, shardId
+			);
 			shardCollector.put( shardId.orElse( null ), shard );
 		}
 		catch (RuntimeException e) {

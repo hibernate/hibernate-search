@@ -65,8 +65,8 @@ public abstract class AbstractPojoSearchSession<R> implements PojoWorkSessionCon
 		return mappingContext.createIndexingPlan( this, commitStrategy, refreshStrategy );
 	}
 
-	protected PojoIndexer createIndexer(DocumentCommitStrategy commitStrategy) {
-		return mappingContext.createIndexer( this, commitStrategy );
+	protected PojoIndexer createIndexer() {
+		return mappingContext.createIndexer( this );
 	}
 
 }

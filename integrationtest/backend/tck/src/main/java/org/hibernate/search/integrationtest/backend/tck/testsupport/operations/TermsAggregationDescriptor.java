@@ -44,7 +44,7 @@ public class TermsAggregationDescriptor extends AggregationDescriptor {
 			return ExpectationsAlternative.unsupported( unsupportedExpectations( typeDescriptor ) );
 		}
 
-		List<F> uniqueTermValues = new ArrayList<>( typeDescriptor.getAscendingUniqueTermValues() );
+		List<F> uniqueTermValues = new ArrayList<>( typeDescriptor.getAscendingUniqueTermValues().getSingle() );
 		// Mess with the value order, because it should not matter
 		uniqueTermValues.add( uniqueTermValues.get( 0 ) );
 		uniqueTermValues.remove( 0 );

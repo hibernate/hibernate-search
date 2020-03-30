@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.backend.elasticsearch.index.layout.IndexLayoutStrategy;
 import org.hibernate.search.backend.elasticsearch.index.layout.impl.IndexNames;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.impl.IndexMetadata;
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchParallelWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
 import org.hibernate.search.engine.backend.schema.management.spi.IndexSchemaManager;
@@ -30,7 +30,7 @@ public class ElasticsearchIndexSchemaManager implements IndexSchemaManager {
 	private final ElasticsearchIndexLifecycleExecutionOptions executionOptions;
 
 	public ElasticsearchIndexSchemaManager(ElasticsearchWorkBuilderFactory workBuilderFactory,
-			ElasticsearchWorkOrchestrator workOrchestrator,
+			ElasticsearchParallelWorkOrchestrator workOrchestrator,
 			IndexLayoutStrategy indexLayoutStrategy,
 			IndexNames indexNames, IndexMetadata expectedMetadata,
 			ElasticsearchIndexLifecycleExecutionOptions executionOptions) {

@@ -6,10 +6,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
+import java.util.List;
+
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSearchPredicateBuilder;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSearchNestedPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
@@ -19,7 +21,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-class ElasticsearchTextPhrasePredicateBuilder extends AbstractElasticsearchSearchPredicateBuilder
+class ElasticsearchTextPhrasePredicateBuilder extends AbstractElasticsearchSearchNestedPredicateBuilder
 		implements PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final JsonObjectAccessor MATCH_PHRASE_ACCESSOR = JsonAccessor.root().property( "match_phrase" ).asObject();
@@ -35,7 +37,8 @@ class ElasticsearchTextPhrasePredicateBuilder extends AbstractElasticsearchSearc
 	private JsonElement phrase;
 	private String analyzer;
 
-	ElasticsearchTextPhrasePredicateBuilder(String absoluteFieldPath, ElasticsearchCompatibilityChecker analyzerChecker) {
+	ElasticsearchTextPhrasePredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy, ElasticsearchCompatibilityChecker analyzerChecker) {
+		super( nestedPathHierarchy );
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.analyzerChecker = analyzerChecker;
 	}

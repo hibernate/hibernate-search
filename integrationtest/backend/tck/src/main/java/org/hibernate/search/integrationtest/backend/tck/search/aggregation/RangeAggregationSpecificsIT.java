@@ -88,7 +88,7 @@ public class RangeAggregationSpecificsIT<F> {
 
 	public RangeAggregationSpecificsIT(FieldTypeDescriptor<F> typeDescriptor) {
 		this.typeDescriptor = typeDescriptor;
-		this.ascendingValues = typeDescriptor.getAscendingUniqueTermValues();
+		this.ascendingValues = typeDescriptor.getAscendingUniqueTermValues().getSingle();
 	}
 
 	@BeforeAll

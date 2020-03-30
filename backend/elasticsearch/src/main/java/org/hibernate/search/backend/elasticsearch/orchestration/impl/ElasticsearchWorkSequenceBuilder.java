@@ -9,8 +9,8 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.elasticsearch.work.result.impl.BulkResult;
-import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 
 /**
  * Organizes the execution of works in a sequence,
@@ -50,7 +50,7 @@ interface ElasticsearchWorkSequenceBuilder {
 	 * @param work The work to be executed
 	 * @return A future that will ultimately contain the result of executing the work, or an exception.
 	 */
-	<T> CompletableFuture<T> addNonBulkExecution(ElasticsearchWork<T> work);
+	<T> CompletableFuture<T> addNonBulkExecution(NonBulkableWork<T> work);
 
 	/**
 	 * Add a step to execute a bulk work.
@@ -61,43 +61,34 @@ interface ElasticsearchWorkSequenceBuilder {
 	 * @param workFuture The work to be executed
 	 * @return A future for the result the bulk execution
 	 */
-	CompletableFuture<BulkResult> addBulkExecution(CompletableFuture<? extends ElasticsearchWork<BulkResult>> workFuture);
+	CompletableFuture<BulkResult> addBulkExecution(CompletableFuture<? extends NonBulkableWork<BulkResult>> workFuture);
 
 	/**
-	 * Add a step to extract the result of bulked works from the result of their bulk work.
+	 * Add a bulked work whose result should be extracted.
 	 * <p>
 	 * <strong>WARNING:</strong> the bulk execution itself must be added to another sequence,
 	 * or to the same sequence but <em>before</em> the result extraction,
 	 * otherwise a deadlock will occur.
+	 * <p>
+	 * Extraction for this work will be triggered as soon as the bulk work completes,
+	 * and will occur regardless of failures when extracting results for other bulked works.
+	 * <p>
+	 * A failure in the bulk work will lead to the bulked work being marked as skipped,
+	 * and a failure during the result extraction of the bulked work
+	 * will lead to the bulked work being marked as failed.
 	 *
-	 * @param bulkResultFuture The bulk work result
+	 * @param bulkResultFuture The bulk work result, returned by a former call to {@link #addBulkExecution(CompletableFuture)}.
+	 * @param bulkedWork The work whose result will be extracted.
+	 * @param index The index of the bulked work in the bulk.
+	 * @return A future that will ultimately contain the result of extracting the work result, or an exception.
 	 */
-	BulkResultExtractionStep addBulkResultExtraction(CompletableFuture<BulkResult> bulkResultFuture);
+	<T> CompletableFuture<T> addBulkResultExtraction(CompletableFuture<BulkResult> bulkResultFuture,
+			BulkableWork<T> bulkedWork, int index);
 
 	/**
 	 * Build the resulting {@link CompletableFuture} for this sequence by adding some final steps if necessary.
 	 * @return A completable future that will be complete when all the works in the sequence completed.
 	 */
 	CompletableFuture<Void> build();
-
-	interface BulkResultExtractionStep {
-
-		/**
-		 * Add a bulked work whose result should be extracted.
-		 * <p>
-		 * Extraction for this work will be triggered as soon as the bulk work completes,
-		 * and will occur regardless of failures when extracting results for other bulked works.
-		 * <p>
-		 * A failure in the bulk work will lead to the bulked work being marked as skipped,
-		 * and a failure during the result extraction of the bulked work
-		 * will lead to the bulked work being marked as failed.
-		 *
-		 * @param bulkedWork The work whose result will be extracted.
-		 * @param index The index of the bulked work in the bulk.
-		 * @return A future that will ultimately contain the result of extracting the work result, or an exception.
-		 */
-		<T> CompletableFuture<T> add(BulkableElasticsearchWork<T> bulkedWork, int index);
-
-	}
 
 }

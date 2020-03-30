@@ -8,7 +8,7 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
 
 /**
  * Aggregates bulkable works into bulks and adds all resulting works
@@ -20,34 +20,20 @@ import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearc
 public interface ElasticsearchWorkBulker {
 
 	/**
+	 * Add a bulkable work to the current bulk.
+	 * <p>
+	 * This method also takes care of adding the bulk work execution to the current sequence if not already done,
+	 * and to add the extraction of the bulkable work result to the current sequence.
+	 *
 	 * @param work A work to add to the current bulk
 	 * @return A future that will ultimately contain the result of executing the work, or an exception.
 	 */
-	<T> CompletableFuture<T> add(BulkableElasticsearchWork<T> work);
-
-	/**
-	 * Ensure that all bulked works that haven't been added to a sequence yet
-	 * are added to the underlying sequence builder.
-	 * <p>
-	 * After this method is called, the underlying sequence builder can
-	 * safely be used to build a new sequence, but the execution of bulked works
-	 * in this sequence will block until {@link #finalizeBulkWork()} has been called.
-	 *
-	 * @return {@code true} if works have been added to the sequence builder
-	 * <strong>as part of the current bulk</strong>,
-	 * {@code false} if they have been added as non-bulked works
-	 * (for instance if there was only one work) or if no work
-	 * was added to the sequence builder.
-	 */
-	boolean addWorksToSequence();
+	<T> CompletableFuture<T> add(BulkableWork<T> work);
 
 	/**
 	 * Ensure that the bulk work (if any) is created.
 	 * <p>
-	 * This method expects that all works have been added to the sequence builder
-	 * using {@link #addWorksToSequence()} beforehand.
-	 * <p>
-	 * After this method is called, any new work added through {@link #add(BulkableElasticsearchWork)}
+	 * After this method is called, any new work added through {@link #add(BulkableWork)}
 	 * will be added to a new bulk.
 	 */
 	void finalizeBulkWork();

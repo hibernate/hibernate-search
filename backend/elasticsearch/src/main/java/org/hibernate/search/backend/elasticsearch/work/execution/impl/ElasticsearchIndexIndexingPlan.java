@@ -10,10 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSerialWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentIndexingWork;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
@@ -29,16 +28,16 @@ import com.google.gson.JsonObject;
 public class ElasticsearchIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 
 	private final ElasticsearchWorkBuilderFactory builderFactory;
-	private final ElasticsearchWorkOrchestrator orchestrator;
+	private final ElasticsearchSerialWorkOrchestrator orchestrator;
 	private final WorkExecutionIndexManagerContext indexManagerContext;
 	private final String tenantId;
 	private final EntityReferenceFactory<R> entityReferenceFactory;
 	private final DocumentRefreshStrategy refreshStrategy;
 
-	private final List<SingleDocumentElasticsearchWork<?>> works = new ArrayList<>();
+	private final List<SingleDocumentIndexingWork> works = new ArrayList<>();
 
 	public ElasticsearchIndexIndexingPlan(ElasticsearchWorkBuilderFactory builderFactory,
-			ElasticsearchWorkOrchestrator orchestrator,
+			ElasticsearchSerialWorkOrchestrator orchestrator,
 			WorkExecutionIndexManagerContext indexManagerContext,
 			BackendSessionContext sessionContext,
 			EntityReferenceFactory<R> entityReferenceFactory,
@@ -72,7 +71,7 @@ public class ElasticsearchIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 				builderFactory.delete(
 						indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
 						indexManagerContext.getElasticsearchIndexWriteName(),
-						URLEncodedString.fromString( elasticsearchId ), routingKey
+						elasticsearchId, routingKey
 				)
 						.refresh( refreshStrategy )
 						.build()
@@ -90,9 +89,11 @@ public class ElasticsearchIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	@Override
 	public CompletableFuture<IndexIndexingPlanExecutionReport<R>> executeAndReport() {
 		try {
-			CompletableFuture<IndexIndexingPlanExecutionReport<R>> future = new CompletableFuture<>();
-			orchestrator.submit( new ElasticsearchIndexingPlanWorkSet<>( works, entityReferenceFactory, future ) );
-			return future;
+			ElasticsearchIndexIndexingPlanExecution<R> execution = new ElasticsearchIndexIndexingPlanExecution<>(
+					orchestrator, entityReferenceFactory,
+					new ArrayList<>( works ) // Copy the list, as we're going to clear it below
+			);
+			return execution.execute();
 		}
 		finally {
 			works.clear();
@@ -116,14 +117,14 @@ public class ElasticsearchIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 				builderFactory.index(
 						indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
 						indexManagerContext.getElasticsearchIndexWriteName(),
-						URLEncodedString.fromString( elasticsearchId ), routingKey, document
+						elasticsearchId, routingKey, document
 				)
 						.refresh( refreshStrategy )
 						.build()
 		);
 	}
 
-	private void collect(SingleDocumentElasticsearchWork<?> work) {
+	private void collect(SingleDocumentIndexingWork work) {
 		works.add( work );
 	}
 

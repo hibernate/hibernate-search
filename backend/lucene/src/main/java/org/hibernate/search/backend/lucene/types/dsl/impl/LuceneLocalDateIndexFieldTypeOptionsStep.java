@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.LuceneLocalDateField
 
 
 class LuceneLocalDateIndexFieldTypeOptionsStep
-		extends AbstractLuceneNumericIndexFieldTypeOptionsStep<LuceneLocalDateIndexFieldTypeOptionsStep, LocalDate> {
+		extends AbstractLuceneTemporalIndexFieldTypeOptionsStep<LuceneLocalDateIndexFieldTypeOptionsStep, LocalDate> {
 
 	LuceneLocalDateIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, LocalDate.class );

@@ -25,8 +25,11 @@ public abstract class AbstractPojoHCAnnBootstrapIntrospector implements PojoBoot
 
 	private final ReflectionManager reflectionManager;
 
+	private final PojoXClassOrdering typeOrdering;
+
 	public AbstractPojoHCAnnBootstrapIntrospector(ReflectionManager reflectionManager) {
 		this.reflectionManager = reflectionManager;
+		this.typeOrdering = new PojoXClassOrdering( reflectionManager );
 	}
 
 	public Stream<Annotation> getAnnotations(XAnnotatedElement xAnnotated) {
@@ -49,15 +52,15 @@ public abstract class AbstractPojoHCAnnBootstrapIntrospector implements PojoBoot
 				.collect( xPropertiesByNameNoDuplicate() );
 	}
 
-	protected <T> Stream<? extends Class<T>> getAscendingSuperClasses(XClass xClass) {
-		return PojoXClassOrdering.get().getAscendingSuperTypes( xClass ).map( this::toClass );
+	protected Stream<Class<?>> getAscendingSuperClasses(XClass xClass) {
+		return typeOrdering.getAscendingSuperTypes( xClass ).map( this::toClass );
 	}
 
-	protected <T> Stream<? extends Class<T>> getDescendingSuperClasses(XClass xClass) {
-		return PojoXClassOrdering.get().getDescendingSuperTypes( xClass ).map( this::toClass );
+	protected Stream<Class<?>> getDescendingSuperClasses(XClass xClass) {
+		return typeOrdering.getDescendingSuperTypes( xClass ).map( this::toClass );
 	}
 
-	private <T> Class<T> toClass(XClass xClass) {
+	private Class<?> toClass(XClass xClass) {
 		return reflectionManager.toClass( xClass );
 	}
 

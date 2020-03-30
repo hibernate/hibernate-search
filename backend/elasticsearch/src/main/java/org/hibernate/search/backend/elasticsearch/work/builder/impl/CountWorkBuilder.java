@@ -11,11 +11,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 
 import com.google.gson.JsonObject;
 
-public interface CountWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<Long>> {
+public interface CountWorkBuilder extends ElasticsearchWorkBuilder<NonBulkableWork<Long>> {
 
 	CountWorkBuilder query(JsonObject query);
 

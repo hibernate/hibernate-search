@@ -9,6 +9,7 @@ package org.hibernate.search.backend.elasticsearch.client.impl;
 import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchBackendSettings;
@@ -23,7 +24,6 @@ import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -126,32 +126,40 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 
 	@Override
 	public ElasticsearchClientImplementor create(ConfigurationPropertySource propertySource,
-			ThreadPoolProvider threadPoolProvider, GsonProvider gsonProvider) {
+			ThreadProvider threadProvider, String threadNamePrefix,
+			ScheduledExecutorService timeoutExecutorService,
+			GsonProvider gsonProvider) {
 		int requestTimeoutMs = REQUEST_TIMEOUT.get( propertySource );
 
 		ServerUris hosts = ServerUris.fromStrings( PROTOCOL.get( propertySource ), HOSTS.get( propertySource ) );
-		RestClient restClient = createClient( hosts, propertySource, threadPoolProvider.getThreadProvider() );
-		Sniffer sniffer = createSniffer( hosts, restClient, propertySource );
+		RestClient restClient = createClient( propertySource, threadProvider, threadNamePrefix, hosts );
+		Sniffer sniffer = createSniffer( propertySource, restClient, hosts );
 
 		return new ElasticsearchClientImpl(
-				restClient, sniffer, threadPoolProvider,
+				restClient, sniffer, timeoutExecutorService,
 				requestTimeoutMs, TimeUnit.MILLISECONDS,
 				gsonProvider.getGson(), gsonProvider.getLogHelper()
 		);
 	}
 
-	private RestClient createClient(ServerUris hosts,
-			ConfigurationPropertySource propertySource,
-			ThreadProvider threadProvider) {
+	private RestClient createClient(ConfigurationPropertySource propertySource,
+			ThreadProvider threadProvider, String threadNamePrefix,
+			ServerUris hosts) {
 		return RestClient.builder( hosts.asHostsArray() )
 				.setRequestConfigCallback( b -> customizeRequestConfig( b, propertySource ) )
 				.setHttpClientConfigCallback(
-						b -> customizeHttpClientConfig( b, httpClientConfigurers, propertySource, hosts, threadProvider )
+						b -> customizeHttpClientConfig(
+								b,
+								propertySource,
+								threadProvider, threadNamePrefix,
+								hosts,
+								httpClientConfigurers
+						)
 				)
 				.build();
 	}
 
-	private Sniffer createSniffer(ServerUris hosts, RestClient client, ConfigurationPropertySource propertySource) {
+	private Sniffer createSniffer(ConfigurationPropertySource propertySource, RestClient client, ServerUris hosts) {
 		boolean discoveryEnabled = DISCOVERY_ENABLED.get( propertySource );
 		if ( discoveryEnabled ) {
 			SnifferBuilder builder = Sniffer.builder( client )
@@ -176,12 +184,13 @@ public class ElasticsearchClientFactoryImpl implements ElasticsearchClientFactor
 	}
 
 	private HttpAsyncClientBuilder customizeHttpClientConfig(HttpAsyncClientBuilder builder,
-			Iterable<ElasticsearchHttpClientConfigurer> configurers,
-			ConfigurationPropertySource propertySource, ServerUris hosts,
-			ThreadProvider threadProvider) {
+			ConfigurationPropertySource propertySource,
+			ThreadProvider threadProvider, String threadNamePrefix,
+			ServerUris hosts,
+			Iterable<ElasticsearchHttpClientConfigurer> configurers) {
 		builder.setMaxConnTotal( MAX_TOTAL_CONNECTION.get( propertySource ) )
 				.setMaxConnPerRoute( MAX_TOTAL_CONNECTION_PER_ROUTE.get( propertySource ) )
-				.setThreadFactory( threadProvider.createThreadFactory( "Elasticsearch transport thread" ) );
+				.setThreadFactory( threadProvider.createThreadFactory( threadNamePrefix + " - Transport thread" ) );
 		if ( !hosts.isSslEnabled() ) {
 			// In this case disable the SSL capability as it might have an impact on
 			// bootstrap time, for example consuming entropy for no reason

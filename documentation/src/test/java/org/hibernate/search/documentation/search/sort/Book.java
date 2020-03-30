@@ -39,7 +39,7 @@ public class Book {
 	private Genre genre;
 
 	@ManyToMany
-	@IndexedEmbedded(storage = ObjectFieldStorage.NESTED)
+	@IndexedEmbedded(storage = ObjectFieldStorage.NESTED, maxDepth = 1)
 	private List<Author> authors = new ArrayList<>();
 
 	public Book() {

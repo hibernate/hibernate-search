@@ -14,8 +14,8 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
-import org.hibernate.search.backend.lucene.work.impl.LuceneSingleDocumentWriteWork;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSerialWorkOrchestrator;
+import org.hibernate.search.backend.lucene.work.impl.SingleDocumentIndexingWork;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.common.spi.EntityReferenceFactory;
 import org.hibernate.search.engine.backend.session.spi.BackendSessionContext;
@@ -36,7 +36,7 @@ public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	private final DocumentCommitStrategy commitStrategy;
 	private final DocumentRefreshStrategy refreshStrategy;
 
-	private final Map<LuceneWriteWorkOrchestrator, List<LuceneSingleDocumentWriteWork<?>>> worksByOrchestrator = new HashMap<>();
+	private final Map<LuceneSerialWorkOrchestrator, List<SingleDocumentIndexingWork>> worksByOrchestrator = new HashMap<>();
 
 	public LuceneIndexIndexingPlan(LuceneWorkFactory factory,
 			WorkExecutionIndexManagerContext indexManagerContext,
@@ -63,7 +63,7 @@ public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 
 		collect( id, routingKey, factory.add(
 				tenantId, indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
-				indexEntry
+				id, indexEntry
 		) );
 	}
 
@@ -101,16 +101,15 @@ public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 	public CompletableFuture<IndexIndexingPlanExecutionReport<R>> executeAndReport() {
 		try {
 			List<CompletableFuture<IndexIndexingPlanExecutionReport<R>>> shardReportFutures = new ArrayList<>();
-			for ( Map.Entry<LuceneWriteWorkOrchestrator, List<LuceneSingleDocumentWriteWork<?>>> entry : worksByOrchestrator.entrySet() ) {
-				LuceneWriteWorkOrchestrator orchestrator = entry.getKey();
-				List<LuceneSingleDocumentWriteWork<?>> works = entry.getValue();
-				CompletableFuture<IndexIndexingPlanExecutionReport<R>> shardReportFuture = new CompletableFuture<>();
-				orchestrator.submit( new LuceneIndexingPlanWriteWorkSet<>(
-						works,
-						entityReferenceFactory,
-						shardReportFuture, commitStrategy, refreshStrategy
-				) );
-				shardReportFutures.add( shardReportFuture );
+			for ( Map.Entry<LuceneSerialWorkOrchestrator, List<SingleDocumentIndexingWork>> entry : worksByOrchestrator.entrySet() ) {
+				LuceneSerialWorkOrchestrator orchestrator = entry.getKey();
+				List<SingleDocumentIndexingWork> works = entry.getValue();
+				LuceneIndexIndexingPlanExecution<R> execution = new LuceneIndexIndexingPlanExecution<>(
+						orchestrator, entityReferenceFactory,
+						commitStrategy, refreshStrategy,
+						works
+				);
+				shardReportFutures.add( execution.execute() );
 			}
 			return IndexIndexingPlanExecutionReport.allOf( shardReportFutures );
 		}
@@ -124,11 +123,11 @@ public class LuceneIndexIndexingPlan<R> implements IndexIndexingPlan<R> {
 		worksByOrchestrator.clear();
 	}
 
-	private void collect(String documentId, String routingKey, LuceneSingleDocumentWriteWork<?> work) {
+	private void collect(String documentId, String routingKey, SingleDocumentIndexingWork work) {
 		// Route the work to the appropriate shard
-		LuceneWriteWorkOrchestrator orchestrator = indexManagerContext.getWriteOrchestrator( documentId, routingKey );
+		LuceneSerialWorkOrchestrator orchestrator = indexManagerContext.getIndexingOrchestrator( documentId, routingKey );
 
-		List<LuceneSingleDocumentWriteWork<?>> works = worksByOrchestrator.get( orchestrator );
+		List<SingleDocumentIndexingWork> works = worksByOrchestrator.get( orchestrator );
 		if ( works == null ) {
 			works = new ArrayList<>();
 			worksByOrchestrator.put( orchestrator, works );

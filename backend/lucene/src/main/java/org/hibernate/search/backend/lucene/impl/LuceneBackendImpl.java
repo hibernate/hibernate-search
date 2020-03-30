@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaRootNodeBuilder;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestratorImplementor;
+import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.spi.IndexManagerBuilder;
@@ -21,14 +21,13 @@ import org.hibernate.search.backend.lucene.index.impl.IndexManagerBackendContext
 import org.hibernate.search.backend.lucene.index.impl.LuceneIndexManagerBuilder;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestratorImpl;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestratorImpl;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
 import org.hibernate.search.engine.backend.spi.BackendImplementor;
 import org.hibernate.search.engine.backend.spi.BackendStartContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
@@ -42,11 +41,12 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 
 	private final String name;
 
+	private final BackendThreads threads;
 	private final BeanHolder<? extends DirectoryProvider> directoryProviderHolder;
 
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
 
-	private final LuceneReadWorkOrchestratorImplementor readOrchestrator;
+	private final LuceneSyncWorkOrchestratorImpl readOrchestrator;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final TimingSource timingSource;
 
@@ -54,19 +54,20 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 	private final IndexManagerBackendContext indexManagerBackendContext;
 
 	LuceneBackendImpl(String name,
+			BackendThreads threads,
 			BeanHolder<? extends DirectoryProvider> directoryProviderHolder,
-			ThreadPoolProvider threadPoolProvider,
 			LuceneWorkFactory workFactory,
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy,
 			TimingSource timingSource,
 			FailureHandler failureHandler) {
 		this.name = name;
+		this.threads = threads;
 		this.directoryProviderHolder = directoryProviderHolder;
 
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 
-		this.readOrchestrator = new LuceneReadWorkOrchestratorImpl(
+		this.readOrchestrator = new LuceneSyncWorkOrchestratorImpl(
 				"Lucene read work orchestrator for backend " + name
 		);
 		this.multiTenancyStrategy = multiTenancyStrategy;
@@ -74,10 +75,9 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 
 		this.eventContext = EventContexts.fromBackendName( name );
 		this.indexManagerBackendContext = new IndexManagerBackendContext(
-				eventContext, directoryProviderHolder.get(),
+				eventContext, threads, directoryProviderHolder.get(),
 				workFactory, multiTenancyStrategy,
 				timingSource, analysisDefinitionRegistry,
-				threadPoolProvider,
 				failureHandler,
 				readOrchestrator
 		);
@@ -95,7 +95,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 
 	@Override
 	public void start(BackendStartContext context) {
-		// TODO HSEARCH-3528 start thread(s) and allocate resources specific to this backend here
+		threads.onStart( context.getConfigurationPropertySource(), context.getThreadPoolProvider() );
 	}
 
 	@Override
@@ -107,10 +107,11 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 	@Override
 	public void stop() {
 		try ( Closer<RuntimeException> closer = new Closer<>() ) {
-			closer.push( LuceneReadWorkOrchestratorImplementor::stop, readOrchestrator );
+			closer.push( LuceneSyncWorkOrchestratorImpl::stop, readOrchestrator );
 			closer.push( holder -> holder.get().close(), directoryProviderHolder );
 			closer.push( BeanHolder::close, directoryProviderHolder );
 			closer.push( TimingSource::stop, timingSource );
+			closer.push( BackendThreads::onStop, threads );
 		}
 	}
 

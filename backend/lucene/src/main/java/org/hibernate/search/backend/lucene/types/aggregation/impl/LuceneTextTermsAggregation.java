@@ -11,6 +11,7 @@ import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.engine.backend.types.converter.spi.ProjectionConverter;
 
@@ -38,8 +39,8 @@ public class LuceneTextTermsAggregation<K>
 	}
 
 	@Override
-	FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector, int limit)
-			throws IOException {
+	FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector,
+			NestedDocsProvider nestedDocsProvider, int limit) throws IOException {
 		// May throw IllegalArgumentException
 		SortedSetDocValuesReaderState docValuesReaderState = new DefaultSortedSetDocValuesReaderState( reader );
 
@@ -102,9 +103,9 @@ public class LuceneTextTermsAggregation<K>
 	public static class Builder<K>
 			extends AbstractBuilder<String, String, K> {
 
-		public Builder(LuceneSearchContext searchContext, String absoluteFieldPath,
+		public Builder(LuceneSearchContext searchContext, String nestedDocumentPath, String absoluteFieldPath,
 				ProjectionConverter<? super String, ? extends K> fromFieldValueConverter) {
-			super( searchContext, absoluteFieldPath, fromFieldValueConverter );
+			super( searchContext, nestedDocumentPath, absoluteFieldPath, fromFieldValueConverter );
 		}
 
 		@Override

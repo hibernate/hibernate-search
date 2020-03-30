@@ -14,7 +14,7 @@ package org.hibernate.search.engine.search.sort.dsl;
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
 public interface FieldSortOptionsStep<S extends FieldSortOptionsStep<?>>
-		extends SortFinalStep, SortThenStep, SortOrderStep<S> {
+		extends SortFinalStep, SortThenStep, SortOrderStep<S>, SortModeStep<S> {
 
 	/**
 	 * Start describing the behavior of this sort when a document doesn't have any value for the targeted field.

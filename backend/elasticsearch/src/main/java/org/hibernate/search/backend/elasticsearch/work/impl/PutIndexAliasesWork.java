@@ -21,7 +21,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
 
-public class PutIndexAliasesWork extends AbstractSimpleElasticsearchWork<Void> {
+public class PutIndexAliasesWork extends AbstractNonBulkableWork<Void> {
 
 	protected PutIndexAliasesWork(Builder builder) {
 		super( builder );
@@ -39,7 +39,7 @@ public class PutIndexAliasesWork extends AbstractSimpleElasticsearchWork<Void> {
 
 		public Builder(GsonProvider gsonProvider, URLEncodedString indexName,
 				Map<String, IndexAliasDefinition> aliases) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.payload = createPayload( gsonProvider, indexName.original, aliases );
 		}
 

@@ -728,20 +728,121 @@ refer to the documentation:
 {elasticsearchDocUrl}/analysis-tokenfilters.html[token filters].
 ====
 
+[[backend-elasticsearch-threads]]
+== Threads
+
+The Elasticsearch backend relies on an internal thread pool to orchestrate indexing requests (add/update/delete)
+and to schedule request timeouts.
+
+By default, the pool contains exactly as many threads as the number of processors available to the JVM on bootstrap.
+That can be changed using a configuration property:
+
+[source]
+----
+hibernate.search.backends.<backend-name>.thread_pool.size = 4
+----
+
+[[backend-elasticsearch-indexing-queues]]
+== Indexing queues
+
+Among all the requests sent by Hibernate Search to Elasticsearch,
+it is expected that there will be a lot of "indexing" requests to create/update/delete a specific document.
+Sending these requests one by one would be inefficient (mainly because of network latency).
+Also, we generally want to preserve the relative order of these requests
+when they are about the same documents.
+
+For these reasons, Hibernate Search pushes these requests to ordered queues
+and relies on the link:{elasticsearchDocUrl}/docs-bulk.html[Bulk API] to send them in batches.
+Each index maintains 10 queues holding at most 1000 elements each,
+and each queue will send bulk requests of at most 100 indexing requests.
+Queues operate independently (in parallel), but each queue sends one bulk request after the other,
+so at any given time there can be at most 10 bulk requests being sent for each index.
+
+[NOTE]
+====
+Indexing operations relative to the same document ID are always pushed to the same queue.
+====
+
+It is possible to customize the queues in order to reduce the load on the Elasticsearch server,
+or on the contrary to improve throughput.
+This is done through the following configuration properties, at the index level:
+
+[source]
+----
+hibernate.search.backends.<backend name>.indexes.<index name>.indexing.queue_count 10 (default)
+hibernate.search.backends.<backend name>.indexes.<index name>.indexing.queue_size 1000 (default)
+hibernate.search.backends.<backend name>.indexes.<index name>.indexing.max_bulk_size 100 (default)
+# OR
+hibernate.search.backends.<backend name>.index_defaults.indexing.queue_count 10 (default)
+hibernate.search.backends.<backend name>.index_defaults.indexing.queue_size 1000 (default)
+hibernate.search.backends.<backend name>.index_defaults.indexing.max_bulk_size 100 (default)
+----
+
+* `indexing.queue_count` defines the number of queues.
+Expects a strictly positive integer value.
++
+Higher values may lead to higher indexing throughput,
+but incur a risk of <<backend-elasticsearch-indexing-queues-circuit-breaker,overloading Elasticsearch>>.
+* `indexing.queue_size` defines the maximum number of elements each queue can hold.
+Expects a strictly positive integer value.
++
+Lower values may lead to lower memory usage, especially if there are many queues,
+but values that are too low will reduce the likeliness of reaching the max bulk size
+and increase the likeliness of <<backend-elasticsearch-indexing-queues-blocking,application threads blocking>>,
+potentially leading to lower indexing throughput.
+* `indexing.max_bulk_size` defines the maximum number of indexing requests in each bulk request.
+Expects a strictly positive integer value.
++
+Higher values may lead to higher indexing throughput,
+but incur a risk of <<backend-elasticsearch-indexing-queues-circuit-breaker,overloading Elasticsearch>>.
++
+Note that raising this number above the queue size has no effect,
+as bulks cannot include more requests than are contained in the queue.
+
+[TIP]
+[[backend-elasticsearch-indexing-queues-blocking]]
+====
+When a queue is full, any attempt to request indexing will block until the request can be put into the queue.
+
+In order to achieve a reasonable level of performance,
+be sure to set the size of queues to a high enough number that this kind of blocking only happens
+when the application is under very high load.
+====
+
+[WARNING]
+[[backend-elasticsearch-indexing-queues-circuit-breaker]]
+====
+Elasticsearch nodes can only handle so many parallel requests,
+and in particular they link:{elasticsearchDocUrl}/circuit-breaker.html[limit the amount of memory]
+available to store all pending requests at any given time.
+
+In order to avoid indexing failures, avoid using overly large numbers
+for the number of queues and the maximum bulk size,
+especially if you expect your index to hold large documents.
+====
+
 [[backend-elasticsearch-io]]
 == Writing and reading
 
 include::components/writing-reading-intro-note.asciidoc[]
 
+[[backend-elasticsearch-io-commit]]
+=== Commit
+
 When writing to indexes, Elasticsearch relies on a link:{elasticsearchDocUrl}/index-modules-translog.html[transaction log]
 to make sure that changes, even uncommitted, are always safe as soon as the REST API call returns.
+
 For that reason, the concept of "commit" is not as important to the Elasticsearch backend,
 and commit requirements are largely irrelevant.
+
+[[backend-elasticsearch-io-refresh]]
+=== Refresh
 
 When reading from indexes, Elasticsearch relies on a periodically refreshed index reader,
 meaning that search queries will return slightly out-of-date results,
 unless a refresh was forced:
 this is called link:{elasticsearchDocUrl}/getting-started-concepts.html#_near_realtime_nrt[near-real-time] behavior.
+
 By default, the index reader is refreshed every second,
 but this can be customized on the Elasticsearch side through index settings:
 see the `refresh_interval` setting on link:{elasticsearchDocUrl}/index-modules.html[this page].

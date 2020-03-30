@@ -15,14 +15,7 @@ mvn clean install -pl integrationtest/performance/backend/elasticsearch -am -Dsk
 mvn clean install -pl integrationtest/performance/backend/lucene -am -DskipTests
 ```
 
-## Run it from command line with standard jars
-
-To run the benchmarks:
-
 ## Run it from command line
-
-There is an alternative way to run it which might be handy when needing to copy the
-performance test to a dedicated server and for some reason you're not liking rsync:
 
 ```
 java -jar integrationtest/performance/backend/elasticsearch/target/benchmarks.jar

@@ -63,7 +63,7 @@ class LuceneSearchQueryExtractContext {
 
 	AggregationExtractContext createAggregationExtractContext() {
 		return new AggregationExtractContext(
-				indexSearcher.getIndexReader(),
+				indexSearcher.getIndexReader(), luceneQuery,
 				convertContext,
 				luceneCollectors.getCollectorsForAllMatchingDocs()
 		);

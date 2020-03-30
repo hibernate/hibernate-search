@@ -17,6 +17,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmbedded;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.KeywordField;
 
 @Entity
@@ -39,6 +40,7 @@ public class Author {
 	private EmbeddableGeoPoint placeOfBirth;
 
 	@ManyToMany(mappedBy = "authors")
+	@IndexedEmbedded(maxDepth = 1)
 	private List<Book> books = new ArrayList<>();
 
 	public Author() {

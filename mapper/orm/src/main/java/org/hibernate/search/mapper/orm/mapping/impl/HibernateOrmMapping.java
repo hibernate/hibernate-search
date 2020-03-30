@@ -21,7 +21,6 @@ import org.hibernate.engine.spi.SessionImplementor;
 import org.hibernate.search.engine.backend.Backend;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.session.spi.DetachedBackendSessionContext;
-import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
@@ -212,8 +211,8 @@ public class HibernateOrmMapping extends AbstractPojoMappingImplementor<Hibernat
 	}
 
 	@Override
-	public PojoIndexer createIndexer(SessionImplementor sessionImplementor, DocumentCommitStrategy commitStrategy) {
-		return HibernateOrmSearchSession.get( this, sessionImplementor ).createIndexer( commitStrategy );
+	public PojoIndexer createIndexer(SessionImplementor sessionImplementor) {
+		return HibernateOrmSearchSession.get( this, sessionImplementor ).createIndexer();
 	}
 
 	@Override

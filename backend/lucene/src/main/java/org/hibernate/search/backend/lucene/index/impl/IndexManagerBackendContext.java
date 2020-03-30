@@ -19,10 +19,11 @@ import org.hibernate.search.backend.lucene.lowlevel.index.impl.IOStrategy;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl;
 import org.hibernate.search.backend.lucene.lowlevel.index.impl.NearRealTimeIOStrategy;
 import org.hibernate.search.backend.lucene.multitenancy.impl.MultiTenancyStrategy;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneBatchingWriteWorkOrchestrator;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneReadWorkOrchestrator;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestratorImplementor;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkProcessor;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneParallelWorkOrchestratorImpl;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSerialWorkOrchestratorImpl;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSyncWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneBatchedWorkProcessor;
+import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.backend.lucene.schema.management.impl.LuceneIndexSchemaManager;
 import org.hibernate.search.backend.lucene.schema.management.impl.SchemaManagementIndexManagerContext;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
@@ -48,7 +49,6 @@ import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexWorkspace;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContextBuilder;
@@ -67,31 +67,31 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 
 	private final EventContext eventContext;
 
+	private final BackendThreads threads;
 	private final DirectoryProvider directoryProvider;
 	private final LuceneWorkFactory workFactory;
 	private final MultiTenancyStrategy multiTenancyStrategy;
 	private final TimingSource timingSource;
 	private final LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry;
-	private final ThreadPoolProvider threadPoolProvider;
 	private final FailureHandler failureHandler;
-	private final LuceneReadWorkOrchestrator readOrchestrator;
+	private final LuceneSyncWorkOrchestrator readOrchestrator;
 
 	public IndexManagerBackendContext(EventContext eventContext,
+			BackendThreads threads,
 			DirectoryProvider directoryProvider,
 			LuceneWorkFactory workFactory,
 			MultiTenancyStrategy multiTenancyStrategy,
 			TimingSource timingSource,
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
-			ThreadPoolProvider threadPoolProvider,
 			FailureHandler failureHandler,
-			LuceneReadWorkOrchestrator readOrchestrator) {
+			LuceneSyncWorkOrchestrator readOrchestrator) {
 		this.eventContext = eventContext;
+		this.threads = threads;
 		this.directoryProvider = directoryProvider;
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.timingSource = timingSource;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 		this.workFactory = workFactory;
-		this.threadPoolProvider = threadPoolProvider;
 		this.failureHandler = failureHandler;
 		this.readOrchestrator = readOrchestrator;
 	}
@@ -124,16 +124,14 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	public IndexIndexer createIndexer(
 			WorkExecutionIndexManagerContext indexManagerContext,
 			LuceneIndexEntryFactory indexEntryFactory,
-			BackendSessionContext sessionContext,
-			DocumentCommitStrategy commitStrategy) {
+			BackendSessionContext sessionContext) {
 		multiTenancyStrategy.checkTenantId( sessionContext.getTenantIdentifier(), eventContext );
 
 		return new LuceneIndexIndexer(
 				workFactory,
 				indexEntryFactory,
 				indexManagerContext,
-				sessionContext,
-				commitStrategy
+				sessionContext
 		);
 	}
 
@@ -184,12 +182,12 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	IOStrategy createIOStrategy(ConfigurationPropertySource propertySource) {
 		switch ( IO_STRATEGY.get( propertySource ) ) {
 			case DEBUG:
-				return DebugIOStrategy.create( directoryProvider, threadPoolProvider, failureHandler );
+				return DebugIOStrategy.create( directoryProvider, threads, failureHandler );
 			case NEAR_REAL_TIME:
 			default:
 				return NearRealTimeIOStrategy.create(
 						propertySource, directoryProvider,
-						timingSource, threadPoolProvider, failureHandler
+						timingSource, threads, failureHandler
 				);
 		}
 	}
@@ -199,7 +197,8 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 	}
 
 	Shard createShard(IOStrategy ioStrategy, LuceneIndexModel model, Optional<String> shardId) {
-		LuceneWriteWorkOrchestratorImplementor writeOrchestrator;
+		LuceneParallelWorkOrchestratorImpl managementOrchestrator;
+		LuceneSerialWorkOrchestratorImpl indexingOrchestrator;
 		IndexAccessorImpl indexAccessor = null;
 		String indexName = model.getIndexName();
 		EventContext shardEventContext = EventContexts.fromIndexNameAndShardId( model.getIndexName(), shardId );
@@ -209,27 +208,41 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 					indexName, shardEventContext,
 					shardId, model.getScopedAnalyzer()
 			);
-			writeOrchestrator = createWriteOrchestrator( indexName, shardEventContext, indexAccessor );
+			managementOrchestrator = createIndexManagementOrchestrator( shardEventContext, indexAccessor );
+			indexingOrchestrator = createIndexingOrchestrator( shardEventContext, indexAccessor );
 
-			return new Shard( shardEventContext, indexAccessor, writeOrchestrator );
+			Shard shard = new Shard(
+					shardEventContext, indexAccessor,
+					managementOrchestrator, indexingOrchestrator
+			);
+			return shard;
 		}
 		catch (RuntimeException e) {
 			new SuppressingCloser( e )
-					// No need to stop the orchestrator, we didn't start it
+					// No need to stop the orchestrators, we didn't start them
 					.push( indexAccessor );
 			throw e;
 		}
 	}
 
-	private LuceneWriteWorkOrchestratorImplementor createWriteOrchestrator(String indexName,
-			EventContext eventContext, IndexAccessorImpl indexAccessor) {
-		return new LuceneBatchingWriteWorkOrchestrator(
-				"Lucene write work orchestrator for " + eventContext.render(),
-				new LuceneWriteWorkProcessor(
-						indexName, eventContext,
-						indexAccessor, failureHandler
+	private LuceneParallelWorkOrchestratorImpl createIndexManagementOrchestrator(EventContext eventContext,
+			IndexAccessorImpl indexAccessor) {
+		return new LuceneParallelWorkOrchestratorImpl(
+				"Lucene index management orchestrator for " + eventContext.render(),
+				eventContext,
+				indexAccessor,
+				threads
+		);
+	}
+
+	private LuceneSerialWorkOrchestratorImpl createIndexingOrchestrator(EventContext eventContext,
+			IndexAccessorImpl indexAccessor) {
+		return new LuceneSerialWorkOrchestratorImpl(
+				"Lucene indexing orchestrator for " + eventContext.render(),
+				new LuceneBatchedWorkProcessor(
+						eventContext, indexAccessor
 				),
-				threadPoolProvider,
+				threads,
 				failureHandler
 		);
 	}

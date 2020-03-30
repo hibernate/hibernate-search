@@ -21,6 +21,6 @@ public interface PojoSearchSessionMappingContext extends PojoWorkMappingContext 
 	<R> PojoIndexingPlan<R> createIndexingPlan(PojoWorkSessionContext<R> context,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy);
 
-	PojoIndexer createIndexer(PojoWorkSessionContext<?> context, DocumentCommitStrategy commitStrategy);
+	PojoIndexer createIndexer(PojoWorkSessionContext<?> context);
 
 }

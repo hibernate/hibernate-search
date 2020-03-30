@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 
 public class LocalDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalDateTime> {
 
@@ -48,18 +50,33 @@ public class LocalDateTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalD
 	}
 
 	@Override
-	public List<LocalDateTime> getAscendingUniqueTermValues() {
+	protected AscendingUniqueTermValues<LocalDateTime> createAscendingUniqueTermValues() {
 		// Remember: we only get millisecond precision for predicates/sorts/aggregations/etc.
-		return Arrays.asList(
-				LocalDateTime.of( -52, 10, 11, 10, 15, 30, 0 ),
-				LocalDateTime.of( 1600, 2, 28, 13, 0, 23, 0 ),
-				LocalDateTime.of( 1900, 1, 1, 0, 0, 0, 0 ),
-				LocalDateTime.of( 1970, 1, 1, 0, 0, 0, 0 ),
-				LocalDateTime.of( 1980, 1, 1, 0, 0, 0, 0 ),
-				LocalDateTime.of( 1980, 12, 31, 12, 0, 0, 0 ),
-				LocalDateTime.of( 2004, 2, 29, 1, 0, 0, 0 ),
-				LocalDateTime.of( 2017, 7, 7, 11, 15, 30, 555_000_000 )
-		);
+		return new AscendingUniqueTermValues<LocalDateTime>() {
+			@Override
+			protected List<LocalDateTime> createSingle() {
+				return Arrays.asList(
+						LocalDateTime.of( -52, 10, 11, 10, 15, 30, 0 ),
+						LocalDateTime.of( 1600, 2, 28, 13, 0, 23, 0 ),
+						LocalDateTime.of( 1900, 1, 1, 0, 0, 0, 0 ),
+						LocalDateTime.of( 1970, 1, 1, 0, 0, 0, 0 ),
+						LocalDateTime.of( 1980, 1, 1, 0, 0, 0, 0 ),
+						LocalDateTime.of( 1980, 12, 31, 12, 0, 0, 0 ),
+						LocalDateTime.of( 2004, 2, 29, 1, 0, 0, 0 ),
+						LocalDateTime.of( 2017, 7, 7, 11, 15, 30, 555_000_000 )
+				);
+			}
+
+			@Override
+			protected List<List<LocalDateTime>> createMultiResultingInSingleAfterSum() {
+				return valuesThatWontBeUsed();
+			}
+
+			@Override
+			protected LocalDateTime applyDelta(LocalDateTime value, int multiplierForDelta) {
+				return value.plus( multiplierForDelta, ChronoUnit.YEARS );
+			}
+		};
 	}
 
 	@Override

@@ -16,6 +16,7 @@ import org.hibernate.search.backend.lucene.index.spi.ShardingStrategyInitializat
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
 import org.hibernate.search.engine.cfg.spi.OptionalConfigurationProperty;
+import org.hibernate.search.util.common.data.impl.SimpleHashFunction;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public class HashShardingStrategy implements ShardingStrategy {
@@ -62,21 +63,7 @@ public class HashShardingStrategy implements ShardingStrategy {
 	}
 
 	private String toShardIdentifier(String routingKey) {
-		return shardIds[Math.abs( hash( routingKey ) % shardIds.length )];
-	}
-
-	private static int hash(String routingKey) {
-		if ( routingKey == null ) {
-			return 0;
-		}
-
-		// reproduce the hashCode implementation of String as documented in the javadoc
-		// to be safe cross Java version (in case it changes some day)
-		int hash = 0;
-		int length = routingKey.length();
-		for ( int index = 0; index < length; index++ ) {
-			hash = 31 * hash + routingKey.charAt( index );
-		}
-		return hash;
+		// Note the hash function MUST NOT CHANGE, otherwise existing indexes will no longer work correctly.
+		return SimpleHashFunction.pick( shardIds, routingKey );
 	}
 }

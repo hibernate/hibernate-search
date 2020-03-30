@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import java.util.List;
+
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
@@ -30,15 +32,15 @@ public final class LuceneNumericFieldPredicateBuilderFactory<F, E extends Number
 
 	@Override
 	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(LuceneSearchContext searchContext, String absoluteFieldPath,
-			LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker) {
+			List<String> nestedPathHierarchy, LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker) {
 		checkSearchable( absoluteFieldPath );
-		return new LuceneNumericMatchPredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
+		return new LuceneNumericMatchPredicateBuilder<>( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec );
 	}
 
 	@Override
 	public LuceneNumericRangePredicateBuilder<F, E> createRangePredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneCompatibilityChecker converterChecker) {
+			LuceneSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy, LuceneCompatibilityChecker converterChecker) {
 		checkSearchable( absoluteFieldPath );
-		return new LuceneNumericRangePredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
+		return new LuceneNumericRangePredicateBuilder<>( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec );
 	}
 }

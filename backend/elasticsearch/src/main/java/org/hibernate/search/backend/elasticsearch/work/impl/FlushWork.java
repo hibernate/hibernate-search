@@ -22,7 +22,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.FlushWorkBui
  * in ES5 (elasticsearch/elasticsearch:7cc48c8e8723d3b31fbcb371070bc2a8d87b1f7e).
  *
  */
-public class FlushWork extends AbstractSimpleElasticsearchWork<Void> {
+public class FlushWork extends AbstractNonBulkableWork<Void> {
 
 	protected FlushWork(Builder builder) {
 		super( builder );
@@ -39,7 +39,7 @@ public class FlushWork extends AbstractSimpleElasticsearchWork<Void> {
 		private final Set<URLEncodedString> indexNames = new HashSet<>();
 
 		public Builder() {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 		}
 
 		@Override

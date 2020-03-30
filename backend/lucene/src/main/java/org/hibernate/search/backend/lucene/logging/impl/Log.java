@@ -96,7 +96,7 @@ public interface Log extends BasicLogger {
 	@LogMessage(level = WARN)
 	@Message(id = ID_OFFSET_1 + 52,
 			value = "Going to reset the index writer and force release of the IndexWriter lock. %1$s")
-	void indexAccessorReset(@FormatWith(EventContextFormatter.class) EventContext context);
+	void indexWriterReset(@FormatWith(EventContextFormatter.class) EventContext context);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ID_OFFSET_1 + 55,
@@ -113,8 +113,8 @@ public interface Log extends BasicLogger {
 	SearchException unableToLoadResource(String fileName);
 
 	@Message(id = ID_OFFSET_1 + 118,
-			value = "Index Merge operation")
-	String indexMergeOperation();
+			value = "Index Merge operation on index '%1$s'")
+	String indexMergeOperation(String indexName);
 
 	@LogMessage(level = Level.WARN)
 	@Message(id = ID_OFFSET_1 + 225,
@@ -477,8 +477,8 @@ public interface Log extends BasicLogger {
 	SearchException unableToMergeSegments(@Param EventContext context, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_2 + 79,
-			value = "Unable to clean up after write errors.")
-	SearchException unableToCleanUpAfterError(@Param EventContext context, @Cause Exception e);
+			value = "Unable to close the index writer after write failures.")
+	SearchException unableToCloseIndexWriterAfterFailures(@Param EventContext context, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_2 + 80, value = "Impossible to detect a decimal scale to use for this field."
 			+ " If the value is bridged, set '.asBigDecimal().decimalScale( int )' in the bind, else verify your mapping.")
@@ -527,8 +527,8 @@ public interface Log extends BasicLogger {
 			value = "Invalid routing key: '%1$s'. Valid keys are: %2$s.")
 	SearchException invalidRoutingKeyForExplicitShardingStrategy(String invalidKey, Collection<String> validKeys);
 
-	@Message(id = ID_OFFSET_2 + 93, value = "Multiple conflicting nested document paths to build a projection for field '%1$s'. '%2$s' vs. '%3$s'.")
-	SearchException conflictingNestedDocumentPathsForProjection(String absoluteFieldPath, String nestedDocumentPath1, String nestedDocumentPath2, @Param EventContext context);
+	@Message(id = ID_OFFSET_2 + 93, value = "Multiple index conflicting models on nested document paths targeting '%1$s'. '%2$s' vs. '%3$s'.")
+	SearchException conflictingNestedDocumentPaths(String absoluteFieldPath, String nestedDocumentPath1, String nestedDocumentPath2, @Param EventContext context);
 
 	@Message(id = ID_OFFSET_2 + 94,
 			value = "Cannot apply an analyzer on an aggregable field. Use a normalizer instead. Analyzer: '%1$s'."
@@ -611,4 +611,36 @@ public interface Log extends BasicLogger {
 			value = "Unable to drop index directory: %1$s")
 	SearchException unableToDropIndexDirectory(String causeMessage,
 			@Param EventContext context, @Cause Exception cause);
+
+	@Message(id = ID_OFFSET_2 + 112, value = "Multiple index conflicting models on nested document paths targeting '%1$s'. '%2$s' vs. '%3$s'.")
+	SearchException conflictingNestedDocumentPathHierarchy(String absoluteFieldPath, List<String> nestedDocumentPathHierarchy1, List<String> nestedDocumentPathHierarchy2,
+			@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 113, value = "Simple query string targets fields [%1$s, %3$s] spanning multiple nested paths: %2$s, %4$s.")
+	SearchException simpleQueryStringSpanningMultipleNestedPaths(String fieldPath1, String nestedPath1, String fieldPath2, String nestedPath2);
+
+	@Message(id = ID_OFFSET_2 + 114,
+			value = "Cannot compute the median across nested documents.")
+	SearchException cannotComputeMedianAcrossNested(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 115,
+			value = "Cannot compute the sum, average or median of a text field. Only min and max are supported.")
+	SearchException cannotComputeSumOrAvgOrMedianForStringField(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 116,
+			value = "Cannot compute the sum of a temporal field. Only min, max, avg and median are supported.")
+	SearchException cannotComputeSumForTemporalField(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 117,
+			value = "Cannot compute the sum for a distance sort. Only min, max, avg and median are supported.")
+	SearchException cannotComputeSumForDistanceSort(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 118,
+			value = "A failure occurred during a low-level write operation"
+					+ " and the index writer had to be reset."
+					+ " Some write operations may have been lost as a result."
+					+ " Failure: %1$s")
+	SearchException uncommittedOperationsBecauseOfFailure(String causeMessage,
+			@Param EventContext context, @Cause Throwable cause);
+
 }

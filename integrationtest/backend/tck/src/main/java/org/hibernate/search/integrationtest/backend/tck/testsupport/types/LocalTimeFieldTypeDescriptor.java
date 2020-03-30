@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 
 public class LocalTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalTime> {
 
@@ -34,18 +36,33 @@ public class LocalTimeFieldTypeDescriptor extends FieldTypeDescriptor<LocalTime>
 	}
 
 	@Override
-	public List<LocalTime> getAscendingUniqueTermValues() {
+	protected AscendingUniqueTermValues<LocalTime> createAscendingUniqueTermValues() {
 		// Remember: we only get millisecond precision for predicates/sorts/aggregations/etc.
-		return Arrays.asList(
-				LocalTime.of( 0, 0, 0, 0 ),
-				LocalTime.of( 1, 0, 0, 0 ),
-				LocalTime.of( 10, 15, 30, 0 ),
-				LocalTime.of( 11, 15, 30, 555_000_000 ),
-				LocalTime.of( 12, 0, 0, 0 ),
-				LocalTime.of( 13, 0, 23, 0 ),
-				LocalTime.of( 17, 59, 0, 0 ),
-				LocalTime.of( 23, 59, 59, 999_000_000 )
-		);
+		return new AscendingUniqueTermValues<LocalTime>() {
+			@Override
+			protected List<LocalTime> createSingle() {
+				return Arrays.asList(
+						LocalTime.of( 0, 0, 0, 0 ),
+						LocalTime.of( 1, 0, 0, 0 ),
+						LocalTime.of( 10, 15, 30, 0 ),
+						LocalTime.of( 11, 15, 30, 555_000_000 ),
+						LocalTime.of( 12, 0, 0, 0 ),
+						LocalTime.of( 13, 0, 23, 0 ),
+						LocalTime.of( 17, 59, 0, 0 ),
+						LocalTime.of( 23, 59, 59, 999_000_000 )
+				);
+			}
+
+			@Override
+			protected List<List<LocalTime>> createMultiResultingInSingleAfterSum() {
+				return valuesThatWontBeUsed();
+			}
+
+			@Override
+			protected LocalTime applyDelta(LocalTime value, int multiplierForDelta) {
+				return value.plus( multiplierForDelta, ChronoUnit.MINUTES );
+			}
+		};
 	}
 
 	@Override

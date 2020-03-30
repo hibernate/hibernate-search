@@ -197,7 +197,7 @@ public class ElasticsearchScopeModel {
 						return nestedDocumentPath1;
 					}
 
-					throw log.conflictingNestedDocumentPathsForProjection(
+					throw log.conflictingNestedDocumentPaths(
 							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
 				} )
 				.orElse( Optional.empty() );
@@ -205,18 +205,36 @@ public class ElasticsearchScopeModel {
 		return nestedDocumentPath.orElse( null );
 	}
 
-	public List<String> getNestedPathHierarchy(String absoluteFieldPath) {
+	public List<String> getNestedPathHierarchyForField(String absoluteFieldPath) {
 		Optional<List<String>> nestedDocumentPath = indexModels.stream()
 				.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath ) )
 				.filter( Objects::nonNull )
-				.map( fieldNode -> Optional.ofNullable( fieldNode.getNestedPathHierarchy() ) )
+				.map( node -> Optional.ofNullable( node.getNestedPathHierarchy() ) )
 				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
 					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
 						return nestedDocumentPath1;
 					}
 
-					throw log.conflictingNestedDocumentPathHierarchyForProjection(
+					throw log.conflictingNestedDocumentPathHierarchy(
 							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
+				} )
+				.orElse( Optional.empty() );
+
+		return nestedDocumentPath.orElse( null );
+	}
+
+	public List<String> getNestedPathHierarchyForObject(String absoluteObjectPath) {
+		Optional<List<String>> nestedDocumentPath = indexModels.stream()
+				.map( indexModel -> indexModel.getObjectNode( absoluteObjectPath ) )
+				.filter( Objects::nonNull )
+				.map( node -> Optional.ofNullable( node.getNestedPathHierarchy() ) )
+				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
+					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
+						return nestedDocumentPath1;
+					}
+
+					throw log.conflictingNestedDocumentPathHierarchy(
+							absoluteObjectPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
 				} )
 				.orElse( Optional.empty() );
 

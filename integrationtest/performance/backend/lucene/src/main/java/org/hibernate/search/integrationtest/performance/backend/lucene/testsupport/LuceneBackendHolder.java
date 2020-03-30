@@ -33,7 +33,7 @@ public class LuceneBackendHolder extends AbstractBackendHolder {
 	 * Note that configuration properties are applied both at the backend level and at the index level,
 	 * so using the "index_defaults." prefix is optional when setting index-level properties.
 	 */
-	@Param({ "", "io.commit_interval=1000", "io.commit_interval=1000&io.refresh_interval=1000", "io.strategy=debug" })
+	@Param({ "", "io.refresh_interval=1000" })
 	private String configuration;
 
 	@Override

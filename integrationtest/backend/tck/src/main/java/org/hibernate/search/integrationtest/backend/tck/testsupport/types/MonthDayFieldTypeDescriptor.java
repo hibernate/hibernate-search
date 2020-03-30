@@ -6,8 +6,10 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
+import java.time.LocalDate;
 import java.time.Month;
 import java.time.MonthDay;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -20,6 +22,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 
 public class MonthDayFieldTypeDescriptor extends FieldTypeDescriptor<MonthDay> {
 
@@ -28,17 +31,33 @@ public class MonthDayFieldTypeDescriptor extends FieldTypeDescriptor<MonthDay> {
 	}
 
 	@Override
-	public List<MonthDay> getAscendingUniqueTermValues() {
-		return Arrays.asList(
-				MonthDay.of( Month.JANUARY, 1 ),
-				MonthDay.of( Month.FEBRUARY, 29 ),
-				MonthDay.of( Month.MARCH, 7 ),
-				MonthDay.of( Month.JUNE, 6 ),
-				MonthDay.of( Month.JULY, 14 ),
-				MonthDay.of( Month.SEPTEMBER, 18 ),
-				MonthDay.of( Month.NOVEMBER, 6 ),
-				MonthDay.of( Month.DECEMBER, 31 )
-		);
+	protected AscendingUniqueTermValues<MonthDay> createAscendingUniqueTermValues() {
+		return new AscendingUniqueTermValues<MonthDay>() {
+			@Override
+			protected List<MonthDay> createSingle() {
+				return Arrays.asList(
+						MonthDay.of( Month.JANUARY, 1 ),
+						MonthDay.of( Month.FEBRUARY, 29 ),
+						MonthDay.of( Month.MARCH, 7 ),
+						MonthDay.of( Month.JUNE, 6 ),
+						MonthDay.of( Month.JULY, 14 ),
+						MonthDay.of( Month.SEPTEMBER, 18 ),
+						MonthDay.of( Month.NOVEMBER, 6 ),
+						MonthDay.of( Month.DECEMBER, 31 )
+				);
+			}
+
+			@Override
+			protected List<List<MonthDay>> createMultiResultingInSingleAfterSum() {
+				return valuesThatWontBeUsed();
+			}
+
+			@Override
+			protected MonthDay applyDelta(MonthDay value, int multiplierForDelta) {
+				LocalDate date = value.atYear( 0 ).plus( multiplierForDelta, ChronoUnit.DAYS );
+				return MonthDay.of( date.getMonth(), date.getDayOfMonth() );
+			}
+		};
 	}
 
 	@Override

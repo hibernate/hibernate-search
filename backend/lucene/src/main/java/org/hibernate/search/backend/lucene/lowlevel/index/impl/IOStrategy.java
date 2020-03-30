@@ -14,7 +14,7 @@ import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolde
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvider;
 import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderProvider;
 import org.hibernate.search.backend.lucene.lowlevel.writer.impl.IndexWriterProvider;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
+import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
@@ -25,13 +25,13 @@ import org.apache.lucene.analysis.Analyzer;
 public abstract class IOStrategy {
 
 	private final DirectoryProvider directoryProvider;
-	final ThreadPoolProvider threadPoolProvider;
+	final BackendThreads threads;
 	final FailureHandler failureHandler;
 
-	protected IOStrategy(DirectoryProvider directoryProvider, ThreadPoolProvider threadPoolProvider,
+	protected IOStrategy(DirectoryProvider directoryProvider, BackendThreads threads,
 			FailureHandler failureHandler) {
 		this.directoryProvider = directoryProvider;
-		this.threadPoolProvider = threadPoolProvider;
+		this.threads = threads;
 		this.failureHandler = failureHandler;
 	}
 

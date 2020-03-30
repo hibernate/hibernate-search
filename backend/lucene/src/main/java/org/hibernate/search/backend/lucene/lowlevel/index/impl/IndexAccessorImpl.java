@@ -38,7 +38,8 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 	private final IndexWriterProvider indexWriterProvider;
 	private final IndexReaderProvider indexReaderProvider;
 
-	public IndexAccessorImpl(EventContext eventContext, DirectoryHolder directoryHolder,
+	public IndexAccessorImpl(EventContext eventContext,
+			DirectoryHolder directoryHolder,
 			IndexWriterProvider indexWriterProvider, IndexReaderProvider indexReaderProvider) {
 		this.eventContext = eventContext;
 		this.directoryHolder = directoryHolder;
@@ -53,17 +54,10 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 	@Override
 	public void close() throws IOException {
 		try ( Closer<IOException> closer = new Closer<>() ) {
-			closer.push( IndexReaderProvider::clear, indexReaderProvider );
 			closer.push( IndexWriterProvider::clear, indexWriterProvider );
+			closer.push( IndexReaderProvider::clear, indexReaderProvider );
 			closer.push( DirectoryHolder::close, directoryHolder );
 		}
-	}
-
-	@Override
-	public void reset() throws IOException {
-		log.indexAccessorReset( eventContext );
-		indexWriterProvider.clear();
-		indexReaderProvider.clear();
 	}
 
 	@Override
@@ -104,8 +98,7 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 	public void dropIndexIfExisting() {
 		try {
 			// Ensure no one is using the directory
-			indexWriterProvider.clear();
-			indexReaderProvider.clear();
+			clear();
 
 			Directory directory = directoryHolder.get();
 
@@ -123,42 +116,41 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 		}
 	}
 
-	@Override
-	public void commit() {
-		try {
-			IndexWriterDelegatorImpl delegator = indexWriterProvider.getOrNull();
-			if ( delegator != null ) {
-				delegator.commit();
-			}
-		}
-		catch (RuntimeException | IOException e) {
-			throw log.unableToCommitIndex( eventContext, e );
+	private synchronized void clear() throws IOException {
+		try ( Closer<IOException> closer = new Closer<>() ) {
+			closer.push( IndexWriterProvider::clear, indexWriterProvider );
+			closer.push( IndexReaderProvider::clear, indexReaderProvider );
 		}
 	}
 
 	@Override
-	public long commitOrDelay() {
-		try {
-			IndexWriterDelegatorImpl delegator = indexWriterProvider.getOrNull();
-			if ( delegator != null ) {
-				return delegator.commitOrDelay();
-			}
-			else {
-				return 0L;
-			}
+	public void commit() {
+		IndexWriterDelegatorImpl delegator = indexWriterProvider.getOrNull();
+		if ( delegator != null ) {
+			delegator.commit();
 		}
-		catch (RuntimeException | IOException e) {
-			throw log.unableToCommitIndex( eventContext, e );
+	}
+
+	@Override
+	public void commitOrDelay() {
+		IndexWriterDelegatorImpl delegator = indexWriterProvider.getOrNull();
+		if ( delegator != null ) {
+			delegator.commitOrDelay();
 		}
 	}
 
 	@Override
 	public void refresh() {
+		indexReaderProvider.refresh();
+	}
+
+	@Override
+	public void mergeSegments() {
 		try {
-			indexReaderProvider.refresh();
+			indexWriterProvider.getOrCreate().mergeSegments();
 		}
-		catch (RuntimeException | IOException e) {
-			throw log.unableToRefreshIndex( eventContext, e );
+		catch (IOException e) {
+			throw log.unableToMergeSegments( eventContext, e );
 		}
 	}
 
@@ -170,6 +162,21 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 	@Override
 	public DirectoryReader getIndexReader() throws IOException {
 		return indexReaderProvider.getOrCreate();
+	}
+
+	@Override
+	public void cleanUpAfterFailure(Throwable throwable, Object failingOperation) {
+		try {
+			/*
+			 * Note this will close the index writer,
+			 * which with the default settings will trigger a commit.
+			 */
+			indexWriterProvider.clearAfterFailure( throwable, failingOperation );
+			indexReaderProvider.clear();
+		}
+		catch (RuntimeException | IOException e) {
+			throwable.addSuppressed( e );
+		}
 	}
 
 	public Directory getDirectoryForTests() {
@@ -190,5 +197,4 @@ public class IndexAccessorImpl implements AutoCloseable, IndexAccessor {
 			log.lockingFailureDuringInitialization( directory.toString(), eventContext );
 		}
 	}
-
 }

@@ -6,11 +6,12 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.result.impl;
 
+import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 
 
 public interface BulkResult {
 
-	BulkResultItemExtractor withContext(ElasticsearchWorkExecutionContext context);
+	<T> T extract(ElasticsearchWorkExecutionContext context, BulkableWork<T> work, int index);
 
 }

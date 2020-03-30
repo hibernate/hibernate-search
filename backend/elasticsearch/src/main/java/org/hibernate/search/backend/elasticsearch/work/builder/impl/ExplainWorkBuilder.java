@@ -10,11 +10,11 @@ import java.util.Set;
 import java.util.function.Function;
 
 import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.NonBulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.result.impl.ExplainResult;
 
 
-public interface ExplainWorkBuilder extends ElasticsearchWorkBuilder<ElasticsearchWork<ExplainResult>> {
+public interface ExplainWorkBuilder extends ElasticsearchWorkBuilder<NonBulkableWork<ExplainResult>> {
 
 	ExplainWorkBuilder routingKeys(Set<String> routingKeys);
 

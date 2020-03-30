@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.backend.spi;
 
 import org.hibernate.search.engine.environment.bean.BeanResolver;
+import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 
@@ -31,5 +32,7 @@ public interface BackendStartContext {
 	BeanResolver getBeanResolver();
 
 	ConfigurationPropertySource getConfigurationPropertySource();
+
+	ThreadPoolProvider getThreadPoolProvider();
 
 }

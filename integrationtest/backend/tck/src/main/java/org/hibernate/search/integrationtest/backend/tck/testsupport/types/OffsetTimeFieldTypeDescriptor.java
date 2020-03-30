@@ -9,6 +9,7 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 import java.time.LocalTime;
 import java.time.OffsetTime;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +21,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 
 public class OffsetTimeFieldTypeDescriptor extends FieldTypeDescriptor<OffsetTime> {
 
@@ -33,18 +35,33 @@ public class OffsetTimeFieldTypeDescriptor extends FieldTypeDescriptor<OffsetTim
 	}
 
 	@Override
-	public List<OffsetTime> getAscendingUniqueTermValues() {
+	protected AscendingUniqueTermValues<OffsetTime> createAscendingUniqueTermValues() {
 		// Remember: we only get millisecond precision for predicates/sorts/aggregations/etc.
-		return Arrays.asList(
-				LocalTime.of( 3, 4, 0, 0 ).atOffset( ZoneOffset.ofHours( 10 ) ),
-				LocalTime.of( 2, 0, 0, 0 ).atOffset( ZoneOffset.ofHours( 2 ) ),
-				LocalTime.of( 10, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( -2 ) ),
-				LocalTime.of( 13, 0, 23, 0 ).atOffset( ZoneOffset.ofHours( 0 ) ),
-				LocalTime.of( 10, 0, 0, 0 ).atOffset( ZoneOffset.ofHours( -4 ) ),
-				LocalTime.of( 19, 59, 0, 0 ).atOffset( ZoneOffset.ofHours( 2 ) ),
-				LocalTime.of( 23, 59, 59, 999_000_000 ).atOffset( ZoneOffset.ofHours( 0 ) ),
-				LocalTime.of( 21, 0, 0, 0 ).atOffset( ZoneOffset.ofHours( -4 ) )
-		);
+		return new AscendingUniqueTermValues<OffsetTime>() {
+			@Override
+			protected List<OffsetTime> createSingle() {
+				return Arrays.asList(
+						LocalTime.of( 3, 4, 0, 0 ).atOffset( ZoneOffset.ofHours( 10 ) ),
+						LocalTime.of( 2, 0, 0, 0 ).atOffset( ZoneOffset.ofHours( 2 ) ),
+						LocalTime.of( 10, 15, 30, 0 ).atOffset( ZoneOffset.ofHours( -2 ) ),
+						LocalTime.of( 13, 0, 23, 0 ).atOffset( ZoneOffset.ofHours( 0 ) ),
+						LocalTime.of( 10, 0, 0, 0 ).atOffset( ZoneOffset.ofHours( -4 ) ),
+						LocalTime.of( 19, 59, 0, 0 ).atOffset( ZoneOffset.ofHours( 2 ) ),
+						LocalTime.of( 23, 59, 59, 999_000_000 ).atOffset( ZoneOffset.ofHours( 0 ) ),
+						LocalTime.of( 21, 0, 0, 0 ).atOffset( ZoneOffset.ofHours( -4 ) )
+				);
+			}
+
+			@Override
+			protected List<List<OffsetTime>> createMultiResultingInSingleAfterSum() {
+				return valuesThatWontBeUsed();
+			}
+
+			@Override
+			protected OffsetTime applyDelta(OffsetTime value, int multiplierForDelta) {
+				return value.plus( multiplierForDelta, ChronoUnit.HOURS );
+			}
+		};
 	}
 
 	@Override

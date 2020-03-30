@@ -28,43 +28,59 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 	}
 
 	@Override
-	public LuceneSchemaManagementWork<Void> createIndexIfMissing() {
-		return new LuceneCreateIndexIfMissingWork();
+	public IndexManagementWork<Void> createIndexIfMissing() {
+		return new CreateIndexIfMissingWork();
 	}
 
 	@Override
-	public LuceneSchemaManagementWork<Void> dropIndexIfExisting() {
-		return new LuceneDropIndexIfExistingWork();
+	public IndexManagementWork<Void> dropIndexIfExisting() {
+		return new DropIndexIfExistingWork();
 	}
 
 	@Override
-	public LuceneSchemaManagementWork<Void> validateIndexExists() {
-		return new LuceneValidateIndexExistsWork();
+	public IndexManagementWork<Void> validateIndexExists() {
+		return new ValidateIndexExistsWork();
 	}
 
 	@Override
-	public LuceneSingleDocumentWriteWork<?> add(String tenantId, String entityTypeName, Object entityIdentifier,
-			LuceneIndexEntry indexEntry) {
-		return new LuceneAddEntryWork( tenantId, entityTypeName, entityIdentifier, indexEntry );
+	public IndexManagementWork<?> flush() {
+		return new FlushWork();
 	}
 
 	@Override
-	public LuceneSingleDocumentWriteWork<?> update(String tenantId, String entityTypeName, Object entityIdentifier,
+	public IndexManagementWork<?> refresh() {
+		return new RefreshWork();
+	}
+
+	@Override
+	public IndexManagementWork<?> mergeSegments() {
+		return new MergeSegmentsWork();
+	}
+
+	@Override
+	public SingleDocumentIndexingWork add(String tenantId, String entityTypeName, Object entityIdentifier,
+			String documentIdentifier, LuceneIndexEntry indexEntry) {
+		return new AddEntryWork( tenantId, entityTypeName, entityIdentifier,
+				documentIdentifier, indexEntry );
+	}
+
+	@Override
+	public SingleDocumentIndexingWork update(String tenantId, String entityTypeName, Object entityIdentifier,
 			String documentIdentifier, LuceneIndexEntry indexEntry) {
 		Query filter = multiTenancyStrategy.getFilterOrNull( tenantId );
-		return new LuceneUpdateEntryWork( tenantId, entityTypeName, entityIdentifier,
+		return new UpdateEntryWork( tenantId, entityTypeName, entityIdentifier,
 				documentIdentifier, filter, indexEntry );
 	}
 
 	@Override
-	public LuceneSingleDocumentWriteWork<?> delete(String tenantId, String entityTypeName, Object entityIdentifier,
+	public SingleDocumentIndexingWork delete(String tenantId, String entityTypeName, Object entityIdentifier,
 			String documentIdentifier) {
 		Query filter = multiTenancyStrategy.getFilterOrNull( tenantId );
-		return new LuceneDeleteEntryWork( tenantId, entityTypeName, entityIdentifier, documentIdentifier, filter );
+		return new DeleteEntryWork( tenantId, entityTypeName, entityIdentifier, documentIdentifier, filter );
 	}
 
 	@Override
-	public LuceneWriteWork<?> deleteAll(String tenantId, Set<String> routingKeys) {
+	public IndexManagementWork<?> deleteAll(String tenantId, Set<String> routingKeys) {
 		List<Query> filters = new ArrayList<>();
 		Query filter = multiTenancyStrategy.getFilterOrNull( tenantId );
 		if ( filter != null ) {
@@ -74,33 +90,23 @@ public class LuceneWorkFactoryImpl implements LuceneWorkFactory {
 			filters.add( Queries.anyTerm( MetadataFields.routingKeyFieldName(), routingKeys ) );
 		}
 
-		return new LuceneDeleteEntriesByQueryWork( Queries.boolFilter( new MatchAllDocsQuery(), filters ) );
+		return new DeleteEntriesByQueryWork( Queries.boolFilter( new MatchAllDocsQuery(), filters ) );
 	}
 
 	@Override
-	public LuceneWriteWork<?> noOp() {
-		return new LuceneNoOpWriteWork();
+	public <R> ReadWork<R> search(LuceneSearcher<R> searcher, Integer offset, Integer limit) {
+		return new SearchWork<>( searcher, offset, limit );
 	}
 
 	@Override
-	public LuceneWriteWork<?> mergeSegments() {
-		return new LuceneMergeSegmentsWork();
+	public ReadWork<Integer> count(LuceneSearcher<?> searcher) {
+		return new CountWork( searcher );
 	}
 
 	@Override
-	public <R> LuceneReadWork<R> search(LuceneSearcher<R> searcher, Integer offset, Integer limit) {
-		return new LuceneSearchWork<>( searcher, offset, limit );
-	}
-
-	@Override
-	public LuceneReadWork<Integer> count(LuceneSearcher<?> searcher) {
-		return new LuceneCountWork( searcher );
-	}
-
-	@Override
-	public LuceneReadWork<Explanation> explain(LuceneSearcher<?> searcher,
+	public ReadWork<Explanation> explain(LuceneSearcher<?> searcher,
 			String explainedDocumentIndexName, String explainedDocumentId, Query explainedDocumentFilter) {
-		return new LuceneExplainWork(
+		return new ExplainWork(
 				searcher,
 				explainedDocumentIndexName, explainedDocumentId, explainedDocumentFilter
 		);

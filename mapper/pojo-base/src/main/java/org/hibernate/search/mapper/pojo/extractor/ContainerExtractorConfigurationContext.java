@@ -9,7 +9,7 @@ package org.hibernate.search.mapper.pojo.extractor;
 import java.util.List;
 
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
-import org.hibernate.search.util.common.annotaion.Incubating;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A context to assign names to container extractor implementations.

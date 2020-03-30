@@ -115,6 +115,16 @@ public final class LuceneBackendSettings {
 	public static final String ANALYSIS_CONFIGURER = "analysis.configurer";
 
 	/**
+	 * The size of the thread pool assigned to the backend.
+	 * <p>
+	 * Expects a strictly positive integer value,
+	 * or a string that can be parsed to such integer value.
+	 * <p>
+	 * Defaults to the number of processor cores available to the JVM on startup.
+	 */
+	public static final String THREAD_POOL_SIZE = "thread_pool.size";
+
+	/**
 	 * Configuration property keys for directories without the {@link #DIRECTORY_PREFIX prefix}.
 	 */
 	public static final class DirectoryRadicals {

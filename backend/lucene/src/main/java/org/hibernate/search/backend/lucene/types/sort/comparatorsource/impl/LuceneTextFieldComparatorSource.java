@@ -8,8 +8,9 @@ package org.hibernate.search.backend.lucene.types.sort.comparatorsource.impl;
 
 import java.io.IOException;
 
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DocValuesJoin;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.ReplaceMissingSortedDocValues;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.TextMultiValuesToSingleValuesSource;
 import org.hibernate.search.backend.lucene.types.sort.impl.SortMissingValue;
 
 import org.apache.lucene.index.LeafReaderContext;
@@ -20,20 +21,24 @@ import org.apache.lucene.util.BytesRef;
 public class LuceneTextFieldComparatorSource extends LuceneFieldComparatorSource {
 
 	private final Object missingValue;
+	private final MultiValueMode multiValueMode;
 
-	public LuceneTextFieldComparatorSource(String nestedDocumentPath, Object missingValue) {
+	public LuceneTextFieldComparatorSource(String nestedDocumentPath, Object missingValue, MultiValueMode multiValueMode) {
 		super( nestedDocumentPath );
 		this.missingValue = missingValue;
+		this.multiValueMode = multiValueMode;
 	}
 
 	@Override
 	public FieldComparator<?> newComparator(String fieldname, int numHits, int sortPos, boolean reversed) {
 		final boolean sortMissingLast = missingLast() ^ reversed;
+		TextMultiValuesToSingleValuesSource source =
+				TextMultiValuesToSingleValuesSource.fromField( fieldname, multiValueMode, nestedDocsProvider );
 
 		return new FieldComparator.TermOrdValComparator( numHits, fieldname, sortMissingLast ) {
 			@Override
 			protected SortedDocValues getSortedDocValues(LeafReaderContext context, String field) throws IOException {
-				SortedDocValues sortedDocValues = DocValuesJoin.getJoinedAsSingleValuedSorted( context, field, nestedDocsProvider );
+				SortedDocValues sortedDocValues = source.getValues( context );
 
 				if ( missingValue == null || missingFirst() || missingLast() ) {
 					return sortedDocValues;

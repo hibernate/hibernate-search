@@ -13,8 +13,8 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryHolder;
+import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.backend.lucene.search.timeout.spi.TimingSource;
-import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -38,7 +38,7 @@ public class IndexWriterProvider {
 	private final Analyzer analyzer;
 	private final TimingSource timingSource;
 	private final int commitInterval;
-	private final ThreadProvider threadProvider;
+	private BackendThreads threads;
 	private final FailureHandler failureHandler;
 
 	/* TODO HSEARCH-3776 re-allow configuring index writers
@@ -60,7 +60,7 @@ public class IndexWriterProvider {
 	public IndexWriterProvider(String indexName, EventContext eventContext,
 			DirectoryHolder directoryHolder, Analyzer analyzer,
 			TimingSource timingSource, int commitInterval,
-			ThreadProvider threadProvider,
+			BackendThreads threads,
 			FailureHandler failureHandler) {
 		this.indexName = indexName;
 		this.eventContext = eventContext;
@@ -68,7 +68,7 @@ public class IndexWriterProvider {
 		this.analyzer = analyzer;
 		this.timingSource = timingSource;
 		this.commitInterval = commitInterval;
-		this.threadProvider = threadProvider;
+		this.threads = threads;
 		this.failureHandler = failureHandler;
 		/* TODO HSEARCH-3776 re-allow configuring index writers
 		this.luceneParameters = indexManager.getIndexingParameters();
@@ -80,20 +80,34 @@ public class IndexWriterProvider {
 	/**
 	 * Closes and drops any cached resources (index writer in particular).
 	 * <p>
-	 * Should be used when stopping the index or to clean up upon error.
+	 * Should be used when stopping the index.
 	 */
 	public void clear() throws IOException {
+		IndexWriterDelegatorImpl indexWriterDelegator = currentWriter.getAndSet( null );
+		if ( indexWriterDelegator != null ) {
+			indexWriterDelegator.close();
+		}
+	}
+
+	/**
+	 * Closes and drops any cached resources (index writer in particular).
+	 * <p>
+	 * Should be used to clean up upon error.
+	 */
+	public void clearAfterFailure(Throwable throwable, Object failingOperation) {
+		log.indexWriterReset( eventContext );
+
 		/*
 		 * Acquire the lock so that we're sure no writer will be created for the directory before we close the current one.
 		 * This means in particular that write locks to the directory will be released,
 		 * at least for a short period of time.
 		 */
 		currentWriterModificationLock.lock();
+		IndexWriterDelegatorImpl indexWriterDelegator;
 		try {
-			IndexWriterDelegatorImpl indexWriterDelegator = currentWriter.getAndSet( null );
+			indexWriterDelegator = currentWriter.getAndSet( null );
 			if ( indexWriterDelegator != null ) {
-				indexWriterDelegator.close();
-				log.trace( "IndexWriter closed" );
+				indexWriterDelegator.closeAfterFailure( throwable, failingOperation );
 			}
 		}
 		finally {
@@ -113,7 +127,13 @@ public class IndexWriterProvider {
 				indexWriterDelegator = currentWriter.get();
 				if ( indexWriterDelegator == null ) {
 					IndexWriter indexWriter = createNewIndexWriter();
-					indexWriterDelegator = new IndexWriterDelegatorImpl( indexWriter, timingSource, commitInterval );
+					indexWriterDelegator = new IndexWriterDelegatorImpl(
+							indexWriter, eventContext,
+							threads.getWriteExecutor(),
+							timingSource, commitInterval,
+							failureHandler,
+							this::clearAfterFailure
+					);
 					log.trace( "IndexWriter opened" );
 					currentWriter.set( indexWriterDelegator );
 				}
@@ -143,11 +163,10 @@ public class IndexWriterProvider {
 		 */
 		MergeScheduler mergeScheduler = new HibernateSearchConcurrentMergeScheduler(
 				indexName, eventContext.render(),
-				threadProvider, failureHandler
+				threads.getThreadProvider(), failureHandler
 		);
 		writerConfig.setMergeScheduler( mergeScheduler );
 		writerConfig.setOpenMode( OpenMode.CREATE_OR_APPEND );
 		return writerConfig;
 	}
-
 }

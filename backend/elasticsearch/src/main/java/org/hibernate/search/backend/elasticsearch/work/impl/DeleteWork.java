@@ -6,16 +6,13 @@
  */
 package org.hibernate.search.backend.elasticsearch.work.impl;
 
-import org.hibernate.search.backend.elasticsearch.client.impl.Paths;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchRequest;
-import org.hibernate.search.backend.elasticsearch.client.spi.ElasticsearchResponse;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.DeleteWorkBuilder;
 
 import com.google.gson.JsonObject;
 
 
-public class DeleteWork extends AbstractSingleDocumentElasticsearchWork<Void> {
+public class DeleteWork extends AbstractSingleDocumentIndexingWork {
 
 	private static final ElasticsearchRequestSuccessAssessor SUCCESS_ASSESSOR =
 			DefaultElasticsearchRequestSuccessAssessor.builder().ignoreErrorStatuses( 404 ).build();
@@ -24,59 +21,33 @@ public class DeleteWork extends AbstractSingleDocumentElasticsearchWork<Void> {
 		super( builder );
 	}
 
-	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, ElasticsearchResponse response) {
-		return null;
-	}
-
-	@Override
-	protected Void generateResult(ElasticsearchWorkExecutionContext context, JsonObject bulkResponseItem) {
-		return null;
-	}
-
 	public static class Builder
-			extends AbstractSingleDocumentElasticsearchWork.AbstractBuilder<Builder>
+			extends AbstractSingleDocumentIndexingWork.AbstractBuilder<Builder>
 			implements DeleteWorkBuilder {
 		private final URLEncodedString indexName;
 		private final URLEncodedString typeName;
-		private final URLEncodedString id;
 		private final String routingKey;
 
 		public static Builder forElasticsearch67AndBelow(String entityTypeName, Object entityIdentifier,
-				URLEncodedString elasticsearchIndexName, URLEncodedString typeName, URLEncodedString id, String routingKey) {
+				URLEncodedString elasticsearchIndexName, URLEncodedString typeName,
+				String documentIdentifier, String routingKey) {
 			return new Builder( entityTypeName, entityIdentifier,
-					elasticsearchIndexName, typeName, id, routingKey );
+					elasticsearchIndexName, typeName, documentIdentifier, routingKey );
 		}
 
 		public static Builder forElasticsearch7AndAbove(String entityTypeName, Object entityIdentifier,
-				URLEncodedString elasticsearchIndexName, URLEncodedString id, String routingKey) {
+				URLEncodedString elasticsearchIndexName, String documentIdentifier, String routingKey) {
 			return new Builder( entityTypeName, entityIdentifier,
-					elasticsearchIndexName, null, id, routingKey );
+					elasticsearchIndexName, null, documentIdentifier, routingKey );
 		}
 
 		private Builder(String entityTypeName, Object entityIdentifier,
 				URLEncodedString elasticsearchIndexName,
-				URLEncodedString typeName, URLEncodedString id, String routingKey) {
-			super( elasticsearchIndexName, SUCCESS_ASSESSOR, entityTypeName, entityIdentifier );
+				URLEncodedString typeName, String documentIdentifier, String routingKey) {
+			super( SUCCESS_ASSESSOR, entityTypeName, entityIdentifier, documentIdentifier );
 			this.indexName = elasticsearchIndexName;
 			this.typeName = typeName;
-			this.id = id;
 			this.routingKey = routingKey;
-		}
-
-		@Override
-		protected ElasticsearchRequest buildRequest() {
-			ElasticsearchRequest.Builder builder =
-					ElasticsearchRequest.delete()
-					.pathComponent( indexName )
-					.pathComponent( typeName != null ? typeName : Paths._DOC ) // _doc for ES7+
-					.pathComponent( id );
-
-			if ( routingKey != null ) {
-				builder.param( "routing", routingKey );
-			}
-
-			return builder.build();
 		}
 
 		@Override
@@ -87,7 +58,7 @@ public class DeleteWork extends AbstractSingleDocumentElasticsearchWork<Void> {
 				delete.addProperty( "_type", typeName.original );
 			}
 
-			delete.addProperty( "_id", id.original );
+			delete.addProperty( "_id", documentIdentifier );
 
 			if ( routingKey != null ) {
 				delete.addProperty( "routing", routingKey );
@@ -97,6 +68,11 @@ public class DeleteWork extends AbstractSingleDocumentElasticsearchWork<Void> {
 			result.add( "delete", delete );
 
 			return result;
+		}
+
+		@Override
+		protected JsonObject buildBulkableActionBody() {
+			return null;
 		}
 
 		@Override

@@ -24,7 +24,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import com.google.gson.JsonObject;
 
 
-public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
+public class SearchWork<R> extends AbstractNonBulkableWork<R> {
 
 	private static final Log queryLog = LoggerFactory.make( Log.class, DefaultLogCategories.QUERY );
 
@@ -89,7 +89,7 @@ public class SearchWork<R> extends AbstractSimpleElasticsearchWork<R> {
 
 		private Builder(JsonObject payload, ElasticsearchSearchResultExtractor<R> resultExtractor, Boolean trackTotalHits,
 				boolean allowPartialSearchResultsSupported) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.payload = payload;
 			this.resultExtractor = resultExtractor;
 			this.trackTotalHits = trackTotalHits;

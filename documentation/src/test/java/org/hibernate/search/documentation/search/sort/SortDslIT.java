@@ -18,6 +18,7 @@ import org.hibernate.search.backend.lucene.LuceneExtension;
 import org.hibernate.search.documentation.testsupport.BackendConfigurations;
 import org.hibernate.search.documentation.testsupport.ElasticsearchBackendConfiguration;
 import org.hibernate.search.documentation.testsupport.LuceneBackendConfiguration;
+import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.mapper.orm.Search;
@@ -39,7 +40,7 @@ import org.junit.runners.Parameterized;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.lucene.search.Sort;
-import org.apache.lucene.search.SortField;
+import org.apache.lucene.search.SortedSetSortField;
 
 @RunWith(Parameterized.class)
 public class SortDslIT {
@@ -94,7 +95,7 @@ public class SortDslIT {
 			// end::entryPoint-lambdas[]
 			assertThat( result )
 					.extracting( Book::getId )
-					.containsExactly( BOOK3_ID, BOOK1_ID, BOOK2_ID, BOOK4_ID );
+					.containsExactly( BOOK4_ID, BOOK1_ID, BOOK2_ID, BOOK3_ID );
 		} );
 
 		OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
@@ -113,7 +114,7 @@ public class SortDslIT {
 			// end::entryPoint-objects[]
 			assertThat( result )
 					.extracting( Book::getId )
-					.containsExactly( BOOK3_ID, BOOK1_ID, BOOK2_ID, BOOK4_ID );
+					.containsExactly( BOOK4_ID, BOOK1_ID, BOOK2_ID, BOOK3_ID );
 		} );
 	}
 
@@ -162,41 +163,98 @@ public class SortDslIT {
 					.extracting( Book::getId )
 					.containsExactly( BOOK1_ID, BOOK4_ID, BOOK2_ID, BOOK3_ID );
 		} );
+	}
+
+	@Test
+	public void order() {
+		withinSearchSession( searchSession -> {
+			// tag::order-asc[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.sort( f -> f.field( "title_sort" ).asc() )
+					.fetchHits( 20 );
+			// end::order-asc[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactly( BOOK1_ID, BOOK4_ID, BOOK2_ID, BOOK3_ID );
+		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::field-missing-first[]
+			// tag::order-desc[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.sort( f -> f.field( "title_sort" ).desc() )
+					.fetchHits( 20 );
+			// end::order-desc[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactly( BOOK3_ID, BOOK2_ID, BOOK4_ID, BOOK1_ID );
+		} );
+
+		withinSearchSession( searchSession -> {
+			// tag::order-order[]
+			List<Book> hits = searchSession.search( Book.class )
+					.where( f -> f.matchAll() )
+					.sort( f -> f.field( "title_sort" ).order( SortOrder.DESC ) )
+					.fetchHits( 20 );
+			// end::order-order[]
+			assertThat( hits )
+					.extracting( Book::getId )
+					.containsExactly( BOOK3_ID, BOOK2_ID, BOOK4_ID, BOOK1_ID );
+		} );
+	}
+
+	@Test
+	public void missing() {
+		withinSearchSession( searchSession -> {
+			// tag::missing-first[]
 			List<Book> hits = searchSession.search( Book.class )
 					.where( f -> f.matchAll() )
 					.sort( f -> f.field( "pageCount" ).missing().first() )
 					.fetchHits( 20 );
-			// end::field-missing-first[]
+			// end::missing-first[]
 			assertThat( hits )
 					.extracting( Book::getId )
-					.containsExactly( BOOK4_ID, BOOK2_ID, BOOK1_ID, BOOK3_ID );
+					.containsExactly( BOOK3_ID, BOOK2_ID, BOOK1_ID, BOOK4_ID );
 		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::field-missing-last[]
+			// tag::missing-last[]
 			List<Book> hits = searchSession.search( Book.class )
 					.where( f -> f.matchAll() )
 					.sort( f -> f.field( "pageCount" ).missing().last() )
 					.fetchHits( 20 );
-			// end::field-missing-last[]
+			// end::missing-last[]
 			assertThat( hits )
 					.extracting( Book::getId )
-					.containsExactly( BOOK2_ID, BOOK1_ID, BOOK3_ID, BOOK4_ID );
+					.containsExactly( BOOK2_ID, BOOK1_ID, BOOK4_ID, BOOK3_ID );
 		} );
 
 		withinSearchSession( searchSession -> {
-			// tag::field-missing-use[]
+			// tag::missing-use[]
 			List<Book> hits = searchSession.search( Book.class )
 					.where( f -> f.matchAll() )
 					.sort( f -> f.field( "pageCount" ).missing().use( 300 ) )
 					.fetchHits( 20 );
-			// end::field-missing-use[]
+			// end::missing-use[]
 			assertThat( hits )
 					.extracting( Book::getId )
-					.containsExactly( BOOK2_ID, BOOK1_ID, BOOK4_ID, BOOK3_ID );
+					.containsExactly( BOOK2_ID, BOOK1_ID, BOOK3_ID, BOOK4_ID );
+		} );
+	}
+
+	@Test
+	public void mode() {
+		withinSearchSession( searchSession -> {
+			// tag::mode-avg[]
+			List<Author> hits = searchSession.search( Author.class )
+					.where( f -> f.matchAll() )
+					.sort( f -> f.field( "books.pageCount" ).mode( SortMode.AVG ) )
+					.fetchHits( 20 );
+			// end::mode-avg[]
+			assertThat( hits )
+					.extracting( Author::getId )
+					.containsExactly( ASIMOV_ID, MARTINEZ_ID );
 		} );
 	}
 
@@ -287,15 +345,15 @@ public class SortDslIT {
 					.where( f -> f.matchAll() )
 					.sort( f -> f.fromLuceneSort(
 							new Sort(
-									new SortField( "genre_sort", SortField.Type.STRING ),
-									new SortField( "pageCount", SortField.Type.INT )
+									new SortedSetSortField( "genre_sort", false ),
+									new SortedSetSortField( "title_sort", false )
 							)
 					) )
 					.fetchHits( 20 );
 			// end::lucene-fromLuceneSort[]
-			assertThat( hits )
-					.extracting( Book::getId )
-					.containsExactly( BOOK4_ID, BOOK2_ID, BOOK1_ID, BOOK3_ID );
+
+			assertThat( hits ).extracting( Book::getId )
+					.containsExactly( BOOK4_ID, BOOK1_ID, BOOK2_ID, BOOK3_ID );
 		} );
 
 		withinSearchSession( searchSession -> {
@@ -304,7 +362,7 @@ public class SortDslIT {
 					.extension( LuceneExtension.get() )
 					.where( f -> f.matchAll() )
 					.sort( f -> f.fromLuceneSortField(
-							new SortField( "title_sort", SortField.Type.STRING )
+							new SortedSetSortField( "title_sort", false )
 					) )
 					.fetchHits( 20 );
 			// end::lucene-fromLuceneSortField[]
@@ -405,7 +463,7 @@ public class SortDslIT {
 			Book book3 = new Book();
 			book3.setId( BOOK3_ID );
 			book3.setTitle( "The Robots of Dawn" );
-			book3.setPageCount( 435 );
+			book3.setPageCount( null ); // Missing page count: this is on purpose
 			book3.setGenre( Genre.SCIENCE_FICTION );
 			book3.getAuthors().add( isaacAsimov );
 			isaacAsimov.getBooks().add( book3 );
@@ -413,10 +471,10 @@ public class SortDslIT {
 			Book book4 = new Book();
 			book4.setId( BOOK4_ID );
 			book4.setTitle( "The Automatic Detective" );
-			book4.setPageCount( null ); // Missing page count: this is on purpose
+			book4.setPageCount( 435 );
 			book4.setGenre( Genre.CRIME_FICTION );
 			book4.getAuthors().add( aLeeMartinez );
-			aLeeMartinez.getBooks().add( book3 );
+			aLeeMartinez.getBooks().add( book4 );
 
 			entityManager.persist( isaacAsimov );
 			entityManager.persist( aLeeMartinez );

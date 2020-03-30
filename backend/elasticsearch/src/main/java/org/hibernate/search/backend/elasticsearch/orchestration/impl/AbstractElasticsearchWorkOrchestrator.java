@@ -6,27 +6,21 @@
  */
 package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
-import java.util.concurrent.CompletableFuture;
-
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
+import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 import org.hibernate.search.engine.backend.orchestration.spi.AbstractWorkOrchestrator;
 
-/**
- * An abstract base for {@link ElasticsearchWorkOrchestratorImplementor} implementations.
- */
-abstract class AbstractElasticsearchWorkOrchestrator
-		extends AbstractWorkOrchestrator<ElasticsearchWorkSet>
-		implements ElasticsearchWorkOrchestratorImplementor {
+abstract class AbstractElasticsearchWorkOrchestrator<W>
+		extends AbstractWorkOrchestrator<W> {
 
-	AbstractElasticsearchWorkOrchestrator(String name) {
+	protected final ElasticsearchLink link;
+
+	AbstractElasticsearchWorkOrchestrator(String name, ElasticsearchLink link) {
 		super( name );
+		this.link = link;
 	}
 
-	@Override
-	public <T> CompletableFuture<T> submit(ElasticsearchWork<T> work) {
-		CompletableFuture<T> future = new CompletableFuture<>();
-		submit( new ElasticsearchSingleWorkSet<>( work, future ) );
-		return future;
+	protected final ElasticsearchWorkExecutionContext createWorkExecutionContext() {
+		return new ElasticsearchWorkExecutionContextImpl( link.getClient(), link.getGsonProvider() );
 	}
-
 }

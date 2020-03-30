@@ -16,6 +16,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ExpectationsAlternative;
 
 public class BooleanFieldTypeDescriptor extends FieldTypeDescriptor<Boolean> {
@@ -25,8 +26,28 @@ public class BooleanFieldTypeDescriptor extends FieldTypeDescriptor<Boolean> {
 	}
 
 	@Override
-	public List<Boolean> getAscendingUniqueTermValues() {
-		return Arrays.asList( false, true );
+	protected AscendingUniqueTermValues<Boolean> createAscendingUniqueTermValues() {
+		return new AscendingUniqueTermValues<Boolean>() {
+			@Override
+			public List<Boolean> createSingle() {
+				return Arrays.asList( false, true );
+			}
+
+			@Override
+			protected List<List<Boolean>> createMultiResultingInSingleAfterSum() {
+				return valuesThatWontBeUsed();
+			}
+
+			@Override
+			protected List<List<Boolean>> createMultiResultingInSingleAfterAvg() {
+				return valuesThatWontBeUsed();
+			}
+
+			@Override
+			protected List<List<Boolean>> createMultiResultingInSingleAfterMedian() {
+				return valuesThatWontBeUsed();
+			}
+		};
 	}
 
 	@Override

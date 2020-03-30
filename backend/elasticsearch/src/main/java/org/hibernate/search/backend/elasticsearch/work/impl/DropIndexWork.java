@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.DropIndexWorkBuilder;
 
 
-public class DropIndexWork extends AbstractSimpleElasticsearchWork<Void> {
+public class DropIndexWork extends AbstractNonBulkableWork<Void> {
 
 	protected DropIndexWork(Builder builder) {
 		super( builder );
@@ -29,7 +29,7 @@ public class DropIndexWork extends AbstractSimpleElasticsearchWork<Void> {
 		private final URLEncodedString indexName;
 
 		public Builder(URLEncodedString indexName) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.indexName = indexName;
 		}
 

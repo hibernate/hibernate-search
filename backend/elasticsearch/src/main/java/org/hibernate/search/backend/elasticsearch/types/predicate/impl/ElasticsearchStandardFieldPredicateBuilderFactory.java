@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.types.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
@@ -63,17 +64,18 @@ public class ElasticsearchStandardFieldPredicateBuilderFactory<F>
 
 	@Override
 	public MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> createMatchPredicateBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath, ElasticsearchCompatibilityChecker converterChecker,
-			ElasticsearchCompatibilityChecker analyzerChecker) {
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy,
+			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchCompatibilityChecker analyzerChecker) {
 		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchStandardMatchPredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
+		return new ElasticsearchStandardMatchPredicateBuilder<>( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec );
 	}
 
 	@Override
 	public RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> createRangePredicateBuilder(
-			ElasticsearchSearchContext searchContext, String absoluteFieldPath, ElasticsearchCompatibilityChecker converterChecker) {
+			ElasticsearchSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy
+			, ElasticsearchCompatibilityChecker converterChecker) {
 		checkSearchable( absoluteFieldPath );
-		return new ElasticsearchRangePredicateBuilder<>( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
+		return new ElasticsearchRangePredicateBuilder<>( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec );
 	}
 
 	protected void checkSearchable(String absoluteFieldPath) {

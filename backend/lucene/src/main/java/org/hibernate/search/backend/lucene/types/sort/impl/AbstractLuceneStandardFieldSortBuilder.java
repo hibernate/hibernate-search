@@ -11,11 +11,9 @@ import java.lang.invoke.MethodHandles;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneStandardFieldCodec;
 import org.hibernate.search.engine.backend.types.converter.spi.DslConverter;
-import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
@@ -28,15 +26,12 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * @see LuceneStandardFieldCodec
  */
 abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStandardFieldCodec<F, E>>
-		extends AbstractLuceneSearchSortBuilder
-		implements FieldSortBuilder<LuceneSearchSortBuilder> {
+	extends AbstractLuceneDocumentValueSortBuilder
+	implements FieldSortBuilder<LuceneSearchSortBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	private final LuceneSearchContext searchContext;
-
-	protected final String absoluteFieldPath;
-	protected final String nestedDocumentPath;
 
 	protected final DslConverter<?, ? extends F> converter;
 	private final DslConverter<F, ? extends F> rawConverter;
@@ -48,15 +43,13 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 
 	protected Object missingValue;
 
-	protected AbstractLuceneStandardFieldSortBuilder(
-			LuceneSearchContext searchContext,
+	protected AbstractLuceneStandardFieldSortBuilder(LuceneSearchContext searchContext,
 			String absoluteFieldPath, String nestedDocumentPath,
 			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			LuceneCompatibilityChecker converterChecker, C codec,
 			Object sortMissingValueFirstPlaceholder, Object sortMissingValueLastPlaceholder) {
+		super( absoluteFieldPath, nestedDocumentPath );
 		this.searchContext = searchContext;
-		this.absoluteFieldPath = absoluteFieldPath;
-		this.nestedDocumentPath = nestedDocumentPath;
 		this.converter = converter;
 		this.rawConverter = rawConverter;
 		this.converterChecker = converterChecker;
@@ -83,9 +76,7 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 			missingValue = encodeMissingAs( converted );
 		}
 		catch (RuntimeException e) {
-			throw log.cannotConvertDslParameter(
-					e.getMessage(), e, EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
-			);
+			throw log.cannotConvertDslParameter( e.getMessage(), e, getEventContext() );
 		}
 	}
 
@@ -117,4 +108,5 @@ abstract class AbstractLuceneStandardFieldSortBuilder<F, E, C extends LuceneStan
 				return converter;
 		}
 	}
+
 }

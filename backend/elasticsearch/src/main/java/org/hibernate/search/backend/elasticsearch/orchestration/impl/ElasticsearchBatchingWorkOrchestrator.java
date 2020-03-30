@@ -8,117 +8,133 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
+import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
+import org.hibernate.search.backend.elasticsearch.resources.impl.BackendThreads;
+import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
+import org.hibernate.search.backend.elasticsearch.work.impl.IndexingWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.reporting.FailureHandler;
+import org.hibernate.search.util.common.data.impl.SimpleHashFunction;
+import org.hibernate.search.util.common.impl.Closer;
 
 /**
- * An orchestrator sharing context across multiple threads,
- * allowing to batch together worksets from different threads,
- * and thus to produce bigger bulk works.
- * <p>
- * More precisely, the submitted works are sent to a queue which is processed periodically
+ * An orchestrator sending works to a queue which is processed periodically
  * in a separate thread.
- * This allows to process more works when orchestrating, which allows to use bulk works
- * more extensively.
- *
+ * <p>
+ * Works are processed in the order they are submitted.
+ * <p>
+ * Processing works in a single thread means more works can be processed at a time,
+ * which is a good thing when using bulk works.
  */
-class ElasticsearchBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrchestrator
-		implements ElasticsearchWorkOrchestratorImplementor {
+public class ElasticsearchBatchingWorkOrchestrator
+		extends AbstractElasticsearchWorkOrchestrator<ElasticsearchBatchedWork<?>>
+		implements ElasticsearchSerialWorkOrchestrator {
 
-	private final ThreadPoolProvider threadPoolProvider;
-	private final BatchingExecutor<ElasticsearchWorkSet, ElasticsearchWorkProcessor> executor;
+	private static final ConfigurationProperty<Integer> QUEUE_COUNT =
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.INDEXING_QUEUE_COUNT )
+					.asInteger()
+					.withDefault( ElasticsearchIndexSettings.Defaults.INDEXING_QUEUE_COUNT )
+					.build();
+
+	private static final ConfigurationProperty<Integer> QUEUE_SIZE =
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.INDEXING_QUEUE_SIZE )
+					.asInteger()
+					.withDefault( ElasticsearchIndexSettings.Defaults.INDEXING_QUEUE_SIZE )
+					.build();
+
+	private static final ConfigurationProperty<Integer> MAX_BULK_SIZE =
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.INDEXING_MAX_BULK_SIZE )
+					.asInteger()
+					.withDefault( ElasticsearchIndexSettings.Defaults.INDEXING_MAX_BULK_SIZE )
+					.build();
+
+	private final BackendThreads threads;
+	private final FailureHandler failureHandler;
+
+	private BatchingExecutor<ElasticsearchBatchedWorkProcessor>[] executors;
 
 	/**
 	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)
-	 * @param processor A work processor to use in the background thread.
-	 * @param threadPoolProvider A provider of thread pools.
-	 * @param maxWorksetsPerBatch The maximum number of worksets to
-	 * process in a single batch. Higher values mean lesser chance of transport
-	 * thread starvation, but higher heap consumption.
-	 * @param fair if {@code true} worksets are always submitted to the
-	 * delegate in FIFO order, if {@code false} worksets submitted
-	 * when the internal queue is full may be submitted out of order.
+	 * @param threads The threads for this backend.
+	 * @param link The Elasticsearch link for this backend.
 	 * @param failureHandler A failure handler to report failures of the background thread.
 	 */
-	ElasticsearchBatchingWorkOrchestrator(
-			String name, ElasticsearchWorkProcessor processor, ThreadPoolProvider threadPoolProvider,
-			int maxWorksetsPerBatch, boolean fair,
+	public ElasticsearchBatchingWorkOrchestrator(
+			String name, BackendThreads threads, ElasticsearchLink link,
 			FailureHandler failureHandler) {
-		super( name );
-		this.threadPoolProvider = threadPoolProvider;
-		this.executor = new BatchingExecutor<>(
-				name, processor, maxWorksetsPerBatch, fair,
-				failureHandler
-		);
-	}
-
-	/**
-	 * Create a child orchestrator.
-	 * <p>
-	 * The child orchestrator will use the same resources and its works
-	 * will be executed by the same background thread.
-	 * <p>
-	 * Closing the child will not close the parent,
-	 * but will make the current thread wait for the completion of previously submitted works,
-	 * and will prevent any more work to be submitted through the child.
-	 *
-	 * @param name The name of the child orchestrator when reporting errors
-	 */
-	public ElasticsearchWorkOrchestratorImplementor createChild(String name) {
-		return new ElasticsearchChildBatchingWorkOrchestrator( name );
+		super( name, link );
+		this.threads = threads;
+		this.failureHandler = failureHandler;
 	}
 
 	@Override
-	protected void doStart() {
-		executor.start( threadPoolProvider );
+	public <T> CompletableFuture<T> submit(IndexingWork<T> work) {
+		CompletableFuture<T> future = new CompletableFuture<>();
+		submit( new ElasticsearchBatchedWork<>( work, future ) );
+		return future;
 	}
 
 	@Override
-	protected void doSubmit(ElasticsearchWorkSet workSet) throws InterruptedException {
-		executor.submit( workSet );
+	protected void doStart(ConfigurationPropertySource propertySource) {
+		int queueCount = QUEUE_COUNT.get( propertySource );
+		int queueSize = QUEUE_SIZE.get( propertySource );
+		int maxBulkSize = MAX_BULK_SIZE.get( propertySource );
+
+		ElasticsearchWorkExecutionContext executionContext = createWorkExecutionContext();
+
+		executors = new BatchingExecutor[queueCount];
+		for ( int i = 0; i < executors.length; i++ ) {
+			// Processors are not thread-safe: create one per executor.
+			ElasticsearchBatchedWorkProcessor processor = createProcessor( executionContext, maxBulkSize );
+			executors[i] = new BatchingExecutor<>(
+					getName() + " - " + i,
+					processor,
+					queueSize,
+					true,
+					failureHandler
+			);
+		}
+
+		for ( BatchingExecutor<?> executor : executors ) {
+			executor.start( threads.getWorkExecutor() );
+		}
+	}
+
+	@Override
+	protected void doSubmit(ElasticsearchBatchedWork<?> work) throws InterruptedException {
+		SimpleHashFunction.pick( executors, work.getQueuingKey() )
+				.submit( work );
 	}
 
 	@Override
 	protected CompletableFuture<?> getCompletion() {
-		return executor.getCompletion();
+		CompletableFuture<?>[] completions = new CompletableFuture[executors.length];
+		for ( int i = 0; i < executors.length; i++ ) {
+			completions[i] = executors[i].getCompletion();
+		}
+		return CompletableFuture.allOf( completions );
 	}
 
 	@Override
 	protected void doStop() {
-		executor.stop();
+		try ( Closer<RuntimeException> closer = new Closer<>() ) {
+			closer.pushAll( BatchingExecutor::stop, executors );
+		}
 	}
 
-	private class ElasticsearchChildBatchingWorkOrchestrator extends AbstractElasticsearchWorkOrchestrator
-			implements ElasticsearchWorkOrchestratorImplementor {
-
-		protected ElasticsearchChildBatchingWorkOrchestrator(String name) {
-			super( name );
-		}
-
-		@Override
-		protected void doStart() {
-			// uses the resources of the parent orchestrator
-		}
-
-		@Override
-		protected void doSubmit(ElasticsearchWorkSet workSet) {
-			ElasticsearchBatchingWorkOrchestrator.this.submit( workSet );
-		}
-
-		@Override
-		protected CompletableFuture<?> getCompletion() {
-			/*
-			 * TODO HSEARCH-3576 this will wait for *all* tasks to finish, including tasks from other children.
-			 *  We should do better.
-			 */
-			return ElasticsearchBatchingWorkOrchestrator.this.getCompletion();
-		}
-
-		@Override
-		protected void doStop() {
-			// uses the resources of the parent orchestrator
-		}
+	private ElasticsearchBatchedWorkProcessor createProcessor(ElasticsearchWorkExecutionContext context,
+			int maxBulkSize) {
+		ElasticsearchWorkSequenceBuilder sequenceBuilder = new ElasticsearchDefaultWorkSequenceBuilder( context );
+		ElasticsearchWorkBulker bulker = new ElasticsearchDefaultWorkBulker(
+				sequenceBuilder,
+				(worksToBulk, refreshStrategy) ->
+						link.getWorkBuilderFactory().bulk( worksToBulk ).refresh( refreshStrategy ).build(),
+				maxBulkSize
+		);
+		return new ElasticsearchBatchedWorkProcessor( sequenceBuilder, bulker );
 	}
 
 }

@@ -36,7 +36,7 @@ public class LuceneBooleanFieldAggregationBuilderFactory
 
 	@Override
 	public <K> RangeAggregationBuilder<K> createRangeAggregationBuilder(LuceneSearchContext searchContext,
-			String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
+			String nestedDocumentPath, String absoluteFieldPath, Class<K> expectedType, ValueConvert convert) {
 		throw log.rangeAggregationsNotSupportedByFieldType(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);

@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.mapper.pojo.model;
 
-import org.hibernate.search.util.common.annotaion.Incubating;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * An element in the POJO model.

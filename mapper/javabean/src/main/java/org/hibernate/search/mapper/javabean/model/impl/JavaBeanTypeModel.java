@@ -100,13 +100,15 @@ class JavaBeanTypeModel<T> implements PojoRawTypeModel<T> {
 	}
 
 	@Override
+	@SuppressWarnings("unchecked") // xClass represents T, so its supertypes represent ? super T
 	public Stream<JavaBeanTypeModel<? super T>> getAscendingSuperTypes() {
-		return introspector.getAscendingSuperTypes( xClass );
+		return (Stream<JavaBeanTypeModel<? super T>>) introspector.getAscendingSuperTypes( xClass );
 	}
 
 	@Override
+	@SuppressWarnings("unchecked") // xClass represents T, so its supertypes represent ? super T
 	public Stream<? extends PojoRawTypeModel<? super T>> getDescendingSuperTypes() {
-		return introspector.getDescendingSuperTypes( xClass );
+		return (Stream<? extends PojoRawTypeModel<? super T>>) introspector.getDescendingSuperTypes( xClass );
 	}
 
 	@Override

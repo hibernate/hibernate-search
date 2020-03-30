@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.scope.model.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -226,7 +227,43 @@ public class LuceneScopeModel {
 						return nestedDocumentPath1;
 					}
 
-					throw log.conflictingNestedDocumentPathsForProjection(
+					throw log.conflictingNestedDocumentPaths(
+							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
+				} )
+				.orElse( Optional.empty() );
+
+		return nestedDocumentPath.orElse( null );
+	}
+
+	public List<String> getNestedPathHierarchyForField(String absoluteFieldPath) {
+		Optional<List<String>> nestedDocumentPath = indexModels.stream()
+				.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath ) )
+				.filter( Objects::nonNull )
+				.map( node -> Optional.ofNullable( node.getNestedPathHierarchy() ) )
+				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
+					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
+						return nestedDocumentPath1;
+					}
+
+					throw log.conflictingNestedDocumentPathHierarchy(
+							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
+				} )
+				.orElse( Optional.empty() );
+
+		return nestedDocumentPath.orElse( null );
+	}
+
+	public List<String> getNestedPathHierarchyForObject(String absoluteFieldPath) {
+		Optional<List<String>> nestedDocumentPath = indexModels.stream()
+				.map( indexModel -> indexModel.getObjectNode( absoluteFieldPath ) )
+				.filter( Objects::nonNull )
+				.map( node -> Optional.ofNullable( node.getNestedPathHierarchy() ) )
+				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
+					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
+						return nestedDocumentPath1;
+					}
+
+					throw log.conflictingNestedDocumentPathHierarchy(
 							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
 				} )
 				.orElse( Optional.empty() );

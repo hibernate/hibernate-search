@@ -31,6 +31,7 @@ import org.hibernate.search.backend.elasticsearch.multitenancy.MultiTenancyStrat
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.DiscriminatorMultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.MultiTenancyStrategy;
 import org.hibernate.search.backend.elasticsearch.multitenancy.impl.NoMultiTenancyStrategy;
+import org.hibernate.search.backend.elasticsearch.resources.impl.BackendThreads;
 import org.hibernate.search.backend.elasticsearch.types.dsl.provider.impl.ElasticsearchIndexFieldTypeFactoryProvider;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.backend.spi.BackendFactory;
@@ -115,13 +116,16 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 		BeanResolver beanResolver = buildContext.getBeanResolver();
 		BeanHolder<? extends ElasticsearchClientFactory> clientFactoryHolder = null;
 		BeanHolder<? extends IndexLayoutStrategy> indexLayoutStrategyHolder = null;
+		BackendThreads threads = null;
 		ElasticsearchLinkImpl link = null;
 		try {
+			threads = new BackendThreads( "Backend " + name );
+
 			clientFactoryHolder = CLIENT_FACTORY.getAndTransform( propertySource, beanResolver::resolve );
 
 			ElasticsearchDialectFactory dialectFactory = new ElasticsearchDialectFactory();
 			link = new ElasticsearchLinkImpl(
-					clientFactoryHolder, buildContext.getThreadPoolProvider(), defaultGsonProvider, logPrettyPrinting,
+					clientFactoryHolder, threads, defaultGsonProvider, logPrettyPrinting,
 					dialectFactory, configuredVersion, versionCheckEnabled
 			);
 
@@ -132,6 +136,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			}
 			else {
 				// We must determine the Elasticsearch version, and thus instantiate the client, right now.
+				threads.onStart( propertySource, buildContext.getThreadPoolProvider() );
 				link.onStart( propertySource );
 
 				version = link.getElasticsearchVersion();
@@ -151,8 +156,7 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 
 			return new ElasticsearchBackendImpl(
 					name,
-					link,
-					buildContext.getThreadPoolProvider(),
+					threads, link,
 					typeFactoryProvider,
 					userFacingGson,
 					analysisDefinitionRegistry,
@@ -166,7 +170,8 @@ public class ElasticsearchBackendFactory implements BackendFactory {
 			new SuppressingCloser( e )
 					.push( BeanHolder::close, clientFactoryHolder )
 					.push( BeanHolder::close, indexLayoutStrategyHolder )
-					.push( ElasticsearchLinkImpl::onStop, link );
+					.push( ElasticsearchLinkImpl::onStop, link )
+					.push( BackendThreads::onStop, threads );
 			throw e;
 		}
 	}

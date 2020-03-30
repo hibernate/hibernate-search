@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import java.util.List;
+
 import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermRangeQuery;
 
@@ -22,10 +24,10 @@ class LuceneTextRangePredicateBuilder<F>
 
 	LuceneTextRangePredicateBuilder(
 			LuceneSearchContext searchContext,
-			String absoluteFieldPath,
+			String absoluteFieldPath, List<String> nestedPathHierarchy,
 			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			LuceneCompatibilityChecker converterChecker, LuceneTextFieldCodec<F> codec) {
-		super( searchContext, absoluteFieldPath, converter, rawConverter, converterChecker, codec );
+		super( searchContext, absoluteFieldPath, nestedPathHierarchy, converter, rawConverter, converterChecker, codec );
 	}
 
 	@Override

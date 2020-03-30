@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
+import java.util.List;
+
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
@@ -43,28 +45,28 @@ public interface LuceneFieldPredicateBuilderFactory {
 
 	boolean hasCompatibleAnalyzer(LuceneFieldPredicateBuilderFactory other);
 
-	MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker);
+	MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder( LuceneSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy,
+			LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker);
 
 	RangePredicateBuilder<LuceneSearchPredicateBuilder> createRangePredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneCompatibilityChecker converterChecker);
+			LuceneSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy, LuceneCompatibilityChecker converterChecker);
 
 	PhrasePredicateBuilder<LuceneSearchPredicateBuilder> createPhrasePredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneCompatibilityChecker analyzerChecker);
+			LuceneSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy, LuceneCompatibilityChecker analyzerChecker);
 
 	WildcardPredicateBuilder<LuceneSearchPredicateBuilder> createWildcardPredicateBuilder(
-			String absoluteFieldPath);
+			String absoluteFieldPath, List<String> nestedPathHierarchy);
 
 	LuceneSimpleQueryStringPredicateBuilderFieldState createSimpleQueryStringFieldContext(String absoluteFieldPath);
 
-	ExistsPredicateBuilder<LuceneSearchPredicateBuilder> createExistsPredicateBuilder(String absoluteFieldPath);
+	ExistsPredicateBuilder<LuceneSearchPredicateBuilder> createExistsPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy);
 
 	SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
-			String absoluteFieldPath);
+			String absoluteFieldPath, List<String> nestedPathHierarchy);
 
 	SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
-			String absoluteFieldPath);
+			String absoluteFieldPath, List<String> nestedPathHierarchy);
 
 	SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
-			String absoluteFieldPath);
+			String absoluteFieldPath, List<String> nestedPathHierarchy);
 }

@@ -43,7 +43,7 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 			return ExpectationsAlternative.unsupported( unsupportedExpectations( typeDescriptor ) );
 		}
 
-		List<F> ascendingValues = typeDescriptor.getAscendingUniqueTermValues();
+		List<F> ascendingValues = typeDescriptor.getAscendingUniqueTermValues().getSingle();
 		List<F> mainIndexDocumentFieldValues = new ArrayList<>();
 		List<F> otherIndexDocumentFieldValues = new ArrayList<>();
 		List<List<F>> multiValuedIndexDocumentFieldValues = new ArrayList<>();

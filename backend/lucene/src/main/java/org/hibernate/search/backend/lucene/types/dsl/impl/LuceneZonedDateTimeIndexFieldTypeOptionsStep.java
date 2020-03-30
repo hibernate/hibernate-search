@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumeri
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneZonedDateTimeFieldCodec;
 
 class LuceneZonedDateTimeIndexFieldTypeOptionsStep
-		extends AbstractLuceneNumericIndexFieldTypeOptionsStep<LuceneZonedDateTimeIndexFieldTypeOptionsStep, ZonedDateTime> {
+		extends AbstractLuceneTemporalIndexFieldTypeOptionsStep<LuceneZonedDateTimeIndexFieldTypeOptionsStep, ZonedDateTime> {
 
 	LuceneZonedDateTimeIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, ZonedDateTime.class );

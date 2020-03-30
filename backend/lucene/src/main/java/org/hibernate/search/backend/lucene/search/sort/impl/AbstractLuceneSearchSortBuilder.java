@@ -9,8 +9,6 @@ package org.hibernate.search.backend.lucene.search.sort.impl;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilder;
 
-
-
 public abstract class AbstractLuceneSearchSortBuilder implements SearchSortBuilder<LuceneSearchSortBuilder>,
 		LuceneSearchSortBuilder {
 

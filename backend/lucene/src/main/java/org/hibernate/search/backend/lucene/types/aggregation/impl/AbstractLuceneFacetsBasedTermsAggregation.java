@@ -27,6 +27,7 @@ import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.facet.LabelAndValue;
 import org.apache.lucene.index.IndexReader;
+import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 
 /**
  * @param <F> The type of field values exposed to the mapper.
@@ -37,6 +38,7 @@ import org.apache.lucene.index.IndexReader;
 abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		extends AbstractLuceneBucketAggregation<K, Long> {
 
+	protected final String nestedDocumentPath;
 	protected final String absoluteFieldPath;
 	private final ProjectionConverter<? super F, ? extends K> fromFieldValueConverter;
 
@@ -46,6 +48,7 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 
 	AbstractLuceneFacetsBasedTermsAggregation(AbstractBuilder<F, T, K> builder) {
 		super( builder );
+		this.nestedDocumentPath = builder.nestedDocumentPath;
 		this.absoluteFieldPath = builder.absoluteFieldPath;
 		this.fromFieldValueConverter = builder.fromFieldValueConverter;
 		this.order = builder.order;
@@ -109,8 +112,8 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		return toMap( convertContext, buckets );
 	}
 
-	abstract FacetResult getTopChildren(IndexReader reader,
-			FacetsCollector facetsCollector, int limit) throws IOException;
+	abstract FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector,
+			NestedDocsProvider nestedDocsProvider, int limit) throws IOException;
 
 	abstract Set<T> collectFirstTerms(IndexReader reader, boolean descending, int limit)
 			throws IOException;
@@ -124,6 +127,11 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 	private List<Bucket<T>> getTopBuckets(AggregationExtractContext context) throws IOException {
 		FacetsCollector facetsCollector = context.getCollector( FacetsCollectorFactory.KEY );
 
+		NestedDocsProvider nestedDocsProvider = null;
+		if ( nestedDocumentPath != null ) {
+			nestedDocsProvider = context.createNestedDocsProvider( nestedDocumentPath );
+		}
+
 		/*
 		 * TODO HSEARCH-3666 What if the sort order is by term value?
 		 *  Lucene returns facets in descending count order.
@@ -135,7 +143,7 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		 *  To improve on this, we would need to re-implement the facet collections.
 		 */
 		int limit = maxTermCount;
-		FacetResult facetResult = getTopChildren( context.getIndexReader(), facetsCollector, limit );
+		FacetResult facetResult = getTopChildren( context.getIndexReader(), facetsCollector, nestedDocsProvider, limit );
 
 		List<Bucket<T>> buckets = new ArrayList<>();
 
@@ -166,6 +174,7 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 			extends AbstractLuceneBucketAggregation.AbstractBuilder<K, Long>
 			implements TermsAggregationBuilder<K> {
 
+		private final String nestedDocumentPath;
 		private final String absoluteFieldPath;
 
 		private final ProjectionConverter<? super F, ? extends K> fromFieldValueConverter;
@@ -174,9 +183,10 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 		private int minDocCount = 1;
 		private int maxTermCount = 100;
 
-		AbstractBuilder(LuceneSearchContext searchContext, String absoluteFieldPath,
+		AbstractBuilder(LuceneSearchContext searchContext, String nestedDocumentPath, String absoluteFieldPath,
 				ProjectionConverter<? super F, ? extends K> fromFieldValueConverter) {
 			super( searchContext );
+			this.nestedDocumentPath = nestedDocumentPath;
 			this.absoluteFieldPath = absoluteFieldPath;
 			this.fromFieldValueConverter = fromFieldValueConverter;
 		}

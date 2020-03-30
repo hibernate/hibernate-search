@@ -12,7 +12,7 @@ import org.hibernate.search.backend.elasticsearch.search.sort.dsl.ElasticsearchS
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchFetchable;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
-import org.hibernate.search.util.common.annotaion.Incubating;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 public interface ElasticsearchSearchQueryOptionsStep<H, LOS>
 		extends SearchQueryOptionsStep<

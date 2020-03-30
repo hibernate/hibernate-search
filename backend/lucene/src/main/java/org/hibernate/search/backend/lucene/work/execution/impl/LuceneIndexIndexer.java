@@ -10,10 +10,8 @@ import java.util.concurrent.CompletableFuture;
 
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntry;
 import org.hibernate.search.backend.lucene.document.impl.LuceneIndexEntryFactory;
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSerialWorkOrchestrator;
 import org.hibernate.search.backend.lucene.work.impl.LuceneWorkFactory;
-import org.hibernate.search.engine.backend.work.execution.DocumentCommitStrategy;
-import org.hibernate.search.engine.backend.work.execution.DocumentRefreshStrategy;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
@@ -25,18 +23,15 @@ public class LuceneIndexIndexer implements IndexIndexer {
 	private final LuceneIndexEntryFactory indexEntryFactory;
 	private final WorkExecutionIndexManagerContext indexManagerContext;
 	private final String tenantId;
-	private final DocumentCommitStrategy commitStrategy;
 
 	public LuceneIndexIndexer(LuceneWorkFactory factory,
 			LuceneIndexEntryFactory indexEntryFactory,
 			WorkExecutionIndexManagerContext indexManagerContext,
-			BackendSessionContext sessionContext,
-			DocumentCommitStrategy commitStrategy) {
+			BackendSessionContext sessionContext) {
 		this.factory = factory;
 		this.indexEntryFactory = indexEntryFactory;
 		this.indexManagerContext = indexManagerContext;
 		this.tenantId = sessionContext.getTenantIdentifier();
-		this.commitStrategy = commitStrategy;
 	}
 
 	@Override
@@ -47,15 +42,16 @@ public class LuceneIndexIndexer implements IndexIndexer {
 		LuceneIndexEntry indexEntry = indexEntryFactory.create( tenantId, id, routingKey, documentContributor );
 
 		// Route the work to the appropriate shard
-		LuceneWriteWorkOrchestrator orchestrator = indexManagerContext.getWriteOrchestrator( id, routingKey );
+		LuceneSerialWorkOrchestrator orchestrator = indexManagerContext.getIndexingOrchestrator( id, routingKey );
 
-		return orchestrator.submit(
+		CompletableFuture<Long> future = new CompletableFuture<>();
+		orchestrator.submit(
+				future,
 				factory.add(
 						tenantId, indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
-						indexEntry
-				),
-				commitStrategy,
-				DocumentRefreshStrategy.NONE
+						id, indexEntry
+				)
 		);
+		return future;
 	}
 }

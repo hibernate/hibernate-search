@@ -95,6 +95,14 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 
 	protected abstract boolean operationWillFailIfAppliedToDeletedIndex();
 
+	protected void beforeInitData(StubMappingIndexManager indexManager) {
+		// Nothing to do by default.
+	}
+
+	protected void afterInitData(StubMappingIndexManager indexManager) {
+		// Nothing to do by default.
+	}
+
 	protected abstract void assertPreconditions(StubMappingIndexManager indexManager);
 
 	protected abstract CompletableFuture<?> executeAsync(IndexWorkspace workspace);
@@ -110,9 +118,7 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 				)
 				.setup();
 
-		// Make sure index readers are initialized before writing,
-		// otherwise some assumptions made in the refresh IT won't hold.
-		indexManager.createScope().query().where( f -> f.matchAll() ).fetchTotalHitCount();
+		beforeInitData( indexManager );
 
 		IndexIndexer indexer =
 				indexManager.createIndexer( DocumentCommitStrategy.NONE );
@@ -124,6 +130,8 @@ public abstract class AbstractIndexWorkspaceSimpleOperationIT {
 			} );
 		}
 		CompletableFuture.allOf( tasks ).join();
+
+		afterInitData( indexManager );
 	}
 
 	private static class IndexMapping {

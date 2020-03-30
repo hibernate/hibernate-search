@@ -17,7 +17,7 @@ import org.hibernate.search.backend.elasticsearch.types.codec.impl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
 import org.hibernate.search.backend.elasticsearch.types.predicate.impl.ElasticsearchTextFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.elasticsearch.types.projection.impl.ElasticsearchStandardFieldProjectionBuilderFactory;
-import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchStandardFieldSortBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.types.sort.impl.ElasticsearchTextFieldSortBuilderFactory;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
 import org.hibernate.search.engine.backend.types.Norms;
@@ -176,7 +176,7 @@ class ElasticsearchStringIndexFieldTypeOptionsStep
 				new ElasticsearchTextFieldPredicateBuilderFactory(
 						resolvedSearchable, dslConverter, rawDslConverter, codec, mapping
 				),
-				new ElasticsearchStandardFieldSortBuilderFactory<>(
+				new ElasticsearchTextFieldSortBuilderFactory(
 						resolvedSortable, dslConverter, rawDslConverter, codec
 				),
 				new ElasticsearchStandardFieldProjectionBuilderFactory<>(

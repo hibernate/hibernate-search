@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
@@ -41,8 +42,8 @@ public final class LuceneGeoPointFieldPredicateBuilderFactory
 	}
 
 	@Override
-	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker) {
+	public MatchPredicateBuilder<LuceneSearchPredicateBuilder> createMatchPredicateBuilder(LuceneSearchContext searchContext, String absoluteFieldPath,
+			List<String> nestedPathHierarchy, LuceneCompatibilityChecker converterChecker, LuceneCompatibilityChecker analyzerChecker) {
 		throw log.directValueLookupNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
@@ -50,7 +51,7 @@ public final class LuceneGeoPointFieldPredicateBuilderFactory
 
 	@Override
 	public RangePredicateBuilder<LuceneSearchPredicateBuilder> createRangePredicateBuilder(
-			LuceneSearchContext searchContext, String absoluteFieldPath, LuceneCompatibilityChecker converterChecker) {
+			LuceneSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy, LuceneCompatibilityChecker converterChecker) {
 		throw log.rangesNotSupportedByGeoPoint(
 				EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 		);
@@ -58,23 +59,23 @@ public final class LuceneGeoPointFieldPredicateBuilderFactory
 
 	@Override
 	public SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinCirclePredicateBuilder(
-			String absoluteFieldPath) {
+			String absoluteFieldPath, List<String> nestedPathHierarchy) {
 		checkSearchable( absoluteFieldPath );
-		return new LuceneGeoPointSpatialWithinCirclePredicateBuilder( absoluteFieldPath );
+		return new LuceneGeoPointSpatialWithinCirclePredicateBuilder( absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinPolygonPredicateBuilder(
-			String absoluteFieldPath) {
+			String absoluteFieldPath, List<String> nestedPathHierarchy) {
 		checkSearchable( absoluteFieldPath );
-		return new LuceneGeoPointSpatialWithinPolygonPredicateBuilder( absoluteFieldPath );
+		return new LuceneGeoPointSpatialWithinPolygonPredicateBuilder( absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateBuilder> createSpatialWithinBoundingBoxPredicateBuilder(
-			String absoluteFieldPath) {
+			String absoluteFieldPath, List<String> nestedPathHierarchy) {
 		checkSearchable( absoluteFieldPath );
-		return new LuceneGeoPointSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath );
+		return new LuceneGeoPointSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override

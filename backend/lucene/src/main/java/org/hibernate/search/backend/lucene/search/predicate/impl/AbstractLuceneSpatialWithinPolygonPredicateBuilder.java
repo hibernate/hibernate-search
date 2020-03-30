@@ -6,18 +6,21 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import java.util.List;
+
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 import org.hibernate.search.engine.spatial.GeoPolygon;
 
 
-public abstract class AbstractLuceneSpatialWithinPolygonPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
+public abstract class AbstractLuceneSpatialWithinPolygonPredicateBuilder extends AbstractLuceneSearchNestedPredicateBuilder
 		implements SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateBuilder> {
 
 	protected final String absoluteFieldPath;
 
 	protected GeoPolygon polygon;
 
-	protected AbstractLuceneSpatialWithinPolygonPredicateBuilder(String absoluteFieldPath) {
+	protected AbstractLuceneSpatialWithinPolygonPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
+		super( nestedPathHierarchy );
 		this.absoluteFieldPath = absoluteFieldPath;
 	}
 

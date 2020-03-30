@@ -8,10 +8,9 @@ package org.hibernate.search.backend.elasticsearch.work.execution.impl;
 
 import java.util.concurrent.CompletableFuture;
 
-import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchWorkOrchestrator;
-import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
-import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.orchestration.impl.ElasticsearchSerialWorkOrchestrator;
 import org.hibernate.search.backend.elasticsearch.work.builder.factory.impl.ElasticsearchWorkBuilderFactory;
+import org.hibernate.search.backend.elasticsearch.work.impl.SingleDocumentIndexingWork;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentContributor;
 import org.hibernate.search.engine.backend.work.execution.spi.DocumentReferenceProvider;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexer;
@@ -22,12 +21,12 @@ import com.google.gson.JsonObject;
 public class ElasticsearchIndexIndexer implements IndexIndexer {
 
 	private final ElasticsearchWorkBuilderFactory factory;
-	private final ElasticsearchWorkOrchestrator orchestrator;
+	private final ElasticsearchSerialWorkOrchestrator orchestrator;
 	private final WorkExecutionIndexManagerContext indexManagerContext;
 	private final String tenantId;
 
 	public ElasticsearchIndexIndexer(ElasticsearchWorkBuilderFactory factory,
-			ElasticsearchWorkOrchestrator orchestrator,
+			ElasticsearchSerialWorkOrchestrator orchestrator,
 			WorkExecutionIndexManagerContext indexManagerContext,
 			BackendSessionContext sessionContext) {
 		this.factory = factory;
@@ -45,10 +44,10 @@ public class ElasticsearchIndexIndexer implements IndexIndexer {
 
 		JsonObject document = indexManagerContext.createDocument( tenantId, id, documentContributor );
 
-		ElasticsearchWork<Void> work = factory.index(
+		SingleDocumentIndexingWork work = factory.index(
 				indexManagerContext.getMappedTypeName(), referenceProvider.getEntityIdentifier(),
 				indexManagerContext.getElasticsearchIndexWriteName(),
-				URLEncodedString.fromString( elasticsearchId ), routingKey, document
+				elasticsearchId, routingKey, document
 		)
 				.build();
 		return orchestrator.submit( work );

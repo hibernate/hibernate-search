@@ -6,10 +6,11 @@
  */
 package org.hibernate.search.backend.lucene.work.execution.impl;
 
-import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
-import org.hibernate.search.backend.lucene.orchestration.impl.LuceneWriteWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneParallelWorkOrchestrator;
+import org.hibernate.search.backend.lucene.orchestration.impl.LuceneSerialWorkOrchestrator;
 
 /**
  * An interface with knowledge of the index manager internals,
@@ -28,9 +29,9 @@ public interface WorkExecutionIndexManagerContext {
 
 	String getMappedTypeName();
 
-	LuceneWriteWorkOrchestrator getWriteOrchestrator(String documentId, String routingKey);
+	LuceneSerialWorkOrchestrator getIndexingOrchestrator(String documentId, String routingKey);
 
-	Collection<LuceneWriteWorkOrchestrator> getWriteOrchestrators(Set<String> routingKeys);
+	List<LuceneParallelWorkOrchestrator> getManagementOrchestrators(Set<String> routingKeys);
 
-	Collection<LuceneWriteWorkOrchestrator> getAllWriteOrchestrators();
+	List<LuceneParallelWorkOrchestrator> getAllManagementOrchestrators();
 }

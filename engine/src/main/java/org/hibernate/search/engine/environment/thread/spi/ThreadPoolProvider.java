@@ -46,10 +46,14 @@ public interface ThreadPoolProvider {
 	ThreadPoolExecutor newFixedThreadPool(int threads, String threadNamePrefix, int queueSize);
 
 	/**
-	 * Get the executor for short, scheduled tasks.
+	 * Creates a new fixed size {@link ScheduledExecutorService}.
+	 * <p>
+	 * The queue size is not capped, so users should take care of checking they submit a reasonable amount of tasks.
 	 *
-	 * @return A (shared) instance of {@link ScheduledExecutorService}.
+	 * @param threads the number of threads
+	 * @param threadNamePrefix a label to identify the threads; useful for profiling.
+	 * @return the new ExecutorService
 	 */
-	ScheduledExecutorService getSharedScheduledThreadPool();
+	ScheduledExecutorService newScheduledExecutor(int threads, String threadNamePrefix);
 
 }

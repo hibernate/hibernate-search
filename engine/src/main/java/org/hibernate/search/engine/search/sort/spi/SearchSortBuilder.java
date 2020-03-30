@@ -24,5 +24,4 @@ public interface SearchSortBuilder<B> {
 	 * allowing the backend to call a {@code build()} method in particular.
 	 */
 	B toImplementation();
-
 }

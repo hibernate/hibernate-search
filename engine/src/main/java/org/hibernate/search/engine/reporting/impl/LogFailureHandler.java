@@ -11,7 +11,6 @@ import java.util.List;
 
 import org.hibernate.search.engine.reporting.EntityIndexingFailureContext;
 import org.hibernate.search.engine.reporting.FailureContext;
-import org.hibernate.search.engine.reporting.IndexFailureContext;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.logging.impl.Log;
@@ -32,11 +31,6 @@ public class LogFailureHandler implements FailureHandler {
 
 	@Override
 	public void handle(EntityIndexingFailureContext context) {
-		log.exceptionOccurred( formatMessage( context ).toString(), context.getThrowable() );
-	}
-
-	@Override
-	public void handle(IndexFailureContext context) {
 		log.exceptionOccurred( formatMessage( context ).toString(), context.getThrowable() );
 	}
 
@@ -66,26 +60,6 @@ public class LogFailureHandler implements FailureHandler {
 			for ( Object entityReference : entityReferences ) {
 				messageBuilder.append( entityReference );
 				messageBuilder.append( " " );
-			}
-		}
-
-		return messageBuilder;
-	}
-
-	private StringBuilder formatMessage(IndexFailureContext context) {
-		final List<?> uncommittedOperations = context.getUncommittedOperations();
-
-		final StringBuilder messageBuilder = formatMessage( (FailureContext) context );
-
-		messageBuilder.append( "Index: " )
-				.append( context.getIndexName() )
-				.append( "\n" );
-
-		if ( ! uncommittedOperations.isEmpty() ) {
-			messageBuilder.append( "Uncommitted operations as a result:\n" );
-			for ( Object operation : uncommittedOperations ) {
-				messageBuilder.append( operation );
-				messageBuilder.append( "\n" );
 			}
 		}
 

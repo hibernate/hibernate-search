@@ -8,6 +8,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.u
 
 import java.io.IOException;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.hibernate.search.backend.elasticsearch.client.impl.ElasticsearchClientFactoryImpl;
@@ -19,7 +20,7 @@ import org.hibernate.search.backend.elasticsearch.gson.spi.GsonProvider;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
-import org.hibernate.search.engine.environment.thread.spi.ThreadPoolProvider;
+import org.hibernate.search.engine.environment.thread.spi.ThreadProvider;
 import org.hibernate.search.util.impl.integrationtest.common.rule.CallQueue;
 
 import org.junit.rules.TestRule;
@@ -94,11 +95,13 @@ public class ElasticsearchClientSpy implements TestRule {
 
 		@Override
 		public ElasticsearchClientImplementor create(ConfigurationPropertySource propertySource,
-				ThreadPoolProvider threadPoolProvider, GsonProvider gsonProvider) {
+				ThreadProvider threadProvider, String threadNamePrefix, ScheduledExecutorService timeoutExecutorService,
+				GsonProvider gsonProvider) {
 			createdClientCount.incrementAndGet();
-			return new SpyingElasticsearchClient(
-					delegate.create( propertySource, threadPoolProvider, gsonProvider )
-			);
+			return new SpyingElasticsearchClient( delegate.create(
+					propertySource, threadProvider, threadNamePrefix,
+					timeoutExecutorService, gsonProvider
+			) );
 		}
 	}
 

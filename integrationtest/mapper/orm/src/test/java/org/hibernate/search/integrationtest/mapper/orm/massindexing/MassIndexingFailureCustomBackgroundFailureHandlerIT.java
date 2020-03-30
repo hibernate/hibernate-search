@@ -32,7 +32,6 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 	@Override
 	protected void assertBeforeSetup() {
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 0 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 0 );
 	}
@@ -40,7 +39,6 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 	@Override
 	protected void assertAfterSetup() {
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 0 );
 	}
@@ -55,7 +53,6 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 	protected void assertEntityIndexingFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString) {
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 1 );
 	}
@@ -70,7 +67,6 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 	protected void assertEntityGetterFailureHandling(String entityName, String entityReferenceAsString,
 			String exceptionMessage, String failingOperationAsString) {
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 1 );
 	}
@@ -87,7 +83,6 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 			Class<? extends Throwable> exceptionType, String exceptionMessage,
 			String failingOperationAsString) {
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
 	}
 
@@ -105,7 +100,6 @@ public class MassIndexingFailureCustomBackgroundFailureHandlerIT extends Abstrac
 			String failingEntityIndexingExceptionMessage, String failingEntityIndexingOperationAsString,
 			String failingMassIndexerOperationExceptionMessage, String failingMassIndexerOperationAsString) {
 		assertThat( staticCounters.get( StubFailureHandler.CREATE ) ).isEqualTo( 1 );
-		assertThat( staticCounters.get( StubFailureHandler.HANDLE_INDEX_CONTEXT ) ).isEqualTo( 0 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_GENERIC_CONTEXT ) ).isEqualTo( 1 );
 		assertThat( staticCounters.get( StubFailureHandler.HANDLE_ENTITY_INDEXING_CONTEXT ) ).isEqualTo( 1 );
 	}

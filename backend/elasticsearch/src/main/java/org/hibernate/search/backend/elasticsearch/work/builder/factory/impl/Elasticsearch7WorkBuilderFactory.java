@@ -38,7 +38,7 @@ import org.hibernate.search.backend.elasticsearch.work.builder.impl.ScrollWorkBu
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.SearchWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.builder.impl.WaitForIndexStatusWorkBuilder;
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkWork;
-import org.hibernate.search.backend.elasticsearch.work.impl.BulkableElasticsearchWork;
+import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ClearScrollWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.CloseIndexWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.CountWork;
@@ -76,16 +76,17 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 
 	@Override
 	public IndexWorkBuilder index(String entityTypeName, Object entityIdentifier,
-			URLEncodedString elasticsearchIndexName, URLEncodedString id, String routingKey, JsonObject document) {
+			URLEncodedString elasticsearchIndexName,
+			String documentIdentifier, String routingKey, JsonObject document) {
 		return IndexWork.Builder.forElasticsearch7AndAbove( entityTypeName, entityIdentifier,
-				elasticsearchIndexName, id, routingKey, document );
+				elasticsearchIndexName, documentIdentifier, routingKey, document );
 	}
 
 	@Override
 	public DeleteWorkBuilder delete(String entityTypeName, Object entityIdentifier,
-			URLEncodedString elasticsearchIndexName, URLEncodedString id, String routingKey) {
+			URLEncodedString elasticsearchIndexName, String documentIdentifier, String routingKey) {
 		return DeleteWork.Builder.forElasticsearch7AndAbove( entityTypeName, entityIdentifier,
-				elasticsearchIndexName, id, routingKey );
+				elasticsearchIndexName, documentIdentifier, routingKey );
 	}
 
 	@Override
@@ -109,7 +110,7 @@ public class Elasticsearch7WorkBuilderFactory implements ElasticsearchWorkBuilde
 	}
 
 	@Override
-	public BulkWorkBuilder bulk(List<? extends BulkableElasticsearchWork<?>> bulkableWorks) {
+	public BulkWorkBuilder bulk(List<? extends BulkableWork<?>> bulkableWorks) {
 		return new BulkWork.Builder( bulkableWorks );
 	}
 

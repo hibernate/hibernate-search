@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,8 +21,10 @@ import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPredicateBuilderFactory {
 
 	private final Map<String, LuceneFieldPredicateBuilderFactory> leafFields = new HashMap<>();
+	private final List<String> nestedPathHierarchy;
 
 	public LuceneObjectPredicateBuilderFactoryImpl(LuceneIndexModel indexModel, LuceneIndexSchemaObjectNode objectNode) {
+		nestedPathHierarchy = objectNode.getNestedPathHierarchy();
 		addLeafFields( indexModel, objectNode );
 	}
 
@@ -49,7 +52,7 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 	public ExistsPredicateBuilder<LuceneSearchPredicateBuilder> createExistsPredicateBuilder() {
 		LuceneExistsCompositePredicateBuilder objectPredicateBuilder = new LuceneExistsCompositePredicateBuilder();
 		for ( Map.Entry<String, LuceneFieldPredicateBuilderFactory> entry : leafFields.entrySet() ) {
-			ExistsPredicateBuilder<LuceneSearchPredicateBuilder> existsPredicateBuilder = entry.getValue().createExistsPredicateBuilder( entry.getKey() );
+			ExistsPredicateBuilder<LuceneSearchPredicateBuilder> existsPredicateBuilder = entry.getValue().createExistsPredicateBuilder( entry.getKey(), nestedPathHierarchy );
 			objectPredicateBuilder.addChild( existsPredicateBuilder );
 		}
 		return objectPredicateBuilder;

@@ -18,7 +18,7 @@ public class LuceneIndexSchemaObjectNode {
 
 	private static final LuceneIndexSchemaObjectNode ROOT =
 			// we do not store childrenPaths for the root node
-			new LuceneIndexSchemaObjectNode( null, null, null, Collections.emptyList(), null, false );
+			new LuceneIndexSchemaObjectNode( null, null, Collections.emptyList(), Collections.emptyList(), null, false );
 
 	public static LuceneIndexSchemaObjectNode root() {
 		return ROOT;
@@ -28,7 +28,7 @@ public class LuceneIndexSchemaObjectNode {
 
 	private final String absolutePath;
 
-	private final String nestedDocumentPath;
+	private final List<String> nestedPathHierarchy;
 
 	private final List<String> childrenAbsolutePaths;
 
@@ -36,11 +36,11 @@ public class LuceneIndexSchemaObjectNode {
 
 	private final boolean multiValued;
 
-	public LuceneIndexSchemaObjectNode(LuceneIndexSchemaObjectNode parent, String absolutePath, String nestedDocumentPath, List<String> childrenAbsolutePaths,
+	public LuceneIndexSchemaObjectNode(LuceneIndexSchemaObjectNode parent, String absolutePath, List<String> nestedPathHierarchy, List<String> childrenAbsolutePaths,
 			ObjectFieldStorage storage, boolean multiValued) {
 		this.parent = parent;
 		this.absolutePath = absolutePath;
-		this.nestedDocumentPath = nestedDocumentPath;
+		this.nestedPathHierarchy = Collections.unmodifiableList( nestedPathHierarchy );
 		this.storage = storage;
 		this.multiValued = multiValued;
 		this.childrenAbsolutePaths = childrenAbsolutePaths.stream()
@@ -60,8 +60,8 @@ public class LuceneIndexSchemaObjectNode {
 		return MetadataFields.compose( absolutePath, relativeFieldName );
 	}
 
-	public String getNestedDocumentPath() {
-		return nestedDocumentPath;
+	public List<String> getNestedPathHierarchy() {
+		return nestedPathHierarchy;
 	}
 
 	public List<String> getChildrenAbsolutePaths() {

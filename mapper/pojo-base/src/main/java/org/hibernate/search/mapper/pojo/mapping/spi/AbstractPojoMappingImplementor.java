@@ -81,8 +81,8 @@ public abstract class AbstractPojoMappingImplementor<M>
 	}
 
 	@Override
-	public PojoIndexer createIndexer(PojoWorkSessionContext<?> context, DocumentCommitStrategy commitStrategy) {
-		return delegate.createIndexer( context, commitStrategy );
+	public PojoIndexer createIndexer(PojoWorkSessionContext<?> context) {
+		return delegate.createIndexer( context );
 	}
 
 	protected final PojoMappingDelegate getDelegate() {

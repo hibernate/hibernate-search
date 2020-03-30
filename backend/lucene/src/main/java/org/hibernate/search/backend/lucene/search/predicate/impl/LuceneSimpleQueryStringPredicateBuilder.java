@@ -15,16 +15,18 @@ import java.util.Set;
 import org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer;
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
+import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
-import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexFieldComponent;
-import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneDifferentNestedObjectCompatibilityChecker;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopeModel;
+import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexFieldComponent;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneSucceedingCompatibilityChecker;
+import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneFieldPredicateBuilderFactory;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneSimpleQueryStringPredicateBuilderFieldState;
-import org.hibernate.search.backend.lucene.lowlevel.common.impl.AnalyzerConstants;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.BooleanOperator;
+import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.predicate.spi.SimpleQueryStringPredicateBuilder;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -32,10 +34,9 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.queryparser.simple.SimpleQueryParser;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.Query;
-import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 
 public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
-	implements SimpleQueryStringPredicateBuilder<LuceneSearchPredicateBuilder> {
+		implements SimpleQueryStringPredicateBuilder<LuceneSearchPredicateBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
@@ -49,10 +50,12 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 	private boolean ignoreAnalyzer = false;
 	private EnumSet<SimpleQueryFlag> flags;
 	private LuceneCompatibilityChecker analyzerChecker = new LuceneSucceedingCompatibilityChecker();
+	private LuceneDifferentNestedObjectCompatibilityChecker nestedCompatibilityChecker;
 
 	LuceneSimpleQueryStringPredicateBuilder(LuceneSearchContext searchContext, LuceneScopeModel scopeModel) {
 		this.scopeModel = scopeModel;
 		this.analysisDefinitionRegistry = searchContext.getAnalysisDefinitionRegistry();
+		this.nestedCompatibilityChecker = LuceneDifferentNestedObjectCompatibilityChecker.empty( scopeModel );
 	}
 
 	@Override
@@ -77,9 +80,10 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 		LuceneSimpleQueryStringPredicateBuilderFieldState field = fields.get( absoluteFieldPath );
 		if ( field == null ) {
 			LuceneScopedIndexFieldComponent<LuceneFieldPredicateBuilderFactory> fieldComponent = scopeModel.getSchemaNodeComponent(
-				absoluteFieldPath, LuceneSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
+					absoluteFieldPath, LuceneSearchPredicateBuilderFactoryImpl.PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY );
 			field = fieldComponent.getComponent().createSimpleQueryStringFieldContext( absoluteFieldPath );
 			analyzerChecker = analyzerChecker.combine( fieldComponent.getAnalyzerCompatibilityChecker() );
+			nestedCompatibilityChecker = nestedCompatibilityChecker.combineAndCheck( absoluteFieldPath );
 			fields.put( absoluteFieldPath, field );
 		}
 		return field;
@@ -165,6 +169,12 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 		queryParser.setDefaultOperator( defaultOperator );
 
 		return queryParser.parse( simpleQueryString );
+
+	}
+
+	@Override
+	public Query build(LuceneSearchPredicateContext context) {
+		return applyImplicitNestedSteps( nestedCompatibilityChecker.getNestedPathHierarchy(), context, super.build( context ) );
 	}
 
 	private Analyzer buildAnalyzer() {

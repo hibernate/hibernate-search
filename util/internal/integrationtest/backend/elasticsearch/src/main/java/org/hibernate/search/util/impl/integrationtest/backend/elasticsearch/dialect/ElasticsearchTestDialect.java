@@ -40,7 +40,7 @@ public interface ElasticsearchTestDialect {
 
 	URLEncodedString getTypeKeywordForNonMappingApi();
 
-	Optional<URLEncodedString> getTypeNameForMappingApi();
+	Optional<URLEncodedString> getTypeNameForMappingAndBulkApi();
 
 	Boolean getIncludeTypeNameParameterForMappingApi();
 
@@ -64,4 +64,7 @@ public interface ElasticsearchTestDialect {
 
 	boolean supportsIsWriteIndex();
 
+	default boolean hasBugForSortMaxOnNegativeFloats() {
+		return false;
+	}
 }

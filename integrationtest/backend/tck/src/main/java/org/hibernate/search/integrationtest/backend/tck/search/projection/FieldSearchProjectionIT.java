@@ -586,7 +586,7 @@ public class FieldSearchProjectionIT {
 				)
 						.assertThrown()
 						.isInstanceOf( SearchException.class )
-						.hasMessageContaining( "Multiple conflicting nested document paths to build a projection" )
+						.hasMessageContaining( "Multiple index conflicting models on nested document paths" )
 						.hasMessageContaining( "'" + fieldPath + "'" );
 			} );
 		}

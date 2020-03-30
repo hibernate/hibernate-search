@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -18,7 +19,7 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
  * An abstract base for orchestrator implementations,
  * implementing a thread-safe shutdown.
  *
- * @param <W> The type of submitted worksets.
+ * @param <W> The type of batched works.
  */
 public abstract class AbstractWorkOrchestrator<W> {
 
@@ -37,7 +38,15 @@ public abstract class AbstractWorkOrchestrator<W> {
 		return name;
 	}
 
-	public final void start() {
+	/**
+	 * Start any resource necessary to operate the orchestrator at runtime.
+	 * <p>
+	 * Called by the owner of this orchestrator once after bootstrap,
+	 * before any other method is called.
+	 *
+	 * @param propertySource The property source to extract configuration from.
+	 */
+	public final void start(ConfigurationPropertySource propertySource) {
 		lifecycleLock.writeLock().lock();
 		try {
 			switch ( state ) {
@@ -47,7 +56,7 @@ public abstract class AbstractWorkOrchestrator<W> {
 					throw new IllegalStateException( "Cannot start an orchestrator while it's stopping" );
 				case STOPPED:
 					state = State.RUNNING;
-					doStart();
+					doStart( propertySource );
 					break;
 			}
 		}
@@ -56,6 +65,14 @@ public abstract class AbstractWorkOrchestrator<W> {
 		}
 	}
 
+	/**
+	 * Stop accepting works and return a future that completes when all works have been completely executed.
+	 * <p>
+	 * Optionally called by the owner of this orchestrator before {@link #stop()},
+	 * if it needs to wait for work completion.
+	 *
+	 * @return A future that completes when all ongoing works have been completely executed.
+	 */
 	public final CompletableFuture<?> preStop() {
 		lifecycleLock.writeLock().lock();
 		try {
@@ -74,6 +91,11 @@ public abstract class AbstractWorkOrchestrator<W> {
 		}
 	}
 
+	/**
+	 * Forcibly shut down ongoing work and release any resource necessary to operate the orchestrator at runtime.
+	 * <p>
+	 * Called by the owner of this orchestrator on shutdown.
+	 */
 	public final void stop() {
 		lifecycleLock.writeLock().lock();
 		try {
@@ -92,15 +114,15 @@ public abstract class AbstractWorkOrchestrator<W> {
 		}
 	}
 
-	protected abstract void doStart();
+	protected abstract void doStart(ConfigurationPropertySource propertySource);
 
-	protected abstract void doSubmit(W workSet) throws InterruptedException;
+	protected abstract void doSubmit(W work) throws InterruptedException;
 
 	protected abstract CompletableFuture<?> getCompletion();
 
 	protected abstract void doStop();
 
-	public final void submit(W workSet) {
+	public final void submit(W work) {
 		if ( !lifecycleLock.readLock().tryLock() ) {
 			// The orchestrator is starting, pre-stopping or stopping: abort.
 			throw log.submittedWorkToStoppedOrchestrator( name );
@@ -110,11 +132,11 @@ public abstract class AbstractWorkOrchestrator<W> {
 				// The orchestrator is stopping or stopped: abort.
 				throw log.submittedWorkToStoppedOrchestrator( name );
 			}
-			doSubmit( workSet );
+			doSubmit( work );
 		}
 		catch (InterruptedException e) {
 			Thread.currentThread().interrupt();
-			throw log.threadInterruptedWhileSubmittingWorkset( name );
+			throw log.threadInterruptedWhileSubmittingWork( name );
 		}
 		finally {
 			lifecycleLock.readLock().unlock();

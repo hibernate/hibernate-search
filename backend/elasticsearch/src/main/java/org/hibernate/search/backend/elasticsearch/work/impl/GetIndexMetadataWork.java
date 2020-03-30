@@ -30,7 +30,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 
-public class GetIndexMetadataWork extends AbstractSimpleElasticsearchWork<List<ExistingIndexMetadata>> {
+public class GetIndexMetadataWork extends AbstractNonBulkableWork<List<ExistingIndexMetadata>> {
 
 	private static final TypeToken<Map<String, RootTypeMapping>> STRING_TO_TYPE_MAPPING_MAP_TYPE_TOKEN =
 			new TypeToken<Map<String, RootTypeMapping>>() {
@@ -136,7 +136,7 @@ public class GetIndexMetadataWork extends AbstractSimpleElasticsearchWork<List<E
 		}
 
 		private Builder(URLEncodedString typeName, Boolean includeTypeName) {
-			super( null, DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
+			super( DefaultElasticsearchRequestSuccessAssessor.INSTANCE );
 			this.typeName = typeName;
 			this.includeTypeName = includeTypeName;
 		}

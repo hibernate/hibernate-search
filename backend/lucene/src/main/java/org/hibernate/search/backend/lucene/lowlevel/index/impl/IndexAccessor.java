@@ -20,13 +20,6 @@ import org.apache.lucene.index.DirectoryReader;
 public interface IndexAccessor {
 
 	/**
-	 * Closes and drops any cached resources: index writers, index readers.
-	 * <p>
-	 * Should be used when stopping the index or to clean up upon error.
-	 */
-	void reset() throws IOException;
-
-	/**
 	 * Checks whether the index exists (on disk, ...), and creates it if necessary.
 	 */
 	void createIndexIfMissing();
@@ -50,17 +43,18 @@ public interface IndexAccessor {
 	 * Commits the underlying index writer, if any,
 	 * or delay the commit if a commit happened recently
 	 * and configuration requires to wait longer between two commits.
-	 *
-	 * @return {@code 0} if the commit occurred.
-	 * If the commit was delayed,
-	 * returns the number of milliseconds until the moment a commit can be executed.
 	 */
-	long commitOrDelay();
+	void commitOrDelay();
 
 	/**
 	 * Refreshes the underlying index readers.
 	 */
 	void refresh();
+
+	/**
+	 * Merge segments files.
+	 */
+	void mergeSegments();
 
 	/**
 	 * @return The index writer delegator.
@@ -71,4 +65,15 @@ public interface IndexAccessor {
 	 * @return The most up-to-date index reader available.
 	 */
 	DirectoryReader getIndexReader() throws IOException;
+
+	/**
+	 * Closes, drops and re-creates any cached resources: index writers, index readers.
+	 * <p>
+	 * Should be used to clean up the accessor upon write or commit failure,
+	 * passing an exception with as much information as possible (operation, document ID, ...).
+	 *
+	 * @param throwable The failure.
+	 * @param failingOperation The operation that failed.
+	 */
+	void cleanUpAfterFailure(Throwable throwable, Object failingOperation);
 }

@@ -7,6 +7,7 @@
 package org.hibernate.search.integrationtest.backend.tck.testsupport.types;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expect
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.IndexingExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.MatchPredicateExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.expectations.RangePredicateExpectations;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.values.AscendingUniqueTermValues;
 
 public class LocalDateFieldTypeDescriptor extends FieldTypeDescriptor<LocalDate> {
 
@@ -25,17 +27,32 @@ public class LocalDateFieldTypeDescriptor extends FieldTypeDescriptor<LocalDate>
 	}
 
 	@Override
-	public List<LocalDate> getAscendingUniqueTermValues() {
-		return Arrays.asList(
-				LocalDate.of( -52, 10, 11 ),
-				LocalDate.of( 1600, 2, 28 ),
-				LocalDate.of( 1900, 1, 1 ),
-				LocalDate.of( 1970, 1, 1 ),
-				LocalDate.of( 1980, 1, 1 ),
-				LocalDate.of( 1980, 12, 31 ),
-				LocalDate.of( 2004, 2, 29 ),
-				LocalDate.of( 2017, 7, 7 )
-		);
+	protected AscendingUniqueTermValues<LocalDate> createAscendingUniqueTermValues() {
+		return new AscendingUniqueTermValues<LocalDate>() {
+			@Override
+			protected List<LocalDate> createSingle() {
+				return Arrays.asList(
+						LocalDate.of( -52, 10, 11 ),
+						LocalDate.of( 1600, 2, 28 ),
+						LocalDate.of( 1900, 1, 1 ),
+						LocalDate.of( 1970, 1, 1 ),
+						LocalDate.of( 1980, 1, 1 ),
+						LocalDate.of( 1980, 12, 31 ),
+						LocalDate.of( 2004, 2, 29 ),
+						LocalDate.of( 2017, 7, 7 )
+				);
+			}
+
+			@Override
+			protected List<List<LocalDate>> createMultiResultingInSingleAfterSum() {
+				return valuesThatWontBeUsed();
+			}
+
+			@Override
+			protected LocalDate applyDelta(LocalDate value, int multiplierForDelta) {
+				return value.plus( multiplierForDelta, ChronoUnit.YEARS );
+			}
+		};
 	}
 
 	@Override

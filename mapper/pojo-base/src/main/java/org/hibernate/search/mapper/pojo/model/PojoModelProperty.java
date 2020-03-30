@@ -8,7 +8,7 @@ package org.hibernate.search.mapper.pojo.model;
 
 import java.util.stream.Stream;
 
-import org.hibernate.search.util.common.annotaion.Incubating;
+import org.hibernate.search.util.common.annotation.Incubating;
 
 /**
  * A model element representing a property bound to a bridge.

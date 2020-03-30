@@ -33,7 +33,7 @@ public abstract class AbstractTypeOrdering<T> {
 
 	/**
 	 * @param subType A type (non-null)
-	 * @return The superclass of the given type, or null if there is none.
+	 * @return The superclass of the given type, or Object for interfaces, or null for Object.
 	 */
 	protected abstract T getSuperClass(T subType);
 

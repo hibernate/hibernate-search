@@ -12,7 +12,7 @@ import org.hibernate.search.backend.lucene.types.codec.impl.AbstractLuceneNumeri
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneOffsetTimeFieldCodec;
 
 class LuceneOffsetTimeIndexFieldTypeOptionsStep
-		extends AbstractLuceneNumericIndexFieldTypeOptionsStep<LuceneOffsetTimeIndexFieldTypeOptionsStep, OffsetTime> {
+		extends AbstractLuceneTemporalIndexFieldTypeOptionsStep<LuceneOffsetTimeIndexFieldTypeOptionsStep, OffsetTime> {
 
 	LuceneOffsetTimeIndexFieldTypeOptionsStep(LuceneIndexFieldTypeBuildContext buildContext) {
 		super( buildContext, OffsetTime.class );
