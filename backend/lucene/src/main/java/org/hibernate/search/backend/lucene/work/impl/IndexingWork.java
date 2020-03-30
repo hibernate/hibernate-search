@@ -14,7 +14,7 @@ public interface IndexingWork<T> {
 	Object getInfo();
 
 	/**
-	 * @return A string that will be used to direct the work to a specific queue.
+	 * @return A string that will be used to route the work to a specific queue.
 	 * Never {@code null}.
 	 * Works that must be executed in the same relative order they were submitted in
 	 * (i.e. works pertaining to the same document) should return the same string.
