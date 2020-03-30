@@ -743,7 +743,7 @@ hibernate.search.backends.<backend-name>.thread_pool.size = 4
 ----
 
 [[backend-elasticsearch-indexing-queues]]
-=== Indexing queues
+== Indexing queues
 
 Among all the requests sent by Hibernate Search to Elasticsearch,
 it is expected that there will be a lot of "indexing" requests to create/update/delete a specific document.
