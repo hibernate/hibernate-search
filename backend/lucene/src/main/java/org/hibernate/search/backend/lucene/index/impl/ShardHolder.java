@@ -72,6 +72,7 @@ class ShardHolder implements ReadIndexManagerContext, WorkExecutionIndexManagerC
 			}
 
 			for ( Shard shard : shards.values() ) {
+				shard.start( propertySource );
 				managementOrchestrators.add( shard.getManagementOrchestrator() );
 			}
 		}

@@ -8,9 +8,12 @@ package org.hibernate.search.backend.lucene.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.lucene.cfg.LuceneIndexSettings;
 import org.hibernate.search.backend.lucene.resources.impl.BackendThreads;
 import org.hibernate.search.engine.backend.orchestration.spi.AbstractWorkOrchestrator;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.data.impl.SimpleHashFunction;
 import org.hibernate.search.util.common.impl.Closer;
@@ -19,14 +22,23 @@ public class LuceneSerialWorkOrchestratorImpl
 		extends AbstractWorkOrchestrator<LuceneBatchedWork<?>>
 		implements LuceneSerialWorkOrchestrator {
 
-	// TODO HSEARCH‌-3575 allow to configure this value
-	private static final int MAX_WORKS_PER_BATCH = 1000;
-	// TODO HSEARCH‌-3575 allow to configure this value
-	private static final int PARALLELISM = 10;
+	private static final ConfigurationProperty<Integer> QUEUE_COUNT =
+			ConfigurationProperty.forKey( LuceneIndexSettings.INDEXING_QUEUE_COUNT )
+					.asInteger()
+					.withDefault( LuceneIndexSettings.Defaults.INDEXING_QUEUE_COUNT )
+					.build();
+
+	private static final ConfigurationProperty<Integer> QUEUE_SIZE =
+			ConfigurationProperty.forKey( LuceneIndexSettings.INDEXING_QUEUE_SIZE )
+					.asInteger()
+					.withDefault( LuceneIndexSettings.Defaults.INDEXING_QUEUE_SIZE )
+					.build();
 
 	private final LuceneBatchedWorkProcessor processor;
 	private final BackendThreads threads;
-	private final BatchingExecutor<LuceneBatchedWorkProcessor>[] executors;
+	private final FailureHandler failureHandler;
+
+	private BatchingExecutor<LuceneBatchedWorkProcessor>[] executors;
 
 	/**
 	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)
@@ -41,16 +53,7 @@ public class LuceneSerialWorkOrchestratorImpl
 		super( name );
 		this.processor = processor;
 		this.threads = threads;
-		this.executors = new BatchingExecutor[PARALLELISM];
-		for ( int i = 0; i < executors.length; i++ ) {
-			executors[i] = new BatchingExecutor<>(
-					name + " - " + i,
-					processor,
-					MAX_WORKS_PER_BATCH,
-					true,
-					failureHandler
-			);
-		}
+		this.failureHandler = failureHandler;
 	}
 
 	@Override
@@ -64,7 +67,21 @@ public class LuceneSerialWorkOrchestratorImpl
 	}
 
 	@Override
-	protected void doStart() {
+	protected void doStart(ConfigurationPropertySource propertySource) {
+		int queueCount = QUEUE_COUNT.get( propertySource );
+		int queueSize = QUEUE_SIZE.get( propertySource );
+
+		executors = new BatchingExecutor[queueCount];
+		for ( int i = 0; i < executors.length; i++ ) {
+			executors[i] = new BatchingExecutor<>(
+					getName() + " - " + i,
+					processor,
+					queueSize,
+					true,
+					failureHandler
+			);
+		}
+
 		for ( BatchingExecutor<?> executor : executors ) {
 			executor.start( threads.getWriteExecutor() );
 		}

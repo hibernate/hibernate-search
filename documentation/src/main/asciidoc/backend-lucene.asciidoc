@@ -556,6 +556,78 @@ That can be changed using a configuration property:
 hibernate.search.backends.<backend-name>.thread_pool.size = 4
 ----
 
+[[backend-lucene-indexing-queues]]
+== Indexing queues
+
+Among all the write operations performed by Hibernate Search on the indexes,
+it is expected that there will be a lot of "indexing" operations to create/update/delete a specific document.
+We generally want to preserve the relative order of these requests
+when they are about the same documents.
+
+For this reasons, Hibernate Search pushes these operations to internal queues and applies them in batches.
+Each index maintains 10 queues holding at most 1000 elements each.
+Queues operate independently (in parallel), but each queue applies one operation after the other,
+so at any given time there can be at most 10 batches of indexing requests being applied for each index.
+
+[NOTE]
+====
+Indexing operations relative to the same document ID are always pushed to the same queue.
+====
+
+It is possible to customize the queues in order to reduce resource consumption,
+or on the contrary to improve throughput.
+This is done through the following configuration properties, at the index level:
+
+[source]
+----
+hibernate.search.backends.<backend name>.indexes.<index name>.indexing.queue_count 10 (default)
+hibernate.search.backends.<backend name>.indexes.<index name>.indexing.queue_size 1000 (default)
+# OR
+hibernate.search.backends.<backend name>.index_defaults.indexing.queue_count 10 (default)
+hibernate.search.backends.<backend name>.index_defaults.indexing.queue_size 1000 (default)
+----
+
+* `indexing.queue_count` defines the number of queues.
+Expects a strictly positive integer value.
++
+Higher values may lead to higher indexing throughput if CPU is the bottleneck when indexing.
++
+Note that raising this number above the <<backend-lucene-threads,number of threads>> is never useful,
+as the number of threads limits how many queues can be processed in parallel.
+* `indexing.queue_size` defines the maximum number of elements each queue can hold.
+Expects a strictly positive integer value.
++
+Lower values may lead to lower memory usage, especially if there are many queues,
+but values that are too low will increase the likeliness of
+<<backend-lucene-indexing-queues-blocking,application threads blocking>>
+
+[TIP]
+[[backend-lucene-indexing-queues-blocking]]
+====
+When a queue is full, any attempt to request indexing will block until the request can be put into the queue.
+
+In order to achieve a reasonable level of performance,
+be sure to set the size of queues to a high enough number that this kind of blocking only happens
+when the application is under very high load.
+====
+
+[TIP]
+====
+When <<backend-lucene-configuration-sharding,sharding>> is enabled,
+each shard will be assigned its own set of queues.
+
+If you use the `hash` sharding strategy *based on the document ID* (and not based on a provided routing key),
+make sure to set the number of queues to a number with no common denominator with the number of shards;
+otherwise, some queues may be used much less than others.
+
+For example, if you set the number of shards to 8 and the number of queues to 4,
+documents ending up in the shard #0 will always end up in queue #0 of that shard.
+That's because both the routing to a shard and the routing to a queue take the hash of the document ID
+then apply a modulo operation to that hash,
+and `<some hash> % 8 == 0` (routed to shard #0) implies `<some hash> % 4 == 0` (routed to queue #0 of shard #0).
+Again, this is only true if you rely on the document ID and not on a provided routing key for sharding.
+====
+
 [[backend-lucene-io]]
 == Writing and reading
 
