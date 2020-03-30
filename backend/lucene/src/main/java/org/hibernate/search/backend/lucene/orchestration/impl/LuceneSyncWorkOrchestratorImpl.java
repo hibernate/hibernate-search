@@ -18,6 +18,7 @@ import org.hibernate.search.backend.lucene.lowlevel.reader.impl.ReadIndexManager
 import org.hibernate.search.backend.lucene.work.impl.ReadWork;
 import org.hibernate.search.backend.lucene.work.impl.ReadWorkExecutionContext;
 import org.hibernate.search.engine.backend.orchestration.spi.AbstractWorkOrchestrator;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -33,7 +34,7 @@ public class LuceneSyncWorkOrchestratorImpl
 
 	public LuceneSyncWorkOrchestratorImpl(String name) {
 		super( name );
-		start(); // Nothing to start, just force the superclass to go to the right state.
+		start( null ); // Nothing to start, just force the superclass to go to the right state.
 	}
 
 	@Override
@@ -64,7 +65,7 @@ public class LuceneSyncWorkOrchestratorImpl
 	}
 
 	@Override
-	protected void doStart() {
+	protected void doStart(ConfigurationPropertySource propertySource) {
 		// Nothing to do
 	}
 

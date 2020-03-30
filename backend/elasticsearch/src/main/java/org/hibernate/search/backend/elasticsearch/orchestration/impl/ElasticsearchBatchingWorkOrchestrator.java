@@ -8,10 +8,13 @@ package org.hibernate.search.backend.elasticsearch.orchestration.impl;
 
 import java.util.concurrent.CompletableFuture;
 
+import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.resources.impl.BackendThreads;
 import org.hibernate.search.backend.elasticsearch.work.impl.IndexingWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
+import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.util.common.data.impl.SimpleHashFunction;
 import org.hibernate.search.util.common.impl.Closer;
@@ -29,24 +32,28 @@ public class ElasticsearchBatchingWorkOrchestrator
 		extends AbstractElasticsearchWorkOrchestrator<ElasticsearchBatchedWork<?>>
 		implements ElasticsearchSerialWorkOrchestrator {
 
-	// TODO HSEARCH-3575 make this configurable
-	private static final int MAX_BULK_SIZE = 100;
-	/*
-	 * Setting the following constant involves a bit of guesswork.
-	 * Basically we want the number to be large enough for the orchestrator
-	 * to create bulks of the maximum size defined above most of the time,
-	 * and to avoid cases where the queue is full as much as possible,
-	 * because threads submitting works will block when that happens.
-	 * But we also want to keep the number as low as possible to avoid
-	 * consuming too much memory with pending works.
-	 */
-	// TODO HSEARCH-3575 make this configurable
-	private static final int QUEUE_SIZE = 10 * MAX_BULK_SIZE;
-	// TODO HSEARCH-3575 make this configurable
-	private static final int PARALLELISM = 10;
+	private static final ConfigurationProperty<Integer> QUEUE_COUNT =
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.INDEXING_QUEUE_COUNT )
+					.asInteger()
+					.withDefault( ElasticsearchIndexSettings.Defaults.INDEXING_QUEUE_COUNT )
+					.build();
+
+	private static final ConfigurationProperty<Integer> QUEUE_SIZE =
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.INDEXING_QUEUE_SIZE )
+					.asInteger()
+					.withDefault( ElasticsearchIndexSettings.Defaults.INDEXING_QUEUE_SIZE )
+					.build();
+
+	private static final ConfigurationProperty<Integer> MAX_BULK_SIZE =
+			ConfigurationProperty.forKey( ElasticsearchIndexSettings.INDEXING_MAX_BULK_SIZE )
+					.asInteger()
+					.withDefault( ElasticsearchIndexSettings.Defaults.INDEXING_MAX_BULK_SIZE )
+					.build();
 
 	private final BackendThreads threads;
-	private final BatchingExecutor<ElasticsearchBatchedWorkProcessor>[] executors;
+	private final FailureHandler failureHandler;
+
+	private BatchingExecutor<ElasticsearchBatchedWorkProcessor>[] executors;
 
 	/**
 	 * @param name The name of the orchestrator thread (and of this orchestrator when reporting errors)
@@ -59,18 +66,7 @@ public class ElasticsearchBatchingWorkOrchestrator
 			FailureHandler failureHandler) {
 		super( name, link );
 		this.threads = threads;
-		this.executors = new BatchingExecutor[PARALLELISM];
-		for ( int i = 0; i < executors.length; i++ ) {
-			// Processors are not thread-safe: create one per executor.
-			ElasticsearchBatchedWorkProcessor processor = createProcessor();
-			executors[i] = new BatchingExecutor<>(
-					name + " - " + i,
-					processor,
-					QUEUE_SIZE,
-					true,
-					failureHandler
-			);
-		}
+		this.failureHandler = failureHandler;
 	}
 
 	@Override
@@ -81,7 +77,24 @@ public class ElasticsearchBatchingWorkOrchestrator
 	}
 
 	@Override
-	protected void doStart() {
+	protected void doStart(ConfigurationPropertySource propertySource) {
+		int queueCount = QUEUE_COUNT.get( propertySource );
+		int queueSize = QUEUE_SIZE.get( propertySource );
+		int maxBulkSize = MAX_BULK_SIZE.get( propertySource );
+
+		executors = new BatchingExecutor[queueCount];
+		for ( int i = 0; i < executors.length; i++ ) {
+			// Processors are not thread-safe: create one per executor.
+			ElasticsearchBatchedWorkProcessor processor = createProcessor( maxBulkSize );
+			executors[i] = new BatchingExecutor<>(
+					getName() + " - " + i,
+					processor,
+					queueSize,
+					true,
+					failureHandler
+			);
+		}
+
 		for ( BatchingExecutor<?> executor : executors ) {
 			executor.start( threads.getWorkExecutor() );
 		}
@@ -109,14 +122,14 @@ public class ElasticsearchBatchingWorkOrchestrator
 		}
 	}
 
-	private ElasticsearchBatchedWorkProcessor createProcessor() {
+	private ElasticsearchBatchedWorkProcessor createProcessor(int maxBulkSize) {
 		ElasticsearchWorkSequenceBuilder sequenceBuilder =
 				new ElasticsearchDefaultWorkSequenceBuilder( this::createWorkExecutionContext );
 		ElasticsearchWorkBulker bulker = new ElasticsearchDefaultWorkBulker(
 				sequenceBuilder,
 				(worksToBulk, refreshStrategy) ->
 						link.getWorkBuilderFactory().bulk( worksToBulk ).refresh( refreshStrategy ).build(),
-				MAX_BULK_SIZE
+				maxBulkSize
 		);
 		return new ElasticsearchBatchedWorkProcessor( sequenceBuilder, bulker );
 	}

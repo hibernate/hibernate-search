@@ -128,6 +128,31 @@ public final class LuceneIndexSettings {
 	public static final String SHARDING_SHARD_IDENTIFIERS = SHARDING_PREFIX + ShardingRadicals.SHARD_IDENTIFIERS;
 
 	/**
+	 * The prefix for indexing-related property keys.
+	 */
+	public static final String INDEXING_PREFIX = "indexing.";
+
+	/**
+	 * The number of indexing queues assigned to each index (or each shard of each index, when sharding is enabled).
+	 * <p>
+	 * Expects a strictly positive integer value,
+	 * or a string that can be parsed to such integer value.
+	 * <p>
+	 * Defaults to {@link Defaults#INDEXING_QUEUE_COUNT}.
+	 */
+	public static final String INDEXING_QUEUE_COUNT = INDEXING_PREFIX + IndexingRadicals.QUEUE_COUNT;
+
+	/**
+	 * The size of indexing queues.
+	 * <p>
+	 * Expects a strictly positive integer value,
+	 * or a string that can be parsed to such integer value.
+	 * <p>
+	 * Defaults to {@link Defaults#INDEXING_QUEUE_SIZE}.
+	 */
+	public static final String INDEXING_QUEUE_SIZE = INDEXING_PREFIX + IndexingRadicals.QUEUE_SIZE;
+
+	/**
 	 * Configuration property keys for I/O, without the {@link #IO_PREFIX prefix}.
 	 */
 	public static final class IORadicals {
@@ -154,6 +179,18 @@ public final class LuceneIndexSettings {
 	}
 
 	/**
+	 * Configuration property keys for indexing, without the {@link #INDEXING_PREFIX prefix}.
+	 */
+	public static final class IndexingRadicals {
+
+		private IndexingRadicals() {
+		}
+
+		public static final String QUEUE_COUNT = "queue_count";
+		public static final String QUEUE_SIZE = "queue_size";
+	}
+
+	/**
 	 * Default values for the different settings if no values are given.
 	 */
 	public static final class Defaults {
@@ -165,5 +202,7 @@ public final class LuceneIndexSettings {
 		public static final IOStrategyName IO_STRATEGY = IOStrategyName.NEAR_REAL_TIME;
 		public static final int IO_COMMIT_INTERVAL = 0;
 		public static final int IO_REFRESH_INTERVAL = 0;
+		public static final int INDEXING_QUEUE_COUNT = 10;
+		public static final int INDEXING_QUEUE_SIZE = 1000;
 	}
 }

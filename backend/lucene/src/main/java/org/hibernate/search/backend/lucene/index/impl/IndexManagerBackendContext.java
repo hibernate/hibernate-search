@@ -215,7 +215,6 @@ public class IndexManagerBackendContext implements WorkExecutionBackendContext, 
 					shardEventContext, indexAccessor,
 					managementOrchestrator, indexingOrchestrator
 			);
-			shard.start();
 			return shard;
 		}
 		catch (RuntimeException e) {

@@ -39,6 +39,54 @@ public final class ElasticsearchIndexSettings {
 	public static final String SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT = "schema_management.minimal_required_status_wait_timeout";
 
 	/**
+	 * The prefix for indexing-related property keys.
+	 */
+	public static final String INDEXING_PREFIX = "indexing.";
+
+	/**
+	 * The number of indexing queues assigned to each index.
+	 * <p>
+	 * Expects a strictly positive integer value,
+	 * or a string that can be parsed to such integer value.
+	 * <p>
+	 * Defaults to {@link Defaults#INDEXING_QUEUE_COUNT}.
+	 */
+	public static final String INDEXING_QUEUE_COUNT = INDEXING_PREFIX + IndexingRadicals.QUEUE_COUNT;
+
+	/**
+	 * The size of indexing queues.
+	 * <p>
+	 * Expects a strictly positive integer value,
+	 * or a string that can be parsed to such integer value.
+	 * <p>
+	 * Defaults to {@link Defaults#INDEXING_QUEUE_SIZE}.
+	 */
+	public static final String INDEXING_QUEUE_SIZE = INDEXING_PREFIX + IndexingRadicals.QUEUE_SIZE;
+
+	/**
+	 * The maximum size of bulk requests created when processing indexing queues.
+	 * <p>
+	 * Expects a strictly positive integer value,
+	 * or a string that can be parsed to such integer value.
+	 * <p>
+	 * Defaults to {@link Defaults#INDEXING_MAX_BULK_SIZE}.
+	 */
+	public static final String INDEXING_MAX_BULK_SIZE = INDEXING_PREFIX + IndexingRadicals.MAX_BULK_SIZE;
+
+	/**
+	 * Configuration property keys for indexing, without the {@link #INDEXING_PREFIX prefix}.
+	 */
+	public static final class IndexingRadicals {
+
+		private IndexingRadicals() {
+		}
+
+		public static final String QUEUE_COUNT = "queue_count";
+		public static final String QUEUE_SIZE = "queue_size";
+		public static final String MAX_BULK_SIZE = "max_bulk_size";
+	}
+
+	/**
 	 * Default values for the different settings if no values are given.
 	 */
 	public static final class Defaults {
@@ -48,6 +96,9 @@ public final class ElasticsearchIndexSettings {
 
 		public static final IndexStatus SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS = IndexStatus.GREEN;
 		public static final int SCHEMA_MANAGEMENT_MINIMAL_REQUIRED_STATUS_WAIT_TIMEOUT = 10_000;
+		public static final int INDEXING_QUEUE_COUNT = 10;
+		public static final int INDEXING_QUEUE_SIZE = 1000;
+		public static final int INDEXING_MAX_BULK_SIZE = 100;
 	}
 
 }

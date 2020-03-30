@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
+import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 import org.hibernate.search.engine.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
@@ -42,8 +43,10 @@ public abstract class AbstractWorkOrchestrator<W> {
 	 * <p>
 	 * Called by the owner of this orchestrator once after bootstrap,
 	 * before any other method is called.
+	 *
+	 * @param propertySource The property source to extract configuration from.
 	 */
-	public final void start() {
+	public final void start(ConfigurationPropertySource propertySource) {
 		lifecycleLock.writeLock().lock();
 		try {
 			switch ( state ) {
@@ -53,7 +56,7 @@ public abstract class AbstractWorkOrchestrator<W> {
 					throw new IllegalStateException( "Cannot start an orchestrator while it's stopping" );
 				case STOPPED:
 					state = State.RUNNING;
-					doStart();
+					doStart( propertySource );
 					break;
 			}
 		}
@@ -111,7 +114,7 @@ public abstract class AbstractWorkOrchestrator<W> {
 		}
 	}
 
-	protected abstract void doStart();
+	protected abstract void doStart(ConfigurationPropertySource propertySource);
 
 	protected abstract void doSubmit(W work) throws InterruptedException;
 
