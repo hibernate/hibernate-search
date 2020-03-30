@@ -11,6 +11,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.backend.elasticsearch.cfg.ElasticsearchIndexSettings;
 import org.hibernate.search.backend.elasticsearch.link.impl.ElasticsearchLink;
 import org.hibernate.search.backend.elasticsearch.resources.impl.BackendThreads;
+import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
 import org.hibernate.search.backend.elasticsearch.work.impl.IndexingWork;
 import org.hibernate.search.engine.backend.orchestration.spi.BatchingExecutor;
 import org.hibernate.search.engine.cfg.spi.ConfigurationProperty;
@@ -82,10 +83,12 @@ public class ElasticsearchBatchingWorkOrchestrator
 		int queueSize = QUEUE_SIZE.get( propertySource );
 		int maxBulkSize = MAX_BULK_SIZE.get( propertySource );
 
+		ElasticsearchWorkExecutionContext executionContext = createWorkExecutionContext();
+
 		executors = new BatchingExecutor[queueCount];
 		for ( int i = 0; i < executors.length; i++ ) {
 			// Processors are not thread-safe: create one per executor.
-			ElasticsearchBatchedWorkProcessor processor = createProcessor( maxBulkSize );
+			ElasticsearchBatchedWorkProcessor processor = createProcessor( executionContext, maxBulkSize );
 			executors[i] = new BatchingExecutor<>(
 					getName() + " - " + i,
 					processor,
@@ -122,9 +125,9 @@ public class ElasticsearchBatchingWorkOrchestrator
 		}
 	}
 
-	private ElasticsearchBatchedWorkProcessor createProcessor(int maxBulkSize) {
-		ElasticsearchWorkSequenceBuilder sequenceBuilder =
-				new ElasticsearchDefaultWorkSequenceBuilder( this::createWorkExecutionContext );
+	private ElasticsearchBatchedWorkProcessor createProcessor(ElasticsearchWorkExecutionContext context,
+			int maxBulkSize) {
+		ElasticsearchWorkSequenceBuilder sequenceBuilder = new ElasticsearchDefaultWorkSequenceBuilder( context );
 		ElasticsearchWorkBulker bulker = new ElasticsearchDefaultWorkBulker(
 				sequenceBuilder,
 				(worksToBulk, refreshStrategy) ->
