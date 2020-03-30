@@ -227,6 +227,16 @@ public final class ElasticsearchBackendSettings {
 	public static final String LAYOUT_STRATEGY = "layout.strategy";
 
 	/**
+	 * The size of the thread pool assigned to the backend.
+	 * <p>
+	 * Expects a strictly positive integer value,
+	 * or a string that can be parsed to such integer value.
+	 * <p>
+	 * Defaults to the number of processor cores available to the JVM on startup.
+	 */
+	public static final String THREAD_POOL_SIZE = "thread_pool.size";
+
+	/**
 	 * Default values for the different settings if no values are given.
 	 */
 	public static final class Defaults {

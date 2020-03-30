@@ -115,7 +115,7 @@ class ElasticsearchBackendImpl implements BackendImplementor,
 
 	@Override
 	public void start(BackendStartContext context) {
-		threads.onStart( context.getThreadPoolProvider() );
+		threads.onStart( context.getConfigurationPropertySource(), context.getThreadPoolProvider() );
 		link.onStart( context.getConfigurationPropertySource() );
 		generalPurposeOrchestrator.start();
 	}

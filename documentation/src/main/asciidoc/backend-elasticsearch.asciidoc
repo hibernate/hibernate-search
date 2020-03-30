@@ -728,6 +728,20 @@ refer to the documentation:
 {elasticsearchDocUrl}/analysis-tokenfilters.html[token filters].
 ====
 
+[[backend-elasticsearch-threads]]
+== Threads
+
+The Elasticsearch backend relies on an internal thread pool to orchestrate indexing requests (add/update/delete)
+and to schedule request timeouts.
+
+By default, the pool contains exactly as many threads as the number of processors available to the JVM on bootstrap.
+That can be changed using a configuration property:
+
+[source]
+----
+hibernate.search.backends.<backend-name>.thread_pool.size = 4
+----
+
 [[backend-elasticsearch-io]]
 == Writing and reading
 

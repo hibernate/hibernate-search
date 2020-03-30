@@ -95,7 +95,7 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 
 	@Override
 	public void start(BackendStartContext context) {
-		threads.onStart( context.getThreadPoolProvider() );
+		threads.onStart( context.getConfigurationPropertySource(), context.getThreadPoolProvider() );
 	}
 
 	@Override
