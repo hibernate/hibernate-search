@@ -11,7 +11,6 @@ import static org.hibernate.search.util.impl.test.ExceptionMatcherBuilder.isExce
 import static org.hibernate.search.util.impl.test.FutureAssert.assertThat;
 
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Supplier;
 
 import org.hibernate.search.backend.elasticsearch.work.impl.BulkableWork;
 import org.hibernate.search.backend.elasticsearch.work.impl.ElasticsearchWorkExecutionContext;
@@ -29,12 +28,10 @@ import org.easymock.EasyMockSupport;
 public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport {
 
 	private ElasticsearchWorkExecutionContext contextMock;
-	private Supplier<ElasticsearchWorkExecutionContext> contextSupplierMock;
 
 	@Before
 	public void initMocks() {
 		contextMock = createStrictMock( ElasticsearchWorkExecutionContext.class );
-		contextSupplierMock = createStrictMock( Supplier.class );
 	}
 
 	@Test
@@ -55,11 +52,10 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		CompletableFuture<Object> work2FutureFromSequenceBuilder;
 
 		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextSupplierMock );
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextMock );
 		verifyAll();
 
 		resetAll();
-		expect( contextSupplierMock.get() ).andReturn( contextMock );
 		replayAll();
 		builder.init( previousFuture );
 		verifyAll();
@@ -139,11 +135,10 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		CompletableFuture<Object> work4FutureFromSequenceBuilder;
 
 		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextSupplierMock );
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextMock );
 		verifyAll();
 
 		resetAll();
-		expect( contextSupplierMock.get() ).andReturn( contextMock );
 		replayAll();
 		builder.init( previousFuture );
 		verifyAll();
@@ -241,11 +236,10 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		CompletableFuture<Void> work2Future = new CompletableFuture<>();
 
 		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextSupplierMock );
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextMock );
 		verifyAll();
 
 		resetAll();
-		expect( contextSupplierMock.get() ).andReturn( contextMock );
 		replayAll();
 		builder.init( previousFuture1 );
 		verifyAll();
@@ -269,7 +263,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		assertThat( sequence1Future ).isPending();
 
 		resetAll();
-		expect( contextSupplierMock.get() ).andReturn( contextMock );
 		replayAll();
 		builder.init( previousFuture2 );
 		verifyAll();
@@ -326,10 +319,9 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 		MyException exception = new MyException();
 
-		expect( contextSupplierMock.get() ).andReturn( contextMock );
 		expect( work0.execute( contextMock ) ).andReturn( (CompletableFuture) work0Future );
 		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextSupplierMock );
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextMock );
 		builder.init( previousFuture );
 		work0FutureFromSequenceBuilder = builder.addNonBulkExecution( work0 );
 		work1FutureFromSequenceBuilder = builder.addNonBulkExecution( work1 );
@@ -396,11 +388,10 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		MyException exception = new MyException();
 
 		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextSupplierMock );
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextMock );
 		verifyAll();
 
 		resetAll();
-		expect( contextSupplierMock.get() ).andReturn( contextMock );
 		replayAll();
 		builder.init( previousFuture );
 		verifyAll();
@@ -481,11 +472,10 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		MyException exception = new MyException();
 
 		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextSupplierMock );
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextMock );
 		verifyAll();
 
 		resetAll();
-		expect( contextSupplierMock.get() ).andReturn( contextMock );
 		replayAll();
 		builder.init( previousFuture );
 		verifyAll();
@@ -581,11 +571,10 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		MyRuntimeException exception = new MyRuntimeException();
 
 		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextSupplierMock );
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextMock );
 		verifyAll();
 
 		resetAll();
-		expect( contextSupplierMock.get() ).andReturn( contextMock );
 		replayAll();
 		builder.init( previousFuture );
 		verifyAll();
@@ -669,11 +658,10 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		MyRuntimeException exception2 = new MyRuntimeException();
 
 		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextSupplierMock );
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextMock );
 		verifyAll();
 
 		resetAll();
-		expect( contextSupplierMock.get() ).andReturn( contextMock );
 		replayAll();
 		builder.init( previousFuture );
 		verifyAll();
@@ -755,11 +743,10 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		MyRuntimeException exception = new MyRuntimeException();
 
 		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextSupplierMock );
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextMock );
 		verifyAll();
 
 		resetAll();
-		expect( contextSupplierMock.get() ).andReturn( contextMock );
 		replayAll();
 		builder.init( previousFuture );
 		verifyAll();
@@ -843,11 +830,10 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		MyRuntimeException exception2 = new MyRuntimeException();
 
 		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextSupplierMock );
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextMock );
 		verifyAll();
 
 		resetAll();
-		expect( contextSupplierMock.get() ).andReturn( contextMock );
 		replayAll();
 		builder.init( previousFuture );
 		verifyAll();
@@ -934,12 +920,11 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 		CompletableFuture<Object> work3FutureFromSequenceBuilder;
 
 		replayAll();
-		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextSupplierMock );
+		ElasticsearchWorkSequenceBuilder builder = new ElasticsearchDefaultWorkSequenceBuilder( contextMock );
 		verifyAll();
 
 		// Build and start the first sequence and simulate a long-running first work
 		resetAll();
-		expect( contextSupplierMock.get() ).andReturn( contextMock );
 		expect( work1.execute( contextMock ) ).andReturn( (CompletableFuture) work1Future );
 		replayAll();
 		builder.init( sequence1PreviousFuture );
@@ -954,7 +939,6 @@ public class ElasticsearchDefaultWorkSequenceBuilderTest extends EasyMockSupport
 
 		// Meanwhile, build and start the second sequence
 		resetAll();
-		expect( contextSupplierMock.get() ).andReturn( contextMock );
 		expect( work3.execute( contextMock ) ).andReturn( (CompletableFuture) work3Future );
 		replayAll();
 		builder.init( sequence2PreviousFuture );
