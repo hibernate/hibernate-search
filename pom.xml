@@ -233,7 +233,6 @@
         <version.org.slf4j>1.7.25</version.org.slf4j>
         <version.log4j>1.2.16</version.log4j>
         <version.junit>4.12</version.junit>
-        <version.org.hamcrest>4.12</version.org.hamcrest>
         <version.org.easymock>4.2</version.org.easymock>
         <version.org.unitils>3.4.6</version.org.unitils>
         <version.org.assertj.assertj-core>3.13.2</version.org.assertj.assertj-core>
