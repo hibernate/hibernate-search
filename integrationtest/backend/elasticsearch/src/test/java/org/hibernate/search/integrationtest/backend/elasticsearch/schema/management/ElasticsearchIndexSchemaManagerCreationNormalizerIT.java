@@ -78,7 +78,7 @@ public class ElasticsearchIndexSchemaManagerCreationNormalizerIT {
 					+ "'filter': {"
 							+ "'custom-elision': {"
 									+ "'type': 'elision',"
-									+ "'articles': ['l', 'd'],"
+									+ "'articles': ['l', 'd']"
 							+ "}"
 					+ "}"
 				+ "}",
