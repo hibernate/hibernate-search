@@ -7,9 +7,12 @@
 package org.hibernate.search.backend.lucene.types.sort.impl;
 
 import java.lang.invoke.MethodHandles;
+import org.apache.lucene.search.Query;
 
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
+import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneSearchSortBuilder;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.SortMode;
@@ -66,6 +69,23 @@ public abstract class AbstractLuceneDocumentValueSortBuilder
 			}
 		}
 		return multiValueMode;
+	}
+
+	protected Query getLuceneFilter() {
+		if ( filter == null ) {
+			return null;
+		}
+
+		Query luceneFilter = null;
+		if ( filter instanceof LuceneSearchPredicateBuilder ) {
+			LuceneSearchPredicateContext filterContext = new LuceneSearchPredicateContext( absoluteFieldPath );
+			luceneFilter = ((LuceneSearchPredicateBuilder) filter).build( filterContext );
+		}
+		else {
+			throw log.unableToCreateNestedSortFilter( absoluteFieldPath );
+		}
+
+		return luceneFilter;
 	}
 
 	protected final EventContext getEventContext() {

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.mapper.scope.spi.MappedIndexScope;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
@@ -25,20 +26,22 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortBuilderFactory;
 public final class SearchSortDslContextImpl<F extends SearchSortBuilderFactory<?, B>, B>
 		implements SearchSortDslContext<F, B> {
 
-	public static <F extends SearchSortBuilderFactory<?, B>, B> SearchSortDslContext<F, B> root(F factory) {
-		return new SearchSortDslContextImpl<>( factory, null, null );
+	public static <F extends SearchSortBuilderFactory<?, B>, B> SearchSortDslContext<F, B> root(F factory, SearchPredicateBuilderFactory predicateFactory) {
+		return new SearchSortDslContextImpl<>( factory, null, null, predicateFactory );
 	}
 
 	private final F factory;
+	private final SearchPredicateBuilderFactory predicateBuilderFactory;
 	private final SearchSortDslContextImpl<F, B> parent;
 	private final B builder;
 
 	private SearchSort sortResult;
 
-	private SearchSortDslContextImpl(F factory, SearchSortDslContextImpl<F, B> parent, B builder) {
+	private SearchSortDslContextImpl(F factory, SearchSortDslContextImpl<F, B> parent, B builder, SearchPredicateBuilderFactory predicateFactory) {
 		this.factory = factory;
 		this.parent = parent;
 		this.builder = builder;
+		this.predicateBuilderFactory = predicateFactory;
 	}
 
 	@Override
@@ -47,8 +50,13 @@ public final class SearchSortDslContextImpl<F extends SearchSortBuilderFactory<?
 	}
 
 	@Override
+	public SearchPredicateBuilderFactory getPredicateBuilderFactory() {
+		return predicateBuilderFactory;
+	}
+
+	@Override
 	public SearchSortDslContext<?, B> append(B builder) {
-		return new SearchSortDslContextImpl<>( factory, this, builder );
+		return new SearchSortDslContextImpl<>( factory, this, builder, predicateBuilderFactory );
 	}
 
 	@Override
