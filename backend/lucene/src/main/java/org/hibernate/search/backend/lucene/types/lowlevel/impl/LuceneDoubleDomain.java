@@ -9,8 +9,6 @@ package org.hibernate.search.backend.lucene.types.lowlevel.impl;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
-
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.NumericDoubleValues;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.util.common.data.Range;
@@ -19,17 +17,18 @@ import org.apache.lucene.document.DoublePoint;
 import org.apache.lucene.document.SortedNumericDocValuesField;
 import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
-import org.apache.lucene.facet.LongValueFacetCounts;
-import org.apache.lucene.facet.range.DoubleRangeFacetCounts;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
+import org.apache.lucene.search.DoubleValues;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.NumericUtils;
 
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValuesToSingleValuesSource;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
+import org.hibernate.search.backend.lucene.lowlevel.facet.impl.DoubleMultiValueRangeFacetCounts;
+import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueFacetCounts;
 
 public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	private static final LuceneNumericDomain<Double> INSTANCE = new LuceneDoubleDomain();
@@ -71,7 +70,7 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	@Override
 	public Query createRangeQuery(String absoluteFieldPath, Double lowerLimit, Double upperLimit) {
 		return DoublePoint.newRangeQuery(
-				absoluteFieldPath, lowerLimit, upperLimit
+			absoluteFieldPath, lowerLimit, upperLimit
 		);
 	}
 
@@ -88,33 +87,28 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	}
 
 	@Override
-	public LongValueFacetCounts createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-			NestedDocsProvider nestedDocsProvider) throws IOException {
-		// TODO HSEARCH-3856 aggregations on multi-valued fields - currently we just use the minimum value
-		DoubleMultiValuesToSingleValuesSource source = DoubleMultiValuesToSingleValuesSource.fromDoubleField(
-				absoluteFieldPath, MultiValueMode.MIN, nestedDocsProvider
-		);
-		return new LongValueFacetCounts(
-				absoluteFieldPath,
-				// We can't use DoubleValueSource.toLongValuesSource() here because it drops the decimals...
-				// So we use this to get raw bits, and then apply fromDocValue to get back the original value.
-				source.toRawValuesSource( NumericDoubleValues::getRawDoubleValues ),
-				facetsCollector
+	public Facets createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
+			MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
+		DoubleMultiValuesSource source = DoubleMultiValuesSource.fromDoubleField( absoluteFieldPath, multiValueMode, nestedDocsProvider );
+		return new LongMultiValueFacetCounts(
+			absoluteFieldPath,
+			// We can't use DoubleValueSource here because it drops the decimals...
+			// So we use this to get raw bits, and then apply fromDocValue to get back the original value.
+			// must be getLongValuesSource().
+			source.getLongValuesSource(),
+			facetsCollector
 		);
 	}
 
 	@Override
 	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 			Collection<? extends Range<? extends Double>> ranges,
-			NestedDocsProvider nestedDocsProvider) throws IOException {
-		// TODO HSEARCH-3856 aggregations on multi-valued fields - currently we just use the minimum value
-		DoubleMultiValuesToSingleValuesSource source = DoubleMultiValuesToSingleValuesSource.fromDoubleField(
-				absoluteFieldPath, MultiValueMode.MIN, nestedDocsProvider
-		);
-		return new DoubleRangeFacetCounts(
-				absoluteFieldPath,
-				source,
-				facetsCollector, FacetCountsUtils.createDoubleRanges( ranges )
+			MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
+		DoubleMultiValuesSource source = DoubleMultiValuesSource.fromDoubleField( absoluteFieldPath, multiValueMode, nestedDocsProvider );
+		return new DoubleMultiValueRangeFacetCounts(
+			absoluteFieldPath,
+			source,
+			facetsCollector, FacetCountsUtils.createDoubleRanges( ranges )
 		);
 	}
 
@@ -131,24 +125,23 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	@Override
 	public FieldComparator.NumericComparator<Double> createFieldComparator(String fieldName, int numHits,
 			MultiValueMode multiValueMode, Double missingValue, NestedDocsProvider nestedDocsProvider) {
-		DoubleMultiValuesToSingleValuesSource source = DoubleMultiValuesToSingleValuesSource
-				.fromDoubleField( fieldName, multiValueMode, nestedDocsProvider );
-
+		DoubleMultiValuesSource source = DoubleMultiValuesSource
+			.fromDoubleField( fieldName, multiValueMode, nestedDocsProvider );
 		return new DoubleFieldComparator( numHits, fieldName, missingValue, source );
 	}
 
 	public static class DoubleFieldComparator extends FieldComparator.DoubleComparator {
 
-		private final DoubleMultiValuesToSingleValuesSource source;
+		private final DoubleMultiValuesSource source;
 
-		public DoubleFieldComparator(int numHits, String field, Double missingValue, DoubleMultiValuesToSingleValuesSource source) {
+		public DoubleFieldComparator(int numHits, String field, Double missingValue, DoubleMultiValuesSource source) {
 			super( numHits, field, missingValue );
 			this.source = source;
 		}
 
 		@Override
 		protected NumericDocValues getNumericDocValues(LeafReaderContext context, String field) throws IOException {
-			return source.getValues( context, null ).getRawDoubleValues();
+			return source.getRawNumericDocValues( context, DoubleValues.withDefault( DoubleValues.EMPTY, missingValue ) );
 		}
 	}
 

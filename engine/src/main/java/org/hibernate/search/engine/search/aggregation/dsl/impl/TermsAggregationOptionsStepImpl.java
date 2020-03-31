@@ -7,18 +7,28 @@
 package org.hibernate.search.engine.search.aggregation.dsl.impl;
 
 import java.util.Map;
+import java.util.function.Function;
 
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationOptionsStep;
+import org.hibernate.search.engine.search.aggregation.dsl.spi.SearchAggregationDslContext;
+import org.hibernate.search.engine.search.common.MultiValue;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.impl.DefaultSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.util.common.impl.Contracts;
 
 class TermsAggregationOptionsStepImpl<F>
-		implements TermsAggregationOptionsStep<TermsAggregationOptionsStepImpl<F>, F, Map<F, Long>> {
+	implements TermsAggregationOptionsStep<TermsAggregationOptionsStepImpl<F>, F, Map<F, Long>> {
 	private final TermsAggregationBuilder<F> builder;
+	private final SearchAggregationDslContext<?> dslContext;
 
-	TermsAggregationOptionsStepImpl(TermsAggregationBuilder<F> builder) {
+	TermsAggregationOptionsStepImpl(TermsAggregationBuilder<F> builder, SearchAggregationDslContext<?> dslContext) {
 		this.builder = builder;
+		this.dslContext = dslContext;
 	}
 
 	@Override
@@ -57,6 +67,39 @@ class TermsAggregationOptionsStepImpl<F>
 		Contracts.assertStrictlyPositive( maxTermCount, "maxTermCount" );
 		builder.maxTermCount( maxTermCount );
 		return this;
+	}
+
+	@Override
+	public TermsAggregationOptionsStepImpl<F> mode(MultiValue mode) {
+		builder.mode( mode );
+		return this;
+	}
+
+	@Override
+	public TermsAggregationOptionsStepImpl<F> filter(
+		Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
+
+		SearchAggregationDslContext<?> ctx = dslContext;
+		SearchPredicateBuilderFactory predicateBuilderFactory = ctx.getPredicateBuilderFactory();
+		SearchPredicateFactory factory = new DefaultSearchPredicateFactory<>( predicateBuilderFactory );
+		SearchPredicate predicate = clauseContributor.apply( extendPredicateFactory( factory ) ).toPredicate();
+
+		filter( predicate );
+		return this;
+	}
+
+	@Override
+	public TermsAggregationOptionsStepImpl<F> filter(SearchPredicate searchPredicate) {
+		SearchAggregationDslContext<?> ctx = dslContext;
+		SearchPredicateBuilderFactory predicateBuilderFactory = ctx.getPredicateBuilderFactory();
+		searchPredicate = (SearchPredicate) predicateBuilderFactory.toImplementation( searchPredicate );
+
+		builder.filter( searchPredicate );
+		return this;
+	}
+
+	protected SearchPredicateFactory extendPredicateFactory(SearchPredicateFactory predicateFactory) {
+		return predicateFactory;
 	}
 
 	@Override

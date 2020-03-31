@@ -38,12 +38,20 @@ public class NestedDocsProvider {
 	private final Query childQuery;
 
 	public NestedDocsProvider(String nestedDocumentPath, Query originalParentQuery) {
-		this( Collections.singleton( nestedDocumentPath ), originalParentQuery );
+		this( Collections.singleton( nestedDocumentPath ), originalParentQuery, null );
+	}
+
+	public NestedDocsProvider(String nestedDocumentPath, Query originalParentQuery, Query nestedFilter) {
+		this( Collections.singleton( nestedDocumentPath ), originalParentQuery, nestedFilter );
 	}
 
 	public NestedDocsProvider(Set<String> nestedDocumentPaths, Query originalParentQuery) {
+		this( nestedDocumentPaths, originalParentQuery, null );
+	}
+
+	public NestedDocsProvider(Set<String> nestedDocumentPaths, Query originalParentQuery, Query nestedFilter) {
 		this.parentFiler = new QueryBitSetProducer( originalParentQuery );
-		this.childQuery = Queries.findChildQuery( nestedDocumentPaths, originalParentQuery );
+		this.childQuery = Queries.findChildQuery( nestedDocumentPaths, originalParentQuery, nestedFilter );
 	}
 
 	public BitSet parentDocs(LeafReaderContext context) throws IOException {

@@ -13,15 +13,23 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 public abstract class AbstractElasticsearchSearchSortBuilder implements SearchSortBuilder<ElasticsearchSearchSortBuilder>,
 		ElasticsearchSearchSortBuilder {
 
 	private static final JsonAccessor<JsonElement> ORDER_ACCESSOR = JsonAccessor.root().property( "order" );
+	private static final JsonAccessor<JsonElement> MODE_ACCESSOR = JsonAccessor.root().property( "mode" );
 	private static final JsonPrimitive ASC_KEYWORD_JSON = new JsonPrimitive( "asc" );
 	private static final JsonPrimitive DESC_KEYWORD_JSON = new JsonPrimitive( "desc" );
+	private static final JsonPrimitive SUM_KEYWORD_JSON = new JsonPrimitive( "sum" );
+	private static final JsonPrimitive AVG_KEYWORD_JSON = new JsonPrimitive( "avg" );
+	private static final JsonPrimitive MIN_KEYWORD_JSON = new JsonPrimitive( "min" );
+	private static final JsonPrimitive MAX_KEYWORD_JSON = new JsonPrimitive( "max" );
+	private static final JsonPrimitive MEDIAN_KEYWORD_JSON = new JsonPrimitive( "median" );
 
 	private SortOrder order;
+	protected SearchPredicate filter;
 
 	@Override
 	public ElasticsearchSearchSortBuilder toImplementation() {
@@ -34,8 +42,14 @@ public abstract class AbstractElasticsearchSearchSortBuilder implements SearchSo
 	}
 
 	@Override
+	public void filter(SearchPredicate filter) {
+		this.filter = filter;
+	}
+
+	@Override
 	public final void buildAndAddTo(ElasticsearchSearchSortCollector collector) {
 		JsonObject innerObject = new JsonObject();
+
 		if ( order != null ) {
 			switch ( order ) {
 				case ASC:
@@ -46,11 +60,11 @@ public abstract class AbstractElasticsearchSearchSortBuilder implements SearchSo
 					break;
 			}
 		}
-		enrichInnerObject( innerObject );
+		enrichInnerObject( collector, innerObject );
 		doBuildAndAddTo( collector, innerObject );
 	}
 
-	protected void enrichInnerObject(JsonObject innerObject) {
+	protected void enrichInnerObject(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
 	}
 
 	protected abstract void doBuildAndAddTo(ElasticsearchSearchSortCollector collector, JsonObject innerObject);

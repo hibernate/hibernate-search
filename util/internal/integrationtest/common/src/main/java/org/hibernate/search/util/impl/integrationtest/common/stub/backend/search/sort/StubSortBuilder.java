@@ -9,12 +9,13 @@ package org.hibernate.search.util.impl.integrationtest.common.stub.backend.searc
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 import org.hibernate.search.engine.search.sort.spi.ScoreSortBuilder;
 
 public class StubSortBuilder implements ScoreSortBuilder<StubSortBuilder>,
-		FieldSortBuilder<StubSortBuilder>, DistanceSortBuilder<StubSortBuilder> {
+	FieldSortBuilder<StubSortBuilder>, DistanceSortBuilder<StubSortBuilder> {
 
 	@Override
 	public StubSortBuilder toImplementation() {
@@ -47,6 +48,11 @@ public class StubSortBuilder implements ScoreSortBuilder<StubSortBuilder>,
 	}
 
 	void simulateBuild() {
+		// No-op, just simulates a call on this object
+	}
+
+	@Override
+	public void filter(SearchPredicate clauseBuilder) {
 		// No-op, just simulates a call on this object
 	}
 }

@@ -22,6 +22,9 @@ import org.hibernate.search.util.common.reporting.EventContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
+import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
 
 abstract class AbstractElasticsearchDocumentValueSortBuilder extends AbstractElasticsearchSearchSortBuilder {
 
@@ -30,6 +33,7 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder extends AbstractEla
 	// new API
 	private static final JsonAccessor<JsonElement> NESTED_ACCESSOR = JsonAccessor.root().property( "nested" );
 	private static final JsonAccessor<JsonElement> PATH_ACCESSOR = JsonAccessor.root().property( "path" );
+	private static final JsonAccessor<JsonElement> FILTER_ACCESSOR = JsonAccessor.root().property( "filter" );
 	// old API
 	private static final JsonAccessor<JsonElement> NESTED_PATH_ACCESSOR = JsonAccessor.root().property( "nested_path" );
 
@@ -47,7 +51,7 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder extends AbstractEla
 	private JsonPrimitive mode;
 
 	AbstractElasticsearchDocumentValueSortBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy,
-			ElasticsearchSearchSyntax searchSyntax) {
+		ElasticsearchSearchSyntax searchSyntax) {
 		this.absoluteFieldPath = absoluteFieldPath;
 		this.nestedPathHierarchy = nestedPathHierarchy;
 		this.searchSyntax = searchSyntax;
@@ -81,7 +85,7 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder extends AbstractEla
 	}
 
 	@Override
-	protected void enrichInnerObject(JsonObject innerObject) {
+	protected void enrichInnerObject(ElasticsearchSearchSortCollector collector, JsonObject innerObject) {
 		if ( !nestedPathHierarchy.isEmpty() ) {
 			if ( searchSyntax.useOldSortNestedApi() ) {
 				// the old api requires only the last path ( the deepest one )
@@ -90,11 +94,20 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder extends AbstractEla
 				NESTED_PATH_ACCESSOR.set( innerObject, new JsonPrimitive( lastNestedPath ) );
 			}
 			else {
+				JsonObject jsonFilter = null;
+				if ( filter instanceof ElasticsearchSearchPredicateBuilder ) {
+					ElasticsearchSearchPredicateContext filterContext = collector.getRootPredicateContext();
+					jsonFilter = ((ElasticsearchSearchPredicateBuilder) filter).build( filterContext );
+				}
+
 				JsonObject nextNestedObjectTarget = innerObject;
 				for ( String nestedPath : nestedPathHierarchy ) {
 					JsonObject nestedObject = new JsonObject();
 					PATH_ACCESSOR.set( nestedObject, new JsonPrimitive( nestedPath ) );
 					NESTED_ACCESSOR.set( nextNestedObjectTarget, nestedObject );
+					if ( jsonFilter != null ) {
+						FILTER_ACCESSOR.set( nestedObject, jsonFilter );
+					}
 
 					// the new api requires a recursion on the path hierarchy
 					nextNestedObjectTarget = nestedObject;

@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.sort.dsl.impl;
 
+import java.util.function.Function;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortMissingValueBehaviorStep;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
@@ -13,6 +14,11 @@ import org.hibernate.search.engine.search.sort.dsl.spi.AbstractSortThenStep;
 import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.common.SortMode;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.dsl.impl.DefaultSearchPredicateFactory;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
 class FieldSortOptionsStepImpl<B>
@@ -23,7 +29,7 @@ class FieldSortOptionsStepImpl<B>
 	private final FieldSortBuilder<B> builder;
 
 	FieldSortOptionsStepImpl(SearchSortDslContext<?, B> dslContext,
-			String absoluteFieldPath) {
+		String absoluteFieldPath) {
 		super( dslContext );
 		this.builder = dslContext.getBuilderFactory().field( absoluteFieldPath );
 	}
@@ -42,6 +48,29 @@ class FieldSortOptionsStepImpl<B>
 
 	@Override
 	public FieldSortMissingValueBehaviorStep<FieldSortOptionsStepImpl<B>> missing() {
+		return this;
+	}
+
+	@Override
+	public FieldSortOptionsStepImpl<B> filter(
+		Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
+
+		SearchSortDslContext<?, ? super B> ctx = getDslContext();
+		SearchPredicateBuilderFactory predicateBuilderFactory = ctx.getPredicateBuilderFactory();
+		SearchPredicateFactory factory = new DefaultSearchPredicateFactory<>( predicateBuilderFactory );
+		SearchPredicate predicate = clauseContributor.apply( extendPredicateFactory( factory ) ).toPredicate();
+
+		filter( predicate );
+		return this;
+	}
+
+	@Override
+	public FieldSortOptionsStepImpl<B> filter(SearchPredicate searchPredicate) {
+		SearchSortDslContext<?, ? super B> ctx = getDslContext();
+		SearchPredicateBuilderFactory predicateBuilderFactory = ctx.getPredicateBuilderFactory();
+		searchPredicate = (SearchPredicate) predicateBuilderFactory.toImplementation( searchPredicate );
+
+		builder.filter( searchPredicate );
 		return this;
 	}
 
@@ -66,6 +95,10 @@ class FieldSortOptionsStepImpl<B>
 	@Override
 	protected B toImplementation() {
 		return builder.toImplementation();
+	}
+
+	protected SearchPredicateFactory extendPredicateFactory(SearchPredicateFactory predicateFactory) {
+		return predicateFactory;
 	}
 
 }

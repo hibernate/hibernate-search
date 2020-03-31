@@ -15,6 +15,7 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.search.FieldComparator;
+import org.apache.lucene.search.Query;
 
 public class LuceneGeoPointDistanceComparatorSource extends LuceneFieldComparatorSource {
 
@@ -23,8 +24,8 @@ public class LuceneGeoPointDistanceComparatorSource extends LuceneFieldComparato
 	private final GeoPoint center;
 	private final MultiValueMode mode;
 
-	public LuceneGeoPointDistanceComparatorSource(String nestedDocumentPath, GeoPoint center, MultiValueMode mode) {
-		super( nestedDocumentPath );
+	public LuceneGeoPointDistanceComparatorSource(String nestedDocumentPath, GeoPoint center, MultiValueMode mode, Query filter) {
+		super( nestedDocumentPath, filter );
 		this.center = center;
 		this.mode = mode;
 	}

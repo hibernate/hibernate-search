@@ -6,13 +6,19 @@
  */
 package org.hibernate.search.backend.lucene.search.sort.impl;
 
+import org.hibernate.search.engine.search.common.SortMode;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.spi.SearchSortBuilder;
 
 public abstract class AbstractLuceneSearchSortBuilder implements SearchSortBuilder<LuceneSearchSortBuilder>,
-		LuceneSearchSortBuilder {
+	LuceneSearchSortBuilder {
 
 	protected SortOrder order;
+
+	protected SortMode multi;
+
+	protected SearchPredicate filter;
 
 	@Override
 	public LuceneSearchSortBuilder toImplementation() {
@@ -24,4 +30,12 @@ public abstract class AbstractLuceneSearchSortBuilder implements SearchSortBuild
 		this.order = order;
 	}
 
+	public void mode(SortMode multi) {
+		this.multi = multi;
+	}
+
+	@Override
+	public void filter(SearchPredicate filter) {
+		this.filter = filter;
+	}
 }
