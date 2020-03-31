@@ -13,11 +13,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.function.Consumer;
 
-import org.junit.Assert;
-
 import org.assertj.core.api.AbstractObjectAssert;
 import org.assertj.core.api.Assertions;
 import org.hamcrest.Matcher;
+import org.hamcrest.MatcherAssert;
 
 
 public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Future<T>> {
@@ -104,7 +103,7 @@ public class FutureAssert<T> extends AbstractObjectAssert<FutureAssert<T>, Futur
 	}
 
 	public FutureAssert<T> isFailed(Matcher<? super Throwable> exceptionMatcher) {
-		return isFailed( throwable -> Assert.assertThat( throwable, exceptionMatcher ) );
+		return isFailed( throwable -> MatcherAssert.assertThat( throwable, exceptionMatcher ) );
 	}
 
 	public FutureAssert<T> isFailed(Consumer<Throwable> exceptionAssertion) {
