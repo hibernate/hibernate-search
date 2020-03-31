@@ -6,7 +6,7 @@
  */
 package org.hibernate.search.util.common.impl;
 
-import static org.assertj.core.api.Java6Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import java.io.Closeable;
 import java.io.IOException;
