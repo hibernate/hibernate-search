@@ -594,13 +594,16 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 
 			@Override
 			public boolean advanceExact(int target) throws IOException {
+				boolean result = false;
 				if ( values.advanceExact( target ) ) {
 					value = values.doubleValue();
+					result = true;
 				}
 				else if ( scores != null && scores.advanceExact( target ) ) {
 					value = scores.doubleValue();
+					result = true;
 				}
-				return false;
+				return result;
 			}
 
 			@Override

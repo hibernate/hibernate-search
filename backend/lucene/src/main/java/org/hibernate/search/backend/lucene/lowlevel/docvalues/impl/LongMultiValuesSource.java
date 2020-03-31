@@ -520,40 +520,25 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 		return new LongMultiValues() {
 
 			private Long value;
-			private boolean singleton = false;
 
 			@Override
 			public boolean advanceExact(int target) throws IOException {
-				singleton = false;
-
+				boolean result = false;
 				if ( values.advanceExact( target ) ) {
 					value = values.longValue();
+					result = true;
 				}
 				else if ( scores != null && scores.advanceExact( target ) ) {
 					value = (long) scores.doubleValue();
-					singleton = true;
+					result = true;
 				}
-				return false;
+				return result;
 			}
 
 			@Override
 			public long longValue() throws IOException {
-				return nextValue();
-			}
-
-			@Override
-			public long nextValue() throws IOException {
-				if ( !singleton ) {
-					return values.nextValue();
-				}
 				return value;
 			}
-
-			@Override
-			public int docValueCount() {
-				return 1;
-			}
-
 		};
 	}
 
@@ -564,13 +549,16 @@ public abstract class LongMultiValuesSource extends LongValuesSource {
 
 			@Override
 			public boolean advanceExact(int target) throws IOException {
+				boolean result = false;
 				if ( values.advanceExact( target ) ) {
 					value = values.doubleValue();
+					result = true;
 				}
 				else if ( scores != null && scores.advanceExact( target ) ) {
 					value = scores.doubleValue();
+					result = true;
 				}
-				return false;
+				return result;
 			}
 
 			@Override
