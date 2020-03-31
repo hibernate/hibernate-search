@@ -78,11 +78,11 @@ public abstract class AbstractLuceneDocumentValueSortBuilder
 
 		Query luceneFilter = null;
 		if ( filter instanceof LuceneSearchPredicateBuilder ) {
-			LuceneSearchPredicateContext filterContext = new LuceneSearchPredicateContext( absoluteFieldPath );
+			LuceneSearchPredicateContext filterContext = new LuceneSearchPredicateContext( nestedDocumentPath );
 			luceneFilter = ((LuceneSearchPredicateBuilder) filter).build( filterContext );
 		}
 		else {
-			throw log.unableToCreateNestedSortFilter( absoluteFieldPath );
+			throw log.unableToCreateNestedSortFilter( nestedDocumentPath );
 		}
 
 		return luceneFilter;

@@ -43,9 +43,6 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	private final String nestedDocumentPath;
-	private final String absoluteFieldPath;
-
 	private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
 	private final List<Range<K>> rangesInOrder;
@@ -53,11 +50,9 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 
 	private LuceneNumericRangeAggregation(Builder<F, E, K> builder) {
 		super( builder );
-		this.absoluteFieldPath = builder.absoluteFieldPath;
 		this.codec = builder.codec;
 		this.rangesInOrder = builder.rangesInOrder;
 		this.encodedRangesInOrder = builder.encodedRangesInOrder;
-		this.nestedDocumentPath = builder.nestedDocumentPath;
 	}
 
 	@Override
@@ -95,8 +90,6 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 			extends AbstractLuceneBucketAggregation.AbstractBuilder<Range<K>, Long>
 			implements RangeAggregationBuilder<K> {
 
-		private final String nestedDocumentPath;
-
 		private final DslConverter<?, ? extends F> toFieldValueConverter;
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
 
@@ -106,8 +99,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		public Builder(LuceneSearchContext searchContext, String nestedDocumentPath, String absoluteFieldPath,
 				DslConverter<?, ? extends F> toFieldValueConverter,
 				AbstractLuceneNumericFieldCodec<F, E> codec) {
-			super( searchContext, absoluteFieldPath );
-			this.nestedDocumentPath = nestedDocumentPath;
+			super( searchContext, absoluteFieldPath, nestedDocumentPath );
 			this.toFieldValueConverter = toFieldValueConverter;
 			this.codec = codec;
 		}
