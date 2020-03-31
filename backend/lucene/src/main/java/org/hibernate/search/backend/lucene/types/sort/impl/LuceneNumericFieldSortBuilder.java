@@ -33,8 +33,9 @@ public class LuceneNumericFieldSortBuilder<F, E extends Number>
 
 	@Override
 	public void buildAndContribute(LuceneSearchSortCollector collector) {
+
 		LuceneNumericFieldComparatorSource<E> fieldComparatorSource = new LuceneNumericFieldComparatorSource<>(
-				nestedDocumentPath, codec.getDomain(), (E) getEffectiveMissingValue( missingValue, order ), getMultiValueMode() );
+				nestedDocumentPath, codec.getDomain(), (E) getEffectiveMissingValue( missingValue, order ), getMultiValueMode(), getLuceneFilter() );
 		SortField sortField = new SortField( absoluteFieldPath, fieldComparatorSource, order == SortOrder.DESC );
 
 		collector.collectSortField( sortField, (nestedDocumentPath != null) ? fieldComparatorSource : null );

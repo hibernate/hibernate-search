@@ -643,4 +643,7 @@ public interface Log extends BasicLogger {
 	SearchException uncommittedOperationsBecauseOfFailure(String causeMessage,
 			@Param EventContext context, @Cause Throwable cause);
 
+	@Message(id = ID_OFFSET_2 + 119,
+			value = "Unable to create nested sort filter for name '%1$s'.")
+	SearchException unableToCreateNestedSortFilter(String name);
 }

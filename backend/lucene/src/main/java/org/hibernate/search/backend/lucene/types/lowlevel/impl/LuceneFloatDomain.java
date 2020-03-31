@@ -24,6 +24,7 @@ import org.apache.lucene.facet.range.DoubleRangeFacetCounts;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
+import org.apache.lucene.search.DoubleValues;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.NumericUtils;
@@ -144,7 +145,7 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 
 		@Override
 		protected NumericDocValues getNumericDocValues(LeafReaderContext context, String field) throws IOException {
-			return source.getValues( context, null ).getRawFloatValues();
+			return source.getValues( context, DoubleValues.withDefault( DoubleValues.EMPTY, missingValue ) ).getRawFloatValues();
 		}
 	}
 

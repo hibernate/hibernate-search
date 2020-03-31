@@ -75,20 +75,27 @@ public class Queries {
 		return queryBuilder.build();
 	}
 
-	public static BooleanQuery findChildQuery(Set<String> nestedDocumentPaths, Query originalParentQuery) {
+	public static BooleanQuery findChildQuery(Set<String> nestedDocumentPaths, Query originalParentQuery, Query nestedFilter) {
 		QueryBitSetProducer parentsFilter = new QueryBitSetProducer( mainDocumentQuery() );
-		return findChildQuery( nestedDocumentPaths, originalParentQuery, parentsFilter );
+		return findChildQuery( nestedDocumentPaths, originalParentQuery, parentsFilter, nestedFilter );
 	}
 
 	public static BooleanQuery findChildQuery(Set<String> nestedDocumentPaths, Query originalParentQuery,
-			QueryBitSetProducer parentsFilter) {
+		QueryBitSetProducer parentsFilter, Query nestedFilter) {
 		ToChildBlockJoinQuery parentQuery = new ToChildBlockJoinQuery( originalParentQuery, parentsFilter );
 
-		return new BooleanQuery.Builder()
-				.add( parentQuery, Occur.MUST )
+		BooleanQuery.Builder builder = new BooleanQuery.Builder();
+
+		builder.add( parentQuery, Occur.MUST )
 				.add( createNestedDocumentPathSubQuery( nestedDocumentPaths ), Occur.FILTER )
-				.add( childDocumentQuery(), Occur.FILTER )
-				.build();
+				.add( childDocumentQuery(), Occur.FILTER );
+
+		if ( nestedFilter != null ) {
+			builder.add( nestedFilter, Occur.FILTER );
+		}
+
+		return builder.build();
+
 	}
 
 	private static BooleanQuery createNestedDocumentPathSubQuery(Set<String> nestedDocumentPaths) {
