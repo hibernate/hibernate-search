@@ -230,7 +230,7 @@
         <!-- Test dependencies -->
 
         <!-- >>> Common -->
-        <version.org.slf4j>1.7.25</version.org.slf4j>
+        <version.org.slf4j>1.7.30</version.org.slf4j>
         <version.log4j>1.2.16</version.log4j>
         <version.junit>4.13</version.junit>
         <version.org.easymock>4.2</version.org.easymock>
