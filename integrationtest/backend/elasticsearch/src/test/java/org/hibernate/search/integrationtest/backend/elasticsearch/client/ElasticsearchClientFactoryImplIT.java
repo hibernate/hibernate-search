@@ -401,7 +401,16 @@ public class ElasticsearchClientFactoryImplIT {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-2469")
-	public void multipleHosts_failover_fault() throws Exception {
+	public void multipleHosts_failover_fault() {
+		SubTest.expectSuccessAfterRetry(
+				// This test is flaky, for some reason once in a while wiremock takes a very long time to answer
+				// even though no delay was configured.
+				// The exact reason is unknown though, so just try multiple times...
+				this::try_multipleHosts_failover_timeout
+		);
+	}
+
+	public void try_multipleHosts_failover_fault() throws Exception {
 		String payload = "{ \"foo\": \"bar\" }";
 		wireMockRule1.stubFor( post( urlPathMatching( "/myIndex/myType" ) )
 				.withRequestBody( equalToJson( payload ) )
