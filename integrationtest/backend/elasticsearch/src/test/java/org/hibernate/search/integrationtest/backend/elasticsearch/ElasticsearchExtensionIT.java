@@ -920,7 +920,7 @@ public class ElasticsearchExtensionIT {
 		JsonObject aggregationResult = query.fetchAll().getAggregation( documentCountPerValue );
 		assertJsonEquals(
 				"{"
-						+ "'value': 3,"
+						+ "'value': 3"
 						+ "}",
 				aggregationResult.toString()
 		);
@@ -947,7 +947,7 @@ public class ElasticsearchExtensionIT {
 		JsonObject aggregationResult = query.fetchAll().getAggregation( documentCountPerValue );
 		assertJsonEquals(
 				"{"
-						+ "'value': 3,"
+						+ "'value': 3"
 						+ "}",
 				aggregationResult.toString()
 		);
