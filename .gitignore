@@ -33,6 +33,7 @@ atlassian-ide-plugin.xml
 .nbattrs
 nb-configuration.xml
 licenseheader.txt
+nbactions.xml
 
 # Sublime
 *.sublime-*

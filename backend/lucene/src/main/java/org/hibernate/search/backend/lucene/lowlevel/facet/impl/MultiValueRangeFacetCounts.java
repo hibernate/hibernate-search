@@ -15,6 +15,11 @@ import org.apache.lucene.facet.LabelAndValue;
 import org.apache.lucene.facet.range.Range;
 import org.apache.lucene.search.Query;
 
+/**
+ * <p>
+ * Copied with some changes from
+ * of <a href="https://lucene.apache.org/">Apache Lucene project</a>.
+ */
 public class MultiValueRangeFacetCounts extends Facets {
 
 	protected final Range[] ranges;

@@ -22,6 +22,11 @@ import org.apache.lucene.util.PriorityQueue;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValues;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesSource;
 
+/**
+ * <p>
+ * Copied with some changes from
+ * of <a href="https://lucene.apache.org/">Apache Lucene project</a>.
+ */
 public class LongMultiValueFacetCounts extends Facets {
 
 	private final int[] counts = new int[1024];

@@ -13,15 +13,27 @@ import java.util.List;
 import java.util.Map;
 import org.apache.lucene.facet.range.LongRange;
 
+/**
+ * <p>
+ * Copied with some changes from
+ * of <a href="https://lucene.apache.org/">Apache Lucene project</a>.
+ */
 class LongMultiValueRangeCounter {
 
 	final LongRangeNode root;
 	final long[] boundaries;
 	final int[] leafCounts;
+
+	// Used during rollup
 	private int leafUpto;
 	private int missingCount;
 
 	public LongMultiValueRangeCounter(LongRange[] ranges) {
+		// Maps all range inclusive endpoints to int flags; 1
+		// = start of interval, 2 = end of interval.  We need to
+		// track the start vs end case separately because if a
+		// given point is both, then it must be its own
+		// elementary interval:
 		Map<Long, Integer> endsMap = new HashMap<>();
 
 		endsMap.put( Long.MIN_VALUE, 1 );
@@ -47,6 +59,7 @@ class LongMultiValueRangeCounter {
 		List<Long> endsList = new ArrayList<>( endsMap.keySet() );
 		Collections.sort( endsList );
 
+		// Build elementaryIntervals (a 1D Venn diagram):
 		List<InclusiveRange> elementaryIntervals = new ArrayList<>();
 		int upto0 = 1;
 		long v = endsList.get( 0 );
@@ -62,26 +75,32 @@ class LongMultiValueRangeCounter {
 		while ( upto0 < endsList.size() ) {
 			v = endsList.get( upto0 );
 			int flags = endsMap.get( v );
-			switch ( flags ) {
-				case 3:
-					if ( v > prev ) {
-						elementaryIntervals.add( new InclusiveRange( prev, v - 1 ) );
-					}
-					elementaryIntervals.add( new InclusiveRange( v, v ) );
-					prev = v + 1;
-					break;
-				case 1:
-					if ( v > prev ) {
-						elementaryIntervals.add( new InclusiveRange( prev, v - 1 ) );
-					}
-					prev = v;
-					break;
-				default:
-					assert flags == 2;
-					elementaryIntervals.add( new InclusiveRange( prev, v ) );
-					prev = v + 1;
-					break;
+			//System.out.println("  v=" + v + " flags=" + flags);
+			if ( flags == 3 ) {
+				// This point is both an end and a start; we need to
+				// separate it:
+				if ( v > prev ) {
+					elementaryIntervals.add( new InclusiveRange( prev, v - 1 ) );
+				}
+				elementaryIntervals.add( new InclusiveRange( v, v ) );
+				prev = v + 1;
 			}
+			else if ( flags == 1 ) {
+				// This point is only the start of an interval;
+				// attach it to next interval:
+				if ( v > prev ) {
+					elementaryIntervals.add( new InclusiveRange( prev, v - 1 ) );
+				}
+				prev = v;
+			}
+			else {
+				assert flags == 2;
+				// This point is only the end of an interval; attach
+				// it to last interval:
+				elementaryIntervals.add( new InclusiveRange( prev, v ) );
+				prev = v + 1;
+			}
+			//System.out.println("    ints=" + elementaryIntervals);
 			upto0++;
 		}
 
@@ -101,9 +120,29 @@ class LongMultiValueRangeCounter {
 		}
 
 		leafCounts = new int[boundaries.length];
+
+		//System.out.println("ranges: " + Arrays.toString(ranges));
+		//System.out.println("intervals: " + elementaryIntervals);
+		//System.out.println("boundaries: " + Arrays.toString(boundaries));
+		//System.out.println("root:\n" + root);
 	}
 
 	public void add(long v) {
+		//System.out.println("add v=" + v);
+
+		// NOTE: this works too, but it's ~6% slower on a simple
+		// test with a high-freq TermQuery w/ range faceting on
+		// wikimediumall:
+		/*
+    int index = Arrays.binarySearch(boundaries, v);
+    if (index < 0) {
+      index = -index-1;
+    }
+    leafCounts[index]++;
+		 */
+		// Binary search to find matched elementary range; we
+		// are guaranteed to find a match because the last
+		// boundary is Long.MAX_VALUE:
 		int lo = 0;
 		int hi = boundaries.length - 1;
 		while ( true ) {
@@ -129,6 +168,9 @@ class LongMultiValueRangeCounter {
 		}
 	}
 
+	/** Fills counts corresponding to the original input
+	 * ranges, returning the missing count (how many hits
+	 * didn't match any ranges). */
 	public int fillCounts(int[] counts) {
 		//System.out.println("  rollup");
 		missingCount = 0;
@@ -193,6 +235,7 @@ class LongMultiValueRangeCounter {
 		}
 	}
 
+	/** Holds one node of the segment tree. */
 	public static final class LongRangeNode {
 		final LongRangeNode left;
 		final LongRangeNode right;
@@ -201,6 +244,8 @@ class LongMultiValueRangeCounter {
 		final long start;
 		final long end;
 
+		// If we are a leaf, the index into elementary ranges that
+		// we point to:
 		final int leafIndex;
 
 		// Which range indices to output when a query goes
@@ -228,8 +273,11 @@ class LongMultiValueRangeCounter {
 			}
 		}
 
+		/** Recursively assigns range outputs to each node. */
 		void addOutputs(int index, LongRange range) {
 			if ( start >= range.min && end <= range.max ) {
+				// Our range is fully included in the incoming
+				// range; add to our output list:
 				if ( outputs == null ) {
 					outputs = new ArrayList<>();
 				}
@@ -237,6 +285,7 @@ class LongMultiValueRangeCounter {
 			}
 			else if ( left != null ) {
 				assert right != null;
+				// Recurse:
 				left.addOutputs( index, range );
 				right.addOutputs( index, range );
 			}

@@ -23,6 +23,11 @@ import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValu
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 
+/**
+ * <p>
+ * Copied with some changes from
+ * of <a href="https://lucene.apache.org/">Apache Lucene project</a>.
+ */
 public class LongMultiValueRangeFacetCounts extends MultiValueRangeFacetCounts {
 
 	public LongMultiValueRangeFacetCounts(String field, MultiValueMode mode, NestedDocsProvider nested, FacetsCollector hits, LongRange... ranges) throws IOException {
@@ -48,7 +53,6 @@ public class LongMultiValueRangeFacetCounts extends MultiValueRangeFacetCounts {
 		for ( FacetsCollector.MatchingDocs hits : matchingDocs ) {
 			LongMultiValues fv = valueSource.getValues( hits.context, null );
 
-			totCount += hits.totalHits;
 			final DocIdSetIterator fastMatchDocs;
 			if ( fastMatchQuery != null ) {
 				final IndexReaderContext topLevelContext = ReaderUtil.getTopLevelContext( hits.context );
@@ -81,6 +85,7 @@ public class LongMultiValueRangeFacetCounts extends MultiValueRangeFacetCounts {
 
 				if ( fv.advanceExact( doc ) ) {
 					int count = fv.docValueCount();
+					totCount += count;
 					for ( int index = 0; index < count; ++index ) {
 						counter.add( fv.nextValue() );
 					}

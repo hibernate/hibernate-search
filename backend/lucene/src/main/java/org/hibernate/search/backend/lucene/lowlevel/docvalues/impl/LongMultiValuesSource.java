@@ -28,6 +28,11 @@ import org.apache.lucene.search.LongValuesSource;
 import org.apache.lucene.util.BitSet;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 
+/**
+ * <p>
+ * Copied with some changes from
+ * of <a href="https://lucene.apache.org/">Apache Lucene project</a>.
+ */
 public abstract class LongMultiValuesSource extends LongValuesSource {
 
 	/**

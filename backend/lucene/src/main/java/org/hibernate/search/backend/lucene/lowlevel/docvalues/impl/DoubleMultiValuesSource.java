@@ -26,8 +26,14 @@ import org.apache.lucene.search.Explanation;
 import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.LongValuesSource;
 import org.apache.lucene.util.BitSet;
+import org.apache.lucene.util.NumericUtils;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 
+/**
+ * <p>
+ * Copied with some changes from
+ * of <a href="https://lucene.apache.org/">Apache Lucene project</a>.
+ */
 public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 
 	protected final String field;
@@ -88,7 +94,7 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 	 */
 	public static DoubleMultiValuesSource fromDoubleField(String field, MultiValueMode mode, NestedDocsProvider nested) {
 		return fromField( field, mode, nested,
-			Double::longBitsToDouble, Double::doubleToRawLongBits );
+			NumericUtils::sortableLongToDouble, NumericUtils::doubleToSortableLong );
 	}
 
 	/**
@@ -112,7 +118,7 @@ public abstract class DoubleMultiValuesSource extends DoubleValuesSource {
 	 */
 	public static DoubleMultiValuesSource fromFloatField(String field, MultiValueMode mode, NestedDocsProvider nested) {
 		return fromField( field, mode, nested,
-			(v) -> (double) Float.intBitsToFloat( (int) v ), (v) -> (long) Float.floatToRawIntBits( (float) v ) );
+			(v) -> (double) NumericUtils.sortableIntToFloat( (int) v ), (v) -> (long) NumericUtils.floatToSortableInt( (float) v ) );
 	}
 
 	/**
