@@ -1,6 +1,54 @@
 Hibernate Search Changelog
 ==========================
 
+6.0.0.Beta6 (31-03-2020)
+-------------------------
+
+** Bug
+    * HSEARCH-3874 @IdClass, even not @Indexed, leads to NPE on bootstrap
+    * HSEARCH-3869 java.lang.IndexOutOfBoundsException when an Elasticsearch bulk work fails
+    * HSEARCH-3861 Elasticsearch search queries fetch the whole document source by default
+    * HSEARCH-3859 .desc().missing().last() / .asc().missing().first() places documents around 0 instead of last/first
+    * HSEARCH-3857 ConcurrentModificationException in very specific scenarios when indexing multiple entities with addOrUpdate which contains @IndexEmbedded dependencies
+    * HSEARCH-3852 Failure to index reports the wrong document ID with Elasticsearch discriminator multi-tenancy
+    * HSEARCH-3851 Entities whose indexing failed are not reported when even just one document ID cannot be converted
+    * HSEARCH-3848 Dynamic entities are ignored when creating a scope targeting Object.class
+    * HSEARCH-3845 Prefix query in SimpleQueryString predicate is case sensitive
+    * HSEARCH-3844 NullPointerException when using simpleQueryString() on non-analyzed, non-normalized fields
+    * HSEARCH-2859 Current implementation of SpatialBridge prevents multi-valued locations
+
+** Improvement
+    * HSEARCH-3873 Upgrade to Hibernate ORM 5.4.13.Final
+    * HSEARCH-3872 Simplify and improve ordering and parallelism of Elasticsearch indexing
+    * HSEARCH-3871 Always enable delayed commits in the Lucene backend
+    * HSEARCH-3870 Upgrade to Elasticsearch 7.6.1
+    * HSEARCH-3867 Upgrade to Lucene 8.5.0
+    * HSEARCH-3850 Expose a tool to build property keys
+    * HSEARCH-3849 Create-or-validate schema management by default
+    * HSEARCH-3796 @IndexedEmbedded should be repeatable
+    * HSEARCH-3752 Implicit nested predicates
+    * HSEARCH-3719 Support a "degraded mode" where failure to contact Elasticsearch or index documents does not affect the whole application
+    * HSEARCH-3575 Add configuration options for the size and number of indexing queues, and the max size of Elasticsearch bulks
+
+** New Feature
+    * HSEARCH-3847 Customize enabled syntax elements in simple query strings
+    * HSEARCH-3841 Offline startup of the Elasticsearch backend
+    * HSEARCH-3759 Initialization options and APIs
+    * HSEARCH-3751 dropAndCreateSchema() as an alternative to purge() in the MassIndexer
+    * HSEARCH-3103 Sorts on multi-valued fields
+
+** Task
+    * HSEARCH-3876 Fix random failures in ElasticsearchClientFactoryImplIT
+    * HSEARCH-3868 Fix SearchQueryResultLoadingOrTransformingIT failures caused by incorrectly expecting ordered hits
+    * HSEARCH-3866 Stop testing against JDK13 in the CI build
+    * HSEARCH-3865 Clean up any change to the permission of index files during tests
+    * HSEARCH-3860 Refactor FieldSearchSortIT to enable testing more complex cases
+    * HSEARCH-3858 upgrade maven-checkstyle-plugin to 3.1.1
+    * HSEARCH-3854 Remove the unnecessary generic type parameter for DocumentElement
+    * HSEARCH-3843 Test Hibernate Search with JDK15 regularly
+    * HSEARCH-3822 Restore support for concurrent Lucene work execution - at least during mass indexing
+    * HSEARCH-3814 Mark experimental APIs/SPIs with an @Incubating annotation
+
 6.0.0.Beta5 (21-02-2020)
 -------------------------
 
