@@ -9,8 +9,10 @@ package org.hibernate.search.backend.lucene.lowlevel.docvalues.impl;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.OptionalDouble;
 import java.util.function.DoubleToLongFunction;
 import java.util.function.Function;
 
@@ -172,8 +174,12 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 				@Override
 				public boolean advanceExact(int doc) throws IOException {
 					if ( values.advanceExact( doc ) ) {
-						value = mode.pick( values );
-						return true;
+						OptionalDouble pick = mode.pick( values );
+						if ( pick.isPresent() ) {
+							value = pick.getAsDouble();
+							return true;
+						}
+
 					}
 					return false;
 				}
@@ -192,11 +198,17 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 		return new NumericDoubleValues() {
 
 			int lastSeenParentDoc = -1;
-			double lastEmittedValue = -1;
+			private Iterator<Double> value;
+			private List<Double> all;
 
 			@Override
 			public double doubleValue() {
-				return lastEmittedValue;
+				return value != null ? value.next() : -1;
+			}
+
+			@Override
+			public int docValueCount() {
+				return all != null ? all.size() : -1;
 			}
 
 			@Override
@@ -213,8 +225,22 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 				}
 
 				lastSeenParentDoc = parentDoc;
-				lastEmittedValue = mode.pick( values, childDocs, nextChildWithValue, parentDoc );
-				return true;
+
+				if ( mode == null || mode == MultiValueMode.NONE ) {
+					all = list( values, childDocs, nextChildWithValue, parentDoc );
+				}
+				else {
+					OptionalDouble pick = mode.pick( values, childDocs, nextChildWithValue, parentDoc );
+					if ( pick.isPresent() ) {
+						all = Collections.singletonList( pick.getAsDouble() );
+					}
+				}
+
+				if ( all != null && !all.isEmpty() ) {
+					value = all.iterator();
+					return true;
+				}
+				return false;
 			}
 
 		};

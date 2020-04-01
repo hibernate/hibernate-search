@@ -12,6 +12,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.OptionalLong;
 import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.index.NumericDocValues;
@@ -167,8 +168,11 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 				@Override
 				public boolean advanceExact(int doc) throws IOException {
 					if ( values.advanceExact( doc ) ) {
-						value = mode.pick( values );
-						return true;
+						OptionalLong pick = mode.pick( values );
+						if ( pick.isPresent() ) {
+							value = pick.getAsLong();
+							return true;
+						}
 					}
 					return false;
 				}
@@ -218,7 +222,10 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 					all = list( values, childDocs, nextChildWithValue, parentDoc );
 				}
 				else {
-					all = Collections.singletonList( mode.pick( values, childDocs, nextChildWithValue, parentDoc ) );
+					OptionalLong pick = mode.pick( values, childDocs, nextChildWithValue, parentDoc );
+					if ( pick.isPresent() ) {
+						all = Collections.singletonList( pick.getAsLong() );
+					}
 				}
 
 				if ( all != null && !all.isEmpty() ) {

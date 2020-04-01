@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.lowlevel.docvalues.impl;
 
 import java.io.IOException;
 import java.util.Objects;
+import java.util.OptionalLong;
 
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.JoinFirstChildIdIterator;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
@@ -61,7 +62,7 @@ public abstract class TextMultiValuesToSingleValuesSource {
 		}
 		TextMultiValuesToSingleValuesSource that = (TextMultiValuesToSingleValuesSource) o;
 		return Objects.equals( mode, that.mode )
-				&& Objects.equals( nestedDocsProvider, that.nestedDocsProvider );
+			&& Objects.equals( nestedDocsProvider, that.nestedDocsProvider );
 	}
 
 	@Override
@@ -106,8 +107,11 @@ public abstract class TextMultiValuesToSingleValuesSource {
 				@Override
 				public boolean advanceExact(int doc) throws IOException {
 					if ( values.advanceExact( doc ) ) {
-						lastEmittedOrd = (int) mode.pick( values );
-						docID = doc;
+						OptionalLong pick = mode.pick( values );
+						if ( pick.isPresent() ) {
+							lastEmittedOrd = (int) pick.getAsLong();
+							docID = doc;
+						}
 						return true;
 					}
 					return false;
@@ -117,7 +121,7 @@ public abstract class TextMultiValuesToSingleValuesSource {
 	}
 
 	protected SortedDocValues select(final SortedSetDocValues values, final BitSet parentDocs,
-			final DocIdSetIterator childDocs) {
+		final DocIdSetIterator childDocs) {
 		if ( parentDocs == null || childDocs == null ) {
 			return DocValues.emptySorted();
 		}
@@ -153,8 +157,13 @@ public abstract class TextMultiValuesToSingleValuesSource {
 				}
 
 				docID = lastSeenParentDoc = parentDoc;
-				lastEmittedOrd = (int) mode.pick( values, childDocs, nextChildWithValue, parentDoc );
-				return true;
+				OptionalLong pick = mode.pick( values, childDocs, nextChildWithValue, parentDoc );
+				if ( pick.isPresent() ) {
+					lastEmittedOrd = (int) pick.getAsLong();
+					return true;
+				}
+
+				return false;
 			}
 		};
 	}
