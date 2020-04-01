@@ -256,7 +256,7 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 				boolean result = false;
 				if ( values.advanceExact( target ) ) {
 					value = values.longValue();
-					value = values.docValueCount();
+					count = values.docValueCount();
 					result = true;
 				}
 				else if ( scores != null && scores.advanceExact( target ) ) {

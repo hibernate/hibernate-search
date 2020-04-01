@@ -32,7 +32,7 @@ public abstract class NumericLongValues extends LongValues {
 	 * @return numeric
 	 */
 	public NumericDocValues getRawLongValues() {
-		return new RawNumericDocValues();
+		return new RawNumericDocValues( this );
 	}
 
 	/**
@@ -72,21 +72,23 @@ public abstract class NumericLongValues extends LongValues {
 		return getRawLongValues();
 	}
 
-	private class RawNumericDocValues extends NumericDocValues {
+	private static class RawNumericDocValues extends NumericDocValues {
 		private int docID = -1;
+		private final NumericLongValues in;
 
-		public RawNumericDocValues() {
+		public RawNumericDocValues(NumericLongValues in) {
+			this.in = in;
 		}
 
 		@Override
 		public boolean advanceExact(int target) throws IOException {
 			docID = target;
-			return NumericLongValues.this.advanceExact( target );
+			return in.advanceExact( target );
 		}
 
 		@Override
 		public long longValue() throws IOException {
-			return NumericLongValues.this.longValue();
+			return in.longValue();
 		}
 
 		@Override
