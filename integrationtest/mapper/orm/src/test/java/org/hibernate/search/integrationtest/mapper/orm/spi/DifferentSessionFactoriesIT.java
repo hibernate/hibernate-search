@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.mapper.orm.spi;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import javax.persistence.Entity;
 import javax.persistence.EntityManager;
 import javax.persistence.Id;
@@ -24,7 +26,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * Tests the creation of a {@link HibernateOrmSearchSession}
@@ -39,9 +40,6 @@ public class DifferentSessionFactoriesIT {
 	@Rule
 	public OrmSetupHelper ormSetupHelper = OrmSetupHelper.withBackendMock( backendMock );
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
 	private SessionFactory sessionFactory;
 	private SessionFactory sessionFactoryAlt;
 
@@ -53,18 +51,19 @@ public class DifferentSessionFactoriesIT {
 
 	@Test
 	public void tryToUseDifferentSessionFactories() {
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Mapping service cannot create a SearchSession using a different session factory." );
-
 		// mapping is taken from the alternative session factory
 		HibernateSearchContextProviderService contextProvider =
 				sessionFactoryAlt.unwrap( SessionFactoryImplementor.class )
 						.getServiceRegistry().getService( HibernateSearchContextProviderService.class );
 
 		// try to use an entityManager owned by the original session factory instead
-		OrmUtils.withinSession( sessionFactory, session -> {
+		assertThatThrownBy( () -> OrmUtils.withinSession( sessionFactory, session -> {
 			HibernateOrmSearchSession.get( contextProvider.get(), (SessionImplementor) session );
-		} );
+		} ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContaining(
+						"Mapping service cannot create a SearchSession using a different session factory."
+				);
 	}
 
 	private SessionFactory initABasicSessionFactory() {

@@ -12,14 +12,9 @@ import java.util.Arrays;
 
 import org.hibernate.search.util.impl.test.SubTest;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class GeoPolygonTest {
-
-	@Rule
-	public final ExpectedException thrown = ExpectedException.none();
 
 	@Test
 	public void validPolygon() {

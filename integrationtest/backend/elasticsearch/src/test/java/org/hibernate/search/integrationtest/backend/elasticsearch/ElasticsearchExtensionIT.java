@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.elasticsearch;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.ElasticsearchIndexMetadataTestUtils.defaultPrimaryName;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
@@ -52,7 +53,6 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonElement;
@@ -83,9 +83,6 @@ public class ElasticsearchExtensionIT {
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	private SearchIntegration integration;
 
@@ -964,11 +961,12 @@ public class ElasticsearchExtensionIT {
 	public void backend_unwrap_error_unknownType() {
 		Backend backend = integration.getBackend( BACKEND_NAME );
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Attempt to unwrap an Elasticsearch backend to '" + String.class.getName() + "'" );
-		thrown.expectMessage( "this backend can only be unwrapped to '" + ElasticsearchBackend.class.getName() + "'" );
-
-		backend.unwrap( String.class );
+		assertThatThrownBy( () -> backend.unwrap( String.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Attempt to unwrap an Elasticsearch backend to '" + String.class.getName() + "'",
+						"this backend can only be unwrapped to '" + ElasticsearchBackend.class.getName() + "'"
+				);
 	}
 
 	@Test
@@ -987,12 +985,13 @@ public class ElasticsearchExtensionIT {
 		Backend backend = integration.getBackend( BACKEND_NAME );
 		ElasticsearchBackend elasticsearchBackend = backend.unwrap( ElasticsearchBackend.class );
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( HttpAsyncClient.class.getName() );
-		thrown.expectMessage( "the client can only be unwrapped to" );
-		thrown.expectMessage( RestClient.class.getName() );
-
-		elasticsearchBackend.getClient( HttpAsyncClient.class );
+		assertThatThrownBy( () -> elasticsearchBackend.getClient( HttpAsyncClient.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						HttpAsyncClient.class.getName(),
+						"the client can only be unwrapped to",
+						RestClient.class.getName()
+				);
 	}
 
 	@Test
@@ -1006,11 +1005,13 @@ public class ElasticsearchExtensionIT {
 	public void indexManager_unwrap_error_unknownType() {
 		IndexManager indexManager = integration.getIndexManager( INDEX_NAME );
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Attempt to unwrap an Elasticsearch index manager to '" + String.class.getName() + "'" );
-		thrown.expectMessage( "this index manager can only be unwrapped to '" + ElasticsearchIndexManager.class.getName() + "'" );
-
-		indexManager.unwrap( String.class );
+		assertThatThrownBy( () -> indexManager.unwrap( String.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Attempt to unwrap an Elasticsearch index manager to '" + String.class.getName() + "'",
+						"this index manager can only be unwrapped to '" + ElasticsearchIndexManager.class.getName() + "'"
+				);
+		;
 	}
 
 	private void initData() {

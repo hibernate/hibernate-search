@@ -37,7 +37,6 @@ import org.hibernate.search.util.impl.test.SubTest;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import org.assertj.core.api.Assertions;
 
@@ -59,9 +58,6 @@ public class SearchSortIT {
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;

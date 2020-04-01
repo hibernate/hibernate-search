@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.search.projection;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
@@ -45,7 +46,6 @@ import org.junit.Assume;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class FieldSearchProjectionIT {
 
@@ -64,9 +64,6 @@ public class FieldSearchProjectionIT {
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;
@@ -172,13 +169,17 @@ public class FieldSearchProjectionIT {
 
 	@Test
 	public void error_nullClass() {
-		thrown.expect( IllegalArgumentException.class );
-		thrown.expectMessage( "must not be null" );
-		thrown.expectMessage( "clazz" );
-
 		StubMappingScope scope = indexManager.createScope();
 
-		scope.projection().field( indexMapping.string1Field.relativeFieldName, (Class<? extends Object>) null ).toProjection();
+		assertThatThrownBy( () -> scope.projection()
+				.field( indexMapping.string1Field.relativeFieldName, (Class<? extends Object>) null )
+				.toProjection()
+		)
+				.isInstanceOf( IllegalArgumentException.class )
+				.hasMessageContainingAll(
+						"must not be null",
+						"clazz"
+				);
 	}
 
 	@Test
@@ -227,36 +228,45 @@ public class FieldSearchProjectionIT {
 	public void error_unknownField() {
 		StubMappingScope scope = indexManager.createScope();
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Unknown field" );
-		thrown.expectMessage( "unknownField" );
-		thrown.expectMessage( INDEX_NAME );
-
-		scope.projection().field( "unknownField", Object.class );
+		assertThatThrownBy( () -> scope.projection()
+				.field( "unknownField", Object.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Unknown field",
+						"unknownField",
+						INDEX_NAME
+				);
 	}
 
 	@Test
 	public void error_objectField_nested() {
 		StubMappingScope scope = indexManager.createScope();
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Unknown field" );
-		thrown.expectMessage( "nestedObject" );
-		thrown.expectMessage( INDEX_NAME );
-
-		scope.projection().field( "nestedObject", Object.class );
+		assertThatThrownBy( () -> scope.projection()
+				.field( "nestedObject", Object.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Unknown field",
+						"nestedObject",
+						INDEX_NAME
+				);
 	}
 
 	@Test
 	public void error_objectField_flattened() {
 		StubMappingScope scope = indexManager.createScope();
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Unknown field" );
-		thrown.expectMessage( "flattenedObject" );
-		thrown.expectMessage( INDEX_NAME );
-
-		scope.projection().field( "flattenedObject", Object.class );
+		assertThatThrownBy( () -> scope.projection()
+				.field( "flattenedObject", Object.class )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Unknown field",
+						"flattenedObject",
+						INDEX_NAME
+				);
 	}
 
 	@Test
@@ -348,14 +358,18 @@ public class FieldSearchProjectionIT {
 	public void error_invalidProjectionType_withProjectionConverter() {
 		FieldModel<?> fieldModel = indexMapping.supportedFieldWithProjectionConverterModels.get( 0 );
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Invalid type" );
-		thrown.expectMessage( "for projection on field" );
-		thrown.expectMessage( fieldModel.relativeFieldName );
-
 		StubMappingScope scope = indexManager.createScope();
 
-		scope.projection().field( fieldModel.relativeFieldName, String.class ).toProjection();
+		assertThatThrownBy( () -> scope.projection()
+				.field( fieldModel.relativeFieldName, String.class )
+				.toProjection()
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Invalid type",
+						"for projection on field",
+						fieldModel.relativeFieldName
+				);
 	}
 
 	/**

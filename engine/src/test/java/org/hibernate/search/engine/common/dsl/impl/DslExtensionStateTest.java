@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.common.dsl.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Collections;
 import java.util.Optional;
@@ -15,17 +16,12 @@ import java.util.function.Function;
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
 import org.hibernate.search.util.common.SearchException;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 
 public class DslExtensionStateTest extends EasyMockSupport {
-
-	@Rule
-	public final ExpectedException thrown = ExpectedException.none();
 
 	private final Function<Object, MyResultType> contextFunction = createMock( Function.class );
 
@@ -66,10 +62,12 @@ public class DslExtensionStateTest extends EasyMockSupport {
 
 	@Test
 	public void orElseFail() {
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "None of the provided extensions can be applied to the current context" );
-		thrown.expectMessage( Collections.emptyList().toString() );
-		state.orElseFail();
+		assertThatThrownBy( state::orElseFail )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"None of the provided extensions can be applied to the current context",
+						Collections.emptyList().toString()
+				);
 	}
 
 	@Test
@@ -78,15 +76,13 @@ public class DslExtensionStateTest extends EasyMockSupport {
 		resetAll();
 		replayAll();
 		state.ifSupported( new MyExtension( extensionToString ), Optional.empty(), contextFunction );
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "None of the provided extensions can be applied to the current context" );
-		thrown.expectMessage( extensionToString );
-		try {
-			state.orElseFail();
-		}
-		finally {
-			verifyAll();
-		}
+		assertThatThrownBy( state::orElseFail )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"None of the provided extensions can be applied to the current context",
+						extensionToString
+				);
+		verifyAll();
 	}
 
 	@Test
@@ -149,17 +145,15 @@ public class DslExtensionStateTest extends EasyMockSupport {
 		state.ifSupported( new MyExtension( extension1ToString ), Optional.empty(), contextFunction );
 		state.ifSupported( new MyExtension( extension2ToString ), Optional.empty(), contextFunction );
 		state.ifSupported( new MyExtension( extension3ToString ), Optional.empty(), contextFunction );
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "None of the provided extensions can be applied to the current context" );
-		thrown.expectMessage( extension1ToString );
-		thrown.expectMessage( extension2ToString );
-		thrown.expectMessage( extension3ToString );
-		try {
-			state.orElseFail();
-		}
-		finally {
-			verifyAll();
-		}
+		assertThatThrownBy( state::orElseFail )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"None of the provided extensions can be applied to the current context",
+						extension1ToString,
+						extension2ToString,
+						extension3ToString
+				);
+		verifyAll();
 	}
 
 	@Test
@@ -310,14 +304,12 @@ public class DslExtensionStateTest extends EasyMockSupport {
 
 		resetAll();
 		replayAll();
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Cannot call ifSupported(...) after orElse(...)" );
-		try {
-			state.ifSupported( new MyExtension(), Optional.empty(), contextFunction );
-		}
-		finally {
-			verifyAll();
-		}
+		assertThatThrownBy( () -> state.ifSupported( new MyExtension(), Optional.empty(), contextFunction ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Cannot call ifSupported(...) after orElse(...)"
+				);
+		verifyAll();
 	}
 
 	private static class MyExtension {

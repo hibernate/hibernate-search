@@ -7,6 +7,7 @@
 package org.hibernate.search.util.common.reflect.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.Assert.fail;
 
 import java.lang.reflect.Type;
@@ -21,15 +22,10 @@ import org.hibernate.search.util.impl.test.reflect.TypeCapture;
 import org.hibernate.search.util.impl.test.reflect.WildcardTypeCapture;
 import org.hibernate.search.util.impl.test.reflect.WildcardTypeCapture.Of;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 @SuppressWarnings("unused")
 public class GenericTypeContextTest {
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	@Test
 	public void simple() {
@@ -79,15 +75,16 @@ public class GenericTypeContextTest {
 
 	@Test
 	public void nullType() {
-		thrown.expect( IllegalArgumentException.class );
-		new GenericTypeContext( null );
+		assertThatThrownBy( () -> new GenericTypeContext( null ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test
 	public void nullType_nonNullContext() {
-		thrown.expect( IllegalArgumentException.class );
 		GenericTypeContext declaringContext = new GenericTypeContext( Object.class );
-		new GenericTypeContext( declaringContext, null );
+
+		assertThatThrownBy( () -> new GenericTypeContext( declaringContext, null ) )
+				.isInstanceOf( IllegalArgumentException.class );
 	}
 
 	@Test

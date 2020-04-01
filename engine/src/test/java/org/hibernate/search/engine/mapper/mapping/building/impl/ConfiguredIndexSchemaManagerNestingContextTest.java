@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.mapper.mapping.building.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.easymock.EasyMock.newCapture;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -28,18 +29,13 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.EasyMockSupport;
 
 public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupport {
-
-	@Rule
-	public final ExpectedException thrown = ExpectedException.none();
 
 	private final MappableTypeModel typeModel1Mock = createMock( "typeModel1Mock", MappableTypeModel.class );
 	private final MappableTypeModel typeModel2Mock = createMock( "typeModel2Mock", MappableTypeModel.class );
@@ -106,24 +102,23 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 		resetAll();
 		EasyMock.expect( typeModel1Mock.getName() ).andReturn( "typeModel1Mock" );
 		replayAll();
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Found an infinite IndexedEmbedded recursion" );
-		thrown.expectMessage( "path 'level1.prefix1_level1.prefix1_'" );
-		thrown.expectMessage( "type '" + typeModel1Mock.toString() + "'" );
-		try {
-			IndexedEmbeddedDefinition level1Definition = new IndexedEmbeddedDefinition(
-					typeModel1Mock, "level1.prefix1_", ObjectFieldStorage.DEFAULT,
-					null, null
-			);
-			level1Context.addIndexedEmbeddedIfIncluded(
-					level1Definition, new IndexedEmbeddedPathTracker( level1Definition ),
-					nestedContextBuilderMock
-			);
-		}
-		catch (SearchException e) {
-			verifyAll();
-			throw e;
-		}
+		assertThatThrownBy( () -> {
+				IndexedEmbeddedDefinition level1Definition = new IndexedEmbeddedDefinition(
+						typeModel1Mock, "level1.prefix1_", ObjectFieldStorage.DEFAULT,
+						null, null
+				);
+				level1Context.addIndexedEmbeddedIfIncluded(
+						level1Definition, new IndexedEmbeddedPathTracker( level1Definition ),
+						nestedContextBuilderMock
+				);
+		} )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Found an infinite IndexedEmbedded recursion",
+						"path 'level1.prefix1_level1.prefix1_'",
+						"type '" + typeModel1Mock.toString() + "'"
+				);
+		verifyAll();
 	}
 
 	@Test
@@ -143,11 +138,7 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 		resetAll();
 		EasyMock.expect( typeModel1Mock.getName() ).andReturn( "typeModel1Mock" );
 		replayAll();
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Found an infinite IndexedEmbedded recursion" );
-		thrown.expectMessage( "path 'level1.prefix1_level2.prefix2_level1.prefix1_'" );
-		thrown.expectMessage( "type '" + typeModel1Mock.toString() + "'" );
-		try {
+		assertThatThrownBy( () -> {
 			IndexedEmbeddedDefinition level2Definition = new IndexedEmbeddedDefinition(
 					typeModel1Mock, "level1.prefix1_", ObjectFieldStorage.DEFAULT,
 					null, null
@@ -156,11 +147,14 @@ public class ConfiguredIndexSchemaManagerNestingContextTest extends EasyMockSupp
 					level2Definition, new IndexedEmbeddedPathTracker( level2Definition ),
 					nestedContextBuilderMock
 			);
-		}
-		catch (SearchException e) {
-			verifyAll();
-			throw e;
-		}
+		} )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Found an infinite IndexedEmbedded recursion",
+						"path 'level1.prefix1_level2.prefix2_level1.prefix1_'",
+						"type '" + typeModel1Mock.toString() + "'"
+				);
+		verifyAll();
 	}
 
 	@Test

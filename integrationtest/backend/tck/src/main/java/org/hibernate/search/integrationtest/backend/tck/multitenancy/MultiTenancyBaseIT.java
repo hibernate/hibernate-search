@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.multitenancy;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
@@ -32,7 +33,6 @@ import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class MultiTenancyBaseIT {
 
@@ -58,9 +58,6 @@ public class MultiTenancyBaseIT {
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper( TckBackendHelper::createMultiTenancyBackendSetupStrategy );
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	private final StubBackendSessionContext tenant1SessionContext = new StubBackendSessionContext( TENANT_1 );
 	private final StubBackendSessionContext tenant2SessionContext = new StubBackendSessionContext( TENANT_2 );
@@ -331,65 +328,73 @@ public class MultiTenancyBaseIT {
 
 	@Test
 	public void not_using_multi_tenancy_for_query_while_enabled_throws_exception() {
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Backend" );
-		thrown.expectMessage( "has multi-tenancy enabled, but no tenant identifier is provided." );
-
 		StubMappingScope scope = indexManager.createScope();
-		SearchQuery<DocumentReference> query = scope.query( new StubBackendSessionContext() )
+
+		assertThatThrownBy( () -> scope.query( new StubBackendSessionContext() )
 				.where( f -> f.matchAll() )
-				.toQuery();
+				.toQuery()
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Backend", "has multi-tenancy enabled, but no tenant identifier is provided."
+				);
 	}
 
 	@Test
 	public void not_using_multi_tenancy_for_add_while_enabled_throws_exception() {
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Backend" );
-		thrown.expectMessage( "has multi-tenancy enabled, but no tenant identifier is provided." );
+		assertThatThrownBy( () -> {
+			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( new StubBackendSessionContext() );
 
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( new StubBackendSessionContext() );
+			plan.add( referenceProvider( DOCUMENT_ID_3 ), document -> {
+				document.addValue( indexMapping.string, STRING_VALUE_3 );
+				document.addValue( indexMapping.integer, INTEGER_VALUE_5 );
 
-		plan.add( referenceProvider( DOCUMENT_ID_3 ), document -> {
-			document.addValue( indexMapping.string, STRING_VALUE_3 );
-			document.addValue( indexMapping.integer, INTEGER_VALUE_5 );
+				DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
+				nestedObject.addValue( indexMapping.nestedObject.string, STRING_VALUE_3 );
+				nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_5 );
+			} );
 
-			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
-			nestedObject.addValue( indexMapping.nestedObject.string, STRING_VALUE_3 );
-			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_5 );
-		} );
-
-		plan.execute().join();
+			plan.execute().join();
+		} )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Backend", "has multi-tenancy enabled, but no tenant identifier is provided."
+				);
 	}
 
 	@Test
 	public void not_using_multi_tenancy_for_update_while_enabled_throws_exception() {
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Backend" );
-		thrown.expectMessage( "has multi-tenancy enabled, but no tenant identifier is provided." );
+		assertThatThrownBy( () -> {
+			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( new StubBackendSessionContext() );
 
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( new StubBackendSessionContext() );
+			plan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
+				document.addValue( indexMapping.string, UPDATED_STRING );
+				document.addValue( indexMapping.integer, INTEGER_VALUE_4 );
 
-		plan.update( referenceProvider( DOCUMENT_ID_2 ), document -> {
-			document.addValue( indexMapping.string, UPDATED_STRING );
-			document.addValue( indexMapping.integer, INTEGER_VALUE_4 );
+				DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
+				nestedObject.addValue( indexMapping.nestedObject.string, UPDATED_STRING );
+				nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_4 );
+			} );
 
-			DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
-			nestedObject.addValue( indexMapping.nestedObject.string, UPDATED_STRING );
-			nestedObject.addValue( indexMapping.nestedObject.integer, INTEGER_VALUE_4 );
-		} );
-
-		plan.execute().join();
+			plan.execute().join();
+		} )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Backend", "has multi-tenancy enabled, but no tenant identifier is provided."
+				);
 	}
 
 	@Test
 	public void not_using_multi_tenancy_for_delete_while_enabled_throws_exception() {
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Backend" );
-		thrown.expectMessage( "has multi-tenancy enabled, but no tenant identifier is provided." );
-
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( new StubBackendSessionContext() );
-		plan.delete( referenceProvider( DOCUMENT_ID_1 ) );
-		plan.execute().join();
+		assertThatThrownBy( () -> {
+			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( new StubBackendSessionContext() );
+			plan.delete( referenceProvider( DOCUMENT_ID_1 ) );
+			plan.execute().join();
+		} )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Backend", "has multi-tenancy enabled, but no tenant identifier is provided."
+				);
 	}
 
 	private void initData() {

@@ -18,7 +18,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class SchemaManagementStrategyNoneIT {
 
@@ -27,9 +26,6 @@ public class SchemaManagementStrategyNoneIT {
 
 	@Rule
 	public OrmSetupHelper setupHelper = OrmSetupHelper.withBackendMock( backendMock );
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	@Test
 	public void none() {
