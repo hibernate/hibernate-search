@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.document;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -24,7 +26,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.impl.CollectionHelper;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -54,14 +55,13 @@ public class DocumentModelDslIT {
 
 	@Test
 	public void nullFieldName() {
-		SubTest.expectException(
-				"Null field name on root",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					root.field( null, this::irrelevantTypeContributor );
-				} )
+				} ),
+				"Null field name on root"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -70,15 +70,14 @@ public class DocumentModelDslIT {
 						.failure( "Field name 'null' is invalid: field names cannot be null or empty" )
 						.build() );
 
-		SubTest.expectException(
-				"Null field name on non-root",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					root.objectField( "nonRoot" )
 							.field( null, this::irrelevantTypeContributor );
-				} )
+				} ),
+				"Null field name on non-root"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -87,14 +86,13 @@ public class DocumentModelDslIT {
 						.failure( "Field name 'null' is invalid: field names cannot be null or empty" )
 						.build() );
 
-		SubTest.expectException(
-				"Null object field name on root",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					root.objectField( null );
-				} )
+				} ),
+				"Null object field name on root"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -103,14 +101,13 @@ public class DocumentModelDslIT {
 						.failure( "Field name 'null' is invalid: field names cannot be null or empty" )
 						.build() );
 
-		SubTest.expectException(
-				"Null object field name on non-root",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					root.objectField( "nonRoot" ).objectField( null );
-				} )
+				} ),
+				"Null object field name on non-root"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Field name 'null' is invalid: field names cannot be null or empty" )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
@@ -123,14 +120,13 @@ public class DocumentModelDslIT {
 
 	@Test
 	public void emptyFieldName() {
-		SubTest.expectException(
-				"empty field name on root",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					root.field( "", this::irrelevantTypeContributor );
-				} )
+				} ),
+				"empty field name on root"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -139,14 +135,13 @@ public class DocumentModelDslIT {
 						.failure( "Field name '' is invalid: field names cannot be null or empty" )
 						.build() );
 
-		SubTest.expectException(
-				"empty field name on non-root",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					root.objectField( "nonRoot" ).field( "", this::irrelevantTypeContributor );
-				} )
+				} ),
+				"empty field name on non-root"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -155,14 +150,13 @@ public class DocumentModelDslIT {
 						.failure( "Field name '' is invalid: field names cannot be null or empty" )
 						.build() );
 
-		SubTest.expectException(
-				"empty object field name on root",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					root.objectField( "" );
-				} )
+				} ),
+				"empty object field name on root"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -171,14 +165,13 @@ public class DocumentModelDslIT {
 						.failure( "Field name '' is invalid: field names cannot be null or empty" )
 						.build() );
 
-		SubTest.expectException(
-				"empty object field name on non-root",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					root.objectField( "nonRoot" ).objectField( "" );
-				} )
+				} ),
+				"empty object field name on non-root"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -190,14 +183,13 @@ public class DocumentModelDslIT {
 
 	@Test
 	public void dotInFieldName() {
-		SubTest.expectException(
-				"field name containing a dot on root",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					root.field( "foo.bar", this::irrelevantTypeContributor );
-				} )
+				} ),
+				"field name containing a dot on root"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -211,14 +203,13 @@ public class DocumentModelDslIT {
 						)
 						.build() );
 
-		SubTest.expectException(
-				"field name containing a dot on non-root",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					root.objectField( "nonRoot" ).field( "foo.bar", this::irrelevantTypeContributor );
-				} )
+				} ),
+				"field name containing a dot on non-root"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -232,14 +223,13 @@ public class DocumentModelDslIT {
 						)
 						.build() );
 
-		SubTest.expectException(
-				"object field name containing a dot on root",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					root.objectField( "foo.bar" );
-				} )
+				} ),
+				"object field name containing a dot on root"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -253,14 +243,13 @@ public class DocumentModelDslIT {
 						)
 						.build() );
 
-		SubTest.expectException(
-				"object field name containing a dot on non-root",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					root.objectField( "nonRoot" ).objectField( "foo.bar" );
-				} )
+				} ),
+				"object field name containing a dot on non-root"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -277,15 +266,14 @@ public class DocumentModelDslIT {
 
 	@Test
 	public void nameCollision_fields() {
-		SubTest.expectException(
-				"Name collision between two fields on root",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					root.field( "field1", f -> f.asString() );
 					root.field( "field1", this::irrelevantTypeContributor );
-				} )
+				} ),
+				"Name collision between two fields on root"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -294,17 +282,16 @@ public class DocumentModelDslIT {
 						.failure( "schema node 'field1' was added twice" )
 						.build() );
 
-		SubTest.expectException(
-				"Name collision between two fields on non-root",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					IndexSchemaObjectField objectField1 = root.objectField( "object1" );
 					IndexSchemaObjectField objectField2 = objectField1.objectField( "object2" );
 					objectField2.field( "field1", f -> f.asString() );
 					objectField2.field( "field1", this::irrelevantTypeContributor );
-				} )
+				} ),
+				"Name collision between two fields on non-root"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -316,15 +303,14 @@ public class DocumentModelDslIT {
 
 	@Test
 	public void nameCollision_objectFields() {
-		SubTest.expectException(
-				"Name collision between two object fields on root",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					root.objectField( "field1" );
 					root.objectField( "field1" );
-				} )
+				} ),
+				"Name collision between two object fields on root"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -333,17 +319,16 @@ public class DocumentModelDslIT {
 						.failure( "schema node 'field1' was added twice" )
 						.build() );
 
-		SubTest.expectException(
-				"Name collision between two object fields on non-root",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					IndexSchemaObjectField objectField1 = root.objectField( "object1" );
 					IndexSchemaObjectField objectField2 = objectField1.objectField( "object2" );
 					objectField2.objectField( "field1" );
 					objectField2.objectField( "field1" );
-				} )
+				} ),
+				"Name collision between two object fields on non-root"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -355,15 +340,14 @@ public class DocumentModelDslIT {
 
 	@Test
 	public void nameCollision_fieldAndObjectField() {
-		SubTest.expectException(
-				"Name collision between two fields on root",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					root.field( "field1", f -> f.asString() );
 					root.objectField( "field1" );
-				} )
+				} ),
+				"Name collision between two fields on root"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -372,17 +356,16 @@ public class DocumentModelDslIT {
 						.failure( "schema node 'field1' was added twice" )
 						.build() );
 
-		SubTest.expectException(
-				"Name collision between two fields (object and non-object) on non-root",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					IndexSchemaObjectField objectField1 = root.objectField( "object1" );
 					IndexSchemaObjectField objectField2 = objectField1.objectField( "object2" );
 					objectField2.field( "field1", f -> f.asString() );
 					objectField2.objectField( "field1" );
-				} )
+				} ),
+				"Name collision between two fields (object and non-object) on non-root"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -394,8 +377,7 @@ public class DocumentModelDslIT {
 
 	@Test
 	public void analyzerOnSortableField() {
-		SubTest.expectException(
-				"Setting an analyzer on sortable field",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					root.field(
@@ -405,9 +387,9 @@ public class DocumentModelDslIT {
 									.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 					)
 							.toReference();
-				} )
+				} ),
+				"Setting an analyzer on sortable field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -422,8 +404,7 @@ public class DocumentModelDslIT {
 
 	@Test
 	public void analyzerOnAggregableField() {
-		SubTest.expectException(
-				"Setting an analyzer on aggregable field",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					root.field(
@@ -433,9 +414,9 @@ public class DocumentModelDslIT {
 									.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 					)
 							.toReference();
-				} )
+				} ),
+				"Setting an analyzer on aggregable field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -450,8 +431,7 @@ public class DocumentModelDslIT {
 
 	@Test
 	public void analyzerAndNormalizer() {
-		SubTest.expectException(
-				"Setting an analyzer and a normalizer on the same field",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					root.field(
@@ -461,9 +441,9 @@ public class DocumentModelDslIT {
 									.normalizer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name )
 					)
 							.toReference();
-				} )
+				} ),
+				"Setting an analyzer and a normalizer on the same field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -478,8 +458,7 @@ public class DocumentModelDslIT {
 
 	@Test
 	public void searchAnalyzerWithoutAnalyzer() {
-		SubTest.expectException(
-				"Setting a search analyzer, without setting an analyzer on the same field",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					root.field(
@@ -488,9 +467,9 @@ public class DocumentModelDslIT {
 									.searchAnalyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 					)
 							.toReference();
-				} )
+				} ),
+				"Setting a search analyzer, without setting an analyzer on the same field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -505,14 +484,13 @@ public class DocumentModelDslIT {
 	@Test
 	public void missingGetReferenceCall() {
 		for ( Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, ?>> typedContextFunction : MAIN_TYPES ) {
-			SubTest.expectException(
-					"Missing toReference() call after " + typedContextFunction,
+			assertThatThrownBy(
 					() -> setup( ctx -> {
 						IndexSchemaElement root = ctx.getSchemaElement();
 						root.field( "myField", typedContextFunction::apply );
-					} )
+					} ),
+					"Missing toReference() call after " + typedContextFunction
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 							.typeContext( TYPE_NAME )
@@ -521,14 +499,13 @@ public class DocumentModelDslIT {
 							.failure( "Incomplete field definition" )
 							.build() );
 		}
-		SubTest.expectException(
-				"Missing toReference() call after objectField()",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					root.objectField( "myField" );
-				} )
+				} ),
+				"Missing toReference() call after objectField()"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -541,8 +518,7 @@ public class DocumentModelDslIT {
 	@Test
 	public void multipleGetReferenceCall() {
 		for ( Function<IndexFieldTypeFactory, StandardIndexFieldTypeOptionsStep<?, ?>> typedContextFunction : MAIN_TYPES ) {
-			SubTest.expectException(
-					"Multiple toReference() calls after " + typedContextFunction,
+			assertThatThrownBy(
 					() -> setup( ctx -> {
 						IndexSchemaElement root = ctx.getSchemaElement();
 						IndexSchemaFieldFinalStep<?> context = root.field(
@@ -551,9 +527,9 @@ public class DocumentModelDslIT {
 						);
 						context.toReference();
 						context.toReference();
-					} )
+					} ),
+					"Multiple toReference() calls after " + typedContextFunction
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 							.typeContext( TYPE_NAME )
@@ -562,16 +538,15 @@ public class DocumentModelDslIT {
 							.failure( "Multiple calls to toReference() for the same field definition" )
 							.build() );
 		}
-		SubTest.expectException(
-				"Multiple toReference() calls after objectField()",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					IndexSchemaElement root = ctx.getSchemaElement();
 					IndexSchemaObjectField context = root.objectField( "myField" );
 					context.toReference();
 					context.toReference();
-				} )
+				} ),
+				"Multiple toReference() calls after objectField()"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )

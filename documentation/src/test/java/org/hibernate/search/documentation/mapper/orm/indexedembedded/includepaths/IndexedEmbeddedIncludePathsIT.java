@@ -21,7 +21,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -108,22 +108,20 @@ public class IndexedEmbeddedIncludePathsIT {
 
 		SearchMapping searchMapping = Search.mapping( entityManagerFactory );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> {
 					searchMapping.scope( Human.class ).predicate()
 							.match().field( "parents.parents.nickname" );
 				}
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" );
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> {
 					searchMapping.scope( Human.class ).predicate()
 							.match().field( "parents.parents.parents.name" );
 				}
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" );
 

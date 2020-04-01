@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.dialect.impl;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import org.hibernate.search.backend.elasticsearch.ElasticsearchVersion;
 import org.hibernate.search.backend.elasticsearch.dialect.model.impl.Elasticsearch56ModelDialect;
@@ -21,7 +22,6 @@ import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elastics
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.Elasticsearch70ProtocolDialect;
 import org.hibernate.search.backend.elasticsearch.dialect.protocol.impl.ElasticsearchProtocolDialect;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
@@ -388,26 +388,24 @@ public class ElasticsearchDialectFactoryTest {
 	}
 
 	private void testUnsupported(String unsupportedVersionString) {
-		SubTest.expectException(
-				"Test unsupported version " + unsupportedVersionString,
+		assertThatThrownBy(
 				() -> {
 					dialectFactory.createModelDialect( ElasticsearchVersion.of( unsupportedVersionString ) );
-				}
+				},
+				"Test unsupported version " + unsupportedVersionString
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "HSEARCH400081" )
 				.hasMessageContaining( "'" + unsupportedVersionString + "'" );
 	}
 
 	private void testAmbiguous(String versionString) {
-		SubTest.expectException(
-				"Test ambiguous version " + versionString,
+		assertThatThrownBy(
 				() -> {
 					dialectFactory.createModelDialect( ElasticsearchVersion.of( versionString ) );
-				}
+				},
+				"Test ambiguous version " + versionString
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "HSEARCH400561" )
 				.hasMessageContaining( "Ambiguous Elasticsearch version: '" + versionString + "'." )

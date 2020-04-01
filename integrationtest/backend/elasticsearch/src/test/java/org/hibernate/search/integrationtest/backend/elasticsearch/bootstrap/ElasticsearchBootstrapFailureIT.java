@@ -11,7 +11,7 @@ import org.hibernate.search.integrationtest.backend.elasticsearch.testsupport.ut
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -33,8 +33,7 @@ public class ElasticsearchBootstrapFailureIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3621")
 	public void cannotConnect() {
-		SubTest.expectException(
-				"Closed port",
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start( BACKEND_NAME )
 						.withBackendProperty(
 								ElasticsearchBackendSettings.HOSTS,
@@ -45,9 +44,9 @@ public class ElasticsearchBootstrapFailureIT {
 								"EmptyIndexName",
 								ctx -> { }
 						)
-						.setup()
+						.setup(),
+				"Closed port"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.backendContext( BACKEND_NAME )

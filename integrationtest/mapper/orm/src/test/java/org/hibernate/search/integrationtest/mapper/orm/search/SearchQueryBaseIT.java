@@ -47,7 +47,6 @@ import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.search.sort.StubSearchSort;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
-import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -153,8 +152,7 @@ public class SearchQueryBaseIT {
 
 			Class<?> invalidClass = String.class;
 
-			SubTest.expectException( () -> searchSession.scope( invalidClass ) )
-					.assertThrown()
+			Assertions.assertThatThrownBy( () -> searchSession.scope( invalidClass ) )
 					.hasMessageContainingAll(
 							"Some of the given types cannot be targeted",
 							"These types are not indexed, nor is any of their subtypes: [" + invalidClass.getName() + "]"
@@ -225,10 +223,9 @@ public class SearchQueryBaseIT {
 
 			Class<?> invalidClass = String.class;
 
-			SubTest.expectException( () -> searchSession.scope(
+			Assertions.assertThatThrownBy( () -> searchSession.scope(
 					invalidClass, Book.NAME
 			) )
-					.assertThrown()
 					.hasMessageContainingAll(
 							"Invalid type for '" + Book.NAME + "'",
 							"expected the entity to extend '" + invalidClass.getName()
@@ -244,10 +241,9 @@ public class SearchQueryBaseIT {
 
 			String invalidName = "foo";
 
-			SubTest.expectException( () -> searchSession.scope(
+			Assertions.assertThatThrownBy( () -> searchSession.scope(
 					Book.class, invalidName
 			) )
-					.assertThrown()
 					.hasMessageContainingAll(
 							"Unknown entity name: '" + invalidName + "'",
 							"Available entity names: ["

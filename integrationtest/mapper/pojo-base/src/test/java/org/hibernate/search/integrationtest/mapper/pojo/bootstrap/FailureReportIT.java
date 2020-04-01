@@ -15,8 +15,8 @@ import org.hibernate.search.integrationtest.mapper.pojo.testsupport.util.rule.Ja
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
-import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
 import org.junit.Rule;
@@ -92,10 +92,9 @@ public class FailureReportIT {
 						+ "JavaBean mapping, type '" + IndexedEntity.class.getName() + "', path '.myProperty'\n"
 		);
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessage(
 						FAILURE_REPORT_INTRODUCTION
@@ -159,10 +158,9 @@ public class FailureReportIT {
 						+ "JavaBean mapping, type '" + IndexedEntity.class.getName() + "', path '.myProperty2'\n"
 		);
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessage(
 						FAILURE_REPORT_INTRODUCTION
@@ -237,10 +235,9 @@ public class FailureReportIT {
 						+ "JavaBean mapping, type '" + IndexedEntity2.class.getName() + "', path '.myProperty2'\n"
 		);
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity1.class, IndexedEntity2.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessage(
 						FAILURE_REPORT_INTRODUCTION
@@ -308,10 +305,9 @@ public class FailureReportIT {
 						+ " index '" + indexName + "', field 'failingField2'\n"
 		);
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessage(
 						FAILURE_REPORT_INTRODUCTION

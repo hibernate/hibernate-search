@@ -33,7 +33,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -270,10 +270,9 @@ public class ImplicitNestedSearchPredicateIT {
 
 	@Test
 	public void predicate_simpleQueryString_multipleNestedPaths() {
-		SubTest.expectException( () -> indexManager.createScope()
+		Assertions.assertThatThrownBy( () -> indexManager.createScope()
 				.predicate().simpleQueryString().field( NESTED_1 + ".text" ).field( "text" )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Simple query string targets fields" )
 				.hasMessageContaining( "spanning multiple nested paths" )

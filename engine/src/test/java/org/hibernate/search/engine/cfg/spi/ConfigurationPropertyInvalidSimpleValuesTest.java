@@ -15,7 +15,7 @@ import java.util.Optional;
 import java.util.function.Function;
 
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -101,8 +101,7 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> extends EasyMockSup
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( invalidStringValue ) );
 		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
 		replayAll();
-		SubTest.expectException( () -> property.get( sourceMock ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> property.get( sourceMock ) )
 				.hasMessageContaining(
 						"Unable to convert configuration property '" + resolvedKey
 								+ "' with value '" + invalidStringValue + "':"
@@ -116,8 +115,7 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> extends EasyMockSup
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( invalidTypeValue ) );
 		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
 		replayAll();
-		SubTest.expectException( () -> property.get( sourceMock ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> property.get( sourceMock ) )
 				.hasMessageContaining(
 						"Unable to convert configuration property '" + resolvedKey
 								+ "' with value '" + invalidTypeValue + "':"
@@ -140,8 +138,7 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> extends EasyMockSup
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( invalidStringValue ) );
 		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
 		replayAll();
-		SubTest.expectException( () -> property.get( sourceMock ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> property.get( sourceMock ) )
 				.hasMessageContaining(
 						"Unable to convert configuration property '" + resolvedKey
 								+ "' with value '" + invalidStringValue + "':"
@@ -155,8 +152,7 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> extends EasyMockSup
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( invalidTypeValue ) );
 		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
 		replayAll();
-		SubTest.expectException( () -> property.get( sourceMock ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> property.get( sourceMock ) )
 				.hasMessageContaining(
 						"Unable to convert configuration property '" + resolvedKey
 								+ "' with value '" + invalidTypeValue + "':"
@@ -181,8 +177,7 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> extends EasyMockSup
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( invalidStringValue ) );
 		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
 		replayAll();
-		SubTest.expectException( () -> property.get( sourceMock ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> property.get( sourceMock ) )
 				.hasMessageContaining(
 						"Unable to convert configuration property '" + resolvedKey
 								+ "' with value '" + invalidStringValue + "':"
@@ -197,8 +192,7 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> extends EasyMockSup
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( commaSeparatedStringValue ) );
 		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
 		replayAll();
-		SubTest.expectException( () -> property.get( sourceMock ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> property.get( sourceMock ) )
 				.hasMessageContaining(
 						"Unable to convert configuration property '" + resolvedKey
 								+ "' with value '" + commaSeparatedStringValue + "':"
@@ -213,8 +207,7 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> extends EasyMockSup
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( invalidTypeValueCollection ) );
 		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
 		replayAll();
-		SubTest.expectException( () -> property.get( sourceMock ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> property.get( sourceMock ) )
 				.hasMessageContaining(
 						"Unable to convert configuration property '" + resolvedKey
 								+ "' with value '" + invalidTypeValueCollection + "':"
@@ -228,8 +221,7 @@ public class ConfigurationPropertyInvalidSimpleValuesTest<T> extends EasyMockSup
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( invalidTypeValue ) );
 		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
 		replayAll();
-		SubTest.expectException( () -> property.get( sourceMock ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> property.get( sourceMock ) )
 				.hasMessageContaining(
 						"Unable to convert configuration property '" + resolvedKey
 								+ "' with value '" + invalidTypeValue + "':"

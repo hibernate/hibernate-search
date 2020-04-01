@@ -17,7 +17,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -39,8 +39,7 @@ public class IdClassIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3874")
 	public void idClass_indexed() {
-		SubTest.expectException( () -> ormSetupHelper.start().setup( IdClassIndexed.class ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> ormSetupHelper.start().setup( IdClassIndexed.class ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"There isn't any explicit document ID mapping for indexed type '"

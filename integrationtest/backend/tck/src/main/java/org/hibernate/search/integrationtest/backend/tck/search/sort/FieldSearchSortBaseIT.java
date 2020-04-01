@@ -48,7 +48,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Assume;
@@ -172,8 +172,7 @@ public class FieldSearchSortBaseIT<F> {
 
 		String fieldPath = getFieldPath( SortOrder.ASC );
 
-		SubTest.expectException( () -> matchNonEmptyQuery( b -> b.field( fieldPath ) ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> matchNonEmptyQuery( b -> b.field( fieldPath ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot compute the median across nested documents",
@@ -191,8 +190,7 @@ public class FieldSearchSortBaseIT<F> {
 
 		String fieldPath = getFieldPath( SortOrder.ASC );
 
-		SubTest.expectException( () -> matchNonEmptyQuery( b -> b.field( fieldPath ) ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> matchNonEmptyQuery( b -> b.field( fieldPath ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot compute the sum, average or median of a text field",
@@ -211,8 +209,7 @@ public class FieldSearchSortBaseIT<F> {
 
 		String fieldPath = getFieldPath( SortOrder.ASC );
 
-		SubTest.expectException( () -> matchNonEmptyQuery( b -> b.field( fieldPath ) ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> matchNonEmptyQuery( b -> b.field( fieldPath ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot compute the sum of a temporal field",

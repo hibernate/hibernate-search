@@ -21,7 +21,6 @@ import java.util.function.Supplier;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandle;
 import org.hibernate.search.util.common.reflect.spi.ValueReadHandleFactory;
-import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Assume;
 import org.junit.Test;
@@ -117,8 +116,7 @@ public class ValueReadHandleTest {
 		ValueReadHandle<?> valueReadHandle = factory.createForMethod( method );
 
 		EntityType entity = new EntityType();
-		SubTest.expectThrowable( () -> valueReadHandle.get( entity ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> valueReadHandle.get( entity ) )
 				.isInstanceOf( SimulatedError.class )
 				.hasMessageContaining( "errorThrowingMethod" );
 	}
@@ -131,8 +129,7 @@ public class ValueReadHandleTest {
 		ValueReadHandle<?> valueReadHandle = factory.createForMethod( method );
 
 		EntityType entity = new EntityType( () -> "toStringResult" );
-		SubTest.expectThrowable( () -> valueReadHandle.get( entity ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> valueReadHandle.get( entity ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"Exception while invoking '" + method.toString() + "' on 'toStringResult'"
@@ -156,8 +153,7 @@ public class ValueReadHandleTest {
 		ValueReadHandle<?> valueReadHandle = factory.createForMethod( method );
 
 		EntityType entity = new EntityType( () -> "toStringResult" );
-		SubTest.expectThrowable( () -> valueReadHandle.get( entity ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> valueReadHandle.get( entity ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"Exception while invoking '" + method.toString() + "' on 'toStringResult'"
@@ -179,8 +175,7 @@ public class ValueReadHandleTest {
 		ValueReadHandle<?> valueReadHandle = factory.createForField( field );
 
 		EntityType entity = new EntityType( () -> "toStringResult" );
-		SubTest.expectThrowable( () -> valueReadHandle.get( entity ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> valueReadHandle.get( entity ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"Exception while invoking '" + field.toString() + "' on 'toStringResult'"
@@ -197,8 +192,7 @@ public class ValueReadHandleTest {
 
 		SimulatedRuntimeException toStringRuntimeException = new SimulatedRuntimeException( "toString" );
 		EntityType entity = new EntityType( () -> { throw toStringRuntimeException; } );
-		SubTest.expectThrowable( () -> valueReadHandle.get( entity ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> valueReadHandle.get( entity ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"Exception while invoking '" + method.toString() + "' on '<EntityType#toString() threw SimulatedRuntimeException>'"

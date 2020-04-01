@@ -24,7 +24,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.programmatic.Property
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -97,10 +97,9 @@ public class CustomPropertyMappingAnnotationBaseIT {
 				return id;
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.annotationTypeContext( AnnotationWithEmptyProcessorRef.class )
@@ -129,10 +128,9 @@ public class CustomPropertyMappingAnnotationBaseIT {
 				return id;
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.annotationTypeContext( AnnotationWithProcessorWithDifferentAnnotationType.class )

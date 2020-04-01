@@ -15,7 +15,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.configuratio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -47,11 +47,10 @@ public class ElasticsearchMatchSearchPredicateIT {
 
 	@Test
 	public void match_skipAnalysis_normalizedStringField() {
-		SubTest.expectException( () -> indexManager.createScope().query()
+		Assertions.assertThatThrownBy( () -> indexManager.createScope().query()
 				.where( f -> f.match().field( "normalizedStringField" ).matching( TEST_TERM ).skipAnalysis() )
 				.toQuery()
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "HSEARCH400560" )
 				.hasMessageContaining( "Elasticsearch backend does not support skip analysis on not analyzed field" )

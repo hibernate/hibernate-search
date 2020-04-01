@@ -26,7 +26,7 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -213,7 +213,7 @@ public class TypeBridgeBaseIT {
 			}
 		}
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.binder( (TypeBinder) context -> {
@@ -223,7 +223,6 @@ public class TypeBridgeBaseIT {
 				)
 						.setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -345,7 +344,7 @@ public class TypeBridgeBaseIT {
 			}
 		}
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.binder( (TypeBinder) context -> {
@@ -360,7 +359,6 @@ public class TypeBridgeBaseIT {
 				)
 						.setup( IndexedEntity.class, ContainedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -393,7 +391,7 @@ public class TypeBridgeBaseIT {
 			}
 		}
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.binder( (TypeBinder) context -> {
@@ -407,7 +405,6 @@ public class TypeBridgeBaseIT {
 				)
 						.setup( IndexedEntity.class, ContainedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -441,7 +438,7 @@ public class TypeBridgeBaseIT {
 			}
 		}
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( NotEntity.class )
 								.binder( (TypeBinder) context -> {
@@ -456,7 +453,6 @@ public class TypeBridgeBaseIT {
 						.withAnnotatedTypes( NotEntity.class )
 						.setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -484,7 +480,7 @@ public class TypeBridgeBaseIT {
 		class NotEntity {
 		}
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.binder( (TypeBinder) context -> {
@@ -499,7 +495,6 @@ public class TypeBridgeBaseIT {
 						.withAnnotatedTypes( NotEntity.class )
 						.setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -539,7 +534,7 @@ public class TypeBridgeBaseIT {
 			}
 		}
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.binder( (TypeBinder) context -> {
@@ -553,7 +548,6 @@ public class TypeBridgeBaseIT {
 				)
 						.setup( IndexedEntity.class, ContainedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -581,7 +575,7 @@ public class TypeBridgeBaseIT {
 			}
 		}
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.binder( (TypeBinder) context -> {
@@ -591,7 +585,6 @@ public class TypeBridgeBaseIT {
 				)
 						.setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -620,7 +613,7 @@ public class TypeBridgeBaseIT {
 			}
 		}
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.binder( (TypeBinder) context -> {
@@ -633,7 +626,6 @@ public class TypeBridgeBaseIT {
 				)
 						.setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -799,7 +791,7 @@ public class TypeBridgeBaseIT {
 				return stringProperty;
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start()
 						.withConfiguration( b -> b.programmaticMapping().type( IndexedEntity.class )
 								.binder( (TypeBinder) context -> {
@@ -810,7 +802,6 @@ public class TypeBridgeBaseIT {
 						)
 						.setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )

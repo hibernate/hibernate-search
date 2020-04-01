@@ -66,7 +66,7 @@ import org.hibernate.search.engine.search.sort.SearchSort;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.test.SubTest;
+
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -173,10 +173,9 @@ public class LuceneExtensionIT {
 				.hasTotalHitCount( 5 );
 
 		// Unsupported extension
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> query.extension( (SearchQuery<DocumentReference> original, LoadingContext<?, ?> loadingContext) -> Optional.empty() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class );
 	}
 
@@ -208,10 +207,9 @@ public class LuceneExtensionIT {
 				.toQuery();
 
 		// Non-existing document
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> query.explain( "InvalidId" )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"Document with id 'InvalidId' does not exist in index '" + INDEX_NAME + "'"
@@ -245,10 +243,9 @@ public class LuceneExtensionIT {
 				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> query.explain( FIRST_ID )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "explain(String id) cannot be used when the query targets multiple indexes" )
 				.hasMessageContaining(
@@ -264,10 +261,9 @@ public class LuceneExtensionIT {
 				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> query.explain( "NotAnIndexName", FIRST_ID )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"index name 'NotAnIndexName' is not among the indexes targeted by this query: ["
@@ -412,13 +408,12 @@ public class LuceneExtensionIT {
 	public void predicate_nativeField() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException(
-				"match() predicate on unsupported native field",
+		Assertions.assertThatThrownBy(
 				() -> scope.query()
 						.where( f -> f.match().field( "nativeField" ).matching( "37" ) )
-						.toQuery()
-				)
-				.assertThrown()
+						.toQuery(),
+				"match() predicate on unsupported native field"
+		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Native fields do not support defining predicates with the DSL: use the Lucene extension and a native query." )
 				.satisfies( FailureReportUtils.hasContext(
@@ -444,11 +439,10 @@ public class LuceneExtensionIT {
 	public void predicate_nativeField_exists() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException(
-				"exists() predicate on unsupported native field",
-				() -> scope.predicate().exists().field( "nativeField" )
+		Assertions.assertThatThrownBy(
+				() -> scope.predicate().exists().field( "nativeField" ),
+				"exists() predicate on unsupported native field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Native fields do not support defining predicates with the DSL: use the Lucene extension and a native query." )
 				.satisfies( FailureReportUtils.hasContext(
@@ -460,14 +454,13 @@ public class LuceneExtensionIT {
 	public void sort_nativeField() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException(
-				"sort on unsupported native field",
+		Assertions.assertThatThrownBy(
 				() -> scope.query()
 						.where( f -> f.matchAll() )
 						.sort( f -> f.field( "nativeField" ) )
-						.toQuery()
-				)
-				.assertThrown()
+						.toQuery(),
+				"sort on unsupported native field"
+		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Native fields do not support defining sorts with the DSL: use the Lucene extension and a native sort." )
 				.satisfies( FailureReportUtils.hasContext(
@@ -539,11 +532,10 @@ public class LuceneExtensionIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, FIRST_ID );
 
 		// now, let's check that projecting on the field throws an exception
-		SubTest.expectException(
-				"projection on native field not supporting projections",
-				() -> scope.projection().field( "nativeField_unsupportedProjection", Integer.class )
+		Assertions.assertThatThrownBy(
+				() -> scope.projection().field( "nativeField_unsupportedProjection", Integer.class ),
+				"projection on native field not supporting projections"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Projections are not enabled for field" )
 				.satisfies( FailureReportUtils.hasContext(
@@ -657,12 +649,12 @@ public class LuceneExtensionIT {
 	public void nativeField_invalidFieldPath() {
 		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 
-		SubTest.expectException(
-				"native field contributing field with invalid field path",
+		assertThatThrownBy(
 				() -> plan.add( referenceProvider( FIRST_ID ), document -> {
 					document.addValue( indexMapping.nativeField_invalidFieldPath, 45 );
-				} ) )
-				.assertThrown()
+				} ),
+				"native field contributing field with invalid field path"
+		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid field path; expected path 'nativeField_invalidFieldPath', got 'not the expected path'." );
 	}

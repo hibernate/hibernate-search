@@ -39,7 +39,7 @@ import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -126,9 +126,9 @@ public class RangeSearchPredicateIT {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
-			SubTest.expectException( () ->
+			Assertions.assertThatThrownBy( () ->
 					scope.predicate().range().field( absoluteFieldPath )
-			).assertThrown()
+			)
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "is not searchable" )
 					.hasMessageContaining( "Make sure the field is marked as searchable" )
@@ -445,11 +445,10 @@ public class RangeSearchPredicateIT {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.unsupportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
-			SubTest.expectException(
-					"range() predicate with unsupported type on field " + absoluteFieldPath,
-					() -> scope.predicate().range().field( absoluteFieldPath )
+			Assertions.assertThatThrownBy(
+					() -> scope.predicate().range().field( absoluteFieldPath ),
+					"range() predicate with unsupported type on field " + absoluteFieldPath
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "range predicates" )
 					.hasMessageContaining( "are not supported by this field's type" )
@@ -726,43 +725,39 @@ public class RangeSearchPredicateIT {
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
-			SubTest.expectException(
-					"range() predicate with null bounds on field " + fieldPath,
+			Assertions.assertThatThrownBy(
 					() -> scope.predicate().range().field( fieldPath )
-							.range( null )
+							.range( null ),
+					"range() predicate with null bounds on field " + fieldPath
 			)
-					.assertThrown()
 					.isInstanceOf( IllegalArgumentException.class )
 					.hasMessageContaining( "'range'" )
 					.hasMessageContaining( "must not be null" );
 
-			SubTest.expectException(
-					"range() predicate with null bounds on field " + fieldPath,
+			Assertions.assertThatThrownBy(
 					() -> scope.predicate().range().field( fieldPath )
-							.between( null, null )
+							.between( null, null ),
+					"range() predicate with null bounds on field " + fieldPath
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Invalid value" )
 					.hasMessageContaining( "at least one bound" )
 					.hasMessageContaining( "must be non-null" )
 					.hasMessageContaining( fieldPath );
 
-			SubTest.expectException(
-					"range() predicate with null bounds on field " + fieldPath,
-					() -> scope.predicate().range().field( fieldPath ).atLeast( null )
+			Assertions.assertThatThrownBy(
+					() -> scope.predicate().range().field( fieldPath ).atLeast( null ),
+					"range() predicate with null bounds on field " + fieldPath
 			)
-					.assertThrown()
 					.isInstanceOf( IllegalArgumentException.class )
 					.hasMessageContaining( "'lowerBoundValue'" )
 					.hasMessageContaining( "must not be null" );
 
 
-			SubTest.expectException(
-					"range() predicate with null bounds on field " + fieldPath,
-					() -> scope.predicate().range().field( fieldPath ).atMost( null )
+			Assertions.assertThatThrownBy(
+					() -> scope.predicate().range().field( fieldPath ).atMost( null ),
+					"range() predicate with null bounds on field " + fieldPath
 			)
-					.assertThrown()
 					.isInstanceOf( IllegalArgumentException.class )
 					.hasMessageContaining( "'upperBoundValue'" )
 					.hasMessageContaining( "must not be null" );
@@ -773,38 +768,34 @@ public class RangeSearchPredicateIT {
 	public void unknown_field() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException(
-				"range() predicate with unknown field",
-				() -> scope.predicate().range().field( "unknown_field" )
+		Assertions.assertThatThrownBy(
+				() -> scope.predicate().range().field( "unknown_field" ),
+				"range() predicate with unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
 
-		SubTest.expectException(
-				"range() predicate with unknown field",
-				() -> scope.predicate().range().fields( indexMapping.string1Field.relativeFieldName, "unknown_field" )
+		Assertions.assertThatThrownBy(
+				() -> scope.predicate().range().fields( indexMapping.string1Field.relativeFieldName, "unknown_field" ),
+				"range() predicate with unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
 
-		SubTest.expectException(
-				"range() predicate with unknown field",
-				() -> scope.predicate().range().field( indexMapping.string1Field.relativeFieldName ).field( "unknown_field" )
+		Assertions.assertThatThrownBy(
+				() -> scope.predicate().range().field( indexMapping.string1Field.relativeFieldName ).field( "unknown_field" ),
+				"range() predicate with unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
 
-		SubTest.expectException(
-				"range() predicate with unknown field",
-				() -> scope.predicate().range().field( indexMapping.string1Field.relativeFieldName ).fields( "unknown_field" )
+		Assertions.assertThatThrownBy(
+				() -> scope.predicate().range().field( indexMapping.string1Field.relativeFieldName ).fields( "unknown_field" ),
+				"range() predicate with unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
@@ -822,11 +813,10 @@ public class RangeSearchPredicateIT {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object invalidValueToMatch = new InvalidType();
 
-			SubTest.expectException(
-					"range().atLeast() predicate with invalid parameter type on field " + absoluteFieldPath,
-					() -> scope.predicate().range().field( absoluteFieldPath ).atLeast( invalidValueToMatch )
+			Assertions.assertThatThrownBy(
+					() -> scope.predicate().range().field( absoluteFieldPath ).atLeast( invalidValueToMatch ),
+					"range().atLeast() predicate with invalid parameter type on field " + absoluteFieldPath
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Unable to convert DSL parameter: " )
 					.hasMessageContaining( InvalidType.class.getName() )
@@ -835,11 +825,10 @@ public class RangeSearchPredicateIT {
 							EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 					) );
 
-			SubTest.expectException(
-					"range().atMost() predicate with invalid parameter type on field " + absoluteFieldPath,
-					() -> scope.predicate().range().field( absoluteFieldPath ).atMost( invalidValueToMatch )
+			Assertions.assertThatThrownBy(
+					() -> scope.predicate().range().field( absoluteFieldPath ).atMost( invalidValueToMatch ),
+					"range().atMost() predicate with invalid parameter type on field " + absoluteFieldPath
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Unable to convert DSL parameter: " )
 					.hasMessageContaining( InvalidType.class.getName() )
@@ -848,12 +837,11 @@ public class RangeSearchPredicateIT {
 							EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 					) );
 
-			SubTest.expectException(
-					"range().from() predicate with invalid parameter type on field " + absoluteFieldPath,
+			Assertions.assertThatThrownBy(
 					() -> scope.predicate().range().field( absoluteFieldPath )
-							.between( invalidValueToMatch, null )
+							.between( invalidValueToMatch, null ),
+					"range().from() predicate with invalid parameter type on field " + absoluteFieldPath
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Unable to convert DSL parameter: " )
 					.hasMessageContaining( InvalidType.class.getName() )
@@ -862,12 +850,11 @@ public class RangeSearchPredicateIT {
 							EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 					) );
 
-			SubTest.expectException(
-					"range().from().to() predicate with invalid parameter type on field " + absoluteFieldPath,
+			Assertions.assertThatThrownBy(
 					() -> scope.predicate().range().field( absoluteFieldPath )
-							.between( null, invalidValueToMatch )
+							.between( null, invalidValueToMatch ),
+					"range().from().to() predicate with invalid parameter type on field " + absoluteFieldPath
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Unable to convert DSL parameter: " )
 					.hasMessageContaining( InvalidType.class.getName() )
@@ -904,13 +891,12 @@ public class RangeSearchPredicateIT {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object upperValueToMatch = fieldModel.predicateUpperBound;
 
-			SubTest.expectException(
+			Assertions.assertThatThrownBy(
 					() -> {
 						indexManager.createScope( rawFieldCompatibleIndexManager )
 								.predicate().range().field( absoluteFieldPath ).atMost( upperValueToMatch );
 					}
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 					.hasMessageContaining( "'" + fieldModel.relativeFieldName + "'" )
@@ -947,10 +933,9 @@ public class RangeSearchPredicateIT {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
-			SubTest.expectException(
+			Assertions.assertThatThrownBy(
 					() -> scope.predicate().range().field( fieldPath )
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 					.hasMessageContaining( "'" + fieldPath + "'" )
@@ -967,10 +952,9 @@ public class RangeSearchPredicateIT {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
-			SubTest.expectException(
+			Assertions.assertThatThrownBy(
 					() -> scope.predicate().range().field( fieldPath )
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 					.hasMessageContaining( "'" + fieldPath + "'" )
@@ -985,14 +969,13 @@ public class RangeSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope( incompatibleDecimalScaleIndexManager );
 		String absoluteFieldPath = indexMapping.scaledBigDecimal.relativeFieldName;
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> {
 					scope.query().selectEntityReference()
 							.where( f -> f.range().field( absoluteFieldPath ).atLeast( new BigDecimal( "739.333" ) ) )
 							.toQuery();
 				}
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 				.hasMessageContaining( "'scaledBigDecimal'" )
@@ -1008,10 +991,9 @@ public class RangeSearchPredicateIT {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
-			SubTest.expectException(
+			Assertions.assertThatThrownBy(
 					() -> scope.predicate().range().field( fieldPath )
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 					.hasMessageContaining( "'" + fieldPath + "'" )

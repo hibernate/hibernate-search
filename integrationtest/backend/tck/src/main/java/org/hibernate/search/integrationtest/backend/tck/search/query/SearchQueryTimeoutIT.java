@@ -30,7 +30,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchTimeoutException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Assume;
 import org.junit.BeforeClass;
@@ -91,8 +91,7 @@ public class SearchQueryTimeoutIT {
 				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
 
-		SubTest.expectException( () -> query.fetchAll() )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> query.fetchAll() )
 				.isInstanceOf( SearchTimeoutException.class )
 				.hasMessageContaining( " exceeded the timeout of 0s, 0ms and 1ns: " );
 	}
@@ -103,8 +102,7 @@ public class SearchQueryTimeoutIT {
 				.failAfter( 1, TimeUnit.NANOSECONDS )
 				.toQuery();
 
-		SubTest.expectException( () -> query.fetchTotalHitCount() )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> query.fetchTotalHitCount() )
 				.isInstanceOf( SearchTimeoutException.class )
 				.hasMessageContaining( " exceeded the timeout of 0s, 0ms and 1ns: " );
 	}

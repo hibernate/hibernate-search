@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.document;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import java.util.function.Consumer;
@@ -21,7 +22,6 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingConte
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
-import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -280,11 +280,10 @@ public class DocumentElementMultiValuedIT {
 	}
 
 	private void expectSingleValuedException(String id, String absoluteFieldPath, Consumer<DocumentElement> documentContributor) {
-		SubTest.expectException(
-				"Multiple values written to field '" + absoluteFieldPath + "'",
-				() -> executeAdd( id, documentContributor )
+		assertThatThrownBy(
+				() -> executeAdd( id, documentContributor ),
+				"Multiple values written to field '" + absoluteFieldPath + "'"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple values were added to single-valued field '" + absoluteFieldPath + "'." )
 				.hasMessageContaining( "Declare the field as multi-valued in order to allow this." );

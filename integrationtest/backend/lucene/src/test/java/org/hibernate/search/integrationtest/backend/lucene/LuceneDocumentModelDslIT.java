@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingContext;
@@ -13,7 +15,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.configuratio
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -28,14 +29,13 @@ public class LuceneDocumentModelDslIT {
 
 	@Test
 	public void unknownAnalyzer() {
-		SubTest.expectException(
-				"Referencing an unknown analyzer",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					ctx.createTypeFactory().asString()
 							.analyzer( "someNameThatIsClearlyNotAssignedToADefinition" );
-				} )
+				} ),
+				"Referencing an unknown analyzer"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -46,14 +46,13 @@ public class LuceneDocumentModelDslIT {
 
 	@Test
 	public void unknownNormalizer() {
-		SubTest.expectException(
-				"Referencing an unknown analyzer",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					ctx.createTypeFactory().asString()
 							.normalizer( "someNameThatIsClearlyNotAssignedToADefinition" );
-				} )
+				} ),
+				"Referencing an unknown analyzer"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )
@@ -64,15 +63,14 @@ public class LuceneDocumentModelDslIT {
 
 	@Test
 	public void unknownSearchAnalyzer() {
-		SubTest.expectException(
-				"Referencing an unknown search analyzer",
+		assertThatThrownBy(
 				() -> setup( ctx -> {
 					ctx.createTypeFactory().asString()
 							.analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )
 							.searchAnalyzer( "someNameThatIsClearlyNotAssignedToADefinition" );
-				} )
+				} ),
+				"Referencing an unknown search analyzer"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( TYPE_NAME )

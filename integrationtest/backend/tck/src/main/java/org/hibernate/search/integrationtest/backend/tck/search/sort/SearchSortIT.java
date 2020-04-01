@@ -32,7 +32,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -222,12 +221,11 @@ public class SearchSortIT {
 
 		// reuse the same sort instance on a different scope,
 		// targeting a different index
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				anotherIndexManager.createScope().query()
 						.where( f -> f.matchAll() )
 						.sort( sort )
 						.toQuery() )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "scope targeting different indexes" )
 				.hasMessageContaining( INDEX_NAME )
@@ -235,12 +233,11 @@ public class SearchSortIT {
 
 		// reuse the same sort instance on a different scope,
 		// targeting different indexes
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				indexManager.createScope( anotherIndexManager ).query()
 						.where( f -> f.matchAll() )
 						.sort( sort )
 						.toQuery() )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "scope targeting different indexes" )
 				.hasMessageContaining( INDEX_NAME )
@@ -264,10 +261,9 @@ public class SearchSortIT {
 				.hasDocRefHitsAnyOrder( INDEX_NAME, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID );
 
 		// Mandatory extension, unsupported
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> indexManager.createScope().sort().extension( new UnSupportedExtension() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class );
 
 		// Conditional extensions with orElse - two, both supported

@@ -33,7 +33,7 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -232,7 +232,7 @@ public class PropertyBridgeBaseIT {
 			}
 		}
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
@@ -244,7 +244,6 @@ public class PropertyBridgeBaseIT {
 						.withAnnotatedTypes( Contained.class )
 						.setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -278,7 +277,7 @@ public class PropertyBridgeBaseIT {
 			}
 		}
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
@@ -293,7 +292,6 @@ public class PropertyBridgeBaseIT {
 				)
 						.setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -436,7 +434,7 @@ public class PropertyBridgeBaseIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
 	public void explicitReindexing_error_use_invalidProperty() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
@@ -456,7 +454,6 @@ public class PropertyBridgeBaseIT {
 								PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class
 						)
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class.getName() )
@@ -472,7 +469,7 @@ public class PropertyBridgeBaseIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
 	public void explicitReindexing_error_fromOtherEntity_invalidProperty() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
@@ -491,7 +488,6 @@ public class PropertyBridgeBaseIT {
 								PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class
 						)
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class.getName() )
@@ -506,7 +502,7 @@ public class PropertyBridgeBaseIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
 	public void explicitReindexing_error_fromOtherEntity_invalidContainerExtractorPath() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
@@ -526,7 +522,6 @@ public class PropertyBridgeBaseIT {
 								PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class
 						)
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class.getName() )
@@ -544,7 +539,7 @@ public class PropertyBridgeBaseIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
 	public void explicitReindexing_error_fromOtherEntity_bridgedElementNotEntityType() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "notEntity" )
@@ -564,7 +559,6 @@ public class PropertyBridgeBaseIT {
 								PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class
 						)
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class.getName() )
@@ -581,7 +575,7 @@ public class PropertyBridgeBaseIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
 	public void explicitReindexing_error_fromOtherEntity_otherEntityTypeNotEntityType() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
@@ -601,7 +595,6 @@ public class PropertyBridgeBaseIT {
 								PropertyBridgeExplicitIndexingClasses.ContainedLevel2Entity.class
 						)
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class.getName() )
@@ -618,7 +611,7 @@ public class PropertyBridgeBaseIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3297")
 	public void explicitReindexing_error_fromOtherEntity_inverseAssociationPathTargetsWrongType() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class )
 								.property( "child" )
@@ -638,7 +631,6 @@ public class PropertyBridgeBaseIT {
 								PropertyBridgeExplicitIndexingClasses.DifferentEntity.class
 						)
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( PropertyBridgeExplicitIndexingClasses.IndexedEntity.class.getName() )
@@ -673,7 +665,7 @@ public class PropertyBridgeBaseIT {
 			}
 		}
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
@@ -684,7 +676,6 @@ public class PropertyBridgeBaseIT {
 				)
 						.setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -720,7 +711,7 @@ public class PropertyBridgeBaseIT {
 			}
 		}
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().withConfiguration(
 						b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "contained" )
@@ -734,7 +725,6 @@ public class PropertyBridgeBaseIT {
 				)
 						.setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )
@@ -879,7 +869,7 @@ public class PropertyBridgeBaseIT {
 				return stringProperty;
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start()
 						.withConfiguration( b -> b.programmaticMapping().type( IndexedEntity.class )
 								.property( "stringProperty" )
@@ -890,7 +880,6 @@ public class PropertyBridgeBaseIT {
 						)
 						.setup( IndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedEntity.class.getName() )

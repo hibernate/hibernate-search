@@ -17,7 +17,7 @@ import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProvi
 import org.hibernate.search.backend.lucene.lowlevel.directory.spi.DirectoryProviderInitializationContext;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
@@ -66,10 +66,9 @@ public class CustomDirectoryIT extends AbstractDirectoryIT {
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	public void invalid() {
 		String invalidDirectoryType = "someInvalidDirectoryType";
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				setup( "someInvalidDirectoryType", c -> c )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.backendContext( BACKEND_NAME )

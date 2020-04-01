@@ -18,7 +18,6 @@ import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Test;
@@ -179,7 +178,6 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 						"Distance related operations are not supported",
 						"string"
 				);
-		;
 	}
 
 	@Test
@@ -216,16 +214,16 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 	public void distanceProjection_nonProjectable() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			scope.projection().field( "nonProjectableGeoPoint", GeoPoint.class ).toProjection();
-		} ).assertThrown()
+		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Projections are not enabled for field" )
 				.hasMessageContaining( "nonProjectableGeoPoint" );
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			scope.projection().distance( "nonProjectableGeoPoint", GeoPoint.of( 43d, 4d ) ).toProjection();
-		} ).assertThrown()
+		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Projections are not enabled for field" )
 				.hasMessageContaining( "nonProjectableGeoPoint" );
@@ -235,9 +233,9 @@ public class DistanceSearchProjectionIT extends AbstractSpatialWithinSearchPredi
 	public void distanceSort_unsortable() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			scope.sort().distance( "unsortableGeoPoint", GeoPoint.of( 43d, 4d ) );
-		} ).assertThrown()
+		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Sorting is not enabled for field" )
 				.hasMessageContaining( "unsortableGeoPoint" );

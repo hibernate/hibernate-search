@@ -21,7 +21,7 @@ import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.rule.StaticCounters;
 
 import org.junit.Rule;
@@ -40,10 +40,9 @@ public class TransientPropertyIT {
 
 	@Test
 	public void withoutDerivedFrom() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> ormSetupHelper.start().setup( EntityWithoutDerivedFrom.class )
 		)
-				.assertThrown()
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( EntityWithoutDerivedFrom.class.getName() )
 						.failure(

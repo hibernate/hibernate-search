@@ -15,7 +15,7 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.IndexBindingConte
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -35,10 +35,9 @@ public class LuceneAnalysisConfigurerIT {
 
 	@Test
 	public void error_invalidReference() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setup( "foobar" )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.backendContext( BACKEND_NAME )
@@ -55,10 +54,9 @@ public class LuceneAnalysisConfigurerIT {
 
 	@Test
 	public void error_failingConfigurer() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setup( FailingConfigurer.class.getName() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.backendContext( BACKEND_NAME )
@@ -86,10 +84,9 @@ public class LuceneAnalysisConfigurerIT {
 
 	@Test
 	public void error_analyzer_namingConflict() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setup( AnalyzerNamingConflictConfigurer.class.getName() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.backendContext( BACKEND_NAME )
@@ -113,10 +110,9 @@ public class LuceneAnalysisConfigurerIT {
 
 	@Test
 	public void error_normalizer_namingConflict() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setup( NormalizerNamingConflictConfigurer.class.getName() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.backendContext( BACKEND_NAME )
@@ -140,10 +136,9 @@ public class LuceneAnalysisConfigurerIT {
 
 	@Test
 	public void error_parameter_namingConflict() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setup( ParameterNamingConflictConfigurer.class.getName() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.backendContext( BACKEND_NAME )

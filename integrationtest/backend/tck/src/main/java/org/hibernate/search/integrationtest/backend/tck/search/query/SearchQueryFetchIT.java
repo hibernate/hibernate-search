@@ -29,7 +29,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -209,10 +208,9 @@ public class SearchQueryFetchIT {
 		result = matchNoneQuery().fetchSingleHit();
 		Assertions.assertThat( result ).isEmpty();
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			matchAllQuery().fetchSingleHit();
 		} )
-				.assertThrown()
 				.isInstanceOf( SearchException.class );
 	}
 

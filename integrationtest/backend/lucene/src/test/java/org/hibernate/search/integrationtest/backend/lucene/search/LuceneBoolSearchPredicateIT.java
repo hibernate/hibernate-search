@@ -12,7 +12,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -44,16 +44,15 @@ public class LuceneBoolSearchPredicateIT {
 	public void minimumShouldMatch_outOfBounds() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException(
-				"bool() predicate with a minimumShouldMatch constraint providing an out-of-bounds value",
+		Assertions.assertThatThrownBy(
 				() -> scope.query()
 						.where( f -> f.bool()
 								.minimumShouldMatchNumber( 3 )
 								.should( f.match().field( "fieldName" ).matching( "blablabla" ) )
 						)
-						.toQuery()
+						.toQuery(),
+				"bool() predicate with a minimumShouldMatch constraint providing an out-of-bounds value"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Computed minimum for minimumShouldMatch constraint is out of bounds" )
 				.hasMessageContaining( "expected a number between '1' and '1', got '3'" );

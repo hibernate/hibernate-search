@@ -21,7 +21,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Assume;
@@ -120,8 +120,7 @@ public class ElasticsearchIndexSchemaManagerStatusCheckIT {
 	}
 
 	private void setupAndInspectIndexExpectingFailure(String ... messageContent) {
-		SubTest.expectException( this::setupAndInspectIndex )
-				.assertThrown()
+		Assertions.assertThatThrownBy( this::setupAndInspectIndex )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( messageContent );
 	}

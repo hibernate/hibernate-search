@@ -31,7 +31,7 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.rule
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Assume;
 import org.junit.Rule;
@@ -87,11 +87,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				+ "}"
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asInteger() ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -116,11 +115,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				+ "}"
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asInteger() ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -139,11 +137,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				+ "}"
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asInteger() ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -165,11 +162,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				+ "}"
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asInteger() ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -192,11 +188,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asInteger() ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -236,11 +231,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asInteger() ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -302,11 +296,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asLocalDate() ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -360,11 +353,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asLocalDate() ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -391,11 +383,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asLocalDate() ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -420,11 +411,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asLocalDate() ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -450,11 +440,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asString().analyzer( "keyword" ) ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -496,11 +485,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asString().analyzer( "default" ) ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -523,12 +511,11 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asString()
 					.analyzer( "keyword" ).searchAnalyzer( "italian" ) ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -573,11 +560,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asString().analyzer( "keyword" ).searchAnalyzer( "italian" ) ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -617,11 +603,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asString().analyzer( "default" ).norms( Norms.YES ) ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -716,11 +701,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asString().analyzer( "english" ).termVector( TermVector.YES ) ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -777,11 +761,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asString().projectable( Projectable.YES ) ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -820,11 +803,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asInteger().indexNullAs( 739 ) ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -846,11 +828,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asInteger().indexNullAs( 739 ) ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -907,11 +888,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asInteger().sortable( Sortable.YES ) ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -989,11 +969,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asBigDecimal().decimalScale( 2 ) ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -1015,11 +994,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asString().normalizer( "default" ) ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )
@@ -1105,11 +1083,10 @@ public class ElasticsearchIndexSchemaManagerValidationMappingAttributeIT {
 				)
 		);
 
-		SubTest.expectException( () -> setupAndValidate( ctx -> {
+		Assertions.assertThatThrownBy( () -> setupAndValidate( ctx -> {
 			IndexSchemaElement root = ctx.getSchemaElement();
 			root.field( "myField", f -> f.asString().normalizer( "another-normalizer" ) ).toReference();
 		} ) )
-				.assertThrown()
 				.isInstanceOf( Exception.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.contextLiteral( SCHEMA_VALIDATION_CONTEXT )

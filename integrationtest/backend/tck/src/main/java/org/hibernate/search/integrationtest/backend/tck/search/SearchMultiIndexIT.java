@@ -22,7 +22,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -203,11 +203,10 @@ public class SearchMultiIndexIT {
 		StubMappingScope scope = indexManager_1_1.createScope( indexManager_1_2 );
 
 		// Predicate
-		SubTest.expectException(
-				"predicate on unknown field with multiple targeted indexes",
-				() -> scope.predicate().match().field( "unknownField" )
+		Assertions.assertThatThrownBy(
+				() -> scope.predicate().match().field( "unknownField" ),
+				"predicate on unknown field with multiple targeted indexes"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field 'unknownField'" )
 				.satisfies( FailureReportUtils.hasContext(
@@ -219,11 +218,10 @@ public class SearchMultiIndexIT {
 
 		// Sort
 
-		SubTest.expectException(
-				"sort on unknown field with multiple targeted indexes",
-				() -> scope.sort().field( "unknownField" )
+		Assertions.assertThatThrownBy(
+				() -> scope.sort().field( "unknownField" ),
+				"sort on unknown field with multiple targeted indexes"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field 'unknownField'" )
 				.satisfies( FailureReportUtils.hasContext(
@@ -235,11 +233,10 @@ public class SearchMultiIndexIT {
 
 		// Projection
 
-		SubTest.expectException(
-				"projection on unknown field with multiple targeted indexes",
-				() -> scope.projection().field( "unknownField", Object.class )
+		Assertions.assertThatThrownBy(
+				() -> scope.projection().field( "unknownField", Object.class ),
+				"projection on unknown field with multiple targeted indexes"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "unknownField" )
@@ -255,39 +252,35 @@ public class SearchMultiIndexIT {
 	public void search_with_incompatible_types_throws_exception() {
 		StubMappingScope scope = indexManager_1_1.createScope( indexManager_1_2 );
 
-		SubTest.expectException(
-				"predicate on field with different type among the targeted indexes",
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().match().field( "differentTypesField" )
-						.matching( DIFFERENT_TYPES_FIELD_1_1_1 )
+						.matching( DIFFERENT_TYPES_FIELD_1_1_1 ),
+				"predicate on field with different type among the targeted indexes"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a predicate for field 'differentTypesField'" );
 
-		SubTest.expectException(
-				"projection on field with different type among the targeted indexes",
-				() -> scope.projection().field( "differentTypesField" ).toProjection()
+		Assertions.assertThatThrownBy(
+				() -> scope.projection().field( "differentTypesField" ).toProjection(),
+				"projection on field with different type among the targeted indexes"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a projection for field 'differentTypesField'" );
 
-		SubTest.expectException(
-				"sort on field with different type among the targeted indexes",
-				() -> scope.sort().field( "differentTypesField" )
+		Assertions.assertThatThrownBy(
+				() -> scope.sort().field( "differentTypesField" ),
+				"sort on field with different type among the targeted indexes"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a sort for field 'differentTypesField'" );
 	}
 
 	@Test
 	public void search_across_backends_throws_exception() {
-		SubTest.expectException(
-				"search across multiple backends",
-				() -> indexManager_1_1.createScope( indexManager_2_1 )
+		Assertions.assertThatThrownBy(
+				() -> indexManager_1_1.createScope( indexManager_2_1 ),
+				"search across multiple backends"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "A multi-index scope cannot span multiple" )
 				.hasMessageContaining( "backends" );

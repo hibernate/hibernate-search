@@ -32,7 +32,6 @@ import org.hibernate.search.mapper.javabean.session.SearchSession;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
-import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Assume;
 import org.junit.Before;
@@ -206,11 +205,10 @@ public class FieldDefaultBridgeIT<V, F> {
 		}
 
 		// convertUnknown must throw a runtime exception on invalid input
-		SubTest.expectException(
-				"convertUnknown on invalid input",
-				() -> dslConverter.convertUnknown( new Object(), toDocumentConvertContext )
+		Assertions.assertThatThrownBy(
+				() -> dslConverter.convertUnknown( new Object(), toDocumentConvertContext ),
+				"convertUnknown on invalid input"
 		)
-				.assertThrown()
 				.isInstanceOf( RuntimeException.class );
 	}
 

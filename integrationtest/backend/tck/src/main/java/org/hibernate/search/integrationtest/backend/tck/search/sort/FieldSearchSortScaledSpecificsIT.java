@@ -16,7 +16,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Before;
 import org.junit.ClassRule;
@@ -56,11 +56,10 @@ public class FieldSearchSortScaledSpecificsIT {
 	public void incompatibleDecimalScale() {
 		StubMappingScope scope = indexManager.createScope( incompatibleDecimalScaleIndexManager );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> scope.query().where( f -> f.matchAll() )
 						.sort( f -> f.field( "scaledBigDecimal" ) )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a sort" )
 				.hasMessageContaining( "'scaledBigDecimal'" )

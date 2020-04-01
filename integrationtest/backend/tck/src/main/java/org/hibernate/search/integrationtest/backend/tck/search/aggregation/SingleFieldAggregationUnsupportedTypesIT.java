@@ -23,7 +23,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 import org.hibernate.search.util.impl.test.singleinstance.BeforeAll;
@@ -98,10 +98,9 @@ public class SingleFieldAggregationUnsupportedTypesIT<F> {
 		FieldModel<F> model = indexMapping.fieldModel;
 		String fieldPath = model.relativeFieldName;
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> expectations.trySetup( indexManager.createScope().aggregation(), fieldPath )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				// Example: Numeric aggregations (range) are not supported by this field's type
 				.hasMessageContaining( "aggregations" )

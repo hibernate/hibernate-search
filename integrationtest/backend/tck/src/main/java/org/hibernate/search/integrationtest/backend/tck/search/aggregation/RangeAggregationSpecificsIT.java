@@ -40,7 +40,7 @@ import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.singleinstance.BeforeAll;
 import org.hibernate.search.util.impl.test.singleinstance.InstanceRule;
@@ -303,12 +303,11 @@ public class RangeAggregationSpecificsIT<F> {
 	public void rangeNull() {
 		String fieldPath = indexMapping.fieldModel.relativeFieldName;
 
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				indexManager.createScope().aggregation().range()
 						.field( fieldPath, typeDescriptor.getJavaType() )
 						.range( null )
 		)
-				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'range'" )
 				.hasMessageContaining( "must not be null" );
@@ -318,12 +317,11 @@ public class RangeAggregationSpecificsIT<F> {
 	public void rangesNull() {
 		String fieldPath = indexMapping.fieldModel.relativeFieldName;
 
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				indexManager.createScope().aggregation().range()
 						.field( fieldPath, typeDescriptor.getJavaType() )
 						.ranges( null )
 		)
-				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'ranges'" )
 				.hasMessageContaining( "must not be null" );
@@ -333,7 +331,7 @@ public class RangeAggregationSpecificsIT<F> {
 	public void rangesContainingNull() {
 		String fieldPath = indexMapping.fieldModel.relativeFieldName;
 
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				indexManager.createScope().aggregation().range()
 						.field( fieldPath, typeDescriptor.getJavaType() )
 						.ranges( Arrays.asList(
@@ -341,7 +339,6 @@ public class RangeAggregationSpecificsIT<F> {
 								null
 						) )
 		)
-				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'range'" )
 				.hasMessageContaining( "must not be null" );
@@ -352,11 +349,10 @@ public class RangeAggregationSpecificsIT<F> {
 	public void superClassFieldType() {
 		String fieldPath = indexMapping.fieldModel.relativeFieldName;
 
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				indexManager.createScope().aggregation().range()
 						.field( fieldPath, typeDescriptor.getJavaType().getSuperclass() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid type" )
 				.hasMessageContaining( "for aggregation on field" )

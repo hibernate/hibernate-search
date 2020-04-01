@@ -45,7 +45,6 @@ public class BootstrapFailureIT {
 						"Unable to find a default value bridge implementation",
 						ContainedEntity.class.getName()
 				);
-;
 	}
 
 	@Entity(name = "failingindexed")

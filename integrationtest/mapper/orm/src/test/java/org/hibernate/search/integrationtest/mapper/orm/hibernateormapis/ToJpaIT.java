@@ -34,7 +34,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -112,10 +112,9 @@ public class ToJpaIT {
 		}
 
 		EntityManager closedEntityManager = entityManager;
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			Search.session( closedEntityManager );
 		} )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessage( "HSEARCH800016: Error trying to access Hibernate ORM session." );
 	}
@@ -178,10 +177,9 @@ public class ToJpaIT {
 					b -> { },
 					StubSearchWorkBehavior.empty()
 			);
-			SubTest.expectException( () -> {
+			Assertions.assertThatThrownBy( () -> {
 				query.getSingleResult();
 			} )
-					.assertThrown()
 					.isInstanceOf( NoResultException.class );
 			backendMock.verifyExpectationsMet();
 
@@ -194,10 +192,9 @@ public class ToJpaIT {
 							reference( IndexedEntity.NAME, "2" )
 					)
 			);
-			SubTest.expectException( () -> {
+			Assertions.assertThatThrownBy( () -> {
 				query.getSingleResult();
 			} )
-					.assertThrown()
 					.isInstanceOf( NonUniqueResultException.class );
 			backendMock.verifyExpectationsMet();
 
@@ -264,8 +261,7 @@ public class ToJpaIT {
 			);
 
 			// Just check that the exception is propagated
-			SubTest.expectException( () -> query.getResultList() )
-					.assertThrown()
+			Assertions.assertThatThrownBy( () -> query.getResultList() )
 					.isInstanceOf( QueryTimeoutException.class )
 					.hasCause( timeoutException );
 		} );
@@ -288,8 +284,7 @@ public class ToJpaIT {
 			);
 
 			// Just check that the exception is propagated
-			SubTest.expectException( () -> query.getResultList() )
-					.assertThrown()
+			Assertions.assertThatThrownBy( () -> query.getResultList() )
 					.isInstanceOf( QueryTimeoutException.class )
 					.hasCause( timeoutException );
 		} );
@@ -317,8 +312,7 @@ public class ToJpaIT {
 			);
 
 			// Just check that the exception is propagated
-			SubTest.expectException( () -> query.getResultList() )
-					.assertThrown()
+			Assertions.assertThatThrownBy( () -> query.getResultList() )
 					.isInstanceOf( QueryTimeoutException.class )
 					.hasCause( timeoutException );
 		} );
@@ -334,10 +328,9 @@ public class ToJpaIT {
 		createSimpleQuery( searchSession );
 		entityManager.close();
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			createSimpleQuery( searchSession );
 		} )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
 	}
@@ -349,10 +342,9 @@ public class ToJpaIT {
 		SearchSession searchSession = Search.session( entityManager );
 		entityManager.close();
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			createSimpleQuery( searchSession );
 		} )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessage( "HSEARCH800017: Underlying Hibernate ORM Session seems to be closed." );
 	}

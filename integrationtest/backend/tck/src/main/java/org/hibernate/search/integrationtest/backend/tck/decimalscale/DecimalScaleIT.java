@@ -23,7 +23,6 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
-import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Rule;
 import org.junit.Test;
@@ -63,33 +62,33 @@ public class DecimalScaleIT {
 
 	@Test
 	public void noDecimalScale_bigDecimal() {
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				setupHelper.start()
 						.withIndex( INDEX_NAME, ctx -> ctx.getSchemaElement().field( "noScaled", f -> f.asBigDecimal() ).toReference() )
 						.setup()
-		).assertThrown()
+		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Impossible to detect a decimal scale to use for this field." );
 	}
 
 	@Test
 	public void noDecimalScale_bigInteger() {
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				setupHelper.start()
 						.withIndex( INDEX_NAME, ctx -> ctx.getSchemaElement().field( "noScaled", f -> f.asBigInteger() ).toReference() )
 						.setup()
-		).assertThrown()
+		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Impossible to detect a decimal scale to use for this field." );
 	}
 
 	@Test
 	public void positiveDecimalScale_bigInteger() {
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				setupHelper.start()
 						.withIndex( INDEX_NAME, ctx -> ctx.getSchemaElement().field( "positiveScaled", f -> f.asBigInteger().decimalScale( 3 ) ).toReference() )
 						.setup()
-		).assertThrown()
+		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Positive decimal scale ['3'] is not allowed for BigInteger fields" );
 	}
@@ -405,12 +404,11 @@ public class DecimalScaleIT {
 		// Provide a value that cannot be represented as a long
 		BigDecimal tooLargeDecimal = BigDecimal.valueOf( Long.MAX_VALUE ).multiply( BigDecimal.TEN );
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 			plan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, tooLargeDecimal ) );
 			plan.execute().join();
 		} )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
 	}
@@ -431,12 +429,11 @@ public class DecimalScaleIT {
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, veryLargeDecimal ) );
 		plan.execute().join();
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			indexManager.createScope()
 					.query().selectEntityReference()
 					.where( p -> p.range().field( "scaled" ).atMost( tooLargeDecimal ) );
 		} )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
 	}
@@ -452,12 +449,11 @@ public class DecimalScaleIT {
 		// Provide a value that cannot be represented as a long
 		BigDecimal tooLargeDecimal = BigDecimal.valueOf( Long.MIN_VALUE ).multiply( BigDecimal.TEN );
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 			plan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, tooLargeDecimal ) );
 			plan.execute().join();
 		} )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
 	}
@@ -473,12 +469,11 @@ public class DecimalScaleIT {
 		// Provide a value that cannot be represented as a long
 		BigInteger tooLargeInteger = BigInteger.valueOf( Long.MAX_VALUE ).multiply( BigInteger.TEN );
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 			plan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, tooLargeInteger ) );
 			plan.execute().join();
 		} )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
 	}
@@ -494,12 +489,11 @@ public class DecimalScaleIT {
 		// Provide a value that cannot be represented as a long
 		BigInteger tooLargeInteger = BigInteger.valueOf( Long.MIN_VALUE ).multiply( BigInteger.TEN );
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 			plan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, tooLargeInteger ) );
 			plan.execute().join();
 		} )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
 	}
@@ -520,12 +514,11 @@ public class DecimalScaleIT {
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, veryLargeNegativeInteger ) );
 		plan.execute().join();
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			indexManager.createScope()
 					.query().selectEntityReference()
 					.where( p -> p.range().field( "scaled" ).atLeast( tooLargeInteger ) );
 		} )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
 	}
@@ -541,12 +534,11 @@ public class DecimalScaleIT {
 		// Provide a value that if it were divided by 10, could not be represented as a long, because the scale of 2
 		BigDecimal tooLargeDecimal = BigDecimal.valueOf( Long.MAX_VALUE ).divide( BigDecimal.TEN );
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 			plan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, tooLargeDecimal ) );
 			plan.execute().join();
 		} )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
 	}
@@ -562,12 +554,11 @@ public class DecimalScaleIT {
 		// Provide a value that if it were divided by 10, could not be represented as a long, because the scale of 2
 		BigDecimal tooLargeDecimal = BigDecimal.valueOf( Long.MIN_VALUE ).divide( BigDecimal.TEN );
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 			plan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, tooLargeDecimal ) );
 			plan.execute().join();
 		} )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
 	}
@@ -588,12 +579,11 @@ public class DecimalScaleIT {
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( decimalScaleIndexMapping.scaled, veryLargeDecimal ) );
 		plan.execute().join();
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			indexManager.createScope()
 					.query().selectEntityReference()
 					.where( p -> p.range().field( "scaled" ).atLeast( tooLargeDecimal ) );
 		} )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
 	}
@@ -609,12 +599,11 @@ public class DecimalScaleIT {
 		// Provide a value that if it were multiplied by 100, could not be represented as a long, because the scale of -2
 		BigInteger tooLargeInteger = BigInteger.valueOf( Long.MAX_VALUE ).multiply( new BigInteger( "1000" ) );
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 			plan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, tooLargeInteger ) );
 			plan.execute().join();
 		} )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
 	}
@@ -635,12 +624,11 @@ public class DecimalScaleIT {
 		plan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, veryLargeInteger ) );
 		plan.execute().join();
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			indexManager.createScope()
 					.query().selectEntityReference()
 					.where( p -> p.range().field( "scaled" ).atMost( tooLargeInteger ) );
 		} )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
 	}
@@ -656,12 +644,11 @@ public class DecimalScaleIT {
 		// Provide a value that if it were multiplied by 100, could not be represented as a long, because the scale of -2
 		BigInteger tooLargeInteger = BigInteger.valueOf( Long.MIN_VALUE ).multiply( new BigInteger( "1000" ) );
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
 			plan.add( referenceProvider( "1" ), doc -> doc.addValue( integerScaleIndexMapping.scaled, tooLargeInteger ) );
 			plan.execute().join();
 		} )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "cannot be indexed because its absolute value is too large." );
 	}

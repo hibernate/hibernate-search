@@ -18,7 +18,7 @@ import org.hibernate.search.engine.spatial.GeoBoundingBox;
 import org.hibernate.search.engine.spatial.GeoPoint;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Test;
 
@@ -94,9 +94,9 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 	public void within_unsearchable_boundingBox() {
 		StubMappingScope scope = unsearchableFieldsIndexManager.createScope();
 
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				scope.predicate().spatial().within().field( "geoPoint" ).boundingBox( BOUNDING_BOX_2 )
-		).assertThrown()
+		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "is not searchable" )
 				.hasMessageContaining( "Make sure the field is marked as searchable" )
@@ -121,11 +121,10 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 	public void unsupported_field_types() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException(
-				"spatial().within().boundingBox() predicate on field with unsupported type",
-				() -> scope.predicate().spatial().within().field( "string" ).boundingBox( BOUNDING_BOX_1 )
+		Assertions.assertThatThrownBy(
+				() -> scope.predicate().spatial().within().field( "string" ).boundingBox( BOUNDING_BOX_1 ),
+				"spatial().within().boundingBox() predicate on field with unsupported type"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Spatial predicates are not supported by" )
 				.satisfies( FailureReportUtils.hasContext(
@@ -374,11 +373,10 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 	public void boundingBox_error_null() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException(
-				"spatial().within().boundingBox() predicate with null bounding box",
-				() -> scope.predicate().spatial().within().field( "geoPoint" ).boundingBox( null )
+		Assertions.assertThatThrownBy(
+				() -> scope.predicate().spatial().within().field( "geoPoint" ).boundingBox( null ),
+				"spatial().within().boundingBox() predicate with null bounding box"
 		)
-				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "HSEARCH900000" );
 	}
@@ -387,12 +385,11 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 	public void unknown_field() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException(
-				"spatial().within().boundingBox() predicate on unknown field",
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().spatial().within().field( "unknown_field" )
-						.boundingBox( BOUNDING_BOX_1 ).toPredicate()
+						.boundingBox( BOUNDING_BOX_1 ).toPredicate(),
+				"spatial().within().boundingBox() predicate on unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
@@ -413,8 +410,7 @@ public class SpatialWithinBoundingBoxSearchPredicateIT extends AbstractSpatialWi
 	public void multiIndex_incompatibleSearchable() {
 		StubMappingScope scope = indexManager.createScope( unsearchableFieldsIndexManager );
 
-		SubTest.expectException( () -> scope.predicate().spatial().within().field( "geoPoint" ).boundingBox( BOUNDING_BOX_2 ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> scope.predicate().spatial().within().field( "geoPoint" ).boundingBox( BOUNDING_BOX_2 ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 				.hasMessageContaining( "geoPoint" )
