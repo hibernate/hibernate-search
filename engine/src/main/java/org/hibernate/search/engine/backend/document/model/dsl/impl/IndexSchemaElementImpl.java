@@ -57,8 +57,8 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> field(
 		String relativeFieldName, IndexFieldType<F> type) {
 		checkRelativeFieldName( relativeFieldName );
-		IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> fieldFinalStep
-			= // Explicit type parameter needed in order for JDT to compile correctly (probably a bug)
+		IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> fieldFinalStep =
+				// Explicit type parameter needed in order for JDT to compile correctly (probably a bug)
 			nestingContext.<IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>>>nest(
 				relativeFieldName,
 				// If the field is included
@@ -75,7 +75,7 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 	@Override
 	public <F extends FilterFactory> IndexSchemaFilterOptionsStep<?, IndexFilterReference<F>> filter(
 		String relativeFilterName, F factory) {
-		checkRelativeFieldName( relativeFilterName );
+		checkRelativeFilterName( relativeFilterName );
 
 		IndexSchemaFilterOptionsStep<?, IndexFilterReference<F>> filterFinalStep
 			= nestingContext.<IndexSchemaFilterOptionsStep<?, IndexFilterReference<F>>>nest(
@@ -97,19 +97,19 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 
 	@Override
 	public IndexSchemaObjectField objectField(String relativeFieldName, ObjectFieldStorage storage) {
-		checkRelativeFilterName( relativeFieldName );
+		checkRelativeFieldName( relativeFieldName );
 		IndexSchemaObjectField objectField = nestingContext.nest(
 			relativeFieldName,
 			// If the field is included
 			(prefixedName, filter) -> {
-				IndexSchemaObjectFieldNodeBuilder objectFieldBuilder
-				= this.objectNodeBuilder.addObjectField( prefixedName, storage );
+					IndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
+							this.objectNodeBuilder.addObjectField( prefixedName, storage );
 				return new IndexSchemaObjectFieldImpl( typeFactory, objectFieldBuilder, filter, false );
 			},
 			// If the field is filtered out
 			(prefixedName, filter) -> {
-				IndexSchemaObjectFieldNodeBuilder objectFieldBuilder
-				= this.objectNodeBuilder.createExcludedObjectField( prefixedName, storage );
+					IndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
+							this.objectNodeBuilder.createExcludedObjectField( prefixedName, storage );
 				return new IndexSchemaObjectFieldImpl( typeFactory, objectFieldBuilder, filter, false );
 			}
 		);
