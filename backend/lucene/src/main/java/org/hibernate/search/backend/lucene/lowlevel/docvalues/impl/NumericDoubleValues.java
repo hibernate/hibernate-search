@@ -12,6 +12,7 @@ import java.util.function.LongToDoubleFunction;
 
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.search.DoubleValues;
+import org.apache.lucene.util.NumericUtils;
 
 /**
  * A per-document numeric value.
@@ -29,23 +30,37 @@ public abstract class NumericDoubleValues extends DoubleValues {
 	}
 
 	/**
+	 * Retrieves the number of values for the current document.This must always
+	 * be greater than zero. It is illegal to call this method after {@link #advanceExact(int)}
+	 * returned {@code false}.
+	 *
+	 * @return value count
+	 */
+	public int docValueCount() {
+		return 1;
+	}
+
+	/**
 	 * Returns numeric docvalues view of raw double bits
+	 *
 	 * @return numeric
 	 */
 	public NumericDocValues getRawDoubleValues() {
-		return new RawNumericDocValues( Double::doubleToRawLongBits );
+		return new RawNumericDocValues( NumericUtils::doubleToSortableLong );
 	}
 
 	/**
 	 * Returns numeric docvalues view of raw float bits
+	 *
 	 * @return numeric
 	 */
 	public NumericDocValues getRawFloatValues() {
-		return new RawNumericDocValues( v -> (long) Float.floatToRawIntBits( (float) v ) );
+		return new RawNumericDocValues( v -> (long) NumericUtils.floatToSortableInt( (float) v ) );
 	}
 
 	/**
 	 * Returns numeric docvalues view of raw long bits
+	 *
 	 * @return numeric
 	 */
 	public NumericDocValues getRawLongValues() {

@@ -17,13 +17,13 @@ import org.apache.lucene.search.LongValues;
  * Copied and adapted from {@code org.elasticsearch.index.fielddata.NumericDoubleValues} class
  * of <a href="https://github.com/elastic/elasticsearch">Elasticsearch project</a>.
  */
-public abstract class LongMultiValues extends LongValues {
+public abstract class NumericLongValues extends LongValues {
 
 	/**
 	 * Sole constructor. (For invocation by subclass
 	 * constructors, typically implicit.)
 	 */
-	protected LongMultiValues() {
+	protected NumericLongValues() {
 	}
 
 	/**
@@ -36,17 +36,6 @@ public abstract class LongMultiValues extends LongValues {
 	}
 
 	/**
-	 * Iterates to the next value in the current document.Do not call this more than {@link #docValueCount} times
-	 * for the document.
-	 *
-	 * @return the next value
-	 * @throws java.io.IOException
-	 */
-	public long nextValue() throws IOException {
-		return longValue();
-	}
-
-	/**
 	 * Retrieves the number of values for the current document.This must always
 	 * be greater than zero. It is illegal to call this method after {@link #advanceExact(int)}
 	 * returned {@code false}.
@@ -56,6 +45,23 @@ public abstract class LongMultiValues extends LongValues {
 	public int docValueCount() {
 		return 1;
 	}
+
+	public static final NumericLongValues LONG_VALUES_EMPTY = new NumericLongValues() {
+		@Override
+		public long longValue() {
+			throw new UnsupportedOperationException();
+		}
+
+		@Override
+		public boolean advanceExact(int doc) {
+			return false;
+		}
+
+		@Override
+		public int docValueCount() {
+			return 0;
+		}
+	};
 
 	/**
 	 * Returns numeric docvalues view of raw int bits
@@ -75,12 +81,12 @@ public abstract class LongMultiValues extends LongValues {
 		@Override
 		public boolean advanceExact(int target) throws IOException {
 			docID = target;
-			return LongMultiValues.this.advanceExact( target );
+			return NumericLongValues.this.advanceExact( target );
 		}
 
 		@Override
 		public long longValue() throws IOException {
-			return LongMultiValues.this.longValue();
+			return NumericLongValues.this.longValue();
 		}
 
 		@Override

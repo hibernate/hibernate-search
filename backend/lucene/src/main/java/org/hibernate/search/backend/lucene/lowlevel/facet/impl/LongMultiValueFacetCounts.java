@@ -19,8 +19,8 @@ import org.apache.lucene.index.IndexReader;
 import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.PriorityQueue;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValues;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesSource;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.NumericLongValues;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesToSingleValuesSource;
 
 /**
  * <p>
@@ -37,27 +37,27 @@ public class LongMultiValueFacetCounts extends Facets {
 
 	private int totCount;
 
-	public LongMultiValueFacetCounts(String field, LongMultiValuesSource valueSource, FacetsCollector hits) throws IOException {
+	public LongMultiValueFacetCounts(String field, LongMultiValuesToSingleValuesSource valueSource, FacetsCollector hits) throws IOException {
 		this.field = field;
 		count( valueSource, hits.getMatchingDocs() );
 	}
 
-	public LongMultiValueFacetCounts(String field, LongMultiValuesSource valueSource, IndexReader reader) throws IOException {
+	public LongMultiValueFacetCounts(String field, LongMultiValuesToSingleValuesSource valueSource, IndexReader reader) throws IOException {
 		this.field = field;
 		countAll( valueSource, field, reader );
 	}
 
-	private void count(LongMultiValuesSource valueSource, List<FacetsCollector.MatchingDocs> matchingDocs) throws IOException {
+	private void count(LongMultiValuesToSingleValuesSource valueSource, List<FacetsCollector.MatchingDocs> matchingDocs) throws IOException {
 
 		for ( FacetsCollector.MatchingDocs hits : matchingDocs ) {
-			LongMultiValues fv = valueSource.getValues( hits.context, null );
+			NumericLongValues fv = valueSource.getValues( hits.context, null );
 
 			DocIdSetIterator docs = hits.bits.iterator();
 			for ( int doc = docs.nextDoc(); doc != DocIdSetIterator.NO_MORE_DOCS; ) {
 				if ( fv.advanceExact( doc ) ) {
 					int count = fv.docValueCount();
 					for ( int index = 0; index < count; ++index ) {
-						increment( fv.nextValue() );
+						increment( fv.longValue() );
 						totCount++;
 					}
 				}
@@ -67,17 +67,17 @@ public class LongMultiValueFacetCounts extends Facets {
 		}
 	}
 
-	private void countAll(LongMultiValuesSource valueSource, String field, IndexReader reader) throws IOException {
+	private void countAll(LongMultiValuesToSingleValuesSource valueSource, String field, IndexReader reader) throws IOException {
 
 		for ( LeafReaderContext context : reader.leaves() ) {
-			LongMultiValues fv = valueSource.getValues( context, null );
+			NumericLongValues fv = valueSource.getValues( context, null );
 			int maxDoc = context.reader().maxDoc();
 
 			for ( int doc = 0; doc < maxDoc; doc++ ) {
 				if ( fv.advanceExact( doc ) ) {
 					int count = fv.docValueCount();
 					for ( int index = 0; index < count; ++index ) {
-						increment( fv.nextValue() );
+						increment( fv.longValue() );
 						totCount++;
 					}
 				}
