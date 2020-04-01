@@ -42,7 +42,7 @@ public class LuceneIndexSchemaFilterNode<F extends FilterFactory> {
 
 		if ( !nestedPathHierarchy.isEmpty() ) {
 			nestedDocumentPath = nestedPathHierarchy
-				.get( nestedPathHierarchy.size()- 1 );
+				.get( nestedPathHierarchy.size() - 1 );
 		}
 
 	}
