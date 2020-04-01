@@ -7,7 +7,9 @@
 package org.hibernate.search.backend.elasticsearch.document.model.dsl.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.hibernate.search.backend.elasticsearch.types.impl.ElasticsearchIndexFieldType;
@@ -21,7 +23,10 @@ import org.hibernate.search.backend.elasticsearch.document.model.impl.Elasticsea
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.AbstractTypeMapping;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
+import org.hibernate.search.engine.backend.document.IndexFilterReference;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFilterOptionsStep;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
+import org.hibernate.search.engine.search.predicate.factories.FilterFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implements IndexSchemaObjectNodeBuilder {
@@ -29,40 +34,50 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, ElasticsearchIndexSchemaNodeContributor> content = new LinkedHashMap<>();
+	private final Map<String, ElasticsearchIndexSchemaNodeContributor> filters = new LinkedHashMap<>();
 
 	@Override
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "absolutePath=" ).append( getAbsolutePath() )
-				.append( "]" )
-				.toString();
+			.append( "[" )
+			.append( "absolutePath=" ).append( getAbsolutePath() )
+			.append( "]" )
+			.toString();
 	}
 
 	@Override
 	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> addField(
-			String relativeFieldName, IndexFieldType<F> indexFieldType) {
+		String relativeFieldName, IndexFieldType<F> indexFieldType) {
 		ElasticsearchIndexFieldType<F> elasticsearchIndexFieldType = (ElasticsearchIndexFieldType<F>) indexFieldType;
 		ElasticsearchIndexSchemaFieldNodeBuilder<F> childBuilder = new ElasticsearchIndexSchemaFieldNodeBuilder<>(
-				this, relativeFieldName, elasticsearchIndexFieldType
+			this, relativeFieldName, elasticsearchIndexFieldType
 		);
 		putField( relativeFieldName, childBuilder );
 		return childBuilder;
 	}
 
 	@Override
+	public <F extends FilterFactory> IndexSchemaFilterOptionsStep<?, IndexFilterReference<F>> addFilter(String name, F factory) {
+		ElasticsearchIndexSchemaFilterFactoryBuilder<F> childBuilder = new ElasticsearchIndexSchemaFilterFactoryBuilder<>(
+			this, name, factory
+		);
+		putFilter( name, childBuilder );
+		return childBuilder;
+	}
+
+	@Override
 	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> createExcludedField(
-			String relativeFieldName, IndexFieldType<F> indexFieldType) {
+		String relativeFieldName, IndexFieldType<F> indexFieldType) {
 		ElasticsearchIndexFieldType<F> elasticsearchIndexFieldType = (ElasticsearchIndexFieldType<F>) indexFieldType;
 		return new ElasticsearchIndexSchemaFieldNodeBuilder<>(
-				this, relativeFieldName, elasticsearchIndexFieldType
+			this, relativeFieldName, elasticsearchIndexFieldType
 		);
 	}
 
 	@Override
 	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, ObjectFieldStorage storage) {
-		ElasticsearchIndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
-				new ElasticsearchIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, storage );
+		ElasticsearchIndexSchemaObjectFieldNodeBuilder objectFieldBuilder
+			= new ElasticsearchIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, storage );
 		putField( relativeFieldName, objectFieldBuilder );
 		return objectFieldBuilder;
 	}
@@ -73,11 +88,19 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 	}
 
 	final void contributeChildren(AbstractTypeMapping mapping, ElasticsearchIndexSchemaObjectNode node,
-			ElasticsearchIndexSchemaNodeCollector collector) {
+		ElasticsearchIndexSchemaNodeCollector collector) {
 		for ( Map.Entry<String, ElasticsearchIndexSchemaNodeContributor> entry : content.entrySet() ) {
 			ElasticsearchIndexSchemaNodeContributor propertyContributor = entry.getValue();
 			propertyContributor.contribute( collector, node, mapping );
 		}
+		for ( Map.Entry<String, ElasticsearchIndexSchemaNodeContributor> entry : filters.entrySet() ) {
+			ElasticsearchIndexSchemaNodeContributor propertyContributor = entry.getValue();
+			propertyContributor.contribute( collector, node, mapping );
+		}
+	}
+
+	final List<String> getFilterNames() {
+		return new ArrayList<>( filters.keySet() );
 	}
 
 	abstract ElasticsearchIndexSchemaRootNodeBuilder getRootNodeBuilder();
@@ -91,4 +114,10 @@ public abstract class AbstractElasticsearchIndexSchemaObjectNodeBuilder implemen
 		}
 	}
 
+	private void putFilter(String name, ElasticsearchIndexSchemaNodeContributor contributor) {
+		Object previous = filters.putIfAbsent( name, contributor );
+		if ( previous != null ) {
+			throw log.indexSchemaFilterNameConflict( name, getEventContext() );
+		}
+	}
 }

@@ -14,6 +14,7 @@ import java.util.concurrent.CompletableFuture;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.predicate.factories.FilterFactory;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.index.StubDocumentWork;
@@ -39,13 +40,19 @@ public abstract class StubBackendBehavior {
 		@Override
 		public void onAddField(String indexName, String absoluteFieldPath) {
 			throw new IllegalStateException( "The stub backend behavior was not set when a field was added to index '"
-					+ indexName + "': " + absoluteFieldPath );
+				+ indexName + "': " + absoluteFieldPath );
+		}
+
+		@Override
+		public void onAddFilter(String indexName, String absoluteFilterPath, FilterFactory factory) {
+			throw new IllegalStateException( "The stub backend behavior was not set when a filter was added to index '"
+				+ indexName + "': " + absoluteFilterPath );
 		}
 
 		@Override
 		public void defineSchema(String indexName, StubIndexSchemaNode rootSchemaNode) {
 			throw new IllegalStateException( "The stub backend behavior was not set when a schema was pushed for index '"
-					+ indexName + "': " + rootSchemaNode );
+				+ indexName + "': " + rootSchemaNode );
 		}
 
 		@Override
@@ -58,33 +65,33 @@ public abstract class StubBackendBehavior {
 		@Override
 		public void processDocumentWork(String indexName, StubDocumentWork work) {
 			throw new IllegalStateException( "The stub backend behavior was not set when a work was prepared for index '"
-					+ indexName + "': " + work );
+				+ indexName + "': " + work );
 		}
 
 		@Override
 		public void discardDocumentWork(String indexName, StubDocumentWork work) {
 			throw new IllegalStateException( "The stub backend behavior was not set when a work was discarded from index '"
-					+ indexName + "': " + work );
+				+ indexName + "': " + work );
 		}
 
 		@Override
 		public CompletableFuture<?> executeDocumentWork(String indexName, StubDocumentWork work) {
 			throw new IllegalStateException( "The stub backend behavior was not set when a work was executed for index '"
-					+ indexName + "': " + work );
+				+ indexName + "': " + work );
 		}
 
 		@Override
 		public CompletableFuture<?> processAndExecuteDocumentWork(String indexName, StubDocumentWork work) {
 			throw new IllegalStateException( "The stub backend behavior was not set when work were prepared and executed for index '"
-					+ indexName + "': " + work );
+				+ indexName + "': " + work );
 		}
 
 		@Override
 		public <T> SearchResult<T> executeSearchWork(Set<String> indexNames, StubSearchWork work,
-				StubSearchProjectionContext projectionContext,
-				LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
+			StubSearchProjectionContext projectionContext,
+			LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
 			throw new IllegalStateException( "The stub backend behavior was not set when a search work was executed for indexes "
-					+ indexNames + ": " + work );
+				+ indexNames + ": " + work );
 		}
 
 		@Override
@@ -96,7 +103,7 @@ public abstract class StubBackendBehavior {
 		@Override
 		public long executeCountWork(Set<String> indexNames) {
 			throw new IllegalStateException( "The stub backend behavior was not set when a count work was executed for indexes "
-					+ indexNames );
+				+ indexNames );
 		}
 	};
 
@@ -123,6 +130,8 @@ public abstract class StubBackendBehavior {
 
 	public abstract void onAddField(String indexName, String absoluteFieldPath);
 
+	public abstract void onAddFilter(String indexName, String absoluteFilterPath, FilterFactory factory);
+
 	public abstract void defineSchema(String indexName, StubIndexSchemaNode rootSchemaNode);
 
 	public abstract CompletableFuture<?> executeSchemaManagementWork(String indexName, StubSchemaManagementWork work,
@@ -137,8 +146,8 @@ public abstract class StubBackendBehavior {
 	public abstract CompletableFuture<?> processAndExecuteDocumentWork(String indexName, StubDocumentWork work);
 
 	public abstract <T> SearchResult<T> executeSearchWork(Set<String> indexNames, StubSearchWork work,
-			StubSearchProjectionContext projectionContext,
-			LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection);
+		StubSearchProjectionContext projectionContext,
+		LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection);
 
 	public abstract CompletableFuture<?> executeIndexScaleWork(String indexName, StubIndexScaleWork work);
 

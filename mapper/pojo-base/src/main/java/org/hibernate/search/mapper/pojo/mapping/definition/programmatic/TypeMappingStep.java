@@ -9,6 +9,7 @@ package org.hibernate.search.mapper.pojo.mapping.definition.programmatic;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.FilterBinder;
 
 /**
  * The step in a mapping definition where a type can be mapped,
@@ -49,6 +50,14 @@ public interface TypeMappingStep {
 	 * @see RoutingKeyBinder
 	 */
 	TypeMappingStep routingKeyBinder(RoutingKeyBinder binder);
+
+	/**
+	 * @param name the name for creating full text filter
+	 * @param binder A {@link FilterBinder} responsible for creating a full text filter.
+	 * @return {@code this}, for method chaining.
+	 * @see RoutingKeyBinder
+	 */
+	TypeMappingStep filter(String name, FilterBinder binder);
 
 	/**
 	 * @param binder A {@link TypeBinder} responsible for creating a bridge.

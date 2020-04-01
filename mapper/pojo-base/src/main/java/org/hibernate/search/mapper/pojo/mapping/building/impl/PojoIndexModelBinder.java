@@ -28,10 +28,12 @@ import org.hibernate.search.mapper.pojo.extractor.ContainerExtractor;
 import org.hibernate.search.mapper.pojo.extractor.impl.BoundContainerExtractorPath;
 import org.hibernate.search.mapper.pojo.extractor.impl.ContainerExtractorHolder;
 import org.hibernate.search.mapper.pojo.extractor.mapping.programmatic.ContainerExtractorPath;
+import org.hibernate.search.mapper.pojo.bridge.binding.impl.BoundFilterBridge;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathPropertyNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathTypeNode;
 import org.hibernate.search.mapper.pojo.model.path.impl.BoundPojoModelPathValueNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.FilterBinder;
 
 /**
  * Binds a mapping to a given entity model and index model
@@ -49,27 +51,30 @@ import org.hibernate.search.mapper.pojo.model.spi.PojoGenericTypeModel;
 public interface PojoIndexModelBinder {
 
 	<C> BoundContainerExtractorPath<C, ?> bindExtractorPath(
-			PojoGenericTypeModel<C> pojoGenericTypeModel, ContainerExtractorPath extractorPath);
+		PojoGenericTypeModel<C> pojoGenericTypeModel, ContainerExtractorPath extractorPath);
 
 	<C, V> ContainerExtractorHolder<C, V> createExtractors(
-			BoundContainerExtractorPath<C, V> boundExtractorPath);
+		BoundContainerExtractorPath<C, V> boundExtractorPath);
 
 	<I> BoundIdentifierBridge<I> bindIdentifier(
-			IndexedEntityBindingContext bindingContext,
-			BoundPojoModelPathPropertyNode<?, I> modelPath, IdentifierBinder binder);
+		IndexedEntityBindingContext bindingContext,
+		BoundPojoModelPathPropertyNode<?, I> modelPath, IdentifierBinder binder);
 
 	<T> BoundRoutingKeyBridge<T> bindRoutingKey(IndexedEntityBindingContext bindingContext,
-			BoundPojoModelPathTypeNode<T> modelPath, RoutingKeyBinder binder);
+		BoundPojoModelPathTypeNode<T> modelPath, RoutingKeyBinder binder);
+
+	<T> Optional<BoundFilterBridge<T>> bindFilter(IndexBindingContext indexBindingContext,
+		BoundPojoModelPathTypeNode<T> modelPath, String name, FilterBinder binder);
 
 	<T> Optional<BoundTypeBridge<T>> bindType(IndexBindingContext bindingContext,
-			BoundPojoModelPathTypeNode<T> modelPath, TypeBinder binder);
+		BoundPojoModelPathTypeNode<T> modelPath, TypeBinder binder);
 
 	<P> Optional<BoundPropertyBridge<P>> bindProperty(IndexBindingContext bindingContext,
-			BoundPojoModelPathPropertyNode<?, P> modelPath, PropertyBinder binder);
+		BoundPojoModelPathPropertyNode<?, P> modelPath, PropertyBinder binder);
 
 	<V> Optional<BoundValueBridge<V, ?>> bindValue(IndexBindingContext bindingContext,
-			BoundPojoModelPathValueNode<?, ?, V> modelPath, boolean multiValued,
-			ValueBinder binder,
-			String relativeFieldName, FieldModelContributor contributor);
+		BoundPojoModelPathValueNode<?, ?, V> modelPath, boolean multiValued,
+		ValueBinder binder,
+		String relativeFieldName, FieldModelContributor contributor);
 
 }

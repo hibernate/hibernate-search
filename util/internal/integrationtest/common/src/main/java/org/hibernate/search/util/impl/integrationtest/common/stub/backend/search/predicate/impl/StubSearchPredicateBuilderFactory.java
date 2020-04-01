@@ -15,6 +15,7 @@ import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.FilterPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.RangePredicateBuilder;
@@ -24,7 +25,7 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinCirclePredi
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
 
 public class StubSearchPredicateBuilderFactory
-		implements SearchPredicateBuilderFactory<StubQueryElementCollector, StubPredicateBuilder> {
+	implements SearchPredicateBuilderFactory<StubQueryElementCollector, StubPredicateBuilder> {
 
 	@Override
 	public SearchPredicate toSearchPredicate(StubPredicateBuilder builder) {
@@ -104,6 +105,11 @@ public class StubSearchPredicateBuilderFactory
 
 	@Override
 	public NestedPredicateBuilder<StubPredicateBuilder> nested(String absoluteFieldPath) {
+		return new StubPredicateBuilder();
+	}
+
+	@Override
+	public FilterPredicateBuilder def(String name) {
 		return new StubPredicateBuilder();
 	}
 }

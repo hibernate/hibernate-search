@@ -6,11 +6,11 @@
  */
 package org.hibernate.search.backend.elasticsearch.document.model.impl;
 
-
 public interface ElasticsearchIndexSchemaNodeCollector {
 
 	void collect(String absolutePath, ElasticsearchIndexSchemaObjectNode node);
 
 	void collect(String absoluteFieldPath, ElasticsearchIndexSchemaFieldNode<?> node);
 
+	void collect(String absoluteFilterPath, ElasticsearchIndexSchemaFilterNode<?> node);
 }

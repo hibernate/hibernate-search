@@ -6,13 +6,14 @@
  */
 package org.hibernate.search.engine.backend.document.model.dsl;
 
-
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexFilterReference;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
+import org.hibernate.search.engine.search.predicate.factories.FilterFactory;
 
 /**
  * An element of the index schema,
@@ -30,7 +31,7 @@ public interface IndexSchemaElement {
 	 * and where a {@link IndexSchemaObjectField#toReference() a reference to the field} can be obtained.
 	 */
 	<F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> field(
-			String relativeFieldName, IndexFieldType<F> type);
+		String relativeFieldName, IndexFieldType<F> type);
 
 	/**
 	 * Add a field to this index schema element with the given almost-built type.
@@ -42,7 +43,7 @@ public interface IndexSchemaElement {
 	 * and where a {@link IndexSchemaObjectField#toReference() a reference to the field} can be obtained.
 	 */
 	default <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> field(
-			String relativeFieldName, IndexFieldTypeFinalStep<F> dslFinalStep) {
+		String relativeFieldName, IndexFieldTypeFinalStep<F> dslFinalStep) {
 		return field( relativeFieldName, dslFinalStep.toIndexFieldType() );
 	}
 
@@ -60,7 +61,18 @@ public interface IndexSchemaElement {
 	 * and where a {@link IndexSchemaObjectField#toReference() a reference to the field} can be obtained.
 	 */
 	<F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> field(String relativeFieldName,
-			Function<? super IndexFieldTypeFactory, ? extends IndexFieldTypeFinalStep<F>> typeContributor);
+		Function<? super IndexFieldTypeFactory, ? extends IndexFieldTypeFinalStep<F>> typeContributor);
+
+	/**
+	 * Add an filter factory to this index schema element with the given storage type.
+	 *
+	 * @param relativeFilterName The relative name of the new filter.
+	 * @param factory The factory type.
+	 * @param <F> The type of accessors for the new filter factory.
+	 * @return A DSL step where the filter can be defined in more details,
+	 * @see FilterFactory
+	 */
+	<F extends FilterFactory> IndexSchemaFilterOptionsStep<?, IndexFilterReference<F>> filter(String relativeFilterName, F factory);
 
 	/**
 	 * Add an object field to this index schema element with the default storage type.

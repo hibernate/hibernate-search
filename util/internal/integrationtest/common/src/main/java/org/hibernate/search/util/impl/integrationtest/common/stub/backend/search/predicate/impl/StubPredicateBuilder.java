@@ -12,6 +12,7 @@ import org.hibernate.search.engine.search.common.ValueConvert;
 import org.hibernate.search.engine.search.predicate.dsl.SimpleQueryFlag;
 import org.hibernate.search.engine.search.predicate.spi.BooleanPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
+import org.hibernate.search.engine.search.predicate.spi.FilterPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchAllPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchIdPredicateBuilder;
 import org.hibernate.search.engine.search.predicate.spi.MatchPredicateBuilder;
@@ -30,18 +31,19 @@ import org.hibernate.search.engine.spatial.GeoPolygon;
 import org.hibernate.search.util.common.data.Range;
 
 public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredicateBuilder>,
-		BooleanPredicateBuilder<StubPredicateBuilder>,
-		MatchIdPredicateBuilder<StubPredicateBuilder>,
-		MatchPredicateBuilder<StubPredicateBuilder>,
-		RangePredicateBuilder<StubPredicateBuilder>,
-		PhrasePredicateBuilder<StubPredicateBuilder>,
-		WildcardPredicateBuilder<StubPredicateBuilder>,
-		SimpleQueryStringPredicateBuilder<StubPredicateBuilder>,
-		NestedPredicateBuilder<StubPredicateBuilder>,
-		ExistsPredicateBuilder<StubPredicateBuilder>,
-		SpatialWithinCirclePredicateBuilder<StubPredicateBuilder>,
-		SpatialWithinPolygonPredicateBuilder<StubPredicateBuilder>,
-		SpatialWithinBoundingBoxPredicateBuilder<StubPredicateBuilder> {
+	BooleanPredicateBuilder<StubPredicateBuilder>,
+	MatchIdPredicateBuilder<StubPredicateBuilder>,
+	MatchPredicateBuilder<StubPredicateBuilder>,
+	RangePredicateBuilder<StubPredicateBuilder>,
+	PhrasePredicateBuilder<StubPredicateBuilder>,
+	WildcardPredicateBuilder<StubPredicateBuilder>,
+	SimpleQueryStringPredicateBuilder<StubPredicateBuilder>,
+	NestedPredicateBuilder<StubPredicateBuilder>,
+	ExistsPredicateBuilder<StubPredicateBuilder>,
+	SpatialWithinCirclePredicateBuilder<StubPredicateBuilder>,
+	SpatialWithinPolygonPredicateBuilder<StubPredicateBuilder>,
+	SpatialWithinBoundingBoxPredicateBuilder<StubPredicateBuilder>,
+	FilterPredicateBuilder<StubPredicateBuilder> {
 
 	@Override
 	public StubPredicateBuilder toImplementation() {
@@ -162,6 +164,11 @@ public class StubPredicateBuilder implements MatchAllPredicateBuilder<StubPredic
 	@Override
 	public void nested(StubPredicateBuilder clauseBuilder) {
 		// No-op
+	}
+
+	@Override
+	public void param(String name, Object value) {
+		// No-op, just simulates a call on this object
 	}
 
 	void simulateBuild() {

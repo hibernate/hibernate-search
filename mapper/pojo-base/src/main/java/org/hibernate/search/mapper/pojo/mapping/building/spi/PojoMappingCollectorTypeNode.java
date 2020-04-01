@@ -8,6 +8,7 @@ package org.hibernate.search.mapper.pojo.mapping.building.spi;
 
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.RoutingKeyBinder;
 import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.TypeBinder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.FilterBinder;
 
 public interface PojoMappingCollectorTypeNode extends PojoMappingCollector {
 
@@ -17,4 +18,5 @@ public interface PojoMappingCollectorTypeNode extends PojoMappingCollector {
 
 	PojoMappingCollectorPropertyNode property(String propertyName);
 
+	void filter(String name, FilterBinder reference);
 }

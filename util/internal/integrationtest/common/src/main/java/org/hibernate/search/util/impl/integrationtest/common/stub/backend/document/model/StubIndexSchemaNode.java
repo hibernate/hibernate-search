@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model;
 
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.types.Aggregable;
@@ -18,6 +20,7 @@ import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
+import org.hibernate.search.engine.search.predicate.factories.FilterFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.impl.integrationtest.common.stub.StubTreeNode;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.types.converter.impl.StubFieldConverter;
@@ -27,6 +30,7 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 	private enum Type {
 		ROOT,
 		OBJECT_FIELD,
+		FILTER_FIELD,
 		NON_OBJECT_FIELD
 	}
 
@@ -36,12 +40,18 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 
 	public static Builder objectField(Builder parent, String relativeFieldName, ObjectFieldStorage storage) {
 		return new Builder( parent, relativeFieldName, Type.OBJECT_FIELD )
-				.objectFieldStorage( storage );
+			.objectFieldStorage( storage );
 	}
 
 	public static Builder field(Builder parent, String relativeFieldName) {
 		return new Builder( parent, relativeFieldName, Type.NON_OBJECT_FIELD );
 	}
+
+	public static Builder filter(Builder parent, String relativeFieldName) {
+		return new Builder( parent, relativeFieldName, Type.FILTER_FIELD );
+	}
+
+	private final Map<String, Object> filterParams;
 
 	/*
 	 * The following properties are purposely ignored when comparing two nodes,
@@ -54,6 +64,7 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 		super( builder );
 		this.converter = builder.converter;
 		this.idDslConverter = builder.idDslConverter;
+		this.filterParams = builder.filterParams;
 	}
 
 	public ToDocumentIdentifierValueConverter<?> getIdDslConverter() {
@@ -64,9 +75,14 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 		return converter;
 	}
 
+	public Map<String, Object> getFilterParams() {
+		return filterParams;
+	}
+
 	public static class Builder extends AbstractBuilder<StubIndexSchemaNode> implements IndexSchemaBuildContext {
 		private StubFieldConverter<?> converter;
 		private ToDocumentIdentifierValueConverter<?> idDslConverter;
+		private Map<String, Object> filterParams = new LinkedHashMap<>();
 
 		private Builder(Builder parent, String relativeFieldName, Type type) {
 			super( parent, relativeFieldName );
@@ -85,9 +101,27 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 
 		public Builder field(String relativeFieldName, Class<?> inputType, Consumer<Builder> contributor) {
 			Builder builder = StubIndexSchemaNode.field( this, relativeFieldName )
-					.inputType( inputType );
+				.inputType( inputType );
 			contributor.accept( builder );
 			child( builder );
+			return this;
+		}
+
+		public Builder filter(String relativeFilterName, Consumer<Builder> contributor) {
+			Builder builder = StubIndexSchemaNode.filter( this, relativeFilterName )
+				.filterParams( filterParams );
+			contributor.accept( builder );
+			child( builder );
+			return this;
+		}
+
+		public Builder filterParam(String name, Object value) {
+			filterParams.put( name, value );
+			return this;
+		}
+
+		public Builder filterParams(Map<String, Object> filterParams) {
+			this.filterParams = filterParams;
 			return this;
 		}
 
@@ -130,6 +164,11 @@ public final class StubIndexSchemaNode extends StubTreeNode<StubIndexSchemaNode>
 
 		public Builder multiValued(boolean multiValued) {
 			attribute( "multiValued", multiValued );
+			return this;
+		}
+
+		public Builder filterFactory(FilterFactory factory) {
+			attribute( "filterFactory", factory );
 			return this;
 		}
 

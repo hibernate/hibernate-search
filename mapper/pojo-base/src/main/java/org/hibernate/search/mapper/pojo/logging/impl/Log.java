@@ -434,4 +434,11 @@ public interface Log extends BasicLogger {
 	SearchException missingProcessorReferenceInMappingAnnotation(
 			@FormatWith(ClassFormatter.class) Class<? extends Annotation> metaAnnotationType);
 
+	@Message(id = ID_OFFSET_2 + 69, value = "Multiple full text filter name: '%1$s'.")
+	SearchException multipleFullTextFilterNames(String name);
+
+	@Message(id = ID_OFFSET_2 + 70,
+			value = "The bind() method of binder '%1$s' is not implemented correctly:"
+					+ " it did not call context.setFactory().")
+	SearchException missingFactoryForBinder(Object binder);
 }

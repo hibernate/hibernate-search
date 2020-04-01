@@ -16,7 +16,6 @@ import org.hibernate.search.util.common.impl.CollectionHelper;
 
 import org.apache.lucene.facet.FacetsConfig;
 
-
 public class LuceneIndexModel implements AutoCloseable {
 
 	private final String indexName;
@@ -29,22 +28,26 @@ public class LuceneIndexModel implements AutoCloseable {
 
 	private final Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodes;
 
+	private final Map<String, LuceneIndexSchemaFilterNode<?>> filterNodes;
+
 	private final ScopedAnalyzer scopedAnalyzer;
 
 	private final FacetsConfig facetsConfig;
 
 	public LuceneIndexModel(String indexName,
-			String mappedTypeName,
-			ToDocumentIdentifierValueConverter<?> idDslConverter,
-			Map<String, LuceneIndexSchemaObjectNode> objectNodesBuilder,
-			Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodesBuilder,
-			ScopedAnalyzer scopedAnalyzer,
-			FacetsConfig facetsConfig) {
+		String mappedTypeName,
+		ToDocumentIdentifierValueConverter<?> idDslConverter,
+		Map<String, LuceneIndexSchemaObjectNode> objectNodesBuilder,
+		Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodesBuilder,
+		Map<String, LuceneIndexSchemaFilterNode<?>> filterNodes,
+		ScopedAnalyzer scopedAnalyzer,
+		FacetsConfig facetsConfig) {
 		this.indexName = indexName;
 		this.mappedTypeName = mappedTypeName;
 		this.idDslConverter = idDslConverter;
 		this.fieldNodes = CollectionHelper.toImmutableMap( fieldNodesBuilder );
 		this.objectNodes = CollectionHelper.toImmutableMap( objectNodesBuilder );
+		this.filterNodes = filterNodes;
 		this.scopedAnalyzer = scopedAnalyzer;
 		this.facetsConfig = facetsConfig;
 	}
@@ -86,12 +89,16 @@ public class LuceneIndexModel implements AutoCloseable {
 		return facetsConfig;
 	}
 
+	public LuceneIndexSchemaFilterNode<?> getFilterNode(String absoluteFilterName) {
+		return filterNodes.get( absoluteFilterName );
+	}
+
 	@Override
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "indexName=" ).append( indexName )
-				.append( "]" )
-				.toString();
+			.append( "[" )
+			.append( "indexName=" ).append( indexName )
+			.append( "]" )
+			.toString();
 	}
 }

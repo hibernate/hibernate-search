@@ -140,6 +140,15 @@ public interface SearchPredicateFactory {
 	SpatialPredicateInitialStep spatial();
 
 	/**
+	 * Match documents if they match a combination of defined filter clauses.
+	 *
+	 * @param name the name of definied filter
+	 * @return The initial step of a DSL where the "range" predicate can be defined.
+	 * @see RangePredicateFieldStep
+	 */
+	FilterPredicateOptionsStep<?> def(String name);
+
+	/**
 	 * Extend the current factory with the given extension,
 	 * resulting in an extended factory offering different types of predicates.
 	 *

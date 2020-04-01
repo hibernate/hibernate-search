@@ -18,54 +18,67 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.impl.LuceneIndexFieldType;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexFilterReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFilterOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectFieldNodeBuilder;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObjectNodeBuilder;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
+import org.hibernate.search.engine.search.predicate.factories.FilterFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
-		implements IndexSchemaObjectNodeBuilder, IndexSchemaBuildContext {
+	implements IndexSchemaObjectNodeBuilder, IndexSchemaBuildContext {
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
 	// Use a LinkedHashMap for deterministic iteration
 	private final Map<String, LuceneIndexSchemaNodeContributor> content = new LinkedHashMap<>();
+	private final Map<String, LuceneIndexSchemaNodeContributor> filters = new LinkedHashMap<>();
 
 	@Override
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "absolutePath=" ).append( getAbsolutePath() )
-				.append( "]" )
-				.toString();
+			.append( "[" )
+			.append( "absolutePath=" ).append( getAbsolutePath() )
+			.append( "]" )
+			.toString();
 	}
 
 	@Override
 	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> addField(
-			String relativeFieldName, IndexFieldType<F> indexFieldType) {
+		String relativeFieldName, IndexFieldType<F> indexFieldType) {
 		LuceneIndexFieldType<F> luceneIndexFieldType = (LuceneIndexFieldType<F>) indexFieldType;
 		LuceneIndexSchemaFieldNodeBuilder<F> childBuilder = new LuceneIndexSchemaFieldNodeBuilder<>(
-				this, relativeFieldName, luceneIndexFieldType
+			this, relativeFieldName, luceneIndexFieldType
 		);
 		putField( relativeFieldName, childBuilder );
 		return childBuilder;
 	}
 
 	@Override
+	public <F extends FilterFactory> IndexSchemaFilterOptionsStep<?, IndexFilterReference<F>> addFilter(String name, F factory) {
+		LuceneIndexSchemaFilterFactoryBuilder<F> childBuilder = new LuceneIndexSchemaFilterFactoryBuilder<>(
+			this, name, factory
+		);
+		putFilter( name, childBuilder );
+		return childBuilder;
+	}
+
+	@Override
 	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> createExcludedField(
-			String relativeFieldName, IndexFieldType<F> indexFieldType) {
+		String relativeFieldName, IndexFieldType<F> indexFieldType) {
 		LuceneIndexFieldType<F> luceneIndexFieldType = (LuceneIndexFieldType<F>) indexFieldType;
 		return new LuceneIndexSchemaFieldNodeBuilder<>(
-				this, relativeFieldName, luceneIndexFieldType
+			this, relativeFieldName, luceneIndexFieldType
 		);
 	}
 
 	@Override
 	public IndexSchemaObjectFieldNodeBuilder addObjectField(String relativeFieldName, ObjectFieldStorage storage) {
-		LuceneIndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
-				new LuceneIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, storage );
+		LuceneIndexSchemaObjectFieldNodeBuilder objectFieldBuilder
+			= new LuceneIndexSchemaObjectFieldNodeBuilder( this, relativeFieldName, storage );
 		putField( relativeFieldName, objectFieldBuilder );
 		return objectFieldBuilder;
 	}
@@ -83,6 +96,9 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 		for ( LuceneIndexSchemaNodeContributor contributor : content.values() ) {
 			contributor.contribute( collector, node );
 		}
+		for ( LuceneIndexSchemaNodeContributor contributor : filters.values() ) {
+			contributor.contribute( collector, node );
+		}
 	}
 
 	final List<String> getChildrenNames() {
@@ -90,10 +106,21 @@ abstract class AbstractLuceneIndexSchemaObjectNodeBuilder
 		return new ArrayList<>( content.keySet() );
 	}
 
+	final List<String> getFilterNames() {
+		return new ArrayList<>( filters.keySet() );
+	}
+
 	private void putField(String name, LuceneIndexSchemaNodeContributor contributor) {
 		Object previous = content.putIfAbsent( name, contributor );
 		if ( previous != null ) {
 			throw log.indexSchemaNodeNameConflict( name, getEventContext() );
+		}
+	}
+
+	private void putFilter(String name, LuceneIndexSchemaNodeContributor contributor) {
+		Object previous = filters.putIfAbsent( name, contributor );
+		if ( previous != null ) {
+			throw log.indexSchemaFilterNameConflict( name, getEventContext() );
 		}
 	}
 }

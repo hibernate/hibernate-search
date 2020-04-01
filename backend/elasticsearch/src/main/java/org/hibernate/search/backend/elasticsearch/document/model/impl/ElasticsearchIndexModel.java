@@ -16,7 +16,6 @@ import org.hibernate.search.engine.backend.types.converter.spi.ToDocumentIdentif
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
 
-
 public class ElasticsearchIndexModel {
 
 	private final IndexNames names;
@@ -27,13 +26,15 @@ public class ElasticsearchIndexModel {
 	private final ToDocumentIdentifierValueConverter<?> idDslConverter;
 	private final Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes;
 	private final Map<String, ElasticsearchIndexSchemaFieldNode<?>> fieldNodes;
+	private final Map<String, ElasticsearchIndexSchemaFilterNode<?>> filterNodes;
 
 	public ElasticsearchIndexModel(IndexNames names,
-			String mappedTypeName,
-			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
-			RootTypeMapping mapping, ToDocumentIdentifierValueConverter<?> idDslConverter,
-			Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes,
-			Map<String, ElasticsearchIndexSchemaFieldNode<?>> fieldNodes) {
+		String mappedTypeName,
+		ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry,
+		RootTypeMapping mapping, ToDocumentIdentifierValueConverter<?> idDslConverter,
+		Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes,
+		Map<String, ElasticsearchIndexSchemaFieldNode<?>> fieldNodes,
+		Map<String, ElasticsearchIndexSchemaFilterNode<?>> filterNodes) {
 		this.names = names;
 		this.mappedTypeName = mappedTypeName;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
@@ -41,6 +42,7 @@ public class ElasticsearchIndexModel {
 		this.idDslConverter = idDslConverter;
 		this.objectNodes = objectNodes;
 		this.fieldNodes = fieldNodes;
+		this.filterNodes = filterNodes;
 	}
 
 	public String getHibernateSearchIndexName() {
@@ -71,6 +73,10 @@ public class ElasticsearchIndexModel {
 		return fieldNodes.get( absoluteFieldPath );
 	}
 
+	public ElasticsearchIndexSchemaFilterNode<?> getFilterNode(String absoluteFilterPath) {
+		return filterNodes.get( absoluteFilterPath );
+	}
+
 	public void contributeLowLevelMetadata(LowLevelIndexMetadataBuilder builder) {
 		builder.setAnalysisDefinitionRegistry( analysisDefinitionRegistry );
 		builder.setMapping( mapping );
@@ -79,10 +85,10 @@ public class ElasticsearchIndexModel {
 	@Override
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "names=" ).append( names )
-				.append( ", mapping=" ).append( mapping )
-				.append( "]" )
-				.toString();
+			.append( "[" )
+			.append( "names=" ).append( names )
+			.append( ", mapping=" ).append( mapping )
+			.append( "]" )
+			.toString();
 	}
 }

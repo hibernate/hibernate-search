@@ -14,6 +14,7 @@ import java.util.Map;
 import org.hibernate.search.backend.elasticsearch.analysis.model.impl.ElasticsearchAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFilterNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaNodeCollector;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.mapping.impl.DynamicType;
@@ -30,7 +31,7 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsearchIndexSchemaObjectNodeBuilder
-		implements IndexSchemaRootNodeBuilder {
+	implements IndexSchemaRootNodeBuilder {
 
 	private final ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider;
 	private final EventContext indexEventContext;
@@ -44,9 +45,9 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 	private ToDocumentIdentifierValueConverter<?> idDslConverter;
 
 	public ElasticsearchIndexSchemaRootNodeBuilder(ElasticsearchIndexFieldTypeFactoryProvider typeFactoryProvider,
-			EventContext indexEventContext,
-			IndexNames indexNames, String mappedTypeName,
-			ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry) {
+		EventContext indexEventContext,
+		IndexNames indexNames, String mappedTypeName,
+		ElasticsearchAnalysisDefinitionRegistry analysisDefinitionRegistry) {
 		this.typeFactoryProvider = typeFactoryProvider;
 		this.indexEventContext = indexEventContext;
 		this.indexNames = indexNames;
@@ -57,7 +58,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 	@Override
 	public EventContext getEventContext() {
 		return getIndexEventContext()
-				.append( EventContexts.indexSchemaRoot() );
+			.append( EventContexts.indexSchemaRoot() );
 	}
 
 	@Override
@@ -94,6 +95,7 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 
 		final Map<String, ElasticsearchIndexSchemaObjectNode> objectNodes = new HashMap<>();
 		final Map<String, ElasticsearchIndexSchemaFieldNode<?>> fieldNodes = new HashMap<>();
+		final Map<String, ElasticsearchIndexSchemaFilterNode<?>> filterNodes = new HashMap<>();
 
 		ElasticsearchIndexSchemaNodeCollector collector = new ElasticsearchIndexSchemaNodeCollector() {
 			@Override
@@ -105,19 +107,25 @@ public class ElasticsearchIndexSchemaRootNodeBuilder extends AbstractElasticsear
 			public void collect(String absoluteFieldPath, ElasticsearchIndexSchemaFieldNode<?> node) {
 				fieldNodes.put( absoluteFieldPath, node );
 			}
+
+			@Override
+			public void collect(String absoluteFilterPath, ElasticsearchIndexSchemaFilterNode<?> node) {
+				filterNodes.put( absoluteFilterPath, node );
+			}
 		};
 
 		ElasticsearchIndexSchemaObjectNode rootNode = ElasticsearchIndexSchemaObjectNode.root();
 		contributeChildren( mapping, rootNode, collector );
 
 		return new ElasticsearchIndexModel(
-				indexNames,
-				mappedTypeName,
-				analysisDefinitionRegistry,
-				mapping,
-				idDslConverter == null ? new StringToDocumentIdentifierValueConverter() : idDslConverter,
-				objectNodes,
-				fieldNodes
+			indexNames,
+			mappedTypeName,
+			analysisDefinitionRegistry,
+			mapping,
+			idDslConverter == null ? new StringToDocumentIdentifierValueConverter() : idDslConverter,
+			objectNodes,
+			fieldNodes,
+			filterNodes
 		);
 	}
 

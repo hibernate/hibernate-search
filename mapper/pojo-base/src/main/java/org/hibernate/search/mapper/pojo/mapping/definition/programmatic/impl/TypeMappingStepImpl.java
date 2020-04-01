@@ -19,9 +19,10 @@ import org.hibernate.search.mapper.pojo.mapping.spi.PojoMappingConfigurationCont
 import org.hibernate.search.mapper.pojo.model.additionalmetadata.building.spi.PojoAdditionalMetadataCollectorTypeNode;
 import org.hibernate.search.mapper.pojo.model.spi.PojoPropertyModel;
 import org.hibernate.search.mapper.pojo.model.spi.PojoRawTypeModel;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.FilterBinder;
 
 public class TypeMappingStepImpl
-		implements TypeMappingStep, PojoMappingConfigurationContributor, PojoTypeMetadataContributor {
+	implements TypeMappingStep, PojoMappingConfigurationContributor, PojoTypeMetadataContributor {
 
 	private final PojoRawTypeModel<?> typeModel;
 
@@ -33,7 +34,7 @@ public class TypeMappingStepImpl
 
 	@Override
 	public void configure(MappingBuildContext buildContext,
-			MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
+		MappingConfigurationCollector<PojoTypeMetadataContributor> configurationCollector) {
 		configurationCollector.collectContributor( typeModel, this );
 	}
 
@@ -66,6 +67,12 @@ public class TypeMappingStepImpl
 	@Override
 	public TypeMappingStep routingKeyBinder(RoutingKeyBinder binder) {
 		children.add( new RoutingKeyBridgeMappingContributor( binder ) );
+		return this;
+	}
+
+	@Override
+	public TypeMappingStep filter(String name, FilterBinder binder) {
+		children.add( new FilterFactoryMappingContributor( name, binder ) );
 		return this;
 	}
 

@@ -309,4 +309,15 @@ public interface Log extends BasicLogger {
 			value = "The background failure handler threw an exception while handling a previous failure."
 					+ " The failure may not have been reported.")
 	void failureInFailureHandler(@Cause Throwable t);
+
+	@Message(id = ID_OFFSET_2 + 70,
+		value = "Filter name '%1$s' is invalid: field names cannot be null or empty.")
+	SearchException relativeFilterNameCannotBeNullOrEmpty(String relativeFilterName,
+		@Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 71,
+		value = "Filter name '%1$s' is invalid: field names cannot contain a dot ('.')."
+		+ " Remove the dot from your filter name.")
+	SearchException relativeFilterNameCannotContainDot(String relativeFilterName,
+		@Param EventContext context);
 }

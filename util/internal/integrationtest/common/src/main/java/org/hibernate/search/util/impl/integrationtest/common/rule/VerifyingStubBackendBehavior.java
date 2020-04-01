@@ -21,6 +21,7 @@ import java.util.function.Supplier;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.reporting.spi.ContextualFailureCollector;
 import org.hibernate.search.engine.search.loading.context.spi.LoadingContext;
+import org.hibernate.search.engine.search.predicate.factories.FilterFactory;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.query.spi.SimpleSearchResult;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendBehavior;
@@ -137,6 +138,14 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	}
 
 	@Override
+	public void onAddFilter(String indexName, String absoluteFieldPath, FilterFactory factory) {
+		CallBehavior<Void> behavior = indexFieldAddBehaviors.get( new IndexFieldKey( indexName, absoluteFieldPath ) );
+		if ( behavior != null ) {
+			behavior.execute();
+		}
+	}
+
+	@Override
 	public void defineSchema(String indexName, StubIndexSchemaNode rootSchemaNode) {
 		getSchemaDefinitionCalls( indexName )
 				.verify(
@@ -161,9 +170,9 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	public void processDocumentWork(String indexName, StubDocumentWork work) {
 		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
 		callQueue.verify(
-				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PROCESS, work ),
-				DocumentWorkCall::verify,
-				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
+			new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PROCESS, work ),
+			DocumentWorkCall::verify,
+			noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
 		);
 	}
 
@@ -171,9 +180,9 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	public void discardDocumentWork(String indexName, StubDocumentWork work) {
 		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
 		callQueue.verify(
-				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.DISCARD, work ),
-				DocumentWorkCall::verify,
-				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
+			new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.DISCARD, work ),
+			DocumentWorkCall::verify,
+			noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
 		);
 	}
 
@@ -181,9 +190,9 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	public CompletableFuture<?> executeDocumentWork(String indexName, StubDocumentWork work) {
 		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
 		return callQueue.verify(
-				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work ),
-				DocumentWorkCall::verify,
-				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
+			new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work ),
+			DocumentWorkCall::verify,
+			noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
 		);
 	}
 
@@ -191,27 +200,27 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	public CompletableFuture<?> processAndExecuteDocumentWork(String indexName, StubDocumentWork work) {
 		CallQueue<DocumentWorkCall> callQueue = getDocumentWorkCalls( indexName );
 		callQueue.verify(
-				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PROCESS, work ),
-				DocumentWorkCall::verify,
-				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
+			new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.PROCESS, work ),
+			DocumentWorkCall::verify,
+			noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
 		);
 		return callQueue.verify(
-				new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work ),
-				DocumentWorkCall::verify,
-				noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
+			new DocumentWorkCall( indexName, DocumentWorkCall.WorkPhase.EXECUTE, work ),
+			DocumentWorkCall::verify,
+			noExpectationsBehavior( () -> CompletableFuture.completedFuture( null ) )
 		);
 	}
 
 	@Override
 	public <T> SearchResult<T> executeSearchWork(Set<String> indexNames, StubSearchWork work,
-			StubSearchProjectionContext projectionContext,
-			LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
+		StubSearchProjectionContext projectionContext,
+		LoadingContext<?, ?> loadingContext, StubSearchProjection<T> rootProjection) {
 		return searchCalls.verify(
-				new SearchWorkCall<>( indexNames, work, projectionContext, loadingContext, rootProjection ),
-				(call1, call2) -> call1.verify( call2 ),
-				noExpectationsBehavior( () -> new SimpleSearchResult<>(
-						0L, Collections.emptyList(), Collections.emptyMap(), Duration.ZERO, false
-				) )
+			new SearchWorkCall<>( indexNames, work, projectionContext, loadingContext, rootProjection ),
+			(call1, call2) -> call1.verify( call2 ),
+			noExpectationsBehavior( () -> new SimpleSearchResult<>(
+			0L, Collections.emptyList(), Collections.emptyMap(), Duration.ZERO, false
+		) )
 		);
 	}
 
@@ -227,9 +236,9 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 	@Override
 	public long executeCountWork(Set<String> indexNames) {
 		return countCalls.verify(
-				new CountWorkCall( indexNames, null ),
-				CountWorkCall::verify,
-				noExpectationsBehavior( () -> 0L )
+			new CountWorkCall( indexNames, null ),
+			CountWorkCall::verify,
+			noExpectationsBehavior( () -> 0L )
 		);
 	}
 
@@ -266,7 +275,34 @@ class VerifyingStubBackendBehavior extends StubBackendBehavior {
 			}
 			IndexFieldKey other = (IndexFieldKey) obj;
 			return Objects.equals( indexName, other.indexName )
-					&& Objects.equals( absoluteFieldPath, other.absoluteFieldPath );
+				&& Objects.equals( absoluteFieldPath, other.absoluteFieldPath );
+		}
+
+		@Override
+		public int hashCode() {
+			return Objects.hash( indexName, absoluteFieldPath );
+		}
+	}
+
+	private static class IndexFieldFilter {
+		final String indexName;
+		final String absoluteFieldPath;
+		private final FilterFactory factory;
+
+		private IndexFieldFilter(String indexName, String absoluteFieldPath, FilterFactory factory) {
+			this.indexName = indexName;
+			this.absoluteFieldPath = absoluteFieldPath;
+			this.factory = factory;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if ( !(obj instanceof IndexFieldKey) ) {
+				return false;
+			}
+			IndexFieldKey other = (IndexFieldKey) obj;
+			return Objects.equals( indexName, other.indexName )
+				&& Objects.equals( absoluteFieldPath, other.absoluteFieldPath );
 		}
 
 		@Override

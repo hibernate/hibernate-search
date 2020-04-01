@@ -7,9 +7,12 @@
 package org.hibernate.search.engine.backend.document.model.dsl.spi;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexFilterReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.IndexFieldType;
+import org.hibernate.search.engine.search.predicate.factories.FilterFactory;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFilterOptionsStep;
 
 public interface IndexSchemaObjectNodeBuilder extends IndexSchemaBuildContext {
 
@@ -22,6 +25,16 @@ public interface IndexSchemaObjectNodeBuilder extends IndexSchemaBuildContext {
 	 * @return A DSL step where the field can be defined in more details.
 	 */
 	<F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> addField(String relativeFieldName, IndexFieldType<F> indexFieldType);
+
+	/**
+	 * Create a new object filter and add it to the current builder.
+	 *
+	 * @param relativeFilterName The relative name of the new filter definition
+	 * @param factory The factory of the new object filter definition
+	 * @param <F> The type of filter factory for the new filter definition
+	 * @return A DSL step where the filter can be defined in more details.
+	 */
+	<F extends FilterFactory> IndexSchemaFilterOptionsStep<?, IndexFilterReference<F>> addFilter(String relativeFilterName, F factory);
 
 	/**
 	 * Create a new field, but do not add it to the current builder.

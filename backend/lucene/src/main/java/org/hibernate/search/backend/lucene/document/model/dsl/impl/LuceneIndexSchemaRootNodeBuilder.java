@@ -18,6 +18,7 @@ import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchema
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaNodeCollector;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.analysis.impl.ScopedAnalyzer;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFilterNode;
 import org.hibernate.search.backend.lucene.types.dsl.LuceneIndexFieldTypeFactory;
 import org.hibernate.search.backend.lucene.types.dsl.impl.LuceneIndexFieldTypeFactoryImpl;
 import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaBuildContext;
@@ -29,7 +30,7 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaObjectNodeBuilder
-		implements IndexSchemaRootNodeBuilder, IndexSchemaBuildContext {
+	implements IndexSchemaRootNodeBuilder, IndexSchemaBuildContext {
 
 	private final EventContext indexEventContext;
 	private final String mappedTypeName;
@@ -38,7 +39,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 	private ToDocumentIdentifierValueConverter<?> idDslConverter;
 
 	public LuceneIndexSchemaRootNodeBuilder(EventContext indexEventContext,
-			String mappedTypeName, LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry) {
+		String mappedTypeName, LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry) {
 		this.indexEventContext = indexEventContext;
 		this.mappedTypeName = mappedTypeName;
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
@@ -72,6 +73,7 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 	public LuceneIndexModel build(String indexName) {
 		Map<String, LuceneIndexSchemaObjectNode> objectNodesBuilder = new HashMap<>();
 		Map<String, LuceneIndexSchemaFieldNode<?>> fieldNodesBuilder = new HashMap<>();
+		Map<String, LuceneIndexSchemaFilterNode<?>> filterNodesBuilder = new HashMap<>();
 		ScopedAnalyzer.Builder scopedAnalyzerBuilder = new ScopedAnalyzer.Builder();
 		FacetsConfig facetsConfig = new FacetsConfig();
 
@@ -84,6 +86,11 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 			@Override
 			public void collectFieldNode(String absoluteFieldPath, LuceneIndexSchemaFieldNode<?> node) {
 				fieldNodesBuilder.put( absoluteFieldPath, node );
+			}
+
+			@Override
+			public void collectFilterNode(String absoluteFilterPath, LuceneIndexSchemaFilterNode<?> node) {
+				filterNodesBuilder.put( absoluteFilterPath, node );
 			}
 
 			@Override
@@ -101,13 +108,14 @@ public class LuceneIndexSchemaRootNodeBuilder extends AbstractLuceneIndexSchemaO
 		contributeChildren( rootNode, collector );
 
 		return new LuceneIndexModel(
-				indexName,
-				mappedTypeName,
-				idDslConverter == null ? new StringToDocumentIdentifierValueConverter() : idDslConverter,
-				objectNodesBuilder,
-				fieldNodesBuilder,
-				scopedAnalyzerBuilder.build(),
-				facetsConfig.getDimConfigs().isEmpty() ? null : facetsConfig
+			indexName,
+			mappedTypeName,
+			idDslConverter == null ? new StringToDocumentIdentifierValueConverter() : idDslConverter,
+			objectNodesBuilder,
+			fieldNodesBuilder,
+			filterNodesBuilder,
+			scopedAnalyzerBuilder.build(),
+			facetsConfig.getDimConfigs().isEmpty() ? null : facetsConfig
 		);
 	}
 

@@ -79,4 +79,6 @@ public interface SearchPredicateBuilderFactory<C, B> {
 	SpatialWithinPolygonPredicateBuilder<B> spatialWithinPolygon(String absoluteFieldPath);
 
 	SpatialWithinBoundingBoxPredicateBuilder<B> spatialWithinBoundingBox(String absoluteFieldPath);
+
+	FilterPredicateBuilder def(String name);
 }

@@ -19,6 +19,7 @@ import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexModel;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFieldNode;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFilterNode;
 import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaObjectNode;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.util.spi.URLEncodedString;
@@ -67,8 +68,8 @@ public class ElasticsearchScopeModel {
 		Iterator<ElasticsearchIndexModel> iterator = indexModels.iterator();
 		ElasticsearchIndexModel indexModelForSelectedIdConverter = null;
 		ToDocumentIdentifierValueConverter<?> selectedIdConverter = null;
-		ElasticsearchScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> scopedIndexFieldComponent =
-				new ElasticsearchScopedIndexRootComponent<>();
+		ElasticsearchScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> scopedIndexFieldComponent
+			= new ElasticsearchScopedIndexRootComponent<>();
 
 		while ( iterator.hasNext() ) {
 			ElasticsearchIndexModel indexModel = iterator.next();
@@ -82,14 +83,14 @@ public class ElasticsearchScopeModel {
 			}
 
 			if ( !selectedIdConverter.isCompatibleWith( idConverter ) ) {
-				ElasticsearchFailingIdCompatibilityChecker failingCompatibilityChecker =
-						new ElasticsearchFailingIdCompatibilityChecker(
-								selectedIdConverter, idConverter,
-								EventContexts.fromIndexNames(
-										indexModelForSelectedIdConverter.getHibernateSearchIndexName(),
-										indexModel.getHibernateSearchIndexName()
-								)
-						);
+				ElasticsearchFailingIdCompatibilityChecker failingCompatibilityChecker
+					= new ElasticsearchFailingIdCompatibilityChecker(
+						selectedIdConverter, idConverter,
+						EventContexts.fromIndexNames(
+							indexModelForSelectedIdConverter.getHibernateSearchIndexName(),
+							indexModel.getHibernateSearchIndexName()
+						)
+					);
 				scopedIndexFieldComponent.setIdConverterCompatibilityChecker( failingCompatibilityChecker );
 			}
 		}
@@ -98,7 +99,7 @@ public class ElasticsearchScopeModel {
 	}
 
 	public <T> ElasticsearchScopedIndexFieldComponent<T> getSchemaNodeComponent(String absoluteFieldPath,
-			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
+		IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
 		ElasticsearchIndexModel indexModelForSelectedSchemaNode = null;
 		ElasticsearchIndexSchemaFieldNode<?> selectedSchemaNode = null;
 		ElasticsearchScopedIndexFieldComponent<T> scopedIndexFieldComponent = new ElasticsearchScopedIndexFieldComponent<>();
@@ -119,18 +120,18 @@ public class ElasticsearchScopeModel {
 
 			if ( !componentRetrievalStrategy.hasCompatibleCodec( scopedIndexFieldComponent.getComponent(), component ) ) {
 				throw componentRetrievalStrategy.createCompatibilityException(
-						absoluteFieldPath,
-						scopedIndexFieldComponent.getComponent(),
-						component,
-						EventContexts.fromIndexNames(
-								indexModelForSelectedSchemaNode.getHibernateSearchIndexName(),
-								indexModel.getHibernateSearchIndexName()
-						)
+					absoluteFieldPath,
+					scopedIndexFieldComponent.getComponent(),
+					component,
+					EventContexts.fromIndexNames(
+						indexModelForSelectedSchemaNode.getHibernateSearchIndexName(),
+						indexModel.getHibernateSearchIndexName()
+					)
 				);
 			}
 			ElasticsearchFailingFieldCompatibilityChecker<T> failingCompatibilityChecker = new ElasticsearchFailingFieldCompatibilityChecker<>(
-					absoluteFieldPath, scopedIndexFieldComponent.getComponent(), component, EventContexts.fromIndexNames(
-					indexModelForSelectedSchemaNode.getHibernateSearchIndexName(), indexModel.getHibernateSearchIndexName()
+				absoluteFieldPath, scopedIndexFieldComponent.getComponent(), component, EventContexts.fromIndexNames(
+				indexModelForSelectedSchemaNode.getHibernateSearchIndexName(), indexModel.getHibernateSearchIndexName()
 			), componentRetrievalStrategy );
 
 			if ( !componentRetrievalStrategy.hasCompatibleConverter( scopedIndexFieldComponent.getComponent(), component ) ) {
@@ -170,7 +171,7 @@ public class ElasticsearchScopeModel {
 				found = true;
 				if ( !ObjectFieldStorage.NESTED.equals( schemaNode.getStorage() ) ) {
 					throw log.nonNestedFieldForNestedQuery(
-							absoluteFieldPath, indexModel.getEventContext()
+						absoluteFieldPath, indexModel.getEventContext()
 					);
 				}
 			}
@@ -180,7 +181,7 @@ public class ElasticsearchScopeModel {
 				ElasticsearchIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( absoluteFieldPath );
 				if ( schemaNode != null ) {
 					throw log.nonObjectFieldForNestedQuery(
-							absoluteFieldPath, indexModel.getEventContext()
+						absoluteFieldPath, indexModel.getEventContext()
 					);
 				}
 			}
@@ -190,13 +191,13 @@ public class ElasticsearchScopeModel {
 
 	public String getNestedDocumentPath(String absoluteFieldPath) {
 		Optional<String> nestedDocumentPath = indexModels.stream()
-				.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath ) )
-				.filter( Objects::nonNull )
-				.map( fieldNode -> Optional.ofNullable( fieldNode.getNestedPath() ) )
-				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
-					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
-						return nestedDocumentPath1;
-					}
+			.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath ) )
+			.filter( Objects::nonNull )
+			.map( fieldNode -> Optional.ofNullable( fieldNode.getNestedPath() ) )
+			.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
+				if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
+					return nestedDocumentPath1;
+				}
 
 					throw log.conflictingNestedDocumentPaths(
 							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
@@ -240,5 +241,29 @@ public class ElasticsearchScopeModel {
 				.orElse( Optional.empty() );
 
 		return nestedDocumentPath.orElse( Collections.emptyList() );
+	}
+
+	public ElasticsearchIndexSchemaFilterNode<?> getFilterNode(String name) {
+		ElasticsearchIndexSchemaFilterNode<?> result = null;
+
+		for ( ElasticsearchIndexModel indexModel : indexModels ) {
+			String indexName = indexModel.getHibernateSearchIndexName();
+
+			ElasticsearchIndexSchemaFilterNode<?> currentFilterNode = indexModel.getFilterNode( name );
+			if ( currentFilterNode == null ) {
+				continue;
+			}
+			if ( result != null ) {
+				throw log.conflictingFilterModel( name, EventContexts.fromIndexName( indexName ) );
+			}
+
+			result = currentFilterNode;
+
+		}
+		if ( result == null ) {
+			throw log.unknownFilterForSearch( name, getIndexesEventContext() );
+		}
+
+		return result;
 	}
 }

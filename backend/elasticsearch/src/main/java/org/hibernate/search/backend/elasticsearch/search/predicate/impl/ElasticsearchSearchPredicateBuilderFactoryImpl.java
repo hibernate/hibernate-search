@@ -37,6 +37,8 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import com.google.gson.JsonObject;
+import org.hibernate.search.backend.elasticsearch.document.model.impl.ElasticsearchIndexSchemaFilterNode;
+import org.hibernate.search.engine.search.predicate.spi.FilterPredicateBuilder;
 
 public class ElasticsearchSearchPredicateBuilderFactoryImpl implements ElasticsearchSearchPredicateBuilderFactory {
 
@@ -50,7 +52,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	private final ElasticsearchScopeModel scopeModel;
 
 	public ElasticsearchSearchPredicateBuilderFactoryImpl(ElasticsearchSearchContext searchContext,
-			ElasticsearchScopeModel scopeModel) {
+		ElasticsearchScopeModel scopeModel) {
 		this.searchContext = searchContext;
 		this.scopeModel = scopeModel;
 	}
@@ -75,7 +77,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public void contribute(ElasticsearchSearchPredicateCollector collector,
-			ElasticsearchSearchPredicateBuilder builder) {
+		ElasticsearchSearchPredicateBuilder builder) {
 		collector.collectPredicate( builder.build( collector.getRootPredicateContext() ) );
 	}
 
@@ -88,7 +90,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	public MatchIdPredicateBuilder<ElasticsearchSearchPredicateBuilder> id() {
 		ElasticsearchScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> component = scopeModel.getIdDslConverter();
 		return new ElasticsearchMatchIdPredicateBuilder(
-				searchContext, component.getIdConverterCompatibilityChecker(), component.getComponent()
+			searchContext, component.getIdConverterCompatibilityChecker(), component.getComponent()
 		);
 	}
 
@@ -154,7 +156,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public SpatialWithinCirclePredicateBuilder<ElasticsearchSearchPredicateBuilder> spatialWithinCircle(
-			String absoluteFieldPath) {
+		String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
 				.getComponent().createSpatialWithinCirclePredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ) );
@@ -162,7 +164,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateBuilder> spatialWithinPolygon(
-			String absoluteFieldPath) {
+		String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
 				.getComponent().createSpatialWithinPolygonPredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ) );
@@ -170,7 +172,7 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> spatialWithinBoundingBox(
-			String absoluteFieldPath) {
+		String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
 				.getComponent().createSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ) );
@@ -193,8 +195,14 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 		return fromJson( searchContext.getUserFacingGson().fromJson( jsonString, JsonObject.class ) );
 	}
 
+	@Override
+	public FilterPredicateBuilder def(String name) {
+		ElasticsearchIndexSchemaFilterNode<?> filterNode = scopeModel.getFilterNode( name );
+		return new ElasticsearchFilterPredicateBuilder( searchContext, this, name, filterNode );
+	}
+
 	private static class PredicateBuilderFactoryRetrievalStrategy
-			implements IndexSchemaFieldNodeComponentRetrievalStrategy<ElasticsearchFieldPredicateBuilderFactory> {
+		implements IndexSchemaFieldNodeComponentRetrievalStrategy<ElasticsearchFieldPredicateBuilderFactory> {
 
 		@Override
 		public ElasticsearchFieldPredicateBuilderFactory extractComponent(ElasticsearchIndexSchemaFieldNode<?> schemaNode) {
@@ -218,8 +226,8 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 
 		@Override
 		public SearchException createCompatibilityException(String absoluteFieldPath,
-				ElasticsearchFieldPredicateBuilderFactory component1, ElasticsearchFieldPredicateBuilderFactory component2,
-				EventContext context) {
+			ElasticsearchFieldPredicateBuilderFactory component1, ElasticsearchFieldPredicateBuilderFactory component2,
+			EventContext context) {
 			return log.conflictingFieldTypesForPredicate( absoluteFieldPath, component1, component2, context );
 		}
 	}

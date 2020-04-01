@@ -118,6 +118,10 @@ public abstract class StubTreeNode<N extends StubTreeNode<N>> implements ToStrin
 			Collections.addAll( attributeValues, values );
 		}
 
+		public List<Object> attribute(String name) {
+			return attributes.get( name );
+		}
+
 		protected void missingChild(String relativeFieldName) {
 			children.computeIfAbsent( relativeFieldName, ignored -> new ArrayList<>() )
 					.add( null );

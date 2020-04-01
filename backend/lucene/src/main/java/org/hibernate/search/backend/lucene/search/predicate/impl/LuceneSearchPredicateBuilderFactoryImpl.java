@@ -11,6 +11,7 @@ import java.util.List;
 
 import org.apache.lucene.search.Query;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFilterNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.scope.model.impl.IndexSchemaFieldNodeComponentRetrievalStrategy;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneScopedIndexFieldComponent;
@@ -37,20 +38,20 @@ import org.hibernate.search.engine.search.predicate.spi.WildcardPredicateBuilder
 import org.hibernate.search.util.common.reporting.EventContext;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
-
+import org.hibernate.search.engine.search.predicate.spi.FilterPredicateBuilder;
 
 public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPredicateBuilderFactory {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	static final PredicateBuilderFactoryRetrievalStrategy PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY =
-			new PredicateBuilderFactoryRetrievalStrategy();
+	static final PredicateBuilderFactoryRetrievalStrategy PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY
+		= new PredicateBuilderFactoryRetrievalStrategy();
 
 	private final LuceneSearchContext searchContext;
 	private final LuceneScopeModel scopeModel;
 
 	public LuceneSearchPredicateBuilderFactoryImpl(LuceneSearchContext searchContext,
-			LuceneScopeModel scopeModel) {
+		LuceneScopeModel scopeModel) {
 		this.searchContext = searchContext;
 		this.scopeModel = scopeModel;
 	}
@@ -62,7 +63,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public LuceneSearchPredicateBuilder toImplementation(SearchPredicate predicate) {
-		if ( !( predicate instanceof LuceneSearchPredicate ) ) {
+		if ( !(predicate instanceof LuceneSearchPredicate) ) {
 			throw log.cannotMixLuceneSearchQueryWithOtherPredicates( predicate );
 		}
 		LuceneSearchPredicate casted = (LuceneSearchPredicate) predicate;
@@ -74,7 +75,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public void contribute(LuceneSearchPredicateCollector collector,
-			LuceneSearchPredicateBuilder builder) {
+		LuceneSearchPredicateBuilder builder) {
 		collector.collectPredicate( builder.build( LuceneSearchPredicateContext.root() ) );
 	}
 
@@ -87,13 +88,19 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 	public MatchIdPredicateBuilder<LuceneSearchPredicateBuilder> id() {
 		LuceneScopedIndexRootComponent<ToDocumentIdentifierValueConverter<?>> component = scopeModel.getIdDslConverter();
 		return new LuceneMatchIdPredicateBuilder(
-				searchContext, component.getIdConverterCompatibilityChecker(), component.getComponent()
+			searchContext, component.getIdConverterCompatibilityChecker(), component.getComponent()
 		);
 	}
 
 	@Override
 	public BooleanPredicateBuilder<LuceneSearchPredicateBuilder> bool() {
 		return new LuceneBooleanPredicateBuilder();
+	}
+
+	@Override
+	public FilterPredicateBuilder def(String name) {
+		LuceneIndexSchemaFilterNode<?> filter = scopeModel.getFilterNode( name );
+		return new LuceneFilterPredicateBuilder( searchContext, this, name, filter );
 	}
 
 	@Override
@@ -161,7 +168,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 	@Override
 	public SpatialWithinBoundingBoxPredicateBuilder<LuceneSearchPredicateBuilder> spatialWithinBoundingBox(
-			String absoluteFieldPath) {
+		String absoluteFieldPath) {
 		return scopeModel
 				.getSchemaNodeComponent( absoluteFieldPath, PREDICATE_BUILDER_FACTORY_RETRIEVAL_STRATEGY )
 				.getComponent().createSpatialWithinBoundingBoxPredicateBuilder( absoluteFieldPath, scopeModel.getNestedPathHierarchyForField( absoluteFieldPath ) );
@@ -180,7 +187,7 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 	}
 
 	private static class PredicateBuilderFactoryRetrievalStrategy
-			implements IndexSchemaFieldNodeComponentRetrievalStrategy<LuceneFieldPredicateBuilderFactory> {
+		implements IndexSchemaFieldNodeComponentRetrievalStrategy<LuceneFieldPredicateBuilderFactory> {
 
 		@Override
 		public LuceneFieldPredicateBuilderFactory extractComponent(LuceneIndexSchemaFieldNode<?> schemaNode) {
@@ -204,8 +211,8 @@ public class LuceneSearchPredicateBuilderFactoryImpl implements LuceneSearchPred
 
 		@Override
 		public SearchException createCompatibilityException(String absoluteFieldPath,
-				LuceneFieldPredicateBuilderFactory component1, LuceneFieldPredicateBuilderFactory component2,
-				EventContext context) {
+			LuceneFieldPredicateBuilderFactory component1, LuceneFieldPredicateBuilderFactory component2,
+			EventContext context) {
 			return log.conflictingFieldTypesForPredicate( absoluteFieldPath, component1, component2, context );
 		}
 	}

@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexModel;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFieldNode;
+import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaFilterNode;
 import org.hibernate.search.backend.lucene.document.model.impl.LuceneIndexSchemaObjectNode;
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.types.predicate.impl.LuceneObjectPredicateBuilderFactory;
@@ -36,11 +37,11 @@ public class LuceneScopeModel {
 	private final Set<LuceneScopeIndexManagerContext> indexManagerContexts;
 
 	public LuceneScopeModel(Set<LuceneIndexModel> indexModels,
-			Set<LuceneScopeIndexManagerContext> indexManagerContexts) {
+		Set<LuceneScopeIndexManagerContext> indexManagerContexts) {
 		this.indexModels = indexModels;
 		this.indexNames = indexModels.stream()
-				.map( LuceneIndexModel::getIndexName )
-				.collect( Collectors.toSet() );
+			.map( LuceneIndexModel::getIndexName )
+			.collect( Collectors.toSet() );
 		this.indexManagerContexts = indexManagerContexts;
 	}
 
@@ -77,12 +78,12 @@ public class LuceneScopeModel {
 			if ( !selectedIdConverter.isCompatibleWith( idConverter ) ) {
 				LuceneFailingIdCompatibilityChecker failingCompatibilityChecker =
 						new LuceneFailingIdCompatibilityChecker(
-								selectedIdConverter, idConverter,
-								EventContexts.fromIndexNames(
-										indexModelForSelectedIdConverter.getIndexName(),
-										indexModel.getIndexName()
-								)
-						);
+						selectedIdConverter, idConverter,
+						EventContexts.fromIndexNames(
+							indexModelForSelectedIdConverter.getIndexName(),
+							indexModel.getIndexName()
+						)
+					);
 				scopedIndexFieldComponent.setIdConverterCompatibilityChecker( failingCompatibilityChecker );
 			}
 		}
@@ -107,7 +108,7 @@ public class LuceneScopeModel {
 				fieldNodeIndexName = indexName;
 				if ( objectNode != null ) {
 					throw log.conflictingFieldModel( absoluteFieldPath, objectNode, fieldNode,
-							EventContexts.fromIndexNames( objectNodeIndexName, indexName )
+						EventContexts.fromIndexNames( objectNodeIndexName, indexName )
 					);
 				}
 				continue;
@@ -120,7 +121,7 @@ public class LuceneScopeModel {
 
 			if ( fieldNode != null ) {
 				throw log.conflictingFieldModel( absoluteFieldPath, currentObjectNode, fieldNode,
-						EventContexts.fromIndexNames( fieldNodeIndexName, indexName )
+					EventContexts.fromIndexNames( fieldNodeIndexName, indexName )
 				);
 			}
 
@@ -134,7 +135,7 @@ public class LuceneScopeModel {
 
 			if ( !result.isCompatibleWith( predicateBuilderFactory ) ) {
 				throw log.conflictingObjectFieldModel( absoluteFieldPath, objectNode, currentObjectNode,
-						EventContexts.fromIndexNames( objectNodeIndexName, indexName )
+					EventContexts.fromIndexNames( objectNodeIndexName, indexName )
 				);
 			}
 		}
@@ -142,7 +143,7 @@ public class LuceneScopeModel {
 	}
 
 	public <T> LuceneScopedIndexFieldComponent<T> getSchemaNodeComponent(String absoluteFieldPath,
-			IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
+		IndexSchemaFieldNodeComponentRetrievalStrategy<T> componentRetrievalStrategy) {
 		LuceneIndexModel indexModelForSelectedSchemaNode = null;
 		LuceneIndexSchemaFieldNode<?> selectedSchemaNode = null;
 		LuceneScopedIndexFieldComponent<T> scopedIndexFieldComponent = new LuceneScopedIndexFieldComponent<>();
@@ -163,19 +164,19 @@ public class LuceneScopeModel {
 
 			if ( !componentRetrievalStrategy.hasCompatibleCodec( scopedIndexFieldComponent.getComponent(), component ) ) {
 				throw componentRetrievalStrategy.createCompatibilityException(
-						absoluteFieldPath,
-						scopedIndexFieldComponent.getComponent(),
-						component,
-						EventContexts.fromIndexNames(
-								indexModelForSelectedSchemaNode.getIndexName(),
-								indexModel.getIndexName()
-						)
+					absoluteFieldPath,
+					scopedIndexFieldComponent.getComponent(),
+					component,
+					EventContexts.fromIndexNames(
+						indexModelForSelectedSchemaNode.getIndexName(),
+						indexModel.getIndexName()
+					)
 				);
 			}
 
 			LuceneFailingFieldCompatibilityChecker<T> failingCompatibilityChecker = new LuceneFailingFieldCompatibilityChecker<>(
-					absoluteFieldPath, scopedIndexFieldComponent.getComponent(), component, EventContexts.fromIndexNames(
-					indexModelForSelectedSchemaNode.getIndexName(), indexModel.getIndexName()
+				absoluteFieldPath, scopedIndexFieldComponent.getComponent(), component, EventContexts.fromIndexNames(
+				indexModelForSelectedSchemaNode.getIndexName(), indexModel.getIndexName()
 			), componentRetrievalStrategy );
 
 			if ( !componentRetrievalStrategy.hasCompatibleConverter( scopedIndexFieldComponent.getComponent(), component ) ) {
@@ -200,7 +201,7 @@ public class LuceneScopeModel {
 				found = true;
 				if ( !ObjectFieldStorage.NESTED.equals( schemaNode.getStorage() ) ) {
 					throw log.nonNestedFieldForNestedQuery(
-							absoluteFieldPath, indexModel.getEventContext()
+						absoluteFieldPath, indexModel.getEventContext()
 					);
 				}
 			}
@@ -210,7 +211,7 @@ public class LuceneScopeModel {
 				LuceneIndexSchemaFieldNode<?> schemaNode = indexModel.getFieldNode( absoluteFieldPath );
 				if ( schemaNode != null ) {
 					throw log.nonObjectFieldForNestedQuery(
-							absoluteFieldPath, indexModel.getEventContext()
+						absoluteFieldPath, indexModel.getEventContext()
 					);
 				}
 			}
@@ -220,13 +221,13 @@ public class LuceneScopeModel {
 
 	public String getNestedDocumentPath(String absoluteFieldPath) {
 		Optional<String> nestedDocumentPath = indexModels.stream()
-				.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath ) )
-				.filter( Objects::nonNull )
-				.map( fieldNode -> Optional.ofNullable( fieldNode.getNestedDocumentPath() ) )
-				.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
-					if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
-						return nestedDocumentPath1;
-					}
+			.map( indexModel -> indexModel.getFieldNode( absoluteFieldPath ) )
+			.filter( Objects::nonNull )
+			.map( fieldNode -> Optional.ofNullable( fieldNode.getNestedDocumentPath() ) )
+			.reduce( (nestedDocumentPath1, nestedDocumentPath2) -> {
+				if ( Objects.equals( nestedDocumentPath1, nestedDocumentPath2 ) ) {
+					return nestedDocumentPath1;
+				}
 
 					throw log.conflictingNestedDocumentPaths(
 							absoluteFieldPath, nestedDocumentPath1.orElse( null ), nestedDocumentPath2.orElse( null ), getIndexesEventContext() );
@@ -270,5 +271,29 @@ public class LuceneScopeModel {
 				.orElse( Optional.empty() );
 
 		return nestedDocumentPath.orElse( Collections.emptyList() );
+	}
+
+	public LuceneIndexSchemaFilterNode<?> getFilterNode(String name) {
+		LuceneIndexSchemaFilterNode result = null;
+
+		for ( LuceneIndexModel indexModel : indexModels ) {
+			String indexName = indexModel.getIndexName();
+
+			LuceneIndexSchemaFilterNode currentFilter = indexModel.getFilterNode( name );
+			if ( currentFilter == null ) {
+				continue;
+			}
+			if ( result != null ) {
+				throw log.conflictingFilterModel( name, EventContexts.fromIndexName( indexName ) );
+			}
+
+			result = currentFilter;
+
+		}
+		if ( result == null ) {
+			throw log.unknownFilterForSearch( name, getIndexesEventContext() );
+		}
+
+		return result;
 	}
 }

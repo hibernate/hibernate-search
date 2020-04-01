@@ -10,8 +10,10 @@ import java.lang.invoke.MethodHandles;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexFilterReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFieldOptionsStep;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaFilterOptionsStep;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFactory;
 import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
@@ -20,6 +22,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.spi.IndexSchemaObj
 import org.hibernate.search.engine.backend.types.IndexFieldType;
 import org.hibernate.search.engine.backend.types.dsl.IndexFieldTypeFinalStep;
 import org.hibernate.search.engine.logging.impl.Log;
+import org.hibernate.search.engine.search.predicate.factories.FilterFactory;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.impl.StringHelper;
 
@@ -32,8 +35,8 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 	private final boolean directChildrenAreMultiValuedByDefault;
 
 	public IndexSchemaElementImpl(IndexFieldTypeFactory typeFactory,
-			B objectNodeBuilder, IndexSchemaNestingContext nestingContext,
-			boolean directChildrenAreMultiValuedByDefault) {
+		B objectNodeBuilder, IndexSchemaNestingContext nestingContext,
+		boolean directChildrenAreMultiValuedByDefault) {
 		this.typeFactory = typeFactory;
 		this.objectNodeBuilder = objectNodeBuilder;
 		this.nestingContext = nestingContext;
@@ -43,26 +46,26 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 	@Override
 	public String toString() {
 		return new StringBuilder( getClass().getSimpleName() )
-				.append( "[" )
-				.append( "objectNodeBuilder=" ).append( objectNodeBuilder )
-				.append( ",nestingContext=" ).append( nestingContext )
-				.append( "]" )
-				.toString();
+			.append( "[" )
+			.append( "objectNodeBuilder=" ).append( objectNodeBuilder )
+			.append( ",nestingContext=" ).append( nestingContext )
+			.append( "]" )
+			.toString();
 	}
 
 	@Override
 	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> field(
-			String relativeFieldName, IndexFieldType<F> type) {
+		String relativeFieldName, IndexFieldType<F> type) {
 		checkRelativeFieldName( relativeFieldName );
-		IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> fieldFinalStep =
-				// Explicit type parameter needed in order for JDT to compile correctly (probably a bug)
-				nestingContext.<IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>>>nest(
-						relativeFieldName,
-						// If the field is included
-						prefixedName -> objectNodeBuilder.addField( prefixedName, type ),
-						// If the field is filtered out
-						prefixedName -> objectNodeBuilder.createExcludedField( prefixedName, type )
-				);
+		IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> fieldFinalStep
+			= // Explicit type parameter needed in order for JDT to compile correctly (probably a bug)
+			nestingContext.<IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>>>nest(
+				relativeFieldName,
+				// If the field is included
+				prefixedName -> objectNodeBuilder.addField( prefixedName, type ),
+				// If the field is filtered out
+				prefixedName -> objectNodeBuilder.createExcludedField( prefixedName, type )
+			);
 		if ( directChildrenAreMultiValuedByDefault ) {
 			fieldFinalStep.multiValued();
 		}
@@ -70,28 +73,45 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 	}
 
 	@Override
+	public <F extends FilterFactory> IndexSchemaFilterOptionsStep<?, IndexFilterReference<F>> filter(
+		String relativeFilterName, F factory) {
+		checkRelativeFieldName( relativeFilterName );
+
+		IndexSchemaFilterOptionsStep<?, IndexFilterReference<F>> filterFinalStep
+			= nestingContext.<IndexSchemaFilterOptionsStep<?, IndexFilterReference<F>>>nest(
+				relativeFilterName,
+				// If the filter is included
+				prefixedName -> objectNodeBuilder.addFilter( prefixedName, factory ),
+				// If the filter is filtered out
+				prefixedName -> objectNodeBuilder.addFilter( prefixedName, factory )
+			);
+
+		return filterFinalStep;
+	}
+
+	@Override
 	public <F> IndexSchemaFieldOptionsStep<?, IndexFieldReference<F>> field(String relativeFieldName,
-			Function<? super IndexFieldTypeFactory, ? extends IndexFieldTypeFinalStep<F>> typeContributor) {
+		Function<? super IndexFieldTypeFactory, ? extends IndexFieldTypeFinalStep<F>> typeContributor) {
 		return field( relativeFieldName, typeContributor.apply( typeFactory ) );
 	}
 
 	@Override
 	public IndexSchemaObjectField objectField(String relativeFieldName, ObjectFieldStorage storage) {
-		checkRelativeFieldName( relativeFieldName );
+		checkRelativeFilterName( relativeFieldName );
 		IndexSchemaObjectField objectField = nestingContext.nest(
-				relativeFieldName,
-				// If the field is included
-				(prefixedName, filter) -> {
-					IndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
-							this.objectNodeBuilder.addObjectField( prefixedName, storage );
-					return new IndexSchemaObjectFieldImpl( typeFactory, objectFieldBuilder, filter, false );
-				},
-				// If the field is filtered out
-				(prefixedName, filter) -> {
-					IndexSchemaObjectFieldNodeBuilder objectFieldBuilder =
-							this.objectNodeBuilder.createExcludedObjectField( prefixedName, storage );
-					return new IndexSchemaObjectFieldImpl( typeFactory, objectFieldBuilder, filter, false );
-				}
+			relativeFieldName,
+			// If the field is included
+			(prefixedName, filter) -> {
+				IndexSchemaObjectFieldNodeBuilder objectFieldBuilder
+				= this.objectNodeBuilder.addObjectField( prefixedName, storage );
+				return new IndexSchemaObjectFieldImpl( typeFactory, objectFieldBuilder, filter, false );
+			},
+			// If the field is filtered out
+			(prefixedName, filter) -> {
+				IndexSchemaObjectFieldNodeBuilder objectFieldBuilder
+				= this.objectNodeBuilder.createExcludedObjectField( prefixedName, storage );
+				return new IndexSchemaObjectFieldImpl( typeFactory, objectFieldBuilder, filter, false );
+			}
 		);
 		if ( directChildrenAreMultiValuedByDefault ) {
 			objectField.multiValued();
@@ -108,4 +128,12 @@ public class IndexSchemaElementImpl<B extends IndexSchemaObjectNodeBuilder> impl
 		}
 	}
 
+	private void checkRelativeFilterName(String relativeFilterName) {
+		if ( StringHelper.isEmpty( relativeFilterName ) ) {
+			throw log.relativeFilterNameCannotBeNullOrEmpty( relativeFilterName, objectNodeBuilder.getEventContext() );
+		}
+		if ( relativeFilterName.contains( "." ) ) {
+			throw log.relativeFilterNameCannotContainDot( relativeFilterName, objectNodeBuilder.getEventContext() );
+		}
+	}
 }
