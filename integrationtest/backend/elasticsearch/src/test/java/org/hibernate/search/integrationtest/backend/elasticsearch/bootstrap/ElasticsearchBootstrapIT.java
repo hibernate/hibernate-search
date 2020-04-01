@@ -18,7 +18,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dialect.ElasticsearchTestDialect;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -75,8 +75,7 @@ public class ElasticsearchBootstrapIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3841")
 	public void explicitProtocolDialect_noVersionCheck() {
-		SubTest.expectException(
-				"NO version check without explicit version number",
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start( BACKEND_NAME )
 						.withBackendProperty(
 								ElasticsearchBackendSettings.VERSION_CHECK_ENABLED, false
@@ -91,9 +90,9 @@ public class ElasticsearchBootstrapIT {
 								ctx -> {
 								}
 						)
-						.setupFirstPhaseOnly()
+						.setupFirstPhaseOnly(),
+				"NO version check without explicit version number"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.backendContext( BACKEND_NAME )
@@ -112,8 +111,7 @@ public class ElasticsearchBootstrapIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3841")
 	public void explicitProtocolDialect_noVersionCheck_incompleteVersion() {
-		SubTest.expectException(
-				"NO version check with partial version number",
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start( BACKEND_NAME )
 						.withBackendProperty(
 								ElasticsearchBackendSettings.VERSION_CHECK_ENABLED, false
@@ -131,9 +129,9 @@ public class ElasticsearchBootstrapIT {
 								ctx -> {
 								}
 						)
-						.setupFirstPhaseOnly()
+						.setupFirstPhaseOnly(),
+				"NO version check with partial version number"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.backendContext( BACKEND_NAME )

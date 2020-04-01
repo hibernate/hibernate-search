@@ -18,7 +18,7 @@ import org.hibernate.search.engine.environment.bean.BeanHolder;
 import org.hibernate.search.engine.environment.bean.BeanReference;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.testsupport.util.AbstractBeanResolverPartialMock;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Test;
 
@@ -260,8 +260,7 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		EasyMock.expect( sourceMock.get( key ) ).andReturn( (Optional) Optional.of( invalidTypeValue ) );
 		EasyMock.expect( sourceMock.resolve( key ) ).andReturn( Optional.of( resolvedKey ) );
 		replayAll();
-		SubTest.expectException( () -> property.get( sourceMock ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> property.get( sourceMock ) )
 				.hasMessageContaining(
 						"Unable to convert configuration property '" + resolvedKey
 								+ "' with value '" + invalidTypeValue + "':"
@@ -290,12 +289,11 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 		EasyMock.expect( beanResolverMock.resolve( StubBean.class, "name" ) )
 				.andThrow( simulatedFailure );
 		replayAll();
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> {
 					property.getAndMap( sourceMock, beanResolverMock::resolve );
 				}
 		)
-				.assertThrown()
 				.hasCause( simulatedFailure )
 				.hasMessageContaining(
 						"Unable to convert configuration property '" + resolvedKey
@@ -327,12 +325,11 @@ public class ConfigurationPropertyBeanReferenceTest extends EasyMockSupport {
 				.andThrow( simulatedFailure );
 		bean1Mock.close(); // Expect the first bean holder to be closed
 		replayAll();
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> {
 					property.getAndMap( sourceMock, beanResolverMock::resolve );
 				}
 		)
-				.assertThrown()
 				.hasCause( simulatedFailure )
 				.hasMessageContaining(
 						"Unable to convert configuration property '" + resolvedKey

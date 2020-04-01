@@ -26,7 +26,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.IndexedEmb
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -160,10 +160,9 @@ public class SearchIndexingPlanBaseIT {
 
 		withinTransaction( sessionFactory, session -> {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
-			SubTest.expectException(
+			Assertions.assertThatThrownBy(
 					() -> indexingPlan.purge( invalidClass, 42, null )
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
 							"Cannot work on type '" + invalidClass.getName() + "', because it is not indexed,"
@@ -180,10 +179,9 @@ public class SearchIndexingPlanBaseIT {
 
 		withinTransaction( sessionFactory, session -> {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
-			SubTest.expectException(
+			Assertions.assertThatThrownBy(
 					() -> indexingPlan.purge( invalidClass, 42, null )
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
 							"Type '" + ContainedEntity.class.getName() + "' is contained in an indexed type but is not itself indexed",
@@ -215,10 +213,9 @@ public class SearchIndexingPlanBaseIT {
 
 		withinTransaction( sessionFactory, session -> {
 			SearchIndexingPlan indexingPlan = Search.session( session ).indexingPlan();
-			SubTest.expectException(
+			Assertions.assertThatThrownBy(
 					() -> indexingPlan.purge( invalidName, 42, null )
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContainingAll(
 							"Unknown entity name: '" + invalidName + "'",
@@ -395,31 +392,27 @@ public class SearchIndexingPlanBaseIT {
 			indexingPlan = Search.session( session ).indexingPlan();
 		}
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> indexingPlan.addOrUpdate( entity )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Underlying Hibernate ORM Session seems to be closed" );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> indexingPlan.delete( entity )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Underlying Hibernate ORM Session seems to be closed" );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> indexingPlan.process()
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Underlying Hibernate ORM Session seems to be closed" );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> indexingPlan.execute()
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Underlying Hibernate ORM Session seems to be closed" );
 	}

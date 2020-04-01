@@ -28,7 +28,6 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -87,10 +86,9 @@ public class AggregationBaseIT {
 				) );
 
 		// Mandatory extension, unsupported
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> scope.aggregation().extension( new UnSupportedExtension() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class );
 	}
 

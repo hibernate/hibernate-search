@@ -28,7 +28,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -166,10 +166,9 @@ public class ObjectExistsSearchPredicateIT {
 		assumeFullMultiIndexCompatibilityCheck();
 		StubMappingScope scope = indexManager.createScope( incompatibleIndexManager );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting models for field" )
 				.hasMessageContaining( "'nested'" )
@@ -196,10 +195,9 @@ public class ObjectExistsSearchPredicateIT {
 		assumeFullMultiIndexCompatibilityCheck();
 		StubMappingScope scope = indexManager.createScope( invertedIndexManager );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().exists().field( "nested" )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting models for object field" )
 				.hasMessageContaining( "'nested'" )
@@ -213,10 +211,9 @@ public class ObjectExistsSearchPredicateIT {
 		assumeFullMultiIndexCompatibilityCheck();
 		StubMappingScope scope = indexManager.createScope( differentFieldsIndexManager );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting models for object field" )
 				.hasMessageContaining( "'nested'" )
@@ -230,10 +227,9 @@ public class ObjectExistsSearchPredicateIT {
 		assumeFullMultiIndexCompatibilityCheck();
 		StubMappingScope scope = indexManager.createScope( incompatibleFieldsIndexManager );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().nested().objectField( "nested" ).nest( f -> f.exists().field( "nested" ) )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting models for object field" )
 				.hasMessageContaining( "'nested'" )
@@ -284,10 +280,9 @@ public class ObjectExistsSearchPredicateIT {
 		assumeFullMultiIndexCompatibilityCheck();
 		StubMappingScope scope = incompatibleIndexManager.createScope( indexManager );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().exists().field( "flattened" )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting models for field" )
 				.hasMessageContaining( "'flattened'" )
@@ -314,10 +309,9 @@ public class ObjectExistsSearchPredicateIT {
 		assumeFullMultiIndexCompatibilityCheck();
 		StubMappingScope scope = invertedIndexManager.createScope( indexManager );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().exists().field( "flattened" )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting models for object field" )
 				.hasMessageContaining( "'flattened'" )
@@ -331,10 +325,9 @@ public class ObjectExistsSearchPredicateIT {
 		assumeFullMultiIndexCompatibilityCheck();
 		StubMappingScope scope = differentFieldsIndexManager.createScope( indexManager );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().exists().field( "flattened" )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting models for object field" )
 				.hasMessageContaining( "'flattened'" )
@@ -348,10 +341,9 @@ public class ObjectExistsSearchPredicateIT {
 		assumeFullMultiIndexCompatibilityCheck();
 		StubMappingScope scope = incompatibleFieldsIndexManager.createScope( indexManager );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().exists().field( "flattened" )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting models for object field" )
 				.hasMessageContaining( "'flattened'" )

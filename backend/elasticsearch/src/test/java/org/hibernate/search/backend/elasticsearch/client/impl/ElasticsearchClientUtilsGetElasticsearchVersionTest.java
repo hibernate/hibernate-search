@@ -84,7 +84,7 @@ public class ElasticsearchClientUtilsGetElasticsearchVersionTest {
 	public void testInvalid() {
 		String invalidVersionString = versionString.substring( 0, versionString.length() - 1 ) + "-A-B";
 		doMock( invalidVersionString );
-		assertThatThrownBy( () ->  ElasticsearchClientUtils.getElasticsearchVersion( clientMock ) )
+		assertThatThrownBy( () -> ElasticsearchClientUtils.getElasticsearchVersion( clientMock ) )
 				.is( matching( ExceptionMatcherBuilder.isException( SearchException.class )
 						.withMessage( "HSEARCH400080" )
 						.causedBy( SearchException.class )

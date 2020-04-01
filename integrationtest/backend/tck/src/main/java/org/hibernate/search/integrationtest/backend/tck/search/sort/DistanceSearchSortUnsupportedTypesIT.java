@@ -18,7 +18,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -77,10 +77,9 @@ public class DistanceSearchSortUnsupportedTypesIT<F> {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = getFieldPath();
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> scope.sort().distance( absoluteFieldPath, GeoPoint.of( 42.0, 45.0 ) )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll( "Distance related operations are not supported", absoluteFieldPath );
 	}

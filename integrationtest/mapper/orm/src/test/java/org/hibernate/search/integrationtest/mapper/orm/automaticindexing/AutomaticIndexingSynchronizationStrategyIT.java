@@ -38,7 +38,6 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
-import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.rule.ExpectedLog4jLog;
 
 import org.junit.Rule;
@@ -447,8 +446,7 @@ public class AutomaticIndexingSynchronizationStrategyIT {
 
 	@Test
 	public void invalidReference() {
-		SubTest.expectException( () -> setup( "invalidName" ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> setup( "invalidName" ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Unable to convert configuration property '"

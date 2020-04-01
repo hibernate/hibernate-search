@@ -24,7 +24,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendConfiguration;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -86,7 +86,7 @@ public class HibernateOrmIndexedIT {
 
 	@Test
 	public void search_singleQuery() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> OrmUtils.withinJPATransaction( entityManagerFactory, entityManager -> {
 					SearchSession searchSession = Search.session( entityManager );
 
@@ -100,7 +100,6 @@ public class HibernateOrmIndexedIT {
 					// end::cross-backend-search[]
 				} )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "A multi-index scope cannot include both " )
 				.hasMessageContaining( " and another type of index" );

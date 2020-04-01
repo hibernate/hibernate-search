@@ -41,6 +41,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -168,9 +169,9 @@ public class MatchSearchPredicateIT {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
-			SubTest.expectException( () ->
+			Assertions.assertThatThrownBy( () ->
 					scope.predicate().match().field( absoluteFieldPath )
-			).assertThrown()
+			)
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "is not searchable" )
 					.hasMessageContaining( "Make sure the field is marked as searchable" )
@@ -248,11 +249,10 @@ public class MatchSearchPredicateIT {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object valueToMatch = fieldModel.document1Value.indexedValue;
 
-			SubTest.expectException(
-					"match() predicate with unsupported type on field " + absoluteFieldPath,
-					() -> scope.predicate().match().field( absoluteFieldPath ).matching( valueToMatch )
+			Assertions.assertThatThrownBy(
+					() -> scope.predicate().match().field( absoluteFieldPath ).matching( valueToMatch ),
+					"match() predicate with unsupported type on field " + absoluteFieldPath
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "match predicates" )
 					.hasMessageContaining( "are not supported by this field's type" )
@@ -267,11 +267,10 @@ public class MatchSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
-			SubTest.expectException(
-					"matching() predicate with null value to match on field " + fieldModel.relativeFieldName,
-					() -> scope.predicate().match().field( fieldModel.relativeFieldName ).matching( null )
+			Assertions.assertThatThrownBy(
+					() -> scope.predicate().match().field( fieldModel.relativeFieldName ).matching( null ),
+					"matching() predicate with null value to match on field " + fieldModel.relativeFieldName
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Invalid value" )
 					.hasMessageContaining( "value to match" )
@@ -284,13 +283,12 @@ public class MatchSearchPredicateIT {
 	public void perFieldBoostWithConstantScore_error() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().match().field( indexMapping.string1Field.relativeFieldName ).boost( 2.1f )
 						.matching( indexMapping.string1Field.document1Value.indexedValue )
 						.constantScore()
 						.toPredicate()
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "per-field boosts together with withConstantScore option" );
 	}
@@ -705,12 +703,11 @@ public class MatchSearchPredicateIT {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object valueToMatch = fieldModel.document1Value.indexedValue;
 
-			SubTest.expectException(
-					"match() predicate with fuzzy() and unsupported type on field " + absoluteFieldPath,
+			Assertions.assertThatThrownBy(
 					() -> scope.predicate().match()
-							.field( absoluteFieldPath ).matching( valueToMatch ).fuzzy()
+							.field( absoluteFieldPath ).matching( valueToMatch ).fuzzy(),
+					"match() predicate with fuzzy() and unsupported type on field " + absoluteFieldPath
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Text predicates" )
 					.hasMessageContaining( "not supported by" )
@@ -718,12 +715,11 @@ public class MatchSearchPredicateIT {
 							EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 					) );
 
-			SubTest.expectException(
-					"match() predicate with fuzzy(int) and unsupported type on field " + absoluteFieldPath,
+			Assertions.assertThatThrownBy(
 					() -> scope.predicate().match()
-							.field( absoluteFieldPath ).matching( valueToMatch ).fuzzy( 1 )
+							.field( absoluteFieldPath ).matching( valueToMatch ).fuzzy( 1 ),
+					"match() predicate with fuzzy(int) and unsupported type on field " + absoluteFieldPath
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Text predicates" )
 					.hasMessageContaining( "not supported by" )
@@ -731,12 +727,11 @@ public class MatchSearchPredicateIT {
 							EventContexts.fromIndexFieldAbsolutePath( absoluteFieldPath )
 					) );
 
-			SubTest.expectException(
-					"match() predicate with fuzzy(int, int) and unsupported type on field " + absoluteFieldPath,
+			Assertions.assertThatThrownBy(
 					() -> scope.predicate().match()
-							.field( absoluteFieldPath ).matching( valueToMatch ).fuzzy( 1, 1 )
+							.field( absoluteFieldPath ).matching( valueToMatch ).fuzzy( 1, 1 ),
+					"match() predicate with fuzzy(int, int) and unsupported type on field " + absoluteFieldPath
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Text predicates" )
 					.hasMessageContaining( "not supported by" )
@@ -751,20 +746,18 @@ public class MatchSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField.relativeFieldName;
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().match().field( absoluteFieldPath )
 						.matching( "foo" ).fuzzy( 3 )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid maximum edit distance" )
 				.hasMessageContaining( "0, 1 or 2" );
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().match().field( absoluteFieldPath )
 						.matching( "foo" ).fuzzy( -1 )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid maximum edit distance" )
 				.hasMessageContaining( "0, 1 or 2" );
@@ -775,11 +768,10 @@ public class MatchSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField.relativeFieldName;
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().match().field( absoluteFieldPath )
 						.matching( "foo" ).fuzzy( 1, -1 )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid exact prefix length" )
 				.hasMessageContaining( "positive or zero" );
@@ -886,13 +878,12 @@ public class MatchSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
 
-		SubTest.expectException( () -> scope.query()
+		Assertions.assertThatThrownBy( () -> scope.query()
 				.where( f -> f.match().field( whitespaceAnalyzedField ).matching( "WORLD" )
 						// we have a normalizer with that name, but not an analyzer
 						.analyzer( DefaultAnalysisDefinitions.NORMALIZER_LOWERCASE.name ) )
 				.toQuery().fetchAll()
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "DefaultAnalysisDefinitions_lowercase" );
 	}
@@ -902,13 +893,12 @@ public class MatchSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
 
-		SubTest.expectException( () -> scope.query()
+		Assertions.assertThatThrownBy( () -> scope.query()
 				.where( f -> f.match().field( whitespaceAnalyzedField ).matching( "WORLD" )
 						// we don't have any analyzer with that name
 						.analyzer( "this_name_does_actually_not_exist" ) )
 				.toQuery().fetchAll()
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "this_name_does_actually_not_exist" );
 	}
@@ -1128,38 +1118,34 @@ public class MatchSearchPredicateIT {
 	public void error_unknownField() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException(
-				"match() predicate with unknown field",
-				() -> scope.predicate().match().field( "unknown_field" )
+		Assertions.assertThatThrownBy(
+				() -> scope.predicate().match().field( "unknown_field" ),
+				"match() predicate with unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
 
-		SubTest.expectException(
-				"match() predicate with unknown field",
-				() -> scope.predicate().match().fields( indexMapping.string1Field.relativeFieldName, "unknown_field" )
+		Assertions.assertThatThrownBy(
+				() -> scope.predicate().match().fields( indexMapping.string1Field.relativeFieldName, "unknown_field" ),
+				"match() predicate with unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
 
-		SubTest.expectException(
-				"match() predicate with unknown field",
-				() -> scope.predicate().match().field( indexMapping.string1Field.relativeFieldName ).field( "unknown_field" )
+		Assertions.assertThatThrownBy(
+				() -> scope.predicate().match().field( indexMapping.string1Field.relativeFieldName ).field( "unknown_field" ),
+				"match() predicate with unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
 
-		SubTest.expectException(
-				"match() predicate with unknown field",
-				() -> scope.predicate().match().field( indexMapping.string1Field.relativeFieldName ).fields( "unknown_field" )
+		Assertions.assertThatThrownBy(
+				() -> scope.predicate().match().field( indexMapping.string1Field.relativeFieldName ).fields( "unknown_field" ),
+				"match() predicate with unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
@@ -1177,11 +1163,10 @@ public class MatchSearchPredicateIT {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 			Object invalidValueToMatch = new InvalidType();
 
-			SubTest.expectException(
-					"match() predicate with invalid parameter type on field " + absoluteFieldPath,
-					() -> scope.predicate().match().field( absoluteFieldPath ).matching( invalidValueToMatch )
+			Assertions.assertThatThrownBy(
+					() -> scope.predicate().match().field( absoluteFieldPath ).matching( invalidValueToMatch ),
+					"match() predicate with invalid parameter type on field " + absoluteFieldPath
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Unable to convert DSL parameter: " )
 					.hasMessageContaining( InvalidType.class.getName() )
@@ -1218,13 +1203,12 @@ public class MatchSearchPredicateIT {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			Object valueToMatch = fieldModel.predicateParameterValue;
 
-			SubTest.expectException(
+			Assertions.assertThatThrownBy(
 					() -> {
 						indexManager.createScope( rawFieldCompatibleIndexManager )
 								.predicate().match().field( fieldModel.relativeFieldName ).matching( valueToMatch );
 					}
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 					.hasMessageContaining( "'" + fieldModel.relativeFieldName + "'" )
@@ -1262,10 +1246,9 @@ public class MatchSearchPredicateIT {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
-			SubTest.expectException(
+			Assertions.assertThatThrownBy(
 					() -> scope.predicate().match().field( fieldPath )
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 					.hasMessageContaining( "'" + fieldPath + "'" )
@@ -1282,10 +1265,9 @@ public class MatchSearchPredicateIT {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
-			SubTest.expectException(
+			Assertions.assertThatThrownBy(
 					() -> scope.predicate().match().field( fieldPath )
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 					.hasMessageContaining( "'" + fieldPath + "'" )
@@ -1300,14 +1282,13 @@ public class MatchSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope( incompatibleAnalyzerIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField.relativeFieldName;
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> {
 					scope.query()
 							.where( f -> f.match().field( absoluteFieldPath ).matching( "fox" ) )
 							.toQuery();
 				}
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 				.hasMessageContaining( "'analyzedString'" )
@@ -1368,14 +1349,13 @@ public class MatchSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope( incompatibleDecimalScaleIndexManager );
 		String absoluteFieldPath = indexMapping.scaledBigDecimal.relativeFieldName;
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> {
 					scope.query().selectEntityReference()
 							.where( f -> f.match().field( absoluteFieldPath ).matching( new BigDecimal( "739.739" ) ) )
 							.toQuery();
 				}
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 				.hasMessageContaining( "'scaledBigDecimal'" )
@@ -1391,10 +1371,9 @@ public class MatchSearchPredicateIT {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
-			SubTest.expectException(
+			Assertions.assertThatThrownBy(
 					() -> scope.predicate().match().field( fieldPath )
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 					.hasMessageContaining( "'" + fieldPath + "'" )

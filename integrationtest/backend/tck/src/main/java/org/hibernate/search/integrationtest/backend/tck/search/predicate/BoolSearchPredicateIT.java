@@ -22,7 +22,7 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -891,22 +891,20 @@ public class BoolSearchPredicateIT {
 	public void minimumShouldMatch_error_negativeCeiling() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException(
-				"minimumShouldMatch constraint with negative ignoreConstraintCeiling",
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().bool().minimumShouldMatch()
-						.ifMoreThan( -1 ).thenRequireNumber( 1 )
+						.ifMoreThan( -1 ).thenRequireNumber( 1 ),
+				"minimumShouldMatch constraint with negative ignoreConstraintCeiling"
 		)
-				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'ignoreConstraintCeiling'" )
 				.hasMessageContaining( "must be positive or zero" );
 
-		SubTest.expectException(
-				"minimumShouldMatch constraint with negative ignoreConstraintCeiling",
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().bool().minimumShouldMatch()
-						.ifMoreThan( -1 ).thenRequirePercent( 50 )
+						.ifMoreThan( -1 ).thenRequirePercent( 50 ),
+				"minimumShouldMatch constraint with negative ignoreConstraintCeiling"
 		)
-				.assertThrown()
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'ignoreConstraintCeiling'" )
 				.hasMessageContaining( "must be positive or zero" );
@@ -916,14 +914,13 @@ public class BoolSearchPredicateIT {
 	public void minimumShouldMatch_error_multipleConflictingCeilings() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException(
-				"bool() predicate with minimumShouldMatch constraints with multiple conflicting ceilings",
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().bool().minimumShouldMatch()
 						.ifMoreThan( 2 ).thenRequireNumber( -1 )
 						.ifMoreThan( 4 ).thenRequirePercent( 70 )
-						.ifMoreThan( 4 ).thenRequirePercent( 70 )
+						.ifMoreThan( 4 ).thenRequirePercent( 70 ),
+				"bool() predicate with minimumShouldMatch constraints with multiple conflicting ceilings"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting minimumShouldMatch constraints for ceiling" )
 				.hasMessageContaining( "'4'" );

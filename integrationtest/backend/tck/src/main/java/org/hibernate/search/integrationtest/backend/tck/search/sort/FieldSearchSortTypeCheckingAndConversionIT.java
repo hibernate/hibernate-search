@@ -42,7 +42,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.BeforeClass;
 import org.junit.ClassRule;
@@ -195,9 +195,9 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 		StubMappingScope scope = indexManager.createScope();
 		String fieldPath = getNonSortableFieldPath();
 
-		SubTest.expectException( () -> {
+		Assertions.assertThatThrownBy( () -> {
 				scope.sort().field( fieldPath );
-		} ).assertThrown()
+		} )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Sorting is not enabled for field" )
 				.hasMessageContaining( fieldPath );
@@ -210,12 +210,11 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 		String absoluteFieldPath = getFieldPath();
 		Object invalidValueToMatch = new InvalidType();
 
-		SubTest.expectException(
-				"field() sort with invalid parameter type for missing().use() on field " + absoluteFieldPath,
+		Assertions.assertThatThrownBy(
 				() -> scope.sort().field( absoluteFieldPath ).missing()
-						.use( invalidValueToMatch )
+						.use( invalidValueToMatch ),
+				"field() sort with invalid parameter type for missing().use() on field " + absoluteFieldPath
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to convert DSL parameter: " )
 				.hasMessageContaining( InvalidType.class.getName() )
@@ -232,12 +231,11 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 		String absoluteFieldPath = getFieldWithDslConverterPath();
 		Object invalidValueToMatch = new InvalidType();
 
-		SubTest.expectException(
-				"field() sort with invalid parameter type for missing().use() on field " + absoluteFieldPath,
+		Assertions.assertThatThrownBy(
 				() -> scope.sort().field( absoluteFieldPath ).missing()
-						.use( invalidValueToMatch )
+						.use( invalidValueToMatch ),
+				"field() sort with invalid parameter type for missing().use() on field " + absoluteFieldPath
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unable to convert DSL parameter: " )
 				.hasMessageContaining( InvalidType.class.getName() )
@@ -277,13 +275,12 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 
 		String fieldPath = getFieldPath();
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> {
 					matchAllQuery( f -> f.field( fieldPath ).asc().missing()
 							.use( new ValueWrapper<>( getSingleValueForMissingUse( BEFORE_DOCUMENT_1_ORDINAL ) ) ), scope );
 				}
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a sort" )
 				.hasMessageContaining( "'" + fieldPath + "'" )
@@ -322,12 +319,11 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 
 		String fieldPath = getFieldPath();
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> {
 					matchAllQuery( f -> f.field( fieldPath ), scope );
 				}
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a sort" )
 				.hasMessageContaining( "'" + fieldPath + "'" )
@@ -342,12 +338,11 @@ public class FieldSearchSortTypeCheckingAndConversionIT<F> {
 
 		String fieldPath = getFieldPath();
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> {
 					matchAllQuery( f -> f.field( fieldPath ), scope );
 				}
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a sort" )
 				.hasMessageContaining( "'" + fieldPath + "'" )

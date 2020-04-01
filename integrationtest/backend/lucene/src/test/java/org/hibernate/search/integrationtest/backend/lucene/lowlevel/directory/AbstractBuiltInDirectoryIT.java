@@ -18,7 +18,6 @@ import org.hibernate.search.backend.lucene.lowlevel.index.impl.IndexAccessorImpl
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
@@ -82,11 +81,10 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 	@TestForIssue(jiraKey = "HSEARCH-3440")
 	@PortedFromSearch5(original = "org.hibernate.search.test.directoryProvider.CustomLockProviderTest.testFailOnNonExistentLockingFactory")
 	public void lockingStrategy_invalid() {
-		SubTest.expectException( () -> setup( c -> c.withBackendProperty(
+		Assertions.assertThatThrownBy( () -> setup( c -> c.withBackendProperty(
 				LuceneBackendSettings.DIRECTORY_LOCKING_STRATEGY,
 				"some_invalid_name"
 		) ) )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.backendContext( BACKEND_NAME )
@@ -140,11 +138,10 @@ public abstract class AbstractBuiltInDirectoryIT extends AbstractDirectoryIT {
 	}
 
 	private void testInvalidFSLockingStrategy(String strategyName) {
-		SubTest.expectException( () -> setup( c -> c.withBackendProperty(
+		Assertions.assertThatThrownBy( () -> setup( c -> c.withBackendProperty(
 				LuceneBackendSettings.DIRECTORY_LOCKING_STRATEGY,
 				strategyName
 		) ) )
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.indexContext( INDEX_NAME )

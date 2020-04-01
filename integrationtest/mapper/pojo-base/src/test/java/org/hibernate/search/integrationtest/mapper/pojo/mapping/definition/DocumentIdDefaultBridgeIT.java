@@ -28,7 +28,7 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.StubBackendUtils;
 import org.hibernate.search.util.impl.integrationtest.common.stub.backend.document.model.StubIndexSchemaNode;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Assume;
 import org.junit.Before;
@@ -185,11 +185,10 @@ public class DocumentIdDefaultBridgeIT<I> {
 		}
 
 		// convertUnknown must throw a runtime exception on invalid input
-		SubTest.expectException(
-				"convertUnknown on invalid input",
-				() -> dslToIndexConverter.convertUnknown( new Object(), convertContext )
+		Assertions.assertThatThrownBy(
+				() -> dslToIndexConverter.convertUnknown( new Object(), convertContext ),
+				"convertUnknown on invalid input"
 		)
-				.assertThrown()
 				.isInstanceOf( RuntimeException.class );
 	}
 

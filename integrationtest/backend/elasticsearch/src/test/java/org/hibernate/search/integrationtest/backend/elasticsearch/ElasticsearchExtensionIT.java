@@ -47,7 +47,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubLoadingOpt
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.hibernate.search.util.impl.test.ExceptionMatcherBuilder;
-import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Before;
@@ -172,10 +171,9 @@ public class ElasticsearchExtensionIT {
 				.hasTotalHitCount( 6 );
 
 		// Unsupported extension
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> query.extension( (SearchQuery<DocumentReference> original, LoadingContext<?, ?> loadingContext) -> Optional.empty() )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class );
 	}
 
@@ -245,10 +243,9 @@ public class ElasticsearchExtensionIT {
 				.toQuery();
 
 		// Non-existing document
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> query.explain( "InvalidId" )
 		)
-				.assertThrown()
 				.has( new HamcrestCondition<>(
 						ExceptionMatcherBuilder.isException( SearchException.class )
 								.causedBy( SearchException.class )
@@ -289,10 +286,9 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> query.explain( FIRST_ID )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "explain(String id) cannot be used when the query targets multiple indexes" )
 				.hasMessageContaining( "pass one of [" + INDEX_NAME + ", " + OTHER_INDEX_NAME + "]" );
@@ -306,10 +302,9 @@ public class ElasticsearchExtensionIT {
 				.where( f -> f.id().matching( FIRST_ID ) )
 				.toQuery();
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> query.explain( "NotAnIndexName", FIRST_ID )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining(
 						"index name 'NotAnIndexName' is not among the indexes targeted by this query: ["
@@ -1011,7 +1006,6 @@ public class ElasticsearchExtensionIT {
 						"Attempt to unwrap an Elasticsearch index manager to '" + String.class.getName() + "'",
 						"this index manager can only be unwrapped to '" + ElasticsearchIndexManager.class.getName() + "'"
 				);
-		;
 	}
 
 	private void initData() {

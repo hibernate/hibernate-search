@@ -21,7 +21,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -77,14 +77,13 @@ public class DistanceSearchSearchableSortableIT {
 		StubMappingScope scope = indexManager.createScope();
 		String fieldPath = "searchableNotSortable";
 
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				scope.query()
 						.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
 						.sort( f -> f.distance( fieldPath, METRO_GARIBALDI ) )
 						.toQuery()
 
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Sorting is not enabled for field" )
 				.hasMessageContaining( "Make sure the field is marked as sortable" )
@@ -102,14 +101,13 @@ public class DistanceSearchSearchableSortableIT {
 		StubMappingScope scope = indexManager.createScope();
 		String fieldPath = "searchableDefaultSortable";
 
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				scope.query()
 						.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
 						.sort( f -> f.distance( fieldPath, METRO_GARIBALDI ) )
 						.toQuery()
 
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Sorting is not enabled for field" )
 				.hasMessageContaining( "Make sure the field is marked as sortable" )
@@ -127,14 +125,13 @@ public class DistanceSearchSearchableSortableIT {
 		StubMappingScope scope = indexManager.createScope();
 		String fieldPath = "notSearchableSortable";
 
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				scope.query()
 						.where( f -> f.spatial().within().field( fieldPath ).circle( METRO_GARIBALDI, 1_500 ) )
 						.sort( f -> f.distance( fieldPath, METRO_GARIBALDI ) )
 						.toQuery()
 
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Field 'notSearchableSortable' is not searchable" )
 				.hasMessageContaining( "Make sure the field is marked as searchable" )

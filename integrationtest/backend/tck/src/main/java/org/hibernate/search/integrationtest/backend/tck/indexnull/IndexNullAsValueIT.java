@@ -28,7 +28,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Assume;
 import org.junit.Rule;
@@ -85,7 +85,7 @@ public class IndexNullAsValueIT {
 
 	@Test
 	public void indexNullAsValue_fullText() {
-		SubTest.expectException( () -> setupHelper.start()
+		Assertions.assertThatThrownBy( () -> setupHelper.start()
 				.withIndex( ANOTHER_INDEX_NAME, ctx -> ctx.getSchemaElement()
 								.field( "fullTextField", c -> c.asString().analyzer( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name ).indexNullAs( "bla bla bla" ) )
 								.toReference()
@@ -93,7 +93,6 @@ public class IndexNullAsValueIT {
 						} )
 				.setup()
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Index-null-as option is not supported on analyzed field." )
 				.hasMessageContaining( DefaultAnalysisDefinitions.ANALYZER_STANDARD_ENGLISH.name )

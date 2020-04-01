@@ -36,7 +36,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 
 import org.junit.Before;
@@ -174,9 +174,9 @@ public class PhraseSearchPredicateIT {
 		StubMappingScope scope = unsearchableFieldsIndexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SubTest.expectException( () ->
+		Assertions.assertThatThrownBy( () ->
 				scope.predicate().phrase().field( absoluteFieldPath )
-		).assertThrown()
+		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "is not searchable" )
 				.hasMessageContaining( "Make sure the field is marked as searchable" )
@@ -295,13 +295,12 @@ public class PhraseSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 		String whitespaceAnalyzedField = indexMapping.whitespaceAnalyzedField.relativeFieldName;
 
-		SubTest.expectException( () -> scope.query()
+		Assertions.assertThatThrownBy( () -> scope.query()
 				.where( f -> f.phrase().field( whitespaceAnalyzedField ).matching( "ONCE UPON" )
 						// we don't have any analyzer with that name
 						.analyzer( "this_name_does_actually_not_exist" ) )
 				.toQuery().fetchAll()
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "this_name_does_actually_not_exist" );
 	}
@@ -343,11 +342,10 @@ public class PhraseSearchPredicateIT {
 		for ( ByTypeFieldModel fieldModel : indexMapping.unsupportedFieldModels ) {
 			String absoluteFieldPath = fieldModel.relativeFieldName;
 
-			SubTest.expectException(
-					"phrase() predicate with unsupported type on field " + absoluteFieldPath,
-					() -> scope.predicate().phrase().field( absoluteFieldPath )
+			Assertions.assertThatThrownBy(
+					() -> scope.predicate().phrase().field( absoluteFieldPath ),
+					"phrase() predicate with unsupported type on field " + absoluteFieldPath
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Text predicates" )
 					.hasMessageContaining( "are not supported by" )
@@ -363,11 +361,10 @@ public class PhraseSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SubTest.expectException(
-				"phrase() predicate with null value to match",
-				() -> scope.predicate().phrase().field( absoluteFieldPath ).matching( null )
+		Assertions.assertThatThrownBy(
+				() -> scope.predicate().phrase().field( absoluteFieldPath ).matching( null ),
+				"phrase() predicate with null value to match"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid phrase" )
 				.hasMessageContaining( "must be non-null" )
@@ -404,14 +401,13 @@ public class PhraseSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().phrase()
 						.field( absoluteFieldPath ).boost( 2.1f )
 						.matching( PHRASE_1 )
 						.constantScore()
 						.toPredicate()
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "per-field boosts together with withConstantScore option" );
 	}
@@ -604,41 +600,37 @@ public class PhraseSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SubTest.expectException(
-				"phrase() predicate with unknown field",
-				() -> scope.predicate().phrase().field( "unknown_field" )
+		Assertions.assertThatThrownBy(
+				() -> scope.predicate().phrase().field( "unknown_field" ),
+				"phrase() predicate with unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
 
-		SubTest.expectException(
-				"phrase() predicate with unknown field",
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().phrase()
-						.fields( absoluteFieldPath, "unknown_field" )
+						.fields( absoluteFieldPath, "unknown_field" ),
+				"phrase() predicate with unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
 
-		SubTest.expectException(
-				"phrase() predicate with unknown field",
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().phrase().field( absoluteFieldPath )
-						.field( "unknown_field" )
+						.field( "unknown_field" ),
+				"phrase() predicate with unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
 
-		SubTest.expectException(
-				"phrase() predicate with unknown field",
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().phrase().field( absoluteFieldPath )
-						.fields( "unknown_field" )
+						.fields( "unknown_field" ),
+				"phrase() predicate with unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
@@ -649,22 +641,20 @@ public class PhraseSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope();
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SubTest.expectException(
-				"phrase() predicate with negative slop",
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().phrase().field( absoluteFieldPath )
-						.matching( "foo" ).slop( -1 )
+						.matching( "foo" ).slop( -1 ),
+				"phrase() predicate with negative slop"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid slop" )
 				.hasMessageContaining( "must be positive or zero" );
 
-		SubTest.expectException(
-				"phrase() predicate with negative slop",
+		Assertions.assertThatThrownBy(
 				() -> scope.predicate().phrase().field( absoluteFieldPath )
-						.matching( "foo" ).slop( Integer.MIN_VALUE )
+						.matching( "foo" ).slop( Integer.MIN_VALUE ),
+				"phrase() predicate with negative slop"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid slop" )
 				.hasMessageContaining( "must be positive or zero" );
@@ -708,14 +698,13 @@ public class PhraseSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope( incompatibleAnalyzerIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> {
 					scope.query()
 							.where( f -> f.phrase().field( absoluteFieldPath ).matching( PHRASE_1_UNIQUE_TERM ) )
 							.toQuery();
 				}
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 				.hasMessageContaining( absoluteFieldPath )
@@ -777,8 +766,7 @@ public class PhraseSearchPredicateIT {
 		StubMappingScope scope = indexManager.createScope( unsearchableFieldsIndexManager );
 		String absoluteFieldPath = indexMapping.analyzedStringField1.relativeFieldName;
 
-		SubTest.expectException( () -> scope.predicate().phrase().field( absoluteFieldPath ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> scope.predicate().phrase().field( absoluteFieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 				.hasMessageContaining( absoluteFieldPath )

@@ -35,7 +35,6 @@ import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
 import org.hibernate.search.util.impl.integrationtest.common.rule.StubSearchWorkBehavior;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.mapper.orm.OrmUtils;
-import org.hibernate.search.util.impl.test.SubTest;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -219,7 +218,7 @@ public class DynamicMapBaseIT {
 					.purge()
 					.mergeSegments();
 
-			SubTest.expectException( () -> {
+			Assertions.assertThatThrownBy( () -> {
 				try {
 					scope.massIndexer().startAndWait();
 				}
@@ -227,7 +226,6 @@ public class DynamicMapBaseIT {
 					Assertions.fail( "Unexpected exception", e );
 				}
 			} )
-					.assertThrown()
 					.hasMessageContainingAll(
 							"Type '" + entityTypeName + " (" + Map.class.getName()
 									+ ")' doesn't have any representation in the JPA metamodel.",
@@ -243,7 +241,7 @@ public class DynamicMapBaseIT {
 		String entityTypeName = "Book";
 
 		backendMock.expectAnySchema( INDEX1_NAME );
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> ormSetupHelper.start()
 						.withConfiguration( builder -> builder.addHbmFromClassPath( hbmPath ) )
 						.withProperty(
@@ -256,7 +254,6 @@ public class DynamicMapBaseIT {
 						)
 						.setup()
 		)
-				.assertThrown()
 				.hasMessageContainingAll(
 						"Type '" + entityTypeName + " (" + Map.class.getName()
 								+ ")' doesn't have any representation in the JPA metamodel.",

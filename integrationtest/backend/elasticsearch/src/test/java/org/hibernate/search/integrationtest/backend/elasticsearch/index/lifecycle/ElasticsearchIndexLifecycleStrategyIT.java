@@ -8,7 +8,7 @@ package org.hibernate.search.integrationtest.backend.elasticsearch.index.lifecyc
 
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -27,7 +27,7 @@ public class ElasticsearchIndexLifecycleStrategyIT {
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3540")
 	public void noCall() {
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start()
 						.withIndexDefaultsProperty(
 								"lifecycle.strategy",
@@ -39,7 +39,6 @@ public class ElasticsearchIndexLifecycleStrategyIT {
 						)
 						.setup()
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Unable to convert configuration property 'hibernate.search.backends.testedBackend.indexes." + INDEX_NAME

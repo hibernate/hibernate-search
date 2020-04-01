@@ -37,7 +37,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Assume;
@@ -165,8 +165,7 @@ public class DistanceSearchSortBaseIT {
 
 		String fieldPath = getFieldPath( SortOrder.ASC );
 
-		SubTest.expectException( () -> simpleQuery( b -> b.distance( fieldPath, CENTER_POINT ) ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> simpleQuery( b -> b.distance( fieldPath, CENTER_POINT ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot compute the median across nested documents",
@@ -184,8 +183,7 @@ public class DistanceSearchSortBaseIT {
 
 		String fieldPath = getFieldPath( SortOrder.ASC );
 
-		SubTest.expectException( () -> simpleQuery( b -> b.distance( fieldPath, CENTER_POINT ) ) )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> simpleQuery( b -> b.distance( fieldPath, CENTER_POINT ) ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContainingAll(
 						"Cannot compute the sum for a distance sort",

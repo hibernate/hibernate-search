@@ -40,6 +40,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Assume;
@@ -192,10 +193,9 @@ public class FieldSearchProjectionIT {
 			Class<?> rightType = fieldModel.type;
 			Class<?> wrongType = ( rightType.equals( Integer.class ) ) ? Long.class : Integer.class;
 
-			SubTest.expectException(
+			Assertions.assertThatThrownBy(
 					() -> scope.projection().field( fieldPath, wrongType ).toProjection()
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Invalid type" )
 					.hasMessageContaining( "for projection on field" )
@@ -213,10 +213,9 @@ public class FieldSearchProjectionIT {
 			Class<?> rightType = fieldModel.type;
 			Class<?> wrongType = ( rightType.equals( Integer.class ) ) ? Long.class : Integer.class;
 
-			SubTest.expectException(
+			Assertions.assertThatThrownBy(
 					() -> scope.projection().field( fieldPath, wrongType, ValueConvert.YES ).toProjection()
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Invalid type" )
 					.hasMessageContaining( "for projection on field" )
@@ -277,9 +276,9 @@ public class FieldSearchProjectionIT {
 			String fieldPath = fieldModel.relativeFieldName;
 			Class<?> fieldType = fieldModel.type;
 
-			SubTest.expectException( () -> {
+			Assertions.assertThatThrownBy( () -> {
 				scope.projection().field( fieldPath, fieldType ).toProjection();
-			} ).assertThrown()
+			} )
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Projections are not enabled for field" )
 					.hasMessageContaining( fieldPath );
@@ -515,11 +514,10 @@ public class FieldSearchProjectionIT {
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldWithProjectionConverterModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
-			SubTest.expectException(
-					"projection on multiple indexes with incompatible types for field " + fieldPath,
-					() -> scope.projection().field( fieldPath )
+			Assertions.assertThatThrownBy(
+					() -> scope.projection().field( fieldPath ),
+					"projection on multiple indexes with incompatible types for field " + fieldPath
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Multiple conflicting types to build a projection" )
 					.hasMessageContaining( "'" + fieldPath + "'" );
@@ -557,11 +555,10 @@ public class FieldSearchProjectionIT {
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
-			SubTest.expectException(
-					"projection on multiple indexes with incompatible types for field " + fieldPath,
-					() -> scope.projection().field( fieldPath )
+			Assertions.assertThatThrownBy(
+					() -> scope.projection().field( fieldPath ),
+					"projection on multiple indexes with incompatible types for field " + fieldPath
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Multiple conflicting types to build a projection" )
 					.hasMessageContaining( "'" + fieldPath + "'" );
@@ -575,11 +572,10 @@ public class FieldSearchProjectionIT {
 		for ( FieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
-			SubTest.expectException(
-					"projection on multiple indexes with incompatible types for field " + fieldPath,
-					() -> scope.projection().field( fieldPath, ValueConvert.NO )
+			Assertions.assertThatThrownBy(
+					() -> scope.projection().field( fieldPath, ValueConvert.NO ),
+					"projection on multiple indexes with incompatible types for field " + fieldPath
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Multiple conflicting types to build a projection" )
 					.hasMessageContaining( "'" + fieldPath + "'" );
@@ -594,11 +590,10 @@ public class FieldSearchProjectionIT {
 			SubTest.expectSuccess( fieldModel, model -> {
 				String fieldPath = indexMapping.nestedObject.relativeFieldName + "." + model.relativeFieldName;
 
-				SubTest.expectException(
-						"projection on multiple indexes with incompatible types for field " + fieldPath,
-						() -> scope.projection().field( fieldPath, ValueConvert.NO )
+				Assertions.assertThatThrownBy(
+						() -> scope.projection().field( fieldPath, ValueConvert.NO ),
+						"projection on multiple indexes with incompatible types for field " + fieldPath
 				)
-						.assertThrown()
 						.isInstanceOf( SearchException.class )
 						.hasMessageContaining( "Multiple index conflicting models on nested document paths" )
 						.hasMessageContaining( "'" + fieldPath + "'" );

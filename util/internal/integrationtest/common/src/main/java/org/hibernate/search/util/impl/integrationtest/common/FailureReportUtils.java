@@ -28,7 +28,7 @@ public final class FailureReportUtils {
 	 * @return A consumer representing an assertion to be passed as a parameter to
 	 * {@link org.assertj.core.api.AbstractThrowableAssert#satisfies(Consumer)}.
 	 */
-	public static Consumer<Throwable> hasContext(EventContext first, EventContext... others) {
+	public static <T extends Throwable> Consumer<T> hasContext(EventContext first, EventContext... others) {
 		return hasContext(
 				EventContext.concat( first, others ).getElements().toArray( new EventContextElement[] { } )
 		);
@@ -39,7 +39,7 @@ public final class FailureReportUtils {
 	 * @return A consumer representing an assertion to be passed as a parameter to
 	 * {@link org.assertj.core.api.AbstractThrowableAssert#satisfies(Consumer)}.
 	 */
-	public static Consumer<Throwable> hasContext(EventContextElement... contextElements) {
+	public static <T extends Throwable> Consumer<T> hasContext(EventContextElement... contextElements) {
 		return throwable -> {
 			Assertions.assertThat( throwable )
 					.isInstanceOf( SearchException.class );

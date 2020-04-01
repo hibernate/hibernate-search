@@ -38,6 +38,7 @@ import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.SubTest;
 
 import org.junit.Before;
@@ -300,11 +301,10 @@ public class ExistsSearchPredicateIT {
 	public void unknownField() {
 		StubMappingScope scope = indexManager.createScope();
 
-		SubTest.expectException(
-				"exists() predicate with unknown field",
-				() -> scope.predicate().exists().field( "unknown_field" )
+		Assertions.assertThatThrownBy(
+				() -> scope.predicate().exists().field( "unknown_field" ),
+				"exists() predicate with unknown field"
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'unknown_field'" );
@@ -366,10 +366,9 @@ public class ExistsSearchPredicateIT {
 		for ( ByTypeFieldModel<?> fieldModel : indexMapping.supportedFieldModels ) {
 			String fieldPath = fieldModel.relativeFieldName;
 
-			SubTest.expectException(
+			Assertions.assertThatThrownBy(
 					() -> scope.predicate().exists().field( fieldPath )
 			)
-					.assertThrown()
 					.isInstanceOf( SearchException.class )
 					.hasMessageContaining( "Multiple conflicting types to build a predicate" )
 					.hasMessageContaining( "'" + fieldPath + "'" )

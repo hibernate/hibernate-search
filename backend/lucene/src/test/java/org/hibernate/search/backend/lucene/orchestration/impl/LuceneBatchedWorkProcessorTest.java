@@ -21,7 +21,7 @@ import org.hibernate.search.backend.lucene.work.impl.IndexingWork;
 import org.hibernate.search.backend.lucene.work.impl.IndexingWorkExecutionContext;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.util.common.reporting.EventContext;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 
 import org.junit.Test;
 
@@ -94,8 +94,8 @@ public class LuceneBatchedWorkProcessorTest extends EasyMockSupport {
 		expectWorkGetInfo( 50 );
 		indexAccessorMock.cleanUpAfterFailure( workException, workInfo( 50 ) );
 		replayAll();
-		SubTest.expectException( () -> processor.submit( failingWork ) )
-				.assertThrown().isSameAs( workException );
+		Assertions.assertThatThrownBy( () -> processor.submit( failingWork ) )
+				.isSameAs( workException );
 		verifyAll();
 
 		// Subsequent works must be executed regardless of previous failures in the same batch
@@ -127,8 +127,7 @@ public class LuceneBatchedWorkProcessorTest extends EasyMockSupport {
 		expectLastCall().andThrow( commitException );
 		indexAccessorMock.cleanUpAfterFailure( commitException, "Commit after a set of index works" );
 		replayAll();
-		SubTest.expectException( () -> processor.forceCommit() )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> processor.forceCommit() )
 				.isSameAs( commitException );
 		verifyAll();
 
@@ -157,8 +156,7 @@ public class LuceneBatchedWorkProcessorTest extends EasyMockSupport {
 		indexAccessorMock.refresh();
 		expectLastCall().andThrow( refreshException );
 		replayAll();
-		SubTest.expectException( () -> processor.forceRefresh() )
-				.assertThrown()
+		Assertions.assertThatThrownBy( () -> processor.forceRefresh() )
 				.isSameAs( refreshException );
 		verifyAll();
 	}

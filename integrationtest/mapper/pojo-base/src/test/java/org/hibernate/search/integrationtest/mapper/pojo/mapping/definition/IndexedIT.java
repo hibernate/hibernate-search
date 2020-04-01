@@ -15,7 +15,7 @@ import org.hibernate.search.mapper.pojo.mapping.definition.annotation.Indexed;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.common.rule.BackendMock;
-import org.hibernate.search.util.impl.test.SubTest;
+import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
 
 import org.junit.Rule;
@@ -200,13 +200,12 @@ public class IndexedIT {
 				throw new UnsupportedOperationException( "Should not be called" );
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start()
 						// Do not mention the type is an entity type here, on purpose, to trigger the failure
 						.withAnnotatedTypes( IndexedWithoutEntityMetadata.class )
 						.setup()
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( IndexedWithoutEntityMetadata.class.getName() )
@@ -230,10 +229,9 @@ public class IndexedIT {
 				return id;
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start().setup( AbstractIndexedEntity.class )
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( AbstractIndexedEntity.class.getName() )
@@ -254,7 +252,7 @@ public class IndexedIT {
 				return id;
 			}
 		}
-		SubTest.expectException(
+		Assertions.assertThatThrownBy(
 				() -> setupHelper.start()
 						.withConfiguration( builder -> {
 							builder.setAnnotatedTypeDiscoveryEnabled( false );
@@ -266,7 +264,6 @@ public class IndexedIT {
 						} )
 						.setup()
 		)
-				.assertThrown()
 				.isInstanceOf( SearchException.class )
 				.hasMessageMatching( FailureReportUtils.buildFailureReportPattern()
 						.typeContext( AbstractIndexedEntity.class.getName() )
