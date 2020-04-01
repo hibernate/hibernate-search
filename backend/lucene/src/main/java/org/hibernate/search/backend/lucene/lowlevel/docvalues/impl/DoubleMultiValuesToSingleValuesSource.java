@@ -31,7 +31,6 @@ import org.apache.lucene.search.IndexSearcher;
 import org.apache.lucene.search.LongValues;
 import org.apache.lucene.search.LongValuesSource;
 import org.apache.lucene.util.BitSet;
-import org.apache.lucene.util.NumericUtils;
 
 /**
  * An implementation of {@link DoubleValuesSource} for docvalues with multiple values per document,
@@ -55,7 +54,7 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 	 * @return A {@link DoubleMultiValuesToSingleValuesSource}
 	 */
 	public static DoubleMultiValuesToSingleValuesSource fromDoubleField(String field, MultiValueMode mode, NestedDocsProvider nested) {
-		return fromField( field, mode, nested, SortedNumericDoubleDocValues::fromDoubleField, NumericUtils::doubleToSortableLong );
+		return fromField( field, mode, nested, SortedNumericDoubleDocValues::fromDoubleField, Double::doubleToRawLongBits );
 	}
 
 	/**
@@ -67,7 +66,7 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 	 * @return A {@link DoubleMultiValuesToSingleValuesSource}
 	 */
 	public static DoubleMultiValuesToSingleValuesSource fromFloatField(String field, MultiValueMode mode, NestedDocsProvider nested) {
-		return fromField( field, mode, nested, SortedNumericDoubleDocValues::fromFloatField, (v) -> (long) NumericUtils.floatToSortableInt( (float) v ) );
+		return fromField( field, mode, nested, SortedNumericDoubleDocValues::fromFloatField, v -> (long) Float.floatToRawIntBits( (float) v ) );
 	}
 
 	private static DoubleMultiValuesToSingleValuesSource fromField(String field, MultiValueMode mode, NestedDocsProvider nested,
