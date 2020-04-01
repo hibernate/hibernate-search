@@ -8,9 +8,10 @@ package org.hibernate.search.mapper.pojo.bridge.binding;
 
 import java.util.Map;
 import org.hibernate.search.engine.environment.bean.BeanHolder;
+import org.hibernate.search.mapper.pojo.bridge.mapping.programmatic.FilterBinder;
 
 /**
- * The context provided to the {@link FilterFactoryBinder#bind(FilterBindingContext)} method.
+ * The context provided to the {@link FilterBinder#bind(org.hibernate.search.mapper.pojo.bridge.binding.FilterBindingContext) } method.
  *
  * @param <T> The type of factory on the POJO side of the factory.
  */

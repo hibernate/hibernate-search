@@ -14,7 +14,7 @@ import org.hibernate.search.engine.search.predicate.factories.FilterFactoryConte
 
 /**
  *
- * @author Waldemar KÃÂÃÂaczyÃÂÃÂski
+ * @author Waldemar Kłaczyński
  */
 public class ElasticsearchFilterFactoryContextImpl implements FilterFactoryContext {
 

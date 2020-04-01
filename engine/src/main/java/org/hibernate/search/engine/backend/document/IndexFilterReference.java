@@ -11,7 +11,7 @@ import org.hibernate.search.engine.search.predicate.factories.FilterFactory;
 /**
  * A reference to an "object" filter of an indexed document.
  *
- * @param <F> The indexed filterÃÂÃÂ factory type.
+ * @param <F> The indexed filter factory type.
  *
  */
 public interface IndexFilterReference<F extends FilterFactory> {
