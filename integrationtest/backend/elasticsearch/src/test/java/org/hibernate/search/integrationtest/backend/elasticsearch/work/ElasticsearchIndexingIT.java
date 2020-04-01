@@ -29,7 +29,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingInd
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -59,9 +58,6 @@ public class ElasticsearchIndexingIT {
 
 	@Rule
 	public ElasticsearchClientSpy clientSpy = new ElasticsearchClientSpy();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	private final IndexLayoutStrategy layoutStrategy;
 	private final URLEncodedString writeAlias;

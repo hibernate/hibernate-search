@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.multitenancy;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
 
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
@@ -20,7 +21,6 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSco
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 /**
  * Test that the backend correctly throws exception
@@ -34,9 +34,6 @@ public class MultiTenancyMismatchIT {
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
-
 	private final StubBackendSessionContext tenant1SessionContext = new StubBackendSessionContext( "tenant_1" );
 
 	private IndexMapping indexMapping;
@@ -44,19 +41,20 @@ public class MultiTenancyMismatchIT {
 
 	@Test
 	public void backend_multi_tenancy_disabled_but_indexes_requiring_multi_tenancy_throws_exception() {
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Index" );
-		thrown.expectMessage( "requires multi-tenancy but the backend" );
-		thrown.expectMessage( "does not support it in its current configuration." );
-
-		setupHelper.start()
+		assertThatThrownBy( () -> setupHelper.start()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.indexManager = indexManager
 				)
 				.withMultiTenancy()
-				.setup();
+				.setup()
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Index", "requires multi-tenancy but the backend",
+						"does not support it in its current configuration."
+				);
 	}
 
 	@Test
@@ -69,14 +67,17 @@ public class MultiTenancyMismatchIT {
 				)
 				.setup();
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Tenant identifier" );
-		thrown.expectMessage( "is provided, but multi-tenancy is disabled for this backend" );
-
 		StubMappingScope scope = indexManager.createScope();
-		scope.query( tenant1SessionContext )
+
+		assertThatThrownBy( () -> scope.query( tenant1SessionContext )
 				.where( f -> f.matchAll() )
-				.toQuery();
+				.toQuery()
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Tenant identifier",
+						"is provided, but multi-tenancy is disabled for this backend."
+				);
 	}
 
 	@Test
@@ -89,13 +90,16 @@ public class MultiTenancyMismatchIT {
 				)
 				.setup();
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Tenant identifier" );
-		thrown.expectMessage( "is provided, but multi-tenancy is disabled for this backend" );
-
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( tenant1SessionContext );
-		plan.update( referenceProvider( "1" ), document -> { } );
-		plan.execute().join();
+		assertThatThrownBy( () -> {
+			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( tenant1SessionContext );
+			plan.update( referenceProvider( "1" ), document -> { } );
+			plan.execute().join();
+		} )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Tenant identifier",
+						"is provided, but multi-tenancy is disabled for this backend."
+				);
 	}
 
 	@Test
@@ -108,13 +112,16 @@ public class MultiTenancyMismatchIT {
 				)
 				.setup();
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Tenant identifier" );
-		thrown.expectMessage( "is provided, but multi-tenancy is disabled for this backend" );
-
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( tenant1SessionContext );
-		plan.update( referenceProvider( "1" ), document -> { } );
-		plan.execute().join();
+		assertThatThrownBy( () -> {
+			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( tenant1SessionContext );
+			plan.update( referenceProvider( "1" ), document -> { } );
+			plan.execute().join();
+		} )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Tenant identifier",
+						"is provided, but multi-tenancy is disabled for this backend."
+				);
 	}
 
 	@Test
@@ -127,13 +134,16 @@ public class MultiTenancyMismatchIT {
 				)
 				.setup();
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Tenant identifier" );
-		thrown.expectMessage( "is provided, but multi-tenancy is disabled for this backend" );
-
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( tenant1SessionContext );
-		plan.delete( referenceProvider( "1" ) );
-		plan.execute().join();
+		assertThatThrownBy( () -> {
+			IndexIndexingPlan<?> plan = indexManager.createIndexingPlan( tenant1SessionContext );
+			plan.delete( referenceProvider( "1" ) );
+			plan.execute().join();
+		} )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Tenant identifier",
+						"is provided, but multi-tenancy is disabled for this backend."
+				);
 	}
 
 	private static class IndexMapping {

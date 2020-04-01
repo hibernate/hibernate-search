@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.lucene;
 
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.hibernate.search.integrationtest.backend.lucene.testsupport.util.DocumentAssert.containsDocument;
 import static org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
@@ -69,7 +70,6 @@ import org.hibernate.search.util.impl.test.SubTest;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class LuceneExtensionIT {
 
@@ -85,9 +85,6 @@ public class LuceneExtensionIT {
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	private SearchIntegration integration;
 
@@ -681,11 +678,12 @@ public class LuceneExtensionIT {
 	public void backend_unwrap_error_unknownType() {
 		Backend backend = integration.getBackend( BACKEND_NAME );
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Attempt to unwrap a Lucene backend to '" + String.class.getName() + "'" );
-		thrown.expectMessage( "this backend can only be unwrapped to '" + LuceneBackend.class.getName() + "'" );
-
-		backend.unwrap( String.class );
+		assertThatThrownBy( () -> backend.unwrap( String.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Attempt to unwrap a Lucene backend to '" + String.class.getName() + "'",
+						"this backend can only be unwrapped to '" + LuceneBackend.class.getName() + "'"
+				);
 	}
 
 	@Test
@@ -699,11 +697,12 @@ public class LuceneExtensionIT {
 	public void indexManager_unwrap_error_unknownType() {
 		IndexManager indexManager = integration.getIndexManager( INDEX_NAME );
 
-		thrown.expect( SearchException.class );
-		thrown.expectMessage( "Attempt to unwrap a Lucene index manager to '" + String.class.getName() + "'" );
-		thrown.expectMessage( "this index manager can only be unwrapped to '" + LuceneIndexManager.class.getName() + "'" );
-
-		indexManager.unwrap( String.class );
+		assertThatThrownBy( () -> indexManager.unwrap( String.class ) )
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Attempt to unwrap a Lucene index manager to '" + String.class.getName() + "'",
+						"this index manager can only be unwrapped to '" + LuceneIndexManager.class.getName() + "'"
+				);
 	}
 
 	private void initData() {

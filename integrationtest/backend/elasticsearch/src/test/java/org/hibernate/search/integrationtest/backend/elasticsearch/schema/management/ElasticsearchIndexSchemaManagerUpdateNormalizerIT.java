@@ -20,7 +20,6 @@ import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.experimental.categories.Category;
-import org.junit.rules.ExpectedException;
 
 /**
  * Tests related to normalizers when updating indexes.
@@ -33,9 +32,6 @@ public class ElasticsearchIndexSchemaManagerUpdateNormalizerIT {
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	@Rule
 	public TestElasticsearchClient elasticSearchClient = new TestElasticsearchClient();

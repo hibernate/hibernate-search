@@ -25,7 +25,6 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class NestedSearchPredicateIT {
 
@@ -48,9 +47,6 @@ public class NestedSearchPredicateIT {
 
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	private IndexMapping indexMapping;
 	private StubMappingIndexManager indexManager;

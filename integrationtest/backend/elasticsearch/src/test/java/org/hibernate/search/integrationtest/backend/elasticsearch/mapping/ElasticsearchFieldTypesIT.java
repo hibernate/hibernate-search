@@ -20,7 +20,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.Se
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 import com.google.gson.JsonObject;
 
@@ -38,9 +37,6 @@ public class ElasticsearchFieldTypesIT {
 
 	@Rule
 	public ElasticsearchClientSpy clientSpy = new ElasticsearchClientSpy();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	@Test
 	public void test() {

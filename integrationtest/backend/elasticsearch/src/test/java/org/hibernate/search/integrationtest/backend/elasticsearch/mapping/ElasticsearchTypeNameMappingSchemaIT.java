@@ -24,7 +24,6 @@ import org.hibernate.search.util.impl.integrationtest.backend.elasticsearch.dial
 
 import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 
@@ -53,9 +52,6 @@ public class ElasticsearchTypeNameMappingSchemaIT {
 
 	@Rule
 	public ElasticsearchClientSpy clientSpy = new ElasticsearchClientSpy();
-
-	@Rule
-	public ExpectedException thrown = ExpectedException.none();
 
 	private final String strategyName;
 	private final JsonObject expectedMappingContent;
