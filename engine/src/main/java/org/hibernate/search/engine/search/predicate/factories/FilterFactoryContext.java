@@ -24,7 +24,7 @@ public interface FilterFactoryContext {
 	/**
 	 * @param <T> type of the parameters
 	 * @param name a name of parametr
-	 * @return parametr of the filter factory {@link FilterPredicateOptionsStep#param(String)}.
+	 * @return parametr of the filter factory {@link FilterPredicateOptionsStep#param(java.lang.String, java.lang.Object)}.
 	 */
 	<T> T param(String name);
 
@@ -44,7 +44,7 @@ public interface FilterFactoryContext {
 	String getAbsolutePath();
 
 	/**
-	 * @return names parametr of the filter {@link FilterPredicateOptionsStep#param(String)}.
+	 * @return names parametr of the filter {@link FilterPredicateOptionsStep#param(java.lang.String, java.lang.Object)}.
 	 */
 	Collection<String> getParamNames();
 
