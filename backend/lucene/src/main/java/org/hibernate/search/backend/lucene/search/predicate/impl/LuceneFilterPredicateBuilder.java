@@ -65,7 +65,7 @@ public class LuceneFilterPredicateBuilder extends AbstractLuceneSearchPredicateB
 		searchPredicate = (SearchPredicate) predicateBuilderFactory.toImplementation( searchPredicate );
 
 		if ( searchPredicate instanceof LuceneSearchPredicateBuilder ) {
-			LuceneSearchPredicateContext filterContext = new LuceneSearchPredicateContext( ctx.getNestedPath() );
+			LuceneSearchPredicateContext filterContext = new LuceneSearchPredicateContext( context.getNestedPath() );
 			luceneFilter = ((LuceneSearchPredicateBuilder) searchPredicate).build( filterContext );
 		}
 		else {
