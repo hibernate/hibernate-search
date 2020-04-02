@@ -556,6 +556,19 @@ That can be changed using a configuration property:
 hibernate.search.backends.<backend-name>.thread_pool.size = 4
 ----
 
+[NOTE]
+====
+This number is _per backend_, not per index.
+Adding more indexes will not add more threads.
+====
+
+[TIP]
+====
+Operations happening in this thread-pool include blocking I/O,
+so raising its size above the number of processor cores available to the JVM
+can make sense and may improve performance.
+====
+
 [[backend-lucene-indexing-queues]]
 == Indexing queues
 
