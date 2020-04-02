@@ -113,12 +113,12 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 		SortedNumericDoubleDocValues values = getSortedNumericDoubleDocValues( ctx );
 
 		if ( nestedDocsProvider == null ) {
-			return replaceScores( select( values ), scores );
+			return select( values );
 		}
 
 		final BitSet rootDocs = nestedDocsProvider.parentDocs( ctx );
 		final DocIdSetIterator innerDocs = nestedDocsProvider.childDocs( ctx );
-		return replaceScores( select( values, rootDocs, innerDocs ), scores );
+		return select( values, rootDocs, innerDocs );
 	}
 
 	/**
@@ -233,40 +233,6 @@ public abstract class DoubleMultiValuesToSingleValuesSource extends DoubleValues
 
 		Collections.sort( result );
 		return result;
-	}
-
-	protected NumericDoubleValues replaceScores(NumericDoubleValues values, DoubleValues scores) {
-		return new NumericDoubleValues() {
-
-			private double value;
-			private int count;
-
-			@Override
-			public boolean advanceExact(int target) throws IOException {
-				boolean result = false;
-				if ( values.advanceExact( target ) ) {
-					value = values.doubleValue();
-					count = values.docValueCount();
-					result = true;
-				}
-				else if ( scores != null && scores.advanceExact( target ) ) {
-					value = scores.doubleValue();
-					count = 1;
-					result = true;
-				}
-				return result;
-			}
-
-			@Override
-			public double doubleValue() throws IOException {
-				return value;
-			}
-
-			@Override
-			public int docValueCount() {
-				return count;
-			}
-		};
 	}
 
 	private static class FieldMultiValuesToSingleValuesSource extends DoubleMultiValuesToSingleValuesSource {

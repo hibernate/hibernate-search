@@ -96,12 +96,12 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 		SortedNumericDocValues values = getSortedNumericDocValues( ctx );
 
 		if ( nestedDocsProvider == null ) {
-			return replaceScores( select( values ), scores );
+			return select( values );
 		}
 
 		final BitSet rootDocs = nestedDocsProvider.parentDocs( ctx );
 		final DocIdSetIterator innerDocs = nestedDocsProvider.childDocs( ctx );
-		return replaceScores( select( values, rootDocs, innerDocs ), scores );
+		return select( values, rootDocs, innerDocs );
 	}
 
 	/**
@@ -243,41 +243,6 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 		Collections.sort( result );
 
 		return result;
-	}
-
-	protected NumericLongValues replaceScores(NumericLongValues values, DoubleValues scores) {
-		return new NumericLongValues() {
-
-			private long value;
-			private int count;
-
-			@Override
-			public boolean advanceExact(int target) throws IOException {
-				boolean result = false;
-				if ( values.advanceExact( target ) ) {
-					value = values.longValue();
-					value = values.docValueCount();
-					result = true;
-				}
-				else if ( scores != null && scores.advanceExact( target ) ) {
-					value = (long) scores.doubleValue();
-					count = 1;
-					result = true;
-				}
-				return result;
-			}
-
-			@Override
-			public long longValue() throws IOException {
-				return value;
-			}
-
-			@Override
-			public int docValueCount() {
-				return count;
-			}
-
-		};
 	}
 
 	private static class MultiFieldValuesToSingleValuesSource extends LongMultiValuesToSingleValuesSource {
