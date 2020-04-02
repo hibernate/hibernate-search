@@ -50,6 +50,9 @@ public final class ElasticsearchIndexSettings {
 	 * or a string that can be parsed to such integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#INDEXING_QUEUE_COUNT}.
+	 * <p>
+	 * See the reference documentation, section "Elasticsearch backend - Indexing",
+	 * for more information about this setting and its implications.
 	 */
 	public static final String INDEXING_QUEUE_COUNT = INDEXING_PREFIX + IndexingRadicals.QUEUE_COUNT;
 
@@ -60,6 +63,9 @@ public final class ElasticsearchIndexSettings {
 	 * or a string that can be parsed to such integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#INDEXING_QUEUE_SIZE}.
+	 * <p>
+	 * See the reference documentation, section "Elasticsearch backend - Indexing",
+	 * for more information about this setting and its implications.
 	 */
 	public static final String INDEXING_QUEUE_SIZE = INDEXING_PREFIX + IndexingRadicals.QUEUE_SIZE;
 
@@ -70,6 +76,9 @@ public final class ElasticsearchIndexSettings {
 	 * or a string that can be parsed to such integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#INDEXING_MAX_BULK_SIZE}.
+	 * <p>
+	 * See the reference documentation, section "Elasticsearch backend - Indexing",
+	 * for more information about this setting and its implications.
 	 */
 	public static final String INDEXING_MAX_BULK_SIZE = INDEXING_PREFIX + IndexingRadicals.MAX_BULK_SIZE;
 

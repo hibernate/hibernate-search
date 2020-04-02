@@ -121,6 +121,9 @@ public final class LuceneBackendSettings {
 	 * or a string that can be parsed to such integer value.
 	 * <p>
 	 * Defaults to the number of processor cores available to the JVM on startup.
+	 * <p>
+	 * See the reference documentation, section "Lucene backend - Threads",
+	 * for more information about this setting and its implications.
 	 */
 	public static final String THREAD_POOL_SIZE = "thread_pool.size";
 

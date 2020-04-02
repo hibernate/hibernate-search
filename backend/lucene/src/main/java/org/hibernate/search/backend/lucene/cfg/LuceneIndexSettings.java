@@ -139,6 +139,9 @@ public final class LuceneIndexSettings {
 	 * or a string that can be parsed to such integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#INDEXING_QUEUE_COUNT}.
+	 * <p>
+	 * See the reference documentation, section "Lucene backend - Indexing",
+	 * for more information about this setting and its implications.
 	 */
 	public static final String INDEXING_QUEUE_COUNT = INDEXING_PREFIX + IndexingRadicals.QUEUE_COUNT;
 
@@ -149,6 +152,9 @@ public final class LuceneIndexSettings {
 	 * or a string that can be parsed to such integer value.
 	 * <p>
 	 * Defaults to {@link Defaults#INDEXING_QUEUE_SIZE}.
+	 * <p>
+	 * See the reference documentation, section "Lucene backend - Indexing",
+	 * for more information about this setting and its implications.
 	 */
 	public static final String INDEXING_QUEUE_SIZE = INDEXING_PREFIX + IndexingRadicals.QUEUE_SIZE;
 
