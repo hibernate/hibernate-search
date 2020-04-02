@@ -742,6 +742,24 @@ That can be changed using a configuration property:
 hibernate.search.backends.<backend-name>.thread_pool.size = 4
 ----
 
+[NOTE]
+====
+This number is _per backend_, not per index.
+Adding more indexes will not add more threads.
+====
+
+[TIP]
+====
+As all operations happening in this thread-pool are non-blocking,
+raising its size above the number of processor cores available to the JVM will not bring
+noticeable performance benefits.
+
+The only reason to alter this setting would be to reduce the number of threads;
+for example, in an application with a single index with a single indexing queue,
+running on a machine with 64 processor cores,
+you might want to bring down the number of threads.
+====
+
 [[backend-elasticsearch-indexing-queues]]
 == Indexing queues
 
