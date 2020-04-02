@@ -155,6 +155,9 @@
 
         <!-- Integration test dependencies -->
 
+        <!-- >>> ORM ITs-->
+        <version.com.h2database>1.4.178</version.com.h2database>
+
         <!-- >>> WildFly ITs-->
         <version.org.arquillian.universe>1.5.0.0</version.org.arquillian.universe>
         <version.org.wildfly.arquillian>2.2.0.Final</version.org.wildfly.arquillian>
