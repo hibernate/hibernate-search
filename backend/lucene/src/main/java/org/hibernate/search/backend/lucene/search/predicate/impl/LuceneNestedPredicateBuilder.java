@@ -39,6 +39,10 @@ class LuceneNestedPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
 	}
 
 	public static Query doBuild(LuceneSearchPredicateContext parentContext, String nestedDocumentPath, Query nestedQuery) {
+		if ( nestedDocumentPath.equals( parentContext.getNestedPath() ) ) {
+			return nestedQuery;
+		}
+
 		BooleanQuery.Builder childQueryBuilder = new BooleanQuery.Builder();
 		childQueryBuilder.add( Queries.childDocumentQuery(), Occur.FILTER );
 		childQueryBuilder.add( Queries.nestedDocumentPathQuery( nestedDocumentPath ), Occur.FILTER );
