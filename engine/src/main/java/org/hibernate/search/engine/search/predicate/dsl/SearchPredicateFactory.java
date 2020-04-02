@@ -143,8 +143,8 @@ public interface SearchPredicateFactory {
 	 * Match documents if they match a combination of defined filter clauses.
 	 *
 	 * @param name the name of definied filter
-	 * @return The initial step of a DSL where the "range" predicate can be defined.
-	 * @see RangePredicateFieldStep
+	 * @return The initial step of a DSL where filter predicates can be defined.
+	 * @see FilterPredicateOptionsStep
 	 */
 	FilterPredicateOptionsStep<?> def(String name);
 

@@ -35,13 +35,13 @@ public @interface IdentifierBridgeRef {
 	 * Reference an identifier bridge by its type.
 	 * @return The type of the  identifier bridge.
 	 */
-	Class<? extends IdentifierBridge> type() default UndefinedBridgeImplementationType.class;
+	Class<? extends IdentifierBridge> type() default PojoUndefinedBridgeImplementationType.class;
 
 	/**
 	 * Class used as a marker for the default value of the {@link #type()} attribute.
 	 */
-	abstract class UndefinedBridgeImplementationType implements IdentifierBridge<Object> {
-		private UndefinedBridgeImplementationType() {
+	abstract class PojoUndefinedBridgeImplementationType implements IdentifierBridge<Object> {
+		private PojoUndefinedBridgeImplementationType() {
 		}
 	}
 

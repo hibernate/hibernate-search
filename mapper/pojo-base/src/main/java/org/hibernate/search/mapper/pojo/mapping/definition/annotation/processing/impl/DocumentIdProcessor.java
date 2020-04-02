@@ -42,7 +42,7 @@ public class DocumentIdProcessor implements PropertyMappingAnnotationProcessor<D
 		IdentifierBinderRef binderReferenceAnnotation = annotation.identifierBinder();
 		Optional<BeanReference<? extends IdentifierBridge>> bridgeReference = context.toBeanReference(
 				IdentifierBridge.class,
-				IdentifierBridgeRef.UndefinedBridgeImplementationType.class,
+				IdentifierBridgeRef.PojoUndefinedBridgeImplementationType.class,
 				bridgeReferenceAnnotation.type(), bridgeReferenceAnnotation.name()
 		);
 		Optional<BeanReference<? extends IdentifierBinder>> binderReference = context.toBeanReference(
