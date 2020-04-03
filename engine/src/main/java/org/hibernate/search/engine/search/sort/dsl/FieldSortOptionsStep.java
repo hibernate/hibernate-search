@@ -7,8 +7,6 @@
 package org.hibernate.search.engine.search.sort.dsl;
 
 import java.util.function.Function;
-import org.hibernate.search.engine.search.predicate.SearchPredicate;
-import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 
 /**
@@ -20,7 +18,7 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
 public interface FieldSortOptionsStep<S extends FieldSortOptionsStep<?, PDF>, PDF extends SearchPredicateFactory>
-		extends SortFinalStep, SortThenStep, SortOrderStep<S>, SortModeStep<S> {
+		extends SortFinalStep, SortThenStep, SortOrderStep<S>, SortModeStep<S>, SortFilterStep<S, PDF> {
 
 	/**
 	 * Start describing the behavior of this sort when a document doesn't
@@ -29,35 +27,5 @@ public interface FieldSortOptionsStep<S extends FieldSortOptionsStep<?, PDF>, PD
 	 * @return The next step.
 	 */
 	FieldSortMissingValueBehaviorStep<S> missing();
-
-	/**
-	 * Add a <a href="#filter">"filter" clause</a> based on a previously-built {@link SearchPredicate}.
-	 *
-	 * @param searchPredicate The predicate that must match.
-	 * @return {@code this}, for method chaining.
-	 */
-	S filter(SearchPredicate searchPredicate);
-
-	/**
-	 * Add a <a href="#filter">"filter" clause</a> to be defined by the given function.
-	 * <p>
-	 * Best used with lambda expressions.
-	 *
-	 * @param clauseContributor A function that will use the factory passed in parameter to create a predicate,
-	 * returning the final step in the predicate DSL.
-	 * Should generally be a lambda expression.
-	 * @return {@code this}, for method chaining.
-	 */
-	S filter(Function<? super PDF, ? extends PredicateFinalStep> clauseContributor);
-
-	/**
-	 * Add a <a href="#filter">"filter" clause</a> based on an almost-built {@link SearchPredicate}.
-	 *
-	 * @param dslFinalStep A final step in the predicate DSL allowing the retrieval of a {@link SearchPredicate}.
-	 * @return {@code this}, for method chaining.
-	 */
-	default S filter(PredicateFinalStep dslFinalStep) {
-		return filter( dslFinalStep.toPredicate() );
-	}
 
 }

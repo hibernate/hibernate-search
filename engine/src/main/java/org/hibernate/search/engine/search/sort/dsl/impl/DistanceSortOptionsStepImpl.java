@@ -6,7 +6,12 @@
  */
 package org.hibernate.search.engine.search.sort.dsl.impl;
 
+import java.util.function.Function;
+
 import org.hibernate.search.engine.search.common.SortMode;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.sort.dsl.DistanceSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.engine.search.sort.dsl.spi.AbstractSortThenStep;
@@ -14,27 +19,43 @@ import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 import org.hibernate.search.engine.search.sort.spi.DistanceSortBuilder;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
-class DistanceSortOptionsStepImpl<B>
+public class DistanceSortOptionsStepImpl<B, PDF extends SearchPredicateFactory>
 		extends AbstractSortThenStep<B>
-		implements DistanceSortOptionsStep<DistanceSortOptionsStepImpl<B>> {
+		implements DistanceSortOptionsStep<DistanceSortOptionsStepImpl<B, PDF>, PDF> {
 
 	private final DistanceSortBuilder<B> builder;
+	private final SearchSortDslContext<?, B, ? extends PDF> dslContext;
 
-	DistanceSortOptionsStepImpl(SearchSortDslContext<?, B, ?> dslContext,
+	public DistanceSortOptionsStepImpl(SearchSortDslContext<?, B, ? extends PDF> dslContext,
 			String absoluteFieldPath, GeoPoint location) {
 		super( dslContext );
+		this.dslContext = dslContext;
 		this.builder = dslContext.getBuilderFactory().distance( absoluteFieldPath, location );
 	}
 
 	@Override
-	public DistanceSortOptionsStepImpl<B> order(SortOrder order) {
+	public DistanceSortOptionsStepImpl<B, PDF> order(SortOrder order) {
 		builder.order( order );
 		return this;
 	}
 
 	@Override
-	public DistanceSortOptionsStepImpl<B> mode(SortMode mode) {
+	public DistanceSortOptionsStepImpl<B, PDF> mode(SortMode mode) {
 		builder.mode( mode );
+		return this;
+	}
+
+	@Override
+	public DistanceSortOptionsStepImpl<B, PDF> filter(
+			Function<? super PDF, ? extends PredicateFinalStep> clauseContributor) {
+		SearchPredicate predicate = clauseContributor.apply( dslContext.getPredicateFactory() ).toPredicate();
+
+		return filter( predicate );
+	}
+
+	@Override
+	public DistanceSortOptionsStepImpl<B, PDF> filter(SearchPredicate searchPredicate) {
+		builder.filter( searchPredicate );
 		return this;
 	}
 

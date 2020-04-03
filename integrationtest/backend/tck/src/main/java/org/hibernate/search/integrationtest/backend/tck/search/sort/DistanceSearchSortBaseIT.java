@@ -210,7 +210,7 @@ public class DistanceSearchSortBaseIT {
 	}
 
 	private SearchQuery<DocumentReference> simpleQuery(
-			Function<? super SearchSortFactory, ? extends DistanceSortOptionsStep<?>> sortContributor) {
+			Function<? super SearchSortFactory, ? extends DistanceSortOptionsStep<?, ?>> sortContributor) {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.where( f -> f.matchAll() )
