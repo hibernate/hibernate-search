@@ -12,7 +12,10 @@ import java.util.List;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.ElasticsearchSearchSyntax;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.AbstractElasticsearchSearchSortBuilder;
+import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
@@ -23,9 +26,6 @@ import org.hibernate.search.util.common.reporting.EventContext;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
-import org.hibernate.search.backend.elasticsearch.search.sort.impl.ElasticsearchSearchSortCollector;
 
 abstract class AbstractElasticsearchDocumentValueSortBuilder extends AbstractElasticsearchSearchSortBuilder {
 
@@ -37,6 +37,7 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder extends AbstractEla
 	private static final JsonAccessor<JsonElement> FILTER_ACCESSOR = JsonAccessor.root().property( "filter" );
 	// old API
 	private static final JsonAccessor<JsonElement> NESTED_PATH_ACCESSOR = JsonAccessor.root().property( "nested_path" );
+	private static final JsonAccessor<JsonElement> NESTED_FILTER_ACCESSOR = JsonAccessor.root().property( "nested_filter" );
 
 	private static final JsonAccessor<JsonElement> MODE_ACCESSOR = JsonAccessor.root().property( "mode" );
 	private static final JsonPrimitive SUM_KEYWORD_JSON = new JsonPrimitive( "sum" );
@@ -98,20 +99,25 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder extends AbstractEla
 				String lastNestedPath = nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 );
 
 				NESTED_PATH_ACCESSOR.set( innerObject, new JsonPrimitive( lastNestedPath ) );
+				if ( filter != null ) {
+					ElasticsearchSearchPredicateContext filterContext = collector.getRootPredicateContext()
+							.explicitNested( lastNestedPath );
+					JsonObject jsonFilter = getJsonFilter( filterContext );
+					NESTED_FILTER_ACCESSOR.set( innerObject, jsonFilter );
+				}
 			}
 			else {
-				JsonObject jsonFilter = null;
-				if ( filter instanceof ElasticsearchSearchPredicateBuilder ) {
-					ElasticsearchSearchPredicateContext filterContext = collector.getRootPredicateContext();
-					jsonFilter = ((ElasticsearchSearchPredicateBuilder) filter).build( filterContext );
-				}
-
 				JsonObject nextNestedObjectTarget = innerObject;
-				for ( String nestedPath : nestedPathHierarchy ) {
+				for ( int i = 0; i < nestedPathHierarchy.size(); i++ ) {
+					String nestedPath = nestedPathHierarchy.get( i );
+
 					JsonObject nestedObject = new JsonObject();
 					PATH_ACCESSOR.set( nestedObject, new JsonPrimitive( nestedPath ) );
 					NESTED_ACCESSOR.set( nextNestedObjectTarget, nestedObject );
-					if ( jsonFilter != null ) {
+					if ( i == (nestedPathHierarchy.size() - 1) && filter != null ) {
+						ElasticsearchSearchPredicateContext filterContext = collector.getRootPredicateContext()
+								.explicitNested( nestedPath );
+						JsonObject jsonFilter = getJsonFilter( filterContext );
 						FILTER_ACCESSOR.set( nestedObject, jsonFilter );
 					}
 
@@ -124,6 +130,10 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder extends AbstractEla
 		if ( mode != null ) {
 			MODE_ACCESSOR.set( innerObject, mode );
 		}
+	}
+
+	private JsonObject getJsonFilter(ElasticsearchSearchPredicateContext filterContext) {
+		return ( (ElasticsearchSearchPredicateBuilder) filter ).build( filterContext );
 	}
 
 	protected final EventContext getEventContext() {
