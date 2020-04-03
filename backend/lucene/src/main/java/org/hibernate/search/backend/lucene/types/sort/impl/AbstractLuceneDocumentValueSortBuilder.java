@@ -16,6 +16,7 @@ import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPre
 import org.hibernate.search.backend.lucene.search.sort.impl.AbstractLuceneSearchSortBuilder;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.SortMode;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.sort.dsl.SortOrder;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
@@ -29,6 +30,7 @@ public abstract class AbstractLuceneDocumentValueSortBuilder
 	protected final String absoluteFieldPath;
 	protected final String nestedDocumentPath;
 	private SortMode mode;
+	private SearchPredicate filter;
 
 	protected AbstractLuceneDocumentValueSortBuilder(String absoluteFieldPath, String nestedDocumentPath) {
 		this.absoluteFieldPath = absoluteFieldPath;
@@ -40,6 +42,10 @@ public abstract class AbstractLuceneDocumentValueSortBuilder
 			throw log.cannotComputeMedianAcrossNested( getEventContext() );
 		}
 		this.mode = mode;
+	}
+
+	public void filter(SearchPredicate filter) {
+		this.filter = filter;
 	}
 
 	protected final MultiValueMode getMultiValueMode() {

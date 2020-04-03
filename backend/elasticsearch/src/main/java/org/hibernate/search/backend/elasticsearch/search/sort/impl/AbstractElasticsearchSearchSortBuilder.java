@@ -13,7 +13,6 @@ import org.hibernate.search.engine.search.sort.spi.SearchSortBuilder;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
-import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 public abstract class AbstractElasticsearchSearchSortBuilder implements SearchSortBuilder<ElasticsearchSearchSortBuilder>,
 		ElasticsearchSearchSortBuilder {
@@ -23,7 +22,6 @@ public abstract class AbstractElasticsearchSearchSortBuilder implements SearchSo
 	private static final JsonPrimitive DESC_KEYWORD_JSON = new JsonPrimitive( "desc" );
 
 	private SortOrder order;
-	protected SearchPredicate filter;
 
 	@Override
 	public ElasticsearchSearchSortBuilder toImplementation() {
@@ -33,11 +31,6 @@ public abstract class AbstractElasticsearchSearchSortBuilder implements SearchSo
 	@Override
 	public void order(SortOrder order) {
 		this.order = order;
-	}
-
-	@Override
-	public void filter(SearchPredicate filter) {
-		this.filter = filter;
 	}
 
 	@Override

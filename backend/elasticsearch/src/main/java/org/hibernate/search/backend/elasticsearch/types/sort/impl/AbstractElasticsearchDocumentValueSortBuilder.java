@@ -15,6 +15,7 @@ import org.hibernate.search.backend.elasticsearch.lowlevel.syntax.search.impl.El
 import org.hibernate.search.backend.elasticsearch.search.sort.impl.AbstractElasticsearchSearchSortBuilder;
 import org.hibernate.search.engine.reporting.spi.EventContexts;
 import org.hibernate.search.engine.search.common.SortMode;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
@@ -49,6 +50,7 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder extends AbstractEla
 	private final ElasticsearchSearchSyntax searchSyntax;
 
 	private JsonPrimitive mode;
+	private SearchPredicate filter;
 
 	AbstractElasticsearchDocumentValueSortBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy,
 			ElasticsearchSearchSyntax searchSyntax) {
@@ -82,6 +84,10 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder extends AbstractEla
 					throw new AssertionFailure( "Unexpected sort mode: " + mode );
 			}
 		}
+	}
+
+	public void filter(SearchPredicate filter) {
+		this.filter = filter;
 	}
 
 	@Override
