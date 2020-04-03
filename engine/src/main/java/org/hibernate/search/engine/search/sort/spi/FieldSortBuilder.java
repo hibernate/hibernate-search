@@ -8,6 +8,7 @@ package org.hibernate.search.engine.search.sort.spi;
 
 import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.common.ValueConvert;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 public interface FieldSortBuilder<B> extends SearchSortBuilder<B> {
 
@@ -18,5 +19,7 @@ public interface FieldSortBuilder<B> extends SearchSortBuilder<B> {
 	void missingAs(Object value, ValueConvert convert);
 
 	void mode(SortMode mode);
+
+	void filter(SearchPredicate filter);
 
 }
