@@ -12,11 +12,11 @@ import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.impl.DefaultSearchSortFactory;
 
 public abstract class AbstractSortThenStep<B> implements SortThenStep {
-	private final SearchSortDslContext<?, ? super B> parentDslContext;
+	private final SearchSortDslContext<?, ? super B, ?> parentDslContext;
 
-	private SearchSortDslContext<?, ? super B> selfDslContext;
+	private SearchSortDslContext<?, ? super B, ?> selfDslContext;
 
-	public AbstractSortThenStep(SearchSortDslContext<?, ? super B> parentDslContext) {
+	public AbstractSortThenStep(SearchSortDslContext<?, ? super B, ?> parentDslContext) {
 		this.parentDslContext = parentDslContext;
 	}
 
@@ -30,11 +30,11 @@ public abstract class AbstractSortThenStep<B> implements SortThenStep {
 		return getSelfDslContext().toSort();
 	}
 
-	protected SearchSortDslContext<?, ? super B> getDslContext() {
+	protected SearchSortDslContext<?, ? super B, ?> getDslContext() {
 		return parentDslContext;
 	}
 
-	private SearchSortDslContext<?, ? super B> getSelfDslContext() {
+	private SearchSortDslContext<?, ? super B, ?> getSelfDslContext() {
 		/*
 		 * Postpone the call of toImplementation() as long as possible,
 		 * and make sure to only call it once,

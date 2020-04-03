@@ -18,7 +18,7 @@ class ScoreSortOptionsStepImpl<B>
 
 	private final ScoreSortBuilder<B> builder;
 
-	ScoreSortOptionsStepImpl(SearchSortDslContext<?, B> dslContext) {
+	ScoreSortOptionsStepImpl(SearchSortDslContext<?, B, ?> dslContext) {
 		super( dslContext );
 		this.builder = dslContext.getBuilderFactory().score();
 	}

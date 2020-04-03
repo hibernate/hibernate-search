@@ -17,74 +17,67 @@ import org.hibernate.search.engine.search.common.SortMode;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
 import org.hibernate.search.engine.search.predicate.dsl.PredicateFinalStep;
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
-import org.hibernate.search.engine.search.predicate.dsl.impl.DefaultSearchPredicateFactory;
-import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 
-class FieldSortOptionsStepImpl<B>
+public class FieldSortOptionsStepImpl<B, PDF extends SearchPredicateFactory>
 		extends AbstractSortThenStep<B>
-		implements FieldSortOptionsStep<FieldSortOptionsStepImpl<B>>,
-				FieldSortMissingValueBehaviorStep<FieldSortOptionsStepImpl<B>> {
+		implements FieldSortOptionsStep<FieldSortOptionsStepImpl<B, PDF>, PDF>,
+				FieldSortMissingValueBehaviorStep<FieldSortOptionsStepImpl<B, PDF>> {
 
+	private final SearchSortDslContext<?, B, ? extends PDF> dslContext;
 	private final FieldSortBuilder<B> builder;
 
-	FieldSortOptionsStepImpl(SearchSortDslContext<?, B> dslContext,
-			String absoluteFieldPath) {
+	public FieldSortOptionsStepImpl(SearchSortDslContext<?, B, ? extends PDF> dslContext, String absoluteFieldPath) {
 		super( dslContext );
+		this.dslContext = dslContext;
 		this.builder = dslContext.getBuilderFactory().field( absoluteFieldPath );
 	}
 
 	@Override
-	public FieldSortOptionsStepImpl<B> order(SortOrder order) {
+	public FieldSortOptionsStepImpl<B, PDF> order(SortOrder order) {
 		builder.order( order );
 		return this;
 	}
 
 	@Override
-	public FieldSortOptionsStepImpl<B> mode(SortMode mode) {
+	public FieldSortOptionsStepImpl<B, PDF> mode(SortMode mode) {
 		builder.mode( mode );
 		return this;
 	}
 
 	@Override
-	public FieldSortMissingValueBehaviorStep<FieldSortOptionsStepImpl<B>> missing() {
+	public FieldSortMissingValueBehaviorStep<FieldSortOptionsStepImpl<B, PDF>> missing() {
 		return this;
 	}
 
 	@Override
-	public FieldSortOptionsStepImpl<B> filter(
-			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
-		SearchPredicateBuilderFactory<?, ?> predicateBuilderFactory = getDslContext().getPredicateBuilderFactory();
-		SearchPredicateFactory factory = new DefaultSearchPredicateFactory<>( predicateBuilderFactory );
-		SearchPredicate predicate = clauseContributor.apply( extendPredicateFactory( factory ) ).toPredicate();
+	public FieldSortOptionsStepImpl<B, PDF> filter(
+			Function<? super PDF, ? extends PredicateFinalStep> clauseContributor) {
+		SearchPredicate predicate = clauseContributor.apply( dslContext.getPredicateFactory() ).toPredicate();
 
-		filter( predicate );
-		return this;
+		return filter( predicate );
 	}
 
 	@Override
-	public FieldSortOptionsStepImpl<B> filter(SearchPredicate searchPredicate) {
-		SearchPredicateBuilderFactory<?, ?> predicateBuilderFactory = getDslContext().getPredicateBuilderFactory();
-		searchPredicate = (SearchPredicate) predicateBuilderFactory.toImplementation( searchPredicate );
-
+	public FieldSortOptionsStepImpl<B, PDF> filter(SearchPredicate searchPredicate) {
 		builder.filter( searchPredicate );
 		return this;
 	}
 
 	@Override
-	public FieldSortOptionsStepImpl<B> first() {
+	public FieldSortOptionsStepImpl<B, PDF> first() {
 		builder.missingFirst();
 		return this;
 	}
 
 	@Override
-	public FieldSortOptionsStepImpl<B> last() {
+	public FieldSortOptionsStepImpl<B, PDF> last() {
 		builder.missingLast();
 		return this;
 	}
 
 	@Override
-	public FieldSortOptionsStepImpl<B> use(Object value, ValueConvert convert) {
+	public FieldSortOptionsStepImpl<B, PDF> use(Object value, ValueConvert convert) {
 		builder.missingAs( value, convert );
 		return this;
 	}
@@ -92,10 +85,6 @@ class FieldSortOptionsStepImpl<B>
 	@Override
 	protected B toImplementation() {
 		return builder.toImplementation();
-	}
-
-	protected SearchPredicateFactory extendPredicateFactory(SearchPredicateFactory predicateFactory) {
-		return predicateFactory;
 	}
 
 }

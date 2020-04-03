@@ -8,6 +8,8 @@ package org.hibernate.search.backend.lucene.search.sort.dsl.impl;
 
 import org.apache.lucene.search.Sort;
 import org.apache.lucene.search.SortField;
+
+import org.hibernate.search.backend.lucene.search.predicate.dsl.LuceneSearchPredicateFactory;
 import org.hibernate.search.backend.lucene.search.sort.dsl.LuceneSearchSortFactory;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilder;
 import org.hibernate.search.backend.lucene.search.sort.impl.LuceneSearchSortBuilderFactory;
@@ -19,14 +21,14 @@ import org.hibernate.search.engine.search.sort.dsl.spi.SearchSortDslContext;
 
 
 public class LuceneSearchSortFactoryImpl
-		extends DelegatingSearchSortFactory
+		extends DelegatingSearchSortFactory<LuceneSearchPredicateFactory>
 		implements LuceneSearchSortFactory {
 
-	private final SearchSortDslContext<LuceneSearchSortBuilderFactory, LuceneSearchSortBuilder> dslContext;
+	private final SearchSortDslContext<LuceneSearchSortBuilderFactory, LuceneSearchSortBuilder, ?> dslContext;
 
 	public LuceneSearchSortFactoryImpl(SearchSortFactory delegate,
-			SearchSortDslContext<LuceneSearchSortBuilderFactory, LuceneSearchSortBuilder> dslContext) {
-		super( delegate );
+			SearchSortDslContext<LuceneSearchSortBuilderFactory, LuceneSearchSortBuilder, LuceneSearchPredicateFactory> dslContext) {
+		super( delegate, dslContext );
 		this.dslContext = dslContext;
 	}
 

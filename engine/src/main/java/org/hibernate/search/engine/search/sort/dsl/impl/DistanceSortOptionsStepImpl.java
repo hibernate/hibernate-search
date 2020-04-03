@@ -20,7 +20,7 @@ class DistanceSortOptionsStepImpl<B>
 
 	private final DistanceSortBuilder<B> builder;
 
-	DistanceSortOptionsStepImpl(SearchSortDslContext<?, B> dslContext,
+	DistanceSortOptionsStepImpl(SearchSortDslContext<?, B, ?> dslContext,
 			String absoluteFieldPath, GeoPoint location) {
 		super( dslContext );
 		this.builder = dslContext.getBuilderFactory().distance( absoluteFieldPath, location );

@@ -19,6 +19,7 @@ import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.search.predicate.SearchPredicate;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.engine.search.query.SearchResult;
 import org.hibernate.search.engine.search.sort.SearchSort;
@@ -413,18 +414,18 @@ public class SearchSortIT {
 	private static class SupportedExtension implements SearchSortFactoryExtension<MyExtendedFactory> {
 		@Override
 		public Optional<MyExtendedFactory> extendOptional(SearchSortFactory original,
-				SearchSortDslContext<?, ?> dslContext) {
+				SearchSortDslContext<?, ?, ?> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( dslContext ).isNotNull();
 			Assertions.assertThat( dslContext.getBuilderFactory() ).isNotNull();
-			return Optional.of( new MyExtendedFactory( original ) );
+			return Optional.of( new MyExtendedFactory( original, dslContext ) );
 		}
 	}
 
 	private static class UnSupportedExtension implements SearchSortFactoryExtension<MyExtendedFactory> {
 		@Override
 		public Optional<MyExtendedFactory> extendOptional(SearchSortFactory original,
-				SearchSortDslContext<?, ?> dslContext) {
+				SearchSortDslContext<?, ?, ?> dslContext) {
 			Assertions.assertThat( original ).isNotNull();
 			Assertions.assertThat( dslContext ).isNotNull();
 			Assertions.assertThat( dslContext.getBuilderFactory() ).isNotNull();
@@ -432,9 +433,9 @@ public class SearchSortIT {
 		}
 	}
 
-	private static class MyExtendedFactory extends DelegatingSearchSortFactory {
-		MyExtendedFactory(SearchSortFactory delegate) {
-			super( delegate );
+	private static class MyExtendedFactory extends DelegatingSearchSortFactory<SearchPredicateFactory> {
+		MyExtendedFactory(SearchSortFactory delegate, SearchSortDslContext<?, ?, ?> dslContext) {
+			super( delegate, dslContext );
 		}
 	}
 }
