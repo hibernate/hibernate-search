@@ -19,14 +19,8 @@ public abstract class AbstractElasticsearchSearchSortBuilder implements SearchSo
 		ElasticsearchSearchSortBuilder {
 
 	private static final JsonAccessor<JsonElement> ORDER_ACCESSOR = JsonAccessor.root().property( "order" );
-	private static final JsonAccessor<JsonElement> MODE_ACCESSOR = JsonAccessor.root().property( "mode" );
 	private static final JsonPrimitive ASC_KEYWORD_JSON = new JsonPrimitive( "asc" );
 	private static final JsonPrimitive DESC_KEYWORD_JSON = new JsonPrimitive( "desc" );
-	private static final JsonPrimitive SUM_KEYWORD_JSON = new JsonPrimitive( "sum" );
-	private static final JsonPrimitive AVG_KEYWORD_JSON = new JsonPrimitive( "avg" );
-	private static final JsonPrimitive MIN_KEYWORD_JSON = new JsonPrimitive( "min" );
-	private static final JsonPrimitive MAX_KEYWORD_JSON = new JsonPrimitive( "max" );
-	private static final JsonPrimitive MEDIAN_KEYWORD_JSON = new JsonPrimitive( "median" );
 
 	private SortOrder order;
 	protected SearchPredicate filter;
