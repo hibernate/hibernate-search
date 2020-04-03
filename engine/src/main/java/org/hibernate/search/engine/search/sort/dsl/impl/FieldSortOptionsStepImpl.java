@@ -24,7 +24,7 @@ import org.hibernate.search.engine.search.sort.spi.FieldSortBuilder;
 class FieldSortOptionsStepImpl<B>
 		extends AbstractSortThenStep<B>
 		implements FieldSortOptionsStep<FieldSortOptionsStepImpl<B>>,
-	FieldSortMissingValueBehaviorStep<FieldSortOptionsStepImpl<B>> {
+				FieldSortMissingValueBehaviorStep<FieldSortOptionsStepImpl<B>> {
 
 	private final FieldSortBuilder<B> builder;
 
@@ -53,10 +53,8 @@ class FieldSortOptionsStepImpl<B>
 
 	@Override
 	public FieldSortOptionsStepImpl<B> filter(
-		Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
-
-		SearchSortDslContext<?, ? super B> ctx = getDslContext();
-		SearchPredicateBuilderFactory predicateBuilderFactory = ctx.getPredicateBuilderFactory();
+			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
+		SearchPredicateBuilderFactory<?, ?> predicateBuilderFactory = getDslContext().getPredicateBuilderFactory();
 		SearchPredicateFactory factory = new DefaultSearchPredicateFactory<>( predicateBuilderFactory );
 		SearchPredicate predicate = clauseContributor.apply( extendPredicateFactory( factory ) ).toPredicate();
 
@@ -66,8 +64,7 @@ class FieldSortOptionsStepImpl<B>
 
 	@Override
 	public FieldSortOptionsStepImpl<B> filter(SearchPredicate searchPredicate) {
-		SearchSortDslContext<?, ? super B> ctx = getDslContext();
-		SearchPredicateBuilderFactory predicateBuilderFactory = ctx.getPredicateBuilderFactory();
+		SearchPredicateBuilderFactory<?, ?> predicateBuilderFactory = getDslContext().getPredicateBuilderFactory();
 		searchPredicate = (SearchPredicate) predicateBuilderFactory.toImplementation( searchPredicate );
 
 		builder.filter( searchPredicate );
