@@ -201,7 +201,8 @@ public class DistanceSearchSortBaseIT {
 
 	private boolean isMedianWithNestedField() {
 		return SortMode.MEDIAN.equals( sortMode )
-				&& EnumSet.of( IndexFieldStructure.IN_NESTED, IndexFieldStructure.IN_NESTED_TWICE )
+				&& EnumSet.of( IndexFieldStructure.IN_NESTED, IndexFieldStructure.IN_NESTED_TWICE,
+						IndexFieldStructure.IN_NESTED_REQUIRING_FILTER )
 				.contains( indexFieldStructure );
 	}
 
@@ -214,15 +215,28 @@ public class DistanceSearchSortBaseIT {
 		StubMappingScope scope = indexManager.createScope();
 		return scope.query()
 				.where( f -> f.matchAll() )
-				.sort( sortContributor.andThen( o -> {
-					if ( sortMode != null ) {
-						return o.mode( sortMode );
-					}
-					else {
-						return o;
-					}
-				} ) )
+				.sort( sortContributor.andThen( this::applySortMode ).andThen( this::applyFilter ) )
 				.toQuery();
+	}
+
+	private DistanceSortOptionsStep<?, ?> applySortMode(DistanceSortOptionsStep<?, ?> optionsStep) {
+		if ( sortMode != null ) {
+			return optionsStep.mode( sortMode );
+		}
+		else {
+			return optionsStep;
+		}
+	}
+
+	private DistanceSortOptionsStep<?, ?> applyFilter(DistanceSortOptionsStep<?, ?> optionsStep) {
+		if ( IndexFieldStructure.IN_NESTED_REQUIRING_FILTER.equals( indexFieldStructure ) ) {
+			return optionsStep.filter( f -> f.match()
+					.field( "nestedObjectRequiringFilter.discriminator" )
+					.matching( "included" ) );
+		}
+		else {
+			return optionsStep;
+		}
 	}
 
 	private String getFieldPath(SortOrder expectedOrder) {
@@ -235,6 +249,8 @@ public class DistanceSearchSortBaseIT {
 				return "nestedObject." + getRelativeFieldName( expectedOrder );
 			case IN_NESTED_TWICE:
 				return "nestedObject.nestedObject." + getRelativeFieldName( expectedOrder );
+			case IN_NESTED_REQUIRING_FILTER:
+				return "nestedObjectRequiringFilter." + getRelativeFieldName( expectedOrder );
 			default:
 				throw new IllegalStateException( "Unexpected value: " + indexFieldStructure );
 		}
@@ -290,15 +306,68 @@ public class DistanceSearchSortBaseIT {
 		DocumentElement nestedObjectInNestedObject =
 				nestedObject.addObject( indexMapping.nestedObject.nestedObject.self );
 		initAllFields( indexMapping.nestedObject.nestedObject, nestedObjectInNestedObject, ordinal );
+
+		// The nested object requiring filters is split into four objects:
+		// the first two are included by the filter and each hold part of the values that will be sorted on,
+		// and the last two are excluded by the filter and hold garbage values that, if they were taken into account,
+		// would mess with the sort order and eventually fail at least *some* tests.
+
+		DocumentElement nestedObjectRequiringFilter_0 = document.addObject( indexMapping.nestedObjectRequiringFilter.self );
+		nestedObjectRequiringFilter_0.addValue( indexMapping.nestedObjectRequiringFilter.discriminator, "included" );
+		initAllFields( indexMapping.nestedObjectRequiringFilter, nestedObjectRequiringFilter_0, ordinal, ValueSelection.FIRST_PARTITION );
+
+		DocumentElement nestedObjectRequiringFilter_1 = document.addObject( indexMapping.nestedObjectRequiringFilter.self );
+		nestedObjectRequiringFilter_1.addValue( indexMapping.nestedObjectRequiringFilter.discriminator, "included" );
+		initAllFields( indexMapping.nestedObjectRequiringFilter, nestedObjectRequiringFilter_1, ordinal, ValueSelection.SECOND_PARTITION );
+
+		DocumentElement nestedObjectRequiringFilter_3 = document.addObject( indexMapping.nestedObjectRequiringFilter.self );
+		nestedObjectRequiringFilter_3.addValue( indexMapping.nestedObjectRequiringFilter.discriminator, "excluded" );
+		initAllFields( indexMapping.nestedObjectRequiringFilter, nestedObjectRequiringFilter_3, ordinal == null ? null : ordinal - 1 );
+
+		DocumentElement nestedObjectRequiringFilter_4 = document.addObject( indexMapping.nestedObjectRequiringFilter.self );
+		nestedObjectRequiringFilter_4.addValue( indexMapping.nestedObjectRequiringFilter.discriminator, "excluded" );
+		initAllFields( indexMapping.nestedObjectRequiringFilter, nestedObjectRequiringFilter_4, ordinal == null ? null : ordinal + 1 );
 	}
 
 	private static void initAllFields(AbstractObjectMapping mapping, DocumentElement document, Integer ordinal) {
-		addSingleValue( mapping.geoPoint, document, ordinal );
-		addMultipleValues( mapping.geoPointAscendingSum, document, SortMode.SUM, ordinal );
-		addMultipleValues( mapping.geoPointAscendingMin, document, SortMode.MIN, ordinal );
-		addMultipleValues( mapping.geoPointAscendingMax, document, SortMode.MAX, ordinal );
-		addMultipleValues( mapping.geoPointAscendingAvg, document, SortMode.AVG, ordinal );
-		addMultipleValues( mapping.geoPointAscendingMedian, document, SortMode.MEDIAN, ordinal );
+		initAllFields( mapping, document, ordinal, ValueSelection.ALL );
+	}
+
+	private static void initAllFields(AbstractObjectMapping mapping, DocumentElement document, Integer ordinal,
+			ValueSelection valueSelection) {
+		if ( EnumSet.of( ValueSelection.ALL, ValueSelection.FIRST_PARTITION ).contains( valueSelection ) ) {
+			addSingleValue( mapping.geoPoint, document, ordinal );
+		}
+
+		Integer startIndexForMultiValued;
+		Integer endIndexForMultiValued;
+
+		switch ( valueSelection ) {
+			case FIRST_PARTITION:
+				startIndexForMultiValued = 0;
+				endIndexForMultiValued = 1;
+				break;
+			case SECOND_PARTITION:
+				startIndexForMultiValued = 1;
+				endIndexForMultiValued = null;
+				break;
+			case ALL:
+			default:
+				startIndexForMultiValued = null;
+				endIndexForMultiValued = null;
+				break;
+		}
+
+		addMultipleValues( mapping.geoPointAscendingSum, document, SortMode.SUM, ordinal,
+				startIndexForMultiValued, endIndexForMultiValued );
+		addMultipleValues( mapping.geoPointAscendingMin, document, SortMode.MIN, ordinal,
+				startIndexForMultiValued, endIndexForMultiValued );
+		addMultipleValues( mapping.geoPointAscendingMax, document, SortMode.MAX, ordinal,
+				startIndexForMultiValued, endIndexForMultiValued );
+		addMultipleValues( mapping.geoPointAscendingAvg, document, SortMode.AVG, ordinal,
+				startIndexForMultiValued, endIndexForMultiValued );
+		addMultipleValues( mapping.geoPointAscendingMedian, document, SortMode.MEDIAN, ordinal,
+				startIndexForMultiValued, endIndexForMultiValued );
 	}
 
 	private static void addSingleValue(IndexFieldReference<GeoPoint> reference, DocumentElement document, Integer ordinal) {
@@ -307,13 +376,26 @@ public class DistanceSearchSortBaseIT {
 		}
 	}
 
-	private static <F> void addMultipleValues(IndexFieldReference<GeoPoint> reference, DocumentElement documentElement,
-			SortMode sortMode, Integer ordinal) {
+	private static void addMultipleValues(IndexFieldReference<GeoPoint> reference, DocumentElement documentElement,
+			SortMode sortMode, Integer ordinal,
+			Integer startIndex, Integer endIndex) {
 		if ( ordinal == null ) {
 			return;
 		}
-		AscendingUniqueDistanceFromCenterValues.INSTANCE.getMultiResultingInSingle( sortMode ).get( ordinal )
-				.forEach( value -> documentElement.addValue( reference, value ) );
+		List<GeoPoint> values = AscendingUniqueDistanceFromCenterValues.INSTANCE.getMultiResultingInSingle( sortMode )
+				.get( ordinal );
+		if ( values.isEmpty() ) {
+			return;
+		}
+		if ( startIndex == null ) {
+			startIndex = 0;
+		}
+		if ( endIndex == null ) {
+			endIndex = values.size();
+		}
+		for ( int i = startIndex; i < endIndex; i++ ) {
+			documentElement.addValue( reference, values.get( i ) );
+		}
 	}
 
 	private static void initData() {
@@ -371,6 +453,7 @@ public class DistanceSearchSortBaseIT {
 	private static class IndexMapping extends AbstractObjectMapping {
 		final FirstLevelObjectMapping flattenedObject;
 		final FirstLevelObjectMapping nestedObject;
+		final FirstLevelObjectMapping nestedObjectRequiringFilter;
 
 		IndexMapping(IndexSchemaElement root) {
 			super( root );
@@ -378,23 +461,37 @@ public class DistanceSearchSortBaseIT {
 					ObjectFieldStorage.FLATTENED );
 			nestedObject = FirstLevelObjectMapping.create( root, "nestedObject",
 					ObjectFieldStorage.NESTED );
+			nestedObjectRequiringFilter = FirstLevelObjectMapping.create( root, "nestedObjectRequiringFilter",
+					ObjectFieldStorage.NESTED, true );
 		}
 	}
 
 	private static class FirstLevelObjectMapping extends AbstractObjectMapping {
 		final IndexObjectFieldReference self;
 
+		final IndexFieldReference<String> discriminator;
+
 		final SecondLevelObjectMapping nestedObject;
 
 		public static FirstLevelObjectMapping create(IndexSchemaElement parent, String relativeFieldName,
 				ObjectFieldStorage storage) {
+			return create( parent, relativeFieldName, storage, false );
+		}
+
+		public static FirstLevelObjectMapping create(IndexSchemaElement parent, String relativeFieldName,
+				ObjectFieldStorage storage, boolean multiValued) {
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
+			if ( multiValued ) {
+				objectField.multiValued();
+			}
 			return new FirstLevelObjectMapping( objectField );
 		}
 
 		private FirstLevelObjectMapping(IndexSchemaObjectField objectField) {
 			super( objectField );
 			self = objectField.toReference();
+
+			discriminator = objectField.field( "discriminator", f -> f.asString() ).toReference();
 
 			nestedObject = SecondLevelObjectMapping.create( objectField, "nestedObject",
 					ObjectFieldStorage.NESTED );
@@ -453,4 +550,9 @@ public class DistanceSearchSortBaseIT {
 		}
 	}
 
+	private enum ValueSelection {
+		FIRST_PARTITION,
+		SECOND_PARTITION,
+		ALL
+	}
 }
