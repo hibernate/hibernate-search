@@ -8,7 +8,6 @@ package org.hibernate.search.integrationtest.backend.tck.search.aggregation;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils.referenceProvider;
-import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +41,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.e
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.SupportedSingleFieldAggregationExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.StandardFieldMapper;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TypeAssertionHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -132,7 +130,7 @@ public class SingleFieldAggregationBaseIT<F> {
 
 	@BeforeAll
 	public void setup() {
-		SearchSetupHelper.SetupContext setupContext = setupHelper.start()
+		setupHelper.start()
 				.withIndex(
 						INDEX_NAME,
 						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
@@ -162,18 +160,13 @@ public class SingleFieldAggregationBaseIT<F> {
 						NULL_ONLY_INDEX_NAME,
 						ctx -> this.nullOnlyIndexMapping = new IndexMapping( ctx.getSchemaElement() ),
 						indexManager -> this.nullOnlyIndexManager = indexManager
-				);
-
-		if ( TckConfiguration.get().getBackendFeatures().aggregationsOnMultiValuedFields( typeDescriptor.getJavaType() ) ) {
-			setupContext
-					.withIndex(
-							MULTI_VALUED_INDEX_NAME,
-							ctx -> this.multiValuedIndexMapping = new MultiValuedIndexMapping( ctx.getSchemaElement() ),
-							indexManager -> this.multiValuedIndexManager = indexManager
-					);
-		}
-
-		setupContext.setup();
+				)
+				.withIndex(
+						MULTI_VALUED_INDEX_NAME,
+						ctx -> this.multiValuedIndexMapping = new MultiValuedIndexMapping( ctx.getSchemaElement() ),
+						indexManager -> this.multiValuedIndexManager = indexManager
+				)
+				.setup();
 
 		initData();
 	}
@@ -385,11 +378,6 @@ public class SingleFieldAggregationBaseIT<F> {
 			"org.hibernate.search.test.query.facet.MultiValuedFacetingTest"
 	})
 	public void multiValued() {
-		assumeTrue(
-				"Aggregations on multi-valued fields are not supported with this backend",
-				TckConfiguration.get().getBackendFeatures().aggregationsOnMultiValuedFields( typeDescriptor.getJavaType() )
-		);
-
 		String fieldPath = multiValuedIndexMapping.fieldModel.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.onMultiValuedIndex( typeDescriptor );
@@ -777,19 +765,17 @@ public class SingleFieldAggregationBaseIT<F> {
 		} );
 		plan.execute().join();
 
-		if ( TckConfiguration.get().getBackendFeatures().aggregationsOnMultiValuedFields( typeDescriptor.getJavaType() ) ) {
-			plan = multiValuedIndexManager.createIndexingPlan();
-			for ( int i = 0; i < multiValuedIndexDocumentFieldValues.size(); i++ ) {
-				List<F> values = multiValuedIndexDocumentFieldValues.get( i );
-				plan.add( referenceProvider( "document_" + i ), document -> {
-					for ( F value : values ) {
-						document.addValue( multiValuedIndexMapping.fieldModel.reference, value );
-					}
-				} );
-			}
-			plan.add( referenceProvider( "document_empty" ), document -> { } );
-			plan.execute().join();
+		plan = multiValuedIndexManager.createIndexingPlan();
+		for ( int i = 0; i < multiValuedIndexDocumentFieldValues.size(); i++ ) {
+			List<F> values = multiValuedIndexDocumentFieldValues.get( i );
+			plan.add( referenceProvider( "document_" + i ), document -> {
+				for ( F value : values ) {
+					document.addValue( multiValuedIndexMapping.fieldModel.reference, value );
+				}
+			} );
 		}
+		plan.add( referenceProvider( "document_empty" ), document -> { } );
+		plan.execute().join();
 
 		// Check that all documents are searchable
 		SearchResultAssert.assertThat( indexManager.createScope().query()
@@ -808,12 +794,10 @@ public class SingleFieldAggregationBaseIT<F> {
 				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasTotalHitCount( 1 );
-		if ( TckConfiguration.get().getBackendFeatures().aggregationsOnMultiValuedFields( typeDescriptor.getJavaType() ) ) {
-			SearchResultAssert.assertThat( multiValuedIndexManager.createScope().query()
-					.where( f -> f.matchAll() )
-					.toQuery() )
-					.hasTotalHitCount( multiValuedIndexDocumentFieldValues.size() + 1 /* +1 for the empty document */ );
-		}
+		SearchResultAssert.assertThat( multiValuedIndexManager.createScope().query()
+				.where( f -> f.matchAll() )
+				.toQuery() )
+				.hasTotalHitCount( multiValuedIndexDocumentFieldValues.size() + 1 /* +1 for the empty document */ );
 	}
 
 	private FieldModel<F> mapField(IndexSchemaElement parent, String prefix,
