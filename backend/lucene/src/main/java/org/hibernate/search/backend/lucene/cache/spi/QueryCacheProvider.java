@@ -20,7 +20,7 @@ public interface QueryCacheProvider {
 	/**
 	 * Returns a {@link QueryCache} given the specified configuration properties.
 	 *
-	 * @param context
+	 * @param context the BackendBuildContext
 	 * @param properties configuration properties
 	 * @param luceneVersion lucene version
 	 * @return a started query cache.
