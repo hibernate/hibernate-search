@@ -93,6 +93,11 @@ public abstract class DefaultServiceResolver implements ServiceResolver {
 			}
 			return services;
 		}
+
+		@Override
+		public <T> T loadJmxService(Class<T> serviceContract) {
+			return null;
+		}
 	}
 
 	/**
@@ -184,6 +189,11 @@ public abstract class DefaultServiceResolver implements ServiceResolver {
 						}
 					} );
 			return services;
+		}
+
+		@Override
+		public <T> T loadJmxService(Class<T> serviceContract) {
+			return null;
 		}
 	}
 }

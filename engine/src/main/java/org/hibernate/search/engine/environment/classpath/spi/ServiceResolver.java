@@ -21,4 +21,15 @@ public interface ServiceResolver {
 	 * @return The ordered set of discovered services.
 	 */
 	<T> Iterable<T> loadJavaServices(Class<T> serviceContract);
+
+	/**
+	 * Discovers and instantiates jmx service of the named service contract.
+	 * <p>
+	 *
+	 * @param serviceContract The java type defining the service contract
+	 * @param <T> The type of the service contract
+	 *
+	 * @return The ordered set of discovered services.
+	 */
+	<T> T loadJmxService(Class<T> serviceContract);
 }

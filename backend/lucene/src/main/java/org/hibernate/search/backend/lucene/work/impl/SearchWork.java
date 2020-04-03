@@ -39,15 +39,15 @@ public class SearchWork<R> implements ReadWork<R> {
 			IndexSearcher indexSearcher = new IndexSearcher( context.getIndexReader() );
 
 			LuceneBackend backend = context.getBackend();
-			if(backend.getQueryCache() != null) {
+			if ( backend.getQueryCache() != null ) {
 				indexSearcher.setQueryCache( backend.getQueryCache() );
 			}
-			if(backend.getQueryCachingPolicy() != null) {
+			if ( backend.getQueryCachingPolicy() != null ) {
 				indexSearcher.setQueryCachingPolicy( backend.getQueryCachingPolicy() );
 			}
 
 			return searcher.search(
-					indexSearcher, context.getIndexReaderMetadataResolver(), offset, limit
+				indexSearcher, context.getIndexReaderMetadataResolver(), offset, limit
 			);
 		}
 		catch (IOException e) {

@@ -12,6 +12,7 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
+import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
 import org.hibernate.search.engine.reporting.spi.FailureCollector;
 
 class RootBuildContext {
@@ -21,6 +22,7 @@ class RootBuildContext {
 	private final ClassResolver classResolver;
 	private final ResourceResolver resourceResolver;
 	private final BeanResolver beanResolver;
+	private final ServiceResolver serviceResolver;
 
 	private final FailureCollector failureCollector;
 	private final ThreadPoolProvider threadPoolProvider;
@@ -29,12 +31,14 @@ class RootBuildContext {
 	RootBuildContext(ConfigurationPropertySource propertySource,
 			ClassResolver classResolver, ResourceResolver resourceResolver,
 			BeanResolver beanResolver,
+			ServiceResolver serviceResolver,
 			FailureCollector failureCollector,
 			ThreadPoolProvider threadPoolProvider, FailureHandler failureHandler) {
 		this.propertySource = propertySource;
 		this.classResolver = classResolver;
 		this.resourceResolver = resourceResolver;
 		this.beanResolver = beanResolver;
+		this.serviceResolver = serviceResolver;
 		this.failureCollector = failureCollector;
 		this.threadPoolProvider = threadPoolProvider;
 		this.failureHandler = failureHandler;
@@ -50,6 +54,10 @@ class RootBuildContext {
 
 	ResourceResolver getResourceResolver() {
 		return resourceResolver;
+	}
+
+	public ServiceResolver getServiceResolver() {
+		return serviceResolver;
 	}
 
 	BeanResolver getBeanResolver() {

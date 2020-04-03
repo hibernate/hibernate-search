@@ -197,7 +197,7 @@ public class SearchIntegrationBuilderImpl implements SearchIntegrationBuilder {
 
 			RootBuildContext rootBuildContext = new RootBuildContext(
 					propertySource,
-					classResolver, resourceResolver, beanResolver,
+					classResolver, resourceResolver, beanResolver, serviceResolver,
 					failureCollector, threadPoolProvider, failureHandler
 			);
 

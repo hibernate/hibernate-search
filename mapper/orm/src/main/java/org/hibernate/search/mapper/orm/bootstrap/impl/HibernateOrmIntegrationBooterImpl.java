@@ -226,7 +226,7 @@ public class HibernateOrmIntegrationBooterImpl implements HibernateOrmIntegratio
 			ClassLoaderService hibernateOrmClassLoaderService = getOrmServiceOrFail( ClassLoaderService.class );
 			Optional<ManagedBeanRegistry> managedBeanRegistryService = getOrmServiceOrEmpty( ManagedBeanRegistry.class );
 			HibernateOrmClassLoaderServiceClassAndResourceAndServiceResolver classAndResourceAndServiceResolver =
-					new HibernateOrmClassLoaderServiceClassAndResourceAndServiceResolver( hibernateOrmClassLoaderService );
+					new HibernateOrmClassLoaderServiceClassAndResourceAndServiceResolver( hibernateOrmClassLoaderService, serviceRegistry );
 			builder.setClassResolver( classAndResourceAndServiceResolver );
 			builder.setResourceResolver( classAndResourceAndServiceResolver );
 			builder.setServiceResolver( classAndResourceAndServiceResolver );

@@ -11,6 +11,7 @@ import org.hibernate.search.engine.reporting.FailureHandler;
 import org.hibernate.search.engine.environment.bean.BeanResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ClassResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
+import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
 
 /**
  * A build context for backends.
@@ -18,6 +19,8 @@ import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 public interface BackendBuildContext {
 
 	ClassResolver getClassResolver();
+
+	ServiceResolver getServiceResolver();
 
 	ResourceResolver getResourceResolver();
 

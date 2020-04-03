@@ -8,6 +8,7 @@ package org.hibernate.search.backend.lucene.cache.spi;
 
 import org.apache.lucene.search.QueryCachingPolicy;
 import org.apache.lucene.util.Version;
+import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
 
 /**
@@ -19,9 +20,10 @@ public interface QueryCachingPolicyProvider {
 	/**
 	 * Returns a {@link QueryCachingPolicy} given the specified configuration properties.
 	 *
+	 * @param context
 	 * @param properties configuration properties
 	 * @param luceneVersion lucene version
 	 * @return a started query cache.
 	 */
-	QueryCachingPolicy getQueryCachingPolicy(ConfigurationPropertySource properties, Version luceneVersion);
+	QueryCachingPolicy getQueryCachingPolicy(BackendBuildContext context, ConfigurationPropertySource properties, Version luceneVersion);
 }

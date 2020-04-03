@@ -19,6 +19,8 @@ import org.hibernate.search.engine.environment.classpath.spi.DefaultResourceReso
 import org.hibernate.search.engine.environment.classpath.spi.DefaultServiceResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ResourceResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
+import org.hibernate.service.Service;
+import org.hibernate.service.ServiceRegistry;
 
 /**
  * An implementation of {@link ClassResolver} which delegates to the ORM-provided {@code ClassResolver}.
@@ -42,14 +44,16 @@ final class HibernateOrmClassLoaderServiceClassAndResourceAndServiceResolver
 	private final ClassResolver internalClassResolver;
 	private final ResourceResolver internalResourceResolver;
 	private final ServiceResolver internalServiceResolver;
+	private final ServiceRegistry serviceRegistry;
 
 	HibernateOrmClassLoaderServiceClassAndResourceAndServiceResolver(
-			org.hibernate.boot.registry.classloading.spi.ClassLoaderService hibernateClassLoaderService) {
+			org.hibernate.boot.registry.classloading.spi.ClassLoaderService hibernateClassLoaderService, ServiceRegistry serviceRegistry) {
 		this.hibernateClassLoaderService = hibernateClassLoaderService;
 		AggregatedClassLoader aggregatedClassLoader = AggregatedClassLoader.createDefault();
 		this.internalClassResolver = DefaultClassResolver.create( aggregatedClassLoader );
 		this.internalResourceResolver = DefaultResourceResolver.create( aggregatedClassLoader );
 		this.internalServiceResolver = DefaultServiceResolver.create( aggregatedClassLoader );
+		this.serviceRegistry = serviceRegistry;
 	}
 
 	@Override
@@ -102,5 +106,9 @@ final class HibernateOrmClassLoaderServiceClassAndResourceAndServiceResolver
 		}
 	}
 
+	@Override
+	public <T> T loadJmxService(Class<T> serviceContract) {
+		Service service = serviceRegistry.getService( (Class<Service>) serviceContract );
+		return (T) service;
+	}
 }
-

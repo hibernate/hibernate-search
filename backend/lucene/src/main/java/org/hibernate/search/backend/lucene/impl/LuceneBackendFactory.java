@@ -195,13 +195,13 @@ public class LuceneBackendFactory implements BackendFactory {
 			return QUERY_CACHE_PROVIDER.getAndMap( propertySource, beanResolver::resolve )
 				.map( holder -> {
 					try ( BeanHolder<? extends QueryCacheProvider> providerHolder = holder ) {
-						QueryCache cache = providerHolder.get().getQueryCache( propertySource, luceneVersion );
+						QueryCache cache = providerHolder.get().getQueryCache( buildContext, propertySource, luceneVersion );
 						return cache;
 					}
 				} )
 				// Otherwise just use from service query cache
 				.orElseGet( () -> {
-					return LuceneCacheServiceLoader.findQueryCache( propertySource, luceneVersion );
+					return LuceneCacheServiceLoader.findQueryCache( buildContext, propertySource, luceneVersion );
 				} );
 		}
 		catch (Exception e) {
@@ -218,13 +218,13 @@ public class LuceneBackendFactory implements BackendFactory {
 			return QUERY_CACHING_POLICY_PROVIDER.getAndMap( propertySource, beanResolver::resolve )
 				.map( holder -> {
 					try ( BeanHolder<? extends QueryCachingPolicyProvider> providerHolder = holder ) {
-						QueryCachingPolicy policy = providerHolder.get().getQueryCachingPolicy( propertySource, luceneVersion );
+						QueryCachingPolicy policy = providerHolder.get().getQueryCachingPolicy( buildContext, propertySource, luceneVersion );
 						return policy;
 					}
 				} )
 				// Otherwise just use an empty from service query caching policy
 				.orElseGet( () -> {
-					return LuceneCacheServiceLoader.findQueryCachingPolicy( propertySource, luceneVersion );
+					return LuceneCacheServiceLoader.findQueryCachingPolicy( buildContext, propertySource, luceneVersion );
 				} );
 		}
 		catch (Exception e) {

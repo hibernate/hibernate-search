@@ -135,6 +135,18 @@ public final class HibernateOrmMapperSettings {
 	public static final String SCHEMA_MANAGEMENT_STRATEGY = PREFIX + Radicals.SCHEMA_MANAGEMENT_STRATEGY;
 
 	/**
+	 * The query cache class to use.
+	 * Defaults to no value.
+	 */
+	public static final String QUERY_CACHE_CLASS = PREFIX + Radicals.QUERY_CACHE_CLASS;
+
+	/**
+	 * The query caching policy class to use.
+	 * Defaults to no value.
+	 */
+	public static final String QUERY_CACHING_POLICY_CLASS = PREFIX + Radicals.QUERY_CACHING_POLICY_CLASS;
+
+	/**
 	 * Configuration property keys without the {@link #PREFIX prefix}.
 	 */
 	public static final class Radicals {
@@ -151,6 +163,8 @@ public final class HibernateOrmMapperSettings {
 		public static final String MAPPING_PROCESS_ANNOTATIONS = "mapping.process_annotations";
 		public static final String MAPPING_CONFIGURER = "mapping.configurer";
 		public static final String SCHEMA_MANAGEMENT_STRATEGY = "schema_management.strategy";
+		public static final String QUERY_CACHE_CLASS = "cache.query_cache_class";
+		public static final String QUERY_CACHING_POLICY_CLASS = "cache.query_caching_policy_class";
 	}
 
 	/**

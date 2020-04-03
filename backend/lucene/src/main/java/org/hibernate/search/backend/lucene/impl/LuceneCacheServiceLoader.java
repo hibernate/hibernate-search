@@ -15,50 +15,40 @@ import org.apache.lucene.search.QueryCachingPolicy;
 import org.apache.lucene.util.Version;
 import org.hibernate.search.backend.lucene.cache.spi.QueryCacheProvider;
 import org.hibernate.search.backend.lucene.cache.spi.QueryCachingPolicyProvider;
+import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.engine.environment.classpath.spi.AggregatedClassLoader;
-import org.hibernate.search.engine.environment.classpath.spi.DefaultServiceResolver;
 import org.hibernate.search.engine.environment.classpath.spi.ServiceResolver;
 
 public class LuceneCacheServiceLoader {
 
-	private static List<QueryCacheProvider> queryProviders;
-	private static List<QueryCachingPolicyProvider> policyProviders;
-
 	private LuceneCacheServiceLoader() {
 	}
 
-	private static synchronized Collection<QueryCacheProvider> getQueryProviders() {
-		if ( queryProviders == null ) {
-			queryProviders = new ArrayList<>();
-			AggregatedClassLoader aggregatedClassLoader = AggregatedClassLoader.createDefault();
-			ServiceResolver serviceResolver = DefaultServiceResolver.create( aggregatedClassLoader );
-			Iterable<QueryCacheProvider> iterator = serviceResolver.loadJavaServices( QueryCacheProvider.class );
-			for ( QueryCacheProvider provider : iterator ) {
-				queryProviders.add( provider );
-			}
+	private static synchronized Collection<QueryCacheProvider> getQueryProviders(BackendBuildContext context) {
+		List<QueryCacheProvider> queryProviders = new ArrayList<>();
+		ServiceResolver serviceResolver = context.getServiceResolver();
+		Iterable<QueryCacheProvider> iterator = serviceResolver.loadJavaServices( QueryCacheProvider.class );
+		for ( QueryCacheProvider provider : iterator ) {
+			queryProviders.add( provider );
 		}
 		return queryProviders;
 	}
 
-	private static synchronized Collection<QueryCachingPolicyProvider> getPolicyProviders() {
-		if ( policyProviders == null ) {
-			policyProviders = new ArrayList<>();
-			AggregatedClassLoader aggregatedClassLoader = AggregatedClassLoader.createDefault();
-			ServiceResolver serviceResolver = DefaultServiceResolver.create( aggregatedClassLoader );
-			Iterable<QueryCachingPolicyProvider> iterator = serviceResolver.loadJavaServices( QueryCachingPolicyProvider.class );
-			for ( QueryCachingPolicyProvider provider : iterator ) {
-				policyProviders.add( provider );
-			}
+	private static synchronized Collection<QueryCachingPolicyProvider> getPolicyProviders(BackendBuildContext context) {
+		List<QueryCachingPolicyProvider> policyProviders = new ArrayList<>();
+		ServiceResolver serviceResolver = context.getServiceResolver();
+		Iterable<QueryCachingPolicyProvider> iterator = serviceResolver.loadJavaServices( QueryCachingPolicyProvider.class );
+		for ( QueryCachingPolicyProvider provider : iterator ) {
+			policyProviders.add( provider );
 		}
 		return policyProviders;
 	}
 
-	public static QueryCache findQueryCache(ConfigurationPropertySource propertySource, Version luceneVersion) {
+	public static QueryCache findQueryCache(BackendBuildContext context, ConfigurationPropertySource propertySource, Version luceneVersion) {
 		QueryCache cache = null;
-		Collection<QueryCacheProvider> providers = getQueryProviders();
+		Collection<QueryCacheProvider> providers = getQueryProviders( context );
 		for ( QueryCacheProvider provider : providers ) {
-			cache = provider.getQueryCache( propertySource, luceneVersion );
+			cache = provider.getQueryCache( context, propertySource, luceneVersion );
 			if ( cache != null ) {
 				break;
 			}
@@ -71,11 +61,11 @@ public class LuceneCacheServiceLoader {
 		return cache;
 	}
 
-	public static QueryCachingPolicy findQueryCachingPolicy(ConfigurationPropertySource propertySource, Version luceneVersion) {
+	public static QueryCachingPolicy findQueryCachingPolicy(BackendBuildContext context, ConfigurationPropertySource propertySource, Version luceneVersion) {
 		QueryCachingPolicy policy = null;
-		Collection<QueryCachingPolicyProvider> providers = getPolicyProviders();
+		Collection<QueryCachingPolicyProvider> providers = getPolicyProviders( context );
 		for ( QueryCachingPolicyProvider provider : providers ) {
-			policy = provider.getQueryCachingPolicy( propertySource, luceneVersion );
+			policy = provider.getQueryCachingPolicy( context, propertySource, luceneVersion );
 			if ( policy != null ) {
 				break;
 			}
