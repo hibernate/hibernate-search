@@ -29,6 +29,6 @@ class TermsAggregationFieldStepImpl implements TermsAggregationFieldStep {
 		Contracts.assertNotNull( type, "type" );
 		TermsAggregationBuilder<F> builder =
 				dslContext.getBuilderFactory().createTermsAggregationBuilder( absoluteFieldPath, type, convert );
-		return new TermsAggregationOptionsStepImpl<>( builder );
+		return new TermsAggregationOptionsStepImpl<>( builder, dslContext );
 	}
 }

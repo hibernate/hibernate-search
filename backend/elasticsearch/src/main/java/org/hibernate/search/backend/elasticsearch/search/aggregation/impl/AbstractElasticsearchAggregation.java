@@ -10,6 +10,7 @@ import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilder;
+import org.hibernate.search.engine.search.predicate.SearchPredicate;
 
 public abstract class AbstractElasticsearchAggregation<A> implements ElasticsearchSearchAggregation<A> {
 
@@ -27,9 +28,15 @@ public abstract class AbstractElasticsearchAggregation<A> implements Elasticsear
 	public abstract static class AbstractBuilder<A> implements SearchAggregationBuilder<A> {
 
 		protected final ElasticsearchSearchContext searchContext;
+		protected SearchPredicate filter;
 
 		public AbstractBuilder(ElasticsearchSearchContext searchContext) {
 			this.searchContext = searchContext;
+		}
+
+		@Override
+		public void filter(SearchPredicate filter) {
+			this.filter = filter;
 		}
 
 		@Override

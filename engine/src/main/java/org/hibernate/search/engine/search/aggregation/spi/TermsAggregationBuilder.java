@@ -21,5 +21,4 @@ public interface TermsAggregationBuilder<K> extends SearchAggregationBuilder<Map
 	void minDocumentCount(int minDocumentCount);
 
 	void maxTermCount(int maxTermCount);
-
 }

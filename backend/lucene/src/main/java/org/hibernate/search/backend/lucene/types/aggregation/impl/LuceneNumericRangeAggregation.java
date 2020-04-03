@@ -73,7 +73,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 
 		NestedDocsProvider nestedDocsProvider = null;
 		if ( nestedDocumentPath != null ) {
-			nestedDocsProvider = context.createNestedDocsProvider( nestedDocumentPath );
+			nestedDocsProvider = context.createNestedDocsProvider( nestedDocumentPath, getNestedFilter() );
 		}
 
 		Facets facetsCount = numericDomain.createRangeFacetCounts(
@@ -96,7 +96,6 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 			implements RangeAggregationBuilder<K> {
 
 		private final String nestedDocumentPath;
-		private final String absoluteFieldPath;
 
 		private final DslConverter<?, ? extends F> toFieldValueConverter;
 		private final AbstractLuceneNumericFieldCodec<F, E> codec;
@@ -107,9 +106,8 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 		public Builder(LuceneSearchContext searchContext, String nestedDocumentPath, String absoluteFieldPath,
 				DslConverter<?, ? extends F> toFieldValueConverter,
 				AbstractLuceneNumericFieldCodec<F, E> codec) {
-			super( searchContext );
+			super( searchContext, absoluteFieldPath );
 			this.nestedDocumentPath = nestedDocumentPath;
-			this.absoluteFieldPath = absoluteFieldPath;
 			this.toFieldValueConverter = toFieldValueConverter;
 			this.codec = codec;
 		}

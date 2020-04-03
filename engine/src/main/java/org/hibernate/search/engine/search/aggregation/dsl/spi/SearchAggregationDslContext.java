@@ -7,6 +7,7 @@
 package org.hibernate.search.engine.search.aggregation.dsl.spi;
 
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilderFactory;
+import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilderFactory;
 
 /**
  * Represents the current context in the search DSL,
@@ -21,4 +22,8 @@ public interface SearchAggregationDslContext<F extends SearchAggregationBuilderF
 	 */
 	F getBuilderFactory();
 
+	/**
+	 * @return The predicate builder factory. Will always return the exact same instance.
+	 */
+	SearchPredicateBuilderFactory getPredicateBuilderFactory();
 }

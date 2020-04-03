@@ -43,7 +43,7 @@ public class AggregationExtractContext {
 		return collectors.get( key );
 	}
 
-	public NestedDocsProvider createNestedDocsProvider(String nestedDocumentPath) {
-		return new NestedDocsProvider( nestedDocumentPath, luceneQuery );
+	public NestedDocsProvider createNestedDocsProvider(String nestedDocumentPath, Query nestedFilter) {
+		return new NestedDocsProvider( nestedDocumentPath, luceneQuery, nestedFilter );
 	}
 }

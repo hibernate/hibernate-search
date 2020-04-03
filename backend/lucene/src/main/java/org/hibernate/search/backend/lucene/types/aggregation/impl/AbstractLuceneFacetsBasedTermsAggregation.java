@@ -112,7 +112,7 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 
 		NestedDocsProvider nestedDocsProvider = null;
 		if ( nestedDocumentPath != null ) {
-			nestedDocsProvider = context.createNestedDocsProvider( nestedDocumentPath );
+			nestedDocsProvider = context.createNestedDocsProvider( nestedDocumentPath, getNestedFilter() );
 		}
 
 		/*
@@ -158,7 +158,6 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 			implements TermsAggregationBuilder<K> {
 
 		private final String nestedDocumentPath;
-		private final String absoluteFieldPath;
 
 		private final ProjectionConverter<? super F, ? extends K> fromFieldValueConverter;
 
@@ -168,9 +167,8 @@ abstract class AbstractLuceneFacetsBasedTermsAggregation<F, T, K>
 
 		AbstractBuilder(LuceneSearchContext searchContext, String nestedDocumentPath, String absoluteFieldPath,
 				ProjectionConverter<? super F, ? extends K> fromFieldValueConverter) {
-			super( searchContext );
+			super( searchContext, absoluteFieldPath );
 			this.nestedDocumentPath = nestedDocumentPath;
-			this.absoluteFieldPath = absoluteFieldPath;
 			this.fromFieldValueConverter = fromFieldValueConverter;
 		}
 
