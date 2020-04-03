@@ -72,7 +72,7 @@ import org.jboss.logging.annotations.ValidIdRanges;
 		@ValidIdRange(min = 320, max = 320),
 		@ValidIdRange(min = 321, max = 321),
 		@ValidIdRange(min = 329, max = 329),
-		@ValidIdRange(min = 330, max = 330),
+		@ValidIdRange(min = 330, max = 332),
 		@ValidIdRange(min = 337, max = 337),
 		@ValidIdRange(min = 341, max = 341),
 		@ValidIdRange(min = 342, max = 342),
@@ -157,6 +157,14 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_1 + 330,
 			value = "Multiple analyzer definitions with the same name: '%1$s'. The analyzer names must be unique." )
 	SearchException analyzerDefinitionNamingConflict(String analyzerDefinitionName);
+
+	@Message(id = ID_OFFSET_1 + 331,
+			value = "Error while applying query cache configuration: %1$s")
+	SearchException unableToApplyQueryCacheConfiguration(String errorMessage, @Cause Exception e);
+
+	@Message(id = ID_OFFSET_1 + 332,
+			value = "Error while applying query caching policy configuration: %1$s")
+	SearchException unableToApplyQueryCachingPolicyConfiguration(String errorMessage, @Cause Exception e);
 
 	@Message(id = ID_OFFSET_1 + 337,
 			value = "Multiple parameters with the same name: '%1$s'. Can't assign both value '%2$s' and '%3$s'" )

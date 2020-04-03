@@ -6,10 +6,15 @@
  */
 package org.hibernate.search.backend.lucene;
 
+import org.apache.lucene.search.QueryCache;
+import org.apache.lucene.search.QueryCachingPolicy;
 import org.hibernate.search.engine.backend.Backend;
 
 public interface LuceneBackend extends Backend {
 
-	// No Lucene-specific backend APIs yet
+	QueryCache getQueryCache();
 
+	QueryCachingPolicy getQueryCachingPolicy();
+
+	String getName();
 }

@@ -12,6 +12,8 @@ import org.hibernate.search.backend.lucene.lowlevel.directory.LockingStrategyNam
 import org.hibernate.search.backend.lucene.multitenancy.MultiTenancyStrategyName;
 
 import org.apache.lucene.util.Version;
+import org.hibernate.search.backend.lucene.cache.spi.QueryCacheProvider;
+import org.hibernate.search.backend.lucene.cache.spi.QueryCachingPolicyProvider;
 
 /**
  * Configuration properties for Lucene backends.
@@ -113,6 +115,30 @@ public final class LuceneBackendSettings {
 	 * which includes a description of the "bean reference" properties and accepted values.
 	 */
 	public static final String ANALYSIS_CONFIGURER = "analysis.configurer";
+
+	/**
+	 * The query cache provider to use.
+	 * <p>
+	 * Expects a reference to a bean of type {@link QueryCacheProvider}.
+	 * <p>
+	 * Defaults to no value.
+	 *
+	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
+	 * which includes a description of the "bean reference" properties and accepted values.
+	 */
+	public static final String QUERY_CACHE_PROVIDER = "cache.query_cache_provider";
+
+	/**
+	 * The query caching policy provider to use.
+	 * <p>
+	 * Expects a reference to a bean of type {@link QueryCachingPolicyProvider}.
+	 * <p>
+	 * Defaults to no value.
+	 *
+	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
+	 * which includes a description of the "bean reference" properties and accepted values.
+	 */
+	public static final String QUERY_CACHING_POLICY_PROVIDER = "cache.query_caching_policy_provider";
 
 	/**
 	 * The size of the thread pool assigned to the backend.

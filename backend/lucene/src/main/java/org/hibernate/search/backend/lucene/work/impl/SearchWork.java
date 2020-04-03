@@ -13,6 +13,7 @@ import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.search.IndexSearcher;
+import org.hibernate.search.backend.lucene.LuceneBackend;
 
 
 public class SearchWork<R> implements ReadWork<R> {
@@ -36,6 +37,14 @@ public class SearchWork<R> implements ReadWork<R> {
 	public R execute(ReadWorkExecutionContext context) {
 		try {
 			IndexSearcher indexSearcher = new IndexSearcher( context.getIndexReader() );
+
+			LuceneBackend backend = context.getBackend();
+			if(backend.getQueryCache() != null) {
+				indexSearcher.setQueryCache( backend.getQueryCache() );
+			}
+			if(backend.getQueryCachingPolicy() != null) {
+				indexSearcher.setQueryCachingPolicy( backend.getQueryCachingPolicy() );
+			}
 
 			return searcher.search(
 					indexSearcher, context.getIndexReaderMetadataResolver(), offset, limit

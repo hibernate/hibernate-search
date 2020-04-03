@@ -25,22 +25,25 @@ import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.index.IndexReader;
+import org.hibernate.search.backend.lucene.LuceneBackend;
 
 public class LuceneSyncWorkOrchestratorImpl
 		extends AbstractWorkOrchestrator<LuceneSyncWorkOrchestratorImpl.WorkExecution<?>>
 		implements LuceneSyncWorkOrchestrator {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
+	private final LuceneBackend backend;
 
-	public LuceneSyncWorkOrchestratorImpl(String name) {
+	public LuceneSyncWorkOrchestratorImpl(String name, LuceneBackend backend) {
 		super( name );
+		this.backend = backend;
 		start( null ); // Nothing to start, just force the superclass to go to the right state.
 	}
 
 	@Override
 	public <T> T submit(Set<String> indexNames, Set<? extends ReadIndexManagerContext> indexManagerContexts,
 			Set<String> routingKeys, ReadWork<T> work) {
-		WorkExecution<T> workExecution = new WorkExecution<>( indexNames, indexManagerContexts, routingKeys, work );
+		WorkExecution<T> workExecution = new WorkExecution<>( backend, indexNames, indexManagerContexts, routingKeys, work );
 		Throwable throwable = null;
 		try {
 			submit( workExecution );
@@ -86,17 +89,24 @@ public class LuceneSyncWorkOrchestratorImpl
 	}
 
 	static class WorkExecution<T> implements AutoCloseable, ReadWorkExecutionContext {
+		private final LuceneBackend backend;
 		private final Set<String> indexNames;
 		private final HibernateSearchMultiReader indexReader;
 		private final ReadWork<T> work;
 
 		private T result;
 
-		WorkExecution(Set<String> indexNames, Set<? extends ReadIndexManagerContext> indexManagerContexts,
+		WorkExecution(LuceneBackend backend, Set<String> indexNames, Set<? extends ReadIndexManagerContext> indexManagerContexts,
 				Set<String> routingKeys, ReadWork<T> work) {
+			this.backend = backend;
 			this.indexNames = indexNames;
 			this.indexReader = HibernateSearchMultiReader.open( indexNames, indexManagerContexts, routingKeys );
 			this.work = work;
+		}
+
+		@Override
+		public LuceneBackend getBackend() {
+			return backend;
 		}
 
 		@Override

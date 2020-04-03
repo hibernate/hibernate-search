@@ -10,6 +10,8 @@ import java.lang.invoke.MethodHandles;
 import java.text.ParseException;
 import java.util.Locale;
 import java.util.Optional;
+import org.apache.lucene.search.QueryCache;
+import org.apache.lucene.search.QueryCachingPolicy;
 
 import org.hibernate.search.backend.lucene.analysis.LuceneAnalysisConfigurer;
 import org.hibernate.search.backend.lucene.analysis.impl.LuceneAnalysisComponentFactory;
@@ -41,8 +43,8 @@ import org.hibernate.search.util.common.AssertionFailure;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 
 import org.apache.lucene.util.Version;
-
-
+import org.hibernate.search.backend.lucene.cache.spi.QueryCacheProvider;
+import org.hibernate.search.backend.lucene.cache.spi.QueryCachingPolicyProvider;
 
 public class LuceneBackendFactory implements BackendFactory {
 
@@ -50,23 +52,33 @@ public class LuceneBackendFactory implements BackendFactory {
 
 	private static final ConfigurationProperty<Optional<Version>> LUCENE_VERSION =
 			ConfigurationProperty.forKey( LuceneBackendSettings.LUCENE_VERSION )
-					.as( Version.class, LuceneBackendFactory::parseLuceneVersion )
-					.build();
+			.as( Version.class, LuceneBackendFactory::parseLuceneVersion )
+			.build();
 
 	private static final ConfigurationProperty<MultiTenancyStrategyName> MULTI_TENANCY_STRATEGY =
 			ConfigurationProperty.forKey( LuceneBackendSettings.MULTI_TENANCY_STRATEGY )
-					.as( MultiTenancyStrategyName.class, MultiTenancyStrategyName::of )
-					.withDefault( LuceneBackendSettings.Defaults.MULTI_TENANCY_STRATEGY )
-					.build();
+			.as( MultiTenancyStrategyName.class, MultiTenancyStrategyName::of )
+			.withDefault( LuceneBackendSettings.Defaults.MULTI_TENANCY_STRATEGY )
+			.build();
 
 	private static final OptionalConfigurationProperty<BeanReference<? extends LuceneAnalysisConfigurer>> ANALYSIS_CONFIGURER =
 			ConfigurationProperty.forKey( LuceneBackendSettings.ANALYSIS_CONFIGURER )
-					.asBeanReference( LuceneAnalysisConfigurer.class )
-					.build();
+			.asBeanReference( LuceneAnalysisConfigurer.class )
+			.build();
+
+	private static final OptionalConfigurationProperty<BeanReference<? extends QueryCacheProvider>> QUERY_CACHE_PROVIDER =
+			ConfigurationProperty.forKey( LuceneBackendSettings.QUERY_CACHE_PROVIDER )
+			.asBeanReference( QueryCacheProvider.class )
+			.build();
+
+	private static final OptionalConfigurationProperty<BeanReference<? extends QueryCachingPolicyProvider>> QUERY_CACHING_POLICY_PROVIDER =
+			ConfigurationProperty.forKey( LuceneBackendSettings.QUERY_CACHING_POLICY_PROVIDER )
+			.asBeanReference( QueryCachingPolicyProvider.class )
+			.build();
 
 	@Override
 	public BackendImplementor create(String name, BackendBuildContext buildContext,
-			ConfigurationPropertySource propertySource) {
+		ConfigurationPropertySource propertySource) {
 		EventContext backendContext = EventContexts.fromBackendName( name );
 
 		BackendThreads backendThreads = new BackendThreads( "Backend " + name );
@@ -79,18 +91,23 @@ public class LuceneBackendFactory implements BackendFactory {
 		MultiTenancyStrategy multiTenancyStrategy = getMultiTenancyStrategy( propertySource );
 
 		LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry = getAnalysisDefinitionRegistry(
-				buildContext, propertySource, luceneVersion
+			buildContext, propertySource, luceneVersion
 		);
 
+		QueryCache queryCache = getQueryCache( buildContext, propertySource, luceneVersion );
+		QueryCachingPolicy queryCachingPolicy = getQueryCachingPolicy( buildContext, propertySource, luceneVersion );
+
 		return new LuceneBackendImpl(
-				name,
-				backendThreads,
-				directoryProviderHolder,
-				new LuceneWorkFactoryImpl( multiTenancyStrategy ),
-				analysisDefinitionRegistry,
-				multiTenancyStrategy,
-				new DefaultTimingSource(),
-				buildContext.getFailureHandler()
+			name,
+			backendThreads,
+			directoryProviderHolder,
+			new LuceneWorkFactoryImpl( multiTenancyStrategy ),
+			analysisDefinitionRegistry,
+			multiTenancyStrategy,
+			new DefaultTimingSource(),
+			buildContext.getFailureHandler(),
+			queryCache,
+			queryCachingPolicy
 		);
 	}
 
@@ -106,9 +123,9 @@ public class LuceneBackendFactory implements BackendFactory {
 		else {
 			Version latestVersion = LuceneBackendSettings.Defaults.LUCENE_VERSION;
 			log.recommendConfiguringLuceneVersion(
-					LUCENE_VERSION.resolveOrRaw( propertySource ),
-					latestVersion,
-					backendContext
+				LUCENE_VERSION.resolveOrRaw( propertySource ),
+				latestVersion,
+				backendContext
 			);
 			luceneVersion = latestVersion;
 		}
@@ -116,11 +133,11 @@ public class LuceneBackendFactory implements BackendFactory {
 	}
 
 	private BeanHolder<? extends DirectoryProvider> getDirectoryProvider(EventContext backendContext,
-			BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
+		BackendBuildContext buildContext, ConfigurationPropertySource propertySource) {
 		DirectoryProviderInitializationContextImpl initializationContext = new DirectoryProviderInitializationContextImpl(
-				backendContext,
-				buildContext.getBeanResolver(),
-				propertySource.withMask( "directory" )
+			backendContext,
+			buildContext.getBeanResolver(),
+			propertySource.withMask( "directory" )
 		);
 		return initializationContext.createDirectoryProvider();
 	}
@@ -135,37 +152,83 @@ public class LuceneBackendFactory implements BackendFactory {
 				return new DiscriminatorMultiTenancyStrategy();
 			default:
 				throw new AssertionFailure( String.format(
-						Locale.ROOT, "Unsupported multi-tenancy strategy '%1$s'.",
-						multiTenancyStrategyName
+					Locale.ROOT, "Unsupported multi-tenancy strategy '%1$s'.",
+					multiTenancyStrategyName
 				) );
 		}
 	}
 
 	private LuceneAnalysisDefinitionRegistry getAnalysisDefinitionRegistry(
-			BackendBuildContext buildContext, ConfigurationPropertySource propertySource,
-			Version luceneVersion) {
+		BackendBuildContext buildContext, ConfigurationPropertySource propertySource,
+		Version luceneVersion) {
 		try {
 			// Apply the user-provided analysis configurer if necessary
 			final BeanResolver beanResolver = buildContext.getBeanResolver();
 			return ANALYSIS_CONFIGURER.getAndMap( propertySource, beanResolver::resolve )
-					.map( holder -> {
-						try ( BeanHolder<? extends LuceneAnalysisConfigurer> configurerHolder = holder ) {
-							LuceneAnalysisComponentFactory analysisComponentFactory = new LuceneAnalysisComponentFactory(
-									luceneVersion,
-									buildContext.getClassResolver(),
-									buildContext.getResourceResolver()
-							);
+				.map( holder -> {
+					try ( BeanHolder<? extends LuceneAnalysisConfigurer> configurerHolder = holder ) {
+						LuceneAnalysisComponentFactory analysisComponentFactory = new LuceneAnalysisComponentFactory(
+							luceneVersion,
+							buildContext.getClassResolver(),
+							buildContext.getResourceResolver()
+						);
 							LuceneAnalysisConfigurationContextImpl collector =
 									new LuceneAnalysisConfigurationContextImpl( analysisComponentFactory );
-							configurerHolder.get().configure( collector );
-							return new LuceneAnalysisDefinitionRegistry( collector );
-						}
-					} )
-					// Otherwise just use an empty registry
-					.orElseGet( LuceneAnalysisDefinitionRegistry::new );
+						configurerHolder.get().configure( collector );
+						return new LuceneAnalysisDefinitionRegistry( collector );
+					}
+				} )
+				// Otherwise just use an empty registry
+				.orElseGet( LuceneAnalysisDefinitionRegistry::new );
 		}
 		catch (Exception e) {
 			throw log.unableToApplyAnalysisConfiguration( e.getMessage(), e );
+		}
+	}
+
+	private QueryCache getQueryCache(
+		BackendBuildContext buildContext, ConfigurationPropertySource propertySource,
+		Version luceneVersion) {
+		try {
+			// Apply the user-provided query cache if necessary
+			final BeanResolver beanResolver = buildContext.getBeanResolver();
+			return QUERY_CACHE_PROVIDER.getAndMap( propertySource, beanResolver::resolve )
+				.map( holder -> {
+					try ( BeanHolder<? extends QueryCacheProvider> providerHolder = holder ) {
+						QueryCache cache = providerHolder.get().getQueryCache( propertySource, luceneVersion );
+						return cache;
+					}
+				} )
+				// Otherwise just use from service query cache
+				.orElseGet( () -> {
+					return LuceneCacheServiceLoader.findQueryCache( propertySource, luceneVersion );
+				} );
+		}
+		catch (Exception e) {
+			throw log.unableToApplyQueryCacheConfiguration( e.getMessage(), e );
+		}
+	}
+
+	private QueryCachingPolicy getQueryCachingPolicy(
+		BackendBuildContext buildContext, ConfigurationPropertySource propertySource,
+		Version luceneVersion) {
+		try {
+			// Apply the user-provided query caching policy if necessary
+			final BeanResolver beanResolver = buildContext.getBeanResolver();
+			return QUERY_CACHING_POLICY_PROVIDER.getAndMap( propertySource, beanResolver::resolve )
+				.map( holder -> {
+					try ( BeanHolder<? extends QueryCachingPolicyProvider> providerHolder = holder ) {
+						QueryCachingPolicy policy = providerHolder.get().getQueryCachingPolicy( propertySource, luceneVersion );
+						return policy;
+					}
+				} )
+				// Otherwise just use an empty from service query caching policy
+				.orElseGet( () -> {
+					return LuceneCacheServiceLoader.findQueryCachingPolicy( propertySource, luceneVersion );
+				} );
+		}
+		catch (Exception e) {
+			throw log.unableToApplyQueryCachingPolicyConfiguration( e.getMessage(), e );
 		}
 	}
 

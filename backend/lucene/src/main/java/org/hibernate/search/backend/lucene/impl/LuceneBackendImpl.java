@@ -8,6 +8,8 @@ package org.hibernate.search.backend.lucene.impl;
 
 import java.lang.invoke.MethodHandles;
 import java.util.concurrent.CompletableFuture;
+import org.apache.lucene.search.QueryCache;
+import org.apache.lucene.search.QueryCachingPolicy;
 
 import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDefinitionRegistry;
 import org.hibernate.search.backend.lucene.document.model.dsl.impl.LuceneIndexSchemaRootNodeBuilder;
@@ -52,6 +54,8 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 
 	private final EventContext eventContext;
 	private final IndexManagerBackendContext indexManagerBackendContext;
+	private final QueryCache queryCache;
+	private final QueryCachingPolicy queryCachingPolicy;
 
 	LuceneBackendImpl(String name,
 			BackendThreads threads,
@@ -60,7 +64,9 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 			LuceneAnalysisDefinitionRegistry analysisDefinitionRegistry,
 			MultiTenancyStrategy multiTenancyStrategy,
 			TimingSource timingSource,
-			FailureHandler failureHandler) {
+			FailureHandler failureHandler,
+			QueryCache queryCache,
+			QueryCachingPolicy queryCachingPolicy) {
 		this.name = name;
 		this.threads = threads;
 		this.directoryProviderHolder = directoryProviderHolder;
@@ -68,7 +74,8 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 		this.analysisDefinitionRegistry = analysisDefinitionRegistry;
 
 		this.readOrchestrator = new LuceneSyncWorkOrchestratorImpl(
-				"Lucene read work orchestrator for backend " + name
+				"Lucene read work orchestrator for backend " + name,
+				this
 		);
 		this.multiTenancyStrategy = multiTenancyStrategy;
 		this.timingSource = timingSource;
@@ -81,6 +88,23 @@ public class LuceneBackendImpl implements BackendImplementor, LuceneBackend {
 				failureHandler,
 				readOrchestrator
 		);
+		this.queryCache = queryCache;
+		this.queryCachingPolicy = queryCachingPolicy;
+	}
+
+	@Override
+	public String getName() {
+		return name;
+	}
+
+	@Override
+	public QueryCache getQueryCache() {
+		return queryCache;
+	}
+
+	@Override
+	public QueryCachingPolicy getQueryCachingPolicy() {
+		return queryCachingPolicy;
 	}
 
 	@Override

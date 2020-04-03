@@ -10,6 +10,7 @@ import org.hibernate.search.backend.lucene.lowlevel.reader.impl.IndexReaderMetad
 import org.hibernate.search.util.common.reporting.EventContext;
 
 import org.apache.lucene.index.IndexReader;
+import org.hibernate.search.backend.lucene.LuceneBackend;
 
 
 public interface ReadWorkExecutionContext {
@@ -19,5 +20,7 @@ public interface ReadWorkExecutionContext {
 	IndexReaderMetadataResolver getIndexReaderMetadataResolver();
 
 	EventContext getEventContext();
+
+	LuceneBackend getBackend();
 
 }
