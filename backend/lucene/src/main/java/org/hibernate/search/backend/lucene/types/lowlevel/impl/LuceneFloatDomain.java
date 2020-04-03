@@ -89,10 +89,10 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 
 	@Override
 	public Facets createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-			MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
+			NestedDocsProvider nestedDocsProvider) throws IOException {
 
 		DoubleMultiValuesToSingleValuesSource source = DoubleMultiValuesToSingleValuesSource.fromFloatField(
-				absoluteFieldPath, multiValueMode, nestedDocsProvider
+				absoluteFieldPath, MultiValueMode.NONE, nestedDocsProvider
 		);
 		return new LongMultiValueFacetCounts(
 			absoluteFieldPath,
@@ -107,10 +107,10 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	@Override
 	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 			Collection<? extends Range<? extends Float>> ranges,
-			MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
+			NestedDocsProvider nestedDocsProvider) throws IOException {
 		// TODO HSEARCH-3856 aggregations on multi-valued fields - currently we just use the minimum value
 		DoubleMultiValuesToSingleValuesSource source = DoubleMultiValuesToSingleValuesSource.fromFloatField(
-				absoluteFieldPath, multiValueMode, nestedDocsProvider
+				absoluteFieldPath, MultiValueMode.NONE, nestedDocsProvider
 		);
 		return new DoubleMultiValueRangeFacetCounts(
 				absoluteFieldPath, source,

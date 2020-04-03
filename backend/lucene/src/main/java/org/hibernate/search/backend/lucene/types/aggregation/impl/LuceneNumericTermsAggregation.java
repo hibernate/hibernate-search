@@ -50,7 +50,7 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 	FacetResult getTopChildren(IndexReader reader, FacetsCollector facetsCollector,
 			NestedDocsProvider nestedDocsProvider, int limit) throws IOException {
 		Facets facetCounts = numericDomain.createTermsFacetCounts(
-				absoluteFieldPath, facetsCollector, getMultiValueMode(), nestedDocsProvider
+				absoluteFieldPath, facetsCollector, nestedDocsProvider
 		);
 		return facetCounts.getTopChildren( limit, absoluteFieldPath );
 	}

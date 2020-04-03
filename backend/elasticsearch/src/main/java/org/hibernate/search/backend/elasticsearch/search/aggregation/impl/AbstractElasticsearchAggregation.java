@@ -10,7 +10,6 @@ import java.util.Set;
 
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
 import org.hibernate.search.engine.search.aggregation.spi.SearchAggregationBuilder;
-import org.hibernate.search.engine.search.common.MultiValue;
 
 public abstract class AbstractElasticsearchAggregation<A> implements ElasticsearchSearchAggregation<A> {
 
@@ -28,15 +27,9 @@ public abstract class AbstractElasticsearchAggregation<A> implements Elasticsear
 	public abstract static class AbstractBuilder<A> implements SearchAggregationBuilder<A> {
 
 		protected final ElasticsearchSearchContext searchContext;
-		protected MultiValue mode;
 
 		public AbstractBuilder(ElasticsearchSearchContext searchContext) {
 			this.searchContext = searchContext;
-		}
-
-		@Override
-		public void mode(MultiValue multi) {
-			this.mode = multi;
 		}
 
 		@Override

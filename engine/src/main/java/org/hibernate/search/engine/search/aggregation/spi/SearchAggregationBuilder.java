@@ -7,7 +7,6 @@
 package org.hibernate.search.engine.search.aggregation.spi;
 
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
-import org.hibernate.search.engine.search.common.MultiValue;
 
 /**
  * A search aggregation builder, i.e. an object responsible for collecting parameters
@@ -16,8 +15,6 @@ import org.hibernate.search.engine.search.common.MultiValue;
  * @param <A> The type of resulting aggregations.
  */
 public interface SearchAggregationBuilder<A> {
-
-	void mode(MultiValue mode);
 
 	SearchAggregation<A> build();
 

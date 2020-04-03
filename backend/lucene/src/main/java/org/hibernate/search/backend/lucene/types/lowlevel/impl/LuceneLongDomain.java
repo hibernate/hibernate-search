@@ -85,9 +85,9 @@ public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 
 	@Override
 	public Facets createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-			MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
+			NestedDocsProvider nestedDocsProvider) throws IOException {
 		LongMultiValuesToSingleValuesSource source = LongMultiValuesToSingleValuesSource.fromLongField(
-				absoluteFieldPath, multiValueMode, nestedDocsProvider
+				absoluteFieldPath, MultiValueMode.NONE, nestedDocsProvider
 		);
 		return new LongMultiValueFacetCounts(
 				absoluteFieldPath, source,
@@ -98,10 +98,10 @@ public class LuceneLongDomain implements LuceneNumericDomain<Long> {
 	@Override
 	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 			Collection<? extends Range<? extends Long>> ranges,
-			MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
+			NestedDocsProvider nestedDocsProvider) throws IOException {
 
 		LongMultiValuesToSingleValuesSource source = LongMultiValuesToSingleValuesSource.fromLongField(
-				absoluteFieldPath, multiValueMode, nestedDocsProvider
+				absoluteFieldPath, MultiValueMode.NONE, nestedDocsProvider
 		);
 		return new LongMultiValueRangeFacetCounts(
 				absoluteFieldPath, source,
