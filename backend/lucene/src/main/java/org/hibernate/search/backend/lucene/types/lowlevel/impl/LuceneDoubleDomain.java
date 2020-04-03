@@ -88,9 +88,9 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 
 	@Override
 	public Facets createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-			MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
+			NestedDocsProvider nestedDocsProvider) throws IOException {
 		DoubleMultiValuesToSingleValuesSource source = DoubleMultiValuesToSingleValuesSource.fromDoubleField(
-			absoluteFieldPath, multiValueMode, nestedDocsProvider
+			absoluteFieldPath, MultiValueMode.NONE, nestedDocsProvider
 		);
 		return new LongMultiValueFacetCounts(
 			absoluteFieldPath,
@@ -105,9 +105,9 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	@Override
 	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 			Collection<? extends Range<? extends Double>> ranges,
-			MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException {
+			NestedDocsProvider nestedDocsProvider) throws IOException {
 		DoubleMultiValuesToSingleValuesSource source = DoubleMultiValuesToSingleValuesSource.fromDoubleField(
-				absoluteFieldPath, multiValueMode, nestedDocsProvider
+				absoluteFieldPath, MultiValueMode.NONE, nestedDocsProvider
 		);
 		return new DoubleMultiValueRangeFacetCounts(
 			absoluteFieldPath,
