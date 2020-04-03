@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.engine.search.aggregation.dsl;
 
+import org.hibernate.search.engine.search.common.MultiValue;
 
 /**
  * The final step in a "terms" aggregation definition, where optional parameters can be set.
@@ -71,5 +72,13 @@ public interface TermsAggregationOptionsStep<S extends TermsAggregationOptionsSt
 	 * @return {@code this}, for method chaining.
 	 */
 	S maxTermCount(int maxTermCount);
+
+	/**
+	 * Start describing the behavior of this sort when a document do have mode values for the targeted field.
+	 *
+	 * @param mode The mode.
+	 * @return The next step.
+	 */
+	S mode(MultiValue mode);
 
 }

@@ -201,8 +201,8 @@ public class LuceneSearchQueryBuilder<H>
 				new SearchProjectionRequestContext( extractionRequirementsBuilder );
 		rootProjection.request( projectionRequestContext );
 		if ( aggregations != null ) {
-			AggregationRequestContext aggregationRequestContext =
-					new AggregationRequestContext( extractionRequirementsBuilder );
+			AggregationRequestContext aggregationRequestContext
+				= new AggregationRequestContext( extractionRequirementsBuilder, definitiveLuceneQuery );
 			for ( LuceneSearchAggregation<?> aggregation : aggregations.values() ) {
 				aggregation.request( aggregationRequestContext );
 			}

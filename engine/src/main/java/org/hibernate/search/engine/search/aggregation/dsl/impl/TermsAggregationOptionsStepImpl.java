@@ -11,6 +11,7 @@ import java.util.Map;
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
 import org.hibernate.search.engine.search.aggregation.dsl.TermsAggregationOptionsStep;
+import org.hibernate.search.engine.search.common.MultiValue;
 import org.hibernate.search.util.common.impl.Contracts;
 
 class TermsAggregationOptionsStepImpl<F>
@@ -56,6 +57,12 @@ class TermsAggregationOptionsStepImpl<F>
 	public TermsAggregationOptionsStepImpl<F> maxTermCount(int maxTermCount) {
 		Contracts.assertStrictlyPositive( maxTermCount, "maxTermCount" );
 		builder.maxTermCount( maxTermCount );
+		return this;
+	}
+
+	@Override
+	public TermsAggregationOptionsStepImpl<F> mode(MultiValue mode) {
+		builder.mode( mode );
 		return this;
 	}
 
