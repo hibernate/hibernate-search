@@ -75,7 +75,7 @@ public class ElasticsearchJpaIT extends JPATestCase {
 		JsonHelper.assertJsonEqualsIgnoringUnknownFields(
 				"{" +
 					"'lastName': 'Hergesheimer'," +
-					"'fullName': 'Klaus Hergesheimer'," +
+					"'fullName': 'Klaus Hergesheimer'" +
 				"}",
 				source
 		);
