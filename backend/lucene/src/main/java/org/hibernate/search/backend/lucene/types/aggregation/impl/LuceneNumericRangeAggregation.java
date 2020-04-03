@@ -78,7 +78,7 @@ public class LuceneNumericRangeAggregation<F, E extends Number, K>
 
 		Facets facetsCount = numericDomain.createRangeFacetCounts(
 				absoluteFieldPath, facetsCollector, encodedRangesInOrder,
-				nestedDocsProvider
+				getMultiValueMode(), nestedDocsProvider
 		);
 
 		FacetResult facetResult = facetsCount.getTopChildren( rangesInOrder.size(), absoluteFieldPath );

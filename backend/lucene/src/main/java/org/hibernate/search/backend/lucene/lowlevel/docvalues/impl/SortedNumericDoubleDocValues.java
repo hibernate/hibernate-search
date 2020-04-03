@@ -79,7 +79,7 @@ public abstract class SortedNumericDoubleDocValues extends DocIdSetIterator {
 		}
 	}
 
-	private static SortedNumericDoubleDocValues create(SortedNumericDocValues values, LongToDoubleFunction decoder) {
+	public static SortedNumericDoubleDocValues create(SortedNumericDocValues values, LongToDoubleFunction decoder) {
 		NumericDocValues singleton = DocValues.unwrapSingleton( values );
 		if ( singleton != null ) {
 			return new SingleValuedFieldNumericDoubleDocValues( singleton, decoder );

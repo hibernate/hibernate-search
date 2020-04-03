@@ -15,7 +15,6 @@ import org.hibernate.search.util.common.data.Range;
 
 import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
-import org.apache.lucene.facet.LongValueFacetCounts;
 import org.apache.lucene.index.IndexableField;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Query;
@@ -41,12 +40,12 @@ public interface LuceneNumericDomain<E extends Number> {
 
 	E sortedDocValueToTerm(long longValue);
 
-	LongValueFacetCounts createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
-			NestedDocsProvider nestedDocsProvider) throws IOException;
+	Facets createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
+			MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException;
 
 	Facets createRangeFacetCounts(String absoluteFieldPath,
 			FacetsCollector facetsCollector, Collection<? extends Range<? extends E>> ranges,
-			NestedDocsProvider nestedDocsProvider) throws IOException;
+			MultiValueMode multiValueMode, NestedDocsProvider nestedDocsProvider) throws IOException;
 
 	IndexableField createIndexField(String absoluteFieldPath, E numericValue);
 

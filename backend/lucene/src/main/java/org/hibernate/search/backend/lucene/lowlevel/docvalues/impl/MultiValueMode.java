@@ -304,6 +304,17 @@ public enum MultiValueMode {
 			}
 			return result;
 		}
+	},
+	NONE {
+		@Override
+		long pick(SortedNumericDocValues values) throws IOException {
+			throw new IllegalArgumentException( "Unsupported sort mode: " + this );
+		}
+
+		@Override
+		double pick(SortedNumericDoubleDocValues values) throws IOException {
+			throw new IllegalArgumentException( "Unsupported sort mode: " + this );
+		}
 	};
 
 	abstract long pick(SortedNumericDocValues values) throws IOException;

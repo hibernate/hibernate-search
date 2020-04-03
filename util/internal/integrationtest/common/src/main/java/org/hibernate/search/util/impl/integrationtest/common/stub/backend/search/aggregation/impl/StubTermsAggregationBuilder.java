@@ -10,6 +10,7 @@ import java.util.Map;
 
 import org.hibernate.search.engine.search.aggregation.SearchAggregation;
 import org.hibernate.search.engine.search.aggregation.spi.TermsAggregationBuilder;
+import org.hibernate.search.engine.search.common.MultiValue;
 
 class StubTermsAggregationBuilder<K>
 		implements StubAggregationBuilder<Map<K, Long>>, TermsAggregationBuilder<K> {
@@ -41,6 +42,11 @@ class StubTermsAggregationBuilder<K>
 
 	@Override
 	public void maxTermCount(int maxTermCount) {
+		// No-op
+	}
+
+	@Override
+	public void mode(MultiValue mode) {
 		// No-op
 	}
 

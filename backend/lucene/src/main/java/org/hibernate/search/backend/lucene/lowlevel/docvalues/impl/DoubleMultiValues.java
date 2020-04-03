@@ -8,25 +8,47 @@ package org.hibernate.search.backend.lucene.lowlevel.docvalues.impl;
 
 import java.io.IOException;
 import java.util.function.DoubleToLongFunction;
-import java.util.function.LongToDoubleFunction;
 
 import org.apache.lucene.index.NumericDocValues;
 import org.apache.lucene.search.DoubleValues;
-import org.apache.lucene.util.NumericUtils;
 
 /**
  * A per-document numeric value.
  * <p>
- * Copied and adapted from {@code org.elasticsearch.index.fielddata.NumericDoubleValues} class
+ * Copied and adapted from {@code org.elasticsearch.index.fielddata.DoubleMultiValues} class
  * of <a href="https://github.com/elastic/elasticsearch">Elasticsearch project</a>.
  */
-public abstract class NumericDoubleValues extends DoubleValues {
+public abstract class DoubleMultiValues extends DoubleValues {
+
+	private final DoubleToLongFunction encoder;
 
 	/**
-	 * Sole constructor. (For invocation by subclass
+	 * Sole constructor.(For invocation by subclass
 	 * constructors, typically implicit.)
 	 */
-	protected NumericDoubleValues() {
+	protected DoubleMultiValues() {
+		this.encoder = Double::doubleToRawLongBits;
+	}
+
+	/**
+	 * Sole constructor.(For invocation by subclass
+	 * constructors, typically implicit.)
+	 *
+	 * @param encoder
+	 */
+	protected DoubleMultiValues(DoubleToLongFunction encoder) {
+		this.encoder = encoder;
+	}
+
+	/**
+	 * Iterates to the next value in the current document.Do not call this more than {@link #docValueCount} times
+	 * for the document.
+	 *
+	 * @return the next value
+	 * @throws java.io.IOException
+	 */
+	public double nextValue() throws IOException {
+		return doubleValue();
 	}
 
 	/**
@@ -46,7 +68,7 @@ public abstract class NumericDoubleValues extends DoubleValues {
 	 * @return numeric
 	 */
 	public NumericDocValues getRawDoubleValues() {
-		return new RawNumericDocValues( NumericUtils::doubleToSortableLong );
+		return new RawNumericDocValues( Double::doubleToRawLongBits );
 	}
 
 	/**
@@ -55,7 +77,7 @@ public abstract class NumericDoubleValues extends DoubleValues {
 	 * @return numeric
 	 */
 	public NumericDocValues getRawFloatValues() {
-		return new RawNumericDocValues( v -> (long) NumericUtils.floatToSortableInt( (float) v ) );
+		return new RawNumericDocValues( (v) -> (long) Float.floatToRawIntBits( (float) v ) );
 	}
 
 	/**
@@ -64,67 +86,44 @@ public abstract class NumericDoubleValues extends DoubleValues {
 	 * @return numeric
 	 */
 	public NumericDocValues getRawLongValues() {
-		return new RawNumericDocValues( v -> (long) v );
-	}
-
-	public static NumericDoubleValues fromField(NumericDocValues values, LongToDoubleFunction decoder) {
-		return new FieldNumericDoubleValues( values, decoder );
+		return new RawNumericDocValues( (v) -> (long) v );
 	}
 
 	/**
-	 * An empty NumericDoubleValues instance that always returns {@code false} from {@link #advanceExact(int)}
+	 * Returns numeric docvalues view of raw int bits
+	 *
+	 * @return numeric
 	 */
-	public static final NumericDoubleValues EMPTY = new NumericDoubleValues() {
-		@Override
-		public double doubleValue() {
-			throw new UnsupportedOperationException();
-		}
+	public NumericDocValues getRawIntValues() {
+		return getRawLongValues();
+	}
 
-		@Override
-		public boolean advanceExact(int doc) {
-			return false;
-		}
-	};
-
-	private static class FieldNumericDoubleValues extends NumericDoubleValues {
-
-		private final NumericDocValues values;
-		private final LongToDoubleFunction decoder;
-
-		FieldNumericDoubleValues(NumericDocValues values, LongToDoubleFunction decoder) {
-			this.values = values;
-			this.decoder = decoder;
-		}
-
-		@Override
-		public double doubleValue() throws IOException {
-			return decoder.applyAsDouble( values.longValue() );
-		}
-
-		@Override
-		public boolean advanceExact(int doc) throws IOException {
-			return values.advanceExact( doc );
-		}
-
+	/**
+	 * Returns numeric docvalues view of raw int bits
+	 *
+	 * @return numeric
+	 */
+	public NumericDocValues getRawValues() {
+		return new RawNumericDocValues( encoder );
 	}
 
 	private class RawNumericDocValues extends NumericDocValues {
 		private int docID = -1;
-		private final DoubleToLongFunction decorator;
+		private final DoubleToLongFunction encoder;
 
-		public RawNumericDocValues(DoubleToLongFunction decorator) {
-			this.decorator = decorator;
+		public RawNumericDocValues(DoubleToLongFunction encoder) {
+			this.encoder = encoder;
 		}
 
 		@Override
 		public boolean advanceExact(int target) throws IOException {
 			docID = target;
-			return NumericDoubleValues.this.advanceExact( target );
+			return DoubleMultiValues.this.advanceExact( target );
 		}
 
 		@Override
 		public long longValue() throws IOException {
-			return decorator.applyAsLong( NumericDoubleValues.this.doubleValue() );
+			return encoder.applyAsLong( DoubleMultiValues.this.doubleValue() );
 		}
 
 		@Override
