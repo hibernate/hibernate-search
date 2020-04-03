@@ -26,6 +26,6 @@ class RangeAggregationFieldStepImpl implements RangeAggregationFieldStep {
 		Contracts.assertNotNull( type, "type" );
 		RangeAggregationBuilder<F> builder =
 				dslContext.getBuilderFactory().createRangeAggregationBuilder( absoluteFieldPath, type, convert );
-		return new RangeAggregationRangeStepImpl<>( builder );
+		return new RangeAggregationRangeStepImpl<>( builder, dslContext );
 	}
 }

@@ -649,4 +649,8 @@ public interface Log extends BasicLogger {
 					+ " Only fields that are contained in the nested object with path '%1$s'"
 					+ " are allowed here.")
 	SearchException invalidNestedObjectPathForPredicate(String nestedObjectPath, List<String> fieldPaths);
+
+	@Message(id = ID_OFFSET_2 + 122,
+			value = "Unable to create nested aggregation filter for name '%1$s'.")
+	SearchException unableToCreateNestedAggregationFilter(String name);
 }
