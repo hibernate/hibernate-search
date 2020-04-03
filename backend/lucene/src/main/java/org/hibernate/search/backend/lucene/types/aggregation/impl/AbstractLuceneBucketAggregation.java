@@ -28,12 +28,14 @@ public abstract class AbstractLuceneBucketAggregation<K, V> implements LuceneSea
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 	private final Set<String> indexNames;
-	private final String absoluteFieldPath;
+	protected final String absoluteFieldPath;
+	protected final String nestedDocumentPath;
 	private final Query nestedFilter;
 
 	AbstractLuceneBucketAggregation(AbstractBuilder<K, V> builder) {
 		this.indexNames = builder.searchContext.getIndexNames();
 		this.absoluteFieldPath = builder.absoluteFieldPath;
+		this.nestedDocumentPath = builder.nestedDocumentPath;
 		this.nestedFilter = builder.getLuceneFilter();
 	}
 
@@ -53,12 +55,14 @@ public abstract class AbstractLuceneBucketAggregation<K, V> implements LuceneSea
 	public abstract static class AbstractBuilder<K, V> implements SearchAggregationBuilder<Map<K, V>> {
 
 		protected final LuceneSearchContext searchContext;
+		private final String nestedDocumentPath;
 		protected final String absoluteFieldPath;
 		protected SearchPredicate filter;
 
-		public AbstractBuilder(LuceneSearchContext searchContext, String absoluteFieldPath) {
+		public AbstractBuilder(LuceneSearchContext searchContext, String absoluteFieldPath, String nestedDocumentPath) {
 			this.searchContext = searchContext;
 			this.absoluteFieldPath = absoluteFieldPath;
+			this.nestedDocumentPath = nestedDocumentPath;
 		}
 
 		@Override
@@ -76,11 +80,11 @@ public abstract class AbstractLuceneBucketAggregation<K, V> implements LuceneSea
 
 			Query luceneFilter = null;
 			if ( filter instanceof LuceneSearchPredicateBuilder ) {
-				LuceneSearchPredicateContext filterContext = new LuceneSearchPredicateContext( absoluteFieldPath );
+				LuceneSearchPredicateContext filterContext = new LuceneSearchPredicateContext( nestedDocumentPath );
 				luceneFilter = ((LuceneSearchPredicateBuilder) filter).build( filterContext );
 			}
 			else {
-				throw log.unableToCreateNestedAggregationFilter( absoluteFieldPath );
+				throw log.unableToCreateNestedAggregationFilter( nestedDocumentPath );
 			}
 
 			return luceneFilter;
