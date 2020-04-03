@@ -9,6 +9,7 @@ package org.hibernate.search.engine.search.sort.dsl;
 import java.util.function.Function;
 
 import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
+import org.hibernate.search.engine.spatial.GeoPoint;
 
 /**
  * A base interface for subtypes of {@link SearchSortFactory} allowing to
@@ -25,4 +26,11 @@ public interface ExtendedSearchSortFactory<PDF extends SearchPredicateFactory>
 	@Override
 	FieldSortOptionsStep<?, PDF> field(String absoluteFieldPath);
 
+	@Override
+	DistanceSortOptionsStep<?, PDF> distance(String absoluteFieldPath, GeoPoint location);
+
+	@Override
+	default DistanceSortOptionsStep<?, PDF> distance(String absoluteFieldPath, double latitude, double longitude) {
+		return distance( absoluteFieldPath, GeoPoint.of( latitude, longitude ) );
+	}
 }

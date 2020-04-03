@@ -47,7 +47,7 @@ public class DefaultSearchSortFactory<B> implements SearchSortFactory {
 	}
 
 	@Override
-	public DistanceSortOptionsStep<?> distance(String absoluteFieldPath, GeoPoint location) {
+	public DistanceSortOptionsStep<?, ? extends SearchPredicateFactory> distance(String absoluteFieldPath, GeoPoint location) {
 		return new DistanceSortOptionsStepImpl<>(
 				dslContext, absoluteFieldPath, location
 		);

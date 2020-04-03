@@ -18,6 +18,7 @@ import org.hibernate.search.engine.search.sort.dsl.ScoreSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtension;
 import org.hibernate.search.engine.search.sort.dsl.SearchSortFactoryExtensionIfSupportedStep;
+import org.hibernate.search.engine.search.sort.dsl.impl.DistanceSortOptionsStepImpl;
 import org.hibernate.search.engine.search.sort.dsl.impl.FieldSortOptionsStepImpl;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
@@ -52,13 +53,8 @@ public class DelegatingSearchSortFactory<PDF extends SearchPredicateFactory> imp
 	}
 
 	@Override
-	public DistanceSortOptionsStep<?> distance(String absoluteFieldPath, GeoPoint location) {
-		return delegate.distance( absoluteFieldPath, location );
-	}
-
-	@Override
-	public DistanceSortOptionsStep<?> distance(String absoluteFieldPath, double latitude, double longitude) {
-		return delegate.distance( absoluteFieldPath, latitude, longitude );
+	public DistanceSortOptionsStep<?, PDF> distance(String absoluteFieldPath, GeoPoint location) {
+		return new DistanceSortOptionsStepImpl<>( dslContext, absoluteFieldPath, location );
 	}
 
 	@Override
