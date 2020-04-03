@@ -1,1 +1,1 @@
-org.hibernate.search.mapper.orm.cache.impl.QueryCachingPolicyProviderImpl
+org.hibernate.search.mapper.orm.cache.impl.HibernateOrmQueryCachingPolicyProvider
