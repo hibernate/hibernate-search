@@ -54,8 +54,7 @@ class RangeAggregationRangeStepImpl<F>
 	public RangeAggregationRangeStepImpl<F> filter(
 		Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor) {
 
-		SearchAggregationDslContext<?> ctx = dslContext;
-		SearchPredicateBuilderFactory predicateBuilderFactory = ctx.getPredicateBuilderFactory();
+		SearchPredicateBuilderFactory<?, ?> predicateBuilderFactory = dslContext.getPredicateBuilderFactory();
 		SearchPredicateFactory factory = new DefaultSearchPredicateFactory<>( predicateBuilderFactory );
 		SearchPredicate predicate = clauseContributor.apply( extendPredicateFactory( factory ) ).toPredicate();
 
@@ -65,8 +64,7 @@ class RangeAggregationRangeStepImpl<F>
 
 	@Override
 	public RangeAggregationRangeStepImpl<F> filter(SearchPredicate searchPredicate) {
-		SearchAggregationDslContext<?> ctx = dslContext;
-		SearchPredicateBuilderFactory predicateBuilderFactory = ctx.getPredicateBuilderFactory();
+		SearchPredicateBuilderFactory<?, ?> predicateBuilderFactory = dslContext.getPredicateBuilderFactory();
 		searchPredicate = (SearchPredicate) predicateBuilderFactory.toImplementation( searchPredicate );
 
 		builder.filter( searchPredicate );

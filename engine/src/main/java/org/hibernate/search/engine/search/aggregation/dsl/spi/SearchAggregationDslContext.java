@@ -25,5 +25,5 @@ public interface SearchAggregationDslContext<F extends SearchAggregationBuilderF
 	/**
 	 * @return The predicate builder factory. Will always return the exact same instance.
 	 */
-	SearchPredicateBuilderFactory getPredicateBuilderFactory();
+	SearchPredicateBuilderFactory<?, ?> getPredicateBuilderFactory();
 }
