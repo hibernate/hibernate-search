@@ -30,10 +30,6 @@ public class TckBackendFeatures {
 		return false;
 	}
 
-	public boolean aggregationsOnMultiValuedFields(Class<?> fieldType) {
-		return true;
-	}
-
 	public boolean nonCanonicalRangeInAggregations() {
 		return true;
 	}

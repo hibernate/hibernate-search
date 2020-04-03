@@ -11,13 +11,6 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBack
 class LuceneTckBackendFeatures extends TckBackendFeatures {
 
 	@Override
-	public boolean aggregationsOnMultiValuedFields(Class<?> fieldType) {
-		// TODO HSEARCH-1929 + HSEARCH-1927 Aggregations on multi-valued numeric fields are not supported at the moment
-		//  See in particular https://hibernate.atlassian.net/browse/HSEARCH-1927?focusedCommentId=88210&page=com.atlassian.jira.plugin.system.issuetabpanels%3Acomment-tabpanel#comment-88210
-		return String.class.equals( fieldType );
-	}
-
-	@Override
 	public boolean nonDefaultOrderInTermsAggregations() {
 		// TODO HSEARCH-3666 Lucene terms aggregations (discrete facets) may return wrong results for any sort other than the default one
 		return false;
