@@ -168,11 +168,12 @@ public final class ElasticsearchExtension<H, R, E, LOS>
 	@Override
 	@SuppressWarnings("unchecked") // If the factory is an instance of ElasticsearchSearchSortBuilderFactory, the cast is safe
 	public Optional<ElasticsearchSearchSortFactory> extendOptional(
-			SearchSortFactory original, SearchSortDslContext<?, ?> dslContext) {
+			SearchSortFactory original, SearchSortDslContext<?, ?, ?> dslContext) {
 		if ( dslContext.getBuilderFactory() instanceof ElasticsearchSearchSortBuilderFactory ) {
 			return Optional.of( new ElasticsearchSearchSortFactoryImpl(
 					original,
-					(SearchSortDslContext<ElasticsearchSearchSortBuilderFactory, ElasticsearchSearchSortBuilder>) dslContext
+					((SearchSortDslContext<ElasticsearchSearchSortBuilderFactory, ElasticsearchSearchSortBuilder, ?>) dslContext)
+							.withExtendedPredicateFactory( this )
 			) );
 		}
 		else {

@@ -373,12 +373,12 @@ public class FieldSearchSortBaseIT<F> {
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(
-			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?>> sortContributor) {
+			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?, ?>> sortContributor) {
 		return matchNonEmptyQuery( sortContributor, indexManager.createScope() );
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyQuery(
-			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?>> sortContributor, StubMappingScope scope) {
+			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?, ?>> sortContributor, StubMappingScope scope) {
 		return query(
 				f -> f.matchAll().except( f.id().matchingAny( Arrays.asList( EMPTY_1, EMPTY_2, EMPTY_3, EMPTY_4 ) ) ),
 				sortContributor,
@@ -387,12 +387,12 @@ public class FieldSearchSortBaseIT<F> {
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyAndEmpty1Query(
-			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?>> sortContributor) {
+			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?, ?>> sortContributor) {
 		return matchNonEmptyAndEmpty1Query( sortContributor, indexManager.createScope() );
 	}
 
 	private SearchQuery<DocumentReference> matchNonEmptyAndEmpty1Query(
-			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?>> sortContributor, StubMappingScope scope) {
+			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?, ?>> sortContributor, StubMappingScope scope) {
 		return query(
 				f -> f.matchAll().except( f.id().matchingAny( Arrays.asList( EMPTY_2, EMPTY_3, EMPTY_4 ) ) ),
 				sortContributor,
@@ -401,18 +401,18 @@ public class FieldSearchSortBaseIT<F> {
 	}
 
 	private SearchQuery<DocumentReference> matchAllQuery(
-			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?>> sortContributor) {
+			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?, ?>> sortContributor) {
 		return matchAllQuery( sortContributor, indexManager.createScope() );
 	}
 
 	private SearchQuery<DocumentReference> matchAllQuery(
-			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?>> sortContributor, StubMappingScope scope) {
+			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?, ?>> sortContributor, StubMappingScope scope) {
 		return query( f -> f.matchAll(), sortContributor, scope );
 	}
 
 	private SearchQuery<DocumentReference> query(
 			Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> predicateContributor,
-			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?>> sortContributor,
+			Function<? super SearchSortFactory, ? extends FieldSortOptionsStep<?, ?>> sortContributor,
 			StubMappingScope scope) {
 		return scope.query()
 				.where( predicateContributor )
@@ -420,7 +420,7 @@ public class FieldSearchSortBaseIT<F> {
 				.toQuery();
 	}
 
-	private FieldSortOptionsStep<?> applySortMode(FieldSortOptionsStep<?> optionsStep) {
+	private FieldSortOptionsStep<?, ?> applySortMode(FieldSortOptionsStep<?, ?> optionsStep) {
 		if ( sortMode != null ) {
 			return optionsStep.mode( sortMode );
 		}

@@ -15,10 +15,11 @@ import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
  * The initial and final step in a "field" sort definition, where optional parameters can be set.
  *
  * @param <S> The "self" type (the actual exposed type of this step).
+ * @param <PDF> The type of factory used to create predicates in {@link #filter(Function)}.
  *
  * @author Emmanuel Bernard emmanuel@hibernate.org
  */
-public interface FieldSortOptionsStep<S extends FieldSortOptionsStep<?>>
+public interface FieldSortOptionsStep<S extends FieldSortOptionsStep<?, PDF>, PDF extends SearchPredicateFactory>
 		extends SortFinalStep, SortThenStep, SortOrderStep<S>, SortModeStep<S> {
 
 	/**
@@ -47,7 +48,7 @@ public interface FieldSortOptionsStep<S extends FieldSortOptionsStep<?>>
 	 * Should generally be a lambda expression.
 	 * @return {@code this}, for method chaining.
 	 */
-	S filter(Function<? super SearchPredicateFactory, ? extends PredicateFinalStep> clauseContributor);
+	S filter(Function<? super PDF, ? extends PredicateFinalStep> clauseContributor);
 
 	/**
 	 * Add a <a href="#filter">"filter" clause</a> based on an almost-built {@link SearchPredicate}.

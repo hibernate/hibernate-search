@@ -22,12 +22,12 @@ final class SearchSortFactoryExtensionStep<B>
 		implements SearchSortFactoryExtensionIfSupportedMoreStep {
 
 	private final SearchSortFactory parent;
-	private final SearchSortDslContext<?, B> dslContext;
+	private final SearchSortDslContext<?, B, ?> dslContext;
 
 	private final DslExtensionState<SortFinalStep> state = new DslExtensionState<>();
 
 	SearchSortFactoryExtensionStep(SearchSortFactory parent,
-			SearchSortDslContext<?, B> dslContext) {
+			SearchSortDslContext<?, B, ?> dslContext) {
 		this.parent = parent;
 		this.dslContext = dslContext;
 	}

@@ -38,6 +38,6 @@ public interface SearchSortFactoryExtension<T> {
 	 * @return An optional containing the extended sort factory ({@link T}) in case
 	 * of success, or an empty optional otherwise.
 	 */
-	Optional<T> extendOptional(SearchSortFactory original, SearchSortDslContext<?, ?> dslContext);
+	Optional<T> extendOptional(SearchSortFactory original, SearchSortDslContext<?, ?, ?> dslContext);
 
 }

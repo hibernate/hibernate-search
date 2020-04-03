@@ -9,6 +9,7 @@ package org.hibernate.search.engine.search.sort.dsl.impl;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.common.dsl.spi.DslExtensionState;
+import org.hibernate.search.engine.search.predicate.dsl.SearchPredicateFactory;
 import org.hibernate.search.engine.search.sort.dsl.CompositeSortComponentsStep;
 import org.hibernate.search.engine.search.sort.dsl.DistanceSortOptionsStep;
 import org.hibernate.search.engine.search.sort.dsl.FieldSortOptionsStep;
@@ -24,9 +25,9 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 
 public class DefaultSearchSortFactory<B> implements SearchSortFactory {
 
-	private final SearchSortDslContext<?, B> dslContext;
+	private final SearchSortDslContext<?, B, ?> dslContext;
 
-	public DefaultSearchSortFactory(SearchSortDslContext<?, B> dslContext) {
+	public DefaultSearchSortFactory(SearchSortDslContext<?, B, ?> dslContext) {
 		this.dslContext = dslContext;
 	}
 
@@ -41,7 +42,7 @@ public class DefaultSearchSortFactory<B> implements SearchSortFactory {
 	}
 
 	@Override
-	public FieldSortOptionsStep<?> field(String absoluteFieldPath) {
+	public FieldSortOptionsStep<?, ? extends SearchPredicateFactory> field(String absoluteFieldPath) {
 		return new FieldSortOptionsStepImpl<>( dslContext, absoluteFieldPath );
 	}
 
