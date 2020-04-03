@@ -14,9 +14,9 @@ import org.apache.lucene.util.Version;
 import org.hibernate.boot.registry.selector.spi.StrategyCreator;
 import org.hibernate.boot.registry.selector.spi.StrategySelector;
 import org.hibernate.search.backend.lucene.cache.spi.QueryCacheProvider;
+import org.hibernate.search.backend.lucene.cfg.LuceneBackendSettings;
 import org.hibernate.search.engine.backend.spi.BackendBuildContext;
 import org.hibernate.search.engine.cfg.spi.ConfigurationPropertySource;
-import org.hibernate.search.mapper.orm.cfg.HibernateOrmMapperSettings;
 import org.hibernate.search.mapper.orm.logging.impl.Log;
 import org.hibernate.search.util.common.logging.impl.LoggerFactory;
 import org.hibernate.service.spi.ServiceException;
@@ -28,7 +28,7 @@ public class HibernateOrmQueryCacheProvider implements QueryCacheProvider {
 	public QueryCache getQueryCache(BackendBuildContext context, ConfigurationPropertySource properties, Version luceneVersion) {
 		StrategySelector selector = context.getServiceResolver().loadJmxService( StrategySelector.class );
 
-		Object setting = properties.get( HibernateOrmMapperSettings.QUERY_CACHING_POLICY_CLASS ).orElse( null );
+		Object setting = properties.get( LuceneBackendSettings.QUERY_CACHING_POLICY_CLASS ).orElse( null );
 		if ( setting == null ) {
 			return null;
 		}

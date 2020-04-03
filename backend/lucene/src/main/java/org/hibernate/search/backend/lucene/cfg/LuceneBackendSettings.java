@@ -141,6 +141,30 @@ public final class LuceneBackendSettings {
 	public static final String QUERY_CACHING_POLICY_PROVIDER = "cache.query_caching_policy_provider";
 
 	/**
+	 * The query cache alias to use.
+	 * <p>
+	 * Expects a reference to a bean of type {@link QueryCache}.
+	 * <p>
+	 * Defaults to no value.
+	 *
+	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
+	 * which includes a description of the "bean reference" properties and accepted values.
+	 */
+	public static final String QUERY_CACHE_CLASS = "cache.query_cache_class";
+
+	/**
+	 * The query caching policy alias to use.
+	 * <p>
+	 * Expects a reference to a bean of type {@link QueryCachingPolicy}.
+	 * <p>
+	 * Defaults to no value.
+	 *
+	 * @see org.hibernate.search.engine.cfg The core documentation of configuration properties,
+	 * which includes a description of the "bean reference" properties and accepted values.
+	 */
+	public static final String QUERY_CACHING_POLICY_CLASS = "cache.query_caching_policy_class";
+
+	/**
 	 * The size of the thread pool assigned to the backend.
 	 * <p>
 	 * Expects a strictly positive integer value,
