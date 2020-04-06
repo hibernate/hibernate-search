@@ -9,7 +9,7 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSearchPredicateBuilder;
+import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSingleFieldPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
@@ -19,10 +19,14 @@ import org.apache.lucene.search.BooleanClause;
 import org.apache.lucene.search.BooleanQuery;
 import org.apache.lucene.search.Query;
 
-public class LuceneExistsCompositePredicateBuilder extends AbstractLuceneSearchPredicateBuilder
+public class LuceneExistsCompositePredicateBuilder extends AbstractLuceneSingleFieldPredicateBuilder
 		implements ExistsPredicateBuilder<LuceneSearchPredicateBuilder> {
 
 	private final List<LuceneSearchPredicateBuilder> children = new ArrayList<>();
+
+	public LuceneExistsCompositePredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
+		super( absoluteFieldPath, nestedPathHierarchy );
+	}
 
 	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {

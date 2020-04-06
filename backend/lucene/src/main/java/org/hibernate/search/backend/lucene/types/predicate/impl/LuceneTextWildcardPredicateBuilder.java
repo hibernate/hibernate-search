@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import java.util.List;
 
-import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSearchNestedPredicateBuilder;
+import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSingleFieldPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.types.predicate.parse.impl.LuceneWildcardExpressionHelper;
@@ -20,18 +20,15 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.WildcardQuery;
 import org.apache.lucene.util.BytesRef;
 
-class LuceneTextWildcardPredicateBuilder extends AbstractLuceneSearchNestedPredicateBuilder
+class LuceneTextWildcardPredicateBuilder extends AbstractLuceneSingleFieldPredicateBuilder
 		implements WildcardPredicateBuilder<LuceneSearchPredicateBuilder> {
-
-	protected final String absoluteFieldPath;
 
 	private final Analyzer analyzerOrNormalizer;
 
 	private String pattern;
 
 	LuceneTextWildcardPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy, Analyzer analyzerOrNormalizer) {
-		super( nestedPathHierarchy );
-		this.absoluteFieldPath = absoluteFieldPath;
+		super( absoluteFieldPath, nestedPathHierarchy );
 		this.analyzerOrNormalizer = analyzerOrNormalizer;
 	}
 

@@ -6,6 +6,8 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
+import java.util.List;
+
 import org.hibernate.search.backend.lucene.lowlevel.query.impl.Queries;
 import org.hibernate.search.engine.search.predicate.spi.NestedPredicateBuilder;
 
@@ -16,19 +18,22 @@ import org.apache.lucene.search.join.QueryBitSetProducer;
 import org.apache.lucene.search.join.ScoreMode;
 import org.apache.lucene.search.join.ToParentBlockJoinQuery;
 
-class LuceneNestedPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
+class LuceneNestedPredicateBuilder extends AbstractLuceneSingleFieldPredicateBuilder
 		implements NestedPredicateBuilder<LuceneSearchPredicateBuilder> {
-
-	private final String absoluteFieldPath;
 
 	private LuceneSearchPredicateBuilder nestedBuilder;
 
-	LuceneNestedPredicateBuilder(String absoluteFieldPath) {
-		this.absoluteFieldPath = absoluteFieldPath;
+	LuceneNestedPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
+		super(
+				absoluteFieldPath,
+				// The given list includes absoluteFieldPath at the end, but here we don't want it to be included.
+				nestedPathHierarchy.subList( 0, nestedPathHierarchy.size() - 1 )
+		);
 	}
 
 	@Override
 	public void nested(LuceneSearchPredicateBuilder nestedBuilder) {
+		nestedBuilder.checkNestableWithin( absoluteFieldPath );
 		this.nestedBuilder = nestedBuilder;
 	}
 

@@ -54,6 +54,11 @@ public class LuceneMatchIdPredicateBuilder extends AbstractLuceneSearchPredicate
 	}
 
 	@Override
+	public void checkNestableWithin(String expectedParentNestedPath) {
+		// Nothing to do
+	}
+
+	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
 		Builder builder = new BooleanQuery.Builder();
 		for ( String value : values ) {

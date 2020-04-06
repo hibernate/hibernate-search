@@ -13,7 +13,7 @@ import org.hibernate.search.backend.lucene.analysis.model.impl.LuceneAnalysisDef
 import org.hibernate.search.backend.lucene.logging.impl.Log;
 import org.hibernate.search.backend.lucene.scope.model.impl.LuceneCompatibilityChecker;
 import org.hibernate.search.backend.lucene.search.impl.LuceneSearchContext;
-import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSearchNestedPredicateBuilder;
+import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSingleFieldPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneTextFieldCodec;
@@ -29,12 +29,11 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.TermQuery;
 import org.apache.lucene.util.QueryBuilder;
 
-class LuceneTextPhrasePredicateBuilder extends AbstractLuceneSearchNestedPredicateBuilder
+class LuceneTextPhrasePredicateBuilder extends AbstractLuceneSingleFieldPredicateBuilder
 		implements PhrasePredicateBuilder<LuceneSearchPredicateBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
 
-	protected final String absoluteFieldPath;
 	protected final LuceneTextFieldCodec<?> codec;
 
 	private final LuceneCompatibilityChecker analyzerChecker;
@@ -50,8 +49,7 @@ class LuceneTextPhrasePredicateBuilder extends AbstractLuceneSearchNestedPredica
 			LuceneSearchContext searchContext, String absoluteFieldPath, List<String> nestedPathHierarchy,
 			LuceneTextFieldCodec<?> codec,
 			Analyzer analyzerOrNormalizer, LuceneCompatibilityChecker analyzerChecker) {
-		super( nestedPathHierarchy );
-		this.absoluteFieldPath = absoluteFieldPath;
+		super( absoluteFieldPath, nestedPathHierarchy );
 		this.codec = codec;
 		this.analyzer = analyzerOrNormalizer;
 		this.analyzerChecker = analyzerChecker;

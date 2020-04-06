@@ -643,12 +643,14 @@ public interface Log extends BasicLogger {
 	SearchException uncommittedOperationsBecauseOfFailure(String causeMessage,
 			@Param EventContext context, @Cause Throwable cause);
 
-	@Message(id = ID_OFFSET_2 + 119,
-			value = "Unable to create nested sort filter for name '%1$s'.")
-	SearchException unableToCreateNestedSortFilter(String name);
-
 	@Message(id = ID_OFFSET_2 + 120,
 			value = "Field '%1$s' is not contained in a nested object."
-					+ "Sort filters are only available if the field to sort on is contained in a nested objects.")
+					+ " Sort filters are only available if the field to sort on is contained in a nested objects.")
 	SearchException cannotFilterSortOnRootDocumentField(String absoluteFieldPath, @Param EventContext context);
+
+	@Message(id = ID_OFFSET_2 + 121,
+			value = "Predicate targets unexpected fields %2$s."
+					+ " Only fields that are contained in the nested object with path '%1$s'"
+					+ " are allowed here.")
+	SearchException invalidNestedObjectPathForPredicate(String nestedObjectPath, List<String> fieldPaths);
 }

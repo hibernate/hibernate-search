@@ -16,6 +16,11 @@ class LuceneMatchAllPredicateBuilder extends AbstractLuceneSearchPredicateBuilde
 		implements MatchAllPredicateBuilder<LuceneSearchPredicateBuilder> {
 
 	@Override
+	public void checkNestableWithin(String expectedParentNestedPath) {
+		// Nothing to do
+	}
+
+	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
 		return new MatchAllDocsQuery();
 	}
