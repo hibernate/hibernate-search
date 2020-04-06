@@ -10,6 +10,8 @@ import org.apache.lucene.search.Query;
 
 public interface LuceneSearchPredicateBuilder {
 
+	void checkNestableWithin(String expectedParentNestedPath);
+
 	Query build(LuceneSearchPredicateContext context);
 
 }

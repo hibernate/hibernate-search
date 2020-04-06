@@ -30,7 +30,7 @@ public abstract class AbstractLuceneDocumentValueSortBuilder
 	protected final String absoluteFieldPath;
 	protected final String nestedDocumentPath;
 	private SortMode mode;
-	private SearchPredicate filter;
+	private LuceneSearchPredicateBuilder filterBuilder;
 
 	protected AbstractLuceneDocumentValueSortBuilder(String absoluteFieldPath, String nestedDocumentPath) {
 		this.absoluteFieldPath = absoluteFieldPath;
@@ -48,7 +48,9 @@ public abstract class AbstractLuceneDocumentValueSortBuilder
 		if ( nestedDocumentPath == null ) {
 			throw log.cannotFilterSortOnRootDocumentField( absoluteFieldPath, getEventContext() );
 		}
-		this.filter = filter;
+		LuceneSearchPredicateBuilder builder = (LuceneSearchPredicateBuilder) filter;
+		builder.checkNestableWithin( nestedDocumentPath );
+		this.filterBuilder = builder;
 	}
 
 	protected final MultiValueMode getMultiValueMode() {
@@ -81,20 +83,12 @@ public abstract class AbstractLuceneDocumentValueSortBuilder
 	}
 
 	protected Query getLuceneFilter() {
-		if ( filter == null ) {
+		if ( filterBuilder == null ) {
 			return null;
 		}
 
-		Query luceneFilter = null;
-		if ( filter instanceof LuceneSearchPredicateBuilder ) {
-			LuceneSearchPredicateContext filterContext = new LuceneSearchPredicateContext( nestedDocumentPath );
-			luceneFilter = ((LuceneSearchPredicateBuilder) filter).build( filterContext );
-		}
-		else {
-			throw log.unableToCreateNestedSortFilter( nestedDocumentPath );
-		}
-
-		return luceneFilter;
+		LuceneSearchPredicateContext filterContext = new LuceneSearchPredicateContext( nestedDocumentPath );
+		return filterBuilder.build( filterContext );
 	}
 
 	protected final EventContext getEventContext() {

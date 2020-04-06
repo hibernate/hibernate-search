@@ -20,10 +20,12 @@ import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 
 public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPredicateBuilderFactory {
 
-	private final Map<String, LuceneFieldPredicateBuilderFactory> leafFields = new HashMap<>();
+	private final String absoluteFieldPath;
 	private final List<String> nestedPathHierarchy;
+	private final Map<String, LuceneFieldPredicateBuilderFactory> leafFields = new HashMap<>();
 
 	public LuceneObjectPredicateBuilderFactoryImpl(LuceneIndexModel indexModel, LuceneIndexSchemaObjectNode objectNode) {
+		absoluteFieldPath = objectNode.getAbsolutePath();
 		nestedPathHierarchy = objectNode.getNestedPathHierarchy();
 		addLeafFields( indexModel, objectNode );
 	}
@@ -35,13 +37,13 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 		}
 
 		LuceneObjectPredicateBuilderFactoryImpl casted = (LuceneObjectPredicateBuilderFactoryImpl) other;
-		Set<String> absoluteFieldPaths = leafFields.keySet();
-		if ( !absoluteFieldPaths.equals( casted.leafFields.keySet() ) ) {
+		Set<String> leafFieldPaths = leafFields.keySet();
+		if ( !leafFieldPaths.equals( casted.leafFields.keySet() ) ) {
 			return false;
 		}
 
-		for ( String absoluteFieldPath : absoluteFieldPaths ) {
-			if ( !leafFields.get( absoluteFieldPath ).hasCompatibleCodec( casted.leafFields.get( absoluteFieldPath ) ) ) {
+		for ( String leafFieldPath : leafFieldPaths ) {
+			if ( !leafFields.get( leafFieldPath ).hasCompatibleCodec( casted.leafFields.get( leafFieldPath ) ) ) {
 				return false;
 			}
 		}
@@ -50,7 +52,9 @@ public class LuceneObjectPredicateBuilderFactoryImpl implements LuceneObjectPred
 
 	@Override
 	public ExistsPredicateBuilder<LuceneSearchPredicateBuilder> createExistsPredicateBuilder() {
-		LuceneExistsCompositePredicateBuilder objectPredicateBuilder = new LuceneExistsCompositePredicateBuilder();
+		LuceneExistsCompositePredicateBuilder objectPredicateBuilder = new LuceneExistsCompositePredicateBuilder(
+				absoluteFieldPath, nestedPathHierarchy
+		);
 		for ( Map.Entry<String, LuceneFieldPredicateBuilderFactory> entry : leafFields.entrySet() ) {
 			ExistsPredicateBuilder<LuceneSearchPredicateBuilder> existsPredicateBuilder = entry.getValue().createExistsPredicateBuilder( entry.getKey(), nestedPathHierarchy );
 			objectPredicateBuilder.addChild( existsPredicateBuilder );

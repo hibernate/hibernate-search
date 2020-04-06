@@ -12,16 +12,14 @@ import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPred
 import org.hibernate.search.engine.spatial.GeoPolygon;
 
 
-public abstract class AbstractLuceneSpatialWithinPolygonPredicateBuilder extends AbstractLuceneSearchNestedPredicateBuilder
+public abstract class AbstractLuceneSpatialWithinPolygonPredicateBuilder
+		extends AbstractLuceneSingleFieldPredicateBuilder
 		implements SpatialWithinPolygonPredicateBuilder<LuceneSearchPredicateBuilder> {
-
-	protected final String absoluteFieldPath;
 
 	protected GeoPolygon polygon;
 
 	protected AbstractLuceneSpatialWithinPolygonPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		super( nestedPathHierarchy );
-		this.absoluteFieldPath = absoluteFieldPath;
+		super( absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override

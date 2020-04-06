@@ -13,18 +13,16 @@ import org.hibernate.search.engine.spatial.DistanceUnit;
 import org.hibernate.search.engine.spatial.GeoPoint;
 
 
-public abstract class AbstractLuceneSpatialWithinCirclePredicateBuilder extends AbstractLuceneSearchNestedPredicateBuilder
+public abstract class AbstractLuceneSpatialWithinCirclePredicateBuilder
+		extends AbstractLuceneSingleFieldPredicateBuilder
 		implements SpatialWithinCirclePredicateBuilder<LuceneSearchPredicateBuilder> {
-
-	protected final String absoluteFieldPath;
 
 	protected GeoPoint center;
 
 	protected double radiusInMeters;
 
 	protected AbstractLuceneSpatialWithinCirclePredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		super( nestedPathHierarchy );
-		this.absoluteFieldPath = absoluteFieldPath;
+		super( absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override

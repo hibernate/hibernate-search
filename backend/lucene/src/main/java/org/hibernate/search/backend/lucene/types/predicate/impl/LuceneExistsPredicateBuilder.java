@@ -8,7 +8,7 @@ package org.hibernate.search.backend.lucene.types.predicate.impl;
 
 import java.util.List;
 
-import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSearchNestedPredicateBuilder;
+import org.hibernate.search.backend.lucene.search.predicate.impl.AbstractLuceneSingleFieldPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateBuilder;
 import org.hibernate.search.backend.lucene.search.predicate.impl.LuceneSearchPredicateContext;
 import org.hibernate.search.backend.lucene.types.codec.impl.LuceneFieldCodec;
@@ -16,15 +16,13 @@ import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 
 import org.apache.lucene.search.Query;
 
-public class LuceneExistsPredicateBuilder extends AbstractLuceneSearchNestedPredicateBuilder
+public class LuceneExistsPredicateBuilder extends AbstractLuceneSingleFieldPredicateBuilder
 		implements ExistsPredicateBuilder<LuceneSearchPredicateBuilder> {
 
-	private final String absoluteFieldPath;
 	private final LuceneFieldCodec<?> codec;
 
 	LuceneExistsPredicateBuilder(String absoluteFieldPath, LuceneFieldCodec<?> codec, List<String> nestedPathHierarchy) {
-		super( nestedPathHierarchy );
-		this.absoluteFieldPath = absoluteFieldPath;
+		super( absoluteFieldPath, nestedPathHierarchy );
 		this.codec = codec;
 		// Score is always constant for this query
 		constantScore();

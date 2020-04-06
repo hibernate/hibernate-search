@@ -7,8 +7,10 @@
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,7 +37,7 @@ import org.apache.lucene.queryparser.simple.SimpleQueryParser;
 import org.apache.lucene.search.BooleanClause.Occur;
 import org.apache.lucene.search.Query;
 
-public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearchPredicateBuilder
+public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneNestablePredicateBuilder
 		implements SimpleQueryStringPredicateBuilder<LuceneSearchPredicateBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -169,12 +171,16 @@ public class LuceneSimpleQueryStringPredicateBuilder extends AbstractLuceneSearc
 		queryParser.setDefaultOperator( defaultOperator );
 
 		return queryParser.parse( simpleQueryString );
-
 	}
 
 	@Override
-	public Query build(LuceneSearchPredicateContext context) {
-		return applyImplicitNestedSteps( nestedCompatibilityChecker.getNestedPathHierarchy(), context, super.build( context ) );
+	protected List<String> getNestedPathHierarchy() {
+		return nestedCompatibilityChecker.getNestedPathHierarchy();
+	}
+
+	@Override
+	protected List<String> getFieldPathsForErrorMessage() {
+		return new ArrayList<>( fields.keySet() );
 	}
 
 	private Analyzer buildAnalyzer() {

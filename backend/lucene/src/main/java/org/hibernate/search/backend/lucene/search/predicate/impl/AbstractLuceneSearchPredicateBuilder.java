@@ -6,8 +6,6 @@
  */
 package org.hibernate.search.backend.lucene.search.predicate.impl;
 
-import java.util.List;
-
 import org.hibernate.search.engine.search.predicate.spi.SearchPredicateBuilder;
 
 import org.apache.lucene.search.BoostQuery;
@@ -54,22 +52,4 @@ public abstract class AbstractLuceneSearchPredicateBuilder implements SearchPred
 
 	protected abstract Query doBuild(LuceneSearchPredicateContext context);
 
-	protected Query applyImplicitNestedSteps(List<String> nestedPathHierarchy, LuceneSearchPredicateContext context, Query baseQuery) {
-		Query result = baseQuery;
-
-		// traversing the furtherImplicitNestedSteps in the inverted order
-		for ( int i = 0; i < nestedPathHierarchy.size(); i++ ) {
-			int index = nestedPathHierarchy.size() - 1 - i;
-			String path = nestedPathHierarchy.get( index );
-			if ( path.equals( context.getNestedPath() ) ) {
-				// the upper levels have been handled by the explicit predicate/s
-				break;
-			}
-
-			LuceneSearchPredicateContext childContext = ( index == 0 ) ? context : new LuceneSearchPredicateContext( nestedPathHierarchy.get( index - 1 ) );
-			result = LuceneNestedPredicateBuilder.doBuild( childContext, path, result );
-		}
-
-		return result;
-	}
 }
