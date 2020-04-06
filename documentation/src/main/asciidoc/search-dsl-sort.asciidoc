@@ -239,8 +239,7 @@ include::{sourcedir}/org/hibernate/search/documentation/search/sort/SortDslIT.ja
 // Search 5 anchors backward compatibility
 [[_handling_missing_values]]
 
-Documents that do not have any value for a sort field will be assigned a default value
-depending on the sort and field type (`0`, an empty string, ...).
+Documents that do not have any value for a sort field will appear in the last position by default.
 
 The behavior for missing values can be controlled explicitly through the `.missing()` option:
 

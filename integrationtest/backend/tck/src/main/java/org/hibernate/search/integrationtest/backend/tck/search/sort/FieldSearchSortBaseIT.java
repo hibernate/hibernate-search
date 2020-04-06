@@ -219,7 +219,8 @@ public class FieldSearchSortBaseIT<F> {
 	}
 
 	@Test
-	public void missingValue() {
+	@TestForIssue(jiraKey = "HSEARCH-3886")
+	public void missingValue_default() {
 		assumeTestParametersWork();
 
 		SearchQuery<DocumentReference> query;
@@ -227,10 +228,29 @@ public class FieldSearchSortBaseIT<F> {
 		String fieldPathForAscendingOrderTests = getFieldPath( SortOrder.ASC );
 		String fieldPathForDescendingOrderTests = getFieldPath( SortOrder.DESC );
 
-		// Default order
-		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPathForAscendingOrderTests ).missing().last() );
+		// Default for missing values is last, regardless of the order
+
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPathForAscendingOrderTests ) );
 		assertThat( query )
 				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1 );
+
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPathForAscendingOrderTests ).asc() );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY_1 );
+
+		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPathForDescendingOrderTests ).desc() );
+		assertThat( query )
+				.hasDocRefHitsExactOrder( INDEX_NAME, DOCUMENT_3, DOCUMENT_2, DOCUMENT_1, EMPTY_1 );
+	}
+
+	@Test
+	public void missingValue_explicit() {
+		assumeTestParametersWork();
+
+		SearchQuery<DocumentReference> query;
+
+		String fieldPathForAscendingOrderTests = getFieldPath( SortOrder.ASC );
+		String fieldPathForDescendingOrderTests = getFieldPath( SortOrder.DESC );
 
 		// Explicit order with missing().last()
 		query = matchNonEmptyAndEmpty1Query( f -> f.field( fieldPathForAscendingOrderTests ).asc().missing().last() );
@@ -269,7 +289,7 @@ public class FieldSearchSortBaseIT<F> {
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-3254")
-	public void missingValue_multipleEmpty() {
+	public void missingValue_explicit_multipleEmpty() {
 		assumeTestParametersWork();
 
 		List<DocumentReference> docRefHits;
