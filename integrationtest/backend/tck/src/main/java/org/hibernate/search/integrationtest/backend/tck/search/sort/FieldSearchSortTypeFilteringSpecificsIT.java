@@ -98,6 +98,41 @@ public class FieldSearchSortTypeFilteringSpecificsIT<F> {
 				);
 	}
 
+	@Test
+	public void invalidNestedPath_parent() {
+		String fieldPath = indexMapping.nestedObject1.relativeFieldName + "."
+				+ indexMapping.nestedObject1.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
+		String fieldInParentPath = indexMapping.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
+
+		assertThatThrownBy(
+				() -> matchAllQuery( f -> f.field( fieldPath ).filter( pf -> pf.exists().field( fieldInParentPath ) ) )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Predicate targets unexpected fields [" + fieldInParentPath + "]",
+						"Only fields that are contained in the nested object with path '" + indexMapping.nestedObject1.relativeFieldName + "'"
+								+ " are allowed here."
+				);
+	}
+
+	@Test
+	public void invalidNestedPath_sibling() {
+		String fieldPath = indexMapping.nestedObject1.relativeFieldName + "."
+				+ indexMapping.nestedObject1.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
+		String fieldInSiblingPath = indexMapping.nestedObject2.relativeFieldName + "."
+				+ indexMapping.nestedObject2.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
+
+		assertThatThrownBy(
+				() -> matchAllQuery( f -> f.field( fieldPath ).filter( pf -> pf.exists().field( fieldInSiblingPath ) ) )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Predicate targets unexpected fields [" + fieldInSiblingPath + "]",
+						"Only fields that are contained in the nested object with path '" + indexMapping.nestedObject1.relativeFieldName + "'"
+								+ " are allowed here."
+				);
+	}
+
 	private SearchQuery<DocumentReference> matchAllQuery(
 			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
 		return matchAllQuery( sortContributor, indexManager.createScope() );
@@ -122,12 +157,18 @@ public class FieldSearchSortTypeFilteringSpecificsIT<F> {
 
 	private static class IndexMapping extends AbstractObjectMapping {
 		final FirstLevelObjectMapping flattenedObject;
+		final FirstLevelObjectMapping nestedObject1;
+		final FirstLevelObjectMapping nestedObject2;
 
 		IndexMapping(IndexSchemaElement root) {
 			super( root );
 
 			flattenedObject = FirstLevelObjectMapping.create( root, "flattenedObject",
 					ObjectFieldStorage.FLATTENED );
+			nestedObject1 = FirstLevelObjectMapping.create( root, "nestedObject1",
+					ObjectFieldStorage.NESTED );
+			nestedObject2 = FirstLevelObjectMapping.create( root, "nestedObject2",
+					ObjectFieldStorage.NESTED );
 		}
 	}
 

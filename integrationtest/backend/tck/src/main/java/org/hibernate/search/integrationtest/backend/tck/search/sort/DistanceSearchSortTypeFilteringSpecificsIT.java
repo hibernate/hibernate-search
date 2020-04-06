@@ -71,6 +71,40 @@ public class DistanceSearchSortTypeFilteringSpecificsIT {
 				);
 	}
 
+	@Test
+	public void invalidNestedPath_parent() {
+		String fieldPath = indexMapping.nestedObject1.relativeFieldName + ".geoPoint";
+		String fieldInParentPath = "geoPoint";
+
+		assertThatThrownBy(
+				() -> matchAllQuery( f -> f.distance( fieldPath, GeoPoint.of( 42.0, 42.0 ) )
+						.filter( pf -> pf.exists().field( fieldInParentPath ) ) )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Predicate targets unexpected fields [" + fieldInParentPath + "]",
+						"Only fields that are contained in the nested object with path '" + indexMapping.nestedObject1.relativeFieldName + "'"
+								+ " are allowed here."
+				);
+	}
+
+	@Test
+	public void invalidNestedPath_sibling() {
+		String fieldPath = indexMapping.nestedObject1.relativeFieldName + ".geoPoint";
+		String fieldInSiblingPath = indexMapping.nestedObject2.relativeFieldName + ".geoPoint";
+
+		assertThatThrownBy(
+				() -> matchAllQuery( f -> f.distance( fieldPath, GeoPoint.of( 42.0, 42.0 ) )
+						.filter( pf -> pf.exists().field( fieldInSiblingPath ) ) )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Predicate targets unexpected fields [" + fieldInSiblingPath + "]",
+						"Only fields that are contained in the nested object with path '" + indexMapping.nestedObject1.relativeFieldName + "'"
+								+ " are allowed here."
+				);
+	}
+
 	private SearchQuery<DocumentReference> matchAllQuery(
 			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
 		return matchAllQuery( sortContributor, indexManager.createScope() );
@@ -95,12 +129,18 @@ public class DistanceSearchSortTypeFilteringSpecificsIT {
 
 	private static class IndexMapping extends AbstractObjectMapping {
 		final FirstLevelObjectMapping flattenedObject;
+		final FirstLevelObjectMapping nestedObject1;
+		final FirstLevelObjectMapping nestedObject2;
 
 		IndexMapping(IndexSchemaElement root) {
 			super( root );
 
 			flattenedObject = FirstLevelObjectMapping.create( root, "flattenedObject",
 					ObjectFieldStorage.FLATTENED );
+			nestedObject1 = FirstLevelObjectMapping.create( root, "nestedObject1",
+					ObjectFieldStorage.NESTED );
+			nestedObject2 = FirstLevelObjectMapping.create( root, "nestedObject2",
+					ObjectFieldStorage.NESTED );
 		}
 	}
 
