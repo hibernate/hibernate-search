@@ -51,6 +51,7 @@ class NestedPredicateFieldStepImpl<B>
 			throw log.cannotAddMultiplePredicatesToNestedPredicate();
 		}
 		this.childPredicateBuilder = builderFactory.toImplementation( searchPredicate );
+		builder.nested( childPredicateBuilder );
 		return this;
 	}
 
@@ -62,7 +63,6 @@ class NestedPredicateFieldStepImpl<B>
 
 	@Override
 	protected B toImplementation() {
-		builder.nested( childPredicateBuilder );
 		return builder.toImplementation();
 	}
 
