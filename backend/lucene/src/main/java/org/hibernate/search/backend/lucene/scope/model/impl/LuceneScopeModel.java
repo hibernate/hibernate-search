@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.lucene.scope.model.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
@@ -250,7 +251,7 @@ public class LuceneScopeModel {
 				} )
 				.orElse( Optional.empty() );
 
-		return nestedDocumentPath.orElse( null );
+		return nestedDocumentPath.orElse( Collections.emptyList() );
 	}
 
 	public List<String> getNestedPathHierarchyForObject(String absoluteFieldPath) {
@@ -268,6 +269,6 @@ public class LuceneScopeModel {
 				} )
 				.orElse( Optional.empty() );
 
-		return nestedDocumentPath.orElse( null );
+		return nestedDocumentPath.orElse( Collections.emptyList() );
 	}
 }

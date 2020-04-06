@@ -26,7 +26,7 @@ public abstract class AbstractElasticsearchSearchNestedPredicateBuilder extends 
 	@Override
 	public final JsonObject build(ElasticsearchSearchPredicateContext context) {
 		JsonObject result = super.build( context );
-		if ( nestedPathHierarchy != null && !nestedPathHierarchy.isEmpty() ) {
+		if ( !nestedPathHierarchy.isEmpty() ) {
 			result = applyImplicitNested( result, nestedPathHierarchy, context );
 		}
 		return result;

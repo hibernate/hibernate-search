@@ -7,6 +7,7 @@
 package org.hibernate.search.backend.elasticsearch.scope.model.impl;
 
 import java.lang.invoke.MethodHandles;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -220,7 +221,7 @@ public class ElasticsearchScopeModel {
 				} )
 				.orElse( Optional.empty() );
 
-		return nestedDocumentPath.orElse( null );
+		return nestedDocumentPath.orElse( Collections.emptyList() );
 	}
 
 	public List<String> getNestedPathHierarchyForObject(String absoluteObjectPath) {
@@ -238,6 +239,6 @@ public class ElasticsearchScopeModel {
 				} )
 				.orElse( Optional.empty() );
 
-		return nestedDocumentPath.orElse( null );
+		return nestedDocumentPath.orElse( Collections.emptyList() );
 	}
 }
