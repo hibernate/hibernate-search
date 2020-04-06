@@ -179,7 +179,8 @@ public class ElasticsearchSearchPredicateBuilderFactoryImpl implements Elasticse
 	@Override
 	public NestedPredicateBuilder<ElasticsearchSearchPredicateBuilder> nested(String absoluteFieldPath) {
 		scopeModel.checkNestedField( absoluteFieldPath );
-		return new ElasticsearchNestedPredicateBuilder( absoluteFieldPath );
+		List<String> nestedPathHierarchy = scopeModel.getNestedPathHierarchyForObject( absoluteFieldPath );
+		return new ElasticsearchNestedPredicateBuilder( absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override

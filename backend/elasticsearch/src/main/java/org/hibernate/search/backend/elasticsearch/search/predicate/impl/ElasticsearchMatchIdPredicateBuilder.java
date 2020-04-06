@@ -75,6 +75,11 @@ public class ElasticsearchMatchIdPredicateBuilder extends AbstractElasticsearchS
 	}
 
 	@Override
+	public void checkNestableWithin(String expectedParentNestedPath) {
+		// Nothing to do
+	}
+
+	@Override
 	protected JsonObject doBuild(ElasticsearchSearchPredicateContext context,
 			JsonObject outerObject, JsonObject innerObject) {
 		JsonArray array = convert( values, context.getTenantId() );

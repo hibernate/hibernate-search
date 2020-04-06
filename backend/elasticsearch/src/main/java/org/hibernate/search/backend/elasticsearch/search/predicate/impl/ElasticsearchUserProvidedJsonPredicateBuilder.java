@@ -18,6 +18,11 @@ class ElasticsearchUserProvidedJsonPredicateBuilder implements ElasticsearchSear
 	}
 
 	@Override
+	public void checkNestableWithin(String expectedParentNestedPath) {
+		// Nothing to do: we'll assume the user knows what they are doing.
+	}
+
+	@Override
 	public JsonObject build(
 			ElasticsearchSearchPredicateContext context) {
 		return json;

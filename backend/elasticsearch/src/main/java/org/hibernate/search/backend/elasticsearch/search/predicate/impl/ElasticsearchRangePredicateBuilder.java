@@ -28,7 +28,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 
-public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearchSearchNestedPredicateBuilder
+public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearchSingleFieldPredicateBuilder
 		implements RangePredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -42,7 +42,6 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 
 	private final ElasticsearchSearchContext searchContext;
 
-	private final String absoluteFieldPath;
 	private final DslConverter<?, ? extends F> converter;
 	private final DslConverter<F, ? extends F> rawConverter;
 	private final ElasticsearchCompatibilityChecker converterChecker;
@@ -55,9 +54,8 @@ public class ElasticsearchRangePredicateBuilder<F> extends AbstractElasticsearch
 			String absoluteFieldPath, List<String> nestedPathHierarchy,
 			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchFieldCodec<F> codec) {
-		super( nestedPathHierarchy );
+		super( absoluteFieldPath, nestedPathHierarchy );
 		this.searchContext = searchContext;
-		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;
 		this.rawConverter = rawConverter;
 		this.converterChecker = converterChecker;

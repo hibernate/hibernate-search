@@ -27,7 +27,7 @@ public class ElasticsearchSearchPredicateContext {
 		return sessionContext.getTenantIdentifier();
 	}
 
-	public ElasticsearchSearchPredicateContext explicitNested(String path) {
+	public ElasticsearchSearchPredicateContext withNestedPath(String path) {
 		return new ElasticsearchSearchPredicateContext( sessionContext, path );
 	}
 

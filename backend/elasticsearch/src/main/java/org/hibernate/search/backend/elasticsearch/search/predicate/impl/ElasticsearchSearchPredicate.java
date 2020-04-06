@@ -24,6 +24,11 @@ class ElasticsearchSearchPredicate
 	}
 
 	@Override
+	public void checkNestableWithin(String expectedParentNestedPath) {
+		delegate.checkNestableWithin( expectedParentNestedPath );
+	}
+
+	@Override
 	public JsonObject build(ElasticsearchSearchPredicateContext context) {
 		return delegate.build( context );
 	}

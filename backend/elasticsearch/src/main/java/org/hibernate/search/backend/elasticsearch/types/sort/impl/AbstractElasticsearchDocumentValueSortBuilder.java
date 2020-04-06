@@ -51,7 +51,7 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder extends AbstractEla
 	private final ElasticsearchSearchSyntax searchSyntax;
 
 	private JsonPrimitive mode;
-	private SearchPredicate filter;
+	private ElasticsearchSearchPredicateBuilder filterBuilder;
 
 	AbstractElasticsearchDocumentValueSortBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy,
 			ElasticsearchSearchSyntax searchSyntax) {
@@ -91,7 +91,9 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder extends AbstractEla
 		if ( nestedPathHierarchy.isEmpty() ) {
 			throw log.cannotFilterSortOnRootDocumentField( absoluteFieldPath, getEventContext() );
 		}
-		this.filter = filter;
+		ElasticsearchSearchPredicateBuilder builder = (ElasticsearchSearchPredicateBuilder) filter;
+		builder.checkNestableWithin( nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 ) );
+		this.filterBuilder = builder;
 	}
 
 	@Override
@@ -102,9 +104,9 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder extends AbstractEla
 				String lastNestedPath = nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 );
 
 				NESTED_PATH_ACCESSOR.set( innerObject, new JsonPrimitive( lastNestedPath ) );
-				if ( filter != null ) {
+				if ( filterBuilder != null ) {
 					ElasticsearchSearchPredicateContext filterContext = collector.getRootPredicateContext()
-							.explicitNested( lastNestedPath );
+							.withNestedPath( lastNestedPath );
 					JsonObject jsonFilter = getJsonFilter( filterContext );
 					NESTED_FILTER_ACCESSOR.set( innerObject, jsonFilter );
 				}
@@ -117,9 +119,9 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder extends AbstractEla
 					JsonObject nestedObject = new JsonObject();
 					PATH_ACCESSOR.set( nestedObject, new JsonPrimitive( nestedPath ) );
 					NESTED_ACCESSOR.set( nextNestedObjectTarget, nestedObject );
-					if ( i == (nestedPathHierarchy.size() - 1) && filter != null ) {
+					if ( i == (nestedPathHierarchy.size() - 1) && filterBuilder != null ) {
 						ElasticsearchSearchPredicateContext filterContext = collector.getRootPredicateContext()
-								.explicitNested( nestedPath );
+								.withNestedPath( nestedPath );
 						JsonObject jsonFilter = getJsonFilter( filterContext );
 						FILTER_ACCESSOR.set( nestedObject, jsonFilter );
 					}
@@ -136,7 +138,7 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder extends AbstractEla
 	}
 
 	private JsonObject getJsonFilter(ElasticsearchSearchPredicateContext filterContext) {
-		return ( (ElasticsearchSearchPredicateBuilder) filter ).build( filterContext );
+		return filterBuilder.build( filterContext );
 	}
 
 	protected final EventContext getEventContext() {

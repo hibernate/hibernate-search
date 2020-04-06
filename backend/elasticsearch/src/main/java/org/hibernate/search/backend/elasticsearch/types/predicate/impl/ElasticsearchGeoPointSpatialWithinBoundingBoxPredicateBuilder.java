@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSearchNestedPredicateBuilder;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
@@ -21,7 +21,8 @@ import org.hibernate.search.engine.spatial.GeoPoint;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
-class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder extends AbstractElasticsearchSearchNestedPredicateBuilder
+class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder extends
+		AbstractElasticsearchSingleFieldPredicateBuilder
 		implements SpatialWithinBoundingBoxPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final JsonObjectAccessor GEO_BOUNDING_BOX_ACCESSOR = JsonAccessor.root().property( "geo_bounding_box" ).asObject();
@@ -30,16 +31,14 @@ class ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder extends Abst
 
 	private static final String BOTTOM_RIGHT_PROPERTY_NAME = "bottom_right";
 
-	private final String absoluteFieldPath;
-
 	private final ElasticsearchFieldCodec<GeoPoint> codec;
 
 	private JsonElement topLeft;
 	private JsonElement bottomRight;
 
-	ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy, ElasticsearchFieldCodec<GeoPoint> codec) {
-		super( nestedPathHierarchy );
-		this.absoluteFieldPath = absoluteFieldPath;
+	ElasticsearchGeoPointSpatialWithinBoundingBoxPredicateBuilder(String absoluteFieldPath,
+			List<String> nestedPathHierarchy, ElasticsearchFieldCodec<GeoPoint> codec) {
+		super( absoluteFieldPath, nestedPathHierarchy );
 		this.codec = codec;
 	}
 
