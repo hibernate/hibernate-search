@@ -10,7 +10,7 @@ import java.util.List;
 
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSearchNestedPredicateBuilder;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 import org.hibernate.search.engine.search.predicate.spi.SpatialWithinPolygonPredicateBuilder;
@@ -20,20 +20,18 @@ import org.hibernate.search.engine.spatial.GeoPolygon;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-class ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder extends AbstractElasticsearchSearchNestedPredicateBuilder
+class ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder extends
+		AbstractElasticsearchSingleFieldPredicateBuilder
 		implements SpatialWithinPolygonPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final JsonObjectAccessor GEO_POLYGON_ACCESSOR = JsonAccessor.root().property( "geo_polygon" ).asObject();
 
 	private static final String POINTS_PROPERTY_NAME = "points";
 
-	private final String absoluteFieldPath;
-
 	private JsonArray pointsArray;
 
 	ElasticsearchGeoPointSpatialWithinPolygonPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		super( nestedPathHierarchy );
-		this.absoluteFieldPath = absoluteFieldPath;
+		super( absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override

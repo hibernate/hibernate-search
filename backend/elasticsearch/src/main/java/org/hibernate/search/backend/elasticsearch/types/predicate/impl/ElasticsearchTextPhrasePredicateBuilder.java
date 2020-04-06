@@ -11,7 +11,7 @@ import java.util.List;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonAccessor;
 import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSearchNestedPredicateBuilder;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 import org.hibernate.search.backend.elasticsearch.lowlevel.index.analysis.impl.AnalyzerConstants;
@@ -21,7 +21,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-class ElasticsearchTextPhrasePredicateBuilder extends AbstractElasticsearchSearchNestedPredicateBuilder
+class ElasticsearchTextPhrasePredicateBuilder extends AbstractElasticsearchSingleFieldPredicateBuilder
 		implements PhrasePredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final JsonObjectAccessor MATCH_PHRASE_ACCESSOR = JsonAccessor.root().property( "match_phrase" ).asObject();
@@ -30,16 +30,15 @@ class ElasticsearchTextPhrasePredicateBuilder extends AbstractElasticsearchSearc
 	private static final JsonAccessor<JsonElement> QUERY_ACCESSOR = JsonAccessor.root().property( "query" );
 	private static final JsonAccessor<String> ANALYZER_ACCESSOR = JsonAccessor.root().property( "analyzer" ).asString();
 
-	private final String absoluteFieldPath;
 	private final ElasticsearchCompatibilityChecker analyzerChecker;
 
 	private Integer slop;
 	private JsonElement phrase;
 	private String analyzer;
 
-	ElasticsearchTextPhrasePredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy, ElasticsearchCompatibilityChecker analyzerChecker) {
-		super( nestedPathHierarchy );
-		this.absoluteFieldPath = absoluteFieldPath;
+	ElasticsearchTextPhrasePredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy,
+			ElasticsearchCompatibilityChecker analyzerChecker) {
+		super( absoluteFieldPath, nestedPathHierarchy );
 		this.analyzerChecker = analyzerChecker;
 	}
 

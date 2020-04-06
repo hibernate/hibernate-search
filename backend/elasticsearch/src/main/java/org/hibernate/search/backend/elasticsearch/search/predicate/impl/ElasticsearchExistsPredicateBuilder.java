@@ -14,17 +14,14 @@ import org.hibernate.search.engine.search.predicate.spi.ExistsPredicateBuilder;
 
 import com.google.gson.JsonObject;
 
-public class ElasticsearchExistsPredicateBuilder extends AbstractElasticsearchSearchNestedPredicateBuilder
+public class ElasticsearchExistsPredicateBuilder extends AbstractElasticsearchSingleFieldPredicateBuilder
 		implements ExistsPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final JsonObjectAccessor EXISTS_ACCESSOR = JsonAccessor.root().property( "exists" ).asObject();
 	private static final JsonAccessor<String> FIELD_ACCESSOR = JsonAccessor.root().property( "field" ).asString();
 
-	private final String absoluteFieldPath;
-
 	ElasticsearchExistsPredicateBuilder(String absoluteFieldPath, List<String> nestedPathHierarchy) {
-		super( nestedPathHierarchy );
-		this.absoluteFieldPath = absoluteFieldPath;
+		super( absoluteFieldPath, nestedPathHierarchy );
 	}
 
 	@Override

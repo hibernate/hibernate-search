@@ -14,7 +14,7 @@ import org.hibernate.search.backend.elasticsearch.gson.impl.JsonObjectAccessor;
 import org.hibernate.search.backend.elasticsearch.logging.impl.Log;
 import org.hibernate.search.backend.elasticsearch.scope.model.impl.ElasticsearchCompatibilityChecker;
 import org.hibernate.search.backend.elasticsearch.search.impl.ElasticsearchSearchContext;
-import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSearchNestedPredicateBuilder;
+import org.hibernate.search.backend.elasticsearch.search.predicate.impl.AbstractElasticsearchSingleFieldPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateBuilder;
 import org.hibernate.search.backend.elasticsearch.search.predicate.impl.ElasticsearchSearchPredicateContext;
 import org.hibernate.search.backend.elasticsearch.types.codec.impl.ElasticsearchFieldCodec;
@@ -28,7 +28,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 
-class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearchSearchNestedPredicateBuilder
+class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearchSingleFieldPredicateBuilder
 		implements MatchPredicateBuilder<ElasticsearchSearchPredicateBuilder> {
 
 	private static final Log log = LoggerFactory.make( Log.class, MethodHandles.lookup() );
@@ -36,8 +36,6 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 	private static final JsonAccessor<JsonElement> QUERY_ACCESSOR = JsonAccessor.root().property( "query" );
 
 	private static final JsonObjectAccessor MATCH_ACCESSOR = JsonAccessor.root().property( "match" ).asObject();
-
-	protected final String absoluteFieldPath;
 
 	private final ElasticsearchSearchContext searchContext;
 
@@ -53,9 +51,8 @@ class ElasticsearchStandardMatchPredicateBuilder<F> extends AbstractElasticsearc
 			String absoluteFieldPath, List<String> nestedPathHierarchy,
 			DslConverter<?, ? extends F> converter, DslConverter<F, ? extends F> rawConverter,
 			ElasticsearchCompatibilityChecker converterChecker, ElasticsearchFieldCodec<F> codec) {
-		super( nestedPathHierarchy );
+		super( absoluteFieldPath, nestedPathHierarchy );
 		this.searchContext = searchContext;
-		this.absoluteFieldPath = absoluteFieldPath;
 		this.converter = converter;
 		this.rawConverter = rawConverter;
 		this.converterChecker = converterChecker;
