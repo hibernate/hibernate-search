@@ -88,6 +88,9 @@ abstract class AbstractElasticsearchDocumentValueSortBuilder extends AbstractEla
 	}
 
 	public void filter(SearchPredicate filter) {
+		if ( nestedPathHierarchy.isEmpty() ) {
+			throw log.cannotFilterSortOnRootDocumentField( absoluteFieldPath, getEventContext() );
+		}
 		this.filter = filter;
 	}
 
