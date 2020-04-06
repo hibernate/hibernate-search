@@ -1,0 +1,159 @@
+/*
+ * Hibernate Search, full-text search for your domain model
+ *
+ * License: GNU Lesser General Public License (LGPL), version 2.1 or later
+ * See the lgpl.txt file in the root directory or <http://www.gnu.org/licenses/lgpl-2.1.html>.
+ */
+package org.hibernate.search.integrationtest.backend.tck.search.sort;
+
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Function;
+import java.util.stream.Stream;
+
+import org.hibernate.search.engine.backend.common.DocumentReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
+import org.hibernate.search.engine.backend.types.Sortable;
+import org.hibernate.search.engine.search.query.SearchQuery;
+import org.hibernate.search.engine.search.sort.dsl.SearchSortFactory;
+import org.hibernate.search.engine.search.sort.dsl.SortFinalStep;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
+import org.hibernate.search.util.common.SearchException;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
+
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.Parameterized;
+
+/**
+ * Tests behavior related to
+ * {@link org.hibernate.search.engine.search.sort.dsl.SortFilterStep#filter(Function) filtering}
+ * that is not tested in {@link FieldSearchSortBaseIT}.
+ */
+@RunWith(Parameterized.class)
+public class FieldSearchSortTypeFilteringSpecificsIT<F> {
+
+	private static Stream<FieldTypeDescriptor<?>> supportedTypeDescriptors() {
+		return FieldTypeDescriptor.getAll().stream()
+				.filter( typeDescriptor -> typeDescriptor.getFieldSortExpectations().isSupported() );
+	}
+
+	@Parameterized.Parameters(name = "{0}")
+	public static Object[][] parameters() {
+		List<Object[]> parameters = new ArrayList<>();
+		supportedTypeDescriptors().forEach( fieldTypeDescriptor -> {
+			parameters.add( new Object[] { fieldTypeDescriptor } );
+		} );
+		return parameters.toArray( new Object[0][] );
+	}
+
+	private static final String INDEX_NAME = "IndexName";
+
+	@ClassRule
+	public static SearchSetupHelper setupHelper = new SearchSetupHelper();
+
+	private static IndexMapping indexMapping;
+	private static StubMappingIndexManager indexManager;
+
+	@BeforeClass
+	public static void setup() {
+		setupHelper.start()
+				.withIndex(
+						INDEX_NAME,
+						ctx -> indexMapping = new IndexMapping( ctx.getSchemaElement() ),
+						indexManager -> FieldSearchSortTypeFilteringSpecificsIT.indexManager = indexManager
+				)
+				.setup();
+	}
+
+	private final FieldTypeDescriptor<F> fieldTypeDescriptor;
+
+	public FieldSearchSortTypeFilteringSpecificsIT(FieldTypeDescriptor<F> fieldTypeDescriptor) {
+		this.fieldTypeDescriptor = fieldTypeDescriptor;
+	}
+
+	@Test
+	public void nonNested() {
+		String fieldPath = indexMapping.flattenedObject.relativeFieldName + "."
+				+ indexMapping.flattenedObject.fieldModels.get( fieldTypeDescriptor ).relativeFieldName;
+
+		assertThatThrownBy(
+				() -> matchAllQuery( f -> f.field( fieldPath )
+						.filter( pf -> pf.exists().field( fieldPath ) ) )
+		)
+				.isInstanceOf( SearchException.class )
+				.hasMessageContainingAll(
+						"Field '" + fieldPath + "' is not contained in a nested object.",
+						"Sort filters are only available if the field to sort on is contained in a nested objects."
+				);
+	}
+
+	private SearchQuery<DocumentReference> matchAllQuery(
+			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor) {
+		return matchAllQuery( sortContributor, indexManager.createScope() );
+	}
+
+	private SearchQuery<DocumentReference> matchAllQuery(
+			Function<? super SearchSortFactory, ? extends SortFinalStep> sortContributor, StubMappingScope scope) {
+		return scope.query()
+				.where( f -> f.matchAll() )
+				.sort( sortContributor )
+				.toQuery();
+	}
+
+	private static class AbstractObjectMapping {
+		final SimpleFieldModelsByType fieldModels;
+
+		AbstractObjectMapping(IndexSchemaElement self) {
+			fieldModels = SimpleFieldModelsByType.mapAll( supportedTypeDescriptors(), self,
+					"", c -> c.sortable( Sortable.YES ) );
+		}
+	}
+
+	private static class IndexMapping extends AbstractObjectMapping {
+		final FirstLevelObjectMapping flattenedObject;
+
+		IndexMapping(IndexSchemaElement root) {
+			super( root );
+
+			flattenedObject = FirstLevelObjectMapping.create( root, "flattenedObject",
+					ObjectFieldStorage.FLATTENED );
+		}
+	}
+
+	private static class FirstLevelObjectMapping extends AbstractObjectMapping {
+		final String relativeFieldName;
+		final IndexObjectFieldReference self;
+
+		public static FirstLevelObjectMapping create(IndexSchemaElement parent, String relativeFieldName,
+				ObjectFieldStorage storage) {
+			return create( parent, relativeFieldName, storage, false );
+		}
+
+		public static FirstLevelObjectMapping create(IndexSchemaElement parent, String relativeFieldName,
+				ObjectFieldStorage storage,
+				boolean multiValued) {
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
+			if ( multiValued ) {
+				objectField.multiValued();
+			}
+			return new FirstLevelObjectMapping( relativeFieldName, objectField );
+		}
+
+		private FirstLevelObjectMapping(String relativeFieldName, IndexSchemaObjectField objectField) {
+			super( objectField );
+			this.relativeFieldName = relativeFieldName;
+			self = objectField.toReference();
+		}
+	}
+}
