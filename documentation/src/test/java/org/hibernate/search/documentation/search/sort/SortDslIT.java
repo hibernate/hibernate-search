@@ -259,6 +259,24 @@ public class SortDslIT {
 	}
 
 	@Test
+	public void filter() {
+		withinSearchSession( searchSession -> {
+			// tag::filter[]
+			List<Author> hits = searchSession.search( Author.class )
+					.where( f -> f.matchAll() )
+					.sort( f -> f.field( "books.pageCount" )
+							.mode( SortMode.AVG )
+							.filter( pf -> pf.match().field( "books.genre" )
+									.matching( Genre.CRIME_FICTION ) ) )
+					.fetchHits( 20 );
+			// end::filter[]
+			assertThat( hits )
+					.extracting( Author::getId )
+					.containsExactly( MARTINEZ_ID, ASIMOV_ID );
+		} );
+	}
+
+	@Test
 	public void composite() {
 		withinSearchSession( searchSession -> {
 			// tag::composite[]

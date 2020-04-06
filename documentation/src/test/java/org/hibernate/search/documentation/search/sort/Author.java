@@ -13,6 +13,7 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
 
+import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.FullTextField;
 import org.hibernate.search.mapper.pojo.mapping.definition.annotation.GenericField;
@@ -40,7 +41,7 @@ public class Author {
 	private EmbeddableGeoPoint placeOfBirth;
 
 	@ManyToMany(mappedBy = "authors")
-	@IndexedEmbedded(maxDepth = 1)
+	@IndexedEmbedded(maxDepth = 1, storage = ObjectFieldStorage.NESTED)
 	private List<Book> books = new ArrayList<>();
 
 	public Author() {
