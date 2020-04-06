@@ -45,6 +45,9 @@ public abstract class AbstractLuceneDocumentValueSortBuilder
 	}
 
 	public void filter(SearchPredicate filter) {
+		if ( nestedDocumentPath == null ) {
+			throw log.cannotFilterSortOnRootDocumentField( absoluteFieldPath, getEventContext() );
+		}
 		this.filter = filter;
 	}
 

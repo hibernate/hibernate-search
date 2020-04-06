@@ -646,4 +646,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_2 + 119,
 			value = "Unable to create nested sort filter for name '%1$s'.")
 	SearchException unableToCreateNestedSortFilter(String name);
+
+	@Message(id = ID_OFFSET_2 + 120,
+			value = "Field '%1$s' is not contained in a nested object."
+					+ "Sort filters are only available if the field to sort on is contained in a nested objects.")
+	SearchException cannotFilterSortOnRootDocumentField(String absoluteFieldPath, @Param EventContext context);
 }

@@ -651,4 +651,9 @@ public interface Log extends BasicLogger {
 	@Message(id = ID_OFFSET_3 + 103,
 			value = "Cannot compute the sum for a distance sort. Only min, max, avg and median are supported.")
 	SearchException cannotComputeSumForDistanceSort(@Param EventContext context);
+
+	@Message(id = ID_OFFSET_3 + 104,
+			value = "Field '%1$s' is not contained in a nested object."
+					+ "Sort filters are only available if the field to sort on is contained in a nested objects.")
+	SearchException cannotFilterSortOnRootDocumentField(String absoluteFieldPath, @Param EventContext context);
 }
