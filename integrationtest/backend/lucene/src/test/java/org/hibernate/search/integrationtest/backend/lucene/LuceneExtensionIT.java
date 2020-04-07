@@ -42,8 +42,12 @@ import org.hibernate.search.backend.lucene.search.query.LuceneSearchQuery;
 import org.hibernate.search.backend.lucene.search.query.LuceneSearchResult;
 import org.hibernate.search.backend.lucene.lowlevel.common.impl.MetadataFields;
 import org.hibernate.search.engine.backend.Backend;
+import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.types.Projectable;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.index.IndexManager;
@@ -405,6 +409,44 @@ public class LuceneExtensionIT {
 	}
 
 	@Test
+	public void sort_filter_fromLuceneQuery() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.extension( LuceneExtension.get() )
+				.where( f -> f.matchAll() )
+				.sort( f -> f.field( indexMapping.nestedObject.relativeFieldName + ".sort1" )
+						// The provided predicate factory should already be extended and offer Lucene-specific extensions
+						.filter( pf -> pf.fromLuceneQuery( new TermQuery( new Term(
+								indexMapping.nestedObject.relativeFieldName + ".discriminator",
+								"included"
+						) ) ) )
+				)
+				.toQuery();
+		assertThat( query ).hasDocRefHitsExactOrder(
+				INDEX_NAME,
+				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID
+		);
+
+		// Check descending order, just in case the above order was reached by chance.
+		query = scope.query()
+				.extension( LuceneExtension.get() )
+				.where( f -> f.matchAll() )
+				.sort( f -> f.field( indexMapping.nestedObject.relativeFieldName + ".sort1" )
+						.desc()
+						.filter( pf -> pf.fromLuceneQuery( new TermQuery( new Term(
+								indexMapping.nestedObject.relativeFieldName + ".discriminator",
+								"included"
+						) ) ) )
+				)
+				.toQuery();
+		assertThat( query ).hasDocRefHitsExactOrder(
+				INDEX_NAME,
+				FIFTH_ID, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID
+		);
+	}
+
+	@Test
 	public void predicate_nativeField() {
 		StubMappingScope scope = indexManager.createScope();
 
@@ -729,6 +771,13 @@ public class LuceneExtensionIT {
 			document.addValue( indexMapping.sort1, "a" );
 			document.addValue( indexMapping.sort2, "z" );
 			document.addValue( indexMapping.sort3, "z" );
+
+			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
+			nestedObject1.addValue( indexMapping.nestedObject.sort1, "a" );
+			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
+			nestedObject2.addValue( indexMapping.nestedObject.sort1, "b" );
 		} );
 		plan.add( referenceProvider( SECOND_ID ), document -> {
 			document.addValue( indexMapping.integer, 2 );
@@ -740,6 +789,13 @@ public class LuceneExtensionIT {
 			document.addValue( indexMapping.sort1, "z" );
 			document.addValue( indexMapping.sort2, "a" );
 			document.addValue( indexMapping.sort3, "z" );
+
+			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
+			nestedObject1.addValue( indexMapping.nestedObject.sort1, "b" );
+			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
+			nestedObject2.addValue( indexMapping.nestedObject.sort1, "a" );
 		} );
 		plan.add( referenceProvider( THIRD_ID ), document -> {
 			document.addValue( indexMapping.geoPoint, GeoPoint.of( 40.12, -71.34 ) );
@@ -751,6 +807,13 @@ public class LuceneExtensionIT {
 			document.addValue( indexMapping.sort1, "z" );
 			document.addValue( indexMapping.sort2, "z" );
 			document.addValue( indexMapping.sort3, "a" );
+
+			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
+			nestedObject1.addValue( indexMapping.nestedObject.sort1, "c" );
+			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
+			nestedObject2.addValue( indexMapping.nestedObject.sort1, "b" );
 		} );
 		plan.add( referenceProvider( FOURTH_ID ), document -> {
 			document.addValue( indexMapping.nativeField, 89 );
@@ -760,6 +823,13 @@ public class LuceneExtensionIT {
 			document.addValue( indexMapping.sort1, "z" );
 			document.addValue( indexMapping.sort2, "z" );
 			document.addValue( indexMapping.sort3, "z" );
+
+			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
+			nestedObject1.addValue( indexMapping.nestedObject.sort1, "d" );
+			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
+			nestedObject2.addValue( indexMapping.nestedObject.sort1, "c" );
 		} );
 		plan.add( referenceProvider( FIFTH_ID ), document -> {
 			// This document should not match any query
@@ -770,6 +840,13 @@ public class LuceneExtensionIT {
 			document.addValue( indexMapping.sort1, "zz" );
 			document.addValue( indexMapping.sort2, "zz" );
 			document.addValue( indexMapping.sort3, "zz" );
+
+			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
+			nestedObject1.addValue( indexMapping.nestedObject.sort1, "e" );
+			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
+			nestedObject2.addValue( indexMapping.nestedObject.sort1, "a" );
 		} );
 		plan.execute().join();
 	}
@@ -786,6 +863,8 @@ public class LuceneExtensionIT {
 		final IndexFieldReference<String> sort1;
 		final IndexFieldReference<String> sort2;
 		final IndexFieldReference<String> sort3;
+
+		final ObjectMapping nestedObject;
 
 		IndexMapping(IndexSchemaElement root) {
 			integer = root.field(
@@ -834,6 +913,36 @@ public class LuceneExtensionIT {
 			sort2 = root.field( "sort2", f -> f.asString().sortable( Sortable.YES ) )
 					.toReference();
 			sort3 = root.field( "sort3", f -> f.asString().sortable( Sortable.YES ) )
+					.toReference();
+
+			nestedObject = ObjectMapping.create( root, "nestedObject", ObjectFieldStorage.NESTED, true );
+		}
+	}
+
+	private static class ObjectMapping {
+		final String relativeFieldName;
+		final IndexObjectFieldReference self;
+
+		final IndexFieldReference<String> discriminator;
+		final IndexFieldReference<String> sort1;
+
+		public static ObjectMapping create(IndexSchemaElement parent, String relativeFieldName,
+				ObjectFieldStorage storage,
+				boolean multiValued) {
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
+			if ( multiValued ) {
+				objectField.multiValued();
+			}
+			return new ObjectMapping( relativeFieldName, objectField );
+		}
+
+		private ObjectMapping(String relativeFieldName, IndexSchemaObjectField objectField) {
+			this.relativeFieldName = relativeFieldName;
+			self = objectField.toReference();
+
+			discriminator = objectField.field( "discriminator", f -> f.asString() ).toReference();
+
+			sort1 = objectField.field( "sort1", f -> f.asString().sortable( Sortable.YES ) )
 					.toReference();
 		}
 	}
