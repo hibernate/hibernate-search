@@ -29,7 +29,7 @@ import org.hibernate.search.engine.reporting.spi.EventContexts;
 class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityBindingMapperContext {
 
 	private final ContextualFailureCollector failureCollector;
-	private final TypeMetadataContributorProvider<StubTypeMetadataContributor> contributorProvider;
+	private final TypeMetadataContributorProvider<StubMappedIndex> contributorProvider;
 
 	private final boolean multiTenancyEnabled;
 
@@ -37,7 +37,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 	private final Map<IndexedEmbeddedDefinition, IndexedEmbeddedPathTracker> pathTrackers = new HashMap<>();
 
 	StubMapper(MappingBuildContext buildContext,
-			TypeMetadataContributorProvider<StubTypeMetadataContributor> contributorProvider,
+			TypeMetadataContributorProvider<StubMappedIndex> contributorProvider,
 			boolean multiTenancyEnabled) {
 		this.failureCollector = buildContext.getFailureCollector();
 		this.contributorProvider = contributorProvider;
@@ -64,12 +64,8 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 	}
 
 	private void prepareType(MappableTypeModel type, Consumer<Optional<String>> backendNameCollector) {
-		Set<StubTypeMetadataContributor> metadataSet = contributorProvider.get( type );
-		metadataSet.forEach( metadata -> {
-			if ( metadata.getIndexName() != null ) {
-				backendNameCollector.accept( Optional.ofNullable( metadata.getBackendName() ) );
-			}
-		} );
+		getMappedIndex( type )
+				.ifPresent( mappedIndex -> backendNameCollector.accept( mappedIndex.backendName() ) );
 	}
 
 	@Override
@@ -86,44 +82,44 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 				} );
 	}
 
-	private void mapTypeIfIndexed(MappableTypeModel type,
-			MappedIndexManagerFactory indexManagerFactory) {
-		Set<StubTypeMetadataContributor> contributorSet = contributorProvider.get( type );
-		String indexName = null;
-		String backendName = null;
-		for ( StubTypeMetadataContributor contributor : contributorSet ) {
-			if ( contributor.getIndexName() != null ) {
-				indexName = contributor.getIndexName();
-			}
-			if ( contributor.getBackendName() != null ) {
-				backendName = contributor.getBackendName();
-			}
-		}
-		if ( indexName != null ) {
+	private void mapTypeIfIndexed(MappableTypeModel type, MappedIndexManagerFactory indexManagerFactory) {
+		Optional<StubMappedIndex> mappedIndexOptional = getMappedIndex( type );
+		mappedIndexOptional.ifPresent( mappedIndex -> {
 			MappedIndexManagerBuilder indexManagerBuilder = indexManagerFactory.createMappedIndexManager(
 					this,
-					Optional.ofNullable( backendName ),
-					indexName,
+					mappedIndex.backendName(),
+					mappedIndex.name(),
 					type.getName(),
 					multiTenancyEnabled
 			);
 			indexManagerBuilders.put( (StubTypeModel) type, indexManagerBuilder );
-			contributorProvider.get( type ).forEach( c -> c.contribute( indexManagerBuilder.getRootBindingContext() ) );
+			mappedIndex.bind( indexManagerBuilder.getRootBindingContext() );
+		} );
+	}
+
+	private Optional<StubMappedIndex> getMappedIndex(MappableTypeModel type) {
+		Set<StubMappedIndex> stubMappedIndices = contributorProvider.get( type );
+		if ( stubMappedIndices.isEmpty() ) {
+			return Optional.empty();
 		}
+		if ( stubMappedIndices.size() > 1 ) {
+			throw new IllegalStateException( "Multiple type mappings for type " + type
+					+ ". Only one mapping per type is not supported for the stub mapper." );
+		}
+		return Optional.of( stubMappedIndices.iterator().next() );
 	}
 
 	@Override
 	public StubMappingPartialBuildState prepareBuild() throws MappingAbortedException {
-		Map<String, StubMappingIndexManager> indexMappingsByTypeIdentifier = new HashMap<>();
+		Map<String, StubMappedIndex> mappedIndexesByTypeIdentifier = new HashMap<>();
 		for ( Map.Entry<StubTypeModel, MappedIndexManagerBuilder> entry : indexManagerBuilders.entrySet() ) {
 			StubTypeModel typeModel = entry.getKey();
 			try {
-				String indexName = entry.getValue().getIndexName();
-				MappedIndexManager indexManager = entry.getValue().build();
-				indexMappingsByTypeIdentifier.put(
-						typeModel.asString(),
-						new StubMappingIndexManager( indexName, indexManager )
-				);
+				MappedIndexManager indexManagerDelegate = entry.getValue().build();
+				StubMappedIndex mappedIndex = getMappedIndex( typeModel ).get();
+				mappedIndex.onIndexManagerCreated( indexManagerDelegate );
+
+				mappedIndexesByTypeIdentifier.put( typeModel.asString(), mappedIndex );
 			}
 			catch (RuntimeException e) {
 				failureCollector.withContext( EventContexts.fromType( typeModel ) ).add( e );
@@ -134,7 +130,7 @@ class StubMapper implements Mapper<StubMappingPartialBuildState>, IndexedEntityB
 			throw new MappingAbortedException();
 		}
 
-		return new StubMappingPartialBuildState( indexMappingsByTypeIdentifier );
+		return new StubMappingPartialBuildState( mappedIndexesByTypeIdentifier );
 	}
 
 	@Override

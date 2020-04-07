@@ -22,7 +22,6 @@ import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.filesystem.TemporaryFileHolder;
 import org.hibernate.search.util.common.impl.SuppressingCloser;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapping;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingInitiator;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingKey;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
@@ -75,28 +74,20 @@ public abstract class AbstractBackendHolder {
 
 		indexes = new ArrayList<>();
 		for ( int i = 0; i < INDEX_COUNT; ++i ) {
-			MappedIndex index = new MappedIndex();
+			MappedIndex index = new MappedIndex( BACKEND_NAME, i );
+			initiator.add( index );
 			indexes.add( index );
-			initiator.add(
-					"type_" + i, BACKEND_NAME, "index_" + i,
-					index::bind
-			);
 		}
 
 		SearchIntegrationPartialBuildState integrationPartialBuildState = integrationBuilder.prepareBuild();
 		try {
 			SearchIntegrationFinalizer finalizer =
 					integrationPartialBuildState.finalizer( propertySource, unusedPropertyChecker );
-			StubMapping mapping = finalizer.finalizeMapping(
+			finalizer.finalizeMapping(
 					mappingKey,
 					(context, partialMapping) ->
 							partialMapping.finalizeMapping( StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP )
 			);
-			for ( int i = 0; i < INDEX_COUNT; ++i ) {
-				MappedIndex index = indexes.get( i );
-				String typeId = "type_" + i;
-				index.setIndexManager( mapping.getIndexMappingByTypeIdentifier( typeId ) );
-			}
 			integration = finalizer.finalizeIntegration();
 		}
 		catch (RuntimeException e) {
@@ -139,5 +130,4 @@ public abstract class AbstractBackendHolder {
 			throws IOException;
 
 	protected abstract String getConfigurationParameter();
-
 }

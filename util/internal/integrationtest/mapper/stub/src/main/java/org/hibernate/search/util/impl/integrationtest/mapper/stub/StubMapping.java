@@ -20,13 +20,13 @@ import org.hibernate.search.util.common.impl.Futures;
 
 public class StubMapping implements MappingImplementor<StubMapping> {
 
-	private final Map<String, StubMappingIndexManager> indexManagersByTypeIdentifier;
+	private final Map<String, StubMappedIndex> mappedIndexesByTypeIdentifier;
 
 	private final StubMappingSchemaManagementStrategy schemaManagementStrategy;
 
-	StubMapping(Map<String, StubMappingIndexManager> indexManagersByTypeIdentifier,
+	StubMapping(Map<String, StubMappedIndex> mappedIndexesByTypeIdentifier,
 			StubMappingSchemaManagementStrategy schemaManagementStrategy) {
-		this.indexManagersByTypeIdentifier = indexManagersByTypeIdentifier;
+		this.mappedIndexesByTypeIdentifier = mappedIndexesByTypeIdentifier;
 		this.schemaManagementStrategy = schemaManagementStrategy;
 	}
 
@@ -73,16 +73,16 @@ public class StubMapping implements MappingImplementor<StubMapping> {
 	}
 
 	public StubMappingIndexManager getIndexMappingByTypeIdentifier(String typeId) {
-		return indexManagersByTypeIdentifier.get( typeId );
+		return mappedIndexesByTypeIdentifier.get( typeId );
 	}
 
 	private CompletableFuture<?> doSchemaManagementOperation(
 			Function<IndexSchemaManager, CompletableFuture<?>> operation,
 			ContextualFailureCollector failureCollector) {
-		CompletableFuture<?>[] futures = new CompletableFuture<?>[indexManagersByTypeIdentifier.size()];
+		CompletableFuture<?>[] futures = new CompletableFuture<?>[mappedIndexesByTypeIdentifier.size()];
 		int typeCounter = 0;
 
-		for ( Map.Entry<String, StubMappingIndexManager> entry : indexManagersByTypeIdentifier.entrySet() ) {
+		for ( Map.Entry<String, StubMappedIndex> entry : mappedIndexesByTypeIdentifier.entrySet() ) {
 			IndexSchemaManager delegate = entry.getValue().getSchemaManager();
 			ContextualFailureCollector typeFailureCollector =
 					failureCollector.withContext( EventContexts.fromType( entry.getKey() ) );

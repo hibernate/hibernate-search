@@ -57,8 +57,7 @@ public abstract class AbstractMassIndexingBenchmarks extends AbstractBackendBenc
 	public void prepareIteration(DatasetHolder datasetHolder) {
 		index = getIndexPartition().getIndex();
 		StubBackendSessionContext sessionContext = new StubBackendSessionContext();
-		indexer = index.getIndexManager()
-				.createIndexer( sessionContext, commitStrategy );
+		indexer = index.createIndexer( sessionContext, commitStrategy );
 		dataset = datasetHolder.getDataset();
 	}
 

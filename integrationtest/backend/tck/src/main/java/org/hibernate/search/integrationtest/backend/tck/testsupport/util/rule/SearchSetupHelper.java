@@ -8,6 +8,8 @@ package org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +24,7 @@ import org.hibernate.search.engine.common.spi.SearchIntegrationBuilder;
 import org.hibernate.search.engine.common.spi.SearchIntegrationFinalizer;
 import org.hibernate.search.engine.common.spi.SearchIntegrationPartialBuildState;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
+import org.hibernate.search.engine.mapper.mapping.spi.MappedIndexManager;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendAccessor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendHelper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckBackendSetupStrategy;
@@ -35,6 +38,7 @@ import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIni
 import org.hibernate.search.util.common.impl.Closer;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingKey;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingSchemaManagementStrategy;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
 import org.junit.rules.RuleChain;
 import org.junit.rules.TestRule;
@@ -135,7 +139,7 @@ public class SearchSetupHelper implements TestRule {
 		private final ConfigurationPropertySource propertySource;
 		// Use a LinkedHashMap for deterministic iteration
 		private final Map<String, Object> overriddenProperties = new LinkedHashMap<>();
-		private final List<IndexDefinition> indexDefinitions = new ArrayList<>();
+		private final List<StubMappedIndex> mappedIndexes = new ArrayList<>();
 		private boolean multiTenancyEnabled = false;
 		private StubMappingSchemaManagementStrategy schemaManagementStrategy = StubMappingSchemaManagementStrategy.DROP_AND_CREATE_AND_DROP;
 
@@ -185,11 +189,47 @@ public class SearchSetupHelper implements TestRule {
 		}
 
 		public SetupContext withIndex(String rawIndexName,
-				Consumer<? super StubIndexMappingContext> optionsContributor,
+				Consumer<? super StubTypeMappingConfigurationContext> optionsContributor,
 				Consumer<? super IndexedEntityBindingContext> mappingContributor, IndexSetupListener listener) {
-			IndexDefinition indexDefinition = new IndexDefinition( rawIndexName, mappingContributor, listener );
-			optionsContributor.accept( new StubIndexMappingContext( indexDefinition ) );
-			indexDefinitions.add( indexDefinition );
+			StubTypeMappingConfigurationContext configurationContext = new StubTypeMappingConfigurationContext();
+			optionsContributor.accept( configurationContext );
+
+			return withIndex( new StubMappedIndex( rawIndexName ) {
+				@Override
+				public String typeName() {
+					return configurationContext.typeName == null
+							? super.typeName() : configurationContext.typeName;
+				}
+
+				@Override
+				public Optional<String> backendName() {
+					return Optional.ofNullable( configurationContext.backendName );
+				}
+
+				@Override
+				protected void bind(IndexedEntityBindingContext context) {
+					mappingContributor.accept( context );
+				}
+
+				@Override
+				protected void onIndexManagerCreated(MappedIndexManager manager) {
+					super.onIndexManagerCreated( manager );
+					listener.onSetup( this );
+				}
+			} );
+		}
+
+		public SetupContext withIndexes(StubMappedIndex ... mappedIndexes) {
+			return withIndexes( Arrays.asList( mappedIndexes ) );
+		}
+
+		public SetupContext withIndexes(Collection<? extends StubMappedIndex> mappedIndexes) {
+			mappedIndexes.forEach( this::withIndex );
+			return this;
+		}
+
+		public SetupContext withIndex(StubMappedIndex mappedIndex) {
+			mappedIndexes.add( mappedIndex );
 			return this;
 		}
 
@@ -208,9 +248,9 @@ public class SearchSetupHelper implements TestRule {
 					SearchIntegration.builder( propertySource, unusedPropertyChecker );
 
 			StubMappingInitiator initiator = new StubMappingInitiator( multiTenancyEnabled );
+			mappedIndexes.forEach( initiator::add );
 			StubMappingKey mappingKey = new StubMappingKey();
 			integrationBuilder.addMappingInitiator( mappingKey, initiator );
-			indexDefinitions.forEach( d -> d.beforeBuild( initiator ) );
 
 			SearchIntegrationPartialBuildState integrationPartialBuildState = integrationBuilder.prepareBuild();
 			integrationPartialBuildStates.add( integrationPartialBuildState );
@@ -227,8 +267,6 @@ public class SearchSetupHelper implements TestRule {
 				integrations.add( integration );
 				integrationPartialBuildStates.remove( integrationPartialBuildState );
 
-				indexDefinitions.forEach( d -> d.afterBuild( mapping ) );
-
 				return integration;
 			};
 		}
@@ -239,21 +277,21 @@ public class SearchSetupHelper implements TestRule {
 
 	}
 
-	public static class StubIndexMappingContext {
+	public static class StubTypeMappingConfigurationContext {
 
-		private final IndexDefinition indexDefinition;
+		private String typeName;
+		private String backendName;
 
-		public StubIndexMappingContext(IndexDefinition indexDefinition) {
-			this.indexDefinition = indexDefinition;
+		public StubTypeMappingConfigurationContext() {
 		}
 
-		public StubIndexMappingContext mappedType(String typeName) {
-			indexDefinition.typeName = typeName;
+		public StubTypeMappingConfigurationContext mappedType(String typeName) {
+			this.typeName = typeName;
 			return this;
 		}
 
-		public StubIndexMappingContext backend(String backendName) {
-			indexDefinition.backendName = backendName;
+		public StubTypeMappingConfigurationContext backend(String backendName) {
+			this.backendName = backendName;
 			return this;
 		}
 
@@ -268,37 +306,6 @@ public class SearchSetupHelper implements TestRule {
 	public interface PartialSetup {
 
 		SearchIntegration doSecondPhase();
-
-	}
-
-	private static class IndexDefinition {
-		private final String rawIndexName;
-		private final Consumer<? super IndexedEntityBindingContext> mappingContributor;
-		private final IndexSetupListener listener;
-
-		private String typeName;
-		private String backendName;
-
-		private IndexDefinition(String rawIndexName,
-				Consumer<? super IndexedEntityBindingContext> mappingContributor, IndexSetupListener listener) {
-			this.rawIndexName = rawIndexName;
-			this.mappingContributor = mappingContributor;
-			this.listener = listener;
-			// Use the index name for the type name by default.
-			// Tests are easier to write if we can just have one constant for the index name.
-			this.typeName = rawIndexName;
-			this.backendName = null;
-		}
-
-		void beforeBuild(StubMappingInitiator stubMetadataContributor) {
-			stubMetadataContributor.add( typeName, backendName, rawIndexName, mappingContributor );
-		}
-
-		void afterBuild(StubMapping mapping) {
-			listener.onSetup(
-					mapping.getIndexMappingByTypeIdentifier( typeName )
-			);
-		}
 
 	}
 }
