@@ -21,10 +21,8 @@ import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.Weight;
 import org.apache.lucene.util.NumericUtils;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValuesToSingleValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.NumericDoubleValues;
-import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 
 /**
  * <p>
@@ -32,10 +30,6 @@ import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider
  * of <a href="https://lucene.apache.org/">Apache Lucene project</a>.
  */
 public class DoubleMultiValueRangeFacetCounts extends MultiValueRangeFacetCounts {
-
-	public DoubleMultiValueRangeFacetCounts(String field, MultiValueMode mode, NestedDocsProvider nested, FacetsCollector hits, DoubleRange... ranges) throws IOException {
-		this( field, DoubleMultiValuesToSingleValuesSource.fromDoubleField( field, mode, nested ), hits, ranges );
-	}
 
 	public DoubleMultiValueRangeFacetCounts(String field, DoubleMultiValuesToSingleValuesSource valueSource, FacetsCollector hits, DoubleRange... ranges) throws IOException {
 		this( field, valueSource, hits, null, ranges );
