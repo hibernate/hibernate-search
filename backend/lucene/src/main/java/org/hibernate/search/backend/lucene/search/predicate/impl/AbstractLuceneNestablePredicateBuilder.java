@@ -52,17 +52,17 @@ abstract class AbstractLuceneNestablePredicateBuilder extends AbstractLuceneSear
 
 		Query result = super.build( contextAfterImplicitNesting );
 
-		// traversing the furtherImplicitNestedSteps in the inverted order
-		for ( int i = 0; i < nestedPathHierarchy.size(); i++ ) {
-			int index = nestedPathHierarchy.size() - 1 - i;
-			String path = nestedPathHierarchy.get( index );
+		// traversing the nestedPathHierarchy in reversed order
+		int hierarchyLastIndex = nestedPathHierarchy.size() - 1;
+		for ( int i = hierarchyLastIndex; i >= 0; i-- ) {
+			String path = nestedPathHierarchy.get( i );
 			if ( path.equals( context.getNestedPath() ) ) {
 				// the upper levels have been handled by the explicit predicate/s
 				break;
 			}
 
-			String parentNestedDocumentPath = ( index == 0 ) ? null // The parent document is the root document
-					: nestedPathHierarchy.get( index - 1 ); // The parent document is a nested document one level higher
+			String parentNestedDocumentPath = ( i == 0 ) ? null // The parent document is the root document
+					: nestedPathHierarchy.get( i - 1 ); // The parent document is a nested document one level higher
 			result = LuceneNestedPredicateBuilder.doBuild( parentNestedDocumentPath, path, result );
 		}
 
