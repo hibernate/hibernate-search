@@ -10,9 +10,9 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
 
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningDoubleMultiValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
+import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueRangeFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.util.common.data.Range;
 
@@ -30,7 +30,6 @@ import org.apache.lucene.util.NumericUtils;
 
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValuesToSingleValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
-import org.hibernate.search.backend.lucene.lowlevel.facet.impl.DoubleMultiValueRangeFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueFacetCounts;
 
 public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
@@ -98,12 +97,19 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 			Collection<? extends Range<? extends Float>> ranges,
 			NestedDocsProvider nestedDocsProvider) throws IOException {
-		JoiningDoubleMultiValuesSource source = JoiningDoubleMultiValuesSource.fromFloatField(
+		// As we don't need to apply any operation to terms except sometimes a sort,
+		// we can simply rely on raw, int values, whose order is the same as their corresponding float value.
+		// Values are ultimately converted back to the Float equivalent by calling sortedDocValueToTerm.
+		JoiningLongMultiValuesSource source = JoiningLongMultiValuesSource.fromIntField(
 				absoluteFieldPath, nestedDocsProvider
 		);
-		return new DoubleMultiValueRangeFacetCounts(
+		return new LongMultiValueRangeFacetCounts(
 				absoluteFieldPath, source,
-				facetsCollector, FacetCountsUtils.createDoubleRanges( ranges )
+				facetsCollector,
+				FacetCountsUtils.createLongRangesForFloatingPointValues(
+						ranges, value -> (long) NumericUtils.floatToSortableInt( value ),
+						Float.NEGATIVE_INFINITY, Float.POSITIVE_INFINITY
+				)
 		);
 	}
 
