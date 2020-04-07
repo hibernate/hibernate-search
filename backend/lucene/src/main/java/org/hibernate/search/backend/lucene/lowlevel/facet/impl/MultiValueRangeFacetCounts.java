@@ -17,7 +17,7 @@ import org.apache.lucene.search.Query;
 
 /**
  * <p>
- * Copied with some changes from
+ * Copied with some changes from {@code org.apache.lucene.facet.range.RangeFacetCounts}
  * of <a href="https://lucene.apache.org/">Apache Lucene project</a>.
  */
 public class MultiValueRangeFacetCounts extends Facets {

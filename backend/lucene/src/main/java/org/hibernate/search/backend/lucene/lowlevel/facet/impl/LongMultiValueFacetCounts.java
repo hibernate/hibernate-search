@@ -24,7 +24,7 @@ import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValu
 
 /**
  * <p>
- * Copied with some changes from
+ * Copied with some changes from {@code org.apache.lucene.facet.LongValueFacetCounts}
  * of <a href="https://lucene.apache.org/">Apache Lucene project</a>.
  */
 public class LongMultiValueFacetCounts extends Facets {
