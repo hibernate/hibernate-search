@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
 
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.util.common.data.Range;
@@ -74,11 +75,6 @@ public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
 	}
 
 	@Override
-	public Integer rawFacetTermToTerm(long longValue) {
-		return (int) longValue;
-	}
-
-	@Override
 	public Integer sortedDocValueToTerm(long longValue) {
 		return (int) longValue;
 	}
@@ -86,8 +82,8 @@ public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
 	@Override
 	public Facets createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 			NestedDocsProvider nestedDocsProvider) throws IOException {
-		LongMultiValuesToSingleValuesSource source = LongMultiValuesToSingleValuesSource.fromIntField(
-				absoluteFieldPath, MultiValueMode.NONE, nestedDocsProvider
+		JoiningLongMultiValuesSource source = JoiningLongMultiValuesSource.fromIntField(
+				absoluteFieldPath, nestedDocsProvider
 		);
 		return new LongMultiValueFacetCounts(
 				absoluteFieldPath, source,
@@ -99,8 +95,8 @@ public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
 	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 			Collection<? extends Range<? extends Integer>> ranges,
 			NestedDocsProvider nestedDocsProvider) throws IOException {
-		LongMultiValuesToSingleValuesSource source = LongMultiValuesToSingleValuesSource.fromIntField(
-				absoluteFieldPath, MultiValueMode.NONE, nestedDocsProvider
+		JoiningLongMultiValuesSource source = JoiningLongMultiValuesSource.fromIntField(
+				absoluteFieldPath, nestedDocsProvider
 		);
 		return new LongMultiValueRangeFacetCounts(
 				absoluteFieldPath, source,

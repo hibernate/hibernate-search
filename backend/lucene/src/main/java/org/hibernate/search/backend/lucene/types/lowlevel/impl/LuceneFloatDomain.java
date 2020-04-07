@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
 
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningDoubleMultiValuesSource;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.util.common.data.Range;
@@ -76,13 +78,6 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	}
 
 	@Override
-	public Float rawFacetTermToTerm(long longValue) {
-		// See createTermsFacetCounts: it's the reason we need this method
-		// Using the reverse operation from Double.doubleToRawLongBits, which is used in DoubleDocValues.
-		return Float.intBitsToFloat( (int) longValue );
-	}
-
-	@Override
 	public Float sortedDocValueToTerm(long longValue) {
 		return NumericUtils.sortableIntToFloat( (int) longValue );
 	}
@@ -90,27 +85,21 @@ public class LuceneFloatDomain implements LuceneNumericDomain<Float> {
 	@Override
 	public Facets createTermsFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 			NestedDocsProvider nestedDocsProvider) throws IOException {
-
-		DoubleMultiValuesToSingleValuesSource source = DoubleMultiValuesToSingleValuesSource.fromFloatField(
-				absoluteFieldPath, MultiValueMode.NONE, nestedDocsProvider
+		// As we don't need to apply any operation to terms except sometimes a sort,
+		// we can simply rely on raw, int values, whose order is the same as their corresponding float value.
+		// Values are ultimately converted back to the Float equivalent by calling sortedDocValueToTerm.
+		JoiningLongMultiValuesSource source = JoiningLongMultiValuesSource.fromIntField(
+				absoluteFieldPath, nestedDocsProvider
 		);
-		return new LongMultiValueFacetCounts(
-			absoluteFieldPath,
-			// We can't use DoubleValueSource here because it drops the decimals...
-			// So we use this to get raw bits, and then apply fromDocValue to get back the original value.
-			// must be getLongValuesSource().
-			source.getLongValuesSource(),
-			facetsCollector
-		);
+		return new LongMultiValueFacetCounts( absoluteFieldPath, source, facetsCollector );
 	}
 
 	@Override
 	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 			Collection<? extends Range<? extends Float>> ranges,
 			NestedDocsProvider nestedDocsProvider) throws IOException {
-		// TODO HSEARCH-3856 aggregations on multi-valued fields - currently we just use the minimum value
-		DoubleMultiValuesToSingleValuesSource source = DoubleMultiValuesToSingleValuesSource.fromFloatField(
-				absoluteFieldPath, MultiValueMode.NONE, nestedDocsProvider
+		JoiningDoubleMultiValuesSource source = JoiningDoubleMultiValuesSource.fromFloatField(
+				absoluteFieldPath, nestedDocsProvider
 		);
 		return new DoubleMultiValueRangeFacetCounts(
 				absoluteFieldPath, source,

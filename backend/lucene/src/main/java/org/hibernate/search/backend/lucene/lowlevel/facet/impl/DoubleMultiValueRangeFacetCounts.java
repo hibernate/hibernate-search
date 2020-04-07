@@ -8,6 +8,10 @@ package org.hibernate.search.backend.lucene.lowlevel.facet.impl;
 
 import java.io.IOException;
 import java.util.List;
+
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValues;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValuesSource;
+
 import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.facet.FacetsCollector.MatchingDocs;
 import org.apache.lucene.facet.range.DoubleRange;
@@ -21,8 +25,6 @@ import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.Weight;
 import org.apache.lucene.util.NumericUtils;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValuesToSingleValuesSource;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.NumericDoubleValues;
 
 /**
  * <p>
@@ -31,17 +33,16 @@ import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.NumericDouble
  */
 public class DoubleMultiValueRangeFacetCounts extends MultiValueRangeFacetCounts {
 
-	public DoubleMultiValueRangeFacetCounts(String field, DoubleMultiValuesToSingleValuesSource valueSource, FacetsCollector hits, DoubleRange... ranges) throws IOException {
+	public DoubleMultiValueRangeFacetCounts(String field, DoubleMultiValuesSource valueSource, FacetsCollector hits, DoubleRange... ranges) throws IOException {
 		this( field, valueSource, hits, null, ranges );
 	}
 
-	public DoubleMultiValueRangeFacetCounts(String field, DoubleMultiValuesToSingleValuesSource valueSource, FacetsCollector hits, Query fastMatchQuery, DoubleRange... ranges) throws IOException {
+	public DoubleMultiValueRangeFacetCounts(String field, DoubleMultiValuesSource valueSource, FacetsCollector hits, Query fastMatchQuery, DoubleRange... ranges) throws IOException {
 		super( field, ranges, fastMatchQuery );
 		count( valueSource, hits.getMatchingDocs() );
 	}
 
-	private void count(DoubleMultiValuesToSingleValuesSource valueSource, List<MatchingDocs> matchingDocs) throws IOException {
-
+	private void count(DoubleMultiValuesSource valueSource, List<MatchingDocs> matchingDocs) throws IOException {
 		DoubleRange[] doubleRanges = (DoubleRange[]) this.ranges;
 
 		LongRange[] longRanges = new LongRange[doubleRanges.length];
@@ -56,7 +57,7 @@ public class DoubleMultiValueRangeFacetCounts extends MultiValueRangeFacetCounts
 
 		int missingCount = 0;
 		for ( MatchingDocs hits : matchingDocs ) {
-			NumericDoubleValues fv = valueSource.getValues( hits.context, null );
+			DoubleMultiValues fv = valueSource.getValues( hits.context );
 
 			final DocIdSetIterator fastMatchDocs;
 			if ( fastMatchQuery != null ) {
@@ -89,10 +90,9 @@ public class DoubleMultiValueRangeFacetCounts extends MultiValueRangeFacetCounts
 					}
 				}
 				if ( fv.advanceExact( doc ) ) {
-					int count = fv.docValueCount();
-					totCount += count;
-					for ( int index = 0; index < count; ++index ) {
-						counter.add( NumericUtils.doubleToSortableLong( fv.doubleValue() ) );
+					while ( fv.hasNextValue() ) {
+						++totCount;
+						counter.add( NumericUtils.doubleToSortableLong( fv.nextValue() ) );
 					}
 				}
 				else {

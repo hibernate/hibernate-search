@@ -86,7 +86,7 @@ public class LuceneNumericTermsAggregation<F, E extends Number, K>
 
 	@Override
 	E labelToTerm(String termAsString) {
-		return numericDomain.rawFacetTermToTerm( Long.parseLong( termAsString ) );
+		return numericDomain.sortedDocValueToTerm( Long.parseLong( termAsString ) );
 	}
 
 	@Override
