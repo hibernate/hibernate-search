@@ -56,8 +56,9 @@ public abstract class AbstractElasticsearchNestablePredicateBuilder extends Abst
 		JsonObject result = super.build( contextAfterImplicitNesting );
 
 		// traversing the nestedPathHierarchy in the inverted order
-		for ( int i = 0; i < nestedPathHierarchy.size(); i++ ) {
-			String path = nestedPathHierarchy.get( nestedPathHierarchy.size() - 1 - i );
+		int hierarchyLastIndex = nestedPathHierarchy.size() - 1;
+		for ( int i = hierarchyLastIndex; i >= 0; i-- ) {
+			String path = nestedPathHierarchy.get( i );
 			if ( path.equals( context.getNestedPath() ) ) {
 				// skip all from this point
 				break;
