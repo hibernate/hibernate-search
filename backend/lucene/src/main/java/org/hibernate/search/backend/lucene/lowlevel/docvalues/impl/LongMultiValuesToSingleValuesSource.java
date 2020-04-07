@@ -7,10 +7,6 @@
 package org.hibernate.search.backend.lucene.lowlevel.docvalues.impl;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
 import org.apache.lucene.index.DocValues;
 import org.apache.lucene.index.LeafReaderContext;
@@ -92,7 +88,7 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 	}
 
 	@Override
-	public NumericLongValues getValues(LeafReaderContext ctx, DoubleValues scores) throws IOException {
+	public LongValues getValues(LeafReaderContext ctx, DoubleValues scores) throws IOException {
 		SortedNumericDocValues values = getSortedNumericDocValues( ctx );
 
 		if ( nestedDocsProvider == null ) {
@@ -121,10 +117,10 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 
 	protected abstract SortedNumericDocValues getSortedNumericDocValues(LeafReaderContext ctx) throws IOException;
 
-	protected NumericLongValues select(final SortedNumericDocValues values) {
+	protected LongValues select(final SortedNumericDocValues values) {
 		final NumericDocValues singleton = DocValues.unwrapSingleton( values );
 		if ( singleton != null ) {
-			return new NumericLongValues() {
+			return new LongValues() {
 				@Override
 				public long longValue() throws IOException {
 					return singleton.longValue();
@@ -136,27 +132,8 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 				}
 			};
 		}
-		else if ( mode == null || mode == MultiValueMode.NONE ) {
-			return new NumericLongValues() {
-
-				@Override
-				public long longValue() throws IOException {
-					return values.nextValue();
-				}
-
-				@Override
-				public int docValueCount() {
-					return values.docValueCount();
-				}
-
-				@Override
-				public boolean advanceExact(int doc) throws IOException {
-					return values.advanceExact( doc );
-				}
-			};
-		}
 		else {
-			return new NumericLongValues() {
+			return new LongValues() {
 				private long value;
 
 				@Override
@@ -176,28 +153,21 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 		}
 	}
 
-	protected NumericLongValues select(final SortedNumericDocValues values, final BitSet parentDocs,
-		final DocIdSetIterator childDocs) {
+	protected LongValues select(final SortedNumericDocValues values, final BitSet parentDocs,
+			final DocIdSetIterator childDocs) {
 		if ( parentDocs == null || childDocs == null ) {
-			return NumericLongValues.LONG_VALUES_EMPTY;
+			return DocValuesUtils.LONG_VALUES_EMPTY;
 		}
 
 		JoinFirstChildIdIterator joinIterator = new JoinFirstChildIdIterator( parentDocs, childDocs, values );
 
-		return new NumericLongValues() {
+		return new LongValues() {
 			int lastSeenParentDoc = -1;
 			long lastEmittedValue = -1;
-			private Iterator<Long> value;
-			private List<Long> all;
 
 			@Override
-			public long longValue() throws IOException {
-				return value != null ? value.next() : -1;
-			}
-
-			@Override
-			public int docValueCount() {
-				return all != null ? all.size() : -1;
+			public long longValue() {
+				return lastEmittedValue;
 			}
 
 			@Override
@@ -214,35 +184,10 @@ public abstract class LongMultiValuesToSingleValuesSource extends LongValuesSour
 				}
 
 				lastSeenParentDoc = parentDoc;
-				if ( mode == null || mode == MultiValueMode.NONE ) {
-					all = list( values, childDocs, nextChildWithValue, parentDoc );
-				}
-				else {
-					all = Collections.singletonList( mode.pick( values, childDocs, nextChildWithValue, parentDoc ) );
-				}
-
-				if ( all != null && !all.isEmpty() ) {
-					value = all.iterator();
-					return true;
-				}
-				return false;
+				lastEmittedValue = mode.pick( values, childDocs, nextChildWithValue, parentDoc );
+				return true;
 			}
 		};
-	}
-
-	protected List<Long> list(SortedNumericDocValues values, DocIdSetIterator docItr, int startDoc, int endDoc) throws IOException {
-
-		List<Long> result = new ArrayList<>();
-		int count = 0;
-		for ( int doc = startDoc; doc < endDoc; doc = docItr.nextDoc() ) {
-			if ( values.advanceExact( doc ) ) {
-				result.add( values.nextValue() );
-			}
-		}
-
-		Collections.sort( result );
-
-		return result;
 	}
 
 	private static class MultiFieldValuesToSingleValuesSource extends LongMultiValuesToSingleValuesSource {

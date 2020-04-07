@@ -18,8 +18,9 @@ import org.apache.lucene.search.Query;
 import org.apache.lucene.search.ScoreMode;
 import org.apache.lucene.search.Scorer;
 import org.apache.lucene.search.Weight;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.NumericLongValues;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesToSingleValuesSource;
+
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValues;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesSource;
 
 /**
  * <p>
@@ -28,24 +29,23 @@ import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValu
  */
 public class LongMultiValueRangeFacetCounts extends MultiValueRangeFacetCounts {
 
-	public LongMultiValueRangeFacetCounts(String field, LongMultiValuesToSingleValuesSource valueSource, FacetsCollector hits, LongRange... ranges) throws IOException {
+	public LongMultiValueRangeFacetCounts(String field, LongMultiValuesSource valueSource, FacetsCollector hits, LongRange... ranges) throws IOException {
 		this( field, valueSource, hits, null, ranges );
 	}
 
-	public LongMultiValueRangeFacetCounts(String field, LongMultiValuesToSingleValuesSource valueSource, FacetsCollector hits, Query fastMatchQuery, LongRange... ranges) throws IOException {
+	public LongMultiValueRangeFacetCounts(String field, LongMultiValuesSource valueSource, FacetsCollector hits, Query fastMatchQuery, LongRange... ranges) throws IOException {
 		super( field, ranges, fastMatchQuery );
 		count( valueSource, hits.getMatchingDocs() );
 	}
 
-	private void count(LongMultiValuesToSingleValuesSource valueSource, List<FacetsCollector.MatchingDocs> matchingDocs) throws IOException {
-
+	private void count(LongMultiValuesSource valueSource, List<FacetsCollector.MatchingDocs> matchingDocs) throws IOException {
 		LongRange[] longRanges = (LongRange[]) this.ranges;
 
 		LongMultiValueRangeCounter counter = new LongMultiValueRangeCounter( longRanges );
 
 		int missingCount = 0;
 		for ( FacetsCollector.MatchingDocs hits : matchingDocs ) {
-			NumericLongValues fv = valueSource.getValues( hits.context, null );
+			LongMultiValues fv = valueSource.getValues( hits.context );
 
 			final DocIdSetIterator fastMatchDocs;
 			if ( fastMatchQuery != null ) {
@@ -78,10 +78,9 @@ public class LongMultiValueRangeFacetCounts extends MultiValueRangeFacetCounts {
 				}
 
 				if ( fv.advanceExact( doc ) ) {
-					int count = fv.docValueCount();
-					totCount += count;
-					for ( int index = 0; index < count; ++index ) {
-						counter.add( fv.longValue() );
+					while ( fv.hasNextValue() ) {
+						++totCount;
+						counter.add( fv.nextValue() );
 					}
 				}
 				else {

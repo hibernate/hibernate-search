@@ -17,8 +17,8 @@ import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.facet.LabelAndValue;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.PriorityQueue;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.NumericLongValues;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesToSingleValuesSource;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValues;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.LongMultiValuesSource;
 
 /**
  * <p>
@@ -35,22 +35,20 @@ public class LongMultiValueFacetCounts extends Facets {
 
 	private int totCount;
 
-	public LongMultiValueFacetCounts(String field, LongMultiValuesToSingleValuesSource valueSource, FacetsCollector hits) throws IOException {
+	public LongMultiValueFacetCounts(String field, LongMultiValuesSource valueSource, FacetsCollector hits) throws IOException {
 		this.field = field;
 		count( valueSource, hits.getMatchingDocs() );
 	}
 
-	private void count(LongMultiValuesToSingleValuesSource valueSource, List<FacetsCollector.MatchingDocs> matchingDocs) throws IOException {
-
+	private void count(LongMultiValuesSource valueSource, List<FacetsCollector.MatchingDocs> matchingDocs) throws IOException {
 		for ( FacetsCollector.MatchingDocs hits : matchingDocs ) {
-			NumericLongValues fv = valueSource.getValues( hits.context, null );
+			LongMultiValues fv = valueSource.getValues( hits.context );
 
 			DocIdSetIterator docs = hits.bits.iterator();
 			for ( int doc = docs.nextDoc(); doc != DocIdSetIterator.NO_MORE_DOCS; ) {
 				if ( fv.advanceExact( doc ) ) {
-					int count = fv.docValueCount();
-					for ( int index = 0; index < count; ++index ) {
-						increment( fv.longValue() );
+					while ( fv.hasNextValue() ) {
+						increment( fv.nextValue() );
 						totCount++;
 					}
 				}
