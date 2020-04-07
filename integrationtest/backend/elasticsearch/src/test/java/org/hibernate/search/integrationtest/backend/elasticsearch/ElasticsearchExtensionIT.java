@@ -26,10 +26,15 @@ import org.hibernate.search.backend.elasticsearch.search.query.dsl.Elasticsearch
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchQuery;
 import org.hibernate.search.backend.elasticsearch.search.query.ElasticsearchSearchResult;
 import org.hibernate.search.engine.backend.Backend;
+import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
+import org.hibernate.search.engine.backend.document.IndexObjectFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
+import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaObjectField;
+import org.hibernate.search.engine.backend.document.model.dsl.ObjectFieldStorage;
 import org.hibernate.search.engine.backend.index.IndexManager;
 import org.hibernate.search.engine.backend.types.Projectable;
+import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
 import org.hibernate.search.engine.common.spi.SearchIntegration;
 import org.hibernate.search.engine.backend.common.DocumentReference;
@@ -734,6 +739,46 @@ public class ElasticsearchExtensionIT {
 	}
 
 	@Test
+	public void sort_filter_fromJson() {
+		StubMappingScope scope = indexManager.createScope();
+
+		SearchQuery<DocumentReference> query = scope.query()
+				.extension( ElasticsearchExtension.get() )
+				.where( f -> f.matchAll() )
+				.sort( f -> f.field( indexMapping.nestedObject.relativeFieldName + ".sort1" )
+						// The provided predicate factory should already be extended and offer Elasticsearch-specific extensions
+						.filter( pf -> pf.fromJson(
+								"{'match': {'"
+										+ indexMapping.nestedObject.relativeFieldName + ".discriminator"
+										+ "': 'included'}}"
+						) )
+				)
+				.toQuery();
+		assertThat( query ).hasDocRefHitsExactOrder(
+				INDEX_NAME,
+				FIRST_ID, SECOND_ID, THIRD_ID, FOURTH_ID, FIFTH_ID, EMPTY_ID
+		);
+
+		// Check descending order, just in case the above order was reached by chance.
+		query = scope.query()
+				.extension( ElasticsearchExtension.get() )
+				.where( f -> f.matchAll() )
+				.sort( f -> f.field( indexMapping.nestedObject.relativeFieldName + ".sort1" )
+						.desc()
+						.filter( pf -> pf.fromJson(
+								"{'match': {'"
+										+ indexMapping.nestedObject.relativeFieldName + ".discriminator"
+										+ "': 'included'}}"
+						) )
+				)
+				.toQuery();
+		assertThat( query ).hasDocRefHitsExactOrder(
+				INDEX_NAME,
+				FIFTH_ID, FOURTH_ID, THIRD_ID, SECOND_ID, FIRST_ID, EMPTY_ID
+		);
+	}
+
+	@Test
 	public void projection_nativeField() {
 		StubMappingScope scope = indexManager.createScope();
 
@@ -1024,6 +1069,13 @@ public class ElasticsearchExtensionIT {
 			document.addValue( indexMapping.nativeField_sort5, new JsonPrimitive( "a" ) );
 
 			document.addValue( indexMapping.nativeField_aggregation, new JsonPrimitive( "value-for-doc-1-and-2" ) );
+
+			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
+			nestedObject1.addValue( indexMapping.nestedObject.sort1, "b" );
+			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
+			nestedObject2.addValue( indexMapping.nestedObject.sort1, "a" );
 		} );
 		plan.add( referenceProvider( FIRST_ID ), document -> {
 			document.addValue( indexMapping.string, "text 1" );
@@ -1037,6 +1089,13 @@ public class ElasticsearchExtensionIT {
 			document.addValue( indexMapping.nativeField_sort5, new JsonPrimitive( "a" ) );
 
 			document.addValue( indexMapping.nativeField_aggregation, new JsonPrimitive( "value-for-doc-1-and-2" ) );
+
+			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
+			nestedObject1.addValue( indexMapping.nestedObject.sort1, "a" );
+			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
+			nestedObject2.addValue( indexMapping.nestedObject.sort1, "b" );
 		} );
 		plan.add( referenceProvider( THIRD_ID ), document -> {
 			document.addValue( indexMapping.string, "text 3" );
@@ -1050,6 +1109,13 @@ public class ElasticsearchExtensionIT {
 			document.addValue( indexMapping.nativeField_sort5, new JsonPrimitive( "a" ) );
 
 			document.addValue( indexMapping.nativeField_aggregation, new JsonPrimitive( "value-for-doc-3" ) );
+
+			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
+			nestedObject1.addValue( indexMapping.nestedObject.sort1, "c" );
+			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
+			nestedObject2.addValue( indexMapping.nestedObject.sort1, "b" );
 		} );
 		plan.add( referenceProvider( FOURTH_ID ), document -> {
 			document.addValue( indexMapping.string, "text 4" );
@@ -1061,6 +1127,13 @@ public class ElasticsearchExtensionIT {
 			document.addValue( indexMapping.nativeField_sort3, new JsonPrimitive( "z" ) );
 			document.addValue( indexMapping.nativeField_sort4, new JsonPrimitive( "a" ) );
 			document.addValue( indexMapping.nativeField_sort5, new JsonPrimitive( "a" ) );
+
+			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
+			nestedObject1.addValue( indexMapping.nestedObject.sort1, "d" );
+			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
+			nestedObject2.addValue( indexMapping.nestedObject.sort1, "c" );
 		} );
 		plan.add( referenceProvider( FIFTH_ID ), document -> {
 			document.addValue( indexMapping.string, "text 5" );
@@ -1073,6 +1146,13 @@ public class ElasticsearchExtensionIT {
 			document.addValue( indexMapping.nativeField_unsupportedType, new JsonPrimitive( "foobar" ) ); // ignore_malformed is enabled, this should be ignored
 
 			document.addValue( indexMapping.nativeField_sort5, new JsonPrimitive( "z" ) );
+
+			DocumentElement nestedObject1 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject1.addValue( indexMapping.nestedObject.discriminator, "included" );
+			nestedObject1.addValue( indexMapping.nestedObject.sort1, "e" );
+			DocumentElement nestedObject2 = document.addObject( indexMapping.nestedObject.self );
+			nestedObject2.addValue( indexMapping.nestedObject.discriminator, "excluded" );
+			nestedObject2.addValue( indexMapping.nestedObject.sort1, "a" );
 		} );
 		plan.add( referenceProvider( EMPTY_ID ), document -> { } );
 
@@ -1105,6 +1185,8 @@ public class ElasticsearchExtensionIT {
 		final IndexFieldReference<JsonElement> nativeField_sort5;
 
 		final IndexFieldReference<JsonElement> nativeField_aggregation;
+
+		final ObjectMapping nestedObject;
 
 		IndexMapping(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString().projectable( Projectable.YES ) ).toReference();
@@ -1184,7 +1266,36 @@ public class ElasticsearchExtensionIT {
 							.asNative().mapping( "{'type': 'keyword', 'doc_values': true}" )
 			)
 					.toReference();
+
+			nestedObject = ObjectMapping.create( root, "nestedObject", ObjectFieldStorage.NESTED, true );
 		}
 	}
 
+	private static class ObjectMapping {
+		final String relativeFieldName;
+		final IndexObjectFieldReference self;
+
+		final IndexFieldReference<String> discriminator;
+		final IndexFieldReference<String> sort1;
+
+		public static ObjectMapping create(IndexSchemaElement parent, String relativeFieldName,
+				ObjectFieldStorage storage,
+				boolean multiValued) {
+			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
+			if ( multiValued ) {
+				objectField.multiValued();
+			}
+			return new ObjectMapping( relativeFieldName, objectField );
+		}
+
+		private ObjectMapping(String relativeFieldName, IndexSchemaObjectField objectField) {
+			this.relativeFieldName = relativeFieldName;
+			self = objectField.toReference();
+
+			discriminator = objectField.field( "discriminator", f -> f.asString() ).toReference();
+
+			sort1 = objectField.field( "sort1", f -> f.asString().sortable( Sortable.YES ) )
+					.toReference();
+		}
+	}
 }
