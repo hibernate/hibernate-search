@@ -6,11 +6,14 @@
  */
 package org.hibernate.search.backend.lucene.lowlevel.facet.impl;
 
+import com.carrotsearch.hppc.LongHashSet;
 import com.carrotsearch.hppc.LongIntScatterMap;
 import com.carrotsearch.hppc.cursors.LongIntCursor;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+
+import com.carrotsearch.hppc.procedures.LongProcedure;
 import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
@@ -41,16 +44,23 @@ public class LongMultiValueFacetCounts extends Facets {
 	}
 
 	private void count(LongMultiValuesSource valueSource, List<FacetsCollector.MatchingDocs> matchingDocs) throws IOException {
+		LongHashSet uniqueValuesForDocument = new LongHashSet();
+		LongProcedure incrementCountForDocumentId = this::increment;
+
 		for ( FacetsCollector.MatchingDocs hits : matchingDocs ) {
 			LongMultiValues fv = valueSource.getValues( hits.context );
 
 			DocIdSetIterator docs = hits.bits.iterator();
 			for ( int doc = docs.nextDoc(); doc != DocIdSetIterator.NO_MORE_DOCS; ) {
 				if ( fv.advanceExact( doc ) ) {
+					totCount++;
 					while ( fv.hasNextValue() ) {
-						increment( fv.nextValue() );
-						totCount++;
+						// Each document must be counted only once per value.
+						uniqueValuesForDocument.add( fv.nextValue() );
 					}
+
+					uniqueValuesForDocument.forEach( incrementCountForDocumentId );
+					uniqueValuesForDocument.clear();
 				}
 
 				doc = docs.nextDoc();
