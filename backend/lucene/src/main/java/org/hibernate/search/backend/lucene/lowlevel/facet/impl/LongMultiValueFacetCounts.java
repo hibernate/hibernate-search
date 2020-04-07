@@ -15,8 +15,6 @@ import org.apache.lucene.facet.FacetResult;
 import org.apache.lucene.facet.Facets;
 import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.facet.LabelAndValue;
-import org.apache.lucene.index.IndexReader;
-import org.apache.lucene.index.LeafReaderContext;
 import org.apache.lucene.search.DocIdSetIterator;
 import org.apache.lucene.util.PriorityQueue;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.NumericLongValues;
@@ -42,11 +40,6 @@ public class LongMultiValueFacetCounts extends Facets {
 		count( valueSource, hits.getMatchingDocs() );
 	}
 
-	public LongMultiValueFacetCounts(String field, LongMultiValuesToSingleValuesSource valueSource, IndexReader reader) throws IOException {
-		this.field = field;
-		countAll( valueSource, field, reader );
-	}
-
 	private void count(LongMultiValuesToSingleValuesSource valueSource, List<FacetsCollector.MatchingDocs> matchingDocs) throws IOException {
 
 		for ( FacetsCollector.MatchingDocs hits : matchingDocs ) {
@@ -63,24 +56,6 @@ public class LongMultiValueFacetCounts extends Facets {
 				}
 
 				doc = docs.nextDoc();
-			}
-		}
-	}
-
-	private void countAll(LongMultiValuesToSingleValuesSource valueSource, String field, IndexReader reader) throws IOException {
-
-		for ( LeafReaderContext context : reader.leaves() ) {
-			NumericLongValues fv = valueSource.getValues( context, null );
-			int maxDoc = context.reader().maxDoc();
-
-			for ( int doc = 0; doc < maxDoc; doc++ ) {
-				if ( fv.advanceExact( doc ) ) {
-					int count = fv.docValueCount();
-					for ( int index = 0; index < count; ++index ) {
-						increment( fv.longValue() );
-						totCount++;
-					}
-				}
 			}
 		}
 	}
