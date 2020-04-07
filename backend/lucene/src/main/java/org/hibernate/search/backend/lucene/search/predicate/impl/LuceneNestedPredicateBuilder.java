@@ -40,11 +40,11 @@ class LuceneNestedPredicateBuilder extends AbstractLuceneSingleFieldPredicateBui
 	@Override
 	protected Query doBuild(LuceneSearchPredicateContext context) {
 		LuceneSearchPredicateContext childContext = new LuceneSearchPredicateContext( absoluteFieldPath );
-		return doBuild( context, absoluteFieldPath, nestedBuilder.build( childContext ) );
+		return doBuild( context.getNestedPath(), absoluteFieldPath, nestedBuilder.build( childContext ) );
 	}
 
-	public static Query doBuild(LuceneSearchPredicateContext parentContext, String nestedDocumentPath, Query nestedQuery) {
-		if ( nestedDocumentPath.equals( parentContext.getNestedPath() ) ) {
+	public static Query doBuild(String parentNestedDocumentPath, String nestedDocumentPath, Query nestedQuery) {
+		if ( nestedDocumentPath.equals( parentNestedDocumentPath ) ) {
 			return nestedQuery;
 		}
 
@@ -54,11 +54,11 @@ class LuceneNestedPredicateBuilder extends AbstractLuceneSingleFieldPredicateBui
 		childQueryBuilder.add( nestedQuery, Occur.MUST );
 
 		Query parentQuery;
-		if ( parentContext.getNestedPath() == null ) {
+		if ( parentNestedDocumentPath == null ) {
 			parentQuery = Queries.mainDocumentQuery();
 		}
 		else {
-			parentQuery = Queries.nestedDocumentPathQuery( parentContext.getNestedPath() );
+			parentQuery = Queries.nestedDocumentPathQuery( parentNestedDocumentPath );
 		}
 
 		// TODO HSEARCH-3090 at some point we should have a parameter for the score mode

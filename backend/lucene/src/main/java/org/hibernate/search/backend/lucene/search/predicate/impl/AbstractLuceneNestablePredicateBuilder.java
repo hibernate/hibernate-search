@@ -61,8 +61,9 @@ abstract class AbstractLuceneNestablePredicateBuilder extends AbstractLuceneSear
 				break;
 			}
 
-			LuceneSearchPredicateContext childContext = ( index == 0 ) ? context : new LuceneSearchPredicateContext( nestedPathHierarchy.get( index - 1 ) );
-			result = LuceneNestedPredicateBuilder.doBuild( childContext, path, result );
+			String parentNestedDocumentPath = ( index == 0 ) ? null // The parent document is the root document
+					: nestedPathHierarchy.get( index - 1 ); // The parent document is a nested document one level higher
+			result = LuceneNestedPredicateBuilder.doBuild( parentNestedDocumentPath, path, result );
 		}
 
 		return result;
