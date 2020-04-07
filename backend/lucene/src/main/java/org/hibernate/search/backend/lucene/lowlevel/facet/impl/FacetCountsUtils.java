@@ -7,11 +7,11 @@
 package org.hibernate.search.backend.lucene.lowlevel.facet.impl;
 
 import java.util.Collection;
+import java.util.function.ToLongFunction;
 
 import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 
-import org.apache.lucene.facet.range.DoubleRange;
 import org.apache.lucene.facet.range.LongRange;
 
 public class FacetCountsUtils {
@@ -19,44 +19,39 @@ public class FacetCountsUtils {
 	private FacetCountsUtils() {
 	}
 
-	public static LongRange[] createLongRanges(Collection<? extends Range<? extends Number>> ranges) {
+	public static <T extends Number> LongRange[] createLongRangesForIntegralValues(Collection<? extends Range<? extends T>> ranges) {
+		return createLongRanges( ranges, Number::longValue, Long.MIN_VALUE, Long.MAX_VALUE, false );
+	}
+
+	public static <T> LongRange[] createLongRangesForFloatingPointValues(Collection<? extends Range<? extends T>> ranges,
+			ToLongFunction<T> encoder, T negativeInfinity, T positiveInfinity) {
+		return createLongRanges( ranges, encoder, negativeInfinity, positiveInfinity, true );
+	}
+
+	private static <T> LongRange[] createLongRanges(Collection<? extends Range<? extends T>> ranges,
+			ToLongFunction<T> encoder,
+			T lowestPossibleValue, T highestPossibleValue, boolean extremaAreInfinity) {
 		LongRange[] longRanges = new LongRange[ranges.size()];
 		int i = 0;
-		for ( Range<? extends Number> range : ranges ) {
-			Number lowerBoundValue = range.getLowerBoundValue().orElse( null );
-			Number upperBoundValue = range.getUpperBoundValue().orElse( null );
+		for ( Range<? extends T> range : ranges ) {
+			T lowerBoundValue = range.getLowerBoundValue().orElse( null );
+			T upperBoundValue = range.getUpperBoundValue().orElse( null );
 			longRanges[i] = new LongRange(
 					String.valueOf( i ),
-					lowerBoundValue == null ? Long.MIN_VALUE : lowerBoundValue.longValue(),
-					// null means -Infinity: if -Infinity is the lower bound, included or not, then Long.MIN_VALUE is included.
-					lowerBoundValue == null
-							|| RangeBoundInclusion.INCLUDED.equals( range.getLowerBoundInclusion() ),
-					upperBoundValue == null ? Long.MAX_VALUE : upperBoundValue.longValue(),
-					// null means +Infinity: if +Infinity is the lower bound, included or not, then Long.MAX_VALUE is included.
-					upperBoundValue == null
-							|| RangeBoundInclusion.INCLUDED.equals( range.getUpperBoundInclusion() )
+					encoder.applyAsLong( lowerBoundValue == null ? lowestPossibleValue : lowerBoundValue ),
+					// The lower bound is included if it is explicitly included
+					RangeBoundInclusion.INCLUDED.equals( range.getLowerBoundInclusion() )
+							// ... or if it is infinity but infinity cannot be represented
+							|| !extremaAreInfinity && lowerBoundValue == null,
+					encoder.applyAsLong( upperBoundValue == null ? highestPossibleValue : upperBoundValue ),
+					// The upper bound is included if it is explicitly included
+					RangeBoundInclusion.INCLUDED.equals( range.getUpperBoundInclusion() )
+							// ... or if it is infinity but infinity cannot be represented
+							|| !extremaAreInfinity && upperBoundValue == null
 			);
 			++i;
 		}
 		return longRanges;
-	}
-
-	public static DoubleRange[] createDoubleRanges(Collection<? extends Range<? extends Number>> ranges) {
-		DoubleRange[] doubleRanges = new DoubleRange[ranges.size()];
-		int i = 0;
-		for ( Range<? extends Number> range : ranges ) {
-			Number lowerBoundValue = range.getLowerBoundValue().orElse( null );
-			Number upperBoundValue = range.getUpperBoundValue().orElse( null );
-			doubleRanges[i] = new DoubleRange(
-					String.valueOf( i ),
-					lowerBoundValue == null ? Double.NEGATIVE_INFINITY : lowerBoundValue.doubleValue(),
-					RangeBoundInclusion.INCLUDED.equals( range.getLowerBoundInclusion() ),
-					upperBoundValue == null ? Double.POSITIVE_INFINITY : upperBoundValue.doubleValue(),
-					RangeBoundInclusion.INCLUDED.equals( range.getUpperBoundInclusion() )
-			);
-			++i;
-		}
-		return doubleRanges;
 	}
 
 }

@@ -100,7 +100,8 @@ public class LuceneIntegerDomain implements LuceneNumericDomain<Integer> {
 		);
 		return new LongMultiValueRangeFacetCounts(
 				absoluteFieldPath, source,
-				facetsCollector, FacetCountsUtils.createLongRanges( ranges )
+				facetsCollector,
+				FacetCountsUtils.createLongRangesForIntegralValues( ranges )
 		);
 	}
 

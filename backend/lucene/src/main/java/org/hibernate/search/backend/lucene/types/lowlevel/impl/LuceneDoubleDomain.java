@@ -10,9 +10,12 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.Comparator;
 
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningDoubleMultiValuesSource;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValuesToSingleValuesSource;
 import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.JoiningLongMultiValuesSource;
+import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
 import org.hibernate.search.backend.lucene.lowlevel.facet.impl.FacetCountsUtils;
+import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueFacetCounts;
+import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueRangeFacetCounts;
 import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider;
 import org.hibernate.search.util.common.data.Range;
 
@@ -27,11 +30,6 @@ import org.apache.lucene.search.DoubleValues;
 import org.apache.lucene.search.FieldComparator;
 import org.apache.lucene.search.Query;
 import org.apache.lucene.util.NumericUtils;
-
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.DoubleMultiValuesToSingleValuesSource;
-import org.hibernate.search.backend.lucene.lowlevel.docvalues.impl.MultiValueMode;
-import org.hibernate.search.backend.lucene.lowlevel.facet.impl.DoubleMultiValueRangeFacetCounts;
-import org.hibernate.search.backend.lucene.lowlevel.facet.impl.LongMultiValueFacetCounts;
 
 public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	private static final LuceneNumericDomain<Double> INSTANCE = new LuceneDoubleDomain();
@@ -98,13 +96,19 @@ public class LuceneDoubleDomain implements LuceneNumericDomain<Double> {
 	public Facets createRangeFacetCounts(String absoluteFieldPath, FacetsCollector facetsCollector,
 			Collection<? extends Range<? extends Double>> ranges,
 			NestedDocsProvider nestedDocsProvider) throws IOException {
-		JoiningDoubleMultiValuesSource source = JoiningDoubleMultiValuesSource.fromDoubleField(
+		// As we don't need to apply any operation to terms except sometimes a sort,
+		// we can simply rely on raw, long values, whose order is the same as their corresponding double value.
+		// Values are ultimately converted back to the Double equivalent by calling sortedDocValueToTerm.
+		JoiningLongMultiValuesSource source = JoiningLongMultiValuesSource.fromLongField(
 				absoluteFieldPath, nestedDocsProvider
 		);
-		return new DoubleMultiValueRangeFacetCounts(
-			absoluteFieldPath,
-			source,
-			facetsCollector, FacetCountsUtils.createDoubleRanges( ranges )
+		return new LongMultiValueRangeFacetCounts(
+				absoluteFieldPath, source,
+				facetsCollector,
+				FacetCountsUtils.createLongRangesForFloatingPointValues(
+						ranges, NumericUtils::doubleToSortableLong,
+						Double.NEGATIVE_INFINITY, Double.POSITIVE_INFINITY
+				)
 		);
 	}
 
