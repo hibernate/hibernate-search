@@ -25,7 +25,6 @@ import org.hibernate.search.integrationtest.performance.backend.base.testsupport
 import org.hibernate.search.util.common.impl.Futures;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubBackendSessionContext;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMapperUtils;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.Fork;
@@ -120,8 +119,8 @@ public abstract class AbstractOnTheFlyIndexingBenchmarks extends AbstractBackend
 		StubBackendSessionContext sessionContext = new StubBackendSessionContext();
 		PerThreadIndexPartition partition = getIndexPartition();
 		MappedIndex index = partition.getIndex();
-		IndexIndexingPlan<?> indexingPlan = index.getIndexManager()
-				.createIndexingPlan( sessionContext, getCommitStrategyParam(), refreshStrategy );
+		IndexIndexingPlan<?> indexingPlan =
+				index.createIndexingPlan( sessionContext, getCommitStrategyParam(), refreshStrategy );
 
 		for ( Long documentIdInThread : idsToAdd ) {
 			long documentId = partition.toDocumentId( documentIdInThread );
@@ -169,9 +168,9 @@ public abstract class AbstractOnTheFlyIndexingBenchmarks extends AbstractBackend
 	@Group("concurrentReadWrite")
 	public void concurrentQuery(QueryParams params, Blackhole blackhole) {
 		PerThreadIndexPartition partition = getIndexPartition();
-		StubMappingIndexManager indexManager = partition.getIndex().getIndexManager();
+		MappedIndex index = partition.getIndex();
 
-		SearchResult<DocumentReference> results = indexManager.createScope().query()
+		SearchResult<DocumentReference> results = index.createScope().query()
 				.where( f -> f.matchAll() )
 				.sort( f -> f.field( MappedIndex.SHORT_TEXT_FIELD_NAME ) )
 				.fetch( params.getQueryMaxResults() );

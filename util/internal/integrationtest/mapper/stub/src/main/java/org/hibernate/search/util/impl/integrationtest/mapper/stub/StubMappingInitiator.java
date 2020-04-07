@@ -8,41 +8,37 @@ package org.hibernate.search.util.impl.integrationtest.mapper.stub;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 import org.hibernate.search.engine.mapper.mapping.building.spi.Mapper;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingConfigurationCollector;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingInitiator;
-import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.engine.mapper.mapping.building.spi.TypeMetadataContributorProvider;
 import org.hibernate.search.engine.mapper.mapping.building.spi.MappingBuildContext;
 
-public class StubMappingInitiator implements MappingInitiator<StubTypeMetadataContributor, StubMappingPartialBuildState> {
+public class StubMappingInitiator implements MappingInitiator<StubMappedIndex, StubMappingPartialBuildState> {
 
 	private final boolean multiTenancyEnabled;
-	private final List<StubTypeMetadataContributor> mappingContributors = new ArrayList<>();
+	private final List<StubMappedIndex> mappedIndexes = new ArrayList<>();
 
 	public StubMappingInitiator(boolean multiTenancyEnabled) {
 		this.multiTenancyEnabled = multiTenancyEnabled;
 	}
 
-	public void add(String typeIdentifier, String backendName, String indexName,
-			Consumer<? super IndexedEntityBindingContext> mappingContributor) {
-		mappingContributors.add( new StubTypeMetadataContributor( new StubTypeModel( typeIdentifier ), backendName,
-				indexName, mappingContributor ) );
+	public void add(StubMappedIndex mappedIndex) {
+		mappedIndexes.add( mappedIndex );
 	}
 
 	@Override
 	public void configure(MappingBuildContext buildContext,
-			MappingConfigurationCollector<StubTypeMetadataContributor> configurationCollector) {
-		for ( StubTypeMetadataContributor mappingContributor : mappingContributors ) {
-			mappingContributor.contribute( configurationCollector );
+			MappingConfigurationCollector<StubMappedIndex> configurationCollector) {
+		for ( StubMappedIndex mappedIndex : mappedIndexes ) {
+			configurationCollector.collectContributor( new StubTypeModel( mappedIndex.typeName() ), mappedIndex );
 		}
 	}
 
 	@Override
 	public Mapper<StubMappingPartialBuildState> createMapper(MappingBuildContext buildContext,
-			TypeMetadataContributorProvider<StubTypeMetadataContributor> contributorProvider) {
+			TypeMetadataContributorProvider<StubMappedIndex> contributorProvider) {
 		return new StubMapper( buildContext, contributorProvider, multiTenancyEnabled );
 	}
 

@@ -13,10 +13,10 @@ import org.hibernate.search.engine.mapper.mapping.building.spi.MappingPartialBui
 
 public class StubMappingPartialBuildState implements MappingPartialBuildState {
 
-	private final Map<String, StubMappingIndexManager> indexMappingsByTypeIdentifier;
+	private final Map<String, StubMappedIndex> mappedIndexesByTypeIdentifier;
 
-	StubMappingPartialBuildState(Map<String, StubMappingIndexManager> indexMappingsByTypeIdentifier) {
-		this.indexMappingsByTypeIdentifier = indexMappingsByTypeIdentifier;
+	StubMappingPartialBuildState(Map<String, StubMappedIndex> mappedIndexesByTypeIdentifier) {
+		this.mappedIndexesByTypeIdentifier = mappedIndexesByTypeIdentifier;
 	}
 
 	@Override
@@ -25,7 +25,7 @@ public class StubMappingPartialBuildState implements MappingPartialBuildState {
 	}
 
 	public MappingImplementor<StubMapping> finalizeMapping(StubMappingSchemaManagementStrategy schemaManagementStrategy) {
-		return new StubMapping( indexMappingsByTypeIdentifier, schemaManagementStrategy );
+		return new StubMapping( mappedIndexesByTypeIdentifier, schemaManagementStrategy );
 	}
 
 }

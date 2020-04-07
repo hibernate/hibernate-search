@@ -6,30 +6,50 @@
  */
 package org.hibernate.search.integrationtest.performance.backend.base.testsupport.index;
 
+import java.util.Optional;
+
 import org.hibernate.search.engine.backend.document.DocumentElement;
 import org.hibernate.search.engine.backend.document.IndexFieldReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Sortable;
 import org.hibernate.search.engine.mapper.mapping.building.spi.IndexedEntityBindingContext;
 import org.hibernate.search.integrationtest.performance.backend.base.testsupport.analysis.Analyzers;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappedIndex;
 
 import org.openjdk.jmh.annotations.CompilerControl;
 
 @CompilerControl(CompilerControl.Mode.INLINE)
-public class MappedIndex {
+public class MappedIndex extends StubMappedIndex {
 
 	public static final String SHORT_TEXT_FIELD_NAME = "shortText";
 	public static final String LONG_TEXT_FIELD_NAME = "longText";
 	public static final String NUMERIC_FIELD_NAME = "numeric";
 
+	private final String backendName;
+	private final int indexId;
+
 	private IndexFieldReference<String> shortTextField;
 	private IndexFieldReference<String> longTextField;
 	private IndexFieldReference<Long> numericField;
 
-	private StubMappingIndexManager indexManager;
+	public MappedIndex(String backendName, int indexId) {
+		super( "index_" + indexId );
+		this.backendName = backendName;
+		this.indexId = indexId;
+	}
 
-	public void bind(IndexedEntityBindingContext context) {
+	@Override
+	public String typeName() {
+		return "type_" + indexId;
+	}
+
+	@Override
+	public Optional<String> backendName() {
+		return Optional.of( backendName );
+	}
+
+	@Override
+	protected void bind(IndexedEntityBindingContext context) {
 		IndexSchemaElement root = context.getSchemaElement();
 		shortTextField = root.field(
 				SHORT_TEXT_FIELD_NAME,
@@ -39,14 +59,6 @@ public class MappedIndex {
 		longTextField = root.field( LONG_TEXT_FIELD_NAME, f -> f.asString().analyzer( Analyzers.ANALYZER_ENGLISH ) )
 				.toReference();
 		numericField = root.field( NUMERIC_FIELD_NAME, f -> f.asLong() ).toReference();
-	}
-
-	public void setIndexManager(StubMappingIndexManager indexManager) {
-		this.indexManager = indexManager;
-	}
-
-	public StubMappingIndexManager getIndexManager() {
-		return indexManager;
 	}
 
 	public void populate(DocumentElement documentElement, String shortText, String longText, long numeric) {

@@ -69,11 +69,9 @@ public class IndexInitializer {
 
 		log( index, "Adding documents to index..." );
 
-		IndexWorkspace workspace = index.getIndexManager()
-				.createWorkspace( DetachedBackendSessionContext.of( sessionContext ) );
+		IndexWorkspace workspace = index.createWorkspace( DetachedBackendSessionContext.of( sessionContext ) );
 
-		IndexIndexer indexer = index.getIndexManager()
-				.createIndexer( new StubBackendSessionContext(), DocumentCommitStrategy.NONE );
+		IndexIndexer indexer = index.createIndexer( new StubBackendSessionContext(), DocumentCommitStrategy.NONE );
 		List<CompletableFuture<?>> futures = new ArrayList<>();
 		idStream.forEach( id -> {
 			CompletableFuture<?> future = indexer.add(
@@ -93,8 +91,7 @@ public class IndexInitializer {
 		StubBackendSessionContext sessionContext = new StubBackendSessionContext();
 
 		log( index, "Purging..." );
-		IndexWorkspace workspace = index.getIndexManager()
-				.createWorkspace( DetachedBackendSessionContext.of( sessionContext ) );
+		IndexWorkspace workspace = index.createWorkspace( DetachedBackendSessionContext.of( sessionContext ) );
 		workspace.purge( Collections.emptySet() ).join();
 		log( index, "Finished purge." );
 
@@ -104,7 +101,7 @@ public class IndexInitializer {
 	}
 
 	private static void log(MappedIndex index, String message) {
-		log.infof( "[%s] %s",index.getIndexManager().getName(), message );
+		log.infof( "[%s] %s", index.name(), message );
 	}
 
 }

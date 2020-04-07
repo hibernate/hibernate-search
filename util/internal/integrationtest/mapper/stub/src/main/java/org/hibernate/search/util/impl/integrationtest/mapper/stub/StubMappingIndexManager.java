@@ -21,26 +21,18 @@ import org.hibernate.search.engine.backend.common.DocumentReference;
  * A wrapper around {@link MappedIndexManager} providing some syntactic sugar,
  * such as methods that do not force to provide a session context.
  */
-public class StubMappingIndexManager {
+public abstract class StubMappingIndexManager {
 
-	private final String indexName;
-	private final MappedIndexManager indexManager;
+	public abstract String name();
 
-	StubMappingIndexManager(String indexName, MappedIndexManager indexManager) {
-		this.indexName = indexName;
-		this.indexManager = indexManager;
-	}
-
-	public String getName() {
-		return indexName;
-	}
+	protected abstract MappedIndexManager delegate();
 
 	public <T> T unwrapForTests(Class<T> clazz) {
-		return clazz.cast( indexManager.toAPI() );
+		return clazz.cast( delegate().toAPI() );
 	}
 
 	public IndexSchemaManager getSchemaManager() {
-		return indexManager.getSchemaManager();
+		return delegate().getSchemaManager();
 	}
 
 	public IndexIndexingPlan<StubEntityReference> createIndexingPlan() {
@@ -52,13 +44,13 @@ public class StubMappingIndexManager {
 		 * Use the same defaults as in the ORM mapper for the commit strategy,
 		 * but force refreshes because it's more convenient for tests.
 		 */
-		return indexManager.createIndexingPlan( sessionContext, StubEntityReference.FACTORY,
+		return delegate().createIndexingPlan( sessionContext, StubEntityReference.FACTORY,
 				DocumentCommitStrategy.FORCE, DocumentRefreshStrategy.FORCE );
 	}
 
 	public IndexIndexingPlan<StubEntityReference> createIndexingPlan(StubBackendSessionContext sessionContext,
 			DocumentCommitStrategy commitStrategy, DocumentRefreshStrategy refreshStrategy) {
-		return indexManager.createIndexingPlan( sessionContext, StubEntityReference.FACTORY,
+		return delegate().createIndexingPlan( sessionContext, StubEntityReference.FACTORY,
 				commitStrategy, refreshStrategy );
 	}
 
@@ -68,7 +60,7 @@ public class StubMappingIndexManager {
 
 	public IndexIndexer createIndexer(
 			StubBackendSessionContext sessionContext, DocumentCommitStrategy commitStrategy) {
-		return indexManager.createIndexer( sessionContext, StubEntityReference.FACTORY );
+		return delegate().createIndexer( sessionContext, StubEntityReference.FACTORY );
 	}
 
 	public IndexWorkspace createWorkspace() {
@@ -80,7 +72,7 @@ public class StubMappingIndexManager {
 	}
 
 	public IndexWorkspace createWorkspace(DetachedBackendSessionContext sessionContext) {
-		return indexManager.createWorkspace( sessionContext );
+		return delegate().createWorkspace( sessionContext );
 	}
 
 	/**
@@ -88,7 +80,7 @@ public class StubMappingIndexManager {
 	 */
 	public StubMappingScope createScope() {
 		MappedIndexScopeBuilder<DocumentReference, DocumentReference> builder =
-				indexManager.createScopeBuilder( new StubBackendMappingContext() );
+				delegate().createScopeBuilder( new StubBackendMappingContext() );
 		return new StubMappingScope( builder.build() );
 	}
 
@@ -97,9 +89,9 @@ public class StubMappingIndexManager {
 	 */
 	public StubMappingScope createScope(StubMappingIndexManager... others) {
 		MappedIndexScopeBuilder<DocumentReference, DocumentReference> builder =
-				indexManager.createScopeBuilder( new StubBackendMappingContext() );
+				delegate().createScopeBuilder( new StubBackendMappingContext() );
 		for ( StubMappingIndexManager other : others ) {
-			other.indexManager.addTo( builder );
+			other.delegate().addTo( builder );
 		}
 		return new StubMappingScope( builder.build() );
 	}
@@ -109,9 +101,9 @@ public class StubMappingIndexManager {
 	 */
 	public <R, E> GenericStubMappingScope<R, E> createGenericScope(StubMappingIndexManager... others) {
 		MappedIndexScopeBuilder<R, E> builder =
-				indexManager.createScopeBuilder( new StubBackendMappingContext() );
+				delegate().createScopeBuilder( new StubBackendMappingContext() );
 		for ( StubMappingIndexManager other : others ) {
-			other.indexManager.addTo( builder );
+			other.delegate().addTo( builder );
 		}
 		return new GenericStubMappingScope<>( builder.build() );
 	}
