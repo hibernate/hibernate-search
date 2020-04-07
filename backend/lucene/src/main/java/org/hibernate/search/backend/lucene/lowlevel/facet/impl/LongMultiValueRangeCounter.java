@@ -15,7 +15,7 @@ import org.apache.lucene.facet.range.LongRange;
 
 /**
  * <p>
- * Copied with some changes from
+ * Copied with some changes from {@code org.apache.lucene.facet.range.LongRangeCounter}
  * of <a href="https://lucene.apache.org/">Apache Lucene project</a>.
  */
 class LongMultiValueRangeCounter {

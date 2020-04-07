@@ -28,7 +28,7 @@ import org.hibernate.search.backend.lucene.lowlevel.join.impl.NestedDocsProvider
 
 /**
  * <p>
- * Copied with some changes from
+ * Copied with some changes from {@code org.apache.lucene.facet.range.DoubleRangeFacetCounts}
  * of <a href="https://lucene.apache.org/">Apache Lucene project</a>.
  */
 public class DoubleMultiValueRangeFacetCounts extends MultiValueRangeFacetCounts {
