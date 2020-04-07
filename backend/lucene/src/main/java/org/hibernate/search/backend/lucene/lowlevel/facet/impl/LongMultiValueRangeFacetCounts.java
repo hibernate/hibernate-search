@@ -8,6 +8,9 @@ package org.hibernate.search.backend.lucene.lowlevel.facet.impl;
 
 import java.io.IOException;
 import java.util.List;
+
+import com.carrotsearch.hppc.IntHashSet;
+import com.carrotsearch.hppc.procedures.IntProcedure;
 import org.apache.lucene.facet.FacetsCollector;
 import org.apache.lucene.facet.range.LongRange;
 import org.apache.lucene.index.IndexReaderContext;
@@ -41,12 +44,15 @@ public class LongMultiValueRangeFacetCounts extends MultiValueRangeFacetCounts {
 	private void count(LongMultiValuesSource valueSource, List<FacetsCollector.MatchingDocs> matchingDocs) throws IOException {
 		LongRange[] longRanges = (LongRange[]) this.ranges;
 
+		IntHashSet uniqueLeafIndicesForDocument = new IntHashSet();
 		LongMultiValueRangeCounter counter = new LongMultiValueRangeCounter( longRanges );
+		IntProcedure incrementCountForLeafWithIndex = counter::incrementCountForLeafWithIndex;
 
 		int missingCount = 0;
 		for ( FacetsCollector.MatchingDocs hits : matchingDocs ) {
 			LongMultiValues fv = valueSource.getValues( hits.context );
 
+			totCount += hits.totalHits;
 			final DocIdSetIterator fastMatchDocs;
 			if ( fastMatchQuery != null ) {
 				final IndexReaderContext topLevelContext = ReaderUtil.getTopLevelContext( hits.context );
@@ -79,9 +85,13 @@ public class LongMultiValueRangeFacetCounts extends MultiValueRangeFacetCounts {
 
 				if ( fv.advanceExact( doc ) ) {
 					while ( fv.hasNextValue() ) {
-						++totCount;
-						counter.add( fv.nextValue() );
+						// Each document must be counted only once per range.
+						int leafIndex = counter.findLeafIndex( fv.nextValue() );
+						uniqueLeafIndicesForDocument.add( leafIndex );
 					}
+
+					uniqueLeafIndicesForDocument.forEach( incrementCountForLeafWithIndex );
+					uniqueLeafIndicesForDocument.clear();
 				}
 				else {
 					missingCount++;

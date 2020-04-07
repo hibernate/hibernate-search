@@ -127,18 +127,20 @@ class LongMultiValueRangeCounter {
 		//System.out.println("root:\n" + root);
 	}
 
-	public void add(long v) {
-		//System.out.println("add v=" + v);
+	public void incrementCountForLeafWithIndex(int index) {
+		leafCounts[index]++;
+	}
 
+	public int findLeafIndex(long v) {
 		// NOTE: this works too, but it's ~6% slower on a simple
 		// test with a high-freq TermQuery w/ range faceting on
 		// wikimediumall:
 		/*
-    int index = Arrays.binarySearch(boundaries, v);
-    if (index < 0) {
-      index = -index-1;
-    }
-    leafCounts[index]++;
+		int index = Arrays.binarySearch(boundaries, v);
+		if (index < 0) {
+		  index = -index-1;
+		}
+		return index;
 		 */
 		// Binary search to find matched elementary range; we
 		// are guaranteed to find a match because the last
@@ -147,11 +149,9 @@ class LongMultiValueRangeCounter {
 		int hi = boundaries.length - 1;
 		while ( true ) {
 			int mid = (lo + hi) >>> 1;
-			//System.out.println("  cycle lo=" + lo + " hi=" + hi + " mid=" + mid + " boundary=" + boundaries[mid] + " to " + boundaries[mid+1]);
 			if ( v <= boundaries[mid] ) {
 				if ( mid == 0 ) {
-					leafCounts[0]++;
-					return;
+					return 0;
 				}
 				else {
 					hi = mid - 1;
@@ -161,9 +161,7 @@ class LongMultiValueRangeCounter {
 				lo = mid + 1;
 			}
 			else {
-				leafCounts[mid + 1]++;
-				//System.out.println("  incr @ " + (mid+1) + "; now " + leafCounts[mid+1]);
-				return;
+				return mid + 1;
 			}
 		}
 	}
