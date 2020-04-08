@@ -13,16 +13,34 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TypeAss
 
 public abstract class SupportedSingleFieldAggregationExpectations<F> {
 
+	private final FieldTypeDescriptor<F> fieldType;
+	private final String aggregationName;
 	private final List<F> mainIndexDocumentFieldValues;
 	private final List<F> compatibleIndexDocumentFieldValues;
 	private final List<List<F>> multiValuedIndexDocumentFieldValues;
 
-	protected SupportedSingleFieldAggregationExpectations(List<F> mainIndexDocumentFieldValues,
+	protected SupportedSingleFieldAggregationExpectations(FieldTypeDescriptor<F> fieldType, String aggregationName,
+			List<F> mainIndexDocumentFieldValues,
 			List<F> compatibleIndexDocumentFieldValues,
 			List<List<F>> multiValuedIndexDocumentFieldValues) {
+		this.fieldType = fieldType;
+		this.aggregationName = aggregationName;
 		this.mainIndexDocumentFieldValues = mainIndexDocumentFieldValues;
 		this.compatibleIndexDocumentFieldValues = compatibleIndexDocumentFieldValues;
 		this.multiValuedIndexDocumentFieldValues = multiValuedIndexDocumentFieldValues;
+	}
+
+	@Override
+	public String toString() {
+		return aggregationName + " on type " + fieldType.getUniqueName();
+	}
+
+	public FieldTypeDescriptor<F> fieldType() {
+		return fieldType;
+	}
+
+	public String aggregationName() {
+		return aggregationName;
 	}
 
 	public List<F> getMainIndexDocumentFieldValues() {
@@ -38,25 +56,25 @@ public abstract class SupportedSingleFieldAggregationExpectations<F> {
 	}
 
 	/*
-	 * f -> f.myAggregationType().field( fieldPath, theActualFieldType )
-	 *        .someParam( valueOfActualFieldType )
+	 * f -> f.myAggregationType().field( fieldPath, theUnderlyingFieldType )
+	 *        .someParam( valueOfUnderlyingFieldType )
 	 */
-	public final AggregationScenario<?> simple(FieldTypeDescriptor<F> typeDescriptor) {
-		return withFieldType( TypeAssertionHelper.identity( typeDescriptor ) );
+	public final AggregationScenario<?> simple() {
+		return withFieldType( TypeAssertionHelper.identity( fieldType ) );
 	}
 
 	/*
 	 * f -> f.myAggregationType().field( fieldPath, fieldType )
-	 *        .someParam( fieldValueConverter.apply( valueOfActualFieldType ) )
+	 *        .someParam( helper.create( valueOfUnderlyingFieldType ) )
 	 */
 	public abstract <T> AggregationScenario<?> withFieldType(TypeAssertionHelper<F, T> helper);
 
 	/*
-	 * Same as simple(...), but targeting both the main index and another index,
+	 * Same as simple(), but targeting both the main index and another index,
 	 * and expecting an aggregation result taking into account both indexes.
 	 */
-	public final AggregationScenario<?> onMainAndOtherIndex(FieldTypeDescriptor<F> typeDescriptor) {
-		return withFieldTypeOnMainAndOtherIndex( TypeAssertionHelper.identity( typeDescriptor ) );
+	public final AggregationScenario<?> onMainAndOtherIndex() {
+		return withFieldTypeOnMainAndOtherIndex( TypeAssertionHelper.identity( fieldType ) );
 	}
 
 	/*
@@ -66,14 +84,14 @@ public abstract class SupportedSingleFieldAggregationExpectations<F> {
 	public abstract <T> AggregationScenario<?> withFieldTypeOnMainAndOtherIndex(TypeAssertionHelper<F, T> helper);
 
 	/*
-	 * Same as simple(...), but not expecting any matching document,
+	 * Same as simple(), but not expecting any matching document,
 	 * and thus expecting the aggregation result to be empty.
 	 */
-	public abstract AggregationScenario<?> withoutMatch(FieldTypeDescriptor<F> typeDescriptor);
+	public abstract AggregationScenario<?> withoutMatch();
 
 	/*
-	 * Same as simple(...), but targeting the index with multi-valued documents.
+	 * Same as simple(), but targeting the index with multi-valued documents.
 	 */
-	public abstract AggregationScenario<?> onMultiValuedIndex(FieldTypeDescriptor<F> typeDescriptor);
+	public abstract AggregationScenario<?> onMultiValuedIndex();
 
 }

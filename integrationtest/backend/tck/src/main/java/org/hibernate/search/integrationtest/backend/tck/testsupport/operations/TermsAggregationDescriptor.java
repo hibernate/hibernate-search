@@ -101,6 +101,7 @@ public class TermsAggregationDescriptor extends AggregationDescriptor {
 		multiValuedIndexExpected.put( typeDescriptor.toExpectedDocValue( uniqueTermValues.get( 1 ) ), 2L );
 
 		return ExpectationsAlternative.supported( new SupportedSingleFieldAggregationExpectations<F>(
+				typeDescriptor, "terms",
 				mainIndexDocumentFieldValues,
 				otherIndexDocumentFieldValues,
 				multiValuedIndexDocumentFieldValues
@@ -116,13 +117,13 @@ public class TermsAggregationDescriptor extends AggregationDescriptor {
 			}
 
 			@Override
-			public AggregationScenario<?> withoutMatch(FieldTypeDescriptor<F> typeDescriptor) {
-				return doCreate( Collections.emptyMap(), TypeAssertionHelper.identity( typeDescriptor ) );
+			public AggregationScenario<?> withoutMatch() {
+				return doCreate( Collections.emptyMap(), TypeAssertionHelper.identity( fieldType() ) );
 			}
 
 			@Override
-			public AggregationScenario<?> onMultiValuedIndex(FieldTypeDescriptor<F> typeDescriptor) {
-				return doCreate( multiValuedIndexExpected, TypeAssertionHelper.identity( typeDescriptor ) );
+			public AggregationScenario<?> onMultiValuedIndex() {
+				return doCreate( multiValuedIndexExpected, TypeAssertionHelper.identity( fieldType() ) );
 			}
 
 			private <T> AggregationScenario<Map<T, Long>> doCreate(Map<F, Long> expectedResult,
@@ -161,7 +162,17 @@ public class TermsAggregationDescriptor extends AggregationDescriptor {
 	}
 
 	private <F> UnsupportedSingleFieldAggregationExpectations unsupportedExpectations(FieldTypeDescriptor<F> typeDescriptor) {
-		return (factory, fieldPath) -> factory.terms().field( fieldPath, typeDescriptor.getJavaType() );
+		return new UnsupportedSingleFieldAggregationExpectations() {
+			@Override
+			public void trySetup(SearchAggregationFactory factory, String fieldPath) {
+				factory.terms().field( fieldPath, typeDescriptor.getJavaType() );
+			}
+
+			@Override
+			public String toString() {
+				return "terms on " + typeDescriptor;
+			}
+		};
 	}
 
 }

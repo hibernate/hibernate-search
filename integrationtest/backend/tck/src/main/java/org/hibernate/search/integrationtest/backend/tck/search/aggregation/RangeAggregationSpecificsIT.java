@@ -14,23 +14,24 @@ import static org.junit.Assume.assumeTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
 import org.hibernate.search.engine.backend.types.Aggregable;
 import org.hibernate.search.engine.backend.types.Searchable;
-import org.hibernate.search.engine.backend.types.dsl.StandardIndexFieldTypeOptionsStep;
 import org.hibernate.search.engine.backend.work.execution.spi.IndexIndexingPlan;
-import org.hibernate.search.engine.backend.common.DocumentReference;
 import org.hibernate.search.engine.search.aggregation.AggregationKey;
 import org.hibernate.search.engine.search.query.dsl.SearchQueryOptionsStep;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.AggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.RangeAggregationDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
-import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConfiguration;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
@@ -39,16 +40,15 @@ import org.hibernate.search.util.common.data.Range;
 import org.hibernate.search.util.common.data.RangeBoundInclusion;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-
-import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
-import org.hibernate.search.util.impl.test.singleinstance.BeforeAll;
-import org.hibernate.search.util.impl.test.singleinstance.InstanceRule;
-import org.hibernate.search.util.impl.test.singleinstance.SingleInstanceRunnerWithParameters;
 
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import org.assertj.core.api.Assertions;
 
 /**
  * Tests behavior specific to the range aggregation on supported field types.
@@ -56,43 +56,53 @@ import org.junit.runners.Parameterized;
  * Behavior common to all single-field aggregations is tested in {@link SingleFieldAggregationBaseIT}.
  */
 @RunWith(Parameterized.class)
-@Parameterized.UseParametersRunnerFactory(SingleInstanceRunnerWithParameters.Factory.class)
 public class RangeAggregationSpecificsIT<F> {
 
 	private static final String AGGREGATION_NAME = "aggregationName";
 
+	private static Set<FieldTypeDescriptor<?>> supportedFieldTypes;
+	private static List<DataSet<?>> dataSets;
+
 	@Parameterized.Parameters(name = "{0}")
-	public static Object[][] supportedTypes() {
-		List<Object[]> combinations = new ArrayList<>();
+	public static Object[][] parameters() {
+		supportedFieldTypes = new LinkedHashSet<>();
+		dataSets = new ArrayList<>();
+		List<Object[]> parameters = new ArrayList<>();
 		AggregationDescriptor aggregationDescriptor = new RangeAggregationDescriptor();
-		for ( FieldTypeDescriptor<?> fieldTypeDescriptor : FieldTypeDescriptor.getAll() ) {
-			if ( aggregationDescriptor.getSingleFieldAggregationExpectations( fieldTypeDescriptor ).isSupported() ) {
-				combinations.add( new Object[] {
-						fieldTypeDescriptor
-				} );
+		for ( FieldTypeDescriptor<?> fieldType : FieldTypeDescriptor.getAll() ) {
+			if ( aggregationDescriptor.getSingleFieldAggregationExpectations( fieldType ).isSupported() ) {
+				supportedFieldTypes.add( fieldType );
+				DataSet<?> dataSet = new DataSet<>( fieldType );
+				dataSets.add( dataSet );
+				parameters.add( new Object[] { fieldType, dataSet } );
 			}
 		}
-		return combinations.toArray( new Object[0][] );
+		return parameters.toArray( new Object[0][] );
 	}
 
-	@InstanceRule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@ClassRule
+	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private final FieldTypeDescriptor<F> typeDescriptor;
-	private final List<F> ascendingValues;
+	private static final SimpleMappedIndex<IndexBinding> index =
+			SimpleMappedIndex.of( "Main", IndexBinding::new );
 
-	private SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( "Main", IndexBinding::new );
-
-	public RangeAggregationSpecificsIT(FieldTypeDescriptor<F> typeDescriptor) {
-		this.typeDescriptor = typeDescriptor;
-		this.ascendingValues = typeDescriptor.getAscendingUniqueTermValues().getSingle();
-	}
-
-	@BeforeAll
-	public void setup() {
+	@BeforeClass
+	public static void setup() {
 		setupHelper.start().withIndex( index ).setup();
 
-		initData();
+		for ( DataSet<?> dataSet : dataSets ) {
+			dataSet.init();
+		}
+	}
+
+	private final FieldTypeDescriptor<F> fieldType;
+	private final DataSet<F> dataSet;
+	private final List<F> ascendingValues;
+
+	public RangeAggregationSpecificsIT(FieldTypeDescriptor<F> fieldType, DataSet<F> dataSet) {
+		this.fieldType = fieldType;
+		this.dataSet = dataSet;
+		this.ascendingValues = dataSet.ascendingValues;
 	}
 
 	@Test
@@ -100,15 +110,16 @@ public class RangeAggregationSpecificsIT<F> {
 	public void rangeAtMost() {
 		assumeNonCanonicalRangesSupported();
 
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
 				matchAllQuery()
-						.aggregation( aggregationKey, f -> f.range().field( fieldPath, typeDescriptor.getJavaType() )
+						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.range( Range.atMost( ascendingValues.get( 2 ) ) )
 						)
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
@@ -122,15 +133,16 @@ public class RangeAggregationSpecificsIT<F> {
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeBelowExcludeLimit")
 	public void rangeLessThan() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
 				matchAllQuery()
-						.aggregation( aggregationKey, f -> f.range().field( fieldPath, typeDescriptor.getJavaType() )
+						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.range( Range.lessThan( ascendingValues.get( 2 ) ) )
 						)
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
@@ -144,15 +156,16 @@ public class RangeAggregationSpecificsIT<F> {
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeAbove")
 	public void rangeAtLeast() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
 				matchAllQuery()
-						.aggregation( aggregationKey, f -> f.range().field( fieldPath, typeDescriptor.getJavaType() )
+						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.range( Range.atLeast( ascendingValues.get( 3 ) ) )
 						)
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
@@ -168,15 +181,16 @@ public class RangeAggregationSpecificsIT<F> {
 	public void rangeGreaterThan() {
 		assumeNonCanonicalRangesSupported();
 
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
 				matchAllQuery()
-						.aggregation( aggregationKey, f -> f.range().field( fieldPath, typeDescriptor.getJavaType() )
+						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.range( Range.greaterThan( ascendingValues.get( 3 ) ) )
 						)
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
@@ -190,19 +204,20 @@ public class RangeAggregationSpecificsIT<F> {
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeWithExcludeLimitsAtEachLevel")
 	public void rangesCanonical() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
 				matchAllQuery()
-						.aggregation( aggregationKey, f -> f.range().field( fieldPath, typeDescriptor.getJavaType() )
+						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.ranges( Arrays.asList(
 										Range.canonical( null, ascendingValues.get( 3 ) ),
 										Range.canonical( ascendingValues.get( 3 ), ascendingValues.get( 5 ) ),
 										Range.canonical( ascendingValues.get( 5 ), null )
 								) )
 						)
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
@@ -220,13 +235,13 @@ public class RangeAggregationSpecificsIT<F> {
 	public void rangesBetweenIncludingAllBounds() {
 		assumeNonCanonicalRangesSupported();
 
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
 				matchAllQuery()
-						.aggregation( aggregationKey, f -> f.range().field( fieldPath, typeDescriptor.getJavaType() )
+						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.ranges( Arrays.asList(
 										Range.between( null, RangeBoundInclusion.INCLUDED,
 												ascendingValues.get( 2 ), RangeBoundInclusion.INCLUDED ),
@@ -236,6 +251,7 @@ public class RangeAggregationSpecificsIT<F> {
 												null, RangeBoundInclusion.INCLUDED )
 								) )
 						)
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
@@ -264,19 +280,20 @@ public class RangeAggregationSpecificsIT<F> {
 
 	@Test
 	public void rangesOverlap() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
 				matchAllQuery()
-						.aggregation( aggregationKey, f -> f.range().field( fieldPath, typeDescriptor.getJavaType() )
+						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.ranges( Arrays.asList(
 										Range.canonical( null, ascendingValues.get( 3 ) ),
 										Range.canonical( ascendingValues.get( 1 ), ascendingValues.get( 5 ) ),
 										Range.canonical( ascendingValues.get( 2 ), null )
 								) )
 						)
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
@@ -292,11 +309,11 @@ public class RangeAggregationSpecificsIT<F> {
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeQueryWithNullToAndFrom")
 	public void rangeNull() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		Assertions.assertThatThrownBy( () ->
 				index.createScope().aggregation().range()
-						.field( fieldPath, typeDescriptor.getJavaType() )
+						.field( fieldPath, fieldType.getJavaType() )
 						.range( null )
 		)
 				.isInstanceOf( IllegalArgumentException.class )
@@ -306,11 +323,11 @@ public class RangeAggregationSpecificsIT<F> {
 
 	@Test
 	public void rangesNull() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		Assertions.assertThatThrownBy( () ->
 				index.createScope().aggregation().range()
-						.field( fieldPath, typeDescriptor.getJavaType() )
+						.field( fieldPath, fieldType.getJavaType() )
 						.ranges( null )
 		)
 				.isInstanceOf( IllegalArgumentException.class )
@@ -320,11 +337,11 @@ public class RangeAggregationSpecificsIT<F> {
 
 	@Test
 	public void rangesContainingNull() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		Assertions.assertThatThrownBy( () ->
 				index.createScope().aggregation().range()
-						.field( fieldPath, typeDescriptor.getJavaType() )
+						.field( fieldPath, fieldType.getJavaType() )
 						.ranges( Arrays.asList(
 								Range.canonical( ascendingValues.get( 0 ), ascendingValues.get( 1 ) ),
 								null
@@ -338,11 +355,11 @@ public class RangeAggregationSpecificsIT<F> {
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testUnsupportedRangeParameterTypeThrowsException")
 	public void superClassFieldType() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		Assertions.assertThatThrownBy( () ->
 				index.createScope().aggregation().range()
-						.field( fieldPath, typeDescriptor.getJavaType().getSuperclass() )
+						.field( fieldPath, fieldType.getJavaType().getSuperclass() )
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid type" )
@@ -356,18 +373,19 @@ public class RangeAggregationSpecificsIT<F> {
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeQueryForDoubleWithZeroCount")
 	public void predicate() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
 				index.createScope().query()
-						.where( f -> f.id().matchingAny( Arrays.asList( "document_1", "document_5" ) ) )
-						.aggregation( aggregationKey, f -> f.range().field( fieldPath, typeDescriptor.getJavaType() )
+						.where( f -> f.id().matchingAny( Arrays.asList( dataSet.name + "_document_1", dataSet.name + "_document_5" ) ) )
+						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.range( null, ascendingValues.get( 2 ) )
 								.range( ascendingValues.get( 2 ), ascendingValues.get( 5 ) )
 								.range( ascendingValues.get( 5 ), null )
 						)
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
@@ -387,13 +405,13 @@ public class RangeAggregationSpecificsIT<F> {
 	 */
 	@Test
 	public void limitAndOffset() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
 				matchAllQuery()
-						.aggregation( aggregationKey, f -> f.range().field( fieldPath, typeDescriptor.getJavaType() )
+						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.range( null, ascendingValues.get( 2 ) )
 								.range( ascendingValues.get( 2 ), ascendingValues.get( 5 ) )
 								.range( ascendingValues.get( 5 ), null )
@@ -416,13 +434,13 @@ public class RangeAggregationSpecificsIT<F> {
 	 */
 	@Test
 	public void rangeOverlap() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
 				matchAllQuery()
-						.aggregation( aggregationKey, f -> f.range().field( fieldPath, typeDescriptor.getJavaType() )
+						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.range( ascendingValues.get( 0 ), null )
 								.range( null, ascendingValues.get( 2 ) )
 								.range( ascendingValues.get( 2 ), ascendingValues.get( 5 ) )
@@ -431,6 +449,7 @@ public class RangeAggregationSpecificsIT<F> {
 								.range( ascendingValues.get( 5 ), null )
 								.range( null, ascendingValues.get( 6 ) )
 						)
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
@@ -452,17 +471,18 @@ public class RangeAggregationSpecificsIT<F> {
 	 */
 	@Test
 	public void order_asDefined() {
-		String fieldPath = index.binding().fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModels.get( fieldType ).relativeFieldName;
 
 		AggregationKey<Map<Range<F>, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
 				matchAllQuery()
-						.aggregation( aggregationKey, f -> f.range().field( fieldPath, typeDescriptor.getJavaType() )
+						.aggregation( aggregationKey, f -> f.range().field( fieldPath, fieldType.getJavaType() )
 								.range( null, ascendingValues.get( 2 ) )
 								.range( ascendingValues.get( 2 ), ascendingValues.get( 5 ) )
 								.range( ascendingValues.get( 5 ), null )
 						)
+						.routing( dataSet.name )
 						.toQuery()
 		)
 				.aggregation(
@@ -486,35 +506,6 @@ public class RangeAggregationSpecificsIT<F> {
 		return index.createScope().query().where( f -> f.matchAll() );
 	}
 
-	private void initData() {
-		List<F> documentFieldValues = ascendingValues.subList( 0, 7 );
-
-		IndexIndexingPlan<?> plan = index.createIndexingPlan();
-		for ( int i = 0; i < documentFieldValues.size(); i++ ) {
-			F value = documentFieldValues.get( i );
-			plan.add( referenceProvider( "document_" + i ), document -> {
-				document.addValue( index.binding().fieldModel.reference, value );
-				document.addValue( index.binding().fieldWithConverterModel.reference, value );
-			} );
-		}
-		plan.add( referenceProvider( "document_empty" ), document -> { } );
-		plan.execute().join();
-
-		// Check that all documents are searchable
-		SearchResultAssert.assertThat(
-				index.createScope().query()
-						.where( f -> f.matchAll() )
-						.toQuery()
-		)
-				.hasTotalHitCount( documentFieldValues.size() + 1 /* +1 for the empty document */ );
-	}
-
-	private SimpleFieldModel<F> mapField(IndexSchemaElement parent, String prefix,
-			Consumer<StandardIndexFieldTypeOptionsStep<?, F>> additionalConfiguration) {
-		return SimpleFieldModel.mapper( typeDescriptor, additionalConfiguration )
-				.map( parent, prefix + typeDescriptor.getUniqueName() );
-	}
-
 	@SuppressWarnings("unchecked")
 	private <K, V> Consumer<Map<K, V>> containsExactly(Consumer<BiConsumer<K, V>> expectationBuilder) {
 		List<Map.Entry<K, V>> expected = new ArrayList<>();
@@ -523,26 +514,59 @@ public class RangeAggregationSpecificsIT<F> {
 				.containsExactly( normalize( expected ).toArray( new Map.Entry[0] ) );
 	}
 
-	private class IndexBinding {
-		final SimpleFieldModel<F> fieldModel;
-		final SimpleFieldModel<F> fieldWithConverterModel;
-		final SimpleFieldModel<F> fieldWithAggregationDisabledModel;
+	private static class DataSet<F> {
+		final FieldTypeDescriptor<F> fieldType;
+		final String name;
+		final List<F> ascendingValues;
+		final List<F> documentFieldValues;
+
+		private DataSet(FieldTypeDescriptor<F> fieldType) {
+			this.fieldType = fieldType;
+			this.name = fieldType.getUniqueName();
+			this.ascendingValues = fieldType.getAscendingUniqueTermValues().getSingle();
+			this.documentFieldValues = ascendingValues.subList( 0, 7 );
+		}
+
+		private void init() {
+			IndexIndexingPlan<?> plan = index.createIndexingPlan();
+			for ( int i = 0; i < documentFieldValues.size(); i++ ) {
+				F value = documentFieldValues.get( i );
+				plan.add( referenceProvider( name + "_document_" + i, name ), document -> {
+					document.addValue( index.binding().fieldModels.get( fieldType ).reference, value );
+					document.addValue( index.binding().fieldWithConverterModels.get( fieldType ).reference, value );
+				} );
+			}
+			plan.add( referenceProvider( name + "_document_empty", name ), document -> { } );
+			plan.execute().join();
+
+			// Check that all documents are searchable
+			SearchResultAssert.assertThat(
+					index.createScope().query()
+							.where( f -> f.matchAll() )
+							.routing( name )
+							.toQuery()
+			)
+					.hasTotalHitCount( documentFieldValues.size() + 1 /* +1 for the empty document */ );
+		}
+	}
+
+	private static class IndexBinding {
+		final SimpleFieldModelsByType fieldModels;
+		final SimpleFieldModelsByType fieldWithConverterModels;
+		final SimpleFieldModelsByType fieldWithAggregationDisabledModels;
 
 		IndexBinding(IndexSchemaElement root) {
-			fieldModel = mapField(
-					root, "",
-					c -> c.aggregable( Aggregable.YES )
+			fieldModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+					"", c -> c.aggregable( Aggregable.YES )
 							.searchable( Searchable.NO ) // Range aggregations should not need this
 			);
-			fieldWithConverterModel = mapField(
-					root, "converted_",
-					c -> c.aggregable( Aggregable.YES )
+			fieldWithConverterModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+					"converted_", c -> c.aggregable( Aggregable.YES )
 							.dslConverter( ValueWrapper.class, ValueWrapper.toIndexFieldConverter() )
 							.projectionConverter( ValueWrapper.class, ValueWrapper.fromIndexFieldConverter() )
 			);
-			fieldWithAggregationDisabledModel = mapField(
-					root, "nonAggregable_",
-					c -> c.aggregable( Aggregable.NO )
+			fieldWithAggregationDisabledModels = SimpleFieldModelsByType.mapAll( supportedFieldTypes, root,
+					"nonAggregable_", c -> c.aggregable( Aggregable.NO )
 			);
 		}
 	}

@@ -7,8 +7,10 @@
 package org.hibernate.search.integrationtest.backend.tck.search.aggregation;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import org.hibernate.search.engine.backend.document.model.dsl.IndexSchemaElement;
@@ -18,75 +20,73 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.A
 import org.hibernate.search.integrationtest.backend.tck.testsupport.operations.expectations.UnsupportedSingleFieldAggregationExpectations;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldTypeDescriptor;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModel;
+import org.hibernate.search.integrationtest.backend.tck.testsupport.util.SimpleFieldModelsByType;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
-
-import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
-import org.hibernate.search.util.impl.test.singleinstance.BeforeAll;
-import org.hibernate.search.util.impl.test.singleinstance.InstanceRule;
-import org.hibernate.search.util.impl.test.singleinstance.SingleInstanceRunnerWithParameters;
 
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
+
+import org.assertj.core.api.Assertions;
 
 /**
  * Tests behavior common to all single-field aggregations (range, terms, ...)
  * on unsupported types.
  */
 @RunWith(Parameterized.class)
-@Parameterized.UseParametersRunnerFactory(SingleInstanceRunnerWithParameters.Factory.class)
 public class SingleFieldAggregationUnsupportedTypesIT<F> {
 
-	@Parameterized.Parameters(name = "{0} - {1}")
-	public static Object[][] aggregationTypeCombinations() {
-		List<Object[]> combinations = new ArrayList<>();
+	private static Set<FieldTypeDescriptor<?>> unsupportedFieldTypes;
+
+	@Parameterized.Parameters(name = "{1}")
+	public static Object[][] parameters() {
+		unsupportedFieldTypes = new LinkedHashSet<>();
+		List<Object[]> parameters = new ArrayList<>();
 		for ( AggregationDescriptor aggregationDescriptor : AggregationDescriptor.getAll() ) {
 			for ( FieldTypeDescriptor<?> fieldTypeDescriptor : FieldTypeDescriptor.getAll() ) {
 				Optional<? extends UnsupportedSingleFieldAggregationExpectations> expectations =
 						aggregationDescriptor.getSingleFieldAggregationExpectations( fieldTypeDescriptor ).getUnsupported();
 				if ( expectations.isPresent() ) {
-					combinations.add( new Object[] {
-							aggregationDescriptor,
-							fieldTypeDescriptor,
-							expectations.get()
-					} );
+					unsupportedFieldTypes.add( fieldTypeDescriptor );
+					parameters.add( new Object[] { fieldTypeDescriptor, expectations.get() } );
 				}
 			}
 		}
-		return combinations.toArray( new Object[0][] );
+		return parameters.toArray( new Object[0][] );
 	}
 
-	@InstanceRule
-	public SearchSetupHelper setupHelper = new SearchSetupHelper();
+	@ClassRule
+	public static final SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private final FieldTypeDescriptor<F> typeDescriptor;
+	private static final SimpleMappedIndex<IndexBinding> index =
+			SimpleMappedIndex.of( "Main", IndexBinding::new );
 
+	@BeforeClass
+	public static void setup() {
+		setupHelper.start().withIndex( index ).setup();
+	}
+
+	private final FieldTypeDescriptor<F> fieldType;
 	private final UnsupportedSingleFieldAggregationExpectations expectations;
 
-	private SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( "Main", IndexBinding::new );
-
-	public SingleFieldAggregationUnsupportedTypesIT(AggregationDescriptor thisIsJustForTestName,
-			FieldTypeDescriptor<F> typeDescriptor,
+	public SingleFieldAggregationUnsupportedTypesIT(FieldTypeDescriptor<F> fieldType,
 			UnsupportedSingleFieldAggregationExpectations expectations) {
-		this.typeDescriptor = typeDescriptor;
+		this.fieldType = fieldType;
 		this.expectations = expectations;
-	}
-
-	@BeforeAll
-	public void setup() {
-		setupHelper.start().withIndex( index ).setup();
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1748")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeQueryWithUnsupportedType")
 	public void simple() {
-		SimpleFieldModel<F> model = index.binding().fieldModel;
+		SimpleFieldModel<F> model = index.binding().fieldModels.get( fieldType );
 		String fieldPath = model.relativeFieldName;
 
 		Assertions.assertThatThrownBy(
@@ -103,18 +103,15 @@ public class SingleFieldAggregationUnsupportedTypesIT<F> {
 
 	private SimpleFieldModel<F> mapField(IndexSchemaElement parent, String prefix,
 			Consumer<StandardIndexFieldTypeOptionsStep<?, F>> additionalConfiguration) {
-		return SimpleFieldModel.mapper( typeDescriptor, additionalConfiguration )
-				.map( parent, prefix + typeDescriptor.getUniqueName() );
+		return SimpleFieldModel.mapper( fieldType, additionalConfiguration )
+				.map( parent, prefix + fieldType.getUniqueName() );
 	}
 
-	private class IndexBinding {
-		final SimpleFieldModel<F> fieldModel;
+	private static class IndexBinding {
+		final SimpleFieldModelsByType fieldModels;
 
 		IndexBinding(IndexSchemaElement root) {
-			fieldModel = mapField(
-					root, "",
-					c -> { }
-			);
+			fieldModels = SimpleFieldModelsByType.mapAll( unsupportedFieldTypes, root, "" );
 		}
 	}
 }

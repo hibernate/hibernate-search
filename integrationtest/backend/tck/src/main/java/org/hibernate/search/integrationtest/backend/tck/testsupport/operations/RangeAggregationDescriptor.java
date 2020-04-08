@@ -93,6 +93,7 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 		multiValuedIndexExpected.put( Range.atLeast( ascendingValues.get( 5 ) ), 2L );
 
 		return ExpectationsAlternative.supported( new SupportedSingleFieldAggregationExpectations<F>(
+				typeDescriptor, "range",
 				mainIndexDocumentFieldValues,
 				otherIndexDocumentFieldValues,
 				multiValuedIndexDocumentFieldValues
@@ -109,13 +110,13 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 			}
 
 			@Override
-			public AggregationScenario<?> withoutMatch(FieldTypeDescriptor<F> typeDescriptor) {
-				return doCreate( noIndexedValueExpected, TypeAssertionHelper.identity( typeDescriptor ) );
+			public AggregationScenario<?> withoutMatch() {
+				return doCreate( noIndexedValueExpected, TypeAssertionHelper.identity( fieldType() ) );
 			}
 
 			@Override
-			public AggregationScenario<?> onMultiValuedIndex(FieldTypeDescriptor<F> typeDescriptor) {
-				return doCreate( multiValuedIndexExpected, TypeAssertionHelper.identity( typeDescriptor ) );
+			public AggregationScenario<?> onMultiValuedIndex() {
+				return doCreate( multiValuedIndexExpected, TypeAssertionHelper.identity( fieldType() ) );
 			}
 
 			private <T> AggregationScenario<Map<Range<T>, Long>> doCreate(Map<Range<F>, Long> expectedResult,
@@ -166,7 +167,17 @@ public class RangeAggregationDescriptor extends AggregationDescriptor {
 	}
 
 	private <F> UnsupportedSingleFieldAggregationExpectations unsupportedExpectations(FieldTypeDescriptor<F> typeDescriptor) {
-		return (factory, fieldPath) -> factory.range().field( fieldPath, typeDescriptor.getJavaType() );
+		return new UnsupportedSingleFieldAggregationExpectations() {
+			@Override
+			public void trySetup(SearchAggregationFactory factory, String fieldPath) {
+				factory.range().field( fieldPath, typeDescriptor.getJavaType() );
+			}
+
+			@Override
+			public String toString() {
+				return "range on " + typeDescriptor;
+			}
+		};
 	}
 
 }

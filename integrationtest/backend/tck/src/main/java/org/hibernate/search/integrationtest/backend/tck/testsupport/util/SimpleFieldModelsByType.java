@@ -6,6 +6,7 @@
  */
 package org.hibernate.search.integrationtest.backend.tck.testsupport.util;
 
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -17,31 +18,44 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.types.FieldT
 
 public class SimpleFieldModelsByType {
 	@SafeVarargs
+	public static SimpleFieldModelsByType mapAll(Collection<FieldTypeDescriptor<?>> typeDescriptors,
+			IndexSchemaElement parent, String prefix,
+			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> ... additionalConfiguration) {
+		return mapAll( typeDescriptors.stream(), parent, prefix, additionalConfiguration );
+	}
+
+	@SafeVarargs
 	public static SimpleFieldModelsByType mapAll(Stream<FieldTypeDescriptor<?>> typeDescriptors,
 			IndexSchemaElement parent, String prefix,
-			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration1,
-			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> ... additionalConfiguration2) {
+			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> ... additionalConfiguration) {
 		SimpleFieldModelsByType result = new SimpleFieldModelsByType();
 		typeDescriptors.forEach( typeDescriptor -> {
 			result.content.put(
 					typeDescriptor,
-					SimpleFieldModel.mapper( typeDescriptor, additionalConfiguration1 )
-							.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration2 )
+					SimpleFieldModel.mapper( typeDescriptor, ignored -> { } )
+							.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration )
 			);
 		} );
 		return result;
 	}
 
+	@SafeVarargs
+	public static SimpleFieldModelsByType mapAllMultiValued(Collection<FieldTypeDescriptor<?>> typeDescriptors,
+			IndexSchemaElement parent, String prefix,
+			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> ... additionalConfiguration) {
+		return mapAllMultiValued( typeDescriptors.stream(), parent, prefix, additionalConfiguration );
+	}
+
+	@SafeVarargs
 	public static SimpleFieldModelsByType mapAllMultiValued(Stream<FieldTypeDescriptor<?>> typeDescriptors,
 			IndexSchemaElement parent, String prefix,
-			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration1,
-			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> additionalConfiguration2) {
+			Consumer<StandardIndexFieldTypeOptionsStep<?, ?>> ... additionalConfiguration) {
 		SimpleFieldModelsByType result = new SimpleFieldModelsByType();
 		typeDescriptors.forEach( typeDescriptor -> {
 			result.content.put(
 					typeDescriptor,
-					SimpleFieldModel.mapper( typeDescriptor, additionalConfiguration1 )
-							.mapMultiValued( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration2 )
+					SimpleFieldModel.mapper( typeDescriptor, ignored -> { } )
+							.mapMultiValued( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration )
 			);
 		} );
 		return result;
