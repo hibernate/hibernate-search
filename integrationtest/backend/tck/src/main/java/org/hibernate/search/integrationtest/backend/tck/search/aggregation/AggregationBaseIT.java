@@ -26,7 +26,7 @@ import org.hibernate.search.engine.search.query.SearchQuery;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 
 import org.junit.Before;
@@ -36,8 +36,6 @@ import org.junit.Test;
 import org.assertj.core.api.Assertions;
 
 public class AggregationBaseIT {
-
-	private static final String INDEX_NAME = "IndexName";
 
 	private static final String DOCUMENT_1 = "doc1";
 	private static final String DOCUMENT_2 = "doc2";
@@ -50,25 +48,18 @@ public class AggregationBaseIT {
 	@Rule
 	public SearchSetupHelper setupHelper = new SearchSetupHelper();
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( "Main", IndexBinding::new );
 
 	@Before
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
 
 	@Test
 	public void extension() {
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query;
 		AggregationKey<Map<String, Long>> aggregationKey = AggregationKey.of( "someAggregation" );
 
@@ -93,32 +84,32 @@ public class AggregationBaseIT {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		plan.add( referenceProvider( DOCUMENT_1 ), document -> {
-			document.addValue( indexMapping.string, STRING_1 );
+			document.addValue( index.binding().string, STRING_1 );
 		} );
 		plan.add( referenceProvider( DOCUMENT_2 ), document -> {
-			document.addValue( indexMapping.string, STRING_2 );
+			document.addValue( index.binding().string, STRING_2 );
 		} );
 		plan.add( referenceProvider( DOCUMENT_3 ), document -> {
-			document.addValue( indexMapping.string, STRING_1 );
+			document.addValue( index.binding().string, STRING_1 );
 		} );
 		plan.add( referenceProvider( EMPTY ), document -> { } );
 
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		StubMappingScope scope = indexManager.createScope();
+		StubMappingScope scope = index.createScope();
 		SearchQuery<DocumentReference> query = scope.query()
 				.where( f -> f.matchAll() )
 				.toQuery();
-		assertThat( query ).hasDocRefHitsAnyOrder( INDEX_NAME, DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
+		assertThat( query ).hasDocRefHitsAnyOrder( index.name(), DOCUMENT_1, DOCUMENT_2, DOCUMENT_3, EMPTY );
 	}
 
-	private static class IndexMapping {
+	private static class IndexBinding {
 		final IndexFieldReference<String> string;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			string = root.field( "string", f -> f.asString().aggregable( Aggregable.YES ) )
 					.toReference();
 		}

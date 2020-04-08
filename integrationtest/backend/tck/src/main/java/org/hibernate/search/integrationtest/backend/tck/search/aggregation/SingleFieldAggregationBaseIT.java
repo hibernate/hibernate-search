@@ -46,7 +46,7 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWr
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
 import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingScope;
 import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
@@ -66,14 +66,6 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 @Parameterized.UseParametersRunnerFactory(SingleInstanceRunnerWithParameters.Factory.class)
 public class SingleFieldAggregationBaseIT<F> {
-
-	private static final String INDEX_NAME = "IndexName";
-	private static final String COMPATIBLE_INDEX_NAME = "IndexWithCompatibleFields";
-	private static final String RAW_FIELD_COMPATIBLE_INDEX_NAME = "IndexWithCompatibleRawFields";
-	private static final String INCOMPATIBLE_INDEX_NAME = "IndexWithIncompatibleFields";
-	private static final String EMPTY_INDEX_NAME = "EmptyIndexName";
-	private static final String NULL_ONLY_INDEX_NAME = "NullOnlyIndexName";
-	private static final String MULTI_VALUED_INDEX_NAME = "MultiValuedIndexName";
 
 	private static final String AGGREGATION_NAME = "aggregationName";
 
@@ -102,24 +94,20 @@ public class SingleFieldAggregationBaseIT<F> {
 	private final FieldTypeDescriptor<F> typeDescriptor;
 	private final SupportedSingleFieldAggregationExpectations<F> expectations;
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
-
-	private IndexMapping compatibleIndexMapping;
-	private StubMappingIndexManager compatibleIndexManager;
-
-	private RawFieldCompatibleIndexMapping rawFieldCompatibleIndexMapping;
-	private StubMappingIndexManager rawFieldCompatibleIndexManager;
-
-	private StubMappingIndexManager incompatibleIndexManager;
-
-	private StubMappingIndexManager emptyIndexManager;
-
-	private IndexMapping nullOnlyIndexMapping;
-	private StubMappingIndexManager nullOnlyIndexManager;
-
-	private MultiValuedIndexMapping multiValuedIndexMapping;
-	private StubMappingIndexManager multiValuedIndexManager;
+	private SimpleMappedIndex<IndexBinding> mainIndex =
+			SimpleMappedIndex.of( "Main", IndexBinding::new );
+	private SimpleMappedIndex<IndexBinding> compatibleIndex =
+			SimpleMappedIndex.of( "Compatible", IndexBinding::new );
+	private SimpleMappedIndex<RawFieldCompatibleIndexBinding> rawFieldCompatibleIndex =
+			SimpleMappedIndex.of( "RawFieldCompatible", RawFieldCompatibleIndexBinding::new );
+	private SimpleMappedIndex<IncompatibleIndexBinding> incompatibleIndex =
+			SimpleMappedIndex.of( "Incompatible", IncompatibleIndexBinding::new );
+	private SimpleMappedIndex<IndexBinding> emptyIndex =
+			SimpleMappedIndex.of( "Empty", IndexBinding::new );
+	private SimpleMappedIndex<IndexBinding> nullOnlyIndex =
+			SimpleMappedIndex.of( "NullOnly", IndexBinding::new );
+	private SimpleMappedIndex<MultiValuedIndexBinding> multiValuedIndex =
+			SimpleMappedIndex.of( "MultiValued", MultiValuedIndexBinding::new );
 
 	public SingleFieldAggregationBaseIT(AggregationDescriptor thisIsJustForTestName,
 			FieldTypeDescriptor<F> typeDescriptor,
@@ -131,40 +119,14 @@ public class SingleFieldAggregationBaseIT<F> {
 	@BeforeAll
 	public void setup() {
 		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.withIndex(
-						COMPATIBLE_INDEX_NAME,
-						ctx -> this.compatibleIndexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.compatibleIndexManager = indexManager
-				)
-				.withIndex(
-						RAW_FIELD_COMPATIBLE_INDEX_NAME,
-						ctx -> this.rawFieldCompatibleIndexMapping = new RawFieldCompatibleIndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.rawFieldCompatibleIndexManager = indexManager
-				)
-				.withIndex(
-						INCOMPATIBLE_INDEX_NAME,
-						ctx -> new IncompatibleIndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.incompatibleIndexManager = indexManager
-				)
-				.withIndex(
-						EMPTY_INDEX_NAME,
-						ctx -> new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.emptyIndexManager = indexManager
-				)
-				.withIndex(
-						NULL_ONLY_INDEX_NAME,
-						ctx -> this.nullOnlyIndexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.nullOnlyIndexManager = indexManager
-				)
-				.withIndex(
-						MULTI_VALUED_INDEX_NAME,
-						ctx -> this.multiValuedIndexMapping = new MultiValuedIndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.multiValuedIndexManager = indexManager
+				.withIndexes(
+						mainIndex,
+						compatibleIndex,
+						rawFieldCompatibleIndex,
+						incompatibleIndex,
+						emptyIndex,
+						nullOnlyIndex,
+						multiValuedIndex
 				)
 				.setup();
 
@@ -186,8 +148,8 @@ public class SingleFieldAggregationBaseIT<F> {
 	}
 
 	private <A> void doTest_simple(AggregationScenario<A> scenario) {
-		StubMappingScope scope = indexManager.createScope();
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope();
+		String fieldPath = mainIndex.binding().fieldModel.relativeFieldName;
 		AggregationKey<A> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
@@ -209,15 +171,15 @@ public class SingleFieldAggregationBaseIT<F> {
 	}
 
 	private <A> void doTest_aggregationObject(AggregationScenario<A> scenario) {
-		StubMappingScope scope = indexManager.createScope();
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope();
+		String fieldPath = mainIndex.binding().fieldModel.relativeFieldName;
 		AggregationKey<A> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchAggregation<A> aggregation = scenario.setup( scope.aggregation(), fieldPath )
 				.toAggregation();
 
 		SearchResultAssert.assertThat(
-				indexManager.createScope().query()
+				mainIndex.createScope().query()
 						.where( f -> f.matchAll() )
 						.aggregation( aggregationKey, aggregation )
 						.toQuery()
@@ -235,8 +197,8 @@ public class SingleFieldAggregationBaseIT<F> {
 	}
 
 	private <A> void doTest_aggregationObject_reuse_onScopeTargetingSameIndexes(AggregationScenario<A> scenario) {
-		StubMappingScope scope = indexManager.createScope();
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope();
+		String fieldPath = mainIndex.binding().fieldModel.relativeFieldName;
 		AggregationKey<A> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchAggregation<A> aggregation = scenario.setup( scope.aggregation(), fieldPath )
@@ -266,7 +228,7 @@ public class SingleFieldAggregationBaseIT<F> {
 				);
 
 		// reuse the aggregation instance on a different scope targeting the same index
-		scope = indexManager.createScope();
+		scope = mainIndex.createScope();
 		SearchResultAssert.assertThat(
 				scope.query()
 						.where( f -> f.matchAll() )
@@ -286,8 +248,8 @@ public class SingleFieldAggregationBaseIT<F> {
 	}
 
 	private <A> void doTest_aggregationObject_reuse_onScopeTargetingDifferentIndexes(AggregationScenario<A> scenario) {
-		StubMappingScope scope = indexManager.createScope();
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		StubMappingScope scope = mainIndex.createScope();
+		String fieldPath = mainIndex.binding().fieldModel.relativeFieldName;
 		AggregationKey<A> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchAggregation<A> aggregation = scenario.setup( scope.aggregation(), fieldPath )
@@ -295,38 +257,38 @@ public class SingleFieldAggregationBaseIT<F> {
 
 		// reuse the aggregation instance on a different scope targeting a different index
 		Assertions.assertThatThrownBy( () ->
-				compatibleIndexManager.createScope().query()
+				compatibleIndex.createScope().query()
 						.where( f -> f.matchAll() )
 						.aggregation( aggregationKey, aggregation )
 						.toQuery()
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "scope targeting different indexes" )
-				.hasMessageContaining( INDEX_NAME )
-				.hasMessageContaining( COMPATIBLE_INDEX_NAME );
+				.hasMessageContaining( mainIndex.name() )
+				.hasMessageContaining( compatibleIndex.name() );
 
 		// reuse the aggregation instance on a different scope targeting a superset of the original indexes
 		Assertions.assertThatThrownBy( () ->
-				indexManager.createScope( compatibleIndexManager ).query()
+				mainIndex.createScope( compatibleIndex ).query()
 						.where( f -> f.matchAll() )
 						.aggregation( aggregationKey, aggregation )
 						.toQuery()
 		)
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "scope targeting different indexes" )
-				.hasMessageContaining( INDEX_NAME )
-				.hasMessageContaining( COMPATIBLE_INDEX_NAME );
+				.hasMessageContaining( mainIndex.name() )
+				.hasMessageContaining( compatibleIndex.name() );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-1968" })
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.NoQueryResultsFacetingTest")
 	public void noMatch() {
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldModel.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.withoutMatch( typeDescriptor );
 		testValidAggregation(
-				scenario, indexManager.createScope(),
+				scenario, mainIndex.createScope(),
 				f -> f.id().matching( "none" ), // Don't match any document
 				(f, e) -> e.setup( f, fieldPath )
 		);
@@ -334,7 +296,7 @@ public class SingleFieldAggregationBaseIT<F> {
 
 	/**
 	 * Test behavior when aggregating on an index with no value for the targeted field
-	 * because there is no document in the index.
+	 * because there is no document in the mainIndex.
 	 */
 	@Test
 	@TestForIssue(jiraKey = { "HSEARCH-2955", "HSEARCH-745" })
@@ -343,11 +305,11 @@ public class SingleFieldAggregationBaseIT<F> {
 			"org.hibernate.search.test.query.facet.EdgeCaseFacetTest"
 	})
 	public void emptyIndex() {
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldModel.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.withoutMatch( typeDescriptor );
 		testValidAggregation(
-				scenario, emptyIndexManager.createScope(), fieldPath
+				scenario, emptyIndex.createScope(), fieldPath
 		);
 	}
 
@@ -359,11 +321,11 @@ public class SingleFieldAggregationBaseIT<F> {
 	@TestForIssue(jiraKey = "HSEARCH-2955")
 	@PortedFromSearch5(original = "org.hibernate.search.test.facet.NoIndexedValueFacetingTest")
 	public void nullOnlyIndex() {
-		String fieldPath = nullOnlyIndexMapping.fieldModel.relativeFieldName;
+		String fieldPath = nullOnlyIndex.binding().fieldModel.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.withoutMatch( typeDescriptor );
 		testValidAggregation(
-				scenario, nullOnlyIndexManager.createScope(), fieldPath
+				scenario, nullOnlyIndex.createScope(), fieldPath
 		);
 	}
 
@@ -378,11 +340,11 @@ public class SingleFieldAggregationBaseIT<F> {
 			"org.hibernate.search.test.query.facet.MultiValuedFacetingTest"
 	})
 	public void multiValued() {
-		String fieldPath = multiValuedIndexMapping.fieldModel.relativeFieldName;
+		String fieldPath = multiValuedIndex.binding().fieldModel.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.onMultiValuedIndex( typeDescriptor );
 		testValidAggregation(
-				scenario, multiValuedIndexManager.createScope(), fieldPath
+				scenario, multiValuedIndex.createScope(), fieldPath
 		);
 	}
 
@@ -392,7 +354,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		// Try to pass a "null" field type
 		AggregationScenario<?> scenario = expectations.simple( typeDescriptor );
 
-		Assertions.assertThatThrownBy( () -> scenario.setup( indexManager.createScope().aggregation(), null ) )
+		Assertions.assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), null ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'absoluteFieldPath'" )
 				.hasMessageContaining( "must not be null" );
@@ -400,12 +362,12 @@ public class SingleFieldAggregationBaseIT<F> {
 
 	@Test
 	public void nullFieldType() {
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldModel.relativeFieldName;
 
 		// Try to pass a "null" field type
 		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.nullType() );
 
-		Assertions.assertThatThrownBy( () -> scenario.setup( indexManager.createScope().aggregation(), fieldPath ) )
+		Assertions.assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'type'" )
 				.hasMessageContaining( "must not be null" );
@@ -413,11 +375,11 @@ public class SingleFieldAggregationBaseIT<F> {
 
 	@Test
 	public void invalidFieldType_conversionEnabled() {
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldModel.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.wrongType( typeDescriptor ) );
 
-		Assertions.assertThatThrownBy( () -> scenario.setup( indexManager.createScope().aggregation(), fieldPath ) )
+		Assertions.assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid type" )
 				.hasMessageContaining( "for aggregation on field" )
@@ -426,12 +388,12 @@ public class SingleFieldAggregationBaseIT<F> {
 
 	@Test
 	public void invalidFieldType_conversionDisabled() {
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldModel.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.wrongType( typeDescriptor ) );
 
 		Assertions.assertThatThrownBy( () -> scenario.setupWithConverterSetting(
-				indexManager.createScope().aggregation(), fieldPath, ValueConvert.NO
+				mainIndex.createScope().aggregation(), fieldPath, ValueConvert.NO
 		) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid type" )
@@ -446,48 +408,48 @@ public class SingleFieldAggregationBaseIT<F> {
 
 		AggregationScenario<?> scenario = expectations.simple( typeDescriptor );
 
-		Assertions.assertThatThrownBy( () -> scenario.setup( indexManager.createScope().aggregation(), fieldPath ) )
+		Assertions.assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'" + fieldPath + "'" )
-				.hasMessageContaining( INDEX_NAME );
+				.hasMessageContaining( mainIndex.name() );
 	}
 
 	@Test
 	public void objectField_nested() {
-		String fieldPath = indexMapping.nestedObject.relativeFieldName;
+		String fieldPath = mainIndex.binding().nestedObject.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.identity( typeDescriptor ) );
 
-		Assertions.assertThatThrownBy( () -> scenario.setup( indexManager.createScope().aggregation(), fieldPath ) )
+		Assertions.assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'" + fieldPath + "'" )
-				.hasMessageContaining( INDEX_NAME );
+				.hasMessageContaining( mainIndex.name() );
 	}
 
 	@Test
 	public void objectField_flattened() {
-		String fieldPath = indexMapping.flattenedObject.relativeFieldName;
+		String fieldPath = mainIndex.binding().flattenedObject.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.identity( typeDescriptor ) );
 
-		Assertions.assertThatThrownBy( () -> scenario.setup( indexManager.createScope().aggregation(), fieldPath ) )
+		Assertions.assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Unknown field" )
 				.hasMessageContaining( "'" + fieldPath + "'" )
-				.hasMessageContaining( INDEX_NAME );
+				.hasMessageContaining( mainIndex.name() );
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1748")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.FacetUnknownFieldFailureTest.testKnownFieldNameNotConfiguredForFacetingThrowsException")
 	public void aggregationsDisabled() {
-		String fieldPath = indexMapping.fieldWithAggregationDisabledModel.relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldWithAggregationDisabledModel.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.withFieldType( TypeAssertionHelper.identity( typeDescriptor ) );
 
-		Assertions.assertThatThrownBy( () -> scenario.setup( indexManager.createScope().aggregation(), fieldPath ) )
+		Assertions.assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Aggregations are not enabled for field" )
 				.hasMessageContaining( "'" + fieldPath + "'" );
@@ -495,33 +457,33 @@ public class SingleFieldAggregationBaseIT<F> {
 
 	@Test
 	public void withConverter_conversionEnabled() {
-		String fieldPath = indexMapping.fieldWithConverterModel.relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldWithConverterModel.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.withFieldType(
 				TypeAssertionHelper.wrapper( typeDescriptor )
 		);
 		testValidAggregation(
-				scenario, indexManager.createScope(), fieldPath
+				scenario, mainIndex.createScope(), fieldPath
 		);
 	}
 
 	@Test
 	public void withConverter_conversionDisabled() {
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldModel.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.simple( typeDescriptor );
 		testValidAggregationWithConverterSetting(
-				scenario, indexManager.createScope(), fieldPath, ValueConvert.NO
+				scenario, mainIndex.createScope(), fieldPath, ValueConvert.NO
 		);
 	}
 
 	@Test
 	public void withConverter_invalidFieldType() {
-		String fieldPath = indexMapping.fieldWithConverterModel.relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldWithConverterModel.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.simple( typeDescriptor );
 
-		Assertions.assertThatThrownBy( () -> scenario.setup( indexManager.createScope().aggregation(), fieldPath ) )
+		Assertions.assertThatThrownBy( () -> scenario.setup( mainIndex.createScope().aggregation(), fieldPath ) )
 				.isInstanceOf( SearchException.class )
 				.hasMessageContaining( "Invalid type" )
 				.hasMessageContaining( "for aggregation on field" )
@@ -534,7 +496,7 @@ public class SingleFieldAggregationBaseIT<F> {
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testMultipleFacets")
 	public void duplicated_differentKeys() {
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldModel.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.simple( typeDescriptor );
 
@@ -547,7 +509,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		AggregationKey<A> key2 = AggregationKey.of( "aggregationName2" );
 
 		SearchResultAssert.assertThat(
-				indexManager.createScope().query().where( f -> f.matchAll() )
+				mainIndex.createScope().query().where( f -> f.matchAll() )
 						.aggregation( key1, f -> scenario.setup( f, fieldPath ) )
 						.aggregation( key2, f -> scenario.setup( f, fieldPath ) )
 						.toQuery()
@@ -567,7 +529,7 @@ public class SingleFieldAggregationBaseIT<F> {
 	 */
 	@Test
 	public void duplicated_sameKey() {
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldModel.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.simple( typeDescriptor );
 
@@ -579,7 +541,7 @@ public class SingleFieldAggregationBaseIT<F> {
 		AggregationKey<A> key1 = AggregationKey.of( "aggregationName1" );
 
 		Assertions.assertThatThrownBy( () ->
-				indexManager.createScope().query().where( f -> f.matchAll() )
+				mainIndex.createScope().query().where( f -> f.matchAll() )
 						.aggregation( key1, f -> scenario.setup( f, fieldPath ) )
 						.aggregation( key1, f -> scenario.setup( f, fieldPath ) )
 		)
@@ -590,19 +552,19 @@ public class SingleFieldAggregationBaseIT<F> {
 
 	@Test
 	public void inFlattenedObject() {
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldModel.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.simple( typeDescriptor );
 		testValidAggregation(
-				scenario, indexManager.createScope(), fieldPath
+				scenario, mainIndex.createScope(), fieldPath
 		);
 	}
 
 	@Test
-	public void multiIndex_withCompatibleIndexManager_noConverter() {
-		StubMappingScope scope = indexManager.createScope( compatibleIndexManager );
+	public void multiIndex_withCompatibleIndex_noConverter() {
+		StubMappingScope scope = mainIndex.createScope( compatibleIndex );
 
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldModel.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.onMainAndOtherIndex( typeDescriptor );
 		testValidAggregation(
@@ -611,10 +573,10 @@ public class SingleFieldAggregationBaseIT<F> {
 	}
 
 	@Test
-	public void multiIndex_withCompatibleIndexManager_conversionEnabled() {
-		StubMappingScope scope = indexManager.createScope( compatibleIndexManager );
+	public void multiIndex_withCompatibleIndex_conversionEnabled() {
+		StubMappingScope scope = mainIndex.createScope( compatibleIndex );
 
-		String fieldPath = indexMapping.fieldWithConverterModel.relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldWithConverterModel.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.withFieldTypeOnMainAndOtherIndex(
 				TypeAssertionHelper.wrapper( typeDescriptor )
@@ -625,10 +587,10 @@ public class SingleFieldAggregationBaseIT<F> {
 	}
 
 	@Test
-	public void multiIndex_withRawFieldCompatibleIndexManager_conversionEnabled() {
-		StubMappingScope scope = indexManager.createScope( rawFieldCompatibleIndexManager );
+	public void multiIndex_withRawFieldCompatibleIndex_conversionEnabled() {
+		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
 
-		String fieldPath = indexMapping.fieldWithConverterModel.relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldWithConverterModel.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.withFieldTypeOnMainAndOtherIndex(
 				TypeAssertionHelper.wrapper( typeDescriptor )
@@ -641,10 +603,10 @@ public class SingleFieldAggregationBaseIT<F> {
 	}
 
 	@Test
-	public void multiIndex_withRawFieldCompatibleIndexManager_conversionDisabled() {
-		StubMappingScope scope = indexManager.createScope( rawFieldCompatibleIndexManager );
+	public void multiIndex_withRawFieldCompatibleIndex_conversionDisabled() {
+		StubMappingScope scope = mainIndex.createScope( rawFieldCompatibleIndex );
 
-		String fieldPath = indexMapping.fieldWithConverterModel.relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldWithConverterModel.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.onMainAndOtherIndex( typeDescriptor );
 		testValidAggregationWithConverterSetting(
@@ -653,10 +615,10 @@ public class SingleFieldAggregationBaseIT<F> {
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIndexManager_conversionEnabled() {
-		StubMappingScope scope = indexManager.createScope( incompatibleIndexManager );
+	public void multiIndex_withIncompatibleIndex_conversionEnabled() {
+		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldModel.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.simple( typeDescriptor );
 
@@ -667,10 +629,10 @@ public class SingleFieldAggregationBaseIT<F> {
 	}
 
 	@Test
-	public void multiIndex_withIncompatibleIndexManager_conversionDisabled() {
-		StubMappingScope scope = indexManager.createScope( incompatibleIndexManager );
+	public void multiIndex_withIncompatibleIndex_conversionDisabled() {
+		StubMappingScope scope = mainIndex.createScope( incompatibleIndex );
 
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = mainIndex.binding().fieldModel.relativeFieldName;
 
 		AggregationScenario<?> scenario = expectations.simple( typeDescriptor );
 
@@ -721,56 +683,56 @@ public class SingleFieldAggregationBaseIT<F> {
 		List<F> otherIndexDocumentFieldValues = expectations.getOtherIndexDocumentFieldValues();
 		List<List<F>> multiValuedIndexDocumentFieldValues = expectations.getMultiValuedIndexDocumentFieldValues();
 
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = mainIndex.createIndexingPlan();
 		for ( int i = 0; i < mainIndexDocumentFieldValues.size(); i++ ) {
 			F value = mainIndexDocumentFieldValues.get( i );
 			plan.add( referenceProvider( "document_" + i ), document -> {
-				document.addValue( indexMapping.fieldModel.reference, value );
-				document.addValue( indexMapping.fieldWithConverterModel.reference, value );
+				document.addValue( mainIndex.binding().fieldModel.reference, value );
+				document.addValue( mainIndex.binding().fieldWithConverterModel.reference, value );
 
 				// Note: this object must be single-valued for these tests
-				DocumentElement flattenedObject = document.addObject( indexMapping.flattenedObject.self );
-				flattenedObject.addValue( indexMapping.flattenedObject.fieldModel.reference, value );
+				DocumentElement flattenedObject = document.addObject( mainIndex.binding().flattenedObject.self );
+				flattenedObject.addValue( mainIndex.binding().flattenedObject.fieldModel.reference, value );
 
 				// Note: this object must be single-valued for these tests
-				DocumentElement nestedObject = document.addObject( indexMapping.nestedObject.self );
-				nestedObject.addValue( indexMapping.nestedObject.fieldModel.reference, value );
+				DocumentElement nestedObject = document.addObject( mainIndex.binding().nestedObject.self );
+				nestedObject.addValue( mainIndex.binding().nestedObject.fieldModel.reference, value );
 			} );
 		}
 		plan.add( referenceProvider( "document_empty" ), document -> { } );
 		plan.execute().join();
 
-		plan = compatibleIndexManager.createIndexingPlan();
+		plan = compatibleIndex.createIndexingPlan();
 		for ( int i = 0; i < otherIndexDocumentFieldValues.size(); i++ ) {
 			F value = otherIndexDocumentFieldValues.get( i );
 			plan.add( referenceProvider( "compatibleindex_document_" + i ), document -> {
-				document.addValue( compatibleIndexMapping.fieldModel.reference, value );
-				document.addValue( compatibleIndexMapping.fieldWithConverterModel.reference, value );
+				document.addValue( compatibleIndex.binding().fieldModel.reference, value );
+				document.addValue( compatibleIndex.binding().fieldWithConverterModel.reference, value );
 			} );
 		}
 		plan.execute().join();
 
-		plan = rawFieldCompatibleIndexManager.createIndexingPlan();
+		plan = rawFieldCompatibleIndex.createIndexingPlan();
 		for ( int i = 0; i < otherIndexDocumentFieldValues.size(); i++ ) {
 			F value = otherIndexDocumentFieldValues.get( i );
 			plan.add( referenceProvider( "rawcompatibleindex_document_" + i ), document -> {
-				document.addValue( rawFieldCompatibleIndexMapping.fieldWithConverterModel.reference, value );
+				document.addValue( rawFieldCompatibleIndex.binding().fieldWithConverterModel.reference, value );
 			} );
 		}
 		plan.execute().join();
 
-		plan = nullOnlyIndexManager.createIndexingPlan();
-		plan.add( referenceProvider( "nullOnlyIndexManager_document_0" ), document -> {
-			document.addValue( nullOnlyIndexMapping.fieldModel.reference, null );
+		plan = nullOnlyIndex.createIndexingPlan();
+		plan.add( referenceProvider( "nullOnlyIndex_document_0" ), document -> {
+			document.addValue( nullOnlyIndex.binding().fieldModel.reference, null );
 		} );
 		plan.execute().join();
 
-		plan = multiValuedIndexManager.createIndexingPlan();
+		plan = multiValuedIndex.createIndexingPlan();
 		for ( int i = 0; i < multiValuedIndexDocumentFieldValues.size(); i++ ) {
 			List<F> values = multiValuedIndexDocumentFieldValues.get( i );
 			plan.add( referenceProvider( "document_" + i ), document -> {
 				for ( F value : values ) {
-					document.addValue( multiValuedIndexMapping.fieldModel.reference, value );
+					document.addValue( multiValuedIndex.binding().fieldModel.reference, value );
 				}
 			} );
 		}
@@ -778,23 +740,23 @@ public class SingleFieldAggregationBaseIT<F> {
 		plan.execute().join();
 
 		// Check that all documents are searchable
-		SearchResultAssert.assertThat( indexManager.createScope().query()
+		SearchResultAssert.assertThat( mainIndex.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasTotalHitCount( mainIndexDocumentFieldValues.size() + 1 /* +1 for the empty document */ );
-		SearchResultAssert.assertThat( compatibleIndexManager.createScope().query()
+		SearchResultAssert.assertThat( compatibleIndex.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasTotalHitCount( otherIndexDocumentFieldValues.size() );
-		SearchResultAssert.assertThat( rawFieldCompatibleIndexManager.createScope().query()
+		SearchResultAssert.assertThat( rawFieldCompatibleIndex.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasTotalHitCount( otherIndexDocumentFieldValues.size() );
-		SearchResultAssert.assertThat( nullOnlyIndexManager.createScope().query()
+		SearchResultAssert.assertThat( nullOnlyIndex.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasTotalHitCount( 1 );
-		SearchResultAssert.assertThat( multiValuedIndexManager.createScope().query()
+		SearchResultAssert.assertThat( multiValuedIndex.createScope().query()
 				.where( f -> f.matchAll() )
 				.toQuery() )
 				.hasTotalHitCount( multiValuedIndexDocumentFieldValues.size() + 1 /* +1 for the empty document */ );
@@ -812,15 +774,15 @@ public class SingleFieldAggregationBaseIT<F> {
 				.mapMultiValued( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration );
 	}
 
-	private class IndexMapping {
+	private class IndexBinding {
 		final FieldModel<F> fieldModel;
 		final FieldModel<F> fieldWithConverterModel;
 		final FieldModel<F> fieldWithAggregationDisabledModel;
 
-		final ObjectMapping flattenedObject;
-		final ObjectMapping nestedObject;
+		final ObjectBinding flattenedObject;
+		final ObjectBinding nestedObject;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			fieldModel = mapField(
 					root, "",
 					c -> c.aggregable( Aggregable.YES )
@@ -836,17 +798,17 @@ public class SingleFieldAggregationBaseIT<F> {
 					c -> c.aggregable( Aggregable.NO )
 			);
 
-			flattenedObject = new ObjectMapping( root, "flattenedObject", ObjectFieldStorage.FLATTENED );
-			nestedObject = new ObjectMapping( root, "nestedObject", ObjectFieldStorage.NESTED );
+			flattenedObject = new ObjectBinding( root, "flattenedObject", ObjectFieldStorage.FLATTENED );
+			nestedObject = new ObjectBinding( root, "nestedObject", ObjectFieldStorage.NESTED );
 		}
 	}
 
-	private class ObjectMapping {
+	private class ObjectBinding {
 		final String relativeFieldName;
 		final IndexObjectFieldReference self;
 		final FieldModel<F> fieldModel;
 
-		ObjectMapping(IndexSchemaElement parent, String relativeFieldName, ObjectFieldStorage storage) {
+		ObjectBinding(IndexSchemaElement parent, String relativeFieldName, ObjectFieldStorage storage) {
 			this.relativeFieldName = relativeFieldName;
 			IndexSchemaObjectField objectField = parent.objectField( relativeFieldName, storage );
 			self = objectField.toReference();
@@ -856,10 +818,10 @@ public class SingleFieldAggregationBaseIT<F> {
 		}
 	}
 
-	private class RawFieldCompatibleIndexMapping {
+	private class RawFieldCompatibleIndexBinding {
 		final FieldModel<F> fieldWithConverterModel;
 
-		RawFieldCompatibleIndexMapping(IndexSchemaElement root) {
+		RawFieldCompatibleIndexBinding(IndexSchemaElement root) {
 			/*
 			 * Add a field with the same name as the fieldWithConverterModel from IndexMapping,
 			 * but with an incompatible projection converter.
@@ -881,8 +843,8 @@ public class SingleFieldAggregationBaseIT<F> {
 		}
 	}
 
-	private class IncompatibleIndexMapping {
-		IncompatibleIndexMapping(IndexSchemaElement root) {
+	private class IncompatibleIndexBinding {
+		IncompatibleIndexBinding(IndexSchemaElement root) {
 			/*
 			 * Add a field with the same name as the fieldModel from IndexMapping,
 			 * but with an incompatible type.
@@ -892,10 +854,10 @@ public class SingleFieldAggregationBaseIT<F> {
 		}
 	}
 
-	private class MultiValuedIndexMapping {
+	private class MultiValuedIndexBinding {
 		final FieldModel<F> fieldModel;
 
-		MultiValuedIndexMapping(IndexSchemaElement root) {
+		MultiValuedIndexBinding(IndexSchemaElement root) {
 			fieldModel = mapMultiValuedField(
 					root, "",
 					c -> c.aggregable( Aggregable.YES )

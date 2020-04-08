@@ -37,7 +37,8 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.TckConf
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.ValueWrapper;
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.impl.integrationtest.common.assertion.SearchResultAssert;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+
 import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -57,8 +58,6 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 @Parameterized.UseParametersRunnerFactory(SingleInstanceRunnerWithParameters.Factory.class)
 public class TermsAggregationSpecificsIT<F> {
-
-	private static final String INDEX_NAME = "IndexName";
 
 	private static final String AGGREGATION_NAME = "aggregationName";
 
@@ -86,8 +85,7 @@ public class TermsAggregationSpecificsIT<F> {
 	private final List<F> valuesInDescendingDocumentCountOrder;
 	private final Map<F, List<String>> documentIdPerTerm;
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( "Main", IndexBinding::new );
 
 	public TermsAggregationSpecificsIT(FieldTypeDescriptor<F> typeDescriptor) {
 		this.typeDescriptor = typeDescriptor;
@@ -128,13 +126,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 	@BeforeAll
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 
 		initData();
 	}
@@ -147,7 +139,7 @@ public class TermsAggregationSpecificsIT<F> {
 	}
 
 	private <S> void doTestSuperClassFieldType(Class<S> superClass) {
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModel.relativeFieldName;
 
 		AggregationKey<Map<S, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
@@ -170,14 +162,14 @@ public class TermsAggregationSpecificsIT<F> {
 	 */
 	@Test
 	public void predicate() {
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModel.relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		Map.Entry<F, List<String>> firstTermEntry = documentIdPerTerm.entrySet().iterator().next();
 
 		SearchResultAssert.assertThat(
-				indexManager.createScope().query()
+				index.createScope().query()
 						.where( f -> f.id()
 								.matching( firstTermEntry.getValue().get( 0 ) )
 								.matching( firstTermEntry.getValue().get( 1 ) )
@@ -199,7 +191,7 @@ public class TermsAggregationSpecificsIT<F> {
 	 */
 	@Test
 	public void limitAndOffset() {
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModel.relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
@@ -220,7 +212,7 @@ public class TermsAggregationSpecificsIT<F> {
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testDefaultSortOrderIsCount")
 	public void order_default() {
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModel.relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
@@ -243,7 +235,7 @@ public class TermsAggregationSpecificsIT<F> {
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testCountSortOrderDesc")
 	public void orderByCountDescending() {
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModel.relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
@@ -270,7 +262,7 @@ public class TermsAggregationSpecificsIT<F> {
 	public void orderByCountAscending() {
 		assumeNonDefaultOrdersSupported();
 
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModel.relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
@@ -296,7 +288,7 @@ public class TermsAggregationSpecificsIT<F> {
 	public void orderByTermDescending() {
 		assumeNonDefaultOrdersSupported();
 
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModel.relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
@@ -323,7 +315,7 @@ public class TermsAggregationSpecificsIT<F> {
 	public void orderByTermAscending() {
 		assumeNonDefaultOrdersSupported();
 
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModel.relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
@@ -348,7 +340,7 @@ public class TermsAggregationSpecificsIT<F> {
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testZeroCountsExcluded")
 	public void minDocumentCount_positive() {
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModel.relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
@@ -376,14 +368,14 @@ public class TermsAggregationSpecificsIT<F> {
 	@Test
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testZeroCountsIncluded")
 	public void minDocumentCount_zero() {
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModel.relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		Map.Entry<F, List<String>> firstTermEntry = documentIdPerTerm.entrySet().iterator().next();
 
 		SearchResultAssert.assertThat(
-				indexManager.createScope().query()
+				index.createScope().query()
 						// Exclude documents containing the first term from matches
 						.where( f -> f.matchAll().except(
 								f.id().matchingAny( firstTermEntry.getValue() )
@@ -410,12 +402,12 @@ public class TermsAggregationSpecificsIT<F> {
 
 	@Test
 	public void minDocumentCount_zero_noMatch() {
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModel.relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
-				indexManager.createScope().query()
+				index.createScope().query()
 						// Exclude all documents from the matches
 						.where( f -> f.id().matching( "none" ) )
 						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, typeDescriptor.getJavaType() )
@@ -440,12 +432,12 @@ public class TermsAggregationSpecificsIT<F> {
 	public void minDocumentCount_zero_noMatch_orderByTermDescending() {
 		assumeNonDefaultOrdersSupported();
 
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModel.relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
 		SearchResultAssert.assertThat(
-				indexManager.createScope().query()
+				index.createScope().query()
 						// Exclude all documents from the matches
 						.where( f -> f.id().matching( "none" ) )
 						.aggregation( aggregationKey, f -> f.terms().field( fieldPath, typeDescriptor.getJavaType() )
@@ -469,10 +461,10 @@ public class TermsAggregationSpecificsIT<F> {
 
 	@Test
 	public void minDocumentCount_negative() {
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModel.relativeFieldName;
 
 		Assertions.assertThatThrownBy( () ->
-				indexManager.createScope().aggregation().terms().field( fieldPath, typeDescriptor.getJavaType() )
+				index.createScope().aggregation().terms().field( fieldPath, typeDescriptor.getJavaType() )
 						.minDocumentCount( -1 ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'minDocumentCount'" )
@@ -483,7 +475,7 @@ public class TermsAggregationSpecificsIT<F> {
 	@TestForIssue(jiraKey = "HSEARCH-776")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.SimpleFacetingTest.testMaxFacetCounts")
 	public void maxTermCount_positive() {
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModel.relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
@@ -514,7 +506,7 @@ public class TermsAggregationSpecificsIT<F> {
 	public void maxTermCount_positive_orderByTermAscending() {
 		assumeNonDefaultOrdersSupported();
 
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModel.relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
@@ -542,7 +534,7 @@ public class TermsAggregationSpecificsIT<F> {
 	public void maxTermCount_positive_orderByCountAscending() {
 		assumeNonDefaultOrdersSupported();
 
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModel.relativeFieldName;
 
 		AggregationKey<Map<F, Long>> aggregationKey = AggregationKey.of( AGGREGATION_NAME );
 
@@ -568,10 +560,10 @@ public class TermsAggregationSpecificsIT<F> {
 
 	@Test
 	public void maxTermCount_zero() {
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModel.relativeFieldName;
 
 		Assertions.assertThatThrownBy( () ->
-				indexManager.createScope().aggregation().terms().field( fieldPath, typeDescriptor.getJavaType() )
+				index.createScope().aggregation().terms().field( fieldPath, typeDescriptor.getJavaType() )
 						.maxTermCount( 0 ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'maxTermCount'" )
@@ -580,10 +572,10 @@ public class TermsAggregationSpecificsIT<F> {
 
 	@Test
 	public void maxTermCount_negative() {
-		String fieldPath = indexMapping.fieldModel.relativeFieldName;
+		String fieldPath = index.binding().fieldModel.relativeFieldName;
 
 		Assertions.assertThatThrownBy( () ->
-				indexManager.createScope().aggregation().terms().field( fieldPath, typeDescriptor.getJavaType() )
+				index.createScope().aggregation().terms().field( fieldPath, typeDescriptor.getJavaType() )
 						.maxTermCount( -1 ) )
 				.isInstanceOf( IllegalArgumentException.class )
 				.hasMessageContaining( "'maxTermCount'" )
@@ -591,7 +583,7 @@ public class TermsAggregationSpecificsIT<F> {
 	}
 
 	private SearchQueryOptionsStep<?, DocumentReference, ?, ?, ?> matchAllQuery() {
-		return indexManager.createScope().query().where( f -> f.matchAll() );
+		return index.createScope().query().where( f -> f.matchAll() );
 	}
 
 	private void assumeNonDefaultOrdersSupported() {
@@ -602,14 +594,14 @@ public class TermsAggregationSpecificsIT<F> {
 	}
 
 	private void initData() {
-		IndexIndexingPlan<?> plan = indexManager.createIndexingPlan();
+		IndexIndexingPlan<?> plan = index.createIndexingPlan();
 		int documentCount = 0;
 		for ( Map.Entry<F, List<String>> entry : documentIdPerTerm.entrySet() ) {
 			F value = entry.getKey();
 			for ( String documentId : entry.getValue() ) {
 				plan.add( referenceProvider( documentId ), document -> {
-					document.addValue( indexMapping.fieldModel.reference, value );
-					document.addValue( indexMapping.fieldWithConverterModel.reference, value );
+					document.addValue( index.binding().fieldModel.reference, value );
+					document.addValue( index.binding().fieldWithConverterModel.reference, value );
 				} );
 				++documentCount;
 			}
@@ -620,7 +612,7 @@ public class TermsAggregationSpecificsIT<F> {
 
 		// Check that all documents are searchable
 		SearchResultAssert.assertThat(
-				indexManager.createScope().query()
+				index.createScope().query()
 						.where( f -> f.matchAll() )
 						.toQuery()
 		)
@@ -649,12 +641,12 @@ public class TermsAggregationSpecificsIT<F> {
 				.containsExactlyInAnyOrder( normalize( expected ).toArray( new Map.Entry[0] ) );
 	}
 
-	private class IndexMapping {
+	private class IndexBinding {
 		final FieldModel<F> fieldModel;
 		final FieldModel<F> fieldWithConverterModel;
 		final FieldModel<F> fieldWithAggregationDisabledModel;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			fieldModel = mapField(
 					root, "",
 					c -> c.aggregable( Aggregable.YES )
