@@ -22,7 +22,8 @@ import org.hibernate.search.integrationtest.backend.tck.testsupport.util.Standar
 import org.hibernate.search.integrationtest.backend.tck.testsupport.util.rule.SearchSetupHelper;
 import org.hibernate.search.util.common.SearchException;
 import org.hibernate.search.util.impl.integrationtest.common.FailureReportUtils;
-import org.hibernate.search.util.impl.integrationtest.mapper.stub.StubMappingIndexManager;
+import org.hibernate.search.util.impl.integrationtest.mapper.stub.SimpleMappedIndex;
+
 import org.assertj.core.api.Assertions;
 import org.hibernate.search.util.impl.test.annotation.PortedFromSearch5;
 import org.hibernate.search.util.impl.test.annotation.TestForIssue;
@@ -41,8 +42,6 @@ import org.junit.runners.Parameterized;
 @RunWith(Parameterized.class)
 @Parameterized.UseParametersRunnerFactory(SingleInstanceRunnerWithParameters.Factory.class)
 public class SingleFieldAggregationUnsupportedTypesIT<F> {
-
-	private static final String INDEX_NAME = "IndexName";
 
 	@Parameterized.Parameters(name = "{0} - {1}")
 	public static Object[][] aggregationTypeCombinations() {
@@ -70,8 +69,7 @@ public class SingleFieldAggregationUnsupportedTypesIT<F> {
 
 	private final UnsupportedSingleFieldAggregationExpectations expectations;
 
-	private IndexMapping indexMapping;
-	private StubMappingIndexManager indexManager;
+	private SimpleMappedIndex<IndexBinding> index = SimpleMappedIndex.of( "Main", IndexBinding::new );
 
 	public SingleFieldAggregationUnsupportedTypesIT(AggregationDescriptor thisIsJustForTestName,
 			FieldTypeDescriptor<F> typeDescriptor,
@@ -82,24 +80,18 @@ public class SingleFieldAggregationUnsupportedTypesIT<F> {
 
 	@BeforeAll
 	public void setup() {
-		setupHelper.start()
-				.withIndex(
-						INDEX_NAME,
-						ctx -> this.indexMapping = new IndexMapping( ctx.getSchemaElement() ),
-						indexManager -> this.indexManager = indexManager
-				)
-				.setup();
+		setupHelper.start().withIndex( index ).setup();
 	}
 
 	@Test
 	@TestForIssue(jiraKey = "HSEARCH-1748")
 	@PortedFromSearch5(original = "org.hibernate.search.test.query.facet.RangeFacetingTest.testRangeQueryWithUnsupportedType")
 	public void simple() {
-		FieldModel<F> model = indexMapping.fieldModel;
+		FieldModel<F> model = index.binding().fieldModel;
 		String fieldPath = model.relativeFieldName;
 
 		Assertions.assertThatThrownBy(
-				() -> expectations.trySetup( indexManager.createScope().aggregation(), fieldPath )
+				() -> expectations.trySetup( index.createScope().aggregation(), fieldPath )
 		)
 				.isInstanceOf( SearchException.class )
 				// Example: Numeric aggregations (range) are not supported by this field's type
@@ -116,10 +108,10 @@ public class SingleFieldAggregationUnsupportedTypesIT<F> {
 				.map( parent, prefix + typeDescriptor.getUniqueName(), additionalConfiguration );
 	}
 
-	private class IndexMapping {
+	private class IndexBinding {
 		final FieldModel<F> fieldModel;
 
-		IndexMapping(IndexSchemaElement root) {
+		IndexBinding(IndexSchemaElement root) {
 			fieldModel = mapField(
 					root, "",
 					c -> { }
